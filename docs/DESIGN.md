@@ -366,24 +366,48 @@ PlanInput ─► rr-hazards ─► [HazardProfile] ─► rr-consequence ─► 
 Hard rules (also in `CLAUDE.md`): deterministic; no wall clock; no OS entropy; no `rand`; all engine
 crates compile for `wasm32-unknown-unknown`; `#![forbid(unsafe_code)]`.
 
-## 6. Data layer *(confirm against research)*
+## 6. Data layer
 
-Packs are versioned, checksummed files under `data/`, produced only by `rr-etl`, described in
-`data/manifest.json` (source URL, retrieval date, sha256, licence, row counts). Raw downloads are never
-committed.
+Grounded in `docs/research/data-sources.md` (2026-09-25, sizes measured). Packs are versioned,
+checksummed files under `data/`, produced only by `rr-etl`, described in `data/manifest.json`
+(source URL as fetched, version label, retrieval timestamp, sha256, licence and obligations, rows).
+Raw downloads are never committed. Output is deterministic so a refresh with unchanged inputs is a
+byte-identical pack.
 
 | Pack | Contents | Load | Size target |
 | --- | --- | --- | --- |
-| `core` | County table (3,1xx rows: NRI per-hazard annualised frequency, exposure, EAL, SVI, resilience; state; NCA region; coastal/tsunami flags), ZIP -> county crosswalk, climate multipliers, national base rates, facility proximity flags | at start | ≤ 3 MB gzipped |
-| `geo` | County boundaries (Census-derived TopoJSON) for the map thumbnail | lazy | ≤ 1 MB gzipped |
-| `tract` | Census-tract NRI for finer location | lazy, later | tens of MB, chunked by state |
+| `core` | NRI v1.20 counties trimmed to the model's fields (3,232 rows incl. Connecticut's 9 planning regions); ZIP -> county shares (33,791 ZCTAs); county outage statistics derived from ORNL EAGLE-I 2014–2025; per-county event rates from HURDAT2, SPC and NOAA Storm Events; USGS seismic exceedance at county centroids; NCA5 Atlas / CMRA climate ratios; NFIP flood-zone share and claims; nuclear-site distance, TRI and high-hazard-dam counts; Census Community Resilience Estimates and CDC SVI; national base rates with sources | at start | ≤ 5 MB gzipped (research estimate 3.5–4.5) |
+| `geo` | County boundaries (Census 2024 cartographic 1:20m, 3-decimal coordinates) for the map thumbnail and click-to-select | lazy | ≤ 0.35 MB gzipped |
+| `tract` | Census-tract NRI per state (median 0.3 MB, California 2 MB) | lazy, later | 23 MB for all states |
 
-Refresh: `.github/workflows/data-refresh.yml` runs quarterly and opens a PR; `rr-cli data verify`
-checks checksums and row counts; the About screen shows pack versions.
+Rules learned from the research:
 
-Privacy: ZIP -> county is a bundled table; no geocoder is called. County boundaries are bundled.
-An optional online flood-zone point lookup, if added, is behind consent that names FEMA as the
-recipient.
+- **The National Risk Index has terms of use beyond public domain.** They forbid reverse
+  engineering or deriving the underlying datasets, require a citation naming the dataset version and
+  access date plus a "uses NRI data but is not endorsed by FEMA" statement, forbid presenting
+  modified data as FEMA's, and let FEMA rescind use. We comply: the app ships only the trimmed
+  per-county fields the model needs (never the raw tables), shows the disclaimer with version and date
+  on the About screen and in the packet's sources, and states plainly which numbers are ours. This was
+  flagged to the owner on 2026-09-25.
+- **NRI v1.20 changed meaning.** Riverine flooding became inland flooding (`IFLD`), social
+  vulnerability now comes from Census Community Resilience Estimates, and `AFREQ` is an event count
+  for some hazards and a probability for wildfire. Per-hazard semantics ship in
+  `data/core/nri_semantics.toml`; `rr-hazards` never guesses.
+- **ZIP codes are ambiguous**: 30 % of ZCTAs span more than one county. When no county holds 80 % of
+  a ZIP the engine returns `ambiguous_zip` with the candidates and the UI asks.
+- **Connecticut** uses planning-region FIPS (091xx) in NRI and Census 2024 but old counties (090xx) in
+  the ZIP relationship file and CMRA; the ETL applies a crosswalk so every pack joins.
+- **No live federal endpoints at runtime.** fema.gov blocks scripted clients, the Census API needs a
+  key, several sources were withdrawn in 2025. Everything is precomputed; the only optional online
+  lookups (flood zone by snapped grid cell, NWS alerts by county) are consented, and none is needed
+  for the plan.
+- **Do not bundle** GEM (non-commercial share-alike), rmpmap (share-alike), First Street or
+  PowerOutage.us. Credit lines are required for EAGLE-I and the NCA5 Atlas (CC BY 4.0); the app's
+  About screen lists every attribution from `EngineInfo.attributions`.
+
+Refresh: `.github/workflows/data-refresh.yml` runs quarterly and opens a PR; `rr-etl verify` checks
+checksums, row counts and that every county FIPS joins across packs; the About screen shows pack
+versions and dates so a stale snapshot is obvious.
 
 ## 7. Content layer
 
@@ -464,6 +488,7 @@ guidance beyond safe storage and training pointers.
 ## 14. Decision log (append only)
 
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
+- 2026-09-25 — Data-source research folded into §6: NRI terms and v1.20 semantics, 5 MB core budget, ZIP ambiguity rule (`ambiguous_zip`), Connecticut crosswalk, no runtime federal calls, `EngineInfo.attributions`.
 - 2026-09-25 — Prior-art and behavioural research folded in (§2 additions): three water levels,
   housing duration modifiers, two-tier relief rating, stage/confidence questions, drills as readiness
   items, kcal/litre planning, scored community items, firearm free-action wording, bundled snapshot.
