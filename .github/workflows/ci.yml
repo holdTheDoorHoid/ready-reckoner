@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  workflows-parse:
+    name: Workflow files parse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse every workflow file as YAML
+        run: |
+          python3 - <<'PY'
+          import glob, sys, yaml
+          bad = 0
+          for f in sorted(glob.glob('.github/workflows/*.yml')):
+              try:
+                  yaml.safe_load(open(f))
+                  print('ok ', f)
+              except Exception as e:
+                  bad += 1
+                  print('BAD', f, e)
+          sys.exit(1 if bad else 0)
+          PY
+
+  rust:
+    name: Rust (fmt, clippy, test)
+    runs-on: ubuntu-latest
+    needs: workflows-parse
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+
+  wasm:
+    name: WebAssembly build
+    runs-on: ubuntu-latest
+    needs: workflows-parse
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Build engine crates for wasm32 (native-only crates excluded)
+        run: cargo build --target wasm32-unknown-unknown --workspace --exclude rr-cli --exclude rr-etl
+
+  web:
+    name: Web (check, test, build)
+    runs-on: ubuntu-latest
+    needs: workflows-parse
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npm test -- --run --maxWorkers=2 --passWithNoTests
+      - run: npm run build

@@ -1,0 +1,39 @@
+name: Refresh data packs
+
+# Quarterly: re-run the ETL against the federal sources and open a pull request with the new packs
+# and provenance manifest. Nothing merges automatically; a human reads the diff summary.
+on:
+  schedule:
+    - cron: '0 6 1 1,4,7,10 *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Run the ETL
+        run: cargo run --release -p rr-etl -- refresh --out data
+      - name: Open a pull request if anything changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- data; then
+            echo "No data changes."; exit 0
+          fi
+          branch="data-refresh-$(date -u +%Y-%m-%d)"
+          git config user.name "ready-reckoner-bot"
+          git config user.email "noreply@github.com"
+          git checkout -b "$branch"
+          git add data
+          git commit -m "data: quarterly refresh $(date -u +%Y-%m-%d)"
+          git push -u origin "$branch"
+          gh pr create --title "Data refresh $(date -u +%Y-%m-%d)" \
+            --body "Automated quarterly ETL run. Review data/manifest.json for source changes and data/CHANGES.md for the summary." \
+            --base main --head "$branch"

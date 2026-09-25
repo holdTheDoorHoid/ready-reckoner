@@ -1,0 +1,25 @@
+# Rust
+/target
+**/target
+Cargo.lock.bak
+
+# Web
+web/node_modules
+web/dist
+web/public/pkg
+web/.vite
+web/coverage
+
+# Data: raw downloads are never committed; only the built packs + manifest are
+data/raw/
+data/tmp/
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea
+.vscode/settings.json
+
+# Local env
+.env
+.env.*

@@ -1,0 +1,22 @@
+{
+  "planning_date": "2026-10-01",
+  "location": { "country": "US", "zip": "60637", "setting": "urban" },
+  "housing": {
+    "kind": "apartment_low_rise", "tenure": "rent", "floor": 3, "basement": false,
+    "water": "municipal", "sewer": "sewer", "heating": "gas", "cooling": "window",
+    "backup_power": "none", "alarms": { "smoke": true, "co": true, "extinguisher": false }
+  },
+  "people": [
+    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": ["vegetarian"], "epinephrine": false }, "earner": false, "commute": { "distance_km": 3, "mode": "bike", "remote_possible": true } }
+  ],
+  "pets": { "dogs": 0, "cats": 0, "small": 0, "large_animals": 0 },
+  "mobility": { "vehicles": [] },
+  "finances": {
+    "monthly_budget_usd": 0, "one_off_budget_usd": 0,
+    "emergency_fund_months": 0, "monthly_expenses_usd": 1400,
+    "income": { "earners": 0, "stability": "variable" },
+    "insurance": { "home_or_renters": false, "flood": false, "earthquake": false }
+  },
+  "existing": [],
+  "dials": { "confidence": "nine_in_ten", "climate": "today", "horizon_years": 10 }
+}

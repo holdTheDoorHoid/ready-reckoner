@@ -1,0 +1,22 @@
+{
+  "planning_date": "2026-10-01",
+  "location": { "country": "US", "zip": "33139", "setting": "urban" },
+  "housing": {
+    "kind": "apartment_high_rise", "tenure": "own", "floor": 14, "basement": false,
+    "water": "municipal", "sewer": "sewer", "heating": "electric_resistance", "cooling": "central",
+    "backup_power": "none", "alarms": { "smoke": true, "co": false, "extinguisher": false }
+  },
+  "people": [
+    { "age_band": "senior", "pregnant_or_nursing": false, "medical": { "daily_rx": true, "refrigerated_rx": true, "powered_device": "none", "mobility": "limited", "dietary": ["low_sodium"], "epinephrine": false }, "earner": false }
+  ],
+  "pets": { "dogs": 0, "cats": 1, "small": 0, "large_animals": 0 },
+  "mobility": { "vehicles": [ { "fuel": "gas" } ] },
+  "finances": {
+    "monthly_budget_usd": 100, "one_off_budget_usd": 0,
+    "emergency_fund_months": 12, "monthly_expenses_usd": 3000,
+    "income": { "earners": 0, "stability": "stable" },
+    "insurance": { "home_or_renters": true, "flood": true, "earthquake": false }
+  },
+  "existing": [],
+  "dials": { "confidence": "nine_in_ten", "climate": "y2050", "horizon_years": 10 }
+}

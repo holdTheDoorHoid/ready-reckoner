@@ -1,0 +1,26 @@
+{
+  "planning_date": "2026-10-01",
+  "location": { "country": "US", "county_fips": "20051", "setting": "rural" },
+  "housing": {
+    "kind": "rural_property", "tenure": "own", "floor": 1, "basement": true,
+    "water": "well", "sewer": "septic", "heating": "propane", "cooling": "central",
+    "backup_power": "none", "alarms": { "smoke": true, "co": true, "extinguisher": true }
+  },
+  "people": [
+    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 0, "mode": "walk", "remote_possible": false } },
+    { "age_band": "adult", "pregnant_or_nursing": true, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 35, "mode": "car", "remote_possible": false } },
+    { "age_band": "teen", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": true }, "earner": false },
+    { "age_band": "child", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": false },
+    { "age_band": "toddler", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": false }
+  ],
+  "pets": { "dogs": 2, "cats": 3, "small": 0, "large_animals": 12 },
+  "mobility": { "vehicles": [ { "fuel": "gas" }, { "fuel": "diesel" } ] },
+  "finances": {
+    "monthly_budget_usd": 80, "one_off_budget_usd": 0,
+    "emergency_fund_months": 1, "monthly_expenses_usd": 5200,
+    "income": { "earners": 2, "stability": "seasonal" },
+    "insurance": { "home_or_renters": true, "flood": false, "earthquake": false }
+  },
+  "existing": [ { "item_id": "generator_portable", "qty": 0 } ],
+  "dials": { "confidence": "nine_in_ten", "climate": "today", "horizon_years": 10 }
+}

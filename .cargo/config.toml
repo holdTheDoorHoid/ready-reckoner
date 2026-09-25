@@ -1,0 +1,5 @@
+# Shared machine: several agents build at once on 8 cores / 15 GB.
+# Incremental is OFF on purpose (incompatible with the shared sccache; see CLAUDE.md).
+[build]
+jobs = 3
+incremental = false
