@@ -20,5 +20,5 @@
     "insurance": { "home_or_renters": true, "flood": false, "earthquake": false }
   },
   "existing": [],
-  "dials": { "confidence": "nineteen_in_twenty", "climate": "y2050", "horizon_years": 10 }
+  "dials": { "return_period": "one_in_50", "climate": "y2050", "horizon_years": 10 }
 }

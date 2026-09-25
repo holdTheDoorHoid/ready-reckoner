@@ -19,5 +19,5 @@
     "insurance": { "home_or_renters": true, "flood": false, "earthquake": false }
   },
   "existing": [ { "item_id": "water_stored", "qty": 20 } ],
-  "dials": { "confidence": "nineteen_in_twenty", "climate": "today", "horizon_years": 10 }
+  "dials": { "return_period": "one_in_500", "climate": "today", "horizon_years": 10 }
 }
