@@ -57,6 +57,40 @@ Planner decisions taken with the owner's delegated design judgement:
 - Social capital (neighbours, CERT, mutual aid) is a first-class plan item.
 - UI framework: Svelte 5 (the app is forms and lists); mock engine first behind the same contract.
 
+Additions from the prior-art and behavioural research (`docs/research/prior-art-and-psychology.md`,
+2026-09-25):
+
+- **Three water levels.** Official figures range from 2 to 15 L per person per day because they
+  measure different things. The app shows survival (about 3 L), basic (about 4 L, one US gallon,
+  the default) and comfortable (about 15 L, the Sphere domestic minimum), explains the difference,
+  and lets the user choose (`Dials.water_level`).
+- **Housing modifies duration.** Upper floors extend self-sufficiency targets for water and
+  evacuation (Tokyo's stockpile guidance uses 7 days above the low floors versus 3), wells and septic
+  tie water to power, mobile homes change the evacuate trigger. These are household modifiers in
+  `rr-consequence`, cited or tagged `Prior`.
+- **Two-tier relief rating** (from the Oregon Resilience Plan): for each bucket the app also shows
+  "when outside help plausibly arrives" and "when service is mostly restored" for the design event,
+  so "days on your own" has a story behind it (`BucketAssessment.relief`).
+- **Stage and confidence, tracked locally.** One optional question at the start ("Where are you
+  today?": haven't thought about it / thinking about it / have some things / have a plan / keeping it
+  up) tailors copy to the stage; one confidence question (1–5) is asked at the start and again after
+  the plan, so the app can show the change. FEMA's 2024 household survey found 60 % believe preparing
+  helps but only 43 % feel able to do it; building that confidence is the product's actual job.
+- **Drills and pre-commitments count.** If-then triggers ("if the county issues an evacuation
+  warning for our zone, we leave within 30 minutes"), a go/stay card, and ten-minute drills are
+  readiness items that count toward the `fire`, `evacuate` and `security` targets and appear in the
+  maintenance calendar.
+- **Calories and litres, never servings.** Food is planned in kcal (default 2,100 per adult-day) and
+  water in litres/gallons. The UI shows cost per 2,000 kcal and per gallon for food and water items,
+  because "30-day" retail kits were found to supply about 1,700 kcal a day.
+- **Neighbours are scored.** The community items (know two neighbours' numbers, agree who checks on
+  whom, join or form a block group / CERT) carry real risk-reduction weight in the allocator.
+- **Firearms free action** states the safe-storage and suicide-risk evidence in the neutral form
+  public-health bodies use, and nothing more.
+- **Bundled, versioned data snapshot; no live federal endpoints at runtime.** The National Risk
+  Index front end moved into another FEMA tool in 2025 and its Future Risk Index was withdrawn in
+  February 2025; other consumer risk sites disappeared the same year.
+
 ## 3. The model in five sentences
 
 Where you live gives each hazard a yearly chance; who you are changes what those hazards would do to
@@ -421,9 +455,17 @@ guidance beyond safe storage and training pointers.
   shown with wide ranges and low confidence, and the consequence-bucket design keeps their effect on
   the plan bounded.
 - **Price bands date.** They carry a retrieval date and the user's own prices override them.
+- **Federal risk data is moving and being withdrawn.** The NRI Future Risk Index is gone, so climate
+  multipliers come from NCA5 / CMRA, not from NRI; the ETL must tolerate URL changes and the manifest
+  must make a stale snapshot obvious. *(research)*
 - **Scope creep** toward a general prepping encyclopedia. The packet is the product; guidance blocks
   stay short and attached to a bucket, hazard or tier.
 
 ## 14. Decision log (append only)
 
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
+- 2026-09-25 — Prior-art and behavioural research folded in (§2 additions): three water levels,
+  housing duration modifiers, two-tier relief rating, stage/confidence questions, drills as readiness
+  items, kcal/litre planning, scored community items, firearm free-action wording, bundled snapshot.
+  Contract additions (optional fields): `Dials.water_level`, `PlanInput.stage`, `PlanInput.confidence_1to5`,
+  `BucketAssessment.relief`, `Item.energy_kcal_per_unit`, `Item.volume_l_per_unit`.
