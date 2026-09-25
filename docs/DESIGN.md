@@ -115,10 +115,12 @@ PlanInput {
   housing: Housing
   people: [Person]
   pets: Pets
-  mobility: Mobility                  # vehicles, commutes
+  mobility: Mobility                  # vehicles
   finances: Finances
-  existing: [Owned]                   # optional inventory {item_id, qty}
+  existing: [Owned]                   # baseline inventory {item_id, qty}
   dials: Dials
+  stage?: not_thought_about|thinking|have_some_things|have_a_plan|maintaining
+  confidence_1to5?: u8                # asked at the start and again after the plan
 }
 LocationInput { country: "US", zip?: "19147", county_fips?: "42101", setting: urban|suburban|rural }
 Housing {
@@ -148,9 +150,11 @@ Finances {
   insurance: { home_or_renters: bool, flood: bool, earthquake: bool }
 }
 Dials {
-  confidence: nine_in_ten|nineteen_in_twenty|ninety_nine_in_hundred    # design-event quantile
+  return_period: one_in_10|one_in_50|one_in_100|one_in_500     # default one_in_100; see §4.4
   climate: today|y2050
-  horizon_years: u8 = 10
+  horizon_years: u8 = 10                                       # for "in the next ten years" sentences
+  water_level: survival|basic|comfortable                      # default basic (≈ 1 US gal/person/day)
+  scenario_overrides: [{ id, on }]                             # named scenarios, e.g. cascadia_m9
 }
 ```
 
@@ -158,84 +162,151 @@ Dials {
 
 Natural (the 18 FEMA National Risk Index hazards): `avalanche`, `coastal_flooding`, `cold_wave`,
 `drought`, `earthquake`, `hail`, `heat_wave`, `hurricane`, `ice_storm`, `landslide`, `lightning`,
-`riverine_flooding`, `strong_wind`, `tornado`, `tsunami`, `volcanic_activity`, `wildfire`,
-`winter_weather`.
+`riverine_flooding` (NRI v1.20 "inland flooding"), `strong_wind`, `tornado`, `tsunami`,
+`volcanic_activity`, `wildfire`, `winter_weather`.
 
 Societal: `pandemic`, `grid_failure` (regional, multi-day, not weather-caused), `cyber_outage`
-(utility, payments, telecom), `civil_unrest`, `supply_chain_disruption`, `hazmat_release`,
-`nuclear_plant_incident`, `nuclear_attack` (includes EMP), `terrorism`.
+(utility, payments, pharmacy/insurer IT), `civil_unrest`, `supply_chain_disruption` (store shortages,
+pre-storm runs), `hazmat_release`, `nuclear_plant_incident`, `nuclear_attack` (includes EMP),
+`terrorism`.
 
 Personal: `job_loss`, `house_fire`, `medical_emergency`, `vehicle_stranding`, `local_utility_outage`
 (water main, boil-water notice, gas leak), `burglary`, `earner_death_or_disability`,
 `extended_household_illness`.
 
-Each hazard has, per location and dial setting:
+Named scenarios (decided per location by the engine, toggleable by the user): `cascadia_m9`,
+`new_madrid_m7`, `hayward_m7`, `local_tsunami`, `major_hurricane_direct_hit`. A scenario is a hazard
+whose single rate sits close to the dial and would otherwise make targets jump (§4.4).
+
+For each hazard the engine computes a **household event rate**
+
+    r_h = λ_h · a_h · m_h
+
+where λ_h is the county event rate (NRI annualised frequency for natural hazards, with per-hazard
+semantics from `data/core/nri_semantics.toml`; national base rates for personal and societal
+hazards), a_h is the footprint fraction (the chance this household is affected given a county event:
+derived from outage peak fractions for power, flood-zone share for floods, 1 for personal events,
+`Prior` otherwise), and m_h is the household modifier (§4.3). Every factor carries provenance and a
+range.
 
 ```
 HazardProfile {
-  id, annual_probability: f64,       # P(at least one household-significant event in a year)
-  severity: 0..1,                    # relative, for ranking and copy
-  eal_per_household_usd?: f64,       # where NRI gives it
-  climate_multiplier: f64,           # 1.0 for today
-  confidence: high|medium|low|prior,
-  sources: [CitationId]
+  id, name, tier: natural|societal|personal, display: ranked|rare_catastrophic,
+  rate_per_year: f64, rate_range: [lo, hi], annual_probability: f64, probability_range: [lo, hi],
+  severity: 0..1, eal_per_household_usd?: f64, climate_multiplier: f64,
+  confidence: high|medium|low|prior, sources: [CitationId], frequency_sentence, buckets: [BucketId]
 }
 ```
 
-Natural hazard probabilities come from the NRI annualised frequency and exposure fields (county
-level; tract later), cross-checked against USGS seismic, USFS wildfire and NOAA severe-weather
-climatologies *(confirm against research)*. Societal and personal probabilities come from national
-base rates adjusted by household and location factors (income stability for `job_loss`, housing type
-and alarms for `house_fire`, facility proximity for `hazmat_release` and `nuclear_plant_incident`,
-setting for `burglary`), each adjustment cited or labelled `prior`.
+`nuclear_attack`, `terrorism` and similar are `rare_catastrophic`: shown in their own box with
+likelihood and severity as two separate columns, never ranked by expected loss (a tiny probability
+times a huge loss would otherwise dominate the register).
 
 ### 4.3 Consequence buckets
 
-| id | Plain name | Target type | Typical drivers |
+Three kinds. Duration buckets are sized in days; readiness buckets are capabilities you either have or
+don't; money buckets are months of income gap or an insurance decision on a separate savings track.
+
+| id | Plain name | Kind | Typical drivers |
 | --- | --- | --- | --- |
-| `power` | No grid electricity | days | storms, ice, heat, grid failure, wildfire PSPS |
-| `water` | No safe tap water | days | floods, earthquakes, freezes, main breaks, boil-water notices |
-| `shelter_in_place` | Can't leave home; stores and roads closed | days | winter storms, pandemic, unrest, hazmat |
-| `evacuate` | Must leave home | notice hours + days away | wildfire, hurricane, flood, hazmat, tsunami |
-| `thermal` | Dangerous heat or cold indoors | days | heat wave, cold wave, outage in season |
-| `medical` | No EMS, pharmacy or hospital access | days | any large event; pandemic |
-| `income` | Loss of household income | months | job loss, pandemic, disability, disaster displacement |
-| `comms` | No phone or internet | days | storms, grid, cyber |
-| `supply_chain` | Shortages of everyday goods | weeks | pandemic, port/rail/fuel disruption, regional disaster |
-| `home_loss` | Home damaged or uninhabitable | one-off | fire, flood, tornado, earthquake, hurricane |
-| `fire` | House fire | readiness | cooking, heating, electrical |
-| `security` | Personal and home security | readiness | burglary, unrest, post-disaster opportunism |
+| `power` | No grid power at home | days | storms, ice, heat, grid failure, wildfire shutoffs |
+| `water_boil` | Tap water must be treated (boil notice; taps still run) | days | main breaks, floods, storms |
+| `water_out` | No tap water at all (pressure loss, do-not-use, quake) | days | earthquakes, freezes, hurricanes, wells without power |
+| `supplies` | Can't get to a store (can't go out, or shelves are empty) | days | winter storms, pandemic, curfews, pre-storm runs |
+| `thermal` | Dangerous heat or cold indoors | days | heat wave, cold wave, an outage in season |
+| `medication` | Medication and medical-supply continuity | days | any large event; pharmacy IT outage; pandemic |
+| `comms` | No phone, internet or card payments | days | storms, grid, cyber |
+| `evacuate` | Must leave home quickly | readiness: 10-year need, notice time, days away | wildfire, hurricane, flood, hazmat, tsunami, house fire |
+| `get_home` | Stranded away from home | readiness: 10-year need, distance | commute distance and mode |
+| `medical_emergency` | Medical emergency when help is slow | readiness | injury, illness; rural response times |
+| `fire` | House fire | readiness | cooking, heating, electrical; attached housing |
+| `security` | Home and personal security | readiness | burglary, unrest, post-disaster opportunism |
+| `income` | Loss of income | months of gap after unemployment insurance | job loss, pandemic, disability, displacement |
+| `home_loss` | Home damaged or uninhabitable | money + readiness (insurance, documents) | fire, flood, wind, quake |
 
 Each hazard maps to buckets with a conditional probability and a duration distribution:
 
 ```
-Effect { hazard, bucket, p_given_event: f64, duration: LogNormal{median_days, p90_days} | Fixed,
+Effect { hazard, bucket, p_given_event: f64,
+         duration: LogNormal{median_days, p90_days} | Fixed{days},   # σ = ln(p90/median)/1.2816
          evidence: empirical|prior, sources: [CitationId] }
 ```
 
-Empirical durations come from outage restoration statistics (EAGLE-I, utility reliability reports),
-boil-water-notice records, displacement studies and pandemic stay-home data where they exist; the
-rest are labelled priors *(confirm against research)*.
+Empirical durations come from outage restoration statistics (EAGLE-I county curves: median = time to
+50 % restored, bad case = time to 90 % restored), boil-water-notice records (Texas, Kentucky), Hazus
+restoration tables, the Oregon Resilience Plan, displacement surveys and 2020 stay-home durations
+(median 45 days). The rest are `Prior`, labelled as such, and the app shows "why we think this" with
+a user override. `docs/research/risk-model.md` §2.4 holds the default table.
 
-### 4.4 The design event
+**Coupling rules** (household modifiers, each one line, each explainable): a private well with an
+electric pump makes every power event a `water_out` event; a high-rise above the booster-pump floors
+does the same and ties mobility to elevators; a gas furnace needs power for `thermal` cold; a gas
+stove covers `water_boil` while gas flows; a wood stove with fuel covers `thermal` cold; refrigerated
+medication inherits power events longer than about a day; a powered medical device triples the harm
+weight of `power`; age 65+ raises the `thermal` harm weight; infants raise water need by half and add
+a formula line; renters cannot install generators and face more permanent displacement; attached
+housing doubles neighbour-fire exposure; no vehicle changes evacuation mode and lead time; commute
+distance sizes the get-home bag (walking at about 3 mph); income stability scales job-loss incidence
+(×0.5 tenured/public, ×1 typical, ×1.5–2 gig/seasonal); rural addresses raise the value of first-aid
+capability.
 
-For bucket *b*, horizon *H* years, and hazard *h* with annual probability *p_h*, the expected number
-of *b*-consequences from *h* in *H* years is λ_h = H · p_h · q_{h,b}. Treating events as a Poisson
-process with independent durations drawn from F_{h,b}, the chance that no event in *H* years lasts
-longer than *d* days is
+### 4.4 The exceedance curve and the design event
 
-    P(max ≤ d) = exp( − Σ_h λ_h · (1 − F_{h,b}(d)) )
+For bucket *b* the central object is
 
-The **target** for bucket *b* is the smallest *d* with P(max ≤ d) ≥ c, where *c* is the confidence
-dial (0.90, 0.95, 0.99). This is closed-form apart from a monotone root find, so it is deterministic
-and fast enough to recompute on every dial change. Natural-frequency copy falls out of the same
-expression: "of 100 households like yours, about `100·(1 − exp(−Σ λ_h (1 − F_h(3))))` will face an
-outage longer than three days in the next ten years."
+    Λ_b(d) = Σ_h r_h · q_{h,b} · S_{h,b}(d)
 
-Targets are rounded up to the plan's tier boundaries for presentation and the raw value is kept for
-the expert view. `income` uses months and is driven mainly by `job_loss`, `pandemic` and
-`earner_death_or_disability`; `evacuate` reports notice time (minutes to hours) and days away;
-`fire` and `security` are readiness checklists, not durations.
+the expected number of times per year this household faces a *b*-disruption longer than *d* days.
+Because one event feeds several buckets, correlation between buckets is preserved automatically. From
+this one curve:
+
+1. **Target.** The dial is a return period *N*; the target is the smallest ladder value *d\** with
+   Λ_b(d\*) ≤ 1/N. The default, one-in-100, is close to "90 % sure nothing in the next ten years is
+   worse" (exp(−10 · Λ) = 0.9 gives Λ = 0.0105) and is the same one-percent-a-year yardstick behind
+   FEMA flood maps. In ordinary counties it reproduces official guidance (Philadelphia: about 3 days of
+   power and water, 10 days of food, 2 weeks of medication).
+
+   | Dial | Label | Annual rate | Chance in 10 years |
+   | --- | --- | --- | --- |
+   | one_in_10 | Common disruptions | 0.10 | 65 % |
+   | one_in_50 | Serious | 0.02 | 18 % |
+   | one_in_100 (default) | Very serious | 0.01 | 10 % |
+   | one_in_500 | Rare catastrophes | 0.002 | 2 % |
+
+2. **Natural frequencies.** Of 100 households like yours, `100 · (1 − exp(−T · Λ_b(d)))` will face a
+   disruption longer than *d* in the next *T* years.
+3. **Value of the x-th day of supplies** equals Λ_b(x): the marginal value of one more day is the
+   annual rate of events that outlast it. Diminishing returns fall out of the mathematics (for
+   Philadelphia water the first three days cover about 60 times more expected disruption-days than
+   days 30–33; for Coos Bay well water only 19 times, which is why the coast stores deeper).
+4. **Consumption** (for rotation and cost): Σ_h r_h q_{h,b} E[D] days per year.
+
+**Ranges.** Every rate and duration carries a stated uncertainty; the engine propagates it (seeded,
+deterministic; either an outer loop of parameter draws or one-at-a-time sensitivity) and reports the
+target as "about 3 days (2–5)", rounded to the ladder ½, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90,
+180, 365. The one or two parameters that drive the range are named.
+
+**The cliff rule.** When a single hazard's rate is within about a factor of three of the dial rate,
+targets jump between dial settings (Coos Bay well water: 14 days at one-in-50, 50 at one-in-100, 196
+at one-in-500). Then the engine: says so plainly ("your answer depends mostly on one event: a Cascadia
+earthquake"); exposes it as a **named scenario** (on by default where state guidance addresses it, as
+Oregon's two-weeks-minimum does); shows the plan with and without it; and prefers capabilities over
+stockpiles for the long tail (a filter plus a raw water source rather than 120 gallons).
+
+**Readiness buckets** use the 10-year need probability P = 1 − exp(−10 · Σ r): include the capability
+when P ≥ 2 % (`Prior` default) or when its value per dollar beats the current tier's best item.
+Notice time (minutes for tsunami and fire, hours for flash flood, days for hurricane) decides what
+the bag holds and where it lives.
+
+**Money buckets.** Income: each earner's spell rate (about 0.083 per year, scaled by stability) and a
+spell length distribution (median 10 weeks, bad case 36) net of unemployment insurance give
+Λ_income(months); the target is months of gap at the dial, reported as a savings goal on a separate
+track. Home loss: an insurance-and-documents decision plus a displacement-cost estimate, driven by the
+NRI loss ratio, flood-zone share, fire rate and displacement surveys. No stockpile target.
+
+**Two-tier relief rating.** For each duration bucket the engine also reports when outside help
+plausibly arrives and when service is mostly restored for the design event (Oregon Resilience Plan
+style), so "days on your own" has a story behind it.
 
 ### 4.5 Tiers
 
@@ -243,15 +314,15 @@ the expert view. `income` uses months and is driven mainly by `job_loss`, `pande
 | --- | --- | --- | --- |
 | `now` | Free actions | 0 | always, first |
 | `h72` | Three days | 3 | always |
-| `get_home` | Get-home bag | per commuter | any commute > 3 km or by transit |
-| `w2` | Two weeks | 14 | any bucket target > 3 days (almost everyone) |
-| `m1` | One month | 30 | any bucket target > 14 days, or `income` ≥ 1 month |
-| `m3` | Three months | 90 | `income` target ≥ 3 months or `supply_chain` ≥ 6 weeks |
-| `m6` | Six months | 180 | `income` target ≥ 6 months |
-| `y1` | One year | 365 | only when the user asks, or income/pandemic dials justify it |
+| `w2` | Two weeks | 14 | any duration target > 3 days (almost everyone) |
+| `m1` | One month | 30 | any duration target > 14 days |
+| `m3` | Three months | 90 | any duration target > 30 days; mostly the money track |
+| `m6` | Six months | 180 | any duration target > 90 days (named scenarios at cautious dials) |
+| `y1` | One year | 365 | only when a target exceeds 180 days or the user asks |
 
-The tier a household should reach is the maximum over buckets of the tier that covers each target.
-The plan says, per bucket, which tier is "enough" and stops there.
+The get-home bag is an item in the `get_home` bucket, unlocked right after the three-day basics. The
+tier a household should reach is the maximum over buckets of the tier that covers each target; the
+plan says, per bucket, which tier is enough and stops there.
 
 ### 4.6 Items and requirements
 
@@ -267,7 +338,7 @@ id = "water_stored"
 name = "Stored drinking water"
 category = "water"
 unit = "gallon"
-buckets = ["water"]
+buckets = ["water_out", "water_boil"]
 tier = "h72"
 free = false
 spec = "Commercially bottled water, or tap water in clean food-grade containers with tight lids, kept cool and dark."
@@ -275,6 +346,7 @@ look_for = ["Food-grade (HDPE #2 or PET #1) containers", "Sealed bottled water w
 avoid = ["Milk jugs (they leak and grow bacteria)", "Containers that held chemicals"]
 price_band_usd = { low = 0.0, high = 1.50, per = "gallon", note = "reused bottles are free; bottled water about $1 per gallon" }
 quantity_rule = "water_gallons"         # implemented in rr-supply
+volume_l_per_unit = 3.785
 maintenance = { rotate_months = 6 }
 citations = ["ready_gov_water", "cdc_water_storage"]
 hazard_extras = []
@@ -299,35 +371,52 @@ matter (`id`, `applies_to`, `citations`). The packet is assembled from them.
 
 ### 4.7 Budget allocation
 
-Uncovered risk for the household is
+The value of an item that moves bucket *b*'s coverage from *x* to *x + Δ* days, capped at the
+target, over a ten-year horizon is
 
-    R = Σ_b w_b · Σ_{d = covered_b + 1}^{target_b} P_b(need ≥ d days within H)
+    V = 10 · w_b · ∫_x^{min(x+Δ, target)} Λ_b(t) dt
 
-where *w_b* is a documented severity weight per bucket (water and medical highest, comms lowest)
-and P_b(need ≥ d) = 1 − exp(−Σ_h λ_h (1 − F_{h,b}(d))). Because P falls with *d*, the first day of a
-bucket is always worth more than the fourteenth: cheap early coverage floats to the top without
-special cases.
+expected weighted disruption-days covered per decade. Readiness items use
+V = 10 · w · r_need · (day-equivalents of harm avoided). Harm weights *w_b* (`Prior`, documented,
+shown in the expert view): water and a dependent's medication 3; thermal with a vulnerable member 2;
+food, power, communications 1; a powered medical device triples `power`. Because Λ falls with *d*,
+the first day of a bucket is always worth more than the fourteenth and cheap early coverage floats to
+the top without special cases. Baseline inventory sets the starting *x*.
 
-Each month the allocator: (1) applies every `free = true` action not yet done, ordered by ΔR;
-(2) repeatedly buys the (item, increment) with the highest ΔR per dollar that fits the remaining
-budget; (3) if the best item costs more than the month's budget, reserves toward it (an envelope) and
-says so. It stops when every bucket is covered to its target and reports "you are done for your
-risk; here is the maintenance calendar". The user's recorded actual prices replace the band midpoint.
+The allocator, each month: (1) month 0 applies every free action (documents, plan, contacts, alarm
+tests, refill-at-seven rule, water-heater reserve, neighbours) and updates coverage; (2) walks the
+tiers in order with each bucket's target capped at the tier horizon; (3) orders candidates life-safety
+first, then value per dollar, and buys the best affordable one; (4) **promotes** a cheap later-tier
+item whose value per dollar is at least five times the current tier's best (an extra week of a
+dependent's medication); (5) keeps a **sinking fund** when the best item costs up to twice the monthly
+budget and the affordable alternative is worth less than a quarter of it; (6) stops when no tier has a
+positive-value candidate and reports "you are done for your risk; here is the maintenance calendar",
+routing any surplus to the income savings track or suggesting a more cautious dial. Recorded actual
+prices replace band midpoints. A simultaneous-need check runs on the shared event list so a major
+hurricane is covered for power, water and food at the same time (this matters for storage space, not
+money).
+
+**Rare catastrophic hazards** get a budget cap: specialised items default to $0 and an opt-in allows
+at most 10 % of the monthly budget; the packet shows that the three-day and two-week supplies already
+cover the official "get inside, stay inside, stay tuned" sheltering phase.
 
 Guardrails (warn, never block): zero budget; a powered medical device with no power plan by month
-three; refrigerated medication with no cooling plan; no water at all after month one; a household
-with an evacuation-heavy profile and no go-bag; insurance gaps for owners in flood or quake zones.
+three; refrigerated medication with no cooling plan; no water at all after month one; an
+evacuation-heavy profile with no go-bag; insurance gaps for owners in flood or quake zones; a cliff
+(one scenario dominates the answer).
 
 ### 4.8 Outputs
 
 ```
 PlanOutput {
-  engine_version, data_pack_version, content_version,
+  engine_version, api_version, data_pack_version, content_version,
   location: LocationResolved,
-  register: [HazardProfile]            # ranked
-  buckets: [BucketAssessment]          # target, covered, contributions, frequency sentences
+  register: [HazardProfile]            # ranked, with rare_catastrophic items flagged for their own box
+  buckets: [BucketAssessment]          # target (with range), covered, tier_enough, contributions, relief, sentences
+  scenarios: [ScenarioInfo]            # named scenarios that apply here, on/off, effect summary
   tier_reached, tier_recommended,
-  plan: { months: [{ index, budget, actions: [PlanItem] }], done: bool, reserve: [Envelope] },
+  plan: { months: [{ index, budget, items: [PlanItem] }], done_month?, envelopes: [Envelope],
+          savings_track?: { target_months, target_usd, current_months, monthly_suggestion_usd, why } },
   requirements: [RequirementLine],
   warnings: [Warning],
   packet_markdown: String,             # the printable packet, sections in §9
@@ -488,6 +577,7 @@ guidance beyond safe storage and training pointers.
 ## 14. Decision log (append only)
 
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
+- 2026-09-25 — Risk-model research folded into §4: 14 buckets in three kinds (duration / readiness / money), water split into boil vs no-water, `supplies` replaces shelter_in_place + supply_chain, `get_home` and `medical_emergency` as readiness buckets; return-period dial (default one-in-100) with named-scenario toggles and the cliff rule; ranges and the day ladder; savings track for income; rare-catastrophic box and budget cap; harm weights; allocator promotion and sinking fund. `CountyRecord`, `BaseRate`, `HouseholdEventRate` added to the shared types as the data contract.
 - 2026-09-25 — Data-source research folded into §6: NRI terms and v1.20 semantics, 5 MB core budget, ZIP ambiguity rule (`ambiguous_zip`), Connecticut crosswalk, no runtime federal calls, `EngineInfo.attributions`.
 - 2026-09-25 — Prior-art and behavioural research folded in (§2 additions): three water levels,
   housing duration modifiers, two-tier relief rating, stage/confidence questions, drills as readiness
