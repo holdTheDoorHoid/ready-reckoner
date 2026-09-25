@@ -320,7 +320,10 @@ style), so "days on your own" has a story behind it.
 | `m6` | Six months | 180 | any duration target > 90 days (named scenarios at cautious dials) |
 | `y1` | One year | 365 | only when a target exceeds 180 days or the user asks |
 
-The get-home bag is an item in the `get_home` bucket, unlocked right after the three-day basics. The
+No authority defines a one-month tier (Ready.gov says "several days", the Red Cross two weeks at home,
+Oregon and Washington two weeks, Germany ten days, the Church three months); `m1` is an interpolation
+and the plan says so once. The get-home bag is an item in the `get_home` bucket, unlocked right after
+the three-day basics. The
 tier a household should reach is the maximum over buckets of the tier that covers each target; the
 plan says, per bucket, which tier is enough and stops there.
 
@@ -577,6 +580,7 @@ guidance beyond safe storage and training pointers.
 ## 14. Decision log (append only)
 
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
+- 2026-09-25 — Supply-standards research folded in: constants registry with sources and disagreement notes (`docs/research/supply-standards.md` §13–§14); water 1 gal/person-day basic (¾ drinking), survival ≈ 3 L, comfortable 15 L, heat ×1.75–2; food in kcal by DGA age band with cost per person-day (pantry $8.44 USDA TFP Aug 2026; staples $2.15–2.85; freeze-dried $9–39 per 2,000 kcal); medication reserve 14 days (7–30); **antibiotics quantity 0 with a clinician card**; one-month tier is an interpolation.
 - 2026-09-25 — Risk-model research folded into §4: 14 buckets in three kinds (duration / readiness / money), water split into boil vs no-water, `supplies` replaces shelter_in_place + supply_chain, `get_home` and `medical_emergency` as readiness buckets; return-period dial (default one-in-100) with named-scenario toggles and the cliff rule; ranges and the day ladder; savings track for income; rare-catastrophic box and budget cap; harm weights; allocator promotion and sinking fund. `CountyRecord`, `BaseRate`, `HouseholdEventRate` added to the shared types as the data contract.
 - 2026-09-25 — Data-source research folded into §6: NRI terms and v1.20 semantics, 5 MB core budget, ZIP ambiguity rule (`ambiguous_zip`), Connecticut crosswalk, no runtime federal calls, `EngineInfo.attributions`.
 - 2026-09-25 — Prior-art and behavioural research folded in (§2 additions): three water levels,
