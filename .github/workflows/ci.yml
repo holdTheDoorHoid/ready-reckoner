@@ -73,5 +73,5 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - run: npm run check
-      - run: npm test -- --run --maxWorkers=2 --passWithNoTests
+      - run: npm test -- --run --maxWorkers=2
       - run: npm run build
