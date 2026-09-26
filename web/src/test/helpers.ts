@@ -2,6 +2,7 @@
 import { flushSync, mount, tick, unmount, type Component } from 'svelte';
 
 import type { Engine } from '../engine/index';
+import type { PackLoader } from '../engine/loader';
 import { createMockEngine } from '../engine/mock';
 import type { PlanInput } from '../engine/types';
 import { APP_CONTEXT, AppState } from '../lib/app.svelte';
@@ -67,20 +68,21 @@ export interface Rendered {
  */
 export async function render(
   Screen: Component,
-  options: { plan?: SavedPlan | null; route?: string; engine?: Engine; today?: string } = {},
+  options: { plan?: SavedPlan | null; route?: string; engine?: Engine; loader?: PackLoader | null; today?: string; waitForPlan?: boolean } = {},
 ): Promise<Rendered> {
   const storage = new MemoryStorage();
   if (options.plan) storage.setItem(STORAGE_KEY, JSON.stringify(options.plan));
   const app = new AppState({
     storage,
     engine: options.engine ?? createMockEngine(),
+    loader: options.loader ?? null,
     delay: 0,
     saveDelay: 0,
     today: () => options.today ?? '2026-10-01',
   });
   await app.init();
   flushSync();
-  if (app.plan) await until(() => !!app.result.output || !!app.result.error, 'the first assessment');
+  if (app.plan && options.waitForPlan !== false) await until(() => !!app.result.output || !!app.result.error, 'the first assessment');
   window.location.hash = options.route ? `#/${options.route}` : '#/';
   const router = new Router(window);
   const target = document.createElement('div');

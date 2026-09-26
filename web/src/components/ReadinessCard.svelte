@@ -4,6 +4,7 @@
 -->
 <script lang="ts">
   import type { BucketAssessment, PlanItem } from '../engine/types';
+  import { keyedItems } from '../lib/lookup';
   import { dayPhrase, naturalFrequency, noticeRange } from '../lib/format';
   import ExplainButton from './ExplainButton.svelte';
   import Icon from './Icon.svelte';
@@ -14,7 +15,7 @@
 
 </script>
 
-<article class="readiness card" aria-labelledby="{uid}-name">
+<article class="readiness card" aria-labelledby="{uid}-name" data-bucket={bucket.id} data-target={JSON.stringify(bucket.target)}>
   <h3 id="{uid}-name">{bucket.name}</h3>
   {#if bucket.target.kind === 'evacuate'}
     <p class="small">
@@ -31,7 +32,7 @@
     {#if ready.length}
       <p class="list-title">Ready</p>
       <ul class="have-list">
-        {#each ready as item (item.item_id + item.tier)}
+        {#each keyedItems(ready) as { key, item } (key)}
           <li class="has"><Icon name="check" /><span>{item.name}</span></li>
         {/each}
       </ul>
@@ -39,7 +40,7 @@
     {#if todo.length}
       <p class="list-title">Still to do</p>
       <ul class="have-list">
-        {#each todo as item (item.item_id + item.tier)}
+        {#each keyedItems(todo) as { key, item } (key)}
           <li><Icon name="circle" /><span>{item.name}</span></li>
         {/each}
       </ul>

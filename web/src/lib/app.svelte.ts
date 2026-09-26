@@ -153,6 +153,11 @@ export class AppState {
       });
     });
     this.ready = true;
+    try {
+      if (typeof performance.mark === 'function') performance.mark('rr:app:ready');
+    } catch {
+      // Timing only.
+    }
   }
 
   destroy(): void {

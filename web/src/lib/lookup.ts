@@ -46,3 +46,18 @@ export function itemSourceIds(cat: Catalogue | null, output: PlanOutput | undefi
   const item = catalogueItem(cat, itemId)?.citations ?? [];
   return [...new Set([...quantity, ...item])];
 }
+
+/**
+ * Plan items with a stable key each. A month can hold the same item twice (the last deposit toward
+ * it and the purchase itself), so the key names the kind too, and any repeat gets a number: a
+ * keyed list must never see the same key twice.
+ */
+export function keyedItems<T extends PlanItem>(items: readonly T[]): { key: string; item: T }[] {
+  const seen = new Map<string, number>();
+  return items.map((item) => {
+    const base = `${item.kind}:${item.item_id}:${item.tier}`;
+    const n = seen.get(base) ?? 0;
+    seen.set(base, n + 1);
+    return { key: n === 0 ? base : `${base}#${n}`, item };
+  });
+}

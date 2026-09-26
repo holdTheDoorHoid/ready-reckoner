@@ -11,7 +11,9 @@
     "test": "vitest --passWithNoTests",
     "icons": "node scripts/make-icons.mjs",
     "shots": "node scripts/screenshots.mjs",
-    "pwa-check": "node scripts/pwa-check.mjs"
+    "pwa-check": "node scripts/pwa-check.mjs",
+    "e2e": "node scripts/e2e.mjs",
+    "packet-pages": "node scripts/packet-pages.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",

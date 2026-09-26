@@ -30,7 +30,7 @@
   </p>
   <div class="grid">
     {#if income && income.target.kind === 'months' && track}
-      <article class="card" aria-labelledby="income-title">
+      <article class="card" aria-labelledby="income-title" data-bucket={income.id} data-target={JSON.stringify(income.target)}>
         <h3 id="income-title">{income.name}</h3>
         <p><span class="big">{targetMonths(income.target.value, income.target.low, income.target.high)}</span> of expenses{track.target_usd > 0 ? `, about ${usd(track.target_usd)}` : ''}.</p>
         <div

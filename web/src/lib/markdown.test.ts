@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { FIXTURE_NAMES, FIXTURES } from '../engine/fixtures';
 import { createMockEngine } from '../engine/mock';
-import { renderMarkdown } from './markdown';
+import { countTables, packetSections, renderMarkdown, splitIntro } from './markdown';
 
 /** Anything that could run script, load a resource, or restyle the page. */
 function unsafe(html: string): string[] {
@@ -100,5 +100,64 @@ describe('packet rendering', () => {
     expect(html).toContain('<h2 class="md-h1">Title</h2>');
     expect(html).toContain('<h3 class="md-h2">Section</h3>');
     expect(html).toContain('<div class="table-wrap" tabindex="0" role="region" aria-label="Table 1: a">');
+  });
+});
+
+describe('the packet in sections (so the map can sit in Your risks and the sources can be styled)', () => {
+  const md = [
+    '# Your preparedness packet',
+    '',
+    'For: 2 adults.',
+    '',
+    '## Summary',
+    '',
+    'Short.',
+    '',
+    '## Your risks',
+    '',
+    'The events most likely to reach you.',
+    '',
+    '### The ones most likely to reach you',
+    '',
+    '| a | b |',
+    '| --- | --- |',
+    '| 1 | 2 |',
+    '',
+    '## Sources',
+    '',
+    '**1** Water. FEMA, 2021. https://www.ready.gov/water',
+    '',
+  ].join('\n');
+
+  it('cuts at each ## heading, keeping every line exactly once', () => {
+    const sections = packetSections(md);
+    expect(sections.map((s) => s.slug)).toEqual(['cover', 'summary', 'your-risks', 'sources']);
+    expect(sections.map((s) => s.markdown).join('')).toBe(md);
+  });
+
+  it("splits a section's opening from the rest at its first subheading", () => {
+    const risks = packetSections(md).find((s) => s.slug === 'your-risks')!.markdown;
+    const { intro, rest } = splitIntro(risks);
+    expect(intro).toBe('## Your risks\n\nThe events most likely to reach you.\n\n');
+    expect(rest.startsWith('### The ones most likely to reach you')).toBe(true);
+    expect(splitIntro('## Sources\n\nOnly text.\n')).toEqual({ intro: '## Sources\n\nOnly text.\n', rest: '' });
+  });
+
+  it('keeps numbering tables across parts rendered separately', () => {
+    const first = renderMarkdown('| a | b |\n| --- | --- |\n| 1 | 2 |\n');
+    expect(countTables(first)).toBe(1);
+    const second = renderMarkdown('| c | d |\n| --- | --- |\n| 3 | 4 |\n', { tableStart: countTables(first) });
+    expect(second).toContain('aria-label="Table 2: c"');
+  });
+
+  it('finds every section in every fixture packet from the mock', async () => {
+    const mock = createMockEngine();
+    for (const name of FIXTURE_NAMES) {
+      const out = await mock.assess(FIXTURES[name]);
+      if (!out.ok) throw new Error(out.error.message);
+      const sections = packetSections(out.value.packet_markdown);
+      expect(sections.map((s) => s.markdown).join(''), name).toBe(out.value.packet_markdown);
+      expect(sections.some((s) => s.slug === 'your-risks'), name).toBe(true);
+    }
   });
 });

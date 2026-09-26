@@ -34,7 +34,9 @@ export function pageCount(pdf) {
   }
 }
 
-const site = await serve({ root: dist });
+// Serve under the base path the build was made for (BASE_PATH=/ready-reckoner/ for Pages).
+const base = /src="(\/[^"]*?)assets\//.exec(readFileSync(join(dist, 'index.html'), 'utf8'))?.[1] ?? '/';
+const site = await serve({ root: dist, base });
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--no-sandbox', '--font-render-hinting=none'] });
 try {
   const page = await browser.newPage();

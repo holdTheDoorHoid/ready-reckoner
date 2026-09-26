@@ -247,7 +247,8 @@
       <section aria-labelledby="days-title">
         <h2 id="days-title">How long to be ready for</h2>
         <p class="section-intro">
-          The days your household should be able to manage for each kind of disruption, at your settings. The bar shows what you have now.
+          The days your household should be able to manage for each kind of disruption, at your settings. The bar shows how much of it your
+          plan covers once every step in it is done.
         </p>
         <div class="grid">
           {#each duration as b (b.id)}<BucketGauge bucket={b} />{/each}

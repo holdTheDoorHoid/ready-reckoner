@@ -6,7 +6,7 @@
   import type { HazardProfile, PlanItem } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { chanceWithin, CONFIDENCE_LABELS, percent, usd } from '../lib/format';
-  import { bucketName, itemSourceIds, lowerFirst } from '../lib/lookup';
+  import { bucketName, itemSourceIds, keyedItems, lowerFirst } from '../lib/lookup';
   import { href } from '../lib/router.svelte';
   import ExplainButton from './ExplainButton.svelte';
   import IconArray from './IconArray.svelte';
@@ -60,7 +60,7 @@
   {#if helps.length}
     <p class="small helps">
       <strong>What helps:</strong>
-      {#each helps.slice(0, 3) as item, i (item.item_id + item.tier)}{i > 0 ? ', ' : ''}{lowerFirst(item.name)} ({item.kind === 'free_action' ? 'free' : usd(item.est_cost_usd)}){/each}.
+      {#each keyedItems(helps.slice(0, 3)) as { key, item }, i (key)}{i > 0 ? ', ' : ''}{lowerFirst(item.name)} ({item.kind === 'free_action' ? 'free' : usd(item.est_cost_usd)}){/each}.
       <a href={href('plan')}>See it in your plan</a>
     </p>
   {/if}

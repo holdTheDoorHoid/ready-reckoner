@@ -2,7 +2,10 @@ import axe from 'axe-core';
 import { flushSync, tick, type Component } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import DataProgress from '../components/DataProgress.svelte';
 import MockBanner from '../components/MockBanner.svelte';
+import { PackLoader } from '../engine/loader';
+import { gateEngine } from '../engine/wasm';
 import type { Engine } from '../engine/index';
 import { FIXTURE_NAMES, FIXTURES, type FixtureName } from '../engine/fixtures';
 import { createMockEngine } from '../engine/mock';
@@ -308,6 +311,43 @@ describe('what the screens show', () => {
     current = await render(About, { plan, route: 'about', engine: realEngine(['core']) });
     expect(current.text()).not.toContain('The national data is not loaded');
     expect(current.text()).toContain('version e8b8cd6861e6');
+  });
+
+  it('the data line: a calm progress line after half a second, and "Try again" when a download fails', async () => {
+    let release: (() => void) | undefined;
+    let fail = false;
+    const manifest = JSON.stringify({ pack_version: 'v1', packs: { core: { files: [{ path: 'core/counties.csv', bytes: 100 }] } } });
+    const get = (url: string): Promise<Response> => {
+      if (url.includes('manifest.json')) return Promise.resolve(new Response(manifest, { headers: { 'content-type': 'application/json' } }));
+      if (fail) return Promise.reject(new TypeError('Failed to fetch'));
+      return new Promise((resolve) => (release = () => resolve(new Response('x'.repeat(100)))));
+    };
+    const mock = createMockEngine();
+    const loader = new PackLoader(mock, '/s/', { fetch: get });
+    void loader.core().catch(() => undefined);
+    current = await render(DataProgress, { engine: gateEngine(mock, loader), loader, waitForPlan: false });
+    expect(current.text()).not.toContain('Getting the county data ready');
+    await new Promise((r) => setTimeout(r, 600));
+    flushSync();
+    expect(current.text()).toContain('Getting the county data ready');
+    expect(current.target.querySelector('progress')).not.toBeNull();
+    release?.();
+    await loader.core();
+    await tick();
+    flushSync();
+    expect(current.text()).not.toContain('Getting the county data ready');
+    expect(current.text()).toContain('The county data is ready.');
+    current.cleanup();
+
+    fail = true;
+    const broken = new PackLoader(createMockEngine(), '/s/', { fetch: get });
+    await broken.core().catch(() => undefined);
+    current = await render(DataProgress, { engine: gateEngine(createMockEngine(), broken), loader: broken, waitForPlan: false });
+    flushSync();
+    expect(current.text()).toContain('The county data did not finish loading.');
+    expect(current.text()).toContain('Check your internet connection');
+    const retry = [...current.target.querySelectorAll('button')].find((b) => b.textContent?.includes('Try again'));
+    expect(retry).toBeDefined();
   });
 
   it('start: starting a plan takes the person to the first step with a dated plan', async () => {

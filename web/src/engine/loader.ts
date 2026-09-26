@@ -73,6 +73,15 @@ async function readBody(response: Response, onBytes: (n: number) => void): Promi
   return out;
 }
 
+/** A point in the Performance timeline (`rr:data:core` and so on), for measuring the app. */
+function mark(name: string): void {
+  try {
+    if (typeof performance.mark === 'function') performance.mark(name);
+  } catch {
+    // Timing never makes loading fail.
+  }
+}
+
 function message(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }
@@ -204,6 +213,7 @@ export class PackLoader {
         }
         const result = await run(manifest);
         this.#set(name, { phase: 'ready' }, manifest.pack_version);
+        mark(`rr:data:${name}`);
         return result;
       } catch (e) {
         this.#set(name, { phase: 'failed', error: message(e) });

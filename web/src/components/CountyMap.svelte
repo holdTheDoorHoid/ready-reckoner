@@ -93,11 +93,11 @@
       {#each view.markers as m (m.fips)}
         {#if m.label}
           <g class="marker marker--numbered">
-            <circle cx={m.x} cy={m.y} r="8" />
+            <circle cx={m.x} cy={m.y} r="10.5" />
             <text x={m.x} y={m.y} dy="0.35em" text-anchor="middle">{m.label}</text>
           </g>
         {:else}
-          <circle class="marker marker--ring" cx={m.x} cy={m.y} r="7" />
+          <circle class="marker marker--ring" cx={m.x} cy={m.y} r={m.r ?? 8} />
         {/if}
       {/each}
     </svg>
@@ -186,7 +186,7 @@
   }
   .marker--numbered text {
     fill: var(--text);
-    font: 700 10px var(--font);
+    font: 700 12.5px var(--font);
   }
   figcaption {
     margin-top: var(--s2);

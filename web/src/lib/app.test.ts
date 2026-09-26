@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 
 import type { Engine } from '../engine/index';
 import { FIXTURES } from '../engine/fixtures';
+import { PackLoader } from '../engine/loader';
 import { createMockEngine } from '../engine/mock';
+import { gateEngine } from '../engine/wasm';
 import type { Envelope, PlanInput, PlanOutput } from '../engine/types';
 import { MemoryStorage, savedFor, until } from '../test/helpers';
 import { AppState } from './app.svelte';
@@ -129,6 +131,49 @@ describe('AppState', () => {
     await app.startNew();
     app.saveNow();
     expect(app.saveFailed).toBe(false);
+    app.destroy();
+  });
+});
+
+describe('AppState with the data loading behind it', () => {
+  /** A site whose manifest and one core file download on request, or fail. */
+  function site() {
+    let failing = true;
+    const manifest = JSON.stringify({ pack_version: 'v9', packs: { core: { files: [{ path: 'core/counties.csv', bytes: 10 }] } } });
+    const get = async (url: string): Promise<Response> => {
+      if (url.includes('manifest.json')) return new Response(manifest, { headers: { 'content-type': 'application/json' } });
+      if (failing) throw new TypeError('Failed to fetch');
+      return new Response('counties', { headers: { 'content-type': 'text/plain' } });
+    };
+    return { get, heal: () => (failing = false) };
+  }
+
+  it('is ready before the data, reports a failed download as pack_missing, and plans after "Try again"', async () => {
+    const s = site();
+    const mock = createMockEngine();
+    const loader = new PackLoader(mock, '/s/', { fetch: s.get });
+    const engine = gateEngine(mock, loader);
+    const storage = new MemoryStorage();
+    storage.setItem(STORAGE_KEY, JSON.stringify(savedFor(FIXTURES['philadelphia-renters-4'])));
+    const app = new AppState({ storage, engine, loader, delay: 0, saveDelay: 0, today: () => '2026-10-02' });
+    void loader.core().catch(() => undefined);
+    await app.init();
+    flushSync();
+    expect(app.ready).toBe(true);
+    await until(() => !!app.result.error, 'the failed data to be reported');
+    expect(app.result.error?.code).toBe('pack_missing');
+    expect(app.result.error?.message).toMatch(/could not be downloaded/);
+    expect(app.data?.core.phase).toBe('failed');
+    await app.dataSettled();
+
+    s.heal();
+    app.retryData();
+    flushSync();
+    await until(() => !!app.result.output, 'the plan after trying again', 5000);
+    expect(app.data?.core.phase).toBe('ready');
+    expect(app.data?.packVersion).toBe('v9');
+    expect(app.manifest?.pack_version).toBe('v9');
+    expect(app.dataUrlsFetched()).toContain('/s/data/core/counties.csv?v=v9');
     app.destroy();
   });
 });

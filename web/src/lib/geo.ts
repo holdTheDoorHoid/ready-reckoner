@@ -100,8 +100,8 @@ export async function fetchCountyShapes(base: string): Promise<CountyShapes | nu
 export const MAP_WIDTH = 300;
 export const MAP_HEIGHT = 200;
 const MARGIN = 8;
-/** A county smaller than this (viewBox units) also gets a ring, so it can be found. */
-const SMALL = 9;
+/** A county smaller than this (viewBox units) also gets a ring around it, so the eye finds it. */
+const SMALL = 22;
 
 export type Role = 'focus' | 'candidate' | 'context';
 
@@ -118,6 +118,8 @@ export interface MapMarker {
   y: number;
   /** A number shown in the marker (candidates), or none for a plain ring. */
   label?: string;
+  /** Radius of a plain ring. */
+  r?: number;
 }
 
 export interface MapView {
@@ -178,9 +180,12 @@ export function stateView(shapes: CountyShapes, fips: string): MapView | null {
     .map((c) => ({ fips: c.fips, name: c.name, role: 'context' as const, d: pathOf(c, project) }));
   paths.push({ fips, name: focus.name, role: 'focus', d: pathOf(focus, project) });
   const markers: MapMarker[] = [];
-  if (extent(focus, project) < SMALL) {
-    const [x, y] = project(focus.lon, focus.lat);
-    markers.push({ fips, x, y });
+  const size = extent(focus, project);
+  if (size < SMALL) {
+    // Ring the middle of the county's box (its interior point can sit off-centre).
+    const [x0, y0] = project(focus.bbox[0], focus.bbox[3]);
+    const [x1, y1] = project(focus.bbox[2], focus.bbox[1]);
+    markers.push({ fips, x: (x0 + x1) / 2, y: (y0 + y1) / 2, r: Math.max(8, size / 2 + 6) });
   }
   return { paths, markers };
 }

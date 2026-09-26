@@ -16,7 +16,7 @@
   import { useApp } from '../lib/app.svelte';
   import { addMonths, formatDate, formatMonth, monthsBetween, quantity, usd } from '../lib/format';
   import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, stageLine } from '../lib/labels';
-  import { allPlanItems, bucketName, catalogueItem, itemSourceIds, tierName } from '../lib/lookup';
+  import { allPlanItems, bucketName, catalogueItem, itemSourceIds, keyedItems, tierName } from '../lib/lookup';
   import { href } from '../lib/router.svelte';
 
   const app = useApp();
@@ -86,7 +86,16 @@
       <ul class="stats" aria-label="Summary">
         <li class="card">
           <span class="stat__label">This month</span>
-          <span class="stat__value">{monthly > 0 || (thisMonth?.budget_usd ?? 0) > 0 ? `${usd(thisMonth?.budget_usd ?? monthly)} to spend` : 'Free steps only'}</span>
+          <span class="stat__value">
+            {#if (thisMonth?.budget_usd ?? 0) > 0}
+              {usd(thisMonth?.budget_usd ?? 0)} to spend
+            {:else if monthly > 0}
+              Free steps first
+            {:else}
+              Free steps only
+            {/if}
+          </span>
+          {#if (thisMonth?.budget_usd ?? 0) <= 0 && monthly > 0}<span class="small muted">{usd(monthly)} a month from next month</span>{/if}
         </li>
         <li class="card">
           <span class="stat__label">Done so far</span>
@@ -116,7 +125,7 @@
         <section aria-labelledby="earlier-title">
           <h2 id="earlier-title">Still to do from earlier months</h2>
           <p class="section-intro">Plans slip; that is normal. These still help, in this order.</p>
-          {#each earlier as item (item.item_id + item.tier)}<ItemCard {item} />{/each}
+          {#each keyedItems(earlier) as { key, item } (key)}<ItemCard {item} />{/each}
         </section>
       {/if}
 
@@ -132,12 +141,12 @@
             <p class="section-intro">These cost nothing and cover more than you might expect. Do them in any order.</p>
             {#each groupFree(free) as group (group.name)}
               <h4 class="group">{group.name}</h4>
-              {#each group.items as item (item.item_id + item.tier)}<ItemCard {item} compact />{/each}
+              {#each keyedItems(group.items) as { key, item } (key)}<ItemCard {item} compact />{/each}
             {/each}
           {/if}
           {#if buy.length}
             <h3>To get <span class="muted h-note">about {usd(spend(buy))} of {usd(thisMonth?.budget_usd ?? 0)}</span></h3>
-            {#each buy as item (item.item_id + item.tier)}<ItemCard {item} />{/each}
+            {#each keyedItems(buy) as { key, item } (key)}<ItemCard {item} />{/each}
           {/if}
         {/if}
       </section>
@@ -146,7 +155,7 @@
         <section aria-labelledby="next-title">
           <h2 id="next-title">{monthLabel(nextMonth.index)} <span class="muted h-note">from {formatDate(addMonths(planningDate, nextMonth.index))}</span></h2>
           <ul class="preview">
-            {#each nextMonth.items.filter((i) => !i.done) as item (item.item_id + item.tier)}
+            {#each keyedItems(nextMonth.items.filter((i) => !i.done)) as { key, item } (key)}
               <li>
                 {item.name}: {item.kind === 'free_action' ? 'free' : `${quantity(item.quantity, item.unit)}, about ${usd(item.est_cost_usd)}`}
                 <Sources ids={sourcesOf(output, item)} variant="inline" what={item.name} />
@@ -157,8 +166,11 @@
       {/if}
 
       <section aria-labelledby="progress-title">
-        <h2 id="progress-title">Progress by consequence</h2>
-        <p class="section-intro">What you have now against each target. Checking items off moves these.</p>
+        <h2 id="progress-title">Where your plan takes you</h2>
+        <p class="section-intro">
+          How much of each target the plan covers once every step in it is done. What you have already done is counted in the plan above ("Done so
+          far").
+        </p>
         <div class="progress card">
           {#each output.buckets.filter((b) => b.target.kind === 'days') as b (b.id)}<BucketGauge bucket={b} compact />{/each}
         </div>
@@ -176,8 +188,8 @@
             {#each output.plan.envelopes as e, i (i)}
               {@const month = months.find((m) => m.items.some((x) => x.item_id === e.item_id && !x.done && Math.abs(x.est_cost_usd - e.needed_usd) < 0.01))}
               <li class="card">
-                <strong>{catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id}</strong>: about {usd(e.needed_usd)}
-                {#if month}; ready to buy around {formatMonth(addMonths(planningDate, month.index))}{/if}.
+                <strong>{catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id}</strong>: about {usd(e.needed_usd)}{#if month}; ready to buy
+                  around {formatMonth(addMonths(planningDate, month.index))}{/if}.
                 <Sources ids={itemSourceIds(app.catalogue, output, e.item_id)} variant="inline" what={catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id} />
               </li>
             {/each}
@@ -196,7 +208,7 @@
                 <span class="muted small">{open.length} {open.length === 1 ? 'step' : 'steps'}{spend(open) > 0 ? `, about ${usd(spend(open))}` : ''}</span>
               </summary>
               <ul class="month__list">
-                {#each open as item (item.item_id + item.tier)}
+                {#each keyedItems(open) as { key, item } (key)}
                   <li>
                     <span>{item.name}</span>
                     <span class="muted">{item.kind === 'free_action' ? 'free' : `${quantity(item.quantity, item.unit)}, about ${usd(item.est_cost_usd)}`}</span>
@@ -221,7 +233,7 @@
           <h2 id="done-title">Done <span class="muted h-note">{done.length}</span></h2>
           <details>
             <summary>Show what you've done</summary>
-            {#each done as item (item.item_id + item.tier)}<ItemCard {item} />{/each}
+            {#each keyedItems(done) as { key, item } (key)}<ItemCard {item} />{/each}
           </details>
         </section>
       {/if}

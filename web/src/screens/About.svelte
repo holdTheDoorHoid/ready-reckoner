@@ -43,9 +43,9 @@
     const counties = core.filter((f) => !ZIP_FILES.includes(f.path));
     const map = (manifest.packs.geo?.files ?? []).filter((f) => f.path === MAP_FILE);
     return [
-      { name: 'County data', what: manifest.packs.core?.description ?? 'Hazards, outages and more for every county.', files: counties.length, bytes: size(counties), status: phaseWords(app.data?.core.phase, 'Loads when the app opens') },
+      { name: 'County data', what: 'For every county: natural hazards, power outages, storms and other events, climate projections, floods, earthquakes, nearby facilities and how resilient the community is.', files: counties.length, bytes: size(counties), status: phaseWords(app.data?.core.phase, 'Loads when the app opens') },
       { name: 'ZIP code list', what: 'Which county each ZIP code is in, and how far it is from nuclear plants and chemical sites.', files: zips.length, bytes: size(zips), status: phaseWords(app.data?.zip.phase, 'Loads when you type a ZIP code') },
-      { name: 'County map', what: manifest.packs.geo?.description ?? 'County outlines for the map.', files: map.length, bytes: size(map), status: phaseWords(app.data?.map.phase, 'Loads when a map is shown') },
+      { name: 'County map', what: 'The outline of every county, for the small maps.', files: map.length, bytes: size(map), status: phaseWords(app.data?.map.phase, 'Loads when a map is shown') },
     ].filter((p) => p.files > 0);
   });
 

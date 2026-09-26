@@ -1,6 +1,9 @@
 <!--
-  A duration bucket: the target with its range ("about 3 days (2–5)"), how much is covered now as
-  a meter with the words beside it, the relief rating, and what drives it.
+  A duration bucket: the target with its range ("about 3 days (2–5)"), how much of it the plan
+  covers once every step is done (a meter with the words beside it), the relief rating, and what
+  drives it. The engine's `covered` is the plan's end point, not what the household has today,
+  so the words say "your plan covers". A target of 0 days means the bucket does not apply at these
+  settings, and says so instead of drawing an empty meter.
 -->
 <script lang="ts">
   import type { BucketAssessment } from '../engine/types';
@@ -16,47 +19,53 @@
   const uid = $props.id();
 
   const target = $derived(bucket.target.kind === 'days' ? bucket.target : null);
+  const notNeeded = $derived(target !== null && target.value <= 0);
   const covered = $derived(bucket.covered.kind === 'days' ? bucket.covered.value : 0);
-  const done = $derived(target !== null && covered >= target.value);
-  const pct = $derived(target ? Math.min(100, (covered / target.value) * 100) : 0);
+  const done = $derived(target !== null && !notNeeded && covered >= target.value);
+  const pct = $derived(target && !notNeeded ? Math.min(100, (covered / target.value) * 100) : 0);
   const coveredText = $derived.by(() => {
-    if (!target) return '';
-    if (done) return `Covered: all ${dayPhrase(target.value)}`;
+    if (!target || notNeeded) return '';
+    if (done) return `Your plan covers all ${dayPhrase(target.value)}`;
     const t = dayPhrase(target.value);
     const c = dayPhrase(covered);
     const [cn, cu] = [c.split(' ')[0], c.split(' ').slice(1).join(' ')];
     const tu = t.split(' ').slice(1).join(' ');
-    return covered > 0 && cu.replace(/s$/, '') === tu.replace(/s$/, '') ? `${cn} of ${t} covered` : `${covered === 0 ? '0' : c} of ${t} covered`;
+    return covered > 0 && cu.replace(/s$/, '') === tu.replace(/s$/, '') ? `Your plan covers ${cn} of ${t}` : `Your plan covers ${covered === 0 ? '0' : c} of ${t}`;
   });
   const targetText = $derived(target ? targetDays(target.value, target.low, target.high) : '');
   const mainText = $derived(target ? `about ${dayPhrase(target.value)}` : '');
 </script>
 
 {#if target}
-  <article class="gauge" class:card={!compact} class:compact aria-labelledby="{uid}-name">
+  <article class="gauge" class:card={!compact} class:compact aria-labelledby="{uid}-name" data-bucket={bucket.id} data-target={JSON.stringify(bucket.target)}>
     <h3 id="{uid}-name" class="gauge__name">{bucket.name}</h3>
-    {#if !compact}
-      <p class="gauge__target">
-        <span class="visually-hidden">Be ready for </span>
-        <span class="big">{mainText}</span>
-        <span class="range">{targetText.slice(mainText.length).trim()}</span>
+    {#if notNeeded}
+      <p class="gauge__target"><span class="big">Not needed</span></p>
+      <p class="small muted">At your settings this does not apply to your home, so there is nothing to prepare for it.</p>
+    {:else}
+      {#if !compact}
+        <p class="gauge__target">
+          <span class="visually-hidden">Be ready for </span>
+          <span class="big">{mainText}</span>
+          <span class="range">{targetText.slice(mainText.length).trim()}</span>
+        </p>
+      {/if}
+      <div
+        class="meter"
+        role="meter"
+        aria-labelledby="{uid}-name"
+        aria-valuemin="0"
+        aria-valuemax={target.value}
+        aria-valuenow={Math.min(covered, target.value)}
+        aria-valuetext={coveredText}
+      >
+        <div class="meter__fill" class:meter__fill--done={done} style:width="{pct}%"></div>
+      </div>
+      <p class="gauge__covered" class:is-done={done}>
+        {#if done}<Icon name="check" />{/if}
+        <span>{coveredText}</span>
       </p>
     {/if}
-    <div
-      class="meter"
-      role="meter"
-      aria-labelledby="{uid}-name"
-      aria-valuemin="0"
-      aria-valuemax={target.value}
-      aria-valuenow={Math.min(covered, target.value)}
-      aria-valuetext={coveredText}
-    >
-      <div class="meter__fill" class:meter__fill--done={done} style:width="{pct}%"></div>
-    </div>
-    <p class="gauge__covered" class:is-done={done}>
-      {#if done}<Icon name="check" />{/if}
-      <span>{coveredText}</span>
-    </p>
     {#if compact}
       <Sources ids={[...bucket.sources, ...(bucket.relief?.sources ?? [])]} variant="inline" what="{bucket.name}: be ready for {targetText}" />
     {/if}
