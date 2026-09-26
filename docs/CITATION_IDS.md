@@ -158,6 +158,47 @@ source; it has no URL yet, so it cannot be a registry entry.
 | `inquirer_peco_outages` | Power outages in Philadelphia history: Peco's biggest storms | The Philadelphia Inquirer, 2025 | https://www.inquirer.com/weather/power-outages-peco-most-history-20250626.html | two of PECO's five largest outages were ice storms (1994, 2014), outside the 2018–2025 records (big ice storm class) |
 | `county_boil_water_records` | a county's boil-water notice records, when a data pack provides them (none does yet; the id is a placeholder for the source the data workstream adds) | — | — | replacing the default boil-water duration with the county's median and 90th percentile |
 
+## Added for the v0.1.1 guidance on 2026-09-26
+
+Life-safety sentences from the round-2 review (S1, S7, RR-P04, RR-P07, RR-P16, RR-P17, P-22). Each
+page was read on 2026-09-26 and the claim checked against it. A quote is stored only where the
+wording was matched in the page's own text (the HTML or PDF, not a summary).
+
+| id | Source | Used for | Check result |
+| --- | --- | --- | --- |
+| `fda_insulin_emergency` | FDA, Information Regarding Insulin Storage and Switching Between Products in an Emergency (content current as of 2017-09-19) | insulin in the maker's vial or cartridge keeps working 28 days at 59–86 °F; use warmer insulin in an emergency and replace it; never use frozen insulin; keep it as cool as possible, out of the sun | confirmed, exact quote stored. The 28 days apply to the original vial or cartridge only (insulin moved out of it: two weeks), hence "in its original vial or pen" |
+| `ada_insulin_storage` | American Diabetes Association, Insulin Storage and Syringe Safety | do not use insulin with particles, discoloration, frosting, crystals or clumps | confirmed on the page (paraphrased) |
+| `aace_diabetes_emergency` | American Association of Clinical Endocrinology, Are You Prepared to Manage Your Diabetes in an Emergency? | the diabetes kit: testing supplies, needles and syringes, glucose tablets | confirmed (paraphrased). CDC's list (`cdc_diabetes_emergencies`) names syringes, the meter, spare batteries, lancets and glucose tablets but not test strips or pen needles, so both are cited |
+| `medicare_drugs_disaster` | CMS / Medicare.gov, Getting drugs in a disaster or emergency | ask your drug plan about a 60- to 90-day supply | confirmed, exact quote stored |
+| `cdc_heat_related_illness` | CDC, Heat-Related Illnesses: What to Look For, What to Do (CS280226, 2017) | heat stroke: 103 °F or higher; hot, red, dry or damp skin; fast, strong pulse; confusion; passing out; call 911, move to a cooler place, cool cloths or a cool bath, nothing to drink | confirmed from the PDF, exact quote stored. Ready.gov's heat page still says "Red, hot and dry skin with no sweat"; the guidance follows CDC |
+| `cpsc_co_information_center` | CPSC, Carbon Monoxide Information Center | symptoms (headache, dizziness, weakness, nausea, vomiting, sleepiness, confusion); get outside to fresh air, then call 911 | confirmed, exact quote stored. `cdc_co_basics` lists the symptoms but not what to do |
+| `osha_downed_wires` | OSHA fact sheet, Working Safely Around Downed Electrical Wires (2018) | treat every line as energized; in a vehicle touching a line, stay inside unless it is on fire | confirmed from the PDF, exact quote stored |
+| `pa_puc_power_line_safety` | Pennsylvania PUC, Power Line Safety fact sheet (2013) | stay at least 30 feet from a downed line and anything it touches; treat all downed lines as energized; call 911 and the utility | confirmed (paraphrased). The brief asked for 35 feet: that figure comes from ESFI and utility pages; ESFI refuses automated reads, and the one state page giving 35 feet (Texas Department of Insurance) is about an electrocuted worker. The guidance says 30 feet, from the regulator's fact sheet |
+| `cpuc_medical_baseline` | California PUC, Medical Baseline | utility medical programs bring a lower rate and advance notice of outages | confirmed (paraphrased); cited in the disability topic and the glossary |
+| `psegli_critical_care` | PSEG Long Island, Protect Your Health During Power Outages (Critical Care Program) | the program does not guarantee priority restoration; plan ahead for medical needs; the utility stays in touch in severe weather | confirmed (paraphrased). Replaces Ready.gov's "ask to be put on a list for priority power restoration" (RR-P07) |
+| `tdem_stear` | Texas Division of Emergency Management, State of Texas Emergency Assistance Registry | a free state registry; registering does not guarantee a service | confirmed (paraphrased); the example behind "some states" in the disability topic (the state table is v0.2.0) |
+| `epa_burnwise_faq` | EPA Burn Wise, Frequent Questions about Wood-Burning Appliances | wood stove, chimney and vents professionally inspected and cleaned each year; creosote build-up causes chimney fires | confirmed, exact quote stored |
+| `ready_gov_stay_safe_warm` | FEMA / Ready.gov, Stay Safe and Warm Toolkit (FEMA Advisory, January 2026) | go to a warming center if you cannot keep your home warm; call 2-1-1 to find one | confirmed from the PDF, exact quote stored |
+| `pa_puc_gas_emergencies` | Pennsylvania PUC, Gas Emergencies | smell gas: leave at once; do not turn lights on or off or use a phone at home; call 911 and the gas utility from a safe distance | confirmed (paraphrased). PHMSA's leak page refuses automated reads |
+| `ready_gov_safety_skills` | FEMA / Ready.gov, Safety Skills | smell gas or hear hissing: get everyone out, call the gas company from a neighbour's home; only a qualified professional turns the gas back on | confirmed through a page fetch; ready.gov refuses plain HTTP clients, so no quote is stored |
+| `redcross_sound_the_alarm` | American Red Cross, Sound the Alarm | free smoke alarm installation from your local Red Cross | redcross.org refuses automated requests; read through the Internet Archive capture of the same URL (2026-09-17). Paraphrased |
+| `usfa_smoke_alarm_renters` | USFA, Pictograph: Where to put home smoke alarms (renters) | renters without alarms ask the landlord or rental agent to install them | confirmed, exact quote stored. `usfa_smoke_alarms` supplies "some fire departments ... install ... at no cost". No readable national source says landlords must provide alarms "in most states", so the guidance only says to ask |
+| `medlineplus_cpr` | MedlinePlus (National Library of Medicine), CPR health topic | hands-only CPR for a teen or adult whose heart has stopped, no training needed; hands on the center of the chest, push hard and fast; call 911; AEDs are in many public places and talk you through each step | confirmed, exact quote stored (NLM-written summary, public domain) |
+| `cdc_well_disinfection` | CDC, How to Disinfect Wells After an Emergency (reviewed 2025-05-29) | after flooding, do not drink well water until it is disinfected and tested; ask the health department | confirmed through a page fetch; cdc.gov refuses plain HTTP clients, so no quote is stored |
+| `epa_children_wildfire_smoke` | EPA, Protect Children from Wildfires, Smoke, and Volcanic Ash | N95 masks are not made to fit children; use a clean air room | confirmed, exact quote stored |
+
+**`fema_nhs_2024` repointed (RR-P17).** It cited FEMA's 2024 National Household Survey findings deck
+through a copy on a private website. FEMA has removed the deck from fema.gov (the URL now answers 404),
+so the entry now points at the Internet Archive capture of FEMA's own file
+(`fema_icpd_2024-national-household-survey-on-disaster-preparedness-findings_05072025.pdf`, captured
+2025-05-07), publisher "FEMA (via Internet Archive)", with the cost-barrier sentence as its quote. The
+text of FEMA's file and the old copy is identical, so every figure the guidance cites still matches
+(checked: 88, 34, 18 and 8 of 100 with supplies past three days, two weeks, a month and three months;
+26 cost; 25 "don't know what else to do"; 16 health or disability; 71 expect help from family; 18 heard
+how to help neighbours; renters 43 and owners 87 insured; 63/22 power outage and 47/5 active shooter,
+risk and experience). The DataLumos archive the review suggested (project 218642) holds FEMA's
+2017–2023 survey data, not the 2024 findings deck.
+
 ## Registry index for the other workstreams
 
 Every id below is in `content/citations.toml`. Federal entries carry an exact quote where one was
@@ -169,17 +210,17 @@ checked; "prior" marks an expert estimate.
 | Expert estimates (prior = true) | `rr_expert_prior` (supply sizing and upkeep, `docs/QUANTITY_RULES.md`), `rr_risk_model_priors` (hazard rates and durations, `docs/RISK_MODEL.md`), `prior_harm_weights` (allocator harm weights) |
 | Research compilations and prices | `rr_research_supply_standards`, `rr_research_risk_model`, `rr_research_prior_art`, `rr_research_data_sources`, `rr_price_observations_2026_09` |
 | Water quantity and storage | `ready_gov_water`, `ready_gov_kit`, `cdc_water_storage`, `sphere_2018`, `who_wedc_tn9`, `iom_dri_water_2005`, `church_emergency_prep_manual`, `washington_prepare_in_a_year`, `oregon_b2wr_toolkit`, `doe_water_heaters`, `cdc_find_clean_water`, `bbk_vorsorgen_2025`, `dema_prepared_for_crises` |
-| Water treatment and advisories | `cdc_water_disinfection`, `epa_emergency_disinfection`, `cdc_water_advisories`, `cdc_bleach_disinfecting` |
+| Water treatment and advisories | `cdc_water_disinfection`, `epa_emergency_disinfection`, `cdc_water_advisories`, `cdc_bleach_disinfecting`, `cdc_well_disinfection` (private wells after a flood) |
 | Water outage durations | `shaffer_2026_texas_boil_notices`, `water_2024_kentucky_advisories`, `epa_boil_water_report_2024`, `epa_asheville_boil_notice_2024`, `fema_hazus_eq_restoration`, `oregon_resilience_plan_2013` |
 | Food and energy needs | `usda_dga_2020_2025`, `ready_gov_food`, `fsis_shelf_stable`, `usda_fooddata_central`, `church_home_storage_2007`, `church_hsc_order_form_2026`, `byu_longer_term_storage_2019`, `usu_food_storage_booklet`, `ensign_2006_year_supply` |
 | Food costs | `usda_tfp_aug2026`, `usda_food_plans_aug2026`, `bls_average_prices` |
 | Infants | `aap_formula_amounts`, `cdc_infant_feeding_disaster`, `cdc_infant_checklist`, `sutter_diapers` |
-| Medicine continuity | `cdc_pregnancy_emergency`, `redcross_survival_kit`, `florida_dem_medication`, `cdc_diabetes_emergencies`, `cdc_insulin_emergency`, `ready_gov_disability`, `healthcare_ready_refill_laws`, `hhs_aspr_epap`, `fda_expired_medicines`, `fda_shelf_life_extension`, `kff_ehbs_2025` |
+| Medicine continuity | `cdc_pregnancy_emergency`, `redcross_survival_kit`, `florida_dem_medication`, `cdc_diabetes_emergencies`, `cdc_insulin_emergency`, `ready_gov_disability`, `healthcare_ready_refill_laws`, `hhs_aspr_epap`, `fda_expired_medicines`, `fda_shelf_life_extension`, `kff_ehbs_2025`, `fda_insulin_emergency`, `ada_insulin_storage`, `aace_diabetes_emergency`, `medicare_drugs_disaster` |
 | Antibiotics (quantity 0) | `cdc_antibiotic_use`, `usc_21_353`, `cdc_yellow_book_travel_kits`, `fda_fish_antibiotics_warning_2023`, `bishop_2020_fish_antibiotics`, `mo_med_2026_antibiotic_kits`, `wms_wound_2014` |
-| First aid and masks | `redcross_first_aid_kit`, `dhs_stop_the_bleed`, `cdc_masks`, `cdc_cholera_treatment`, `cdc_nchs_ed_visits`, `mell_2017_ems_response` |
+| First aid and masks | `redcross_first_aid_kit`, `dhs_stop_the_bleed`, `medlineplus_cpr`, `cdc_masks`, `epa_children_wildfire_smoke`, `cdc_cholera_treatment`, `cdc_nchs_ed_visits`, `mell_2017_ems_response` |
 | Sanitation and hygiene | `rdpo_emergency_toilet`, `oregon_b2wr_toolkit`, `cdc_hygiene_emergency`, `cdc_period_factsheet`, `sphere_2018` |
-| Heat and cold | `cdc_heat_health`, `ready_gov_heat`, `cdc_niosh_heat_hydration`, `cdc_yellow_book_heat_cold`, `cdc_winter_safety`, `ready_gov_winter`, `semenza_1996_heat_deaths`, `stone_2023_heat_blackout`, `cdc_co_basics` |
-| Power and fuel | `ready_gov_power_outages`, `eia_outage_hours_2024`, `eia_861_reliability_2024`, `ornl_eagle_i_outages`, `ornl_repowrd_2022`, `do_2023_outages`, `epa_energy_star_refrigerators`, `doe_appliance_energy`, `sil_cpap_power`, `nlr_pvwatts_v8`, `eia_btu`, `lehi_fuel_storage`, `ecfr_49_180_209`, `martell_2020_restoration_data`, `honda_eu2200i_spec` (generator fuel use) |
+| Heat and cold | `cdc_heat_health`, `ready_gov_heat`, `cdc_niosh_heat_hydration`, `cdc_yellow_book_heat_cold`, `cdc_winter_safety`, `ready_gov_winter`, `semenza_1996_heat_deaths`, `stone_2023_heat_blackout`, `cdc_co_basics`, `cdc_heat_related_illness`, `cpsc_co_information_center`, `ready_gov_stay_safe_warm`, `epa_burnwise_faq` |
+| Power and fuel | `ready_gov_power_outages`, `eia_outage_hours_2024`, `eia_861_reliability_2024`, `ornl_eagle_i_outages`, `ornl_repowrd_2022`, `do_2023_outages`, `epa_energy_star_refrigerators`, `doe_appliance_energy`, `sil_cpap_power`, `nlr_pvwatts_v8`, `eia_btu`, `lehi_fuel_storage`, `ecfr_49_180_209`, `martell_2020_restoration_data`, `honda_eu2200i_spec` (generator fuel use), `osha_downed_wires`, `pa_puc_power_line_safety`, `cpuc_medical_baseline`, `psegli_critical_care` |
 | Communications | `ready_gov_alerts`, `fcc_wea`, `nws_weather_radio`, `fcc_frs`, `fcc_gmrs`, `ecfr_47_1_1102`, `fcc_text_911`, `ready_gov_low_cost`, `ready_gov_plan`, `ready_gov_family_comm_card` |
 | Pets | `ready_gov_pets`, `aspca_disaster_prep`, `petmd_dog_water`, `merck_vet_maintenance_fluids` |
 | Evacuation and getting home | `ready_gov_evacuation`, `cdc_evacuation_psa`, `ready_gov_kit_2020`, `fhwa_mutcd_walking_speed`, `nws_tsunami_safety`, `dogami_tsunami_faq`, `hcfl_ev_safety`, `doe_afdc_stations`, `doe_fueleconomy_ev`, `ready_gov_pets`, `aspca_disaster_prep` |
@@ -187,11 +228,12 @@ checked; "prior" marks an expert estimate.
 | Stay-home and pandemic | `cdc_mmwr_stay_at_home_2020`, `marani_2021_pandemics`, `cdc_pandemic_history` |
 | Money and income | `fema_effak`, `ready_gov_financial`, `cfpb_emergency_fund`, `finra_financial_foundations`, `stlouisfed_emergency_fund_2025`, `fed_shed_2024`, `bls_work_experience_2024`, `bls_unemployment_duration`, `bls_displaced_workers_2026`, `bls_jolts_layoffs`, `dol_unemployment_insurance`, `ssa_disability_facts`, `nchs_accidental_injury_2024` |
 | Home loss and insurance | `fema_nfip_flood_insurance`, `floodsmart_buy_policy`, `fema_flood_zones`, `openfema_nfip`, `aung_2025_displacement`, `census_pulse_displacement`, `usfa_residential_fires` |
+| Home fire and gas | `usfa_residential_fires`, `usfa_smoke_alarms`, `usfa_smoke_alarm_renters`, `redcross_sound_the_alarm`, `ready_gov_home_fires`, `usfa_heating_fires`, `usfa_cooking_fires`, `usfa_extinguishers`, `pa_puc_gas_emergencies`, `ready_gov_safety_skills` |
 | Security | `ncpc_home_safety`, `bjs_criminal_victimization_2023`, `cisa_secure_our_world`, `cisa_deescalation`, `ftc_disaster_scams`, `anglemyer_2014_firearm_access` (the firearms free action only) |
 | Nuclear and radiation | `ready_gov_nuclear`, `ready_gov_radiation`, `cdc_potassium_iodide`, `nrc_potassium_iodide`, `fema_nuclear_sites`, `fri_nuclear_risk_2024` |
 | Seismic and geologic | `usgs_nshm_2023`, `usgs_ucerf3_2015`, `usgs_bay_area_outlook_2016`, `usgs_new_madrid`, `usgs_pp1661f_cascadia`, `osu_cascadia_2012`, `oregon_resilience_plan_2013`, `oregon_2_weeks_ready` |
 | Weather and climate data | `noaa_storm_events`, `noaa_hurdat2`, `cmra_2025`, `nca5_climate_trends`, `nca5_atlas` |
-| Community and behaviour | `aldrich_sawada_2015`, `ye_aldrich_2019`, `fema_nhs_2024`, `listos_california`, `ready_gov_cert`, `clarke_2002_panic`, `tierney_2006_disaster_myths`, `drury_2009_shared_identity`, `wood_2018_milling`, `vinnell_2020_shakeout`, `gargano_2017_wtc_training`, `gollwitzer_sheeran_2006`, `lally_2010_habits` |
+| Community and behaviour | `aldrich_sawada_2015`, `ye_aldrich_2019`, `fema_nhs_2024` (FEMA's own file via the Internet Archive), `tdem_stear`, `listos_california`, `ready_gov_cert`, `clarke_2002_panic`, `tierney_2006_disaster_myths`, `drury_2009_shared_identity`, `wood_2018_milling`, `vinnell_2020_shakeout`, `gargano_2017_wtc_training`, `gollwitzer_sheeran_2006`, `lally_2010_habits` |
 | Risk communication | `gigerenzer_2007_statistics`, `akl_2011_cochrane_frequencies`, `witte_allen_2000_eppm`, `tannenbaum_2015_fear_appeals` |
 | Mental health | `samhsa_988`, `samhsa_disaster_distress` |
 | Hazmat and planning | `epa_tri_2024`, `cdc_water_advisories`, `fema_cpg201_thira`, `tokyo_bichiku_navi` |

@@ -49,6 +49,17 @@ a price observation), forums, influencer content, product marketing.
 - **Check the claim, not just the quote.** Before a guidance sentence cites a page, read the page
   and confirm it says that. If the page cannot be read, or says something weaker, drop or soften
   the sentence. A URL must point at the document itself, not a landing page.
+- **Removed federal documents.** When an agency takes a page or file down, cite the Internet
+  Archive capture of the agency's own URL, with the publisher "<agency> (via Internet Archive)"
+  (`fema_nhs_2024`, `doe_water_heaters`). Never cite a copy on a third-party site.
+- **Sites that refuse automated reads.** Some sites (cdc.gov, ready.gov, redcross.org, some state
+  pages) answer plain HTTP clients with "access denied". Read the page with a normal page fetch or
+  through a web-archive capture of the same URL, say how it was read in `docs/CITATION_IDS.md`, and
+  store a `quote` only when the wording was matched in the page's own text. Never work around bot
+  protection or a CAPTCHA; if a page cannot be read, it cannot back a sentence.
+- **When federal pages disagree,** follow the agency whose job it is (CDC for first aid, FDA for
+  medicines) and note the other wording in `docs/CITATION_IDS.md`. Ready.gov's heat page still
+  says heat-stroke skin is "dry with no sweat"; CDC says dry or damp, and the guidance follows CDC.
 
 ## 3. Items
 
@@ -133,6 +144,17 @@ wait" and "do not wait", "hurry", "while supplies last", "before it's too late" 
 warns on exclamation marks. Say what to do and when instead ("Meet the people next door before
 you need them", "Leave as soon as authorities tell you to").
 
+**Life-safety sentences reach paper.** A sentence that could save a life (fire escape, gas leak,
+carbon monoxide, downed lines, CPR, heat stroke, medicine storage) goes in a block the packet
+prints for every household it concerns, and you confirm it in the regenerated packets
+(`docs/PACKET.md`). The packet prints the "What helps" and "What to avoid" paragraphs of every
+active bucket block and of each hazard card. When a bucket's only hazard has a card (medical
+emergency), the bucket prints a pointer to the card instead, so its life-safety lines also go in
+the hazard block (`hazard_medical`). `{if:…}` spans take hazard ids only, so a sentence for some
+homes (a well, wood heat, a generator) is written plainly and opens with its condition ("If you
+heat with wood, ..."). Every printed sentence costs space in every packet, and so does each new
+source line, so reuse a source the block already cites when it says the same thing.
+
 ## 5. Sensitive topics (mechanical enforcement of PRINCIPLES §9)
 
 - A drug name followed by a dose is rejected in any text. Items in category `medical` are also
@@ -149,6 +171,11 @@ you need them", "Leave as soon as authorities tell you to").
 - Potassium iodide may be mentioned only together with "official" instructions. Nuclear and
   radiological guidance cites FEMA, CDC or NRC text and does not recommend it outside the emergency
   planning zone of a plant.
+- Medicine storage follows the medicine's own rule, never a blanket timer. Insulin in its original
+  vial or pen keeps working 28 days at 59–86 °F (FDA `fda_insulin_emergency`): keep it below 86 °F
+  and never frozen, use it if it got warmer and nothing else is available, and replace it. For
+  other refrigerated medicines the reader asks the pharmacist now and writes the answer on the
+  medicine list. Do not repeat "throw away refrigerated medicine after a day" next to insulin.
 
 ## 6. UI copy
 
@@ -158,6 +185,16 @@ you need them", "Leave as soon as authorities tell you to").
   show more precision than the data (`Prior` numbers show as ranges).
 - Money: whole dollars; bands as "$30–45".
 - Never "you must". Prefer "the plan includes" / "you could".
+- Two sentences have fixed wording (round-2 review, 2026-09-26); use them word for word wherever
+  they appear:
+  - **Status line** (packet page 1, Start screen): "Ready Reckoner is an independent, open-source
+    planning aid. It is not official emergency guidance, and not medical, legal or financial
+    advice. Follow instructions from your local officials first."
+  - **Dial sentence** (packet, CLI, web, `topic_the_dial`, the glossary): "For any one need,
+    something worse than its target comes in about 1 of every 10 ten-year stretches. Across all
+    your needs together, the chance that at least one runs out is higher, roughly 1 in 3. That is
+    why the plan also gives you ways to cope when a target runs out." Never say the default makes
+    you "90% sure nothing worse happens": that is true for one need at a time only.
 
 ## 7. Public-domain federal text
 

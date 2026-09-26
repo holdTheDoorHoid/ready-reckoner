@@ -16,5 +16,5 @@ Disasters are harder when you rely on power, medicine, equipment or other people
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
 [^ready_gov_older_adults]: FEMA / Ready.gov, Older Adults (2026).
 [^cpuc_medical_baseline]: California Public Utilities Commission, Medical Baseline (2026).
-[^psegli_critical_care]: PSEG Long Island (electric utility), Protect Your Health During Power Outages (Critical Care Program) (2026).
+[^psegli_critical_care]: PSEG Long Island, Protect Your Health During Power Outages (Critical Care Program) (2026).
 [^tdem_stear]: Texas Division of Emergency Management, State of Texas Emergency Assistance Registry (STEAR) (2026).

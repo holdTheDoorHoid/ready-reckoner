@@ -8,7 +8,7 @@ citations: [cdc_heat_health, stone_2023_heat_blackout, ready_gov_heat, ready_gov
 
 **What helps.** Know where you can go to cool off. Dial 2-1-1 to find air conditioning near you.[^cdc_heat_health] Cover windows with drapes or shades, and weather-strip doors and windows.[^ready_gov_heat] Take cool showers, wear loose, light-colored clothing, and drink plenty of fluids. Check on family members, older adults and neighbours.[^ready_gov_heat] Heat can cause power outages, so plan for refrigerated medicines and powered medical devices.[^cdc_heat_health] {if:drought}In a drought, follow local limits on water use, and make saving water a daily habit.[^ready_gov_drought]{/if}
 
-**What to avoid.** Do not rely on a fan when it is over 90°F indoors. It can make you hotter.[^cdc_heat_health] Never leave people or pets in a closed car on a warm day.[^ready_gov_heat] Heat stroke is an emergency. Signs include a body temperature of 103°F or higher, hot, red skin that may be dry or damp, a fast, strong pulse, confusion or passing out. Call 911, move the person somewhere cooler, and cool them with cool cloths or a cool bath while you wait. Do not give them anything to drink.[^cdc_heat_related_illness]
+**What to avoid.** Do not rely on a fan when it is over 90°F indoors. It can make you hotter.[^cdc_heat_health] Never leave people or pets in a closed car on a warm day.[^ready_gov_heat] Heat stroke is an emergency. Signs include a temperature of 103°F or more, hot, red skin that may be dry or damp, a fast, strong pulse, confusion or passing out. Call 911, move the person somewhere cooler, cool them with cool cloths or a cool bath, and give them nothing to drink.[^cdc_heat_related_illness]
 
 ## Sources
 
