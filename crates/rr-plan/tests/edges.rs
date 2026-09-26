@@ -39,16 +39,19 @@ fn owned_items_count_and_recorded_prices_replace_the_band() {
             item_id: ItemId::from("water_stored_bottled"),
             qty: 13.0,
             paid_usd: Some(10.0),
+            tested_on: None,
         },
         Owned {
             item_id: ItemId::from("power_headlamp"),
             qty: 4.0,
             paid_usd: None,
+            tested_on: None,
         },
         Owned {
             item_id: ItemId::from("fire_test_alarms"),
             qty: 1.0,
             paid_usd: None,
+            tested_on: None,
         },
     ];
     let out = assess(&input);
@@ -240,6 +243,7 @@ fn assumed_basics_are_credited_listed_and_can_be_switched_off() {
         item_id: ItemId::from(note.related[0].as_str()),
         qty: 0.0,
         paid_usd: None,
+        tested_on: None,
     });
     let c = assess(&listed);
     let still = c

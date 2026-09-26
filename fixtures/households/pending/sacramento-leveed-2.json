@@ -1,0 +1,24 @@
+{
+  "planning_date": "2026-10-01",
+  "location": { "country": "US", "zip": "95834", "setting": "suburban" },
+  "housing": {
+    "kind": "detached", "tenure": "own", "floor": 1, "basement": false,
+    "water": "municipal", "sewer": "sewer", "heating": "gas", "cooling": "central",
+    "backup_power": "none", "alarms": { "smoke": true, "co": false, "extinguisher": true },
+    "cooking": "electric", "raw_water_source": "none", "water_system_record": "fine"
+  },
+  "people": [
+    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 12, "mode": "car", "remote_possible": true } },
+    { "age_band": "senior", "pregnant_or_nursing": false, "medical": { "daily_rx": true, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": false }
+  ],
+  "pets": { "dogs": 0, "cats": 1, "small": 0, "large_animals": 0 },
+  "mobility": { "vehicles": [ { "fuel": "gas" } ] },
+  "finances": {
+    "monthly_budget_usd": 100, "one_off_budget_usd": 0,
+    "emergency_fund_months": 3, "monthly_expenses_usd": 5200,
+    "income": { "earners": 1, "stability": "stable" },
+    "insurance": { "home_or_renters": true, "flood": false, "earthquake": false, "sewer_backup": false }
+  },
+  "existing": [],
+  "dials": { "return_period": "one_in_100", "climate": "today", "horizon_years": 10 }
+}

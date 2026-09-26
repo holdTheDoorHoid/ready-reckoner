@@ -3,7 +3,7 @@
  * from `catalogue()` and never from here, so the real engine can rename things freely.
  */
 import type { BucketInfo, HazardId, HazardInfo, HazardTier, TierInfo } from '../types';
-import { HAZARD_IDS } from '../types';
+import { HAZARD_IDS, RETIRED_HAZARD_IDS } from '../types';
 
 const HAZARD_NAMES: Record<HazardId, string> = {
   avalanche: 'Avalanches',
@@ -41,18 +41,55 @@ const HAZARD_NAMES: Record<HazardId, string> = {
   burglary: 'Burglary',
   earner_death_or_disability: "An earner's death or disability",
   extended_household_illness: 'Long illness in the household',
+  // Contract v2 (awaiting: web-risks — the mock's own rows for these).
+  wildfire_smoke: 'Wildfire smoke',
+  dust_storm: 'Dust storm',
+  sinkhole: 'Sinkhole or ground collapse',
+  geomagnetic_storm: 'Severe solar storm',
+  vei7_eruption: 'Very large volcanic eruption',
+  dam_failure: 'Dam or levee failure',
+  network_outage: 'Phone or internet outage',
+  drug_shortage: 'Medicine shortage',
+  benefit_interruption: 'Government pay or benefits stop',
+  attack_disruption: 'Attack or threat closes your area',
+  multi_month_blackout: 'Power out for months (any cause)',
+  war_infrastructure: 'War with attacks on US infrastructure',
+  cbrn_attack: 'Chemical, biological or radiological attack',
+  severe_pandemic: 'Severe pandemic',
+  financial_crisis: 'Financial crisis with bank closures',
+  mass_violence: 'Mass shooting or bombing',
+  water_damage: 'Burst pipe or water leak',
+  eviction: 'Eviction',
+  arrest_or_detention: 'A household member is arrested or detained',
 };
 
-function hazardTier(index: number): HazardTier {
-  if (index < 18) return 'natural';
-  if (index < 27) return 'societal';
-  return 'personal';
+const NATURAL = new Set<HazardId>([
+  'avalanche', 'coastal_flooding', 'cold_wave', 'drought', 'earthquake', 'hail', 'heat_wave',
+  'hurricane', 'ice_storm', 'landslide', 'lightning', 'riverine_flooding', 'strong_wind', 'tornado',
+  'tsunami', 'volcanic_activity', 'wildfire', 'winter_weather', 'wildfire_smoke', 'dust_storm',
+  'sinkhole', 'geomagnetic_storm', 'vei7_eruption',
+]);
+
+const PERSONAL = new Set<HazardId>([
+  'job_loss', 'house_fire', 'medical_emergency', 'vehicle_stranding', 'local_utility_outage',
+  'burglary', 'earner_death_or_disability', 'extended_household_illness', 'water_damage',
+  'eviction', 'arrest_or_detention',
+]);
+
+/** Natural, societal or personal, as `rr-types` defines them. */
+export function hazardTier(id: HazardId): HazardTier {
+  if (NATURAL.has(id)) return 'natural';
+  if (PERSONAL.has(id)) return 'personal';
+  return 'societal';
 }
 
-export const HAZARDS: HazardInfo[] = HAZARD_IDS.map((id, i) => ({
+/** Every hazard the engine may emit: the retired ids are left out, as in the real catalogue. */
+export const HAZARDS: HazardInfo[] = HAZARD_IDS.filter(
+  (id) => !(RETIRED_HAZARD_IDS as readonly string[]).includes(id),
+).map((id) => ({
   id,
   name: HAZARD_NAMES[id],
-  tier: hazardTier(i),
+  tier: hazardTier(id),
 }));
 
 export function hazardName(id: HazardId): string {
@@ -72,6 +109,7 @@ export const BUCKETS: BucketInfo[] = [
   { id: 'medical_emergency', name: 'Medical emergency when help is slow', kind: 'readiness', target_kind: 'readiness' },
   { id: 'fire', name: 'House fire', kind: 'readiness', target_kind: 'readiness' },
   { id: 'security', name: 'Home and personal security', kind: 'readiness', target_kind: 'readiness' },
+  { id: 'clean_air', name: 'Unhealthy air indoors', kind: 'readiness', target_kind: 'readiness' },
   { id: 'income', name: 'Loss of income', kind: 'money', target_kind: 'months' },
   { id: 'home_loss', name: 'Home damaged or unlivable', kind: 'money', target_kind: 'readiness' },
 ];

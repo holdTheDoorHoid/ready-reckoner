@@ -5,6 +5,7 @@
 use rr_types::{BucketId, HazardId};
 
 /// A hazard as a plural noun phrase, for "how often … happen where you live".
+#[allow(deprecated)] // the retired `terrorism` still needs an arm while the id exists
 pub fn hazard_plural(h: HazardId) -> &'static str {
     use HazardId::*;
     match h {
@@ -43,10 +44,16 @@ pub fn hazard_plural(h: HazardId) -> &'static str {
         Burglary => "break-ins",
         EarnerDeathOrDisability => "the death or disability of an earner",
         ExtendedHouseholdIllness => "long illnesses at home",
+        // awaiting: consequence — plain phrases for the contract v2 hazards (none is emitted yet).
+        WildfireSmoke | DustStorm | Sinkhole | GeomagneticStorm | Vei7Eruption | DamFailure
+        | NetworkOutage | DrugShortage | BenefitInterruption | AttackDisruption
+        | MultiMonthBlackout | WarInfrastructure | CbrnAttack | SeverePandemic
+        | FinancialCrisis | MassViolence | WaterDamage | Eviction | ArrestOrDetention => h.name(),
     }
 }
 
 /// A hazard as a single event with an article, for "depends mostly on one event: …".
+#[allow(deprecated)] // the retired `terrorism` still needs an arm while the id exists
 pub fn hazard_one(h: HazardId) -> &'static str {
     use HazardId::*;
     match h {
@@ -85,6 +92,11 @@ pub fn hazard_one(h: HazardId) -> &'static str {
         Burglary => "a break-in",
         EarnerDeathOrDisability => "the death or disability of an earner",
         ExtendedHouseholdIllness => "a long illness",
+        // awaiting: consequence — plain phrases for the contract v2 hazards (none is emitted yet).
+        WildfireSmoke | DustStorm | Sinkhole | GeomagneticStorm | Vei7Eruption | DamFailure
+        | NetworkOutage | DrugShortage | BenefitInterruption | AttackDisruption
+        | MultiMonthBlackout | WarInfrastructure | CbrnAttack | SeverePandemic
+        | FinancialCrisis | MassViolence | WaterDamage | Eviction | ArrestOrDetention => h.name(),
     }
 }
 
@@ -104,6 +116,8 @@ pub fn bucket_cause_verb(b: BucketId) -> &'static str {
         MedicalEmergency => "bring a medical emergency",
         Fire => "start a fire",
         Security => "threaten home security",
+        // awaiting: consequence — words for the contract v2 clean-air bucket.
+        CleanAir => "fill homes with smoke or dust",
         Income => "cut income",
         HomeLoss => "damage homes",
     }
@@ -125,6 +139,8 @@ pub fn bucket_noun_plural(b: BucketId) -> &'static str {
         MedicalEmergency => "medical emergencies",
         Fire => "fires",
         Security => "security problems",
+        // awaiting: consequence — words for the contract v2 clean-air bucket.
+        CleanAir => "spells of unhealthy air",
         Income => "income gaps",
         HomeLoss => "displacements",
     }
@@ -146,6 +162,8 @@ pub fn bucket_noun(b: BucketId) -> &'static str {
         MedicalEmergency => "emergency",
         Fire => "fire",
         Security => "problem",
+        // awaiting: consequence — words for the contract v2 clean-air bucket.
+        CleanAir => "spell of unhealthy air",
         Income => "income gap",
         HomeLoss => "displacement",
     }
@@ -167,6 +185,8 @@ pub fn bucket_verb(b: BucketId) -> &'static str {
         MedicalEmergency => "have a medical emergency",
         Fire => "have a home fire",
         Security => "have a break-in or a nearby curfew",
+        // awaiting: consequence — words for the contract v2 clean-air bucket.
+        CleanAir => "have unhealthy air at home",
         Income => "lose income",
         HomeLoss => "have to leave home for a while because of damage",
     }
@@ -188,6 +208,8 @@ pub fn bucket_short(b: BucketId) -> &'static str {
         MedicalEmergency => "Medical emergency",
         Fire => "Fire",
         Security => "Security",
+        // awaiting: consequence — words for the contract v2 clean-air bucket.
+        CleanAir => "Clean air",
         Income => "Income gap",
         HomeLoss => "Home damage",
     }

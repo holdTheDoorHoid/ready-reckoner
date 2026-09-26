@@ -145,9 +145,12 @@ fn philadelphia_has_no_named_scenarios_and_shows_rare_catastrophes_last() {
     let a = assess("philadelphia-renters-4", "42101");
     assert!(a.scenarios.is_empty(), "{:?}", a.scenarios);
     let n = a.profiles.len();
-    let rare: Vec<H> = a.profiles[n - 2..].iter().map(|p| p.id).collect();
-    assert_eq!(rare, [H::NuclearAttack, H::Terrorism]);
-    for p in &a.profiles[n - 2..] {
+    // Contract v2 retired `terrorism`: it is never emitted, so nuclear attack is the one rare row
+    // until the other families arrive (awaiting: hazards — the nine rare families).
+    assert!(a.profiles.iter().all(|p| !p.id.is_retired()));
+    let rare: Vec<H> = a.profiles[n - 1..].iter().map(|p| p.id).collect();
+    assert_eq!(rare, [H::NuclearAttack]);
+    for p in &a.profiles[n - 1..] {
         assert_eq!(p.display, HazardDisplay::RareCatastrophic);
         assert!(!p.frequency_sentence.contains("Of 100"));
     }
@@ -158,25 +161,16 @@ fn philadelphia_has_no_named_scenarios_and_shows_rare_catastrophes_last() {
             .contains("about 1 in 2,000 to about 1 in 400 a year")
     );
     assert_eq!(nuke.rate_range, [0.0005, 0.0025]);
-    // The figure is the world's, not the household's (hazard review H-01), and the terrorism row
-    // says what it counts: a closure of the area, not the chance of being hurt (H-03).
+    // The figure is the world's, not the household's (hazard review H-01).
     assert!(
         nuke.frequency_sentence.contains("anywhere in the world")
             && nuke.frequency_sentence.contains("not for your household"),
         "{}",
         nuke.frequency_sentence
     );
-    let terror = profile(&a, H::Terrorism);
-    assert!(
-        terror.frequency_sentence.contains("half a day to two days")
-            && terror
-                .frequency_sentence
-                .contains("not the chance of being hurt"),
-        "{}",
-        terror.frequency_sentence
-    );
-    // Both rare rows carry the range the web shows instead of a point.
-    for p in &a.profiles[n - 2..] {
+    // The rare row carries the range the web shows instead of a point, and names its family.
+    assert_eq!(nuke.family.as_deref(), Some("nuclear_attack"));
+    for p in &a.profiles[n - 1..] {
         let [lo, hi] = p.rate_range;
         assert!(lo > 0.0 && hi >= 4.0 * lo, "{}: {lo} {hi}", p.id);
         assert!(lo <= p.rate_per_year && p.rate_per_year <= hi);

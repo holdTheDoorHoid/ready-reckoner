@@ -97,6 +97,64 @@ pub struct Item {
     /// litre or gallon).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub volume_l_per_unit: Option<f32>,
+    /// Items this one needs first: an accessory's device (batteries need the light, fuel needs
+    /// the can). The allocator never schedules it before them (contract v2; REVIEW K4). Optional
+    /// in content files; defaults to empty.
+    #[serde(default)]
+    pub requires: Vec<ItemId>,
+    /// The share of its readiness bucket's value this item carries, 0 to 1, so a whistle no
+    /// longer outranks a headlamp (contract v2; REVIEW K3). Absent means the bucket's value is
+    /// shared as before.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub readiness_share: Option<f32>,
+    /// A decision rather than a purchase (an insurance policy or a home repair to weigh), never
+    /// paid from the supplies budget (contract v2; REVIEW N4, N5). Optional in content files;
+    /// defaults to false.
+    #[serde(default)]
+    pub decision: bool,
+    /// Belongs to the long-horizon section (rain catchment, fuel storage, sanitation for months),
+    /// shown when a target passes 30 days or the household asks (contract v2). Optional in content
+    /// files; defaults to false.
+    #[serde(default)]
+    pub long_horizon: bool,
+    /// The season the item should be ready by, or checked before: the maintenance anchor
+    /// (contract v2; REVIEW N8). Absent when the season does not matter.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub season: Option<Season>,
+    /// Try it every this many months to be sure it works (a jump pack, a generator, a key safe,
+    /// flashlights); the Have screen records `Owned::tested_on` (contract v2; the Deviant Ollam
+    /// lessons). Absent when it needs no test.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub test_interval_months: Option<u16>,
+}
+
+string_enum! {
+    /// A season an item is anchored to: have it before the season starts, or check it then
+    /// (contract v2; REVIEW N8). Meteorological seasons: spring March to May, summer June to August
+    /// (the Atlantic hurricane season opens 1 June), fall September to November, winter December
+    /// to February.
+    pub enum Season: "season" {
+        /// March to May.
+        Spring = "spring",
+        /// June to August.
+        Summer = "summer",
+        /// September to November.
+        Fall = "fall",
+        /// December to February.
+        Winter = "winter",
+    }
+}
+
+impl Season {
+    /// The month the season starts, 1 to 12: March, June, September or December.
+    pub const fn start_month(self) -> u8 {
+        match self {
+            Season::Spring => 3,
+            Season::Summer => 6,
+            Season::Fall => 9,
+            Season::Winter => 12,
+        }
+    }
 }
 
 /// A typical price range for one unit, in US dollars.
@@ -134,8 +192,33 @@ pub struct GuidanceMeta {
     pub id: String,
     /// Heading shown to the user.
     pub title: String,
-    /// Bucket, hazard, tier or topic ids the block applies to.
+    /// Bucket, hazard, tier, topic or family ids the block applies to.
     pub applies_to: Vec<String>,
     /// Sources for the block.
     pub citations: Vec<CitationId>,
+    /// What kind of block this is, which decides where the packet and the app can use it
+    /// (contract v2). Absent in blocks not yet classified.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<GuidanceKind>,
+}
+
+string_enum! {
+    /// What kind of guidance block this is (contract v2).
+    pub enum GuidanceKind: "guidance kind" {
+        /// For after a disaster: the recovery page.
+        After = "after",
+        /// Part of the household's plan: the shelter plan, the 48-hour list, the communication
+        /// plan.
+        Plan = "plan",
+        /// About one hazard: its card.
+        Hazard = "hazard",
+        /// About one consequence bucket.
+        Bucket = "bucket",
+        /// About one plan tier.
+        Tier = "tier",
+        /// A topic that cuts across buckets (access needs, long horizon, Learn articles).
+        Topic = "topic",
+        /// About one rare-event family, with its "what it changes in your plan" paragraph.
+        Family = "family",
+    }
 }

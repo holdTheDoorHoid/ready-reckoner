@@ -5,7 +5,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::{BucketId, Citation, CitationId, HazardId, HazardTier, ItemId, TargetKind, TierId};
+use crate::{
+    BucketId, Citation, CitationId, Date, HazardId, HazardTier, ItemId, TargetKind, TierId,
+};
 
 /// A location the engine recognised: a county, plus the ZIP code if one was given.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -40,6 +42,80 @@ pub struct LocationResolved {
     /// A note about the data, for example "your county; tract-level data not yet loaded".
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub data_note: Option<String>,
+    /// What the data pack knows about this place's exposure to the v2 hazards, each value with
+    /// its source, for the "Why here" drawers and the About data page (contract v2). Omitted when
+    /// nothing is known.
+    #[serde(default, skip_serializing_if = "Exposure::is_empty")]
+    pub exposure: Exposure,
+}
+
+/// A value from the data pack together with the source it came from.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Sourced<T> {
+    /// The value.
+    pub value: T,
+    /// Where it comes from.
+    pub source: CitationId,
+}
+
+/// A place's exposure to the v2 hazards (DESIGN-DELTA §1.3, §2), from the county and ZIP columns
+/// of the data pack. Every field is optional (absent when the pack has no value for the place)
+/// and carries its source. The hazard and consequence crates read the pack directly; this is the
+/// copy the app shows.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Exposure {
+    /// The county's strategic-exposure class for the nuclear family: `A`, `B`, `C1`, `C2`, `D` or
+    /// `E` (REVIEW §2.3; `data/core/strategic_sites.toml`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub strategic_class: Option<Sourced<String>>,
+    /// Distance from the ZIP code's centre to the nearest listed strategic site, in kilometres.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub strategic_km: Option<Sourced<f64>>,
+    /// Share of the ZIP code inside the Category 1–3 storm-surge zone (NOAA/NHC), 0 to 1.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub surge_cat3_share: Option<Sourced<f64>>,
+    /// Days a year with wildfire smoke and PM2.5 of at least 35.5 µg/m³ (unhealthy for sensitive
+    /// groups), county mean.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub smoke_days_35: Option<Sourced<f64>>,
+    /// Share of the county's people living behind a levee (National Levee Database), 0 to 1.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub leveed_pop_share: Option<Sourced<f64>>,
+    /// High-hazard-potential dams within 10 km of the ZIP code whose listed downstream town lies
+    /// in it (USACE National Inventory of Dams).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dams_high_within_10km: Option<Sourced<u16>>,
+    /// Share of the county on karst (limestone) ground (USGS), 0 to 1.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub karst_share: Option<Sourced<f64>>,
+    /// Share of the county rated susceptible to landslides (USGS), 0 to 1.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub landslide_susceptible_share: Option<Sourced<f64>>,
+    /// Share of the county's public-water customers served by a system with a health-based
+    /// violation in the last five years (EPA SDWIS), 0 to 1. A compliance record, not a measure
+    /// of how easily the system breaks.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub water_system_flag: Option<Sourced<f64>>,
+    /// The NERC geomagnetic scaling factor for the county's latitude (1 at the benchmark
+    /// latitude; higher further north).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub geomag_factor: Option<Sourced<f64>>,
+    /// The metro area's share of FEMA Urban Area Security Initiative money, 0 to 1 (0 outside the
+    /// funded areas).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub uasi_share: Option<Sourced<f64>>,
+    /// Eviction filings per renter household per year in the county (Eviction Lab), 0 to 1.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub eviction_rate: Option<Sourced<f64>>,
+}
+
+impl Exposure {
+    /// True when no field is known.
+    pub fn is_empty(&self) -> bool {
+        *self == Exposure::default()
+    }
 }
 
 /// A point on the map, in decimal degrees (WGS 84).
@@ -83,8 +159,9 @@ string_enum! {
     pub enum HazardDisplay: "hazard display" {
         /// In the ranked list, ordered by what it means for this household.
         Ranked = "ranked",
-        /// In a separate box for rare catastrophes (nuclear attack and EMP, war, terrorism), with
-        /// likelihood and severity as two columns; never ranked by expected loss.
+        /// In a separate box for rare catastrophes (the nine families of [`HazardId::RARE`]), with
+        /// likelihood (range only) and severity as separate columns; never ranked by expected
+        /// loss.
         RareCatastrophic = "rare_catastrophic",
     }
 }
@@ -126,6 +203,69 @@ pub struct HazardProfile {
     pub frequency_sentence: String,
     /// The consequence buckets this hazard feeds.
     pub buckets: Vec<BucketId>,
+    /// For a rare row, the family it heads ([`HazardId::family`]); absent for ranked hazards
+    /// (contract v2).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub family: Option<String>,
+    /// Named causes inside this hazard (for example the EMP of a high-altitude burst inside the
+    /// nuclear family, or a dam release inside river flooding), each a note with its sources and,
+    /// where known, its own rate. Sub-causes are data, not hazard ids (contract v2; REVIEW H9).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sub_causes: Vec<SubCause>,
+    /// The location term behind the rate, for the "Why here" column: a class, its words and its
+    /// multiplier range (contract v2; REVIEW §2.3).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_factor: Option<LocationFactor>,
+    /// Show only the range, never a point estimate: set for every rare row and every rate that
+    /// rests on expert judgement stacked on expert judgement (contract v2; REVIEW H1). Omitted
+    /// when false.
+    #[serde(default, skip_serializing_if = "core::ops::Not::not")]
+    pub range_only: bool,
+    /// One comparison with the household's own ranked list, for example "less likely than a house
+    /// fire (about 5 in 100 for you)" (contract v2; REVIEW §2.4).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub anchor_sentence: Option<String>,
+    /// What it would mean if it happened here, in zone-conditional words ("life-threatening",
+    /// "serious disruption", "a few days' disruption") (contract v2; REVIEW §2.4).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub if_it_reaches_you: Option<String>,
+    /// What it changes in the plan: usually "nothing beyond your basics", or one free step
+    /// (contract v2; REVIEW §2.4).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub what_it_changes: Option<String>,
+}
+
+/// A named cause inside a hazard (contract v2). Sub-causes are notes on the profile, never hazard
+/// ids of their own.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SubCause {
+    /// Stable id, unique within its hazard, for example `hemp` or `yellowstone`.
+    pub id: String,
+    /// Plain name.
+    pub name: String,
+    /// What it is and what it changes, in plain language.
+    pub note: String,
+    /// Its own yearly rate as `[low, high]`, where one is known.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rate_range: Option<[f64; 2]>,
+    /// Where it comes from.
+    pub sources: Vec<CitationId>,
+}
+
+/// The location term behind a hazard's rate (contract v2; REVIEW §2.3): which class the place
+/// falls in, what that means in words, and how much it multiplies the rate.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LocationFactor {
+    /// The class, for example `"A"` (near a strategic military site) or a metro tier.
+    pub class: String,
+    /// The class in words, for example "near a strategic military site".
+    pub label: String,
+    /// The multiplier as `[low, middle, high]`.
+    pub multiplier: [f64; 3],
+    /// Where it comes from.
+    pub sources: Vec<CitationId>,
 }
 
 /// The day values targets are rounded to: ½, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 180 and
@@ -248,6 +388,30 @@ pub struct BucketAssessment {
     /// When outside help arrives and service is mostly restored, where known.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub relief: Option<Relief>,
+    /// The worst event in the region's record for this bucket, and whether the target would have
+    /// covered it (contract v2; REVIEW R10). Absent where the pack has no such record.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stress_test: Option<StressTest>,
+}
+
+/// The worst event in the region's record for one bucket: how long service stayed out, and
+/// whether this household's target would have covered it (contract v2; REVIEW R10).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StressTest {
+    /// The event, for example "Hurricane Helene".
+    pub event: String,
+    /// The day it began.
+    pub date: Date,
+    /// The region whose record it comes from, in words.
+    pub region: String,
+    /// `(days, share still out)` pairs: for example `(7.0, 0.12)` means 12 in 100 customers were
+    /// still out a week in. Days rise; shares are 0 to 1.
+    pub share_out_at_days: Vec<(f32, f32)>,
+    /// The household's target would have outlasted the event.
+    pub covered_by_target: bool,
+    /// Where it comes from.
+    pub sources: Vec<CitationId>,
 }
 
 string_enum! {
@@ -348,6 +512,14 @@ pub struct PlanItem {
     /// What the household recorded paying, in US dollars.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub paid_usd: Option<f32>,
+    /// Items this one needs first (an accessory's device); it is never scheduled before them
+    /// (contract v2; REVIEW K4).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub requires: Vec<ItemId>,
+    /// A decision rather than a purchase: an insurance policy or a home repair to weigh, with no
+    /// money from the supplies budget (contract v2; REVIEW N4, N5). Omitted when false.
+    #[serde(default, skip_serializing_if = "core::ops::Not::not")]
+    pub decision: bool,
 }
 
 /// One month of the plan.
@@ -406,6 +578,31 @@ pub struct Plan {
     /// The emergency-fund goal, when the household has income to protect.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub savings_track: Option<SavingsTrack>,
+    /// The first savings step, reachable soon: one month of expenses or $500, whichever is
+    /// smaller, and the month it is reached (contract v2; REVIEW N4).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_milestone: Option<SavingsMilestone>,
+    /// The plan is in bare-minimum mode, because the household asked for it
+    /// (`Dials::minimum_kit`) or because the full plan would run past 36 months (contract v2;
+    /// REVIEW R6). Omitted when false.
+    #[serde(default, skip_serializing_if = "core::ops::Not::not")]
+    pub minimum_kit: bool,
+    /// The long-horizon section (rain catchment, fuel storage, sanitation for months), shown when
+    /// a target passes 30 days or `Dials::long_horizon` is on (contract v2). Omitted when empty.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub long_horizon: Vec<PlanItem>,
+}
+
+/// A savings step toward the emergency fund (contract v2; REVIEW N4).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SavingsMilestone {
+    /// Months of expenses the step stands for.
+    pub months: f32,
+    /// The step in US dollars.
+    pub usd: f32,
+    /// The plan month by which it is reached (counted from 0, like [`PlanMonth::index`]).
+    pub by_month: u16,
 }
 
 /// A named scenario the engine considered for this location (for example a magnitude 9 Cascadia
@@ -438,6 +635,9 @@ string_enum! {
 }
 
 /// A guardrail message (DESIGN §4.7): the plan looks off, but the user may know better.
+///
+/// `id` is a stable string. Contract v2 adds six kinds, named by the associated constants below
+/// (`Warning::SURGE_ZONE_STAY_HOME`, …); `docs/ENGINE-API.md` lists every id the engine emits.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Warning {
@@ -451,6 +651,34 @@ pub struct Warning {
     pub why: String,
     /// Ids of related hazards, buckets or items.
     pub related: Vec<String>,
+}
+
+impl Warning {
+    /// The home is in a storm-surge zone, or leaving is likely, and the plan never says to leave
+    /// (contract v2; REVIEW S2).
+    pub const SURGE_ZONE_STAY_HOME: &'static str = "surge_zone_stay_home";
+    /// Refrigerated medicine needs a power source for a power target of two days or more, and the
+    /// plan has none (contract v2; REVIEW S1).
+    pub const COLD_CHAIN_POWER: &'static str = "cold_chain_power";
+    /// A household that relies on federal pay or a benefit has no food buffer by month 3
+    /// (contract v2; REVIEW H7).
+    pub const BENEFIT_LAPSE: &'static str = "benefit_lapse";
+    /// The full plan would run past 36 months; bare-minimum mode schedules the smallest kit first
+    /// (contract v2; REVIEW R6).
+    pub const PLAN_TOO_LONG: &'static str = "plan_too_long";
+    /// A water filter is in the plan but no raw water source is named (contract v2; REVIEW S6).
+    pub const NO_RAW_WATER_SOURCE: &'static str = "no_raw_water_source";
+    /// The household cannot cook or boil water without power (contract v2; REVIEW K1).
+    pub const NO_COOKING_CAPABILITY: &'static str = "no_cooking_capability";
+    /// The six kinds contract v2 adds, in the order above.
+    pub const V2_IDS: [&'static str; 6] = [
+        Warning::SURGE_ZONE_STAY_HOME,
+        Warning::COLD_CHAIN_POWER,
+        Warning::BENEFIT_LAPSE,
+        Warning::PLAN_TOO_LONG,
+        Warning::NO_RAW_WATER_SOURCE,
+        Warning::NO_COOKING_CAPABILITY,
+    ];
 }
 
 /// Everything `assess` returns.
@@ -487,4 +715,26 @@ pub struct PlanOutput {
     pub packet_markdown: String,
     /// Every citation referenced anywhere above.
     pub provenance: Vec<Citation>,
+    /// Facts for the recovery page ("After a disaster: the first 30 days") (contract v2; REVIEW
+    /// N2). Omitted when nothing is known.
+    #[serde(default, skip_serializing_if = "RecoveryInfo::is_empty")]
+    pub recovery: RecoveryInfo,
+}
+
+/// Facts for the recovery page (contract v2; REVIEW N2).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RecoveryInfo {
+    /// Federal disaster declarations that covered the county in the last five years (OpenFEMA).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub county_declarations_5yr: Option<u16>,
+    /// Where they come from.
+    pub sources: Vec<CitationId>,
+}
+
+impl RecoveryInfo {
+    /// True when nothing is known.
+    pub fn is_empty(&self) -> bool {
+        self.county_declarations_5yr.is_none() && self.sources.is_empty()
+    }
 }

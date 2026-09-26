@@ -1,0 +1,24 @@
+{
+  "planning_date": "2026-10-01",
+  "location": { "country": "US", "zip": "77550", "setting": "urban" },
+  "housing": {
+    "kind": "apartment_high_rise", "tenure": "rent", "floor": 9, "basement": false,
+    "water": "municipal", "sewer": "sewer", "heating": "electric_resistance", "cooling": "central",
+    "backup_power": "none", "alarms": { "smoke": true, "co": false, "extinguisher": false },
+    "cooking": "electric"
+  },
+  "people": [
+    { "age_band": "senior", "pregnant_or_nursing": false, "medical": { "daily_rx": true, "refrigerated_rx": false, "powered_device": "none", "mobility": "limited", "dietary": [], "epinephrine": false }, "earner": false, "access_needs": ["home_health"] }
+  ],
+  "pets": { "dogs": 0, "cats": 1, "small": 0, "large_animals": 0 },
+  "mobility": { "vehicles": [] },
+  "finances": {
+    "monthly_budget_usd": 30, "one_off_budget_usd": 200,
+    "emergency_fund_months": 2, "monthly_expenses_usd": 2100,
+    "income": { "earners": 0, "stability": "stable" },
+    "insurance": { "home_or_renters": true, "flood": false, "earthquake": false },
+    "benefits": ["ssi_ssdi"]
+  },
+  "existing": [],
+  "dials": { "return_period": "one_in_100", "climate": "today", "horizon_years": 10 }
+}

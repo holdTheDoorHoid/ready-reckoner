@@ -52,6 +52,7 @@ fn base(fixture: &str, monthly: f32) -> Setup {
         item_id: rr_types::ItemId::from("jug"),
         qty: 1.0,
         paid_usd: None,
+        tested_on: None,
     }];
     s
 }

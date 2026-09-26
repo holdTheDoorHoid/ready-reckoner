@@ -32,6 +32,10 @@ pub fn plan_input() -> PlanInput {
                 co: false,
                 extinguisher: true,
             },
+            below_grade_bedroom: true,
+            cooking: Some(CookingFuel::Gas),
+            raw_water_source: Some(RawWaterSource::RainBarrel),
+            water_system_record: Some(WaterSystemRecord::OccasionalNotices),
         },
         people: vec![
             Person {
@@ -51,6 +55,7 @@ pub fn plan_input() -> PlanInput {
                     mode: CommuteMode::Transit,
                     remote_possible: true,
                 }),
+                access_needs: vec![AccessNeed::Hearing, AccessNeed::ServiceAnimal],
             },
             Person {
                 age_band: AgeBand::Child,
@@ -65,6 +70,7 @@ pub fn plan_input() -> PlanInput {
                 },
                 earner: false,
                 commute: None,
+                access_needs: vec![AccessNeed::Cognitive],
             },
         ],
         pets: Pets {
@@ -89,12 +95,16 @@ pub fn plan_input() -> PlanInput {
                 home_or_renters: true,
                 flood: false,
                 earthquake: true,
+                sewer_backup: Some(false),
+                life_or_disability: Some(true),
             },
+            benefits: vec![Benefit::SnapWic, Benefit::FederalPay],
         },
         existing: vec![Owned {
             item_id: "water_stored".into(),
             qty: 20.0,
             paid_usd: Some(18.5),
+            tested_on: Some(date(2026, 9, 12)),
         }],
         assume_basics: false,
         dials: Dials {
@@ -107,9 +117,55 @@ pub fn plan_input() -> PlanInput {
                 on: false,
             }],
             rare_catastrophic_opt_in: true,
+            rare_opt_in: vec!["nuclear_attack".into(), "all".into()],
+            minimum_kit: true,
+            long_horizon: true,
         },
         stage: Some(Stage::HaveSomeThings),
         confidence_1to5: Some(3),
+        family_plan: Some(family_plan()),
+    }
+}
+
+pub fn contact(name: &str, phone: &str) -> Contact {
+    Contact {
+        name: Some(name.into()),
+        phone: Some(phone.into()),
+    }
+}
+
+/// A family plan with every field filled in, already tidy.
+pub fn family_plan() -> FamilyPlan {
+    FamilyPlan {
+        meeting_place_near: Some("The mailbox at the corner of 9th and Pine".into()),
+        meeting_place_far: Some("The public library on Main Street".into()),
+        out_of_area_contact: Some(contact("Aunt Rosa", "555-0100")),
+        school_pickup: Some("Grandpa picks up from Lincoln Elementary; the school holds children until a listed adult arrives".into()),
+        work_plans: Some("Sam stays at the hospital until relieved; Ana walks home".into()),
+        shelter_spot_home: Some("The inner hallway on the ground floor".into()),
+        shelter_spot_work: Some("The stairwell on floor 3".into()),
+        where_we_would_go: Some("Rosa's house in Harrisburg".into()),
+        routes: vec!["I-76 west to the turnpike".into(), "US-322 west".into()],
+        neighbours_who_check: Some("Mr. Lee next door checks on us; we check on Mrs. Park".into()),
+        who_takes_animals: Some("Rosa takes the dog".into()),
+        shutoff_gas: Some("Beside the meter at the back; wrench on the hook".into()),
+        shutoff_water: Some("Basement, front wall, blue handle".into()),
+        shutoff_electric: Some("Panel in the kitchen closet".into()),
+        trusted_circle: vec![
+            TrustedPerson {
+                name: Some("Rosa".into()),
+                phone: Some("555-0100".into()),
+                holds: vec![Holds::SpareKey, Holds::Documents],
+            },
+            TrustedPerson {
+                name: Some("Dev".into()),
+                phone: Some("555-0101".into()),
+                holds: vec![Holds::MedicalPoa, Holds::BackupCodes],
+            },
+        ],
+        lawyer: Some(contact("J. Ortiz", "555-0102")),
+        roadside_assistance: Some("555-0103".into()),
+        numbers_by_heart: vec!["555-0100".into(), "555-0104".into()],
     }
 }
 
@@ -135,6 +191,32 @@ pub fn location() -> LocationResolved {
             hazmat_facilities_within_5km: 12,
         },
         data_note: Some("your county; tract-level data not yet loaded".into()),
+        exposure: exposure(),
+    }
+}
+
+fn sourced<T>(value: T, source: &str) -> Option<Sourced<T>> {
+    Some(Sourced {
+        value,
+        source: source.into(),
+    })
+}
+
+/// Every exposure field filled in.
+pub fn exposure() -> Exposure {
+    Exposure {
+        strategic_class: sourced("C1".to_owned(), "rr_strategic_sites"),
+        strategic_km: sourced(42.5, "rr_strategic_sites"),
+        surge_cat3_share: sourced(0.0, "nhc_surge_maps"),
+        smoke_days_35: sourced(1.4, "epa_aqs_pm25"),
+        leveed_pop_share: sourced(0.02, "usace_nld"),
+        dams_high_within_10km: sourced(1, "usace_nid"),
+        karst_share: sourced(0.1, "usgs_karst"),
+        landslide_susceptible_share: sourced(0.05, "usgs_landslide_susceptibility"),
+        water_system_flag: sourced(0.0, "epa_sdwis"),
+        geomag_factor: sourced(0.7, "nerc_tpl007_benchmark"),
+        uasi_share: sourced(0.03, "fema_uasi_fy2025"),
+        eviction_rate: sourced(0.06, "eviction_lab"),
     }
 }
 
@@ -175,6 +257,8 @@ fn plan_item(done: bool) -> PlanItem {
         tier: TierId::H72,
         done,
         paid_usd: done.then_some(8.0),
+        requires: vec!["water_container".into()],
+        decision: !done,
     }
 }
 
@@ -192,11 +276,20 @@ fn bucket(id: BucketId, target: Target, relief: Option<Relief>) -> BucketAssessm
         }],
         frequency_sentences: vec!["About 12 of 100 households like yours ...".into()],
         sources: vec!["eagle_i_outages".into()],
+        stress_test: relief.as_ref().map(|_| StressTest {
+            event: "Hurricane Isaias".into(),
+            date: date(2020, 8, 4),
+            region: "the Northeast".into(),
+            share_out_at_days: vec![(1.0, 0.4), (3.0, 0.1), (7.0, 0.01)],
+            covered_by_target: true,
+            sources: vec!["eagle_i_outages".into()],
+        }),
         relief,
     }
 }
 
 fn hazard(id: HazardId, display: HazardDisplay) -> HazardProfile {
+    let rare = display == HazardDisplay::RareCatastrophic;
     HazardProfile {
         id,
         name: id.name().into(),
@@ -213,6 +306,30 @@ fn hazard(id: HazardId, display: HazardDisplay) -> HazardProfile {
         sources: vec!["fema_nri".into()],
         frequency_sentence: "About 26 of 100 households like yours each year.".into(),
         buckets: vec![BucketId::Power, BucketId::Thermal],
+        family: id.family().map(str::to_owned),
+        sub_causes: vec![SubCause {
+            id: if rare { "hemp" } else { "freezing_rain" }.into(),
+            name: if rare {
+                "Electrical effects (EMP)"
+            } else {
+                "Freezing rain"
+            }
+            .into(),
+            note: "A named cause inside this hazard.".into(),
+            rate_range: rare.then_some([1.0e-5, 2.0e-3]),
+            sources: vec!["epri_2019_hemp".into()],
+        }],
+        location_factor: rare.then(|| LocationFactor {
+            class: "C1".into(),
+            label: "in one of the ten largest metro areas".into(),
+            multiplier: [0.3, 0.6, 0.9],
+            sources: vec!["rr_strategic_sites".into()],
+        }),
+        range_only: rare,
+        anchor_sentence: rare
+            .then(|| "Less likely than a house fire (about 5 in 100 for you).".into()),
+        if_it_reaches_you: rare.then(|| "Life-threatening.".into()),
+        what_it_changes: rare.then(|| "One free step: pick your shelter spot.".into()),
     }
 }
 
@@ -299,6 +416,13 @@ pub fn plan_output() -> PlanOutput {
                 monthly_suggestion_usd: 100.0,
                 why: "Most job losses last about ten weeks.".into(),
             }),
+            first_milestone: Some(SavingsMilestone {
+                months: 0.12,
+                usd: 500.0,
+                by_month: 5,
+            }),
+            minimum_kit: true,
+            long_horizon: vec![plan_item(false)],
         },
         requirements: vec![RequirementLine {
             id: "water_out.water_stored".into(),
@@ -320,6 +444,10 @@ pub fn plan_output() -> PlanOutput {
         }],
         packet_markdown: "# Your plan\n".into(),
         provenance: vec![citation()],
+        recovery: RecoveryInfo {
+            county_declarations_5yr: Some(3),
+            sources: vec!["openfema_declarations".into()],
+        },
     }
 }
 
@@ -354,6 +482,12 @@ pub fn item() -> Item {
         hazard_extras: vec![HazardId::Hurricane],
         energy_kcal_per_unit: Some(0.0),
         volume_l_per_unit: Some(3.785),
+        requires: vec!["water_container".into()],
+        readiness_share: Some(0.25),
+        decision: true,
+        long_horizon: true,
+        season: Some(Season::Summer),
+        test_interval_months: Some(6),
     }
 }
 
@@ -366,6 +500,7 @@ pub fn catalogue() -> Catalogue {
             title: "Water".into(),
             applies_to: vec!["water_out".into(), "water_boil".into()],
             citations: vec!["ready_gov_water".into()],
+            kind: Some(GuidanceKind::Bucket),
         }],
         hazards: HazardInfo::all(),
         buckets: BucketInfo::all(),
@@ -387,6 +522,15 @@ pub fn engine_info() -> EngineInfo {
             version: Some("1.20".into()),
             accessed: date(2026, 9, 25),
         }],
+        validation: ValidationSummary {
+            events_tested: 22,
+            covered: 6,
+            partial: 5,
+            short: 10,
+            not_modelled: 1,
+            data_pack: "core-2026.09".into(),
+            url_anchor: "#/validation".into(),
+        },
     }
 }
 

@@ -42,7 +42,7 @@ fn every_ts_interface_matches_the_rust_types() {
         &json(&PlanInput::defaults()),
         &parses::<PlanInput>,
     );
-    for (_, input) in fixtures::all() {
+    for (_, input) in fixtures::all().into_iter().chain(fixtures::pending()) {
         c.check_root("PlanInput", &json(&input), &parses::<PlanInput>);
     }
     c.check_root(
@@ -143,9 +143,17 @@ fn every_ts_interface_matches_the_rust_types() {
 #[test]
 fn every_ts_id_list_matches_the_rust_enum() {
     let file = types_ts();
+    let rare: Vec<&str> = HazardId::RARE.iter().map(|h| h.as_str()).collect();
+    let retired: Vec<&str> = HazardId::ALL
+        .iter()
+        .filter(|h| h.is_retired())
+        .map(|h| h.as_str())
+        .collect();
     let lists: &[(&str, &[&str])] = &[
         ("HAZARD_TIERS", HazardTier::STRS),
         ("HAZARD_IDS", HazardId::STRS),
+        ("RARE_HAZARD_IDS", &rare),
+        ("RETIRED_HAZARD_IDS", &retired),
         ("TARGET_KINDS", TargetKind::STRS),
         ("BUCKET_KINDS", BucketKind::STRS),
         ("BUCKET_IDS", BucketId::STRS),
@@ -176,6 +184,14 @@ fn every_ts_id_list_matches_the_rust_enum() {
         ("EVIDENCE_KINDS", EvidenceKinds::STRS),
         ("ERROR_CODES", ErrorCode::STRS),
         ("EXPLAIN_KINDS", ExplainKind::STRS),
+        ("ACCESS_NEEDS", AccessNeed::STRS),
+        ("COOKING_FUELS", CookingFuel::STRS),
+        ("RAW_WATER_SOURCES", RawWaterSource::STRS),
+        ("WATER_SYSTEM_RECORDS", WaterSystemRecord::STRS),
+        ("BENEFITS", Benefit::STRS),
+        ("HOLDS", Holds::STRS),
+        ("SEASONS", Season::STRS),
+        ("GUIDANCE_KINDS", GuidanceKind::STRS),
     ];
     let strings = |name: &str| -> Vec<String> {
         file.arrays
@@ -236,6 +252,32 @@ fn contract_version_agrees_everywhere() {
     assert_eq!(
         file.numbers.get("ENGINE_API_VERSION"),
         Some(&f64::from(ENGINE_API_VERSION))
+    );
+    // The family-plan limits the engine applies, so the web form can use the same maxlength.
+    let limits = [
+        ("FAMILY_PLAN_TEXT_MAX", FAMILY_PLAN_TEXT_MAX),
+        ("FAMILY_PLAN_SHORT_MAX", FAMILY_PLAN_SHORT_MAX),
+        ("TRUSTED_CIRCLE_MAX", TRUSTED_CIRCLE_MAX),
+        ("ROUTES_MAX", ROUTES_MAX),
+        ("NUMBERS_BY_HEART_MAX", NUMBERS_BY_HEART_MAX),
+    ];
+    for (name, value) in limits {
+        assert_eq!(
+            file.numbers.get(name),
+            Some(&(value as f64)),
+            "types.ts {name} differs from rr-types"
+        );
+    }
+    let mut known: BTreeSet<&str> = limits.iter().map(|(n, _)| *n).collect();
+    known.insert("ENGINE_API_VERSION");
+    let unchecked: Vec<&String> = file
+        .numbers
+        .keys()
+        .filter(|k| !known.contains(k.as_str()))
+        .collect();
+    assert!(
+        unchecked.is_empty(),
+        "add these types.ts numbers to this test: {unchecked:?}"
     );
     let doc = read_repo_file("docs/ENGINE-API.md");
     assert!(

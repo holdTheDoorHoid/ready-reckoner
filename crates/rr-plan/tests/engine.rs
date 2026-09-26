@@ -67,8 +67,8 @@ fn with_no_packs_the_sample_counties_still_plan() {
 fn catalogue_and_defaults() {
     let c = engine().catalogue();
     assert_eq!(c.items.len(), rr_content::content().items.len());
-    assert_eq!(c.buckets.len(), 14);
-    assert_eq!(c.hazards.len(), 35);
+    assert_eq!(c.buckets.len(), 15); // contract v2: + clean_air
+    assert_eq!(c.hazards.len(), 53); // contract v2: the active ids
     let d = engine().defaults();
     assert!(d.validate().is_empty());
     // The placeholder ZIP code fails loudly rather than planning for somewhere else.
