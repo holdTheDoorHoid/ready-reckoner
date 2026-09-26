@@ -540,11 +540,16 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   arrests, FDIC and openFDA (notes). OE-417 counts reports, not household outages, so the regional
   blackout keeps its prior and gains the OE-417 physical-attack and cyber counts as sub-cause notes;
   no FCC or CSB series measures cyber outages or chemical releases, so those priors stand.
-- **Outages by cause (M-18, M-10).** The outage floor can top up each storm hazard by its share of
+- **Outages by cause (M-18, M-10).** The outage floor tops up each storm hazard by its share of
   recorded outages matched by date (`natural::shortfall_by_cause`), instead of counting every
-  shortfall as windstorms; it reads data-model's `OutageModel::causes` (awaiting: data-model), so
-  the v0.1 rule runs until then. The hurricane double count M-10 is `rr-consequence`'s (county curve
-  plus hurricane rows); `rr-hazards` already subtracts modelled hurricane outages in the floor.
+  shortfall as windstorms. It reads the county record's `outage_model.causes` (the pack's
+  `core/outage_causes.csv`, since the data-model merge); a county without cause shares keeps the
+  v0.1 rule (all of the shortfall to windstorms), and its note says the records are not matched to
+  storms. The `wind` cause counts the modelled outages of windstorms, tornadoes, lightning and
+  hail together (data-model files all four under it), and a hurricane top-up also goes into the
+  Category 1–2 part, so the major-hurricane card still shows the full rate. The hurricane double
+  count M-10 is `rr-consequence`'s (county curve plus hurricane rows); `rr-hazards` already
+  subtracts modelled hurricane outages in the floor.
 - **New scenarios have effects rows** (rr-consequence, v0.2.0). `wasatch_m7`,
   `san_andreas_south_m78` and `seattle_fault_m7` take the New Madrid and Hayward priors;
   `heat_blackout` is rr-consequence's heat-plus-outage class and owns its durations and effects

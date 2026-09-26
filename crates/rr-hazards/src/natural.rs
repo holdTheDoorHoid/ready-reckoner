@@ -808,8 +808,15 @@ fn outage_share(hazard: HazardId) -> Option<f64> {
 }
 
 /// The outage floor: when recorded outages (EAGLE-I) show more storm power cuts than the storm
-/// rates explain, the difference is counted as windstorms, the most common cause.
-fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
+/// rates explain, the difference is counted under the storms the county's outages were matched to
+/// by date ([`floor_by_cause`]); when the record carries no causes, all of it is counted as
+/// windstorms, the most common cause.
+fn outage_floor(
+    ctx: &Ctx<'_>,
+    rates: &mut Vec<HazardRate>,
+    hurricane: Option<&mut HurricaneSplit>,
+    notes: &mut Notes,
+) {
     let county = ctx.county_label();
     let Some(o) = ctx.county.outages.as_ref() else {
         notes.add(format!(
@@ -841,7 +848,7 @@ fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
         return;
     }
     if let Some(causes) = outage_causes(ctx) {
-        floor_by_cause(recorded, causes, rates, &records, &homes, notes);
+        floor_by_cause(recorded, causes, rates, hurricane, &records, &homes, notes);
         return;
     }
     let weather = spread(recorded, OUTAGE_RATE_SPREAD, &[cite::EAGLE_I]).times(&prior(
@@ -862,7 +869,8 @@ fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
     extra.high = (weather.high - modelled) / c;
     notes.add(format!(
         "{records} show {homes} caught in an outage {}, more often than the county's storm \
-         records explain. The extra outages are counted as windstorms, the most common cause.",
+         records explain. The records here are not matched to the storms behind them, so the \
+         extra outages are counted as windstorms, the most common cause.",
         crate::sentence::about_times_a_year(recorded)
     ));
     match rates.iter_mut().find(|r| r.hazard == HazardId::StrongWind) {
@@ -885,34 +893,51 @@ fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
 
 /// Share of the county's recorded outages by cause, attributed by event date (model review
 /// M-18): keys `hurricane`, `ice`, `winter`, `wind`, `wildfire`, `heat`, `cold_grid`, `flood`,
-/// `grid` and `unattributed`, as data-model's `OutageModel::causes` writes them.
-/// awaiting: data-model — `CountyRecord::outage_model` is not merged; once it is, this returns
-/// `ctx.county.outage_model.as_ref().map(|m| &m.causes).filter(|c| !c.is_empty())`.
-fn outage_causes<'a>(_ctx: &Ctx<'a>) -> Option<&'a BTreeMap<String, f32>> {
-    None
+/// `grid` and `unattributed`, from the pack's `core/outage_causes.csv` as rr-data fills
+/// `CountyRecord::outage_model` (shares above zero only). `None` when the record has no outage
+/// model or no cause shares (a county on its state's pooled record, or a pack without the file):
+/// the floor then counts the whole shortfall as windstorms, as before, and its note says so.
+fn outage_causes<'a>(ctx: &Ctx<'a>) -> Option<&'a BTreeMap<String, f32>> {
+    ctx.county
+        .outage_model
+        .as_ref()
+        .map(|m| &m.causes)
+        .filter(|c| !c.is_empty())
 }
 
-/// The storm hazards the outage floor tops up: their cause key in the attribution and their
-/// verb.
-const FLOOR_CAUSES: [(HazardId, &str, &str); 4] = [
+/// The storm hazards the outage floor tops up: the hazard that takes the top-up, its cause key in
+/// the attribution, the hazards whose modelled outages count against that cause, and its verb.
+/// data-model's `wind` class holds thunderstorm, high and strong winds, tornadoes, lightning and
+/// hail (`rr-etl` `outage_model::PRIORITY`), so all four hazards count against it, and a shortfall
+/// goes to windstorms.
+const FLOOR_CAUSES: [(HazardId, &str, &[HazardId], &str); 4] = [
     (
         HazardId::StrongWind,
         "wind",
+        &[
+            HazardId::StrongWind,
+            HazardId::Tornado,
+            HazardId::Lightning,
+            HazardId::Hail,
+        ],
         "lose power or have damage in a windstorm",
     ),
     (
         HazardId::WinterWeather,
         "winter",
+        &[HazardId::WinterWeather],
         "be snowed in or lose power in a winter storm",
     ),
     (
         HazardId::IceStorm,
         "ice",
+        &[HazardId::IceStorm],
         "lose power or be stuck at home in an ice storm",
     ),
     (
         HazardId::Hurricane,
         "hurricane",
+        &[HazardId::Hurricane],
         "lose power or have damage from a hurricane or tropical storm",
     ),
 ];
@@ -934,10 +959,10 @@ pub(crate) fn shortfall_by_cause(
             .filter(|v| v.is_finite() && *v > 0.0)
             .unwrap_or(0.0)
     };
-    let storm_total: f64 = FLOOR_CAUSES.iter().map(|(_, k, _)| share(k)).sum();
+    let storm_total: f64 = FLOOR_CAUSES.iter().map(|(_, k, _, _)| share(k)).sum();
     let unattributed = share("unattributed") * OUTAGE_WEATHER_SHARE.0;
     let mut out = Vec::new();
-    for (h, key, _) in FLOOR_CAUSES {
+    for (h, key, covered, _) in FLOOR_CAUSES {
         let own = share(key);
         // The weather part of the unattributed outages, in proportion to the attributed storm
         // shares (all to windstorms when none is attributed).
@@ -951,7 +976,7 @@ pub(crate) fn shortfall_by_cause(
         let needed = recorded * (own + part);
         let have = modelled
             .iter()
-            .filter(|(m, _)| *m == h)
+            .filter(|(m, _)| covered.contains(m))
             .map(|(_, r)| *r)
             .sum::<f64>();
         let c = outage_share(h).unwrap_or(1.0);
@@ -962,11 +987,15 @@ pub(crate) fn shortfall_by_cause(
     out
 }
 
-/// Applies [`shortfall_by_cause`] to the rates, with a note.
+/// Applies [`shortfall_by_cause`] to the rates, with a note. A hurricane top-up also goes into the
+/// Category 1–2 part of the hurricane split: the major-hurricane scenario's register card shows
+/// that part plus the major part, and must still show the full rate. The majors are HURDAT2's own
+/// passages; the outages the model misses come from the more frequent weaker storms.
 fn floor_by_cause(
     recorded: f64,
     causes: &BTreeMap<String, f32>,
     rates: &mut Vec<HazardRate>,
+    mut hurricane: Option<&mut HurricaneSplit>,
     records: &str,
     homes: &str,
     notes: &mut Notes,
@@ -988,9 +1017,15 @@ fn floor_by_cause(
         );
         let verb = FLOOR_CAUSES
             .iter()
-            .find(|(x, _, _)| *x == h)
-            .map_or("lose power", |(_, _, v)| *v);
+            .find(|(x, _, _, _)| *x == h)
+            .map_or("lose power", |(_, _, _, v)| *v);
         named.push(crate::plural(h));
+        if h == HazardId::Hurricane
+            && let Some(split) = hurricane.as_deref_mut()
+        {
+            split.cat12_today = split.cat12_today.plus(&e);
+            split.cat12_future = split.cat12_future.plus(&e);
+        }
         match rates.iter_mut().find(|r| r.hazard == h) {
             Some(r) => {
                 r.today = r.today.plus(&e);
@@ -1067,7 +1102,7 @@ pub(crate) fn assess(ctx: &Ctx<'_>, notes: &mut Notes) -> Natural {
         };
         out.rates.extend(rate);
     }
-    outage_floor(ctx, &mut out.rates, notes);
+    outage_floor(ctx, &mut out.rates, out.hurricane.as_mut(), notes);
     out.rates.sort_by_key(|r| r.hazard);
     out
 }
@@ -1108,5 +1143,22 @@ mod tests {
         // Nothing unattributed to share out and every cause explained: no top-up.
         let explained = shortfall_by_cause(0.1, &causes, &[(HazardId::StrongWind, 1.0)]);
         assert!(explained.iter().all(|(h, _)| *h != HazardId::StrongWind));
+    }
+
+    #[test]
+    fn tornado_lightning_and_hail_outages_count_against_the_wind_class() {
+        // data-model files tornadoes, lightning and hail under `wind`, so their modelled outages
+        // count against it: windstorms take only what is left, (1.0 - 0.55) / 0.9.
+        let causes: BTreeMap<String, f32> = [("wind".to_owned(), 1.0f32)].into_iter().collect();
+        let modelled = [
+            (HazardId::StrongWind, 0.3),
+            (HazardId::Tornado, 0.1),
+            (HazardId::Lightning, 0.1),
+            (HazardId::Hail, 0.05),
+        ];
+        let got = shortfall_by_cause(1.0, &causes, &modelled);
+        assert_eq!(got.len(), 1);
+        assert_eq!(got[0].0, HazardId::StrongWind);
+        assert!((got[0].1 - 0.45 / 0.9).abs() < 1e-9);
     }
 }
