@@ -95,6 +95,12 @@ registry ids, so each source has exactly one id:
 | an OpenFEMA id | `openfema_nfip` for the data and `openfema_disclaimer` for the required statement |
 | a pandemic base-rate id | `cdc_pandemic_history` (onsets) or `marani_2021_pandemics` (recurrence) |
 
+The two ids the data job added itself, `nhtsa_early_estimate_2025` (1.10 deaths per 100 million
+vehicle miles in 2025, exact quote stored) and `census_popest_vintage_2025` (the Census population
+file used as a denominator), are now registry entries with the same ids. `nhtsa_crashes_2023` now
+points at the 2023 overview itself (DOT HS 813 705) rather than the Crash Stats home page, with the
+6.14 million crashes quoted.
+
 ## Registry index for the other workstreams
 
 Every id below is in `content/citations.toml`. Federal entries carry an exact quote where one was

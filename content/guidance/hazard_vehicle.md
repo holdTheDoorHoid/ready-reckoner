@@ -12,7 +12,7 @@ citations: [nhtsa_crashes_2023, ready_gov_winter, ready_gov_evacuation, nhtsa_ti
 
 ## Sources
 
-[^nhtsa_crashes_2023]: National Highway Traffic Safety Administration, Traffic Safety Facts: 2023 data overview (2025).
+[^nhtsa_crashes_2023]: National Highway Traffic Safety Administration, Overview of Motor Vehicle Traffic Crashes in 2023 (Research Note, DOT HS 813 705) (2025).
 [^ready_gov_winter]: FEMA / Ready.gov, Winter Weather (2026).
 [^ready_gov_evacuation]: FEMA / Ready.gov, Evacuation (2026).
 [^nhtsa_tires]: National Highway Traffic Safety Administration, Tires (2026).
