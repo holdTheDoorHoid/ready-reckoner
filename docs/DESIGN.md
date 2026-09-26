@@ -459,7 +459,7 @@ PlanInput ─► rr-hazards ─► [HazardProfile] ─► rr-consequence ─► 
 | `rr-budget` | Risk function, allocator, guardrails | rr-types, rr-supply, rr-content |
 | `rr-plan` | Pipeline, PlanOutput, packet Markdown | all of the above |
 | `rr-wasm` | `wasm-bindgen` surface per `docs/ENGINE-API.md` | rr-plan |
-| `rr-cli` | `plan`, `risks`, `explain`, `catalogue`, `data verify`, `golden` | rr-plan (native) |
+| `rr-cli` | `plan`, `risks`, `targets --sweep`, `explain`, `catalogue`, `citations --missing`, `county search/show`, `data verify/info`, `golden [--update]`, `doctor` (`docs/CLI.md`) | rr-plan, rr-data, rr-etl (native) |
 | `rr-etl` | Downloads sources, builds packs, writes manifest (native, reqwest) | rr-types |
 
 Hard rules (also in `CLAUDE.md`): deterministic; no wall clock; no OS entropy; no `rand`; all engine
