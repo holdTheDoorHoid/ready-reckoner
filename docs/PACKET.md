@@ -2,7 +2,8 @@
 
 The printable packet is `PlanOutput.packet_markdown`, written by `crates/rr-plan` (`src/packet/`)
 from the plan's numbers and the guidance blocks in `content/guidance/`. The web app renders it with
-its sanitising Markdown renderer and prints each `##` section on its own page; the CLI prints it
+its sanitising Markdown renderer (with the county map at the start of "Your risks") and prints the
+sections one after another, the sources in two small columns; the CLI prints it
 as is. `docs/DESIGN.md` §9 sets the sections; this file says what feeds each one and how the
 household's numbers get into the guidance text.
 
@@ -28,11 +29,16 @@ research live in the app's Learn and explain views; the packet keeps what to do.
   each with title, publisher, year and the URL once.
 
 On the seven fixtures this gives 7,900 to 11,100 words (down from 16,800 to 24,500), a fifth of
-it the Sources section and data credits. Printed with the app's print stylesheet (every `##`
-section on a new page) that is still about 30 pages: the section breaks leave about five pages
-part-empty and the sources take about six. `the_packet_stays_short`
+it the Sources section and data credits. `the_packet_stays_short`
 (`crates/rr-plan/tests/fixtures.rs`) fails above 11,500 words, so the packet cannot grow back
 unnoticed.
+
+Printed from the app (headless Chrome, `web/scripts/packet-pages.mjs`), the Philadelphia packet
+was 30 US Letter pages (28 A4) while every `##` section started a new page; with sections
+following on (a heading is never left alone at the foot of a page), the sources in two columns of
+8 pt type, tables allowed to run on (rows never split, headers repeat) and tighter paragraph
+spacing it is 22 Letter pages (21 A4) at the same 10.5 pt body text. The rest of the way to 20
+is the words themselves.
 
 ## Format
 

@@ -146,7 +146,7 @@
         map come only when they are needed. Sizes are as stored; the download is smaller.
       </p>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-      <div class="table-wrap" tabindex="0" role="region" aria-label="The data on this device">
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Data parts: size and status">
         <table>
           <thead><tr><th scope="col">Part</th><th scope="col">What it holds</th><th scope="col">Size</th><th scope="col">Status</th></tr></thead>
           <tbody>

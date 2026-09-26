@@ -11,14 +11,14 @@ exportable JSON file; there is no server.
 | # | Screen | One job | Notes |
 | --- | --- | --- | --- |
 | 0 | Start | Explain what this is and the privacy promise; start new or import a saved plan | Import via file picker (JSON). Big, calm. |
-| 1 | Where you live | ZIP or county, setting (urban/suburban/rural), housing type, own/rent, water/sewer, heating/cooling, backup power | ZIP resolves to county from a bundled crosswalk. Nothing sent anywhere; say so on the screen. Optional "improve with online lookups" toggle explains exactly what would be sent to whom. |
+| 1 | Where you live | ZIP or county, setting (urban/suburban/rural), housing type, own/rent, water/sewer, heating/cooling, backup power | ZIP resolves to county from a bundled crosswalk (the ZIP code list loads when someone starts typing one). A ZIP code that spans counties lists each with its share of the ZIP code's land and a numbered map. A county map confirms the result. Nothing sent anywhere; say so on the screen. Optional "improve with online lookups" toggle explains exactly what would be sent to whom. |
 | 2 | Who is in your household | People by age band; medical needs (daily meds, refrigerated meds, powered devices, mobility, dietary); pregnancy; pets | Add-a-person cards. Medical fields collapsed until "anyone with medical needs?" is yes. |
 | 3 | How you get around | Vehicles and fuel type; each adult's commute distance and mode; can they work remotely; school distance | Drives the get-home bag and evacuation logic. EVs get their own guidance. |
 | 4 | Money | Monthly prep budget; one-off amount if any; months of expenses saved; earners and income stability; insurance held | Budget slider with "typical" marker. Reassure: $0 produces a plan of free actions. |
 | 5 | What you already have | Optional inventory: quick checklist of common items with quantities | Skippable. Reduces the plan by what is owned. |
 | 6 | Your risks | The register: hazard cards ranked, natural-frequency sentences, a county map thumbnail, the consequence buckets with "days you should be able to manage" | Dials live here in a drawer: return period (Common 1-in-10 / Serious 1-in-50 / Very serious 1-in-100, default / Rare catastrophes 1-in-500, each with its ten-year chance), climate horizon (today / around 2050), water level (survival / basic / comfortable), and named-scenario toggles when the engine offers them (e.g. Cascadia). Rare catastrophic hazards sit in their own two-column box (how likely / how bad). Duration buckets show target with range and the relief rating; readiness buckets are have/don't-have cards; money buckets are a separate savings track. Changing a dial re-renders live. Every number has a source link. |
 | 7 | Your plan | Phased purchases and actions by month; "this month" first; each item shows spec, what to look for, avoid, price band, and *why* (which buckets, which hazards); check-off and record what you paid | Free actions first, always. Progress bar per bucket ("power: 3 of 9 days covered"). Guardrail warnings, never blocks. |
-| 8 | Your packet | Print view: summary, risks, targets, checklists per tier, evacuation and family plan, documents list, maintenance calendar, special needs, sources | Print stylesheet -> browser PDF. Black-and-white friendly. Page breaks per section. |
+| 8 | Your packet | Print view: summary, risks (with the county map), targets, checklists per tier, evacuation and family plan, documents list, maintenance calendar, special needs, sources | Print stylesheet -> browser PDF. Black-and-white friendly. Sections follow on (no forced page break; a heading never ends a page); sources in two columns of small type. |
 | 9 | Maintain | Rotation and check calendar, drills, review reminders (local only), export/import | Rotation dates computed from purchase dates the user recorded. |
 | 10 | Learn | Why consequences not causes; disaster myths; how the numbers are made; talking with children; community | Short articles from `content/`. |
 | 11 | About and method | Versions of engine, data packs and content; every source; licences; how to report a wrong number | |
@@ -39,7 +39,13 @@ exportable JSON file; there is no server.
 - `ItemCard`: spec, look-for, avoid, price band, quantity for this household, why, check-off,
   paid-amount field.
 - `Dial`: labelled, with the plain phrase and the jargon in brackets.
-- `SourceLink`: citation id -> title, publisher, year, URL, retrieved date.
+- `SourceLink` (`Sources.svelte`): citation id -> title, publisher, year, URL (with the site's name),
+  retrieved date and the quoted passage, "Expert estimate" for priors; from `PlanOutput.provenance`.
+  A card-footer disclosure ("Sources (3)") and a small inline one after a single number.
+- `CountyMap`: inline SVG from the lazy `geo` pack; the county striped and outlined inside its
+  state (a ring when it is tiny), or the counties of an ambiguous ZIP code numbered as in the list.
+- `DataProgress`: the one calm line under the header while the county data loads (only after half a
+  second), with the reason and "Try again" if it fails.
 - `Warning`: guardrail message with the reason and a "keep anyway" affordance.
 
 ## Accessibility

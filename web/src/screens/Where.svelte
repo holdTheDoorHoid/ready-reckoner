@@ -213,7 +213,11 @@
       <div class="lookup" aria-live="polite">
         {#if looking && !resolved && suggestions.length === 0}
           <p class="small muted" aria-busy="true">
-            Looking up your county{app.data && app.data.core.phase === 'loading' ? ' (the county data is still loading)' : ''}…
+            Looking up your county{app.data?.core.phase === 'loading'
+              ? ' (the county data is still loading)'
+              : app.data?.zip.phase === 'loading'
+                ? ' (getting the ZIP code list, once)'
+                : ''}…
           </p>
         {/if}
         {#if lookupError?.code === 'pack_missing'}

@@ -98,11 +98,9 @@ try {
   const NET = { offline: false, latency: 40, downloadThroughput: 1_250_000, uploadThroughput: 500_000 };
   await cdp.send('Network.emulateNetworkConditions', NET);
   site.reset();
-  let startBytes = 0;
   const t0 = Date.now();
   await page.goto(site.url, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#page-title');
-  startBytes = site.sent().total;
   // The county data loads behind the start screen; the service worker is registered after it.
   await page.waitForFunction(() => performance.getEntriesByName('rr:data:core').length > 0, { timeout: 120000 });
   await page.waitForFunction(() => !!navigator.serviceWorker?.controller, { timeout: 120000 });
@@ -120,14 +118,13 @@ try {
     countyDataReadyMs: Math.round(marks.dataCore),
     firstContentfulPaintMs: Math.round(marks.fcp),
     offlineCopyDoneMs: wallMs,
-    bytesBeforeStartScreen: startBytes,
     bytesTotal: first.total,
     files: first.files.map((f) => ({ path: f.path, bytes: f.bytes, requests: f.requests })),
   };
   check(
     'the start screen is ready before the county data is in',
     marks.appReady < marks.dataCore,
-    `start screen at ${Math.round(marks.appReady)} ms (${kb(startBytes)} sent), county data at ${Math.round(marks.dataCore)} ms, ${kb(first.total)} in all`,
+    `start screen at ${Math.round(marks.appReady)} ms, county data at ${Math.round(marks.dataCore)} ms; ${kb(first.total)} transferred in all`,
   );
   check('first visit sends no ZIP tables and no map', !first.files.some((f) => /zip_|geo\//.test(f.path)));
   check('no file is sent twice on the first visit (the offline copy reuses the browser cache)', first.files.every((f) => f.requests === 1 || f.path === 'index.html'), first.files.filter((f) => f.requests > 1).map((f) => f.path).join(', '));
@@ -196,6 +193,8 @@ try {
   // -------------------------------------------------------------------------------------------
   // 3. assess timing in the browser
   // -------------------------------------------------------------------------------------------
+  // The very first call warms the engine up (one time); the dial changes below are the steady state.
+  const coldMs = await page.evaluate(() => performance.getEntriesByName('rr:assess:engine')[0]?.duration ?? NaN);
   await page.evaluate(() => performance.clearMeasures());
   await page.click('button[aria-controls="settings-panel"]');
   const dialOptions = await page.$$('#settings-panel input[type="radio"]');
@@ -211,13 +210,27 @@ try {
     total: performance.getEntriesByName('rr:assess').map((e) => e.duration),
   }));
   summary.assessMs = {
+    firstCall: +coldMs.toFixed(1),
     calls: timing.engine.length,
     engineMedian: +median(timing.engine).toFixed(1),
     engineMax: +Math.max(...timing.engine).toFixed(1),
     withJsonMedian: +median(timing.total).toFixed(1),
     withJsonMax: +Math.max(...timing.total).toFixed(1),
   };
-  check(`assess under 50 ms in the browser (median of ${timing.engine.length} calls)`, median(timing.engine) < 50, `engine ${summary.assessMs.engineMedian} ms median, ${summary.assessMs.engineMax} ms max; with JSON ${summary.assessMs.withJsonMedian} ms`);
+  check(`assess under 50 ms in the browser (median of ${timing.engine.length} calls)`, median(timing.engine) < 50, `engine ${summary.assessMs.engineMedian} ms median, ${summary.assessMs.engineMax} ms max; with JSON ${summary.assessMs.withJsonMedian} ms; the first call of the visit ${summary.assessMs.firstCall} ms`);
+  // The same on a CPU four times slower (Chrome's emulation of a mid-range phone): reported, not checked.
+  const cpu = await page.createCDPSession();
+  await cpu.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  await page.evaluate(() => performance.clearMeasures());
+  for (const option of dialOptions.slice(0, 4)) {
+    await option.click();
+    await sleep(300);
+    await page.waitForSelector('[data-screen-ready][aria-busy="false"]', { timeout: 30000 });
+  }
+  const slow = await page.evaluate(() => performance.getEntriesByName('rr:assess:engine').map((e) => e.duration));
+  await cpu.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+  summary.assessMs.phoneCpuMedian = +median(slow).toFixed(1);
+  console.log(`INFO  assess with a 4x slower CPU: ${summary.assessMs.phoneCpuMedian} ms median of ${slow.length} calls`);
   // Back to the fixture's own setting.
   await page.click('#settings-panel input[value="one_in_100"]').catch(() => undefined);
   await page.waitForSelector('[data-screen-ready][aria-busy="false"]');
