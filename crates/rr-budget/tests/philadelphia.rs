@@ -232,22 +232,30 @@ fn example_markdown(result: &BudgetResult) -> String {
             .months
             .get(m)
             .map(|month| {
-                if m == 0 {
-                    vec![format!("{} free steps", month.items.len())]
-                } else {
-                    month
-                        .items
-                        .iter()
-                        .map(|i| format!("{} {}", short(&i.name), money(i.est_cost_usd)))
-                        .collect()
+                let free = month
+                    .items
+                    .iter()
+                    .filter(|i| i.kind == PlanItemKind::FreeAction)
+                    .count();
+                let mut v: Vec<String> = month
+                    .items
+                    .iter()
+                    .filter(|i| i.kind != PlanItemKind::FreeAction)
+                    .map(|i| format!("{} {}", short(&i.name), money(i.est_cost_usd)))
+                    .collect();
+                if free > 0 {
+                    v.push(format!("{free} free steps"));
                 }
+                v
             })
             .unwrap_or_default();
         let _ = writeln!(md, "| {m} | {r} | {} |", ours.join("; "));
     }
     let _ = writeln!(
         md,
-        "\nWhy they differ: DESIGN §4.7 orders life-safety items first and `docs/ENGINE-API.md` \
+        "\nMonth 0 shows at most eight free steps (the planner's choice-overload rule); the \
+         remaining four, which add no days of cover, move to month 1. Why the purchases differ: \
+         DESIGN §4.7 orders life-safety items first and `docs/ENGINE-API.md` \
          lists water as life-safety, so the water containers move from month 5 to month 1 (the \
          prototype had no life-safety flags). Food is bought in day-ladder chunks (to 2, 3, 5, 7 \
          and 10 days) instead of the prototype's hand-made 3-, 7- and 14-day bundles, and heat \
