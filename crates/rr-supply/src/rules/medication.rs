@@ -130,7 +130,7 @@ pub fn rx_cold_storage(
         format!("{} need", people(n as f64))
     };
     let mut text = format!(
-        "{who} medicine kept cold, such as insulin. An insulated bag with fresh cold packs keeps it cool, never frozen, for about {}. Insulin in its vial or pen keeps working up to {} between {} °F and {} °F, so in a longer power cut keep it in the shade and below {} °F; never use insulin that froze. For other medicines, ask your pharmacist now how long they keep out of the fridge and write it on your medicine list.",
+        "{who} medicine kept cold, such as insulin. An insulated bag with fresh cold packs keeps it cool, never frozen, for about {}. Insulin in its vial or pen keeps working up to {} between {} °F and {} °F, so in a longer power cut keep it in the shade and below {} °F; never use insulin that froze.",
         fmt_days(hold),
         fmt_days(insulin_days),
         num(low_f, 0),
@@ -303,7 +303,9 @@ mod tests {
             "{}",
             cold.plain
         );
-        assert!(cold.plain.contains("ask your pharmacist"), "{}", cold.plain);
+        // The pharmacist question lives in the bag's copy and the Medicine guidance; the line
+        // does not repeat it.
+        assert!(!cold.plain.contains("pharmacist"), "{}", cold.plain);
         // Never the one-day discard rule (round-2 review S1).
         let lower = cold.plain.to_lowercase();
         assert!(
