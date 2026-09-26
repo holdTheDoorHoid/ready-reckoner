@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test": "vitest --passWithNoTests"
+    "test": "vitest --passWithNoTests",
+    "icons": "node scripts/make-icons.mjs",
+    "shots": "node scripts/screenshots.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",

@@ -1,0 +1,163 @@
+/*
+ * Print: the packet as a black-and-white document that works on A4 and US Letter. Margins suit
+ * both page sizes; each packet section starts on a new page; nothing depends on colour; links
+ * print their address; the app's navigation and controls disappear.
+ */
+@page {
+  size: auto;
+  margin: 16mm 15mm 18mm;
+}
+
+@media print {
+  :root,
+  :root[data-theme='dark'] {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f2f2f2;
+    --surface-3: #e5e5e5;
+    --text: #000000;
+    --text-muted: #333333;
+    --border: #999999;
+    --border-strong: #555555;
+    --accent: #000000;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 10.5pt;
+    line-height: 1.4;
+  }
+
+  .no-print,
+  .site-header,
+  .site-footer,
+  .mock-banner,
+  .update-banner,
+  .skip-link,
+  nav {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .page {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  .packet a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 8.5pt;
+    word-break: break-all;
+  }
+
+  .packet .visually-hidden {
+    display: none !important;
+  }
+
+  .packet h2.md-h1 {
+    font-size: 20pt;
+    margin: 0 0 8pt;
+  }
+
+  /* Every section of the packet starts a new page. */
+  .packet h3.md-h2 {
+    break-before: page;
+    font-size: 15pt;
+    margin: 0 0 8pt;
+    padding-bottom: 4pt;
+    border-bottom: 1.5pt solid #000;
+  }
+
+  .packet h4 {
+    font-size: 12pt;
+    margin: 12pt 0 4pt;
+  }
+
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+  }
+
+  p,
+  li,
+  blockquote {
+    orphans: 3;
+    widows: 3;
+  }
+
+  table,
+  tr,
+  .table-wrap {
+    break-inside: avoid;
+  }
+
+  .table-wrap {
+    overflow: visible !important;
+  }
+
+  table {
+    font-size: 9.5pt;
+  }
+
+  th,
+  td {
+    border: 0.75pt solid #555 !important;
+    padding: 3pt 5pt !important;
+    background: #fff !important;
+  }
+
+  th {
+    background: #eee !important;
+  }
+
+  /* Write-in cells in the family plan get room to write. */
+  .packet td:empty {
+    height: 22pt;
+    min-width: 45%;
+  }
+
+  blockquote {
+    border: 1pt solid #000 !important;
+    background: #fff !important;
+    padding: 6pt 10pt !important;
+    margin: 8pt 0 !important;
+  }
+
+  .packet input[type='checkbox'] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 9pt;
+    height: 9pt;
+    border: 1pt solid #000;
+    margin: 0 4pt 0 0;
+    vertical-align: -1pt;
+    position: relative;
+  }
+
+  .packet input[type='checkbox']:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -3pt;
+    left: 0.5pt;
+    font-size: 9pt;
+  }
+
+  .packet .footnotes {
+    font-size: 8.5pt;
+    border-top: 0.75pt solid #000;
+    margin-top: 12pt;
+  }
+}

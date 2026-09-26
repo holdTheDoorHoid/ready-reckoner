@@ -826,6 +826,17 @@ function bucketName(id: BucketId): string {
   return BUCKETS.find((b) => b.id === id)!.name;
 }
 
+/** Share of household-significant events that last a day or more, per bucket (placeholder). */
+const DAY_SHARE: Record<DurationBucket, number> = {
+  power: 0.04,
+  water_boil: 0.3,
+  water_out: 0.2,
+  supplies: 0.3,
+  thermal: 0.05,
+  medication: 0.15,
+  comms: 0.05,
+};
+
 const BUCKET_PHRASE: Record<DurationBucket, string> = {
   power: 'go without grid power',
   water_boil: 'need to boil or treat tap water',
@@ -955,7 +966,7 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
       tierEnough = tierForDays(target.value);
       relief = targets.relief[b];
       sentences = [];
-      const dayRate = rate * 0.4;
+      const dayRate = rate * DAY_SHARE[b];
       if (target.value > 1 && dayRate > dialRate) {
         sentences.push(frequencySentence(chanceWithin(dayRate, years), `${BUCKET_PHRASE[b]} for a day or more`, years));
       }
