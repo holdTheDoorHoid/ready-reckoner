@@ -963,6 +963,7 @@ fn run(
     let plan = Plan {
         months,
         done_month,
+        minimum_done_month: None,
         envelopes,
         savings_track,
         // awaiting: budget — the first savings milestone, bare-minimum mode and the long-horizon

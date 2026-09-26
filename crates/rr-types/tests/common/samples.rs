@@ -120,6 +120,7 @@ pub fn plan_input() -> PlanInput {
             rare_opt_in: vec!["nuclear_attack".into(), "all".into()],
             minimum_kit: true,
             long_horizon: true,
+            legal_opt_in: true,
         },
         stage: Some(Stage::HaveSomeThings),
         confidence_1to5: Some(3),
@@ -405,6 +406,7 @@ pub fn plan_output() -> PlanOutput {
                 items: vec![plan_item(true), plan_item(false)],
             }],
             done_month: Some(7),
+            minimum_done_month: Some(2),
             envelopes: vec![SavingsEnvelope {
                 item_id: "power_station_small".into(),
                 saved_usd: 60.0,
@@ -485,6 +487,7 @@ pub fn item() -> Item {
         volume_l_per_unit: Some(3.785),
         requires: vec!["water_container".into()],
         readiness_share: Some(0.25),
+        alternative_group: Some("stored_water".into()),
         decision: true,
         long_horizon: true,
         season: Some(Season::Summer),
