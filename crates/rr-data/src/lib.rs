@@ -1136,9 +1136,20 @@ impl DataStore {
             return Vec::new();
         };
         let fallback = Date::parse(m.generated.get(..10).unwrap_or("")).ok();
+        // An optional pack's credit line appears once one of its files is loaded.
+        let pack_loaded = |pack: &str| {
+            m.packs
+                .get(pack)
+                .is_some_and(|p| p.files.iter().any(|f| self.loaded.contains_key(&f.path)))
+        };
         let mut out: Vec<Attribution> = m
             .attributions
             .iter()
+            .filter(|a| {
+                m.attribution_packs
+                    .get(&a.source)
+                    .is_none_or(|pack| pack_loaded(pack))
+            })
             .filter_map(|a| {
                 let accessed = Date::parse(&a.accessed).ok().or(fallback)?;
                 Some(Attribution {
@@ -1214,5 +1225,38 @@ mod tests {
             AfreqKind::EventsPerYear
         );
         assert_eq!(rec.nri_version, "1.20.0 (December 2025)");
+    }
+
+    #[test]
+    fn optional_pack_credit_lines_wait_for_their_pack() {
+        let places = b"place,name,buildings_direct,buildings_indirect,risk_national_rank\n0655520,\"Paradise, CA\",0.9,0.1,0.99\n";
+        let manifest = serde_json::json!({
+            "pack_version": "abc",
+            "generated": "2026-09-26T00:00:00Z",
+            "packs": {
+                "wildfire_places": { "files": [ {
+                    "path": "opt/wildfire_places/places.csv",
+                    "sha256": sha256_hex(places), "rows": 1
+                } ] }
+            },
+            "attributions": [
+                { "source": "FEMA National Risk Index", "text": "NRI", "accessed": "2026-09-01" },
+                { "source": "Wildfire", "text": "USFS", "accessed": "2026-09-01" }
+            ],
+            "attribution_packs": { "Wildfire": "wildfire_places" }
+        });
+        let mut s = DataStore::new();
+        s.load_pack("manifest.json", manifest.to_string().as_bytes())
+            .unwrap();
+        let sources = |s: &DataStore| {
+            s.attributions()
+                .into_iter()
+                .map(|a| a.source)
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(sources(&s), vec!["FEMA National Risk Index"]);
+        s.load_pack("opt/wildfire_places/places.csv", places)
+            .unwrap();
+        assert_eq!(sources(&s), vec!["FEMA National Risk Index", "Wildfire"]);
     }
 }

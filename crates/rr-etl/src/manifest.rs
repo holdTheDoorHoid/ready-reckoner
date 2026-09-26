@@ -34,6 +34,11 @@ pub struct Manifest {
     /// rule 5). Refreshes keep this section as it is; only a person sets `approved`.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub sign_offs: BTreeMap<String, SignOff>,
+    /// Attributions that belong to an optional pack, by attribution `source` -> pack name. The
+    /// engine shows those credit lines only once the pack is loaded (a packet should not credit
+    /// data it never read).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub attribution_packs: BTreeMap<String, String>,
 }
 
 /// One owner decision (see [`Manifest::sign_offs`]).

@@ -192,7 +192,7 @@ pub const JOBS: &[JobSpec] = &[
     },
     JobSpec {
         id: "surge",
-        title: "NOAA/NHC storm-surge area shares by ZIP (optional pack; 1.65 GB input)",
+        title: "NOAA/NHC storm-surge area shares by ZIP (optional pack; large rasters)",
         run: surge::run,
         default: false,
     },
@@ -467,6 +467,20 @@ fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
         .cloned()
         .collect();
     attributions.extend(out.attributions.iter().cloned());
+    // A job whose files all sit in one optional pack: its credit lines belong to that pack.
+    let packs: BTreeSet<String> = out.written.iter().map(|w| pack_of(&w.path)).collect();
+    for a in &out.attributions {
+        match packs.iter().next() {
+            Some(p) if packs.len() == 1 && p != "core" && p != "geo" => {
+                manifest
+                    .attribution_packs
+                    .insert(a.source.clone(), p.clone());
+            }
+            _ => {
+                manifest.attribution_packs.remove(&a.source);
+            }
+        }
+    }
     attributions.sort_by(|a, b| a.source.cmp(&b.source));
     manifest.attributions = attributions;
     manifest.jobs.insert(
@@ -695,6 +709,72 @@ mod tests {
             key: vec!["fips".into()],
             diff,
         }
+    }
+
+    #[test]
+    fn optional_packs_have_their_own_names_and_jobs_are_registered_once() {
+        assert_eq!(pack_of("core/smoke.csv"), "core");
+        assert_eq!(pack_of("geo/counties.json"), "geo");
+        assert_eq!(pack_of("opt/surge/zip_surge.csv"), "surge");
+        assert_eq!(pack_of("opt/wildfire_places/places.csv"), "wildfire_places");
+        let mut ids: Vec<&str> = JOBS.iter().map(|j| j.id).collect();
+        let n = ids.len();
+        ids.sort_unstable();
+        ids.dedup();
+        assert_eq!(ids.len(), n, "duplicate job ids");
+        let optional: Vec<&str> = JOBS.iter().filter(|j| !j.default).map(|j| j.id).collect();
+        assert_eq!(optional, vec!["surge", "wildfire_places"]);
+        // Jobs that read other jobs' files come after them.
+        let pos = |id: &str| JOBS.iter().position(|j| j.id == id).unwrap();
+        assert!(pos("strategic") < pos("facilities"));
+        assert!(pos("events") < pos("surge_proxy") && pos("nri") < pos("surge_proxy"));
+        assert!(pos("nri") < pos("levees") && pos("nri") < pos("water_systems"));
+    }
+
+    #[test]
+    fn optional_pack_jobs_tag_their_credit_lines() {
+        let credit = |source: &str| Attribution {
+            source: source.into(),
+            text: "t".into(),
+            license: "l".into(),
+            url: "u".into(),
+            version: None,
+            accessed: "2026-09-26".into(),
+        };
+        let job = |id: &'static str| JobSpec {
+            id,
+            title: "t",
+            run: |_| Ok(JobOutput::default()),
+            default: false,
+        };
+        let mut m = Manifest::default();
+        let places = JobOutput {
+            written: vec![written(
+                "opt/wildfire_places/places.csv",
+                1,
+                DiffSummary::default(),
+            )],
+            attributions: vec![credit("USFS")],
+            ..Default::default()
+        };
+        record(&mut m, &job("wildfire_places"), &places);
+        let smoke = JobOutput {
+            written: vec![written("core/smoke.csv", 1, DiffSummary::default())],
+            attributions: vec![credit("HMS")],
+            ..Default::default()
+        };
+        record(&mut m, &job("smoke"), &smoke);
+        assert_eq!(m.attribution_packs.len(), 1);
+        assert_eq!(m.attribution_packs["USFS"], "wildfire_places");
+        assert_eq!(m.attributions.len(), 2);
+        // A source that moves into the core pack loses its optional tag.
+        let moved = JobOutput {
+            written: vec![written("core/places.csv", 1, DiffSummary::default())],
+            attributions: vec![credit("USFS")],
+            ..Default::default()
+        };
+        record(&mut m, &job("wildfire_places"), &moved);
+        assert!(m.attribution_packs.is_empty());
     }
 
     #[test]
