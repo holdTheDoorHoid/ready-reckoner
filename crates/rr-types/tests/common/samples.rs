@@ -96,6 +96,7 @@ pub fn plan_input() -> PlanInput {
             qty: 20.0,
             paid_usd: Some(18.5),
         }],
+        assume_basics: false,
         dials: Dials {
             return_period: ReturnPeriod::OneIn50,
             climate: ClimateHorizon::Y2050,
@@ -332,6 +333,7 @@ pub fn item() -> Item {
         free: false,
         life_safety: true,
         rare_catastrophic: false,
+        assumed_basic: true,
         spec: "Bottled water, or tap water in clean food-grade containers.".into(),
         look_for: vec!["Food-grade containers".into()],
         avoid: vec!["Milk jugs".into()],

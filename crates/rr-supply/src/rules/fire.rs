@@ -16,6 +16,13 @@ fn is_apartment(housing: &Housing) -> bool {
     )
 }
 
+fn is_house(housing: &Housing) -> bool {
+    matches!(
+        housing.kind,
+        HousingKind::Rowhouse | HousingKind::Detached | HousingKind::RuralProperty
+    )
+}
+
 /// Levels of the home (the form does not ask; an estimate by kind of building), with or without
 /// the basement.
 fn levels(b: &mut Basis, housing: &Housing, with_basement: bool) -> f64 {
@@ -35,13 +42,17 @@ fn levels(b: &mut Basis, housing: &Housing, with_basement: bool) -> f64 {
 }
 
 /// A fire escape plan: two ways out of every room and a meeting spot outside. Every household
-/// gets it, alarms or not. Rule `fire_escape_plan`.
+/// gets it, alarms or not. A house at street level is not assumed to sleep upstairs, so its plan
+/// asks for a second way out of any upstairs bedroom instead of sizing a ladder. Rule
+/// `fire_escape_plan`.
 pub fn fire_escape_plan(housing: &Housing) -> Sizing {
     let mut b = Basis::new();
     b.cite("ready_gov_home_fires");
     let mut text = "A fire escape plan: two ways out of every room, a meeting spot outside, and a practice run with everyone.".to_owned();
     if is_apartment(housing) {
         text.push_str(" In a building, know both stairways and never use the elevator in a fire.");
+    } else if is_house(housing) && housing.floor <= 1 {
+        text.push_str(" If anyone sleeps upstairs, check that each bedroom has a second way out, such as a window onto a porch roof or an escape ladder.");
     }
     if housing.alarms.smoke {
         text.push_str(" Test your smoke alarms every month.");
@@ -113,19 +124,39 @@ pub fn co_alarm_count(housing: &Housing) -> Option<Sizing> {
     ))
 }
 
-/// Fire extinguishers, one per level, when the household has none (an estimate for the level
-/// count). Rule `extinguisher_count`.
+/// Fire extinguishers when the household has none: one on each floor people live on (an apartment
+/// or mobile home 1, a house 2, not the basement; an estimate), the ground-floor one near the
+/// kitchen. The form does not say where the kitchen is, so it is assumed to be on the floor with
+/// the way out; the line says to add one when it is not. Rule `extinguisher_count`.
 pub fn extinguisher_count(housing: &Housing) -> Option<Sizing> {
     if housing.alarms.extinguisher {
         return None;
     }
     let mut b = Basis::new();
     b.cite("usfa_extinguishers");
-    let n = levels(&mut b, housing, true);
-    let text = format!(
-        "No fire extinguisher yet: {}, one on each level including the kitchen's. Learn how to use one before you need it.",
-        count(n, "extinguisher", "extinguishers")
-    );
+    let floors = levels(&mut b, housing, false);
+    let each = b.k(keys::EXTINGUISHERS_PER_FLOOR);
+    let n = floors * each;
+    let text = if floors <= 1.0 {
+        format!(
+            "No fire extinguisher yet: {} for a home on one floor, kept near the kitchen. Learn how to use it before you need it.",
+            count(
+                n,
+                "multipurpose (A-B-C) extinguisher",
+                "multipurpose (A-B-C) extinguishers"
+            )
+        )
+    } else {
+        format!(
+            "No fire extinguisher yet: {}, one on each of the {} floors a home like yours has, the ground-floor one near the kitchen. If your kitchen is on another floor, keep one there too. Learn how to use one before you need it.",
+            count(
+                n,
+                "multipurpose (A-B-C) extinguisher",
+                "multipurpose (A-B-C) extinguishers"
+            ),
+            num(floors, 0)
+        )
+    };
     Some(Sizing::new(
         &b,
         "extinguisher_count",
@@ -137,26 +168,27 @@ pub fn extinguisher_count(housing: &Housing) -> Option<Sizing> {
     ))
 }
 
-/// An escape ladder for an upstairs bedroom: houses (assumed to sleep upstairs) and apartments on the
-/// second or third floor (an estimate). Rule `escape_ladder_count`.
+/// An escape ladder only where people sleep above the ground with no second way out assumed: a home
+/// (any kind but a mobile home) whose floor is 2 or 3 (an estimate; a ladder does not reach higher,
+/// where the stairs are the way out). The form's floor is where the household lives, so a house at
+/// street level gets the upstairs-bedroom advice in its escape plan instead. Rule
+/// `escape_ladder_count`.
 pub fn escape_ladder_count(housing: &Housing) -> Option<Sizing> {
+    if housing.kind == HousingKind::MobileHome {
+        return None;
+    }
     let mut b = Basis::new();
-    let needed = match housing.kind {
-        HousingKind::Detached | HousingKind::Rowhouse | HousingKind::RuralProperty => {
-            b.k(keys::ALARM_LEVELS_HOUSE) > 1.0
-        }
-        HousingKind::ApartmentHighRise | HousingKind::ApartmentLowRise => {
-            let lo = b.k(keys::ESCAPE_LADDER_LOWEST_FLOOR);
-            let hi = b.k(keys::ESCAPE_LADDER_HIGHEST_FLOOR);
-            (lo..=hi).contains(&f64::from(housing.floor))
-        }
-        HousingKind::MobileHome => false,
-    };
-    if !needed {
+    let lo = b.k(keys::ESCAPE_LADDER_LOWEST_FLOOR);
+    let hi = b.k(keys::ESCAPE_LADDER_HIGHEST_FLOOR);
+    let floor = f64::from(housing.floor);
+    if !(lo..=hi).contains(&floor) {
         return None;
     }
     b.cite("ready_gov_home_fires");
-    let text = "1 escape ladder for an upstairs bedroom window, in case the stairs are blocked by fire. Keep it by the window and practise with it.".to_owned();
+    let text = format!(
+        "You live on floor {}, above the ground: 1 escape ladder for a bedroom window, in case fire or smoke blocks the way out, unless every bedroom already has a second way out such as a fire escape. Keep it by the window and practise with it.",
+        num(floor, 0)
+    );
     Some(Sizing::new(
         &b,
         "escape_ladder_count",
@@ -200,12 +232,19 @@ mod tests {
         let co = co_alarm_count(&p.housing).unwrap();
         assert_eq!(co.quantity, 2.0, "a rowhouse sleeps on 2 levels");
         assert!(co.citations.iter().any(|c| c == "ready_gov_power_outages"));
-        // 2 levels + a basement
-        assert_eq!(extinguisher_count(&p.housing).unwrap().quantity, 3.0);
-        assert_eq!(escape_ladder_count(&p.housing).unwrap().quantity, 1.0);
+        // One per floor of a two-floor rowhouse, not the basement; the kitchen is assumed to be
+        // on the ground floor.
+        let ext = extinguisher_count(&p.housing).unwrap();
+        assert_eq!(ext.quantity, 2.0);
+        assert!(ext.plain.contains("near the kitchen") && ext.plain.contains("A-B-C"));
+        assert!(ext.prior && ext.citations.iter().any(|c| c == "usfa_extinguishers"));
+        // Street level: no ladder; the escape plan asks about upstairs bedrooms instead.
+        assert!(escape_ladder_count(&p.housing).is_none());
         let plan = fire_escape_plan(&p.housing);
         assert_eq!(plan.quantity, 1.0);
         assert!(plan.plain.contains("two ways out") && plan.plain.contains("every month"));
+        assert!(plan.plain.contains("sleeps upstairs"));
+        assert!(!plan.prior);
     }
 
     #[test]
@@ -232,6 +271,16 @@ mod tests {
             1.0,
             "3rd floor"
         );
+        let phoenix = fixtures::get("phoenix-apartment-cpap-1").unwrap();
+        let ladder = escape_ladder_count(&phoenix.housing).unwrap();
+        assert!(ladder.plain.starts_with("You live on floor 2"));
+        assert_eq!(extinguisher_count(&phoenix.housing).unwrap().quantity, 1.0);
+        // A house whose household lives upstairs (floor 2) gets one; a mobile home never does.
+        let mut upstairs = fixtures::get("philadelphia-renters-4").unwrap().housing;
+        upstairs.floor = 2;
+        assert_eq!(escape_ladder_count(&upstairs).unwrap().quantity, 1.0);
+        upstairs.kind = HousingKind::MobileHome;
+        assert!(escape_ladder_count(&upstairs).is_none());
         let coos = fixtures::get("coos-bay-well-owner-2").unwrap();
         assert!(co_alarm_count(&coos.housing).is_none());
         assert!(extinguisher_count(&coos.housing).is_none());

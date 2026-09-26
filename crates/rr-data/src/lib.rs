@@ -631,11 +631,12 @@ impl DataStore {
                     .collect();
             }
             "core/flood.csv" => {
-                let (i_f, i_s, i_c, i_m) = (
+                let (i_f, i_s, i_c, i_m, i_b) = (
                     t.col("fips")?,
                     t.col("sfha_home_share")?,
                     t.col("claims_per_1000_policies_year")?,
                     t.col("mean_paid_usd")?,
+                    t.col("sfha_share_basis")?,
                 );
                 self.flood = t
                     .rows
@@ -647,6 +648,7 @@ impl DataStore {
                                 sfha_home_share: f32c(&r[i_s])?,
                                 claims_per_1000_policies_year: f32c(&r[i_c]),
                                 mean_paid_usd: f32c(&r[i_m]),
+                                sfha_basis: (!r[i_b].is_empty()).then(|| r[i_b].clone()),
                             },
                         ))
                     })

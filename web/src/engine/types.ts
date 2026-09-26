@@ -212,6 +212,12 @@ export interface PlanInput {
   finances: Finances;
   /** What the household already has, and free actions already done (qty 1 or more). */
   existing: Owned[];
+  /**
+   * Credit the household with everyday basics almost every home has (blankets and warm layers, a
+   * cooking pot and can opener, a phone, a bag per person, three days of ordinary food) unless the
+   * Have screen says otherwise. Defaults to true when absent; the packet lists what was assumed.
+   */
+  assume_basics?: boolean;
   dials: Dials;
   /** Where the household says it is with preparing. */
   stage?: Stage;
@@ -679,6 +685,8 @@ export interface Item {
   life_safety?: boolean;
   /** Capped by the allocator: $0 by default, at most 10% of the budget if the user opts in. The engine always sends it. */
   rare_catastrophic?: boolean;
+  /** Credited to every household as already owned when PlanInput.assume_basics is on. The engine always sends it. */
+  assumed_basic?: boolean;
   spec: string;
   look_for: string[];
   avoid: string[];

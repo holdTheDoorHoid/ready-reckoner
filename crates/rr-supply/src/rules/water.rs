@@ -6,7 +6,7 @@ use super::Sizing;
 use crate::basis::Basis;
 use crate::constants::{constants, keys};
 use crate::format::{
-    L_PER_GAL, OZ_PER_GAL, and_list, count, days as fmt_days, gallons, num, people,
+    L_PER_GAL, OZ_PER_GAL, and_list, count, days as fmt_days, gallons, num, people, round_to,
 };
 use crate::household::is_formula_fed;
 
@@ -19,7 +19,8 @@ pub struct WaterDaily {
     pub hot: bool,
     /// People in the household.
     pub people: usize,
-    /// Gallons per person per day (the level's allowance, with the drinking share doubled in heat).
+    /// Gallons per person per day (the level's allowance, with the drinking share doubled in heat;
+    /// the drinking share alone for [`Share::Drinking`]).
     pub allowance_gal: f64,
     /// The drinking part of the allowance, in gallons per person per day.
     pub drinking_gal: f64,
@@ -67,7 +68,18 @@ impl WaterDaily {
     }
 }
 
-/// One day of water for these people and pets (research §1.6), reading every number through `b`.
+/// Which part of the day's water a rule counts, so that it reads (and cites) only the numbers
+/// behind its own amount.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Share {
+    /// Everything at the chosen level: drinking, cooking and washing.
+    All,
+    /// Only water that must be safe to swallow (a boil-water notice), whatever the level.
+    Drinking,
+}
+
+/// One day of water for these people and pets (research §1.6), reading every number it uses
+/// through `b`.
 pub(crate) fn daily(
     b: &mut Basis,
     people: &[Person],
@@ -75,28 +87,50 @@ pub(crate) fn daily(
     level: WaterLevel,
     hot: bool,
 ) -> WaterDaily {
-    let (total, drinking) = match level {
-        _ if people.is_empty() => (0.0, 0.0),
-        WaterLevel::Survival => {
-            let s = b.k(keys::WATER_SURVIVAL_GAL);
-            (s, s)
-        }
-        WaterLevel::Basic => (
-            b.k(keys::WATER_BASIC_GAL),
-            b.k(keys::WATER_DRINKING_SHARE_BASIC_GAL),
-        ),
-        // Sphere's 15 L keeps the survival drinking amount (about 3 L) and adds cooking and washing.
-        WaterLevel::Comfortable => (
-            b.k(keys::WATER_COMFORTABLE_GAL),
-            b.k(keys::WATER_SURVIVAL_GAL),
-        ),
+    daily_share(b, people, pets, level, hot, Share::All)
+}
+
+/// [`daily`] for one share of the water. The drinking share is cited only when the amount uses
+/// it (in heat, or for [`Share::Drinking`]); otherwise it is filled in for reference.
+pub(crate) fn daily_share(
+    b: &mut Basis,
+    people: &[Person],
+    pets: &Pets,
+    level: WaterLevel,
+    hot: bool,
+    share: Share,
+) -> WaterDaily {
+    // The drinking part of each level: Ready.gov's 3/4 gallon of the basic gallon; the survival
+    // level is all drinking; Sphere's 15 L keeps the survival drinking amount (about 3 L) and adds
+    // cooking and washing.
+    let drinking_key = match level {
+        WaterLevel::Basic => keys::WATER_DRINKING_SHARE_BASIC_GAL,
+        WaterLevel::Survival | WaterLevel::Comfortable => keys::WATER_SURVIVAL_GAL,
     };
-    let (allowance_gal, drinking_gal) = if hot && !people.is_empty() {
-        let m = b.k(keys::WATER_HEAT_DRINKING_MULTIPLIER);
-        b.k(keys::HOT_CLIMATE_DAYS_95F);
-        (total + drinking * (m - 1.0), drinking * m)
+    let total_key = match level {
+        WaterLevel::Survival => keys::WATER_SURVIVAL_GAL,
+        WaterLevel::Basic => keys::WATER_BASIC_GAL,
+        WaterLevel::Comfortable => keys::WATER_COMFORTABLE_GAL,
+    };
+    let (allowance_gal, drinking_gal) = if people.is_empty() {
+        (0.0, 0.0)
     } else {
-        (total, drinking)
+        let drinking = if hot || share == Share::Drinking {
+            b.k(drinking_key)
+        } else {
+            constants().value(drinking_key)
+        };
+        let total = match share {
+            Share::All => b.k(total_key),
+            Share::Drinking => drinking,
+        };
+        if hot {
+            let m = b.k(keys::WATER_HEAT_DRINKING_MULTIPLIER);
+            b.k(keys::HOT_CLIMATE_DAYS_95F);
+            (total + drinking * (m - 1.0), drinking * m)
+        } else {
+            (total, drinking)
+        }
     };
     let nursing = people.iter().filter(|p| p.pregnant_or_nursing).count();
     let formula_infants = people.iter().filter(|p| is_formula_fed(p)).count();
@@ -391,7 +425,14 @@ pub(crate) fn how_to_treat(b: &mut Basis) -> String {
 /// `water_treatment_capacity` (bucket `water_boil`).
 pub fn water_treatment_boil(days: f64, people_list: &[Person], pets: &Pets, hot: bool) -> Sizing {
     let mut b = Basis::new();
-    let d = daily(&mut b, people_list, pets, WaterLevel::Basic, hot);
+    let d = daily_share(
+        &mut b,
+        people_list,
+        pets,
+        WaterLevel::Basic,
+        hot,
+        Share::Drinking,
+    );
     let per_day = d.drinking_total_gal();
     let q = per_day * days;
     let how = how_to_treat(&mut b);
@@ -429,7 +470,9 @@ pub fn water_treatment_boil(days: f64, people_list: &[Person], pets: &Pets, hot:
 }
 
 /// Tap water in clean reused drink bottles: three days of the household's water, but no more than
-/// it can bottle (6 gallons, an estimate). A free way to meet part of `water_gallons`. Rule
+/// it can bottle (6 gallons, an estimate). A free way to meet part of `water_gallons`. The line
+/// cites the household's water sources only when three days of water is under the cap (then that
+/// is the amount); otherwise the cap is the amount, and only its sources stand behind it. Rule
 /// `water_reused_bottles`.
 pub fn water_reused_bottles(
     people_list: &[Person],
@@ -437,19 +480,36 @@ pub fn water_reused_bottles(
     level: WaterLevel,
     hot: bool,
 ) -> Sizing {
-    let mut b = Basis::new();
-    let d = daily(&mut b, people_list, pets, level, hot);
-    let max = b.k(keys::REUSED_BOTTLES_MAX_GAL);
-    let rotate = b.k(keys::WATER_ROTATION_MONTHS);
-    b.cite("church_emergency_prep_manual");
+    let mut need = Basis::new();
+    let d = daily(&mut need, people_list, pets, level, hot);
     let days = f64::from(rr_types::TierId::H72.days());
     let three_days = d.total_gal() * days;
-    let q = three_days.min(max);
+    let cap = constants().value(keys::REUSED_BOTTLES_MAX_GAL);
+    let mut b = Basis::new();
+    let (q, amount) = if three_days >= cap {
+        let max = b.k(keys::REUSED_BOTTLES_MAX_GAL);
+        (
+            max,
+            format!(
+                "about {}, the most a household can usually gather this way",
+                gallons(max)
+            ),
+        )
+    } else {
+        b.cite_all(need.cites());
+        (
+            three_days,
+            format!(
+                "about {} ({} of your water)",
+                gallons(super::round_quantity("gallon", three_days)),
+                fmt_days(days)
+            ),
+        )
+    };
+    let rotate = b.k(keys::WATER_ROTATION_MONTHS);
+    b.cite("church_emergency_prep_manual");
     let text = format!(
-        "Free first step: fill clean drink bottles you already have with tap water, about {} ({} of your water, up to the {} a household can usually gather). Not milk jugs: they leak. Label them and replace the water every {}.",
-        gallons(super::round_quantity("gallon", q)),
-        fmt_days(days),
-        gallons(max),
+        "Free first step: fill clean drink bottles you already have with tap water, {amount}. Not milk jugs: they leak. Label them and replace the water every {}.",
         count(rotate, "month", "months")
     );
     Sizing::new(
@@ -465,24 +525,34 @@ pub fn water_reused_bottles(
         "min({} gal/day × {} days, {} gal) = {} gal",
         num(d.total_gal(), 4),
         num(days, 0),
-        num(max, 1),
+        num(cap, 1),
         num(q, 3)
     )])
 }
 
-/// Unscented bleach for disinfecting water and surfaces: a bottle per two weeks of the longer of
-/// the boil-notice and no-water targets, at least one (an estimate). Rule `bleach_bottles`.
-pub fn bleach_bottles(days: f64) -> Sizing {
+/// Unscented bleach for making water safe and for cleaning: one bottle per household whatever the
+/// target, because at half a millilitre a gallon one bottle treats thousands of gallons (CDC), and a
+/// fresh bottle every six months, because bleach weakens in storage (an estimate). Rule
+/// `bleach_bottles`.
+pub fn bleach_bottles() -> Sizing {
     let mut b = Basis::new();
-    let per = b.k(keys::BLEACH_BOTTLE_DAYS);
+    let q = b.k(keys::BLEACH_BOTTLES_PER_HOUSEHOLD);
     let (lo, hi) = b.range(keys::BLEACH_STRENGTH_PCT);
-    let q = crate::format::ceil_count((days.max(0.0) / per).max(1.0));
+    let ml = b.k(keys::BLEACH_ML_PER_GAL);
+    let cloudy = b.k(keys::BLEACH_CLOUDY_MULTIPLIER);
+    let replace = b.k(keys::BLEACH_REPLACE_MONTHS);
+    b.cite("cdc_bleach_disinfecting");
+    // Gallons of clear water one fluid ounce of bleach makes safe.
+    let gal_per_oz = L_PER_GAL * 1000.0 / OZ_PER_GAL / ml;
     let text = format!(
-        "{} of plain unscented bleach ({} to {} % sodium hypochlorite, not the splashless kind), for disinfecting water and cleaning: one bottle lasts a household about {}. Bleach weakens over time, so buy fresh when you rotate your water.",
+        "{} of plain unscented bleach ({} to {} % sodium hypochlorite, not the splashless kind), for making water safe and for cleaning, however long your target is. At about {} mL a gallon, each ounce treats about {} gallons of clear water ({} if it is cloudy or very cold), so one bottle treats thousands of gallons. Bleach weakens in storage: buy a fresh bottle every {}, when you replace the water you store yourself.",
         count(q, "bottle", "bottles"),
         num(lo, 0),
         num(hi, 0),
-        fmt_days(per)
+        num(ml, 1),
+        num(round_to(gal_per_oz, 10.0), 0),
+        num(round_to(gal_per_oz / cloudy, 10.0), 0),
+        count(replace, "month", "months")
     );
     Sizing::new(
         &b,
@@ -493,6 +563,14 @@ pub fn bleach_bottles(days: f64) -> Sizing {
         Per::Household,
         text,
     )
+    .math(vec![format!(
+        "{} bottle per household; {} L/gal × 1000 mL/L ÷ {} oz/gal ÷ {} mL per gal of water = {} gal of water per oz",
+        num(q, 0),
+        num(L_PER_GAL, 3),
+        num(OZ_PER_GAL, 0),
+        num(ml, 2),
+        num(gal_per_oz, 1)
+    )])
 }
 
 /// Propane to boil `gallons_to_boil` on a camp stove outdoors (an estimate). Rule `boil_fuel`.
@@ -707,18 +785,73 @@ mod tests {
     }
 
     #[test]
-    fn reused_bottles_and_bleach() {
+    fn reused_bottles_cite_only_what_their_amount_uses() {
         let p = philly();
         let r = water_reused_bottles(&p.people, &p.pets, WaterLevel::Basic, false);
-        // 3 days would be 12.9 gallons; a household can gather about 6.
+        // 3 days would be 12.9 gallons; a household can gather about 6, so the cap is the amount
+        // and the dog's water (PetMD, the 40 lb estimate) is not behind the line.
         assert_eq!(r.quantity, 6.0);
         assert!(r.prior && r.plain.contains("milk jugs"));
+        assert!(r.plain.contains("the most a household can usually gather"));
+        for id in ["petmd_dog_water", "merck_vet_maintenance_fluids"] {
+            assert!(!r.citations.iter().any(|c| c == id), "{id}");
+        }
+        assert!(r.citations.iter().any(|c| c == "rr_research_risk_model"));
+        // One person: 3 days is 3 gallons, under the cap, so the water sources stand behind it
+        // and the cap does not.
         let none = Pets::default();
         let one = water_reused_bottles(&p.people[..1], &none, WaterLevel::Basic, false);
         assert_eq!(one.quantity, 3.0);
-        assert_eq!(bleach_bottles(3.0).quantity, 1.0);
-        assert_eq!(bleach_bottles(50.0).quantity, 4.0);
-        assert!(bleach_bottles(3.0).plain.contains("5 to 9 %"));
+        assert!(one.plain.contains("3 days of your water"), "{}", one.plain);
+        assert!(!one.prior, "{:?}", one.citations);
+        assert!(!one.citations.iter().any(|c| c == "rr_research_risk_model"));
+        assert!(one.citations.iter().any(|c| c == "ready_gov_water"));
+    }
+
+    #[test]
+    fn one_bottle_of_bleach_whatever_the_target() {
+        let s = bleach_bottles();
+        assert_eq!(s.quantity, 1.0);
+        assert_eq!(s.unit, "bottle");
+        assert!(
+            s.plain
+                .starts_with("1 bottle of plain unscented bleach (5 to 9 %")
+        );
+        // 3,785 mL ÷ 128 oz ÷ 0.5 mL a gallon: about 60 gallons an ounce, 30 when cloudy.
+        assert!(
+            s.plain.contains("about 60 gallons of clear water (30 if"),
+            "{}",
+            s.plain
+        );
+        assert!(s.plain.contains("thousands of gallons"));
+        assert!(s.plain.contains("every 6 months"));
+        assert!(s.prior, "the six-month replacement is an estimate");
+        for id in [
+            "cdc_water_storage",
+            "epa_emergency_disinfection",
+            "cdc_water_disinfection",
+            "cdc_bleach_disinfecting",
+            "rr_expert_prior",
+        ] {
+            assert!(s.citations.iter().any(|c| c == id), "missing {id}");
+        }
+    }
+
+    #[test]
+    fn the_boil_line_cites_the_drinking_share_only() {
+        let p = philly();
+        let none = Pets::default();
+        let s = water_treatment_boil(3.0, &p.people, &none, false);
+        // 4 × 0.75 gal (Ready.gov); the basic gallon's other source (CDC storage) is not used.
+        assert_eq!(s.quantity, 9.0);
+        assert!(s.citations.iter().any(|c| c == "ready_gov_water"));
+        assert!(!s.citations.iter().any(|c| c == "cdc_water_storage"));
+        // Stored water at the comfortable level uses Sphere's 15 L, not the survival drinking
+        // amount (WHO), unless it is hot.
+        let c = water_gallons(3.0, &p.people, &none, WaterLevel::Comfortable, false, 0.0);
+        assert!(!c.citations.iter().any(|x| x == "who_wedc_tn9"));
+        let hot = water_gallons(3.0, &p.people, &none, WaterLevel::Comfortable, true, 0.0);
+        assert!(hot.citations.iter().any(|x| x == "who_wedc_tn9"));
     }
 
     #[test]

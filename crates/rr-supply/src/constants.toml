@@ -257,13 +257,33 @@ sources = ["epa_emergency_disinfection", "cdc_water_disinfection"]
 
 
 [[constant]]
-key = "bleach_bottle_days"
-label = "Days one bottle of unscented bleach covers water treatment and cleaning"
-unit = "day"
-default = 14.0
+key = "bleach_ml_per_gal"
+label = "Bleach (5 to 9 %) to make one gallon of clear water safe"
+unit = "millilitre per gallon"
+default = 0.5
+sources = ["cdc_water_disinfection"]
+note = "CDC: 8 drops of 5 to 9 % bleach per gallon, about 1/2 mL or a little less than 1/8 teaspoon; double it for cloudy or very cold water. At that rate each fluid ounce of bleach treats about 60 gallons of clear water, so one household bottle treats thousands of gallons."
+
+[[constant]]
+key = "bleach_bottles_per_household"
+label = "Bottles of unscented bleach to keep, whatever the length of the target"
+unit = "bottle"
+default = 1.0
+sources = ["cdc_water_storage"]
+note = "CDC: store a bottle of unscented bleach whose label says 5 to 9 % sodium hypochlorite, to disinfect water. One bottle treats thousands of gallons at 1/2 mL a gallon, far more than any target needs, so a longer target does not add bottles; replacing the bottle keeps it strong."
+note_sources = ["cdc_water_storage", "cdc_water_disinfection"]
+
+[[constant]]
+key = "bleach_replace_months"
+label = "Buy a fresh bottle of bleach every"
+unit = "month"
+default = 6.0
+low = 6.0
+high = 12.0
 prior = true
-sources = ["cdc_bleach_disinfecting", "rr_research_supply_standards", "rr_expert_prior"]
-note = "One 64 to 121 oz bottle covers a household's water treatment and surface cleaning for about two weeks (an assumption). Bleach loses strength over time."
+sources = ["rr_expert_prior", "cdc_water_storage"]
+note = "Bleach slowly loses strength in storage, and the research found no agency shelf life for it (supply-standards section 4.3). The plan buys a fresh bottle each time the stored water is rotated, every 6 months (CDC); keeping a bottle up to a year is the upper end."
+note_sources = ["rr_research_supply_standards", "cdc_water_storage"]
 
 [[constant]]
 key = "boil_minutes"
@@ -1103,11 +1123,32 @@ prior = true
 sources = ["rr_expert_prior"]
 
 [[constant]]
+key = "blankets_per_person"
+label = "Warm blankets per person aged 1 and over (most homes already have them)"
+unit = "blanket per person"
+default = 1.0
+sources = ["ready_gov_kit", "sphere_2018"]
+note = "Ready.gov: a sleeping bag or warm blanket for each person. Sphere: at least one blanket and bedding per person, more in cold climates. CDC: babies under 1 get warm sleepwear or a sleep sack instead of loose bedding, and never sleep in a cold room."
+note_sources = ["ready_gov_kit", "sphere_2018", "cdc_winter_safety"]
+
+[[constant]]
 key = "sleeping_bags_per_person"
-label = "Sleeping bag or warm blanket per person"
+label = "Sleeping bag (or an extra heavy blanket) per person who needs one"
 unit = "item per person"
 default = 1.0
 sources = ["ready_gov_kit", "sphere_2018"]
+note = "CDC's backup heat for a winter storm is extra blankets, sleeping bags and warm coats. The plan counts a blanket and warm layers for everyone first (most homes have them), and adds a sleeping bag or an extra heavy blanket only for a long cold target or for people 65 and over."
+note_sources = ["cdc_winter_safety", "ready_gov_kit", "sphere_2018"]
+
+[[constant]]
+key = "sleeping_bags_min_days"
+label = "Cold target, in days, beyond which everyone gets a sleeping bag or an extra heavy blanket"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "Blankets and warm layers carry a household through a short outage in one warm room. Beyond three days, or with someone 65 or over (CDC: older adults are most at risk in the cold), the plan adds a sleeping bag or an extra heavy blanket. A home heated by a wood stove, which works without power, gets it only as an optional upgrade; a gas furnace is not assumed to work without power."
+note_sources = ["cdc_winter_safety"]
 
 [[constant]]
 key = "warm_layer_sets_per_person"
@@ -1162,15 +1203,16 @@ sources = ["rr_expert_prior", "usfa_smoke_alarms"]
 
 [[constant]]
 key = "escape_ladder_lowest_floor"
-label = "Lowest apartment floor that needs an escape ladder"
+label = "Lowest floor people sleep on that needs an escape ladder (any kind of home)"
 unit = "floor"
 default = 2.0
 prior = true
 sources = ["rr_expert_prior", "ready_gov_home_fires"]
+note = "The form's floor is where the household lives (1 is street level), so it stands for where people sleep. A house that reports floor 1 is not assumed to sleep upstairs; its escape plan says to check a second way out of any upstairs bedroom instead. The form does not ask about a second exit, so a floor 2 or 3 home is assumed to have none."
 
 [[constant]]
 key = "escape_ladder_highest_floor"
-label = "Highest apartment floor an escape ladder reaches"
+label = "Highest floor an escape ladder reaches"
 unit = "floor"
 default = 3.0
 prior = true
@@ -1184,12 +1226,14 @@ default = 5.0
 sources = ["cdc_co_basics"]
 
 [[constant]]
-key = "extinguishers_per_household"
-label = "Fire extinguishers per household"
-unit = "extinguisher"
+key = "extinguishers_per_floor"
+label = "Fire extinguishers per floor people live on (the ground-floor one near the kitchen)"
+unit = "extinguisher per floor"
 default = 1.0
 prior = true
 sources = ["rr_expert_prior"]
+note = "The form does not ask how many floors a home has or where the kitchen is. The plan counts the floors people live on (1 for an apartment or mobile home, 2 for a house; not the basement) and assumes the kitchen is on the floor with the way out; a kitchen on another floor gets its own. USFA: a multipurpose A-B-C extinguisher works on most home fires."
+note_sources = ["usfa_extinguishers"]
 
 [[constant]]
 key = "neighbour_contacts"
