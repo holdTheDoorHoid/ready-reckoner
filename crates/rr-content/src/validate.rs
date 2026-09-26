@@ -820,15 +820,9 @@ fn check_states(content: &Content, r: &mut Report) {
                     r.error(&loc, format!("citation `{c}` is not in citations.toml"));
                 }
             }
+            // No reading-level check here: official names and web addresses dominate these
+            // short lines, and the fixed wording around them lives in `tables.rs`.
             check_text(r, &loc, &line.text, false);
-            if let Some(grade) = readability::flesch_kincaid_grade(&line.text)
-                && grade > 12.0
-            {
-                r.warn(
-                    &loc,
-                    format!("{} line reads at grade {grade:.1}", line.topic),
-                );
-            }
         }
     }
     for code in tables::JURISDICTIONS {

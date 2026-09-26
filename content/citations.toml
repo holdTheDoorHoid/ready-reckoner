@@ -57,7 +57,7 @@ title = "Power Outages"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/power-outages"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "If the power is out for more than a day, discard any medication that should be refrigerated, unless the drug’s label says otherwise."
 license = "US Government Work (public domain)"
 
@@ -77,7 +77,7 @@ title = "People with Disabilities"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/disability"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Talk to your doctor or pharmacist about how you can create an emergency supply of medicines."
 license = "US Government Work (public domain)"
 
@@ -97,7 +97,7 @@ title = "Evacuation"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/evacuation"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Keep a full tank of gas if an evacuation seems likely. Keep a half tank of gas in it at all times in case of an unexpected need to evacuate."
 license = "US Government Work (public domain)"
 
@@ -117,7 +117,7 @@ title = "Extreme Heat"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/heat"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Fans create air flow and a false sense of comfort, but do not reduce body temperature or prevent heat-related illnesses."
 license = "US Government Work (public domain)"
 
@@ -157,7 +157,7 @@ title = "Make A Plan"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/plan"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Know how you’ll contact one another and reconnect if separated. Establish a family meeting place that’s familiar and easy to find."
 license = "US Government Work (public domain)"
 
@@ -186,7 +186,7 @@ title = "Emergency Alerts"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/alerts"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "You are not charged for receiving WEAs, and there is no need to subscribe."
 license = "US Government Work (public domain)"
 
@@ -206,7 +206,7 @@ title = "Earthquakes"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/earthquakes"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "A standard homeowner’s insurance policy does not cover earthquake damage."
 license = "US Government Work (public domain)"
 
@@ -266,7 +266,7 @@ title = "Tornadoes"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/tornadoes"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "The next best protection is a small, interior, windowless room or basement on the lowest level of a sturdy building."
 license = "US Government Work (public domain)"
 
@@ -296,7 +296,7 @@ title = "Hurricanes"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/hurricanes"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "You may have to evacuate quickly due to a hurricane if you live in an evacuation zone."
 license = "US Government Work (public domain)"
 
@@ -306,7 +306,7 @@ title = "Chemicals and Hazardous Materials Incidents"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/chemical"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Identify an above-ground shelter room with as few openings as possible."
 license = "US Government Work (public domain)"
 
@@ -582,7 +582,7 @@ title = "Carbon Monoxide Poisoning Basics"
 publisher = "Centers for Disease Control and Prevention"
 year = 2026
 url = "https://www.cdc.gov/carbon-monoxide/about/index.html"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Never use a generator inside your home or garage, even if doors and windows are open."
 license = "US Government Work (public domain)"
 
@@ -1495,7 +1495,7 @@ title = "Staying Safe with Electric Vehicles (hurricane season and flooding)"
 publisher = "Hillsborough County, Florida"
 year = 2025
 url = "https://hcfl.gov/residents/sustainability-and-green/green-hillsborough/staying-safe-with-electric-vehicles"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "Local government publication (paraphrased, not quoted)"
 
 [[citation]]
@@ -2600,3 +2600,116 @@ year = 2024
 url = "https://www.pharmacy.texas.gov/files_pdf/2024-severe-weather-disaster-notification.pdf"
 retrieved = "2026-09-26"
 license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "ready_gov_recovering"
+title = "Recovering from Disaster"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/recovering-disaster"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_home_inspections"
+title = "Home Inspections (Individual Assistance)"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/assistance/individual/after-applying/home-inspections"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_disaster_fraud"
+title = "Disaster Fraud"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/about/offices/security/disaster-fraud"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_ihp"
+title = "Individuals and Households Program"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/assistance/individual/program"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "disasterassistance_gov"
+title = "DisasterAssistance.gov: apply for disaster assistance"
+publisher = "U.S. Department of Homeland Security"
+year = 2026
+url = "https://www.disasterassistance.gov/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "floodsmart_start_claim"
+title = "Start a Claim"
+publisher = "FEMA, National Flood Insurance Program (FloodSmart)"
+year = 2026
+url = "https://www.floodsmart.gov/recover/start-a-claim"
+retrieved = "2026-09-26"
+quote = "Report the flood and your loss to your insurance provider as soon as possible. They’ll partner you with an insurance adjuster who will inspect your property after you file your claim."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ftc_scams_after_disasters"
+title = "How To Avoid Scams After Weather Emergencies and Natural Disasters"
+publisher = "Federal Trade Commission"
+year = 2026
+url = "https://consumer.ftc.gov/articles/how-avoid-scams-after-weather-emergencies-and-natural-disasters"
+retrieved = "2026-09-26"
+quote = "Know that FEMA doesn’t charge application fees."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "healthcare_ready_rx_open"
+title = "Rx Open: open pharmacies in disaster areas"
+publisher = "Healthcare Ready"
+year = 2026
+url = "https://healthcareready.org/rxopen/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "usa_gov_replace_ids"
+title = "How to replace lost or stolen ID cards"
+publisher = "USAGov"
+year = 2026
+url = "https://www.usa.gov/replace-vital-documents"
+retrieved = "2026-09-26"
+quote = "Many require you to show an official document, like your birth certificate. This proves your identity or citizenship."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_clean_room"
+title = "Create a Clean Room to Protect Indoor Air Quality During a Wildfire"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/emergencies-iaq/create-clean-room-protect-indoor-air-quality-during-wildfire"
+retrieved = "2026-09-26"
+quote = "A clean room is a room that is set up to keep levels of smoke and other particles as low as possible during wildfire smoke events."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "texasready_hurricanes"
+title = "Hurricanes: what to do before, during and after"
+publisher = "Texas Department of State Health Services (TexasReady)"
+year = 2026
+url = "https://texasready.gov/be-informed/natural-disasters/hurricanes.html"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "nws_aly_cold_safety"
+title = "Cold Weather Safety Tips (public service announcement)"
+publisher = "NOAA National Weather Service, Albany NY office"
+year = 2019
+url = "https://www.weather.gov/media/aly/PSAs/ExtremeCold.pdf"
+retrieved = "2026-09-26"
+quote = "Let hot and cold water trickle or drip at night from a faucet."
+license = "US Government Work (public domain)"
