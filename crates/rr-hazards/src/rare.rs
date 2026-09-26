@@ -153,10 +153,8 @@ fn nuclear(ctx: &Ctx<'_>, notes: &mut Notes) -> Row {
                 &ctx.county_and_state(),
             );
             let mut src = vec![cite::STRATEGIC_SITES, cite::FEMA_NAPB90];
-            match c {
-                StrategicClass::A | StrategicClass::C1 => src.push(cite::FEMA_PNA_1985),
-                StrategicClass::B => src.push(cite::PHILIPPE_2023),
-                _ => {}
+            if c == StrategicClass::B {
+                src.push(cite::PHILIPPE_2023);
             }
             src.push(cite::RR_PRIORS);
             (def.f_s, why, c.as_str().to_owned(), src)
@@ -217,15 +215,22 @@ fn nuclear(ctx: &Ctx<'_>, notes: &mut Notes) -> Row {
         ctx.county.state_abbr.as_str(),
         "AK" | "HI" | "PR" | "GU" | "VI" | "AS" | "MP"
     );
-    let emp_note = if lower48 {
-        "Only as part of a nuclear attack: a burst high above the country could cut power and \
-         phones over a wide area and damage some cars and electronics. EPRI's 2019 study found \
-         months-long nationwide blackouts unlikely; the claim that most Americans would die is \
-         not a published model."
+    let (emp_note, emp_sources): (&str, &[&str]) = if lower48 {
+        (
+            "Only as part of a nuclear attack: a burst high above the country could damage \
+             electronics and black out a region. EPRI's 2019 study found little damage to large \
+             transformers and did not support a nationwide blackout lasting months. The claim \
+             that most Americans would die rests on testimony that assumed such a blackout for a \
+             year, not on a published model.",
+            &[cite::EPRI_HEMP, cite::PRY_2015_EMP, cite::RR_PRIORS],
+        )
     } else {
-        "Only as part of a nuclear attack: a burst high above the lower 48 states could cut power \
-         and phones there; where you live the effect depends on where the burst is. EPRI's 2019 \
-         study found months-long nationwide blackouts unlikely."
+        (
+            "Only as part of a nuclear attack: a burst high above the lower 48 states could black \
+             out a region there; where you live the effect depends on where the burst is. EPRI's \
+             2019 study did not support a nationwide blackout lasting months.",
+            &[cite::EPRI_HEMP, cite::RR_PRIORS],
+        )
     };
     let sub_causes = vec![
         sub(
@@ -251,7 +256,7 @@ fn nuclear(ctx: &Ctx<'_>, notes: &mut Notes) -> Row {
             "Electromagnetic pulse (EMP) from a high-altitude burst",
             emp_note,
             Some([hemp.low, hemp.high]),
-            &[cite::EPRI_HEMP, cite::RR_PRIORS],
+            emp_sources,
         ),
         sub(
             "national_disruption",
@@ -347,14 +352,11 @@ fn geomagnetic(ctx: &Ctx<'_>) -> (Row, Estimate) {
         cap(hi),
         &[cite::LLOYDS_2013, cite::NERC_TPL007, cite::RR_PRIORS],
     );
+    // Low end Moriña 2019; high end Riley's 2012 estimate as Moriña 2019 reports it, beside Love's;
+    // Lloyd's return period falls inside (see `CARRINGTON_STORM`).
     let storm = span(
         CARRINGTON_STORM,
-        &[
-            cite::RILEY_2012,
-            cite::LOVE_CARRINGTON,
-            cite::MORINA_2019,
-            cite::LLOYDS_2013,
-        ],
+        &[cite::LOVE_CARRINGTON, cite::MORINA_2019, cite::LLOYDS_2013],
     );
     let mut est = storm.times_span(&conditional);
     if geo.is_some() {
@@ -502,8 +504,8 @@ fn multi_month(gmd: &Estimate, war: &Estimate, lower48: bool) -> Row {
         sub(
             "emp",
             "EMP from a nuclear attack",
-            "Only as part of a nuclear attack; EPRI's 2019 study found months-long nationwide \
-             blackouts unlikely.",
+            "Only as part of a nuclear attack; EPRI's 2019 study did not support a nationwide \
+             blackout lasting months.",
             Some([hemp_part.low, hemp_part.high]),
             &[cite::EPRI_HEMP, cite::RR_PRIORS],
         ),
@@ -554,8 +556,8 @@ fn cbrn(ctx: &Ctx<'_>) -> Row {
         sub(
             "chemical",
             "Chemical",
-            "About 3 in 4 such incidents worldwide involve chemicals: shelter inside for hours, \
-             or leave the immediate area if told to.",
+            "A toxic chemical released on purpose: shelter inside for hours, or leave the \
+             immediate area if told to.",
             None,
             &[cite::START_POICN],
         ),
@@ -570,8 +572,7 @@ fn cbrn(ctx: &Ctx<'_>) -> Row {
         sub(
             "radiological",
             "Radiological (\"dirty bomb\")",
-            "Shelter inside for hours; the area may stay closed for weeks. None has caused mass \
-             casualties anywhere.",
+            "Shelter inside for hours; the area may stay closed for weeks.",
             None,
             &[cite::START_POICN],
         ),

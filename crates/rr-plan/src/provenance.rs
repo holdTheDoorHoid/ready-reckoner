@@ -20,13 +20,10 @@ use crate::pipeline::Assessment;
 /// the list only shrinks. // awaiting: rr-content
 pub const AWAITING_CONTENT: &[&str] = &[
     "county_boil_water_records",
-    // Requested by rr-hazards for v0.2.0 (docs/CITATION_IDS.md, "Not added"): no copy could be
-    // read that docs/CONTENT_STANDARDS.md §2 allows. The other 42 requested ids are in the
-    // registry since the v0.2.0 content merge.
-    "fema_protection_nuclear_age_1985",
-    "fema_napb90",
-    "epri_2019_hemp",
-    "riley_2012_carrington",
+    // The four rr-hazards ids with no allowed copy (docs/CITATION_IDS.md, "Not added") left this
+    // list on 2026-09-26: rr-hazards no longer cites fema_protection_nuclear_age_1985 or
+    // riley_2012_carrington, cites powermag_epri_2019_hemp in place of epri_2019_hemp, and
+    // fema_napb90 is in the registry from the NTIS copy.
 ];
 
 /// Where a placeholder source points: the index where requested ids wait for their entry.
