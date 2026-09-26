@@ -148,6 +148,23 @@ pub enum ItemRole {
     StoredWater,
 }
 
+/// One item's part in the bare-minimum kit (`rr-supply`'s `SizedLine::minimum`; contract v2's
+/// `Dials::minimum_kit`): the kit needs `need` units of line `line`, and one unit of the item
+/// gives `units_per_item` of them. Several items can meet one line (one light: a headlamp or a
+/// lantern); the line is met once what the household has adds up to `need`.
+///
+/// In TOML or JSON: `{ line = "power.lights", units_per_item = 1.0, need = 1.0 }`.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MinimumShare {
+    /// The requirement line's id (`water_out.water_gallons`).
+    pub line: String,
+    /// Line units one unit of the item gives (above zero).
+    pub units_per_item: f64,
+    /// Line units the kit needs (zero or more).
+    pub need: f64,
+}
+
 /// Everything the allocator needs to know about a catalogue item beyond `rr_types::Item`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -171,6 +188,10 @@ pub struct ItemMeta {
     /// Roles for the guardrails.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub roles: Vec<ItemRole>,
+    /// Its part in the bare-minimum kit, one entry per kit line it helps meet. Empty: not in
+    /// the kit.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub minimum: Vec<MinimumShare>,
 }
 
 impl ItemMeta {
@@ -183,6 +204,7 @@ impl ItemMeta {
             step: None,
             set_quantity: None,
             roles: Vec::new(),
+            minimum: Vec::new(),
         }
     }
 
@@ -245,6 +267,20 @@ impl ItemMeta {
                 item: item(),
                 field: "set_quantity",
             });
+        }
+        for m in &self.minimum {
+            if !positive(m.units_per_item) {
+                return Err(MetaError::Number {
+                    item: item(),
+                    field: "minimum.units_per_item",
+                });
+            }
+            if !(m.need.is_finite() && m.need >= 0.0) {
+                return Err(MetaError::Number {
+                    item: item(),
+                    field: "minimum.need",
+                });
+            }
         }
         Ok(())
     }

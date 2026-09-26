@@ -785,6 +785,7 @@ fn two_item_case(monthly: f32) -> Case {
         risks: Risks {
             curves,
             assessments: BTreeMap::new(),
+            ..Risks::default()
         },
         context: GuardrailContext::default(),
     }

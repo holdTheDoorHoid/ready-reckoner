@@ -13,6 +13,10 @@ pub(crate) const WELL_WATER_TREATED: &str = "well water, treated";
 /// The same for a household whose raw-water source is one it picks (a rain barrel, a creek).
 pub(crate) const RAW_WATER_TREATED: &str = "raw water, treated";
 
+/// Added to the "why" of a purchase bought for the bare-minimum kit.
+pub(crate) const MINIMUM_KIT_NOTE: &str = " Part of the bare-minimum kit (three days of water, \
+    light, warmth and medicine), which comes first.";
+
 /// One bucket (or part) a purchase moves, with the numbers for its sentence.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct DurationText {

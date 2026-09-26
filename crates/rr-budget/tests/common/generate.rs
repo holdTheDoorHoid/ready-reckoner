@@ -106,6 +106,7 @@ pub fn case(seed: u64) -> Case {
         } else {
             Vec::new()
         },
+        ..GuardrailContext::default()
     };
     Case {
         seed,
@@ -330,6 +331,7 @@ fn risks(g: &mut Gen) -> Risks {
     Risks {
         curves,
         assessments,
+        ..Risks::default()
     }
 }
 
