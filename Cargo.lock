@@ -990,6 +990,7 @@ dependencies = [
  "rr-budget",
  "rr-consequence",
  "rr-content",
+ "rr-data",
  "rr-hazards",
  "rr-supply",
  "rr-types",

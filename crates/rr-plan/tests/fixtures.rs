@@ -15,7 +15,15 @@ fn every_fixture_assesses() {
     for (name, _, out) in outputs() {
         assert_eq!(out.api_version, rr_types::ENGINE_API_VERSION, "{name}");
         assert_eq!(out.content_version, rr_content::CONTENT_VERSION, "{name}");
-        assert!(out.data_pack_version.starts_with("fixtures+"), "{name}");
+        assert_eq!(
+            Some(out.data_pack_version.as_str()),
+            rr_data::DataStore::pack_version(common::engine().store()),
+            "{name}: planned against the data packs"
+        );
+        assert!(
+            out.location.data_note.as_deref() != Some(rr_plan::source::FIXTURE_DATA_NOTE),
+            "{name}: real county records, not the sample counties"
+        );
         assert_eq!(out.buckets.len(), 14, "{name}");
         let ids: Vec<BucketId> = out.buckets.iter().map(|b| b.id).collect();
         assert_eq!(ids, BucketId::ALL, "{name}: buckets in BucketId order");

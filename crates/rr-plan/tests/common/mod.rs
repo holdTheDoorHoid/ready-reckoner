@@ -3,11 +3,20 @@
 
 use std::sync::OnceLock;
 
+use rr_data::DataStore;
 use rr_plan::{Assessment, Engine};
 use rr_types::{PlanInput, PlanOutput};
 
-/// One engine for the whole test binary.
-pub fn engine() -> &'static Engine {
+/// One engine on the repository's data packs for the whole test binary.
+pub fn engine() -> &'static Engine<DataStore> {
+    static ENGINE: OnceLock<Engine<DataStore>> = OnceLock::new();
+    ENGINE.get_or_init(|| {
+        Engine::with_data_dir(rr_plan::golden::data_dir()).expect("the data packs in data/ load")
+    })
+}
+
+/// One engine on the seven sample counties (no data packs).
+pub fn fixture_engine() -> &'static Engine {
     static ENGINE: OnceLock<Engine> = OnceLock::new();
     ENGINE.get_or_init(|| Engine::with_fixtures().expect("fixture engine"))
 }

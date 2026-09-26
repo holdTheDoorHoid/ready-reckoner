@@ -1,6 +1,7 @@
-//! Location: ZIP codes and county codes resolve per docs/ENGINE-API.md, `ambiguous_zip` lists the
-//! counties largest first, a county code wins over a ZIP code, and `assess` returns the same
-//! location errors.
+//! Location: ZIP codes and county codes resolve per docs/ENGINE-API.md against the real
+//! crosswalk, `ambiguous_zip` lists the counties largest first, a county code wins over a ZIP
+//! code, and `assess` returns the same location errors. The trait's default resolution (used by
+//! the sample counties) follows the same rules.
 
 mod common;
 
@@ -42,6 +43,17 @@ fn fixture_zip_codes_resolve_to_their_counties() {
 }
 
 #[test]
+fn most_of_a_zip_code_is_enough_and_the_share_is_kept() {
+    // 19118 (Chestnut Hill) is 98 % Philadelphia and 2 % Montgomery County.
+    let r = engine()
+        .resolve_location(&loc(Some("19118"), None))
+        .unwrap();
+    assert_eq!(r.county_fips, "42101");
+    let share = r.zip_county_share.unwrap();
+    assert!((0.8..1.0).contains(&share), "{share}");
+}
+
+#[test]
 fn a_county_code_wins_over_a_zip_code() {
     let r = engine()
         .resolve_location(&loc(Some("19147"), Some("17031")))
@@ -54,49 +66,42 @@ fn a_county_code_wins_over_a_zip_code() {
 #[test]
 fn unknown_locations_fail_with_their_codes() {
     let e = engine();
-    let err = e.resolve_location(&loc(Some("00000"), None)).unwrap_err();
-    assert_eq!(err.code, ErrorCode::UnknownZip);
-    let err = e.resolve_location(&loc(None, Some("42999"))).unwrap_err();
-    assert_eq!(err.code, ErrorCode::UnknownCounty);
-    let suggestions = err.suggestions().unwrap();
-    assert_eq!(suggestions.len(), 1, "{suggestions:?}");
-    assert_eq!(suggestions[0].county_fips, "42101", "same state first");
-    let err = e.resolve_location(&loc(None, None)).unwrap_err();
-    assert_eq!(err.code, ErrorCode::BadInput);
+    assert_eq!(
+        e.resolve_location(&loc(Some("00000"), None))
+            .unwrap_err()
+            .code,
+        ErrorCode::UnknownZip
+    );
+    assert_eq!(
+        e.resolve_location(&loc(None, Some("42999")))
+            .unwrap_err()
+            .code,
+        ErrorCode::UnknownCounty
+    );
+    assert_eq!(
+        e.resolve_location(&loc(None, None)).unwrap_err().code,
+        ErrorCode::BadInput
+    );
 }
 
 #[test]
-fn an_ambiguous_zip_lists_every_county_largest_first() {
-    // A made-up ZIP code split between two fixture counties (no real ZIP spans these).
-    let source = FixtureSource::new()
-        .unwrap()
-        .with_zip("99901", &[("17031", 0.35), ("42101", 0.65)]);
-    let e = Engine::new(source).unwrap();
-    let err = e.resolve_location(&loc(Some("99901"), None)).unwrap_err();
+fn a_real_ambiguous_zip_lists_every_county_largest_first() {
+    // 33034 (Homestead, Florida City) is about 53 % Miami-Dade and 47 % Monroe County.
+    let e = engine();
+    let err = e.resolve_location(&loc(Some("33034"), None)).unwrap_err();
     assert_eq!(err.code, ErrorCode::AmbiguousZip);
     let s = err.suggestions().unwrap();
     let fips: Vec<&str> = s.iter().map(|l| l.county_fips.as_str()).collect();
-    assert_eq!(fips, ["42101", "17031"]);
-    assert_eq!(s[0].zip_county_share, Some(0.65));
+    assert_eq!(fips, ["12086", "12087"]);
+    assert!(s[0].zip_county_share.unwrap() > s[1].zip_county_share.unwrap());
     // assess answers the same, and the pick the app records (the county) then works.
-    let mut input = household("philadelphia-renters-4");
-    input.location.zip = Some("99901".into());
+    let mut input = household("miami-condo-retiree-1");
+    input.location.zip = Some("33034".into());
     assert_eq!(e.assess(&input).unwrap_err().code, ErrorCode::AmbiguousZip);
-    input.location.county_fips = Some("42101".into());
+    input.location.county_fips = Some("12087".into());
     let out = e.assess(&input).unwrap();
-    assert_eq!(out.location.county_fips, "42101");
-    assert_eq!(out.location.zip.as_deref(), Some("99901"));
-    assert_eq!(out.location.zip_county_share, Some(0.65));
-}
-
-#[test]
-fn eighty_percent_of_a_zip_code_is_enough() {
-    let source = FixtureSource::new()
-        .unwrap()
-        .with_zip("99902", &[("42101", 0.8), ("17031", 0.2)]);
-    let e = Engine::new(source).unwrap();
-    let r = e.resolve_location(&loc(Some("99902"), None)).unwrap();
-    assert_eq!(r.county_fips, "42101");
+    assert_eq!(out.location.county_name, "Monroe");
+    assert_eq!(out.location.zip.as_deref(), Some("33034"));
 }
 
 #[test]
@@ -112,11 +117,41 @@ fn county_search_finds_names_codes_and_states() {
     assert_eq!(first("Philadelphia County"), "42101");
     assert_eq!(first("42101"), "42101");
     assert_eq!(first("Cook, IL"), "17031");
-    assert_eq!(first("miami"), "12086");
-    assert!(e.county_search("Cook, TX").is_empty());
+    assert_eq!(first("Miami-Dade"), "12086");
+    assert!(e.county_search("zzzz").is_empty());
     assert!(e.county_search("").is_empty());
-    assert!(e.county_search("zzz").is_empty());
-    assert!(e.county_search("4").len() <= 10);
+    assert!(e.county_search("Cook").len() <= 10);
+}
+
+// The trait's default resolution, on the sample counties with made-up ZIP codes.
+
+#[test]
+fn the_default_resolution_follows_the_same_rules() {
+    let source = FixtureSource::new()
+        .unwrap()
+        .with_zip("99901", &[("17031", 0.35), ("42101", 0.65)])
+        .with_zip("99902", &[("42101", 0.8), ("17031", 0.2)]);
+    let e = Engine::new(source).unwrap();
+    let err = e.resolve_location(&loc(Some("99901"), None)).unwrap_err();
+    assert_eq!(err.code, ErrorCode::AmbiguousZip);
+    let fips: Vec<String> = err
+        .suggestions()
+        .unwrap()
+        .into_iter()
+        .map(|l| l.county_fips)
+        .collect();
+    assert_eq!(fips, ["42101", "17031"]);
+    let r = e.resolve_location(&loc(Some("99902"), None)).unwrap();
+    assert_eq!(r.county_fips, "42101", "80 % is enough");
+    let r = e.resolve_location(&loc(Some("19147"), None)).unwrap();
+    assert_eq!(r.county_fips, "42101");
+    let err = e.resolve_location(&loc(None, Some("42999"))).unwrap_err();
+    assert_eq!(err.code, ErrorCode::UnknownCounty);
+    assert_eq!(
+        err.suggestions().unwrap()[0].county_fips,
+        "42101",
+        "same state"
+    );
 }
 
 /// A source with no counties loaded yet.
@@ -158,6 +193,10 @@ fn before_any_pack_loads_assess_is_pack_missing() {
     let err = e.assess(&household("philadelphia-renters-4")).unwrap_err();
     assert_eq!(err.code, ErrorCode::PackMissing);
     assert_eq!(e.engine_info().data_pack_version, None);
+    // An empty data store answers the same.
+    let e = Engine::new(rr_data::DataStore::new()).unwrap();
+    let err = e.assess(&household("philadelphia-renters-4")).unwrap_err();
+    assert_eq!(err.code, ErrorCode::PackMissing);
 }
 
 #[test]

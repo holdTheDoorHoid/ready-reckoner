@@ -7,29 +7,60 @@ use common::engine;
 use rr_plan::coverage::{DIVISIBLE_CLASSES, ITEM_LINES, LONG_STORE_FOOD, Units};
 use rr_plan::provenance::AWAITING_CONTENT;
 
+fn nri_disclaimer() -> String {
+    rr_content::content()
+        .citation("fema_nri_disclaimer")
+        .and_then(|c| c.quote.clone())
+        .unwrap()
+}
+
 #[test]
 fn engine_info_carries_versions_and_the_nri_statement() {
     let info = engine().engine_info();
     assert_eq!(info.api_version, rr_types::ENGINE_API_VERSION);
     assert_eq!(info.engine_version, rr_plan::ENGINE_VERSION);
     assert_eq!(info.content_version, rr_content::CONTENT_VERSION);
-    assert!(info.data_pack_version.unwrap().starts_with("fixtures+"));
-    assert_eq!(info.packs_loaded, ["fixtures"]);
-    let nri = info
-        .attributions
-        .iter()
-        .find(|a| a.source.contains("National Risk Index"))
-        .expect("the NRI statement");
-    let registry = rr_content::content()
-        .citation("fema_nri_disclaimer")
-        .and_then(|c| c.quote.clone())
-        .unwrap();
-    assert_eq!(nri.text, registry, "shown exactly as the terms require");
-    assert!(nri.version.as_deref().unwrap().contains("1.20"));
+    let manifest: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(rr_plan::golden::data_dir().join("manifest.json")).unwrap(),
+    )
+    .unwrap();
     assert_eq!(
-        info.attributions[0].source, nri.source,
+        info.data_pack_version.as_deref(),
+        manifest["pack_version"].as_str()
+    );
+    assert_eq!(info.packs_loaded, ["core"]);
+    let first = &info.attributions[0];
+    assert!(
+        first.source.contains("National Risk Index"),
         "NRI statement first"
     );
+    assert!(
+        first.text.contains(&nri_disclaimer()),
+        "the manifest's NRI text carries the statement the terms require"
+    );
+    assert!(first.version.as_deref().unwrap().contains("1.20"));
+}
+
+#[test]
+fn with_no_packs_the_sample_counties_still_plan() {
+    let e = common::fixture_engine();
+    let info = e.engine_info();
+    assert!(info.data_pack_version.unwrap().starts_with("fixtures+"));
+    assert_eq!(info.packs_loaded, ["fixtures"]);
+    assert_eq!(
+        info.attributions[0].text,
+        nri_disclaimer(),
+        "exact statement"
+    );
+    let out = e
+        .assess(&common::household("philadelphia-renters-4"))
+        .unwrap();
+    assert_eq!(out.location.county_fips, "42101");
+    assert_eq!(
+        out.location.data_note.as_deref(),
+        Some(rr_plan::source::FIXTURE_DATA_NOTE)
+    );
+    assert!(out.packet_markdown.contains("**Sample data.**"));
 }
 
 #[test]

@@ -6,8 +6,9 @@
 //!                (source)   (rates)       (targets)          (lines)       (plan)       + packet
 //! ```
 //!
-//! [`Engine`] owns a county data source ([`CountySource`]; [`FixtureSource`] until the national
-//! data pack lands) and the embedded content, and answers every engine function in
+//! [`Engine`] owns a county data source ([`CountySource`]: `rr-data`'s `DataStore` with the data
+//! packs, or [`FixtureSource`]'s seven sample counties) and the embedded content, and answers every
+//! engine function in
 //! `docs/ENGINE-API.md`: [`Engine::assess`], [`Engine::explain`], [`Engine::county_search`],
 //! [`Engine::resolve_location`], [`Engine::catalogue`], [`Engine::defaults`] and
 //! [`Engine::engine_info`]. `rr-wasm` and `rr-cli` wrap it.
@@ -62,13 +63,28 @@ pub struct Engine<S: CountySource = FixtureSource> {
 }
 
 impl Engine<FixtureSource> {
-    /// An engine on the seven fixture counties (see [`FixtureSource`]).
+    /// An engine on the seven fixture counties (see [`FixtureSource`]): for tests, and for an
+    /// engine with no data packs (its locations say "sample data").
     ///
     /// # Errors
     ///
     /// If the embedded fixtures or content do not parse (the test suite guarantees they do).
     pub fn with_fixtures() -> Result<Self, EngineError> {
         Engine::new(FixtureSource::new()?)
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl Engine<rr_data::DataStore> {
+    /// An engine on a data directory (the repository's `data/`): `manifest.json` and the core
+    /// pack, loaded and checked as the web app loads them. Native only.
+    ///
+    /// # Errors
+    ///
+    /// `pack_missing` or `pack_corrupt` from [`source::load_data_dir`], or `internal` if the
+    /// embedded content does not parse.
+    pub fn with_data_dir(dir: impl AsRef<std::path::Path>) -> Result<Self, EngineError> {
+        Engine::new(source::load_data_dir(dir.as_ref())?)
     }
 }
 

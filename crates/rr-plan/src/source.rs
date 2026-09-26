@@ -1,12 +1,13 @@
-//! Where county data comes from: the [`CountySource`] trait and [`FixtureSource`], the seven
-//! hand-built fixture counties the engine runs on until the national data pack lands.
+//! Where county data comes from: the [`CountySource`] trait, implemented by `rr-data`'s
+//! [`DataStore`] (the national data pack) and by [`FixtureSource`] (seven hand-built sample
+//! counties, for tests and for an engine with no packs loaded; its locations say "sample data").
 //!
-//! `rr-data`'s `DataStore` will implement [`CountySource`] with the same meaning for every method
-//! (its `county`, `resolve_zip`, `search_locations`, `base_rates`, `attributions`, `location` and
-//! `pack_version` already match). // awaiting: rr-data
+//! Native callers load the repository's `data/` directory with [`load_data_dir`] (or
+//! `Engine::with_data_dir`); the web app hands each pack file to `DataStore::load_pack` itself.
 
 use std::collections::BTreeMap;
 
+use rr_data::DataStore;
 use rr_types::{
     Attribution, BaseRate, CountyRecord, Date, EngineError, ErrorCode, LocationInput,
     LocationResolved,
@@ -271,4 +272,109 @@ fn fixture_attributions() -> Vec<Attribution> {
         });
     }
     out
+}
+
+/// The National Risk Index credit line goes first (its terms require the statement; the About
+/// screen and the packet show it first); the rest keep their order.
+fn nri_first(mut list: Vec<Attribution>) -> Vec<Attribution> {
+    list.sort_by_key(|a| !a.source.contains("National Risk Index"));
+    list
+}
+
+impl CountySource for DataStore {
+    fn county(&self, fips: &str) -> Option<&CountyRecord> {
+        DataStore::county(self, fips.trim())
+    }
+
+    fn resolve_zip(&self, zip: &str) -> Vec<(String, f32)> {
+        DataStore::resolve_zip(self, zip)
+    }
+
+    fn search(&self, query: &str) -> Vec<LocationResolved> {
+        self.search_locations(query)
+    }
+
+    fn base_rates(&self) -> &[BaseRate] {
+        DataStore::base_rates(self)
+    }
+
+    fn attributions(&self) -> Vec<Attribution> {
+        nri_first(DataStore::attributions(self))
+    }
+
+    fn location(&self, county_fips: &str, zip: Option<&str>) -> Option<LocationResolved> {
+        DataStore::location(self, county_fips.trim(), zip)
+    }
+
+    fn pack_version(&self) -> Option<String> {
+        DataStore::pack_version(self).map(str::to_owned)
+    }
+
+    /// The manifest's packs with at least one file loaded (`core`, `geo`).
+    fn packs_loaded(&self) -> Vec<String> {
+        let loaded = self.loaded();
+        match self.manifest() {
+            Some(m) => m
+                .packs
+                .iter()
+                .filter(|(_, p)| p.files.iter().any(|f| loaded.contains_key(&f.path)))
+                .map(|(name, _)| name.clone())
+                .collect(),
+            None => Vec::new(),
+        }
+    }
+
+    fn has_counties(&self) -> bool {
+        self.counties().next().is_some()
+    }
+
+    fn resolve(&self, input: &LocationInput) -> Result<LocationResolved, EngineError> {
+        DataStore::resolve(self, input)
+    }
+}
+
+/// The packs [`load_data_dir`] loads: the core pack (every lookup the engine makes). The `geo`
+/// pack only draws the map.
+pub const DATA_DIR_PACKS: [&str; 1] = ["core"];
+
+/// Loads a data directory the way the web app loads the packs: `manifest.json` first, then every
+/// file of the core pack, each checked against its sha256. Native only.
+///
+/// # Errors
+///
+/// `pack_missing` when a file cannot be read, `pack_corrupt` when one fails its checksum or
+/// cannot be decoded.
+#[cfg(not(target_arch = "wasm32"))]
+pub fn load_data_dir(dir: &std::path::Path) -> Result<DataStore, EngineError> {
+    let read = |rel: &str| -> Result<Vec<u8>, EngineError> {
+        let path = dir.join(rel);
+        std::fs::read(&path).map_err(|e| {
+            EngineError::new(
+                ErrorCode::PackMissing,
+                format!("The data file {} could not be read: {e}", path.display()),
+            )
+        })
+    };
+    let manifest_bytes = read("manifest.json")?;
+    let manifest: rr_data::Manifest = serde_json::from_slice(&manifest_bytes).map_err(|e| {
+        EngineError::new(
+            ErrorCode::PackCorrupt,
+            format!("data/manifest.json could not be read: {e}"),
+        )
+    })?;
+    let mut files: Vec<(String, Vec<u8>)> = vec![("manifest.json".to_owned(), manifest_bytes)];
+    for pack in DATA_DIR_PACKS {
+        if let Some(p) = manifest.packs.get(pack) {
+            for f in &p.files {
+                files.push((f.path.clone(), read(&f.path)?));
+            }
+        }
+    }
+    let refs: Vec<(&str, &[u8])> = files
+        .iter()
+        .map(|(n, b)| (n.as_str(), b.as_slice()))
+        .collect();
+    let mut store = DataStore::new();
+    store.load_many(&refs)?;
+    Ok(store)
 }

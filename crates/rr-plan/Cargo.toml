@@ -15,6 +15,10 @@ rr-consequence = { path = "../rr-consequence" }
 rr-supply = { path = "../rr-supply" }
 rr-budget = { path = "../rr-budget" }
 rr-content = { path = "../rr-content" }
+rr-data = { path = "../rr-data" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+rr-data = { path = "../rr-data" }

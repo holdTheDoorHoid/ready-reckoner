@@ -10,15 +10,20 @@ use rr_types::{
     ReturnPeriod, Target,
 };
 
+fn fresh() -> &'static rr_plan::Engine<rr_data::DataStore> {
+    static FRESH: std::sync::OnceLock<rr_plan::Engine<rr_data::DataStore>> =
+        std::sync::OnceLock::new();
+    FRESH.get_or_init(|| rr_plan::Engine::with_data_dir(rr_plan::golden::data_dir()).unwrap())
+}
+
 #[test]
 fn the_same_input_gives_byte_identical_output() {
     for (name, input) in rr_types::fixtures::all() {
         let a = rr_plan::to_json(&assess(&input));
         let b = rr_plan::to_json(&assess(&input));
         assert!(a == b, "{name}: two runs differ");
-        // A fresh engine too (no state carried between calls).
-        let other = rr_plan::Engine::with_fixtures().unwrap();
-        let c = rr_plan::to_json(&other.assess(&input).unwrap());
+        // A freshly loaded engine too (no state carried between calls or loads).
+        let c = rr_plan::to_json(&fresh().assess(&input).unwrap());
         assert!(a == c, "{name}: a second engine differs");
     }
 }

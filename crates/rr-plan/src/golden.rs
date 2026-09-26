@@ -1,7 +1,8 @@
 //! Golden files: `fixtures/golden/<fixture>.md` (the packet) and `.json` (the whole
-//! [`rr_types::PlanOutput`], keys sorted) for every fixture household. [`compare_all`] is what the
-//! tests (and `rr golden`) run; [`write_all`] regenerates them when `RR_UPDATE_GOLDENS=1`. A change
-//! to a golden must be explained in the commit message (CLAUDE.md).
+//! [`rr_types::PlanOutput`]) for every fixture household, planned against the repository's data
+//! packs (`data/`). [`compare_all`] is what the tests (and `rr golden`) run; [`write_all`]
+//! regenerates them when `RR_UPDATE_GOLDENS=1`. A change to a golden must be explained in the
+//! commit message (CLAUDE.md).
 
 use std::path::{Path, PathBuf};
 
@@ -26,13 +27,18 @@ pub fn golden_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures/golden")
 }
 
-/// Renders every fixture household with the fixture counties.
+/// `data/` in the repository: the data packs the goldens are planned against.
+pub fn data_dir() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../data")
+}
+
+/// Renders every fixture household against the repository's data packs.
 ///
 /// # Errors
 ///
-/// The first fixture that fails to assess, with its name.
+/// The data packs failing to load, or the first fixture that fails to assess, with its name.
 pub fn render_all() -> Result<Vec<Golden>, String> {
-    let engine = Engine::with_fixtures().map_err(|e| e.to_string())?;
+    let engine = Engine::with_data_dir(data_dir()).map_err(|e| e.to_string())?;
     let mut out = Vec::new();
     for (name, input) in rr_types::fixtures::all() {
         let output = engine.assess(&input).map_err(|e| format!("{name}: {e}"))?;
