@@ -458,6 +458,7 @@ publisher = "U.S. Fire Administration"
 year = 2026
 url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/smoke-alarms/"
 retrieved = "2026-09-25"
+quote = "Test smoke alarms every month and replace 9-volt smoke alarm batteries at least once every year."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -467,6 +468,7 @@ publisher = "U.S. Fire Administration"
 year = 2026
 url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/fire-extinguishers/"
 retrieved = "2026-09-25"
+quote = "There are also multipurpose fire extinguishers that might be labeled \"B-C\" or \"A-B-C\" that can be used on most types of home fires."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -476,6 +478,7 @@ publisher = "U.S. Fire Administration"
 year = 2026
 url = "https://www.usfa.fema.gov/prevention/home-fires/prevent-fires/cooking/"
 retrieved = "2026-09-25"
+quote = "Cooking is, by far, the leading cause of home fires and home fire injuries."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -485,6 +488,7 @@ publisher = "U.S. Fire Administration"
 year = 2026
 url = "https://www.usfa.fema.gov/prevention/home-fires/prevent-fires/heating/"
 retrieved = "2026-09-25"
+quote = "Keep anything that can burn at least 3 feet from all heat sources including fireplaces, wood stoves, radiators, space heaters or candles."
 license = "US Government Work (public domain)"
 
 # ---------------------------------------------------------------------------------------------

@@ -1,0 +1,99 @@
+# Rare and catastrophic: nuclear, radiological, EMP. General supplies already cover the sheltering
+# phase; specialised items are rare_catastrophic = true, tier y1, $0 by default and capped at 10% of
+# the monthly budget on opt-in (DESIGN §4.7). Potassium iodide appears only with official
+# instructions and only within a plant's emergency planning zone (CONTENT_STANDARDS §5).
+
+[[item]]
+id = "rare_get_inside_plan"
+name = "Know 'Get inside, stay inside, stay tuned'"
+category = "rare_catastrophic"
+unit = "action"
+buckets = ["supplies"]
+tier = "now"
+free = true
+spec = "For a radiation emergency, get inside the most protective place you can reach, such as a basement or the middle of a large brick or concrete building, stay there for at least 24 hours unless officials say otherwise, and listen for instructions (Ready.gov). Radiation levels fall quickly during the first day, and your three-day supplies cover this sheltering."
+look_for = [
+  "The most protective spot at home, work and school",
+  "A battery or crank radio for instructions",
+  "Pets brought inside with you",
+]
+avoid = [
+  "Leaving shelter early to look for family: stay put and stay in touch",
+  "Running fans or air systems that pull in outside air",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: the plan uses supplies you already keep." }
+quantity_rule = "once"
+citations = ["ready_gov_nuclear", "ready_gov_radiation"]
+hazard_extras = ["nuclear_attack", "nuclear_plant_incident"]
+
+[[item]]
+id = "rare_potassium_iodide"
+name = "Potassium iodide: only on official instruction, near a nuclear plant"
+category = "rare_catastrophic"
+unit = "action"
+buckets = ["medication"]
+tier = "y1"
+free = true
+rare_catastrophic = true
+spec = "Potassium iodide protects only the thyroid and matters only near a nuclear plant: federal programs supply it to states for people within the 10-mile emergency planning zone. If you live there, ask your state or county health department about its program, and take it only when public health officials tell you to (CDC)."
+look_for = [
+  "Your state or county health department's plan for your zone",
+  "Where local officials would hand it out",
+  "The alert channel that would give the instruction",
+]
+avoid = [
+  "Taking it on your own: CDC says it can cause harm and is useful only in specific situations",
+  "Buying it outside a plant's emergency planning zone",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: public health programs supply it where it is needed." }
+quantity_rule = "once_if_near_nuclear_plant"
+citations = ["cdc_potassium_iodide", "nrc_potassium_iodide", "ready_gov_radiation"]
+hazard_extras = ["nuclear_plant_incident"]
+
+[[item]]
+id = "rare_radiation_meter"
+name = "Personal radiation dosimeter card"
+category = "rare_catastrophic"
+unit = "dosimeter"
+buckets = ["supplies"]
+tier = "y1"
+free = false
+rare_catastrophic = true
+spec = "A card that changes color to show how much radiation it has absorbed. It is optional: in a radiation emergency, official instructions on when to shelter and when to leave matter far more than your own reading."
+look_for = [
+  "A clear color scale printed on the card",
+  "An expiry date on the package",
+]
+avoid = [
+  "Treating it as permission to leave shelter early",
+  "Spending on it before water, medicine and the three-day basics",
+]
+price_band_usd = { low = 24.95, high = 24.99, per = "dosimeter", note = "Two retail listings for dosimeter cards: $24.95 and $24.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["ready_gov_radiation", "rr_price_observations_2026_09"]
+hazard_extras = ["nuclear_attack", "nuclear_plant_incident"]
+
+[[item]]
+id = "rare_faraday_storage"
+name = "Shielded (Faraday) bag for spare electronics"
+category = "rare_catastrophic"
+unit = "bag"
+buckets = ["comms"]
+tier = "y1"
+free = false
+rare_catastrophic = true
+spec = "A metal-lined bag for a spare radio, phone or power bank. The effects of an electromagnetic pulse on home electronics are highly uncertain, so this is optional and never a priority; a battery radio and general supplies are the main protection."
+look_for = [
+  "A fully sealing closure",
+  "Room for a spare radio and charger",
+]
+avoid = [
+  "Spending on it before the basics",
+  "Believing claims that it guarantees protection",
+]
+price_band_usd = { low = 37.95, high = 97.95, per = "bag", note = "Two retail listings: a 15-liter bag at $37.95 and a 30-liter pack at $97.95." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["rr_research_risk_model", "fri_nuclear_risk_2024", "rr_price_observations_2026_09"]
+hazard_extras = ["nuclear_attack"]

@@ -1,0 +1,191 @@
+# Pets, infants, older adults, pregnancy, disability and large animals. Rules:
+# docs/CONTENT_STANDARDS.md §3. Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
+
+[[item]]
+id = "special_pet_plan"
+name = "Pet plan: microchip, records, a photo and a buddy"
+category = "special_needs"
+unit = "action"
+buckets = ["evacuate"]
+tier = "now"
+free = true
+spec = "Keep your pet's ID tag and microchip details current, put vaccination records and a recent photo with your documents, and arrange a buddy who can care for or evacuate your pets if you cannot (Ready.gov). If officials ask you to evacuate, your pets should go too."
+look_for = [
+  "Microchip contact details that are up to date",
+  "Vaccination records and a photo of you with your pet",
+  "A neighbour or friend who agrees to be your pet buddy",
+]
+avoid = [
+  "Leaving pets behind in an evacuation",
+  "Assuming every shelter and hotel takes pets: check ahead",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free if your pet is already chipped; a vet charges for a microchip." }
+quantity_rule = "once_if_pets"
+citations = ["ready_gov_pets", "aspca_disaster_prep"]
+hazard_extras = []
+
+[[item]]
+id = "special_pet_kit"
+name = "Pet go-kit"
+category = "special_needs"
+unit = "pet"
+buckets = ["evacuate", "supplies"]
+tier = "h72"
+free = false
+spec = "For each pet, a carrier or leash, bowls, a pet first-aid kit, two weeks of any medicine, litter supplies for cats, and copies of records in a waterproof bag (Ready.gov, ASPCA)."
+look_for = [
+  "A carrier big enough for your pet to stand and turn around",
+  "Two weeks of your pet's medicines",
+  "Collapsible bowls and a spare leash",
+]
+avoid = [
+  "A carrier your pet has never been inside: practice first",
+  "Leaving medicines out of the kit",
+]
+price_band_usd = { low = 34.95, high = 100.00, per = "pet", note = "Two retail listings: a pet first-aid kit at $34.95 and a packed dog go-kit at $100. Food is priced separately." }
+retrieved = "2026-09-25"
+quantity_rule = "per_pet"
+maintenance = { check_months = 6 }
+citations = ["ready_gov_pets", "aspca_disaster_prep", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "special_pet_food"
+name = "Extra pet food in an airtight container"
+category = "special_needs"
+unit = "pound of dry food"
+buckets = ["supplies", "evacuate"]
+tier = "h72"
+free = false
+spec = "Seven to ten days of your pet's usual food in an airtight, waterproof container (ASPCA, Ready.gov), plus water for pets, which the water plan counts. Rotate it every two months so it stays fresh."
+look_for = [
+  "The food your pet already eats",
+  "An airtight, waterproof container",
+  "A can opener or pull-tab cans if you use wet food",
+]
+avoid = [
+  "Switching foods suddenly during a stressful time",
+  "Letting the stored food go stale",
+]
+price_band_usd = { low = 3.81, high = 4.09, per = "pound of dry food", note = "Two online listings for 21–22 pound bags of dry dog food: $3.81 and $4.09 a pound. Prices vary widely by brand." }
+retrieved = "2026-09-25"
+quantity_rule = "pet_food_lb"
+maintenance = { rotate_months = 2 }
+citations = ["aspca_disaster_prep", "ready_gov_pets", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "special_infant_go_kit"
+name = "Pack an infant go-kit from CDC's checklist"
+category = "special_needs"
+unit = "action"
+buckets = ["supplies", "evacuate"]
+tier = "now"
+free = true
+spec = "Use CDC's emergency checklist for families with infants: formula or breastfeeding supplies, diapers and wipes, an infant thermometer, a bulb syringe, a pain reliever made for infants, warm sleepwear or a sleep sack, and a portable crib. Babies under one should never sleep in a cold room (CDC)."
+look_for = [
+  "CDC's printable checklist, ticked off",
+  "Supplies in the size your baby uses now",
+  "A monthly check that the kit still fits your baby's needs",
+]
+avoid = [
+  "Adult medicines for babies",
+  "Letting the baby sleep in a cold room during an outage",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to assemble from what you have; formula and diapers are priced as their own items." }
+quantity_rule = "once_if_infant"
+maintenance = { check_months = 1 }
+citations = ["cdc_infant_checklist", "cdc_winter_safety"]
+hazard_extras = []
+
+[[item]]
+id = "special_access_needs_plan"
+name = "Plan for access and mobility needs"
+category = "special_needs"
+unit = "action"
+buckets = ["evacuate", "medical_emergency", "power"]
+tier = "now"
+free = true
+spec = "Build a support network who know your needs, can reach you and know how to operate your equipment, and plan how you would evacuate with it (Ready.gov). Keep a spare battery for a power wheelchair or other assistive device if you can, and ask local groups for help buying one if you cannot."
+look_for = [
+  "Two or more people who will check on you and can move your equipment",
+  "Printed communication cards if speech or hearing is affected",
+  "A second dialysis center or treatment clinic, if you use one",
+]
+avoid = [
+  "A plan that depends on one helper",
+  "Evacuation transport that cannot take your wheelchair or service animal",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to plan; spare batteries cost extra." }
+quantity_rule = "once_if_mobility_needs"
+citations = ["ready_gov_disability", "ready_gov_older_adults"]
+hazard_extras = []
+
+[[item]]
+id = "special_older_adult_plan"
+name = "Plan for older adults in the household"
+category = "special_needs"
+unit = "action"
+buckets = ["evacuate", "thermal", "medical_emergency"]
+tier = "now"
+free = true
+spec = "Plan transport if help is needed to evacuate, copy Medicare and Medicaid cards, give someone in your support network a key and show them your equipment, and ask any clinic you rely on about its emergency plans (Ready.gov). Heat and cold are harder on people over 65, so set up daily check-ins in extreme weather."
+look_for = [
+  "Copies of Medicare, Medicaid and insurance cards",
+  "Someone with a key who knows where supplies are kept",
+  "A cooling and warming plan with daily check-ins",
+]
+avoid = [
+  "Planning to drive yourself if you rarely drive now",
+  "Keeping medicines and supplies in more than one hard-to-find place",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: conversations and copies." }
+quantity_rule = "once_if_senior"
+citations = ["ready_gov_older_adults", "cdc_heat_health", "cdc_winter_safety"]
+hazard_extras = []
+
+[[item]]
+id = "special_pregnancy_plan"
+name = "Plan for pregnancy and nursing"
+category = "special_needs"
+unit = "action"
+buckets = ["medication", "medical_emergency", "supplies"]
+tier = "now"
+free = true
+spec = "CDC advises people who are pregnant or nursing to keep at least 7 to 10 days of prescriptions and ask about a 30-day emergency refill, keep copies of prenatal records, and avoid water treated with iodine. Learn the urgent warning signs of pregnancy and after birth, and where you would go to give birth if your hospital is closed."
+look_for = [
+  "Copies of prenatal records and insurance cards",
+  "Extra water: needs rise in pregnancy and when nursing",
+  "A second birthing hospital on your route",
+]
+avoid = [
+  "Drinking iodine-treated water (CDC)",
+  "Waiting out warning signs because roads are bad: call 911",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: planning with your clinician." }
+quantity_rule = "once_if_pregnant_or_nursing"
+citations = ["cdc_pregnancy_emergency", "cdc_water_disinfection", "iom_dri_water_2005"]
+hazard_extras = []
+
+[[item]]
+id = "special_livestock_plan"
+name = "Plan for horses and livestock"
+category = "special_needs"
+unit = "action"
+buckets = ["evacuate", "water_out"]
+tier = "now"
+free = true
+spec = "Plan to evacuate large animals early, set up a buddy system with nearby farms to share trailers and pasture, and keep vet records handy (ASPCA). Large animals need about 20 to 30 liters of water a day each, so fill tubs before the power goes out (Sphere)."
+look_for = [
+  "A trailer, or a neighbour's, and animals used to loading",
+  "Two places the animals could go",
+  "Water tubs you can fill before a storm",
+]
+avoid = [
+  "Waiting until the last minute to move large animals",
+  "Relying on an electric pump for their water in an outage",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to plan." }
+quantity_rule = "once_if_large_animals"
+citations = ["aspca_disaster_prep", "sphere_2018"]
+hazard_extras = []

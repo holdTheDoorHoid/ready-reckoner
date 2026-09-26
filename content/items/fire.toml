@@ -1,0 +1,316 @@
+# House fire, carbon monoxide, utilities and wildfire smoke. Rules: docs/CONTENT_STANDARDS.md §3.
+# Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
+
+[[item]]
+id = "fire_test_alarms"
+name = "Test smoke and carbon monoxide alarms every month"
+category = "fire"
+unit = "action"
+buckets = ["fire"]
+tier = "now"
+free = true
+life_safety = true
+spec = "Press the test button on every smoke and carbon monoxide alarm once a month (USFA). Replace smoke alarms 10 years after they were made, and carbon monoxide alarms as the maker says or every 5 years (CDC)."
+look_for = [
+  "A monthly reminder, such as the first of the month",
+  "The date printed on the back of each alarm",
+  "Batteries replaced yearly in alarms that use 9-volt batteries",
+]
+avoid = [
+  "Taking the battery out to stop cooking alarms",
+  "Painting over or covering an alarm",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a monthly button press." }
+quantity_rule = "once"
+maintenance = { check_months = 1 }
+citations = ["usfa_smoke_alarms", "cdc_co_basics", "ready_gov_home_fires"]
+hazard_extras = []
+
+[[item]]
+id = "fire_escape_plan"
+name = "Make a home fire escape plan with two ways out"
+category = "fire"
+unit = "action"
+buckets = ["fire", "evacuate"]
+tier = "now"
+free = true
+life_safety = true
+spec = "Find two ways out of every room, pick a meeting spot outside, and practice twice a year, including feeling your way out in the dark (Ready.gov). Fire can make a home dark and deadly in minutes."
+look_for = [
+  "Windows that open and screens that come out quickly",
+  "A meeting spot in front of the home, such as a mailbox",
+  "Children who know not to hide from firefighters",
+]
+avoid = [
+  "Going back inside for belongings or pets",
+  "Security bars without a quick-release",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a floor plan and practice." }
+quantity_rule = "once"
+maintenance = { check_months = 6 }
+citations = ["ready_gov_home_fires", "usfa_smoke_alarms"]
+hazard_extras = []
+
+[[item]]
+id = "fire_kitchen_safety"
+name = "Stay with your cooking and keep a lid nearby"
+category = "fire"
+unit = "action"
+buckets = ["fire"]
+tier = "now"
+free = true
+spec = "Cooking is by far the leading cause of home fires (USFA). Stay in the kitchen while frying or broiling, and keep a pan lid or baking sheet nearby to cover a pan fire."
+look_for = [
+  "A lid within reach of the stove",
+  "Pot handles turned toward the back",
+  "Towels, mitts and packaging kept away from burners",
+]
+avoid = [
+  "Throwing water on a grease fire",
+  "Leaving the kitchen with a burner on",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits." }
+quantity_rule = "once"
+citations = ["usfa_cooking_fires"]
+hazard_extras = []
+
+[[item]]
+id = "fire_heating_safety"
+name = "Heat safely: space heaters 3 feet from anything that burns"
+category = "fire"
+unit = "action"
+buckets = ["fire", "thermal"]
+tier = "now"
+free = true
+spec = "Keep anything that can burn at least 3 feet from heaters, fireplaces and stoves, turn space heaters off when you leave the room or go to bed, and have chimneys and heating equipment checked each year (USFA). Never heat the home with an oven."
+look_for = [
+  "Space heaters with automatic shut-off (CDC)",
+  "A clear 3-foot zone around every heater",
+  "A yearly chimney and furnace check",
+]
+avoid = [
+  "Extension cords for space heaters",
+  "Grills, camp stoves or generators indoors for heat (carbon monoxide)",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits; a chimney check costs extra." }
+quantity_rule = "once"
+citations = ["usfa_heating_fires", "cdc_winter_safety", "cdc_co_basics"]
+hazard_extras = []
+
+[[item]]
+id = "fire_learn_shutoffs"
+name = "Learn where your water, gas and power shut-offs are"
+category = "fire"
+unit = "action"
+buckets = ["fire", "water_out"]
+tier = "now"
+free = true
+spec = "Find your home's main water valve, gas meter valve and electrical panel, and learn how each one works; Ready.gov's basic kit includes a wrench or pliers to turn off utilities. Officials may tell you to shut the water main to keep unsafe water out (CDC)."
+look_for = [
+  "Labels on the main breaker and water valve",
+  "A wrench or pliers kept by the gas meter and water valve",
+  "Everyone old enough knowing where they are",
+]
+avoid = [
+  "Trying a stiff valve for the first time in the dark",
+  "Turning gas back on yourself after it was shut off: call the gas company",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a walk around the house." }
+quantity_rule = "once"
+citations = ["ready_gov_kit", "cdc_find_clean_water", "ready_gov_earthquakes"]
+hazard_extras = []
+
+[[item]]
+id = "fire_defensible_space"
+name = "Clear a fire-resistant zone around the house"
+category = "fire"
+unit = "action"
+buckets = ["fire", "home_loss"]
+tier = "now"
+free = true
+spec = "Keep a zone free of leaves, debris and anything flammable for at least 30 feet around your home, clean gutters, and find a hose that reaches every side (Ready.gov). Work closest to the house first."
+look_for = [
+  "Clean gutters and roof",
+  "Firewood, mulch and propane tanks moved away from the walls",
+  "A hose that reaches all sides of the house",
+]
+avoid = [
+  "Dry plants and wood piles against the house",
+  "Waiting for a fire warning to start",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: yard work." }
+quantity_rule = "once_if_house"
+maintenance = { check_months = 12 }
+citations = ["ready_gov_wildfires"]
+hazard_extras = ["wildfire"]
+
+[[item]]
+id = "fire_quake_secure"
+name = "Secure the water heater and tall furniture"
+category = "fire"
+unit = "action"
+buckets = ["fire", "water_out", "medical_emergency"]
+tier = "now"
+free = true
+spec = "Strap the water heater and anchor bookcases, refrigerators, televisions and wall hangings, and store heavy or breakable things on low shelves (Ready.gov). A strapped tank stays a store of clean water; a fallen one can break a gas line."
+look_for = [
+  "A water heater strap kit sized for your tank",
+  "Anti-tip straps for tall furniture",
+  "Heavy objects moved to low shelves",
+]
+avoid = [
+  "Tall furniture over beds",
+  "Renters drilling without asking: ask the landlord, who may do it",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to plan and rearrange; strap kits cost extra at a hardware store." }
+quantity_rule = "once"
+citations = ["ready_gov_earthquakes", "doe_water_heaters"]
+hazard_extras = ["earthquake"]
+
+[[item]]
+id = "fire_smoke_alarm"
+name = "Smoke alarms inside and outside sleeping areas"
+category = "fire"
+unit = "alarm"
+buckets = ["fire"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "Smoke alarms inside and outside each bedroom and sleeping area and on every level of the home (USFA). Interconnected alarms, which all sound together, give more warning."
+look_for = [
+  "A listing mark from a testing lab on the package",
+  "Sealed 10-year batteries, or plan to change batteries yearly",
+  "Alarms with strobes or bed shakers for anyone who is deaf or hard of hearing",
+]
+avoid = [
+  "Alarms right next to the stove or bathroom, which cause false alarms",
+  "Alarms more than 10 years old",
+]
+price_band_usd = { low = 20.49, high = 30.99, per = "alarm", note = "Two listings for battery-operated smoke alarms: $20.49 and $30.99." }
+retrieved = "2026-09-25"
+quantity_rule = "smoke_alarm_count"
+maintenance = { rotate_months = 120, check_months = 1 }
+citations = ["usfa_smoke_alarms", "ready_gov_home_fires", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "fire_co_alarm"
+name = "Carbon monoxide alarm on each sleeping level"
+category = "fire"
+unit = "alarm"
+buckets = ["fire", "power"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "A battery or battery-backup carbon monoxide alarm near every sleeping area and on every level (CDC, Ready.gov). It matters most in outages, when people use generators, grills and heaters that make this colorless, odorless gas."
+look_for = [
+  "Battery power or a plug-in with battery backup",
+  "One near each sleeping area",
+  "A digital display, if you want to see low levels",
+]
+avoid = [
+  "Relying on a smoke alarm to detect carbon monoxide unless it is a combination alarm",
+  "Alarms past their replacement date",
+]
+price_band_usd = { low = 33.99, high = 41.49, per = "alarm", note = "Two listings: a battery carbon monoxide alarm at $33.99 and a plug-in with battery backup at $41.49." }
+retrieved = "2026-09-25"
+quantity_rule = "co_alarm_count"
+maintenance = { rotate_months = 60, check_months = 1 }
+citations = ["cdc_co_basics", "ready_gov_power_outages", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "fire_extinguisher"
+name = "Multipurpose fire extinguisher"
+category = "fire"
+unit = "extinguisher"
+buckets = ["fire"]
+tier = "h72"
+free = false
+spec = "A multipurpose extinguisher labeled A-B-C, which works on most home fires, kept near the kitchen and an exit (USFA). Use it only on a small fire with a clear way out: pull the pin, aim at the base, squeeze and sweep."
+look_for = [
+  "An A-B-C rating and a testing-lab listing",
+  "A size you can lift and aim: 2.5 to 5 pounds",
+  "A mounting bracket by the kitchen door",
+]
+avoid = [
+  "Fighting a fire that is spreading: get out and call 911",
+  "Extinguishers with the gauge needle out of the green",
+]
+price_band_usd = { low = 40.49, high = 48.49, per = "extinguisher", note = "Three restaurant-supply listings for 2.5–5 pound A-B-C extinguishers: $40.49, $45.49 and $48.49." }
+retrieved = "2026-09-25"
+quantity_rule = "extinguisher_count"
+maintenance = { check_months = 1 }
+citations = ["usfa_extinguishers", "ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "fire_escape_ladder"
+name = "Escape ladder for upstairs bedrooms"
+category = "fire"
+unit = "ladder"
+buckets = ["fire"]
+tier = "w2"
+free = false
+spec = "A folding ladder that hooks over an upstairs windowsill, giving a second way out of a bedroom when the stairs are blocked. Match the length to the floor: two-story or three-story."
+look_for = [
+  "A length rated for your floor",
+  "A testing-lab listing and a weight rating",
+  "Stored under the bed or in the closet of the room it serves",
+]
+avoid = [
+  "Keeping it boxed in the garage",
+  "Never practicing how to hook it on (practice on the ground floor)",
+]
+price_band_usd = { low = 69.99, high = 114.99, per = "ladder", note = "Two listings: a two-story ladder at $69.99 and a three-story ladder at $114.99." }
+retrieved = "2026-09-25"
+quantity_rule = "escape_ladder_count"
+citations = ["ready_gov_home_fires", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "fire_utility_wrench"
+name = "Wrench kept for turning off utilities"
+category = "fire"
+unit = "wrench"
+buckets = ["fire", "water_out"]
+tier = "h72"
+free = false
+spec = "An adjustable wrench kept by the gas meter or water valve so anyone can shut them quickly; Ready.gov's basic kit lists a wrench or pliers to turn off utilities. Use one you own if it fits."
+look_for = [
+  "A size that fits your gas and water valves",
+  "Tied or hung where it will stay",
+]
+avoid = [
+  "Storing it in a toolbox you cannot find in the dark",
+  "A wrench too small to turn a stiff valve",
+]
+price_band_usd = { low = 26.99, high = 31.99, per = "wrench", note = "Two listings for adjustable wrenches: $26.99 and $31.99. A wrench you already own works too." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["ready_gov_kit", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "fire_clean_air_room"
+name = "Clean-air room for wildfire smoke"
+category = "fire"
+unit = "air cleaner"
+buckets = ["supplies", "medical_emergency"]
+tier = "w2"
+free = false
+spec = "A portable air cleaner with a HEPA filter for one room you can close off from smoke (EPA, Ready.gov). EPA says a box fan with a MERV 13 filter attached is a cost-effective alternative; use a newer fan with safety features."
+look_for = [
+  "A room size rating that matches your clean room",
+  "True HEPA filter and spare filters",
+  "For a box-fan filter: a MERV 13 filter and a 2012 or newer fan",
+]
+avoid = [
+  "Air cleaners that make ozone",
+  "Leaving windows open or running a whole-house fan in smoke",
+]
+price_band_usd = { low = 119.99, high = 129.99, per = "air cleaner", note = "Two retail listings for room air cleaners with HEPA filters: $119.99 and $129.99. A box fan with a filter costs less." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["epa_diy_air_cleaners", "epa_wildfire_indoor_air", "ready_gov_wildfires", "rr_price_observations_2026_09"]
+hazard_extras = ["wildfire"]
