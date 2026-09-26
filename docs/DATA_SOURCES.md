@@ -127,7 +127,7 @@ yearly chance) and `notes`. The traps it records:
 | `median_hours`, `p90_hours` | Median and 90th-percentile customer outage length |
 | `years_covered` | First–last year with data, e.g. `2014-2025` |
 | `years_of_data` | Months with at least one EAGLE-I record ÷ 12 (the rate's denominator) |
-| `duration_basis` | `county`, or `state` when the county has fewer than 10 events and the duration columns come from the state pool |
+| `duration_basis` | `county`; `state` when the county has fewer than 10 events and the duration columns come from the state pool; `island` for Puerto Rico (§10) |
 | `events_per_year`, `events` | County events per year and in total |
 | `customers` | Customer count used (larger of ORNL MCC and households, §10) |
 | `customer_hours_per_customer_year` | All recorded outage time per customer (comparable to SAIDI with major events) |
@@ -172,9 +172,10 @@ county by three workers (about 0.7 requests a second); USGS MMI VI 100-year data
 Northern Mariana Islands and American Samoa have no service model. Refresh: with each NSHM
 release (about every five years).
 
-### core/climate.csv (3,202 rows) and core/climate_levels.csv — projections
+### core/climate.csv (3,202 rows) — projections
 
-Every value is a **projected multiplier** (future ÷ present) for the 2050 dial.
+Every value is a **projection** for the 2050 dial. Ratio columns multiply today's frequency; each
+has a central value and a `_high` value so 2050 numbers can show a range.
 
 | Column | Definition |
 | --- | --- |
@@ -184,17 +185,21 @@ Every value is a **projected multiplier** (future ÷ present) for the 2050 dial.
 | `wettest_day`, `wettest_day_5yr` | Rain on the wettest day of the year / of 5 years: 1 + Atlas % change |
 | `extreme_rain_total`, `extreme_rain_days` | Rain on, and number of, days in the top 1% of historical amounts: 1 + % change |
 | `annual_rain` | Total precipitation: 1 + % change |
-| `consecutive_dry_days_mid45`, `dry_days_mid45`, `hot_days_90f_mid45`, `cooling_degree_days_mid45`, `heavy_rain_days_1in_mid45` | CMRA ensemble mean, RCP4.5 mid-century (2035–2064) ÷ historical (1976–2005) |
+| each of the above `_high` | Same at +3 °C of warming (Atlas GWL3 layer) |
+| `consecutive_dry_days_mid45`, `dry_days_mid45`, `hot_days_90f_mid45`, `cooling_degree_days_mid45`, `heavy_rain_days_1in_mid45` | CMRA ensemble mean, RCP4.5 mid-century (2035–2064) ÷ historical (1976–2005); `_high` uses RCP8.5 |
+| `days_over_95f_hist`, `_2050`, `_2050_high` | CMRA county count of days a year above 95 °F: historical (1976–2005, modelled), RCP4.5 and RCP8.5 mid-century |
+| `days_over_2in_*`, `icing_days_*`, `dry_spell_days_*` | Same for days with more than 2 in of rain, days at or below freezing all day, and the longest dry spell |
+| `days_over_90f_hist` | CMRA historical days a year above 90 °F (the heat cap `rr-hazards` applies) |
 
-`climate_levels.csv` (long: `fips`, `variable`, `gwl15`, `gwl2`, `gwl3`) gives the Atlas ratios at
-1.5, 2 and 3 °C for sensitivity displays. Sources: NCA5 Interactive Atlas county layers at global
-warming levels (changes vs 1991–2020, SSP5-8.5 runs; **CC BY 4.0**), LOCA2 ensemble decadal county
-series (**CC BY 4.0**), CMRA 2025 (NOAA / U.S. Climate Resilience Toolkit; the ArcGIS item's
-licence field is blank, treated as US Government work). Contiguous US only. No county fire-weather
-index exists in these sources; dry-day and hot-day ratios are the closest proxies.
-`rr-data::climate_multiplier` maps hazards to these variables by a documented default
-(`variables_for`), clamped to 0.2–5; `rr-hazards` may override it. Refresh: when NCA6 or CMRA
-publish new county values.
+The count columns are the keys `rr-hazards` reads first (docs/RISK_MODEL.md, "Hazard rates");
+ratios are its fallback. Sources: NCA5 Interactive Atlas county layers at global warming levels 2
+and 3 °C (changes vs 1991–2020, SSP5-8.5 runs; **CC BY 4.0**), LOCA2 ensemble decadal county series
+(**CC BY 4.0**), CMRA 2025 (NOAA / U.S. Climate Resilience Toolkit; the ArcGIS item's licence field
+is blank, treated as US Government work). The Atlas 1.5 °C layer is read but not written, as
+nothing uses it. Contiguous US only. No county fire-weather index exists in these sources;
+dry-day and hot-day ratios are the closest proxies. `rr-data::climate_multiplier` maps hazards to
+the ratio columns by a documented default (`variables_for`), clamped to 0.2–5; `rr-hazards` has its
+own order of preference. Refresh: when NCA6 or CMRA publish new county values.
 
 ### core/flood.csv (3,144 rows)
 
@@ -231,18 +236,24 @@ likelihood. Refresh: yearly.
 Community context only — the household model uses the household's own answers. ACS through the
 Census API is not used (it needs a key).
 
-### core/base_rates.toml (15 rates, 10 publications)
+### core/base_rates.toml (16 rates, 11 publications)
 
 National rates for societal and personal hazards, each computed in the ETL from a quoted figure:
 residential fires, fire deaths and injuries per household-year and mean loss per fire (USFA 2023 ÷
 Census CPS households 2023); layoffs per worker-month and a yearly upper bound (BLS JOLTS, fetched
-live); emergency department visits, admissions and injury visits per person-year (NCHS 2022);
-unintentional-injury deaths (NCHS 2024); traffic deaths per 100 million vehicle miles (NHTSA 2025
-early estimate) and injuries per person-year (NHTSA 2023 ÷ Census Vintage 2025 population, fetched
-live); pandemic onset per year with an exact Poisson 90% range (5 onsets in 108 years); national
-power interruption hours (EIA 2024). Every `[[rate]]` has `value`, `unit`, optional `low`/`high`,
-`source` (a citation id), `year`, `figure`, `derivation`, `note`; every `[[publication]]` gives the
-title, publisher and URL so the content layer can add the citation to `content/citations.toml`.
+live); the chance of being unemployed at some point in a year (BLS work-experience unemployment
+rate, 8.3% in 2024); emergency department visits, admissions and injury visits per person-year
+(NCHS 2022); unintentional-injury deaths (NCHS 2024); traffic deaths per 100 million vehicle miles
+(NHTSA 2025 early estimate) and injuries per person-year (NHTSA 2023 ÷ Census Vintage 2025
+population, fetched live); pandemic onset per year with an exact Poisson 90% range (5 onsets in
+108 years); national power interruption hours (EIA 2024). Every `[[rate]]` has `value`, `unit`,
+optional `low`/`high`, `source`, `year`, `figure`, `derivation`, `note`. `source` is the citation
+id from the content registry (`docs/CITATION_IDS.md`; one id per source): `census_households_cps`,
+`usfa_residential_fires`, `bls_jolts_layoffs`, `bls_work_experience_2024`, `cdc_nchs_ed_visits`,
+`nchs_accidental_injury_2024`, `nhtsa_crashes_2023`, `cdc_pandemic_history`,
+`eia_outage_hours_2024`, and two the registry does not have yet, `nhtsa_early_estimate_2025` and
+`census_popest_vintage_2025` (each `[[publication]]` gives the title, publisher and URL for the
+content layer).
 
 ### geo/counties.json (3,222 features)
 
@@ -384,9 +395,12 @@ recipient and what it learns.
   (`power_interruption_hours_per_customer_year`).
 - **Small counties are noisy** (a few hundred customers: reporting flicker of 10 customers makes an
   event). Use the `customers` column to pool small counties with `outages_state.csv`.
-- **Puerto Rico** has EAGLE-I data only from 2021 and usable customer counts for 7 municipios; its
-  rates (up to 66 outages per customer-year in Mayagüez) reflect frequent load-shedding and the
-  2022 and 2024 island-wide blackouts. The US Virgin Islands are similar.
+- **Puerto Rico**: EAGLE-I files LUMA's outages by utility region, each under one "hub"
+  municipio (the hubs' customer counts in the 2024 file sum to the island's 1.49 million). Read
+  per municipio, those hubs showed up to 66 outages per customer-year. The ETL sums the hubs into
+  one island-wide series and gives every municipio the island's figures (`duration_basis =
+  island`); data start in 2021. The US Virgin Islands are reported per district; their rates are
+  high and, for St. John (about 2,700 customers), noisy.
 - **EAGLE-I coverage** before 2018 is not published by state; partial utility coverage then biases
   rates low. 72 mainland counties have no usable records.
 - **OpenFEMA reports zero flood-zone structures in counties with many flood-zone policies**

@@ -61,6 +61,11 @@ pub const MIN_EVENTS_FOR_COUNTY_DURATIONS: u32 = 10;
 /// than this are left out.
 pub const MIN_STATE_COVERAGE: f64 = 0.5;
 
+/// Synthetic unit for Puerto Rico. EAGLE-I files LUMA's outages by utility region, each under one
+/// "hub" municipio (the hubs' customer counts in the 2024 file sum to the island's), so the
+/// hubs are summed into one island-wide series and every municipio gets the island's figures.
+pub const PR_ISLAND: u32 = 72000;
+
 /// The event definition, quoted into the manifest and into every `OutageStats`.
 pub const DEFINITION: &str = "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (ORNL modelled customer count; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged. Short reversals inside an event (under half of the current peak or trough, or under the 1% level) are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power. Rates are customer outages in such events per customer per year of data.";
 
@@ -348,6 +353,8 @@ fn process_year(
     let mut rec = csv::ByteRecord::new();
     let mut diag = YearDiag::default();
     let mut stamps: HashSet<i64> = HashSet::with_capacity(40_000);
+    let mut pr_sums: BTreeMap<i64, f64> = BTreeMap::new();
+    let pr_customers: f64 = mcc.range(72001..73000).map(|(_, c)| *c).sum();
     while rdr.read_byte_record(&mut rec)? {
         diag.rows += 1;
         let (Some(f), Some(n), Some(t)) = (rec.get(i_f), rec.get(i_n), rec.get(i_t)) else {
@@ -376,6 +383,16 @@ fn process_year(
             state.excluded_years.insert((st, y));
             continue;
         }
+        if fips / 1000 == 72 {
+            *pr_sums.entry(t).or_default() += n;
+            let island = state
+                .units
+                .entry(PR_ISLAND)
+                .or_insert_with(|| Unit::new(pr_customers));
+            island.months.insert(y as u32 * 12 + m);
+            island.years.insert(y);
+            continue;
+        }
         let unit = state
             .units
             .entry(fips)
@@ -386,6 +403,12 @@ fn process_year(
         unit.months.insert(y as u32 * 12 + m);
         unit.years.insert(y);
         unit.row(t, n);
+    }
+    // Puerto Rico: feed the island-wide sums in time order (works for either file sort order).
+    if let Some(island) = state.units.get_mut(&PR_ISLAND) {
+        for (t, n) in pr_sums {
+            island.row(t, n);
+        }
     }
     let mut ts: Vec<i64> = stamps.into_iter().collect();
     ts.sort_unstable();
@@ -620,7 +643,14 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut unknown = BTreeSet::new();
     for fips in state.units.keys() {
         let code = format!("{fips:05}");
-        if canon.contains(&code) {
+        if *fips == PR_ISLAND {
+            for c in counties.iter().filter(|c| c.fips.starts_with("72")) {
+                by_county
+                    .entry(c.fips.clone())
+                    .or_default()
+                    .push((*fips, 1.0));
+            }
+        } else if canon.contains(&code) {
             by_county.entry(code).or_default().push((*fips, 1.0));
         } else if is_old_ct(&code) {
             for o in cw.overlaps.iter().filter(|o| o.old == code) {
@@ -787,6 +817,11 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             _ => (None, ""),
         };
         let Some(d) = dist else { continue };
+        let basis = if parts.iter().any(|(f, _)| *f == PR_ISLAND) {
+            "island"
+        } else {
+            basis
+        };
         let years_covered = match (years_all.first(), years_all.last()) {
             (Some(a), Some(b)) => format!("{a}-{b}"),
             _ => String::new(),
@@ -819,7 +854,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         if super::is_island_territory(&c.state_abbr) {
             "EAGLE-I does not cover this island area".to_string()
         } else if c.state_abbr == "PR" {
-            "EAGLE-I covers Puerto Rico only from 2021 and reports no usable customer count for this municipio".to_string()
+            "No usable EAGLE-I records for Puerto Rico".to_string()
         } else {
             "No usable EAGLE-I records for this county (utility not tracked, or no modelled customer count)".to_string()
         }
@@ -829,6 +864,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     out.notes.push(format!(
         "Event definition: {DEFINITION} Counties with fewer than {MIN_EVENTS_FOR_COUNTY_DURATIONS} events use their state's pooled duration distribution (duration_basis = state; {state_basis} counties); the event rate is always the county's own."
     ));
+    out.notes.push("Puerto Rico: EAGLE-I files LUMA's outages by utility region, each under one hub municipio (the hubs' customer counts in the 2024 file sum to the island's 1.49 million). The hubs are summed into one island-wide series (customers = the sum of ORNL's modelled customers for all 78 municipios), and every municipio carries the island's figures (duration_basis = island). Data start in 2021.".into());
     out.notes.push("Years of data: a month counts when the county has at least one record in it (EAGLE-I lists only snapshots with customers out), so years_of_data is months with data divided by 12. State-years in 2018-2022 where ORNL reports under 50% customer coverage are left out; ORNL publishes no coverage figures for other years, so partial utility coverage there biases rates low.".into());
     out.notes.push("Customer outages at the start of an event are counted from the event's start (they may have begun below the threshold) and customers still out when the county drops below the threshold are counted as restored then, so durations for the first and last customers in an event are slightly understated.".into());
     if !state.excluded_years.is_empty() {
@@ -970,6 +1006,48 @@ mod tests {
         // 92 customers restored at slot 8, 8 customers at slot 24.
         assert_eq!(u.durations.get(&8), Some(&92.0));
         assert_eq!(u.durations.get(&24), Some(&8.0));
+    }
+
+    #[test]
+    fn puerto_rico_hubs_are_summed_into_one_island_series() {
+        let mut mcc = BTreeMap::new();
+        mcc.insert(72001u32, 600.0);
+        mcc.insert(72003u32, 400.0);
+        let mut csv = String::from("fips_code,county,state,customers_out,run_start_time\n");
+        for q in 0..5 {
+            let t = format!("2024-01-01 {:02}:{:02}:00", q / 4, (q % 4) * 15);
+            csv.push_str(&format!(
+                "72013,Arecibo,Puerto Rico,30,{t}\n72021,Bayamon,Puerto Rico,20,{t}\n"
+            ));
+        }
+        let mut state = State::default();
+        let state_of = |f: u32| {
+            if f / 1000 == 72 {
+                "PR".to_string()
+            } else {
+                String::new()
+            }
+        };
+        process_year(
+            &mut csv.as_bytes(),
+            &mut state,
+            &mcc,
+            &state_of,
+            &BTreeMap::new(),
+        )
+        .unwrap();
+        assert_eq!(
+            state.units.len(),
+            1,
+            "hubs do not become units of their own"
+        );
+        let island = state.units.get_mut(&PR_ISLAND).unwrap();
+        assert_eq!(island.customers, 1000.0);
+        island.close();
+        assert_eq!(island.events, 1);
+        // 30 + 20 customers out at every snapshot, all restored together at the end.
+        assert!((island.arrivals - 50.0).abs() < 1e-9);
+        assert_eq!(island.durations.get(&5), Some(&50.0));
     }
 
     #[test]
