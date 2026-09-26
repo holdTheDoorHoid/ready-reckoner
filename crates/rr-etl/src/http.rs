@@ -318,6 +318,21 @@ impl Http {
         Err(EtlError::Http(last))
     }
 
+    /// Download to a file on disk (for archives that need random access, like ZIPs), returning
+    /// the stream's checksum. The caller deletes the file when done unless `--keep-raw`.
+    pub fn download_to(&self, url: &str, path: &Path) -> Result<Streamed> {
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        let ((), streamed) = self.stream(url, None, |reader| {
+            let mut f = BufWriter::with_capacity(1 << 20, File::create(path)?);
+            std::io::copy(reader, &mut f)?;
+            f.flush()?;
+            Ok(())
+        })?;
+        Ok(streamed)
+    }
+
     fn raw_file(&self, name: &str) -> Result<File> {
         let path = self.raw_dir.join(name);
         if let Some(parent) = path.parent() {
