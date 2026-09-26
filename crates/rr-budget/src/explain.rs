@@ -112,10 +112,15 @@ pub(crate) fn why(lead: Lead, parts: &WhyParts, people: usize, years: u8) -> Str
 
 fn duration_sentence(d: &DurationText, people: usize) -> String {
     let added = (d.to_days - d.from_days).max(0.0);
-    let who = if people == 1 {
-        "1 person".to_owned()
-    } else {
-        format!("{people} people")
+    // Water and food scale with the number of people; other cover is for the household.
+    let who = match d.bucket {
+        BucketId::WaterOut | BucketId::WaterBoil | BucketId::Supplies if people == 1 => {
+            " for 1 person".to_owned()
+        }
+        BucketId::WaterOut | BucketId::WaterBoil | BucketId::Supplies => {
+            format!(" for {people} people")
+        }
+        _ => String::new(),
     };
     let goal = goal_text(d.target_days);
     let progress = if d.to_days + 1e-9 >= d.target_days {
@@ -124,7 +129,7 @@ fn duration_sentence(d: &DurationText, people: usize) -> String {
         format!("bringing you to {} of the {goal}", days_number(d.to_days))
     };
     format!(
-        "Adds {} of {} for {who}, {progress}.",
+        "Adds {} of {}{who}, {progress}.",
         days_text(added),
         supply_noun(d.bucket, d.part.as_deref())
     )
@@ -231,13 +236,22 @@ fn goal_text(target: f64) -> String {
     }
 }
 
-/// Whole dollars: "$30"; amounts under a dollar show as "under $1".
+/// Whole dollars with thousands separators: "$30", "$16,800"; amounts under a dollar show as
+/// "under $1".
 pub(crate) fn dollars(x: f64) -> String {
     if x > 0.0 && x < 0.5 {
-        "under $1".into()
-    } else {
-        format!("${}", x.round() as i64)
+        return "under $1".into();
     }
+    let digits = (x.round() as i64).abs().to_string();
+    let mut grouped = String::new();
+    for (i, c) in digits.chars().enumerate() {
+        if i > 0 && (digits.len() - i) % 3 == 0 {
+            grouped.push(',');
+        }
+        grouped.push(c);
+    }
+    let sign = if x.round() < 0.0 { "-" } else { "" };
+    format!("{sign}${grouped}")
 }
 
 fn supply_noun(bucket: BucketId, part: Option<&str>) -> String {
@@ -252,7 +266,11 @@ fn supply_noun(bucket: BucketId, part: Option<&str>) -> String {
             _ => "protection from dangerous heat or cold",
         },
         BucketId::Medication => "medicine",
-        BucketId::Comms => "phone power and news",
+        BucketId::Comms => match part {
+            Some("phone") => return "phone power and news".into(),
+            Some("payments") => return "cash for when card payments are down".into(),
+            _ => "backup for phones, news and payments",
+        },
         _ => short_name(bucket),
     };
     match part {
@@ -273,7 +291,11 @@ fn event_phrase(bucket: BucketId, part: Option<&str>) -> String {
             _ => "face dangerous heat or cold at home",
         },
         BucketId::Medication => "can't get medicine refilled",
-        BucketId::Comms => "lose phone and internet",
+        BucketId::Comms => match part {
+            Some("phone") => "lose phone and internet",
+            Some("payments") => "can't pay by card",
+            _ => "lose phone, internet or card payments",
+        },
         _ => "are affected",
     }
     .to_owned()
@@ -352,6 +374,8 @@ mod tests {
         assert_eq!(days_text(13.6), "14 days");
         assert_eq!(dollars(34.6), "$35");
         assert_eq!(dollars(0.2), "under $1");
+        assert_eq!(dollars(16_800.0), "$16,800");
+        assert_eq!(dollars(1_234_567.4), "$1,234,567");
         assert_eq!(join_and(&["a", "b", "c"]), "a, b and c");
     }
 

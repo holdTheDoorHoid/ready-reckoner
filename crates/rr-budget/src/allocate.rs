@@ -1211,25 +1211,45 @@ fn line(
 
 fn why_parts(ctx: &Ctx<'_>, cand: &Candidate) -> WhyParts {
     let years = f64::from(ctx.years);
-    let mut valued: Vec<&Gain> = cand.gains.iter().filter(|g| g.value > VALUE_EPS).collect();
-    valued.sort_by(|a, b| b.value.total_cmp(&a.value).then(a.track.cmp(&b.track)));
-    let durations: Vec<DurationText> = valued
-        .iter()
-        .map(|g| {
-            let tr = &ctx.tracks[g.track];
-            let ref_days = ladder_floor_days(g.x0);
-            let rate = tr.share * curve(ctx, tr.bucket).lambda_at(ref_days);
-            DurationText {
-                bucket: tr.bucket,
-                part: tr.part.clone(),
-                from_days: g.x0,
-                to_days: g.x1,
-                target_days: tr.target,
+    // One line per bucket: parts of a bucket moved by the same purchase (a contribution without a
+    // part) are reported together, from the weakest part's coverage before to after.
+    let mut groups: Vec<(BucketId, Vec<&Gain>)> = Vec::new();
+    for g in cand.gains.iter().filter(|g| g.value > VALUE_EPS) {
+        let b = ctx.tracks[g.track].bucket;
+        match groups.iter_mut().find(|(gb, _)| *gb == b) {
+            Some((_, list)) => list.push(g),
+            None => groups.push((b, vec![g])),
+        }
+    }
+    let mut scored: Vec<(f64, DurationText)> = groups
+        .into_iter()
+        .map(|(bucket, gains)| {
+            let value: f64 = gains.iter().map(|g| g.value).sum();
+            let first = &ctx.tracks[gains[0].track];
+            let (part, from, to, share) = if gains.len() == 1 {
+                (first.part.clone(), gains[0].x0, gains[0].x1, first.share)
+            } else {
+                let from = gains.iter().map(|g| g.x0).fold(f64::INFINITY, f64::min);
+                let to = gains.iter().map(|g| g.x1).fold(f64::INFINITY, f64::min);
+                let share: f64 = gains.iter().map(|g| ctx.tracks[g.track].share).sum();
+                (None, from, to, share.min(1.0))
+            };
+            let ref_days = ladder_floor_days(from);
+            let rate = share * curve(ctx, bucket).lambda_at(ref_days);
+            let text = DurationText {
+                bucket,
+                part,
+                from_days: from,
+                to_days: to,
+                target_days: first.target,
                 ref_days,
                 per_100: per_100(rate, years),
-            }
+            };
+            (value, text)
         })
         .collect();
+    scored.sort_by(|a, b| b.0.total_cmp(&a.0).then(a.1.bucket.cmp(&b.1.bucket)));
+    let durations: Vec<DurationText> = scored.into_iter().map(|(_, t)| t).collect();
     let mut ready: Vec<&(BucketId, f64, bool)> = cand
         .ready
         .iter()
@@ -1248,16 +1268,38 @@ fn why_parts(ctx: &Ctx<'_>, cand: &Candidate) -> WhyParts {
         .collect();
     let headline = durations
         .first()
-        .map(|d| d.bucket)
-        .or_else(|| readiness.first().map(|r| r.bucket));
+        .map(|d| (d.bucket, d.part.clone()))
+        .or_else(|| readiness.first().map(|r| (r.bucket, None)));
     let causes: Vec<HazardId> = headline
-        .map(|b| top_hazards(ctx, b).into_iter().map(|(h, _)| h).collect())
+        .map(|(b, part)| {
+            top_hazards(ctx, b)
+                .into_iter()
+                .map(|(h, _)| h)
+                .filter(|h| fits_part(*h, part.as_deref()))
+                .collect()
+        })
         .unwrap_or_default();
     WhyParts {
         durations,
         readiness,
         also: ctx.offers[cand.offer].item.buckets.clone(),
         causes,
+    }
+}
+
+/// Whether a hazard can cause the named part of a bucket: heat waves do not cause dangerous cold
+/// and winter hazards do not cause dangerous heat. Other parts and hazards always fit.
+fn fits_part(h: HazardId, part: Option<&str>) -> bool {
+    match part {
+        Some("heat") => !matches!(
+            h,
+            HazardId::ColdWave | HazardId::WinterWeather | HazardId::IceStorm | HazardId::Avalanche
+        ),
+        Some("cold") => !matches!(
+            h,
+            HazardId::HeatWave | HazardId::Drought | HazardId::Wildfire
+        ),
+        _ => true,
     }
 }
 
@@ -1358,10 +1400,11 @@ fn covered_targets(ctx: &Ctx<'_>, state: &State) -> BTreeMap<BucketId, Target> {
     out
 }
 
-/// The highest tier whose (capped) targets every tracked bucket meets.
+/// The highest tier, up to the recommended one, whose (capped) targets every tracked bucket meets.
 fn tier_met(ctx: &Ctx<'_>, cov: &[f64]) -> TierId {
+    let recommended = tier_recommended(ctx);
     let mut reached = TierId::Now;
-    for &k in &WALK {
+    for &k in WALK.iter().filter(|&&k| k <= recommended) {
         let horizon = f64::from(k.days());
         let ok = ctx
             .tracks

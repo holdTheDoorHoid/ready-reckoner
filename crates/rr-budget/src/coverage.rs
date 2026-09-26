@@ -293,7 +293,7 @@ pub trait CoverageRule {
             Some(p) => self.part_coverage(bucket, p, list, household),
             None => self.coverage(bucket, list, household),
         };
-        (measure(&more) - measure(items)).max(0.0)
+        (measure(&more) - measure(items)).max(0.0) + 0.0
     }
 }
 
@@ -341,7 +341,8 @@ impl ContributionTable {
                     (None, Some(_)) => false,
                 })
                 .map(|c| c.household_days_per_unit(people))
-                .sum()
+                .sum::<f64>()
+                + 0.0
         })
     }
 
@@ -352,10 +353,12 @@ impl ContributionTable {
         items: &[(ItemId, f64)],
         household: &PlanInput,
     ) -> f64 {
+        // `+ 0.0` turns the -0.0 an empty f64 sum starts from into 0.0, so no "-0" reaches JSON.
         items
             .iter()
             .map(|(id, q)| q.max(0.0) * self.rate(id, bucket, part, household))
-            .sum()
+            .sum::<f64>()
+            + 0.0
     }
 }
 
