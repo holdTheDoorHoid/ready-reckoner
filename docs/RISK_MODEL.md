@@ -545,10 +545,13 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   shortfall as windstorms. It reads the county record's `outage_model.causes` (the pack's
   `core/outage_causes.csv`, since the data-model merge); a county without cause shares keeps the
   v0.1 rule (all of the shortfall to windstorms), and its note says the records are not matched to
-  storms. The `wind` cause counts the modelled outages of windstorms, tornadoes, lightning and
-  hail together (data-model files all four under it), and a hurricane top-up also goes into the
-  Category 1–2 part, so the major-hurricane card still shows the full rate. The hurricane double
-  count M-10 is `rr-consequence`'s (county curve plus hurricane rows); `rr-hazards` already
+  storms. Outages matched to no storm are put on none (M-18's "cause not recorded"): spreading
+  them over the storms with a dated share put Schleicher County, Texas at 9 winter storms a year
+  (a 3.6 % winter share carrying 84 % unmatched outages); `rr-consequence`'s power bucket counts
+  them from the county's outage record. The `wind` cause counts the modelled outages of
+  windstorms, tornadoes, lightning and hail together (data-model files all four under it), and a
+  hurricane top-up also goes into the Category 1–2 part, so the major-hurricane card still shows
+  the full rate. The hurricane double count M-10 is `rr-consequence`'s (county curve plus hurricane rows); `rr-hazards` already
   subtracts modelled hurricane outages in the floor.
 - **New scenarios have effects rows** (rr-consequence, v0.2.0). `wasatch_m7`,
   `san_andreas_south_m78` and `seattle_fault_m7` take the New Madrid and Hayward priors;
