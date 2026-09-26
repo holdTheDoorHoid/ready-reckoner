@@ -137,9 +137,13 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
         "med_cooler_refrigerated_rx",
         &[("medication.rx_cold_storage", Units::Fill)],
     ),
+    // The set includes oral rehydration salts.
     (
         "med_otc_basics",
-        &[("medical_emergency.otc_medicines", Units::Fill)],
+        &[
+            ("medical_emergency.otc_medicines", Units::Fill),
+            ("medical_emergency.ors_packets", Units::Fill),
+        ],
     ),
     // Leaving home and getting home.
     ("evac_go_bag", &[("evacuate.go_bag", Units::Per(1.0))]),
@@ -161,6 +165,24 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
         &[("get_home.get_home_water", Units::Fill)],
     ),
     ("gethome_car_kit", &[("get_home.car_kit", Units::Per(1.0))]),
+    // Documents, insurance and savings (money buckets: shown in `explain`, not bought).
+    ("docs_effak", &[("home_loss.document_kit", Units::Fill)]),
+    (
+        "docs_renters_insurance",
+        &[("home_loss.insurance_home_or_renters", Units::Fill)],
+    ),
+    (
+        "docs_insurance_check",
+        &[
+            ("home_loss.insurance_home_or_renters", Units::Fill),
+            ("home_loss.insurance_flood", Units::Fill),
+            ("home_loss.insurance_earthquake", Units::Fill),
+        ],
+    ),
+    (
+        "docs_start_emergency_fund",
+        &[("income.emergency_fund_months", Units::Fill)],
+    ),
     // Fire and security.
     (
         "fire_escape_plan",
