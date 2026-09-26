@@ -116,3 +116,11 @@ pub use savings::{
 
 /// Crate name, used by the CLI's `--version` and by the about screen.
 pub const CRATE: &str = "rr-budget";
+
+/// Every citation id this crate can emit: the harm weights (also the rare allowance's harm-days
+/// priors) and the savings track's legal-emergency figure. `rr citations --missing` checks them.
+pub const CITATION_IDS: [&str; 3] = [
+    weights::HARM_WEIGHT_CITATION,
+    rare::RARE_HARM_CITATION,
+    savings::LEGAL_COST_CITATION,
+];
