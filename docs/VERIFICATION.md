@@ -302,7 +302,7 @@ research's 3 days (it was 5, which RISK_MODEL expected the pack's passage counts
 
 79 counties have no EAGLE-I record (37 in Nebraska, 21 in Alaska, 5 in Tennessee, the Pacific
 territories). Their power targets are mostly 2 days (56 of 79) against 3–5 elsewhere, and 12
-Alaska boroughs get ½ day of power and **no thermal target at all** for a gas-heated home (Juneau,
+Alaska boroughs get ½ to 1 day of power and **no thermal target at all** for a gas-heated home (Juneau,
 Sitka, North Slope: `verify_sweep` rows 02110, 02220, 02185), because the fallback is a third of
 short storm outages at 2 h / 20 h and NRI's cold-wave counts in Alaska are low. Four Alaska
 boroughs also get no communications target. *Proposed:* when a county has no record, use its
@@ -312,8 +312,8 @@ as the data workstream recommended; say so in the notes.
 ### Places the brief named
 
 - **Puerto Rico**: every municipio carries the island-wide EAGLE-I series (as documented); after
-  V-01, 30 days of power (21–30), thermal 21, medicine 14–30. The 2017 Maria outage predates the
-  record (2021–2025).
+  V-01, 30 days of power (21–30), heat or cold 21, medicine 21 (San Juan). The 2017 Maria outage
+  predates the record (2021–2025).
 - **Alaska**: see V-15; Anchorage 3 days of power, Fairbanks 5, Mat-Su 5, all "two weeks" enough.
 - **Connecticut**: all nine planning regions plan; before V-02 their hurricane-driven targets were
   the highest in the Northeast; now Capitol region power 5, water 5, medicine 14.
