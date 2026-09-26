@@ -22,9 +22,11 @@ pub mod outages;
 pub mod seismic;
 pub mod smoke;
 pub mod strategic;
+pub mod surge;
 pub mod surge_proxy;
 pub mod vulnerability;
 pub mod water_systems;
+pub mod wildfire_places;
 
 /// Shared state for a refresh.
 pub struct Ctx {
@@ -187,6 +189,18 @@ pub const JOBS: &[JobSpec] = &[
         title: "Eviction filings per renter household (Eviction Lab; written only with the owner's sign-off)",
         run: eviction::run,
         default: true,
+    },
+    JobSpec {
+        id: "surge",
+        title: "NOAA/NHC storm-surge area shares by ZIP (optional pack; 1.65 GB input)",
+        run: surge::run,
+        default: false,
+    },
+    JobSpec {
+        id: "wildfire_places",
+        title: "USFS Wildfire Risk to Communities by Census place, with ZIP-to-place shares (optional pack)",
+        run: wildfire_places::run,
+        default: false,
     },
     JobSpec {
         id: "vulnerability",
