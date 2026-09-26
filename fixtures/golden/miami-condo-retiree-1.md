@@ -14,7 +14,7 @@
 
 ### The three things that matter most
 
-1. Of 100 households like yours, about 50 (40–65) will have to leave home quickly at least once in the next 10 years. Know your evacuation zone and where you would go; leave when told.[2, 3]
+1. Of 100 households like yours, about 50 (35–65) will have to leave home quickly at least once in the next 10 years. Know your evacuation zone and where you would go; leave when told.[2, 3]
 2. Of 100 households like yours, about 85 (75–95) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 2 weeks at home with no power, and about 3 weeks with no tap water.
 3. Of 100 households like yours, about 70 (50–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 weeks of food you normally eat, and 3 weeks of daily medicine on hand.
 
@@ -157,7 +157,6 @@ Shown apart, so that a tiny chance of a huge loss cannot crowd out everything el
 | What | How likely | How bad |
 | --- | --- | --- |
 | Nuclear attack | Forecasters asked in 2024 put the chance of a nuclear catastrophe anywhere in the world (10 million or more deaths) before 2045 at 1 to 5 in 100. Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. That is the chance for the whole world, not for your household: no reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[58, 59] | Very severe |
-| Terrorist attack | An attack that shuts down the area where you live for half a day to two days (roads, schools and shops closed) is rare: for a household like yours, expert estimates range from about 1 in 10,000 to about 1 in 1,000 a year. This counts the disruption to daily life, not the chance of being hurt.[22] | Very severe |
 
 **What helps.** Get inside, stay inside, stay tuned.[59] Go to a basement or the middle of a large brick or concrete building. Stay there for 24 hours unless there is a fire or another immediate danger, or officials say it is safe to leave. Radiation levels drop fast during the first 24 hours.[59]
 

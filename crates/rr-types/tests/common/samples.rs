@@ -208,6 +208,7 @@ pub fn exposure() -> Exposure {
         strategic_class: sourced("C1".to_owned(), "rr_strategic_sites"),
         strategic_km: sourced(42.5, "rr_strategic_sites"),
         surge_cat3_share: sourced(0.0, "nhc_surge_maps"),
+        surge_proxy_class: sourced("moderate".to_owned(), "nhc_surge_maps"),
         smoke_days_35: sourced(1.4, "epa_aqs_pm25"),
         leveed_pop_share: sourced(0.02, "usace_nld"),
         dams_high_within_10km: sourced(1, "usace_nid"),

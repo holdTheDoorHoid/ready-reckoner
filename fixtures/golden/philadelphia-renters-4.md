@@ -161,7 +161,6 @@ Shown apart, so that a tiny chance of a huge loss cannot crowd out everything el
 | What | How likely | How bad |
 | --- | --- | --- |
 | Nuclear attack | Forecasters asked in 2024 put the chance of a nuclear catastrophe anywhere in the world (10 million or more deaths) before 2045 at 1 to 5 in 100. Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. That is the chance for the whole world, not for your household: no reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[49, 50] | Very severe |
-| Terrorist attack | An attack that shuts down the area where you live for half a day to two days (roads, schools and shops closed) is rare: for a household like yours, expert estimates range from about 1 in 10,000 to about 1 in 1,000 a year. This counts the disruption to daily life, not the chance of being hurt.[18] | Very severe |
 
 **What helps.** Get inside, stay inside, stay tuned.[50] Go to a basement or the middle of a large brick or concrete building. Stay there for 24 hours unless there is a fire or another immediate danger, or officials say it is safe to leave. Radiation levels drop fast during the first 24 hours.[50]
 
