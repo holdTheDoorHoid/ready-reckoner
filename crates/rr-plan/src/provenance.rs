@@ -20,10 +20,6 @@ use crate::pipeline::Assessment;
 /// the list only shrinks. // awaiting: rr-content
 pub const AWAITING_CONTENT: &[&str] = &[
     "county_boil_water_records",
-    // rr-budget's legal-emergency line on the savings track (`Dials::legal_opt_in`): the median
-    // bail set for felony defendants in large counties (BJS, 2009), requested in
-    // docs/CITATION_IDS.md with the figure to confirm (budget2, 2026-09-26).
-    "bjs_felony_defendants_2009",
     // The four rr-hazards ids with no allowed copy (docs/CITATION_IDS.md, "Not added") left this
     // list on 2026-09-26: rr-hazards no longer cites fema_protection_nuclear_age_1985 or
     // riley_2012_carrington, cites powermag_epri_2019_hemp in place of epri_2019_hemp, and

@@ -629,6 +629,12 @@ matched in the page's own text.
 | `openfema_housing_assistance` | FEMA, OpenFEMA Housing Assistance Program Data, Owners and Renters v2 | `core/series/ihp_displacement.toml`: FEMA rental assistance per approved household, by type of disaster | the landing pages showed FEMA's "technical difficulties" page in a browser today, so both datasets were read through the OpenFEMA API's own metadata (OpenFemaDataSets, refreshed 2026-09-26): aggregated, non-PII Individual Assistance data by state, county and ZIP code from declaration DR1439 (2002). No quote stored |
 | `fcc_dirs_reports` | FCC PSHSB, Disaster Information Reporting System (DIRS) and its Communications Status Reports | `core/series/fcc_dirs.toml`: the share of cell sites out by county during eight hurricanes, 2017–2024 | fcc.gov refuses scripted clients, so the DIRS page was read in a browser; quote. One of the status reports the series cites (DOC-346368A1, Hurricane Harvey, 2017-08-26) was downloaded: it builds on DIRS outage data and has the per-county table of cell sites served, out and percent out. The series file's own URL (DOC-353805A1) is the FCC's 2018 report on the 2017 hurricane season, which confirms 48 of 78 Puerto Rico municipios had every cell site out after Maria |
 
+## Requested by budget (2026-09-26)
+
+| id | Source | What it backs | How it was read and checked |
+| --- | --- | --- | --- |
+| `bjs_felony_defendants_2009` | BJS, *Felony Defendants in Large Urban Counties, 2009: Statistical Tables* (NCJ 243777, Reaves, December 2013) | the savings track's optional legal-emergency line: a typical bail amount | PDF downloaded from bjs.ojp.gov and read in its extracted text. **The $10,000 figure is right**: Table 16 gives a median bail amount of $10,000 for all felony defendants in the 75 largest counties whose bail was set in 2009 (mean $55,400); $6,000 for those released and $25,000 for those detained (the stored quote is the report's own sentence on those two). Table 15 gives the spread: 28% under $5,000, 15% $5,000–9,999, 21% $10,000–24,999, 12% $25,000–49,999 and 25% $50,000 or more. The glossary says a bail bond company usually charges a fee of 10% of the full bail amount, often with collateral. Scope: felony cases only, the 75 largest counties, 2009, and defendants given nonfinancial release are left out. BJS has published nothing newer for state courts: the SCPS series ended with 2009, and the National Pretrial Reporting Program relaunched in 2021 has no published results listed on BJS's pretrial pages (checked 2026-09-26), so this remains the figure to use |
+
 ## Registry index for the other workstreams
 
 Every id below is in `content/citations.toml`. Federal entries carry an exact quote where one was
@@ -679,6 +685,7 @@ checked; "prior" marks an expert estimate.
 | Emergency refills by state (v0.2.0) | `healthcare_ready_refill_laws`, `nacds_2018_emergency_refills`, `fl_bop_emergency_refills`, `tx_pharmacy_disaster_2024`, `medicare_drugs_disaster` |
 | Our own documents | `rr_design_decision_log_2026` (the backtest and the nuclear-wording decisions) |
 | Data pack v2 county and national files (data-model) | `noaa_nclimgrid_daily`, `eia_861_reliability`, `openfema_declarations`, `openfema_housing_assistance`, `fcc_dirs_reports`, `pnnl_oe417_linkage`, `openfda_drug_shortages`, `fdic_failed_banks`, `crs_rs20348_funding_gaps`, `fbi_cde_arrests` |
+| Legal emergencies (budget) | `bjs_felony_defendants_2009`, `lsc_get_legal_help`, `aclu_stopped_by_police`, `fbi_cde_arrests` |
 
 ## Requested
 
