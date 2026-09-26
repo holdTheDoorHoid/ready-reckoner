@@ -129,8 +129,9 @@ defined as `[^id]: Publisher, title (year).`, copying the registry's publisher a
 checks that each footnote names its source's title). One idea per sentence. Eighth-grade reading level (the
 validator computes Flesch-Kincaid and warns above 9). No countdowns, no scarcity, no imagery of
 suffering, no "when the SHTF". The validator rejects pressure phrases ("you must", "act now", "don't
-wait", "hurry", "while supplies last", "before it's too late" and similar) and warns on exclamation
-marks.
+wait" and "do not wait", "hurry", "while supplies last", "before it's too late" and similar) and
+warns on exclamation marks. Say what to do and when instead ("Meet the people next door before
+you need them", "Leave as soon as authorities tell you to").
 
 ## 5. Sensitive topics (mechanical enforcement of PRINCIPLES §9)
 

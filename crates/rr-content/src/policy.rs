@@ -442,6 +442,7 @@ pub const BANNED_PHRASES: &[&str] = &[
     "limited time",
     "act now",
     "don t wait",
+    "do not wait",
     "last chance",
     "hurry",
 ];
@@ -555,6 +556,20 @@ mod tests {
     #[test]
     fn tokens_split_on_punctuation_and_lowercase() {
         assert_eq!(t("Band-Aid, don't"), vec!["band", "aid", "don", "t"]);
+    }
+
+    #[test]
+    fn waiting_phrases_are_pressure_in_both_spellings() {
+        // Verification V-17: "Do not wait ..." slipped past a list that had only "don't wait".
+        for text in [
+            "Don't wait to file.",
+            "Don\u{2019}t wait to file.",
+            "Do not wait to see flames.",
+            "DO NOT WAIT",
+        ] {
+            assert!(!find_phrases(&t(text), BANNED_PHRASES).is_empty(), "{text}");
+        }
+        assert!(find_phrases(&t("Do not let the water wait."), BANNED_PHRASES).is_empty());
     }
 
     #[test]

@@ -8,7 +8,7 @@ citations: [cdc_nchs_ed_visits, mell_2017_ems_response, oregon_2_weeks_ready, dh
 
 **What helps.** Learn how to stop serious bleeding. Hospitals, fire departments and health departments often offer free or low-cost classes.[^dhs_stop_the_bleed] Keep a first-aid kit at home and in the car. Check it often and replace what you use.[^redcross_first_aid_kit] Keep each person's medicine list and allergies where a responder can find them.[^ready_gov_disability] Know how to reach 911, and call rather than text if you can.[^fcc_text_911] CERT training teaches disaster first aid and light search and rescue.[^ready_gov_cert] Save 988 in every phone for a mental health crisis.[^samhsa_988]
 
-**What to avoid.** Do not save antibiotics for later or take someone else's. The wrong medicine can delay the right treatment.[^cdc_antibiotic_use] Do not wait for a disaster to learn first aid. People with emergency training before the World Trade Center attack were less likely to develop PTSD afterward.[^gargano_2017_wtc_training]
+**What to avoid.** Do not save antibiotics for later or take someone else's. The wrong medicine can delay the right treatment.[^cdc_antibiotic_use] Learn first aid before a disaster, not during one: people with emergency training before the World Trade Center attack were less likely to develop PTSD afterward.[^gargano_2017_wtc_training]
 
 ## Sources
 

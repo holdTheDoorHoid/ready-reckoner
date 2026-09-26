@@ -8,7 +8,7 @@ citations: [census_pulse_displacement, fema_nhs_2024, ready_gov_earthquakes, rea
 
 **What helps.** Check your insurance now. A standard homeowner's policy does not cover earthquake damage, and most do not cover flooding.[^ready_gov_earthquakes][^ready_gov_financial] A new flood policy usually takes 30 days to start, so buy it well before storm season.[^fema_nfip_flood_insurance] Renters can buy flood coverage for their belongings.[^floodsmart_buy_policy] Photograph or video your home and belongings. Keep copies of key documents in a fireproof, waterproof box, with a trusted person, or in secure files away from home.[^fema_effak]
 
-**What to avoid.** Do not keep your only copies of documents at home. Do not wait until a storm is on the way to buy flood insurance.[^fema_nfip_flood_insurance] Be careful with anyone who shows up offering quick repairs, and report scams.[^ftc_disaster_scams]
+**What to avoid.** Do not keep your only copies of documents at home. Buy flood insurance well before a storm is on the way: a new policy usually takes 30 days to start.[^fema_nfip_flood_insurance] Be careful with anyone who shows up offering quick repairs, and report scams.[^ftc_disaster_scams]
 
 ## Sources
 

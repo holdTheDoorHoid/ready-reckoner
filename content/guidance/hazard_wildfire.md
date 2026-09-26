@@ -8,7 +8,7 @@ citations: [ready_gov_wildfires, epa_wildfire_indoor_air, rr_research_risk_model
 
 **What helps.** Keep a zone at least 30 feet around your home clear of leaves, debris and anything that burns.[^ready_gov_wildfires] Know your evacuation zone and routes, and practice with your pets.[^ready_gov_wildfires] Store N95 masks for smoke. Pick a room you can close off from outside air, and run a portable air cleaner there.[^ready_gov_wildfires] A box fan with a MERV 13 filter makes a low-cost air cleaner.[^epa_diy_air_cleaners] If your heating and cooling system brings in fresh air, set it to recirculate.[^ready_gov_wildfires] Keep phones charged and have backup chargers.[^ready_gov_wildfires]
 
-**What to avoid.** Do not wait to see flames. Evacuate right away if authorities tell you to.[^ready_gov_wildfires] Do not use an air cleaner that makes ozone.[^epa_wildfire_indoor_air] Avoid hard exercise when it is smoky, so you breathe in less smoke.[^epa_wildfire_indoor_air]
+**What to avoid.** Leave as soon as authorities tell you to, even if you cannot see flames.[^ready_gov_wildfires] Do not use an air cleaner that makes ozone.[^epa_wildfire_indoor_air] Avoid hard exercise when it is smoky, so you breathe in less smoke.[^epa_wildfire_indoor_air]
 
 ## Sources
 

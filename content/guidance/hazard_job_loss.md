@@ -8,7 +8,7 @@ citations: [bls_work_experience_2024, bls_displaced_workers_2026, ssa_disability
 
 **What helps.** Build an emergency fund a little at a time. The right amount depends on your situation.[^cfpb_emergency_fund] Planners often suggest three to six months of living expenses, and more if your income varies.[^finra_financial_foundations] Know how to file for unemployment in your state.[^dol_unemployment_insurance] Keep copies of your financial, legal and medical papers together, with the names of people to call.[^fema_effak] Write a bare-bones budget you could switch to, and keep a pantry that can stretch a tight month.
 
-**What to avoid.** Do not wait to file. Contact your state's unemployment program as soon as possible after losing work.[^dol_unemployment_insurance] Do not keep your emergency fund in investments you would have to sell. A savings account lets you take money out at any time without a penalty.[^finra_financial_foundations]
+**What to avoid.** File soon after losing work: contact your state's unemployment program as soon as you can.[^dol_unemployment_insurance] Do not keep your emergency fund in investments you would have to sell. A savings account lets you take money out at any time without a penalty.[^finra_financial_foundations]
 
 ## Sources
 

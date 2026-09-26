@@ -10,7 +10,7 @@ Neighbours are a supply, and the plan counts them. After Japan's 2011 tsunami, t
 
 **What helps.** Swap phone numbers with two neighbours. Agree who checks on whom, especially older neighbours and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[^ready_gov_older_adults] Host a block party, since strong communities start with prepared neighbours.[^listos_california] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[^ready_gov_cert]
 
-**What to avoid.** Do not wait for a disaster to meet the people next door. A short hello now makes it easier to knock on a door later.
+**What to avoid.** Meet the people next door before you need them. A short hello now makes it easier to knock on a door later.
 
 ## Sources
 

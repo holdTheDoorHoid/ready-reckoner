@@ -8,7 +8,7 @@ citations: [bls_work_experience_2024, bls_unemployment_duration, fed_shed_2024, 
 
 **What helps.** Start an emergency fund, even a small one. The right amount depends on your situation.[^cfpb_emergency_fund] Financial planners often suggest three to six months of living expenses, and more if your income varies.[^finra_financial_foundations] Save a little automatically each payday.[^cfpb_emergency_fund] Know how to file for unemployment in your state before you need it.[^dol_unemployment_insurance] Write a bare-bones budget you could switch to. Check whether you have disability insurance. A 20-year-old worker has a 1-in-4 chance of becoming disabled before retirement age.[^ssa_disability_facts]
 
-**What to avoid.** Do not keep your emergency fund where it is hard to reach. Keep it in cash or a savings account you can use quickly.[^finra_financial_foundations] Do not wait to file for unemployment. Contact your state's program as soon as possible after losing work.[^dol_unemployment_insurance]
+**What to avoid.** Do not keep your emergency fund where it is hard to reach. Keep it in cash or a savings account you can use quickly.[^finra_financial_foundations] File for unemployment soon after losing work: contact your state's program as soon as you can.[^dol_unemployment_insurance]
 
 ## Sources
 
