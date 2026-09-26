@@ -174,13 +174,33 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     };
     let mut when = String::new();
     let monthly = f64::from(input.finances.monthly_budget_usd);
-    if let Some(m) = a.budget.plan.done_month {
-        let date = text::month_start(input.planning_date, m);
-        when = format!(
-            " At your budget, the plan gets there by month {m} ({}).",
-            text::month_year(date)
-        );
-    } else if monthly <= 0.0 && input.finances.one_off_budget_usd <= 0.0 {
+    let date = |m: u16| text::month_year(text::month_start(input.planning_date, m));
+    // The plan's two done months (rr-budget v0.2.0): the bare-minimum kit first, then everything.
+    const KIT: &str = "the bare minimum (three days of water, light, warmth and medicine)";
+    match (a.budget.plan.minimum_done_month, a.budget.plan.done_month) {
+        (Some(k), Some(m)) if k < m => {
+            when = format!(
+                " At your budget, {KIT} is in place by month {k} ({}), and everything by month \
+                 {m} ({}).",
+                date(k),
+                date(m)
+            );
+        }
+        (_, Some(m)) => {
+            when = format!(
+                " At your budget, the plan gets there by month {m} ({}).",
+                date(m)
+            );
+        }
+        (Some(k), None) if monthly > 0.0 => {
+            when = format!(
+                " At your budget, {KIT} is in place by month {k} ({}); the rest takes longer.",
+                date(k)
+            );
+        }
+        _ => {}
+    }
+    if when.is_empty() && monthly <= 0.0 && input.finances.one_off_budget_usd <= 0.0 {
         when = " With no money set aside, the plan is the free steps; they still cover a lot."
             .to_owned();
     }
