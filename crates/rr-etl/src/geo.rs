@@ -24,7 +24,8 @@ pub fn haversine_km(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     let (p1, p2) = (lat1.to_radians(), lat2.to_radians());
     let dp = p2 - p1;
     let dl = (lon2 - lon1).to_radians();
-    let a = (dp / 2.0).sin().powi(2) + p1.cos() * p2.cos() * (dl / 2.0).sin().powi(2);
+    let (sp, sl) = ((dp / 2.0).sin(), (dl / 2.0).sin());
+    let a = sp * sp + p1.cos() * p2.cos() * sl * sl;
     2.0 * EARTH_RADIUS_KM * a.sqrt().min(1.0).asin()
 }
 

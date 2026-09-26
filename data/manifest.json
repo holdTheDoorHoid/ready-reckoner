@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "pack_version": "3d0e0f865336",
+  "generated": "2026-09-26T00:23:53Z",
+  "packs": {
+    "core": {
+      "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
+      "files": [
+        {
+          "path": "core/counties.csv",
+          "job": "geography",
+          "sha256": "23d53539850fc2362197da0958a762d2b9b89f7a17bac326b594e3468dac5a85",
+          "bytes": 246729,
+          "rows": 3232,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/ct_crosswalk.csv",
+          "job": "geography",
+          "sha256": "020c472b946ac7b0e891ceb04bb79438c01fc0ba445a6e0abec72c2fd4c08144",
+          "bytes": 603,
+          "rows": 19,
+          "key": [
+            "old_fips",
+            "region_fips"
+          ]
+        },
+        {
+          "path": "core/states.csv",
+          "job": "geography",
+          "sha256": "0ba0c48efe7dcf197ef4ba0392d16747f0996cfb81d28fab534596754ffef022",
+          "bytes": 2291,
+          "rows": 56,
+          "key": [
+            "state_fips"
+          ]
+        },
+        {
+          "path": "core/zip_centroids.csv",
+          "job": "geography",
+          "sha256": "93d7ed18b5325143d10c5eb02d5914f674ee4c7c185f8093662f28290e237fe0",
+          "bytes": 708501,
+          "rows": 33791,
+          "key": [
+            "zip"
+          ]
+        },
+        {
+          "path": "core/zip_county.csv",
+          "job": "geography",
+          "sha256": "6c5503994cd70d3d98c33b3b07d61a392573e262932edcfdc53fe76805357ca0",
+          "bytes": 775072,
+          "rows": 46772,
+          "key": [
+            "zip",
+            "county_fips"
+          ]
+        }
+      ]
+    },
+    "geo": {
+      "description": "County boundaries for the map thumbnail and click-to-select. Loaded lazily.",
+      "files": [
+        {
+          "path": "geo/counties.json",
+          "job": "geography",
+          "sha256": "5513188c3fbe4220767cf9308c3727c022c76011ea9c163ac8785d0682adf980",
+          "bytes": 1441292,
+          "rows": 3222
+        }
+      ]
+    }
+  },
+  "jobs": {
+    "geography": {
+      "title": "Counties, ZIP-to-county shares, states and the Connecticut crosswalk",
+      "finished": "2026-09-26T00:23:53Z",
+      "sources": [
+        {
+          "name": "Census cartographic boundary counties 2024, 1:500,000",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
+          "version": "GENZ2024; Last-Modified Thu, 10 Apr 2025 16:26:02 GMT",
+          "retrieved": "2026-09-26T00:23:38Z",
+          "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
+          "bytes": 11626066,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2024 Gazetteer, counties",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_counties_national.zip",
+          "version": "2024 Gazetteer; Last-Modified Fri, 30 Aug 2024 18:40:41 GMT",
+          "retrieved": "2026-09-26T00:23:43Z",
+          "sha256": "3c337402b5c6e8d5aa26b4278ccf4edc8989f2683765b3ffbf22296cdb2df3a0",
+          "bytes": 141679,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "NCA5 Interactive Atlas regions (ArcGIS layer NCA_Regions)",
+          "url": "https://services3.arcgis.com/0Fs3HcaFfvzXvm7w/arcgis/rest/services/NCA_Regions/FeatureServer/0/query?where=1%3D1&outFields=RegionName&returnGeometry=true&outSR=4326&maxAllowableOffset=0.02&geometryPrecision=3&f=json",
+          "version": "NCA5 (2023) Atlas regions; generalised to 0.02 degrees for this lookup",
+          "retrieved": "2026-09-26T00:23:43Z",
+          "sha256": "96f8cf74fd2c18aa6eb6aa71cfcd15ef0d6eda038beef0e957a9bbb0afdafa1a",
+          "bytes": 2733046,
+          "license": "CC0 1.0 Universal"
+        },
+        {
+          "name": "Census Connecticut county-to-county-subdivision crosswalk",
+          "url": "https://www2.census.gov/geo/docs/reference/ct_change/ct_cou_to_cousub_crosswalk.txt",
+          "version": "ct_change crosswalk; Last-Modified Mon, 11 Sep 2023 13:42:52 GMT",
+          "retrieved": "2026-09-26T00:23:46Z",
+          "sha256": "13ad002564e30e6dcd1df112fdaa985f2cd0cdb908f7f3017cd2723db294cff8",
+          "bytes": 22091,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2022 Connecticut county subdivision to 2020 ZCTA relationship file",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2022/acs22_cousub22_zcta520_st09.txt",
+          "version": "rel2022 acs22; Last-Modified Fri, 20 Jan 2023 15:22:07 GMT",
+          "retrieved": "2026-09-26T00:23:46Z",
+          "sha256": "1ef973388b3c3f9e9553b60aa7db0ee47762d3cb2b3d03f5b7796165590f1820",
+          "bytes": 62822,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2020 ZCTA to county relationship file",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_county20_natl.txt",
+          "version": "rel2020; Last-Modified Thu, 09 Dec 2021 16:27:40 GMT",
+          "retrieved": "2026-09-26T00:23:47Z",
+          "sha256": "3ed41278d637dc249e0323306f68be8a6c234e3090f4de88ef328dee71aeaaaf",
+          "bytes": 6821287,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2024 Gazetteer, ZCTAs",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_zcta_national.zip",
+          "version": "2024 Gazetteer; Last-Modified Fri, 30 Aug 2024 18:40:45 GMT",
+          "retrieved": "2026-09-26T00:23:49Z",
+          "sha256": "7b85c04a131672f58b38a950eb82855d5fd4054f0bd9bc3f69aa28897a714e3d",
+          "bytes": 1013803,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census cartographic boundary counties 2024, 1:20,000,000",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_20m.zip",
+          "version": "GENZ2024; Last-Modified Thu, 10 Apr 2025 16:25:55 GMT",
+          "retrieved": "2026-09-26T00:23:52Z",
+          "sha256": "c9a54fd95422436b8822e0b070a45a9bc3de08eb13f943cdba66e7a9c2a135ff",
+          "bytes": 900230,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 87388,
+      "rows_out": 87092,
+      "outputs": [
+        "core/counties.csv",
+        "core/states.csv",
+        "core/ct_crosswalk.csv",
+        "core/zip_county.csv",
+        "core/zip_centroids.csv",
+        "geo/counties.json"
+      ],
+      "notes": [
+        "2 Connecticut ZIPs have a land-area difference over 0.5% between the 2020 county file and the 2022 town file; the town file is used.",
+        "ZIP parts in the excluded uninhabited island areas were dropped: 96799->60040.",
+        "33791 ZIPs (ZCTAs); 10069 span more than one county; 4602 have no county holding 80% or more of their land (the engine asks the user to choose).",
+        "County map: 3222 features from the 1:20,000,000 file, coordinates rounded to 3 decimals, RFC 7946 winding (exterior counter-clockwise); 0.299 MB gzipped. Not on the map (not in the 1:20m file): 60010, 60020, 60050, 66010, 69100, 69110, 69120, 78010, 78020, 78030.",
+        "Canonical county list: the 2024 1:500,000 cartographic county file (3232 counties and equivalents, including Connecticut's 9 planning regions and Puerto Rico), minus 60030 (Rose Island, American Samoa (uninhabited atoll)), 60040 (Swains Island, American Samoa (no NRI record)), 69085 (Northern Islands, Northern Mariana Islands (no NRI record)).",
+        "Internal points come from the 2024 Gazetteer; for 10 island-area counties not in the Gazetteer (60010, 60020, 60050, 66010, 69100, 69110, 69120, 78010, 78020, 78030) the polygon centroid is used.",
+        "NCA5 region per state: the region polygon holding most of the state's county internal points; islands outside the generalised polygons use their chapter region (AS, GU, MP, VI).",
+        "Connecticut: ZIP shares for Connecticut come from the 2022 town-to-ZCTA file, so they point at planning regions (091xx). ct_crosswalk.csv records the land-area overlap of the 8 retired counties and 9 regions, used to convert sources that still report old counties.",
+        "states.csv: `coastal` means a marine (ocean, gulf or tidal estuary) shoreline; Pennsylvania counts through the tidal Delaware estuary. `great_lakes` means a Great Lakes shoreline. These two flags are curated, not downloaded."
+      ]
+    }
+  },
+  "attributions": [
+    {
+      "source": "NCA5 Atlas regions",
+      "text": "Region boundaries: U.S. Global Change Research Program, Fifth National Climate Assessment Interactive Atlas (CC0 1.0).",
+      "license": "CC0 1.0",
+      "url": "https://www.arcgis.com/home/item.html?id=d6614156fe694956be25f4bb9f52b378",
+      "version": "NCA5 (2023)",
+      "accessed": "2026-09-26"
+    }
+  ]
+}

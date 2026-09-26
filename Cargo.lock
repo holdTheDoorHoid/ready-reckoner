@@ -955,6 +955,7 @@ dependencies = [
  "csv",
  "flate2",
  "reqwest",
+ "rr-types",
  "serde",
  "serde_json",
  "sha2",

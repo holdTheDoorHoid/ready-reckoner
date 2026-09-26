@@ -303,8 +303,15 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut towns = Vec::new();
     for r in &trows {
         let state = &r[t_state];
-        let land = town_land.get(&r[t_geoid]).copied().unwrap_or(0.0);
-        towns.push((format!("{state}{}", r[t_old]), format!("{state}{}", r[t_new]), land));
+        // The file ends with footnote lines; keep only Connecticut rows with real town codes
+        // (skip "County subdivisions not defined", which is water).
+        let (old, new, geoid) = (&r[t_old], &r[t_new], &r[t_geoid]);
+        let is_code = |s: &str, n: usize| s.len() == n && s.bytes().all(|b| b.is_ascii_digit());
+        if state != "09" || !is_code(old, 3) || !is_code(new, 3) || !is_code(geoid, 10) || geoid.ends_with("00000") {
+            continue;
+        }
+        let land = town_land.get(geoid).copied().unwrap_or(0.0);
+        towns.push((format!("{state}{old}"), format!("{state}{new}"), land));
     }
     let cw = Crosswalk::from_towns(&towns)?;
     out.rows_in += trows.len() as u64;
@@ -370,6 +377,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut zip_county = Table::new(&["zip", "county_fips", "land_share"], 2);
     let mut multi = 0usize;
     let mut ambiguous = 0usize;
+    let mut dropped_excluded: Vec<String> = Vec::new();
     for (z, cmap) in &parts {
         let (tl, tw) = zip_total.get(z).copied().unwrap_or((0.0, 0.0));
         let mut shares: Vec<(String, f64)> = cmap
@@ -385,6 +393,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             ambiguous += 1;
         }
         for (c, s) in shares {
+            if excluded.contains(c.as_str()) {
+                dropped_excluded.push(format!("{z}->{c}"));
+                continue;
+            }
             if !canon.contains(&c) {
                 return Err(data_err(format!("ZIP {z} points at county {c}, which is not in the 2024 county list")));
             }
@@ -392,6 +404,12 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         }
     }
     out.table(ctx, ZIP_COUNTY, &mut zip_county)?;
+    if !dropped_excluded.is_empty() {
+        out.notes.push(format!(
+            "ZIP parts in the excluded uninhabited island areas were dropped: {}.",
+            dropped_excluded.join(", ")
+        ));
+    }
     out.notes.push(format!(
         "{} ZIPs (ZCTAs); {multi} span more than one county; {ambiguous} have no county holding 80% or more of their land (the engine asks the user to choose).",
         parts.len()
@@ -406,7 +424,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut zc = Table::new(&["zip", "lat", "lon"], 1);
     for r in &zgrows {
         let (Ok(lat), Ok(lon)) = (r[zg_lat].parse::<f64>(), r[zg_lon].parse::<f64>()) else { continue };
-        zc.push(vec![r[zg_id].clone(), fixed(lat, 4), fixed(lon, 4)]);
+        zc.push(vec![r[zg_id].clone(), fixed(lat, 3), fixed(lon, 3)]);
     }
     out.rows_in += zgrows.len() as u64;
     out.table(ctx, ZIP_CENTROIDS, &mut zc)?;
@@ -450,6 +468,8 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         text: "Region boundaries: U.S. Global Change Research Program, Fifth National Climate Assessment Interactive Atlas (CC0 1.0).".to_string(),
         license: "CC0 1.0".to_string(),
         url: "https://www.arcgis.com/home/item.html?id=d6614156fe694956be25f4bb9f52b378".to_string(),
+        version: Some("NCA5 (2023)".to_string()),
+        accessed: regions_doc.retrieved[..10].to_string(),
     });
     Ok(out)
 }
