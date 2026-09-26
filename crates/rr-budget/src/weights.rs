@@ -2,13 +2,15 @@
 //! bucket hurts, relative to one day without food. They are expert priors (`Prior`), shown in the
 //! expert view with the one-line reason in [`HarmWeightRule::why`].
 //!
-//! The design fixes: water (no tap water, boil notices) and a dependent's medication 3; heat or
-//! cold with a vulnerable member 2; food and supplies, power and communications 1; a powered
-//! medical device triples `power`. The rows this crate adds where the design is silent are marked
-//! `design: false` and called out in the report: an adult's own medication and `thermal` with no
-//! vulnerable member fall back to the base weight 1; readiness buckets use 1 except `evacuate`,
-//! which uses the research prototype's 2; money buckets are 0 because the supplies budget never
-//! pays for them.
+//! The design fixes: water (no tap water, boil notices) 3; anyone's daily prescription 3 (the
+//! planner's decision of 2026-09-25, widening DESIGN §4.7's "a dependent's medication":
+//! interrupting insulin, anticonvulsants or psychiatric medicine is dangerous whoever takes it);
+//! heat or cold with a vulnerable member 2; food and supplies, power and communications 1; a
+//! powered medical device triples `power`. Rows the design does not state are marked
+//! `design: false`: medication for a household with no daily prescription and `thermal` with no
+//! vulnerable member use the base weight 1; readiness buckets use 1 except `evacuate`, which uses
+//! the research prototype's 2 (confirmed by the planner); money buckets are 0 because the
+//! supplies budget never pays for them.
 
 use rr_types::{AgeBand, BucketId, Mobility, Person, PlanInput, PoweredDevice};
 
@@ -21,8 +23,8 @@ pub const HARM_WEIGHT_CITATION: &str = "prior_harm_weights";
 pub enum Applies {
     /// Always (the base row for the bucket).
     Always,
-    /// Someone who depends on others takes daily or refrigerated medicine.
-    DependentOnMedication,
+    /// Someone takes a prescription medicine every day, or one that must stay cold.
+    DailyPrescription,
     /// Someone aged 65 or over, under 4, pregnant or nursing, with limited mobility, or using a
     /// powered medical device lives here.
     VulnerableToHeatOrCold,
@@ -66,12 +68,12 @@ pub const HARM_WEIGHTS: &[HarmWeightRule] = &[
         why: "Drinking untreated water during a boil notice can make the whole household sick.",
     },
     HarmWeightRule {
-        id: "medication_dependent",
+        id: "medication_rx",
         bucket: BucketId::Medication,
         weight: 3.0,
-        applies: Applies::DependentOnMedication,
+        applies: Applies::DailyPrescription,
         design: true,
-        why: "A missed daily medicine can become an emergency, and someone who depends on others cannot sort out a refill alone.",
+        why: "Stopping a daily prescription, such as insulin, seizure or mental-health medicine, can quickly become an emergency, whoever takes it.",
     },
     HarmWeightRule {
         id: "medication",
@@ -79,7 +81,7 @@ pub const HARM_WEIGHTS: &[HarmWeightRule] = &[
         weight: 1.0,
         applies: Applies::Always,
         design: false,
-        why: "An adult managing their own prescription can usually get an early refill; the design sets 3 only for a dependent's medicine.",
+        why: "Nobody here takes a daily prescription, so running short of medical supplies is a hardship rather than an emergency.",
     },
     HarmWeightRule {
         id: "thermal_vulnerable",
@@ -224,21 +226,12 @@ fn applies(a: Applies, household: &PlanInput) -> bool {
     let people = &household.people;
     match a {
         Applies::Always => true,
-        Applies::DependentOnMedication => people
+        Applies::DailyPrescription => people
             .iter()
-            .any(|p| (p.medical.daily_rx || p.medical.refrigerated_rx) && is_dependent(p)),
+            .any(|p| p.medical.daily_rx || p.medical.refrigerated_rx),
         Applies::VulnerableToHeatOrCold => people.iter().any(is_vulnerable_to_heat_or_cold),
         Applies::PoweredDevice => people.iter().any(has_powered_device),
     }
-}
-
-/// Someone who relies on others day to day: a child or teen, an adult aged 65 or over, or anyone
-/// with limited mobility or a wheelchair.
-pub fn is_dependent(p: &Person) -> bool {
-    matches!(
-        p.age_band,
-        AgeBand::Infant | AgeBand::Toddler | AgeBand::Child | AgeBand::Teen | AgeBand::Senior
-    ) || p.medical.mobility != Mobility::None
 }
 
 /// Someone heat and cold hurt first: aged 65 or over, under 4, pregnant or nursing, with limited
@@ -278,17 +271,21 @@ mod tests {
         assert_eq!(w(BucketId::Power, phl), 1.0);
         assert_eq!(w(BucketId::Comms, phl), 1.0);
         assert_eq!(w(BucketId::Income, phl), 0.0);
-        // Phoenix: one adult with a CPAP: power tripled; their own medicine at the base weight;
-        // the device also makes them vulnerable to heat.
+        // Phoenix: one adult with a CPAP and a daily prescription: power tripled; their own
+        // medicine weighs 3 like anyone's; the device also makes them vulnerable to heat.
         let phx = "phoenix-apartment-cpap-1";
         assert_eq!(w(BucketId::Power, phx), 3.0);
-        assert_eq!(w(BucketId::Medication, phx), 1.0);
+        assert_eq!(w(BucketId::Medication, phx), 3.0);
         assert_eq!(w(BucketId::Thermal, phx), 2.0);
-        // Chicago student: nobody vulnerable, no medicine.
+        // Chicago student: nobody vulnerable, no prescription.
         let chi = "chicago-student-zero-budget-1";
         assert_eq!(w(BucketId::Thermal, chi), 1.0);
         assert_eq!(w(BucketId::Medication, chi), 1.0);
         assert_eq!(w(BucketId::Evacuate, chi), 2.0);
+        // A working-age adult on refrigerated medicine (insulin) counts too.
+        let mut h = fixtures::get(chi).unwrap();
+        h.people[0].medical.refrigerated_rx = true;
+        assert_eq!(harm_weight(BucketId::Medication, &h).0, 3.0);
     }
 
     #[test]
