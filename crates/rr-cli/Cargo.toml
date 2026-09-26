@@ -6,9 +6,29 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-description = "Ready Reckoner: cli (native only)"
+description = "Ready Reckoner: the `rr` command line, the human and CI oracle for the engine (native only)"
+
+[[bin]]
+name = "rr"
+path = "src/main.rs"
 
 [dependencies]
+rr-types = { path = "../rr-types" }
+rr-content = { path = "../rr-content" }
+rr-hazards = { path = "../rr-hazards" }
+rr-consequence = { path = "../rr-consequence" }
+rr-supply = { path = "../rr-supply" }
+rr-budget = { path = "../rr-budget" }
+rr-plan = { path = "../rr-plan" }
+# `--data <dir>`: the packs are loaded into an `rr_data::DataStore` (checksums checked on load).
+rr-data = { path = "../rr-data" }
+# `rr data verify` runs the ETL's own file checks (checksums, row counts, joins across packs).
+rr-etl = { path = "../rr-etl" }
+clap = { version = "4.5", features = ["derive"] }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"
