@@ -65,8 +65,11 @@ pub const MIN_STATE_COVERAGE: f64 = 0.5;
 /// reporting dropout: the count before it was at least the start threshold and the count after
 /// it comes back to at least [`DROPOUT_REBOUND`] of that level. EAGLE-I's county count is the sum
 /// of each utility's outage map; a utility missing from a scrape reads as everyone restored at
-/// once and everyone losing power again when it reappears.
-pub const MAX_DROPOUT_S: i64 = 86_400;
+/// once and everyone losing power again when it reappears. Utility outage maps fail most often
+/// in the worst storms, for days at a time: Hurricane Michael's restoration in Jackson County,
+/// Florida (October 2018) has data gaps of two and three days while about 10,000 customers were
+/// still out.
+pub const MAX_DROPOUT_S: i64 = 3 * 86_400;
 /// See [`MAX_DROPOUT_S`].
 pub const DROPOUT_REBOUND: f64 = 0.5;
 /// Half-width, in snapshots, of the running median used to cut doubled counts inside a sustained
@@ -113,7 +116,7 @@ pub struct EventRecord {
 pub const PR_ISLAND: u32 = 72000;
 
 /// The event definition, quoted into the manifest and into every `OutageStats`.
-pub const DEFINITION: &str = "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged, and up to 24 hours when the count before the gap was at least 1% and comes back to at least half of it (a utility missing from the data for a while). Inside an event the counts are repaired before durations are read: during a sustained outage, counts more than 1.5 times the 3-hour running median (reports counted twice) are cut to the median, and dips shorter than 24 hours are filled to the level around them (a utility missing from some snapshots, which otherwise reads as everyone restored and cut off again); short reversals under half of the current peak or trough, or under the 1% level, are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power. Rates are customer outages in such events per customer per year of data.";
+pub const DEFINITION: &str = "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged, and up to 72 hours when the count before the gap was at least 1% and comes back to at least half of it (a utility missing from the data for a while). Inside an event the counts are repaired before durations are read: during a sustained outage, counts more than 1.5 times the 3-hour running median (reports counted twice) are cut to the median, and dips shorter than 24 hours are filled to the level around them (a utility missing from some snapshots, which otherwise reads as everyone restored and cut off again); short reversals under half of the current peak or trough, or under the 1% level, are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power. Rates are customer outages in such events per customer per year of data.";
 
 #[derive(Debug, Clone, Default)]
 struct OpenEvent {
@@ -1364,7 +1367,7 @@ mod tests {
     }
 
     #[test]
-    fn reporting_dropouts_are_bridged_up_to_a_day() {
+    fn reporting_dropouts_are_bridged_up_to_three_days() {
         // 1,000 customers, 200 out; the data vanish for 6 hours and come back at the same level:
         // a utility missing from the scrape, not a restoration.
         let mut u = unit(1000.0);
@@ -1388,12 +1391,22 @@ mod tests {
         }
         u.close();
         assert_eq!(u.events, 2);
-        // Longer than a day: two events.
+        // Two and a half days: still a dropout.
         let mut u = unit(1000.0);
         for i in 0..8 {
             u.row(i * SLOT_S, 200.0);
         }
-        for i in 110..118 {
+        for i in 250..258 {
+            u.row(i * SLOT_S, 200.0);
+        }
+        u.close();
+        assert_eq!(u.events, 1);
+        // Longer than three days: two events.
+        let mut u = unit(1000.0);
+        for i in 0..8 {
+            u.row(i * SLOT_S, 200.0);
+        }
+        for i in 300..308 {
             u.row(i * SLOT_S, 200.0);
         }
         u.close();

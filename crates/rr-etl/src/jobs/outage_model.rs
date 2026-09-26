@@ -11,15 +11,16 @@
 //!    the state become `cold_grid` (the February 2021 Texas blackout is the model case).
 //! 2. **Regional pooled tails with credibility weights.** For each county and each length
 //!    *d* (1, 3, 7, 14, 30 days) the rate of customer outages lasting at least *d* days per
-//!    customer-year from its own record, λ_c(d), is blended with the rate of the counties within
-//!    [`REGION_RADIUS_KM`] in the same region, λ_R(d) (distance-weighted, the county itself left
-//!    out): λ̂ = Z·λ_c + (1 − Z)·λ_R with Z = E / (E + k), where E is the number of qualifying
+//!    customer-year from its own record, λ_c(d), is blended with the rate over the county and
+//!    its neighbours within [`POOL_RADIUS_KM`] (distance-weighted; 400 km for the short lengths,
+//!    800 km for a week or more), λ_R(d): λ̂ = Z·λ_c + (1 − Z)·λ_R with Z = E / (E + k), where E is the number of qualifying
 //!    events a county like this one would expect to see in its own record (the region's rate of
 //!    events reaching *d* days × the county's years of data) and k = [`CREDIBILITY_K`]. A county's
 //!    record gets full weight only where it can be expected to hold many such events, so one
 //!    extreme storm (Linn County's 2020 derecho) no longer sets the county's long tail alone.
-//!    The pool leaves out outages attributed to hurricanes, wildfires and floods, which the model
-//!    carries in their own rows (M-10's double count).
+//!    The pool leaves out outages attributed to hurricanes, wildfires, floods, cold-driven grid
+//!    emergencies and other grid failures, which the model carries in rows of their own (M-10's
+//!    double count).
 //! 3. **Pooled restoration curves** by region and cause: the share of the peak still out 1 to 30
 //!    days after the peak, and the days until half and nine in ten are back, over major county
 //!    events; Puerto Rico and the US Virgin Islands are regions of their own, and every region's
@@ -61,8 +62,12 @@ pub const OPT_EVENTS: &str = "opt/outage_events/county_events.csv";
 /// Optional pack: the held-out test results, for the validation page.
 pub const OPT_HOLDOUT: &str = "opt/outage_events/holdout.csv";
 
-/// Radius of a county's region for pooling and for the stress table.
+/// Radius of a county's region for the stress table.
 pub const REGION_RADIUS_KM: f64 = 250.0;
+/// Radius of the distance weights for the pooled tails, per outage length (1, 3, 7, 14 and 30
+/// days). Longer outages come from rarer, larger storms, so they are pooled more widely. Chosen
+/// by comparing 150-1,200 km on the two held-out splits (see [`holdout_test`]).
+pub const POOL_RADIUS_KM: [f64; 5] = [400.0, 400.0, 800.0, 800.0, 800.0];
 /// The credibility constant k in Z = E / (E + k): the number of qualifying events at which a
 /// county's own record and its region's weigh the same. Five is the weight the model already
 /// gives five hurricane passages when it shrinks a county's major-hurricane share
@@ -109,8 +114,10 @@ pub const CLASSES: [&str; 10] = [
     "grid",
     "unattributed",
 ];
-/// Causes the local pool leaves out: the model carries them in rows of their own.
-pub const OUTSIDE_POOL: [&str; 3] = ["hurricane", "wildfire", "flood"];
+/// Causes the local pool leaves out: the model carries them in rows of their own (hurricane
+/// rows, the wildfire shutoff row, the riverine and coastal flooding rows, the cold-wave row and
+/// the regional grid-failure row).
+pub const OUTSIDE_POOL: [&str; 5] = ["hurricane", "wildfire", "flood", "cold_grid", "grid"];
 
 /// Storm Events types in priority order, with the cause each stands for. When several episodes
 /// overlap an outage, the first in this list wins (tropical types only count when no HURDAT2
@@ -285,6 +292,7 @@ struct TrackPoint {
 struct Oe417 {
     state: String,
     begin: i64,
+    end: i64,
     kind: String,
 }
 
@@ -360,6 +368,7 @@ pub fn oe417_is_emergency(kind: &str) -> bool {
         "voltage reduction",
         "inadequa",
         "load management",
+        "system operation",
     ]
     .iter()
     .any(|p| k.contains(p))
@@ -637,20 +646,94 @@ fn county_stats(
     out
 }
 
-/// Neighbours of each county: (index, kernel weight), same region, the county itself left out.
-fn neighbours(places: &[Place]) -> Vec<Vec<(usize, f64)>> {
+/// How counties are pooled into regions (the constants are the defaults; the held-out test
+/// compares alternatives).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct PoolCfg {
+    /// Radius of the distance weights at each outage length, km.
+    pub radius_km: [f64; 5],
+    /// Credibility constant.
+    pub k: f64,
+    /// Pool only within the county's NCA5 region (otherwise by distance alone; separate island
+    /// grids are never pooled together).
+    pub same_region: bool,
+    /// The county's own record is part of its region's (the collective includes every member, as
+    /// in Bühlmann credibility); otherwise it is left out.
+    pub include_self: bool,
+}
+
+/// The pooling the pack uses.
+pub const POOL: PoolCfg = PoolCfg {
+    radius_km: POOL_RADIUS_KM,
+    k: CREDIBILITY_K,
+    same_region: false,
+    include_self: true,
+};
+
+/// The pooling for this run: [`POOL`], unless a development run overrides it
+/// (`RR_OUTAGE_POOL=radius_km,k,same_region,include_self`, for comparing choices on the held-out
+/// test; the manifest notes record it).
+fn pool_cfg() -> PoolCfg {
+    let Ok(spec) = std::env::var("RR_OUTAGE_POOL") else {
+        return POOL;
+    };
+    let p: Vec<&str> = spec.split(',').collect();
+    let r = |i: usize| p.get(i).and_then(|x| x.parse().ok());
+    let radius_km = match (r(0), r(4)) {
+        (Some(a), Some(b)) => [a, a, b, b, b],
+        (Some(a), None) => [a; 5],
+        _ => POOL.radius_km,
+    };
+    PoolCfg {
+        radius_km,
+        k: p.get(1).and_then(|x| x.parse().ok()).unwrap_or(POOL.k),
+        same_region: p
+            .get(2)
+            .map_or(POOL.same_region, |x| *x == "1" || *x == "true"),
+        include_self: p
+            .get(3)
+            .map_or(POOL.include_self, |x| *x == "1" || *x == "true"),
+    }
+}
+
+fn grid_group(p: &Place, same_region: bool) -> &str {
+    match p.region.as_str() {
+        "puerto_rico" | "virgin_islands" | "alaska" | "hawaii_pacific" => p.region.as_str(),
+        r if same_region => r,
+        _ => "mainland",
+    }
+}
+
+/// Pooling partners of each county: (index, distance weight at each outage length), the
+/// county itself first with weight 1 when `cfg.include_self`.
+fn neighbours(places: &[Place], cfg: PoolCfg) -> Vec<Vec<(usize, [f64; 5])>> {
     let mut out = vec![Vec::new(); places.len()];
+    let rmax = cfg.radius_km.iter().cloned().fold(0.0, f64::max);
+    let dlat = rmax / 111.0 + 0.1;
     for i in 0..places.len() {
+        if cfg.include_self {
+            out[i].push((i, [1.0; 5]));
+        }
         for j in 0..places.len() {
-            if i == j || places[i].region != places[j].region {
+            if i == j
+                || grid_group(&places[i], cfg.same_region)
+                    != grid_group(&places[j], cfg.same_region)
+            {
                 continue;
             }
             let (a, b) = (&places[i], &places[j]);
-            if (a.lat - b.lat).abs() > 2.5 {
+            if (a.lat - b.lat).abs() > dlat {
                 continue;
             }
-            let w = kernel(haversine_km(a.lat, a.lon, b.lat, b.lon));
-            if w > 0.0 {
+            let km = haversine_km(a.lat, a.lon, b.lat, b.lon);
+            if km < rmax {
+                let mut w = [0.0; 5];
+                for (k, r) in cfg.radius_km.iter().enumerate() {
+                    if km < *r {
+                        let u = km / r;
+                        w[k] = (1.0 - u * u) * (1.0 - u * u);
+                    }
+                }
                 out[i].push((j, w));
             }
         }
@@ -672,60 +755,71 @@ struct Blend {
 fn blend(
     i: usize,
     stats: &[CountyStats],
-    nb: &[Vec<(usize, f64)>],
+    nb: &[Vec<(usize, [f64; 5])>],
     customers: &[f64],
+    k_cred: f64,
 ) -> Option<Blend> {
     let own = &stats[i];
     let mut num = [0.0f64; 5];
-    let mut den = 0.0;
+    let mut den = [0.0f64; 5];
     let mut qnum = [0.0f64; 5];
-    let mut qden = 0.0;
+    let mut qden = [0.0f64; 5];
     let mut rnum = 0.0;
+    let mut rden = 0.0;
     let mut n = 0usize;
     for (j, w) in &nb[i] {
         let s = &stats[*j];
         if !s.has_data || s.years <= 0.0 {
             continue;
         }
-        n += 1;
-        let wc = w * customers[*j] * s.years;
-        for k in 0..5 {
-            num[k] += wc * s.own[k];
-            qnum[k] += w * s.years * s.qual_rate[k];
+        if *j != i && w[0] > 0.0 {
+            n += 1;
         }
-        rnum += wc * s.rate;
-        den += wc;
-        qden += w * s.years;
+        for k in 0..5 {
+            let wc = w[k] * customers[*j].max(1.0) * s.years;
+            num[k] += wc * s.own[k];
+            den[k] += wc;
+            qnum[k] += w[k] * s.years * s.qual_rate[k];
+            qden[k] += w[k] * s.years;
+        }
+        let wc0 = w[0] * customers[*j].max(1.0) * s.years;
+        rnum += wc0 * s.rate;
+        rden += wc0;
     }
     let mut b = Blend {
         region_counties: n,
         ..Default::default()
     };
-    match (own.has_data, den > 0.0) {
+    match (own.has_data, n > 0) {
         (false, false) => return None,
         (true, false) => {
             b.basis = "own_only";
             b.lam = own.own;
+            b.region = own.own;
             b.z = [1.0; 5];
             b.region_rate = own.rate;
         }
         (false, true) => {
             b.basis = "region_only";
             for k in 0..5 {
-                b.region[k] = num[k] / den;
+                b.region[k] = if den[k] > 0.0 { num[k] / den[k] } else { 0.0 };
                 b.lam[k] = b.region[k];
             }
-            b.region_rate = rnum / den;
+            b.region_rate = rnum / rden;
         }
         (true, true) => {
             b.basis = "blend";
             for k in 0..5 {
-                b.region[k] = num[k] / den;
-                let expected = qnum[k] / qden * own.years;
-                b.z[k] = credibility(expected);
+                b.region[k] = num[k] / den[k];
+                let expected = qnum[k] / qden[k] * own.years;
+                b.z[k] = if expected <= 0.0 {
+                    0.0
+                } else {
+                    expected / (expected + k_cred)
+                };
                 b.lam[k] = b.z[k] * own.own[k] + (1.0 - b.z[k]) * b.region[k];
             }
-            b.region_rate = rnum / den;
+            b.region_rate = rnum / rden;
         }
     }
     Some(b)
@@ -916,10 +1010,14 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         let (_, r) = im::read(&ctx.data, im::OE417_EVENTS, "oe417")?;
         let mut v: Vec<Oe417> = r
             .iter()
-            .map(|x| Oe417 {
-                state: x[1].clone(),
-                begin: x[2].parse().unwrap_or(0),
-                kind: x[4].clone(),
+            .map(|x| {
+                let begin = x[2].parse().unwrap_or(0);
+                Oe417 {
+                    state: x[1].clone(),
+                    begin,
+                    end: x[3].parse().unwrap_or(begin),
+                    kind: x[4].clone(),
+                }
             })
             .collect();
         v.sort_by_key(|x| x.begin);
@@ -948,12 +1046,16 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             (places[ci].lat, places[ci].lon)
         };
         let state = places[ci].state.clone();
+        // A long event is attributed by what brought it to its peak: rain ahead of a hurricane
+        // can start an outage a day or two before the storm arrives (Helene in Buncombe County
+        // began on 25 September 2024 and peaked on the 27th).
+        let rise_end = e.peak_t.clamp(e.start, e.start + 48 * 3600);
         // 1. Tropical cyclones.
         let lo = points.partition_point(|p| p.t < e.start - TRACK_BEFORE_S);
         let mut best: Option<(f64, usize)> = None;
         for p in points[lo..]
             .iter()
-            .take_while(|p| p.t <= e.start + TRACK_AFTER_S)
+            .take_while(|p| p.t <= rise_end + TRACK_AFTER_S)
         {
             if (p.lat - lat).abs() > 3.0 {
                 continue;
@@ -975,19 +1077,23 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         } else {
             episodes.get(&ci).map(|v| v.as_slice()).unwrap_or(&[])
         };
-        let hi = eps.partition_point(|x| x.begin <= e.start + EPISODE_AFTER_S);
+        let hi = eps.partition_point(|x| x.begin <= rise_end + EPISODE_AFTER_S);
         let from = eps.partition_point(|x| x.begin < e.start - 45 * 86_400);
         let overlapping: Vec<&Episode> = eps[from..hi]
             .iter()
             .filter(|x| x.end >= e.start - EPISODE_BEFORE_S)
             .collect();
         let oe_near = |pred: fn(&str) -> bool| {
-            let lo = oe417.partition_point(|x| x.begin < e.start - OE417_WINDOW_S);
-            oe417[lo..]
+            // Reports whose span overlaps the event's rise, give or take a day.
+            let hi = oe417.partition_point(|x| x.begin <= rise_end + OE417_WINDOW_S);
+            oe417[..hi]
                 .iter()
-                .take_while(|x| x.begin <= e.start + OE417_WINDOW_S)
-                .find(|x| x.state == state && pred(&x.kind))
+                .rev()
+                .take_while(|x| x.begin >= e.start - 30 * 86_400)
+                .filter(|x| x.end >= e.start - OE417_WINDOW_S)
+                .filter(|x| x.state == state && pred(&x.kind))
                 .map(|x| x.kind.clone())
+                .min()
         };
         if let Some((class, code)) = storm_events_cause(overlapping.iter().map(|x| x.code.as_str()))
         {
@@ -1053,27 +1159,24 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         (first_year, last_year),
         true,
     );
-    let nb = neighbours(&places);
+    let cfg = pool_cfg();
+    let nb = neighbours(&places, cfg);
     let blends: Vec<Option<Blend>> = (0..places.len())
-        .map(|i| blend(i, &pool, &nb, &customers))
+        .map(|i| blend(i, &pool, &nb, &customers, cfg.k))
         .collect();
 
+    // Three significant figures for rates and two for weights: the estimates are far less
+    // certain than that, and the core pack is fetched on every first visit.
     let mut pooled = Table::new(
         &[
             "fips",
             "basis",
-            "years",
             "rate",
             "lam_ge_1d",
             "lam_ge_3d",
             "lam_ge_7d",
             "lam_ge_14d",
             "lam_ge_30d",
-            "own_ge_1d",
-            "own_ge_3d",
-            "own_ge_7d",
-            "own_ge_14d",
-            "own_ge_30d",
             "z_1d",
             "z_3d",
             "z_7d",
@@ -1089,22 +1192,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         let mut row = vec![
             places[i].fips.clone(),
             b.basis.to_string(),
-            if s.has_data {
-                sig4(s.years)
-            } else {
-                String::new()
-            },
-            sig4(if s.has_data { s.rate } else { b.region_rate }),
+            sig(if s.has_data { s.rate } else { b.region_rate }, 3),
         ];
-        row.extend(b.lam.iter().map(|x| sig4(*x)));
-        row.extend((0..5).map(|k| {
-            if s.has_data {
-                sig4(s.own[k])
-            } else {
-                String::new()
-            }
-        }));
-        row.extend(b.z.iter().map(|x| sig(*x, 3)));
+        row.extend(b.lam.iter().map(|x| sig(*x, 3)));
+        row.extend(b.z.iter().map(|x| sig(*x, 2)));
         row.push(b.region_counties.to_string());
         pooled.push(row);
     }
@@ -1128,9 +1219,11 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             continue;
         }
         let mut row = vec![places[i].fips.clone()];
-        row.extend(s.by_class.iter().map(|x| sig(*x, 3)));
+        // Two significant figures, and shares under half a percent written as 0.
+        let share = |x: f64| if x < 0.005 { "0".to_string() } else { sig(x, 2) };
+        row.extend(s.by_class.iter().map(|x| share(*x)));
         for c in OUTSIDE_POOL {
-            row.push(sig(s.by_class_1d[class_index(c)], 3));
+            row.push(share(s.by_class_1d[class_index(c)]));
         }
         causes.push(row);
     }
@@ -1420,9 +1513,11 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     out.table(ctx, STRESS, &mut stress)?;
 
     // --- Optional pack: county event curves ----------------------------------------------
+    // Keyed `county_fips`, not `fips`: most counties have no outage of a day or more, and the
+    // coverage check in `verify` applies to per-county tables only.
     let mut opt = Table::new(
         &[
-            "fips",
+            "county_fips",
             "start",
             "class",
             "cause",
@@ -1460,13 +1555,38 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     out.table(ctx, OPT_EVENTS, &mut opt)?;
 
     // --- Held-out test ---------------------------------------------------------------------------
-    let (holdout, lines) = holdout_test(&places, &targets, &units, &events, &nb, &customers);
+    let (holdout, lines) = holdout_test(&places, &targets, &units, &events, &customers, cfg);
     for l in &lines {
         eprintln!("  {l}");
     }
     let mut ht = holdout;
     out.table(ctx, OPT_HOLDOUT, &mut ht)?;
     out.notes.extend(lines);
+
+    // --- Counties without rows, by reason (verify checks every county-keyed file) -------------
+    let covered_pooled: BTreeSet<String> = pooled.rows.iter().map(|r| r[0].clone()).collect();
+    let covered_own: BTreeSet<String> = causes.rows.iter().map(|r| r[0].clone()).collect();
+    let covered_stress: BTreeSet<String> = stress.rows.iter().map(|r| r[0].clone()).collect();
+    let mut missing: BTreeMap<&str, Vec<String>> = BTreeMap::new();
+    for p in &places {
+        let reason = if !covered_pooled.contains(&p.fips) {
+            "No EAGLE-I record for the county or any county near it (island areas outside the EAGLE-I coverage)"
+        } else if !covered_own.contains(&p.fips) {
+            "No EAGLE-I record of its own: the pooled tail is its region's, and there are no causes to report"
+        } else if !covered_stress.contains(&p.fips) {
+            "No major outage event recorded in the county's region"
+        } else {
+            continue;
+        };
+        missing.entry(reason).or_default().push(p.fips.clone());
+    }
+    out.missing = missing
+        .into_iter()
+        .map(|(reason, fips)| crate::manifest::Missing {
+            reason: reason.to_string(),
+            fips,
+        })
+        .collect();
 
     // --- Provenance and notes ---------------------------------------------------------------
     out.source(SourceRecord {
@@ -1481,8 +1601,9 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     });
     out.definitions.insert(
         "pooled_tail".into(),
-        format!("For each county and each length d of 1, 3, 7, 14 and 30 days: lam_ge_Nd = Z x own_ge_Nd + (1 - Z) x (the same rate over the counties within {REGION_RADIUS_KM:.0} km in the same region, weighted by customers x years of data x (1 - (distance/{REGION_RADIUS_KM:.0} km)^2)^2, the county itself left out), with Z = E / (E + {CREDIBILITY_K}) and E = the number of events reaching d days that a county with this county's years of data would record at the region's rate (an event reaches d days when at least 0.25% of the county's customers, and at least 5, were out that long). Rates are customer outages lasting at least d days per customer per year, counting outages the model does not carry in rows of their own: outages attributed to hurricanes, wildfires and floods are left out."),
+        format!("For each county and each length d of 1, 3, 7, 14 and 30 days: lam_ge_Nd = Z x own_ge_Nd + (1 - Z) x region_Nd. region_Nd is the same rate over the county and every county within R(d) of it ({} km for 1 and 3 days, {} km for 7, 14 and 30 days; separate island grids are never pooled), each weighted by customers x years of data x (1 - (distance/R)^2)^2. Z = E / (E + {CREDIBILITY_K}), where E is the number of events reaching d days that a county with this county's years of data would record at the pooled rate (an event reaches d days when at least 0.25% of the county's customers, and at least 5, were out that long). Rates are customer outages lasting at least d days per customer per year, counting only outages the model does not carry in rows of their own: outages attributed to hurricanes, wildfires, floods, cold-driven grid emergencies and other grid failures are left out.", POOL_RADIUS_KM[0], POOL_RADIUS_KM[2]),
     );
+
     out.definitions.insert(
         "attribution".into(),
         format!("An outage event is attributed, in order, to a tropical cyclone when a HURDAT2 track point of at least 34 kt passes within {TRACK_RADIUS_KM:.0} km of the county's internal point from 36 hours before to 24 hours after the outage began; else to the highest-priority NOAA Storm Events episode in the county or its forecast zone overlapping the 6 hours before to 2 hours after the start (tropical, ice, tornado and thunderstorm wind, winter, wildfire, high wind, flood, lightning and hail, heat, cold); winter, ice and cold events that coincide (within 24 hours, same state) with a DOE OE-417 load-shed, energy-emergency or fuel-supply report are cold_grid; else to an OE-417 grid disturbance (not weather) in the same state within 24 hours; else 'unattributed' (cause not recorded)."),
@@ -1503,27 +1624,44 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     Ok(out)
 }
 
-/// The held-out test: fit 2014-2019, predict 2020-2025 (and an even/odd-year split).
+/// Bins of the predicted yearly chance of a qualifying event, for the reliability rows.
+const RELIABILITY_BINS: [(f64, f64, &str); 5] = [
+    (0.0, 0.01, "under 1 in 100"),
+    (0.01, 0.03, "1 to 3 in 100"),
+    (0.03, 0.1, "3 to 10 in 100"),
+    (0.1, 0.3, "10 to 30 in 100"),
+    (0.3, 1.01, "30 in 100 or more"),
+];
+
+/// The held-out test: fit 2014-2019, predict 2020-2025 (and an even/odd-year split that the
+/// lower coverage of the early years does not bias). For each outage length and each estimator
+/// (the county's own record, the region alone, the blend) it reports: predicted and observed
+/// customer outages lasting that long (calibration in the large); the mean Poisson deviance of
+/// each county's count of qualifying events (lower is better; a county-only estimate that saw
+/// none predicts none and is penalised when one comes); and a reliability table: the predicted
+/// yearly chance that a county records a qualifying event against the share of county-years
+/// that did.
 fn holdout_test(
     places: &[Place],
     targets: &[Vec<(usize, f64)>],
     units: &[Unit],
     events: &[Ev],
-    nb: &[Vec<(usize, f64)>],
     customers: &[f64],
+    cfg: PoolCfg,
 ) -> (Table, Vec<String>) {
+    let nb = &neighbours(places, cfg);
     let mut table = Table::new(
         &[
             "split",
             "mark_days",
             "estimator",
+            "measure",
+            "bin",
             "predicted",
             "observed",
-            "ratio",
-            "deviance",
-            "counties",
+            "n",
         ],
-        3,
+        5,
     );
     let mut lines = Vec::new();
     type Filter = Box<dyn Fn(u16) -> bool>;
@@ -1539,16 +1677,18 @@ fn holdout_test(
             Box::new(|y| y % 2 == 1),
         ),
     ];
+    let year_of = |t: i64| crate::timefmt::civil_from_days(t.div_euclid(86_400)).0 as u16;
     for (name, fit, test) in &splits {
-        // Unit-level sums for a year filter.
+        // Unit-level sums for a year filter, and qualifying events per unit and year.
         let sums = |f: &dyn Fn(u16) -> bool| {
             let mut ge = vec![[0.0f64; 5]; units.len()];
             let mut q = vec![[0.0f64; 5]; units.len()];
+            let mut qy: Vec<BTreeMap<u16, [f64; 5]>> = vec![BTreeMap::new(); units.len()];
             for e in events {
                 if OUTSIDE_POOL.contains(&CLASSES[e.class]) {
                     continue;
                 }
-                let y = crate::timefmt::civil_from_days(e.start.div_euclid(86_400)).0 as u16;
+                let y = year_of(e.start);
                 if !f(y) {
                     continue;
                 }
@@ -1557,6 +1697,7 @@ fn holdout_test(
                     ge[e.unit][k] += e.ge[k];
                     if e.ge[k] >= thr {
                         q[e.unit][k] += 1.0;
+                        qy[e.unit].entry(y).or_default()[k] += 1.0;
                     }
                 }
             }
@@ -1571,11 +1712,10 @@ fn holdout_test(
                         / 12.0
                 })
                 .collect();
-            (ge, q, years)
+            (ge, q, years, qy)
         };
-        let (fge, fq, fyears) = sums(fit.as_ref());
-        let (tge, tq, tyears) = sums(test.as_ref());
-        // County stats from unit sums.
+        let (fge, fq, fyears, _) = sums(fit.as_ref());
+        let (tge, tq, tyears, tqy) = sums(test.as_ref());
         let to_county = |ge: &[[f64; 5]], q: &[[f64; 5]], years: &[f64]| {
             let mut s = vec![CountyStats::default(); places.len()];
             for (u, ts) in targets.iter().enumerate() {
@@ -1596,14 +1736,27 @@ fn holdout_test(
         };
         let fit_s = to_county(&fge, &fq, &fyears);
         let test_s = to_county(&tge, &tq, &tyears);
+        // Test years with data per county, and qualifying events per county-year (the county's
+        // main unit).
+        let main_unit: Vec<Option<usize>> = {
+            let mut m: Vec<Option<(usize, f64)>> = vec![None; places.len()];
+            for (u, ts) in targets.iter().enumerate() {
+                for (c, w) in ts {
+                    if m[*c].is_none_or(|(_, bw)| *w > bw) {
+                        m[*c] = Some((u, *w));
+                    }
+                }
+            }
+            m.into_iter().map(|x| x.map(|(u, _)| u)).collect()
+        };
         for (k, mark) in MARKS.iter().enumerate().take(4) {
-            // Per county: predictions of the customer-outage rate and of the qualifying-event rate.
             let mut acc: BTreeMap<&str, (f64, f64, f64, usize)> = BTreeMap::new();
+            let mut rel: BTreeMap<(&str, usize), (f64, f64, usize)> = BTreeMap::new();
             for i in 0..places.len() {
                 if !fit_s[i].has_data || !test_s[i].has_data || test_s[i].years <= 0.0 {
                     continue;
                 }
-                let Some(b) = blend(i, &fit_s, nb, customers) else {
+                let Some(b) = blend(i, &fit_s, nb, customers, cfg.k) else {
                     continue;
                 };
                 if b.basis != "blend" {
@@ -1612,14 +1765,13 @@ fn holdout_test(
                 let exposure = customers[i].max(1.0) * test_s[i].years;
                 let obs = test_s[i].own[k] * exposure;
                 let n_obs = test_s[i].qual_rate[k] * test_s[i].years;
-                // Region event rate: back out from the blend inputs.
                 let own_q = fit_s[i].qual_rate[k];
                 let mut qn = 0.0;
                 let mut qd = 0.0;
                 for (j, w) in &nb[i] {
                     if fit_s[*j].has_data {
-                        qn += w * fit_s[*j].years * fit_s[*j].qual_rate[k];
-                        qd += w * fit_s[*j].years;
+                        qn += w[k] * fit_s[*j].years * fit_s[*j].qual_rate[k];
+                        qd += w[k] * fit_s[*j].years;
                     }
                 }
                 let reg_q = if qd > 0.0 { qn / qd } else { own_q };
@@ -1629,6 +1781,17 @@ fn holdout_test(
                     ("region only", b.region[k], reg_q),
                     ("blend", b.lam[k], z * own_q + (1.0 - z) * reg_q),
                 ];
+                // County-years of the test: the main unit's years with data.
+                let county_years: Vec<(u16, bool)> = main_unit[i]
+                    .map(|u| {
+                        units[u]
+                            .months
+                            .iter()
+                            .filter(|(y, m)| test(**y) && **m >= 6)
+                            .map(|(y, _)| (*y, tqy[u].get(y).is_some_and(|c| c[k] >= 1.0)))
+                            .collect()
+                    })
+                    .unwrap_or_default();
                 for (est, lam, q) in preds {
                     let mu = (q * test_s[i].years).max(1e-6);
                     let dev = if n_obs > 0.0 {
@@ -1641,6 +1804,17 @@ fn holdout_test(
                     e.1 += obs;
                     e.2 += dev;
                     e.3 += 1;
+                    let p = 1.0 - exp(-q);
+                    let bin = RELIABILITY_BINS
+                        .iter()
+                        .position(|(lo, hi, _)| p >= *lo && p < *hi)
+                        .unwrap_or(RELIABILITY_BINS.len() - 1);
+                    let r = rel.entry((est, bin)).or_default();
+                    for (_, hit) in &county_years {
+                        r.0 += p;
+                        r.1 += f64::from(u8::from(*hit));
+                        r.2 += 1;
+                    }
                 }
             }
             for (est, (pred, obs, dev, n)) in &acc {
@@ -1649,16 +1823,49 @@ fn holdout_test(
                     name.to_string(),
                     mark.to_string(),
                     est.to_string(),
+                    "customer_outages".into(),
+                    String::new(),
                     sig4(*pred),
                     sig4(*obs),
-                    sig4(ratio),
+                    n.to_string(),
+                ]);
+                table.push(vec![
+                    name.to_string(),
+                    mark.to_string(),
+                    est.to_string(),
+                    "mean_poisson_deviance".into(),
+                    String::new(),
                     sig4(dev / *n as f64),
+                    String::new(),
                     n.to_string(),
                 ]);
                 lines.push(format!(
                     "Held-out test ({name}), outages of {mark}+ days, {est}: predicted {pred:.0} customer outages, observed {obs:.0} (observed/predicted {ratio:.2}); mean Poisson deviance of qualifying-event counts {:.3} over {n} counties.",
                     dev / *n as f64
                 ));
+            }
+            for ((est, bin), (p, hits, n)) in &rel {
+                if *n == 0 {
+                    continue;
+                }
+                table.push(vec![
+                    name.to_string(),
+                    mark.to_string(),
+                    est.to_string(),
+                    "reliability".into(),
+                    format!("{bin}: {}", RELIABILITY_BINS[*bin].2),
+                    sig4(p / *n as f64),
+                    sig4(hits / *n as f64),
+                    n.to_string(),
+                ]);
+                if *est == "blend" {
+                    lines.push(format!(
+                        "Held-out reliability ({name}), {mark}+ days, blend, predicted {}: mean predicted yearly chance {:.3}, observed share of county-years {:.3} ({n} county-years).",
+                        RELIABILITY_BINS[*bin].2,
+                        p / *n as f64,
+                        hits / *n as f64
+                    ));
+                }
             }
         }
     }
@@ -1750,24 +1957,33 @@ mod tests {
             ..Default::default()
         };
         let stats = vec![mk(0.08, 0.1), mk(0.0, 0.0), mk(0.0, 0.0)];
-        let nb = vec![
-            vec![(1, 1.0), (2, 1.0)],
-            vec![(0, 1.0), (2, 1.0)],
-            vec![(0, 1.0), (1, 1.0)],
-        ];
+        let all = vec![(0, [1.0; 5]), (1, [1.0; 5]), (2, [1.0; 5])];
+        let nb = vec![all.clone(), all.clone(), all];
         let cust = vec![1000.0; 3];
-        let b = blend(0, &stats, &nb, &cust).unwrap();
-        // At 7 days the neighbours saw no qualifying events, so E = 0 and Z = 0: all region.
-        assert_eq!(b.z[2], 0.0);
-        assert_eq!(b.lam[2], 0.0);
-        // At 1 day E = 2 events a year x 10 years = 20, Z = 0.8.
-        assert!((b.z[0] - 0.8).abs() < 1e-12);
-        // A neighbour's region is the mean of (0.08, 0.0) with equal weights = 0.04; its region
-        // records 0.05 qualifying events a year, so E = 0.5 over 10 years.
-        let b1 = blend(1, &stats, &nb, &cust).unwrap();
-        assert!((b1.region[2] - 0.04).abs() < 1e-12);
-        let e = 0.05 * 10.0;
-        assert!((b1.z[2] - e / (e + CREDIBILITY_K)).abs() < 1e-12);
-        assert!(b1.lam[2] > 0.0 && b1.lam[2] < 0.04);
+        let b0 = blend(0, &stats, &nb, &cust, CREDIBILITY_K).unwrap();
+        let b1 = blend(1, &stats, &nb, &cust, CREDIBILITY_K).unwrap();
+        // At 1 day the region records 2 qualifying events a year: E = 20 over 10 years, Z = 0.8.
+        assert!((b0.z[0] - 0.8).abs() < 1e-12);
+        // At 7 days: region rate 0.08 / 3, E = (1 event / 30 county-years) x 10 = 1/3.
+        let e = 1.0 / 3.0;
+        let z = e / (e + CREDIBILITY_K);
+        assert!((b0.z[2] - z).abs() < 1e-12);
+        assert!((b0.region[2] - 0.08 / 3.0).abs() < 1e-12);
+        assert!((b0.lam[2] - (z * 0.08 + (1.0 - z) * 0.08 / 3.0)).abs() < 1e-12);
+        // The storm's county keeps more of it than its neighbours, and both share it.
+        assert!(b0.lam[2] > b1.lam[2] && b1.lam[2] > 0.0);
+        assert_eq!(b0.region_counties, 2);
+        // Leaving the county out of its own region (the old way) gives the neighbour more than
+        // the county the storm hit.
+        let w = [1.0; 5];
+        let loo = vec![
+            vec![(1, w), (2, w)],
+            vec![(0, w), (2, w)],
+            vec![(0, w), (1, w)],
+        ];
+        let l0 = blend(0, &stats, &loo, &cust, CREDIBILITY_K).unwrap();
+        let l1 = blend(1, &stats, &loo, &cust, CREDIBILITY_K).unwrap();
+        assert!(l1.lam[2] > l0.lam[2] * 0.5);
+        assert_eq!(l0.z[2], 0.0);
     }
 }

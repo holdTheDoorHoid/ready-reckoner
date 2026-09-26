@@ -185,14 +185,11 @@ impl SeriesDoc {
         let parsed: toml::Table = text
             .parse()
             .map_err(|e| data_err(format!("{rel} does not parse: {e}")))?;
-        let n = parsed
-            .get("rate")
-            .and_then(|v| v.as_array())
-            .map_or(0, |a| a.len())
-            + parsed
-                .get("row")
-                .and_then(|v| v.as_array())
-                .map_or(0, |a| a.len());
+        // Every top-level array counts, as `verify` counts TOML entries (rates, rows, notes).
+        let n: usize = parsed
+            .values()
+            .map(|v| v.as_array().map_or(0, |a| a.len()))
+            .sum();
         out.text(ctx, rel, &text, n as u64)
     }
 }

@@ -54,3 +54,11 @@ from = "2020-10-26"
 to = "2020-10-29"
 states = ["OK", "TX", "KS"]
 source = "NOAA National Weather Service Norman, October 26-28, 2020 ice storm summary"
+
+[[name]]
+name = "November 2018 Camp Fire"
+classes = ["wildfire", "wind", "unattributed", "grid"]
+from = "2018-11-08"
+to = "2018-11-10"
+states = ["CA"]
+source = "National Institute of Standards and Technology, Technical Note 2252 (Camp Fire timeline)"
