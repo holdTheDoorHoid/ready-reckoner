@@ -6,6 +6,7 @@
 //! | `device_power_plan` | warn | a powered medical device, no backup power at home, and no device-power item by month 3 |
 //! | `cold_chain_plan` | warn | refrigerated medicine, and by month 3 no cooler for it or, where it needs a power source (a power target of 2 days or more and no backup power: rr-supply's `power_for_cold_medicine` line), nothing that covers that power (the design gives no month; this reuses the device rule's) |
 //! | `no_stored_water_by_month_3` | warn | free steps (refilled drink bottles) leave the stored-water need short, and no stored water is owned or bought by month 3 |
+//! | `smoke_alarms_landlord` | warn | renters with no working smoke alarms: the plan buys none, because the landlord comes first (round-2 review RR-P16), so it says so |
 //! | `evacuation_no_go_bag` | warn | a ten-year chance of having to leave of 10 % or more (`Prior`) and no go-bag by month 6 (`Prior`) |
 //! | `insurance_flood` / `insurance_quake` | warn | an owner in a flood- or quake-prone area without that policy |
 //! | `cliff_<bucket>` | note | `rr-consequence` found one rare event driving the bucket's target |
@@ -123,6 +124,20 @@ pub(crate) fn check(
              station can keep a small cooler or the fridge running. Ask your pharmacist how long \
              yours can stay out of the fridge.",
             &["medication", "power"],
+        ));
+    }
+
+    // Renters with no smoke alarms: the plan budgets none (the landlord, the fire department or
+    // the Red Cross come first), so the packet must say so where it cannot be missed.
+    if !household.housing.alarms.smoke && household.housing.tenure == Tenure::Rent {
+        out.push(warning(
+            "smoke_alarms_landlord",
+            WarningSeverity::Warn,
+            "Your home has no working smoke alarms: ask your landlord to put them in.".into(),
+            "Smoke alarms give the warning that gets people out of a house fire. Ask your landlord \
+             in writing first. If that does not work, ask your fire department or the Red Cross, \
+             which install free smoke alarms in many places. Buy them yourself only if nobody can.",
+            &["fire"],
         ));
     }
 

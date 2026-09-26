@@ -258,3 +258,33 @@ fn the_cold_chain_guardrail_waits_for_the_medicine_power() {
     // the cold chain, as before.
     assert!(!warns(&plan(40.0, 0.0, false)));
 }
+
+/// RR-P16: renters with no smoke alarms get no purchase (the landlord comes first), so the plan
+/// says so in a warning the packet prints; owners and homes with alarms get none.
+#[test]
+fn renters_without_smoke_alarms_are_told_to_ask_the_landlord() {
+    let run = |smoke: bool, tenure: rr_types::Tenure| {
+        let mut s = Setup::new("philadelphia-renters-4", 60.0, 0.0);
+        s.household.housing.alarms.smoke = smoke;
+        s.household.housing.tenure = tenure;
+        s.run().warnings
+    };
+    let w = run(false, rr_types::Tenure::Rent);
+    let w = w
+        .iter()
+        .find(|w| w.id == "smoke_alarms_landlord")
+        .expect("renters without alarms are told");
+    assert!(w.message.contains("ask your landlord"), "{}", w.message);
+    assert!(w.why.contains("Red Cross"), "{}", w.why);
+    for (smoke, tenure) in [
+        (true, rr_types::Tenure::Rent),
+        (false, rr_types::Tenure::Own),
+    ] {
+        assert!(
+            !run(smoke, tenure)
+                .iter()
+                .any(|w| w.id == "smoke_alarms_landlord"),
+            "{smoke} {tenure:?}"
+        );
+    }
+}
