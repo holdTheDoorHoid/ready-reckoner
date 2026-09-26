@@ -32,6 +32,7 @@ import { BUCKETS, HAZARDS, TIERS } from './mock/names';
 import type { CountyRow, StateRow } from './mock/places';
 import { COUNTIES, countyByFips, stateByFips, stateForZip, STATES, ZIP_MAJORITY, ZIPS } from './mock/places';
 import { validatePlanInput } from './mock/validate';
+import { exposureFor, validationSummary } from './mock/v2';
 
 /** The JSON round trip the WebAssembly boundary imposes: no undefined, no shared references. */
 function wire<T>(value: T): T {
@@ -98,6 +99,8 @@ function fromCounty(row: CountyRow, zip?: string, share?: number): Resolved {
   };
   if (zip !== undefined) location.zip = zip;
   if (share !== undefined) location.zip_county_share = share;
+  const exposure = exposureFor(row.fips);
+  if (exposure) location.exposure = exposure;
   return { location, profile: row.profile };
 }
 
@@ -267,6 +270,7 @@ export function createMockEngine(): Engine {
           attributions: ATTRIBUTIONS,
         };
         if (packs.size > 0) info.data_pack_version = MOCK_DATA_VERSION;
+        info.validation = validationSummary(MOCK_DATA_VERSION);
         return ok(info);
       }),
     load_pack: (name, bytes) =>

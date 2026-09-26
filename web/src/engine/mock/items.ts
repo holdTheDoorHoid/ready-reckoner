@@ -5,6 +5,7 @@
  * as the one permitted free action (docs/CONTENT_STANDARDS.md §5).
  */
 import type { BucketId, HazardId, Item, TierId } from '../types';
+import { withV2 } from './items-v2';
 
 const RETRIEVED = '2026-09-25';
 
@@ -61,7 +62,7 @@ function item(d: Def): Item {
   return out;
 }
 
-export const ITEMS: Item[] = [
+export const ITEMS: Item[] = withV2([
   // ------------------------------------------------------------------------------------------
   // Free actions (month 0, always first)
   // ------------------------------------------------------------------------------------------
@@ -894,7 +895,7 @@ export const ITEMS: Item[] = [
     extras: ['nuclear_attack', 'nuclear_plant_incident'],
     rare_catastrophic: true,
   }),
-];
+]);
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));
 

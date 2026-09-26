@@ -5,7 +5,8 @@
  * the print stylesheet are exercised the way the real packet will exercise them.
  */
 import type { BucketId, PlanInput, PlanItem, TierId } from '../types';
-import { band, dayPhrase, formatDate, addMonths, monthsPhrase, naturalFrequency, noticeRange, quantity, severityBand, targetDays, targetMonths, usd, CONFIDENCE_LABELS } from '../../lib/format';
+import { band, dayPhrase, formatDate, addMonths, monthsPhrase, naturalFrequency, noticeRange, quantity, rangeOnly, severityBand, targetDays, targetMonths, usd, CONFIDENCE_LABELS } from '../../lib/format';
+import { alsoCheckedNote } from './v2';
 import { catalogueItem } from './items';
 import type { ModelResult } from './model';
 import { TIERS } from './names';
@@ -129,15 +130,19 @@ export function buildPacket(input: PlanInput, r: ModelResult): string {
   out.push('');
   const rare = o.register.filter((h) => h.display === 'rare_catastrophic');
   if (rare.length) {
+    // The collapsed table only (hazard-expansion C.1): the packet does not grow with the sub-rows.
     out.push('### Rare but severe', '');
-    out.push('These are shown apart because a tiny chance times a huge loss would otherwise crowd out everything else.', '');
-    out.push('| What | How likely | How bad |', '| --- | --- | --- |');
+    out.push('Sorted by how likely here, not by how bad. Expert estimates, so each is a range.', '');
+    out.push('| What | How likely for you | If it reaches you | What it changes in your plan |', '| --- | --- | --- | --- |');
     for (const h of rare) {
-      out.push(`| ${md(h.name)} | ${naturalFrequency(1 - Math.exp(-h.rate_per_year * years))} | ${severityBand(h.severity).label} |`);
+      out.push(`| ${md(h.name)} | ${md(rangeOnly(h.rate_range[0], h.rate_range[1], years))} | ${md(h.if_it_reaches_you ?? '')} | ${md(h.what_it_changes ?? '')} |`);
     }
     out.push('');
     out.push('Your three-day supplies already cover the first days of sheltering: get inside, stay inside, stay tuned.[^mock_nuclear_guidance]', '');
   }
+  out.push('### Notes on these numbers', '');
+  out.push(`- These chances are for ${md(place)} as a whole. A home near a river, the coast or a steep slope can face more.`);
+  out.push(`- ${md(alsoCheckedNote(r.register))}`, '');
   out.push('*County map: a map of your county will appear here in a later version.*', '');
 
   // 3. Targets ---------------------------------------------------------------------------------

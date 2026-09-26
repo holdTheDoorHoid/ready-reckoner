@@ -108,7 +108,9 @@ describe('accessibility (axe in jsdom; colour contrast is checked in a real brow
         r.cleanup();
         current = undefined;
       }
-    });
+      // axe over the long risks and plan pages takes most of the default 30 s in jsdom when the
+      // suite runs in parallel.
+    }, 90_000);
   }
 });
 

@@ -59,6 +59,15 @@ export const CITATIONS: Citation[] = [
   mock('mock_nuclear_guidance', 'shelter guidance (stands in for Ready.gov)'),
   mock('mock_firearm_storage', 'safe storage guidance (stands in for public-health guidance)'),
   mock('mock_drills', 'drills and practice (stands in for published drill evaluations)'),
+  // Contract v2: the rare families, the new ranked hazards and the data pack v2 columns.
+  mock('mock_strategic_sites', 'strategic sites and fallout paths by county (stands in for the curated strategic-site list)'),
+  mock('mock_forecasts', 'published forecasts of war and nuclear use (stands in for expert surveys)', true),
+  mock('mock_solar_storms', 'severe solar storm return periods and geomagnetic factors (stands in for NERC and published studies)'),
+  mock('mock_uasi', 'urban areas funded for terrorism preparedness (stands in for FEMA UASI allocations)'),
+  mock('mock_active_shooter', 'active shooter incidents (stands in for FBI reports)'),
+  mock('mock_smoke_days', 'county wildfire smoke days (stands in for published smoke data)'),
+  mock('mock_arrests', 'arrest counts by age (stands in for the FBI Crime Data Explorer)'),
+  mock('mock_eviction', 'eviction filings (stands in for Eviction Lab)'),
 ];
 
 const BY_ID = new Map(CITATIONS.map((c) => [c.id, c]));
