@@ -5,17 +5,16 @@
 use std::collections::BTreeMap;
 
 use rr_budget::{
-    BucketCurve, BudgetInput, BudgetOptions, BudgetResult, Cliff, GuardrailContext, Risks,
-    Schedule,
+    BucketCurve, BudgetInput, BudgetOptions, BudgetResult, Cliff, GuardrailContext, Risks, Schedule,
 };
 use rr_consequence::{ConsequenceAssessment, CountyData};
 use rr_content::Content;
 use rr_hazards::HazardAssessment;
 use rr_supply::{ItemSizer, SizedLine, SupplyContext};
 use rr_types::{
-    Attribution, BucketAssessment, BucketId, BucketKind, ClimateHorizon, CountyRecord,
-    EngineError, ErrorCode, HazardId, ItemId, LocationResolved, PlanInput, PlanItemKind, Target,
-    TARGET_LADDER_DAYS, Warning, WarningSeverity,
+    Attribution, BucketAssessment, BucketId, BucketKind, ClimateHorizon, CountyRecord, EngineError,
+    ErrorCode, HazardId, ItemId, LocationResolved, PlanInput, PlanItemKind, TARGET_LADDER_DAYS,
+    Target, Warning, WarningSeverity,
 };
 
 use crate::coverage::{self, Offers};
@@ -27,6 +26,10 @@ pub const RESERVE_SHARE: f64 = 0.5;
 
 /// The longest plan, in months after month 0 (the ten-year horizon).
 pub const MAX_PLAN_MONTHS: u16 = 120;
+
+/// How much a powered medical device multiplies the harm weight of `power` (the allocator's
+/// `power_device` harm-weight row, DESIGN §4.7).
+pub const DEVICE_MULTIPLIER: f64 = 3.0;
 
 /// A household flood or earthquake rate at or above this counts as "prone" for the insurance
 /// guardrails: the one-percent-a-year yardstick behind FEMA flood maps (`fema_flood_zones`).
@@ -179,10 +182,7 @@ pub fn run<S: CountySource + ?Sized>(
         .ok_or_else(|| {
             EngineError::new(
                 ErrorCode::PackMissing,
-                format!(
-                    "The data for {} is not loaded yet.",
-                    location.county_name
-                ),
+                format!("The data for {} is not loaded yet.", location.county_name),
             )
         })?
         .clone();
@@ -215,23 +215,53 @@ pub fn run<S: CountySource + ?Sized>(
         .iter()
         .map(|p| (p.id, p.rate_per_year))
         .collect();
-    let offers = coverage::build(content, &sizer, &targets, &register);
+    let evacuate_p10 = match buckets
+        .iter()
+        .find(|b| b.id == BucketId::Evacuate)
+        .map(|b| b.target)
+    {
+        Some(Target::Evacuate { p_need_10yr, .. }) => p_need_10yr,
+        _ => 0.0,
+    };
+    let offers = coverage::build(content, &sizer, &targets, &register, evacuate_p10);
 
     // Budget.
+    // A curve for every duration bucket the catalogue can cover. A bucket with no part to buy
+    // (nobody takes a prescription, so no medicine to stock) gets no curve: there is nothing to
+    // value, and the plan counts it as covered.
     let mut curves = BTreeMap::new();
     for (&bucket, &target) in &targets {
-        if target <= 0.0 {
+        if target <= 0.0 || offers.rule.parts_of(bucket).is_empty() {
             continue;
         }
         if let Some(c) = consequence.curve(bucket) {
-            curves.insert(bucket, budget_curve(c, target));
+            let mut curve = budget_curve(c, target);
+            if bucket == BucketId::Power
+                && offers
+                    .rule
+                    .parts_of(bucket)
+                    .iter()
+                    .any(|p| p.name == coverage::DEVICE_PART)
+            {
+                // A powered medical device triples the harm weight of a power cut (DESIGN §4.7):
+                // two thirds of the bucket's harm is the device's, so its part gets that share.
+                curve.part_shares.insert(
+                    coverage::DEVICE_PART.to_owned(),
+                    1.0 - 1.0 / DEVICE_MULTIPLIER,
+                );
+            }
+            curves.insert(bucket, curve);
         }
     }
     let risks = Risks {
         curves,
         assessments: buckets.iter().map(|b| (b.id, b.clone())).collect(),
     };
-    let prone = |ids: &[HazardId]| ids.iter().map(|h| register.get(h).copied().unwrap_or(0.0)).sum::<f64>();
+    let prone = |ids: &[HazardId]| {
+        ids.iter()
+            .map(|h| register.get(h).copied().unwrap_or(0.0))
+            .sum::<f64>()
+    };
     let context = GuardrailContext {
         flood_zone: prone(&[HazardId::RiverineFlooding, HazardId::CoastalFlooding])
             >= PRONE_RATE_PER_YEAR,
@@ -283,7 +313,14 @@ pub fn run<S: CountySource + ?Sized>(
     };
     for b in &mut buckets {
         let covered = budget.covered.get(&b.id).copied();
+        let nothing_to_buy =
+            b.id.kind() == BucketKind::Duration && offers.rule.parts_of(b.id).is_empty();
         b.covered = match (b.target, covered) {
+            (Target::Days { value, .. }, _) if nothing_to_buy => Target::Days {
+                value,
+                low: value,
+                high: value,
+            },
             (Target::Days { value, .. }, Some(Target::Days { value: c, .. })) => {
                 let v = c.min(value).max(0.0);
                 Target::Days {
@@ -330,13 +367,38 @@ pub fn run<S: CountySource + ?Sized>(
     }
 
     // Warnings: the consequence crate's cliff warnings are canonical; drop the budget's duplicate
-    // ids.
+    // ids. The budget's "no stored water" check reads the whole no-water bucket (its weakest
+    // part, often the toilet); drop it when the stored-water part itself has water by month 1.
+    let stored_by_month_1 = {
+        let mut early: Vec<(ItemId, f64)> = Vec::new();
+        for m in budget.plan.months.iter().take_while(|m| m.index <= 1) {
+            for it in &m.items {
+                if it.kind != PlanItemKind::Reserve {
+                    early.push((it.item_id.clone(), f64::from(it.quantity)));
+                }
+            }
+        }
+        offers
+            .rule
+            .part_days(BucketId::WaterOut, coverage::STORED_WATER_PART, &early)
+    };
     let mut warnings: Vec<Warning> = consequence.warnings.clone();
     for w in &budget.warnings {
+        if w.id == "no_water_after_month_1" && stored_by_month_1 > 0.0 {
+            continue;
+        }
         if !warnings.iter().any(|x| x.id == w.id) {
             warnings.push(w.clone());
         }
     }
+    // One sinking fund per item (docs/DESIGN.md §14, 2026-09-26): keep each item's latest.
+    let mut budget = budget;
+    let mut envelopes: Vec<rr_types::SavingsEnvelope> = Vec::new();
+    for e in budget.plan.envelopes.drain(..) {
+        envelopes.retain(|x| x.item_id != e.item_id);
+        envelopes.push(e);
+    }
+    budget.plan.envelopes = envelopes;
     let unknown_existing: Vec<ItemId> = {
         let mut v: Vec<ItemId> = input
             .existing

@@ -29,10 +29,18 @@
 //! 3. For heat and cold items the table does not name, the item's `hazard_extras`: heat-wave
 //!    items meet the first `thermal_heat` line, winter items the first `thermal_cold` line.
 //!
+//! Only water, food, medicine, generator fuel and baby formula are divisible
+//! ([`DIVISIBLE_CLASSES`]); everything else is bought as one set, sized to meet its line. Bulk
+//! staples ([`LONG_STORE_FOOD`]) count only for the days beyond the first month, as `rr-supply`'s
+//! `long_term_staples` rule intends: the first month is food the household normally eats.
+//!
 //! Readiness buckets (leaving home, getting home, medical emergencies, fire, security) have no
-//! days. Each has a checklist: its need lines that some offered item meets, plus offered items
-//! that name the bucket without meeting a line. Each checklist entry carries an equal share of
-//! the harm the whole checklist avoids ([`READINESS_HARM`], an expert estimate).
+//! days. An item that meets one of their need lines, or (meeting none) lists one first among its
+//! buckets, is a step on that bucket's checklist and avoids the bucket's harm each time it is
+//! needed ([`READINESS_HARM`], an expert estimate, as the research prototype valued each
+//! capability).
+//! A go-bag is life-safety for a household with a ten-year chance of having to leave of 10 % or
+//! more, the level at which the allocator's guardrail expects one by month six.
 //!
 //! Items are offered only when the household needs them: the item's rule gives a quantity above
 //! zero, it does not rest only on an optional line (a generator, a solar panel), and a
@@ -77,8 +85,14 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
     // Phones, news and payments.
     ("power_bank", &[("comms.phone_power_wh", Units::Fill)]),
     ("comms_noaa_radio", &[("comms.noaa_radio", Units::Per(1.0))]),
-    ("comms_frs_radios", &[("comms.two_way_radios", Units::Per(2.0))]),
-    ("comms_contact_card", &[("comms.contact_cards", Units::Fill)]),
+    (
+        "comms_frs_radios",
+        &[("comms.two_way_radios", Units::Per(2.0))],
+    ),
+    (
+        "comms_contact_card",
+        &[("comms.contact_cards", Units::Fill)],
+    ),
     ("comms_paper_map", &[("comms.local_map", Units::Per(1.0))]),
     // Water and the toilet.
     (
@@ -128,12 +142,18 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
     ),
     // Leaving home and getting home.
     ("evac_go_bag", &[("evacuate.go_bag", Units::Per(1.0))]),
-    ("evac_half_tank", &[("evacuate.fuel_half_tank", Units::Fill)]),
+    (
+        "evac_half_tank",
+        &[("evacuate.fuel_half_tank", Units::Fill)],
+    ),
     (
         "special_access_needs_plan",
         &[("evacuate.evacuation_assistance_plan", Units::Fill)],
     ),
-    ("special_pet_kit", &[("evacuate.pet_carrier", Units::Per(1.0))]),
+    (
+        "special_pet_kit",
+        &[("evacuate.pet_carrier", Units::Per(1.0))],
+    ),
     ("gethome_bag", &[("get_home.get_home_bag", Units::Per(1.0))]),
     (
         "water_personal_filter",
@@ -141,22 +161,26 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
     ),
     ("gethome_car_kit", &[("get_home.car_kit", Units::Per(1.0))]),
     // Fire and security.
-    ("fire_escape_plan", &[("fire.fire_escape_plan", Units::Fill)]),
+    (
+        "fire_escape_plan",
+        &[("fire.fire_escape_plan", Units::Fill)],
+    ),
     (
         "community_know_two_neighbours",
         &[("security.neighbour_contacts", Units::Fill)],
     ),
 ];
 
-/// Day-equivalents of harm a readiness bucket's whole checklist avoids each time it is needed
-/// (DESIGN §4.7: V = 10 · w · r_need · harm), from the research prototype's capability items
-/// (go-bag 2, get-home bag 0.5, first-aid kit and masks 0.3 rounded up, smoke-alarm test 5) and
-/// 0.5 for security, which the research did not price. Expert estimates: they order readiness
-/// items against each other and against supplies, and never reach the user as numbers.
+/// Day-equivalents of harm one step on a readiness bucket's checklist avoids each time it is
+/// needed (DESIGN §4.7: V = 10 · w · r_need · harm), from the research prototype's capability
+/// items (go-bag 2, get-home bag 0.5, first-aid kit 0.1, smoke-alarm test 5) and 0.5 for
+/// security, which the research did not price. Expert estimates: they order readiness items
+/// against each other and against supplies, and never reach the user as numbers. (A medical
+/// emergency is needed about twice a year, so its small harm per use still adds up.)
 pub const READINESS_HARM: [(BucketId, f64); 5] = [
     (BucketId::Evacuate, 2.0),
     (BucketId::GetHome, 0.5),
-    (BucketId::MedicalEmergency, 0.5),
+    (BucketId::MedicalEmergency, 0.1),
     (BucketId::Fire, 5.0),
     (BucketId::Security, 0.5),
 ];
@@ -165,10 +189,39 @@ pub const READINESS_HARM: [(BucketId, f64); 5] = [
 /// the research prototype; the harm weights they multiply are the allocator's).
 pub const COVERAGE_CITATIONS: [&str; 2] = ["rr_research_risk_model", "prior_harm_weights"];
 
+/// Item classes bought in chunks toward the next step of the day ladder; everything else is a set.
+pub const DIVISIBLE_CLASSES: [&str; 5] = [
+    "water_stored",
+    "food",
+    "prescription_medicine",
+    "generator_fuel",
+    "infant_formula",
+];
+
+/// Food for long storage that counts only for the days beyond the first month.
+pub const LONG_STORE_FOOD: [&str; 1] = ["food_bulk_staples"];
+
+/// Days of a supplies target that food the household normally eats must cover first.
+pub const FIRST_MONTH_DAYS: f64 = 30.0;
+
+/// A ten-year chance of having to leave at or above this makes a go-bag life-safety (the
+/// allocator's evacuation-heavy threshold).
+pub const GO_BAG_LIFE_SAFETY_P10: f64 = rr_budget::EVACUATION_HEAVY_P10;
+
 /// Heat-wave hazards, for the heat-and-cold fallback.
 const HEAT: [HazardId; 1] = [HazardId::HeatWave];
 /// Winter hazards, for the heat-and-cold fallback.
-const COLD: [HazardId; 3] = [HazardId::ColdWave, HazardId::WinterWeather, HazardId::IceStorm];
+const COLD: [HazardId; 3] = [
+    HazardId::ColdWave,
+    HazardId::WinterWeather,
+    HazardId::IceStorm,
+];
+
+/// The power part that keeps a medical device running.
+pub const DEVICE_PART: &str = "medical device power";
+
+/// The water part that is stored drinking water (then treatment, for long targets).
+pub const STORED_WATER_PART: &str = "stored water";
 
 /// The plain name of the part a line's `item_class` belongs to. The allocator prints it in
 /// brackets after the bucket's supply ("food and supplies (pet food)"), so it reads as words.
@@ -176,10 +229,10 @@ fn part_name(bucket: BucketId, class: &str) -> String {
     let name = match class {
         "light" => "lights",
         "battery_pack" => "batteries",
-        "medical_device_power" | "device_battery" | "power_station" => "medical device power",
+        "medical_device_power" | "device_battery" | "power_station" => DEVICE_PART,
         "generator_fuel" => "generator fuel",
         "wheelchair_battery" => "wheelchair battery",
-        "water_stored" => "stored water",
+        "water_stored" => STORED_WATER_PART,
         "water_treatment_capacity" if bucket == BucketId::WaterOut => "bleach",
         "water_treatment_capacity" => "water treatment",
         "livestock_water" => "water for animals",
@@ -315,6 +368,7 @@ pub fn build(
     sizer: &ItemSizer<'_>,
     targets: &BTreeMap<BucketId, f64>,
     register: &BTreeMap<HazardId, f64>,
+    evacuate_p10: f64,
 ) -> Offers {
     let lines = sizer.lines();
     let need = |l: &&SizedLine| l.kind == LineKind::Need && l.quantity > 0.0;
@@ -328,7 +382,10 @@ pub fn build(
             continue;
         };
         let rule_lines: Vec<&SizedLine> = lines.iter().filter(|l| l.line.rule == rule).collect();
-        let unit = rule_lines.first().map(|l| l.line.unit.as_str()).unwrap_or("");
+        let unit = rule_lines
+            .first()
+            .map(|l| l.line.unit.as_str())
+            .unwrap_or("");
         let conv = conversion(unit, item);
         let quantity = q.quantity / conv;
         if !(quantity.is_finite() && quantity > 1e-9) {
@@ -357,7 +414,7 @@ pub fn build(
         // Joins.
         let mut joins: Vec<Join> = Vec::new();
         let mut divisible = false;
-        let mut push = |line: &SizedLine, units: f64, joins: &mut Vec<Join>| {
+        let push = |line: &SizedLine, units: f64, joins: &mut Vec<Join>| {
             if !joins.iter().any(|j| j.line_id == line.line.id) && units > 0.0 {
                 joins.push(Join {
                     line_id: line.line.id.clone(),
@@ -392,7 +449,10 @@ pub fn build(
                 };
                 push(l, units, &mut joins);
             }
-            divisible = proportional && day_scaled && !item.free;
+            let class_ok = rule_need
+                .iter()
+                .all(|l| DIVISIBLE_CLASSES.contains(&l.line.item_class.as_str()));
+            divisible = proportional && day_scaled && class_ok && !item.free;
         }
         for l in via_alt {
             // An alternative (reused bottles) counts in the need line's unit.
@@ -419,7 +479,11 @@ pub fn build(
             }
         }
         // 3. Heat and cold by hazard, for thermal items the table does not name.
-        if joins.is_empty() && listed.is_none() && item.buckets.contains(&BucketId::Thermal) {
+        if joins.is_empty()
+            && listed.is_none()
+            && !item.free
+            && item.buckets.contains(&BucketId::Thermal)
+        {
             let class = if item.hazard_extras.iter().any(|h| HEAT.contains(h)) {
                 Some("thermal_heat")
             } else if item.hazard_extras.iter().any(|h| COLD.contains(h)) {
@@ -439,6 +503,36 @@ pub fn build(
             }
         }
 
+        // A set sized by a generic rule buys as many as its lines ask for (two fans, two pairs
+        // of radios), so buying the set meets the line.
+        let mut quantity = quantity;
+        if !divisible {
+            let needed = listed
+                .unwrap_or(&[])
+                .iter()
+                .filter_map(|(key, units)| match units {
+                    Units::Per(u) if *u > 0.0 => Some((key, *u)),
+                    _ => None,
+                })
+                .flat_map(|(key, u)| {
+                    lines
+                        .iter()
+                        .filter(need)
+                        .filter(move |l| line_matches(&l.line.id, key))
+                        .map(move |l| (l.line.id.contains(".person_"), l.quantity / u))
+                })
+                .fold((0.0_f64, 0.0_f64), |(people, most), (per_person, q)| {
+                    if per_person {
+                        (people + q, most)
+                    } else {
+                        (people, most.max(q))
+                    }
+                });
+            let needed = needed.0.max(needed.1);
+            if needed > 0.0 {
+                quantity = needed.ceil();
+            }
+        }
         let mut item = item.clone();
         for j in &joins {
             if !item.buckets.contains(&j.bucket) {
@@ -450,7 +544,8 @@ pub fn build(
                 .iter()
                 .any(|l| l.line.id == j.line_id && l.life_safety)
         });
-        item.life_safety |= life_safety_line;
+        let go_bag = joins.iter().any(|j| j.line_id == "evacuate.go_bag");
+        item.life_safety |= life_safety_line || (go_bag && evacuate_p10 >= GO_BAG_LIFE_SAFETY_P10);
         offered.push(Offered {
             item,
             quantity,
@@ -471,35 +566,12 @@ pub fn build(
 }
 
 /// The allocator's metadata: sets and steps, readiness credits, guardrail roles.
-fn metadata(
-    offered: &[Offered],
-    rule: &PlanCoverage,
-) -> (Vec<ItemMeta>, Vec<ItemId>) {
-    // Readiness checklists: coverable need lines, plus items that name the bucket but meet no
-    // line in it.
-    let mut entries: BTreeMap<BucketId, usize> = BTreeMap::new();
-    for (bucket, _) in READINESS_HARM {
-        let lined: BTreeSet<&str> = offered
-            .iter()
-            .flat_map(|o| o.joins.iter())
-            .filter(|j| j.bucket == bucket)
-            .map(|j| j.line_id.as_str())
-            .map(|id| id.split(".person_").next().unwrap_or(id))
-            .collect();
-        let unlined = offered
-            .iter()
-            .filter(|o| o.item.buckets.contains(&bucket))
-            .filter(|o| !o.joins.iter().any(|j| j.bucket == bucket))
-            .count();
-        entries.insert(bucket, lined.len() + unlined);
-    }
+fn metadata(offered: &[Offered], rule: &PlanCoverage) -> (Vec<ItemMeta>, Vec<ItemId>) {
     let harm_share = |b: BucketId| -> f64 {
-        let total = READINESS_HARM
+        READINESS_HARM
             .iter()
             .find(|(x, _)| *x == b)
-            .map_or(0.0, |(_, h)| *h);
-        let n = entries.get(&b).copied().unwrap_or(0);
-        if n == 0 { 0.0 } else { total / n as f64 }
+            .map_or(0.0, |(_, h)| *h)
     };
 
     let mut meta = Vec::new();
@@ -511,27 +583,31 @@ fn metadata(
         } else {
             m.set_quantity = Some(set_quantity(o.quantity));
         }
-        for (bucket, _) in READINESS_HARM {
-            let share = harm_share(bucket);
-            if share <= 0.0 {
-                continue;
-            }
-            let lined: BTreeSet<&str> = o
-                .joins
+        // Readiness credit: every readiness bucket where the item meets a line; an item that
+        // meets none gets credit for the first readiness bucket its catalogue entry lists, its
+        // main purpose (a tornado shelter spot is security first, not a medical kit).
+        let lined: Vec<BucketId> = READINESS_HARM
+            .iter()
+            .map(|(b, _)| *b)
+            .filter(|b| o.joins.iter().any(|j| j.bucket == *b))
+            .collect();
+        let credited: Vec<BucketId> = if !lined.is_empty() {
+            lined
+        } else {
+            o.item
+                .buckets
                 .iter()
-                .filter(|j| j.bucket == bucket)
-                .map(|j| j.line_id.as_str())
-                .map(|id| id.split(".person_").next().unwrap_or(id))
-                .collect();
-            let n = if lined.is_empty() {
-                usize::from(o.item.buckets.contains(&bucket))
-            } else {
-                lined.len()
-            };
-            if n > 0 {
+                .copied()
+                .find(|b| READINESS_HARM.iter().any(|(x, _)| x == b))
+                .into_iter()
+                .collect()
+        };
+        for bucket in credited {
+            let share = harm_share(bucket);
+            if share > 0.0 {
                 m.readiness.push(ReadinessCredit {
                     bucket,
-                    harm_day_equivalents: share * n as f64,
+                    harm_day_equivalents: share,
                 });
             }
         }
@@ -560,26 +636,32 @@ fn metadata(
 /// A set's size in whole units (a set is bought at once).
 fn set_quantity(q: f64) -> f64 {
     let r = q.round();
-    if (q - r).abs() < 1e-6 { r.max(1.0) } else { q.ceil().max(1.0) }
+    if (q - r).abs() < 1e-6 {
+        r.max(1.0)
+    } else {
+        q.ceil().max(1.0)
+    }
 }
 
-/// One segment of a part: a need line and the items that meet it.
+/// One segment of a part: a need line (or a stretch of one) and the items that meet it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Segment {
     /// The line's id.
     pub line_id: String,
     /// Days of the bucket this segment stands for when fully met.
     pub span: f64,
-    /// The line's quantity.
+    /// The quantity that meets the segment, in line units.
     pub requirement: f64,
     /// Line units per item unit, per item.
     pub contrib: BTreeMap<ItemId, f64>,
+    /// Whatever the segment before holds beyond its own requirement counts here too (food the
+    /// household normally eats also covers the days after the first month).
+    pub takes_overflow: bool,
 }
 
 impl Segment {
-    fn days(&self, qty: &dyn Fn(&ItemId) -> f64) -> f64 {
-        let have: f64 = self.contrib.iter().map(|(id, u)| qty(id) * u).sum();
-        self.span * (have / self.requirement).clamp(0.0, 1.0)
+    fn have(&self, qty: &dyn Fn(&ItemId) -> f64) -> f64 {
+        self.contrib.iter().map(|(id, u)| qty(id) * u).sum::<f64>()
     }
 }
 
@@ -594,7 +676,19 @@ pub struct Part {
 
 impl Part {
     fn days(&self, qty: &dyn Fn(&ItemId) -> f64) -> f64 {
-        self.segments.iter().map(|s| s.days(qty)).sum::<f64>() + 0.0
+        let mut total = 0.0;
+        let mut overflow = 0.0;
+        for s in &self.segments {
+            let mut have = s.have(qty);
+            if s.takes_overflow {
+                have += overflow;
+            }
+            if s.requirement > 0.0 {
+                total += s.span * (have / s.requirement).clamp(0.0, 1.0);
+            }
+            overflow = (have - s.requirement).max(0.0);
+        }
+        total + 0.0
     }
 }
 
@@ -652,6 +746,7 @@ impl PlanCoverage {
                         span: stored_days,
                         requirement: s.quantity,
                         contrib: contrib_for(s),
+                        takes_overflow: false,
                     }];
                     used.insert(s.line.id.as_str());
                     if let Some(t) = treated {
@@ -660,6 +755,7 @@ impl PlanCoverage {
                             span: (target - stored_days).max(0.0),
                             requirement: t.quantity,
                             contrib: contrib_for(t),
+                            takes_overflow: false,
                         });
                         used.insert(t.line.id.as_str());
                     }
@@ -675,9 +771,50 @@ impl PlanCoverage {
                     });
                 }
             }
+            // Food: what the household normally eats covers the first month; bulk staples only
+            // the days after it.
+            if bucket == BucketId::Supplies {
+                if let Some(food) = coverable.iter().find(|l| l.line.rule == "food_kcal") {
+                    let all = contrib_for(food);
+                    let (tail, first): (BTreeMap<ItemId, f64>, BTreeMap<ItemId, f64>) = all
+                        .into_iter()
+                        .partition(|(id, _)| LONG_STORE_FOOD.contains(&id.as_str()));
+                    let per_day = food.per_day.unwrap_or(food.quantity / target.max(1.0));
+                    let head_days = target.min(FIRST_MONTH_DAYS);
+                    let mut segments = vec![Segment {
+                        line_id: food.line.id.clone(),
+                        span: head_days,
+                        requirement: per_day * head_days,
+                        contrib: first.clone(),
+                        takes_overflow: false,
+                    }];
+                    if target > FIRST_MONTH_DAYS {
+                        let mut both = first;
+                        both.extend(tail);
+                        // The head's items already count toward the head; only their excess
+                        // (the overflow) and the staples count here.
+                        both.retain(|id, _| LONG_STORE_FOOD.contains(&id.as_str()));
+                        segments.push(Segment {
+                            line_id: food.line.id.clone(),
+                            span: target - FIRST_MONTH_DAYS,
+                            requirement: per_day * (target - FIRST_MONTH_DAYS),
+                            contrib: both,
+                            takes_overflow: true,
+                        });
+                    }
+                    used.insert(food.line.id.as_str());
+                    parts.push(Part {
+                        name: part_name(bucket, "food"),
+                        segments,
+                    });
+                }
+            }
             // Everything else, grouped by kind of cover, in line order.
             let mut groups: Vec<(String, Vec<&SizedLine>)> = Vec::new();
-            for l in coverable.iter().filter(|l| !used.contains(l.line.id.as_str())) {
+            for l in coverable
+                .iter()
+                .filter(|l| !used.contains(l.line.id.as_str()))
+            {
                 let name = part_name(bucket, &l.line.item_class);
                 match groups.iter_mut().find(|(n, _)| *n == name) {
                     Some((_, v)) => v.push(l),
@@ -695,6 +832,7 @@ impl PlanCoverage {
                             span: target / n,
                             requirement: l.quantity,
                             contrib: contrib_for(l),
+                            takes_overflow: false,
                         })
                         .collect(),
                 });
@@ -719,6 +857,12 @@ impl PlanCoverage {
             .get(&bucket)
             .map(|(_, p)| p.as_slice())
             .unwrap_or(&[])
+    }
+
+    /// Days one part of a bucket covers with these items (0 for an unknown part).
+    pub fn part_days(&self, bucket: BucketId, part: &str, items: &[(ItemId, f64)]) -> f64 {
+        let qty = lookup(items);
+        self.part(bucket, part).map_or(0.0, |p| p.days(&qty))
     }
 
     fn part(&self, bucket: BucketId, part: &str) -> Option<&Part> {

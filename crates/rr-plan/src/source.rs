@@ -100,8 +100,8 @@ const FIXTURE_BASE_RATES: &str = include_str!("../../rr-hazards/tests/data/base_
 
 /// The note every fixture location carries, so no screen or packet mistakes test data for the
 /// national data pack.
-pub const FIXTURE_DATA_NOTE: &str = "Test data: the engine is running on seven hand-built \
-    sample counties, not the national data pack. Hazards describe your whole county.";
+pub const FIXTURE_DATA_NOTE: &str = "The engine is running on seven hand-built sample \
+    counties, not the national data pack. Hazards describe your whole county.";
 
 /// When the fixture data was assembled (the retrieval date of the research inputs it copies).
 const FIXTURE_ACCESSED: Date = match Date::from_ymd(2026, 9, 25) {
@@ -140,7 +140,9 @@ impl FixtureSource {
                 )
             })?;
             if let Some(zip) = f.location.zip.take() {
-                zips.entry(zip).or_default().push((f.county.fips.clone(), 1.0));
+                zips.entry(zip)
+                    .or_default()
+                    .push((f.county.fips.clone(), 1.0));
             }
             f.location.zip_county_share = None;
             counties.insert(f.county.fips.clone(), f);
@@ -250,7 +252,8 @@ fn fixture_attributions() -> Vec<Attribution> {
         out.push(Attribution {
             source: "FEMA National Risk Index".to_owned(),
             text,
-            url: "https://www.fema.gov/about/openfema/data-sets/national-risk-index-data".to_owned(),
+            url: "https://www.fema.gov/about/openfema/data-sets/national-risk-index-data"
+                .to_owned(),
             version: Some("1.20.0 (December 2025)".to_owned()),
             accessed: FIXTURE_ACCESSED,
         });

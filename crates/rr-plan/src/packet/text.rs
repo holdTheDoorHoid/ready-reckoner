@@ -10,7 +10,10 @@ use rr_types::{AgeBand, Date, PlanInput};
 pub fn md(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     for c in text.chars() {
-        if matches!(c, '\\' | '*' | '_' | '`' | '[' | ']' | '|' | '<' | '>' | '#') {
+        if matches!(
+            c,
+            '\\' | '*' | '_' | '`' | '[' | ']' | '|' | '<' | '>' | '#'
+        ) {
             out.push('\\');
         }
         out.push(c);
@@ -117,11 +120,7 @@ fn plural(unit: &str, qty: f64) -> String {
     if n >= 2 && bytes[n - 1] == b'y' && !b"aeiou".contains(&bytes[n - 2]) {
         return format!("{}ies", &unit[..n - 1]);
     }
-    if unit.ends_with('s')
-        || unit.ends_with('x')
-        || unit.ends_with("ch")
-        || unit.ends_with("sh")
-    {
+    if unit.ends_with('s') || unit.ends_with('x') || unit.ends_with("ch") || unit.ends_with("sh") {
         return format!("{unit}es");
     }
     format!("{unit}s")
@@ -157,7 +156,11 @@ pub fn day_phrase(d: f64) -> String {
         return "half a day".to_owned();
     }
     let (n, unit) = unit_of(d);
-    format!("{} {unit}{}", n_text(n), if (n - 1.0).abs() < 1e-9 { "" } else { "s" })
+    format!(
+        "{} {unit}{}",
+        n_text(n),
+        if (n - 1.0).abs() < 1e-9 { "" } else { "s" }
+    )
 }
 
 fn unit_of(d: f64) -> (f64, &'static str) {
@@ -247,7 +250,11 @@ pub fn notice_range(low_hours: f64, high_hours: f64) -> String {
             format!("{} minute{}", m as i64, if m == 1.0 { "" } else { "s" })
         } else if h < 48.0 {
             let r = (h * 10.0).round() / 10.0;
-            format!("{} hour{}", n_text(r), if (r - 1.0).abs() < 1e-9 { "" } else { "s" })
+            format!(
+                "{} hour{}",
+                n_text(r),
+                if (r - 1.0).abs() < 1e-9 { "" } else { "s" }
+            )
         } else {
             let d = (h / 24.0).round();
             format!("{} day{}", d as i64, if d == 1.0 { "" } else { "s" })
@@ -355,15 +362,6 @@ pub fn join_and(parts: &[String]) -> String {
     }
 }
 
-/// Capitalises the first letter.
-pub fn upper_first(s: &str) -> String {
-    let mut c = s.chars();
-    match c.next() {
-        Some(f) => f.to_uppercase().chain(c).collect(),
-        None => String::new(),
-    }
-}
-
 /// Lower-cases the first letter (for names used mid-sentence), unless the second letter is also
 /// upper case (an acronym such as "NOAA").
 pub fn lower_first(s: &str) -> String {
@@ -391,7 +389,10 @@ mod tests {
         assert_eq!(day_phrase(90.0), "3 months");
         assert_eq!(day_phrase(365.0), "1 year");
         assert_eq!(target_days(3.0, 2.0, 5.0), "about 3 days (2–5)");
-        assert_eq!(target_days(14.0, 10.0, 30.0), "about 2 weeks (10 days to 1 month)");
+        assert_eq!(
+            target_days(14.0, 10.0, 30.0),
+            "about 2 weeks (10 days to 1 month)"
+        );
         assert_eq!(target_days(5.0, 5.0, 10.0), "about 5 days (up to 10 days)");
         assert_eq!(band(29.0, 45.0), "$29–45");
         assert_eq!(band(0.0, 0.0), "free");
@@ -405,7 +406,10 @@ mod tests {
         assert_eq!(per_100(0.99), "almost all");
         assert_eq!(notice_range(0.25, 12.0), "15 minutes to 12 hours");
         assert_eq!(md("a|b*c"), "a\\|b\\*c");
-        assert_eq!(date(Date::from_ymd(2026, 10, 1).unwrap()), "October 1, 2026");
+        assert_eq!(
+            date(Date::from_ymd(2026, 10, 1).unwrap()),
+            "October 1, 2026"
+        );
         assert_eq!(lower_first("NOAA radio"), "NOAA radio");
         assert_eq!(lower_first("Stored water"), "stored water");
     }
