@@ -17,7 +17,10 @@ on GitHub Pages. No server, no accounts, no analytics.
 1. **Deterministic engine.** Same inputs, same outputs, byte for byte. No wall clock inside the engine
    (the planning date is an input). No OS entropy and no `rand` crate (`getrandom` breaks wasm32); if
    you ever need randomness, use the seeded generator in `rr-types`. Everything under `crates/` except
-   `rr-cli` and `rr-etl` must compile for `wasm32-unknown-unknown`.
+   `rr-cli` and `rr-etl` must compile for `wasm32-unknown-unknown`. **Transcendental math goes through
+   `rr_types::math` (`exp`, `ln`, `pow`, `norm_cdf`, pure-Rust libm)**, never `f64::exp`/`ln`/`powf`:
+   the browser and glibc round differently and CLI goldens would drift from browser output.
+   `clippy.toml` rejects the std methods.
 2. **Every number carries a citation.** A quantity, rate, price band or duration that reaches the user
    has a `CitationId` resolving to `content/citations.toml`, or it does not ship. Expert priors are
    allowed but are tagged `Prior` and rendered as such.

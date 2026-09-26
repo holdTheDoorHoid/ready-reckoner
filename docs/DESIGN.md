@@ -580,6 +580,17 @@ guidance beyond safe storage and training pointers.
 ## 14. Decision log (append only)
 
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
+- 2026-09-25 — `rr-types` merged (agent/types 7cf13e0). Decisions made there: deterministic
+  transcendental math via `rr_types::math` on pure-Rust `libm` (browser and glibc round `exp`/`ln`
+  differently; `clippy.toml` now forbids the std methods in the workspace); z₀.₉ = 1.2815515655446004;
+  type names `SavingsEnvelope`, `DataConfidence`, `HouseholdMobility` (JSON unchanged); optional
+  additions `Owned.paid_usd`, `Citation.prior`, `Item.{retrieved, life_safety, rare_catastrophic}`, name
+  tables in `Catalogue`, `TARGET_LADDER_DAYS`; `bad_input` details carry `problems[]`; county wins when
+  both ZIP and county are given (how the UI records an `ambiguous_zip` pick); plan months count from 0 and
+  the one-off budget lands in month 0; `home_loss` has a readiness target; `EngineInfo.attributions` is
+  required so every engine carries the FEMA disclaimer; horizon 1–50 years; `income.earners` must equal
+  the people marked earners. Confirmed: `OutageStats.p_ge_Nd` is the share of outages lasting ≥ N days
+  (conditional on an outage), and `get_home` distance comes from the commute input.
 - 2026-09-25 — Supply-standards research folded in: constants registry with sources and disagreement notes (`docs/research/supply-standards.md` §13–§14); water 1 gal/person-day basic (¾ drinking), survival ≈ 3 L, comfortable 15 L, heat ×1.75–2; food in kcal by DGA age band with cost per person-day (pantry $8.44 USDA TFP Aug 2026; staples $2.15–2.85; freeze-dried $9–39 per 2,000 kcal); medication reserve 14 days (7–30); **antibiotics quantity 0 with a clinician card**; one-month tier is an interpolation.
 - 2026-09-25 — Risk-model research folded into §4: 14 buckets in three kinds (duration / readiness / money), water split into boil vs no-water, `supplies` replaces shelter_in_place + supply_chain, `get_home` and `medical_emergency` as readiness buckets; return-period dial (default one-in-100) with named-scenario toggles and the cliff rule; ranges and the day ladder; savings track for income; rare-catastrophic box and budget cap; harm weights; allocator promotion and sinking fund. `CountyRecord`, `BaseRate`, `HouseholdEventRate` added to the shared types as the data contract.
 - 2026-09-25 — Data-source research folded into §6: NRI terms and v1.20 semantics, 5 MB core budget, ZIP ambiguity rule (`ambiguous_zip`), Connecticut crosswalk, no runtime federal calls, `EngineInfo.attributions`.
