@@ -188,13 +188,21 @@ impl Crosswalk {
         acc
     }
 
-    /// Replace old-county keys in a per-county map by region keys using [`Self::intensive`].
-    /// Non-Connecticut keys pass through unchanged; region keys already present win.
+    /// Replace old-county keys in a per-county map by region keys using [`Self::intensive`],
+    /// and give each successor of a retired county code ([`RETIRED`]) the retired code's value.
+    /// Other keys pass through unchanged; keys already present win.
     pub fn apply_intensive(&self, values: BTreeMap<String, f64>) -> BTreeMap<String, f64> {
         let (old, mut rest): (BTreeMap<_, _>, BTreeMap<_, _>) =
             values.into_iter().partition(|(k, _)| is_old_ct(k));
         for (k, v) in self.intensive(&old) {
             rest.entry(k).or_insert(v);
+        }
+        for (retired, new) in RETIRED {
+            if let Some(v) = rest.remove(*retired) {
+                for n in *new {
+                    rest.entry(n.to_string()).or_insert(v);
+                }
+            }
         }
         rest
     }
@@ -250,5 +258,17 @@ mod tests {
         assert_eq!(out.get("42101"), Some(&5.0));
         assert_eq!(out.get("09110"), Some(&2.0));
         assert!(!out.contains_key("09003"));
+    }
+
+    #[test]
+    fn apply_carries_retired_codes_to_successors() {
+        let cw = toy();
+        let mut v = BTreeMap::new();
+        v.insert("02261".to_string(), 3.0); // Valdez-Cordova, split in 2019
+        v.insert("02066".to_string(), 4.0); // a successor with its own value keeps it
+        let out = cw.apply_intensive(v);
+        assert_eq!(out.get("02063"), Some(&3.0));
+        assert_eq!(out.get("02066"), Some(&4.0));
+        assert!(!out.contains_key("02261"));
     }
 }

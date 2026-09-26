@@ -825,6 +825,10 @@ impl DataStore {
     }
 
     /// The record for a county (five-digit FIPS), if `counties.csv` is loaded and it exists.
+    ///
+    /// `climate` holds every column of `climate.csv` by its header name: ratios to today (central
+    /// and `_high`) and CMRA day counts (`*_hist`, `*_2050`, `*_2050_high`, which are counts, not
+    /// multipliers). See `docs/DATA_SOURCES.md`.
     pub fn county(&self, fips: &str) -> Option<&CountyRecord> {
         self.counties.get(fips)
     }

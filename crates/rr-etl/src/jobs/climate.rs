@@ -448,7 +448,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
 
     out.missing = missing_groups(&counties, &covered, |c| {
         if super::is_outside_conus(&c.state_abbr) {
-            "The NCA5 Atlas, LOCA2 and CMRA county projections cover the contiguous US only"
+            "CMRA publishes no values for this county, and the NCA5 Atlas and LOCA2 cover the contiguous US only"
                 .to_string()
         } else {
             "No county projection values".to_string()
@@ -502,7 +502,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         "days_over_90f_hist".into(),
         "County count, days a year with a high above 90 °F: CMRA HISTORIC_MEAN_TMAX90F (1976-2005 ensemble mean).".into(),
     );
-    out.notes.push("All values are projections, not observations. Ratio columns multiply today's frequency: the central Atlas column is a world 2 °C warmer than pre-industrial and `_high` 3 °C; the central CMRA column is the RCP4.5 mid-century ensemble mean and `_high` RCP8.5. Count columns are CMRA county values in days a year (historical 1976-2005 is itself modelled). The Atlas 1.5 °C layer is read but not written (nothing uses it). Connecticut values are land-area-weighted averages of the old counties' values.".into());
+    out.notes.push("All values are projections, not observations. Ratio columns multiply today's frequency: the central Atlas column is a world 2 °C warmer than pre-industrial and `_high` 3 °C; the central CMRA column is the RCP4.5 mid-century ensemble mean and `_high` RCP8.5. Count columns are CMRA county values in days a year (historical 1976-2005 is itself modelled). The Atlas 1.5 °C layer is read but not written (nothing uses it). Connecticut values are land-area-weighted averages of the old counties' values; counties created since the source's county list (Chugach and Copper River, Alaska) take the value of the county they were split from. Coverage: the NCA5 Atlas and LOCA2 columns cover the contiguous US; CMRA covers every state and island area but publishes no RCP4.5 values for Alaska, so Alaska rows have only the `_high` (RCP8.5) CMRA ratios and counts.".into());
     out.notes.push("No fire-weather index is published at county level by these sources; consecutive dry days, dry days and hot days are the closest proxies for wildfire weather.".into());
     let accessed = crate::timefmt::today_utc();
     out.attributions.push(Attribution {
