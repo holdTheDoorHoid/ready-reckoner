@@ -425,9 +425,11 @@ pub(crate) const DUST_FOOTPRINT: Triple = (0.3, 0.1, 0.6);
 /// confidence): yearly chance that a sinkhole or ground collapse damages a home on karst ground.
 pub(crate) const SINKHOLE_ON_KARST: Triple = (2.0e-4, 5.0e-5, 1.0e-3);
 
-/// PRIOR (hazard-expansion H-05; ASDSO counts 173 failures and 587 incidents in 2005 to mid-2013,
-/// about 2 in 10,000 failures per dam a year across every class): failures, or incidents that
-/// force an evacuation (Oroville 2017), per high-hazard dam a year.
+/// PRIOR (hazard-expansion H-05): failures, or incidents that force an evacuation (Oroville 2017),
+/// per high-hazard dam a year. For scale: state dam safety programs reported 173 failures and 587
+/// incidents from January 2005 through June 2013 (ASDSO, whose page gives no dam count); over the
+/// more than 90,000 dams in the National Inventory of Dams that is 173 ÷ 8.5 years ÷ 90,000, about
+/// 2 in 10,000 failures per dam a year across every hazard class.
 pub(crate) const DAM_EVENT_PER_DAM: Triple = (1.0e-4, 3.0e-5, 5.0e-4);
 /// PRIOR (H-05): share of a ZIP code's households told to leave when a dam whose listed
 /// downstream town lies in it fails or threatens to.
@@ -489,9 +491,14 @@ pub(crate) const EVICTION_SAVINGS: Triple = (0.5, 0.3, 0.8);
 /// Months of savings from which [`EVICTION_SAVINGS`] applies.
 pub(crate) const EVICTION_SAVINGS_MONTHS: f32 = 3.0;
 
-/// PRIOR (CSIS terrorism dataset 1994–2025; hazard-expansion B3): attacks or credible threats a
-/// year that put a metro area under an order covering 100,000 people or more for 12 hours or
-/// more (Oklahoma City 1995, 11 September 2001, the anthrax letters of 2001, Boston 2013).
+/// PRIOR (hazard-expansion B3): attacks or credible threats a year that put a metro area under an
+/// order covering 100,000 people or more for 12 hours or more. Oklahoma City 1995, 11 September
+/// 2001, the anthrax letters of 2001 and Boston 2013 come close to that rule: three or four in the
+/// 30.3 years the CSIS dataset covers (1 January 1994 to 30 April 2024; 725 attacks and plots),
+/// 0.10–0.13 a year. The middle stays 0.1: the corrected window moves that count's rate by 2 %
+/// (over the 31 years first assumed it was 0.097–0.129), less than the rounding of a one-figure
+/// prior. The count of closures is this crate's reading of those events; CSIS does not count
+/// closures.
 pub(crate) const ATTACK_US: Triple = (0.1, 0.04, 0.25);
 /// PRIOR (B3): share of the metro area's households under the order.
 pub(crate) const ATTACK_METRO_SHARE: Triple = (0.3, 0.1, 0.8);
@@ -582,8 +589,13 @@ pub(crate) const NUCLEAR_LIMITED_US: Triple = (1.0e-4, 2.0e-5, 5.0e-4);
 /// PRIOR (B1.3): a crude nuclear device in a US city: FRI's non-state acquisition forecasts
 /// (0.05–0.17 % a year) × 0.3 detonated × 0.25 in a US city; the low end respects 80 years of none.
 pub(crate) const NUCLEAR_IND_US: Triple = (5.0e-5, 1.0e-6, 5.0e-4);
-/// PRIOR (B1.3): a nuclear weapon used anywhere in the world (XPT 0.48–0.54 %, FRI 0.11–0.55 %,
-/// Good Judgment 0.40 %, Rethink Priorities about 1.1 %, the 80-year record 0.62 % a year).
+/// PRIOR (B1.3): a nuclear weapon used anywhere in the world, a year. The published forecasts,
+/// per year: XPT 0.48–0.60 % (question 31, use killing more than 1,000 by the end of 2030:
+/// superforecasters' median 4 %, experts' 5 %, over the 8.5 years from the tournament), FRI
+/// 0.11–0.55 %, Good Judgment 0.40 %, Rethink Priorities about 1.1 %, the 80-year record 0.62 %.
+/// The middle, 0.5 %, is the XPT superforecasters' median (0.48 %); the XPT experts' median
+/// (0.60 %) lies inside the range. The ends are not XPT's: the low end is FRI's superforecasters
+/// (about 0.1 %), and the high end, 1.5 %, sits above Rethink Priorities' 1.1 %.
 pub(crate) const NUCLEAR_USE_WORLD: Triple = (5.0e-3, 1.0e-3, 1.5e-2);
 /// PRIOR (B2): chance a large attack includes a high-altitude burst (EMP).
 pub(crate) const HEMP_GIVEN_STRATEGIC: Triple = (0.5, 0.2, 0.8);
@@ -602,9 +614,13 @@ pub(crate) const IND_METRO_HOUSEHOLD_SHARE: f64 = 0.1;
 /// known; its range runs from class E's low to class A's high.
 pub(crate) const STRATEGIC_FACTOR_UNKNOWN: Triple = (0.314, 0.01, 0.99);
 
-/// PRIOR (B2): a Carrington-class geomagnetic storm, a year: the geometric middle of five
-/// published estimates (Riley 2012 about 1.3 %, Love about 1.1 %, Riley and Love 2017 0.3–1.1 %,
-/// Moriña 2019 0.05–0.19 %, Lloyd's 2013 about 0.7 %).
+/// PRIOR (B2): a Carrington-class geomagnetic storm, a year. The low end, 5 in 10,000, is Moriña
+/// et al.'s (2019) lower bound, 0.46 % a decade. The high end, 1.3 in 100, is Riley's (2012)
+/// estimate of about 12 % a decade as Moriña et al. report it, just above Love et al.'s (2015)
+/// 1.13 storms a century (about 1.1 % a year; 95 % interval 0.42–2.41). The middle is the
+/// geometric middle of the two ends (2.5 in 1,000, rounded to 3). Lloyd's (2013) return period of
+/// about 150 years (0.67 % a year) and Moriña's central 0.92 % a decade (0.09 % a year) fall
+/// inside the range.
 pub(crate) const CARRINGTON_STORM: Triple = (3.0e-3, 5.0e-4, 1.3e-2);
 /// PRIOR (Lloyd's 2013: 20–40 million people at risk of a long outage out of about 330 million):
 /// chance that such a storm cuts a household's power for days, at the population-average
@@ -637,8 +653,10 @@ pub(crate) const WAR_HOMELAND_ATTACKED: Triple = (0.5, 0.2, 0.8);
 /// and E), relative to near them.
 pub(crate) const WAR_FAR_FROM_TARGETS: f64 = 0.3;
 
-/// PRIOR (B4; START POICN counts 517 CBRN events worldwide in 1990–2017, about 76 % chemical):
-/// chemical, biological or radiological attacks a year that disrupt daily life in a US metro.
+/// PRIOR (B4): chemical, biological or radiological attacks a year that disrupt daily life in a US
+/// metro. For context, START's POICN database counts 517 CBRN events worldwide in 1990–2016
+/// (attacks, failed attempts and plots). That count is not the rate's arithmetic, so its corrected
+/// window (27 years, not the 28 first assumed) leaves the rate as it was.
 pub(crate) const CBRN_US: Triple = (0.03, 0.01, 0.1);
 /// PRIOR (B4): share of the metro area's households under an order (buildings and blocks, not
 /// the whole metro, as with the anthrax letters).
@@ -671,15 +689,21 @@ pub(crate) const MASS_VIOLENCE_PER_PERSON: Triple = (3.0e-7, 1.0e-7, 1.0e-6);
 // Named scenarios added in v0.2.0 (REVIEW H10; hazard-expansion H-13).
 // ---------------------------------------------------------------------------------------------
 
-/// DATA (Working Group on Utah Earthquake Probabilities 2016; confirm): 43 % chance of a
-/// magnitude 6.75 or larger earthquake on the Wasatch Front in 50 years. Low and high are PRIOR.
+/// DATA (Working Group on Utah Earthquake Probabilities 2016, as the Utah Geological Survey
+/// summarises it): 43 % chance of one or more magnitude 6.75 or larger earthquakes in the Wasatch
+/// Front region in 50 years, on any of its faults (18 % on the Wasatch fault zone alone). Low and
+/// high are PRIOR.
 pub(crate) const WASATCH_50YR: Triple = (0.43, 0.30, 0.57);
 /// DATA (UCERF3, USGS Fact Sheet 2015–3009; confirm): 19 % chance of magnitude 6.7 or larger on
 /// the southern San Andreas fault in 30 years. Low and high are PRIOR.
 pub(crate) const SAN_ANDREAS_SOUTH_30YR: Triple = (0.19, 0.12, 0.28);
-/// DATA (USGS and Washington DNR on the Seattle fault zone; confirm): about 5 % chance of a
-/// magnitude 6.5 or larger earthquake on the Seattle fault in 50 years. Low and high are PRIOR.
-pub(crate) const SEATTLE_FAULT_50YR: Triple = (0.05, 0.02, 0.10);
+/// DATA (USGS Fact Sheet 2025-3050): 17 % chance of a magnitude 6.5 or larger earthquake on a
+/// crustal (shallow) fault anywhere in the Puget Sound region in 50 years, the region's faults
+/// taken together (about one every 265 years); the Seattle fault is one of them. No readable
+/// source gives the Seattle fault's own chance, so the Seattle fault scenario uses this regional
+/// figure and says so. Low and high are PRIOR; the high end allows for USGS's caution that 17 %
+/// may be an underestimate, since the region's faults are not all mapped.
+pub(crate) const PUGET_SOUND_CRUSTAL_50YR: Triple = (0.17, 0.10, 0.30);
 /// Days a year over 95 °F (CMRA historical baseline) from which a county counts as a desert
 /// heat county for the heat-and-blackout scenario (Maricopa about 140, Clark about 125).
 pub(crate) const DESERT_HEAT_DAYS_95F: f64 = 60.0;

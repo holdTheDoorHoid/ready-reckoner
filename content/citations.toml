@@ -3407,6 +3407,18 @@ url = "https://www.scientificamerican.com/article/who-would-take-the-brunt-of-an
 retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
+# Added 2026-09-26 (hazards2c): the federally hosted copy of NAPB-90, at the National Technical
+# Information Service (U.S. Department of Commerce). How it was read: docs/CITATION_IDS.md.
+[[citation]]
+id = "fema_napb90"
+title = "Nuclear Attack Planning Base - 1990 (NAPB-90): Final Project Report"
+publisher = "FEMA (via the NTIS National Technical Reports Library, PB87-204624)"
+year = 1987
+url = "https://ntrl.ntis.gov/NTRL/dashboard/searchResults/titleDetail/PB87204624.xhtml"
+retrieved = "2026-09-26"
+quote = "To determine risk levels for U.S. counties, NAPB-90 employed the combined results of 12 \"most-likely\" wind patterns--one such pattern for each month of the year--and used the highest resulting radiation effect in each county as its potential risk level."
+license = "US Government Work (public domain)"
+
 [[citation]]
 id = "igrf14_coefficients"
 title = "International Geomagnetic Reference Field, 14th generation (IGRF-14): coefficients"

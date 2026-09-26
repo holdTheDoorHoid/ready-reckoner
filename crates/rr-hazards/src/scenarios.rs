@@ -561,7 +561,7 @@ const SAN_ANDREAS_SOUTH: &[&str] = &[
     "06111", // Ventura
 ];
 
-/// Counties on or next to the Seattle fault zone.
+/// Counties on or next to the Seattle fault zone, in the central Puget Sound region.
 const SEATTLE_FAULT: &[&str] = &[
     "53033", // King
     "53035", // Kitsap
@@ -732,7 +732,9 @@ pub(crate) fn detect(ctx: &Ctx<'_>, natural: &Natural, notes: &mut Notes) -> Vec
         ));
     }
     if SEATTLE_FAULT.contains(&fips) {
-        let (p, lo, hi) = SEATTLE_FAULT_50YR;
+        // The only citable chance is the regional one (USGS Fact Sheet 2025-3050): any magnitude
+        // 6.5+ earthquake on a shallow fault in the Puget Sound region, the Seattle fault included.
+        let (p, lo, hi) = PUGET_SOUND_CRUSTAL_50YR;
         let today = Estimate::data(
             rate_from_chance(p, 50.0),
             rate_from_chance(lo, 50.0),
@@ -744,9 +746,10 @@ pub(crate) fn detect(ctx: &Ctx<'_>, natural: &Natural, notes: &mut Notes) -> Vec
             "seattle_fault_m7",
             "Magnitude 7 Seattle fault earthquake",
             today,
-            "is on the Seattle fault zone, which last broke about 1,100 years ago. Scientists put \
-             the chance of a magnitude 6.5 or larger earthquake on it at about 5 in 100 over the \
-             next 50 years.",
+            "is in the Puget Sound region, where the Seattle fault last broke about 1,100 years \
+             ago. The USGS puts the chance of a magnitude 6.5 or larger earthquake on a shallow \
+             fault somewhere in the region, the Seattle fault or another, at about 17 in 100 over \
+             the next 50 years.",
             Some((
                 "Washington asks every household to be two weeks ready, so the plan includes it.",
                 cite::WA_TWO_WEEKS,
@@ -852,10 +855,12 @@ mod tests {
     #[test]
     fn the_new_scenarios_published_chances() {
         // Wasatch: 43 % in 50 years -> 1.12 % a year; southern San Andreas: 19 % in 30 years ->
-        // 0.70 % a year; Seattle fault: 5 % in 50 years -> 0.10 % a year.
+        // 0.70 % a year; Puget Sound shallow faults (the Seattle fault scenario): 17 % in 50 years
+        // -> 0.37 % a year, close to USGS's one in 265 years.
         assert!((rate_from_chance(0.43, 50.0) - 0.011_242).abs() < 1e-6);
         assert!((rate_from_chance(0.19, 30.0) - 0.007_024).abs() < 1e-6);
-        assert!((rate_from_chance(0.05, 50.0) - 0.001_026).abs() < 1e-6);
+        assert!((rate_from_chance(0.17, 50.0) - 0.003_727).abs() < 1e-6);
+        assert!((rate_from_chance(0.17, 50.0) - 1.0 / 265.0).abs() < 1e-4);
     }
 
     #[test]

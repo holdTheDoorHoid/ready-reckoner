@@ -137,18 +137,18 @@ pub const USGS_BAY_AREA_2016: &str = "usgs_bay_area_outlook_2016";
 
 // ---------------------------------------------------------------------------------------------
 // Contract v2 (v0.2.0): the data pack's exposure columns, the new ranked hazards, the rare
-// families and the new scenarios. Ids not yet in `content/citations.toml` are requested in
-// `docs/CITATION_IDS.md` ("Requested by hazards for v0.2.0").
+// families and the new scenarios. Requested in `docs/CITATION_IDS.md` ("Requested by hazards for
+// v0.2.0"); every one is in `content/citations.toml` since the v0.2.0 content merge and the
+// reconciliation of 2026-09-26, which dropped the ids no allowed copy could be found for.
 // ---------------------------------------------------------------------------------------------
 
 /// Ready Reckoner's strategic-site table (`data/core/strategic_sites.toml`): the class rules,
 /// every site with one public source, the metros, ports and refineries (compiled 2026-09-26).
 pub const STRATEGIC_SITES: &str = "rr_strategic_sites";
-/// FEMA, *Protection in the Nuclear Age* (1985): a place designated a risk area "does not mean
-/// that it will be attacked"; the public precedent for the "Why here" sentence.
-pub const FEMA_PNA_1985: &str = "fema_protection_nuclear_age_1985";
-/// FEMA, Nuclear Attack Planning Base 1990 (1987, released 2005): county blast and fallout
-/// classes, the method precedent.
+/// FEMA, *Nuclear Attack Planning Base - 1990* (NAPB-90), final project report (April 1987), as
+/// the National Technical Information Service serves it (PB87-204624): risk levels for every US
+/// county from blast and from fallout, the method precedent for the classes. It "merely
+/// identifies areas and populations which are at potential risk" (p. 2).
 pub const FEMA_NAPB90: &str = "fema_napb90";
 /// Philippe (2023), Scientific American and Princeton's *The Missiles on our Land*: fallout from
 /// an attack on the missile silos, the calibration of the downwind class.
@@ -171,8 +171,8 @@ pub const USGS_KARST: &str = "usgs_karst_2014";
 pub const USACE_NID: &str = "usace_nid";
 /// USACE National Levee Database: people behind levees and USACE's levee risk rating.
 pub const USACE_NLD: &str = "usace_nld";
-/// Association of State Dam Safety Officials: estimated rates of dam failure (173 failures and
-/// 587 incidents, 2005 to mid-2013).
+/// Association of State Dam Safety Officials, Dam Failures and Incidents: state dam safety
+/// programs reported 173 failures and 587 incidents from January 2005 through June 2013.
 pub const ASDSO: &str = "asdso_dam_failures";
 /// Eviction Lab (Princeton): eviction filings and judgments by county (ODC-BY).
 pub const EVICTION_LAB: &str = "eviction_lab_county_estimates";
@@ -189,15 +189,18 @@ pub const OPENFDA_SHORTAGES: &str = "openfda_drug_shortages";
 pub const CRS_FUNDING_GAPS: &str = "crs_rs20348_funding_gaps";
 /// Reporting on the November 2025 lapse in SNAP benefits during the 43-day shutdown.
 pub const SNAP_LAPSE_2025: &str = "snap_lapse_2025";
-/// CSIS, the US terrorism dataset (attacks and plots, 1994–2025).
+/// CSIS, methodology of its US terrorism dataset (October 2024): 725 attacks and plots from
+/// 1 January 1994 to 30 April 2024.
 pub const CSIS_TERRORISM: &str = "csis_terrorism_2025";
 /// FBI, Crime in the United States: arrests by age and sex (Crime Data Explorer).
 pub const FBI_ARRESTS: &str = "fbi_cde_arrests";
 /// FBI, Active Shooter Incidents in the United States in 2024.
 pub const FBI_ACTIVE_SHOOTER: &str = "fbi_active_shooter_2024";
-/// START, Profiles of Incidents involving CBRN and Non-state Actors (POICN).
+/// START, Profiles of Incidents involving CBRN and Non-state Actors (POICN): 517 events
+/// worldwide, 1990 to 2016.
 pub const START_POICN: &str = "start_poicn";
-/// Karger et al. (2023), the Existential Risk Persuasion Tournament (XPT).
+/// Karger et al. (2023), the Existential Risk Persuasion Tournament (XPT). Question 31, a nuclear
+/// weapon killing more than 1,000 people by the end of 2030: superforecasters 4 %, experts 5 %.
 pub const XPT_2023: &str = "xpt_2023_karger";
 /// Rethink Priorities (Rodriguez 2019): how likely is a nuclear exchange between the US and
 /// Russia.
@@ -206,11 +209,16 @@ pub const RP_2019: &str = "rp_2019_nuclear";
 pub const BARRETT_2013: &str = "barrett_2013_inadvertent";
 /// FEMA, Nuclear Detonation Response Guidance: Planning for the First 72 Hours (2023).
 pub const FEMA_NUCLEAR_72H: &str = "fema_nuclear_72h_2023";
-/// EPRI (2019), High-Altitude Electromagnetic Pulse and the Bulk Power System.
-pub const EPRI_HEMP: &str = "epri_2019_hemp";
-/// Riley (2012), Space Weather: the chance of another Carrington event.
-pub const RILEY_2012: &str = "riley_2012_carrington";
-/// Moriña et al. (2019), Scientific Reports: the probability of a Carrington-like event.
+/// EPRI's 2019 study of high-altitude EMP and the bulk power system, as POWER magazine reported it
+/// (EPRI's own product page carries no readable text): little damage to large power transformers;
+/// no support for a nationwide blackout lasting months.
+pub const EPRI_HEMP: &str = "powermag_epri_2019_hemp";
+/// Pry (2015), statement for the record to the House Oversight Committee: the "9 of 10 Americans
+/// would die" figure rests on an assumed nationwide blackout lasting a year, not on a published
+/// model.
+pub const PRY_2015_EMP: &str = "pry_2015_emp_testimony";
+/// Moriña et al. (2019), Scientific Reports: a Carrington-like storm in the next decade, 0.46–1.88 %
+/// (95 %); they report Riley's (2012) earlier estimate of about 12 % a decade.
 pub const MORINA_2019: &str = "morina_2019_carrington";
 /// Love (USGS): lognormality of historical magnetic-storm intensity.
 pub const LOVE_CARRINGTON: &str = "love_carrington";
@@ -229,10 +237,13 @@ pub const NPR_MARIA: &str = "npr_maria_2018";
 /// Stone et al. (2023), Environmental Science & Technology: a blackout during a heat wave in
 /// Atlanta, Detroit and Phoenix.
 pub const STONE_2023: &str = "stone_2023_heat_blackout";
-/// Working Group on Utah Earthquake Probabilities (2016): earthquake forecast for the Wasatch
-/// Front.
+/// Working Group on Utah Earthquake Probabilities (2016), as the Utah Geological Survey summarises
+/// it: 43 % for one or more magnitude 6.75+ earthquakes in the Wasatch Front region in 50 years
+/// (18 % on the Wasatch fault zone alone).
 pub const UTAH_WGUEP: &str = "utah_wguep_2016";
-/// USGS, the Seattle fault zone: its earthquakes and their chance.
+/// USGS Fact Sheet 2025-3050 (Wirth et al.), earthquake probabilities in the Pacific Northwest: a
+/// 17 % chance of a magnitude 6.5 or larger crustal-fault earthquake in the Puget Sound region in
+/// 50 years; the Seattle fault last broke in 923–924 C.E.
 pub const USGS_SEATTLE_FAULT: &str = "usgs_seattle_fault";
 /// PNNL event-correlated outage dataset (DOE OE-417 reports linked to EAGLE-I outages; CC BY 4.0).
 pub const PNNL_OE417: &str = "pnnl_oe417_linkage";
@@ -242,9 +253,12 @@ pub const CDC_CO: &str = "cdc_co_quickstats";
 pub const FTC_SENTINEL: &str = "ftc_sentinel_2024";
 /// USGS, the Barry Arm landslide and tsunami hazard in Prince William Sound.
 pub const USGS_BARRY_ARM: &str = "usgs_barry_arm";
-/// CDC, H5N1 bird flu: current situation summary.
+/// CDC, H5 bird flu: current situation (71 human cases in the US since February 2024; no known
+/// person-to-person spread).
 pub const CDC_H5N1: &str = "cdc_h5n1_situation";
-/// Mid-Atlantic IV-fluid shortage after Hurricane Helene (PMC commentary, 2024).
+/// Journal of Pediatric Pharmacology and Therapeutics (2024), commentary on the IV-fluid shortage
+/// after Hurricane Helene closed a North Carolina plant that makes "a sizable portion" of the
+/// country's IV fluids.
 pub const IV_FLUIDS_2024: &str = "iv_fluids_helene_2024";
 
 /// Every id above, for tests.
@@ -302,7 +316,6 @@ pub const ALL: &[&str] = &[
     CDC_PREGNANCY,
     USGS_BAY_AREA_2016,
     STRATEGIC_SITES,
-    FEMA_PNA_1985,
     FEMA_NAPB90,
     PHILIPPE_2023,
     FEMA_UASI_FY2026,
@@ -330,7 +343,7 @@ pub const ALL: &[&str] = &[
     BARRETT_2013,
     FEMA_NUCLEAR_72H,
     EPRI_HEMP,
-    RILEY_2012,
+    PRY_2015_EMP,
     MORINA_2019,
     LOVE_CARRINGTON,
     LLOYDS_2013,
