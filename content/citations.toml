@@ -326,7 +326,7 @@ title = "Cybersecurity"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/cybersecurity"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Use a password manager and two methods of verification."
 license = "US Government Work (public domain)"
 
@@ -3361,3 +3361,40 @@ retrieved = "2026-09-26"
 quote = "a 22-event backtest: covered 6, partial 5, short 10, not modelled 1"
 license = "CC BY-SA 4.0"
 
+[[citation]]
+id = "state_dept_passport_card"
+title = "Get a Passport Card"
+publisher = "U.S. Department of State (via Internet Archive)"
+year = 2026
+url = "https://travel.state.gov/content/travel/en/passports/need-passport/card.html"
+retrieved = "2026-09-26"
+quote = "The card is proof of U.S. citizenship and identity, and has the same length of validity as the passport book."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "state_dept_child_passport"
+title = "Apply for a Child's Passport Under 16"
+publisher = "U.S. Department of State (via Internet Archive)"
+year = 2026
+url = "https://travel.state.gov/content/travel/en/passports/need-passport/under-16.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ftc_2008_locksmith"
+title = "FTC Urges Consumers to Use Caution When Seeking a Locksmith"
+publisher = "Federal Trade Commission"
+year = 2008
+url = "https://www.ftc.gov/news-events/news/press-releases/2008/05/ftc-urges-consumers-use-caution-when-seeking-locksmith"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_data_backup_2012"
+title = "Data Backup Options"
+publisher = "Ruggiero P. and Heckathorn M.A., US-CERT (now CISA)"
+year = 2012
+url = "https://www.cisa.gov/sites/default/files/publications/data_backup_options.pdf"
+retrieved = "2026-09-26"
+quote = "Store 1 copy offsite (e.g., outside your home or business facility)."
+license = "Published by US-CERT, now CISA (paraphrased)"
