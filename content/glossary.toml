@@ -21,9 +21,9 @@ definition = "The chance that a disruption is worse than a given level, such as 
 citations = ["rr_research_risk_model"]
 
 [[term]]
-plain = "Being ready for 9 of 10 ten-year stretches"
+plain = "Being ready for 9 of 10 ten-year stretches, for each need"
 term = "Design event (the default dial setting)"
-definition = "The size of disruption the plan covers by default: you can be about 90% sure nothing worse happens in the next ten years."
+definition = "The size of disruption the plan covers by default. For any one need, something worse than its target comes in about 1 of every 10 ten-year stretches; across all your needs together, the chance that at least one runs out is roughly 1 in 3."
 citations = ["rr_research_risk_model"]
 
 [[term]]
@@ -136,6 +136,12 @@ term = "Public Safety Power Shutoff (PSPS)"
 definition = "When fire danger is high, some utilities turn off power in risky areas so their lines cannot start a fire. Shutoffs often last one to three days (an estimate)."
 citations = ["rr_research_risk_model"]
 
+[[term]]
+plain = "Your power company's list for medical needs"
+term = "Utility medical program (medical baseline, critical care)"
+definition = "A program for customers who rely on powered medical equipment. It can bring early warnings of outages and, in some places, a lower rate, but it does not mean your power comes back first."
+citations = ["cpuc_medical_baseline", "psegli_critical_care"]
+
 # ---------------------------------------------------------------------------------------------
 # Warnings and communication
 # ---------------------------------------------------------------------------------------------
@@ -219,14 +225,26 @@ citations = ["epa_diy_air_cleaners", "epa_wildfire_indoor_air"]
 [[term]]
 plain = "A close-fitting mask that filters the air"
 term = "N95 respirator"
-definition = "A mask that protects better than cloth or surgical masks when it fits well. Keep some for wildfire smoke, volcanic ash and outbreaks."
-citations = ["cdc_masks", "ready_gov_wildfires"]
+definition = "A mask that protects better than cloth or surgical masks when it fits well. Keep some for wildfire smoke, volcanic ash and outbreaks; they are not made to fit children."
+citations = ["cdc_masks", "ready_gov_wildfires", "epa_children_wildfire_smoke"]
 
 [[term]]
 plain = "Dangerously high body temperature"
 term = "Heat stroke"
-definition = "A medical emergency with a body temperature above 103°F, hot, red, dry skin, a fast pulse and confusion. Call 911."
-citations = ["ready_gov_heat"]
+definition = "A medical emergency. Signs include a body temperature of 103°F or higher, hot, red skin that may be dry or damp, a fast, strong pulse and confusion; call 911 and cool the person with cool cloths while you wait."
+citations = ["cdc_heat_related_illness"]
+
+[[term]]
+plain = "Chest pushes only, no breaths"
+term = "Hands-only CPR"
+definition = "Pushing hard and fast in the center of the chest of a teen or adult whose heart has stopped, after calling 911. You do not need training to do it."
+citations = ["medlineplus_cpr"]
+
+[[term]]
+plain = "A heart defibrillator anyone can use"
+term = "AED (automated external defibrillator)"
+definition = "A device that can shock a stopped heart back into a normal rhythm. It gives spoken step-by-step instructions, and many public places have one."
+citations = ["medlineplus_cpr"]
 
 [[term]]
 plain = "Dangerously low body temperature"

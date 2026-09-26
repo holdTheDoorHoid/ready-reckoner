@@ -18,7 +18,7 @@ Two weeks is where much official advice meets. The Red Cross suggests two weeks 
 [^cdc_water_storage]: CDC, How to Create an Emergency Water Supply (2025).
 [^oregon_2_weeks_ready]: Oregon Department of Emergency Management, 2 Weeks Ready (2026).
 [^bbk_vorsorgen_2025]: Bundesamt für Bevölkerungsschutz und Katastrophenhilfe (BBK), Germany, Vorsorgen für Krisen und Katastrophen (Preparing for crises and disasters), 2nd edition, November 2025 (2025).
-[^fema_nhs_2024]: FEMA (mirror of the published slide deck), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
+[^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
 [^florida_dem_medication]: Florida Division of Emergency Management, Medication (personal and family plans) (2026).
 [^rdpo_emergency_toilet]: Regional Disaster Preparedness Organization, Portland Metro Region, Emergency Toilet Guidebook (twin-bucket toilet) (2024).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).

@@ -19,4 +19,4 @@ After an emergency, you may need to get by on your own for several days.[^ready_
 [^ready_gov_food]: FEMA / Ready.gov, Food (2026).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
 [^ready_gov_evacuation]: FEMA / Ready.gov, Evacuation (2026).
-[^fema_nhs_2024]: FEMA (mirror of the published slide deck), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
+[^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).

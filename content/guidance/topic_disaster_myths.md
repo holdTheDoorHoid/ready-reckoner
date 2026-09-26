@@ -17,4 +17,4 @@ Disaster movies show panic, looting and people turning on each other. Research o
 [^tierney_2006_disaster_myths]: Tierney K., Bevc C. and Kuligowski E., Metaphors Matter: Disaster Myths, Media Frames, and Their Consequences in Hurricane Katrina (Annals of the AAPSS 604:57–81) (2006).
 [^aldrich_sawada_2015]: Aldrich D.P. and Sawada Y., The physical and social determinants of mortality in the 3.11 tsunami (Social Science and Medicine 124:66–75) (2015).
 [^semenza_1996_heat_deaths]: Semenza J.C. et al., Heat-Related Deaths during the July 1995 Heat Wave in Chicago (New England Journal of Medicine 335:84–90) (1996).
-[^fema_nhs_2024]: FEMA (mirror of the published slide deck), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
+[^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
