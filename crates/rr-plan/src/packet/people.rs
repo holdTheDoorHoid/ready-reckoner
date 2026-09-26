@@ -48,8 +48,11 @@ fn lines(cx: &Ctx<'_>, rules: &[&str], out: &mut Vec<String>) -> usize {
     n
 }
 
+/// A topic block under its own small heading.
 fn block(cx: &Ctx<'_>, target: &str, out: &mut Vec<String>) {
     if let Some(g) = cx.blocks_for(target).first() {
+        out.push(format!("#### {}", md(&g.meta.title)));
+        out.push(String::new());
         out.push(cx.guidance(g, None, None));
         out.push(String::new());
     }
@@ -125,9 +128,9 @@ pub(super) fn family(cx: &Ctx<'_>, out: &mut Vec<String>) {
     } = a.bucket(BucketId::Evacuate).target
     {
         out.push(format!(
-            "About {} households like yours have to leave home quickly at least once in 10 \
-             years. Warning can be {} ahead. Plan to be away for about {}.{}",
-            text::per_100(p_need_10yr),
+            "{} households like yours have to leave home quickly at least once in 10 years. \
+             Warning can be {} ahead. Plan to be away for about {}.{}",
+            text::upper_first(&text::households(p_need_10yr)),
             text::notice_range(f64::from(notice_hours_low), f64::from(notice_hours_high)),
             text::day_phrase(f64::from(days_away).max(1.0)),
             cite_all(&a.bucket(BucketId::Evacuate).sources)

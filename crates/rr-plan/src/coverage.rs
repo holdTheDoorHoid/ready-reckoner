@@ -190,13 +190,22 @@ pub const READINESS_HARM: [(BucketId, f64); 5] = [
 pub const COVERAGE_CITATIONS: [&str; 2] = ["rr_research_risk_model", "prior_harm_weights"];
 
 /// Item classes bought in chunks toward the next step of the day ladder; everything else is a set.
-pub const DIVISIBLE_CLASSES: [&str; 5] = [
+pub const DIVISIBLE_CLASSES: [&str; 6] = [
     "water_stored",
     "food",
     "prescription_medicine",
     "generator_fuel",
     "infant_formula",
+    "pet_food",
 ];
+
+/// Rules whose count grows with the target's days without a daily rate (one bottle of bleach per
+/// two weeks, one pack of batteries per week): bought a unit at a time, so a long target does not
+/// arrive as one big purchase.
+pub const DIVISIBLE_RULES: [&str; 2] = ["bleach_bottles", "battery_packs"];
+
+/// Classes bought at least a week's worth at a time (a bag of pet food, not a pound).
+const WEEK_STEP_CLASSES: [&str; 1] = ["pet_food"];
 
 /// Food for long storage that counts only for the days beyond the first month.
 pub const LONG_STORE_FOOD: [&str; 1] = ["food_bulk_staples"];
@@ -294,6 +303,8 @@ pub struct Offered {
     pub joins: Vec<Join>,
     /// Bought in chunks (water, food, medicine) rather than as one set.
     pub divisible: bool,
+    /// The chunk size for a divisible item, in the item's unit.
+    pub step: f64,
 }
 
 /// Everything built from the catalogue for one household.
@@ -414,6 +425,7 @@ pub fn build(
         // Joins.
         let mut joins: Vec<Join> = Vec::new();
         let mut divisible = false;
+        let mut step = 1.0_f64;
         let push = |line: &SizedLine, units: f64, joins: &mut Vec<Join>| {
             if !joins.iter().any(|j| j.line_id == line.line.id) && units > 0.0 {
                 joins.push(Join {
@@ -452,7 +464,17 @@ pub fn build(
             let class_ok = rule_need
                 .iter()
                 .all(|l| DIVISIBLE_CLASSES.contains(&l.line.item_class.as_str()));
-            divisible = proportional && day_scaled && class_ok && !item.free;
+            let by_rule = DIVISIBLE_RULES.contains(&rule);
+            divisible = proportional && ((day_scaled && class_ok) || by_rule) && !item.free;
+            if divisible {
+                // A week of pet food at a time; everything else a unit at a time.
+                step = rule_need
+                    .iter()
+                    .filter(|l| WEEK_STEP_CLASSES.contains(&l.line.item_class.as_str()))
+                    .filter_map(|l| l.per_day)
+                    .map(|per_day| (per_day * 7.0 / conv).ceil())
+                    .fold(1.0_f64, f64::max);
+            }
         }
         for l in via_alt {
             // An alternative (reused bottles) counts in the need line's unit.
@@ -551,6 +573,7 @@ pub fn build(
             quantity,
             joins,
             divisible,
+            step,
         });
     }
 
@@ -579,7 +602,7 @@ fn metadata(offered: &[Offered], rule: &PlanCoverage) -> (Vec<ItemMeta>, Vec<Ite
     for o in offered {
         let mut m = ItemMeta::new(o.item.id.clone());
         if o.divisible {
-            m.step = Some(1.0);
+            m.step = Some(o.step);
         } else {
             m.set_quantity = Some(set_quantity(o.quantity));
         }
@@ -654,9 +677,10 @@ pub struct Segment {
     pub requirement: f64,
     /// Line units per item unit, per item.
     pub contrib: BTreeMap<ItemId, f64>,
-    /// Whatever the segment before holds beyond its own requirement counts here too (food the
-    /// household normally eats also covers the days after the first month).
-    pub takes_overflow: bool,
+    /// Counts only once the segment before is fully met, and receives whatever that segment
+    /// holds beyond its own requirement (bulk staples count only after a month of normal food,
+    /// and normal food beyond a month counts here too).
+    pub after_previous: bool,
 }
 
 impl Segment {
@@ -678,14 +702,21 @@ impl Part {
     fn days(&self, qty: &dyn Fn(&ItemId) -> f64) -> f64 {
         let mut total = 0.0;
         let mut overflow = 0.0;
+        let mut previous_full = true;
         for s in &self.segments {
             let mut have = s.have(qty);
-            if s.takes_overflow {
+            if s.after_previous {
+                if !previous_full {
+                    previous_full = false;
+                    overflow = 0.0;
+                    continue;
+                }
                 have += overflow;
             }
             if s.requirement > 0.0 {
                 total += s.span * (have / s.requirement).clamp(0.0, 1.0);
             }
+            previous_full = have + 1e-9 >= s.requirement;
             overflow = (have - s.requirement).max(0.0);
         }
         total + 0.0
@@ -746,7 +777,7 @@ impl PlanCoverage {
                         span: stored_days,
                         requirement: s.quantity,
                         contrib: contrib_for(s),
-                        takes_overflow: false,
+                        after_previous: false,
                     }];
                     used.insert(s.line.id.as_str());
                     if let Some(t) = treated {
@@ -755,7 +786,7 @@ impl PlanCoverage {
                             span: (target - stored_days).max(0.0),
                             requirement: t.quantity,
                             contrib: contrib_for(t),
-                            takes_overflow: false,
+                            after_previous: false,
                         });
                         used.insert(t.line.id.as_str());
                     }
@@ -786,7 +817,7 @@ impl PlanCoverage {
                         span: head_days,
                         requirement: per_day * head_days,
                         contrib: first.clone(),
-                        takes_overflow: false,
+                        after_previous: false,
                     }];
                     if target > FIRST_MONTH_DAYS {
                         let mut both = first;
@@ -799,7 +830,7 @@ impl PlanCoverage {
                             span: target - FIRST_MONTH_DAYS,
                             requirement: per_day * (target - FIRST_MONTH_DAYS),
                             contrib: both,
-                            takes_overflow: true,
+                            after_previous: true,
                         });
                     }
                     used.insert(food.line.id.as_str());
@@ -832,7 +863,7 @@ impl PlanCoverage {
                             span: target / n,
                             requirement: l.quantity,
                             contrib: contrib_for(l),
-                            takes_overflow: false,
+                            after_previous: false,
                         })
                         .collect(),
                 });

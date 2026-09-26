@@ -22,8 +22,8 @@
 //! - the provenance list and the packet ([`packet`], `docs/PACKET.md`).
 //!
 //! Deterministic: no clock (the planning date is an input), no randomness, no hash-map iteration;
-//! the same input gives byte-identical output on every target ([`to_json`] writes it with every
-//! object's keys sorted).
+//! the same input gives byte-identical output on every target ([`to_json`] writes it; the output
+//! types hold no maps, so field order is fixed).
 #![forbid(unsafe_code)]
 #![cfg_attr(not(test), deny(missing_docs))]
 
@@ -218,58 +218,17 @@ impl<S: CountySource> Engine<S> {
     }
 }
 
-/// The output as pretty JSON with every object's keys sorted, so the same input always gives the
-/// same bytes (the goldens use it).
+/// The output as pretty JSON, the bytes the goldens hold. Fields come in the contract's order
+/// (the same order `rr-wasm`'s envelope uses) and the output types hold no maps, so the same input
+/// always gives the same bytes; numbers keep their own width (an `f32` prints as `0.1`, not
+/// `0.10000000149011612`).
 pub fn to_json<T: serde::Serialize>(value: &T) -> String {
-    let v = serde_json::to_value(value).unwrap_or(serde_json::Value::Null);
-    let mut out = String::new();
-    write_sorted(&v, 0, &mut out);
+    let mut out = serde_json::to_string_pretty(value).unwrap_or_else(|e| {
+        format!(
+            "{{\"error\": {}}}",
+            serde_json::Value::String(e.to_string())
+        )
+    });
     out.push('\n');
     out
-}
-
-fn write_sorted(v: &serde_json::Value, indent: usize, out: &mut String) {
-    use serde_json::Value;
-    let pad = |n: usize| "  ".repeat(n);
-    match v {
-        Value::Object(map) => {
-            if map.is_empty() {
-                out.push_str("{}");
-                return;
-            }
-            let mut keys: Vec<&String> = map.keys().collect();
-            keys.sort();
-            out.push_str("{\n");
-            for (i, k) in keys.iter().enumerate() {
-                out.push_str(&pad(indent + 1));
-                out.push_str(&serde_json::to_string(k).unwrap_or_default());
-                out.push_str(": ");
-                write_sorted(&map[k.as_str()], indent + 1, out);
-                if i + 1 < keys.len() {
-                    out.push(',');
-                }
-                out.push('\n');
-            }
-            out.push_str(&pad(indent));
-            out.push('}');
-        }
-        Value::Array(items) => {
-            if items.is_empty() {
-                out.push_str("[]");
-                return;
-            }
-            out.push_str("[\n");
-            for (i, item) in items.iter().enumerate() {
-                out.push_str(&pad(indent + 1));
-                write_sorted(item, indent + 1, out);
-                if i + 1 < items.len() {
-                    out.push(',');
-                }
-                out.push('\n');
-            }
-            out.push_str(&pad(indent));
-            out.push(']');
-        }
-        other => out.push_str(&serde_json::to_string(other).unwrap_or_default()),
-    }
 }

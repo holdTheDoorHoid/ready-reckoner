@@ -109,7 +109,6 @@ fn plural(unit: &str, qty: f64) -> String {
         "pound of dry food" => return "pounds of dry food".to_owned(),
         "ounce of powder" => return "ounces of powder".to_owned(),
         "cycle's supply" => return "cycles' supplies".to_owned(),
-        "2,000 kcal" => return "× 2,000 kcal".to_owned(),
         "8-ounce canister" => return "8-ounce canisters".to_owned(),
         "12-ounce bottle" => return "12-ounce bottles".to_owned(),
         "24-pack" => return "24-packs".to_owned(),
@@ -136,12 +135,19 @@ pub fn number(q: f64) -> String {
     }
 }
 
-/// "12 gallons", "1 kit", "$100" for dollars, "41 × 2,000 kcal" for food units.
+/// "12 gallons", "1 kit", "$100" for dollars, "26,000 kcal" for food counted in 2,000 kcal
+/// units, "4 (one per person)" for items counted per person.
 pub fn quantity(q: f64, unit: &str) -> String {
+    if let Some(per) = unit
+        .strip_suffix(" kcal")
+        .and_then(|n| n.replace(',', "").parse::<f64>().ok())
+    {
+        return format!("{} kcal", number(q * per));
+    }
     match unit {
         "dollar" | "usd" => usd(q),
         "action" | "plan" | "decision" => String::new(),
-        "2,000 kcal" => format!("{} × 2,000 kcal", number(q)),
+        "person" | "pet" => format!("{} (one per {unit})", number(q)),
         _ => format!("{} {}", number(q), plural(unit, q)),
     }
 }
@@ -362,6 +368,15 @@ pub fn join_and(parts: &[String]) -> String {
     }
 }
 
+/// Capitalises the first letter.
+pub fn upper_first(s: &str) -> String {
+    let mut c = s.chars();
+    match c.next() {
+        Some(f) => f.to_uppercase().chain(c).collect(),
+        None => String::new(),
+    }
+}
+
 /// Lower-cases the first letter (for names used mid-sentence), unless the second letter is also
 /// upper case (an acronym such as "NOAA").
 pub fn lower_first(s: &str) -> String {
@@ -401,6 +416,8 @@ mod tests {
         assert_eq!(quantity(1.0, "kit"), "1 kit");
         assert_eq!(quantity(4.0, "battery"), "4 batteries");
         assert_eq!(quantity(100.0, "dollar"), "$100");
+        assert_eq!(quantity(13.0, "2,000 kcal"), "26,000 kcal");
+        assert_eq!(quantity(4.0, "person"), "4 (one per person)");
         assert_eq!(per_100(0.254), "25");
         assert_eq!(per_100(0.004), "fewer than 1");
         assert_eq!(per_100(0.99), "almost all");

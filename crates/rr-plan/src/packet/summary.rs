@@ -76,7 +76,12 @@ fn home(cx: &Ctx<'_>) -> String {
         BackupPower::Generator => parts.push("a generator".to_owned()),
         BackupPower::SolarBattery => parts.push("solar panels with a battery".to_owned()),
     }
-    format!("a {tenure} {kind}, with {}", text::join_and(&parts))
+    let article = if tenure.starts_with(['a', 'e', 'i', 'o', 'u']) {
+        "an"
+    } else {
+        "a"
+    };
+    format!("{article} {tenure} {kind}, with {}", text::join_and(&parts))
 }
 
 /// "very serious disruptions: the kind that come about once in 100 years".
@@ -302,6 +307,12 @@ fn three_things(cx: &Ctx<'_>) -> Vec<String> {
         rr_types::Target::Months { value, .. } => f64::from(value),
         _ => 0.0,
     };
+    // A named scenario the plan includes that changes the targets explains long targets best.
+    let driving = a
+        .consequence
+        .scenarios
+        .iter()
+        .find(|s| s.on && s.effect_summary.starts_with("Planning for it changes"));
     if let Some(w) = a.warnings.iter().find(|w| w.id.starts_with("cliff_")) {
         let scenario = w
             .related
@@ -313,6 +324,13 @@ fn three_things(cx: &Ctx<'_>) -> Vec<String> {
             None => " Your targets shows how much it moves the numbers.",
         };
         out.push(format!("{}{tail}", w.message));
+    } else if let Some(s) = driving {
+        out.push(format!(
+            "Your longest targets come from one event the plan includes: a {}. {} You can turn \
+             it off on the risks screen to see the plan without it.",
+            text::lower_first(&s.name),
+            s.effect_summary
+        ));
     } else if input.finances.income.earners > 0 && income_months > 0.0 {
         let lead = a
             .bucket(BucketId::Income)

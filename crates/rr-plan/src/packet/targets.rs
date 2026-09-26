@@ -147,6 +147,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push(String::new());
     if a.input.dials.climate == rr_types::ClimateHorizon::Y2050 {
         if let Some(g) = cx.blocks_for("topic:climate_horizon").first() {
+            out.push(format!("#### {}", md(&g.meta.title)));
+            out.push(String::new());
             out.push(cx.guidance(g, None, None));
             out.push(String::new());
         }
