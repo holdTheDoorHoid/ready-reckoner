@@ -389,31 +389,41 @@ fn sweep(
         ));
     }
 
-    // Cliff warnings at any setting, with the settings that raise them.
-    let mut cliffs: Vec<(String, String, String, Vec<String>)> = Vec::new();
+    // Cliff warnings at any setting: the settings that raise each one, and the engine's words at
+    // the raising setting nearest the household's own (its "the level you chose" means that one).
+    let position = |rp: ReturnPeriod| ReturnPeriod::ALL.iter().position(|x| *x == rp).unwrap_or(0);
+    let mut cliffs: Vec<(String, Vec<(ReturnPeriod, &rr_types::Warning)>)> = Vec::new();
     for (rp, r) in runs {
         for w in r.warnings.iter().filter(|w| w.id.starts_with("cliff_")) {
             match cliffs.iter_mut().find(|c| c.0 == w.id) {
-                Some(c) => c.3.push(format::dial_short(*rp)),
-                None => cliffs.push((
-                    w.id.clone(),
-                    w.message.clone(),
-                    w.why.clone(),
-                    vec![format::dial_short(*rp)],
-                )),
+                Some(c) => c.1.push((*rp, w)),
+                None => cliffs.push((w.id.clone(), vec![(*rp, w)])),
             }
         }
     }
     if !cliffs.is_empty() {
         s.push_str("\nWhen one event drives the answer\n\n");
-        for (id, message, why, at) in &cliffs {
+        for (id, at) in &cliffs {
             let bucket = id
                 .strip_prefix("cliff_")
                 .and_then(|b| b.parse::<BucketId>().ok())
                 .map(|b| b.name().to_owned())
                 .unwrap_or_else(|| id.clone());
-            let line = format!("{bucket} (at {}): {message} {why}", at.join(", "));
-            s.push_str(&format!("  - {}\n", wrap(&line, WRAP, 4)));
+            let settings: Vec<String> = at.iter().map(|(rp, _)| format::dial_short(*rp)).collect();
+            let nearest = at
+                .iter()
+                .min_by_key(|(rp, _)| position(*rp).abs_diff(position(current)))
+                .map(|(rp, w)| (*rp, *w));
+            if let Some((rp, w)) = nearest {
+                let line = format!(
+                    "{bucket}, raised at {}. At {}: {} {}",
+                    format::join_and(&settings),
+                    format::dial_short(rp),
+                    w.message,
+                    w.why
+                );
+                s.push_str(&format!("  - {}\n", wrap(&line, WRAP, 4)));
+            }
         }
     }
     let scenarios: Vec<String> = a

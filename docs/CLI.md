@@ -166,8 +166,8 @@ Days to be ready for (income in months), with the range in brackets. * marks the
 
  Worse, of 100 ten-year stretches          65           20            10             2
  Enough for this household                 two weeks    one month     three months   one year
- Plan done by month                        10           12            15             23
- Purchases in the plan                     $1,918       $2,295        $2,724         $3,936
+ Plan done by month                        9            11            14             21
+ Purchases in the plan                     $1,745       $2,106        $2,504         $3,563
 ...
 ```
 
