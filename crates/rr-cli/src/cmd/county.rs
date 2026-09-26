@@ -199,6 +199,12 @@ pub fn render(c: &CountyRecord, loc: Option<&rr_types::LocationResolved>) -> Str
             ),
         ]);
         t.row(["Years covered".to_owned(), o.years_covered.clone()]);
+        if let Some(state) = &o.state_series {
+            t.row([
+                "Figures from".to_owned(),
+                format!("{state} as a whole (the county has no records of its own)"),
+            ]);
+        }
         s.push_str(&t.render(1));
         s.push_str(&format!(
             "  {}\n",

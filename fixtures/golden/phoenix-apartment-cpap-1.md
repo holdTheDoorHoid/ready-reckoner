@@ -339,17 +339,17 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 | 12 (October 2027) | Over-the-counter medicine basics: 1 set | $43 |
 | 13 (November 2027) | save toward cash in small bills; Two-bucket emergency toilet kit: 1 kit | $48 |
 | 14 (December 2027) | save toward cash in small bills | $20 |
-| 15 (January 2028) | save toward cash in small bills; Cash in small bills: $100 | $120 |
+| 15 (January 2028) | save toward cash in small bills; Cash in small bills: $100, $60 of it from savings | $60 |
 | 16 (February 2028) | Multipurpose fire extinguisher: 1 extinguisher | $33 |
 | 17 (March 2028) | Extra shelf-stable food you already eat: 4,000 kcal; Solar motion-sensor outdoor light: 1 light | $44 |
 | 18 (April 2028) | save toward bleeding-control kit (tourniquet and pressure bandage); Extra shelf-stable food you already eat: 4,000 kcal | $39 |
 | 19 (May 2028) | save toward bleeding-control kit (tourniquet and pressure bandage) | $20 |
-| 20 (June 2028) | save toward bleeding-control kit (tourniquet and pressure bandage); Bleeding-control kit (tourniquet and pressure bandage): 1 kit | $91 |
+| 20 (June 2028) | save toward bleeding-control kit (tourniquet and pressure bandage); Bleeding-control kit (tourniquet and pressure bandage): 1 kit, $60 of it from savings | $31 |
 | 21 (July 2028) | Escape ladder for upstairs bedrooms: 1 ladder | $59 |
 | 22 (August 2028) | save toward clean-air room for wildfire smoke | $20 |
 | 23 (September 2028) | save toward clean-air room for wildfire smoke; Phone power bank (about 20,000 mAh): 1 power bank | $56 |
 | 24 (October 2028) | save toward clean-air room for wildfire smoke | $20 |
-| 25 (November 2028) | save toward clean-air room for wildfire smoke; Clean-air room for wildfire smoke: 1 air cleaner | $144 |
+| 25 (November 2028) | save toward clean-air room for wildfire smoke; Clean-air room for wildfire smoke: 1 air cleaner, $80 of it from savings | $64 |
 | 26 (December 2028) | save toward portable battery power station (about 1,000 watt-hours) | $20 |
 | 27 (January 2029) | save toward portable battery power station (about 1,000 watt-hours); Extra shelf-stable food you already eat: 8,000 kcal | $58 |
 | 28 (February 2029) | save toward portable battery power station (about 1,000 watt-hours) | $20 |
@@ -362,7 +362,7 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 | 35 (September 2029) | save toward portable battery power station (about 1,000 watt-hours) | $20 |
 | 36 (October 2029) | save toward portable battery power station (about 1,000 watt-hours) | $20 |
 | 37 (November 2029) | save toward portable battery power station (about 1,000 watt-hours) | $20 |
-| 38 (December 2029) | save toward portable battery power station (about 1,000 watt-hours); Portable battery power station (about 1,000 watt-hours): 1 power station | $503 |
+| 38 (December 2029) | save toward portable battery power station (about 1,000 watt-hours); Portable battery power station (about 1,000 watt-hours): 1 power station, $260 of it from savings | $243 |
 
 ### When you are done
 
@@ -480,7 +480,7 @@ The household plan above covers school, daycare and work plans and a walking rou
 
 **What helps.** Swap phone numbers with two neighbours. Agree who checks on whom, especially older neighbours and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[110] Host a block party, since strong communities start with prepared neighbours.[111] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[112]
 
-**What to avoid.** Do not wait for a disaster to meet the people next door. A short hello now makes it easier to knock on a door later.
+**What to avoid.** Meet the people next door before you need them. A short hello now makes it easier to knock on a door later.
 
 ## Documents and money
 
@@ -534,7 +534,7 @@ Of 100 households like yours, about 20 (10–40) will have an income gap of more
 
 **What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[129] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[130] Write a short calm plan: what you might feel, what helps you, and who you will call.[105] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[131]
 
-**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[132] Do not wait until things feel unbearable to reach out. The 988 line supports people in emotional distress as well as in crisis.[129]
+**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[132] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[129]
 
 ## Maintenance calendar
 

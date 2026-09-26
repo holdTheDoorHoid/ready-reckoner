@@ -610,8 +610,15 @@ pub fn boil_fuel(gallons_to_boil: f64) -> Sizing {
 /// Water for livestock and horses (Sphere): 25 L a day per large animal for the target's days, but
 /// no more than the days of water a household stores (`water_stored_cap_days`, 14), the same cap
 /// as people's stored water (an estimate for animals). Beyond that the line points to power for the
-/// well pump or a plan to haul water instead of more tank space. Rule `livestock_water`.
-pub fn livestock_water(days: f64, large_animals: u8) -> Option<Sizing> {
+/// well pump or a plan to haul water instead of more tank space.
+///
+/// `pump`: the household is on a well and a generator can run the pump in a power cut (it owns one,
+/// or its plan includes one: the power bucket's generator line is then a need). The animals'
+/// stored water then only has to last until the generator runs the pump
+/// (`livestock_pump_bridge_days`, 3, an estimate), and two weeks in stock tanks becomes an
+/// alternative ([`livestock_water_stored`]). `drought`: a drought drives the no-water target, and
+/// the line says that hauling water in is the answer to a dry well. Rule `livestock_water`.
+pub fn livestock_water(days: f64, large_animals: u8, pump: bool, drought: bool) -> Option<Sizing> {
     if large_animals == 0 || days <= 0.0 {
         return None;
     }
@@ -619,9 +626,14 @@ pub fn livestock_water(days: f64, large_animals: u8) -> Option<Sizing> {
     let l_each = b.k(keys::WATER_LIVESTOCK_L_DAY);
     let (lo, hi) = b.range(keys::WATER_LIVESTOCK_L_DAY);
     b.cite("aspca_disaster_prep");
-    // The cap stands behind the line only when it binds.
-    let capped = days > constants().value(keys::WATER_STORED_CAP_DAYS);
-    let stored_days = if capped {
+    // Only the limit that binds stands behind the line.
+    let bridge = constants().value(keys::LIVESTOCK_PUMP_BRIDGE_DAYS);
+    let bridged = pump && days > bridge;
+    let capped = !bridged && days > constants().value(keys::WATER_STORED_CAP_DAYS);
+    let stored_days = if bridged {
+        b.cite(crate::constants::PRIOR_SOURCE);
+        b.k(keys::LIVESTOCK_PUMP_BRIDGE_DAYS)
+    } else if capped {
         b.cite(crate::constants::PRIOR_SOURCE);
         b.k(keys::WATER_STORED_CAP_DAYS)
     } else {
@@ -640,7 +652,18 @@ pub fn livestock_water(days: f64, large_animals: u8) -> Option<Sizing> {
         num(litres, 0),
         gallons(super::round_quantity("gallon", gal))
     );
-    if capped {
+    if bridged {
+        text.push_str(&format!(
+            " Your target is {}; store the first {}, until the generator runs the well pump, and in a longer power cut let it keep the pump going (see the generator line) instead of storing weeks of water.",
+            fmt_days(days),
+            fmt_days(stored_days)
+        ));
+        if drought {
+            text.push_str(
+                " A drought that lowers the well is different: plan to haul water in, and a stock tank holds what you haul.",
+            );
+        }
+    } else if capped {
         text.push_str(&format!(
             " Your target is {}; store the first {}, as for people, and beyond that keep the well pump powered (a generator or battery sized for it) or plan to haul water, instead of buying more tank space.",
             fmt_days(days),
@@ -651,6 +674,50 @@ pub fn livestock_water(days: f64, large_animals: u8) -> Option<Sizing> {
         Sizing::new(
             &b,
             "livestock_water",
+            "livestock_water",
+            gal,
+            "gallon",
+            Per::Pet,
+            text,
+        )
+        .per_day(stored_days, n * l_each / L_PER_GAL),
+    )
+}
+
+/// Two weeks of stored water for large animals, as an alternative to running the well pump on a
+/// generator (see [`livestock_water`]): 25 L a day per animal × min(target, 14) days. No catalogue
+/// item is sized by it; it says what storing instead of pumping would take. Rule
+/// `livestock_water_stored`.
+pub fn livestock_water_stored(days: f64, large_animals: u8) -> Option<Sizing> {
+    if large_animals == 0 || days <= 0.0 {
+        return None;
+    }
+    let mut b = Basis::new();
+    let l_each = b.k(keys::WATER_LIVESTOCK_L_DAY);
+    b.cite("aspca_disaster_prep");
+    let capped = days > constants().value(keys::WATER_STORED_CAP_DAYS);
+    let stored_days = if capped {
+        b.cite(crate::constants::PRIOR_SOURCE);
+        b.k(keys::WATER_STORED_CAP_DAYS)
+    } else {
+        days
+    };
+    let n = f64::from(large_animals);
+    let litres = n * l_each * stored_days;
+    let gal = litres / L_PER_GAL;
+    let text = format!(
+        "Instead of relying on the generator, you could store {} for the animals in stock tanks: {} × {} L a day × {} = {} L, about {} of tank space. A stock tank also holds water you haul in.",
+        fmt_days(stored_days),
+        count(n, "large animal", "large animals"),
+        num(l_each, 0),
+        fmt_days(stored_days),
+        num(litres, 0),
+        gallons(super::round_quantity("gallon", gal))
+    );
+    Some(
+        Sizing::new(
+            &b,
+            "livestock_water_stored",
             "livestock_water",
             gal,
             "gallon",
@@ -795,19 +862,19 @@ mod tests {
 
     #[test]
     fn livestock_uses_sphere_twenty_five_litres() {
-        let s = livestock_water(3.0, 12).unwrap();
+        let s = livestock_water(3.0, 12, false, false).unwrap();
         // 12 × 25 × 3 = 900 L = 237.8 gal
         assert_eq!(s.quantity, 237.8);
         assert_eq!(s.citations[0], "sphere_2018");
         assert!(!s.prior && !s.plain.contains("well pump"));
-        assert!(livestock_water(3.0, 0).is_none());
+        assert!(livestock_water(3.0, 0, false, false).is_none());
     }
 
     #[test]
     fn livestock_water_is_capped_at_the_stored_days() {
         // 12 large animals × 25 L × min(target, 14) days: a 60-day target stores 14 days,
         // 4,200 L = 1,109.5 gal (it was 18,000 L, 4,755 gal).
-        let s = livestock_water(60.0, 12).unwrap();
+        let s = livestock_water(60.0, 12, false, false).unwrap();
         assert_eq!(s.quantity, 1109.5);
         assert_eq!(s.days, Some(14.0));
         assert_eq!(s.per_day, Some(12.0 * 25.0 / L_PER_GAL));
@@ -820,9 +887,44 @@ mod tests {
                 .any(|c| c == "byu_longer_term_storage_2019")
         );
         // Exactly 14 days is not capped; the cap never lowers a shorter target.
-        let at = livestock_water(14.0, 12).unwrap();
+        let at = livestock_water(14.0, 12, false, false).unwrap();
         assert_eq!(at.quantity, s.quantity);
         assert!(!at.prior && !at.plain.contains("well pump"));
+    }
+
+    #[test]
+    fn livestock_water_bridges_three_days_when_a_generator_runs_the_pump() {
+        // 12 × 25 L × 3 days = 900 L = 237.8 gal, instead of 14 days (1,109.5 gal).
+        let s = livestock_water(60.0, 12, true, false).unwrap();
+        assert_eq!(s.quantity, 237.8);
+        assert_eq!(s.days, Some(3.0));
+        assert!(s.prior, "the three-day bridge is an estimate");
+        assert!(
+            s.plain.contains("until the generator runs the well pump"),
+            "{}",
+            s.plain
+        );
+        assert!(
+            !s.plain.contains("haul water"),
+            "no drought, no hauling: {}",
+            s.plain
+        );
+        assert!(
+            !s.citations
+                .iter()
+                .any(|c| c == "byu_longer_term_storage_2019")
+        );
+        let dry = livestock_water(60.0, 12, true, true).unwrap();
+        assert!(dry.plain.contains("haul water in"), "{}", dry.plain);
+        // A target the bridge already covers is stored whole, with no generator sentence.
+        let short = livestock_water(2.0, 12, true, true).unwrap();
+        assert_eq!(short.days, Some(2.0));
+        assert!(!short.prior && !short.plain.contains("generator"));
+        // The alternative: two weeks in stock tanks.
+        let alt = livestock_water_stored(60.0, 12).unwrap();
+        assert_eq!(alt.quantity, 1109.5);
+        assert_eq!(alt.rule, "livestock_water_stored");
+        assert!(livestock_water_stored(60.0, 0).is_none());
     }
 
     #[test]

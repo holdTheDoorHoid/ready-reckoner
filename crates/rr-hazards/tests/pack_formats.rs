@@ -294,3 +294,38 @@ fn no_recorded_major_passage_gives_a_small_share_not_a_third() {
         .unwrap();
     assert!(close(t.rate_per_year, s.rate_per_year, 1e-9));
 }
+
+/// A county with no outage records of its own carries its state's pooled series (rr-data, V-15):
+/// the notes say so, and the outage floor names whose records they are.
+#[test]
+fn a_states_outage_series_is_named_in_the_notes() {
+    let mut fixture = county("42101");
+    let own = run(&household("philadelphia-renters-4"), &fixture);
+    assert!(
+        !own.notes
+            .iter()
+            .any(|n| n.contains("No power-outage records"))
+    );
+    let o = fixture
+        .county
+        .outages
+        .as_mut()
+        .expect("Philadelphia has records");
+    o.state_series = Some("Pennsylvania".to_owned());
+    // Frequent enough outages that the floor applies and its note appears.
+    o.events_per_customer_year = 3.0;
+    let years = o.years_covered.clone();
+    let a = run(&household("philadelphia-renters-4"), &fixture);
+    let want = format!(
+        "No power-outage records for Philadelphia County: its power-cut figures use \
+         Pennsylvania's records ({years}) instead."
+    );
+    assert!(a.notes.contains(&want), "{:?}", a.notes);
+    assert!(
+        a.notes.iter().any(|n| n.starts_with(&format!(
+            "Pennsylvania's power-outage records ({years}) show homes across Pennsylvania caught"
+        ))),
+        "{:?}",
+        a.notes
+    );
+}

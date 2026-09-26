@@ -5,7 +5,7 @@
 //! - reads the item's Terms & Conditions and extracts the disclaimer FEMA requires, verbatim;
 //! - checks the data dictionary still says version 1.20 (a new version must be reviewed, because
 //!   field meanings changed between 1.19 and 1.20 and may change again);
-//! - pages through all counties, keeps 9 fields per hazard and 6 county fields, rounds to 4
+//! - pages through all counties, keeps 6 fields per hazard and 6 county fields, rounds to 4
 //!   significant figures, and never writes the raw table;
 //! - writes `nri_semantics.toml` so `rr-hazards` knows what each hazard's `AFREQ` means.
 
@@ -38,18 +38,21 @@ const TECH_DOC_ARCHIVE: &str = "https://web.archive.org/web/20260720090240/https
 /// The NRI version this job's semantics table was written for.
 pub const EXPECTED_VERSION: &str = "1.20";
 
-/// Per-hazard fields kept, as (NRI suffix, pack column).
+/// Per-hazard fields kept, as (NRI suffix, pack column). `EALP` (population loss) stays although
+/// no crate reads it yet: it is the input a health-based severity for heat and cold would use.
+/// Building exposure, building loss and the loss rate (`EXPB`, `EALB`, `ALRB`) left the pack on
+/// 2026-09-26 because no engine crate reads them.
 const HAZARD_FIELDS: &[(&str, &str)] = &[
     ("AFREQ", "afreq"),
-    ("EXPB", "expb"),
     ("EXPP", "expp"),
-    ("EALB", "ealb"),
     ("EALP", "ealp"),
     ("EALT", "ealt"),
     ("HLRB", "hlrb"),
-    ("ALRB", "alrb"),
     ("RISKS", "risk_score"),
 ];
+
+/// Hazard fields read only to derive the county flags `coastal` and `tsunami_zone`, not shipped.
+const FLAG_FIELDS: &[&str] = &["CFLD_EXPB", "TSUN_EXPB", "TSUN_EXPP"];
 
 /// County fields kept, as (NRI field, pack column).
 const COUNTY_FIELDS: &[(&str, &str)] = &[
@@ -398,6 +401,16 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     if !absent.is_empty() {
         out.notes.push(format!("Fields that NRI v1.20 does not publish (left empty): {}. Drought is modelled for agriculture only.", absent.join(", ")));
     }
+    for f in FLAG_FIELDS {
+        if !dict_fields.contains(*f) {
+            return Err(data_err(format!(
+                "NRI data dictionary no longer lists field {f}, which the coastal and tsunami-zone flags need"
+            )));
+        }
+        if !fields.iter().any(|x| x == f) {
+            fields.push((*f).to_string());
+        }
+    }
 
     // Page through the layer.
     let query_url = format!("{LAYER}/query");
@@ -559,7 +572,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         "A county has a tsunami zone when NRI v1.20 assigns it tsunami building or population exposure (TSUN_EXPB > 0 or TSUN_EXPP > 0).".into(),
     );
     out.notes.push(format!(
-        "{} counties, {} hazard rows. Kept per hazard: AFREQ, EXPB, EXPP, EALB, EALP, EALT, HLRB, ALRB, RISKS; per county: POPULATION, BUILDVALUE, EAL_VALT, SOVI_SCORE, RESL_SCORE, CRF_VALUE. Values rounded to 4 significant figures. Hazard rows where every field is empty (hazard not applicable) are omitted.",
+        "{} counties, {} hazard rows. Kept per hazard: AFREQ, EXPP, EALP, EALT, HLRB, RISKS; per county: POPULATION, BUILDVALUE, EAL_VALT, SOVI_SCORE, RESL_SCORE, CRF_VALUE. CFLD_EXPB and TSUN_EXPB are read only for the coastal and tsunami-zone flags; EXPB, EALB and ALRB are not shipped (no engine crate reads them). Values rounded to 4 significant figures. Hazard rows where every field is empty (hazard not applicable) are omitted.",
         ct.rows.len(),
         ht.rows.len()
     ));

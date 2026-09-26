@@ -95,7 +95,7 @@ fn verify(data: &DataArgs) -> Result<Output, CliError> {
             s.push_str(&format!(
                 "  ok  store: {} county records, {} ZIP codes, {} counties on the map\n",
                 thousands(store.counties().count() as u64),
-                thousands(rows_of(store, "core/zip_centroids.csv")),
+                thousands(store.zip_count() as u64),
                 thousands(store.map_ids().len() as u64)
             ));
             let engine = Engine::new(src).map_err(|e| CliError::engine(&e, None))?;
@@ -132,10 +132,6 @@ fn verify(data: &DataArgs) -> Result<Output, CliError> {
 }
 
 /// Rows the store read from one pack file (0 when it is not loaded).
-fn rows_of(store: &rr_data::DataStore, path: &str) -> u64 {
-    store.loaded().get(path).copied().map_or(0, u64::from)
-}
-
 /// Every fixture household's location resolves on this source.
 fn fixture_households(engine: &Engine<Source>, s: &mut String, problems: &mut Vec<String>) {
     let mut ok = 0usize;

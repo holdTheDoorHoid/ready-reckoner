@@ -226,3 +226,154 @@ fn a_powered_device_makes_its_backup_life_safety() {
     }
     let _ = engine();
 }
+
+/// Days of a days-kind coverage (0 for other kinds), with `low` and `high` checked equal to it.
+fn plain_days(t: &Target) -> f32 {
+    match *t {
+        Target::Days { value, low, high } => {
+            assert!(value == low && value == high, "{t:?}");
+            value
+        }
+        _ => 0.0,
+    }
+}
+
+/// `covered_today` is what the household has before the plan buys anything: same kind as the
+/// target, never more than the plan's end point, and never more than the target in days.
+#[test]
+fn coverage_today_never_exceeds_the_plans() {
+    for (name, _, out) in common::outputs() {
+        for b in &out.buckets {
+            assert_eq!(b.covered_today.kind(), b.target.kind(), "{name} {}", b.id);
+            match (b.target, b.covered, b.covered_today) {
+                (Target::Days { value, .. }, end, now) => {
+                    let (end, now) = (plain_days(&end), plain_days(&now));
+                    assert!(
+                        0.0 <= now && now <= end && end <= value,
+                        "{name} {}: today {now}, plan {end}, target {value}",
+                        b.id
+                    );
+                }
+                (
+                    Target::Readiness { of, .. },
+                    Target::Readiness { done: end, .. },
+                    Target::Readiness {
+                        done: now,
+                        of: now_of,
+                        ..
+                    },
+                ) => {
+                    assert_eq!(now_of, of, "{name} {}", b.id);
+                    assert!(now <= end, "{name} {}: {now} > {end}", b.id);
+                }
+                (
+                    Target::Evacuate { days_away, .. },
+                    Target::Evacuate { days_away: end, .. },
+                    Target::Evacuate { days_away: now, .. },
+                ) => {
+                    assert!(now == 0.0 || now == days_away, "{name}");
+                    assert!(
+                        now <= end,
+                        "{name}: a go-bag today but not at the plan's end"
+                    );
+                }
+                (Target::Months { .. }, end, now) => assert_eq!(end, now, "{name} {}", b.id),
+                other => panic!("{name} {}: {other:?}", b.id),
+            }
+        }
+    }
+}
+
+/// A household that has already done every step of its plan has, today, what the plan covers;
+/// a household that has done none of it has only what it owns.
+#[test]
+fn coverage_today_follows_what_the_household_has_done() {
+    for name in ["philadelphia-renters-4", "hays-kansas-farm-5"] {
+        let input = household(name);
+        let out = assess(&input);
+        // Every step at the quantity the plan gives it, one entry per item (the UI merges
+        // check-offs the same way).
+        let mut done: std::collections::BTreeMap<String, f32> = Default::default();
+        for m in &out.plan.months {
+            for it in m.items.iter().filter(|i| i.kind != PlanItemKind::Reserve) {
+                *done.entry(it.item_id.as_str().to_owned()).or_default() += it.quantity;
+            }
+        }
+        let mut all_done = input.clone();
+        all_done.existing = done
+            .into_iter()
+            .map(|(id, qty)| rr_types::Owned {
+                item_id: id.as_str().into(),
+                qty,
+                paid_usd: None,
+            })
+            .collect();
+        let after = assess(&all_done);
+        for (b, a) in out.buckets.iter().zip(&after.buckets) {
+            if b.id.kind() == BucketKind::Duration {
+                assert_eq!(
+                    plain_days(&a.covered_today),
+                    plain_days(&b.covered),
+                    "{name} {}: today once every step is done",
+                    b.id
+                );
+            }
+        }
+        // Nothing listed and no basics assumed: today covers only buckets with nothing to buy.
+        let mut none = input.clone();
+        none.existing.clear();
+        none.assume_basics = false;
+        let bare = common::run(&none);
+        for b in &bare.buckets {
+            if b.id.kind() == BucketKind::Duration && !bare.offers.rule.parts_of(b.id).is_empty() {
+                assert_eq!(plain_days(&b.covered_today), 0.0, "{name} {}", b.id);
+            }
+        }
+    }
+}
+
+/// The packet's "Spend" (verification V-18): a month's money out counts a deposit once and a
+/// purchase paid from savings only for the rest, so it never exceeds the month's budget plus what
+/// earlier months left unspent, and never more than the month's lines add up to.
+#[test]
+fn a_months_spend_never_exceeds_its_budget_plus_what_earlier_months_left() {
+    for (name, input) in rr_types::fixtures::all() {
+        let a = common::run(&input);
+        let (mut budget, mut spent) = (0.0_f64, 0.0_f64);
+        for m in &a.budget.plan.months {
+            budget += f64::from(m.budget_usd);
+            let s = a.month_spend(m.index);
+            assert!(
+                spent + s <= budget + 0.01,
+                "{name} month {}: spends {s:.2} with {:.2} available",
+                m.index,
+                budget - spent
+            );
+            spent += s;
+            let lines: f64 = m
+                .items
+                .iter()
+                .filter(|i| !i.done && i.kind != PlanItemKind::FreeAction)
+                .map(|i| f64::from(i.est_cost_usd))
+                .sum();
+            assert!(s <= lines + 1e-6, "{name} month {}", m.index);
+        }
+    }
+    // Philadelphia, month 14: the last $30 toward the cash reserve and the $100 it buys ($90
+    // of it saved) are $40 of that month's $60, not $130.
+    let a = common::run(&household("philadelphia-renters-4"));
+    assert!(
+        (a.month_spend(14) - 40.0).abs() < 0.01,
+        "{}",
+        a.month_spend(14)
+    );
+    assert!(a.input.finances.monthly_budget_usd >= 40.0);
+    let packet = assess(&household("philadelphia-renters-4")).packet_markdown;
+    assert!(
+        packet.contains(
+            "| 14 (December 2027) | save toward cash in small bills; Cash in small bills: $100, \
+             $90 of it from savings | $40 |"
+        ),
+        "the table row"
+    );
+}

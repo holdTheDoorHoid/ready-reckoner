@@ -210,7 +210,8 @@ pub struct Purchase {
 }
 
 /// What the allocator returns. `rr-plan` copies `plan` and `warnings` into `PlanOutput`, fills
-/// each `BucketAssessment::covered` from `covered`, and takes the tiers from here.
+/// each `BucketAssessment::covered` from `covered` and `covered_today` from `covered_today`, and
+/// takes the tiers from here.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct BudgetResult {
     /// The month-by-month plan, with envelopes and the savings track.
@@ -218,6 +219,10 @@ pub struct BudgetResult {
     /// Coverage at the end of the plan, per bucket, in the bucket's target kind (duration and
     /// readiness buckets; money buckets are left to the savings track and insurance).
     pub covered: BTreeMap<BucketId, Target>,
+    /// Coverage before the plan buys anything, in the same shape as `covered`: what the household
+    /// already has (existing inventory, including anything the caller credits as owned, and the
+    /// free actions it has already done). The state `tier_reached` is measured on.
+    pub covered_today: BTreeMap<BucketId, Target>,
     /// Coverage at the end of every month of the plan.
     pub coverage_by_month: Vec<MonthCoverage>,
     /// Money at every month of the plan.

@@ -47,6 +47,7 @@
   --gauge-track: #e3e0d8;
   --gauge-fill: #0e5c69;
   --gauge-over: #2b6a3c;
+  --gauge-plan: #7aaab2;
 
   --mock-bg: #fff3c4;
   --mock-ink: #4d3a00;
@@ -132,6 +133,7 @@
     --gauge-track: #2e3439;
     --gauge-fill: #62b6c4;
     --gauge-over: #7fc792;
+    --gauge-plan: #3f7780;
 
     --mock-bg: #3a2f10;
     --mock-ink: #f5dc93;
@@ -190,6 +192,7 @@
     --gauge-track: #2e3439;
     --gauge-fill: #62b6c4;
     --gauge-over: #7fc792;
+    --gauge-plan: #3f7780;
 
     --mock-bg: #3a2f10;
     --mock-ink: #f5dc93;

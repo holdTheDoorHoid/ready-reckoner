@@ -432,6 +432,7 @@ mod tests {
         }
         let r = verify(&dir).unwrap();
         assert!(r.problems.is_empty(), "{:?}", r.problems);
-        assert!(r.files >= 19, "{} files", r.files);
+        // 17 core files and the map (zip_centroids.csv left the pack on 2026-09-26).
+        assert!(r.files >= 18, "{} files", r.files);
     }
 }

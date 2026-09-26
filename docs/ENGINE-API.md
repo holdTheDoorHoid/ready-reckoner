@@ -148,7 +148,8 @@ HazardProfile { id, name, tier: natural|societal|personal, display: ranked|rare_
                 confidence: high|medium|low|prior, sources: [CitationId], frequency_sentence,
                 buckets: [BucketId] }
 
-BucketAssessment { id, name, target: Target, covered: Target, tier_enough: TierId,
+BucketAssessment { id, name, target: Target, covered: Target, covered_today: Target,
+                   tier_enough: TierId,
                    contributions: [{ hazard, share }], frequency_sentences: [string],
                    sources: [CitationId],
                    relief?: { help_arrives_days, mostly_restored_days, sources } }
@@ -187,8 +188,14 @@ What the numbers mean:
   and for `home_loss` (an insurance-and-documents decision with no stockpile target).
   `value` is rounded to the day ladder ½, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 180, 365
   (`TARGET_LADDER_DAYS` in both Rust and TypeScript); `low` and `high` are the 10th and 90th
-  percentiles under parameter uncertainty. In `covered`, `low` and `high` equal `value` and
-  `p_need_10yr` repeats the target's. `tier_enough` is where the plan stops adding to that bucket.
+  percentiles under parameter uncertainty. `covered` is where the plan takes the household once
+  every step in it is done; `covered_today` is what the household has now, before the plan buys
+  anything: `existing` (what it owns and has checked off) plus the assumed basics when
+  `assume_basics` is on. Both have the target's kind, days never exceed the target's days, and
+  `covered_today` never exceeds `covered`; in both, `low` and `high` equal `value` and
+  `p_need_10yr` repeats the target's. The plan screen's progress bars and the risks screen's
+  gauges show `covered_today` as "you have now" and `covered` as "your plan covers".
+  `tier_enough` is where the plan stops adding to that bucket.
 - `relief` (duration buckets, where known): when outside help plausibly arrives and when service is
   mostly restored for the design event (the Oregon Resilience Plan's two-tier rating).
 - `scenarios`: named scenarios (for example `cascadia_m9`) that apply to this location, with the
@@ -305,15 +312,15 @@ comes back at once.
 
 1. `manifest.json` first. The engine checks every later file against the sha256 it records (a file
    loaded before the manifest is checked when the manifest arrives).
-2. Every file listed under `packs.core.files` except the three ZIP tables, fetched at once and
+2. Every file listed under `packs.core.files` except the two ZIP tables, fetched at once and
    loaded one by one with `core/counties.csv` last. The engine reassembles the county records
    after each file, which is only real work once the county list is in, so this order is the
    fastest; any order gives the same answers.
-3. The ZIP tables (`core/zip_county.csv`, `core/zip_centroids.csv`, `core/zip_facilities.csv`;
-   `ZIP_FILES` in `crates/rr-wasm/src/source.rs`) when a location has a real ZIP code: the app
-   starts fetching them when someone starts typing one, or when a saved plan has one. Only ZIP
-   lookups read them, so a first visit is about 0.65 MB lighter, and someone who finds their
-   county by name never downloads them.
+3. The ZIP tables (`core/zip_county.csv`, `core/zip_facilities.csv`; `ZIP_FILES` in
+   `crates/rr-wasm/src/source.rs`) when a location has a real ZIP code: the app starts fetching
+   them when someone starts typing one, or when a saved plan has one. Only ZIP lookups read them,
+   so a first visit is about 0.38 MB lighter, and someone who finds their county by name never
+   downloads them.
 4. `geo/counties.json` (county outlines for the map) only when a map is shown; nothing else needs
    it.
 

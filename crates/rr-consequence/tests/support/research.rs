@@ -49,6 +49,7 @@ pub fn outage_stats(rate: f32, median_h: f64, p90_h: f64, years: &str) -> Outage
         years_covered: years.to_owned(),
         event_definition: "county events with at least 0.5% of customers out (research prototype)"
             .to_owned(),
+        state_series: None,
     }
 }
 

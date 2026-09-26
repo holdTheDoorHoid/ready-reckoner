@@ -48,7 +48,6 @@ pub const PACK_FILES: &[&str] = &[
     "core/states.csv",
     "core/ct_crosswalk.csv",
     "core/zip_county.csv",
-    "core/zip_centroids.csv",
     "core/nri_counties.csv",
     "core/nri_hazards.csv",
     "core/nri_semantics.toml",
@@ -87,13 +86,10 @@ struct NriCounty {
 struct RawNri {
     hazard: HazardId,
     afreq: Option<f32>,
-    expb: Option<f32>,
     expp: Option<f32>,
-    ealb: Option<f32>,
     ealp: Option<f32>,
     ealt: Option<f32>,
     hlrb: Option<f32>,
-    alrb: Option<f32>,
     risk_score: Option<f32>,
 }
 
@@ -104,6 +100,15 @@ struct RawOutage {
     median_hours: f32,
     p90_hours: f32,
     years_covered: String,
+}
+
+/// A state's pooled outage figures (`outages_state.csv`, keyed by state abbreviation).
+#[derive(Debug, Clone)]
+struct RawStateOutage {
+    events_per_customer_year: f32,
+    p: [f32; 4],
+    median_hours: f32,
+    p90_hours: f32,
 }
 
 /// Facility data per county.
@@ -221,6 +226,7 @@ pub struct DataStore {
     semantics: BTreeMap<HazardId, SemanticsEntry>,
     nri_version: String,
     outages: BTreeMap<String, RawOutage>,
+    outages_state: BTreeMap<String, RawStateOutage>,
     events: BTreeMap<String, BTreeMap<String, EventRate>>,
     seismic: BTreeMap<String, Seismic>,
     climate: BTreeMap<String, BTreeMap<String, f32>>,
@@ -228,7 +234,6 @@ pub struct DataStore {
     facilities: BTreeMap<String, (Facilities, CountyFacilityFlags)>,
     vulnerability: BTreeMap<String, (Vulnerability, Option<u32>)>,
     zip_county: BTreeMap<String, Vec<(String, f32)>>,
-    zip_points: BTreeMap<String, LatLon>,
     zip_facilities: BTreeMap<String, ZipFacilities>,
     base_rates: Vec<BaseRate>,
     base_rate_entries: Vec<BaseRateEntry>,
@@ -443,8 +448,38 @@ impl DataStore {
                     );
                 }
             }
-            "core/states.csv" | "core/ct_crosswalk.csv" | "core/outages_state.csv" => {
+            "core/states.csv" | "core/ct_crosswalk.csv" => {
                 // Loaded for completeness and checksums; the engine reads county-level values.
+            }
+            "core/outages_state.csv" => {
+                // Each state's pooled series, for the counties with no outage record.
+                let ix = |c: &str| t.col(c);
+                let (i_s, i_e, i_1, i_3, i_7, i_14, i_m, i_9) = (
+                    ix("state_abbr")?,
+                    ix("events_per_customer_year")?,
+                    ix("p_ge_1d")?,
+                    ix("p_ge_3d")?,
+                    ix("p_ge_7d")?,
+                    ix("p_ge_14d")?,
+                    ix("median_hours")?,
+                    ix("p90_hours")?,
+                );
+                self.outages_state.clear();
+                for r in &t.rows {
+                    let g = |i: usize| {
+                        f32c(&r[i])
+                            .ok_or_else(|| corrupt(name, format!("missing value for {}", r[i_s])))
+                    };
+                    self.outages_state.insert(
+                        r[i_s].clone(),
+                        RawStateOutage {
+                            events_per_customer_year: g(i_e)?,
+                            p: [g(i_1)?, g(i_3)?, g(i_7)?, g(i_14)?],
+                            median_hours: g(i_m)?,
+                            p90_hours: g(i_9)?,
+                        },
+                    );
+                }
             }
             "core/zip_county.csv" => {
                 let (i_z, i_c, i_s) = (t.col("zip")?, t.col("county_fips")?, t.col("land_share")?);
@@ -460,22 +495,6 @@ impl DataStore {
                 for v in self.zip_county.values_mut() {
                     v.sort_by(|a, b| b.1.total_cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
                 }
-            }
-            "core/zip_centroids.csv" => {
-                let (i_z, i_lat, i_lon) = (t.col("zip")?, t.col("lat")?, t.col("lon")?);
-                self.zip_points = t
-                    .rows
-                    .iter()
-                    .filter_map(|r| {
-                        Some((
-                            r[i_z].clone(),
-                            LatLon {
-                                lat: f(&r[i_lat])?,
-                                lon: f(&r[i_lon])?,
-                            },
-                        ))
-                    })
-                    .collect();
             }
             "core/nri_counties.csv" => {
                 let (i_f, i_p, i_b, i_c, i_t) = (
@@ -505,15 +524,14 @@ impl DataStore {
             "core/nri_hazards.csv" => {
                 let ix = |c: &str| t.col(c);
                 let (i_f, i_h) = (ix("fips")?, ix("hazard")?);
+                // The pack's columns since 2026-09-26; older packs also carry expb, ealb and
+                // alrb, which nothing reads.
                 let cols = [
                     ix("afreq")?,
-                    ix("expb")?,
                     ix("expp")?,
-                    ix("ealb")?,
                     ix("ealp")?,
                     ix("ealt")?,
                     ix("hlrb")?,
-                    ix("alrb")?,
                     ix("risk_score")?,
                 ];
                 self.nri_rows.clear();
@@ -527,14 +545,11 @@ impl DataStore {
                         .push(RawNri {
                             hazard,
                             afreq: v[0],
-                            expb: v[1],
-                            expp: v[2],
-                            ealb: v[3],
-                            ealp: v[4],
-                            ealt: v[5],
-                            hlrb: v[6],
-                            alrb: v[7],
-                            risk_score: v[8],
+                            expp: v[1],
+                            ealp: v[2],
+                            ealt: v[3],
+                            hlrb: v[4],
+                            risk_score: v[5],
                         });
                 }
             }
@@ -757,6 +772,24 @@ impl DataStore {
             .and_then(|m| m.definition("outages", "event_definition"))
             .unwrap_or("EAGLE-I outage event (definition in data/manifest.json)")
             .to_string();
+        // The years a state's series covers: the span of its counties' own records.
+        let mut state_years: BTreeMap<&str, (String, String)> = BTreeMap::new();
+        for (fips, o) in &self.outages {
+            let (Some(base), Some((from, to))) =
+                (self.base.get(fips), o.years_covered.split_once('-'))
+            else {
+                continue;
+            };
+            let e = state_years
+                .entry(base.state_abbr.as_str())
+                .or_insert_with(|| (from.to_owned(), to.to_owned()));
+            if from < e.0.as_str() {
+                e.0 = from.to_owned();
+            }
+            if to > e.1.as_str() {
+                e.1 = to.to_owned();
+            }
+        }
         let mut out = BTreeMap::new();
         for (fips, base) in &self.base {
             let nc = self.nri_county.get(fips).cloned().unwrap_or_default();
@@ -773,29 +806,53 @@ impl DataStore {
                         NriHazard {
                             afreq: r.afreq,
                             afreq_kind: kind,
-                            expb: r.expb,
+                            expb: None,
                             expp: r.expp,
-                            ealb: r.ealb,
+                            ealb: None,
                             ealp: r.ealp,
                             ealt: r.ealt,
                             hlrb: r.hlrb,
-                            alrb: r.alrb,
+                            alrb: None,
                             risk_score: r.risk_score,
                         },
                     ))
                 })
                 .collect();
-            let outages = self.outages.get(fips).map(|o| OutageStats {
-                events_per_customer_year: o.events_per_customer_year,
-                p_ge_1d: o.p[0],
-                p_ge_3d: o.p[1],
-                p_ge_7d: o.p[2],
-                p_ge_14d: o.p[3],
-                median_hours: o.median_hours,
-                p90_hours: o.p90_hours,
-                years_covered: o.years_covered.clone(),
-                event_definition: event_definition.clone(),
-            });
+            // A county with no outage record of its own takes its state's pooled series, marked
+            // as such (verification V-15: without it, a third of short storm outages stood in,
+            // and Juneau got half a day of power).
+            let outages = match self.outages.get(fips) {
+                Some(o) => Some(OutageStats {
+                    events_per_customer_year: o.events_per_customer_year,
+                    p_ge_1d: o.p[0],
+                    p_ge_3d: o.p[1],
+                    p_ge_7d: o.p[2],
+                    p_ge_14d: o.p[3],
+                    median_hours: o.median_hours,
+                    p90_hours: o.p90_hours,
+                    years_covered: o.years_covered.clone(),
+                    event_definition: event_definition.clone(),
+                    state_series: None,
+                }),
+                None => self
+                    .outages_state
+                    .get(&base.state_abbr)
+                    .map(|o| OutageStats {
+                        events_per_customer_year: o.events_per_customer_year,
+                        p_ge_1d: o.p[0],
+                        p_ge_3d: o.p[1],
+                        p_ge_7d: o.p[2],
+                        p_ge_14d: o.p[3],
+                        median_hours: o.median_hours,
+                        p90_hours: o.p90_hours,
+                        years_covered: state_years
+                            .get(base.state_abbr.as_str())
+                            .map(|(a, b)| format!("{a}-{b}"))
+                            .unwrap_or_default(),
+                        event_definition: event_definition.clone(),
+                        state_series: Some(base.state_name.clone()),
+                    }),
+            };
             let (vulnerability, households) = match self.vulnerability.get(fips) {
                 Some((v, h)) => (Some(v.clone()), *h),
                 None => (None, None),
@@ -853,9 +910,9 @@ impl DataStore {
         self.zip_county.iter()
     }
 
-    /// The ZIP centroid, if known.
-    pub fn zip_centroid(&self, zip: &str) -> Option<LatLon> {
-        self.zip_points.get(zip.trim()).copied()
+    /// How many ZIP codes (ZCTAs) `zip_county.csv` holds (0 before it is loaded).
+    pub fn zip_count(&self) -> usize {
+        self.zip_county.len()
     }
 
     /// Facility data for a ZIP, if known.

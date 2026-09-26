@@ -149,7 +149,7 @@ try {
   const mapFiles = lazy.files.filter((f) => f.path.startsWith('data/geo/'));
   summary.zipTables = { bytes: zipFiles.reduce((s, f) => s + f.bytes, 0), files: zipFiles.map((f) => f.path) };
   summary.map = { bytes: mapFiles.reduce((s, f) => s + f.bytes, 0), files: mapFiles.map((f) => f.path) };
-  check('the imported ZIP code fetches the ZIP tables, once', zipFiles.length === 3 && zipFiles.every((f) => f.requests === 1), summary.zipTables.files.join(', '));
+  check('the imported ZIP code fetches the ZIP tables, once', zipFiles.length === 2 && zipFiles.every((f) => f.requests === 1), summary.zipTables.files.join(', '));
   check('the first map fetches the county outlines, once', mapFiles.length === 1 && mapFiles[0].requests === 1, `${kb(summary.map.bytes)}`);
   await continueTo(page, 'Who is in your household');
   await continueTo(page, 'How you get around');

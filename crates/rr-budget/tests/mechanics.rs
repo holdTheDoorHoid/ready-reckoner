@@ -5,6 +5,8 @@
 
 mod common;
 
+use std::collections::BTreeMap;
+
 use common::item;
 use common::setup::{Setup, buy, divisible, set};
 use rr_budget::{
@@ -13,7 +15,8 @@ use rr_budget::{
     allocate_with_rule,
 };
 use rr_types::{
-    BucketId, ItemId, Owned, Per, PlanInput, PlanItemKind, RequirementLine, TierId, fixtures,
+    BucketId, ItemId, Owned, Per, PlanInput, PlanItemKind, RequirementLine, Target, TierId,
+    fixtures,
 };
 
 fn order(r: &BudgetResult) -> Vec<&str> {
@@ -231,6 +234,20 @@ fn recorded_prices_and_existing_inventory() {
     }
     let bought: f64 = r.sequence.iter().map(|p| p.quantity).sum();
     assert_eq!(bought, 8.0, "from 1 day to 3 days for 4 people");
+    // Today's coverage is what the household owns before the plan buys anything (one day); the
+    // plan's end point is the target (three).
+    let days = |t: &BTreeMap<BucketId, Target>| match t[&BucketId::Supplies] {
+        Target::Days { value, low, high } => {
+            assert!(value == low && value == high);
+            value
+        }
+        other => panic!("{other:?}"),
+    };
+    assert_eq!(days(&r.covered_today), 1.0);
+    assert_eq!(days(&r.covered), 3.0);
+    // With nothing owned, nothing is covered today.
+    s.household.existing.clear();
+    assert_eq!(days(&s.run().covered_today), 0.0);
 }
 
 /// A set owned in part is completed, not bought again: one headlamp of four is owned.
@@ -967,5 +984,10 @@ fn free_actions_beyond_eight_move_to_later_months_and_count_from_then() {
     // unnecessary.
     assert_eq!(month_of(&r, "lights"), Some(0));
     assert_eq!(month_of(&r, "containers"), None);
-    assert!(!r.warnings.iter().any(|w| w.id == "no_water_after_month_1"));
+    // The free step covers the 1-day no-water target, so there is nothing more to store.
+    assert!(
+        !r.warnings
+            .iter()
+            .any(|w| w.id == "no_stored_water_by_month_3")
+    );
 }

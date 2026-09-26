@@ -485,6 +485,9 @@ fn run(
         apply(&ctx, &mut state, &cand);
         free_order.push((cand.offer, cand.qty));
     }
+    // Coverage with what the household has and every free step done, before any purchase (the
+    // stored-water guardrail asks whether free steps leave the water short).
+    let after_free = state.track_cov.clone();
     // Free actions are spread over the first months (at most eight to do in any month). The
     // allocator values purchases as if all of them were done, since they cost nothing and all
     // come within three months, so it never buys what a scheduled free step will cover; the plan's
@@ -892,12 +895,13 @@ fn run(
     };
 
     let covered = covered_targets(&ctx, &state, &checklist);
+    let covered_today = covered_targets(&ctx, &so_far, &checklist);
     let free_month_of: BTreeMap<usize, u16> =
         scheduled_free.iter().map(|&(m, i, _)| (i, m)).collect();
     let facts = guardrail_facts(
         &ctx,
         &state,
-        &coverage_by_month,
+        &after_free,
         &purchase_months,
         &free_month_of,
         stopped,
@@ -907,6 +911,7 @@ fn run(
     Ok(BudgetResult {
         plan,
         covered,
+        covered_today,
         coverage_by_month,
         money_by_month,
         sequence,
@@ -2240,7 +2245,7 @@ fn tier_recommended(ctx: &Ctx<'_>) -> TierId {
 fn guardrail_facts(
     ctx: &Ctx<'_>,
     state: &State,
-    coverage_by_month: &[MonthCoverage],
+    after_free: &[f64],
     purchase_months: &BTreeMap<usize, u16>,
     free_month_of: &BTreeMap<usize, u16>,
     stopped: Option<u16>,
@@ -2264,6 +2269,9 @@ fn guardrail_facts(
                     && b.contains(&BucketId::Power)
             }
             ItemRole::GoBag => !o.item.free && b.contains(&BucketId::Evacuate),
+            ItemRole::StoredWater => {
+                !o.item.free && o.item.life_safety && b.contains(&BucketId::WaterOut)
+            }
         }
     };
     let first_month = |role: ItemRole| -> Option<u16> {
@@ -2285,12 +2293,43 @@ fn guardrail_facts(
             })
             .min()
     };
-    let water_after_month_1 = coverage_by_month
+    // Stored water is needed when free steps (refilled bottles) and what the household has leave
+    // the parts stored water fills short of the target; with nothing in the catalogue that stores
+    // water, when they leave any part of the no-water bucket short.
+    let stored_offers: Vec<usize> = (0..ctx.offers.len())
+        .filter(|&i| !ctx.offers[i].item.free && has_role(&ctx.offers[i], ItemRole::StoredWater))
+        .collect();
+    let short = |t: usize| after_free[t] + 1e-6 < ctx.tracks[t].target;
+    // The no-water parts stored water fills (the stored-water part, not the toilet): where a
+    // plentiful supply of it, alone, gives cover.
+    let water_tracks: BTreeSet<usize> = stored_offers
         .iter()
-        .take_while(|c| c.month <= 1)
-        .last()
-        .and_then(|c| c.days.get(&BucketId::WaterOut).copied())
-        .unwrap_or(0.0);
+        .flat_map(|&i| {
+            let plenty = vec![(
+                ctx.offers[i].item.id.clone(),
+                ctx.offers[i].set_quantity.max(1.0) * 1.0e4,
+            )];
+            ctx.offers[i]
+                .tracks
+                .iter()
+                .copied()
+                .filter(move |&t| ctx.tracks[t].bucket == BucketId::WaterOut)
+                .filter(move |&t| track_coverage(ctx, t, &plenty) > 1e-9)
+                .collect::<Vec<usize>>()
+        })
+        .collect();
+    let water_target = ctx
+        .input
+        .risks
+        .curves
+        .get(&BucketId::WaterOut)
+        .is_some_and(|c| c.target_days > 0.0);
+    let water_needed = water_target
+        && if water_tracks.is_empty() {
+            (0..ctx.tracks.len()).any(|t| ctx.tracks[t].bucket == BucketId::WaterOut && short(t))
+        } else {
+            water_tracks.iter().any(|&t| short(t))
+        };
     let uncovered: Vec<BucketId> = ctx
         .tracks
         .iter()
@@ -2307,7 +2346,26 @@ fn guardrail_facts(
         device_power_month: first_month(ItemRole::DevicePower),
         cold_chain_month: first_month(ItemRole::ColdChain),
         go_bag_month: first_month(ItemRole::GoBag),
-        water_after_month_1,
+        water_needed,
+        // Month 0 for stored water the household already has, else the first purchase; never a
+        // free step (`first_month` counts every free item from month 0).
+        stored_water_month: stored_offers
+            .iter()
+            .filter_map(|&i| {
+                let id = &ctx.offers[i].item.id;
+                let owned = ctx
+                    .input
+                    .household
+                    .existing
+                    .iter()
+                    .any(|e| e.item_id == *id && e.qty > 0.0);
+                if owned {
+                    Some(0)
+                } else {
+                    purchase_months.get(&i).copied()
+                }
+            })
+            .min(),
         uncovered_when_stopped: if stopped.is_some() {
             uncovered
         } else {

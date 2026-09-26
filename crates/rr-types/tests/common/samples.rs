@@ -184,6 +184,7 @@ fn bucket(id: BucketId, target: Target, relief: Option<Relief>) -> BucketAssessm
         name: id.name().into(),
         target,
         covered: target,
+        covered_today: target,
         tier_enough: TierId::W2,
         contributions: vec![Contribution {
             hazard: HazardId::IceStorm,

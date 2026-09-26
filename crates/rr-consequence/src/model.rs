@@ -755,16 +755,21 @@ fn add_pool_terms(
     match from_stats {
         Some((stats, curve, dropped)) => {
             let rate = f64::from(stats.events_per_customer_year);
+            // A county with no records of its own uses its state's pooled series (rr-data).
+            let place = match &stats.state_series {
+                Some(state) => format!("across {state}"),
+                None => "here".to_owned(),
+            };
             let rp = ps.factor(
                 "rate:outage_stats".to_owned(),
                 table.params.outage_stats_rate_factor.value,
-                "how often county-wide storm outages happen here".to_owned(),
+                format!("how often county-wide storm outages happen {place}"),
                 Evidence::Empirical,
             );
             let dp = ps.factor(
                 "dur:outage_stats".to_owned(),
                 table.params.duration_factor_empirical.value,
-                "how long county-wide storm outages last here".to_owned(),
+                format!("how long county-wide storm outages last {place}"),
                 Evidence::Empirical,
             );
             let source = CitationId::from("ornl_eagle_i_outages");
@@ -813,8 +818,14 @@ fn add_pool_terms(
                 bucket: BucketId::Power,
                 hazards,
                 plain: format!(
-                    "Power: county-wide storm outages use this county's outage records ({}): a home \
-                     here is caught in one about {}; half are over within {}, 9 in 10 within {}.",
+                    "Power: county-wide storm outages use {} ({}): a home here is caught in one \
+                     about {}; half are over within {}, 9 in 10 within {}.",
+                    match &stats.state_series {
+                        Some(state) => format!(
+                            "{state}'s outage records, because this county has none of its own"
+                        ),
+                        None => "this county's outage records".to_owned(),
+                    },
                     stats.years_covered,
                     words::rate_phrase(rate),
                     words::hours_phrase(f64::from(stats.median_hours)),
@@ -1482,6 +1493,7 @@ mod tests {
             p90_hours,
             years_covered: "2020-2025".to_owned(),
             event_definition: String::new(),
+            state_series: None,
         }
     }
 

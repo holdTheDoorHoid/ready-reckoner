@@ -680,6 +680,10 @@ fn metadata(offered: &[Offered], rule: &PlanCoverage) -> (Vec<ItemMeta>, Vec<Ite
         if meets("evacuate.go_bag") {
             m.roles.push(ItemRole::GoBag);
         }
+        // Stored water itself, not the free step of refilling bottles (an alternative).
+        if meets("water_out.water_gallons") && !o.item.free {
+            m.roles.push(ItemRole::StoredWater);
+        }
         let measured = !m.readiness.is_empty() || o.joins.iter().any(|j| rule.covers(j));
         if !measured && !o.item.hazard_extras.is_empty() && !o.item.free {
             extras.push(o.item.id.clone());

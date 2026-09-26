@@ -166,10 +166,10 @@
       {/if}
 
       <section aria-labelledby="progress-title">
-        <h2 id="progress-title">Where your plan takes you</h2>
+        <h2 id="progress-title">Where you are, and where your plan takes you</h2>
         <p class="section-intro">
-          How much of each target the plan covers once every step in it is done. What you have already done is counted in the plan above ("Done so
-          far").
+          The solid bar is what you have now: what you already own and the steps you have checked off. The striped bar is how much of each
+          target the plan covers once every step in it is done.
         </p>
         <div class="progress card">
           {#each output.buckets.filter((b) => b.target.kind === 'days') as b (b.id)}<BucketGauge bucket={b} compact />{/each}

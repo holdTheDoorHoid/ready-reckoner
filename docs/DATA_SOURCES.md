@@ -44,9 +44,12 @@ cargo run -p rr-etl -- jobs
 
 ## 2. The packs
 
-Sizes are gzip -9 as a static host would serve them. The core pack totals **2.99 MB**
-gzipped file by file (3.05 MB as one `gzip -c data/core/*` stream; budget 5 MB) and 10.8 MB
-uncompressed; `geo/counties.json` is **0.30 MB** gzipped (budget 0.35 MB).
+Sizes are gzip -9 as a static host would serve them. The core pack totals **2.37 MB**
+gzipped file by file (2.42 MB as one `gzip -c data/core/*` stream; budget 5 MB) and 8.8 MB
+uncompressed; a first visit fetches 1.99 MB of it (everything but the two ZIP tables, which load
+when a ZIP code is typed). `geo/counties.json` is **0.30 MB** gzipped (budget 0.35 MB). Until
+2026-09-26 the core pack was 2.99 MB: it also shipped `zip_centroids.csv` and three NRI columns
+(`expb`, `ealb`, `alrb`) that nothing in the engine read.
 
 Licence shorthand: **PD** = US Government work, public domain (17 U.S.C. 105).
 
@@ -82,22 +85,22 @@ two shoreline flags are curated in the ETL (`STATE_FACTS`), not downloaded.
 dropped as boundary slivers). Source: Census 2020 ZCTA-to-county relationship file; Connecticut
 from the Census 2022 town-to-ZCTA file. PD. Refresh: with each decennial relationship file.
 
-### core/zip_centroids.csv (33,791 rows)
-
-`zip`, `lat`, `lon` (Census Gazetteer 2024 ZCTA internal points, 3 decimals ≈ 110 m). PD.
-
 ### core/nri_counties.csv (3,232 rows) and core/nri_hazards.csv (45,853 rows)
 
 | File | Columns |
 | --- | --- |
 | `nri_counties.csv` | `fips`, `population` (2020), `building_value_usd`, `eal_valt` (expected annual loss, all hazards, $), `sovi_score`, `resl_score`, `crf_value`, `coastal`, `tsunami_zone` |
-| `nri_hazards.csv` | `fips`, `hazard` (our 18 natural hazard ids), `afreq`, `expb` ($), `expp` (people), `ealb` ($/yr), `ealp` (people/yr), `ealt` ($/yr), `hlrb`, `alrb`, `risk_score` (0–100) |
+| `nri_hazards.csv` | `fips`, `hazard` (our 18 natural hazard ids), `afreq`, `expp` (people), `ealp` (people/yr), `ealt` ($/yr), `hlrb`, `risk_score` (0–100) |
 
 Source: FEMA National Risk Index v1.20.0 ("December 2025"), ArcGIS FeatureServer
 `National_Risk_Index_Counties` (fema.gov file downloads refuse scripted clients). Terms: see §6.
-Only these trimmed, rounded fields ship; the raw table is never written. Hazard rows where every
-field is empty (hazard not applicable) are omitted; drought has no building or population fields
-(NRI models it for agriculture only). `coastal` = NRI assigns coastal-flooding building exposure
+Only these trimmed, rounded fields ship; the raw table is never written. Building exposure, building
+loss and the building loss rate (`EXPB`, `EALB`, `ALRB`) were dropped on 2026-09-26 because no crate
+reads them (`EXPB` of coastal flooding and tsunami is still read, only to set the two flags below).
+`ealp` (population loss) stays although nothing reads it yet: it is the input a health-based
+severity for heat and cold would use. Hazard rows where every field is empty (hazard not
+applicable) are omitted; drought has no building or population fields (NRI models it for
+agriculture only). `coastal` = NRI assigns coastal-flooding building exposure
 (`CFLD_EXPB > 0`, 536 counties); `tsunami_zone` = tsunami building or population exposure (118
 counties). Both flags are ours, derived from NRI. Refresh: when FEMA publishes a new version (the
 job refuses to run on anything but v1.20 until the semantics are reviewed).
@@ -120,7 +123,8 @@ yearly chance) and `notes`. The traps it records:
 - **Coastal flooding** is a modelled sum including recurring high-tide flooding (often > 1 a
   year); it is not the chance of a damaging surge.
 - **Inland flooding** replaced riverine flooding in v1.20 and treats about 100% of a county's
-  buildings as exposed: `ealb/expb` is a county-wide average, not an in-floodplain rate.
+  buildings as exposed: its building loss ratio (`EALB`/`EXPB`, not shipped) is a county-wide
+  average, not an in-floodplain rate.
 
 ### core/outages.csv (3,153 rows) and core/outages_state.csv (53 rows) — see §5
 
@@ -139,7 +143,9 @@ yearly chance) and `notes`. The traps it records:
 | `longest_event_hours` | Longest qualifying event |
 
 `outages_state.csv` pools the same statistics by state (customer-weighted), for small-sample
-fallback. Source: ORNL EAGLE-I recorded electricity outages 2014–2025, figshare
+fallback. The engine uses a state's row for every county with no row in `outages.csv` (72 counties
+in 9 states; `rr-data` marks the record `state_series` and gives it the years its state's
+counties cover); American Samoa, Guam and the Northern Mariana Islands have no state row. Source: ORNL EAGLE-I recorded electricity outages 2014–2025, figshare
 doi:10.6084/m9.figshare.24237376 (v4, 2026-02-25), `MCC.csv`, `coverage_history.csv`; CDC SVI 2022
 household counts. **CC BY 4.0: the credit line in §7 must be shown.** Refresh: yearly (a new year
 is added each spring).
@@ -243,8 +249,12 @@ Refresh: quarterly.
 NID dams rated High hazard potential), `nuclear_within_16km` / `nuclear_within_80km` (any part of
 the county within 10 / 50 miles of an operating plant), `significant_hazard_dams`.
 `zip_facilities.csv`: `nearest_nuclear_km` (from the ZIP centroid, 0.1 km), `tri_within_5km`.
+ZIP centroids are the Census Gazetteer 2024 ZCTA internal points rounded to 3 decimals (≈ 110 m);
+the job reads them itself and they are not shipped (until 2026-09-26 they were
+`core/zip_centroids.csv`, which nothing in the engine read).
 Sources: FEMA Operating Nuclear Power Plant Sites (57), EPA TRI basic data file 2024, USACE National
-Inventory of Dams (nation CSV), Census 2024 1:500k county boundaries for point-in-polygon. PD.
+Inventory of Dams (nation CSV), Census 2024 1:500k county boundaries for point-in-polygon, Census
+Gazetteer 2024 ZCTAs. PD.
 Hazard potential rates the consequence of a failure (High: probable loss of life), not its
 likelihood. Refresh: yearly.
 

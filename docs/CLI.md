@@ -232,7 +232,7 @@ stop.
 
 ```
 $ rr citations --missing
-Checked 217 citation ids referred to by the content, the engine crates and the data (data pack e8b8cd6861e6 (data)).
+Checked 219 citation ids referred to by the content, the engine crates and the data (data pack 25f3ed156688 (data)).
 1 is not defined in content/citations.toml:
 
  Id                         Status                                       Referred to by
@@ -252,7 +252,7 @@ social vulnerability. A search with no match exits 1.
 
 ```
 $ rr county search "Cook, IL"
-1 match for "Cook, IL" in data pack e8b8cd6861e6 (data)
+1 match for "Cook, IL" in data pack 25f3ed156688 (data)
 
  FIPS   County  State          Population
  17031  Cook    Illinois (IL)   5,273,000
@@ -276,11 +276,11 @@ fixture household resolves to a county. On the fixtures it says
 $ rr data verify
 Verifying the data pack in data
 
-  ok  store: 19 files load by their manifest path and match their sha256 (pack e8b8cd6861e6)
-  ok  store: row counts match the manifest for 19 of 19 files
+  ok  store: 18 files load by their manifest path and match their sha256 (pack 25f3ed156688)
+  ok  store: row counts match the manifest for 18 of 18 files
   ok  store: 3,232 county records, 33,791 ZIP codes, 3,222 counties on the map
   ok  engine: 7 of 7 fixture households resolve to a county with a record
-  ok  rr-etl verify: 19 files, 71 checks, 0 problems
+  ok  rr-etl verify: 18 files, 69 checks, 0 problems
 ...
 Everything checks out.
 ```
@@ -325,15 +325,15 @@ debug builds and CI machines are slower than the target describes.
 
 ```
 $ cargo run --release -p rr-cli -- doctor
-rr doctor: 7 fixture households on data pack e8b8cd6861e6 (data)
-Engine 0.1.0 (API 1), content 2026.09.25+0e9448c9, release build, 5 timed runs each
+rr doctor: 7 fixture households on data pack 25f3ed156688 (data)
+Engine 0.1.0 (API 1), content 2026.09.25+1318eadb, release build, 5 timed runs each
 
   ok  content validation: 0 errors, 0 warnings
-  ok  catalogue: 140 items, 0 without a resolvable citation
+  ok  catalogue: 104 items, 0 without a resolvable citation
 
  Fixture                        County            Median ms  Max ms  < 50 ms  Same bytes  Warnings  Uncited
- chicago-student-zero-budget-1  Cook, IL                 14      14  yes      yes                2        0
- coos-bay-well-owner-2          Coos, OR                 25      26  yes      yes                2        0
+ chicago-student-zero-budget-1  Cook, IL                 11      12  yes      yes                3        0
+ coos-bay-well-owner-2          Coos, OR                 17      19  yes      yes                2        0
 ...
 Result: OK. Every fixture plans, repeats byte for byte, and cites every number.
 ```

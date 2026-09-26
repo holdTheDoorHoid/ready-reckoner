@@ -464,7 +464,7 @@ export interface HazardProfile {
  */
 export const TARGET_LADDER_DAYS = [0.5, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 180, 365] as const;
 
-/** Duration buckets. `low`/`high` are the 10th and 90th percentiles; in `covered` they equal `value`. */
+/** Duration buckets. `low`/`high` are the 10th and 90th percentiles; in `covered` and `covered_today` they equal `value`. */
 export interface TargetDays {
   kind: 'days';
   value: number;
@@ -519,8 +519,14 @@ export interface BucketAssessment {
   name: string;
   /** Its kind matches the bucket's `target_kind` (see `catalogue().buckets`). */
   target: Target;
-  /** Same kind as `target`. */
+  /** Where the plan takes the household once every step is done. Same kind as `target`. */
   covered: Target;
+  /**
+   * What the household has covered today, before the plan buys anything: what it owns and has
+   * checked off (with the assumed basics when `assume_basics` is on). Same kind as `target`;
+   * never more than `covered`.
+   */
+  covered_today: Target;
   tier_enough: TierId;
   /** Largest share first. */
   contributions: Contribution[];

@@ -120,10 +120,6 @@ const CORE: &[(&str, &[u8])] = &[
         include_bytes!("../../../data/core/vulnerability.csv"),
     ),
     (
-        "core/zip_centroids.csv",
-        include_bytes!("../../../data/core/zip_centroids.csv"),
-    ),
-    (
         "core/zip_county.csv",
         include_bytes!("../../../data/core/zip_county.csv"),
     ),

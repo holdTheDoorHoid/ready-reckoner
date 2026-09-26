@@ -1,5 +1,6 @@
-//! Job 1 — geography: the canonical county list, states, ZIP-to-county shares, ZIP centroids,
-//! the Connecticut crosswalk and the county map.
+//! Job 1 — geography: the canonical county list, states, ZIP-to-county shares, the Connecticut
+//! crosswalk and the county map. It also reads the ZIP (ZCTA) internal points for the facilities
+//! job ([`zcta_points`]); they are not shipped, because nothing in the engine reads a ZIP's point.
 //!
 //! Sources (all Census Bureau, public domain, except the NCA5 region polygons, CC0):
 //! - Cartographic boundary counties 2024, 1:500,000 (names, territories) and 1:20,000,000 (map);
@@ -27,8 +28,6 @@ pub const COUNTIES: &str = "core/counties.csv";
 pub const STATES: &str = "core/states.csv";
 /// ZIP (ZCTA) to county land shares.
 pub const ZIP_COUNTY: &str = "core/zip_county.csv";
-/// ZIP (ZCTA) internal points.
-pub const ZIP_CENTROIDS: &str = "core/zip_centroids.csv";
 /// County map for the web app.
 pub const GEO_COUNTIES: &str = "geo/counties.json";
 
@@ -600,34 +599,6 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         parts.len()
     ));
 
-    // --- ZIP centroids --------------------------------------------------------------------
-    let gz = ctx
-        .http
-        .get(GAZ_ZCTA, Some("geography/2024_Gaz_zcta_national.zip"))?;
-    out.source(source_from(
-        "Census 2024 Gazetteer, ZCTAs",
-        &gz,
-        version_of(&gz, "2024 Gazetteer"),
-        PUBLIC_DOMAIN,
-        "",
-    ));
-    let ztext = String::from_utf8_lossy(&zip_entry(&gz.bytes, ".txt")?).to_string();
-    let (zgh, zgrows) = parse_delimited(&ztext, b'\t')?;
-    let (zg_id, zg_lat, zg_lon) = (
-        col(&zgh, "GEOID")?,
-        col(&zgh, "INTPTLAT")?,
-        col(&zgh, "INTPTLONG")?,
-    );
-    let mut zc = Table::new(&["zip", "lat", "lon"], 1);
-    for r in &zgrows {
-        let (Ok(lat), Ok(lon)) = (r[zg_lat].parse::<f64>(), r[zg_lon].parse::<f64>()) else {
-            continue;
-        };
-        zc.push(vec![r[zg_id].clone(), fixed(lat, 3), fixed(lon, 3)]);
-    }
-    out.rows_in += zgrows.len() as u64;
-    out.table(ctx, ZIP_CENTROIDS, &mut zc)?;
-
     // --- County map (1:20m, 3 decimals) ---------------------------------------------------
     let cb20 = ctx
         .http
@@ -683,6 +654,52 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         accessed: regions_doc.retrieved[..10].to_string(),
     });
     Ok(out)
+}
+
+/// ZIP (ZCTA) internal points from the Census 2024 Gazetteer, for the facilities job's distances.
+pub struct ZctaPoints {
+    /// `(zip, lat, lon)`, each coordinate rounded to 3 decimals (about 110 m).
+    pub points: Vec<(String, f64, f64)>,
+    /// The Gazetteer download, for the manifest.
+    pub source: crate::manifest::SourceRecord,
+    /// Rows read.
+    pub rows_in: u64,
+}
+
+/// Reads the ZIP (ZCTA) internal points. The coordinates are rounded to 3 decimals exactly as
+/// `core/zip_centroids.csv` held them before it left the pack (2026-09-26), so the distances the
+/// facilities job measures from them are unchanged; ZIPs without a usable point are skipped.
+pub fn zcta_points(ctx: &Ctx) -> Result<ZctaPoints> {
+    let gz = ctx
+        .http
+        .get(GAZ_ZCTA, Some("geography/2024_Gaz_zcta_national.zip"))?;
+    let source = source_from(
+        "Census 2024 Gazetteer, ZCTAs",
+        &gz,
+        version_of(&gz, "2024 Gazetteer"),
+        PUBLIC_DOMAIN,
+        "",
+    );
+    let ztext = String::from_utf8_lossy(&zip_entry(&gz.bytes, ".txt")?).to_string();
+    let (zgh, zgrows) = parse_delimited(&ztext, b'\t')?;
+    let (zg_id, zg_lat, zg_lon) = (
+        col(&zgh, "GEOID")?,
+        col(&zgh, "INTPTLAT")?,
+        col(&zgh, "INTPTLONG")?,
+    );
+    let round3 = |cell: &str| -> Option<f64> {
+        let v = cell.parse::<f64>().ok()?;
+        fixed(v, 3).parse::<f64>().ok()
+    };
+    let points = zgrows
+        .iter()
+        .filter_map(|r| Some((r[zg_id].clone(), round3(&r[zg_lat])?, round3(&r[zg_lon])?)))
+        .collect();
+    Ok(ZctaPoints {
+        points,
+        source,
+        rows_in: zgrows.len() as u64,
+    })
 }
 
 fn geojson(

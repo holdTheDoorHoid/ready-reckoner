@@ -8,7 +8,7 @@ Stress before, during and after a disaster is normal. In FEMA's 2024 survey, the
 
 **What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[^samhsa_988] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[^samhsa_disaster_distress] Write a short calm plan: what you might feel, what helps you, and who you will call.[^rr_research_prior_art] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[^oregon_2_weeks_ready]
 
-**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[^aap_talking_to_children] Do not wait until things feel unbearable to reach out. The 988 line supports people in emotional distress as well as in crisis.[^samhsa_988]
+**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[^aap_talking_to_children] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[^samhsa_988]
 
 ## Sources
 

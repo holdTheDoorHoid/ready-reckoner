@@ -466,7 +466,7 @@ function heaterGallons(f: Facts): number {
   return f.house ? f.galPerDay : 0;
 }
 
-/** Days covered today for each duration bucket, before snapping to the ladder. */
+/** Days covered for each duration bucket by what is in `owned`, before snapping to the ladder. */
 export function coverage(owned: Owned, f: Facts, t: Targets): Record<DurationBucket, number> {
   let gallons = 0;
   for (const [id, per] of Object.entries(GALLONS)) gallons += q(owned, id) * per;
@@ -980,7 +980,8 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
   const years = input.dials.horizon_years;
   const dialRate = DIAL_RATE[input.dials.return_period];
 
-  // Buckets
+  // Buckets. `covered_today` is what the household has now; `covered` starts the same and moves
+  // to the plan's end point once the plan is scheduled (below).
   const cover = coverage(owned, facts, targets);
   const buckets: BucketAssessment[] = BUCKET_IDS.map((id) => {
     const { list, rate } = contributions(register, id);
@@ -993,7 +994,7 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
     if ((DURATION_BUCKETS as string[]).includes(id)) {
       const b = id as DurationBucket;
       target = targets.days[b];
-      const c = floorLadder(cover[b]);
+      const c = floorLadder(Math.min(cover[b], target.value));
       covered = { kind: 'days', value: c, low: c, high: c };
       tierEnough = tierForDays(target.value);
       relief = targets.relief[b];
@@ -1014,7 +1015,7 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
       const p = chanceWithin(readinessRate(register, id), 10);
       const ev = targets.evacuate;
       target = { kind: 'evacuate', p_need_10yr: sig(p), notice_hours_low: ev.notice_hours[0], notice_hours_high: ev.notice_hours[1], days_away: ev.days_away };
-      covered = { ...target };
+      covered = { ...target, days_away: has(owned, 'go_bag') ? ev.days_away : 0 };
       tierEnough = 'h72';
       sentences = [frequencySentence(p, READINESS_PHRASE.evacuate!, 10)];
     } else {
@@ -1031,6 +1032,7 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
       name: bucketName(id),
       target,
       covered,
+      covered_today: { ...covered },
       tier_enough: tierEnough,
       contributions: list,
       frequency_sentences: sentences,
@@ -1047,6 +1049,7 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
   const chunks = buildChunks(ctx);
   markDone(ctx, chunks);
   const { plan, schedule, unscheduled } = schedulePlan(ctx, chunks, buckets);
+  planEndCoverage(ctx, chunks, unscheduled, buckets);
 
   // Tiers reached and recommended
   const recommended = tierRecommended(targets);
@@ -1095,6 +1098,34 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
   const result: ModelResult = { output, facts, profile, register, targets, states, schedule };
   output.packet_markdown = buildPacket(input, result);
   return result;
+}
+
+/**
+ * Moves each bucket's `covered` to where the plan takes the household once every step is done:
+ * what it owns, every free step and every purchase the plan schedules (steps it cannot afford
+ * within the mock's horizon are left out). `covered_today` stays what the household has now.
+ */
+function planEndCoverage(ctx: Ctx, chunks: Chunk[], unscheduled: Chunk[], buckets: BucketAssessment[]): void {
+  const qty = new Map(ctx.owned.qty);
+  const add = (id: string, n: number) => qty.set(id, (qty.get(id) ?? 0) + n);
+  for (const id of freeActions(ctx)) if (!has(ctx.owned, id)) add(id, 1);
+  for (const c of chunks) if (!c.done && c.qty > 0 && !unscheduled.includes(c)) add(c.item.id, c.qty);
+  const end: Owned = { qty, paid: ctx.owned.paid };
+  const cover = coverage(end, ctx.f, ctx.targets);
+  const endCtx: Ctx = { ...ctx, owned: end };
+  for (const b of buckets) {
+    const t = b.target;
+    const today = b.covered_today;
+    if (t.kind === 'days' && today.kind === 'days') {
+      const c = Math.max(today.value, floorLadder(Math.min(cover[b.id as DurationBucket], t.value)));
+      b.covered = { kind: 'days', value: c, low: c, high: c };
+    } else if (t.kind === 'evacuate') {
+      b.covered = { ...t, days_away: has(end, 'go_bag') ? t.days_away : 0 };
+    } else if (t.kind === 'readiness') {
+      const items = readinessItems(endCtx, b.id);
+      b.covered = { ...t, done: items.filter((i) => i.done).length, of: items.length };
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1642,14 +1673,17 @@ function buildWarnings(
   const firstWater = Math.min(
     ...chunks.filter((c) => c.resource === 'water').map((c) => (c.done ? -1 : (schedule.get(`${c.item.id}:${c.tier}`) ?? Infinity))),
   );
-  const freeWaterDays = (FREE_BOTTLE_GALLONS + heaterGallons(f)) / Math.max(0.1, f.galPerDay);
-  if (freeWaterDays < 1 && firstWater > 1) {
+  // As the engine's guardrail: refilled bottles (and the water heater) leave the stored-water
+  // need short, and no stored water is owned or bought by month 3.
+  const freeGallons = FREE_BOTTLE_GALLONS + heaterGallons(f);
+  const storedNeed = Math.min(targets.days.water_out.value, 14) * f.galPerDay;
+  if (freeGallons < storedNeed && firstWater > 3) {
     out.push({
-      id: 'no_water_after_month1',
+      id: 'no_stored_water_by_month_3',
       severity: 'warn',
-      message: 'Stored water comes late in this plan.',
-      why: `${firstSentence(buckets, 'water_out')} Filling clean bottles you already have is free and covers the first day.`,
-      related: ['water_out', 'water_reused_bottles'],
+      message: 'No stored water beyond refilled bottles by month 3.',
+      why: 'Refilled drink bottles are a good start, but they hold only a little. Water is the one supply you cannot go long without: a few gallons of bottled water or a water jug is the next step, and costs little.',
+      related: ['water_out'],
     });
   }
   const evac = buckets.find((b) => b.id === 'evacuate')!.target;

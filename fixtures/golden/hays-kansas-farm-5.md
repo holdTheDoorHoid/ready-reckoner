@@ -8,7 +8,7 @@
 
 ## Summary
 
-**Where you are now:** getting started. **What is enough for your risks:** three months of supplies; each need stops at the step that covers it. At your budget, the plan gets there by month 43 (May 2030).
+**Where you are now:** getting started. **What is enough for your risks:** three months of supplies; each need stops at the step that covers it. At your budget, the plan gets there by month 34 (August 2029).
 
 ### The three things that matter most
 
@@ -89,7 +89,7 @@ Of 100 households like yours, about 95 (87–99) will have someone lose a job in
 
 **What helps.** Build an emergency fund a little at a time. The right amount depends on your situation.[29] Planners often suggest three to six months of living expenses, and more if your income varies.[30] Know how to file for unemployment in your state.[31] Keep copies of your financial, legal and medical papers together, with the names of people to call.[32] Write a bare-bones budget you could switch to, and keep a pantry that can stretch a tight month.
 
-**What to avoid.** Do not wait to file. Contact your state's unemployment program as soon as possible after losing work.[31] Do not keep your emergency fund in investments you would have to sell. A savings account lets you take money out at any time without a penalty.[30]
+**What to avoid.** File soon after losing work: contact your state's unemployment program as soon as you can.[31] Do not keep your emergency fund in investments you would have to sell. A savings account lets you take money out at any time without a penalty.[30]
 
 **What it can do:** lost income. **How bad:** Serious. **How sure:** Mostly data.
 
@@ -262,6 +262,7 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] **Baby wipes**: 2 packs, about $5 (usually $5). Adds 5 days of diapers and wipes, bringing you to 5 of the 10-day goal.
 - [ ] **N95 respirators**: 20 respirators, about $20 (usually $14–26). Gets you ready for a medical emergency before help arrives.
 - [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17). Gets you ready for getting home if you are stranded.
+- [ ] **Period products for two cycles**: 2 cycles' supplies, about $12 (usually $9–15). Adds 10 days of period products, which completes the 10-day goal.
 
 ### Month by month
 
@@ -275,10 +276,9 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Pick a warm room for a winter outage (free)
 - [ ] Neighbours and skills: swap numbers, check on each other, learn first aid (free)
 - [ ] If you own firearms: safe storage and training (free)
-- [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20)
-- [ ] **Period products for two cycles**: 2 cycles' supplies, about $12 (usually $9–15)
 - [ ] **Extra pet food in an airtight container**: 13 pounds of dry food, about $16 (usually $10–22)
 - [ ] **Personal straw or squeeze filter for a bag**: 1 filter, about $23 (usually $18–29)
+- [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20)
 
 **Month 3 (from January 1, 2027), $80 to spend**
 
@@ -290,12 +290,12 @@ Your monthly money starts next month, so this month is the free steps above.
 
 **Month 4 (from February 1, 2027), $80 to spend**
 
-- [ ] **Headlamp or flashlight for each person**: 4 headlamps, about $47 (usually $13–80)
+- [ ] **Family first-aid kit**: 2 kits, about $71 (usually $55–88)
+- [ ] **Whistle for each go-bag**: 5 whistles, about $9 (usually $6–13)
 
 **Month 5 (from March 1, 2027), $80 to spend**
 
-- [ ] **Family first-aid kit**: 2 kits, about $71 (usually $55–88)
-- [ ] **Whistle for each go-bag**: 5 whistles, about $9 (usually $6–13)
+- [ ] **Headlamp or flashlight for each person**: 4 headlamps, about $47 (usually $13–80)
 
 **Month 6 (from April 1, 2027), $80 to spend**
 
@@ -326,48 +326,39 @@ Your monthly money starts next month, so this month is the free steps above.
 
 **Month 11 (from September 1, 2027), $80 to spend**
 
-- Set aside $40 toward **cash in small bills**.
+- Set aside $40 toward **stock tank to hold water for horses and livestock**.
 
 ### After the first year
 
 | Month | What | Spend |
 | --- | --- | --- |
-| 12 (October 2027) | save toward cash in small bills; Cash in small bills: $100; Store-bought bottled water: 67 gallons | $207 |
-| 13 (November 2027) | Bleeding-control kit (tourniquet and pressure bandage): 1 kit | $71 |
-| 14 (December 2027) | save toward clean-air room for wildfire smoke | $40 |
-| 15 (January 2028) | save toward clean-air room for wildfire smoke; Clean-air room for wildfire smoke: 1 air cleaner | $164 |
-| 16 (February 2028) | save toward stock tank to hold water for horses and livestock | $40 |
-| 17 (March 2028) | save toward stock tank to hold water for horses and livestock; Phone power bank (about 20,000 mAh): 3 power banks | $149 |
-| 18 (April 2028) | save toward stock tank to hold water for horses and livestock | $40 |
-| 19 (May 2028) | save toward stock tank to hold water for horses and livestock | $40 |
-| 20 (June 2028) | save toward stock tank to hold water for horses and livestock | $40 |
-| 21 (July 2028) | save toward stock tank to hold water for horses and livestock; Pet go-kit: a carrier and a bag you pack from your supplies: 5 (one per pet) | $202 |
-| 22 (August 2028) | save toward stock tank to hold water for horses and livestock; Diapers: 60 diapers; Extra pet food in an airtight container: 13 pounds of dry food | $80 |
-| 23 (September 2028) | save toward stock tank to hold water for horses and livestock; Solar motion-sensor outdoor light: 1 light | $65 |
-| 24 (October 2028) | save toward stock tank to hold water for horses and livestock | $40 |
-| 25 (November 2028) | save toward stock tank to hold water for horses and livestock; License-free two-way radios (FRS), a pair: 2 pairs | $124 |
-| 26 (December 2028) | save toward stock tank to hold water for horses and livestock | $40 |
-| 27 (January 2029) | save toward stock tank to hold water for horses and livestock; Extra shelf-stable food you already eat: 20,000 kcal | $135 |
-| 28 (February 2029) | save toward stock tank to hold water for horses and livestock | $40 |
-| 29 (March 2029) | save toward stock tank to hold water for horses and livestock | $40 |
-| 30 (April 2029) | save toward stock tank to hold water for horses and livestock; Extra shelf-stable food you already eat: 20,000 kcal | $135 |
-| 31 (May 2029) | save toward stock tank to hold water for horses and livestock | $40 |
-| 32 (June 2029) | save toward stock tank to hold water for horses and livestock | $40 |
-| 33 (July 2029) | save toward stock tank to hold water for horses and livestock; Extra shelf-stable food you already eat: 28,000 kcal | $172 |
-| 34 (August 2029) | save toward stock tank to hold water for horses and livestock | $40 |
-| 35 (September 2029) | save toward stock tank to hold water for horses and livestock | $40 |
-| 36 (October 2029) | save toward stock tank to hold water for horses and livestock | $40 |
-| 37 (November 2029) | save toward stock tank to hold water for horses and livestock | $40 |
-| 38 (December 2029) | save toward stock tank to hold water for horses and livestock | $40 |
-| 39 (January 2030) | save toward stock tank to hold water for horses and livestock | $40 |
-| 40 (February 2030) | save toward stock tank to hold water for horses and livestock | $40 |
-| 41 (March 2030) | save toward stock tank to hold water for horses and livestock | $40 |
-| 42 (April 2030) | save toward stock tank to hold water for horses and livestock | $40 |
-| 43 (May 2030) | save toward stock tank to hold water for horses and livestock; Stock tank to hold water for horses and livestock: 1,110 gallon of tank spaces | $1,555 |
+| 12 (October 2027) | save toward stock tank to hold water for horses and livestock | $40 |
+| 13 (November 2027) | save toward stock tank to hold water for horses and livestock; Cash in small bills: $100 | $140 |
+| 14 (December 2027) | save toward stock tank to hold water for horses and livestock; Store-bought bottled water: 67 gallons | $107 |
+| 15 (January 2028) | save toward stock tank to hold water for horses and livestock | $40 |
+| 16 (February 2028) | save toward stock tank to hold water for horses and livestock; Bleeding-control kit (tourniquet and pressure bandage): 1 kit | $111 |
+| 17 (March 2028) | save toward stock tank to hold water for horses and livestock; Stock tank to hold water for horses and livestock: 238 gallon of tank spaces, $280 of it from savings | $85 |
+| 18 (April 2028) | save toward clean-air room for wildfire smoke | $40 |
+| 19 (May 2028) | save toward clean-air room for wildfire smoke; Clean-air room for wildfire smoke: 1 air cleaner, $80 of it from savings | $84 |
+| 20 (June 2028) | save toward pet go-kit: a carrier and a bag you pack from your supplies | $40 |
+| 21 (July 2028) | save toward pet go-kit: a carrier and a bag you pack from your supplies; Pet go-kit: a carrier and a bag you pack from your supplies: 5 (one per pet), $80 of it from savings; Diapers: 60 diapers | $146 |
+| 22 (August 2028) | License-free two-way radios (FRS), a pair: 2 pairs | $84 |
+| 23 (September 2028) | Extra pet food in an airtight container: 13 pounds of dry food; Solar motion-sensor outdoor light: 1 light | $41 |
+| 24 (October 2028) | save toward inverter generator (outdoors only, 20 feet from the house) | $40 |
+| 25 (November 2028) | save toward inverter generator (outdoors only, 20 feet from the house); Extra shelf-stable food you already eat: 20,000 kcal | $135 |
+| 26 (December 2028) | save toward inverter generator (outdoors only, 20 feet from the house) | $40 |
+| 27 (January 2029) | save toward inverter generator (outdoors only, 20 feet from the house); Phone power bank (about 20,000 mAh): 3 power banks | $149 |
+| 28 (February 2029) | save toward inverter generator (outdoors only, 20 feet from the house) | $40 |
+| 29 (March 2029) | save toward inverter generator (outdoors only, 20 feet from the house) | $40 |
+| 30 (April 2029) | save toward inverter generator (outdoors only, 20 feet from the house); Extra shelf-stable food you already eat: 20,000 kcal | $135 |
+| 31 (May 2029) | save toward inverter generator (outdoors only, 20 feet from the house) | $40 |
+| 32 (June 2029) | save toward inverter generator (outdoors only, 20 feet from the house); Inverter generator (outdoors only, 20 feet from the house): 1 generator, $360 of it from savings | $124 |
+| 33 (July 2029) | save toward extra shelf-stable food you already eat | $40 |
+| 34 (August 2029) | save toward extra shelf-stable food you already eat; Extra shelf-stable food you already eat: 28,000 kcal, $80 of it from savings | $92 |
 
 ### When you are done
 
-By month 43 (May 2030) every need is covered to the step that is enough for your risks. After that you are done: keep up the maintenance calendar below, and put the same money toward your savings goal if you have one.
+By month 34 (August 2029) every need is covered to the step that is enough for your risks. After that you are done: keep up the maintenance calendar below, and put the same money toward your savings goal if you have one.
 
 ## Checklists
 
@@ -381,15 +372,15 @@ Tick these off as you go: one list per step, up to the step that is enough for y
 - [ ] Baby wipes: 2 packs
 - [ ] N95 respirators: 20 respirators
 - [ ] Chlorine dioxide water treatment: 1 pack
-- [ ] Spare batteries for lights and the radio: 1 × 24-pack
 - [ ] Period products for two cycles: 2 cycles' supplies
 - [ ] Extra pet food in an airtight container: 13 pounds of dry food
 - [ ] Personal straw or squeeze filter for a bag: 1 filter
+- [ ] Spare batteries for lights and the radio: 1 × 24-pack
 - [ ] Over-the-counter medicine basics: 1 set
 - [ ] Get-home bag for each commuter: a small bag you stock from home: 1 bag
-- [ ] Headlamp or flashlight for each person: 4 headlamps
 - [ ] Family first-aid kit: 2 kits
 - [ ] Whistle for each go-bag: 5 whistles
+- [ ] Headlamp or flashlight for each person: 4 headlamps
 - [ ] Extra toilet paper: 60 rolls
 - [ ] Foil emergency blankets: 5 blankets
 - [ ] Fire-resistant, waterproof document pouch: 1 pouch
@@ -398,20 +389,21 @@ Tick these off as you go: one list per step, up to the step that is enough for y
 - [ ] Car emergency kit: 2 kits
 - [ ] Battery or rechargeable fan: 2 fans
 - [ ] Cash in small bills: $100
-- [ ] Phone power bank (about 20,000 mAh): 3 power banks
 - [ ] Pet go-kit: a carrier and a bag you pack from your supplies: 5 (one per pet)
+- [ ] Phone power bank (about 20,000 mAh): 3 power banks
 
 ### Two weeks
 
 - [ ] Bar soap and laundry soap: 5 person-months
 - [ ] Bleeding-control kit (tourniquet and pressure bandage): 1 kit
+- [ ] Stock tank to hold water for horses and livestock: 238 gallon of tank spaces
 - [ ] Clean-air room for wildfire smoke: 1 air cleaner
 - [ ] Diapers: 60 diapers
+- [ ] License-free two-way radios (FRS), a pair: 2 pairs
 - [ ] Extra pet food in an airtight container: 13 pounds of dry food
 - [ ] Solar motion-sensor outdoor light: 1 light
-- [ ] License-free two-way radios (FRS), a pair: 2 pairs
 - [ ] Extra shelf-stable food you already eat: 68,000 kcal
-- [ ] Stock tank to hold water for horses and livestock: 1,110 gallon of tank spaces
+- [ ] Inverter generator (outdoors only, 20 feet from the house): 1 generator
 
 ### Three months
 
@@ -496,7 +488,7 @@ The household plan above covers school, daycare and work plans and a walking rou
 
 **What helps.** Swap phone numbers with two neighbours. Agree who checks on whom, especially older neighbours and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[108] Host a block party, since strong communities start with prepared neighbours.[109] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[110]
 
-**What to avoid.** Do not wait for a disaster to meet the people next door. A short hello now makes it easier to knock on a door later.
+**What to avoid.** Meet the people next door before you need them. A short hello now makes it easier to knock on a door later.
 
 ### Pets
 
@@ -525,7 +517,7 @@ Keep paper copies in a waterproof pouch and photos you can reach from any phone.
 
 ### Savings
 
-Of 100 households like yours, about 20 (10–45) will have an income gap of more than 3 months in the next 10 years. The goal is about 6 months of expenses (about $31,200); you have 1 month saved. Your supplies plan is done by month 43. After that, your $80 a month for supplies could go here, reaching the goal in about 27 years. This is a savings goal, kept separate from the supplies budget.
+Of 100 households like yours, about 20 (10–45) will have an income gap of more than 3 months in the next 10 years. The goal is about 6 months of expenses (about $31,200); you have 1 month saved. Your supplies plan is done by month 34. After that, your $80 a month for supplies could go here, reaching the goal in about 27 years. This is a savings goal, kept separate from the supplies budget.
 
 - **Money: start an emergency fund and a bare-bones budget.** Set up an automatic transfer, however small, into a savings account you keep for emergencies; the CFPB says the right amount depends on your situation, and planners often suggest working toward three to six months of expenses (FINRA). Write down your essential monthly costs and what you would cut first, so you know how far savings would stretch. If anyone earns, find your state's unemployment website now, so you could file right away if a job ends (Department of Labor).[27, 29, 30, 31, 113, 114]
 
@@ -554,19 +546,19 @@ Of 100 households like yours, about 20 (10–45) will have an income gap of more
 
 ### Pets and animals
 
-- 12 large animals × 25 L a day (20 to 30) × 14 days = 4,200 L, about 1,109.5 gallons. Fill tubs or stock tanks before a storm or an outage. Your target is 60 days; store the first 14 days, as for people, and beyond that keep the well pump powered (a generator or battery sized for it) or plan to haul water, instead of buying more tank space. (Sphere, ASPCA, BYU, Church of Jesus Christ; some amounts are estimates)[11, 12, 57, 88, 99, 122, 123, 124, 125]
+- 12 large animals × 25 L a day (20 to 30) × 3 days = 900 L, about 237.8 gallons. Fill tubs or stock tanks before a storm or an outage. Your target is 60 days; store the first 3 days, until the generator runs the well pump, and in a longer power cut let it keep the pump going (see the generator line) instead of storing weeks of water. A drought that lowers the well is different: plan to haul water in, and a stock tank holds what you haul. (Sphere, ASPCA; some amounts are estimates)[11, 12, 57, 88, 99]
 - Dry food for the 2 dogs and the 3 cats for 10 days (at least a week): about 0.7 lb a day for each dog and 0.15 lb a day for each cat = 18.5 lb. Feed what the label says for yours, and keep it in an airtight, waterproof container. (ASPCA, Ready.gov; some amounts are estimates)[12, 16, 41, 42, 88, 98, 99, 120]
 - 5 pet carriers, one for each pet, with a pet go-kit: water and food from your home supplies, any medicine each takes, records and a photo. Public shelters may take only service animals, so find pet-friendly places to stay ahead of time. (ASPCA, Ready.gov)[21, 99]
-- Water for the pet go-kit, set aside from your stored water rather than bought extra: 7 days for the 2 dogs and the 3 cats = 5.7 gallons. Replace it every 2 months. (ASPCA, PetMD, Merck Veterinary Manual; some amounts are estimates)[88, 99, 126, 127]
+- Water for the pet go-kit, set aside from your stored water rather than bought extra: 7 days for the 2 dogs and the 3 cats = 5.7 gallons. Replace it every 2 months. (ASPCA, PetMD, Merck Veterinary Manual; some amounts are estimates)[88, 99, 122, 123]
 - Food for the pet go-kit, set aside from your pet food rather than bought extra: 10 days (7 to 10 days) for the 2 dogs and the 3 cats = 50 pet-days. Replace it every 2 months. (ASPCA)[99]
 
 ### Stress and mental health
 
 #### Stress, mental health and the 988 line
 
-**What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[128] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[129] Write a short calm plan: what you might feel, what helps you, and who you will call.[101] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[130]
+**What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[124] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[125] Write a short calm plan: what you might feel, what helps you, and who you will call.[101] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[126]
 
-**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[106] Do not wait until things feel unbearable to reach out. The 988 line supports people in emotional distress as well as in crisis.[128]
+**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[106] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[124]
 
 ## Maintenance calendar
 
@@ -576,18 +568,18 @@ Supplies only help if they still work. Dates count from when each item enters yo
 | --- | --- |
 | Every month | Check: fire safety at home: alarms, an escape plan, safe cooking and heating |
 | Every 2 months | Use and restock: extra pet food in an airtight container; Use and restock: pack your pets' food in the go-kit; Use and restock: pack your pets' water in the go-kit |
-| Every 3 months | Check: phone power bank (about 20,000 mAh) |
+| Every 3 months | Check: phone power bank (about 20,000 mAh); Check: inverter generator (outdoors only, 20 feet from the house) |
 | April 1, 2027 | Check: go-bag for each person: a backpack you pack from your supplies (then every 6 months); Check: keep medicines going: a written list, early refills, an emergency supply (then every 6 months); Use and restock: tap water in clean reused bottles (then every 6 months) |
 | May 1, 2027 | Check: practice: ten-minute drills and the first things to do (then every 6 months); Check: store-bought bottled water (then every 6 months) |
 | July 1, 2027 | Check: get-home bag for each commuter: a small bag you stock from home (then every 6 months) |
-| September 1, 2027 | Check: family first-aid kit (then every 6 months) |
+| August 1, 2027 | Check: family first-aid kit (then every 6 months) |
 | October 1, 2027 | Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
 | November 1, 2027 | Check: make a household plan and a contact card for each person (then every year); Check: documents and insurance: copy key papers, record belongings, check cover (then every year); Use and restock: unscented household bleach (for treating water) (then every year) |
 | December 1, 2027 | Check: NOAA Weather Radio with a tone alert (then every 6 months); Check: neighbours and skills: swap numbers, check on each other, learn first aid (then every year); Check: spare batteries for lights and the radio (then every year) |
 | January 1, 2028 | Check: car emergency kit (then every 6 months); Check: over-the-counter medicine basics (then every year) |
 | January 1, 2029 | Check: pet go-kit: a carrier and a bag you pack from your supplies (then every 6 months) |
-| May 1, 2029 | Check: license-free two-way radios (FRS), a pair (then every 6 months) |
-| January 1, 2030 | Use and restock: extra shelf-stable food you already eat (then every year) |
+| February 1, 2029 | Check: license-free two-way radios (FRS), a pair (then every 6 months) |
+| November 1, 2029 | Use and restock: extra shelf-stable food you already eat (then every year) |
 
 ## Sources
 
@@ -617,9 +609,9 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **111** Flood Insurance. FEMA, 2026. https://www.fema.gov/flood-insurance **112** Buy a Policy. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/get-insured/buy-a-policy **113** When the Unexpected Happens, Be Ready with an Emergency Fund. Federal Reserve Bank of St. Louis, 2025. https://www.stlouisfed.org/publications/page-one-economics/2025/sep/when-unexpected-happens-be-ready-with-emergency-fund **114** Economic Well-Being of U.S. Households in 2024. Board of Governors of the Federal Reserve System, 2025. https://www.federalreserve.gov/publications/2025-economic-well-being-of-us-households-in-2024-executive-summary.htm **115** Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/reproductive-health/emergency-preparation-response/safety-messages.html **116** Epinephrine injection, USP auto-injector: patient information. U.S. National Library of Medicine, DailyMed, 2023. https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=b7a4171c-7934-4723-a140-bd93ea84aae1&audience=consumer **117** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023 **118** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **119** Emergency List for Families With Infants and Young Children. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/infant-feeding-emergencies-toolkit/php/checklist.html **120** Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020. Centers for Disease Control and Prevention, 2020. https://www.cdc.gov/mmwr/volumes/69/wr/mm6935a2.htm
 
-**121** Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate. Institute of Medicine (National Academies Press), 2005. https://nap.nationalacademies.org/catalog/10925/ **122** An Approach to Longer-Term Food Storage. Brigham Young University, Department of Nutrition, Dietetics and Food Science, 2019. https://brightspotcdn.byu.edu/b1/4d/75fc449e4ce9843daa701f69faa4/an-approach-to-longer-term-food-storage.SEPT2019.pdf **123** Food Storage for One Year. The Church of Jesus Christ of Latter-day Saints, 2006. https://www.churchofjesuschrist.org/study/ensign/2006/03/random-sampler/food-storage-for-one-year?lang=eng **124** Be 2 Weeks Ready tool kit. Oregon Department of Emergency Management, 2023. https://www.oregon.gov/oem/Documents/B2WR-Complete-Tool-Kit-EN.pdf **125** Prepare in a Year. Washington Emergency Management Division, 2024. https://mil.wa.gov/prepare-in-a-year **126** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water **127** Maintenance Fluid Plan in Animals. Merck & Co., Inc., 2025. https://www.merckvetmanual.com/therapeutics/fluid-therapy/maintenance-fluid-plan-in-animals **128** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **129** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **130** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx
+**121** Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate. Institute of Medicine (National Academies Press), 2005. https://nap.nationalacademies.org/catalog/10925/ **122** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water **123** Maintenance Fluid Plan in Animals. Merck & Co., Inc., 2025. https://www.merckvetmanual.com/therapeutics/fluid-therapy/maintenance-fluid-plan-in-animals **124** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **125** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **126** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx
 
-39 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+45 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

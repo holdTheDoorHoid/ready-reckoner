@@ -92,25 +92,34 @@ fn brief_line(item: &PlanItem) -> String {
     }
 }
 
-/// One month after the first year as a table row: what to buy or do, and what it costs.
+/// One month after the first year as a table row: what to buy or do, and the money that leaves
+/// that month's budget ([`crate::Assessment::month_spend`]): a deposit counts once, and a purchase
+/// paid from savings only for what the savings do not cover (verification V-18: the row used to
+/// add the deposit and the full price, $130 in a $60 month).
 fn table_row(cx: &Ctx<'_>, m: &PlanMonth) -> String {
     let start = text::month_start(cx.a.input.planning_date, m.index);
     let mut what: Vec<String> = Vec::new();
-    let mut spend = 0.0_f64;
     for i in m.items.iter().filter(|i| !i.done) {
         match i.kind {
             PlanItemKind::FreeAction => what.push(format!("{} (free)", md(&i.name))),
             PlanItemKind::Purchase => {
-                spend += f64::from(i.est_cost_usd);
                 let q = text::quantity(f64::from(i.quantity), &i.unit);
-                what.push(if q.is_empty() {
+                let mut line = if q.is_empty() {
                     md(&i.name)
                 } else {
                     format!("{}: {}", md(&i.name), md(&q))
-                });
+                };
+                let saved = cx.a.from_savings(m.index, &i.item_id);
+                if saved > 0.005 {
+                    if saved + 0.005 >= f64::from(i.est_cost_usd) {
+                        line.push_str(", paid from savings");
+                    } else {
+                        line.push_str(&format!(", {} of it from savings", text::usd(saved)));
+                    }
+                }
+                what.push(line);
             }
             PlanItemKind::Reserve => {
-                spend += f64::from(i.est_cost_usd);
                 what.push(format!(
                     "save toward {}",
                     md(&text::lower_first(saving_for(&i.name)))
@@ -123,7 +132,7 @@ fn table_row(cx: &Ctx<'_>, m: &PlanMonth) -> String {
         m.index,
         text::month_year(start),
         what.join("; "),
-        text::usd(spend)
+        text::usd(cx.a.month_spend(m.index))
     )
 }
 

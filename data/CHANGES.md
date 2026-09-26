@@ -27,3 +27,28 @@ Jobs run: geography, nri, outages, events, seismic, climate, flood, facilities, 
 | `core/zip_county.csv` | 0 | 46772 | 46772 | 0 | 0 | new |
 | `core/zip_facilities.csv` | 0 | 33791 | 33791 | 0 | 0 | new |
 | `geo/counties.json` | 0 | 3222 | 3222 | 0 | 0 | new |
+
+## 2026-09-26T08:24:54Z — pack version 25f3ed156688
+
+Jobs run: geography, nri, facilities.
+
+A trim; every source is unchanged (same checksums as the initial build). `nri_hazards.csv` drops
+the `expb`, `ealb` and `alrb` columns, which no crate reads (every other value is identical);
+`zip_centroids.csv` leaves the core pack (nothing in the engine read it; the facilities job now
+reads the Census Gazetteer ZIP points itself, and `zip_facilities.csv` comes out byte-identical).
+The core pack goes from 2.99 MB to 2.37 MB gzipped file by file (10.8 MB to 8.8 MB uncompressed);
+a first visit fetches 1.99 MB of it instead of 2.36 MB.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/counties.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/ct_crosswalk.csv` | 19 | 19 | 0 | 0 | 0 | unchanged |
+| `core/facilities.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/nri_counties.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/nri_hazards.csv` | 45853 | 45853 | 0 | 0 | 45853 | changed |
+| `core/nri_semantics.toml` | 18 | 18 | 0 | 0 | 0 | unchanged |
+| `core/states.csv` | 56 | 56 | 0 | 0 | 0 | unchanged |
+| `core/zip_centroids.csv` | 33791 | 0 | 0 | 33791 | 0 | removed |
+| `core/zip_county.csv` | 46772 | 46772 | 0 | 0 | 0 | unchanged |
+| `core/zip_facilities.csv` | 33791 | 33791 | 0 | 0 | 0 | unchanged |
+| `geo/counties.json` | 3222 | 3222 | 0 | 0 | 0 | unchanged |

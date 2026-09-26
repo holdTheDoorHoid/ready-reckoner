@@ -89,13 +89,15 @@ pub struct NriHazard {
     pub afreq: Option<f32>,
     /// What `afreq` means for this hazard.
     pub afreq_kind: AfreqKind,
-    /// Building value exposed, in US dollars (`EXPB`).
+    /// Building value exposed, in US dollars (`EXPB`). Not in the core pack (nothing reads it);
+    /// only the hand-built sample counties carry it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expb: Option<f32>,
     /// Population exposed (`EXPP`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub expp: Option<f32>,
-    /// Expected annual loss to buildings, in US dollars (`EALB`).
+    /// Expected annual loss to buildings, in US dollars (`EALB`). Not in the core pack (nothing
+    /// reads it); only the hand-built sample counties carry it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ealb: Option<f32>,
     /// Expected annual loss of population (`EALP`).
@@ -107,7 +109,8 @@ pub struct NriHazard {
     /// Historic loss ratio for buildings (`HLRB`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hlrb: Option<f32>,
-    /// Expected annual loss rate for buildings (`ALRB`).
+    /// Expected annual loss rate for buildings (`ALRB`). Not in the core pack (nothing reads
+    /// it); only the hand-built sample counties carry it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub alrb: Option<f32>,
     /// Risk score, 0 to 100 (`RISKS`).
@@ -137,6 +140,10 @@ pub struct OutageStats {
     pub years_covered: String,
     /// What counted as an outage event.
     pub event_definition: String,
+    /// When the county has no outage record of its own, the state whose pooled figures
+    /// (`core/outages_state.csv`) stand in, by name ("Alaska"). Absent for a county's own record.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state_series: Option<String>,
 }
 
 /// How often an event type happens in a county, and how long it lasts.

@@ -492,6 +492,49 @@ pub fn fridge_wh(days: f64) -> Option<Sizing> {
     )
 }
 
+/// A generator for a household on a well with horses or livestock: a need, not an option. In a
+/// power cut it runs the well pump so the animals have water after the first days their stored
+/// water covers (`livestock_water`), and the fridge and lights too. The same homes as
+/// [`generator_units`] (a house, and a power target of a day or more on a well); `None` without
+/// large animals, off a well, or where a generator is not offered. Rule `generator_units`.
+pub fn generator_for_well_pump(days: f64, housing: &Housing, large_animals: u8) -> Option<Sizing> {
+    if large_animals == 0 || housing.water != WaterSource::Well {
+        return None;
+    }
+    generator_units(days, housing)?;
+    let mut b = Basis::new();
+    b.cite("cdc_co_basics");
+    b.cite("ready_gov_power_outages");
+    b.cite("aspca_disaster_prep");
+    b.cite(crate::constants::PRIOR_SOURCE);
+    let bridge = b.k(keys::LIVESTOCK_PUMP_BRIDGE_DAYS);
+    let w = b.k(keys::WELL_PUMP_W);
+    let (s_lo, s_hi) = b.range(keys::WELL_PUMP_START_MULTIPLIER);
+    let clearance = b.k(keys::GENERATOR_CLEARANCE_FT);
+    let n = f64::from(large_animals);
+    let mut text = format!(
+        "A portable generator that can start your well pump, so your {} have water after the first {} of a power cut; it runs the fridge and lights too. Starting a pump takes {} to {} times its running watts (about {} W): check the pump's nameplate before you buy. It must run outdoors, at least {} feet from windows, doors and vents, never in a garage, and it needs fuel (see the fuel line).",
+        count(n, "large animal", "large animals"),
+        fmt_days(bridge),
+        num(s_lo, 0),
+        num(s_hi, 0),
+        num(w, 0),
+        num(clearance, 0)
+    );
+    if housing.tenure == Tenure::Rent {
+        text.push_str(" Ask your landlord first.");
+    }
+    Some(Sizing::new(
+        &b,
+        "generator_units",
+        "generator",
+        1.0,
+        "generator",
+        Per::Household,
+        text,
+    ))
+}
+
 /// Energy to run a well pump for essential water (an estimate; optional, because stored water
 /// covers the same need more cheaply). Rule `well_pump_wh`.
 pub fn well_pump_wh(days: f64, housing: &Housing) -> Option<Sizing> {

@@ -5,7 +5,7 @@
 //! | `zero_budget` | note | no monthly and no one-off money |
 //! | `device_power_plan` | warn | a powered medical device, no backup power at home, and no device-power item by month 3 |
 //! | `cold_chain_plan` | warn | refrigerated medicine and no way to keep it cold by month 3 (the design gives no month; this reuses the device rule's) |
-//! | `no_water_after_month_1` | warn | no stored water at the end of month 1 |
+//! | `no_stored_water_by_month_3` | warn | free steps (refilled drink bottles) leave the stored-water need short, and no stored water is owned or bought by month 3 |
 //! | `evacuation_no_go_bag` | warn | a ten-year chance of having to leave of 10 % or more (`Prior`) and no go-bag by month 6 (`Prior`) |
 //! | `insurance_flood` / `insurance_quake` | warn | an owner in a flood- or quake-prone area without that policy |
 //! | `cliff_<bucket>` | note | `rr-consequence` found one rare event driving the bucket's target |
@@ -27,6 +27,10 @@ pub const EVACUATION_HEAVY_P10: f64 = 0.10;
 /// Month by which an evacuation-heavy household should have a go-bag (`Prior`).
 pub const GO_BAG_BY_MONTH: u16 = 6;
 
+/// Month by which a household with a no-water target should have stored water beyond the free
+/// step of refilling drink bottles (PRINCIPLES §11: "no water at all after month three").
+pub const STORED_WATER_BY_MONTH: u16 = 3;
+
 /// What the allocator found, for the checks.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Facts {
@@ -36,8 +40,10 @@ pub(crate) struct Facts {
     pub cold_chain_month: Option<u16>,
     /// First month a go-bag is in hand.
     pub go_bag_month: Option<u16>,
-    /// Days of `water_out` covered at the end of month 1.
-    pub water_after_month_1: f64,
+    /// The household has a no-water target that free steps and what it has leave short.
+    pub water_needed: bool,
+    /// First month stored water beyond free steps is in hand (owned or bought), if ever.
+    pub stored_water_month: Option<u16>,
     /// Buckets still short of their goal when the plan ran out of things to buy.
     pub uncovered_when_stopped: Vec<BucketId>,
 }
@@ -111,13 +117,14 @@ pub(crate) fn check(
         ));
     }
 
-    if facts.water_after_month_1 <= 1e-9 {
+    if facts.water_needed && late(facts.stored_water_month, STORED_WATER_BY_MONTH) {
         out.push(warning(
-            "no_water_after_month_1",
+            "no_stored_water_by_month_3",
             WarningSeverity::Warn,
-            "No stored water after the first month.".into(),
-            "Water is the one supply you cannot go long without. Filling clean bottles from the tap \
-             costs nothing.",
+            "No stored water beyond refilled bottles by month 3.".into(),
+            "Refilled drink bottles are a good start, but they hold only a little. Water is the one \
+             supply you cannot go long without: a few gallons of bottled water or a water jug is the \
+             next step, and costs little.",
             &["water_out"],
         ));
     }

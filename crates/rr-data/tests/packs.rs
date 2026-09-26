@@ -304,10 +304,51 @@ fn philadelphia_record_has_the_expected_shape() {
     );
     assert!(o.median_hours <= o.p90_hours);
     assert!(o.event_definition.contains("1%"));
+    assert_eq!(
+        o.state_series, None,
+        "Philadelphia has its own outage records"
+    );
     let sz = c.seismic.as_ref().unwrap();
     assert!(sz.p_pga_ge_0_2g_per_year < sz.p_pga_ge_0_1g_per_year);
     assert!(c.events.contains_key("winter_storm"));
     assert!(c.flood.is_some() && c.facilities.is_some() && c.vulnerability.is_some());
+}
+
+/// A county with no outage record of its own takes its state's pooled series (verification
+/// V-15): Juneau carries Alaska's row of `outages_state.csv`, and the years its counties' records
+/// span. A territory with no state row keeps none.
+#[test]
+fn counties_without_outage_records_use_their_states_series() {
+    let s = store();
+    let juneau = s.county("02110").unwrap();
+    let o = juneau.outages.as_ref().expect("the state series stands in");
+    assert_eq!(o.state_series.as_deref(), Some("Alaska"));
+    assert_eq!(o.events_per_customer_year, 1.523);
+    assert_eq!((o.p_ge_1d, o.p_ge_3d), (0.01864, 0.000802));
+    assert_eq!((o.median_hours, o.p90_hours), (1.75, 7.25));
+    assert_eq!(o.years_covered, "2015-2025");
+    assert!(o.event_definition.contains("1%"));
+    // Anchorage has records of its own.
+    let anchorage = s.county("02020").unwrap().outages.as_ref().unwrap();
+    assert_eq!(anchorage.state_series, None);
+    // American Samoa has neither a county record nor a state row.
+    assert!(s.county("60010").unwrap().outages.is_none());
+    // Every county with a state row now has outage figures.
+    let states: BTreeSet<String> = s
+        .counties()
+        .filter(|c| c.outages.as_ref().is_some_and(|o| o.state_series.is_none()))
+        .map(|c| c.state_abbr.clone())
+        .collect();
+    let without: Vec<&str> = s
+        .counties()
+        .filter(|c| c.outages.is_none())
+        .map(|c| c.state_abbr.as_str())
+        .collect();
+    assert!(
+        without.iter().all(|st| ["AS", "GU", "MP"].contains(st)),
+        "{without:?}"
+    );
+    assert!(states.contains("AK") && states.contains("NE"));
 }
 
 #[test]
