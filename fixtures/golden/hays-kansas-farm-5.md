@@ -61,7 +61,7 @@ Nearly every household like yours will go through a heat wave in the next ten ye
 
 **What to avoid.** Do not rely on a fan when it is over 90°F indoors. It can make you hotter.[13] Never leave people or pets in a closed car on a warm day. Heat stroke is an emergency. Signs include a body temperature above 103°F, hot, red, dry skin, a fast pulse and confusion. Call 911.[14]
 
-**What it can do:** no power and dangerous heat or cold at home. **How bad:** Minor. **How sure:** Mostly data.
+**What it can do:** no power and dangerous heat or cold at home. **How bad:** Serious. **How sure:** Mostly data.
 
 #### 3. Strong wind
 
@@ -147,6 +147,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 - These chances are for Ellis County as a whole. A home near a river, the coast or a steep slope can face more; the county's average is what the plan uses.
 - Also checked, and too rare here to list (under 1 in 100,000 a year): landslides.
 - Ambulances take longer to reach rural homes, so first-aid skills and supplies count for more here.
+- Heat waves are marked Serious for this household because someone in it is pregnant or nursing; they are most dangerous for households like yours.
 
 ## Your targets
 

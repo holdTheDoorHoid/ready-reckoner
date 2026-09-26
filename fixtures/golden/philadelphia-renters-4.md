@@ -51,7 +51,7 @@ Nearly every household like yours will go through a heat wave in the next ten ye
 
 **What to avoid.** Do not rely on a fan when it is over 90°F indoors. It can make you hotter.[3] Never leave people or pets in a closed car on a warm day. Heat stroke is an emergency. Signs include a body temperature above 103°F, hot, red, dry skin, a fast pulse and confusion. Call 911.[4]
 
-**What it can do:** no power and dangerous heat or cold at home. **How bad:** Minor. **How sure:** Based on data.
+**What it can do:** no power and dangerous heat or cold at home. **How bad:** Serious. **How sure:** Based on data.
 
 #### 2. Medical emergency
 
@@ -71,7 +71,7 @@ Nearly every household like yours will go through a spell of dangerous cold in t
 
 **What to avoid.** Never heat your home with a gas stove or oven. Use generators and grills only outdoors, away from windows.[14] Choose electric space heaters with automatic shut-off, and keep them 3 feet from anything that can burn.[13, 15] Do not overdo it when you shovel snow.[14]
 
-**What it can do:** no power, no tap water and dangerous heat or cold at home. **How bad:** Minor. **How sure:** Based on data.
+**What it can do:** no power, no tap water and dangerous heat or cold at home. **How bad:** Serious. **How sure:** Based on data.
 
 #### 4. Supply chain disruption
 
@@ -145,6 +145,8 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 - These chances are for Philadelphia County as a whole. A home near a river, the coast or a steep slope can face more; the county's average is what the plan uses.
 - Also checked, and too rare here to list (under 1 in 100,000 a year): wildfires.
 - A nuclear power plant is within 50 miles (80 km), the zone where food and water may be checked; potassium iodide matters only inside the 10-mile zone and is handed out by the authorities.
+- Heat waves are marked Serious for this household because someone in it is 65 or older; they are most dangerous for households like yours.
+- Cold waves are marked Serious for this household because someone in it is 65 or older; they are most dangerous for households like yours.
 
 ## Your targets
 

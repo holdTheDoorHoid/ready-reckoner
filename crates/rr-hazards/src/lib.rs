@@ -151,6 +151,19 @@ pub fn assess(
     rates.extend(societal::assess(&ctx, &mut notes));
     rates.extend(personal::assess(&ctx, &mut notes));
     rates.sort_by_key(|r| r.hazard);
+    for (h, what) in [
+        (HazardId::HeatWave, "Heat waves"),
+        (HazardId::ColdWave, "Cold waves"),
+    ] {
+        if rates.iter().any(|r| r.hazard == h) {
+            if let Some(why) = severity::at_risk_reason(input, h) {
+                notes.add(format!(
+                    "{what} are marked Serious for this household because {why}; they are most \
+                     dangerous for households like yours."
+                ));
+            }
+        }
+    }
 
     // rr-consequence gets each hazard's full rate; a named scenario is an extra event class
     // (see the `scenarios` module).
@@ -259,7 +272,7 @@ fn profile(ctx: &Ctx<'_>, r: &HazardRate, e: &Estimate) -> HazardProfile {
         rate_range: [e.low, e.high],
         annual_probability: chance(e.value),
         probability_range: [chance(e.low), chance(e.high)],
-        severity: severity::of(r),
+        severity: severity::for_household(r, ctx.input),
         eal_per_household_usd: r.eal_per_household,
         climate_multiplier,
         confidence: r

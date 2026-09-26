@@ -15,11 +15,17 @@
 //! judgement, is `low` (or `medium` if the range is narrow); a rate resting only on expert
 //! judgement is `prior`.
 
-use rr_types::{DataConfidence, Evidence, HazardTier, math};
+use rr_types::{
+    AgeBand, Cooling, DataConfidence, Evidence, HazardId, HazardTier, Heating, PlanInput,
+    PoweredDevice, math,
+};
 
 use crate::cite;
 use crate::estimate::Estimate;
-use crate::params::{NATURAL_SEVERITY_FLOOR, SEVERITY_LOSS_ONE_USD, SEVERITY_LOSS_ZERO_USD};
+use crate::params::{
+    AT_RISK_TEMPERATURE_SEVERITY, NATURAL_SEVERITY_FLOOR, SEVERITY_LOSS_ONE_USD,
+    SEVERITY_LOSS_ZERO_USD,
+};
 use crate::rate::HazardRate;
 
 /// Severity from a per-event loss in US dollars, on the fixed log scale.
@@ -43,6 +49,53 @@ pub(crate) fn of(rate: &HazardRate) -> f64 {
     let s = from_loss(loss);
     if rate.hazard.tier() == HazardTier::Natural {
         s.max(NATURAL_SEVERITY_FLOOR)
+    } else {
+        s
+    }
+}
+
+/// Why a heat or cold wave is worse for this household than for the average one, if it is:
+/// someone 65 or older or a baby (and, for heat, someone pregnant), someone on a powered medical
+/// device, or a home without air conditioning (heat) or heating (cold). CDC names older adults,
+/// babies, pregnancy and chronic illness as the groups heat and cold hurt most; in Chicago's 1995
+/// heat wave, having no air conditioning raised the risk of death (Semenza et al. 1996).
+pub(crate) fn at_risk_reason(input: &PlanInput, hazard: HazardId) -> Option<&'static str> {
+    let heat = match hazard {
+        HazardId::HeatWave => true,
+        HazardId::ColdWave => false,
+        _ => return None,
+    };
+    let people = &input.people;
+    if people.iter().any(|p| matches!(p.age_band, AgeBand::Senior)) {
+        return Some("someone in it is 65 or older");
+    }
+    if people.iter().any(|p| matches!(p.age_band, AgeBand::Infant)) {
+        return Some("there is a baby");
+    }
+    if heat && people.iter().any(|p| p.pregnant_or_nursing) {
+        return Some("someone in it is pregnant or nursing");
+    }
+    if people
+        .iter()
+        .any(|p| p.medical.powered_device != PoweredDevice::None)
+    {
+        return Some("someone in it relies on a powered medical device");
+    }
+    if heat && input.housing.cooling == Cooling::None {
+        return Some("the home has no air conditioning");
+    }
+    if !heat && input.housing.heating == Heating::None {
+        return Some("the home has no heating");
+    }
+    None
+}
+
+/// The severity of one hazard for this household: [`of`], raised to "Serious" for a heat or
+/// cold wave when someone in the household is at higher risk ([`at_risk_reason`]).
+pub(crate) fn for_household(rate: &HazardRate, input: &PlanInput) -> f64 {
+    let s = of(rate);
+    if at_risk_reason(input, rate.hazard).is_some() {
+        s.max(AT_RISK_TEMPERATURE_SEVERITY)
     } else {
         s
     }
@@ -76,6 +129,29 @@ mod tests {
         assert!((from_loss(5_000.0) - 0.5).abs() < 1e-12);
         // A house fire, $32,700 (USFA 2023): about 0.70.
         assert!((from_loss(11.27e9 / 344_600.0) - 0.704).abs() < 0.001);
+    }
+
+    #[test]
+    fn heat_and_cold_are_serious_for_households_at_risk() {
+        let mut input = rr_types::fixtures::get("philadelphia-renters-4").unwrap();
+        // A senior lives there: heat and cold waves are at least "Serious".
+        assert_eq!(
+            at_risk_reason(&input, HazardId::HeatWave),
+            Some("someone in it is 65 or older")
+        );
+        assert!(at_risk_reason(&input, HazardId::ColdWave).is_some());
+        assert!(at_risk_reason(&input, HazardId::StrongWind).is_none());
+        // Adults only, with air conditioning and gas heat: no floor.
+        input
+            .people
+            .retain(|p| matches!(p.age_band, AgeBand::Adult));
+        assert!(at_risk_reason(&input, HazardId::HeatWave).is_none());
+        // Take the air conditioning away and heat is serious again; cold is not.
+        input.housing.cooling = Cooling::None;
+        assert!(at_risk_reason(&input, HazardId::HeatWave).is_some());
+        assert!(at_risk_reason(&input, HazardId::ColdWave).is_none());
+        // 0.4 is about $2,000 an event on the fixed scale, an emergency-department visit.
+        assert!((AT_RISK_TEMPERATURE_SEVERITY - from_loss(2_000.0)).abs() < 0.001);
     }
 
     #[test]

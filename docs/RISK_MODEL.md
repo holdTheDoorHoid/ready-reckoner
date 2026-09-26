@@ -213,6 +213,14 @@ $500,000; long illness $5,000; pandemic $5,000; regional blackout $1,000; cyber 
 curfew $300; shortages $100; chemical release $500; nuclear plant accident $20,000. Nuclear attack
 is 1 and terrorism 0.9 by definition. The fixed scale means a hazard's severity reads the same in
 every county, and likelihood and severity stay separate columns in the rare-catastrophe box.
+**Heat and cold for households at risk** (verification, 2026-09-26): NRI's expected loss already
+counts deaths and injuries, valued per statistical life, but spreading it over every household
+and every county episode makes heat read "Minor" (Philadelphia: about $85 an episode). A heat or
+cold wave therefore shows at least 0.4, "Serious" (an emergency visit on the same scale), when the
+household has someone 65 or older, a baby, someone on a powered medical device, someone pregnant
+(heat), or no air conditioning (heat) or heating (cold) — the groups CDC names and the Chicago
+1995 findings (`cdc_heat_health`, `cdc_winter_safety`, `semenza_1996_heat_deaths`; PRIOR). A note
+says why. Severity is shown, not planned with: the targets do not change.
 
 **Confidence**: data within a factor of 1.6 either way is `high`, within 3 `medium`, wider `low`;
 a rate that rests partly on expert judgement is `medium` within a factor of 3, otherwise `low`;

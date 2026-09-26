@@ -49,7 +49,7 @@ Nearly every household like yours will go through a heat wave in a ten-year stre
 
 **What to avoid.** Do not rely on a fan when it is over 90°F indoors. It can make you hotter.[4] Never leave people or pets in a closed car on a warm day. Heat stroke is an emergency. Signs include a body temperature above 103°F, hot, red, dry skin, a fast pulse and confusion. Call 911.[5]
 
-**What it can do:** no power and dangerous heat or cold at home. **How bad:** Minor. **How sure:** Based on data.
+**What it can do:** no power and dangerous heat or cold at home. **How bad:** Serious. **How sure:** Based on data.
 
 #### 2. Medical emergency
 
@@ -148,6 +148,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 - Earthquakes, tsunamis and volcanoes, and risks such as job loss, house fires and pandemics, are not changed for 2050.
 - How often these will happen by 2050 is unclear, so they are left as today: hailstorms, landslides, lightning strikes, windstorms and tornadoes.
 - A nuclear power plant is within 50 miles (80 km), the zone where food and water may be checked; potassium iodide matters only inside the 10-mile zone and is handed out by the authorities.
+- Heat waves are marked Serious for this household because someone in it relies on a powered medical device; they are most dangerous for households like yours.
 
 ## Your targets
 

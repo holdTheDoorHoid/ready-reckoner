@@ -49,7 +49,7 @@ Nearly every household like yours will go through a heat wave in a ten-year stre
 
 **What to avoid.** Do not rely on a fan when it is over 90°F indoors. It can make you hotter.[4] Never leave people or pets in a closed car on a warm day. Heat stroke is an emergency. Signs include a body temperature above 103°F, hot, red, dry skin, a fast pulse and confusion. Call 911.[5]
 
-**What it can do:** no power and dangerous heat or cold at home. **How bad:** Minor. **How sure:** Based on data.
+**What it can do:** no power and dangerous heat or cold at home. **How bad:** Serious. **How sure:** Based on data.
 
 #### 2. Medical emergency
 
@@ -69,7 +69,7 @@ Of 100 households like yours, about 93 will go through a spell of dangerous cold
 
 **What to avoid.** Never heat your home with a gas stove or oven. Use generators and grills only outdoors, away from windows.[16] Choose electric space heaters with automatic shut-off, and keep them 3 feet from anything that can burn.[15, 17] Do not overdo it when you shovel snow.[16]
 
-**What it can do:** no power, no tap water and dangerous heat or cold at home. **How bad:** Minor. **How sure:** Based on data.
+**What it can do:** no power, no tap water and dangerous heat or cold at home. **How bad:** Serious. **How sure:** Based on data.
 
 #### 4. Supply chain disruption
 
@@ -149,6 +149,8 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 - No climate projection for this county covers coastal floods, so they are left as today.
 - A nuclear power plant is within 50 miles (80 km), the zone where food and water may be checked; potassium iodide matters only inside the 10-mile zone and is handed out by the authorities.
 - Job loss is left out: no one in the household is marked as earning.
+- Heat waves are marked Serious for this household because someone in it is 65 or older; they are most dangerous for households like yours.
+- Cold waves are marked Serious for this household because someone in it is 65 or older; they are most dangerous for households like yours.
 
 ## Your targets
 

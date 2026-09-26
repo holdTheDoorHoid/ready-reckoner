@@ -367,6 +367,13 @@ pub(crate) const SEVERITY_LOSS_ONE_USD: f64 = 500_000.0;
 /// Natural hazards never show a severity below this: even a windstorm that only cuts the power
 /// is more than nothing.
 pub(crate) const NATURAL_SEVERITY_FLOOR: f64 = 0.1;
+/// PRIOR. The severity a heat wave or cold wave shows at least, for a household with someone at
+/// higher risk from it: 0.4, "Serious", the severity of an emergency-department visit ($2,000 on
+/// the fixed scale). NRI's expected loss does count deaths and injuries (valued per statistical
+/// life), but spread over every household and every episode in the county, so the per-event
+/// loss reads "Minor" (Philadelphia heat: about $85 an episode) although heat is most dangerous
+/// for exactly these households (CDC; Semenza et al. 1996, Chicago 1995).
+pub(crate) const AT_RISK_TEMPERATURE_SEVERITY: f64 = 0.4;
 
 #[cfg(test)]
 mod tests {
