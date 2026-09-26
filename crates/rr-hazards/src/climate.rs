@@ -113,11 +113,42 @@ fn multiplier_from(mid: f64, high: f64, lo_bound: f64, hi_bound: f64, source: &s
     Estimate::data(m, m.min(h), m.max(h), &[source])
 }
 
-fn describe(label: &str, m: &Estimate) -> String {
-    if (m.high - m.low).abs() < 0.005 {
-        format!("{label} ×{:.2}", m.value)
+/// "heat waves 2.4 to 3 times as often", "flooding from heavy rain 37 to 49 % more often",
+/// "cold waves half as often".
+pub(crate) fn describe(label: &str, m: &Estimate) -> String {
+    format!("{label} {}", how_often(m.low, m.high))
+}
+
+/// A multiplier range in words.
+pub(crate) fn how_often(lo: f64, hi: f64) -> String {
+    let both = |a: String, b: String, unit: &str| {
+        if a == b {
+            format!("{a}{unit}")
+        } else {
+            format!("{a} to {b}{unit}")
+        }
+    };
+    if hi < 0.995 {
+        if (lo - 0.5).abs() < 0.005 && (hi - 0.5).abs() < 0.005 {
+            return "half as often".to_owned();
+        }
+        let pct = |x: f64| format!("{:.0}", ((1.0 - x) * 100.0).round());
+        both(pct(hi), pct(lo), " % less often")
+    } else if lo >= 1.95 {
+        let times = |x: f64| {
+            let r = (x * 10.0).round() / 10.0;
+            if r.fract() == 0.0 {
+                format!("{r:.0}")
+            } else {
+                format!("{r:.1}")
+            }
+        };
+        both(times(lo), times(hi), " times as often")
+    } else if hi < 1.005 {
+        "about as often as today".to_owned()
     } else {
-        format!("{label} ×{:.2} to ×{:.2}", m.low, m.high)
+        let pct = |x: f64| format!("{:.0}", ((x - 1.0) * 100.0).round());
+        both(pct(lo.max(1.0)), pct(hi), " % more often")
     }
 }
 
@@ -404,6 +435,18 @@ mod tests {
                 .value,
             1.0
         );
+    }
+
+    #[test]
+    fn multipliers_read_in_plain_words() {
+        assert_eq!(how_often(2.42, 3.0), "2.4 to 3 times as often");
+        assert_eq!(how_often(3.0, 3.0), "3 times as often");
+        assert_eq!(how_often(1.368, 1.489), "37 to 49 % more often");
+        assert_eq!(how_often(1.14, 1.17), "14 to 17 % more often");
+        assert_eq!(how_often(0.5, 0.5), "half as often");
+        assert_eq!(how_often(0.53, 0.62), "38 to 47 % less often");
+        assert_eq!(how_often(1.0, 1.0), "about as often as today");
+        assert_eq!(how_often(1.2104, 1.2113), "21 % more often");
     }
 
     #[test]

@@ -378,8 +378,8 @@ fn hurricane(ctx: &Ctx<'_>) -> Option<(HazardRate, HurricaneSplit)> {
     rate.future = total_future;
     rate.climate = Climate::Projected {
         multiplier: m,
-        what: "major hurricanes ×1.1 to ×1.3 as a share of hurricanes (how often hurricanes \
-               come does not change)"
+        what: "a larger share of hurricanes reaching major strength, 10 to 30 % more (how often \
+               hurricanes come does not change)"
             .to_owned(),
     };
     let split = HurricaneSplit {

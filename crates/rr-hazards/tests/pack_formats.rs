@@ -94,7 +94,7 @@ fn a_high_scenario_column_gives_the_range() {
     assert!(
         a.notes
             .iter()
-            .any(|n| n.contains("heat waves ×2.00 to ×2.60"))
+            .any(|n| n.contains("heat waves 2 to 2.6 times as often"))
     );
 }
 

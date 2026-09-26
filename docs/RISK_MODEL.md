@@ -227,6 +227,13 @@ stretch around 2050". Rare catastrophes get a range-only sentence.
 **Order**: ranked hazards by today's rate, most likely first (so the 2050 dial never reorders
 the list), then the rare-catastrophe box.
 
+**Why we think this**: `rr_hazards::why_we_think_this(hazard)` gives one plain-language reason
+per hazard (the source, or for an expert estimate the reasoning and its size) for the drawer
+behind each card. `HazardAssessment::notes` carries the plain caveats for this household and
+county: county scale, missing outage records, capped heat days, the outage floor, hazards too
+rare to list, the 2050 changes in words ("heat waves 2.4 to 3 times as often"), ignored scenario
+settings, the rural ambulance note and the nuclear planning zone.
+
 ### The fixture registers
 
 From `cargo run -p rr-hazards --example register -- <household> <fips>` on the hand-built fixture

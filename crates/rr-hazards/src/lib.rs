@@ -54,6 +54,7 @@ mod scenarios;
 mod sentence;
 mod severity;
 mod societal;
+mod why;
 
 use serde::{Deserialize, Serialize};
 
@@ -63,6 +64,7 @@ use rr_types::{
 };
 
 pub use scenarios::{AlternativeRate, ScenarioCandidate};
+pub use why::why_we_think_this;
 
 use climate::Climate;
 use ctx::{Ctx, Notes};
@@ -132,7 +134,7 @@ pub fn assess(
             && r.future.value < params::NEGLIGIBLE_RATE
             && !parent
         {
-            negligible.push(r.hazard.name());
+            negligible.push(plural(r.hazard));
         } else {
             rates.push(r.clone());
         }
@@ -269,6 +271,41 @@ fn profile(ctx: &Ctx<'_>, r: &HazardRate, e: &Estimate) -> HazardProfile {
     }
 }
 
+/// A natural hazard's plural name for lists in notes ("heat waves", "tornadoes").
+fn plural(hazard: HazardId) -> &'static str {
+    use HazardId::*;
+    match hazard {
+        Avalanche => "avalanches",
+        CoastalFlooding => "coastal floods",
+        ColdWave => "cold waves",
+        Drought => "droughts",
+        Earthquake => "earthquakes",
+        Hail => "hailstorms",
+        HeatWave => "heat waves",
+        Hurricane => "hurricanes",
+        IceStorm => "ice storms",
+        Landslide => "landslides",
+        Lightning => "lightning strikes",
+        RiverineFlooding => "floods from rivers or heavy rain",
+        StrongWind => "windstorms",
+        Tornado => "tornadoes",
+        Tsunami => "tsunamis",
+        VolcanicActivity => "volcanic eruptions",
+        Wildfire => "wildfires",
+        WinterWeather => "winter storms",
+        other => other.name(),
+    }
+}
+
+/// What a county has too few of to project a change, for the note.
+fn too_few_of(hazard: HazardId) -> &'static str {
+    match hazard {
+        HazardId::ColdWave | HazardId::WinterWeather => "freezing days",
+        HazardId::RiverineFlooding => "days of very heavy rain",
+        _ => "dry spells",
+    }
+}
+
 fn join_lower(names: &[&str]) -> String {
     let lower: Vec<String> = names.iter().map(|n| n.to_lowercase()).collect();
     match lower.len() {
@@ -284,26 +321,28 @@ fn climate_notes(rates: &[HazardRate], notes: &mut Notes) {
     let mut no_increase = Vec::new();
     let mut unclear = Vec::new();
     let mut missing = Vec::new();
-    let mut too_few = Vec::new();
+    let mut too_few: Vec<(&'static str, &'static str)> = Vec::new();
     let mut not_exposed = Vec::new();
     for r in rates {
+        let name = plural(r.hazard);
         match &r.climate {
             Climate::Projected { multiplier, .. }
                 if multiplier.low == 1.0 && multiplier.high == 1.0 =>
             {
-                no_increase.push(r.hazard.name())
+                no_increase.push(name)
             }
             Climate::Projected { what, .. } => projected.push(what.clone()),
-            Climate::Unclear => unclear.push(r.hazard.name()),
-            Climate::NoData => missing.push(r.hazard.name()),
-            Climate::TooFew => too_few.push(r.hazard.name()),
-            Climate::NotExposed => not_exposed.push(r.hazard.name()),
+            Climate::Unclear => unclear.push(name),
+            Climate::NoData => missing.push(name),
+            Climate::TooFew => too_few.push((too_few_of(r.hazard), name)),
+            Climate::NotExposed => not_exposed.push(name),
             Climate::NotApplicable => {}
         }
     }
     if !projected.is_empty() {
         notes.add(format!(
-            "Around 2050 (climate projections; a range runs from middle to high emissions): {}.",
+            "Around 2050 (climate projections; where there is a range, it runs from middle to \
+             high emissions): {}.",
             projected.join("; ")
         ));
     }
@@ -320,16 +359,23 @@ fn climate_notes(rates: &[HazardRate], notes: &mut Notes) {
             join_lower(&not_exposed)
         ));
     }
-    if !too_few.is_empty() {
+    let mut kinds: Vec<&str> = too_few.iter().map(|(k, _)| *k).collect();
+    kinds.dedup();
+    for kind in kinds {
+        let names: Vec<&str> = too_few
+            .iter()
+            .filter(|(k, _)| *k == kind)
+            .map(|(_, n)| *n)
+            .collect();
         notes.add(format!(
-            "This county has too few such days to project a change for {}, so they are left as \
+            "This county has too few {kind} to project a change for {}, so they are left as \
              today.",
-            join_lower(&too_few)
+            join_lower(&names)
         ));
     }
     notes.add(
-        "Earthquakes, tsunamis, volcanoes and personal and societal hazards are not changed for \
-         2050.",
+        "Earthquakes, tsunamis and volcanoes, and risks such as job loss, house fires and \
+         pandemics, are not changed for 2050.",
     );
     if !unclear.is_empty() {
         notes.add(format!(
