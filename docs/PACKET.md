@@ -27,8 +27,10 @@ research live in the app's Learn and explain views; the packet keeps what to do.
 - compact sources: only the ones the packet's brackets point to, run together ten to a paragraph,
   each with title, publisher, year and the URL once.
 
-On the seven fixtures this gives 7,300 to 11,100 words (down from 20,000 to 30,000), about 45 %
-of it guidance and 20 % the Sources section and data credits. `the_packet_stays_short`
+On the seven fixtures this gives 7,900 to 11,100 words (down from 16,800 to 24,500), a fifth of
+it the Sources section and data credits. Printed with the app's print stylesheet (every `##`
+section on a new page) that is still about 30 pages: the section breaks leave about five pages
+part-empty and the sources take about six. `the_packet_stays_short`
 (`crates/rr-plan/tests/fixtures.rs`) fails above 11,500 words, so the packet cannot grow back
 unnoticed.
 
@@ -61,7 +63,7 @@ unnoticed.
 | 7 | `## Documents and money` | The Emergency Financial First Aid Kit's four parts as a checklist; `docs_effak` (documents, inventory and insurance cover) and the document pouch; the insurance lines (`insurance_*`); the cash line; the savings track and `docs_start_emergency_fund`. |
 | 8 | `## Special needs` | Medicine (`medication_days`, `rx_cold_storage`, `epinephrine_check`, `med_list_written`, the cooler, `med_epinephrine_plan`); antibiotics (the `antibiotics_none` line, always); powered devices; babies and toddlers; older adults; getting around; pregnancy and nursing; pets and animals (the pet lines, with the go-kit's water and food staged from household stock next to the carrier); stress and mental health (`topic:mental_health`, always). A subsection appears only when the household needs it. |
 | 9 | `## Maintenance calendar` | For every item in the plan with a rotation or check interval (`Item.maintenance`): every 1 to 3 months as repeating rows; longer intervals as dates counted from the planning date and the month the item enters the plan; the yearly review a year after the planning date. |
-| 10 | `## Sources` | The citations the packet's brackets point to (the first ones in `PlanOutput.provenance`), numbered in order and run together ten to a paragraph: title (without a trailing journal parenthetical), publisher, year, the URL once without `https://`, expert estimates marked; a count of the provenance's other sources; then the data credits from `EngineInfo.attributions` (the National Risk Index statement exactly as its terms require, with version and access date). |
+| 10 | `## Sources` | The citations the packet's brackets point to (the first ones in `PlanOutput.provenance`), numbered in order and run together ten to a paragraph: title (without a trailing journal parenthetical), publisher, year, the URL once (in full, so the app links it), expert estimates marked; a count of the provenance's other sources; then the data credits from `EngineInfo.attributions` (the National Risk Index statement exactly as its terms require, with version and access date). |
 
 Topic blocks the packet does not use (`topic:the_dial`, `topic:consequences_not_causes`,
 `topic:disaster_myths`, `topic:how_numbers_are_made`, `topic:climate_horizon`, `topic:evs`,

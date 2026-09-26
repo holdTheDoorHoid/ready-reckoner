@@ -1,8 +1,8 @@
 //! Section 10: sources. Every citation the packet's brackets point to, in their numbered order,
-//! compact: title, publisher, year and the URL once (without its `https://`), run together ten to
-//! a paragraph so the list prints in a few pages; the retrieval dates are in the plan's JSON. The
-//! expert estimates are marked. Then the data credits, with the National Risk Index statement
-//! exactly as its terms require.
+//! compact: title, publisher, year and the URL once, run together ten to a paragraph so the list
+//! prints in a few pages; the retrieval dates are in the plan's JSON. The expert estimates are
+//! marked. Then the data credits, with the National Risk Index statement exactly as its terms
+//! require.
 
 use rr_types::Citation;
 
@@ -56,11 +56,9 @@ pub(super) fn write(a: &Assessment, provenance: &[Citation], more: usize, out: &
         let url = match first_with_url.iter().find(|(u, _)| *u == c.url.as_str()) {
             Some((_, first)) => format!("Same page as {first}."),
             None => {
+                // In full: the app links a bare https address (and prints it once).
                 first_with_url.push((c.url.as_str(), n));
-                c.url
-                    .strip_prefix("https://")
-                    .unwrap_or(c.url.as_str())
-                    .to_owned()
+                c.url.clone()
             }
         };
         entries.push(format!(
