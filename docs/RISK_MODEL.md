@@ -154,7 +154,7 @@ Natural hazards under 1 in 100,000 a year are left out of the register and named
 | Stranded in a vehicle | a crash or breakdown away from home | 0.15 per vehicle-year (0.05–0.4); no vehicle: 0.03 per non-car commuter (0.01–0.1) | × vehicles | PRIOR (crashes: NHTSA 6.14 million a year) |
 | Local water or gas outage | public water: a boil-water notice or a main break; well: a gas leak or local fault | boil notice 5 %/yr (2–10 %) + main break 10 %/yr (5–20 %); well 1 %/yr (0.3–3 %) | water source (the well pump's own failures are an `rr-consequence` coupling) | PRIOR (research §6.1, §8) |
 | Break-in | a household burglary | 1 %/yr (0.5–2 %), to be replaced by the BJS victimization survey figure | none | PRIOR |
-| Death or disability of an earner | loss of an earner's income | 0.9 % per earner-year (0.5–1.5 %): disability about 0.6 % (SSA: more than 1 in 4 20-year-olds disabled before 67) plus working-age death about 0.3 % | × earners | DERIVED + PRIOR |
+| Death or disability of an earner | loss of an earner's income | 0.9 % per earner-year (0.5–1.5 %): disability about 0.6 % (SSA: 1 in 4 20-year-olds disabled before full retirement age) plus working-age death about 0.3 % | × earners | DERIVED + PRIOR |
 | Long illness in the household | someone sick at home for weeks | 1 % per person-year (0.5–3 %) | × people | PRIOR |
 
 Job loss and earner loss are left out (with a note) when no one is marked as earning; vehicle
@@ -278,7 +278,7 @@ earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092
   is this crate's own prior (`docs/RISK_MODEL.md` §"Hazard rates" / `rr_risk_model_priors`), not a
   cited figure.
 - **Figures to confirm** against the source when the citations are written: UCERF3's 33 % for
-  the Hayward fault, USGS's 7–10 % for New Madrid, the SSA "more than 1 in 4" disability figure,
+  the Hayward fault, USGS's 7–10 % for New Madrid, the SSA "1 in 4" disability figure (checked 2026-09-26: the source says 1 in 4, not "more than"),
   the one-third major share of landfalling hurricanes, and the 1 % burglary prior.
 
 ## Consequences and targets
@@ -650,7 +650,7 @@ For every duration bucket, Λ_b(d) = Σ r_h · q_{h,b} · S_{h,b}(d) (thresholds
   warning among causes with at least 5 % of the rate) and the typical days away (median of the
   time-away mixture, on the ladder). `get_home` gives each commuter's walk and water. Tier `h72`
   when P_need ≥ 2 % (prior), else `now`. `home_loss`: the ten-year displacement chance and the
-  Household Pulse shares (a third back within a week, 12 % out over six months, 1 in 4 renters and
+  Household Pulse shares (most back within a month; 1 in 4 renters and
   1 in 10 owners never back).
 - **Tier enough**: the smallest tier whose days cover the ladder target; income `m3`.
 

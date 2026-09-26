@@ -338,11 +338,14 @@ pub fn per_100(n: f64) -> String {
 }
 
 /// A natural frequency with its range: "about 9 (5–15)"; the range is dropped when it rounds to
-/// the same words.
+/// the same words. Below 1 in 100 the central value has no "about": "fewer than 1 (up to 2)".
 pub fn per_100_range(n: f64, lo: f64, hi: f64) -> String {
     let (c, l, h) = (per_100(n), per_100(lo), per_100(hi));
     if n < 1.0 && hi < 1.0 {
         return "fewer than 1".to_owned();
+    }
+    if n.is_nan() || n < 1.0 {
+        return format!("fewer than 1 (up to {h})");
     }
     if l == h {
         return format!("about {c}");
@@ -423,6 +426,8 @@ mod tests {
         assert_eq!(per_100_range(9.0, 9.2, 9.4), "about 9");
         assert_eq!(per_100_range(0.2, 0.1, 0.5), "fewer than 1");
         assert_eq!(per_100_range(3.0, 0.4, 6.0), "about 3 (0–6)");
+        // Never "about fewer than 1 (0–2)".
+        assert_eq!(per_100_range(0.4, 0.1, 2.3), "fewer than 1 (up to 2)");
     }
 
     #[test]

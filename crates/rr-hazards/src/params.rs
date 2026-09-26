@@ -272,8 +272,9 @@ pub(crate) const PANDEMIC_DISRUPTIVE_SHARE: Triple = (0.25, 0.1, 0.4);
 pub(crate) const NUCLEAR_PLANT_EPZ: Triple = (2.0e-4, 2.0e-5, 5.0e-4);
 /// PRIOR. Same, for a plant 16–80 km away (food and water advisories in the ingestion zone).
 pub(crate) const NUCLEAR_PLANT_INGESTION: Triple = (5.0e-5, 1.0e-5, 2.0e-4);
-/// SRC (research §6.3, from the Forecasting Research Institute): experts' estimates of a
-/// worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. Never
+/// SRC (research §6.3, from the Forecasting Research Institute): superforecasters' and experts'
+/// medians of 1 % and 5 % for a catastrophe killing 10 million or more before 2045, spread over
+/// the years to 2045: about 1 in 2,000 to about 1 in 400 a year (our arithmetic). Never
 /// shown as a point estimate; the value used for arithmetic is the geometric middle.
 pub(crate) const NUCLEAR_ATTACK_RANGE: (f64, f64) = (1.0 / 2000.0, 1.0 / 400.0);
 /// PRIOR. An attack that disrupts daily life where a city household lives: 1 in 10,000 to 1 in
@@ -311,8 +312,8 @@ pub(crate) const WELL_LOCAL_OUTAGE: Triple = (0.01, 0.003, 0.03);
 /// PRIOR. A household burglary, about 1 in 100 homes a year (to be replaced by the BJS National
 /// Crime Victimization Survey figure).
 pub(crate) const BURGLARY: Triple = (0.01, 0.005, 0.02);
-/// DERIVED + PRIOR, per earner-year: disability onset ≈ 0.0061 (SSA: more than 1 in 4
-/// 20-year-olds disabled before 67, spread over 47 years) plus death at working age ≈ 0.003
+/// DERIVED + PRIOR, per earner-year: disability onset ≈ 0.0061 (SSA: 1 in 4 20-year-olds
+/// disabled before full retirement age, 67, spread over 47 years) plus death at working age ≈ 0.003
 /// (accidental deaths alone are 58.1 per 100,000, NCHS 2024).
 pub(crate) const EARNER_LOSS: Triple = (0.009, 0.005, 0.015);
 /// PRIOR. A long illness (weeks) that keeps someone sick at home, per person-year.

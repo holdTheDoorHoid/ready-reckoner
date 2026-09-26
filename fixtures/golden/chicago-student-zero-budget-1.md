@@ -131,7 +131,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 
 | What | How likely | How bad |
 | --- | --- | --- |
-| Nuclear attack | Experts' estimates of a worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[43, 44] | Very severe |
+| Nuclear attack | Forecasters asked in 2024 put the chance of a nuclear catastrophe (10 million or more deaths worldwide) before 2045 at 1 to 5 in 100. Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[43, 44] | Very severe |
 | Terrorist attack | An attack that disrupts daily life where you live is rare: expert estimates range from about 1 in 10,000 to about 1 in 1,000 a year.[18] | Very severe |
 
 **What helps.** Get inside, stay inside, stay tuned.[44] Go to a basement or the middle of a large brick or concrete building. Stay there for 24 hours unless there is a fire or another immediate danger, or officials say it is safe to leave. Radiation levels drop fast during the first 24 hours.[44] Turn off fans and air conditioning that pull in outside air.[45] If you were outside, take off your outer layer of clothing. That can remove up to 90% of radioactive material. Then wash with soap and water.[45] If you live near a nuclear power plant, learn whether you are in its planning zone.[42]
@@ -434,7 +434,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **111** Work Experience of the Population, 2024. U.S. Bureau of Labor Statistics, 2026. https://www.bls.gov/news.release/work.nr0.htm **112** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023 **113** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **114** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **115** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **116** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx **117** Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
 
-41 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+40 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

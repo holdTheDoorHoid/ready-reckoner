@@ -135,7 +135,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 
 | What | How likely | How bad |
 | --- | --- | --- |
-| Nuclear attack | Experts' estimates of a worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[46, 47] | Very severe |
+| Nuclear attack | Forecasters asked in 2024 put the chance of a nuclear catastrophe (10 million or more deaths worldwide) before 2045 at 1 to 5 in 100. Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[46, 47] | Very severe |
 | Terrorist attack | An attack that disrupts daily life where you live is rare: expert estimates range from about 1 in 50,000 to about 1 in 5,000 a year.[12] | Very severe |
 
 **What helps.** Get inside, stay inside, stay tuned.[47] Go to a basement or the middle of a large brick or concrete building. Stay there for 24 hours unless there is a fire or another immediate danger, or officials say it is safe to leave. Radiation levels drop fast during the first 24 hours.[47] Turn off fans and air conditioning that pull in outside air.[48] If you were outside, take off your outer layer of clothing. That can remove up to 90% of radioactive material. Then wash with soap and water.[48] If you live near a nuclear power plant, learn whether you are in its planning zone.[49]
@@ -618,7 +618,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **121** Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate. Institute of Medicine (National Academies Press), 2005. https://nap.nationalacademies.org/catalog/10925/ **122** An Approach to Longer-Term Food Storage. Brigham Young University, Department of Nutrition, Dietetics and Food Science, 2019. https://brightspotcdn.byu.edu/b1/4d/75fc449e4ce9843daa701f69faa4/an-approach-to-longer-term-food-storage.SEPT2019.pdf **123** Food Storage for One Year. The Church of Jesus Christ of Latter-day Saints, 2006. https://www.churchofjesuschrist.org/study/ensign/2006/03/random-sampler/food-storage-for-one-year?lang=eng **124** Be 2 Weeks Ready tool kit. Oregon Department of Emergency Management, 2023. https://www.oregon.gov/oem/Documents/B2WR-Complete-Tool-Kit-EN.pdf **125** Prepare in a Year. Washington Emergency Management Division, 2024. https://mil.wa.gov/prepare-in-a-year **126** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water **127** Maintenance Fluid Plan in Animals. Merck & Co., Inc., 2025. https://www.merckvetmanual.com/therapeutics/fluid-therapy/maintenance-fluid-plan-in-animals **128** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **129** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **130** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx
 
-40 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+39 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

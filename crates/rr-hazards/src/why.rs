@@ -148,7 +148,7 @@ pub fn why_we_think_this(hazard: HazardId) -> &'static str {
              survey figure will replace it."
         }
         EarnerDeathOrDisability => {
-            "More than 1 in 4 of today's 20-year-olds will become disabled before retirement age \
+            "About 1 in 4 of today's 20-year-olds will become disabled before retirement age \
              (Social Security), and some working-age adults die each year: together about 1 in 110 \
              per earner a year."
         }

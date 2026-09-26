@@ -206,9 +206,15 @@ pub(crate) fn natural_frequency(f: Frequency, verb: &str) -> String {
         format!("Fewer than 1 in 100,000 households like yours will {verb} {when}.")
     };
     if f.rate >= 1.0 {
-        // "Nearly every household" hides how often; say it.
+        // "Nearly every household" hides how often; say it ("about once a year", never
+        // "about 1 times a year").
         s.pop();
-        s.push_str(&format!(" (about {} times a year).", sig2(f.rate)));
+        let times = sig2(f.rate);
+        if times == "1" {
+            s.push_str(" (about once a year).");
+        } else {
+            s.push_str(&format!(" (about {times} times a year)."));
+        }
     }
     s
 }
@@ -304,6 +310,13 @@ mod tests {
     }
 
     #[test]
+    fn about_once_a_year_not_1_times() {
+        let s = natural_frequency(freq(1.03, 0.8, 1.3, false), "go through a cold wave");
+        assert!(s.ends_with("(about once a year)."), "{s}");
+        assert!(!s.contains("1 times"), "{s}");
+    }
+
+    #[test]
     fn ranges_with_words() {
         let s = natural_frequency(freq(0.003, 0.0001, 0.2, true), "x");
         assert_eq!(
@@ -332,14 +345,14 @@ mod tests {
     #[test]
     fn rare_catastrophe_range_sentence() {
         let s = range_only(
-            "Experts' estimates of a worldwide nuclear catastrophe range from",
+            "Spread over those years, that is",
             1.0 / 2000.0,
             1.0 / 400.0,
             " No reliable estimate exists for effects where you live.",
         );
         assert_eq!(
             s,
-            "Experts' estimates of a worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live."
+            "Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live."
         );
     }
 }

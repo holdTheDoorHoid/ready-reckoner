@@ -405,7 +405,7 @@ label = "Everyday groceries: USDA Thrifty Food Plan, August 2026"
 unit = "US dollar per person per day"
 default = 8.44
 sources = ["usda_tfp_aug2026"]
-note = "$236.30 a week for the reference family of four. By person it runs from about $3.77 a day for a 1-year-old to $10.51 for a man aged 20 to 50. Shelf-stable pantry food costs about the same (an assumption)."
+note = "$236.30 a week for the reference family of four. By person it runs from about $3.77 a day for a 1-year-old to $10.76 for a boy aged 14 to 19 ($10.51 for a man aged 20 to 50). Shelf-stable pantry food costs about the same (an assumption)."
 
 [[constant]]
 key = "food_cost_staples_usd_per_person_day"

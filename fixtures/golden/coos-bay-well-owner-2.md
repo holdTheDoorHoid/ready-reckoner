@@ -149,7 +149,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 
 | What | How likely | How bad |
 | --- | --- | --- |
-| Nuclear attack | Experts' estimates of a worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[49, 50] | Very severe |
+| Nuclear attack | Forecasters asked in 2024 put the chance of a nuclear catastrophe (10 million or more deaths worldwide) before 2045 at 1 to 5 in 100. Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[49, 50] | Very severe |
 | Terrorist attack | An attack that disrupts daily life where you live is rare: expert estimates range from about 1 in 50,000 to about 1 in 5,000 a year.[3] | Very severe |
 
 **What helps.** Get inside, stay inside, stay tuned.[50] Go to a basement or the middle of a large brick or concrete building. Stay there for 24 hours unless there is a fire or another immediate danger, or officials say it is safe to leave. Radiation levels drop fast during the first 24 hours.[50] Turn off fans and air conditioning that pull in outside air.[51] If you were outside, take off your outer layer of clothing. That can remove up to 90% of radioactive material. Then wash with soap and water.[51] If you live near a nuclear power plant, learn whether you are in its planning zone.[52]
@@ -557,7 +557,7 @@ Of 100 households like yours, about 20 (9–40) will have an income gap of more 
 
 ### Medicine
 
-- 1 person takes prescription medicine every day: keep 30 days of it on hand. Your target is 90 days; beyond 30 days, ask your prescriber or insurer about a longer fill. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration many states let pharmacies give an emergency refill of up to 30 days; ask your pharmacist what yours allows. No agency sets a one-month amount: this step sits between the two-week advice (Red Cross, Oregon, Washington) and the Church's three-month pantry. (Florida DEM, CDC, Red Cross, Healthcare Ready)[3, 35, 44, 45, 47, 71, 72, 73, 74, 93, 94, 95, 122, 123, 124]
+- 1 person takes prescription medicine every day: keep 30 days of it on hand. Your target is 90 days; beyond 30 days, ask your prescriber or insurer about a longer fill. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. No agency sets a one-month amount: this step sits between the two-week advice (Red Cross, Oregon, Washington) and the Church's three-month pantry. (Florida DEM, CDC, Red Cross, Healthcare Ready)[3, 35, 44, 45, 47, 71, 72, 73, 74, 93, 94, 95, 122, 123, 124]
 
 - **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[10, 12, 14, 33, 57, 71, 74, 75, 122]
 
@@ -631,7 +631,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **131** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **132** Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
 
-44 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+43 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

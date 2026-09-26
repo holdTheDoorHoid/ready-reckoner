@@ -144,7 +144,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 
 | What | How likely | How bad |
 | --- | --- | --- |
-| Nuclear attack | Experts' estimates of a worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[54, 55] | Very severe |
+| Nuclear attack | Forecasters asked in 2024 put the chance of a nuclear catastrophe (10 million or more deaths worldwide) before 2045 at 1 to 5 in 100. Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[54, 55] | Very severe |
 | Terrorist attack | An attack that disrupts daily life where you live is rare: expert estimates range from about 1 in 20,000 to about 1 in 2,000 a year.[16] | Very severe |
 
 **What helps.** Get inside, stay inside, stay tuned.[55] Go to a basement or the middle of a large brick or concrete building. Stay there for 24 hours unless there is a fire or another immediate danger, or officials say it is safe to leave. Radiation levels drop fast during the first 24 hours.[55] Turn off fans and air conditioning that pull in outside air.[56] If you were outside, take off your outer layer of clothing. That can remove up to 90% of radioactive material. Then wash with soap and water.[56] If you live near a nuclear power plant, learn whether you are in its planning zone.[57]
@@ -507,7 +507,7 @@ Of 100 households like yours, about 15 (7–30) will have an income gap of more 
 
 ### Medicine
 
-- 1 person takes prescription medicine every day: keep 14 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration many states let pharmacies give an emergency refill of up to 30 days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[16, 39, 40, 41, 45, 49, 50, 52, 73, 74, 75, 76, 96, 126]
+- 1 person takes prescription medicine every day: keep 14 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[16, 39, 40, 41, 45, 49, 50, 52, 73, 74, 75, 76, 96, 126]
 - 1 person needs medicine kept cold, such as insulin: plan to keep it cool but never frozen for up to 7 days without power, with an insulated cooler and cold packs or ice you can replace. After 1 day without power, throw refrigerated medicine out unless its label says otherwise; ask your pharmacist how long yours can stay warm. (Ready.gov, CDC)[2, 16, 24, 25, 39, 40, 41, 61, 78, 96, 127]
 
 - **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[10, 12, 14, 38, 62, 73, 76, 77, 126]
@@ -587,7 +587,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **131** Emergency List for Families With Infants and Young Children. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/infant-feeding-emergencies-toolkit/php/checklist.html **132** Feeding Your Child Safely During a Disaster. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/breastfeeding/php/guidelines-recommendations/feeding-your-child-safely-during-a-disaster.html **133** Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020. Centers for Disease Control and Prevention, 2020. https://www.cdc.gov/mmwr/volumes/69/wr/mm6935a2.htm **134** How many diapers a day should your newborn have?. Sutter Health, 2025. https://www.sutterhealth.org/health/how-many-diapers-a-day-your-newborn-should-have **135** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water **136** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **137** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **138** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx
 
-45 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+44 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

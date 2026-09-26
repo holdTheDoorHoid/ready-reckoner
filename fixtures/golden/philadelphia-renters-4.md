@@ -65,7 +65,7 @@ Nearly every household like yours will have someone need emergency care in the n
 
 #### 3. Cold wave
 
-Nearly every household like yours will go through a spell of dangerous cold in the next ten years (about 1 times a year).[2]
+Nearly every household like yours will go through a spell of dangerous cold in the next ten years (about once a year).[2]
 
 **What helps.** Keep extra blankets, sleeping bags and warm coats, and pick one room to keep warm.[14] Learn how to keep pipes from freezing, and test smoke and carbon monoxide alarms before winter.[15] Keep a car kit with jumper cables, sand, a flashlight, warm clothes, blankets, water and snacks, and keep the gas tank full.[15] Check on older neighbours often.[14] Know the signs of hypothermia, such as shivering, confusion and slurred speech. A body temperature below 95°F is an emergency. Warm the center of the body first.[15] In avalanche country, get training, sign up for alerts from a Forest Service avalanche center, and carry a beacon, a probe and a small shovel.[16]
 
@@ -133,7 +133,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 
 | What | How likely | How bad |
 | --- | --- | --- |
-| Nuclear attack | Experts' estimates of a worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[46, 47] | Very severe |
+| Nuclear attack | Forecasters asked in 2024 put the chance of a nuclear catastrophe (10 million or more deaths worldwide) before 2045 at 1 to 5 in 100. Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[46, 47] | Very severe |
 | Terrorist attack | An attack that disrupts daily life where you live is rare: expert estimates range from about 1 in 10,000 to about 1 in 1,000 a year.[18] | Very severe |
 
 **What helps.** Get inside, stay inside, stay tuned.[47] Go to a basement or the middle of a large brick or concrete building. Stay there for 24 hours unless there is a fire or another immediate danger, or officials say it is safe to leave. Radiation levels drop fast during the first 24 hours.[47] Turn off fans and air conditioning that pull in outside air.[48] If you were outside, take off your outer layer of clothing. That can remove up to 90% of radioactive material. Then wash with soap and water.[48] If you live near a nuclear power plant, learn whether you are in its planning zone.[45]
@@ -520,7 +520,7 @@ Of 100 households like yours, about 15 (6–30) will have an income gap of more 
 
 ### Medicine
 
-- 1 person takes prescription medicine every day: keep 14 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration many states let pharmacies give an emergency refill of up to 30 days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[18, 32, 34, 35, 39, 40, 41, 42, 64, 65, 66, 67, 121]
+- 1 person takes prescription medicine every day: keep 14 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[18, 32, 34, 35, 39, 40, 41, 42, 64, 65, 66, 67, 121]
 
 - **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[9, 11, 13, 31, 53, 64, 67, 68, 121]
 
@@ -604,7 +604,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **121** Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/reproductive-health/emergency-preparation-response/safety-messages.html **122** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023 **123** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **124** Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020. Centers for Disease Control and Prevention, 2020. https://www.cdc.gov/mmwr/volumes/69/wr/mm6935a2.htm **125** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water **126** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **127** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **128** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx
 
-48 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+47 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

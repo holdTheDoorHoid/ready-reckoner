@@ -129,7 +129,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 
 | What | How likely | How bad |
 | --- | --- | --- |
-| Nuclear attack | Experts' estimates of a worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[46, 47] | Very severe |
+| Nuclear attack | Forecasters asked in 2024 put the chance of a nuclear catastrophe (10 million or more deaths worldwide) before 2045 at 1 to 5 in 100. Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[46, 47] | Very severe |
 | Terrorist attack | An attack that disrupts daily life where you live is rare: expert estimates range from about 1 in 10,000 to about 1 in 1,000 a year.[19] | Very severe |
 
 **What helps.** Get inside, stay inside, stay tuned.[47] Go to a basement or the middle of a large brick or concrete building. Stay there for 24 hours unless there is a fire or another immediate danger, or officials say it is safe to leave. Radiation levels drop fast during the first 24 hours.[47] Turn off fans and air conditioning that pull in outside air.[48] If you were outside, take off your outer layer of clothing. That can remove up to 90% of radioactive material. Then wash with soap and water.[48] If you live near a nuclear power plant, learn whether you are in its planning zone.[45]
@@ -505,7 +505,7 @@ No one in the household earns wages, so the plan sets no income-gap goal. Keep a
 
 ### Medicine
 
-- 1 person takes prescription medicine every day: keep 30 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration many states let pharmacies give an emergency refill of up to 30 days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[19, 25, 26, 27, 36, 39, 40, 41, 63, 64, 65, 66, 122]
+- 1 person takes prescription medicine every day: keep 30 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[19, 25, 26, 27, 36, 39, 40, 41, 63, 64, 65, 66, 122]
 - 1 person needs medicine kept cold, such as insulin: plan to keep it cool but never frozen for up to 21 days without power, with an insulated cooler and cold packs or ice you can replace. After 1 day without power, throw refrigerated medicine out unless its label says otherwise; ask your pharmacist how long yours can stay warm. (Ready.gov, CDC)[2, 19, 25, 26, 27, 32, 33, 52, 68, 89, 123]
 
 - **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[10, 12, 14, 53, 63, 66, 67, 98, 122]
@@ -594,7 +594,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **131** Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
 
-39 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+38 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 
