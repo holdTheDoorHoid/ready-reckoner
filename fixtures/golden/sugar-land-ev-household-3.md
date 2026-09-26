@@ -278,18 +278,18 @@ Your budget is $200 a month, plus $1,000 once at the start. The plan does the fr
 - [ ] **Heavy trash bags for the toilet bucket**: 2 bags, about under $1 (usually free). Adds 0.7 days of emergency toilet supplies for 3 people, bringing you to 0.7 of the 2-day goal.
 - [ ] **Extra toilet paper**: 3 rolls, about $2 (usually $1–3). Adds 7 days of toilet paper for 3 people, which completes the 7-day goal.
 - [ ] **Extra pet food in an airtight container**: 5 pounds of dry food, about $6 (usually $4–9). Adds 7 days of pet food, which completes the 7-day goal.
-- [ ] **Whistle for each go-bag**: 3 whistles, about $6 (usually $4–8). Gets you ready for leaving home in a hurry.
+- [ ] **Whistle for each go-bag**: 3 whistles, about $6 (usually $4–8). Gets you ready for leaving home quickly.
 - [ ] **Baby wipes**: 2 packs, about $5 (usually $5). Adds 3.5 days of diapers and wipes, bringing you to 3.5 of the 7-day goal.
 - [ ] **N95 respirators**: 10 respirators, about $10 (usually $7–13). Gets you ready for a medical emergency before help arrives.
-- [ ] **Foil emergency blankets**: 3 blankets, about $8 (usually $2–15). Gets you ready for leaving home in a hurry.
+- [ ] **Foil emergency blankets**: 3 blankets, about $8 (usually $2–15). Gets you ready for leaving home quickly.
 - [ ] **Headlamp or flashlight for each person**: 2 headlamps, about $23 (usually $7–40). Adds 5 days of light during power cuts, which completes the 5-day goal.
 - [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17). Gets you ready for getting home if you are stranded.
 - [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20). Adds 5 days of spare batteries for lights and a radio, which completes the 5-day goal.
 - [ ] **Thermometers: one for the family, and one for a baby**: 2 thermometers, about $16 (usually $15–17). Gets you ready for a medical emergency before help arrives.
 - [ ] **Period products for two cycles**: 2 cycles' supplies, about $12 (usually $9–15). Adds 7 days of period products, which completes the 7-day goal.
 - [ ] **Family first-aid kit**: 1 kit, about $36 (usually $27–44). Gets you ready for a medical emergency before help arrives.
-- [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $28 (usually $23–33). Gets you ready for leaving home in a hurry.
-- [ ] **Pet go-kit: a carrier and a bag you pack from your supplies**: 1 (one per pet), about $32 (usually $30–35). Gets you ready for leaving home in a hurry.
+- [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $28 (usually $23–33). Gets you ready for leaving home quickly.
+- [ ] **Pet go-kit: a carrier and a bag you pack from your supplies**: 1 (one per pet), about $32 (usually $30–35). Gets you ready for leaving home quickly.
 - [ ] **Over-the-counter medicine basics**: 1 set, about $43 (usually $34–52). Gets you ready for a medical emergency before help arrives.
 - [ ] **Personal straw or squeeze filter for a bag**: 2 filters, about $47 (usually $36–58). Gets you ready for getting home if you are stranded.
 - [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $40 (usually $37–43). Adds half a day of phone power and news, bringing you to 1.5 of the 2-day goal.

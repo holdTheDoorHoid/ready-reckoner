@@ -333,7 +333,7 @@ fn event_phrase(bucket: BucketId, part: Option<&str>) -> String {
 
 fn readiness_phrase(bucket: BucketId) -> &'static str {
     match bucket {
-        BucketId::Evacuate => "leaving home in a hurry",
+        BucketId::Evacuate => "leaving home quickly",
         BucketId::GetHome => "getting home if you are stranded",
         BucketId::MedicalEmergency => "a medical emergency before help arrives",
         BucketId::Fire => "a fire at home",
@@ -441,7 +441,7 @@ mod tests {
         };
         assert_eq!(
             why(Lead::Free, &ready, 4, 10),
-            "Free. Gets you ready for leaving home in a hurry. About 5 of 100 households like \
+            "Free. Gets you ready for leaving home quickly. About 5 of 100 households like \
              yours need this in the next 10 years."
         );
     }

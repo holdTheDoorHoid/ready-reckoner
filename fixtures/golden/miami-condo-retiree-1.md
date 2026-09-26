@@ -277,8 +277,8 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] **Insulated bag and cold packs for refrigerated medicine**: 1 set, about $26 (usually $15–37). Adds 21 days of cold storage for medicine, which completes the 21-day goal.
 - [ ] **Carbon monoxide alarm on each sleeping level**: 1 alarm, about $27 (usually $23–30). Gets you ready for a fire at home.
 - [ ] **Extra pet food in an airtight container**: 2 pounds of dry food, about $2 (usually $1–3). Adds 13 days of pet food, bringing you to 13 of the 14-day goal.
-- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3). Gets you ready for leaving home in a hurry.
-- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home in a hurry.
+- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3). Gets you ready for leaving home quickly.
+- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home quickly.
 - [ ] **Headlamp or flashlight for each person**: 1 headlamp, about $12 (usually $3–20). Adds 14 days of light during power cuts, which completes the 14-day goal.
 - [ ] **Extra toilet paper**: 5 rolls, about $4 (usually $2–6). Adds 14 days of toilet paper for 1 person, which completes the 14-day goal.
 - [ ] **Heavy trash bags for the toilet bucket**: 10 bags, about $1 (usually $1). Adds 7 days of emergency toilet supplies for 1 person, bringing you to 14 of the 21-day goal.

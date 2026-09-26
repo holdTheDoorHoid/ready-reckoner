@@ -404,6 +404,18 @@ fn shape_problems(out: &PlanOutput) -> Vec<String> {
             problems.push(format!("packet contains {bad:?}"));
         }
     }
+    // Every hazard card pairs its threat with what to do (PRINCIPLES §4).
+    let risks = out
+        .packet_markdown
+        .split("## Your targets")
+        .next()
+        .unwrap_or_default();
+    for card in risks.split("\n#### ").skip(1) {
+        if !card.contains("**What helps.**") {
+            let title = card.lines().next().unwrap_or_default();
+            problems.push(format!("the card {title:?} has no \"What helps\""));
+        }
+    }
     problems
 }
 

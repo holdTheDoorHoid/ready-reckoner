@@ -268,10 +268,10 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 - Set aside $20 toward **backup battery for a powered medical device**.
 - [ ] **Heavy trash bags for the toilet bucket**: 2 bags, about under $1 (usually free). Adds 1 day of emergency toilet supplies for 1 person, bringing you to 2 of the 3-day goal.
 - [ ] **Extra toilet paper**: 2 rolls, about $2 (usually $1–2). Adds 10 days of toilet paper for 1 person, which completes the 10-day goal.
-- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3). Gets you ready for leaving home in a hurry.
+- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3). Gets you ready for leaving home quickly.
 - [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 4 days of one person's medicine, about $3 (usually $2–5). Adds 4 days of medicine, bringing you to 7 of the 14-day goal.
 - [ ] **Period products for two cycles**: 1 cycle's supply, about $6 (usually $4–7). Adds 10 days of period products, which completes the 10-day goal.
-- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home in a hurry.
+- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home quickly.
 
 ### Month by month
 

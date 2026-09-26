@@ -117,6 +117,8 @@ Of 100 households like yours, about 11 will feel an earthquake strong enough to 
 
 Of 100 households like yours, about 9 (3–18) will have to leave home or work for a tsunami warning in the next ten years.[3, 34, 38]
 
+**What helps.** The steps under "Earthquake" above apply here too.
+
 **What it can do:** having to leave home and damage to the home. **How bad:** Severe. **How sure:** Rough data.
 
 ### Other risks we checked
@@ -269,9 +271,9 @@ Your budget is $150 a month, plus $500 once at the start. The plan does the free
 
 - [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 30 days of one person's medicine, about $26 (usually $12–40). Adds 90 days of medicine, which completes the 90-day goal.
 - [ ] **Unscented household bleach (for treating water)**: 1 bottle, about $8 (usually $7–9). Adds 365 days of bleach for treating water for 2 people, which completes the 365-day goal.
-- [ ] **Whistle for each go-bag**: 2 whistles, about $4 (usually $2–5). Gets you ready for leaving home in a hurry.
+- [ ] **Whistle for each go-bag**: 2 whistles, about $4 (usually $2–5). Gets you ready for leaving home quickly.
 - [ ] **Extra pet food in an airtight container**: 11 pounds of dry food, about $14 (usually $8–19). Adds 7.1 days of pet food, bringing you to 7.1 of the 60-day goal.
-- [ ] **Foil emergency blankets**: 2 blankets, about $5 (usually $1–10). Gets you ready for leaving home in a hurry.
+- [ ] **Foil emergency blankets**: 2 blankets, about $5 (usually $1–10). Gets you ready for leaving home quickly.
 - [ ] **Thermometers: one for the family, and one for a baby**: 1 thermometer, about $8 (usually $7–8). Gets you ready for a medical emergency before help arrives.
 - [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17). Gets you ready for getting home if you are stranded.
 - [ ] **Headlamp or flashlight for each person**: 2 headlamps, about $23 (usually $7–40). Adds 180 days of light during power cuts, which completes the 180-day goal.
@@ -282,11 +284,11 @@ Your budget is $150 a month, plus $500 once at the start. The plan does the free
 - [ ] **Period products for two cycles**: 4 cycles' supplies, about $23 (usually $17–30). Adds 60 days of period products, which completes the 60-day goal.
 - [ ] **Gravity water filter (removes bacteria and parasites)**: 1 filter, about $75 (usually $55–96). Adds 351 days of stored drinking and washing water for 2 people, bringing you to 361 of the 365-day goal.
 - [ ] **Get-home bag for each commuter: a small bag you stock from home**: 1 bag, about $34 (usually $30–39). Gets you ready for getting home if you are stranded.
-- [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $28 (usually $23–33). Gets you ready for leaving home in a hurry.
+- [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $28 (usually $23–33). Gets you ready for leaving home quickly.
 - [ ] **Family first-aid kit**: 1 kit, about $36 (usually $27–44). Gets you ready for a medical emergency before help arrives.
 - [ ] **Two-bucket emergency toilet kit**: 1 kit, about $28 (usually $26–30). Adds 122 days of emergency toilet supplies for 2 people, bringing you to 243 of the 365-day goal.
 - [ ] **Over-the-counter medicine basics**: 1 set, about $43 (usually $34–52). Gets you ready for a medical emergency before help arrives.
-- [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $40 (usually $37–43). Gets you ready for leaving home in a hurry.
+- [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $40 (usually $37–43). Gets you ready for leaving home quickly.
 - [ ] **Bar soap and laundry soap**: 4 person-months, about $24 (usually $8–40). Adds 60 days of soap for 2 people, which completes the 60-day goal.
 
 ### Next month: Month 1 (from November 1, 2026), $150 to spend
