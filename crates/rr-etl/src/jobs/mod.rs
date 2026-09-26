@@ -24,6 +24,8 @@ pub struct Ctx {
     pub data: PathBuf,
     /// HTTP client (knows about `--keep-raw`).
     pub http: Http,
+    /// Keep `data/raw/intermediate/` after the refresh (`--keep-intermediate`).
+    pub keep_intermediate: bool,
 }
 
 /// Everything a job reports back.
@@ -292,7 +294,7 @@ pub fn refresh(ctx: &Ctx, only: &[String]) -> Result<RefreshSummary> {
     manifest.save(&ctx.data)?;
     crate::changes::append(&ctx.data, &manifest, &summary)?;
     // Files one job hands to a later one are not packs: drop them unless asked to keep raw data.
-    if !ctx.http.keep_raw {
+    if !ctx.http.keep_raw && !ctx.keep_intermediate {
         crate::intermediate::clear(&ctx.data)?;
     }
     Ok(summary)
