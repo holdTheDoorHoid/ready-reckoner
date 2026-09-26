@@ -17,4 +17,4 @@ Three months is mostly about money, not supplies. A spell out of work often last
 [^finra_financial_foundations]: FINRA, Financial Foundations (2026).
 [^cfpb_emergency_fund]: Consumer Financial Protection Bureau, An essential guide to building an emergency fund (2025).
 [^church_home_storage_2007]: The Church of Jesus Christ of Latter-day Saints, All Is Safely Gathered In: Family Home Storage (2007).
-[^fema_nhs_2024]: FEMA (mirror of the published slide deck), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
+[^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).

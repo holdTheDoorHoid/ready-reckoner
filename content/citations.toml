@@ -419,10 +419,11 @@ license = "US Government Work (public domain)"
 [[citation]]
 id = "fema_nhs_2024"
 title = "2024 National Household Survey on Disaster Preparedness: Findings"
-publisher = "FEMA (mirror of the published slide deck)"
+publisher = "FEMA (via Internet Archive)"
 year = 2025
-url = "https://survivingcascadia.com/wp-content/uploads/2025/05/2024-national-household-survey-on-disaster-preparedness-findings.pdf"
-retrieved = "2026-09-25"
+url = "https://web.archive.org/web/20250507154704/https://www.fema.gov/sites/default/files/documents/fema_icpd_2024-national-household-survey-on-disaster-preparedness-findings_05072025.pdf"
+retrieved = "2026-09-26"
+quote = "The most frequently selected challenge to taking actions to prepare for a disaster or emergency was thinking that it would cost too much (26%)."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -2259,3 +2260,198 @@ url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MOD
 retrieved = "2026-09-25"
 license = "CC BY-SA 4.0"
 prior = true
+
+# ---------------------------------------------------------------------------------------------
+# Life-safety guidance for v0.1.1 (round-2 review: S1, S7, RR-P04, RR-P07, RR-P16, P-22),
+# added 2026-09-26. Check results are in docs/CITATION_IDS.md.
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "fda_insulin_emergency"
+title = "Information Regarding Insulin Storage and Switching Between Products in an Emergency"
+publisher = "U.S. Food and Drug Administration"
+year = 2017
+url = "https://www.fda.gov/drugs/emergency-preparedness-drugs/information-regarding-insulin-storage-and-switching-between-products-emergency"
+retrieved = "2026-09-26"
+quote = "Insulin products contained in vials or cartridges supplied by the manufacturers (opened or unopened) may be left unrefrigerated at a temperature between 59°F and 86°F for up to 28 days and continue to work."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ada_insulin_storage"
+title = "Insulin Storage and Syringe Safety"
+publisher = "American Diabetes Association"
+year = 2026
+url = "https://diabetes.org/health-wellness/medication/insulin-storage-and-syringe-safety"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "aace_diabetes_emergency"
+title = "Are You Prepared to Manage Your Diabetes in an Emergency?"
+publisher = "American Association of Clinical Endocrinology"
+year = 2026
+url = "https://www.aace.com/disease-and-conditions/diabetes/are-you-prepared-manage-your-diabetes-emergency"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "medicare_drugs_disaster"
+title = "Getting drugs in a disaster or emergency"
+publisher = "Medicare.gov (Centers for Medicare and Medicaid Services)"
+year = 2026
+url = "https://www.medicare.gov/health-drug-plans/part-d/using-drug-coverage/drugs-disaster-emergency"
+retrieved = "2026-09-26"
+quote = "Ask your plan if it offers 60- to 90-day supplies and which pharmacies you can use to get them."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_heat_related_illness"
+title = "Heat-Related Illnesses: What to Look For, What to Do (CS280226)"
+publisher = "Centers for Disease Control and Prevention"
+year = 2017
+url = "https://www.cdc.gov/disasters/extremeheat/pdf/Heat_Related_Illness.pdf"
+retrieved = "2026-09-26"
+quote = "Hot, red, dry, or damp skin"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cpsc_co_information_center"
+title = "Carbon Monoxide Information Center"
+publisher = "U.S. Consumer Product Safety Commission"
+year = 2026
+url = "https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Carbon-Monoxide-Information-Center"
+retrieved = "2026-09-26"
+quote = "If you suspect CO poisoning, get outside to fresh air immediately, and then call 911."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "osha_downed_wires"
+title = "Working Safely Around Downed Electrical Wires (fact sheet)"
+publisher = "Occupational Safety and Health Administration"
+year = 2018
+url = "https://www.osha.gov/sites/default/files/publications/downed_electrical_wires.pdf"
+retrieved = "2026-09-26"
+quote = "If contact is made with an energized power line while you are in a vehicle, remain calm and do not get out unless the vehicle is on fire."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "pa_puc_power_line_safety"
+title = "Power Line Safety (consumer fact sheet)"
+publisher = "Pennsylvania Public Utility Commission"
+year = 2013
+url = "https://www.puc.pa.gov/General/consumer_ed/pdf/Power_Line_Safety-FS.pdf"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "cpuc_medical_baseline"
+title = "Medical Baseline"
+publisher = "California Public Utilities Commission"
+year = 2026
+url = "https://www.cpuc.ca.gov/consumer-support/financial-assistance-savings-and-discounts/medical-baseline"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "psegli_critical_care"
+title = "Protect Your Health During Power Outages (Critical Care Program)"
+publisher = "PSEG Long Island (electric utility)"
+year = 2026
+url = "https://www.psegliny.com/outages/stormprepandrestoration/criticalcareprogram"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "tdem_stear"
+title = "State of Texas Emergency Assistance Registry (STEAR)"
+publisher = "Texas Division of Emergency Management"
+year = 2026
+url = "https://www.tdem.texas.gov/response/state-of-texas-emergency-assistance-registry"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "epa_burnwise_faq"
+title = "Frequent Questions about Wood-Burning Appliances (Burn Wise)"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/burnwise/frequent-questions-about-wood-burning-appliances"
+retrieved = "2026-09-26"
+quote = "EPA and fire officials recommend having your wood stove, chimney, and vents professionally inspected and cleaned each year to keep them in safe working order."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_stay_safe_warm"
+title = "Stay Safe and Warm Toolkit (FEMA Advisory)"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/sites/default/files/2026-01/ready_toolkit_stay-safe-and-warm_01272026.pdf"
+retrieved = "2026-09-26"
+quote = "If you can’t keep your house warm, go to a community warming center."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "pa_puc_gas_emergencies"
+title = "Gas Emergencies"
+publisher = "Pennsylvania Public Utility Commission"
+year = 2026
+url = "https://www.puc.pa.gov/pipeline-safety/gas-emergencies/"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "ready_gov_safety_skills"
+title = "Safety Skills"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/safety-skills"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "redcross_sound_the_alarm"
+title = "Sound the Alarm: free smoke alarm installation (Home Fire Campaign)"
+publisher = "American Red Cross"
+year = 2026
+url = "https://www.redcross.org/sound-the-alarm.html"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "usfa_smoke_alarm_renters"
+title = "Pictograph: Where to put home smoke alarms (renters)"
+publisher = "U.S. Fire Administration"
+year = 2026
+url = "https://www.usfa.fema.gov/gallery/pictographs/pictograph02.html"
+retrieved = "2026-09-26"
+quote = "If you don't have them, ask your landlord or rental agent to install them."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "medlineplus_cpr"
+title = "CPR (health topic summary)"
+publisher = "MedlinePlus, National Library of Medicine"
+year = 2026
+url = "https://medlineplus.gov/cpr.html"
+retrieved = "2026-09-26"
+quote = "If you haven't had any CPR training, you can do hands-only CPR for a teen or adult whose heart has stopped beating."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_well_disinfection"
+title = "How to Disinfect Wells After an Emergency"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/water-emergency/about/how-to-disinfect-wells-after-an-emergency.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_children_wildfire_smoke"
+title = "Protect Children from Wildfires, Smoke, and Volcanic Ash"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/children/protect-children-wildfires-smoke-and-volcanic-ash"
+retrieved = "2026-09-26"
+quote = "Paint, dust, cloth, and surgical masks, even N95 masks, are not made to fit children and will not protect children from breathing wildfire smoke."
+license = "US Government Work (public domain)"

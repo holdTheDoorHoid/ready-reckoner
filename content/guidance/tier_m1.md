@@ -16,7 +16,7 @@ No major U.S. authority sets a one-month household standard. Ready Reckoner uses
 
 [^rr_research_supply_standards]: Ready Reckoner contributors, Supply-sizing evidence base (research report): quantities, shelf lives and costs, with derivations (2026).
 [^cdc_pregnancy_emergency]: CDC, Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies (2025).
-[^fema_nhs_2024]: FEMA (mirror of the published slide deck), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
+[^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
 [^rr_research_risk_model]: Ready Reckoner contributors, Quantitative core model specification (research report): hazards, consequence buckets, durations (2026).
 [^fsis_shelf_stable]: USDA Food Safety and Inspection Service, Shelf-Stable Food Safety (2024).
 [^cfpb_emergency_fund]: Consumer Financial Protection Bureau, An essential guide to building an emergency fund (2025).

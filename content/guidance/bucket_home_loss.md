@@ -13,7 +13,7 @@ citations: [census_pulse_displacement, fema_nhs_2024, ready_gov_earthquakes, rea
 ## Sources
 
 [^census_pulse_displacement]: U.S. Census Bureau data, reported by the National Low Income Housing Coalition, Household Pulse Survey: adults displaced by natural disasters (as reported by NLIHC) (2023).
-[^fema_nhs_2024]: FEMA (mirror of the published slide deck), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
+[^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
 [^ready_gov_earthquakes]: FEMA / Ready.gov, Earthquakes (2026).
 [^ready_gov_financial]: FEMA / Ready.gov, Financial Preparedness (2026).
 [^fema_nfip_flood_insurance]: FEMA, Flood Insurance (2026).

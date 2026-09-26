@@ -12,7 +12,7 @@ Free actions come first in every plan, because they cost nothing and cover a lot
 
 ## Sources
 
-[^fema_nhs_2024]: FEMA (mirror of the published slide deck), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
+[^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
 [^ready_gov_alerts]: FEMA / Ready.gov, Emergency Alerts (2026).
 [^ready_gov_low_cost]: FEMA / Ready.gov, Low and No Cost Preparedness (2026).
 [^ready_gov_earthquakes]: FEMA / Ready.gov, Earthquakes (2026).

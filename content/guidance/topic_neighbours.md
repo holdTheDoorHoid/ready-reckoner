@@ -17,7 +17,7 @@ Neighbours are a supply, and the plan counts them. After Japan's 2011 tsunami, t
 [^aldrich_sawada_2015]: Aldrich D.P. and Sawada Y., The physical and social determinants of mortality in the 3.11 tsunami (Social Science and Medicine 124:66–75) (2015).
 [^ye_aldrich_2019]: Ye M. and Aldrich D.P., Substitute or complement? How social capital, age and socioeconomic status interacted to impact mortality in Japan's 3/11 tsunami (SSM Population Health 7:100403) (2019).
 [^semenza_1996_heat_deaths]: Semenza J.C. et al., Heat-Related Deaths during the July 1995 Heat Wave in Chicago (New England Journal of Medicine 335:84–90) (1996).
-[^fema_nhs_2024]: FEMA (mirror of the published slide deck), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
+[^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
 [^ready_gov_older_adults]: FEMA / Ready.gov, Older Adults (2026).
 [^listos_california]: California Governor's Office of Emergency Services, Listos California: neighbor and community preparedness (2026).
 [^ready_gov_cert]: FEMA / Ready.gov, Community Emergency Response Team (2022).
