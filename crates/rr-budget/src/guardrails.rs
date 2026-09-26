@@ -337,7 +337,7 @@ pub(crate) fn check(
             out.push(warning(
                 Warning::BENEFIT_LAPSE,
                 WarningSeverity::Warn,
-                "No food set aside by month 3 in case pay or benefits stop.".into(),
+                "Not enough food stored by month 3 in case pay or benefits stop.".into(),
                 "Government pay and food benefits have stopped before, for days to weeks at a \
                  time, during shutdowns and funding lapses. A small store of food built early \
                  bridges the gap; a food bank or 211 can help too.",

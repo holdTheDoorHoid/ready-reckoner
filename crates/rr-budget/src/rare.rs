@@ -96,8 +96,8 @@ pub fn allowance_sentence(families: &[HazardId], monthly_allowance_usd: f64) -> 
     let rows = if families.len() == 1 { "row" } else { "rows" };
     format!(
         "Paid from {allowance}, after your three-day basics. It is for the {what} {rows} you \
-         ticked: where you live, the chance passes 1 in 1,000 households over 10 years, the least \
-         the allowance needs. Rare rows it does not buy for are covered by your basics."
+         ticked: where you live, more than 1 in 1,000 households like yours face it in 10 years, \
+         the least the allowance needs. Your basics cover the rare rows it does not buy for."
     )
 }
 

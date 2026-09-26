@@ -2216,11 +2216,13 @@ impl Cache {
         result
     }
 
-    /// Bare-minimum mode: the purchases that complete the kit, before any tier (life-safety
-    /// first, then value per dollar at the three-day caps). For each kit line still short, every
-    /// offer that can meet it is a candidate for just the amount that closes the gap: one
-    /// headlamp of a set of four, three days of water. A line nothing purchasable can meet is left
-    /// to the tiers. Empty when the kit is complete or out of reach.
+    /// Bare-minimum mode: while the kit is short, the purchases that complete it, before the
+    /// tiers, together with the three-day tier's life-safety items (rr-supply leaves the smoke and
+    /// carbon monoxide alarms out of the kit because the allocator orders life-safety first
+    /// anyway). Life-safety first, then value per dollar at the three-day caps. For each kit line
+    /// still short, every offer that can meet it is a candidate for just the amount that closes
+    /// the gap: one headlamp of a set of four, three days of water. A line nothing purchasable can
+    /// meet is left to the tiers. Empty when the kit is complete or out of reach.
     fn minimum_picks(&mut self, ctx: &Ctx<'_>, state: &State, credited: &State) -> Vec<Pick> {
         self.min_cands.clear();
         let mut want: BTreeMap<usize, f64> = BTreeMap::new();
@@ -2249,6 +2251,9 @@ impl Cache {
                 *e = e.max(qty);
             }
         }
+        if want.is_empty() {
+            return Vec::new();
+        }
         let horizon = f64::from(TierId::H72.days());
         let mut picks: Vec<Pick> = Vec::new();
         for (j, qty) in want {
@@ -2269,6 +2274,32 @@ impl Cache {
                 class: 0,
             });
             self.min_cands.push(c);
+        }
+        // The three-day tier's life-safety items keep their place ahead of everything else.
+        for i in self.main.clone() {
+            let item = ctx.offers[i].item;
+            if !item.life_safety
+                || item.tier.max(TierId::H72) > TierId::H72
+                || picks.iter().any(|p| p.offer == i)
+                || !ctx.requires_met(credited, i)
+            {
+                continue;
+            }
+            let low_p_ok = self.low_p_ok[i];
+            if let Some(c) = self.slot(ctx, state, i, 0) {
+                let value = c.core + if low_p_ok { c.low_p } else { 0.0 };
+                if value > VALUE_EPS {
+                    picks.push(Pick {
+                        offer: i,
+                        ti: 0,
+                        cost: c.cost,
+                        value,
+                        promoted: false,
+                        minimum: false,
+                        class: 0,
+                    });
+                }
+            }
         }
         picks.sort_by(|a, b| {
             let (la, lb) = (
