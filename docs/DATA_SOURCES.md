@@ -403,15 +403,15 @@ or `transcribed`, `notes`), `[[rate]]` entries (value, unit, optional `low`/`hig
 `period`, the `figure` it comes from, the `derivation`, `note`, and `unverified` for hand-copied
 figures not re-checked) and `[[row]]` entries holding the table behind the rates:
 
-| File | Source (licence) | How | Rates |
-| --- | --- | --- | --- |
-| `drug_shortages.toml` | U.S. Food and Drug Administration (openFDA) (CC0 1.0 (https://open.fda.gov/license/)) | fetched | `drug_shortages_current` |
-| `fbi_arrests.toml` | Federal Bureau of Investigation, Uniform Crime Reporting Program (Crime Data Explorer) (US Government work, public domain (17 U.S.C. 105)) | fetched | `arrests_per_100k_female_10_17`, `arrests_per_100k_female_18_24`, `arrests_per_100k_female_25_34`, `arrests_per_100k_female_35_44`, `arrests_per_100k_female_45_54`, `arrests_per_100k_female_55_64` and 10 more |
-| `fcc_dirs.toml` | Federal Communications Commission, Public Safety and Homeland Security Bureau (US Government work, public domain (17 U.S.C. 105)) | transcribed | `cell_sites_out_peak_area_share_median`, `cell_sites_out_worst_county_share_median`, `cell_sites_days_until_under_5pct_median` |
-| `fdic_failures.toml` | Federal Deposit Insurance Corporation (US Government work, public domain (17 U.S.C. 105)) | fetched | `bank_failures_per_year`, `bank_failure_cluster_year_share` |
-| `funding_gaps.toml` | Congressional Research Service (J. V. Saturno), with the House Historian's shutdown column (CRS reports are works of the US Government, not subject to copyright) | transcribed | `funding_gap_ge_14d_per_year`, `shutdown_with_furloughs_per_year` |
-| `ihp_displacement.toml` | Federal Emergency Management Agency (OpenFEMA) (OpenFEMA Terms and Conditions (public data; citation and statement required)) | fetched | `ihp_rental_assistance_per_approved_usd_earthquake`, `ihp_rental_assistance_per_approved_usd_fire`, `ihp_rental_assistance_per_approved_usd_flood`, `ihp_rental_assistance_per_approved_usd_hurricane`, `ihp_rental_assistance_per_approved_usd_landslide`, `ihp_rental_assistance_per_approved_usd_other` and 3 more |
-| `oe417.toml` | Pacific Northwest National Laboratory (from DOE OE-417 reports and ORNL EAGLE-I) (CC BY 4.0) | fetched | `grid_weather_reports_per_year`, `grid_operations_reports_per_year`, `grid_physical_attack_reports_per_year`, `grid_suspicious_activity_reports_per_year`, `grid_cyber_reports_per_year`, `grid_fuel_supply_reports_per_year` |
+| File | Entries | gz | Source (licence) | How | Rates |
+| --- | ---: | ---: | --- | --- | --- |
+| `drug_shortages.toml` | 14 | 0.8 KB | U.S. Food and Drug Administration (openFDA) (CC0 1.0 (https://open.fda.gov/license/)) | fetched | `drug_shortages_current` |
+| `fbi_arrests.toml` | 70 | 2.6 KB | Federal Bureau of Investigation, Uniform Crime Reporting Program (Crime Data Explorer) (US Government work, public domain (17 U.S.C. 105)) | fetched | `arrests_per_100k_female_10_17`, `arrests_per_100k_female_18_24`, `arrests_per_100k_female_25_34`, `arrests_per_100k_female_35_44`, `arrests_per_100k_female_45_54`, `arrests_per_100k_female_55_64` and 10 more |
+| `fcc_dirs.toml` | 19 | 2.0 KB | Federal Communications Commission, Public Safety and Homeland Security Bureau (US Government work, public domain (17 U.S.C. 105)) | transcribed | `cell_sites_out_peak_area_share_median`, `cell_sites_out_worst_county_share_median`, `cell_sites_days_until_under_5pct_median` |
+| `fdic_failures.toml` | 92 | 1.6 KB | Federal Deposit Insurance Corporation (US Government work, public domain (17 U.S.C. 105)) | fetched | `bank_failures_per_year`, `bank_failure_cluster_year_share` |
+| `funding_gaps.toml` | 27 | 1.5 KB | Congressional Research Service (J. V. Saturno), with the House Historian's shutdown column (CRS reports are works of the US Government, not subject to copyright) | transcribed | `funding_gap_ge_14d_per_year`, `shutdown_with_furloughs_per_year` |
+| `ihp_displacement.toml` | 22 | 1.8 KB | Federal Emergency Management Agency (OpenFEMA) (OpenFEMA Terms and Conditions (public data; citation and statement required)) | fetched | `ihp_rental_assistance_per_approved_usd_earthquake`, `ihp_rental_assistance_per_approved_usd_fire`, `ihp_rental_assistance_per_approved_usd_flood`, `ihp_rental_assistance_per_approved_usd_hurricane`, `ihp_rental_assistance_per_approved_usd_landslide`, `ihp_rental_assistance_per_approved_usd_other` and 3 more |
+| `oe417.toml` | 288 | 2.7 KB | Pacific Northwest National Laboratory (from DOE OE-417 reports and ORNL EAGLE-I) (CC BY 4.0) | fetched | `grid_weather_reports_per_year`, `grid_operations_reports_per_year`, `grid_physical_attack_reports_per_year`, `grid_suspicious_activity_reports_per_year`, `grid_cyber_reports_per_year`, `grid_fuel_supply_reports_per_year` |
 
 **Optional pack `outage_events`** (issue #15; `opt/outage_events/`, loaded only by the expert views
 and the validation page): `county_events.csv` — every county event that left at least 0.25% of the
