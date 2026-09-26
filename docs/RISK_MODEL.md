@@ -1634,10 +1634,13 @@ The first step (`Plan.first_milestone`) is one month of expenses or $500, whiche
 (professional review RR-P09), reached from the supplies budget once the supplies plan is done; it is
 left out when already saved (most fixtures hold more than $500) or when the plan never frees the
 budget. The savings sentence adds the three-month point when the goal is longer. Households that
-turn on `Dials::legal_opt_in` (from the arrest row) see a separate legal-emergency line: bail in
-felony cases in large counties has a middle value of about $10,000 (`bjs_felony_defendants_2009`,
-requested with the figure to confirm; amounts vary widely and many people are released without
-bail).
+turn on `Dials::legal_opt_in` (from the arrest row) see a separate legal-emergency line, from
+`bjs_felony_defendants_2009` (BJS NCJ 243777, the latest national count; the series ended with 2009
+data): a bail bond company usually charges 10 % of the bail as a fee it does not return (about
+$1,000 on a $10,000 bail), the other way being to pay the full amount; in felony cases in the 75
+largest counties in 2009 the median bail set was $10,000 (Table 16), about 28 in 100 were under
+$5,000 and about 25 in 100 were $50,000 or more (Table 15). The line never implies saving the full
+amount.
 
 ### Guardrail thresholds
 

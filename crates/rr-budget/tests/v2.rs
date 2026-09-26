@@ -672,6 +672,8 @@ fn the_legal_line_needs_the_opt_in_and_the_arrest_row() {
     let why = &r.plan.savings_track.as_ref().unwrap().why;
     assert!(why.contains("Apart from these months"), "{why}");
     assert!(why.contains("$10,000"), "{why}");
+    assert!(why.contains("about $1,000 on a $10,000 bail"), "{why}");
+    assert!(why.contains("about 28 in 100 were under $5,000"), "{why}");
     assert_eq!(
         r.citations,
         [rr_types::CitationId::from(LEGAL_COST_CITATION)]

@@ -14,8 +14,10 @@
 //!   small first goal comes before "3 to 6 months").
 //! - **The three-month point** in the savings sentence, when the goal is longer than three months.
 //! - **A legal-emergency line** for households that turn it on from the arrest row of the register
-//!   (`Dials::legal_opt_in`): a cited typical bail figure with its wide range, shown apart from the
-//!   months of income the goal protects (owner decision 2026-09-26).
+//!   (`Dials::legal_opt_in`), shown apart from the months of income the goal protects (owner
+//!   decision 2026-09-26): the 2009 median bail in large counties with its spread as natural
+//!   frequencies, and the bail-bond fee that is the usual alternative to paying it all
+//!   (`bjs_felony_defendants_2009`).
 
 use rr_types::{BucketId, CitationId, HazardId, PlanInput, SavingsMilestone, SavingsTrack, Target};
 
@@ -30,14 +32,27 @@ pub const FIRST_MILESTONE_USD: f32 = 500.0;
 /// longer (the low end of the 3–6 month goal FINRA and the St. Louis Fed give).
 pub const THREE_MONTH_POINT: f32 = 3.0;
 
-/// The legal-emergency line's typical figure: the median bail amount set for felony defendants
-/// in the 75 largest US counties, $10,000 (Bureau of Justice Statistics, *Felony Defendants in
-/// Large Urban Counties, 2009 — Statistical Tables*, NCJ 243777). Requested in
-/// `docs/CITATION_IDS.md` as [`LEGAL_COST_CITATION`], with the figure to be confirmed against the
-/// source by the content workstream.
+/// The legal-emergency line's figures, all from the Bureau of Justice Statistics, *Felony
+/// Defendants in Large Urban Counties, 2009: Statistical Tables* (NCJ 243777, [`LEGAL_COST_CITATION`]),
+/// the latest national count (the series ended with 2009 data): the median bail set for felony
+/// defendants in the 75 largest counties in 2009 (Table 16).
 pub const LEGAL_BAIL_MEDIAN_USD: f64 = 10_000.0;
 
-/// The citation for [`LEGAL_BAIL_MEDIAN_USD`] (awaited: `rr_plan::provenance::AWAITING_CONTENT`).
+/// The year of those figures, printed with them.
+pub const LEGAL_BAIL_YEAR: u16 = 2009;
+
+/// Of 100 felony defendants whose bail was set, about this many had bail under $5,000 (Table 15:
+/// 28 %).
+pub const LEGAL_BAIL_UNDER_5K_PER_100: u32 = 28;
+
+/// ... and about this many had bail of $50,000 or more (Table 15: 25 %).
+pub const LEGAL_BAIL_50K_OR_MORE_PER_100: u32 = 25;
+
+/// A bail bond company usually charges this share of the full bail amount as a fee, often with
+/// collateral, and does not return it (the report's glossary).
+pub const LEGAL_BOND_FEE_SHARE: f64 = 0.10;
+
+/// The citation for the legal-emergency line's figures.
 pub const LEGAL_COST_CITATION: &str = "bjs_felony_defendants_2009";
 
 /// The income target in months, when the plan has one above zero.
@@ -239,16 +254,29 @@ fn steps_sentence(household: &PlanInput, risks: &Risks, start: u16) -> Option<St
     }
 }
 
-/// The legal-emergency line (`Dials::legal_opt_in`), apart from the months of income.
+/// The legal-emergency line (`Dials::legal_opt_in`), apart from the months of income: the median
+/// labelled as the 2009 figure for large counties, its spread as natural frequencies, and the
+/// bond fee (not the full amount) as what a household usually pays.
 fn legal_sentence() -> String {
+    let fee = LEGAL_BOND_FEE_SHARE * LEGAL_BAIL_MEDIAN_USD;
     format!(
         "Apart from these months: an arrest in the household can mean paying bail and a lawyer. \
-         Many people are released without bail and amounts vary widely, but in the largest \
-         counties the middle amount set in felony cases is about {}. \
-         Money you can reach quickly, and someone in your trusted circle who knows where it is, \
-         helps.",
-        dollars(LEGAL_BAIL_MEDIAN_USD)
+         If bail is set, a bail bond company usually charges a fee of {} of the amount, about {} \
+         on a {} bail, and does not give it back; paying the full amount yourself is the other way. \
+         In felony cases in the 75 largest counties in {LEGAL_BAIL_YEAR}, the latest national count, \
+         the middle bail amount set was {}: about {LEGAL_BAIL_UNDER_5K_PER_100} in 100 were under \
+         $5,000 and about {LEGAL_BAIL_50K_OR_MORE_PER_100} in 100 were $50,000 or more. Money you \
+         can reach quickly, and someone in your trusted circle who knows where it is, helps.",
+        percent(LEGAL_BOND_FEE_SHARE),
+        dollars(fee),
+        dollars(LEGAL_BAIL_MEDIAN_USD),
+        dollars(LEGAL_BAIL_MEDIAN_USD),
     )
+}
+
+/// "10%" for 0.1.
+fn percent(share: f64) -> String {
+    format!("{}%", (share * 100.0).round() as i64)
 }
 
 fn upper_first(s: &str) -> String {
@@ -300,11 +328,29 @@ mod tests {
         assert_eq!(duration_text(231.0), "about 19 years");
     }
 
+    /// What the source says (BJS NCJ 243777, Tables 15 and 16 and the glossary): the 2009 median
+    /// in the 75 largest counties, the spread as natural frequencies, and the bond fee that is not
+    /// returned, so the line never implies the household must save the full amount.
     #[test]
-    fn the_legal_sentence_cites_one_figure_with_its_range_in_words() {
+    fn the_legal_sentence_says_what_the_source_says() {
         let s = legal_sentence();
-        assert!(s.contains("$10,000"), "{s}");
-        assert!(s.contains("released without bail"), "{s}");
         assert!(s.starts_with("Apart from these months"), "{s}");
+        assert!(
+            s.contains("in the 75 largest counties in 2009, the latest national count, the middle bail amount set was $10,000"),
+            "{s}"
+        );
+        assert!(
+            s.contains(
+                "about 28 in 100 were under $5,000 and about 25 in 100 were $50,000 or more"
+            ),
+            "{s}"
+        );
+        assert!(
+            s.contains(
+                "a fee of 10% of the amount, about $1,000 on a $10,000 bail, and does not give it back"
+            ),
+            "{s}"
+        );
+        assert!(!s.contains("vary widely"), "{s}");
     }
 }
