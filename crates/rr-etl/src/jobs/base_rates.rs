@@ -32,13 +32,13 @@ struct Pub {
 
 const PUBS: &[Pub] = &[
     Pub {
-        id: "census_cps_hh1_households",
+        id: "census_households_cps",
         title: "Table HH-1. Households by Type: 1940 to Present",
         publisher: "U.S. Census Bureau, Current Population Survey",
         url: "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls",
     },
     Pub {
-        id: "usfa_residential_fire_estimates",
+        id: "usfa_residential_fires",
         title: "Residential Building Fire Estimates",
         publisher: "U.S. Fire Administration (FEMA)",
         url: "https://www.usfa.fema.gov/statistics/residential-fires/",
@@ -50,13 +50,19 @@ const PUBS: &[Pub] = &[
         url: "https://data.bls.gov/timeseries/JTS000000000000000LDR",
     },
     Pub {
-        id: "nchs_fastats_emergency_department",
+        id: "bls_work_experience_2024",
+        title: "Work Experience of the Population, 2024",
+        publisher: "U.S. Bureau of Labor Statistics",
+        url: "https://www.bls.gov/news.release/work.nr0.htm",
+    },
+    Pub {
+        id: "cdc_nchs_ed_visits",
         title: "FastStats: Emergency Department Visits (NHAMCS 2022)",
         publisher: "CDC National Center for Health Statistics",
         url: "https://www.cdc.gov/nchs/fastats/emergency-department.htm",
     },
     Pub {
-        id: "nchs_fastats_accidental_injury",
+        id: "nchs_accidental_injury_2024",
         title: "FastStats: Accidents or Unintentional Injuries",
         publisher: "CDC National Center for Health Statistics",
         url: "https://www.cdc.gov/nchs/fastats/accidental-injury.htm",
@@ -68,7 +74,7 @@ const PUBS: &[Pub] = &[
         url: "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813800",
     },
     Pub {
-        id: "nhtsa_traffic_safety_facts_2023",
+        id: "nhtsa_crashes_2023",
         title: "Overview of Motor Vehicle Traffic Crashes in 2023 (DOT HS 813 705)",
         publisher: "National Highway Traffic Safety Administration",
         url: "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813705",
@@ -86,7 +92,7 @@ const PUBS: &[Pub] = &[
         url: "https://archive.cdc.gov/www_cdc_gov/flu/pandemic-resources/1918-pandemic-h1n1.html",
     },
     Pub {
-        id: "eia_today_in_energy_66744",
+        id: "eia_outage_hours_2024",
         title: "Today in Energy: U.S. electricity customers averaged more hours of interruptions in 2024",
         publisher: "U.S. Energy Information Administration",
         url: "https://www.eia.gov/todayinenergy/detail.php?id=66744",
@@ -179,21 +185,22 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let households_2023 = 131_434_000.0;
     let lambda_pandemic = 5.0 / 108.0;
     let rates = vec![
-        Rate { id: "us_households_2023", value: households_2023, unit: "households", low: None, high: None, source: "census_cps_hh1_households", year: 2023, figure: "131,434 thousand households in 2023".into(), derivation: "Table HH-1, 2023 row".into(), note: "Denominator for household rates." },
-        Rate { id: "house_fire_per_household_year", value: 344_600.0 / households_2023, unit: "residential building fires per household per year", low: None, high: None, source: "usfa_residential_fire_estimates", year: 2023, figure: "344,600 residential building fires in 2023".into(), derivation: "344,600 fires / 131,434,000 households".into(), note: "About 1 in 381 households a year. Counts fires reported to fire departments." },
-        Rate { id: "house_fire_death_per_household_year", value: 2_890.0 / households_2023, unit: "residential fire deaths per household per year", low: None, high: None, source: "usfa_residential_fire_estimates", year: 2023, figure: "2,890 residential fire deaths in 2023".into(), derivation: "2,890 deaths / 131,434,000 households".into(), note: "" },
-        Rate { id: "house_fire_injury_per_household_year", value: 10_400.0 / households_2023, unit: "residential fire injuries per household per year", low: None, high: None, source: "usfa_residential_fire_estimates", year: 2023, figure: "10,400 residential fire injuries in 2023".into(), derivation: "10,400 injuries / 131,434,000 households".into(), note: "" },
-        Rate { id: "house_fire_mean_loss_usd", value: 11_270_000_000.0 / 344_600.0, unit: "US dollars of direct loss per residential building fire", low: None, high: None, source: "usfa_residential_fire_estimates", year: 2023, figure: "$11.27 billion direct loss from 344,600 residential building fires in 2023".into(), derivation: "$11,270,000,000 / 344,600 fires".into(), note: "A mean; most fires cost far less and a few cost far more." },
+        Rate { id: "us_households_2023", value: households_2023, unit: "households", low: None, high: None, source: "census_households_cps", year: 2023, figure: "131,434 thousand households in 2023".into(), derivation: "Table HH-1, 2023 row".into(), note: "Denominator for household rates." },
+        Rate { id: "house_fire_per_household_year", value: 344_600.0 / households_2023, unit: "residential building fires per household per year", low: None, high: None, source: "usfa_residential_fires", year: 2023, figure: "344,600 residential building fires in 2023".into(), derivation: "344,600 fires / 131,434,000 households".into(), note: "About 1 in 381 households a year. Counts fires reported to fire departments." },
+        Rate { id: "house_fire_death_per_household_year", value: 2_890.0 / households_2023, unit: "residential fire deaths per household per year", low: None, high: None, source: "usfa_residential_fires", year: 2023, figure: "2,890 residential fire deaths in 2023".into(), derivation: "2,890 deaths / 131,434,000 households".into(), note: "" },
+        Rate { id: "house_fire_injury_per_household_year", value: 10_400.0 / households_2023, unit: "residential fire injuries per household per year", low: None, high: None, source: "usfa_residential_fires", year: 2023, figure: "10,400 residential fire injuries in 2023".into(), derivation: "10,400 injuries / 131,434,000 households".into(), note: "" },
+        Rate { id: "house_fire_mean_loss_usd", value: 11_270_000_000.0 / 344_600.0, unit: "US dollars of direct loss per residential building fire", low: None, high: None, source: "usfa_residential_fires", year: 2023, figure: "$11.27 billion direct loss from 344,600 residential building fires in 2023".into(), derivation: "$11,270,000,000 / 344,600 fires".into(), note: "A mean; most fires cost far less and a few cost far more." },
         Rate { id: "layoff_per_worker_month", value: layoff, unit: "layoffs and discharges per worker per month", low: None, high: None, source: "bls_jolts_layoffs", year: year_u16, figure: format!("{last_year} average of the 12 monthly rates: {:.4}%", layoff_pct), derivation: "mean of monthly JTS000000000000000LDR values / 100".into(), note: "Counts events, not people: some workers are laid off twice, so per-person risk is lower." },
         Rate { id: "layoff_upper_bound_per_worker_year", value: 1.0 - pow(1.0 - layoff, 12.0), unit: "chance of at least one layoff or discharge per worker per year (upper bound)", low: None, high: None, source: "bls_jolts_layoffs", year: year_u16, figure: format!("{:.4}% a month", layoff_pct), derivation: "1 - (1 - monthly rate)^12".into(), note: "An upper bound: layoffs cluster in high-turnover jobs, so a typical worker's chance is lower." },
-        Rate { id: "ed_visits_per_person_year", value: 0.473, unit: "emergency department visits per person per year", low: None, high: None, source: "nchs_fastats_emergency_department", year: 2022, figure: "155.4 million visits; 47.3 visits per 100 persons (2022)".into(), derivation: "47.3 / 100".into(), note: "" },
-        Rate { id: "ed_visit_admission_share", value: 0.115, unit: "share of emergency department visits that lead to hospital admission", low: None, high: None, source: "nchs_fastats_emergency_department", year: 2022, figure: "11.5% of visits resulted in hospital admission (2022)".into(), derivation: "11.5 / 100".into(), note: "" },
-        Rate { id: "injury_ed_visits_per_person_year", value: 0.473 * 43.5 / 155.4, unit: "injury-related emergency department visits per person per year", low: None, high: None, source: "nchs_fastats_emergency_department", year: 2022, figure: "43.5 million injury-related visits of 155.4 million (2022)".into(), derivation: "0.473 x 43.5 / 155.4".into(), note: "" },
-        Rate { id: "unintentional_injury_death_per_person_year", value: 58.1 / 100_000.0, unit: "unintentional-injury deaths per person per year", low: None, high: None, source: "nchs_fastats_accidental_injury", year: 2024, figure: "197,449 deaths; 58.1 per 100,000 population (2024)".into(), derivation: "58.1 / 100,000".into(), note: "" },
+        Rate { id: "unemployment_spell_per_worker_year", value: 0.083, unit: "chance a labour-force participant is unemployed at some point in a year", low: None, high: None, source: "bls_work_experience_2024", year: 2024, figure: "work-experience unemployment rate 8.3% in 2024 (14.7 million people unemployed at some time during the year)".into(), derivation: "8.3 / 100".into(), note: "People unemployed at some point in the year / people who worked or looked for work; includes people who quit or were entering the labour force, so it overstates involuntary job loss." },
+        Rate { id: "ed_visits_per_person_year", value: 0.473, unit: "emergency department visits per person per year", low: None, high: None, source: "cdc_nchs_ed_visits", year: 2022, figure: "155.4 million visits; 47.3 visits per 100 persons (2022)".into(), derivation: "47.3 / 100".into(), note: "" },
+        Rate { id: "ed_visit_admission_share", value: 0.115, unit: "share of emergency department visits that lead to hospital admission", low: None, high: None, source: "cdc_nchs_ed_visits", year: 2022, figure: "11.5% of visits resulted in hospital admission (2022)".into(), derivation: "11.5 / 100".into(), note: "" },
+        Rate { id: "injury_ed_visits_per_person_year", value: 0.473 * 43.5 / 155.4, unit: "injury-related emergency department visits per person per year", low: None, high: None, source: "cdc_nchs_ed_visits", year: 2022, figure: "43.5 million injury-related visits of 155.4 million (2022)".into(), derivation: "0.473 x 43.5 / 155.4".into(), note: "" },
+        Rate { id: "unintentional_injury_death_per_person_year", value: 58.1 / 100_000.0, unit: "unintentional-injury deaths per person per year", low: None, high: None, source: "nchs_accidental_injury_2024", year: 2024, figure: "197,449 deaths; 58.1 per 100,000 population (2024)".into(), derivation: "58.1 / 100,000".into(), note: "" },
         Rate { id: "traffic_deaths_per_100m_vmt", value: 1.10, unit: "traffic deaths per 100 million vehicle miles traveled", low: None, high: None, source: "nhtsa_early_estimate_2025", year: 2025, figure: "36,640 deaths (early estimate); 1.10 fatalities per 100 million VMT (2025)".into(), derivation: "as published".into(), note: "All road deaths per mile driven, not only vehicle occupants." },
-        Rate { id: "traffic_injuries_per_person_year", value: 2_440_000.0 / pop2023, unit: "people injured in traffic crashes per person per year", low: None, high: None, source: "nhtsa_traffic_safety_facts_2023", year: 2023, figure: format!("2.44 million people injured (2023); U.S. population {pop2023:.0} (Census Vintage 2025, July 1, 2023)"), derivation: "2,440,000 / population 2023".into(), note: "" },
+        Rate { id: "traffic_injuries_per_person_year", value: 2_440_000.0 / pop2023, unit: "people injured in traffic crashes per person per year", low: None, high: None, source: "nhtsa_crashes_2023", year: 2023, figure: format!("2.44 million people injured (2023); U.S. population {pop2023:.0} (Census Vintage 2025, July 1, 2023)"), derivation: "2,440,000 / population 2023".into(), note: "" },
         Rate { id: "pandemic_onset_per_year", value: 1.0 - exp(-lambda_pandemic), unit: "chance a new pandemic begins in a given year", low: Some(1.0 - exp(-POISSON_5_LOW / 108.0)), high: Some(1.0 - exp(-POISSON_5_HIGH / 108.0)), source: "cdc_pandemic_history", year: 2025, figure: "5 pandemic onsets in 108 years (1918, 1957, 1968, 2009, 2020; 1918-2025)".into(), derivation: "1 - exp(-5/108); range is the exact Poisson 90% interval for 5 events".into(), note: "A crude historical rate with wide uncertainty; treat as a planning figure, not a forecast." },
-        Rate { id: "power_interruption_hours_per_customer_year", value: 11.0, unit: "hours without power per electricity customer per year (national average)", low: Some(6.0), high: None, source: "eia_today_in_energy_66744", year: 2024, figure: "about 9 hours from major events plus about 2 hours from other events in 2024; major events averaged about 4 hours a year in 2014-2023".into(), derivation: "9 + 2; low = 4 + 2 (2014-2023 typical year)".into(), note: "National average; use outages.csv for county detail." },
+        Rate { id: "power_interruption_hours_per_customer_year", value: 11.0, unit: "hours without power per electricity customer per year (national average)", low: Some(6.0), high: None, source: "eia_outage_hours_2024", year: 2024, figure: "about 9 hours from major events plus about 2 hours from other events in 2024; major events averaged about 4 hours a year in 2014-2023".into(), derivation: "9 + 2; low = 4 + 2 (2014-2023 typical year)".into(), note: "National average; use outages.csv for county detail." },
     ];
 
     let mut s = String::new();

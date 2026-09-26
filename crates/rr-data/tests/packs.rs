@@ -13,8 +13,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 use std::sync::OnceLock;
 
+/// The committed packs, or another data directory named by `RR_DATA_DIR`.
 fn data_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data")
+    std::env::var("RR_DATA_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data"))
 }
 
 fn manifest() -> Manifest {
@@ -353,7 +356,7 @@ fn base_rates_carry_sources_and_match_the_research() {
     let s = store();
     let fire = s.base_rate("house_fire_per_household_year").unwrap();
     assert!((fire.value - 0.002622).abs() < 1e-6);
-    assert_eq!(fire.source.as_str(), "usfa_residential_fire_estimates");
+    assert_eq!(fire.source.as_str(), "usfa_residential_fires");
     let p = s.base_rate("pandemic_onset_per_year").unwrap();
     assert!(p.low.unwrap() < p.value && p.value < p.high.unwrap());
     let pubs: BTreeSet<&str> = s.publications().iter().map(|p| p.id.as_str()).collect();

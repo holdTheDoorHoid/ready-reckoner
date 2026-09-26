@@ -54,7 +54,6 @@ pub const PACK_FILES: &[&str] = &[
     "core/events.csv",
     "core/seismic.csv",
     "core/climate.csv",
-    "core/climate_levels.csv",
     "core/flood.csv",
     "core/facilities.csv",
     "core/zip_facilities.csv",
@@ -222,7 +221,6 @@ pub struct DataStore {
     events: BTreeMap<String, BTreeMap<String, EventRate>>,
     seismic: BTreeMap<String, Seismic>,
     climate: BTreeMap<String, BTreeMap<String, f32>>,
-    climate_levels: BTreeMap<String, BTreeMap<String, [Option<f32>; 3]>>,
     flood: BTreeMap<String, FloodPriors>,
     facilities: BTreeMap<String, (Facilities, CountyFacilityFlags)>,
     vulnerability: BTreeMap<String, (Vulnerability, Option<u32>)>,
@@ -632,22 +630,6 @@ impl DataStore {
                     })
                     .collect();
             }
-            "core/climate_levels.csv" => {
-                let (i_f, i_v, a, bb, c) = (
-                    t.col("fips")?,
-                    t.col("variable")?,
-                    t.col("gwl15")?,
-                    t.col("gwl2")?,
-                    t.col("gwl3")?,
-                );
-                self.climate_levels.clear();
-                for r in &t.rows {
-                    self.climate_levels
-                        .entry(r[i_f].clone())
-                        .or_default()
-                        .insert(r[i_v].clone(), [f32c(&r[a]), f32c(&r[bb]), f32c(&r[c])]);
-                }
-            }
             "core/flood.csv" => {
                 let (i_f, i_s, i_c, i_m) = (
                     t.col("fips")?,
@@ -889,12 +871,6 @@ impl DataStore {
             rr_types::ClimateHorizon::Today => Some(1.0),
             rr_types::ClimateHorizon::Y2050 => self.climate.get(fips)?.get(variable).copied(),
         }
-    }
-
-    /// Climate ratios at 1.5, 2 and 3 °C of warming for a county and variable
-    /// (`climate_levels.csv`).
-    pub fn climate_levels(&self, fips: &str, variable: &str) -> Option<[Option<f32>; 3]> {
-        self.climate_levels.get(fips)?.get(variable).copied()
     }
 
     /// National base rates, in file order.

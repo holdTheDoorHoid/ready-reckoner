@@ -15,8 +15,10 @@
 //!   for consecutive dry days, dry days, days above 90 °F, cooling degree days and days with more
 //!   than 1 inch of rain. Mid-century RCP4.5 is close to 2 °C of warming, like the Atlas column.
 //!
-//! `climate.csv` holds the 2 °C ratios and the CMRA ratios (the 2050 dial). `climate_levels.csv`
-//! holds the Atlas ratios at 1.5, 2 and 3 °C for sensitivity displays.
+//! `climate.csv` holds, per variable, the central ratio (Atlas +2 °C; CMRA RCP4.5 mid-century) and
+//! a `_high` ratio (Atlas +3 °C; CMRA RCP8.5 mid-century) so 2050 numbers can show a range, then
+//! CMRA county counts (`<key>_hist`, `_2050`, `_2050_high`, and `days_over_90f_hist`) that
+//! `rr-hazards` reads directly (docs/RISK_MODEL.md, "Hazard rates").
 
 use super::{Ctx, JobOutput, arcgis_query, attr_f64, attr_str, load_counties, missing_groups};
 use crate::Result;
@@ -28,8 +30,6 @@ use std::collections::{BTreeMap, BTreeSet};
 
 /// 2050-dial multipliers.
 pub const CLIMATE: &str = "core/climate.csv";
-/// Atlas ratios at 1.5, 2 and 3 °C (long format).
-pub const CLIMATE_LEVELS: &str = "core/climate_levels.csv";
 
 const ATLAS: &str = "https://services3.arcgis.com/0Fs3HcaFfvzXvm7w/arcgis/rest/services";
 const CMRA_ITEM: &str = "https://www.arcgis.com/home/item.html?id=54f4e2343500422bbddf1f5dafb30bbd";
@@ -154,6 +154,32 @@ const CMRA_VARS: &[(&str, &str, f64, &str)] = &[
         "PR1IN",
         1.0,
         "days a year with more than 1 in of rain",
+    ),
+];
+
+/// CMRA county counts that `rr-hazards` reads directly: (key, CMRA field stem, definition).
+/// Each is written as `<key>_hist` (1976-2005), `<key>_2050` (RCP4.5, 2035-2064) and
+/// `<key>_2050_high` (RCP8.5, 2035-2064).
+const CMRA_COUNTS: &[(&str, &str, &str)] = &[
+    (
+        "days_over_95f",
+        "TMAX95F",
+        "days a year with a high above 95 °F",
+    ),
+    (
+        "days_over_2in",
+        "PR2IN",
+        "days a year with more than 2 in of rain",
+    ),
+    (
+        "icing_days",
+        "TMAX32F",
+        "days a year that stay at or below freezing (icing days)",
+    ),
+    (
+        "dry_spell_days",
+        "CONSECDD",
+        "longest run of days without rain in a year",
     ),
 ];
 
@@ -295,11 +321,20 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         }
     }
 
-    // CMRA mid-century RCP4.5 / historical.
+    // CMRA: ensemble-mean ratios (RCP4.5 mid-century central, RCP8.5 mid-century high) and the
+    // county counts rr-hazards reads directly.
+    let mut stems: Vec<&str> = CMRA_VARS
+        .iter()
+        .map(|(_, s, _, _)| *s)
+        .chain(CMRA_COUNTS.iter().map(|(_, s, _)| *s))
+        .collect();
+    stems.sort_unstable();
+    stems.dedup();
     let mut cmra_fields = vec!["GEOID".to_string()];
-    for (_, stem, _, _) in CMRA_VARS {
-        cmra_fields.push(format!("HISTORIC_MEAN_{stem}"));
-        cmra_fields.push(format!("RCP45MID_MEAN_{stem}"));
+    for stem in &stems {
+        for period in ["HISTORIC", "RCP45MID", "RCP85MID"] {
+            cmra_fields.push(format!("{period}_MEAN_{stem}"));
+        }
     }
     let refs: Vec<&str> = cmra_fields.iter().map(|s| s.as_str()).collect();
     let q = arcgis_query(
@@ -310,91 +345,106 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         &refs,
         "GEOID",
         false,
-        "CMRA 2025; LOCA ensemble mean, historical 1976-2005 and RCP4.5 mid-century 2035-2064",
+        "CMRA 2025; LOCA ensemble mean, historical 1976-2005, RCP4.5 and RCP8.5 mid-century 2035-2064",
         "US Government work (the ArcGIS item's licence field is blank)",
         "Credit: Climate Mapping for Resilience and Adaptation (NOAA / U.S. Climate Resilience Toolkit).",
     )?;
     out.rows_in += q.rows.len() as u64;
     out.source(q.source);
-    let mut cmra: BTreeMap<&str, BTreeMap<String, f64>> = BTreeMap::new();
+    let mut cmra: BTreeMap<String, BTreeMap<String, f64>> = BTreeMap::new();
     for r in &q.rows {
         let Some(g) = attr_str(r, "GEOID") else {
             continue;
         };
+        let get = |period: &str, stem: &str| attr_f64(r, &format!("{period}_MEAN_{stem}"));
         for (name, stem, min_hist, _) in CMRA_VARS {
-            let (Some(h), Some(f)) = (
-                attr_f64(r, &format!("HISTORIC_MEAN_{stem}")),
-                attr_f64(r, &format!("RCP45MID_MEAN_{stem}")),
-            ) else {
+            let Some(h) = get("HISTORIC", stem).filter(|h| h >= min_hist) else {
                 continue;
             };
-            if h >= *min_hist {
-                cmra.entry(name)
+            if let Some(f) = get("RCP45MID", stem) {
+                cmra.entry(name.to_string())
+                    .or_default()
+                    .insert(g.clone(), (f / h).max(0.0));
+            }
+            if let Some(f) = get("RCP85MID", stem) {
+                cmra.entry(format!("{name}_high"))
                     .or_default()
                     .insert(g.clone(), (f / h).max(0.0));
             }
         }
+        for (key, stem, _) in CMRA_COUNTS {
+            for (suffix, period) in [
+                ("hist", "HISTORIC"),
+                ("2050", "RCP45MID"),
+                ("2050_high", "RCP85MID"),
+            ] {
+                if let Some(v) = get(period, stem) {
+                    cmra.entry(format!("{key}_{suffix}"))
+                        .or_default()
+                        .insert(g.clone(), v.max(0.0));
+                }
+            }
+        }
+        if let Some(v) = get("HISTORIC", "TMAX90F") {
+            cmra.entry("days_over_90f_hist".to_string())
+                .or_default()
+                .insert(g.clone(), v.max(0.0));
+        }
     }
-
-    // CMRA reports Connecticut's old counties: convert its ratios to planning regions.
-    let cmra: BTreeMap<&str, BTreeMap<String, f64>> =
+    // CMRA reports Connecticut's old counties: convert to planning regions.
+    let cmra: BTreeMap<String, BTreeMap<String, f64>> =
         cmra.into_iter().map(|(v, m)| (v, fix(m))).collect();
 
-    // climate.csv: 2 °C Atlas ratios + CMRA ratios.
+    // climate.csv: central (+2 °C / RCP4.5 mid-century) and high (+3 °C / RCP8.5 mid-century)
+    // ratios, then county counts.
+    let mut columns: Vec<(String, Option<&BTreeMap<String, f64>>)> = Vec::new();
+    for (name, _, _, _) in ATLAS_VARS {
+        columns.push((
+            name.to_string(),
+            ratios.get("gwl2").and_then(|m| m.get(name)),
+        ));
+        columns.push((
+            format!("{name}_high"),
+            ratios.get("gwl3").and_then(|m| m.get(name)),
+        ));
+    }
+    for (name, _, _, _) in CMRA_VARS {
+        columns.push((name.to_string(), cmra.get(*name)));
+        columns.push((format!("{name}_high"), cmra.get(&format!("{name}_high"))));
+    }
+    for (key, _, _) in CMRA_COUNTS {
+        for suffix in ["hist", "2050", "2050_high"] {
+            let col = format!("{key}_{suffix}");
+            let m = cmra.get(&col);
+            columns.push((col, m));
+        }
+    }
+    columns.push((
+        "days_over_90f_hist".to_string(),
+        cmra.get("days_over_90f_hist"),
+    ));
     let mut header = vec!["fips".to_string()];
-    header.extend(ATLAS_VARS.iter().map(|(n, _, _, _)| n.to_string()));
-    header.extend(CMRA_VARS.iter().map(|(n, _, _, _)| n.to_string()));
+    header.extend(columns.iter().map(|(c, _)| c.clone()));
     let mut table = Table::with_header(header, 1);
     let mut covered = BTreeSet::new();
-    let gwl2 = ratios.get("gwl2");
     for c in &counties {
+        let row_vals: Vec<Option<f64>> = columns
+            .iter()
+            .map(|(_, m)| m.and_then(|m| m.get(&c.fips)).copied())
+            .collect();
+        if row_vals.iter().all(|v| v.is_none()) {
+            continue;
+        }
         let mut row = vec![c.fips.clone()];
-        let mut any = false;
-        for (name, _, _, _) in ATLAS_VARS {
-            let v = gwl2
-                .and_then(|m| m.get(name))
-                .and_then(|m| m.get(&c.fips))
-                .copied();
-            any |= v.is_some();
-            row.push(v.map(sig4).unwrap_or_default());
-        }
-        for (name, _, _, _) in CMRA_VARS {
-            let v = cmra.get(name).and_then(|m| m.get(&c.fips)).copied();
-            any |= v.is_some();
-            row.push(v.map(sig4).unwrap_or_default());
-        }
-        if any {
-            table.push(row);
-            covered.insert(c.fips.clone());
-        }
+        row.extend(
+            row_vals
+                .into_iter()
+                .map(|v| v.map(sig4).unwrap_or_default()),
+        );
+        table.push(row);
+        covered.insert(c.fips.clone());
     }
     out.table(ctx, CLIMATE, &mut table)?;
-
-    // climate_levels.csv: Atlas ratios at every level, long format.
-    let mut levels = Table::new(&["fips", "variable", "gwl15", "gwl2", "gwl3"], 2);
-    for c in &counties {
-        for (name, _, _, _) in ATLAS_VARS {
-            let get = |l: &str| {
-                ratios
-                    .get(l)
-                    .and_then(|m| m.get(name))
-                    .and_then(|m| m.get(&c.fips))
-                    .copied()
-            };
-            let (a, b, d) = (get("gwl15"), get("gwl2"), get("gwl3"));
-            if a.is_none() && b.is_none() && d.is_none() {
-                continue;
-            }
-            levels.push(vec![
-                c.fips.clone(),
-                name.to_string(),
-                a.map(sig4).unwrap_or_default(),
-                b.map(sig4).unwrap_or_default(),
-                d.map(sig4).unwrap_or_default(),
-            ]);
-        }
-    }
-    out.table(ctx, CLIMATE_LEVELS, &mut levels)?;
 
     out.missing = missing_groups(&counties, &covered, |c| {
         if super::is_outside_conus(&c.state_abbr) {
@@ -416,13 +466,43 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             format!("Projected multiplier for {def}: {how}."),
         );
     }
+    for (name, stem, _, def) in ATLAS_VARS {
+        out.definitions.insert(
+            format!("{name}_high"),
+            format!("As `{name}` ({def}) but at +3 °C of warming (NCA5 Atlas `{stem}` GWL3): the upper end of the 2050 range."),
+        );
+    }
     for (name, stem, min_hist, def) in CMRA_VARS {
         out.definitions.insert(
             name.to_string(),
             format!("Projected multiplier for {def}: CMRA RCP45MID_MEAN_{stem} / HISTORIC_MEAN_{stem} (2035-2064 vs 1976-2005); empty when the historical value is under {min_hist}."),
         );
+        out.definitions.insert(
+            format!("{name}_high"),
+            format!(
+                "As `{name}` but for RCP8.5: CMRA RCP85MID_MEAN_{stem} / HISTORIC_MEAN_{stem}."
+            ),
+        );
     }
-    out.notes.push("All values are projections (a multiplier on today's frequency), not observations. The Atlas columns describe a world 2 °C warmer than pre-industrial (the NCA5 central case for mid-century); the CMRA columns are the RCP4.5 mid-century ensemble mean. Connecticut values are land-area-weighted averages of the old counties' values.".into());
+    for (key, stem, def) in CMRA_COUNTS {
+        out.definitions.insert(
+            format!("{key}_hist"),
+            format!("County count, {def}: CMRA HISTORIC_MEAN_{stem} (1976-2005 ensemble mean; a modelled history, not observations)."),
+        );
+        out.definitions.insert(
+            format!("{key}_2050"),
+            format!("County count, {def}: CMRA RCP45MID_MEAN_{stem} (2035-2064)."),
+        );
+        out.definitions.insert(
+            format!("{key}_2050_high"),
+            format!("County count, {def}: CMRA RCP85MID_MEAN_{stem} (2035-2064)."),
+        );
+    }
+    out.definitions.insert(
+        "days_over_90f_hist".into(),
+        "County count, days a year with a high above 90 °F: CMRA HISTORIC_MEAN_TMAX90F (1976-2005 ensemble mean).".into(),
+    );
+    out.notes.push("All values are projections, not observations. Ratio columns multiply today's frequency: the central Atlas column is a world 2 °C warmer than pre-industrial and `_high` 3 °C; the central CMRA column is the RCP4.5 mid-century ensemble mean and `_high` RCP8.5. Count columns are CMRA county values in days a year (historical 1976-2005 is itself modelled). The Atlas 1.5 °C layer is read but not written (nothing uses it). Connecticut values are land-area-weighted averages of the old counties' values.".into());
     out.notes.push("No fire-weather index is published at county level by these sources; consecutive dry days, dry days and hot days are the closest proxies for wildfire weather.".into());
     let accessed = crate::timefmt::today_utc();
     out.attributions.push(Attribution {
