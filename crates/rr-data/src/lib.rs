@@ -14,6 +14,7 @@
 #![forbid(unsafe_code)]
 #![cfg_attr(not(test), deny(missing_docs))]
 
+mod calibration;
 mod climate;
 mod exposure;
 mod location;
@@ -24,6 +25,9 @@ mod table;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod verify;
 
+pub use calibration::{
+    CountyOutageEvent, HoldoutRow, SeriesFile, SeriesRate, SeriesValue, outage_region,
+};
 pub use climate::{CLIMATE_CLAMP, variables_for};
 pub use exposure::{
     EXPOSURE_SOURCES, StrategicArea, StrategicClassDef, StrategicSite, StrategicSites,
@@ -36,7 +40,7 @@ pub use search::MAX_RESULTS;
 use rr_types::{
     AfreqKind, Attribution, BaseRate, CitationId, CountyExposure, CountyRecord, Date, EngineError,
     ErrorCode, EventRate, Facilities, FloodPriors, HazardId, LatLon, NriHazard, OutageStats,
-    PackInfo, PlaceWildfire, Seismic, Vulnerability, ZipRecord,
+    PackInfo, PlaceWildfire, RestorationCurve, Seismic, Vulnerability, ZipRecord,
 };
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -46,7 +50,8 @@ use table::{Csv, b, corrupt, f, f32c};
 /// Crate name, used by the CLI's `--version` and by the about screen.
 pub const CRATE: &str = "rr-data";
 
-/// Every pack file the engine understands, by manifest path.
+/// Every pack file the engine understands, by manifest path (plus the data-pack v2 calibration
+/// files in [`CALIBRATION_FILES`]).
 pub const PACK_FILES: &[&str] = &[
     "manifest.json",
     "core/counties.csv",
@@ -82,6 +87,10 @@ pub const PACK_FILES: &[&str] = &[
     "opt/wildfire_places/places.csv",
     "opt/wildfire_places/zip_places.csv",
 ];
+
+/// Data-pack v2 calibration files (outage model, stress table, restoration curves, temperature,
+/// reliability, declarations, national series, and the optional `outage_events` pack).
+pub const CALIBRATION_FILES: &[&str] = calibration::FILES;
 
 /// What the store keeps per county from `counties.csv`.
 #[derive(Debug, Clone)]
@@ -267,6 +276,7 @@ pub struct DataStore {
     zip_surge: BTreeMap<String, exposure::SurgeShares>,
     places: BTreeMap<String, PlaceWildfire>,
     zip_places: BTreeMap<String, Vec<(String, f32)>>,
+    calibration: calibration::Calibration,
     counties: BTreeMap<String, CountyRecord>,
     defer_rebuild: bool,
 }
@@ -297,7 +307,7 @@ impl DataStore {
     /// Returns the pack version and the number of rows (or entries) read.
     pub fn load_pack(&mut self, name: &str, bytes: &[u8]) -> Result<PackInfo, EngineError> {
         let name = name.trim_start_matches("./").trim_start_matches("data/");
-        if !PACK_FILES.contains(&name) {
+        if !PACK_FILES.contains(&name) && !calibration::Calibration::handles(name) {
             return Err(bad_name(name));
         }
         let sha = sha256_hex(bytes);
@@ -389,6 +399,9 @@ impl DataStore {
     }
 
     fn parse(&mut self, name: &str, bytes: &[u8]) -> Result<u32, EngineError> {
+        if calibration::Calibration::handles(name) {
+            return self.calibration.parse(name, bytes);
+        }
         if name.ends_with(".toml") {
             let text = std::str::from_utf8(bytes).map_err(|e| corrupt(name, e))?;
             return match name {
@@ -955,8 +968,15 @@ impl DataStore {
                     facilities: self.facilities.get(fips).map(|x| x.0.clone()),
                     vulnerability,
                     exposure,
+                    outage_model: None,
+                    temperature: None,
+                    reliability: None,
+                    declarations: None,
                 },
             );
+            if let Some(rec) = out.get_mut(fips) {
+                self.calibration.fill(rec);
+            }
         }
         self.counties = out;
     }
@@ -1125,6 +1145,48 @@ impl DataStore {
     /// County ids present in the map file, once `geo/counties.json` is loaded.
     pub fn map_ids(&self) -> &BTreeSet<String> {
         &self.map_ids
+    }
+
+    /// Pooled power-restoration curves by region and cause (`core/outage_curves.csv`): pick a
+    /// region with [`outage_region`]; `mainland` is the contiguous-US pool, and classes named
+    /// `historic:<id>` are hand-copied events (Hurricane Maria for Puerto Rico).
+    pub fn restoration_curves(&self) -> &[RestorationCurve] {
+        self.calibration.curves()
+    }
+
+    /// One pooled restoration curve, if the pack has that region and cause.
+    pub fn restoration_curve(&self, region: &str, class: &str) -> Option<&RestorationCurve> {
+        self.calibration
+            .curves()
+            .iter()
+            .find(|c| c.region == region && c.class == class)
+    }
+
+    /// A national series (`core/series/<id>.toml`: `oe417`, `drug_shortages`, `fdic_failures`,
+    /// `funding_gaps`, `fcc_dirs`, `fbi_arrests`, `ihp_displacement`).
+    pub fn series(&self, id: &str) -> Option<&SeriesFile> {
+        self.calibration.series(id)
+    }
+
+    /// A rate from a national series, by series id and rate id.
+    pub fn series_rate(&self, series: &str, rate: &str) -> Option<&SeriesRate> {
+        self.calibration.series(series)?.rate(rate)
+    }
+
+    /// Every loaded national series, by id.
+    pub fn all_series(&self) -> &BTreeMap<String, SeriesFile> {
+        self.calibration.all_series()
+    }
+
+    /// A county's recorded outages of a day or more with their restoration curves (optional pack
+    /// `outage_events`; empty until it is loaded).
+    pub fn county_outage_events(&self, fips: &str) -> &[CountyOutageEvent] {
+        self.calibration.county_events(fips)
+    }
+
+    /// The outage model's held-out test (optional pack `outage_events`), for the validation page.
+    pub fn outage_holdout(&self) -> &[HoldoutRow] {
+        self.calibration.holdout()
     }
 
     /// Credit lines and disclaimers the app must show (from the manifest): the FEMA National Risk

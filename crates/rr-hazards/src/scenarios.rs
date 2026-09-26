@@ -706,7 +706,7 @@ pub(crate) fn detect(ctx: &Ctx<'_>, natural: &Natural, notes: &mut Notes) -> Vec
         drafts.push(named_quake(
             ctx,
             "wasatch_m7",
-            "Magnitude 7 Wasatch fault earthquake",
+            "Magnitude 6.75 or larger earthquake on the Wasatch Front",
             today,
             "is on the Wasatch Front. Utah's earthquake working group puts the chance of a \
              magnitude 6.75 or larger earthquake there at about 43 in 100 over the next 50 years.",
@@ -744,7 +744,7 @@ pub(crate) fn detect(ctx: &Ctx<'_>, natural: &Natural, notes: &mut Notes) -> Vec
         drafts.push(named_quake(
             ctx,
             "seattle_fault_m7",
-            "Magnitude 7 Seattle fault earthquake",
+            "Magnitude 6.5 or larger shallow earthquake around Puget Sound",
             today,
             "is in the Puget Sound region, where the Seattle fault last broke about 1,100 years \
              ago. The USGS puts the chance of a magnitude 6.5 or larger earthquake on a shallow \

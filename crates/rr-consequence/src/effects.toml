@@ -2757,7 +2757,7 @@ hazard = "earthquake"
 scenario = "wasatch_m7"
 bucket = "power"
 class = "event"
-label = "a magnitude 7 Wasatch fault earthquake"
+label = "a magnitude 6.75 or larger earthquake on the Wasatch Front"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
 cold_share = 0.4
@@ -2771,7 +2771,7 @@ hazard = "earthquake"
 scenario = "wasatch_m7"
 bucket = "water_out"
 class = "event"
-label = "a magnitude 7 Wasatch fault earthquake"
+label = "a magnitude 6.75 or larger earthquake on the Wasatch Front"
 p_given_event = 0.7
 duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
 requires = "municipal"
@@ -2784,7 +2784,7 @@ hazard = "earthquake"
 scenario = "wasatch_m7"
 bucket = "water_out"
 class = "event"
-label = "a magnitude 7 Wasatch fault earthquake"
+label = "a magnitude 6.75 or larger earthquake on the Wasatch Front"
 p_given_event = 0.5
 duration = { kind = "log_normal", median_days = 8.0, p90_days = 20.0 }
 requires = "well"
@@ -2796,7 +2796,7 @@ hazard = "earthquake"
 scenario = "wasatch_m7"
 bucket = "supplies"
 class = "event"
-label = "a magnitude 7 Wasatch fault earthquake"
+label = "a magnitude 6.75 or larger earthquake on the Wasatch Front"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
 evidence = "prior"
@@ -2807,7 +2807,7 @@ hazard = "earthquake"
 scenario = "wasatch_m7"
 bucket = "medication"
 class = "event"
-label = "a magnitude 7 Wasatch fault earthquake"
+label = "a magnitude 6.75 or larger earthquake on the Wasatch Front"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
 evidence = "prior"
@@ -2818,7 +2818,7 @@ hazard = "earthquake"
 scenario = "wasatch_m7"
 bucket = "comms"
 class = "event"
-label = "a magnitude 7 Wasatch fault earthquake"
+label = "a magnitude 6.75 or larger earthquake on the Wasatch Front"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
 evidence = "prior"
@@ -2830,7 +2830,7 @@ hazard = "earthquake"
 scenario = "wasatch_m7"
 bucket = "home_loss"
 class = "event"
-label = "a magnitude 7 Wasatch fault earthquake"
+label = "a magnitude 6.75 or larger earthquake on the Wasatch Front"
 p_given_event = 0.1
 duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
 evidence = "prior"
@@ -2841,7 +2841,7 @@ hazard = "earthquake"
 scenario = "wasatch_m7"
 bucket = "evacuate"
 class = "event"
-label = "a magnitude 7 Wasatch fault earthquake"
+label = "a magnitude 6.75 or larger earthquake on the Wasatch Front"
 p_given_event = 0.05
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
 notice_hours = [0.0, 0.05]
@@ -2853,7 +2853,7 @@ hazard = "earthquake"
 scenario = "wasatch_m7"
 bucket = "get_home"
 class = "event"
-label = "a magnitude 7 Wasatch fault earthquake"
+label = "a magnitude 6.75 or larger earthquake on the Wasatch Front"
 p_given_event = 0.27
 requires = "commuter"
 evidence = "prior"
@@ -2864,7 +2864,7 @@ hazard = "earthquake"
 scenario = "seattle_fault_m7"
 bucket = "power"
 class = "event"
-label = "a magnitude 7 Seattle fault earthquake"
+label = "a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
 cold_share = 0.4
@@ -2877,7 +2877,7 @@ hazard = "earthquake"
 scenario = "seattle_fault_m7"
 bucket = "water_out"
 class = "event"
-label = "a magnitude 7 Seattle fault earthquake"
+label = "a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 p_given_event = 0.7
 duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
 requires = "municipal"
@@ -2890,7 +2890,7 @@ hazard = "earthquake"
 scenario = "seattle_fault_m7"
 bucket = "water_out"
 class = "event"
-label = "a magnitude 7 Seattle fault earthquake"
+label = "a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 p_given_event = 0.5
 duration = { kind = "log_normal", median_days = 8.0, p90_days = 20.0 }
 requires = "well"
@@ -2902,7 +2902,7 @@ hazard = "earthquake"
 scenario = "seattle_fault_m7"
 bucket = "supplies"
 class = "event"
-label = "a magnitude 7 Seattle fault earthquake"
+label = "a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
 evidence = "prior"
@@ -2913,7 +2913,7 @@ hazard = "earthquake"
 scenario = "seattle_fault_m7"
 bucket = "medication"
 class = "event"
-label = "a magnitude 7 Seattle fault earthquake"
+label = "a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
 evidence = "prior"
@@ -2924,7 +2924,7 @@ hazard = "earthquake"
 scenario = "seattle_fault_m7"
 bucket = "comms"
 class = "event"
-label = "a magnitude 7 Seattle fault earthquake"
+label = "a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
 evidence = "prior"
@@ -2936,7 +2936,7 @@ hazard = "earthquake"
 scenario = "seattle_fault_m7"
 bucket = "home_loss"
 class = "event"
-label = "a magnitude 7 Seattle fault earthquake"
+label = "a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 p_given_event = 0.1
 duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
 evidence = "prior"
@@ -2947,7 +2947,7 @@ hazard = "earthquake"
 scenario = "seattle_fault_m7"
 bucket = "evacuate"
 class = "event"
-label = "a magnitude 7 Seattle fault earthquake"
+label = "a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 p_given_event = 0.05
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
 notice_hours = [0.0, 0.05]
@@ -2959,7 +2959,7 @@ hazard = "earthquake"
 scenario = "seattle_fault_m7"
 bucket = "get_home"
 class = "event"
-label = "a magnitude 7 Seattle fault earthquake"
+label = "a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 p_given_event = 0.27
 requires = "commuter"
 evidence = "prior"
@@ -3149,12 +3149,12 @@ note = "The county earthquake rate includes New Madrid ruptures."
 [[overlap]]
 scenario = "wasatch_m7"
 hazard = "earthquake"
-note = "The Wasatch Front earthquake rate includes Wasatch fault ruptures."
+note = "The Wasatch Front earthquake rate includes these earthquakes (on the Wasatch fault or any other fault in the region)."
 
 [[overlap]]
 scenario = "seattle_fault_m7"
 hazard = "earthquake"
-note = "The Puget Sound earthquake rate includes Seattle fault ruptures (and Cascadia's, taken out separately)."
+note = "The Puget Sound earthquake rate includes these shallow earthquakes, on the Seattle fault or any other (and Cascadia's, taken out separately)."
 
 [[overlap]]
 scenario = "san_andreas_south_m78"
@@ -3237,7 +3237,7 @@ sources = ["rr_risk_model_priors"]
 [[income]]
 hazard = "earthquake"
 scenario = "wasatch_m7"
-label = "the regional economy after a Wasatch fault earthquake"
+label = "the regional economy after a magnitude 6.75 or larger earthquake on the Wasatch Front"
 per_earner = 0.1
 spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
 unemployment_insurance = true
@@ -3247,7 +3247,7 @@ sources = ["rr_risk_model_priors"]
 [[income]]
 hazard = "earthquake"
 scenario = "seattle_fault_m7"
-label = "the regional economy after a Seattle fault earthquake"
+label = "the regional economy after a magnitude 6.5 or larger shallow earthquake around Puget Sound"
 per_earner = 0.1
 spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
 unemployment_insurance = true

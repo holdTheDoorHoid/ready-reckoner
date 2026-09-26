@@ -224,7 +224,7 @@ the terrorism row (retired in contract v2, H-02) are replaced by the rare famili
 | Long illness in the household | someone sick at home for weeks | 1 % per person-year (0.5–3 %) | × people | PRIOR |
 | Burst pipe or water leak (v2) | a burst, frozen or leaking pipe or appliance floods part of the home | 1.5 % per home-year (1–2 %; III/ISO water damage and freezing, about 1 in 67 insured homes a year, 2019–2023) | ×1.3 (1.1–1.6) where 5 or more days a year stay below freezing (CMRA `icing_days_hist`); basement ×1.2 (1–1.5); renters ×0.8 (0.6–1); no housing-age column exists yet, so age is not a modifier | DATA + PRIOR (confidence medium: read through the publisher's summary) |
 | Eviction (v2) | a renting household is taken to court and ordered to leave | the county's eviction filings per renter household × 0.4 (0.3–0.55) that end in a judgment, when the pack has the column; otherwise 2.3 per 100 renter households a year (1–5; Eviction Lab 2016, confirm) | renters only; income stability as for job loss; ×0.5 (0.3–0.8) with three months of savings | PRIOR |
-| Arrest or detention (v2, owner decision 2026-09-26) | a household member is arrested | FBI arrests per 100,000 a year by age band, 2023–2025 (Crime Data Explorer, Tables 29, 39 and 40; the data-model series `fbi_arrests`): the men's and women's rates averaged, since the form does not ask sex. Adults 18–64 are the five FBI bands weighted by the years each covers (7, 10, 10, 10, 10): 3.31 per 100 a year; teens the 10–17 band, 1.47; 65 and over 0.31; children under 13 are not counted | summed over the household (events, not people); the range runs from the women's lowest year to the men's highest | DATA (confidence medium) |
+| Arrest or detention (v2, owner decision 2026-09-26) | a household member is arrested | FBI arrests per 100,000 a year by age band, 2023–2025 (Crime in the United States, the 2023, 2024 and 2025 editions, Tables 29, 39 and 40, over the Census Bureau's Vintage 2025 population by age and sex; the data-model series `fbi_arrests`): the men's and women's rates averaged, since the form does not ask sex. Adults 18–64 are the five FBI bands weighted by the years each covers (7, 10, 10, 10, 10): 3.31 per 100 a year; teens the 10–17 band, 1.47; 65 and over 0.31; children under 13 are not counted | summed over the household (events, not people); the range runs from the women's lowest year to the men's highest | DATA (confidence medium) |
 
 Job loss and earner loss are left out (with a note) when no one is marked as earning; vehicle
 stranding when there is no vehicle and no commute; medicine shortages when no one takes a daily
@@ -379,7 +379,7 @@ for a scenario that does not apply is ignored with a note.
 
 The earthquake card shows the county rate less the long-run shares of every earthquake scenario
 that applies (never below a quarter of it) plus the scenarios' own rates: Coos Bay 0.01981 − 0.0041
-+ 0.01022 = 0.0259 a year; King County takes out both Cascadia's and the Seattle fault's shares.
++ 0.01022 = 0.0259 a year; King County takes out both Cascadia's and the Puget Sound scenario's shares.
 The heat card shows the heat waves (the blackout scenario is one of them, taken out and added
 back). The hurricane card shows the full hurricane rate (Category 1–2 plus major); the tsunami card
 the county rate plus the local-source scenario. `rates` always carries the parent's full rate.
@@ -540,11 +540,47 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   arrests, FDIC and openFDA (notes). OE-417 counts reports, not household outages, so the regional
   blackout keeps its prior and gains the OE-417 physical-attack and cyber counts as sub-cause notes;
   no FCC or CSB series measures cyber outages or chemical releases, so those priors stand.
-- **Outages by cause (M-18, M-10).** The outage floor can top up each storm hazard by its share of
+- **Outages by cause (M-18, M-10).** The outage floor tops up each storm hazard by its share of
   recorded outages matched by date (`natural::shortfall_by_cause`), instead of counting every
-  shortfall as windstorms; it reads data-model's `OutageModel::causes` (awaiting: data-model), so
-  the v0.1 rule runs until then. The hurricane double count M-10 is `rr-consequence`'s (county curve
-  plus hurricane rows); `rr-hazards` already subtracts modelled hurricane outages in the floor.
+  shortfall as windstorms. It reads the county record's `outage_model.causes` (the pack's
+  `core/outage_causes.csv`, since the data-model merge); a county without cause shares keeps the
+  v0.1 rule (all of the shortfall to windstorms), and its note says the records are not matched to
+  storms. Outages matched to no storm, or to wildfires, heat, floods or grid trouble, are put on no
+  storm (M-18's "cause not recorded"); `rr-consequence`'s power bucket counts them from the
+  county's outage record. The conversion from outages to household events and its limits:
+  - **Winter and ice storms cut the power at the share the records show.** Of the Storm Events
+    winter-storm episodes in each NCA5 region (`events.csv`), the share its outage records match an
+    outage to (`outages.csv` events × `outage_causes.csv` share, over the record's years): Midwest
+    0.284, Northeast 0.583, Northern Great Plains 0.185, Northwest 0.331, Southeast 0.806, Southern
+    Great Plains 0.474, Southwest 0.344, elsewhere the national 0.427 (22,758 matched outages in
+    53,296 episodes). Ice storms: Midwest 0.967, Northeast 0.46, elsewhere 1 (the ice cause also
+    holds sleet and freezing fog, so matches can outnumber ice-storm episodes; capped at 1). These
+    replace the 0.3 and 0.8 priors in the floor (`WINTER_CUT_SHARE`, `ICE_CUT_SHARE`; a unit test
+    re-derives them from the pack). The engine's copy of the outage record has no event count, so
+    the share is regional, not the county's own.
+  - **No storm beyond its record.** The floor never takes a storm past its Storm Events episode
+    rate (a power-cutting storm is a storm on record): winter-storm episodes, ice-storm episodes,
+    severe-wind days plus high-wind episodes for windstorms, and the larger of the tropical passage
+    and episode rates for hurricanes. It never lowers a rate either.
+  - **Hurricanes only within reach of the tracks.** A county with no hurricane rate from the track
+    record and no tropical passage or episode on record has no hurricane cause: outages matched to
+    a tropical storm there came from its remnants, count with windstorms, and a note says so.
+  - **Almost no windstorm on record, no matching.** Where the pack's Storm Events record holds
+    fewer than 0.1 severe-wind days plus high-wind episodes a year for a mainland county (fewer than
+    3 in 30 years: a gap in the zone records, as for western Washington's Puget Sound and coast and
+    much of Alaska), its outages could not be matched to windstorms, so the weather share (0.7) of
+    its outages matched to no storm still counts as windstorms, as the old rule did, uncapped, and
+    a note says so. Otherwise those counties would lose the windstorm row they plainly have
+    (Clallam, Washington: 0.67 → 0.0001 a year; Kitsap 0.90 → 0.002). Island grids (Puerto Rico,
+    the US Virgin Islands, Guam, American Samoa, the Northern Mariana Islands) keep the new
+    treatment: rr-data pools them as grids of their own, and Puerto Rico's island-wide record was
+    matched against the whole island's storms. The real fix is the zone-to-county mapping in the
+    events job.
+  The `wind` cause counts the modelled outages of windstorms, tornadoes, lightning and hail
+  together (data-model files all four under it), and a hurricane top-up also goes into the
+  Category 1–2 part, so the major-hurricane card still shows the full rate. The hurricane double
+  count M-10 is `rr-consequence`'s (county curve plus hurricane rows); `rr-hazards` already
+  subtracts modelled hurricane outages in the floor.
 - **New scenarios have effects rows** (rr-consequence, v0.2.0). `wasatch_m7`,
   `san_andreas_south_m78` and `seattle_fault_m7` take the New Madrid and Hayward priors;
   `heat_blackout` is rr-consequence's heat-plus-outage class and owns its durations and effects
@@ -585,15 +621,15 @@ rr_consequence::assess(
 ) -> ConsequenceAssessment
 ```
 
-`CountyData::from_record` reads the county record. Data pack v2 adds optional fields, each
-absent until its branch merges (the county-only model of v0.1 runs without them and says so):
-`outage_model` (the regional outage model: pooled tails with credibility weights, causes, the
-region's worst event; `agent/data-model`), `temperature` (outage hours on hot and cold days),
+`CountyData::from_record` reads the county record. Data pack v2 adds optional fields (the
+county-only model of v0.1 runs where one is missing, and says so): `outage_model` (the regional
+outage model: pooled tails with credibility weights, causes, the region's worst event) and
+`temperature` (outage hours on hot and cold days), both `rr_types::calibration` records on
+`CountyRecord`; `sdwis_violation_share` and `smoke_days` (from `CountyRecord::exposure`); and
 `curves` (pooled restoration curves by region and cause, handed in with
-`CountyData::with_curves(store.restoration_curves())` because they are not per county),
-`sdwis_violation_share` and `smoke_days` (read from `CountyRecord::exposure`, data-hazard's
-`sdwis_violation_pop_share` and `smoke_days_35`, merged in v0.2). Until agent/data-model merges,
-`crates/rr-consequence/src/pack.rs` mirrors its loader types field for field.
+`CountyData::with_curves(store.restoration_curves())` because they are not per county;
+awaiting: plan, which does not pass them yet, so real plans use the regional restoration factors
+and the island grids' Maria curves only once it does).
 
 `ConsequenceAssessment` carries the 15 `BucketAssessment`s (in `BucketId::ALL` order), the
 `ScenarioInfo`s, cliff `Warning`s, the self-sufficiency statement, and the numbers behind every
@@ -910,24 +946,24 @@ big windstorms, grid failure, Cascadia).
 | *hayward_m7* | home_loss | event | a magnitude 7 Hayward fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | *hayward_m7* | evacuate | event | a magnitude 7 Hayward fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
 | *hayward_m7* | get_home | event | a magnitude 7 Hayward fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
-| *wasatch_m7* | power | event | a magnitude 7 Wasatch fault earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
-| *wasatch_m7* | water_out | event | a magnitude 7 Wasatch fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
-| *wasatch_m7* | water_out | event | a magnitude 7 Wasatch fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
-| *wasatch_m7* | supplies | event | a magnitude 7 Wasatch fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
-| *wasatch_m7* | medication | event | a magnitude 7 Wasatch fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
-| *wasatch_m7* | comms | event | a magnitude 7 Wasatch fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
-| *wasatch_m7* | home_loss | event | a magnitude 7 Wasatch fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
-| *wasatch_m7* | evacuate | event | a magnitude 7 Wasatch fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
-| *wasatch_m7* | get_home | event | a magnitude 7 Wasatch fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
-| *seattle_fault_m7* | power | event | a magnitude 7 Seattle fault earthquake | 1 | 3 d | 14 d | prior | in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
-| *seattle_fault_m7* | water_out | event | a magnitude 7 Seattle fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
-| *seattle_fault_m7* | water_out | event | a magnitude 7 Seattle fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
-| *seattle_fault_m7* | supplies | event | a magnitude 7 Seattle fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
-| *seattle_fault_m7* | medication | event | a magnitude 7 Seattle fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
-| *seattle_fault_m7* | comms | event | a magnitude 7 Seattle fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
-| *seattle_fault_m7* | home_loss | event | a magnitude 7 Seattle fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
-| *seattle_fault_m7* | evacuate | event | a magnitude 7 Seattle fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
-| *seattle_fault_m7* | get_home | event | a magnitude 7 Seattle fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *wasatch_m7* | power | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *wasatch_m7* | water_out | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *wasatch_m7* | water_out | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *wasatch_m7* | supplies | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *wasatch_m7* | medication | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *wasatch_m7* | comms | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *wasatch_m7* | home_loss | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *wasatch_m7* | evacuate | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *wasatch_m7* | get_home | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *seattle_fault_m7* | power | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 1 | 3 d | 14 d | prior | in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *seattle_fault_m7* | water_out | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *seattle_fault_m7* | water_out | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *seattle_fault_m7* | supplies | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *seattle_fault_m7* | medication | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *seattle_fault_m7* | comms | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *seattle_fault_m7* | home_loss | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *seattle_fault_m7* | evacuate | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *seattle_fault_m7* | get_home | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | *san_andreas_south_m78* | power | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.3 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
 | *san_andreas_south_m78* | water_out | event | a magnitude 7.8 southern San Andreas earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
 | *san_andreas_south_m78* | water_out | event | a magnitude 7.8 southern San Andreas earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
@@ -949,8 +985,8 @@ big windstorms, grid failure, Cascadia).
 | *major_hurricane_direct_hit*: the local economy after a major hurricane | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *new_madrid_m7*: the regional economy after a New Madrid earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *hayward_m7*: the regional economy after a Hayward fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
-| *wasatch_m7*: the regional economy after a Wasatch fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
-| *seattle_fault_m7*: the regional economy after a Seattle fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *wasatch_m7*: the regional economy after a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *seattle_fault_m7*: the regional economy after a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *san_andreas_south_m78*: the regional economy after a southern San Andreas earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | benefit_interruption: federal pay or benefits that stop | 1 | 2 wk | 6 wk | no | prior | cfpb_shutdown_2013, rr_risk_model_priors |
 | arrest_or_detention: an arrest or detention | 1 | 1 wk | 6 wk | no | prior | fbi_cde_arrests, rr_risk_model_priors |
@@ -968,8 +1004,8 @@ big windstorms, grid failure, Cascadia).
 | *cascadia_m9* | earthquake | The county earthquake rate includes Cascadia's own shaking (0.41 %/yr near Coos Bay, the long-run recurrence). |
 | *hayward_m7* | earthquake | The Bay Area earthquake rate includes Hayward fault ruptures. |
 | *new_madrid_m7* | earthquake | The county earthquake rate includes New Madrid ruptures. |
-| *wasatch_m7* | earthquake | The Wasatch Front earthquake rate includes Wasatch fault ruptures. |
-| *seattle_fault_m7* | earthquake | The Puget Sound earthquake rate includes Seattle fault ruptures (and Cascadia's, taken out separately). |
+| *wasatch_m7* | earthquake | The Wasatch Front earthquake rate includes these earthquakes (on the Wasatch fault or any other fault in the region). |
+| *seattle_fault_m7* | earthquake | The Puget Sound earthquake rate includes these shallow earthquakes, on the Seattle fault or any other (and Cascadia's, taken out separately). |
 | *san_andreas_south_m78* | earthquake | The southern California earthquake rate includes southern San Andreas ruptures. |
 | *heat_blackout* | heat_wave | The county's heat-wave rate includes the heat waves that come with a blackout of a day or more. |
 
@@ -1010,7 +1046,7 @@ big windstorms, grid failure, Cascadia).
   tail: the rates of outages lasting 1, 3, 7, 14 and 30 days per customer-year, each the county's
   own blended with its neighbours' within 400 km (800 km from a week) by a credibility weight
   (λ̂ = Z·λ_county + (1 − Z)·λ_region, Z = E/(E + 5) with E the qualifying events a county like
-  this one would expect in its own record; `agent/data-model`), over the pool's rate of outages of
+  this one would expect in its own record; the data pack's `outage_pooled.csv`), over the pool's rate of outages of
   any length (at least twice the one-day rate, where a county's own record is thin: Manhattan's
   underground grid records none), with the county's own median and 90th-percentile hours for the
   part under a day. The pool leaves out outages attributed to hurricanes, wildfires, floods,
@@ -1021,7 +1057,7 @@ big windstorms, grid failure, Cascadia).
   more, nClimGrid-Daily) replaces the rows' fixed heat shares when the pack has it (M-11). The
   power bucket says whose records these are ("blended with about 450 nearby counties'"). Linn
   County, Iowa, goes from 10 days (the 2020 derecho in its own record) to 5; Oklahoma City from
-  10 to 7.
+  10 to 5.
 - **Fallback, said out loud.** Without the regional model the county's own statistics are used
   as before (or its state's series, V-15), the power bucket says "only your county's own outage
   records", and the range is widened one ladder step at the high end (a structural gap, M-14).
@@ -1149,8 +1185,10 @@ wildfire you could be away for a month or more"). Home loss adds the displacemen
 damage forced the household out, the months by which nine in ten households like it would be home
 (the 90th percentile of the home-loss rows' displacement durations, weighted by how often each
 cause happens), and what living elsewhere that long costs at 30 % of monthly expenses: what
-loss-of-use insurance pays for. The IHP table (months away by incident type) replaces the
-displacement durations when it lands (awaiting: data-model).
+loss-of-use insurance pays for. The durations stay expert estimates: the data pack's FEMA
+housing-assistance series (`ihp_displacement`) gives no months away (only 3 % of rental-eligible
+registrations carry an end date), and its rental assistance per approved household is a floor on
+the cost, not the cost.
 
 ### The worst event on record (v0.2.0)
 

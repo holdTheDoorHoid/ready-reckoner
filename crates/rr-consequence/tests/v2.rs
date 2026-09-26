@@ -725,6 +725,46 @@ fn the_stress_line_says_whether_the_target_outlasts_the_worst_event() {
             .iter()
             .any(|s| s == "ornl_eagle_i_outages")
     );
+    // The sentence reads cleanly whichever way it goes (a string continuation once left a run
+    // of spaces inside it).
+    let line = a
+        .bucket(BucketId::Power)
+        .frequency_sentences
+        .iter()
+        .find(|s| s.starts_with("The worst power cut"))
+        .cloned()
+        .expect("the stress sentence");
+    assert!(!line.contains("  "), "{line}");
+    let mut long = m.clone();
+    if let Some(st) = long.stress.as_mut() {
+        st.share_out_at_days = vec![(1.0, 1.0), (3.0, 1.0), (7.0, 0.9), (14.0, 0.8), (30.0, 0.5)];
+    }
+    let waiting = run(
+        &input,
+        &rates,
+        CountyData {
+            outage_model: Some(&long),
+            state_abbr: "IA",
+            nca_region: "midwest",
+            ..CountyData::default()
+        },
+    );
+    let said = waiting
+        .bucket(BucketId::Power)
+        .frequency_sentences
+        .iter()
+        .find(|s| s.starts_with("The worst power cut"))
+        .cloned()
+        .expect("the stress sentence");
+    assert!(
+        said.contains("still waiting (about 85 in 100 of all customers there were still out)"),
+        "{said}"
+    );
+    for b in &waiting.buckets {
+        for s in &b.frequency_sentences {
+            assert!(!s.contains("  "), "{}: {s}", b.id);
+        }
+    }
     // Water: the state's worst documented failure, for homes on public water.
     let nc = run(
         &input,
@@ -969,8 +1009,14 @@ fn the_three_new_fault_scenarios_have_rows() {
     let input = research::philadelphia_household();
     let rates = vec![rate(HazardId::Earthquake, 0.02)];
     for (id, name) in [
-        ("wasatch_m7", "A magnitude 7 Wasatch fault earthquake"),
-        ("seattle_fault_m7", "A magnitude 7 Seattle fault earthquake"),
+        (
+            "wasatch_m7",
+            "A magnitude 6.75 or larger earthquake on the Wasatch Front",
+        ),
+        (
+            "seattle_fault_m7",
+            "A magnitude 6.5 or larger shallow earthquake around Puget Sound",
+        ),
         (
             "san_andreas_south_m78",
             "A magnitude 7.8 southern San Andreas earthquake",

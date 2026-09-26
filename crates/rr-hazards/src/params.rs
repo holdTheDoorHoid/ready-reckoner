@@ -138,7 +138,9 @@ pub(crate) const OUTAGE_RATE_SPREAD: f64 = 1.3;
 pub(crate) const HEAT_DAYS_CAP_FLOOR: f64 = 0.2;
 
 /// PRIOR. Chance that one household-significant event of each storm type cuts the power, used
-/// only to compare the storm rates with recorded outages (the outage floor).
+/// only to compare the storm rates with recorded outages (the outage floor). Where the county
+/// record matches its outages to storms by date, winter and ice storms use the shares the records
+/// show instead ([`WINTER_CUT_SHARE`], [`ICE_CUT_SHARE`]).
 pub(crate) const OUTAGE_SHARE_STRONG_WIND: f64 = 0.9;
 /// See [`OUTAGE_SHARE_STRONG_WIND`].
 pub(crate) const OUTAGE_SHARE_WINTER: f64 = 0.3;
@@ -152,6 +154,45 @@ pub(crate) const OUTAGE_SHARE_TORNADO: f64 = 0.8;
 pub(crate) const OUTAGE_SHARE_LIGHTNING: f64 = 0.8;
 /// See [`OUTAGE_SHARE_STRONG_WIND`].
 pub(crate) const OUTAGE_SHARE_HAIL: f64 = 0.1;
+
+/// DERIVED (the core data pack, re-derived by a unit test in `natural.rs`): the share of Storm
+/// Events winter-storm episodes (`events.csv` `winter_storm`: winter storm, blizzard, heavy snow and
+/// lake-effect snow) that the county outage records match an outage to (`outages.csv` `events` ×
+/// `outage_causes.csv` `winter_share`), pooled over the counties of each NCA5 region with a record
+/// of their own: Σ matched outages ÷ Σ (episodes a year × the record's years). In the outage floor
+/// it replaces [`OUTAGE_SHARE_WINTER`] as the chance that a winter storm cuts the power. Regions
+/// whose records hold fewer than 100 episodes (Alaska, Hawaii and the Pacific) and counties
+/// outside every region take [`WINTER_CUT_SHARE_NATIONAL`]. The matched
+/// count weighs events by customers out, so large outages count a little more than once.
+pub(crate) const WINTER_CUT_SHARE: &[(&str, f64)] = &[
+    ("midwest", 0.284),
+    ("northeast", 0.583),
+    ("northern_great_plains", 0.185),
+    ("northwest", 0.331),
+    ("southeast", 0.806),
+    ("southern_great_plains", 0.474),
+    ("southwest", 0.344),
+];
+/// DERIVED: the same over every region, 22,758 matched outages in 53,296 episodes.
+pub(crate) const WINTER_CUT_SHARE_NATIONAL: f64 = 0.427;
+/// DERIVED, as [`WINTER_CUT_SHARE`], for ice storms (`events.csv` `ice_storm`, outage cause `ice`),
+/// capped at 1: the ice cause also holds sleet and freezing fog, so matched outages can outnumber
+/// ice-storm episodes. Replaces [`OUTAGE_SHARE_ICE`] in the outage floor.
+pub(crate) const ICE_CUT_SHARE: &[(&str, f64)] = &[
+    ("midwest", 0.967),
+    ("northeast", 0.46),
+    ("northern_great_plains", 1.0),
+    ("southeast", 1.0),
+    ("southern_great_plains", 1.0),
+];
+/// DERIVED: the same over every region (4,299 matched in 4,010 episodes), capped at 1; the
+/// Northwest, the Southwest and Alaska hold too few ice-storm episodes for a share of their own.
+pub(crate) const ICE_CUT_SHARE_NATIONAL: f64 = 1.0;
+/// Severe-wind days plus high-wind episodes a year (Storm Events) below which a county's wind
+/// record is too thin to have matched its outages to windstorms: fewer than 3 in 30 years. In the
+/// pack that is 77 counties, nearly all where the zone records have gaps (western Washington,
+/// Alaska, Puerto Rico and the territories).
+pub(crate) const WIND_RECORD_MIN: f64 = 0.1;
 
 /// PRIOR. How exposed the household's power lines are, by setting: rural lines are long and
 /// overhead, city lines are shorter and partly underground (research §2.7 "utility
@@ -511,11 +552,16 @@ pub(crate) const ATTACK_NON_UASI: Triple = (3.0e-6, 1.0e-6, 3.0e-5);
 /// 0.3, "a few days' disruption" (hazard-expansion H-10).
 pub(crate) const ATTACK_LOSS_USD: f64 = 800.0;
 
-/// DATA (FBI Crime in the United States 2023–2025, Tables 29, 39 and 40, via the data-model
-/// series `fbi_arrests`): arrests per 100,000 people a year by age band, as `(band, first age,
-/// last age, male (value, low, high), female (value, low, high))`. The value is the mean of the
-/// three years; low and high are the lowest and highest year. The FBI counts arrests, not people
-/// or convictions: one person arrested twice counts twice.
+/// DATA (FBI Crime in the United States, the 2023, 2024 and 2025 editions, Tables 29, 39 and 40;
+/// Census Vintage 2025 population by age and sex; the same method as the data-model series
+/// `fbi_arrests`): arrests per 100,000 people a year by age band, as `(band, first age, last age,
+/// male (value, low, high), female (value, low, high))`. For each year, a band's reported arrests
+/// (Tables 39 and 40) are scaled by Table 29's national estimate over the reported total, since
+/// the FBI publishes no national estimate by age or sex, and divided by the band's population on
+/// 1 July of that year. The value is the mean of the three years; low and high are the lowest and
+/// highest year. Recomputed from those tables on 2026-09-26: every figure matches to four
+/// significant figures. The FBI counts arrests, not people or convictions: one person arrested
+/// twice counts twice.
 pub(crate) const ARRESTS_PER_100K: &[(&str, u8, u8, Triple, Triple)] = &[
     (
         "10_17",

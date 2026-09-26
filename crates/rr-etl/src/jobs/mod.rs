@@ -9,6 +9,8 @@ use std::path::PathBuf;
 
 pub mod base_rates;
 pub mod climate;
+pub mod climate_daily;
+pub mod displacement;
 pub mod events;
 pub mod eviction;
 pub mod facilities;
@@ -18,8 +20,13 @@ pub mod geomag;
 pub mod ground;
 pub mod levees;
 pub mod nri;
+pub mod outage_model;
 pub mod outages;
+pub mod reliability;
 pub mod seismic;
+pub mod series;
+pub mod series_arrests;
+pub mod series_transcribed;
 pub mod smoke;
 pub mod strategic;
 pub mod surge;
@@ -34,6 +41,8 @@ pub struct Ctx {
     pub data: PathBuf,
     /// HTTP client (knows about `--keep-raw`).
     pub http: Http,
+    /// Keep `data/raw/intermediate/` after the refresh (`--keep-intermediate`).
+    pub keep_intermediate: bool,
 }
 
 /// Everything a job reports back.
@@ -214,6 +223,36 @@ pub const JOBS: &[JobSpec] = &[
         run: base_rates::run,
         default: true,
     },
+    JobSpec {
+        id: "series",
+        title: "National series: DOE OE-417 grid disturbances (PNNL), FDA drug shortages, FDIC bank failures, federal funding gaps, FCC outage reports, FBI arrests",
+        run: series::run,
+        default: true,
+    },
+    JobSpec {
+        id: "outage_model",
+        title: "Outage causes, credibility-weighted regional tails, restoration curves and the worst-event stress table (EAGLE-I events)",
+        run: outage_model::run,
+        default: true,
+    },
+    JobSpec {
+        id: "climate_daily",
+        title: "Heat and cold days by county and month (NOAA nClimGrid-Daily 1991-2020) and outage hours on hot and cold days",
+        run: climate_daily::run,
+        default: true,
+    },
+    JobSpec {
+        id: "reliability",
+        title: "Utility reliability (EIA-861 SAIDI and SAIFI 2015-2024) by county, and the cross-check with EAGLE-I",
+        run: reliability::run,
+        default: true,
+    },
+    JobSpec {
+        id: "displacement",
+        title: "Federal disaster declarations per county and FEMA housing assistance by type of disaster (OpenFEMA)",
+        run: displacement::run,
+        default: true,
+    },
 ];
 
 /// Pack a file belongs to, from its path: `geo/...` is the map, `opt/<name>/...` is the
@@ -241,6 +280,9 @@ pub fn pack_description(name: &str) -> &'static str {
         }
         "surge" => {
             "Optional: share of each ZIP code's land inside NOAA/NHC's Category 1 and Category 3 storm-surge areas. Built by hand (rr-etl refresh --only surge), not in the quarterly refresh. Not needed to plan."
+        }
+        "outage_events" => {
+            "Optional: every county power outage of a day or more since 2014 with its restoration curve and cause, and the held-out test of the outage model. Loaded only by the expert views and the validation page."
         }
         _ => "Optional pack (not needed to plan; loaded only when a feature asks for it).",
     }
@@ -401,6 +443,10 @@ pub fn refresh(ctx: &Ctx, only: &[String], optional: bool) -> Result<RefreshSumm
     finish_manifest(&mut manifest);
     manifest.save(&ctx.data)?;
     crate::changes::append(&ctx.data, &manifest, &summary)?;
+    // Files one job hands to a later one are not packs: drop them unless asked to keep raw data.
+    if !ctx.http.keep_raw && !ctx.keep_intermediate {
+        crate::intermediate::clear(&ctx.data)?;
+    }
     Ok(summary)
 }
 

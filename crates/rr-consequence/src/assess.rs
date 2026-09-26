@@ -829,7 +829,8 @@ fn stress_sentence(bucket: BucketId, st: &StressTest, target: f32) -> String {
                     "outlasted it for at least 9 in 10 of the homes that lost power".to_owned()
                 } else {
                     format!(
-                        "left some {what} still waiting (about {} in 100 of all customers there                          were still out)",
+                        "left some {what} still waiting (about {} in 100 of all customers there \
+                         were still out)",
                         words::per_100(100.0 * at)
                     )
                 }

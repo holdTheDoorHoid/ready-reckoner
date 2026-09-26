@@ -1067,3 +1067,141 @@ fn the_sub_cause_table_covers_the_csv() {
     assert_eq!(co.rate_range, Some([7.0e-5, 3.0e-4]));
     assert!(close(fire.rate_per_year, 2.0 * 0.002_622, 1e-9));
 }
+
+// ------------------------------------------------------------------------------------------
+// The outage floor by cause (model review M-18): tropical remnants and episode caps.
+// ------------------------------------------------------------------------------------------
+
+/// Ellis County, Kansas with an outage record matched to storms by date: 2 outages a customer a
+/// year, half matched to a tropical storm, 30 % to windstorms; 5 severe-wind days and 1 high-wind
+/// episode a year on record; `tropical` adds a tropical-storm passage rate.
+fn kansas_with_outages(tropical: Option<f32>) -> Fixture {
+    let mut f = county("20051");
+    f.county.outages = Some(
+        serde_json::from_value(json!({
+            "events_per_customer_year": 2.0,
+            "p_ge_1d": 0.02, "p_ge_3d": 0.005, "p_ge_7d": 0.001, "p_ge_14d": 0.0002,
+            "median_hours": 2.0, "p90_hours": 12.0,
+            "years_covered": "2015-2025",
+            "event_definition": "test"
+        }))
+        .unwrap(),
+    );
+    f.county.outage_model = Some(rr_types::OutageModel {
+        rate: 2.0,
+        causes: [("hurricane", 0.5f32), ("wind", 0.3), ("unattributed", 0.2)]
+            .into_iter()
+            .map(|(k, v)| (k.to_owned(), v))
+            .collect(),
+        ..Default::default()
+    });
+    let rate = |r: f32| rr_types::EventRate {
+        rate_per_year: r,
+        share_damaging: None,
+        median_days: None,
+        p90_days: None,
+    };
+    f.county.events.insert("severe_wind_day".into(), rate(5.0));
+    f.county.events.insert("high_wind".into(), rate(1.0));
+    if let Some(t) = tropical {
+        f.county
+            .events
+            .insert("tropical_storm_passage".into(), rate(t));
+    }
+    f
+}
+
+#[test]
+fn tropical_remnants_far_from_the_tracks_count_with_windstorms() {
+    let input = household("hays-kansas-farm-5");
+    let plain = run(&input, &county("20051"));
+    let far = run(&input, &kansas_with_outages(None));
+    // Kansas has no hurricane rate and no tropical row: the half matched to tropical storms joins
+    // the windstorms' share, never a hurricane row.
+    assert!(!has_profile(&far, H::Hurricane));
+    assert!(far.rates.iter().all(|r| r.hazard != H::Hurricane));
+    let wind = rate(&far, H::StrongWind).rate_per_year;
+    assert!(wind > rate(&plain, H::StrongWind).rate_per_year);
+    // Windstorms must explain 2 × (0.3 + 0.5) = 1.6 outages a year, at most 6 episodes a year.
+    let tornado = far
+        .rates
+        .iter()
+        .filter(|r| matches!(r.hazard, H::Tornado | H::Lightning | H::Hail))
+        .map(|r| {
+            r.rate_per_year
+                * match r.hazard {
+                    H::Hail => 0.1,
+                    _ => 0.8,
+                }
+        })
+        .sum::<f64>();
+    assert!(close(wind * 0.9 + tornado, 1.6, 1e-6), "{wind}");
+    assert!(wind <= 6.0);
+    assert!(
+        far.notes
+            .iter()
+            .any(|n| n.contains("remnants of tropical storms")),
+        "{:?}",
+        far.notes
+    );
+    // Within reach of the tracks, the same outages go to hurricanes, held to the passage rate.
+    let near = run(&input, &kansas_with_outages(Some(0.05)));
+    let h = rate(&near, H::Hurricane).rate_per_year;
+    // The pack stores the passage rate as f32.
+    assert!(close(h, 0.05, 1e-6), "{h}");
+    assert!(
+        !near
+            .notes
+            .iter()
+            .any(|n| n.contains("remnants of tropical storms"))
+    );
+}
+
+#[test]
+fn with_no_windstorm_on_record_unmatched_weather_outages_still_count_as_windstorms() {
+    // Western Washington and much of Alaska have almost no severe-wind day or high-wind episode
+    // in the Storm Events record the pack holds (fewer than 3 in 30 years), so their outages could
+    // not be matched to windstorms. There the weather share (0.7) of the outages matched to no
+    // storm counts as windstorms, as the old rule did, with no episode rate to cap it.
+    let input = household("hays-kansas-farm-5");
+    let mut f = kansas_with_outages(Some(0.05));
+    f.county.events.remove("severe_wind_day");
+    f.county.events.remove("high_wind");
+    f.county.outage_model.as_mut().unwrap().causes = [("unattributed", 0.8f32)]
+        .into_iter()
+        .map(|(k, v)| (k.to_owned(), v))
+        .collect();
+    let a = run(&input, &f);
+    let explained = a
+        .rates
+        .iter()
+        .map(|r| {
+            r.rate_per_year
+                * match r.hazard {
+                    H::StrongWind => 0.9,
+                    H::Tornado | H::Lightning => 0.8,
+                    H::Hail => 0.1,
+                    _ => 0.0,
+                }
+        })
+        .sum::<f64>();
+    // 2 outages a year × 0.8 matched to no storm × 0.7 weather = 1.12 for the wind cause.
+    assert!(close(explained, 2.0 * 0.8 * 0.7, 1e-6), "{explained}");
+    assert!(
+        a.notes
+            .iter()
+            .any(|n| n.contains("hold almost no windstorms to match")),
+        "{:?}",
+        a.notes
+    );
+    // An island grid keeps the new treatment: its unmatched outages stay "cause not recorded".
+    let mut island = f.clone();
+    island.county.state_abbr = "PR".into();
+    let b = run(&input, &island);
+    assert!(rate(&b, H::StrongWind).rate_per_year < rate(&a, H::StrongWind).rate_per_year);
+    assert!(
+        !b.notes
+            .iter()
+            .any(|n| n.contains("hold almost no windstorms to match"))
+    );
+}

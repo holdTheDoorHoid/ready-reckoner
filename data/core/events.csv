@@ -4309,7 +4309,7 @@ fips,event_type,rate_per_year,share_damaging,median_days,p90_days,events,share_i
 12031,severe_wind_day,10.73,0.323,,,322,0.02795,spc,1996-2025
 12031,tornado,1,0.1667,,,30,0.03333,spc,1996-2025
 12031,tornado_ef2plus,0.06667,0.5,,,2,0,spc,1996-2025
-12031,tropical_cyclone_impact,0.8667,0.1154,1,2.25,26,0.07692,storm_events,1996-2025
+12031,tropical_cyclone_impact,0.8667,0.1154,1.042,2.25,26,0.07692,storm_events,1996-2025
 12031,tropical_storm_passage,0.3684,,,,28,,hurdat2,1950-2025
 12031,wildfire,0.3667,0,0.2083,6.312,11,0,storm_events,1996-2025
 12031,winter_storm,0.1,0.6667,0.6667,1.625,3,0,storm_events,1996-2025
@@ -12905,7 +12905,7 @@ fips,event_type,rate_per_year,share_damaging,median_days,p90_days,events,share_i
 20109,drought,1.967,0,30,31,59,0,storm_events,1996-2025
 20109,dust_storm,0.5,0,0.04167,0.1771,15,0.06667,storm_events,1996-2025
 20109,extreme_cold,0.3667,0,0.625,3.344,11,0,storm_events,1996-2025
-20109,flash_flood,1.167,0.1429,0.125,0.25,35,0,storm_events,1996-2025
+20109,flash_flood,1.167,0.1429,0.125,0.2326,35,0,storm_events,1996-2025
 20109,flood,0.4333,0.07692,0.4243,0.5417,13,0,storm_events,1996-2025
 20109,hail_1in_day,4.867,0.0411,,,146,0,spc,1996-2025
 20109,hail_2in_day,0.8333,0.04,,,25,0,spc,1996-2025
@@ -23182,8 +23182,8 @@ fips,event_type,rate_per_year,share_damaging,median_days,p90_days,events,share_i
 31029,tornado,0.6,0.5,,,18,0,spc,1996-2025
 31029,wildfire,0.03333,1,0.25,0.25,1,0,storm_events,1996-2025
 31029,winter_storm,1.6,0.04167,0.9167,1.75,48,0.02083,storm_events,1996-2025
-31031,drought,1.633,0.04082,31,31,49,0,storm_events,1996-2025
-31031,extreme_cold,0.8333,0,0.7917,2.458,25,0,storm_events,1996-2025
+31031,drought,1.633,0.04082,31,31.04,49,0,storm_events,1996-2025
+31031,extreme_cold,0.8333,0,0.75,2.5,25,0,storm_events,1996-2025
 31031,flash_flood,0.3,0.5556,0.07639,0.6417,9,0,storm_events,1996-2025
 31031,flood,0.1,1,0.2257,1.375,3,0,storm_events,1996-2025
 31031,hail_1in_day,8.933,0.2276,,,268,0,spc,1996-2025
@@ -23195,7 +23195,7 @@ fips,event_type,rate_per_year,share_damaging,median_days,p90_days,events,share_i
 31031,tornado,2.267,0.3088,,,68,0,spc,1996-2025
 31031,tornado_ef2plus,0.2,0.6667,,,6,0,spc,1996-2025
 31031,wildfire,0.1333,1,1.764,9.591,4,0,storm_events,1996-2025
-31031,winter_storm,2.8,0.1071,0.9583,1.75,84,0,storm_events,1996-2025
+31031,winter_storm,2.8,0.1071,0.9583,1.771,84,0,storm_events,1996-2025
 31033,extreme_cold,0.5333,0,0.5,1.848,16,0,storm_events,1996-2025
 31033,flash_flood,0.9667,0.1724,0.1042,0.2861,29,0,storm_events,1996-2025
 31033,flood,0.1,0.6667,0.08681,0.1458,3,0,storm_events,1996-2025
@@ -36751,14 +36751,14 @@ fips,event_type,rate_per_year,share_damaging,median_days,p90_days,events,share_i
 48165,tornado,0.5,0.2,,,15,0,spc,1996-2025
 48165,tornado_ef2plus,0.06667,0.5,,,2,0,spc,1996-2025
 48165,winter_storm,0.4,0,0.6806,1.781,12,0,storm_events,1996-2025
-48167,coastal_flood,0.7333,0.3182,0.2083,1.833,22,0.04545,storm_events,1996-2025
-48167,drought,0.5333,0.125,30,31,16,0,storm_events,1996-2025
+48167,coastal_flood,0.7333,0.3182,0.25,1.833,22,0.04545,storm_events,1996-2025
+48167,drought,0.5333,0.125,30.04,31.04,16,0,storm_events,1996-2025
 48167,extreme_cold,0.03333,1,1.208,1.208,1,1,storm_events,1996-2025
 48167,flash_flood,2.633,0.6329,0.1146,0.3333,79,0.01266,storm_events,1996-2025
 48167,flood,0.03333,0,0.1354,0.1354,1,0,storm_events,1996-2025
 48167,hail_1in_day,0.8,0.7083,,,24,0,spc,1996-2025
 48167,hail_2in_day,0.1333,0.75,,,4,0,spc,1996-2025
-48167,heat,0.4667,0,4,17.71,14,0.1429,storm_events,1996-2025
+48167,heat,0.4667,0,4.042,17.71,14,0.1429,storm_events,1996-2025
 48167,high_wind,0.1,0.6667,0,0.003472,3,0,storm_events,1996-2025
 48167,hurricane_passage,0.1184,,,,9,,hurdat2,1950-2025
 48167,ice_storm,0.06667,0,0.4583,1.749,2,0,storm_events,1996-2025
