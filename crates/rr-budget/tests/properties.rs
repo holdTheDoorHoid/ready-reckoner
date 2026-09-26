@@ -215,41 +215,95 @@ fn higher_curve_never_delays_its_items() {
     );
 }
 
-/// Free actions come first in month 0 and never appear later.
+/// Free actions: each month lists them before its purchases and deposits; no month has more than
+/// eight still to do; every free item is scheduled exactly once, all within the first three months
+/// (0, 1 and 2); items already done or owned appear only in month 0.
 #[test]
-fn free_items_always_precede_purchases() {
+fn free_items_precede_purchases_at_most_eight_a_month_all_by_month_2() {
+    let mut spread = 0;
     for seed in 0..CASES {
-        let c = case(seed);
-        for schedule in SCHEDULES {
-            let r = run(&c, options(schedule, seed % 2 == 1));
-            let m0 = &r.plan.months[0].items;
-            let first_other = m0
-                .iter()
-                .position(|i| i.kind != PlanItemKind::FreeAction)
-                .unwrap_or(m0.len());
-            assert!(
-                m0[first_other..]
-                    .iter()
-                    .all(|i| i.kind != PlanItemKind::FreeAction),
-                "seed {seed}: a free action after a purchase in month 0"
-            );
-            let free_items = c.items.iter().filter(|i| i.free).count();
-            assert_eq!(
-                first_other, free_items,
-                "seed {seed}: every free item appears in month 0"
-            );
-            for m in &r.plan.months[1..] {
-                assert!(
-                    m.items.iter().all(|i| i.kind != PlanItemKind::FreeAction),
-                    "seed {seed}"
-                );
-                assert!(
-                    m.items.iter().all(|i| !i.done),
-                    "seed {seed}: done items only in month 0"
-                );
+        let mut c = case(seed);
+        if seed % 3 == 0 {
+            // Up to 18 extra free actions, so month 0's cap and the spreading are exercised.
+            let buckets = [
+                BucketId::Power,
+                BucketId::WaterOut,
+                BucketId::Supplies,
+                BucketId::Thermal,
+                BucketId::Comms,
+            ];
+            // At most 24 free actions in all: three months of eight.
+            let own = c.items.iter().filter(|i| i.free).count();
+            for j in 0..(5 + seed as usize % 14).min(24usize.saturating_sub(own)) {
+                let id = format!("extra_free_{j}");
+                let b = buckets[j % buckets.len()];
+                c.items.push(common::item(
+                    &id,
+                    &id,
+                    "action",
+                    &[b],
+                    TierId::Now,
+                    true,
+                    j % 5 == 0,
+                    (0.0, 0.0),
+                ));
+                let mut m = ItemMeta::new(id.as_str());
+                m.contributes = vec![Contributes::per_household(b, 0.1 + 0.05 * j as f64)];
+                c.meta.push(m);
             }
         }
+        let free_items = c.items.iter().filter(|i| i.free).count();
+        for schedule in SCHEDULES {
+            let r = run(&c, options(schedule, seed % 2 == 1));
+            let mut seen = 0;
+            for month in &r.plan.months {
+                let items = &month.items;
+                let first_other = items
+                    .iter()
+                    .position(|i| i.kind != PlanItemKind::FreeAction)
+                    .unwrap_or(items.len());
+                assert!(
+                    items[first_other..]
+                        .iter()
+                        .all(|i| i.kind != PlanItemKind::FreeAction),
+                    "seed {seed}: month {}: a free action after a purchase",
+                    month.index
+                );
+                let to_do = items
+                    .iter()
+                    .filter(|i| i.kind == PlanItemKind::FreeAction && !i.done)
+                    .count();
+                assert!(
+                    to_do <= 8,
+                    "seed {seed}: month {} has {to_do} free actions to do",
+                    month.index
+                );
+                seen += first_other;
+                if month.index > 0 {
+                    assert!(
+                        items.iter().all(|i| !i.done),
+                        "seed {seed}: done items only in month 0"
+                    );
+                    if first_other > 0 {
+                        assert!(
+                            month.index <= 2,
+                            "seed {seed}: free action in month {}",
+                            month.index
+                        );
+                        spread += 1;
+                    }
+                }
+            }
+            assert_eq!(
+                seen, free_items,
+                "seed {seed}: every free item appears once"
+            );
+        }
     }
+    assert!(
+        spread > 20,
+        "only {spread} plans spread free actions past month 0"
+    );
 }
 
 /// Same input, same output: the result and its JSON are identical on a second run, under every

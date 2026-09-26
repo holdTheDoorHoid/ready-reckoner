@@ -2,10 +2,10 @@
 //! guardrails (DESIGN §4.7–§4.8, research risk-model §3.2, §4, §6.3).
 //!
 //! Given a household, its budget, the items on offer and each bucket's exceedance curve, it
-//! produces the month-by-month [`rr_types::Plan`]: free actions in month 0, then purchases in the
-//! order that buys the most risk reduction per dollar, a sinking fund for anything that costs more
-//! than a month's money, a stop when nothing more is worth buying, and the income savings goal on
-//! its own track.
+//! produces the month-by-month [`rr_types::Plan`]: free actions first (at most eight to do in any
+//! month, all within the first three months), then purchases in the order that buys the most risk
+//! reduction per dollar, a sinking fund for anything that costs more than a month's money, a stop
+//! when nothing more is worth buying, and the income savings goal on its own track.
 //!
 //! # Inputs
 //!
@@ -68,7 +68,10 @@ mod savings;
 pub mod value;
 pub mod weights;
 
-pub use allocate::{allocate, allocate_with_rule};
+pub use allocate::{
+    FREE_ACTIONS_BY_MONTH, FREE_ACTIONS_MONTH_0, FREE_ACTIONS_PER_MONTH, allocate,
+    allocate_with_rule,
+};
 pub use coverage::{
     Contributes, ContributionTable, CoverageRule, ItemMeta, ItemRole, MetaError, ReadinessCredit,
     apply_requirements,
