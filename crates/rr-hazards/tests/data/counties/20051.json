@@ -1,0 +1,210 @@
+{
+ "county": {
+  "fips": "20051",
+  "name": "Ellis",
+  "state_abbr": "KS",
+  "state_name": "Kansas",
+  "centroid": {
+   "lat": 38.91,
+   "lon": -99.32
+  },
+  "nca_region": "southern_great_plains",
+  "coastal": false,
+  "tsunami_zone": false,
+  "population": 28929,
+  "households": 11572,
+  "building_value_usd": 8592000000.0,
+  "nri_version": "1.20.0",
+  "nri": {
+   "cold_wave": {
+    "afreq": 3.789,
+    "afreq_kind": "events_per_year",
+    "alrb": 4.465e-09,
+    "ealb": 38.36,
+    "ealp": 0.1246,
+    "ealt": 1714000.0,
+    "expb": 8592000000.0,
+    "expp": 28930.0,
+    "hlrb": 1.178e-09,
+    "risk_score": 54.71
+   },
+   "drought": {
+    "afreq": 50.89,
+    "afreq_kind": "events_per_year",
+    "ealt": 456400.0,
+    "risk_score": 60.91
+   },
+   "earthquake": {
+    "afreq": 0.000485,
+    "afreq_kind": "annual_probability",
+    "alrb": 5.143e-06,
+    "ealb": 44190.0,
+    "ealp": 0.0009196,
+    "ealt": 56780.0,
+    "expb": 16330000000.0,
+    "expp": 28930.0,
+    "hlrb": 0.005578,
+    "risk_score": 23.25
+   },
+   "hail": {
+    "afreq": 9.394,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0001536,
+    "ealb": 1320000.0,
+    "ealp": 0.009001,
+    "ealt": 1805000.0,
+    "expb": 8592000000.0,
+    "expp": 28930.0,
+    "hlrb": 1.666e-05,
+    "risk_score": 84.96
+   },
+   "heat_wave": {
+    "afreq": 4.947,
+    "afreq_kind": "events_per_year",
+    "alrb": 6.874e-07,
+    "ealb": 5906.0,
+    "ealp": 0.004538,
+    "ealt": 68270.0,
+    "expb": 8592000000.0,
+    "expp": 28930.0,
+    "hlrb": 1.39e-07,
+    "risk_score": 16.96
+   },
+   "ice_storm": {
+    "afreq": 0.6525,
+    "afreq_kind": "events_per_year",
+    "alrb": 4.837e-05,
+    "ealb": 415600.0,
+    "ealp": 0.00963,
+    "ealt": 547500.0,
+    "expb": 8590000000.0,
+    "expp": 28920.0,
+    "hlrb": 7.395e-05,
+    "risk_score": 78.41
+   },
+   "landslide": {
+    "afreq": 0.1947,
+    "afreq_kind": "annual_probability",
+    "alrb": 5.848e-09,
+    "ealb": 50.25,
+    "ealp": 6.94e-07,
+    "ealt": 59.75,
+    "expb": 27260000.0,
+    "expp": 90.82,
+    "hlrb": 3.651e-05,
+    "risk_score": 12.15
+   },
+   "lightning": {
+    "afreq": 45.35,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.101e-06,
+    "ealb": 18050.0,
+    "ealp": 0.04643,
+    "ealt": 654100.0,
+    "expb": 8592000000.0,
+    "expp": 28930.0,
+    "hlrb": 4.624e-08,
+    "risk_score": 66.19
+   },
+   "riverine_flooding": {
+    "afreq": 1.429,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0006719,
+    "ealb": 5773000.0,
+    "ealp": 0.02179,
+    "ealt": 6144000.0,
+    "expb": 8589000000.0,
+    "expp": 5813.0,
+    "hlrb": 0.0004705,
+    "risk_score": 34.45
+   },
+   "strong_wind": {
+    "afreq": 5.003,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0001076,
+    "ealb": 924300.0,
+    "ealp": 0.04363,
+    "ealt": 1617000.0,
+    "expb": 8592000000.0,
+    "expp": 28930.0,
+    "hlrb": 2.143e-05,
+    "risk_score": 73.09
+   },
+   "tornado": {
+    "afreq": 0.9801,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0001562,
+    "ealb": 1342000.0,
+    "ealp": 0.08082,
+    "ealt": 2452000.0,
+    "expb": 8592000000.0,
+    "expp": 28930.0,
+    "hlrb": 0.0001594,
+    "risk_score": 57.63
+   },
+   "wildfire": {
+    "afreq": 0.000471,
+    "afreq_kind": "annual_probability",
+    "alrb": 1.514e-05,
+    "ealb": 130100.0,
+    "ealp": 0.0002447,
+    "ealt": 133500.0,
+    "expb": 1174000000.0,
+    "expp": 3915.0,
+    "hlrb": 0.3,
+    "risk_score": 60.69
+   },
+   "winter_weather": {
+    "afreq": 11.32,
+    "afreq_kind": "events_per_year",
+    "alrb": 1.794e-05,
+    "ealb": 154100.0,
+    "ealp": 0.01538,
+    "ealt": 365000.0,
+    "expb": 8592000000.0,
+    "expp": 28930.0,
+    "hlrb": 1.585e-06,
+    "risk_score": 82.81
+   }
+  },
+  "climate": {
+   "days_over_2in_2050": 0.666,
+   "days_over_2in_2050_high": 0.7006,
+   "days_over_2in_hist": 0.5772,
+   "days_over_90f_hist": 54.88,
+   "days_over_95f_2050": 64.38,
+   "days_over_95f_2050_high": 75.21,
+   "days_over_95f_hist": 27.39,
+   "dry_spell_days_2050": 47.68,
+   "dry_spell_days_2050_high": 47.95,
+   "dry_spell_days_hist": 48.61,
+   "icing_days_2050": 15.27,
+   "icing_days_2050_high": 13.13,
+   "icing_days_hist": 24.62
+  },
+  "facilities": {
+   "nearest_nuclear_km": 330.0,
+   "tri_facilities": 5,
+   "high_hazard_dams": 1
+  }
+ },
+ "location": {
+  "country": "US",
+  "county_fips": "20051",
+  "county_name": "Ellis",
+  "state_abbr": "KS",
+  "state_name": "Kansas",
+  "centroid": {
+   "lat": 38.91,
+   "lon": -99.32
+  },
+  "nca_region": "southern_great_plains",
+  "coastal": false,
+  "tsunami_zone": false,
+  "facility_flags": {
+   "nuclear_plant_within_16km": false,
+   "nuclear_plant_within_80km": false,
+   "hazmat_facilities_within_5km": 0
+  }
+ }
+}

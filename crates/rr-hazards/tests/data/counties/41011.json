@@ -1,0 +1,258 @@
+{
+ "county": {
+  "fips": "41011",
+  "name": "Coos",
+  "state_abbr": "OR",
+  "state_name": "Oregon",
+  "centroid": {
+   "lat": 43.18,
+   "lon": -124.06
+  },
+  "nca_region": "northwest",
+  "coastal": true,
+  "tsunami_zone": true,
+  "population": 64845,
+  "households": 25938,
+  "building_value_usd": 16380000000.0,
+  "nri_version": "1.20.0",
+  "nri": {
+   "avalanche": {
+    "afreq": 0.01,
+    "afreq_kind": "events_per_year",
+    "alrb": 8.169e-11,
+    "ealb": 1.338,
+    "ealp": 9.116e-06,
+    "ealt": 126.2,
+    "expb": 1275000.0,
+    "expp": 0.1928,
+    "hlrb": 0.000105,
+    "risk_score": 34.8
+   },
+   "coastal_flooding": {
+    "afreq": 4.754,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0002207,
+    "ealb": 3615000.0,
+    "ealp": 0.01674,
+    "ealt": 3845000.0,
+    "expb": 1729000000.0,
+    "expp": 3594.0,
+    "hlrb": 0.003426,
+    "risk_score": 87.4
+   },
+   "cold_wave": {
+    "afreq": 0.0,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0,
+    "ealb": 0.0,
+    "ealp": 0.0,
+    "ealt": 0.0,
+    "expb": 0.0,
+    "expp": 0.0,
+    "hlrb": 4.333e-07,
+    "risk_score": 0.0
+   },
+   "drought": {
+    "afreq": 24.56,
+    "afreq_kind": "events_per_year",
+    "ealt": 235.7,
+    "risk_score": 14.09
+   },
+   "earthquake": {
+    "afreq": 0.01962,
+    "afreq_kind": "annual_probability",
+    "alrb": 0.001883,
+    "ealb": 30860000.0,
+    "ealp": 1.523,
+    "ealt": 51720000.0,
+    "expb": 28180000000.0,
+    "expp": 64930.0,
+    "hlrb": 0.05582,
+    "risk_score": 98.35
+   },
+   "hail": {
+    "afreq": 0.03207,
+    "afreq_kind": "events_per_year",
+    "alrb": 3.153e-07,
+    "ealb": 5166.0,
+    "ealp": 5.869e-05,
+    "ealt": 6667.0,
+    "expb": 16380000000.0,
+    "expp": 64840.0,
+    "hlrb": 1.785e-05,
+    "risk_score": 3.912
+   },
+   "heat_wave": {
+    "afreq": 2.36,
+    "afreq_kind": "events_per_year",
+    "alrb": 5.498e-09,
+    "ealb": 90.08,
+    "ealp": 0.02204,
+    "ealt": 304700.0,
+    "expb": 16380000000.0,
+    "expp": 64840.0,
+    "hlrb": 3.843e-09,
+    "risk_score": 50.16
+   },
+   "ice_storm": {
+    "afreq": 0.01489,
+    "afreq_kind": "events_per_year",
+    "alrb": 5.027e-09,
+    "ealb": 82.37,
+    "ealp": 0.0004179,
+    "ealt": 5807.0,
+    "expb": 16380000000.0,
+    "expp": 64840.0,
+    "hlrb": 3.376e-07,
+    "risk_score": 12.76
+   },
+   "landslide": {
+    "afreq": 12.77,
+    "afreq_kind": "annual_probability",
+    "alrb": 2.074e-06,
+    "ealb": 33980.0,
+    "ealp": 0.008876,
+    "ealt": 155600.0,
+    "expb": 1694000000.0,
+    "expp": 7030.0,
+    "hlrb": 2.068e-05,
+    "risk_score": 96.28
+   },
+   "lightning": {
+    "afreq": 5.509,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.19e-07,
+    "ealb": 3587.0,
+    "ealp": 0.004937,
+    "ealt": 71220.0,
+    "expb": 16380000000.0,
+    "expp": 64840.0,
+    "hlrb": 3.498e-08,
+    "risk_score": 24.87
+   },
+   "riverine_flooding": {
+    "afreq": 2.25,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.001253,
+    "ealb": 20530000.0,
+    "ealp": 0.07368,
+    "ealt": 21790000.0,
+    "expb": 16340000000.0,
+    "expp": 3424.0,
+    "hlrb": 0.0005582,
+    "risk_score": 85.56
+   },
+   "strong_wind": {
+    "afreq": 0.02681,
+    "afreq_kind": "events_per_year",
+    "alrb": 1.23e-06,
+    "ealb": 20160.0,
+    "ealp": 0.0009781,
+    "ealt": 33570.0,
+    "expb": 16380000000.0,
+    "expp": 64840.0,
+    "hlrb": 5.79e-05,
+    "risk_score": 6.075
+   },
+   "tornado": {
+    "afreq": 0.01165,
+    "afreq_kind": "events_per_year",
+    "alrb": 4.119e-07,
+    "ealb": 6748.0,
+    "ealp": 0.0002975,
+    "ealt": 10850.0,
+    "expb": 16380000000.0,
+    "expp": 64840.0,
+    "hlrb": 3.534e-05,
+    "risk_score": 4.135
+   },
+   "tsunami": {
+    "afreq": 0.145,
+    "afreq_kind": "events_per_year",
+    "alrb": 8.117e-05,
+    "ealb": 1330000.0,
+    "ealp": 0.7413,
+    "ealt": 11490000.0,
+    "expb": 13730000000.0,
+    "expp": 11060.0,
+    "hlrb": 0.0006677,
+    "risk_score": 84.62
+   },
+   "wildfire": {
+    "afreq": 0.0003667,
+    "afreq_kind": "annual_probability",
+    "alrb": 5.603e-06,
+    "ealb": 91790.0,
+    "ealp": 0.000312,
+    "ealt": 96090.0,
+    "expb": 1952000000.0,
+    "expp": 9908.0,
+    "hlrb": 0.3,
+    "risk_score": 64.76
+   },
+   "winter_weather": {
+    "afreq": 8.656,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.782e-09,
+    "ealb": 45.58,
+    "ealp": 0.001671,
+    "ealt": 23240.0,
+    "expb": 16380000000.0,
+    "expp": 64840.0,
+    "hlrb": 4.425e-10,
+    "risk_score": 29.22
+   }
+  },
+  "outages": {
+   "events_per_customer_year": 1.09,
+   "p_ge_1d": 0.01558,
+   "p_ge_3d": 0.001074,
+   "p_ge_7d": 8.039e-05,
+   "p_ge_14d": 6.793e-06,
+   "median_hours": 1.8,
+   "p90_hours": 8.4,
+   "years_covered": "2018-2025",
+   "event_definition": "County outage events with at least 0.5% of customers out, spike-filtered; household rate and fitted lognormal from research risk-model §8.2/§9.2 (EAGLE-I)"
+  },
+  "climate": {
+   "days_over_2in_2050": 3.907,
+   "days_over_2in_2050_high": 3.926,
+   "days_over_2in_hist": 3.236,
+   "days_over_90f_hist": 0.2289,
+   "days_over_95f_2050": 0.1401,
+   "days_over_95f_2050_high": 0.2116,
+   "days_over_95f_hist": 0.02164,
+   "dry_spell_days_2050": 60.57,
+   "dry_spell_days_2050_high": 61.91,
+   "dry_spell_days_hist": 52.96,
+   "icing_days_2050": 0.1683,
+   "icing_days_2050_high": 0.1199,
+   "icing_days_hist": 0.5208
+  },
+  "facilities": {
+   "nearest_nuclear_km": 480.0,
+   "tri_facilities": 5,
+   "high_hazard_dams": 2
+  }
+ },
+ "location": {
+  "country": "US",
+  "county_fips": "41011",
+  "county_name": "Coos",
+  "state_abbr": "OR",
+  "state_name": "Oregon",
+  "centroid": {
+   "lat": 43.18,
+   "lon": -124.06
+  },
+  "nca_region": "northwest",
+  "coastal": true,
+  "tsunami_zone": true,
+  "facility_flags": {
+   "nuclear_plant_within_16km": false,
+   "nuclear_plant_within_80km": false,
+   "hazmat_facilities_within_5km": 0
+  },
+  "zip": "97420"
+ }
+}
