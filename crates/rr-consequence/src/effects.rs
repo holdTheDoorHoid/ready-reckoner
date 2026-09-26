@@ -123,6 +123,10 @@ pub struct EffectRow {
     /// 90th-percentile multiplier on the share (uncertainty); defaults by evidence.
     #[serde(default)]
     pub p_factor: Option<f64>,
+    /// The part of the hazard's rate this row's events come from, when `rr-hazards` splits the
+    /// rate into separate event classes (see [`PartRow`]); absent, the whole rate.
+    #[serde(default)]
+    pub part: Option<String>,
     /// Why we think this.
     #[serde(default)]
     pub note: String,
@@ -302,6 +306,27 @@ impl Params {
     }
 }
 
+/// A part of a hazard's rate that rows can take instead of the whole rate: `rr-hazards` passes
+/// each part's own rate (`rr_hazards::RatePart`), so events of different classes that the
+/// hazard crate counts separately (wildfire warnings to leave and safety power shutoffs) are
+/// never added together and re-split with fixed shares (model review M-06).
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PartRow {
+    /// The hazard.
+    pub hazard: HazardId,
+    /// The part's name, as `rr-hazards` gives it.
+    pub part: String,
+    /// The part's share of the hazard's rate when no split is passed (callers with whole rates
+    /// only, such as the research calibration).
+    pub fallback_share: f64,
+    /// Plain-language name of the events the part counts.
+    pub label: String,
+    /// Why we think this.
+    #[serde(default)]
+    pub note: String,
+}
+
 /// A named scenario whose long-run share is already inside its parent hazard's rate.
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -332,6 +357,9 @@ pub struct EffectsTable {
     /// Scenario shares inside parent hazard rates.
     #[serde(rename = "overlap")]
     pub overlaps: Vec<OverlapRow>,
+    /// Parts of hazard rates that rows can take instead of the whole rate.
+    #[serde(rename = "part", default)]
+    pub parts: Vec<PartRow>,
 }
 
 /// Why the effects table was rejected.
@@ -448,10 +476,22 @@ impl EffectsTable {
                     ));
                 }
             }
+            if let Some(part) = &row.part {
+                if row.scenario.is_some() {
+                    return Err(fail("scenario rows cannot take a part".into()));
+                }
+                if self.part(row.hazard, part).is_none() {
+                    return Err(fail(format!(
+                        "part `{part}` is not declared for {} in [[part]]",
+                        row.hazard
+                    )));
+                }
+            }
             let group = format!(
-                "{}:{}:{}:{}",
+                "{}:{}:{}:{}:{}",
                 row.scenario.as_deref().unwrap_or(row.hazard.as_str()),
                 row.variant.as_deref().unwrap_or("any"),
+                row.part.as_deref().unwrap_or("whole"),
                 row.bucket,
                 row.requires.map_or("all".to_owned(), |r| format!("{r:?}"))
             );
@@ -459,6 +499,37 @@ impl EffectsTable {
             *total += row.p_given_event;
             if *total > 1.0 + 1e-9 {
                 return Err(fail(format!("shares in {group} add up to {total} > 1")));
+            }
+        }
+        let mut part_shares: BTreeMap<HazardId, f64> = BTreeMap::new();
+        for (i, p) in self.parts.iter().enumerate() {
+            if !rr_types::is_well_formed_id(&p.part) || p.label.trim().is_empty() {
+                return Err(TableError::Other(format!(
+                    "part {i} needs a snake_case name and a label"
+                )));
+            }
+            if !(0.0..=1.0).contains(&p.fallback_share) {
+                return Err(TableError::Other(format!(
+                    "part {i} ({} {}): fallback_share {} is not a share",
+                    p.hazard, p.part, p.fallback_share
+                )));
+            }
+            if self.parts[..i]
+                .iter()
+                .any(|q| q.hazard == p.hazard && q.part == p.part)
+            {
+                return Err(TableError::Other(format!(
+                    "part {} {} is declared twice",
+                    p.hazard, p.part
+                )));
+            }
+            let total = part_shares.entry(p.hazard).or_insert(0.0);
+            *total += p.fallback_share;
+            if *total > 1.0 + 1e-9 {
+                return Err(TableError::Other(format!(
+                    "the fallback shares of {}'s parts add up to {total} > 1",
+                    p.hazard
+                )));
             }
         }
         for (i, s) in self.income.iter().enumerate() {
@@ -507,6 +578,13 @@ impl EffectsTable {
             }
         }
         Ok(())
+    }
+
+    /// The declared part `part` of `hazard`'s rate, if any.
+    pub fn part(&self, hazard: HazardId, part: &str) -> Option<&PartRow> {
+        self.parts
+            .iter()
+            .find(|p| p.hazard == hazard && p.part == part)
     }
 
     /// Every citation id used anywhere in the table, sorted and without repeats.

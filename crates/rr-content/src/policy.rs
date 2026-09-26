@@ -760,10 +760,15 @@ mod tests {
         assert_eq!(flats.for_home(Rowhouse), Some(true));
         assert_eq!(flats.for_home(ApartmentHighRise), Some(false));
         assert_eq!(
-            Condition::parse("home:mobile_home").unwrap().for_home(MobileHome),
+            Condition::parse("home:mobile_home")
+                .unwrap()
+                .for_home(MobileHome),
             Some(true)
         );
-        assert_eq!(Condition::parse("tornado").unwrap().for_home(Detached), None);
+        assert_eq!(
+            Condition::parse("tornado").unwrap().for_home(Detached),
+            None
+        );
         assert!(Condition::parse("home:castle").is_err());
         assert!(Condition::parse("home:").is_err());
         assert!(Condition::parse("home:detached|detached").is_err());

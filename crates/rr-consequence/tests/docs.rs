@@ -50,6 +50,12 @@ fn row_line(r: &EffectRow) -> String {
         (Evidence::Prior, Evidence::Prior) => "prior",
     };
     let mut extra = Vec::new();
+    if let Some(part) = &r.part {
+        let label = table()
+            .part(r.hazard, part)
+            .map_or(part.as_str(), |p| p.label.as_str());
+        extra.push(format!("share of the {label} (part `{part}`)"));
+    }
     if let Some(req) = r.requires {
         extra.push(req.describe().to_owned());
     }
@@ -136,6 +142,19 @@ fn generated_table() -> String {
             },
             s.evidence,
             sources.join(", ")
+        );
+    }
+    let _ = writeln!(out);
+    let _ = writeln!(
+        out,
+        "| Hazard | Part | Events it counts | Share when no split is passed | Why |"
+    );
+    let _ = writeln!(out, "|---|---|---|---|---|");
+    for p in &table().parts {
+        let _ = writeln!(
+            out,
+            "| {} | `{}` | {} | {} | {} |",
+            p.hazard, p.part, p.label, p.fallback_share, p.note
         );
     }
     let _ = writeln!(out);

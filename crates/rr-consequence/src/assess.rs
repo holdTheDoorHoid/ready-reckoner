@@ -31,6 +31,17 @@ pub const DURATION_BUCKETS: [BucketId; 7] = [
     BucketId::Comms,
 ];
 
+/// Hazards that can force a household out with minutes of warning: wildfire, flash flooding
+/// (counted under floods from rivers or heavy rain), tsunami and chemical releases. Their short
+/// warning enters the evacuation warning band whenever they contribute to it at all, however
+/// small their share (model review M-08). Dam failure joins them when it becomes a hazard.
+pub const FAST_WARNING_HAZARDS: [HazardId; 4] = [
+    HazardId::Wildfire,
+    HazardId::RiverineFlooding,
+    HazardId::Tsunami,
+    HazardId::HazmatRelease,
+];
+
 /// Catalogue item ids that count as existing coverage (`PlanInput::existing`).
 // awaiting: rr-content (the catalogue's id for "gas stove in the home").
 pub const GAS_STOVE_ITEM_IDS: [&str; 1] = ["gas_stove"];
@@ -256,14 +267,30 @@ fn tier_for_days(days: f32) -> TierId {
         .unwrap_or(TierId::Y1)
 }
 
-/// Everything the consequence model needs for one household. See the crate docs.
+/// Everything the consequence model needs for one household, from whole hazard rates. See the
+/// crate docs. Rows that take a part of a hazard's rate (wildfire warnings to leave and safety
+/// shutoffs) use the effects table's fixed fallback split; the engine passes the hazard crate's
+/// own split with [`assess_with_parts`].
 pub fn assess(
     input: &PlanInput,
     rates: &[HouseholdEventRate],
     county: CountyData<'_>,
     scenarios: &[ScenarioCandidate],
 ) -> ConsequenceAssessment {
-    assess_with_draws(input, rates, county, scenarios, DRAWS)
+    assess_full(input, rates, &[], county, scenarios, DRAWS)
+}
+
+/// [`assess`] with the parts of hazard rates that `rr-hazards` keeps apart
+/// (`HazardAssessment::parts`), so each part is its own event class end to end. This is what
+/// the engine runs.
+pub fn assess_with_parts(
+    input: &PlanInput,
+    rates: &[HouseholdEventRate],
+    parts: &[rr_hazards::RatePart],
+    county: CountyData<'_>,
+    scenarios: &[ScenarioCandidate],
+) -> ConsequenceAssessment {
+    assess_full(input, rates, parts, county, scenarios, DRAWS)
 }
 
 /// [`assess`] with an explicit number of Monte Carlo draws (for timing and tests; `assess` uses
@@ -275,11 +302,24 @@ pub fn assess_with_draws(
     scenarios: &[ScenarioCandidate],
     draws: usize,
 ) -> ConsequenceAssessment {
+    assess_full(input, rates, &[], county, scenarios, draws)
+}
+
+/// The full entry point: whole rates, their parts and the number of draws.
+pub fn assess_full(
+    input: &PlanInput,
+    rates: &[HouseholdEventRate],
+    parts: &[rr_hazards::RatePart],
+    county: CountyData<'_>,
+    scenarios: &[ScenarioCandidate],
+    draws: usize,
+) -> ConsequenceAssessment {
     let table = effects::table();
     let states = scenario_states(input, scenarios);
     let binp = BuildInput {
         plan: input,
         rates,
+        parts,
         county,
         scenarios,
         scenario_on: &states,
@@ -534,7 +574,7 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
         .first()
         .filter(|(_, s)| *s > 0.0 && target_c > 0.0)
         .map(|(i, _)| eval.terms()[*i]);
-    let relief = design.and_then(|t| relief_for(ctx, t));
+    let relief = design.and_then(|t| relief_for(ctx, t, ladder));
 
     let terms: Vec<TermSummary> = order
         .iter()
@@ -650,10 +690,23 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
     (assessment, detail)
 }
 
+/// Outages shorter than this do not count toward "mostly restored" for the design event: the
+/// relief rating describes the disruptions a supplies target is for (model review M-13).
+pub const RELIEF_FROM_DAYS: f64 = 1.0;
+
 /// Relief for a design event: the row's own rating (Oregon Resilience Plan for Cascadia), or,
 /// when its duration comes from a measured restoration curve, help within the 72-hour standard
-/// (or sooner, if service is back sooner) and "mostly restored" at the time to 90 % restored.
-fn relief_for(ctx: &Ctx<'_>, t: &Term) -> Option<Relief> {
+/// (or sooner, if service is back sooner) and "mostly restored" when 90 % of the class's
+/// outages that last at least [`RELIEF_FROM_DAYS`] are over.
+///
+/// A rating whose "mostly restored" comes out shorter than a third of the target describes some
+/// other, smaller event than the one behind the target, so it is left out ("not known"): no
+/// screen or packet may print a relief time that short without naming the event it belongs to.
+fn relief_for(ctx: &Ctx<'_>, t: &Term, target_days: f32) -> Option<Relief> {
+    relief_of(ctx, t).filter(|r| 3.0 * r.mostly_restored_days >= target_days)
+}
+
+fn relief_of(ctx: &Ctx<'_>, t: &Term) -> Option<Relief> {
     if let Some(r) = &t.relief {
         return Some(Relief {
             help_arrives_days: r.help_arrives_days as f32,
@@ -664,10 +717,22 @@ fn relief_for(ctx: &Ctx<'_>, t: &Term) -> Option<Relief> {
     if !t.duration_from_data {
         return None;
     }
-    let restored = t.survival.p90_days();
+    // "Mostly restored" for the design event: the time by which 90 % of this class's outages
+    // that last at least a day are over. Over all outages (most of them an hour or two) the 90th
+    // percentile describes ordinary outages, not the design event: Asheville read "mostly back
+    // in half a day" beside a two-week target (model review M-13).
+    let from = t.survival.sf(RELIEF_FROM_DAYS, 0.0);
+    let restored = if from >= 1.0 {
+        t.survival.p90_days()
+    } else if from > 0.0 {
+        t.survival.quantile_days(1.0 - 0.1 * from)
+    } else {
+        return None;
+    };
     if !restored.is_finite() || restored <= 0.0 {
         return None;
     }
+
     let standard = &ctx.table.params.relief_standard_days;
     let mut sources = t.sources.clone();
     sources.extend(standard.sources.iter().cloned());
@@ -761,6 +826,11 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
         if *s >= 0.05 {
             notice[0] = notice[0].min(band[0]);
             notice[1] = notice[1].max(band[1]);
+        } else if *s > 0.0 && FAST_WARNING_HAZARDS.contains(&t.hazard) {
+            // A fast hazard's short warning counts whenever it can force the household out at
+            // all (model review M-08: Lahaina read "as short as 2 hours" because the wildfire and
+            // local tsunami each held under 5 % of the rate).
+            notice[0] = notice[0].min(band[0]);
         }
     }
     if !notice[0].is_finite() {
@@ -1218,6 +1288,7 @@ fn scenario_summaries(
             let other = model::build(&BuildInput {
                 plan: binp.plan,
                 rates: binp.rates,
+                parts: binp.parts,
                 county: binp.county,
                 scenarios: binp.scenarios,
                 scenario_on: &flipped,

@@ -224,9 +224,10 @@ pub fn run<S: CountySource + ?Sized>(
 
     // Hazards and consequences.
     let hazards = rr_hazards::assess(input, &county, source.base_rates(), &location);
-    let consequence = rr_consequence::assess(
+    let consequence = rr_consequence::assess_with_parts(
         input,
         &hazards.rates,
+        &hazards.parts,
         CountyData::from_record(&county),
         &hazards.scenarios,
     );

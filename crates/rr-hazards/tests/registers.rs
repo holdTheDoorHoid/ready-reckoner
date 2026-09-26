@@ -88,7 +88,13 @@ fn philadelphia_job_loss_and_house_fire_outrank_the_dramatic_natural_hazards() {
         H::Lightning,
         H::Drought,
     ] {
-        let r = profile(&a, h).rate_per_year;
+        // A hazard too rare to list (landslides since NRI's expected loss bounds them) counts
+        // as zero.
+        let r = a
+            .profiles
+            .iter()
+            .find(|p| p.id == h)
+            .map_or(0.0, |p| p.rate_per_year);
         assert!(fire > r && job > r, "{h}: {r} vs fire {fire}, job {job}");
     }
     // Job loss outranks every natural hazard except heat and cold waves, winter storms and

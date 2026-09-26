@@ -59,8 +59,8 @@ mod why;
 use serde::{Deserialize, Serialize};
 
 use rr_types::{
-    BaseRate, CountyRecord, HazardDisplay, HazardId, HazardProfile, HouseholdEventRate,
-    LocationResolved, PlanInput, math,
+    BaseRate, CitationId, CountyRecord, Evidence, HazardDisplay, HazardId, HazardProfile,
+    HouseholdEventRate, LocationResolved, PlanInput, math,
 };
 
 pub use scenarios::{AlternativeRate, ScenarioCandidate};
@@ -91,8 +91,62 @@ pub struct HazardAssessment {
     pub rates: Vec<HouseholdEventRate>,
     /// Named scenarios that apply to this location, with defaults and the user's overrides.
     pub scenarios: Vec<ScenarioCandidate>,
+    /// Parts of a hazard's rate that `rr-consequence` treats as separate event classes (its
+    /// effects rows with a `part`): wildfire warnings to leave ([`WILDFIRE_BURN_PART`]) and
+    /// safety power shutoffs ([`WILDFIRE_SHUTOFF_PART`]), which add up to the wildfire rate; and
+    /// the landslides that damage the home ([`LANDSLIDE_DAMAGE_PART`]), a part of the landslide
+    /// rate (the rest cut off the road).
+    #[serde(default)]
+    pub parts: Vec<RatePart>,
     /// Plain-language caveats for the packet and the "why" drawers.
     pub notes: Vec<String>,
+}
+
+/// The wildfire part that counts warnings to leave home (NRI burn probability × residents
+/// exposed × households warned per home that burns).
+pub const WILDFIRE_BURN_PART: &str = "burn";
+
+/// The wildfire part that counts safety power shutoffs (western states; zero elsewhere).
+pub const WILDFIRE_SHUTOFF_PART: &str = "shutoff";
+
+/// The landslide part that counts damage to the home (the rest of the landslide rate counts
+/// roads cut off).
+pub const LANDSLIDE_DAMAGE_PART: &str = "damage";
+
+/// One part of a hazard's household rate that `rr-consequence` keeps as its own event class
+/// (model review M-06: warnings to leave and power shutoffs were added together, then re-split
+/// 15/85, which undercounted evacuations four- to sevenfold and gave Hawaii shutoffs it does not
+/// have).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RatePart {
+    /// The hazard.
+    pub hazard: HazardId,
+    /// Which part ([`WILDFIRE_BURN_PART`], [`WILDFIRE_SHUTOFF_PART`]).
+    pub part: String,
+    /// Household events a year from this part (climate dial applied, as for `rates`).
+    pub rate_per_year: f64,
+    /// Low end of the plausible range.
+    pub low: f64,
+    /// High end of the plausible range.
+    pub high: f64,
+    /// What it rests on.
+    pub evidence: Evidence,
+    /// Where it comes from.
+    pub sources: Vec<CitationId>,
+}
+
+impl RatePart {
+    fn new(hazard: HazardId, part: &str, e: &Estimate) -> Self {
+        RatePart {
+            hazard,
+            part: part.to_owned(),
+            rate_per_year: e.value,
+            low: e.low,
+            high: e.high,
+            evidence: e.evidence,
+            sources: e.sources.clone(),
+        }
+    }
 }
 
 /// Computes every hazard's household event rate, the register cards and the named scenarios for
@@ -171,6 +225,34 @@ pub fn assess(
         .iter()
         .map(|r| household_rate(r.hazard, r.effective(y2050)))
         .collect();
+    // ... and the parts it keeps apart: wildfire warnings to leave and safety shutoffs, and the
+    // landslides that damage the home (the rest only cut off the road).
+    let kept = |h: HazardId| rates.iter().any(|r| r.hazard == h);
+    let mut parts = Vec::new();
+    if let Some(w) = natural
+        .wildfire
+        .as_ref()
+        .filter(|_| kept(HazardId::Wildfire))
+    {
+        let (burn, shutoff) = if y2050 {
+            (&w.burn_future, &w.shutoff_future)
+        } else {
+            (&w.burn_today, &w.shutoff_today)
+        };
+        parts.push(RatePart::new(HazardId::Wildfire, WILDFIRE_BURN_PART, burn));
+        parts.push(RatePart::new(
+            HazardId::Wildfire,
+            WILDFIRE_SHUTOFF_PART,
+            shutoff,
+        ));
+    }
+    if let Some(d) = natural
+        .landslide_damage
+        .as_ref()
+        .filter(|_| kept(HazardId::Landslide))
+    {
+        parts.push(RatePart::new(HazardId::Landslide, LANDSLIDE_DAMAGE_PART, d));
+    }
 
     let mut cards: Vec<(f64, HazardProfile)> = rates
         .iter()
@@ -198,6 +280,7 @@ pub fn assess(
         profiles: cards.into_iter().map(|(_, p)| p).collect(),
         rates: household_rates,
         scenarios: detected.into_iter().map(|d| d.candidate).collect(),
+        parts,
         notes: notes.0,
     }
 }
@@ -249,20 +332,39 @@ fn profile(ctx: &Ctx<'_>, r: &HazardRate, e: &Estimate) -> HazardProfile {
         Climate::Projected { multiplier, .. } if y2050 => multiplier.value,
         _ => 1.0,
     };
-    let frequency_sentence = match &r.range_sentence {
-        Some(s) => s.clone(),
-        None => sentence::natural_frequency(
+    let around_2050 = y2050 && (climate_multiplier - 1.0).abs() > 1e-9;
+    let sentence_for = |e: &Estimate, verb: &str| {
+        sentence::natural_frequency(
             sentence::Frequency {
                 rate: e.value,
                 low: e.low,
                 high: e.high,
                 show_range: e.evidence == rr_types::Evidence::Prior,
                 years: ctx.years(),
-                around_2050: y2050 && (climate_multiplier - 1.0).abs() > 1e-9,
+                around_2050,
             },
-            &r.verb,
-        ),
+            verb,
+        )
     };
+    let mut frequency_sentence = match &r.range_sentence {
+        Some(s) => s.clone(),
+        None => sentence_for(e, &r.verb),
+    };
+    if let Some((today, future, verb)) = &r.part_sentence {
+        let part = if y2050 { future } else { today };
+        frequency_sentence.push(' ');
+        frequency_sentence.push_str(&sentence::part_frequency(
+            sentence::Frequency {
+                rate: part.value,
+                low: part.low,
+                high: part.high,
+                show_range: part.evidence == rr_types::Evidence::Prior,
+                years: ctx.years(),
+                around_2050,
+            },
+            verb,
+        ));
+    }
     HazardProfile {
         id: r.hazard,
         name: r.hazard.name().to_owned(),

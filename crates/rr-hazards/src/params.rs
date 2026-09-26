@@ -88,6 +88,11 @@ pub(crate) const TORNADO_DISRUPTION: Triple = (5.0, 2.0, 10.0);
 pub(crate) const LANDSLIDE_DAMAGE_RATIO: Triple = (0.3, 0.1, 0.6);
 /// PRIOR. Homes cut off (road closed) per home damaged by a landslide.
 pub(crate) const LANDSLIDE_ACCESS: Triple = (10.0, 3.0, 30.0);
+/// Ceiling on a county-average household's yearly chance that a landslide damages the home
+/// (model review M-05): never above the chance that defines a high-risk flood zone, 1 in 100 a
+/// year (`fema_flood_zones`), which the model already uses as its yardstick for "likely to be
+/// damaged". Before it, NRI's landslide records gave Utuado, Puerto Rico 21 in 100 a year.
+pub(crate) const LANDSLIDE_DAMAGE_CEILING: f64 = 0.01;
 /// PRIOR. Share of recorded tsunami events that bring a warning to leave the inundation zone
 /// (most distant-source events are small surges with an advisory only).
 pub(crate) const TSUNAMI_WARNING_SHARE: Triple = (0.3, 0.1, 0.6);
@@ -106,7 +111,7 @@ pub(crate) const TORNADO_FALLBACK_FOOTPRINT: Triple = (0.005, 0.001, 0.02);
 /// exposure (avalanche, landslide, volcano, wildfire, tsunami).
 pub(crate) const EXPOSURE_FALLBACK_SHARE: Triple = (0.01, 0.001, 0.05);
 /// PRIOR. Landslide footprint (damage or cut-off road) for an exposed home when NRI gives no
-/// loss ratio.
+/// loss ratio; a tenth of it ([`LANDSLIDE_ACCESS`]) damages the home.
 pub(crate) const LANDSLIDE_FALLBACK_FOOTPRINT: Triple = (0.001, 0.000_2, 0.005);
 /// PRIOR. Share of homes in the Special Flood Hazard Area when neither the NFIP share nor the
 /// NRI inland-flood exposure is available.

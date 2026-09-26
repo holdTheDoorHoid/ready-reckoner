@@ -213,6 +213,46 @@ pub(crate) fn natural_frequency(f: Frequency, verb: &str) -> String {
     s
 }
 
+/// A follow-on sentence about one part of a hazard's events, after the card's own sentence has
+/// said "households like yours" and the horizon: "About 10 (4–28) of 100 will have one damage
+/// their home."
+pub(crate) fn part_frequency(f: Frequency, verb: &str) -> String {
+    let p = chance_within(f.rate, f.years);
+    let (pl, ph) = (
+        chance_within(f.low, f.years),
+        chance_within(f.high, f.years),
+    );
+    if p * 100.0 >= 99.5 {
+        format!("Nearly all will {verb}.")
+    } else if p * 100.0 >= 0.95 {
+        let r = if f.show_range {
+            range(&per_100_word(pl * 100.0), &per_100_word(ph * 100.0))
+        } else {
+            String::new()
+        };
+        format!("About {}{r} of 100 will {verb}.", per_100_word(p * 100.0))
+    } else if p * 1000.0 >= 0.95 {
+        let r = if f.show_range {
+            range(&per_1000_word(pl * 1000.0), &per_1000_word(ph * 1000.0))
+        } else {
+            String::new()
+        };
+        format!(
+            "About {}{r} in 1,000 will {verb}.",
+            per_1000_word(p * 1000.0)
+        )
+    } else if p >= 1.0e-5 {
+        let r = if f.show_range {
+            range(&one_in(pl), &one_in(ph))
+        } else {
+            String::new()
+        };
+        format!("About {}{r} will {verb}.", one_in(p))
+    } else {
+        format!("Fewer than 1 in 100,000 will {verb}.")
+    }
+}
+
 /// A yearly rate in words: "about 2.4 times a year", "about once a year" (never "about 1 times
 /// a year"), "about once every 3 years".
 pub(crate) fn about_times_a_year(rate: f64) -> String {
