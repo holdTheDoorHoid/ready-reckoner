@@ -3,7 +3,7 @@
 
 mod common;
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use common::generate::{Case, case};
 use common::{audit, days_at, readiness_at};
@@ -14,6 +14,9 @@ use rr_budget::{
 use rr_types::{BucketId, PlanItemKind, TierId, fixtures};
 
 const CASES: u64 = 250;
+
+/// Cases for the one-off property (it looks at month 0 only, so it runs more of them).
+const ONE_OFF_CASES: u64 = 600;
 
 fn run(c: &Case, options: BudgetOptions) -> BudgetResult {
     let input = BudgetInput {
@@ -412,6 +415,153 @@ fn envelopes_resolve_within_ceil_cost_over_budget() {
         seen > 20 && split_seen > 10,
         "only {seen} ({split_seen} split) envelopes exercised"
     );
+}
+
+/// Split schedule, month 0: the one-off money goes to the top life-safety item, the first
+/// life-safety item in the buying order that costs more than a month's money (DESIGN §4.7, polish
+/// round). When month 0 opens a fund for such an item:
+/// - the item costs more than the one-off money left after any dearer life-safety items bought
+///   outright before it;
+/// - the fund holds at least half of that money, and month 0 spends money on nothing but
+///   life-safety items (the rest of the one-off buys the cheaper ones; what they leave joins the
+///   fund);
+/// - the item arrives within ceil((cost - saved in month 0) / (half the monthly money)) months;
+/// - with its price added to the one-off, the item is bought outright in month 0 instead.
+///
+/// Every case gets a one-off amount and a small monthly budget here, so the rule is exercised.
+#[test]
+fn one_off_money_goes_to_the_top_life_safety_item() {
+    let (mut funded, mut arrived) = (0, 0);
+    for seed in 0..ONE_OFF_CASES {
+        let mut c = case(seed);
+        let s = seed as usize;
+        c.household.finances.one_off_budget_usd = [40.0, 120.0, 200.0, 450.0][s % 4];
+        c.household.finances.monthly_budget_usd = [5.0, 15.0, 30.0, 60.0][(s / 4) % 4];
+        let one_off = f64::from(c.household.finances.one_off_budget_usd);
+        let monthly = f64::from(c.household.finances.monthly_budget_usd);
+        let life_safety = |id: &str| c.items.iter().any(|i| i.id == id && i.life_safety);
+        let r = run(&c, options(SPLIT, false));
+        let m0 = &r.money_by_month[0];
+        let Some((x, cost)) = m0.saving_for.clone() else {
+            continue;
+        };
+        if !(life_safety(x.as_str()) && cost > monthly + 1e-9) {
+            continue;
+        }
+        funded += 1;
+        let month0: Vec<_> = r.sequence.iter().filter(|p| p.month == 0).collect();
+        for p in &month0 {
+            assert!(
+                p.cost_usd < 0.01 || life_safety(p.item_id.as_str()),
+                "seed {seed}: month 0 bought {} (${:.2}) while saving for {x}",
+                p.item_id,
+                p.cost_usd
+            );
+        }
+        let dear: f64 = month0
+            .iter()
+            .filter(|p| p.cost_usd > monthly + 1e-9)
+            .map(|p| p.cost_usd)
+            .sum();
+        let left = one_off - dear;
+        assert!(
+            cost > left - 1e-6,
+            "seed {seed}: {x} costs ${cost:.2} but ${left:.2} of the one-off was left"
+        );
+        assert!(
+            m0.saved_usd + 0.01 >= 0.5 * left,
+            "seed {seed}: the fund for {x} holds ${:.2} of ${left:.2}",
+            m0.saved_usd
+        );
+        // Arrival: half of each later month's money goes in (the largest cost announced while
+        // saving, since a divisible item's chunk can grow).
+        let (_, lives) = audit(&r, &|_| false);
+        let life = lives
+            .iter()
+            .find(|l| l.opened == 0)
+            .expect("the month-0 fund");
+        if let (Some(b), Some(item)) = (life.bought, &life.bought_item) {
+            if *item == x {
+                let announced = r
+                    .money_by_month
+                    .iter()
+                    .filter(|mm| mm.month <= b)
+                    .filter_map(|mm| mm.saving_for.as_ref().map(|(_, c)| *c))
+                    .fold(cost, f64::max);
+                let limit = ((announced - m0.saved_usd) / (0.5 * monthly) - 1e-9).ceil() as u16;
+                assert!(
+                    b <= limit.max(1),
+                    "seed {seed}: {x} bought in month {b}, limit {limit}"
+                );
+                arrived += 1;
+            }
+        }
+        // With its price added to the one-off, it is bought in month 0.
+        let mut richer = c.clone();
+        richer.household.finances.one_off_budget_usd += cost as f32 + 1.0;
+        let r2 = run(&richer, options(SPLIT, false));
+        assert!(
+            r2.sequence.iter().any(|p| p.month == 0 && p.item_id == x),
+            "seed {seed}: {x} (${cost:.2}) not bought in month 0 with ${} once",
+            richer.household.finances.one_off_budget_usd
+        );
+    }
+    println!("one-off: {funded} month-0 funds for a life-safety item, {arrived} arrived");
+    assert!(
+        funded >= 50 && arrived >= 30,
+        "only {funded} funds, {arrived} arrivals"
+    );
+}
+
+/// `Plan.envelopes` holds one entry per item id (ENGINE-API), and each entry adds up every dollar
+/// saved for that item: what its purchases drew from savings, plus what a fund still holds for it
+/// when the plan ends.
+#[test]
+fn one_envelope_per_item_adding_up_every_draw() {
+    let mut merged = 0;
+    for seed in 0..CASES {
+        let c = case(seed);
+        for schedule in SCHEDULES {
+            let r = run(&c, options(schedule, false));
+            let envelopes = &r.plan.envelopes;
+            let ids: BTreeSet<&str> = envelopes.iter().map(|e| e.item_id.as_str()).collect();
+            assert_eq!(
+                ids.len(),
+                envelopes.len(),
+                "seed {seed} {schedule:?}: {envelopes:?}"
+            );
+            let open = r.money_by_month.last().and_then(|mm| mm.saving_for.clone());
+            for e in envelopes {
+                let draws: Vec<_> = r
+                    .sequence
+                    .iter()
+                    .filter(|p| p.item_id == e.item_id && p.from_savings_usd > 1e-9)
+                    .collect();
+                let saved: f64 = draws.iter().map(|p| p.from_savings_usd).sum();
+                let needed: f64 = draws.iter().map(|p| p.cost_usd).sum();
+                let (s, n) = (f64::from(e.saved_usd), f64::from(e.needed_usd));
+                if open.as_ref().is_some_and(|(id, _)| *id == e.item_id) {
+                    // The fund still open adds what it holds and what it needs.
+                    assert!(
+                        s + 0.01 >= saved && n + 0.01 >= needed,
+                        "seed {seed}: {e:?}"
+                    );
+                } else {
+                    assert!(
+                        (s - saved).abs() < 0.011 && (n - needed).abs() < 0.011,
+                        "seed {seed} {schedule:?}: {e:?} vs ${saved:.2} of ${needed:.2}"
+                    );
+                }
+                assert!(s <= n + 0.01, "seed {seed}: {e:?}");
+                merged += usize::from(draws.len() > 1);
+            }
+            for p in r.sequence.iter().filter(|p| p.from_savings_usd > 1e-9) {
+                assert!(ids.contains(p.item_id.as_str()), "seed {seed}: {p:?}");
+            }
+        }
+    }
+    println!("envelopes: {merged} add up more than one draw");
+    assert!(merged > 0, "no item was saved for twice");
 }
 
 /// Split schedule: every month in which the free money covers the cheapest item worth buying

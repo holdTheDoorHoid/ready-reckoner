@@ -289,15 +289,22 @@ pub fn audit(r: &BudgetResult, rare: &dyn Fn(&str) -> bool) -> (Vec<f64>, Vec<En
         );
         left.push(free);
     }
-    // A fund still open at the end is listed last in the plan's envelopes with what it needs.
+    // What a fund still open at the end needs: the main plan's is the last month's `saving_for`
+    // (its envelope may also count earlier purchases of the same item); a rare-catastrophe item is
+    // bought once, so its envelope is only the open fund.
+    let open_main = r.money_by_month.last().and_then(|mm| mm.saving_for.clone());
     for life in lives.iter_mut().filter(|l| l.bought.is_none()) {
-        if let Some(e) = plan
+        let main = open_main
+            .as_ref()
+            .filter(|(id, _)| *id == life.item_id)
+            .map(|(_, cost)| *cost);
+        let envelope = plan
             .envelopes
             .iter()
-            .rev()
             .find(|e| e.item_id == life.item_id)
-        {
-            life.needed = f64::from(e.needed_usd);
+            .map(|e| f64::from(e.needed_usd));
+        if let Some(needed) = main.or(envelope) {
+            life.needed = needed;
         }
     }
     (left, lives)
