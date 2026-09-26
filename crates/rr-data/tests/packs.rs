@@ -323,9 +323,10 @@ fn counties_without_outage_records_use_their_states_series() {
     let juneau = s.county("02110").unwrap();
     let o = juneau.outages.as_ref().expect("the state series stands in");
     assert_eq!(o.state_series.as_deref(), Some("Alaska"));
-    assert_eq!(o.events_per_customer_year, 1.523);
-    assert_eq!((o.p_ge_1d, o.p_ge_3d), (0.01864, 0.000802));
-    assert_eq!((o.median_hours, o.p90_hours), (1.75, 7.25));
+    // Values from the repaired EAGLE-I series (reporting dropouts bridged, 2026-09-26).
+    assert_eq!(o.events_per_customer_year, 1.041);
+    assert_eq!((o.p_ge_1d, o.p_ge_3d), (0.04872, 0.004005));
+    assert_eq!((o.median_hours, o.p90_hours), (2.5, 13.25));
     assert_eq!(o.years_covered, "2015-2025");
     assert!(o.event_definition.contains("1%"));
     // Anchorage has records of its own.

@@ -1,0 +1,86 @@
+# Hand-copied power-outage events and event names for the `outage_model` job.
+#
+# [[event]]: restoration curves for events before EAGLE-I's records (Puerto Rico's EAGLE-I series
+# starts in 2021). `share_out` is the share of customers still without power `days` after the
+# outage began, read from the sources listed; `unverified = true` marks figures not checked
+# against a primary source. The stress table uses an event here for a county in `states` when it
+# is worse, a week in, than anything in the county's region in EAGLE-I.
+#
+# [[name]]: display names for well-known non-tropical events, matched by cause, state and the
+# UTC date the county outage began. Tropical cyclones are named from HURDAT2. The names, date
+# windows and state lists are from general knowledge; the sources named were not re-read
+# (UNVERIFIED as to the exact windows). They only label rows; no number depends on them.
+
+[[event]]
+id = "maria_2017_pr"
+name = "Hurricane Maria"
+storm_id = "AL152017"
+class = "hurricane"
+date = "2017-09-20"
+states = ["PR"]
+peak_share = 1.0
+days = [1, 3, 7, 9, 14, 30, 104, 119, 175, 182, 195, 206, 239, 272, 300, 322, 328]
+share_out = [1.0, 1.0, 1.0, 0.95, 0.914, 0.815, 0.43, 0.365, 0.0821, 0.066, 0.042, 0.03, 0.0114, 0.003, 0.0004, 0.00002, 0.0]
+sources = [
+  "US DOE Office of Cybersecurity, Energy Security, and Emergency Response, Hurricanes Maria & Irma Event Summaries #40-#98 (2017-09-21 to 2018-04-04), https://www.energy.gov/sites/default/files/2017/09/f37/Hurricanes%20Maria%20Irma%20Harvey%20Event%20Summary%20September%2027.pdf and the reports listed in round2/phase2/research/data-model-series-research.md section 3.5",
+  "Government of Puerto Rico, status.pr (archived daily snapshots, Internet Archive)",
+  "PREPA via NPR, 2018-08-15: https://www.npr.org/2018/08/15/638739819/nearly-a-year-after-maria-puerto-rico-officials-claim-power-totally-restored",
+]
+unverified = false
+note = "Share of PREPA customers without power, day 0 = landfall on 2017-09-20 (1,569,796 customers lost power). PREPA reported no customer counts between 2017-10-13 and 2018-01-02: day 30 is the share of normal peak load not yet restored (18.5% restored), and days 30 to 104 are interpolated. Load overstates household restoration (on day 119, 82.9% of load was back but 63.5% of customers). The last customer was reconnected on day 328."
+
+[[event]]
+id = "irma_maria_2017_vi"
+name = "Hurricanes Irma and Maria (US Virgin Islands)"
+storm_id = "AL152017"
+class = "hurricane"
+date = "2017-09-20"
+states = ["VI"]
+peak_share = 1.0
+days = [1, 3, 7, 26, 33, 47, 61, 77, 91, 105, 119, 133]
+share_out = [1.0, 1.0, 1.0, 0.919, 0.851, 0.7642, 0.6323, 0.5176, 0.3631, 0.2584, 0.1564, 0.0704]
+sources = [
+  "US DOE Hurricanes Maria & Irma Event Summaries (VIWAPA figures), 2017-10-16 to 2018-01-31, round2/phase2/research/data-model-series-research.md section 3.4",
+]
+unverified = true
+note = "Share of VIWAPA customers without power, day 0 = Maria at St. Croix (2017-09-20); St. Thomas and St. John had been dark since Irma on 2017-09-06. Customer counts start on day 26; the first week is DOE's qualitative 'the majority of customers' (UNVERIFIED as a number). 93% of all customers (99% of those who could take power) were back by day 133, when DOE stopped reporting."
+
+[[name]]
+name = "August 2020 Midwest derecho"
+classes = ["wind"]
+from = "2020-08-10"
+to = "2020-08-11"
+states = ["NE", "IA", "IL", "IN", "WI", "MN", "SD", "MO", "OH", "MI"]
+source = "NOAA National Weather Service event summaries, August 10, 2020 derecho"
+
+[[name]]
+name = "February 2021 winter storm and Texas blackout (Uri)"
+classes = ["winter", "ice", "cold_grid", "unattributed", "grid"]
+from = "2021-02-10"
+to = "2021-02-20"
+states = ["TX", "OK", "LA", "MS", "AR", "NM", "KS", "MO"]
+source = "University of Texas at Austin, The Timeline and Events of the February 2021 Texas Electric Grid Blackouts (2021)"
+
+[[name]]
+name = "December 2022 winter storm (Elliott)"
+classes = ["winter", "ice", "cold_grid", "wind", "unattributed", "grid"]
+from = "2022-12-22"
+to = "2022-12-27"
+states = ["TN", "NC", "SC", "KY", "VA", "WV", "GA", "AL", "MS", "NY", "PA", "OH", "MI", "ME", "NH", "VT", "MA"]
+source = "FERC and NERC, Winter Storm Elliott inquiry report (2023)"
+
+[[name]]
+name = "October 2020 Oklahoma ice storm"
+classes = ["ice", "winter"]
+from = "2020-10-26"
+to = "2020-10-29"
+states = ["OK", "TX", "KS"]
+source = "NOAA National Weather Service Norman, October 26-28, 2020 ice storm summary"
+
+[[name]]
+name = "November 2018 Camp Fire"
+classes = ["wildfire", "wind", "unattributed", "grid"]
+from = "2018-11-08"
+to = "2018-11-10"
+states = ["CA"]
+source = "National Institute of Standards and Technology, Technical Note 2252 (Camp Fire timeline)"

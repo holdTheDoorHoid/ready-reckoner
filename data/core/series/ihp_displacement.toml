@@ -1,0 +1,198 @@
+# FEMA housing assistance after declared disasters, by type of disaster. Written by rr-etl (job `series`); see docs/DATA_SOURCES.md.
+
+id = "ihp_displacement"
+title = "FEMA housing assistance after declared disasters, by type of disaster"
+publisher = "Federal Emergency Management Agency (OpenFEMA)"
+url = "https://www.fema.gov/openfema-data-page/housing-assistance-program-data-renters-v2"
+licence = "OpenFEMA Terms and Conditions (public data; citation and statement required)"
+attribution = "This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s)."
+source = "openfema_housing_assistance"
+retrieved = "2026-09-26"
+how = "fetched"
+notes = [
+  "HousingAssistanceRenters (147957 rows) and HousingAssistanceOwners (160368 rows) v2, per disaster and ZIP code, joined to DisasterDeclarationsSummaries by disaster number for the incident type; 651 rows had no declaration.",
+  "The damage columns of both v2 files (renters' moderate, major and substantial damage; owners' FEMA-inspected damage buckets; totalInspected) are zero in every row (checked 2026-09-26 by asking the API for rows above zero: none), so no damage share is published; registrations, approvals and rental assistance are filled.",
+  "Counts registrations with FEMA, not all households hit: people who did not apply, or whose insurance covered them, are not in the data. Rental assistance is what FEMA paid to help people live elsewhere, a floor on the cost of being displaced.",
+  "See also https://www.fema.gov/openfema-data-page/housing-assistance-program-data-owners-v2 and https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2. Months displaced by hazard is not built: only 3% of rental-eligible registrations carry an end date.",
+]
+
+[[rate]]
+id = "ihp_rental_assistance_per_approved_usd_earthquake"
+value = 447
+unit = "US dollars of FEMA rental assistance per household approved for assistance (earthquake disasters, nominal)"
+year = 2025
+period = "all declarations in the OpenFEMA housing-assistance files"
+figure = "$18080201 to 40449 approved households"
+derivation = "(renters rentalAmount + owners rentalAmount) / (renters + owners approvedForFemaAssistance)"
+note = "Averages over everyone approved, including those who got no rental help."
+unverified = false
+
+[[rate]]
+id = "ihp_rental_assistance_per_approved_usd_fire"
+value = 2114
+unit = "US dollars of FEMA rental assistance per household approved for assistance (fire disasters, nominal)"
+year = 2025
+period = "all declarations in the OpenFEMA housing-assistance files"
+figure = "$176260645 to 83393 approved households"
+derivation = "(renters rentalAmount + owners rentalAmount) / (renters + owners approvedForFemaAssistance)"
+note = "Averages over everyone approved, including those who got no rental help."
+unverified = false
+
+[[rate]]
+id = "ihp_rental_assistance_per_approved_usd_flood"
+value = 927.4
+unit = "US dollars of FEMA rental assistance per household approved for assistance (flood disasters, nominal)"
+year = 2025
+period = "all declarations in the OpenFEMA housing-assistance files"
+figure = "$798643529 to 861119 approved households"
+derivation = "(renters rentalAmount + owners rentalAmount) / (renters + owners approvedForFemaAssistance)"
+note = "Averages over everyone approved, including those who got no rental help."
+unverified = false
+
+[[rate]]
+id = "ihp_rental_assistance_per_approved_usd_hurricane"
+value = 690.6
+unit = "US dollars of FEMA rental assistance per household approved for assistance (hurricane disasters, nominal)"
+year = 2025
+period = "all declarations in the OpenFEMA housing-assistance files"
+figure = "$6168567448 to 8931809 approved households"
+derivation = "(renters rentalAmount + owners rentalAmount) / (renters + owners approvedForFemaAssistance)"
+note = "Averages over everyone approved, including those who got no rental help."
+unverified = false
+
+[[rate]]
+id = "ihp_rental_assistance_per_approved_usd_landslide"
+value = 121.5
+unit = "US dollars of FEMA rental assistance per household approved for assistance (landslide disasters, nominal)"
+year = 2025
+period = "all declarations in the OpenFEMA housing-assistance files"
+figure = "$73128 to 602 approved households"
+derivation = "(renters rentalAmount + owners rentalAmount) / (renters + owners approvedForFemaAssistance)"
+note = "Averages over everyone approved, including those who got no rental help."
+unverified = false
+
+[[rate]]
+id = "ihp_rental_assistance_per_approved_usd_other"
+value = 16.06
+unit = "US dollars of FEMA rental assistance per household approved for assistance (other disasters, nominal)"
+year = 2025
+period = "all declarations in the OpenFEMA housing-assistance files"
+figure = "$8213380 to 511505 approved households"
+derivation = "(renters rentalAmount + owners rentalAmount) / (renters + owners approvedForFemaAssistance)"
+note = "Averages over everyone approved, including those who got no rental help."
+unverified = false
+
+[[rate]]
+id = "ihp_rental_assistance_per_approved_usd_severe_storm"
+value = 545.6
+unit = "US dollars of FEMA rental assistance per household approved for assistance (severe_storm disasters, nominal)"
+year = 2025
+period = "all declarations in the OpenFEMA housing-assistance files"
+figure = "$749740650 to 1374211 approved households"
+derivation = "(renters rentalAmount + owners rentalAmount) / (renters + owners approvedForFemaAssistance)"
+note = "Averages over everyone approved, including those who got no rental help."
+unverified = false
+
+[[rate]]
+id = "ihp_rental_assistance_per_approved_usd_tornado"
+value = 366.2
+unit = "US dollars of FEMA rental assistance per household approved for assistance (tornado disasters, nominal)"
+year = 2025
+period = "all declarations in the OpenFEMA housing-assistance files"
+figure = "$22848284 to 62392 approved households"
+derivation = "(renters rentalAmount + owners rentalAmount) / (renters + owners approvedForFemaAssistance)"
+note = "Averages over everyone approved, including those who got no rental help."
+unverified = false
+
+[[rate]]
+id = "ihp_rental_assistance_per_approved_usd_winter"
+value = 820.3
+unit = "US dollars of FEMA rental assistance per household approved for assistance (winter disasters, nominal)"
+year = 2025
+period = "all declarations in the OpenFEMA housing-assistance files"
+figure = "$136311144 to 166178 approved households"
+derivation = "(renters rentalAmount + owners rentalAmount) / (renters + owners approvedForFemaAssistance)"
+note = "Averages over everyone approved, including those who got no rental help."
+unverified = false
+
+[[row]]
+incident = "earthquake"
+disasters = 10
+renter_registrations = 9740
+renters_approved = 4502
+owner_registrations = 74910
+owners_approved = 35950
+rental_assistance_usd = 18080000
+
+[[row]]
+incident = "fire"
+disasters = 27
+renter_registrations = 183000
+renters_approved = 46790
+owner_registrations = 289000
+owners_approved = 36600
+rental_assistance_usd = 176300000
+
+[[row]]
+incident = "flood"
+disasters = 84
+renter_registrations = 599600
+renters_approved = 288200
+owner_registrations = 976100
+owners_approved = 572900
+rental_assistance_usd = 798600000
+
+[[row]]
+incident = "hurricane"
+disasters = 120
+renter_registrations = 8326000
+renters_approved = 3649000
+owner_registrations = 11410000
+owners_approved = 5283000
+rental_assistance_usd = 6169000000
+
+[[row]]
+incident = "landslide"
+disasters = 2
+renter_registrations = 356
+renters_approved = 218
+owner_registrations = 689
+owners_approved = 384
+rental_assistance_usd = 73130
+
+[[row]]
+incident = "other"
+disasters = 62
+renter_registrations = 586000
+renters_approved = 487400
+owner_registrations = 33310
+owners_approved = 24110
+rental_assistance_usd = 8213000
+
+[[row]]
+incident = "severe_storm"
+disasters = 284
+renter_registrations = 748600
+renters_approved = 374400
+owner_registrations = 1690000
+owners_approved = 999800
+rental_assistance_usd = 749700000
+
+[[row]]
+incident = "tornado"
+disasters = 22
+renter_registrations = 58020
+renters_approved = 28110
+owner_registrations = 84390
+owners_approved = 34280
+rental_assistance_usd = 22850000
+
+[[row]]
+incident = "winter"
+disasters = 8
+renter_registrations = 307200
+renters_approved = 85640
+owner_registrations = 297600
+owners_approved = 80540
+rental_assistance_usd = 136300000
+

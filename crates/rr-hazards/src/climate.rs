@@ -361,6 +361,11 @@ mod tests {
             vulnerability: None,
             // Added with data pack v2 (data-hazard); nothing here reads it.
             exposure: Default::default(),
+            // Added with data pack v2 (data-model calibration records); nothing here reads them.
+            outage_model: None,
+            temperature: None,
+            reliability: None,
+            declarations: None,
         }
     }
 

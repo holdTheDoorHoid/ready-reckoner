@@ -138,6 +138,21 @@ pub struct Missing {
     pub fips: Vec<String>,
 }
 
+/// A file entry that [`Manifest::rehash`] changed: its row count and sha256 before and after.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Rehashed {
+    /// Path relative to the data directory.
+    pub path: String,
+    /// Row count the manifest recorded.
+    pub old_rows: u64,
+    /// Row count of the file on disk.
+    pub rows: u64,
+    /// sha256 the manifest recorded.
+    pub old_sha256: String,
+    /// sha256 of the file on disk.
+    pub sha256: String,
+}
+
 /// A credit line the app must display.
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Attribution {
@@ -196,6 +211,59 @@ impl Manifest {
         self.pack_version = acc.finish()[..12].to_string();
     }
 
+    /// Recompute every file entry's sha256, size and row count from the files under `data_dir`,
+    /// each job's `rows_out` (the rows of its outputs) and `pack_version`, without downloading
+    /// anything or running a job (`rr-etl manifest --rehash`). For merges of data branches, where
+    /// a file both branches rebuilt matches neither side's entry, and for hand edits of a pack
+    /// file. `generated` and every job's sources, notes and timestamps stay as they are: they
+    /// describe the refreshes that fetched the data. Returns the entries that changed.
+    ///
+    /// # Errors
+    ///
+    /// A listed file that cannot be read or whose rows cannot be counted; the manifest is then
+    /// left unchanged.
+    pub fn rehash(&mut self, data_dir: &Path) -> Result<Vec<Rehashed>> {
+        let mut next = self.clone();
+        let mut changed = Vec::new();
+        for pack in next.packs.values_mut() {
+            for f in &mut pack.files {
+                let bytes = std::fs::read(data_dir.join(&f.path)).map_err(|e| {
+                    data_err(format!(
+                        "{} is listed in the manifest but cannot be read: {e}",
+                        f.path
+                    ))
+                })?;
+                let sha256 = crate::http::sha256_hex(&bytes);
+                let rows = crate::verify::count_rows(&f.path, &bytes)?;
+                let size = bytes.len() as u64;
+                if sha256 != f.sha256 || rows != f.rows || size != f.bytes {
+                    changed.push(Rehashed {
+                        path: f.path.clone(),
+                        old_rows: f.rows,
+                        rows,
+                        old_sha256: f.sha256.clone(),
+                        sha256: sha256.clone(),
+                    });
+                }
+                f.sha256 = sha256;
+                f.rows = rows;
+                f.bytes = size;
+            }
+        }
+        let rows: BTreeMap<String, u64> =
+            next.all_files().map(|f| (f.path.clone(), f.rows)).collect();
+        for job in next.jobs.values_mut() {
+            // A job's outputs are its pack files; an output the packs no longer list keeps the
+            // recorded total.
+            if let Some(total) = job.outputs.iter().map(|o| rows.get(o)).sum::<Option<u64>>() {
+                job.rows_out = total;
+            }
+        }
+        next.recompute_version();
+        *self = next;
+        Ok(changed)
+    }
+
     /// Write the manifest as pretty JSON with a trailing newline.
     pub fn save(&self, data_dir: &Path) -> Result<()> {
         let mut text = serde_json::to_string_pretty(self)?;
@@ -220,5 +288,95 @@ impl Manifest {
     /// Whether the owner has approved the decision `key`.
     pub fn signed_off(&self, key: &str) -> bool {
         self.sign_offs.get(key).is_some_and(|s| s.approved)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn entry(dir: &Path, rel: &str, text: &str, job: &str) -> FileEntry {
+        let p = dir.join(rel);
+        std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+        std::fs::write(&p, text).unwrap();
+        FileEntry {
+            path: rel.into(),
+            job: job.into(),
+            sha256: crate::http::sha256_hex(text.as_bytes()),
+            bytes: text.len() as u64,
+            rows: crate::verify::count_rows(rel, text.as_bytes()).unwrap(),
+            key: vec!["fips".into()],
+        }
+    }
+
+    #[test]
+    fn rehash_recomputes_entries_rows_out_and_the_version() {
+        let dir = std::env::temp_dir().join(format!("rr-etl-rehash-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let events = entry(&dir, "core/events.csv", "fips,x\n01001,1\n", "events");
+        let pooled = entry(
+            &dir,
+            "opt/p/rows.csv",
+            "fips,y\n01001,2\n01003,3\n",
+            "model",
+        );
+        let mut m = Manifest::default();
+        m.packs.insert(
+            "core".into(),
+            Pack {
+                description: String::new(),
+                files: vec![events],
+            },
+        );
+        m.packs.insert(
+            "p".into(),
+            Pack {
+                description: String::new(),
+                files: vec![pooled],
+            },
+        );
+        for (id, out, rows) in [
+            ("events", "core/events.csv", 1),
+            ("model", "opt/p/rows.csv", 2),
+        ] {
+            m.jobs.insert(
+                id.into(),
+                JobRecord {
+                    finished: "2026-09-26T19:00:00Z".into(),
+                    outputs: vec![out.into()],
+                    rows_out: rows,
+                    ..Default::default()
+                },
+            );
+        }
+        m.generated = "2026-09-26T19:00:00Z".into();
+        m.recompute_version();
+        // Nothing changed on disk: nothing to do.
+        let before = m.clone();
+        assert!(m.rehash(&dir).unwrap().is_empty());
+        assert_eq!(m, before);
+
+        // A merge adds rows to one file: its entry, its job's rows_out and the version move.
+        std::fs::write(dir.join("core/events.csv"), "fips,x\n01001,1\n01003,4\n").unwrap();
+        let changed = m.rehash(&dir).unwrap();
+        assert_eq!(changed.len(), 1);
+        assert_eq!(changed[0].path, "core/events.csv");
+        assert_eq!((changed[0].old_rows, changed[0].rows), (1, 2));
+        let f = m.file("core/events.csv").unwrap();
+        assert_eq!((f.rows, f.bytes), (2, 23));
+        assert_eq!(m.jobs["events"].rows_out, 2);
+        assert_eq!(m.jobs["model"].rows_out, 2);
+        assert_ne!(m.pack_version, before.pack_version);
+        // Timestamps describe the refreshes, not the rehash.
+        assert_eq!(m.generated, before.generated);
+        assert_eq!(m.jobs["events"].finished, "2026-09-26T19:00:00Z");
+
+        // A listed file that is gone is an error, and the manifest is left as it was.
+        std::fs::remove_file(dir.join("opt/p/rows.csv")).unwrap();
+        let kept = m.clone();
+        let e = m.rehash(&dir).unwrap_err().to_string();
+        assert!(e.contains("opt/p/rows.csv"), "{e}");
+        assert_eq!(m, kept);
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 }
