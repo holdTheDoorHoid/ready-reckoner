@@ -32,7 +32,8 @@ research live in the app's Learn and explain views; the packet keeps what to do.
   opening why, the numbers behind the target or the requirement lines. (The warnings stay because
   they carry the carbon monoxide, floodwater and do-not-drink rules.) A bucket whose advice a card
   already gives points to the card: the same block, a card whose hazard has that bucket as its only
-  consequence, and dangerous heat or cold at home when the heat-wave and cold-wave cards both show;
+  consequence, and dangerous heat or cold at home when the heat-wave and cold-wave cards both show
+  (not for a home heated with wood, whose stove and chimney advice is that part's own);
 - tier checklists only up to the recommended step, without the tier blocks' prose; the free steps
   are ticked off in the plan itself;
 - four topic blocks: talking with children, neighbours, drills and mental health: their "What

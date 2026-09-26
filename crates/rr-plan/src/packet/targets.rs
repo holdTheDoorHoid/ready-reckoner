@@ -130,14 +130,17 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         .collect();
     // Dangerous heat or cold at home: when the heat-wave and cold-wave cards are both shown, their
     // advice (cooling places, a warm room, fans above 90°F, no oven or grill for heat) is this
-    // bucket's, so it points to them.
+    // bucket's, so it points to them. Not for a home heated with wood, whose stove and chimney
+    // advice is this bucket's own.
     let card_name = |h: rr_types::HazardId| {
         cards
             .iter()
             .find(|(p, g)| p.id == h && g.is_some())
             .map(|(p, _)| p.name.clone())
     };
-    if let (Some(heat), Some(cold)) = (
+    let wood = a.input.housing.heating == rr_types::Heating::Wood;
+    if let (false, Some(heat), Some(cold)) = (
+        wood,
         card_name(rr_types::HazardId::HeatWave),
         card_name(rr_types::HazardId::ColdWave),
     ) {
