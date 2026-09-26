@@ -12,7 +12,7 @@ pub fn hazard_plural(h: HazardId) -> &'static str {
         CoastalFlooding => "floods from the sea",
         ColdWave => "cold waves",
         Drought => "droughts",
-        Earthquake => "damaging earthquakes",
+        Earthquake => "earthquakes",
         Hail => "hailstorms",
         HeatWave => "heat waves",
         Hurricane => "hurricanes and tropical storms",
@@ -202,6 +202,21 @@ pub fn lower_first(s: &str) -> String {
     }
 }
 
+/// A scenario's name as one event with an article, mid-sentence: "Magnitude 9 Cascadia
+/// earthquake" becomes "a magnitude 9 Cascadia earthquake"; a name that already starts with an
+/// article keeps it.
+pub fn scenario_one(name: &str) -> String {
+    let lower = lower_first(name.trim());
+    if ["a ", "an ", "the "].iter().any(|a| lower.starts_with(a)) {
+        return lower;
+    }
+    let article = match lower.chars().next() {
+        Some('a' | 'e' | 'i' | 'o' | 'u') => "an",
+        _ => "a",
+    };
+    format!("{article} {lower}")
+}
+
 /// First letter upper-cased.
 pub fn upper_first(s: &str) -> String {
     let mut c = s.chars();
@@ -376,6 +391,23 @@ pub fn event_source(event_type: &str) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn scenario_names_get_an_article() {
+        assert_eq!(
+            scenario_one("Magnitude 9 Cascadia earthquake"),
+            "a magnitude 9 Cascadia earthquake"
+        );
+        assert_eq!(
+            scenario_one("A magnitude 9 Cascadia earthquake"),
+            "a magnitude 9 Cascadia earthquake"
+        );
+        assert_eq!(scenario_one("Ice age"), "an ice age");
+        assert_eq!(
+            scenario_one("Direct hit by a major hurricane"),
+            "a direct hit by a major hurricane"
+        );
+    }
 
     #[test]
     fn natural_frequencies_follow_the_rounding_rules() {

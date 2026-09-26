@@ -11,6 +11,7 @@
 #![allow(dead_code)]
 
 use rr_consequence::{ScenarioCandidate, Survival};
+use rr_hazards::AlternativeRate;
 use rr_types::{
     CitationId, Evidence, HazardId, HouseholdEventRate, IncomeStability, OutageStats, PlanInput,
 };
@@ -58,7 +59,8 @@ pub fn philadelphia_household() -> PlanInput {
     rr_types::fixtures::get("philadelphia-renters-4").expect("fixture")
 }
 
-/// Household event rates for Philadelphia, reproducing the research prototype's classes:
+/// Household event rates for Philadelphia, reproducing the research prototype's classes with the
+/// effects table's shares (rr-hazards' event definitions):
 /// power (storm days 0.2/yr, county events 0.065, major regional 0.024, catastrophic 0.003, grid
 /// 0.005), no tap water (main breaks 0.10, chemical 0.02, system failure 0.004, grid pumping
 /// 0.002), boil notices 0.05, food (snowed in 0.5, shortages 0.2, curfews 0.03, pandemic 0.01,
@@ -67,19 +69,20 @@ pub fn philadelphia_household() -> PlanInput {
 pub fn philadelphia_rates() -> Vec<HouseholdEventRate> {
     use HazardId::*;
     vec![
-        prior(StrongWind, 0.292),
+        prior(StrongWind, 0.133),
         prior(WinterWeather, 0.5),
-        prior(IceStorm, 0.085),
-        prior(Hurricane, 0.0267),
+        prior(IceStorm, 0.091),
+        prior(Hurricane, 0.0242),
         prior(GridFailure, 0.005),
         prior(LocalUtilityOutage, 0.15),
-        prior(HazmatRelease, 0.02),
+        prior(HazmatRelease, 0.0333),
         prior(SupplyChainDisruption, 0.2),
         prior(CivilUnrest, 0.03),
         prior(CyberOutage, 0.02),
+        // Pandemics that change daily life: a quarter of the 4.6 %/yr onsets (as rr-hazards).
         rate(
             Pandemic,
-            0.046,
+            0.0115,
             1.5,
             Evidence::Empirical,
             "cdc_pandemic_history",
@@ -138,17 +141,19 @@ pub fn coos_household() -> PlanInput {
 pub fn coos_rates() -> Vec<HouseholdEventRate> {
     use HazardId::*;
     vec![
-        // The prototype's "big windstorm or ice storm beyond the record" (0.03 a year) is carried
-        // by strong wind alone (2.5 x 0.012): ice storms are rare on the Oregon coast.
-        prior(StrongWind, 2.5),
+        // Windstorms that cut the power: 0.99 a year carries the prototype's storm phone
+        // outages (0.3 a year) and its big windstorms beyond the record (0.03 a year); ice
+        // storms are rare on the Oregon coast.
+        prior(StrongWind, 0.99),
         prior(WinterWeather, 0.2),
-        prior(Wildfire, 0.04),
+        // Safety shutoffs 0.02 and warnings to leave 0.0035 a year.
+        prior(Wildfire, 0.0235),
         prior(Drought, 0.01),
         prior(SupplyChainDisruption, 0.2),
         prior(CyberOutage, 0.02),
         rate(
             Pandemic,
-            0.046,
+            0.0115,
             1.5,
             Evidence::Empirical,
             "cdc_pandemic_history",
@@ -185,21 +190,36 @@ pub fn coos_outages() -> OutageStats {
     outage_stats(1.09, 1.8, 8.4, "2018-2025")
 }
 
-/// Cascadia (40 % in 50 years near Coos Bay, ≈ 1.0 %/yr; the time-independent reading of the
-/// same record is ≈ 0.4 %/yr) and the local tsunami it would send, for the Oregon coast.
+/// Cascadia (40 % in 50 years near Coos Bay, 1.02 %/yr; the time-independent recurrence of the
+/// same record is 0.41 %/yr, given as an alternative) and the local tsunami it would send. The
+/// research household lives outside the inundation zone and one adult works inside it, so the
+/// local tsunami reaches a household member at about 27 % of the Cascadia rate (the share of the
+/// week spent at work; research §9.3).
 pub fn coos_scenarios(cascadia_on: bool) -> Vec<ScenarioCandidate> {
     let r = -rr_types::math::ln(0.6) / 50.0;
+    let long_run = 0.0041;
+    let alt = |rate: f64| {
+        vec![AlternativeRate {
+            label: "the long-run recurrence (41 ruptures in 10,000 years)".into(),
+            rate_per_year: rate,
+            sources: vec![CitationId::from("osu_cascadia_2012")],
+        }]
+    };
     vec![
         ScenarioCandidate {
             id: "cascadia_m9".into(),
             name: "A magnitude 9 Cascadia earthquake".into(),
             hazard: HazardId::Earthquake,
             rate_per_year: r,
-            low: 0.004,
+            low: long_run,
             high: r,
+            evidence: Evidence::Prior,
             on: cascadia_on,
+            default_on: true,
+            overridden: !cascadia_on,
             applies_because: "Coos County is on the Oregon coast above the Cascadia fault; Oregon asks households to be ready for at least two weeks.".into(),
             variant: Some("coast".into()),
+            alternatives: alt(long_run),
             sources: vec![
                 CitationId::from("osu_cascadia_2012"),
                 CitationId::from("oregon_resilience_plan_2013"),
@@ -209,12 +229,16 @@ pub fn coos_scenarios(cascadia_on: bool) -> Vec<ScenarioCandidate> {
             id: "local_tsunami".into(),
             name: "A tsunami from a nearby earthquake".into(),
             hazard: HazardId::Tsunami,
-            rate_per_year: r,
-            low: 0.004,
-            high: r,
+            rate_per_year: r * 0.27,
+            low: long_run * 0.27,
+            high: r * 0.27,
+            evidence: Evidence::Prior,
             on: true,
-            applies_because: "Coos County has a tsunami inundation zone.".into(),
+            default_on: true,
+            overridden: false,
+            applies_because: "Coos County has a tsunami inundation zone, and one adult works in it.".into(),
             variant: None,
+            alternatives: alt(long_run * 0.27),
             sources: vec![
                 CitationId::from("osu_cascadia_2012"),
                 CitationId::from("dogami_tsunami_faq"),

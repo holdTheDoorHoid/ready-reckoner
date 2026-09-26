@@ -82,6 +82,7 @@ dependencies = [
 name = "rr-consequence"
 version = "0.1.0"
 dependencies = [
+ "rr-hazards",
  "rr-types",
  "serde",
  "serde_json",

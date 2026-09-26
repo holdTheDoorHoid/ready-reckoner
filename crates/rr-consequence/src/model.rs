@@ -12,7 +12,7 @@ use rr_types::{
     BucketId, CitationId, Cooling, CountyRecord, EventRate, Evidence, HazardId, HouseholdEventRate,
     HousingKind, OutageStats, PlanInput, WaterSource,
 };
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::effects::{EffectRow, EffectsTable, Param, ReliefSpec, Requirement};
 use crate::survival::{EmpiricalCurve, Survival};
@@ -43,36 +43,9 @@ impl<'a> CountyData<'a> {
     }
 }
 
-/// A named scenario offered for this location, as `rr-hazards` detects it.
-///
-/// `rr-hazards` owns scenario detection; this is the shape the consequence model needs. The plan
-/// crate converts `rr-hazards`' candidate into this one. // awaiting: rr-hazards
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct ScenarioCandidate {
-    /// Stable id, for example `cascadia_m9`.
-    pub id: String,
-    /// Plain name, for example "A magnitude 9 Cascadia earthquake".
-    pub name: String,
-    /// The hazard family the scenario is counted under in contributions (`earthquake`).
-    pub hazard: HazardId,
-    /// Events per year.
-    pub rate_per_year: f64,
-    /// Low end of the plausible rate (10th percentile).
-    pub low: f64,
-    /// High end of the plausible rate (90th percentile).
-    pub high: f64,
-    /// Included in the plan (the engine's default or the user's override).
-    pub on: bool,
-    /// Why it applies here, in plain language.
-    pub applies_because: String,
-    /// Variant of the consequences (`coast` or `valley` for Cascadia); when absent, `coast` for a
-    /// coastal county and `valley` otherwise.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub variant: Option<String>,
-    /// Where the rate comes from.
-    pub sources: Vec<CitationId>,
-}
+/// A named scenario offered for this location, as `rr-hazards` detects it (its `on` already
+/// reflects the user's override; `dials.scenario_overrides` is applied again here, harmlessly).
+pub use rr_hazards::ScenarioCandidate;
 
 /// What kind of quantity an uncertain parameter scales (picks the default uncertainty factor).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -480,10 +453,11 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
             c.rate_per_year,
             c.low,
             c.high,
-            format!("how likely {} is", words::lower_first(&c.name)),
-            Evidence::Prior,
+            format!("how likely {} is", words::scenario_one(&c.name)),
+            c.evidence,
         ));
     }
+    let parent_factor = overlap_factors(inp, &rates, &mut notes);
 
     // (owner, class, bucket) -> total share of applicable table rows, for the coupling rules.
     let mut table_share: BTreeMap<(Owner, String, BucketId), f64> = BTreeMap::new();
@@ -517,7 +491,10 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
                 (c.rate_per_year, scenario_param[i], Some(i))
             }
             None => match rates.get(&row.hazard) {
-                Some(r) => (r.rate_per_year, rate_param[&row.hazard], None),
+                Some(r) => {
+                    let factor = parent_factor.get(&row.hazard).copied().unwrap_or(1.0);
+                    (r.rate_per_year * factor, rate_param[&row.hazard], None)
+                }
                 None => continue,
             },
         };
@@ -555,6 +532,53 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
         notes,
         job_loss_fallback,
     }
+}
+
+/// How much of each parent hazard's rate is left for its typical rows once the offered named
+/// scenarios take out their long-run shares (see `[[overlap]]` in effects.toml): 1 − Σ share / r,
+/// never below a quarter.
+fn overlap_factors(
+    inp: &BuildInput<'_>,
+    rates: &BTreeMap<HazardId, &HouseholdEventRate>,
+    notes: &mut Vec<String>,
+) -> BTreeMap<HazardId, f64> {
+    let mut shares: BTreeMap<HazardId, f64> = BTreeMap::new();
+    for o in &inp.table.overlaps {
+        let Some(c) = inp.scenarios.iter().find(|c| c.id == o.scenario) else {
+            continue;
+        };
+        let Some(r) = rates.get(&o.hazard) else {
+            continue;
+        };
+        let share = c
+            .alternatives
+            .iter()
+            .map(|a| a.rate_per_year)
+            .filter(|x| x.is_finite() && *x > 0.0)
+            .fold(c.rate_per_year, f64::min);
+        if share.is_finite() && share > 0.0 && r.rate_per_year > 0.0 {
+            *shares.entry(o.hazard).or_insert(0.0) += share;
+            let then = if c.on {
+                "so it is counted once, as the scenario"
+            } else {
+                "and the scenario is off, so the plan leaves it out"
+            };
+            notes.push(format!(
+                "{}: {}'s own long-run share (about {}) is taken out of ordinary {}, {then}.",
+                o.hazard.name(),
+                words::scenario_one(&c.name),
+                words::rate_phrase(share),
+                words::hazard_plural(o.hazard),
+            ));
+        }
+    }
+    shares
+        .into_iter()
+        .map(|(h, share)| {
+            let r = rates[&h].rate_per_year;
+            (h, (1.0 - share / r).max(0.25))
+        })
+        .collect()
 }
 
 fn table_term(

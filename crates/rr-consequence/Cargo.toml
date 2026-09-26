@@ -10,6 +10,8 @@ description = "Ready Reckoner: hazards to consequence buckets, exceedance curves
 
 [dependencies]
 rr-types = { path = "../rr-types" }
+# Named scenarios come from rr-hazards (planner decision: use its ScenarioCandidate directly).
+rr-hazards = { path = "../rr-hazards" }
 serde.workspace = true
 thiserror.workspace = true
 # The effects table is a TOML data file embedded in the crate and parsed once.

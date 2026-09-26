@@ -202,7 +202,7 @@ sources = ["rr_risk_model_priors"]
 note = "Seasonal work."
 
 [params.stability_gig]
-value = 2.0
+value = 1.75
 low = 1.5
 high = 2.0
 unit = "times the base job-loss rate"
@@ -391,31 +391,31 @@ hazard = "cold_wave"
 bucket = "power"
 class = "extreme_cold"
 label = "extreme cold straining the grid"
-p_given_event = 0.03
+p_given_event = 0.005
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
 cold_share = 1.0
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
-note = "Extreme cold can overload the grid and force rolling blackouts (Texas, February 2021)."
+note = "rr-hazards counts every cold wave in the county; about 1 in 200 overloads the grid (Texas, February 2021; the Southeast, December 2022)."
 
 [[effect]]
 hazard = "cold_wave"
 bucket = "water_boil"
 class = "extreme_cold"
 label = "extreme cold straining the grid"
-p_given_event = 0.05
+p_given_event = 0.003
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
 requires = "municipal"
 evidence = "prior"
 sources = ["shaffer_2026_texas_boil_notices", "rr_risk_model_priors"]
-note = "Freezes break mains and drop pressure; winter boil-water notices in Texas lasted a median of 7 days."
+note = "About 1 in 300 county cold waves breaks mains widely enough for a boil-water notice (winter notices in Texas lasted a median of 7 days)."
 
 [[effect]]
 hazard = "cold_wave"
 bucket = "water_out"
 class = "extreme_cold"
 label = "extreme cold straining the grid"
-p_given_event = 0.02
+p_given_event = 0.005
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
@@ -460,22 +460,22 @@ note = "A drought can lower a private well's yield for weeks to months."
 [[effect]]
 hazard = "earthquake"
 bucket = "power"
-class = "damaging"
-label = "damaging earthquakes"
-p_given_event = 0.5
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.3
 duration = { kind = "log_normal", median_days = 0.5, p90_days = 3.0 }
 heat_share = 0.1
 cold_share = 0.4
 evidence = "prior"
 sources = ["fema_hazus_eq_restoration", "oregon_resilience_plan_2013", "rr_risk_model_priors"]
-note = "Typical damaging shaking cuts power for hours to days (after Tohoku, Japan restored over 90 percent of power in 10 days)."
+note = "rr-hazards counts shaking of 0.1 g (intensity VI, things knocked off shelves); damaging shaking is about a third of that. Outages last hours to days (after Tohoku, Japan restored over 90 percent of power in 10 days)."
 
 [[effect]]
 hazard = "earthquake"
 bucket = "water_out"
-class = "damaging"
-label = "damaging earthquakes"
-p_given_event = 0.3
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.1
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
 requires = "municipal"
 evidence = "prior"
@@ -485,9 +485,9 @@ note = "Broken mains after typical shaking take days to weeks to repair (Hazus r
 [[effect]]
 hazard = "earthquake"
 bucket = "water_out"
-class = "damaging"
-label = "damaging earthquakes"
-p_given_event = 0.2
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.07
 duration = { kind = "log_normal", median_days = 8.0, p90_days = 20.0 }
 requires = "well"
 evidence = "prior"
@@ -497,9 +497,9 @@ note = "Hazus puts an extensively damaged well out for 10.5 days on average (sta
 [[effect]]
 hazard = "earthquake"
 bucket = "supplies"
-class = "damaging"
-label = "damaging earthquakes"
-p_given_event = 0.3
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.1
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
@@ -507,9 +507,9 @@ sources = ["rr_risk_model_priors"]
 [[effect]]
 hazard = "earthquake"
 bucket = "medication"
-class = "damaging"
-label = "damaging earthquakes"
-p_given_event = 0.2
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.07
 duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
@@ -517,9 +517,9 @@ sources = ["rr_risk_model_priors"]
 [[effect]]
 hazard = "earthquake"
 bucket = "comms"
-class = "damaging"
-label = "damaging earthquakes"
-p_given_event = 0.5
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.3
 duration = { kind = "log_normal", median_days = 0.5, p90_days = 3.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
@@ -527,9 +527,9 @@ sources = ["rr_risk_model_priors"]
 [[effect]]
 hazard = "earthquake"
 bucket = "evacuate"
-class = "damaging"
-label = "damaging earthquakes"
-p_given_event = 0.05
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.02
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
 notice_hours = [0.0, 0.05]
 evidence = "prior"
@@ -539,18 +539,18 @@ note = "Earthquakes give no warning; a damaged home may have to be left at once.
 [[effect]]
 hazard = "earthquake"
 bucket = "home_loss"
-class = "damaging"
-label = "damaging earthquakes"
-p_given_event = 0.05
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.02
 evidence = "prior"
 sources = ["fema_nri_v120", "rr_risk_model_priors"]
 
 [[effect]]
 hazard = "earthquake"
 bucket = "get_home"
-class = "damaging"
-label = "damaging earthquakes"
-p_given_event = 0.27
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.1
 requires = "commuter"
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
@@ -744,7 +744,7 @@ hazard = "ice_storm"
 bucket = "power"
 class = "local"
 label = "short storm outages"
-p_given_event = 0.3
+p_given_event = 0.65
 duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.417 }
 pool = true
 cold_share = 1.0
@@ -830,7 +830,7 @@ hazard = "landslide"
 bucket = "supplies"
 class = "slide"
 label = "landslides closing roads"
-p_given_event = 0.2
+p_given_event = 0.5
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
@@ -862,7 +862,7 @@ hazard = "landslide"
 bucket = "home_loss"
 class = "slide"
 label = "landslides closing roads"
-p_given_event = 0.05
+p_given_event = 0.1
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
@@ -881,7 +881,7 @@ hazard = "lightning"
 bucket = "power"
 class = "local"
 label = "short storm outages"
-p_given_event = 0.1
+p_given_event = 0.5
 duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.417 }
 pool = true
 heat_share = 0.3
@@ -967,33 +967,33 @@ hazard = "strong_wind"
 bucket = "power"
 class = "local"
 label = "short storm outages"
-p_given_event = 0.5
+p_given_event = 0.85
 duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.417 }
 pool = true
 heat_share = 0.15
 cold_share = 0.4
 evidence = "prior"
 sources = ["eia_861_reliability_2024", "rr_risk_model_priors"]
-note = "Storm days bring short local outages below the county-event threshold (split of the utility's major-event outage frequency)."
+note = "rr-hazards counts windstorms that cut the power or damage the home; most outages are short and local (split of the utility major-event frequency)."
 
 [[effect]]
 hazard = "strong_wind"
 bucket = "power"
 class = "major"
 label = "a windstorm bigger than any in the recent records"
-p_given_event = 0.012
+p_given_event = 0.03
 duration = { kind = "log_normal", median_days = 1.5, p90_days = 5.0 }
 cold_share = 0.8
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
-note = "Big windstorms are rarer than the 2018-2025 outage records can show, so this class stays an expert estimate."
+note = "Big windstorms are rarer than the 2018-2025 outage records can show: Coos Bay's big-windstorm class (research §9, 0.03 a year) over its windstorm rate."
 
 [[effect]]
 hazard = "strong_wind"
 bucket = "comms"
 class = "local"
 label = "short storm outages"
-p_given_event = 0.14
+p_given_event = 0.3
 duration = { kind = "log_normal", median_days = 0.4, p90_days = 1.75 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
@@ -1151,19 +1151,19 @@ hazard = "wildfire"
 bucket = "evacuate"
 class = "threat"
 label = "wildfires"
-p_given_event = 0.075
+p_given_event = 0.15
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
 notice_hours = [0.25, 12.0]
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
-note = "Wildfires give minutes to hours of warning."
+note = "rr-hazards counts warnings to leave and safety shutoffs; in the West most events are shutoffs. Wildfires give minutes to hours of warning."
 
 [[effect]]
 hazard = "wildfire"
 bucket = "power"
 class = "shutoff"
 label = "wildfire safety power shutoffs"
-p_given_event = 0.5
+p_given_event = 0.85
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
 heat_share = 0.3
 evidence = "prior"
@@ -1207,7 +1207,7 @@ hazard = "winter_weather"
 bucket = "power"
 class = "local"
 label = "short storm outages"
-p_given_event = 0.05
+p_given_event = 0.3
 duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.417 }
 pool = true
 cold_share = 1.0
@@ -1244,18 +1244,18 @@ hazard = "pandemic"
 bucket = "supplies"
 class = "stay_home"
 label = "a pandemic that disrupts shopping"
-p_given_event = 0.2
+p_given_event = 0.9
 duration = { kind = "log_normal", median_days = 14.0, p90_days = 45.0 }
 evidence = "prior"
 sources = ["cdc_mmwr_stay_at_home_2020", "cdc_pandemic_history", "rr_risk_model_priors"]
-note = "One of the five pandemics since 1918 (COVID-19) disrupted daily shopping. Stay-home orders in 2020 lasted a median of 45 days, but stores stayed open, so the stockpile need was about two weeks."
+note = "rr-hazards counts pandemics that change daily life (as in 1918 and 2020). Stay-home orders in 2020 lasted a median of 45 days, but stores stayed open, so the stockpile need was about two weeks."
 
 [[effect]]
 hazard = "pandemic"
 bucket = "medication"
 class = "stay_home"
 label = "a pandemic that disrupts shopping"
-p_given_event = 0.2
+p_given_event = 0.9
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
 evidence = "prior"
 sources = ["cdc_pandemic_history", "rr_risk_model_priors"]
@@ -1383,19 +1383,19 @@ hazard = "hazmat_release"
 bucket = "water_out"
 class = "release"
 label = "chemical releases"
-p_given_event = 1.0
+p_given_event = 0.6
 duration = { kind = "log_normal", median_days = 1.5, p90_days = 7.0 }
 requires = "municipal"
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
-note = "A chemical spill can bring a do-not-drink notice lasting days."
+note = "rr-hazards counts releases that bring a do-not-drink order or an order to stay inside; about 6 in 10 are do-not-drink notices (research §6.2: 2 %/yr), lasting days."
 
 [[effect]]
 hazard = "hazmat_release"
 bucket = "supplies"
 class = "release"
 label = "chemical releases"
-p_given_event = 0.3
+p_given_event = 0.4
 duration = { kind = "log_normal", median_days = 0.25, p90_days = 1.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
@@ -1861,12 +1861,12 @@ scenario = "local_tsunami"
 bucket = "evacuate"
 class = "event"
 label = "a tsunami from a nearby earthquake"
-p_given_event = 0.27
+p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 90.0 }
 notice_hours = [0.25, 0.33]
 evidence = "prior"
 sources = ["dogami_tsunami_faq", "rr_risk_model_priors"]
-note = "A local tsunami arrives in 15 to 20 minutes. The share is the part of the week a household member spends in the inundation zone (27 percent for someone who works there); it is 1 if you live there."
+note = "A local tsunami arrives in 15 to 20 minutes. rr-hazards' rate already counts only households in the inundation zone, so every event means leaving at once."
 
 [[effect]]
 hazard = "tsunami"
@@ -1874,7 +1874,7 @@ scenario = "local_tsunami"
 bucket = "home_loss"
 class = "event"
 label = "a tsunami from a nearby earthquake"
-p_given_event = 0.1
+p_given_event = 0.5
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
@@ -2181,6 +2181,32 @@ evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
 # ---------------------------------------------------------------------------------------------
+# Scenario overlaps. rr-hazards passes each hazard's full rate, which already contains the named
+# scenario's long-run share (a Cascadia rupture shakes the county too). When the scenario is
+# offered (on or off), that share leaves the parent's typical rows: the parent's rate is scaled by
+# 1 − share / rate, never below a quarter (the same floor as the hazard card). The share is the
+# scenario's lowest published rate: its long-run alternative when rr-hazards gives one, else its
+# rate. Major hurricanes use `replaced_by` rows instead (a class, not a share). The local tsunami
+# has no overlap: the county tsunami rows are distant-source tsunamis (NRI's historical record;
+# the last Cascadia tsunami was in 1700), and rr-hazards' tsunami card adds the two.
+# ---------------------------------------------------------------------------------------------
+
+[[overlap]]
+scenario = "cascadia_m9"
+hazard = "earthquake"
+note = "The county earthquake rate includes Cascadia's own shaking (0.41 %/yr near Coos Bay, the long-run recurrence)."
+
+[[overlap]]
+scenario = "hayward_m7"
+hazard = "earthquake"
+note = "The Bay Area earthquake rate includes Hayward fault ruptures."
+
+[[overlap]]
+scenario = "new_madrid_m7"
+hazard = "earthquake"
+note = "The county earthquake rate includes New Madrid ruptures."
+
+# ---------------------------------------------------------------------------------------------
 # Income streams (money bucket `income`, research §3.5). Spell lengths are in WEEKS.
 # rate: job_loss uses the household rate from rr-hazards (split evenly between earners); every
 # other stream is r_h x per_earner x earners.
@@ -2199,12 +2225,12 @@ note = "Spell median 10 weeks, bad case 36 weeks; completed spells are shorter t
 [[income]]
 hazard = "pandemic"
 label = "job losses in a pandemic"
-per_earner = 0.02
+per_earner = 0.11
 spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
 unemployment_insurance = true
 evidence = "prior"
 sources = ["cdc_pandemic_history", "rr_risk_model_priors"]
-note = "One of the five pandemics since 1918 (COVID-19) caused mass job loss, when about 1 in 9 workers lost their jobs in spring 2020; so about 0.2 x 0.11 = 0.02 per earner per pandemic."
+note = "In a pandemic that changes daily life, about 1 in 9 workers lost their jobs (spring 2020)."
 
 [[income]]
 hazard = "earthquake"

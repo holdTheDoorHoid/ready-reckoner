@@ -138,6 +138,15 @@ fn generated_table() -> String {
             sources.join(", ")
         );
     }
+    let _ = writeln!(out);
+    let _ = writeln!(
+        out,
+        "| Scenario | Parent hazard whose ordinary rows give up the scenario's long-run share | Why |"
+    );
+    let _ = writeln!(out, "|---|---|---|");
+    for o in &table().overlaps {
+        let _ = writeln!(out, "| *{}* | {} | {} |", o.scenario, o.hazard, o.note);
+    }
     let _ = write!(out, "{END}");
     out
 }

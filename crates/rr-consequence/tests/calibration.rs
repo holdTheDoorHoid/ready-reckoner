@@ -20,15 +20,8 @@ const KNOWN_DEVIATIONS: &[(&str, &str)] = &[
         "Philadelphia Heat or cold at 1 in 50",
         "more coupled classes than the prototype: county-wide winter outages and the ice storm of record also stop the furnace",
     ),
+    ("Philadelphia Heat or cold at 1 in 95", "as above"),
     ("Philadelphia Heat or cold at 1 in 500", "as above"),
-    (
-        "Philadelphia Boil-water notice at 1 in 500",
-        "hurricane boil-water notices (Texas records) added to the prototype's single local class",
-    ),
-    (
-        "Coos Bay Communications at 1 in 10",
-        "the storm rows carry the Philadelphia duration for storm-caused phone outages (0.4 d / 1.75 d) where the prototype used 0.3 / 1.5 for Coos",
-    ),
 ];
 
 #[test]

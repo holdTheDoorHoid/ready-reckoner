@@ -302,6 +302,19 @@ impl Params {
     }
 }
 
+/// A named scenario whose long-run share is already inside its parent hazard's rate.
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct OverlapRow {
+    /// The scenario id.
+    pub scenario: String,
+    /// The parent hazard whose typical rows give up the scenario's share.
+    pub hazard: HazardId,
+    /// Why.
+    #[serde(default)]
+    pub note: String,
+}
+
 /// The whole table.
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -316,6 +329,9 @@ pub struct EffectsTable {
     /// Income streams.
     #[serde(rename = "income")]
     pub income: Vec<IncomeRow>,
+    /// Scenario shares inside parent hazard rates.
+    #[serde(rename = "overlap")]
+    pub overlaps: Vec<OverlapRow>,
 }
 
 /// Why the effects table was rejected.

@@ -365,7 +365,7 @@ impl Ctx<'_> {
     fn owner_name(&self, owner: Owner) -> String {
         match owner {
             Owner::Hazard(h) => words::hazard_one(h).to_owned(),
-            Owner::Scenario(i) => words::lower_first(&self.scenarios[i].name),
+            Owner::Scenario(i) => words::scenario_one(&self.scenarios[i].name),
         }
     }
 
@@ -1326,10 +1326,15 @@ fn cliff_warnings(ctx: &Ctx<'_>, details: &[BucketDetail]) -> Vec<Warning> {
             ),
             Owner::Scenario(i) => (ctx.scenarios[i].id.clone(), ctx.scenarios[i].rate_per_year),
         };
+        // The chosen setting and its neighbours (three settings), so the jump shows.
+        let first = here
+            .saturating_sub(1)
+            .min(d.dial_table.len().saturating_sub(3));
         let cells: Vec<String> = d
             .dial_table
             .iter()
-            .filter(|p| p.return_period_years >= 50)
+            .skip(first)
+            .take(3)
             .map(|p| {
                 format!(
                     "{} at 1 in {}",

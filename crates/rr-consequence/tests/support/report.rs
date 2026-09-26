@@ -6,9 +6,9 @@
 use std::fmt::Write as _;
 
 use rr_consequence::{
-    ConsequenceAssessment, CountyData, DURATION_BUCKETS, ExceedanceCurve, assess, round_up_months,
+    ConsequenceAssessment, CountyData, DURATION_BUCKETS, ExceedanceCurve, assess, dial_rate,
 };
-use rr_types::{BucketId, PlanInput, ReturnPeriod, TARGET_LADDER_DAYS, Target};
+use rr_types::{BucketId, PlanInput, ReturnPeriod, Target};
 
 use super::research::{self, RESEARCH_DEFAULT_RATE, RESEARCH_RATES, ResearchRow};
 
@@ -106,23 +106,6 @@ fn at_rate(a: &ConsequenceAssessment, bucket: BucketId, rate: f64) -> f64 {
 
 fn curve(a: &ConsequenceAssessment, bucket: BucketId) -> &ExceedanceCurve {
     a.curve(bucket).expect("duration bucket")
-}
-
-/// The ladder target if a step within 5 % above the dial rate were accepted (the alternative
-/// rounding discussed in the report).
-fn ladder_with_tolerance(a: &ConsequenceAssessment, bucket: BucketId, rate: f64) -> f32 {
-    if bucket == BucketId::Income {
-        return round_up_months(a.income.curve.target_at(rate * 1.05));
-    }
-    let c = curve(a, bucket);
-    if c.target_at(rate * 1.05) == 0.0 {
-        return 0.0;
-    }
-    TARGET_LADDER_DAYS
-        .iter()
-        .copied()
-        .find(|&l| c.lambda(f64::from(l)) <= rate * 1.05)
-        .unwrap_or(365.0)
 }
 
 fn fmt_days(d: f64) -> String {
@@ -259,11 +242,12 @@ fn natural_frequency_rows(out: &mut String, runs: &Runs, rows: &[(BucketId, f64,
     }
 }
 
-/// The brief's headline checks (docs: brief §8), at the research's dial and at the product's.
+/// The brief's headline checks, at the product's dial (`one_in_100` is the research's default,
+/// −ln(0.9)/10) and ladder rule (round up; within 3 % of a step counts as the step).
 fn headline(out: &mut String, checks: &mut Vec<Check>, phl: &Runs, coos: &Runs) {
     let _ = writeln!(
         out,
-        "| Check | Research | Ours at ≈1 in 95 (research dial, before rounding) | Ours at one_in_100 (1/N): continuous → ladder | With a 5 % rounding tolerance |\n|---|---|---|---|---|"
+        "| Check | Research | Ours, raw design duration | Ours on the ladder (what the app shows) |\n|---|---|---|---|"
     );
     let cases: [(&Runs, BucketId, usize, f64, &str); 8] = [
         (phl, BucketId::Power, 2, 2.8, "Philadelphia power ≈ 3 d"),
@@ -307,28 +291,19 @@ fn headline(out: &mut String, checks: &mut Vec<Check>, phl: &Runs, coos: &Runs) 
     ];
     for (runs, b, dial, research, name) in cases {
         let a = &runs.by_dial[dial];
-        let research_rate = if dial == 2 {
-            RESEARCH_DEFAULT_RATE
-        } else {
-            0.02
-        };
-        let product_rate = [0.1, 0.02, 0.01, 0.002][dial];
-        let at_research = at_rate(a, b, research_rate);
-        let at_product = at_rate(a, b, product_rate);
+        let rate = dial_rate(ReturnPeriod::ALL[dial]);
+        let raw = at_rate(a, b, rate);
         let ladder = match a.bucket(b).target {
             Target::Days { value, .. } | Target::Months { value, .. } => value,
             _ => 0.0,
         };
-        let tol = ladder_with_tolerance(a, b, product_rate);
         let unit = if b == BucketId::Income { " mo" } else { " d" };
+        // One decimal, so the 3 % rule is visible (14.5 days is past 14 × 1.03).
         let _ = writeln!(
             out,
-            "| {name} | {}{unit} | {} | {} → **{ladder}{unit}** | {tol}{unit} |",
-            research,
-            fmt_value(b, at_research),
-            fmt_value(b, at_product),
+            "| {name} | {research}{unit} | {raw:.1}{unit} | **{ladder}{unit}** |",
         );
-        checks.push(check(name, research, at_research, 0.25, 0.0));
+        checks.push(check(name, research, raw, 0.25, 0.0));
     }
 }
 
@@ -349,11 +324,11 @@ pub fn calibration_report() -> (String, Vec<Check>) {
          households (§8.1, §9.1) with household event rates that reproduce the research \
          prototype's event classes (`tests/support/research.rs`), the EAGLE-I outage fits from \
          §8.2/§9.2, and for Coos Bay the Cascadia and local-tsunami scenarios (1.0 %/yr).\n\n\
-         Two things differ from the research by design: the product's dial is exactly 1/N (the \
-         research's default was the 90th percentile of the worst event in ten years, 1 in 95, \
-         Λ = 0.0105), and targets are rounded **up** to the day ladder (the smallest ladder value \
-         with Λ ≤ 1/N). The research numbers are compared at the research's own dial, before \
-         rounding; the product's ladder values are shown beside them.\n"
+         Dial rates (planner decision): `one_in_10` 0.1, `one_in_50` 0.02, `one_in_100` \
+         −ln(0.9)/10 = 0.010536 (the research's default, \"90 % sure nothing in the next ten \
+         years is worse\"), `one_in_500` 0.002. Targets are rounded up to the day ladder, a raw \
+         value within 3 % above a step counting as that step. Research numbers are compared \
+         with our raw design durations at the same rates.\n"
     );
 
     let _ = writeln!(out, "## Headline checks\n");

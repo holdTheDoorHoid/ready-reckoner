@@ -556,7 +556,29 @@ fn the_cliff_rule_names_cascadia_on_the_coast_and_nothing_in_philadelphia() {
         assert!(w.message.contains("Cascadia"), "{}", w.message);
         assert_eq!(w.related, vec!["cascadia_m9".to_owned(), bucket.to_owned()]);
         assert_eq!(w.severity, rr_types::WarningSeverity::Warn);
+        // It shows the chosen setting and its two neighbours.
+        for shown in ["at 1 in 50,", "at 1 in 100,", "at 1 in 500."] {
+            assert!(w.why.contains(shown), "{shown}: {}", w.why);
+        }
+        assert!(!w.why.contains("at 1 in 10,"), "{}", w.why);
     }
+    // At 1 in 50 the neighbours are 1 in 10 and 1 in 100.
+    let at_50 = assess_with_draws(
+        &with_dial(&research::coos_household(), ReturnPeriod::OneIn50),
+        &research::coos_rates(),
+        county,
+        &research::coos_scenarios(true),
+        TEST_DRAWS,
+    );
+    let w = at_50
+        .warnings
+        .iter()
+        .find(|w| w.id == "cliff_water_out")
+        .unwrap_or_else(|| panic!("cliff at 1 in 50: {:?}", at_50.warnings));
+    for shown in ["at 1 in 10,", "at 1 in 50,", "at 1 in 100."] {
+        assert!(w.why.contains(shown), "{shown}: {}", w.why);
+    }
+    assert!(!w.why.contains("1 in 500"), "{}", w.why);
     // The statement names the event once, not once per bucket.
     let named = coos
         .statement
@@ -721,9 +743,13 @@ fn a_scenario_with_no_consequence_rows_is_reported_but_changes_nothing() {
         rate_per_year: 0.01,
         low: 0.005,
         high: 0.02,
+        evidence: rr_types::Evidence::Prior,
         on: true,
+        default_on: true,
+        overridden: false,
         applies_because: "Test.".into(),
         variant: None,
+        alternatives: vec![],
         sources: vec!["rr_risk_model_priors".into()],
     };
     let a = assess_with_draws(
@@ -735,4 +761,74 @@ fn a_scenario_with_no_consequence_rows_is_reported_but_changes_nothing() {
     );
     assert_eq!(a.scenarios.len(), 1);
     assert!(a.scenarios[0].effect_summary.starts_with("Does not change"));
+}
+
+#[test]
+fn an_offered_scenario_takes_its_long_run_share_out_of_the_parent_rate() {
+    // Coos Bay with a county earthquake rate of 0.0198 a year (NRI): with Cascadia offered, the
+    // ordinary earthquake rows run at 0.0198 − 0.0041 (the long-run share); never below a quarter.
+    let input = research::coos_household();
+    let mut rates = research::coos_rates();
+    rates.push(rr_types::HouseholdEventRate {
+        hazard: rr_types::HazardId::Earthquake,
+        rate_per_year: 0.0198,
+        low: 0.0099,
+        high: 0.0396,
+        evidence: rr_types::Evidence::Empirical,
+        sources: vec!["fema_nri_v120".into()],
+    });
+    let quake_power_share = rr_consequence::table()
+        .effects
+        .iter()
+        .find(|r| {
+            r.hazard == rr_types::HazardId::Earthquake
+                && r.scenario.is_none()
+                && r.bucket == BucketId::Power
+        })
+        .unwrap()
+        .p_given_event;
+    let quake_rate = |a: &rr_consequence::ConsequenceAssessment| -> f64 {
+        a.details
+            .iter()
+            .find(|d| d.bucket == BucketId::Power)
+            .unwrap()
+            .terms
+            .iter()
+            .find(|t| t.hazard == rr_types::HazardId::Earthquake && t.scenario.is_none())
+            .map(|t| t.events_per_year / quake_power_share)
+            .unwrap()
+    };
+    for on in [true, false] {
+        let a = assess_with_draws(
+            &input,
+            &rates,
+            CountyData::default(),
+            &research::coos_scenarios(on),
+            TEST_DRAWS,
+        );
+        assert!(
+            (quake_rate(&a) - (0.0198 - 0.0041)).abs() < 1e-12,
+            "{}",
+            quake_rate(&a)
+        );
+        assert!(a.notes.iter().any(|n| n.contains("long-run share")));
+    }
+    let none = assess_with_draws(&input, &rates, CountyData::default(), &[], TEST_DRAWS);
+    assert!((quake_rate(&none) - 0.0198).abs() < 1e-12);
+    // A scenario share larger than the parent's rate leaves a quarter of it.
+    let mut small = rates.clone();
+    small.last_mut().unwrap().rate_per_year = 0.005;
+    small.last_mut().unwrap().low = 0.0025;
+    let a = assess_with_draws(
+        &input,
+        &small,
+        CountyData::default(),
+        &research::coos_scenarios(true),
+        TEST_DRAWS,
+    );
+    assert!(
+        (quake_rate(&a) - 0.00125).abs() < 1e-12,
+        "{}",
+        quake_rate(&a)
+    );
 }

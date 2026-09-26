@@ -66,7 +66,7 @@ pub use curve::{
     CurveTerm, DialPoint, ExceedanceCurve, LADDER_TOLERANCE, ONE_IN_100_RATE, dial_rate,
     round_up_to_ladder,
 };
-pub use effects::{EffectRow, EffectsTable, IncomeRow, table};
+pub use effects::{EffectRow, EffectsTable, IncomeRow, OverlapRow, table};
 pub use income::{GapRule, IncomeCurve, MONTHS_LADDER, round_up_months};
 pub use model::{CountyData, CouplingApplied, OverrideApplied, ScenarioCandidate};
 pub use ranges::DRAWS;
