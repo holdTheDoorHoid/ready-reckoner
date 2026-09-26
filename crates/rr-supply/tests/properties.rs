@@ -71,6 +71,7 @@ fn person(r: &mut SplitMix64) -> Person {
         },
         earner: false,
         commute,
+        access_needs: Vec::new(),
     }
 }
 

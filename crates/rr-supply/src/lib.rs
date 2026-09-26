@@ -1055,6 +1055,9 @@ pub fn sized_requirements(
             BucketId::Security => {
                 out.push(bucket, Some(fire::neighbour_contacts()), Need, now, false);
             }
+            // awaiting: supply — the clean-air lines (respirators, an air cleaner or a DIY filter
+            // box, a sealed-room plan; DESIGN-DELTA §3).
+            BucketId::CleanAir => {}
             BucketId::Income => {
                 let months = t.months(bucket);
                 let s = money::emergency_fund_months(months, &input.finances);

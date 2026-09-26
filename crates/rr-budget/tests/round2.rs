@@ -128,6 +128,7 @@ fn a_first_step_already_done_is_skipped() {
         item_id: rr_types::ItemId::from("comms_contact_card"),
         qty: 1.0,
         paid_usd: None,
+        tested_on: None,
     }];
     let m0 = month0_free(&s);
     assert_eq!(

@@ -5,6 +5,7 @@
 use rr_types::HazardId;
 
 /// Why the engine uses the rate it does for `hazard`, in plain language.
+#[allow(deprecated)] // the retired `terrorism` still needs an arm while the id exists
 pub fn why_we_think_this(hazard: HazardId) -> &'static str {
     use HazardId::*;
     match hazard {
@@ -157,6 +158,14 @@ pub fn why_we_think_this(hazard: HazardId) -> &'static str {
         ExtendedHouseholdIllness => {
             "An illness that keeps someone home for weeks: an expert estimate of about 1 in 100 per \
              person a year."
+        }
+        // awaiting: hazards — the reason for each contract v2 hazard arrives with its rate; none
+        // is emitted yet.
+        WildfireSmoke | DustStorm | Sinkhole | GeomagneticStorm | Vei7Eruption | DamFailure
+        | NetworkOutage | DrugShortage | BenefitInterruption | AttackDisruption
+        | MultiMonthBlackout | WarInfrastructure | CbrnAttack | SeverePandemic
+        | FinancialCrisis | MassViolence | WaterDamage | Eviction | ArrestOrDetention => {
+            "We do not estimate this hazard yet."
         }
     }
 }

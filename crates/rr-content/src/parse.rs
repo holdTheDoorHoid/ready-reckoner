@@ -387,6 +387,8 @@ fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
             title,
             applies_to,
             citations,
+            // awaiting: content — read `kind` from the front matter (DESIGN-DELTA §1.3).
+            kind: None,
         },
         body,
         file: path.to_owned(),

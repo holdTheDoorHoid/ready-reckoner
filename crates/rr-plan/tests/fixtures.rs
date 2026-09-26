@@ -24,7 +24,7 @@ fn every_fixture_assesses() {
             out.location.data_note.as_deref() != Some(rr_plan::source::FIXTURE_DATA_NOTE),
             "{name}: real county records, not the sample counties"
         );
-        assert_eq!(out.buckets.len(), 14, "{name}");
+        assert_eq!(out.buckets.len(), 15, "{name}"); // 15 since contract v2 (clean_air)
         let ids: Vec<BucketId> = out.buckets.iter().map(|b| b.id).collect();
         assert_eq!(ids, BucketId::ALL, "{name}: buckets in BucketId order");
         assert!(!out.register.is_empty(), "{name}");

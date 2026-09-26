@@ -264,6 +264,7 @@ pub fn run<S: CountySource + ?Sized>(
             item_id: id.clone(),
             qty: *qty as f32,
             paid_usd: None,
+            tested_on: None,
         }));
 
     // Budget.

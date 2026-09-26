@@ -379,6 +379,8 @@ pub(crate) fn short_name(bucket: BucketId) -> &'static str {
         BucketId::MedicalEmergency => "medical emergencies",
         BucketId::Fire => "house fires",
         BucketId::Security => "home security",
+        // awaiting: budget — words for the contract v2 clean-air bucket.
+        BucketId::CleanAir => "smoky or dusty air indoors",
         BucketId::Income => "losing income",
         BucketId::HomeLoss => "a damaged home",
     }

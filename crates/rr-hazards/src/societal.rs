@@ -176,6 +176,10 @@ fn nuclear_attack() -> HazardRate {
     )
 }
 
+// awaiting: hazards — `terrorism` is retired in contract v2 and no longer emitted (see `assess`);
+// its disruption half becomes the ranked `attack_disruption` and its personal-safety half the rare
+// `mass_violence` family (DESIGN-DELTA §1, REVIEW H2). Kept, unused, for that rewrite.
+#[allow(dead_code, deprecated)]
 fn terrorism(ctx: &Ctx<'_>) -> HazardRate {
     let k = unrest_setting(ctx.setting()).value;
     let (lo, hi) = (TERRORISM_RANGE.0 * k, TERRORISM_RANGE.1 * k);
@@ -250,7 +254,8 @@ pub(crate) fn assess(ctx: &Ctx<'_>, notes: &mut Notes) -> Vec<HazardRate> {
         ),
         hazmat_release(ctx),
         nuclear_attack(),
-        terrorism(ctx),
+        // `terrorism` is retired in contract v2 and never emitted. awaiting: hazards —
+        // `attack_disruption` (ranked) and `mass_violence` (rare) replace it.
     ];
     out.extend(nuclear_plant_incident(ctx, notes));
     out.sort_by_key(|r| r.hazard);
