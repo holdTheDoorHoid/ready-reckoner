@@ -1,6 +1,6 @@
 //! One hazard's household rate, today and around 2050, with what the register needs to show it.
 
-use rr_types::{DataConfidence, HazardDisplay, HazardId};
+use rr_types::{DataConfidence, HazardDisplay, HazardId, LocationFactor, SubCause};
 
 use crate::climate::Climate;
 use crate::estimate::Estimate;
@@ -38,6 +38,17 @@ pub(crate) struct HazardRate {
     /// sentence: the part's rate today and around 2050, and its verb. The landslide card says how
     /// many households have the home itself damaged, apart from roads cut off (model review M-05).
     pub part_sentence: Option<(Estimate, Estimate, String)>,
+    /// Named causes inside the hazard (contract v2), each a note with its sources.
+    pub sub_causes: Vec<SubCause>,
+    /// The location term behind the rate, for "Why here" (contract v2).
+    pub location_factor: Option<LocationFactor>,
+    /// Show only the range (contract v2): every rare row, and ranked rates built from stacked
+    /// expert judgement.
+    pub range_only: bool,
+    /// What it would mean if it happened here (rare rows).
+    pub if_it_reaches_you: Option<String>,
+    /// What it changes in the plan (rare rows).
+    pub what_it_changes: Option<String>,
 }
 
 impl HazardRate {
@@ -62,6 +73,11 @@ impl HazardRate {
             fixed_severity: None,
             fixed_confidence: None,
             part_sentence: None,
+            sub_causes: Vec::new(),
+            location_factor: None,
+            range_only: false,
+            if_it_reaches_you: None,
+            what_it_changes: None,
         }
     }
 

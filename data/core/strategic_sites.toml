@@ -1,0 +1,1998 @@
+# Strategic sites for the nuclear family and the terrorism tier (Ready Reckoner data pack).
+# Written by the rr-etl `strategic` job from crates/rr-etl/data/strategic_sites.toml (sha256 7447345cfd13379a0ffd703d1e5d3549227c878abaa2b2515bc4ded1bf85ae12); do not edit here.
+# The f_s factors are expert priors (prior = true): show them only as ranges.
+
+schema = "strategic_sites/1"
+status = "reviewed"
+reviewed = "2026-09-26"
+precedence = ["A", "C1", "B", "C2", "D", "E"]
+county_point = "Census 2020 county centre of population (Gazetteer 2024 internal point where the Census publishes none)"
+
+[[class]]
+id = "A"
+label = "Counterforce and command sites"
+f_s = 0.9
+f_s_low = 0.6
+f_s_high = 0.99
+prior = true
+rule = "County contains, or its population centre is within 30 km of: an ICBM launch facility or host base, an SSBN base, a nuclear-capable bomber base, a nuclear-weapons storage site, a primary nuclear command, control and communications (NC3) or continuity-of-government node, or a strategic missile-defence site. Missile fields count by the counties that contain launch facilities."
+why_here = "Your county has, or is close to, {site}: {role_plain}. In a large nuclear war, places like this are treated as likely targets. That does not mean an attack is likely. It means that if one happened, this area would face more danger than most."
+
+[[class]]
+id = "B"
+label = "Missile-field fallout corridor"
+f_s = 0.5
+f_s_low = 0.2
+f_s_high = 0.8
+prior = true
+rule = "Not A or C1, and the county population centre is within 800 km of a launch-facility county at a compass bearing of 45 to 135 degrees (north-east through south-east, the usual downwind side), or within 75 km in any direction."
+why_here = "You live downwind of the nuclear missile fields in {field_states}, about {distance_mi} miles to your {upwind_dir}. Winds here usually blow from the west. If those missile sites were ever attacked, radioactive fallout could drift over your area within a day or two. That is the main reason your chance is higher than in most places."
+
+[[class]]
+id = "C1"
+label = "Largest cities, the capital region and weapons plants"
+f_s = 0.6
+f_s_low = 0.3
+f_s_high = 0.9
+prior = true
+rule = "County is in one of the ten largest metropolitan areas (Census Vintage 2024), in the National Capital Region (10 U.S.C. 2674(f)(2)), or contains, or has its population centre within 30 km of, a site of the NNSA nuclear security enterprise."
+why_here = "You live in {place}. Because of its size and importance, a place like this is treated as a likely target in a large nuclear war. That does not mean an attack is likely, only that the danger here would be greater than in most places."
+
+[[class]]
+id = "C2"
+label = "Other large cities, ports, refineries and bases"
+f_s = 0.3
+f_s_low = 0.1
+f_s_high = 0.6
+prior = true
+rule = "County is in a metropolitan area of 1,000,000 or more (Census Vintage 2024), contains a refinery of 200,000 barrels per calendar day or more (EIA, January 2026), is a principal county of one of the ten busiest ports by tonnage (BTS/USACE 2022), or contains another major military installation listed here."
+why_here = "You live in {place}: {reason}. Places like this could be targets in a large nuclear war, but they are less likely targets than the biggest cities and military sites."
+
+[[class]]
+id = "D"
+label = "Downwind of a target"
+f_s = 0.15
+f_s_low = 0.05
+f_s_high = 0.4
+prior = true
+rule = "Not A to C2, and the county population centre is within 150 km of an A point site, an NNSA site or a C1 county at a compass bearing of 45 to 135 degrees."
+why_here = "You live about {distance_mi} miles downwind of {place}. If that place were attacked, fallout could drift here, so your chance of serious effects is higher than in most rural areas, though still lower than near the target itself."
+
+[[class]]
+id = "E"
+label = "Remote from targets and fallout paths"
+f_s = 0.03
+f_s_low = 0.01
+f_s_high = 0.1
+prior = true
+rule = "Everything else."
+why_here = "None of the places treated as likely targets, and no missile-field fallout path, is close to you. In a large nuclear war, the main effects here would be shortages, power cuts and lost income, not blast or heavy fallout."
+
+[role_plain]
+bomber_base = "a base for bombers that can carry nuclear weapons"
+capital_region = "the nation’s capital"
+doe_weapons_complex = "a plant or laboratory that makes or looks after nuclear weapons"
+icbm_field = "a field of underground nuclear missile silos"
+icbm_host_base = "the Air Force base that runs a nuclear missile field"
+missile_defense = "a missile-defense site"
+mount_weather = "a site where the federal government would keep working in a national emergency"
+nc3_node = "a center that commands or talks to U.S. nuclear forces"
+ssbn_base = "the home port of the Navy’s nuclear-missile submarines"
+weapons_storage = "a place where nuclear weapons are stored"
+
+[template_rules]
+distance_mi = "great-circle distance from the county population centre to the nearest triggering site (B: the nearest launch-facility county that satisfies the B rule, not simply the nearest one), rounded to the nearest 10 miles"
+place = "metro title (short form), the National Capital Region, or the site name"
+reason = "the qualifying reason in words: a metro area of more than a million people; a major port; a large oil refinery; a major military base"
+upwind_dir = "16-point compass direction from the county to that site (for B, where the missile field lies from you)"
+
+[geometry.A]
+radius_km = 30
+measured_from = "each A point site (MIRTA point or agency location) to the county population centre; missile fields by county list"
+sources = ["hazard_expansion_b14"]
+
+[geometry.B]
+azimuth_from_deg = 45
+azimuth_to_deg = 135
+distance_km = 800
+ring_km = 75
+measured_from = "internal point of every county that contains launch facilities (23 counties; proxy for the 450 launch facilities until their coordinates are bundled)"
+sources = ["sciam_2023", "missilesonourland", "napb90_exec", "napb90_annexb", "hazard_expansion_b14"]
+
+[geometry.D]
+azimuth_from_deg = 45
+azimuth_to_deg = 135
+distance_km = 150
+ring_km = 0
+measured_from = "A point sites, NNSA sites and the internal point of every C1 county (missile fields excluded: their downwind side is class B)"
+sources = ["napb90_exec", "hazard_expansion_b14"]
+
+[[site]]
+id = "malmstrom_field"
+name = "Malmstrom AFB missile field (341st Missile Wing)"
+kind = "icbm_field"
+class = "A"
+state = "MT"
+lat = 47.185
+lon = -110.846
+rule = "county_list"
+counties = ["30013", "30015", "30027", "30045", "30049", "30059", "30099", "30107"]
+role_plain = "a field of underground nuclear missile silos"
+role = "Minuteman III launch facilities of the 341st Missile Wing. 150 launch facilities and 15 missile alert facilities over about 13,800 square miles (KTVH, from the Sentinel draft EIS)."
+support = "field and county list: primary (Sentinel Final EIS Volume I, section 2.1.7.1, p. 2-33: 15 MAFs and 150 LFs across the eight counties listed; read in full 2026-09-26)"
+sources = ["ktvh_malmstrom", "sentinel_feis_summary", "sentinel_feis_vol1", "fas_2025", "defensenews_new_silos"]
+unverified = ["defensenews_new_silos: search_summary"]
+note = "The Air Force will dig new Sentinel silos on the existing, mostly Air Force-owned launch sites (Defense News, May 2025), so the county list should not change. County list checked against EIS Volume I on 2026-09-26: all counties match."
+
+[[site]]
+id = "minot_field"
+name = "Minot AFB missile field (91st Missile Wing)"
+kind = "icbm_field"
+class = "A"
+state = "ND"
+lat = 48.274
+lon = -101.413
+rule = "county_list"
+counties = ["38009", "38013", "38049", "38055", "38061", "38075", "38083", "38101"]
+role_plain = "a field of underground nuclear missile silos"
+role = "Minuteman III launch facilities of the 91st Missile Wing. 150 silos over about 8,500 square miles (AP)."
+support = "field and county list: primary (Sentinel Final EIS Volume I, section 2.1.8.1, p. 2-40: 15 MAFs and 150 LFs across the eight counties listed; read in full 2026-09-26)"
+sources = ["ap_sentinel_counties", "sentinel_feis_summary", "sentinel_feis_vol1", "fas_2025", "defensenews_new_silos"]
+unverified = ["ap_sentinel_counties: search_summary", "defensenews_new_silos: search_summary"]
+note = "The Air Force will dig new Sentinel silos on the existing, mostly Air Force-owned launch sites (Defense News, May 2025), so the county list should not change. County list checked against EIS Volume I on 2026-09-26: all counties match."
+
+[[site]]
+id = "warren_field"
+name = "F.E. Warren AFB missile field (90th Missile Wing)"
+kind = "icbm_field"
+class = "A"
+state = "WY, NE, CO"
+lat = 41.231
+lon = -103.847
+rule = "county_list"
+counties = ["56021", "56015", "31007", "31033", "31105", "08123", "08075"]
+role_plain = "a field of underground nuclear missile silos"
+role = "Minuteman III launch facilities of the 90th Missile Wing. 150 silos across seven counties in three states (AP). Platte County, WY held Peacekeeper silos until 2005 and is correctly absent."
+support = "field and county list: primary (Sentinel Final EIS Volume I, section 2.1.6.1, p. 2-13: 15 MAFs and 150 LFs in seven counties and three states; read in full 2026-09-26)"
+sources = ["ap_sentinel_counties", "sentinel_feis_summary", "sentinel_feis_vol1", "fas_2025", "defensenews_new_silos"]
+unverified = ["ap_sentinel_counties: search_summary", "defensenews_new_silos: search_summary"]
+note = "The Air Force will dig new Sentinel silos on the existing, mostly Air Force-owned launch sites (Defense News, May 2025), so the county list should not change. County list checked against EIS Volume I on 2026-09-26: all counties match."
+
+[[site]]
+id = "minot_afb"
+name = "Minot Air Force Base"
+kind = "icbm_host_base"
+also = ["bomber_base", "weapons_storage"]
+class = "A"
+state = "ND"
+lat = 48.4154
+lon = -101.3227
+rule = "point_30km"
+counties = ["38101"]
+role_plain = "the Air Force base that runs a nuclear missile field"
+role = "Host of the 91st Missile Wing; B-52H bomber base; weapons storage (FAS)."
+support = "primary location (MIRTA); ICBM host role primary (Sentinel FEIS); bomber and storage roles secondary (FAS 2025)"
+sources = ["mirta_points", "fas_2025", "sentinel_feis_summary"]
+unverified = ["role: rests on a secondary source"]
+
+[[site]]
+id = "malmstrom_afb"
+name = "Malmstrom Air Force Base"
+kind = "icbm_host_base"
+also = ["weapons_storage"]
+class = "A"
+state = "MT"
+lat = 47.5059
+lon = -111.1826
+rule = "point_30km"
+counties = ["30013"]
+role_plain = "the Air Force base that runs a nuclear missile field"
+role = "Host of the 341st Missile Wing; weapons storage (FAS)."
+support = "primary location (MIRTA); role primary (Sentinel FEIS) and secondary (FAS)"
+sources = ["mirta_points", "sentinel_feis_summary", "fas_2025"]
+unverified = ["role: rests on a secondary source"]
+
+[[site]]
+id = "fe_warren_afb"
+name = "Francis E. Warren Air Force Base"
+kind = "icbm_host_base"
+also = ["weapons_storage"]
+class = "A"
+state = "WY"
+lat = 41.1648
+lon = -104.8632
+rule = "point_30km"
+counties = ["56021"]
+role_plain = "the Air Force base that runs a nuclear missile field"
+role = "Host of the 90th Missile Wing; weapons storage (FAS)."
+support = "primary location (MIRTA); role primary (Sentinel FEIS) and secondary (FAS)"
+sources = ["mirta_points", "sentinel_feis_summary", "fas_2025"]
+unverified = ["role: rests on a secondary source"]
+
+[[site]]
+id = "kitsap_bangor"
+name = "Naval Base Kitsap-Bangor"
+kind = "ssbn_base"
+also = ["weapons_storage"]
+class = "A"
+state = "WA"
+lat = 47.7234
+lon = -122.7148
+rule = "point_30km"
+counties = ["53035"]
+role_plain = "the home port of the Navy’s nuclear-missile submarines"
+role = "Pacific home port of the Ohio-class ballistic-missile submarines; Strategic Weapons Facility Pacific (FAS lists Bangor as a storage site)."
+support = "primary location and identity (MIRTA); role secondary (FAS 2025)"
+sources = ["mirta_points", "fas_2025"]
+unverified = ["role: rests on a secondary source"]
+note = "Jefferson County lies 2.9 km across Hood Canal; its internal point is 61 km away. Decide with population centres."
+
+[[site]]
+id = "kings_bay"
+name = "Naval Submarine Base Kings Bay"
+kind = "ssbn_base"
+also = ["weapons_storage"]
+class = "A"
+state = "GA"
+lat = 30.7904
+lon = -81.5381
+rule = "point_30km"
+counties = ["13039"]
+role_plain = "the home port of the Navy’s nuclear-missile submarines"
+role = "Atlantic home port of the ballistic-missile submarines; Strategic Weapons Facility Atlantic (FAS lists Kings Bay as a storage site)."
+support = "primary location and identity (MIRTA); role secondary (FAS 2025)"
+sources = ["mirta_points", "fas_2025"]
+unverified = ["role: rests on a secondary source"]
+
+[[site]]
+id = "whiteman_afb"
+name = "Whiteman Air Force Base"
+kind = "bomber_base"
+also = ["weapons_storage"]
+class = "A"
+state = "MO"
+lat = 38.7293
+lon = -93.5519
+rule = "point_30km"
+counties = ["29101"]
+role_plain = "a base for bombers that can carry nuclear weapons"
+role = "B-2A base; weapons storage; planned second B-21 base (FAS)."
+support = "primary location (MIRTA); role secondary (FAS 2025)"
+sources = ["mirta_points", "fas_2025"]
+unverified = ["role: rests on a secondary source"]
+
+[[site]]
+id = "barksdale_afb"
+name = "Barksdale Air Force Base"
+kind = "bomber_base"
+also = ["weapons_storage"]
+class = "A"
+state = "LA"
+lat = 32.5003
+lon = -93.5999
+rule = "point_30km"
+counties = ["22015"]
+role_plain = "a base for bombers that can carry nuclear weapons"
+role = "B-52H base and Air Force Global Strike Command headquarters; weapons storage (FAS)."
+support = "primary location (MIRTA); role secondary (FAS 2025)"
+sources = ["mirta_points", "fas_2025"]
+unverified = ["role: rests on a secondary source"]
+
+[[site]]
+id = "ellsworth_afb"
+name = "Ellsworth Air Force Base"
+kind = "bomber_base"
+class = "A"
+state = "SD"
+lat = 44.1571
+lon = -103.094
+rule = "point_30km"
+counties = ["46093"]
+role_plain = "a base for bombers that can carry nuclear weapons"
+role = "First B-21 main operating base (FAS). Today it flies the B-1B, which is not nuclear-capable; the class A listing is for the B-21 bed-down."
+support = "primary location (MIRTA); role secondary (FAS 2025)"
+sources = ["mirta_points", "fas_2025"]
+unverified = ["role: rests on a secondary source"]
+note = "If the B-21 bed-down slips, hold Ellsworth at C2 until aircraft arrive."
+
+[[site]]
+id = "kirtland_afb"
+name = "Kirtland Air Force Base (Kirtland Underground Munitions and Maintenance Storage Complex)"
+kind = "weapons_storage"
+also = ["doe_weapons_complex"]
+class = "A"
+state = "NM"
+lat = 35.0421
+lon = -106.5403
+rule = "point_30km"
+counties = ["35001"]
+role_plain = "a place where nuclear weapons are stored"
+role = "Largest US nuclear-weapons storage site (FAS); also hosts Sandia National Laboratories."
+support = "primary location (MIRTA); role secondary (FAS 2025); Sandia primary (NNSA)"
+sources = ["mirta_points", "fas_2025", "nnsa_locations"]
+unverified = ["role: rests on a secondary source"]
+
+[[site]]
+id = "pantex"
+name = "Pantex Plant"
+kind = "doe_weapons_complex"
+also = ["weapons_storage"]
+class = "A"
+state = "TX"
+lat = 35.317
+lon = -101.567
+rule = "point_30km"
+counties = ["48065"]
+role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
+role = "NNSA plant for nuclear explosive assembly and disassembly (NNSA); FAS lists it among storage sites. Placed in A (storage) rather than C1."
+support = "primary (NNSA); storage secondary (FAS 2025); coordinates secondary"
+sources = ["nnsa_locations", "fas_2025"]
+unverified = ["coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+note = "Potter County (Amarillo) is 31 km from the Pantex point by internal point and closer by population centre; expect it to become A when the ETL uses population centres."
+
+[[site]]
+id = "offutt_afb"
+name = "Offutt Air Force Base"
+kind = "nc3_node"
+class = "A"
+state = "NE"
+lat = 41.1314
+lon = -95.9156
+rule = "point_30km"
+counties = ["31153"]
+role_plain = "a center that commands or talks to U.S. nuclear forces"
+role = "Headquarters of US Strategic Command and its command-and-control facility."
+support = "primary location (MIRTA); role: public reporting (Military Times 2019); stratcom.mil not retrieved"
+sources = ["mirta_points", "militarytimes_offutt"]
+unverified = ["militarytimes_offutt: search_summary"]
+
+[[site]]
+id = "peterson_sfb"
+name = "Peterson Space Force Base"
+kind = "nc3_node"
+class = "A"
+state = "CO"
+lat = 38.8229
+lon = -104.6961
+rule = "point_30km"
+counties = ["08041"]
+role_plain = "a center that commands or talks to U.S. nuclear forces"
+role = "NORAD and US Northern Command headquarters."
+support = "primary location (MIRTA); role primary (NORTHCOM, search summary)"
+sources = ["mirta_points", "northcom_cmc"]
+unverified = ["northcom_cmc: search_summary"]
+
+[[site]]
+id = "cheyenne_mountain"
+name = "Cheyenne Mountain Space Force Station"
+kind = "nc3_node"
+class = "A"
+state = "CO"
+lat = 38.741
+lon = -104.8427
+rule = "point_30km"
+counties = ["08041"]
+role_plain = "a center that commands or talks to U.S. nuclear forces"
+role = "NORAD and USNORTHCOM alternate command center; supports the US Space Command Missile Warning Center."
+support = "primary location (MIRTA); role primary (NORTHCOM, search summary)"
+sources = ["mirta_points", "northcom_cmc"]
+unverified = ["northcom_cmc: search_summary"]
+
+[[site]]
+id = "schriever_sfb"
+name = "Schriever Space Force Base"
+kind = "missile_defense"
+class = "A"
+state = "CO"
+lat = 38.8058
+lon = -104.5205
+rule = "point_30km"
+counties = ["08041"]
+role_plain = "a missile-defense site"
+role = "Colorado Springs node of the Ground-based Midcourse Defense fire control (MDA names Fort Greely and Colorado Springs)."
+support = "primary location (MIRTA); role primary (MDA, search summary; node location given as Colorado Springs)"
+sources = ["mirta_points", "mda_gmd"]
+unverified = ["mda_gmd: search_summary"]
+
+[[site]]
+id = "tinker_afb"
+name = "Tinker Air Force Base"
+kind = "nc3_node"
+class = "A"
+state = "OK"
+lat = 35.4154
+lon = -97.3905
+rule = "point_30km"
+counties = ["40109"]
+role_plain = "a center that commands or talks to U.S. nuclear forces"
+role = "Home of the Navy E-6B Mercury airborne command post and TACAMO communications fleet (Strategic Communications Wing One)."
+support = "primary location (MIRTA); role primary (Tinker AFB fact sheet, search result)"
+sources = ["mirta_points", "tinker_e6b"]
+unverified = ["tinker_e6b: search_summary"]
+
+[[site]]
+id = "pentagon"
+name = "The Pentagon"
+kind = "nc3_node"
+also = ["capital_region"]
+class = "A"
+state = "VA"
+lat = 38.8707
+lon = -77.0556
+rule = "point_30km"
+counties = ["51013"]
+role_plain = "a center that commands or talks to U.S. nuclear forces"
+role = "Department of Defense headquarters and National Military Command Center."
+support = "primary location and identity (MIRTA, Washington Headquarters Services)"
+sources = ["mirta_points", "usc_10_2674"]
+unverified = []
+note = "Montgomery County, MD is 32.3 km by internal point (touch). The whole National Capital Region is C1 regardless."
+
+[[site]]
+id = "raven_rock"
+name = "Raven Rock Mountain Complex (Site R)"
+kind = "nc3_node"
+class = "A"
+state = "PA"
+lat = 39.7336
+lon = -77.4197
+rule = "point_30km"
+counties = ["42001"]
+role_plain = "a center that commands or talks to U.S. nuclear forces"
+role = "Department of Defense underground alternate command and communications center near Blue Ridge Summit."
+support = "primary (Army ERDC technical report TR-19-10, search result); coordinates secondary; not in public MIRTA"
+sources = ["erdc_raven_rock"]
+unverified = ["erdc_raven_rock: search_summary", "coordinates: secondary (not an agency point)"]
+
+[[site]]
+id = "mount_weather"
+name = "Mount Weather Emergency Operations Center"
+kind = "nc3_node"
+class = "A"
+state = "VA"
+lat = 39.0633
+lon = -77.8889
+rule = "point_30km"
+counties = ["51107"]
+role_plain = "a site where the federal government would keep working in a national emergency"
+role = "FEMA continuity-of-government relocation site (civil, not military NC3; grouped here)."
+support = "primary acknowledgement (DHS/FEMA contract notice for the MWEOC facility, search result); coordinates secondary"
+sources = ["mweoc_notice"]
+unverified = ["mweoc_notice: search_summary", "coordinates: secondary (not an agency point)"]
+
+[[site]]
+id = "fort_greely"
+name = "Fort Greely"
+kind = "missile_defense"
+class = "A"
+state = "AK"
+lat = 63.9668
+lon = -145.7151
+rule = "point_30km"
+counties = ["02240"]
+role_plain = "a missile-defense site"
+role = "40 Ground-Based Interceptors and a GMD fire-control node (MDA)."
+support = "primary location (MIRTA); role primary (MDA, search summary)"
+sources = ["mirta_points", "mda_gmd"]
+unverified = ["mda_gmd: search_summary"]
+
+[[site]]
+id = "vandenberg_sfb"
+name = "Vandenberg Space Force Base"
+kind = "missile_defense"
+class = "A"
+state = "CA"
+lat = 34.7137
+lon = -120.5579
+rule = "point_30km"
+counties = ["06083"]
+role_plain = "a missile-defense site"
+role = "4 Ground-Based Interceptors (MDA); Minuteman III test launches."
+support = "primary location (MIRTA); role primary (MDA, search summary)"
+sources = ["mirta_points", "mda_gmd"]
+unverified = ["mda_gmd: search_summary"]
+
+[[site]]
+id = "clear_sfs"
+name = "Clear Space Force Station"
+kind = "missile_defense"
+class = "A"
+state = "AK"
+lat = 64.2882
+lon = -149.1907
+rule = "point_30km"
+counties = ["02068"]
+role_plain = "a missile-defense site"
+role = "Long Range Discrimination Radar and an early-warning radar being upgraded for GMD (MDA)."
+support = "primary location (MIRTA); role primary (MDA, search summary)"
+sources = ["mirta_points", "mda_gmd"]
+unverified = ["mda_gmd: search_summary"]
+
+[[site]]
+id = "beale_afb"
+name = "Beale Air Force Base"
+kind = "missile_defense"
+class = "A"
+state = "CA"
+lat = 39.1209
+lon = -121.3956
+rule = "point_30km"
+counties = ["06115"]
+role_plain = "a missile-defense site"
+role = "Upgraded Early Warning Radar used by GMD (MDA). Sensor site: owner may prefer C2."
+support = "primary location (MIRTA); role primary (MDA, search summary)"
+sources = ["mirta_points", "mda_gmd"]
+unverified = ["mda_gmd: search_summary"]
+note = "The most debatable A members: sensors, not weapons or command posts. Demoting them to C2 moves Barnstable (MA), Yuba and Sutter (CA) and Aleutians West (AK)."
+
+[[site]]
+id = "cape_cod_sfs"
+name = "Cape Cod Space Force Station (at Joint Base Cape Cod)"
+kind = "missile_defense"
+class = "A"
+state = "MA"
+lat = 41.7005
+lon = -70.5449
+rule = "point_30km"
+counties = ["25001"]
+role_plain = "a missile-defense site"
+role = "Early Warning Radar being upgraded for GMD (MDA). Sensor site: owner may prefer C2. MIRTA point is Joint Base Cape Cod."
+support = "primary location (MIRTA, Joint Base Cape Cod); role primary (MDA, search summary)"
+sources = ["mirta_points", "mda_gmd"]
+unverified = ["mda_gmd: search_summary"]
+note = "The most debatable A members: sensors, not weapons or command posts. Demoting them to C2 moves Barnstable (MA), Yuba and Sutter (CA) and Aleutians West (AK)."
+
+[[site]]
+id = "eareckson_as"
+name = "Eareckson Air Station (Shemya Island)"
+kind = "missile_defense"
+class = "A"
+state = "AK"
+lat = 52.721
+lon = 174.1071
+rule = "point_30km"
+counties = ["02016"]
+role_plain = "a missile-defense site"
+role = "Cobra Dane radar used by GMD (MDA). Sensor site: owner may prefer C2."
+support = "primary location (MIRTA); role primary (MDA, search summary)"
+sources = ["mirta_points", "mda_gmd"]
+unverified = ["mda_gmd: search_summary"]
+note = "The most debatable A members: sensors, not weapons or command posts. Demoting them to C2 moves Barnstable (MA), Yuba and Sutter (CA) and Aleutians West (AK)."
+
+[[site]]
+id = "national_capital_region"
+name = "National Capital Region"
+kind = "capital_region"
+class = "C1"
+state = "DC, MD, VA"
+lat = 38.9047
+lon = -77.0163
+rule = "county_list"
+counties = ["11001", "24031", "24033", "51013", "51059", "51107", "51153", "51510", "51600", "51610", "51683", "51685"]
+role_plain = "the nation’s capital"
+role = "The statutory National Capital Region: the District of Columbia; Montgomery and Prince Georges Counties, MD; Arlington, Fairfax, Loudoun and Prince William Counties and the City of Alexandria, VA; and all cities within them."
+support = "primary (10 U.S.C. 2674(f)(2))"
+sources = ["usc_10_2674"]
+unverified = []
+note = "Counties within 30 km of the Pentagon (DC, Arlington, Alexandria, Fairfax County and City, Falls Church, Prince Georges) are A."
+
+[[site]]
+id = "y12"
+name = "Y-12 National Security Complex"
+kind = "doe_weapons_complex"
+class = "C1"
+state = "TN"
+lat = 35.986
+lon = -84.253
+rule = "point_30km"
+counties = ["47001"]
+role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
+role = "Uranium components; Oak Ridge."
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
+sources = ["nnsa_locations"]
+unverified = ["coordinates: secondary (not an agency point)"]
+
+[[site]]
+id = "savannah_river"
+name = "Savannah River Site (NNSA tritium facilities)"
+kind = "doe_weapons_complex"
+class = "C1"
+state = "SC"
+lat = 33.25
+lon = -81.65
+rule = "point_30km"
+counties = ["45003", "45005", "45011"]
+role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
+role = "Tritium supply and processing (NNSA)."
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
+sources = ["nnsa_locations"]
+unverified = ["coordinates: secondary (not an agency point)"]
+
+[[site]]
+id = "kcnsc"
+name = "Kansas City National Security Campus"
+kind = "doe_weapons_complex"
+class = "C1"
+state = "MO"
+lat = 38.866
+lon = -94.55
+rule = "point_30km"
+counties = ["29095"]
+role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
+role = "Non-nuclear components (formerly the Kansas City Plant)."
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
+sources = ["nnsa_locations"]
+unverified = ["coordinates: secondary (not an agency point)"]
+
+[[site]]
+id = "lanl"
+name = "Los Alamos National Laboratory"
+kind = "doe_weapons_complex"
+class = "C1"
+state = "NM"
+lat = 35.87
+lon = -106.3
+rule = "point_30km"
+counties = ["35028"]
+role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
+role = "Design laboratory; plutonium science and engineering (NNSA)."
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
+sources = ["nnsa_locations"]
+unverified = ["coordinates: secondary (not an agency point)"]
+
+[[site]]
+id = "sandia_nm"
+name = "Sandia National Laboratories, Albuquerque"
+kind = "doe_weapons_complex"
+class = "C1"
+state = "NM"
+lat = 35.0421
+lon = -106.5403
+rule = "point_30km"
+counties = ["35001"]
+role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
+role = "Engineering laboratory for weapons (NNSA); on Kirtland AFB, so its county is already A."
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates: MIRTA Kirtland AFB point"
+sources = ["nnsa_locations"]
+unverified = []
+
+[[site]]
+id = "sandia_ca"
+name = "Sandia National Laboratories, Livermore"
+kind = "doe_weapons_complex"
+class = "C1"
+state = "CA"
+lat = 37.676
+lon = -121.705
+rule = "point_30km"
+counties = ["06001"]
+role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
+role = "Sandia California site, next to LLNL."
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
+sources = ["nnsa_locations"]
+unverified = ["coordinates: secondary (not an agency point)"]
+
+[[site]]
+id = "llnl"
+name = "Lawrence Livermore National Laboratory"
+kind = "doe_weapons_complex"
+class = "C1"
+state = "CA"
+lat = 37.6872
+lon = -121.7058
+rule = "point_30km"
+counties = ["06001", "06077"]
+role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
+role = "Design laboratory (NNSA). Site 300 straddles Alameda and San Joaquin counties."
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
+sources = ["nnsa_locations"]
+unverified = ["coordinates: secondary (not an agency point)"]
+
+[[site]]
+id = "nnss"
+name = "Nevada National Security Site"
+kind = "doe_weapons_complex"
+class = "C1"
+state = "NV"
+lat = 37.1
+lon = -116.05
+rule = "point_30km"
+counties = ["32023"]
+role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
+role = "Test site and device assembly (NNSA)."
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
+sources = ["nnsa_locations"]
+unverified = ["coordinates: secondary (not an agency point)"]
+
+[[site]]
+id = "dyess_afb"
+name = "Dyess Air Force Base"
+kind = "bomber_base"
+class = "C2"
+state = "TX"
+lat = 32.4211
+lon = -99.8381
+rule = "county_list"
+counties = ["48441"]
+role_plain = "a base for bombers that can carry nuclear weapons"
+role = "B-1B base. The B-1B is not nuclear-capable (FAS 2025); Dyess is to receive the B-21 after Ellsworth and Whiteman."
+support = "primary location (MIRTA); role secondary (FAS 2025)"
+sources = ["mirta_points", "fas_2025"]
+unverified = ["role: rests on a secondary source"]
+note = "Commonly listed as a nuclear bomber base; not supported today. C2 as a major installation; move to A when B-21s arrive."
+
+[[site]]
+id = "hill_afb"
+name = "Hill Air Force Base"
+kind = "weapons_storage"
+class = "C2"
+state = "UT"
+lat = 41.124
+lon = -111.973
+rule = "county_list"
+counties = ["49011"]
+role_plain = "a place where nuclear weapons are stored"
+role = "ICBM depot maintenance (309th Missile Maintenance Group) and a Sentinel EIS site; FAS 2025 (as summarised) lists Hill AFB and the Utah Test and Training Range among storage locations, but no primary source for warhead storage was found."
+support = "primary location (MIRTA); ICBM role primary (Sentinel FEIS summary); storage unsupported"
+sources = ["mirta_points", "sentinel_feis_summary", "fas_2025"]
+unverified = ["coordinates: secondary (not an agency point)"]
+note = "Held at C2 (major installation) until a primary source supports warhead storage."
+
+[[site]]
+id = "andersen_afb"
+name = "Andersen Air Force Base, Guam"
+kind = "bomber_base"
+class = "C2"
+state = "GU"
+lat = 13.5969
+lon = 144.8981
+rule = "county_list"
+counties = ["66010"]
+role_plain = "a base for bombers that can carry nuclear weapons"
+role = "Pacific bomber forward base (rotational deployments); a likely limited-strike target (w_L)."
+support = "primary location (MIRTA); role not checked against a primary source in this pass"
+sources = ["mirta_points"]
+unverified = ["role: rests on a secondary source"]
+note = "C2 as a major installation; list it in the limited-strike weights w_L."
+
+[[metro]]
+id = "metro_35620"
+cbsa = "35620"
+rank = 1
+title = "New York-Newark-Jersey City, NY-NJ"
+pop_2024 = 19940274
+class = "C1"
+
+[[metro]]
+id = "metro_31080"
+cbsa = "31080"
+rank = 2
+title = "Los Angeles-Long Beach-Anaheim, CA"
+pop_2024 = 12927614
+class = "C1"
+
+[[metro]]
+id = "metro_16980"
+cbsa = "16980"
+rank = 3
+title = "Chicago-Naperville-Elgin, IL-IN"
+pop_2024 = 9408576
+class = "C1"
+
+[[metro]]
+id = "metro_19100"
+cbsa = "19100"
+rank = 4
+title = "Dallas-Fort Worth-Arlington, TX"
+pop_2024 = 8344032
+class = "C1"
+
+[[metro]]
+id = "metro_26420"
+cbsa = "26420"
+rank = 5
+title = "Houston-Pasadena-The Woodlands, TX"
+pop_2024 = 7796182
+class = "C1"
+
+[[metro]]
+id = "metro_33100"
+cbsa = "33100"
+rank = 6
+title = "Miami-Fort Lauderdale-West Palm Beach, FL"
+pop_2024 = 6457988
+class = "C1"
+
+[[metro]]
+id = "metro_47900"
+cbsa = "47900"
+rank = 7
+title = "Washington-Arlington-Alexandria, DC-VA-MD-WV"
+pop_2024 = 6436489
+class = "C1"
+
+[[metro]]
+id = "metro_12060"
+cbsa = "12060"
+rank = 8
+title = "Atlanta-Sandy Springs-Roswell, GA"
+pop_2024 = 6411149
+class = "C1"
+
+[[metro]]
+id = "metro_37980"
+cbsa = "37980"
+rank = 9
+title = "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD"
+pop_2024 = 6330422
+class = "C1"
+
+[[metro]]
+id = "metro_38060"
+cbsa = "38060"
+rank = 10
+title = "Phoenix-Mesa-Chandler, AZ"
+pop_2024 = 5186958
+class = "C1"
+
+[[metro]]
+id = "metro_14460"
+cbsa = "14460"
+rank = 11
+title = "Boston-Cambridge-Newton, MA-NH"
+pop_2024 = 5025517
+class = "C2"
+
+[[metro]]
+id = "metro_40140"
+cbsa = "40140"
+rank = 12
+title = "Riverside-San Bernardino-Ontario, CA"
+pop_2024 = 4744214
+class = "C2"
+
+[[metro]]
+id = "metro_41860"
+cbsa = "41860"
+rank = 13
+title = "San Francisco-Oakland-Fremont, CA"
+pop_2024 = 4648486
+class = "C2"
+
+[[metro]]
+id = "metro_19820"
+cbsa = "19820"
+rank = 14
+title = "Detroit-Warren-Dearborn, MI"
+pop_2024 = 4400578
+class = "C2"
+
+[[metro]]
+id = "metro_42660"
+cbsa = "42660"
+rank = 15
+title = "Seattle-Tacoma-Bellevue, WA"
+pop_2024 = 4145494
+class = "C2"
+
+[[metro]]
+id = "metro_33460"
+cbsa = "33460"
+rank = 16
+title = "Minneapolis-St. Paul-Bloomington, MN-WI"
+pop_2024 = 3757952
+class = "C2"
+
+[[metro]]
+id = "metro_45300"
+cbsa = "45300"
+rank = 17
+title = "Tampa-St. Petersburg-Clearwater, FL"
+pop_2024 = 3424560
+class = "C2"
+
+[[metro]]
+id = "metro_41740"
+cbsa = "41740"
+rank = 18
+title = "San Diego-Chula Vista-Carlsbad, CA"
+pop_2024 = 3298799
+class = "C2"
+
+[[metro]]
+id = "metro_19740"
+cbsa = "19740"
+rank = 19
+title = "Denver-Aurora-Centennial, CO"
+pop_2024 = 3052498
+class = "C2"
+
+[[metro]]
+id = "metro_36740"
+cbsa = "36740"
+rank = 20
+title = "Orlando-Kissimmee-Sanford, FL"
+pop_2024 = 2940513
+class = "C2"
+
+[[metro]]
+id = "metro_16740"
+cbsa = "16740"
+rank = 21
+title = "Charlotte-Concord-Gastonia, NC-SC"
+pop_2024 = 2883370
+class = "C2"
+
+[[metro]]
+id = "metro_12580"
+cbsa = "12580"
+rank = 22
+title = "Baltimore-Columbia-Towson, MD"
+pop_2024 = 2859024
+class = "C2"
+
+[[metro]]
+id = "metro_41180"
+cbsa = "41180"
+rank = 23
+title = "St. Louis, MO-IL"
+pop_2024 = 2811927
+class = "C2"
+
+[[metro]]
+id = "metro_41700"
+cbsa = "41700"
+rank = 24
+title = "San Antonio-New Braunfels, TX"
+pop_2024 = 2763006
+class = "C2"
+
+[[metro]]
+id = "metro_12420"
+cbsa = "12420"
+rank = 25
+title = "Austin-Round Rock-San Marcos, TX"
+pop_2024 = 2550637
+class = "C2"
+
+[[metro]]
+id = "metro_38900"
+cbsa = "38900"
+rank = 26
+title = "Portland-Vancouver-Hillsboro, OR-WA"
+pop_2024 = 2537904
+class = "C2"
+
+[[metro]]
+id = "metro_40900"
+cbsa = "40900"
+rank = 27
+title = "Sacramento-Roseville-Folsom, CA"
+pop_2024 = 2463127
+class = "C2"
+
+[[metro]]
+id = "metro_38300"
+cbsa = "38300"
+rank = 28
+title = "Pittsburgh, PA"
+pop_2024 = 2429917
+class = "C2"
+
+[[metro]]
+id = "metro_29820"
+cbsa = "29820"
+rank = 29
+title = "Las Vegas-Henderson-North Las Vegas, NV"
+pop_2024 = 2398871
+class = "C2"
+
+[[metro]]
+id = "metro_17140"
+cbsa = "17140"
+rank = 30
+title = "Cincinnati, OH-KY-IN"
+pop_2024 = 2302815
+class = "C2"
+
+[[metro]]
+id = "metro_28140"
+cbsa = "28140"
+rank = 31
+title = "Kansas City, MO-KS"
+pop_2024 = 2253579
+class = "C2"
+
+[[metro]]
+id = "metro_18140"
+cbsa = "18140"
+rank = 32
+title = "Columbus, OH"
+pop_2024 = 2225377
+class = "C2"
+
+[[metro]]
+id = "metro_26900"
+cbsa = "26900"
+rank = 33
+title = "Indianapolis-Carmel-Greenwood, IN"
+pop_2024 = 2174833
+class = "C2"
+
+[[metro]]
+id = "metro_17410"
+cbsa = "17410"
+rank = 34
+title = "Cleveland, OH"
+pop_2024 = 2171877
+class = "C2"
+
+[[metro]]
+id = "metro_34980"
+cbsa = "34980"
+rank = 35
+title = "Nashville-Davidson--Murfreesboro--Franklin, TN"
+pop_2024 = 2150553
+class = "C2"
+
+[[metro]]
+id = "metro_41980"
+cbsa = "41980"
+rank = 36
+title = "San Juan-Bayamón-Caguas, PR"
+pop_2024 = 2035484
+class = "C2"
+
+[[metro]]
+id = "metro_41940"
+cbsa = "41940"
+rank = 37
+title = "San Jose-Sunnyvale-Santa Clara, CA"
+pop_2024 = 1995484
+class = "C2"
+
+[[metro]]
+id = "metro_47260"
+cbsa = "47260"
+rank = 38
+title = "Virginia Beach-Chesapeake-Norfolk, VA-NC"
+pop_2024 = 1794278
+class = "C2"
+
+[[metro]]
+id = "metro_27260"
+cbsa = "27260"
+rank = 39
+title = "Jacksonville, FL"
+pop_2024 = 1760548
+class = "C2"
+
+[[metro]]
+id = "metro_39300"
+cbsa = "39300"
+rank = 40
+title = "Providence-Warwick, RI-MA"
+pop_2024 = 1700901
+class = "C2"
+
+[[metro]]
+id = "metro_33340"
+cbsa = "33340"
+rank = 41
+title = "Milwaukee-Waukesha, WI"
+pop_2024 = 1574452
+class = "C2"
+
+[[metro]]
+id = "metro_39580"
+cbsa = "39580"
+rank = 42
+title = "Raleigh-Cary, NC"
+pop_2024 = 1562009
+class = "C2"
+
+[[metro]]
+id = "metro_36420"
+cbsa = "36420"
+rank = 43
+title = "Oklahoma City, OK"
+pop_2024 = 1497821
+class = "C2"
+
+[[metro]]
+id = "metro_31140"
+cbsa = "31140"
+rank = 44
+title = "Louisville/Jefferson County, KY-IN"
+pop_2024 = 1394234
+class = "C2"
+
+[[metro]]
+id = "metro_40060"
+cbsa = "40060"
+rank = 45
+title = "Richmond, VA"
+pop_2024 = 1370165
+class = "C2"
+
+[[metro]]
+id = "metro_32820"
+cbsa = "32820"
+rank = 46
+title = "Memphis, TN-MS-AR"
+pop_2024 = 1339345
+class = "C2"
+
+[[metro]]
+id = "metro_41620"
+cbsa = "41620"
+rank = 47
+title = "Salt Lake City-Murray, UT"
+pop_2024 = 1300762
+class = "C2"
+
+[[metro]]
+id = "metro_13820"
+cbsa = "13820"
+rank = 48
+title = "Birmingham, AL"
+pop_2024 = 1192583
+class = "C2"
+
+[[metro]]
+id = "metro_23420"
+cbsa = "23420"
+rank = 49
+title = "Fresno, CA"
+pop_2024 = 1189557
+class = "C2"
+
+[[metro]]
+id = "metro_24340"
+cbsa = "24340"
+rank = 50
+title = "Grand Rapids-Wyoming-Kentwood, MI"
+pop_2024 = 1178826
+class = "C2"
+
+[[metro]]
+id = "metro_25540"
+cbsa = "25540"
+rank = 51
+title = "Hartford-West Hartford-East Hartford, CT"
+pop_2024 = 1169048
+class = "C2"
+
+[[metro]]
+id = "metro_15380"
+cbsa = "15380"
+rank = 52
+title = "Buffalo-Cheektowaga, NY"
+pop_2024 = 1160172
+class = "C2"
+
+[[metro]]
+id = "metro_46060"
+cbsa = "46060"
+rank = 53
+title = "Tucson, AZ"
+pop_2024 = 1080149
+class = "C2"
+
+[[metro]]
+id = "metro_46140"
+cbsa = "46140"
+rank = 54
+title = "Tulsa, OK"
+pop_2024 = 1059803
+class = "C2"
+
+[[metro]]
+id = "metro_40380"
+cbsa = "40380"
+rank = 55
+title = "Rochester, NY"
+pop_2024 = 1057218
+class = "C2"
+
+[[metro]]
+id = "metro_36540"
+cbsa = "36540"
+rank = 56
+title = "Omaha, NE-IA"
+pop_2024 = 1001010
+class = "C2"
+
+[[port]]
+id = "port_1"
+rank = 1
+name = "Houston Port Authority, TX"
+million_short_tons_2022 = 293.8
+counties = ["48201"]
+
+[[port]]
+id = "port_2"
+rank = 2
+name = "Port of South Louisiana, LA"
+million_short_tons_2022 = 226.2
+counties = ["22089", "22095", "22093"]
+
+[[port]]
+id = "port_3"
+rank = 3
+name = "Corpus Christi, TX"
+million_short_tons_2022 = 174.3
+counties = ["48355", "48409"]
+
+[[port]]
+id = "port_4"
+rank = 4
+name = "New York, NY and NJ"
+million_short_tons_2022 = 141.3
+counties = ["34013", "34039", "34017", "36047", "36085"]
+
+[[port]]
+id = "port_5"
+rank = 5
+name = "Port of Long Beach, CA"
+million_short_tons_2022 = 93
+counties = ["06037"]
+
+[[port]]
+id = "port_6"
+rank = 6
+name = "New Orleans, LA"
+million_short_tons_2022 = 83.3
+counties = ["22071", "22051", "22087"]
+
+[[port]]
+id = "port_7"
+rank = 7
+name = "Beaumont, TX"
+million_short_tons_2022 = 74.3
+counties = ["48245"]
+
+[[port]]
+id = "port_8"
+rank = 8
+name = "Port of Greater Baton Rouge, LA"
+million_short_tons_2022 = 73.4
+counties = ["22033", "22121", "22047", "22005"]
+
+[[port]]
+id = "port_9"
+rank = 9
+name = "Port of Virginia, VA"
+million_short_tons_2022 = 69.4
+counties = ["51710", "51740", "51700"]
+
+[[port]]
+id = "port_10"
+rank = 10
+name = "Lake Charles Harbor District, LA"
+million_short_tons_2022 = 64.1
+counties = ["22019"]
+
+[[refinery]]
+id = "refinery_06013"
+county = "06013"
+barrels_per_calendar_day = 245271
+sites = ["Chevron USA Inc (Richmond), 245271 b/cd"]
+
+[[refinery]]
+id = "refinery_06037"
+county = "06037"
+barrels_per_calendar_day = 650000
+sites = ["Tesoro Refining & Marketing Co (Carson), 365000 b/cd", "Chevron USA Inc (El Segundo), 285000 b/cd"]
+
+[[refinery]]
+id = "refinery_17033"
+county = "17033"
+barrels_per_calendar_day = 253000
+sites = ["Marathon Petroleum Co LP (Robinson), 253000 b/cd"]
+
+[[refinery]]
+id = "refinery_17119"
+county = "17119"
+barrels_per_calendar_day = 345000
+sites = ["WRB Refining LP (Wood River), 345000 b/cd"]
+
+[[refinery]]
+id = "refinery_17197"
+county = "17197"
+barrels_per_calendar_day = 267000
+sites = ["ExxonMobil Refining & Supply Co (Joliet), 267000 b/cd"]
+
+[[refinery]]
+id = "refinery_18089"
+county = "18089"
+barrels_per_calendar_day = 435000
+sites = ["BP Products North America Inc (Whiting), 435000 b/cd"]
+
+[[refinery]]
+id = "refinery_21019"
+county = "21019"
+barrels_per_calendar_day = 307000
+sites = ["Marathon Petroleum Co LP (Catlettsburg), 307000 b/cd"]
+
+[[refinery]]
+id = "refinery_22019"
+county = "22019"
+barrels_per_calendar_day = 734900
+sites = ["Citgo Petroleum Corp (Lake Charles), 471200 b/cd", "Phillips 66 Company (Westlake), 263700 b/cd"]
+
+[[refinery]]
+id = "refinery_22033"
+county = "22033"
+barrels_per_calendar_day = 523500
+sites = ["ExxonMobil Refining & Supply Co (Baton Rouge), 523500 b/cd"]
+
+[[refinery]]
+id = "refinery_22089"
+county = "22089"
+barrels_per_calendar_day = 446153
+sites = ["Shell Oil Products US (Norco), 231153 b/cd", "Valero Refining New Orleans LLC (Norco), 215000 b/cd"]
+
+[[refinery]]
+id = "refinery_22095"
+county = "22095"
+barrels_per_calendar_day = 617000
+sites = ["Marathon Petroleum Co LP (Garyville), 617000 b/cd"]
+
+[[refinery]]
+id = "refinery_27037"
+county = "27037"
+barrels_per_calendar_day = 335000
+sites = ["Flint Hills Resources LP (Saint Paul), 335000 b/cd"]
+
+[[refinery]]
+id = "refinery_28059"
+county = "28059"
+barrels_per_calendar_day = 356440
+sites = ["Chevron USA Inc (Pascagoula), 356440 b/cd"]
+
+[[refinery]]
+id = "refinery_34039"
+county = "34039"
+barrels_per_calendar_day = 275000
+sites = ["Phillips 66 Company (Linden), 275000 b/cd"]
+
+[[refinery]]
+id = "refinery_40071"
+county = "40071"
+barrels_per_calendar_day = 228000
+sites = ["Phillips 66 Company (Ponca City), 228000 b/cd"]
+
+[[refinery]]
+id = "refinery_48039"
+county = "48039"
+barrels_per_calendar_day = 277000
+sites = ["Phillips 66 Company (Sweeny), 277000 b/cd"]
+
+[[refinery]]
+id = "refinery_48167"
+county = "48167"
+barrels_per_calendar_day = 856000
+sites = ["Marathon Petroleum Co LP (Galveston Bay), 631000 b/cd", "Valero Refining Co Texas LP (Texas City), 225000 b/cd"]
+
+[[refinery]]
+id = "refinery_48201"
+county = "48201"
+barrels_per_calendar_day = 1082000
+sites = ["ExxonMobil Refining & Supply Co (Baytown), 564500 b/cd", "Deer Park Refining LP (Deer Park), 312500 b/cd", "Valero Refining Co Texas LP (Houston), 205000 b/cd"]
+
+[[refinery]]
+id = "refinery_48245"
+county = "48245"
+barrels_per_calendar_day = 1891400
+sites = ["Motiva Enterprises LLC (Port Arthur), 656400 b/cd", "ExxonMobil Refining & Supply Co (Beaumont), 612000 b/cd", "Premcor Refining Group Inc (Port Arthur), 385000 b/cd", "TotalEnergies Petrochem & Refg USA (Port Arthur), 238000 b/cd"]
+
+[[refinery]]
+id = "refinery_48355"
+county = "48355"
+barrels_per_calendar_day = 580000
+sites = ["Flint Hills Resources LP (Corpus Christi West), 290000 b/cd", "Valero Refining Co Texas LP (Corpus Christi), 290000 b/cd"]
+
+[[refinery]]
+id = "refinery_53073"
+county = "53073"
+barrels_per_calendar_day = 238500
+sites = ["BP Products North America Inc (Ferndale), 238500 b/cd"]
+
+[uasi_check]
+amounts_verified = true
+checked = "2026-09-26"
+against = "FEMA, Fiscal Year 2026 Homeland Security Grant Program NOFO, Appendix I, 'Fiscal Year 2026 Urban Area Security Initiative Allocations', pp. 71-73 (PDF created 2026-06-23, 96 pages, sha256 b94875508f001bf3ff5d37b6fb3a5934941177bc4f41b7f7a7f24f15161cd9bd)"
+footprint_verified = false
+footprint_note = "FEMA funds urban areas, not counties, and each urban area working group defines its own footprint. The county lists below map each FEMA urban area (2020 delineation names, frozen by the MAPS Act, P.L. 117-219) to 2023 CBSA counties; they are a proposal, not a federal list."
+
+[[uasi]]
+rank = 1
+urban_area = "New York-White Plains, NY"
+state = "New York"
+usd_fy2026 = 142481143
+share = 0.2439
+counties = ["36059", "36103", "36005", "36047", "36061", "36079", "36081", "36085", "36087", "36119"]
+mapping_note = "FEMA urban area named after the 2020-vintage division; proposed as the New York State counties of CBSA 35620 (confirm with the NYC UAWG footprint)."
+
+[[uasi]]
+rank = 2
+urban_area = "Los Angeles-Long Beach-Glendale, CA"
+state = "California"
+usd_fy2026 = 33962648
+share = 0.05813
+counties = ["06037"]
+
+[[uasi]]
+rank = 3
+urban_area = "Washington-Arlington-Alexandria, DC-VA-MD-WV"
+state = "District of Columbia"
+usd_fy2026 = 32167653
+share = 0.05506
+counties = ["51013", "51043", "51047", "51059", "51061", "51107", "51153", "51157", "51177", "51179", "51187", "51510", "51600", "51610", "51630", "51683", "51685", "54037", "24021", "24031", "11001", "24017", "24033"]
+
+[[uasi]]
+rank = 4
+urban_area = "Newark-Jersey City-New Brunswick, NJ-PA"
+state = "New Jersey"
+usd_fy2026 = 32128653
+share = 0.05499
+counties = ["34023", "34025", "34029", "34035", "34013", "34019", "34027", "34037", "34039", "34003", "34017", "34031", "42103"]
+mapping_note = "2020-vintage divisions (Newark; New Brunswick-Lakewood) plus Pike County, PA, which left the NY metro in 2023."
+
+[[uasi]]
+rank = 5
+urban_area = "Chicago-Naperville-Elgin, IL-IN-WI"
+state = "Illinois"
+usd_fy2026 = 30990822
+share = 0.05304
+counties = ["17031", "17043", "17063", "17111", "17197", "17037", "17089", "17093", "17097", "18073", "18089", "18111", "18127", "55059"]
+mapping_note = "2020 title included Kenosha County, WI (a separate metro since 2023)."
+
+[[uasi]]
+rank = 6
+urban_area = "San Francisco-San Jose-Oakland, CA"
+state = "California"
+usd_fy2026 = 28731786
+share = 0.04918
+counties = ["06001", "06013", "06075", "06081", "06041", "06069", "06085"]
+mapping_note = "Bay Area UASI spans the San Francisco and San Jose metros."
+
+[[uasi]]
+rank = 7
+urban_area = "Houston-The Woodlands-Sugar Land, TX"
+state = "Texas"
+usd_fy2026 = 23347667
+share = 0.03996
+counties = ["48015", "48039", "48071", "48157", "48167", "48201", "48291", "48339", "48407", "48473"]
+mapping_note = "2020 title of CBSA 26420."
+
+[[uasi]]
+rank = 8
+urban_area = "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD"
+state = "Pennsylvania"
+usd_fy2026 = 16601884
+share = 0.02842
+counties = ["34005", "34007", "34015", "42017", "42029", "42091", "42045", "42101", "10003", "24015", "34033"]
+
+[[uasi]]
+rank = 9
+urban_area = "San Diego-Chula Vista-Carlsbad, CA"
+state = "California"
+usd_fy2026 = 16266915
+share = 0.02784
+counties = ["06073"]
+
+[[uasi]]
+rank = 10
+urban_area = "Dallas-Fort Worth-Arlington, TX"
+state = "Texas"
+usd_fy2026 = 15462065
+share = 0.02646
+counties = ["48085", "48113", "48121", "48139", "48231", "48257", "48397", "48251", "48367", "48439", "48497"]
+
+[[uasi]]
+rank = 11
+urban_area = "Boston-Cambridge-Newton, MA-NH"
+state = "Massachusetts"
+usd_fy2026 = 14909697
+share = 0.02552
+counties = ["25021", "25023", "25025", "25009", "25017", "33015", "33017"]
+
+[[uasi]]
+rank = 12
+urban_area = "Miami-Fort Lauderdale-Pompano Beach, FL"
+state = "Florida"
+usd_fy2026 = 13699865
+share = 0.02345
+counties = ["12011", "12086", "12099"]
+mapping_note = "2020 title of CBSA 33100."
+
+[[uasi]]
+rank = 13
+urban_area = "Atlanta-Sandy Springs-Alpharetta, GA"
+state = "Georgia"
+usd_fy2026 = 13166340
+share = 0.02254
+counties = ["13013", "13035", "13045", "13063", "13077", "13085", "13089", "13097", "13113", "13117", "13121", "13135", "13149", "13151", "13159", "13187", "13199", "13211", "13217", "13227", "13231", "13247", "13255", "13297", "13015", "13057", "13067", "13143", "13223"]
+mapping_note = "2020 title of CBSA 12060."
+
+[[uasi]]
+rank = 14
+urban_area = "Phoenix-Mesa-Chandler, AZ"
+state = "Arizona"
+usd_fy2026 = 11512287
+share = 0.0197
+counties = ["04013", "04021"]
+
+[[uasi]]
+rank = 15
+urban_area = "Seattle-Tacoma-Bellevue, WA"
+state = "Washington"
+usd_fy2026 = 11212216
+share = 0.01919
+counties = ["53061", "53033", "53053"]
+
+[[uasi]]
+rank = 16
+urban_area = "Minneapolis-St. Paul-Bloomington, MN-WI"
+state = "Minnesota"
+usd_fy2026 = 8344639
+share = 0.01428
+counties = ["27003", "27019", "27025", "27037", "27053", "27059", "27079", "27095", "27123", "27139", "27141", "27163", "27171", "55093", "55109"]
+
+[[uasi]]
+rank = 17
+urban_area = "Virginia Beach-Norfolk-Newport News, VA-NC"
+state = "Virginia"
+usd_fy2026 = 7802388
+share = 0.01335
+counties = ["37029", "37053", "37073", "51073", "51093", "51095", "51115", "51181", "51199", "51550", "51650", "51700", "51710", "51735", "51740", "51800", "51810", "51830"]
+mapping_note = "2020 title of CBSA 47260."
+
+[[uasi]]
+rank = 18
+urban_area = "Anaheim-Santa Ana-Irvine, CA"
+state = "California"
+usd_fy2026 = 7689327
+share = 0.01316
+counties = ["06059"]
+
+[[uasi]]
+rank = 19
+urban_area = "Las Vegas-Henderson-Paradise, NV"
+state = "Nevada"
+usd_fy2026 = 7671239
+share = 0.01313
+counties = ["32003"]
+mapping_note = "2020 title of CBSA 29820."
+
+[[uasi]]
+rank = 20
+urban_area = "Detroit-Warren-Dearborn, MI"
+state = "Michigan"
+usd_fy2026 = 7205819
+share = 0.01233
+counties = ["26163", "26087", "26093", "26099", "26125", "26147"]
+
+[[uasi]]
+rank = 21
+urban_area = "Baltimore-Columbia-Towson, MD"
+state = "Maryland"
+usd_fy2026 = 6895987
+share = 0.0118
+counties = ["24003", "24005", "24013", "24025", "24027", "24035", "24510"]
+
+[[uasi]]
+rank = 22
+urban_area = "Tampa-St. Petersburg-Clearwater, FL"
+state = "Florida"
+usd_fy2026 = 6629070
+share = 0.01135
+counties = ["12103", "12053", "12057", "12101"]
+
+[[uasi]]
+rank = 23
+urban_area = "Riverside-San Bernardino-Ontario, CA"
+state = "California"
+usd_fy2026 = 6530082
+share = 0.01118
+counties = ["06065", "06071"]
+
+[[uasi]]
+rank = 24
+urban_area = "San Antonio-New Braunfels, TX"
+state = "Texas"
+usd_fy2026 = 6291586
+share = 0.01077
+counties = ["48013", "48019", "48029", "48091", "48187", "48259", "48325", "48493"]
+
+[[uasi]]
+rank = 25
+urban_area = "Orlando-Kissimmee-Sanford, FL"
+state = "Florida"
+usd_fy2026 = 6049562
+share = 0.01035
+counties = ["12069", "12095", "12097", "12117"]
+
+[[uasi]]
+rank = 26
+urban_area = "Denver-Aurora-Lakewood, CO"
+state = "Colorado"
+usd_fy2026 = 5790761
+share = 0.00991
+counties = ["08001", "08005", "08014", "08019", "08031", "08035", "08039", "08047", "08059", "08093"]
+mapping_note = "2020 title of CBSA 19740."
+
+[[uasi]]
+rank = 27
+urban_area = "Honolulu, HI"
+state = "Hawaii"
+usd_fy2026 = 5694660
+share = 0.00975
+counties = ["15003"]
+mapping_note = "Urban Honolulu (Honolulu County); 998,747 residents in 2024, 1,253 short of the 1,000,000 line, so not a C1 or C2 metro."
+
+[[uasi]]
+rank = 28
+urban_area = "Portland-Vancouver-Hillsboro, OR-WA"
+state = "Oregon"
+usd_fy2026 = 5539967
+share = 0.00948
+counties = ["41005", "41009", "41051", "41067", "41071", "53011", "53059"]
+
+[[uasi]]
+rank = 29
+urban_area = "St. Louis, MO-IL"
+state = "Missouri"
+usd_fy2026 = 5535938
+share = 0.00948
+counties = ["17005", "17013", "17027", "17083", "17117", "17119", "17133", "17163", "29071", "29099", "29113", "29183", "29189", "29219", "29510"]
+
+[[uasi]]
+rank = 30
+urban_area = "Jacksonville, FL"
+state = "Florida"
+usd_fy2026 = 4232660
+share = 0.00724
+counties = ["12003", "12019", "12031", "12089", "12109"]
+
+[[uasi]]
+rank = 31
+urban_area = "Pittsburgh, PA"
+state = "Pennsylvania"
+usd_fy2026 = 4185597
+share = 0.00716
+counties = ["42003", "42005", "42007", "42019", "42051", "42073", "42125", "42129"]
+
+[[uasi]]
+rank = 32
+urban_area = "New Orleans-Metairie, LA"
+state = "Louisiana"
+usd_fy2026 = 4077142
+share = 0.00698
+counties = ["22051", "22071", "22075", "22087", "22089", "22093", "22095"]
+
+[[uasi]]
+rank = 33
+urban_area = "Sacramento-Roseville-Folsom, CA"
+state = "California"
+usd_fy2026 = 3994615
+share = 0.00684
+counties = ["06017", "06061", "06067", "06113"]
+
+[[uasi]]
+rank = 34
+urban_area = "Charlotte-Concord-Gastonia, NC-SC"
+state = "North Carolina"
+usd_fy2026 = 3862875
+share = 0.00661
+counties = ["37007", "37025", "37071", "37097", "37109", "37119", "37159", "37179", "45023", "45057", "45091"]
+
+[[uasi]]
+rank = 35
+urban_area = "Cleveland-Elyria, OH"
+state = "Ohio"
+usd_fy2026 = 3837253
+share = 0.00657
+counties = ["39007", "39035", "39055", "39085", "39093", "39103"]
+mapping_note = "2020 title of CBSA 17410."
+
+[[uasi]]
+rank = 36
+urban_area = "Nashville-Davidson--Murfreesboro--Franklin, TN"
+state = "Tennessee"
+usd_fy2026 = 3785734
+share = 0.00648
+counties = ["47015", "47021", "47037", "47043", "47081", "47111", "47119", "47147", "47149", "47159", "47165", "47169", "47187", "47189"]
+
+[[uasi]]
+rank = 37
+urban_area = "Kansas City, MO-KS"
+state = "Missouri"
+usd_fy2026 = 3708524
+share = 0.00635
+counties = ["20091", "20103", "20107", "20121", "20209", "29013", "29025", "29037", "29047", "29049", "29095", "29107", "29165", "29177"]
+
+[[uasi]]
+rank = 38
+urban_area = "Cincinnati, OH-KY-IN"
+state = "Ohio"
+usd_fy2026 = 3665266
+share = 0.00627
+counties = ["18029", "18047", "18115", "21015", "21023", "21037", "21077", "21081", "21117", "21191", "39015", "39017", "39025", "39061", "39165"]
+
+[[uasi]]
+rank = 39
+urban_area = "Columbus, OH"
+state = "Ohio"
+usd_fy2026 = 3662688
+share = 0.00627
+counties = ["39041", "39045", "39049", "39073", "39089", "39097", "39117", "39127", "39129", "39159"]
+
+[[uasi]]
+rank = 40
+urban_area = "Austin-Round Rock-Georgetown, TX"
+state = "Texas"
+usd_fy2026 = 3332487
+share = 0.0057
+counties = ["48021", "48055", "48209", "48453", "48491"]
+mapping_note = "2020 title of CBSA 12420."
+
+[[uasi]]
+rank = 41
+urban_area = "Richmond, VA"
+state = "Virginia"
+usd_fy2026 = 3099953
+share = 0.00531
+counties = ["51007", "51036", "51041", "51053", "51075", "51085", "51087", "51097", "51101", "51127", "51145", "51149", "51183", "51570", "51670", "51730", "51760"]
+
+[[uasi]]
+rank = 42
+urban_area = "Indianapolis-Carmel-Anderson, IN"
+state = "Indiana"
+usd_fy2026 = 3050494
+share = 0.00522
+counties = ["18011", "18013", "18057", "18059", "18063", "18081", "18095", "18097", "18109", "18145", "18159"]
+mapping_note = "2020 title of CBSA 26900."
+
+[[uasi]]
+rank = 43
+urban_area = "Colorado Springs, CO"
+state = "Colorado"
+usd_fy2026 = 2757605
+share = 0.00472
+counties = ["08041", "08119"]
+
+[[uasi]]
+rank = 44
+urban_area = "Milwaukee-Waukesha, WI"
+state = "Wisconsin"
+usd_fy2026 = 2684441
+share = 0.00459
+counties = ["55079", "55089", "55131", "55133"]
+
+[[source]]
+id = "mirta_points"
+title = "DoD Sites - Point (Military Installations, Ranges and Training Areas), FeatureServer layer 0"
+publisher = "DoD, Defense Installations Spatial Data Infrastructure"
+year = 2024
+url = "https://services7.arcgis.com/n1YM8pTrFmm7L4hs/arcgis/rest/services/mirta/FeatureServer/0"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "sentinel_feis_summary"
+title = "Environmental Impact Statement for the Sentinel (GBSD) Deployment and Minuteman III Decommissioning and Disposal, Summary"
+publisher = "Department of the Air Force"
+year = 2023
+url = "https://www.afgsc.af.mil/Portals/51/Docs/Sentinel/Sentinel%20FEIS%20-%20Summary%20of%20Final%20EIS%20March%202023.pdf?ver=-4YM2rijKs-XF9ZJeKh8uw%3D%3D"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "sentinel_feis_vol1"
+title = "Sentinel Final EIS, Volume I"
+publisher = "Department of the Air Force"
+year = 2023
+url = "https://minutemanmissile.com/documents/SentinelFinalEISVolumeIFinalEIS.pdf"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "ktvh_malmstrom"
+title = "Draft environmental impact statement outlines future Montana impacts of missile upgrade project (Jonathon Ambarian)"
+publisher = "KTVH (Helena, MT)"
+year = 2022
+url = "https://www.ktvh.com/news/draft-environmental-impact-statement-outlines-future-montana-impacts-of-missile-upgrade-project"
+access = "fetched"
+primary = false
+
+[[source]]
+id = "ap_sentinel_counties"
+title = "New Sentinel ICBMs are planned to replace aging nuclear missiles in US silos. What does it mean?"
+publisher = "Associated Press (syndicated by the Arizona Daily Star, tucson.com)"
+year = 2024
+url = "https://tucson.com/news/nation-world/government-politics/article_6d6c1387-b487-5113-8a2a-855f4ffb5822.html"
+access = "search_summary"
+primary = false
+
+[[source]]
+id = "defensenews_new_silos"
+title = "Sentinel nuclear missiles will need new silos, Air Force says"
+publisher = "Defense News"
+year = 2025
+url = "https://www.defensenews.com/air/2025/05/06/sentinel-nuclear-missiles-will-need-new-silos-air-force-says/"
+access = "search_summary"
+primary = false
+
+[[source]]
+id = "fas_2025"
+title = "United States nuclear weapons, 2025 (Kristensen, Korda, Johns, Knight-Boyle)"
+publisher = "Bulletin of the Atomic Scientists (FAS Nuclear Notebook)"
+year = 2025
+url = "https://thebulletin.org/premium/2025-01/united-states-nuclear-weapons-2025/"
+access = "fetched"
+primary = false
+
+[[source]]
+id = "nnsa_locations"
+title = "Locations (National Nuclear Security Administration)"
+publisher = "DOE / NNSA"
+year = 2026
+url = "https://www.energy.gov/nnsa/locations"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "mda_gmd"
+title = "Ground-based Midcourse Defense (GMD)"
+publisher = "Missile Defense Agency"
+year = 2026
+url = "https://www.mda.mil/system/gmd.html"
+access = "search_summary"
+primary = true
+
+[[source]]
+id = "northcom_cmc"
+title = "Cheyenne Mountain Complex"
+publisher = "NORAD and US Northern Command"
+year = 2026
+url = "https://www.northcom.mil/CheyenneMountain/"
+access = "search_summary"
+primary = true
+
+[[source]]
+id = "tinker_e6b"
+title = "E-6B Mercury Airborne Command Post (fact sheet)"
+publisher = "Tinker Air Force Base"
+year = 2022
+url = "https://www.tinker.af.mil/About-Tinker/Fact-Sheets/Display/Article/3142014/e-6b-mercury-airborne-command-post/"
+access = "search_summary"
+primary = true
+
+[[source]]
+id = "militarytimes_offutt"
+title = "Military dedicates new headquarters for Strategic Command’s nuclear control unit at Offutt"
+publisher = "Military Times"
+year = 2019
+url = "https://www.militarytimes.com/news/your-military/2019/11/19/military-dedicates-new-headquarters-for-strategic-commands-nuclear-control-unit-at-offutt/"
+access = "search_summary"
+primary = false
+
+[[source]]
+id = "erdc_raven_rock"
+title = "ERDC/CERL TR-19-10, Raven Rock Mountain Complex, Site R, PA"
+publisher = "US Army Engineer Research and Development Center"
+year = 2019
+url = "https://apps.dtic.mil/sti/tr/pdf/AD1078618.pdf"
+access = "search_summary"
+primary = true
+
+[[source]]
+id = "mweoc_notice"
+title = "DHS FEMA Mt. Weather Emergency Operations Center (MWEOC) facility, contract opportunity RFQ02982"
+publisher = "DHS / FEMA (SAM.gov notice, via HigherGov)"
+year = 2025
+url = "https://www.highergov.com/contract-opportunity/the-dhs-fema-mt-weather-emergency-operations-ce-rfq02982-o-584ed/"
+access = "search_summary"
+primary = true
+
+[[source]]
+id = "usc_10_2674"
+title = "10 U.S.C. 2674(f)(2), definition of National Capital Region"
+publisher = "US Code (Cornell LII)"
+year = 2026
+url = "https://www.law.cornell.edu/uscode/text/10/2674"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "sciam_2023"
+title = "Who Would Take the Brunt of an Attack on U.S. Nuclear Missile Silos? (Sebastien Philippe)"
+publisher = "Scientific American"
+year = 2023
+url = "https://www.scientificamerican.com/article/who-would-take-the-brunt-of-an-attack-on-u-s-nuclear-missile-silos/"
+access = "fetched"
+primary = false
+
+[[source]]
+id = "missilesonourland"
+title = "The Missiles on our Land"
+publisher = "Princeton University, Program on Science and Global Security"
+year = 2023
+url = "https://missilesonourland.org/"
+access = "fetched"
+primary = false
+
+[[source]]
+id = "napb90_exec"
+title = "Nuclear Attack Planning Base - 1990, Executive Summary"
+publisher = "FEMA (April 1987; released April 2005; FAS mirror)"
+year = 1987
+url = "https://nuke.fas.org/guide/usa/napb-90/execsum.html"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "napb90_annexb"
+title = "Nuclear Attack Planning Base - 1990, Annex B: Fallout Risk, Statistics and Maps"
+publisher = "FEMA (FAS mirror)"
+year = 1987
+url = "https://nuke.fas.org/guide/usa/napb-90/annexb.pdf"
+access = "not_retrieved"
+primary = true
+
+[[source]]
+id = "census_delineation_2023"
+title = "List 1. Core Based Statistical Areas, Metropolitan Divisions and Combined Statistical Areas, July 2023"
+publisher = "US Census Bureau (OMB Bulletin 23-01)"
+year = 2023
+url = "https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2023/delineation-files/list1_2023.xlsx"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "census_cbsa_pop_2024"
+title = "Annual Estimates of the Resident Population for Metropolitan Statistical Areas: April 1, 2020 to July 1, 2024 (CBSA-MET-EST2024-POP)"
+publisher = "US Census Bureau"
+year = 2025
+url = "https://www2.census.gov/programs-surveys/popest/tables/2020-2024/metro/totals/cbsa-met-est2024-pop.xlsx"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "eia_refcap_2026"
+title = "Refinery Capacity Report, Table 3: Capacity of Operable Petroleum Refineries by State as of January 1, 2026"
+publisher = "US Energy Information Administration"
+year = 2026
+url = "https://www.eia.gov/petroleum/refinerycapacity/table3.pdf"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "bts_ports_2025"
+title = "Port Performance Freight Statistics: 2025 Annual Report, Table 2 (Top 25 Ports by Total Tonnage, 2022)"
+publisher = "Bureau of Transportation Statistics (USACE WCSC data)"
+year = 2025
+url = "https://www.bts.gov/sites/bts.dot.gov/files/2025-03/BTS_Port-Performance-2025_Annual-Report_for%20web_20250224-1232.pdf"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "fema_hsgp_fy2026"
+title = "Fiscal Year 2026 Homeland Security Grant Program Notice of Funding Opportunity, Appendix I: HSGP Allocations"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/sites/default/files/documents/fema_gpd_hsgp-nofo-fy2026.pdf"
+access = "fetched"
+primary = true
+
+[[source]]
+id = "hazard_expansion_b14"
+title = "Hazard comprehensiveness and data-first expansion, section B1.4"
+publisher = "Ready Reckoner round-2 review (internal)"
+year = 2026
+url = "file:~/Desktop/ready-reckoner-briefs/round2/reports/hazard-expansion.md"
+access = "fetched"
+primary = false

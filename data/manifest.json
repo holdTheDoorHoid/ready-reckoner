@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "25f3ed156688",
-  "generated": "2026-09-26T08:24:54Z",
+  "pack_version": "685e9975f3ce",
+  "generated": "2026-09-26T18:49:36Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -47,9 +47,9 @@
         {
           "path": "core/events.csv",
           "job": "events",
-          "sha256": "ba62a2de742fc0a5bd79a05780b59229db119a9b714d3a1e991a31e16ec45b59",
-          "bytes": 2710481,
-          "rows": 44057,
+          "sha256": "b7525c8a6c44793a04803360d54e0b3b8144b4533841d11900c5a360dbe32064",
+          "bytes": 2733891,
+          "rows": 44397,
           "key": [
             "fips",
             "event_type"
@@ -58,8 +58,8 @@
         {
           "path": "core/facilities.csv",
           "job": "facilities",
-          "sha256": "725c4dfb9e20490fd08dd3b2c45d1b7db8096b7309f09b5426c1c555731b9194",
-          "bytes": 96804,
+          "sha256": "9abe0e38d1c2d833e9cd58b1ee0766e053b86a140f5145c9dcb30593236a5f6d",
+          "bytes": 103332,
           "rows": 3232,
           "key": [
             "fips"
@@ -71,6 +71,36 @@
           "sha256": "7552994d78cc5ad659cf702d4e5ee06aab1ef542eb56ae91910da6803939df7e",
           "bytes": 190572,
           "rows": 3144,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/geomag.csv",
+          "job": "geomag",
+          "sha256": "467626dd0acf0cead6955ce7f76e9a3772de3701f09f3e72b1b1803dc3a2cb26",
+          "bytes": 50382,
+          "rows": 3232,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/ground.csv",
+          "job": "ground",
+          "sha256": "f90944f6277b295cdbc59799f1ca31fbb46f35abd64b5e1d01327d2899b8a5fb",
+          "bytes": 54145,
+          "rows": 3225,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/levees.csv",
+          "job": "levees",
+          "sha256": "61e9ab61784a078e6b2897dfb753608514a384b3e650f74e7751ad1ac7fc33a4",
+          "bytes": 37578,
+          "rows": 3232,
           "key": [
             "fips"
           ]
@@ -134,6 +164,16 @@
           ]
         },
         {
+          "path": "core/smoke.csv",
+          "job": "smoke",
+          "sha256": "e2eeef315a29df4ba11073b8b73c22cca2106ff757ee895aa1ec81c876e353b1",
+          "bytes": 105225,
+          "rows": 3225,
+          "key": [
+            "fips"
+          ]
+        },
+        {
           "path": "core/states.csv",
           "job": "geography",
           "sha256": "0ba0c48efe7dcf197ef4ba0392d16747f0996cfb81d28fab534596754ffef022",
@@ -144,11 +184,48 @@
           ]
         },
         {
+          "path": "core/strategic.csv",
+          "job": "strategic",
+          "sha256": "a05501372e5806a95fbd09d14e4d42494a565cf2679055bdfa8308b23fa7d0ea",
+          "bytes": 80693,
+          "rows": 3232,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/strategic_sites.toml",
+          "job": "strategic",
+          "sha256": "794bd3213a950b62d9d18d3076aa27b3157d915a88df241e6215a333afc6fbb1",
+          "bytes": 61167,
+          "rows": 207
+        },
+        {
+          "path": "core/surge_proxy.csv",
+          "job": "surge_proxy",
+          "sha256": "5c43a5bb5dba9e1dc3091973950a66a39adcd648deb0efe158028073815ee678",
+          "bytes": 45238,
+          "rows": 3232,
+          "key": [
+            "fips"
+          ]
+        },
+        {
           "path": "core/vulnerability.csv",
           "job": "vulnerability",
           "sha256": "902f8272b9853bd9a49b899b399b8b9534667a7f0fb736f5b445d34314f32e5b",
           "bytes": 123023,
           "rows": 3144,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/water_systems.csv",
+          "job": "water_systems",
+          "sha256": "30970c79020a0c984013e4685ae8d87af2d269d50aefa16beab9fbd572f4b1ff",
+          "bytes": 50033,
+          "rows": 3171,
           "key": [
             "fips"
           ]
@@ -167,8 +244,8 @@
         {
           "path": "core/zip_facilities.csv",
           "job": "facilities",
-          "sha256": "347986b822adac3712fc861394d44e0d964b34e97ad1a520ad3ccfacc28a8412",
-          "bytes": 456712,
+          "sha256": "009e2b1235da6e05f5dd61801aba76e39511321646a2dee71b91c7f7dcd3fcc8",
+          "bytes": 726808,
           "rows": 33791,
           "key": [
             "zip"
@@ -185,6 +262,47 @@
           "sha256": "5513188c3fbe4220767cf9308c3727c022c76011ea9c163ac8785d0682adf980",
           "bytes": 1441292,
           "rows": 3222
+        }
+      ]
+    },
+    "surge": {
+      "description": "Optional: share of each ZIP code's land inside NOAA/NHC's Category 1 and Category 3 storm-surge areas. Built by hand (rr-etl refresh --only surge), not in the quarterly refresh. Not needed to plan.",
+      "files": [
+        {
+          "path": "opt/surge/zip_surge.csv",
+          "job": "surge",
+          "sha256": "70c189cca81259c6f4ad9b882d95880ffc0283ab44ddd6ac2f948ebc889bca32",
+          "bytes": 292323,
+          "rows": 26459,
+          "key": [
+            "zip"
+          ]
+        }
+      ]
+    },
+    "wildfire_places": {
+      "description": "Optional: USFS Wildfire Risk to Communities by Census place, with the ZIP-to-place shares to use it. Not needed to plan; loaded only when the wildfire detail is shown.",
+      "files": [
+        {
+          "path": "opt/wildfire_places/places.csv",
+          "job": "wildfire_places",
+          "sha256": "532321514f3a35ce67a36926c181552911b5428b4af53dfae23c7e63f0b9b77e",
+          "bytes": 1291613,
+          "rows": 32038,
+          "key": [
+            "place"
+          ]
+        },
+        {
+          "path": "opt/wildfire_places/zip_places.csv",
+          "job": "wildfire_places",
+          "sha256": "9595ba4712d845da22bc4f47d0c962f241e93a3663d2d09573deecef5d83a11e",
+          "bytes": 692316,
+          "rows": 35568,
+          "key": [
+            "zip",
+            "place"
+          ]
         }
       ]
     }
@@ -445,13 +563,13 @@
     },
     "events": {
       "title": "Event rates per county from HURDAT2, SPC severe reports and NOAA Storm Events",
-      "finished": "2026-09-26T03:42:04Z",
+      "finished": "2026-09-26T17:38:48Z",
       "sources": [
         {
           "name": "NOAA NHC HURDAT2 best tracks, Atlantic",
           "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2025-091226.txt",
           "version": "hurdat2-1851-2025-091226.txt",
-          "retrieved": "2026-09-26T03:41:16Z",
+          "retrieved": "2026-09-26T17:36:57Z",
           "sha256": "df63fabce0ad824d20447e241bd27a2a65ae36cb2f9b62aa3caacd9171c34f11",
           "bytes": 7071568,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -460,7 +578,7 @@
           "name": "NOAA NHC HURDAT2 best tracks, eastern and central Pacific",
           "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2025-091426.txt",
           "version": "hurdat2-nepac-1949-2025-091426.txt",
-          "retrieved": "2026-09-26T03:41:17Z",
+          "retrieved": "2026-09-26T17:37:13Z",
           "sha256": "02a8860ecb276a01272b5a57655229689bd42c6c9a647e02176273a6213440bc",
           "bytes": 4084038,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -469,7 +587,7 @@
           "name": "NOAA SPC severe weather database: tornadoes (all segments)",
           "url": "https://www.spc.noaa.gov/wcm/data/1950-2025_all_tornadoes.csv",
           "version": "1950-2025_all_tornadoes.csv; Last-Modified Fri, 24 Apr 2026 19:12:10 GMT",
-          "retrieved": "2026-09-26T03:41:19Z",
+          "retrieved": "2026-09-26T17:37:18Z",
           "sha256": "0ac30e15505a875fd2e6269bba55835701f51f67661169ec25de5bed08698973",
           "bytes": 9219030,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -478,7 +596,7 @@
           "name": "NOAA SPC severe weather database: hail reports",
           "url": "https://www.spc.noaa.gov/wcm/data/1955-2025_hail.csv.zip",
           "version": "1955-2025_hail.csv.zip; Last-Modified Fri, 24 Apr 2026 19:12:09 GMT",
-          "retrieved": "2026-09-26T03:41:22Z",
+          "retrieved": "2026-09-26T17:37:21Z",
           "sha256": "f511540a2c1454c863fc1604cf5b2d33bb3e6bfe531079f3a61d53b5d7fe70f8",
           "bytes": 8266856,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -487,7 +605,7 @@
           "name": "NOAA SPC severe weather database: wind reports",
           "url": "https://www.spc.noaa.gov/wcm/data/1955-2025_wind.csv.zip",
           "version": "1955-2025_wind.csv.zip; Last-Modified Fri, 24 Apr 2026 19:12:13 GMT",
-          "retrieved": "2026-09-26T03:41:29Z",
+          "retrieved": "2026-09-26T17:37:26Z",
           "sha256": "1db782d96d29dbb0ffd488a466f006799681cbe04b0003f245d1a2f3f6b9d87b",
           "bytes": 11875052,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -496,7 +614,7 @@
           "name": "NWS zone-county correlation file",
           "url": "https://www.weather.gov/source/gis/Shapefiles/County/bp16ap26.dbx",
           "version": "bp16ap26.dbx",
-          "retrieved": "2026-09-26T03:41:38Z",
+          "retrieved": "2026-09-26T17:37:43Z",
           "sha256": "69d3472d4d576b8a4924efb7a43108f7c64111f503e15efd650f43dc617a6f12",
           "bytes": 350723,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -505,7 +623,7 @@
           "name": "NWS zone-county correlation file",
           "url": "https://www.weather.gov/source/gis/Shapefiles/County/bp18mr25.dbx",
           "version": "bp18mr25.dbx",
-          "retrieved": "2026-09-26T03:41:38Z",
+          "retrieved": "2026-09-26T17:37:44Z",
           "sha256": "721c00ea7a609d5f06ea16f5c8e588d1ab9a928e58d345be522781c957484f6d",
           "bytes": 345543,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -514,7 +632,7 @@
           "name": "NOAA NCEI Storm Events details 1996",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1996_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1996_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:39Z",
+          "retrieved": "2026-09-26T17:37:49Z",
           "sha256": "518c43aadbffbf7509a2ab20cfa6b54f1d63f196b3d8aedb9ffd7d032968eb45",
           "bytes": 6297309,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -523,7 +641,7 @@
           "name": "NOAA NCEI Storm Events details 1997",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1997_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1997_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:40Z",
+          "retrieved": "2026-09-26T17:37:51Z",
           "sha256": "3fdcaa0a839d8b619161188d7d01b8e24e2688fcfc227ea15a73d7da876b36bc",
           "bytes": 6632990,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -532,7 +650,7 @@
           "name": "NOAA NCEI Storm Events details 1998",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1998_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1998_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:40Z",
+          "retrieved": "2026-09-26T17:37:52Z",
           "sha256": "21e4b8d8a88437a25f441ef453ab2ef96ef98f479f2d0f51d0f72b559176699b",
           "bytes": 10295109,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -541,7 +659,7 @@
           "name": "NOAA NCEI Storm Events details 1999",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1999_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1999_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:41Z",
+          "retrieved": "2026-09-26T17:37:54Z",
           "sha256": "c407d09273bc91d645f0f119bfd7128c153f1acb62c239f34572f483b09aacfb",
           "bytes": 10362659,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -550,7 +668,7 @@
           "name": "NOAA NCEI Storm Events details 2000",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2000_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2000_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:42Z",
+          "retrieved": "2026-09-26T17:37:56Z",
           "sha256": "a4ca5b02ad766bf50db2b192c127b625018f66bb9fb4d9746677d39ba2e392ab",
           "bytes": 7914864,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -559,7 +677,7 @@
           "name": "NOAA NCEI Storm Events details 2001",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2001_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2001_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:42Z",
+          "retrieved": "2026-09-26T17:37:57Z",
           "sha256": "77a84aa66aaa9f7f95a15ecb2d18451bc05be801ea10f606d2e83fb44f737e51",
           "bytes": 6876091,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -568,7 +686,7 @@
           "name": "NOAA NCEI Storm Events details 2002",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2002_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2002_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:43Z",
+          "retrieved": "2026-09-26T17:37:58Z",
           "sha256": "6f941b2ea120245e2e924093032c91c3377e7d1ea2c9163593456facb9ebe185",
           "bytes": 7196867,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -577,7 +695,7 @@
           "name": "NOAA NCEI Storm Events details 2003",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2003_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2003_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:44Z",
+          "retrieved": "2026-09-26T17:37:59Z",
           "sha256": "f6d23ba4043394a517c8c6b0db8346f940a1de3fb8cac76eee773c5797243e3c",
           "bytes": 7213001,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -586,7 +704,7 @@
           "name": "NOAA NCEI Storm Events details 2004",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2004_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2004_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:44Z",
+          "retrieved": "2026-09-26T17:38:01Z",
           "sha256": "b0827cd69b8d0ddc1446d8a322132502a05af19b1193c15eae118f13396844e3",
           "bytes": 7335278,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -595,7 +713,7 @@
           "name": "NOAA NCEI Storm Events details 2005",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2005_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2005_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:45Z",
+          "retrieved": "2026-09-26T17:38:02Z",
           "sha256": "d68e3cbfbe5fb79f720eccea372c53585614bab618f3c2a4433e47767f54e55f",
           "bytes": 7765419,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -604,7 +722,7 @@
           "name": "NOAA NCEI Storm Events details 2006",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2006_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2006_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:46Z",
+          "retrieved": "2026-09-26T17:38:03Z",
           "sha256": "a958ea15688b3346fd69efe53e91b4d57a26f8e6f99e1ddcc3b92c2eb2d57d0b",
           "bytes": 7590951,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -613,7 +731,7 @@
           "name": "NOAA NCEI Storm Events details 2007",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2007_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2007_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:46Z",
+          "retrieved": "2026-09-26T17:38:04Z",
           "sha256": "e8289daa871946230862e2ca0d119195df7108e4a680fe83e3d419f3f21a7524",
           "bytes": 9775676,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -622,7 +740,7 @@
           "name": "NOAA NCEI Storm Events details 2008",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2008_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2008_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:47Z",
+          "retrieved": "2026-09-26T17:38:06Z",
           "sha256": "c97260e82760b17bc571d55e1ca1f5073ccc0558b774313d46dddc3e1ef39b37",
           "bytes": 12276398,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -631,7 +749,7 @@
           "name": "NOAA NCEI Storm Events details 2009",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2009_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2009_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:48Z",
+          "retrieved": "2026-09-26T17:38:08Z",
           "sha256": "c04d6e0173153475440cb614bd019287986c74c311c61864478f9087d7d1b357",
           "bytes": 10335606,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -640,7 +758,7 @@
           "name": "NOAA NCEI Storm Events details 2010",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2010_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2010_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:49Z",
+          "retrieved": "2026-09-26T17:38:10Z",
           "sha256": "d109f8a6ab1a71e70f60fe42d30a0e31f370c904e248a51e5fe85573f904878e",
           "bytes": 11729156,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -649,7 +767,7 @@
           "name": "NOAA NCEI Storm Events details 2011",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2011_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2011_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:50Z",
+          "retrieved": "2026-09-26T17:38:12Z",
           "sha256": "be3b40cd098a879be12c2c3e614700560bd537e6178bba8b1aaf099f665dda40",
           "bytes": 15695066,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -658,7 +776,7 @@
           "name": "NOAA NCEI Storm Events details 2012",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2012_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2012_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:51Z",
+          "retrieved": "2026-09-26T17:38:15Z",
           "sha256": "673db47f6dc9e97e06ffec3b628f5341c128f594d9b247bd07bad2e8397ebac3",
           "bytes": 11820671,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -667,7 +785,7 @@
           "name": "NOAA NCEI Storm Events details 2013",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2013_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2013_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:53Z",
+          "retrieved": "2026-09-26T17:38:17Z",
           "sha256": "4fa4036ed1c7ea9a779d5a5841d18de08596c423920189a9e6173488d1a98260",
           "bytes": 11725909,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -676,7 +794,7 @@
           "name": "NOAA NCEI Storm Events details 2014",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2014_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2014_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:53Z",
+          "retrieved": "2026-09-26T17:38:20Z",
           "sha256": "410b457b1b9628cfd63292848a626482a88714c8bd8c45d56a0469f9de05d078",
           "bytes": 11084754,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -685,7 +803,7 @@
           "name": "NOAA NCEI Storm Events details 2015",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2015_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2015_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:54Z",
+          "retrieved": "2026-09-26T17:38:22Z",
           "sha256": "c4a5a24b8c69ad2b6b867790ce298f5b642a60516c9fce5550a8d2f67cd7bf2e",
           "bytes": 10041550,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -694,7 +812,7 @@
           "name": "NOAA NCEI Storm Events details 2016",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2016_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2016_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:55Z",
+          "retrieved": "2026-09-26T17:38:24Z",
           "sha256": "d8e1389897df3557e74ba36820357f6962a7c0ca922595400fe74d883f7a5036",
           "bytes": 9065715,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -703,7 +821,7 @@
           "name": "NOAA NCEI Storm Events details 2017",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2017_c20260519.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2017_c20260519.csv.gz",
-          "retrieved": "2026-09-26T03:41:56Z",
+          "retrieved": "2026-09-26T17:38:26Z",
           "sha256": "bd3ca72b71544222cba8aa2b29eb3f0efe050d3330a0c408e208befb66881750",
           "bytes": 9340854,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -712,7 +830,7 @@
           "name": "NOAA NCEI Storm Events details 2018",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2018_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2018_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:57Z",
+          "retrieved": "2026-09-26T17:38:28Z",
           "sha256": "19702480f50cd2a8dacce5e57891feba156afb87b1ea5cbb4eaeda69d2b964a4",
           "bytes": 9585982,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -721,7 +839,7 @@
           "name": "NOAA NCEI Storm Events details 2019",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2019_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2019_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:57Z",
+          "retrieved": "2026-09-26T17:38:30Z",
           "sha256": "f5043ecc776818b0feffdf1e0fcbaf63329db0635eab1057c7b8ba00ef332e3b",
           "bytes": 11602648,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -730,7 +848,7 @@
           "name": "NOAA NCEI Storm Events details 2020",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2020_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2020_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:58Z",
+          "retrieved": "2026-09-26T17:38:31Z",
           "sha256": "895c56fd46991c4d9a135d67558dc4b447a02a2314efac0ace645135b98f9c9d",
           "bytes": 10444606,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -739,7 +857,7 @@
           "name": "NOAA NCEI Storm Events details 2021",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2021_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2021_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:59Z",
+          "retrieved": "2026-09-26T17:38:33Z",
           "sha256": "60c1daf96dbe8eafd48c80df5b70df51a0125ab95d467ee7009a646761d57715",
           "bytes": 10563953,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -748,7 +866,7 @@
           "name": "NOAA NCEI Storm Events details 2022",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2022_c20260625.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2022_c20260625.csv.gz",
-          "retrieved": "2026-09-26T03:42:00Z",
+          "retrieved": "2026-09-26T17:38:35Z",
           "sha256": "7d6b79d0049a6edec96b061738289daddba90be26fc9afe7b0a6fd617f21452e",
           "bytes": 11817849,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -757,7 +875,7 @@
           "name": "NOAA NCEI Storm Events details 2023",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2023_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2023_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:42:01Z",
+          "retrieved": "2026-09-26T17:38:38Z",
           "sha256": "713784bed40d9e5a95b1d6240a654f865f3ef97703713105c7b35437270da134",
           "bytes": 12888092,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -766,7 +884,7 @@
           "name": "NOAA NCEI Storm Events details 2024",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2024_c20260728.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2024_c20260728.csv.gz",
-          "retrieved": "2026-09-26T03:42:02Z",
+          "retrieved": "2026-09-26T17:38:41Z",
           "sha256": "2070b83eccab041b36360ab73645b9a249c3eefc5b92b5b3fc0cbba4d9fcc09c",
           "bytes": 12693243,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -775,14 +893,14 @@
           "name": "NOAA NCEI Storm Events details 2025",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2025_c20260819.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2025_c20260819.csv.gz",
-          "retrieved": "2026-09-26T03:42:03Z",
+          "retrieved": "2026-09-26T17:38:44Z",
           "sha256": "d9b46b4c6aae554723cadbb9691f3d5258371c02e530ba815d6fe41e4550149f",
           "bytes": 12585209,
           "license": "US Government work, public domain (17 U.S.C. 105)"
         }
       ],
-      "rows_in": 1460073,
-      "rows_out": 44057,
+      "rows_in": 1461768,
+      "rows_out": 44397,
       "outputs": [
         "core/events.csv"
       ],
@@ -791,7 +909,7 @@
         "Storm passages: a storm counts when its best track passes within 50 nautical miles of the county's internal point with interpolated maximum sustained wind of at least 34 kt (tropical_storm_passage), 64 kt (hurricane_passage) or 96 kt (major_hurricane_passage), whatever its tropical or post-tropical status.",
         "SPC: tornadoes are counted once per county per tornado using the per-state segment records (sn = 1) and their county list (f1-f4); tornado_ef2plus uses the rating (mag >= 2). Hail and wind are counted as days with at least one report in the county (hail 1 in and 2 in or larger by size; all severe-wind reports, and 65 kt or more). share_damaging is the share with a reported property loss above zero; loss units changed in 2016 but only 'above zero' is used.",
         "Storm Events: one observation per county per NOAA episode and type. Zone records apply to every county the NWS zone-county correlation file lists for that zone (newest file first, older files as fallback). Episode length runs from the earliest begin to the latest end of the episode's records in the county (local standard time as recorded). share_damaging counts reported property or crop damage above zero (many records leave damage blank, so it is a lower bound); share_injury counts direct or indirect injuries or deaths.",
-        "Retired forecast zones: 20386 zone records whose code is not in the correlation files were placed in the one county of that state whose name the zone carries (after dropping words like Northern or Coastal); 34015 records (382 distinct zones) could not be placed and were skipped (5.1% of the records used).",
+        "Retired forecast zones: 20452 zone records whose code is not in the correlation files were placed in the one county of that state whose name the zone carries (after dropping words like Northern or Coastal); 34370 records (382 distinct zones) could not be placed and were skipped (5.1% of the records used).",
         "Connecticut: sources that report the retired counties are apportioned to planning regions by land-area share (each region's weight is the share of its land inside the reporting county)."
       ],
       "missing": [
@@ -808,15 +926,29 @@
         }
       ]
     },
+    "eviction": {
+      "title": "Eviction filings per renter household (Eviction Lab; written only with the owner's sign-off)",
+      "finished": "2026-09-26T17:34:32Z",
+      "sources": [],
+      "rows_in": 0,
+      "rows_out": 0,
+      "outputs": [],
+      "notes": [
+        "Not built: waiting for the owner's sign-off (manifest sign_offs.eviction_lab_odc_by.approved). Eviction Lab data are Open Data Commons Attribution License (ODC-BY 1.0); the repository asks for approval before an attribution licence enters the packs. Nothing was downloaded."
+      ],
+      "definitions": {
+        "attribution_if_approved": "Eviction filing rates derived by Ready Reckoner from: Ashley Gromis, Ian Fellows, James R. Hendrickson, Lavar Edmonds, Lillian Leung, Adam Porton, and Matthew Desmond. Estimating Eviction Prevalence across the United States. Princeton University Eviction Lab. https://data-downloads.evictionlab.org/#estimating-eviction-prevalance-across-us/. Deposited May 13, 2022. This data is shared under the terms of the Open Data Commons Attribution License (ODC-BY 1.0)."
+      }
+    },
     "facilities": {
       "title": "Nuclear plants, TRI facilities and high-hazard dams by county and ZIP",
-      "finished": "2026-09-26T08:24:54Z",
+      "finished": "2026-09-26T17:32:17Z",
       "sources": [
         {
           "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon)",
           "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
           "version": "GENZ2024",
-          "retrieved": "2026-09-26T08:24:01Z",
+          "retrieved": "2026-09-26T17:31:37Z",
           "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
           "bytes": 11626066,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -825,7 +957,7 @@
           "name": "FEMA Operating Nuclear Power Plant Sites",
           "url": "https://gis.fema.gov/arcgis/rest/services/Partner/Operating_Nuclear_Power_Plant_Sites/FeatureServer/0/query (POST where=1=1; fields plant_name,latitude,longitude,update_dat; ordered by plant_name)",
           "version": "FEMA Partner layer Operating_Nuclear_Power_Plant_Sites",
-          "retrieved": "2026-09-26T08:24:03Z",
+          "retrieved": "2026-09-26T17:31:38Z",
           "sha256": "835f768615ab24034afa84a5b3ae4b4ac341965954c7702e2155a5719e8e9e72",
           "bytes": 7111,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -834,7 +966,7 @@
           "name": "EPA Toxics Release Inventory basic data file 2024, US",
           "url": "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/2024_US/csv",
           "version": "TRI reporting year 2024",
-          "retrieved": "2026-09-26T08:24:04Z",
+          "retrieved": "2026-09-26T17:31:39Z",
           "sha256": "06dfa3a67bb4c5bd38d9e9f0f7b8bff10b95254a63169423632d7f6f251e1506",
           "bytes": 60550684,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -843,7 +975,7 @@
           "name": "USACE National Inventory of Dams (nation CSV)",
           "url": "https://nid.sec.usace.army.mil/api/nation/csv",
           "version": "Data Last Updated 2026-9-23",
-          "retrieved": "2026-09-26T08:24:35Z",
+          "retrieved": "2026-09-26T17:32:06Z",
           "sha256": "d2ab9d97237f8ed814761cef953aa82d2761b909c3dfd8b66352f71c5e2ca645",
           "bytes": 67285174,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -852,19 +984,31 @@
           "name": "Census 2024 Gazetteer, ZCTAs",
           "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_zcta_national.zip",
           "version": "2024 Gazetteer; Last-Modified Fri, 30 Aug 2024 18:40:45 GMT",
-          "retrieved": "2026-09-26T08:24:52Z",
+          "retrieved": "2026-09-26T17:32:15Z",
           "sha256": "7b85c04a131672f58b38a950eb82855d5fd4054f0bd9bc3f69aa28897a714e3d",
           "bytes": 1013803,
           "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2020 ZCTA to place relationship file",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_place20_natl.txt",
+          "version": "rel2020 zcta520-place20",
+          "retrieved": "2026-09-26T17:32:15Z",
+          "sha256": "698a5dad71ed419411677d0ffd8ecd9331067f59c472cdd239b92c12f698285d",
+          "bytes": 9811563,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
         }
       ],
-      "rows_in": 203909,
+      "rows_in": 286789,
       "rows_out": 37023,
       "outputs": [
         "core/facilities.csv",
         "core/zip_facilities.csv"
       ],
       "notes": [
+        "dams_high_within_10km_naming_town: High-hazard dams within 10 km of the ZIP's centre whose NID City (the nearest downstream place most likely to be flooded by a failure, as dam owners report it) matches, by normalised name in the same state, a Census 2020 place that holds at least 10% of the ZIP's land or has at least that share of its own land in the ZIP. 12342 High dams name a town; 8535 (69%) match a Census place. 5184 ZIPs have at least one. Inundation maps are not public; the named town is not an inundation boundary.",
+        "dams_high_poor_condition: High-hazard dams whose latest NID condition assessment is Poor or Unsatisfactory (2791 in the counties; condition is not rated for about a fifth of High dams). high_hazard_dams is the county's total of High dams (dams_high_total in the engine's record).",
+        "strategic_km / strategic_bearing / strategic_site: the nearest class A point site or NNSA weapons-complex site (strategic_sites.toml, rule point_30km) within 150 km of the ZIP's centre, its distance (whole km), the compass bearing from the ZIP to it (whole degrees) and its id; empty beyond 150 km (6808 ZIPs have one). Lets a ZIP next to a site in a neighbouring county (Jefferson County, WA across Hood Canal from Bangor) be recognised.",
         "57 nuclear sites. nuclear_within_16km / _80km: any part of the county (1:500k boundary) within 10 / 50 miles of a site. nearest_nuclear_km is measured from the county's internal point; zip_facilities.csv measures from the ZIP centroid (0.1 km).",
         "TRI reporting year 2024: 21482 facilities with coordinates, placed in counties by point-in-polygon (0 without coordinates skipped); tri_within_5km counts facilities within 5 km of the ZIP centroid.",
         "NID (2026-9-23): dams rated High or Significant hazard potential, placed by their coordinates (100 could not be placed). Hazard potential describes what a failure would cause (High: probable loss of life), not how likely a failure is."
@@ -1097,6 +1241,163 @@
         "Connecticut: ZIP shares for Connecticut come from the 2022 town-to-ZCTA file, so they point at planning regions (091xx). ct_crosswalk.csv records the land-area overlap of the 8 retired counties and 9 regions, used to convert sources that still report old counties.",
         "states.csv: `coastal` means a marine (ocean, gulf or tidal estuary) shoreline; Pennsylvania counts through the tidal Delaware estuary. `great_lakes` means a Great Lakes shoreline. These two flags are curated, not downloaded."
       ]
+    },
+    "geomag": {
+      "title": "Geomagnetic latitude (IGRF-14) and the NERC TPL-007 scaling factor by county",
+      "finished": "2026-09-26T16:40:55Z",
+      "sources": [
+        {
+          "name": "IGRF-14 spherical harmonic coefficients (IAGA; NOAA NCEI copy)",
+          "url": "https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt",
+          "version": "IGRF-14, main-field epoch 2025.0 (dipole terms)",
+          "retrieved": "2026-09-26T16:40:54Z",
+          "sha256": "8f8d88403028fc4ee92c4f38d97b46e0a87e2cfc496045b43c9e26c1d6b0903c",
+          "bytes": 42411,
+          "license": "Open coefficients published by IAGA for any use; NOAA NCEI distribution is a US Government work"
+        },
+        {
+          "name": "NERC Benchmark Geomagnetic Disturbance Event Description (TPL-007), Appendix II",
+          "url": "https://www.nerc.com/globalassets/standards/projects/2013-03/benchmark_gmd_event_aug27_clean.pdf",
+          "version": "draft of 2014-08-21; formula II.1 and Table II-1 transcribed (read 2026-09-26)",
+          "retrieved": "2026-09-26T00:00:00Z",
+          "sha256": "7fb2757bde8ac84d109399fc56de29ebe01dcd17237f25b7266478d83224ad2d",
+          "bytes": 0,
+          "license": "NERC publication; the formula is cited, not copied data",
+          "obligations": "Cite NERC as the source of the scaling formula."
+        }
+      ],
+      "rows_in": 3,
+      "rows_out": 3232,
+      "outputs": [
+        "core/geomag.csv"
+      ],
+      "notes": [
+        "Geomagnetic latitude: angle of each county's internal point from the IGRF-14 dipole equator (epoch 2025.0: g10 -29350, g11 -1410.3, h11 4545.5 nT; geomagnetic north pole 80.79 N, 72.76 W). geomag_factor: NERC's alpha = 0.001 x exp(0.115 x |latitude|), bounded 0.1 to 1 (TPL-007 benchmark, Appendix II, eq. II.1); the benchmark field is 8 V/km x alpha x beta.",
+        "Rounded to 0.1 degree of latitude and two significant figures of alpha.",
+        "Earth conductivity (NERC's beta, 0.2 to 1.2 across US earth models) is not included: NERC publishes its regions only as a map image. Values are the dipole geomagnetic latitude, not corrected geomagnetic coordinates, which differ by a degree or two over the US."
+      ],
+      "definitions": {
+        "geomag_factor": "NERC TPL-007 benchmark scaling factor alpha for geomagnetic latitude: 0.001 x exp(0.115 x L), 0.1 <= alpha <= 1.0 (1.0 at 60 degrees and above)."
+      }
+    },
+    "ground": {
+      "title": "Karst (USGS OFR 2014-1156) and landslide-susceptible terrain (USGS 2024) by county",
+      "finished": "2026-09-26T16:50:06Z",
+      "sources": [
+        {
+          "name": "USGS Slope-Relief Threshold Landslide Susceptibility Models for the US and Puerto Rico: county_analysis.csv",
+          "url": "https://www.sciencebase.gov/catalog/file/get/65ccea5bd34ef4b119cb3bac?f=__disk__8c%2Fda%2F66%2F8cda66bbacf51b14a8c4c1b649b8b26688d59d27",
+          "version": "doi:10.5066/P13KAGU3 (ScienceBase item 65ccea5bd34ef4b119cb3bac, 2024-08-22)",
+          "retrieved": "2026-09-26T16:49:38Z",
+          "sha256": "5f7d9fb6938fe20409b9f957373bee1b7680f5106545fba1d003162d5ebe10ed",
+          "bytes": 229563,
+          "license": "Creative Commons Zero v1.0 Universal (public domain dedication)"
+        },
+        {
+          "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon and areas)",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
+          "version": "GENZ2024",
+          "retrieved": "2026-09-26T16:49:38Z",
+          "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
+          "bytes": 11626066,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "USGS Karst in the United States: digital map compilation (OFR 2014-1156), shapefiles",
+          "url": "https://pubs.usgs.gov/of/2014/1156/downloads/USKarstMap.zip",
+          "version": "Open-File Report 2014-1156 (Weary and Doctor, 2014), USKarstMap.zip",
+          "retrieved": "2026-09-26T16:49:40Z",
+          "sha256": "9d3c11024fc2d5dfa2dd2368d0d8eb67f67fcdde2c942a0a37592ad24a4c555f",
+          "bytes": 282254948,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 3222,
+      "rows_out": 3225,
+      "outputs": [
+        "core/ground.csv"
+      ],
+      "notes": [
+        "karst_share: share of the county's land on carbonate or evaporite rock at or near the surface, or buried under insoluble or up to 50 feet of glacial sediment (USGS OFR 2014-1156 exposure classes E, B1 and B3); rock under more than 50 feet of glacial sediment (B2) is left out. Measured on a 1 km lattice in each region's Albers equal-area plane (the layers' own projection), with county outlines from the Census 1:500,000 file. Karst is where sinkholes can form, not how often they do.",
+        "contiguous US: Continguous48/Carbonates48.shp: 72565 polygons (5272 deeply buried left out), Continguous48/Evaporites48.shp: 8098 polygons (122 deeply buried left out); 3109 counties.",
+        "Alaska: Alaska/AKcarbonates.shp: 11390 polygons (0 deeply buried left out); 30 counties.",
+        "Hawaii: Hawaii/HIcarbonates.shp: 284 polygons (0 deeply buried left out); 5 counties.",
+        "Puerto Rico and US Virgin Islands: PuertoRico_VirginIslands/PRcarbonates.shp: 771 polygons (0 deeply buried left out), PuertoRico_VirginIslands/VIcarbonates.shp: 19 polygons (0 deeply buried left out); 81 counties.",
+        "landslide_susceptible_share: USGS 2024 slope-relief threshold model (https://www.sciencebase.gov/catalog/item/65ccea5bd34ef4b119cb3bac), county table (prop_susc: susceptible area / county area), matched by state and name; renamed or split counties by an override table, Connecticut's retired counties converted to planning regions by land share. No landslide value (the model covers the 50 states and Puerto Rico): 78010, 78020, 78030."
+      ],
+      "definitions": {
+        "karst_share": "Share of the county's land on karst-prone rock (carbonates and evaporites at or near the surface or under thin cover), USGS OFR 2014-1156.",
+        "landslide_susceptible_share": "Share of the county's area rated susceptible by the USGS 2024 slope-relief threshold landslide susceptibility model."
+      },
+      "missing": [
+        {
+          "reason": "Neither USGS source covers Guam, American Samoa or the Northern Mariana Islands",
+          "fips": [
+            "60010",
+            "60020",
+            "60050",
+            "66010",
+            "69100",
+            "69110",
+            "69120"
+          ]
+        }
+      ]
+    },
+    "levees": {
+      "title": "People behind levees and levee risk ratings by county (USACE National Levee Database)",
+      "finished": "2026-09-26T16:59:28Z",
+      "sources": [
+        {
+          "name": "USACE National Levee Database: levee systems by state (public API)",
+          "url": "https://levees.sec.usace.army.mil/api-local/systems/query?type=sy&sy=*&in=@state:<state name> (56 states)",
+          "version": "6159 systems as served on the retrieval date",
+          "retrieved": "2026-09-26T16:58:47Z",
+          "sha256": "95da2b6ca6b27bfc89427258eb51018b79dab5a31009f0b6a84d6178239a8c24",
+          "bytes": 12851337,
+          "license": "US Government work; NLD: \"available for public use\""
+        },
+        {
+          "name": "USACE National Levee Database: leveed areas (feature layer 16)",
+          "url": "https://geospatial.sec.usace.army.mil/dls/rest/services/NLD/Public/FeatureServer/16/query (POST where=1=1; fields SYSTEM_ID,LEVEED_ID; ordered by OBJECTID; maxAllowableOffset=0.0005; geometryPrecision=5)",
+          "version": "NLD Public FeatureServer layer 16 (Leveed Areas), generalised to 0.0005 degrees",
+          "retrieved": "2026-09-26T16:58:59Z",
+          "sha256": "bc1e3dd549ceb7fa2acc595985788892e6cbb698a6ca994cceab4bb40e3dad25",
+          "bytes": 4833947,
+          "license": "US Government work; NLD: \"available for public use\""
+        },
+        {
+          "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon and areas)",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
+          "version": "GENZ2024",
+          "retrieved": "2026-09-26T16:59:25Z",
+          "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
+          "bytes": 11626066,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2020 centers of population by block group",
+          "url": "https://www2.census.gov/geo/docs/reference/cenpop2020/blkgrp/CenPop2020_Mean_BG.txt",
+          "version": "CenPop2020_Mean_BG",
+          "retrieved": "2026-09-26T16:59:26Z",
+          "sha256": "e4a7ebbf07a8a8d846cea9d2daeb600dea50b1ec2d7703909e40d45c013cd63a",
+          "bytes": 10583505,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 254639,
+      "rows_out": 3232,
+      "outputs": [
+        "core/levees.csv"
+      ],
+      "notes": [
+        "6159 levee systems with 22.3 million people at risk (NLD API). People split among counties: 1129 systems by the Census 2020 block-group population inside their leveed areas, 2418 by leveed-area land (lattice every 0.005 degrees) where no block-group centre falls inside, 805 by the first vertex of an area too small for the lattice, 11 without a leveed-area polygon by the system's point; 0 systems (0 people) could not be placed. After capping each county at its population, 17.2 million people are counted.",
+        "leveed_pop_share = people behind levees in the county / county population (NRI 2020), capped at 1 because nested systems can count people twice (capped: 05017 (1.17), 05035 (1.52), 05041 (1.17), 05093 (1.37), 05095 (1.73), 05111 (1.05), 12011 (3.20), 17003 (1.35), 22007 (1.76), 22009 (2.41), 22025 (1.55), 22029 (2.21), 22035 (1.16), 22041 (1.33), 22047 (1.82), 22051 (1.23), 22057 (1.18), 22065 (1.16), 22071 (1.49), 22075 (1.01), 22077 (2.15), 22079 (2.59), 22083 (1.31), 22087 (2.31), 22089 (1.14), 22093 (1.28), 22101 (1.53), 22107 (1.17), 22121 (2.24), 22123 (1.16), 28011 (1.05), 28027 (1.16), 28053 (1.45), 28055 (1.34), 28119 (2.24), 28125 (1.35), 28133 (1.07), 28143 (1.73), 28151 (1.15), 29069 (1.34), 29143 (1.13), 38017 (1.04)). levee_risk_high_share = of those people, the share behind systems USACE rates Very High or High risk (LSAC); two thirds of systems are not screened, so a 0 there often means 'not rated', not 'low risk'. Counties with no levee system are 0."
+      ],
+      "definitions": {
+        "levee_risk_high_share": "Share of the county's leveed residents behind levee systems with a USACE Levee Screening and Assessment rating of Very High or High.",
+        "leveed_pop_share": "Share of the county's residents living in areas USACE's National Levee Database shows behind a levee (modelled people at risk from the National Structure Inventory, split among counties by where people live inside the leveed areas)."
+      }
     },
     "nri": {
       "title": "FEMA National Risk Index v1.20, trimmed to the model's county fields",
@@ -1513,6 +1814,324 @@
         }
       ]
     },
+    "smoke": {
+      "title": "Wildfire-smoke days per county from NOAA HMS smoke polygons and EPA AQS PM2.5",
+      "finished": "2026-09-26T17:26:46Z",
+      "sources": [
+        {
+          "name": "NOAA NESDIS Hazard Mapping System smoke polygons, daily shapefiles 2016-2023",
+          "url": "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/YYYY/MM/hms_smokeYYYYMMDD.zip",
+          "version": "2920 daily files (2 missing); sha256 is of the files' sha256 values in date order",
+          "retrieved": "2026-09-26T17:26:03Z",
+          "sha256": "18398463f69c3a5f563d48b740070cf57a48089b4512a6c5f5880a261636052d",
+          "bytes": 54109642,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon and areas)",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
+          "version": "GENZ2024",
+          "retrieved": "2026-09-26T17:26:03Z",
+          "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
+          "bytes": 11626066,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2016",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2016.zip",
+          "version": "daily_88101_2016.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:04Z",
+          "sha256": "bb70b9a2050de500d5dde412d46045feca5c9699848a2a8111e166c47cd3fd05",
+          "bytes": 4552673,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2017",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2017.zip",
+          "version": "daily_88101_2017.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:08Z",
+          "sha256": "0a09c955d4a84e604acfb3d3bfc864a4bff883eaca9ac1deb208563204256d74",
+          "bytes": 5188737,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2018",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2018.zip",
+          "version": "daily_88101_2018.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:11Z",
+          "sha256": "a82e60b1bd486ebd23adacedd4f1822a41cda0985194b3a21898e135cdf468e5",
+          "bytes": 6325876,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2019",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2019.zip",
+          "version": "daily_88101_2019.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:15Z",
+          "sha256": "88b9b0b1bbd0c7545ffc07959a5ecbd4c6fbe951c67ea648cef70cafe956af53",
+          "bytes": 7315771,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2020",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2020.zip",
+          "version": "daily_88101_2020.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:21Z",
+          "sha256": "18283fe4ffceb53e3091a7fa7de57a2d5b925ce3d56a08d3518021e00212a3ec",
+          "bytes": 7911864,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2021",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2021.zip",
+          "version": "daily_88101_2021.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:26Z",
+          "sha256": "c3f876f8cd898c3bd921db45e1a2dd39c52ed7f5bb48e82a600066a434f6afd4",
+          "bytes": 9003762,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2022",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2022.zip",
+          "version": "daily_88101_2022.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:32Z",
+          "sha256": "82f5035943a447f8edebf1f0b3f774e08b81a250a86295871a8574726d6b2f94",
+          "bytes": 9687295,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2023",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2023.zip",
+          "version": "daily_88101_2023.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:39Z",
+          "sha256": "4b40502e8147419643a1120c666c4aa952633094f21f65475844172bcc78833b",
+          "bytes": 9919616,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 2947796,
+      "rows_out": 3225,
+      "outputs": [
+        "core/smoke.csv"
+      ],
+      "notes": [
+        "Smoke-covered: the county's internal point inside a Medium or Heavy HMS polygon (2920 daily files 2016-2023, 2 missing: 2016-03-06, 2016-11-12). PM2.5: EPA AQS daily 24-hour averages (sample durations 24 HOUR and 24-HR BLK AVG, 'Excluded' exceptional-event rows left out), the county's highest monitor per day, sites placed by coordinates.",
+        "smoke_days_35 / smoke_days_55: mean days a year 2016-2023 that are smoke-covered with 24-hour PM2.5 of at least 35.5 / 55.5 µg/m³, estimated each year as (observed smoke-covered days over the threshold / observed smoke-covered days) x smoke-covered days, so monitors that run every third or sixth day are not undercounted. smoke_trend: least-squares slope of the yearly smoke_days_35 estimate, days per year per year. hms_smoke_days: mean smoke-covered days a year. Basis: monitor 641 (at least 10 observed smoke-covered days), imputed 2498 (rate of the nearest such county within 150 km in the same NCA5 region, else the region's pooled rate, applied to the county's own smoke-covered days), hms_only 86 (no rate to borrow: counts are 0 where HMS never showed smoke, blank otherwise).",
+        "HMS outlines smoke in the whole air column; the PM2.5 test keeps only days when it reached the ground. Winter inversion pollution (Utah, the San Joaquin Valley) counts only on days HMS also shows smoke. Childs et al. 2022 (CC BY-SA) is not bundled."
+      ],
+      "definitions": {
+        "smoke_days_35": "Days a year (2016-2023 mean) when NOAA HMS shows medium or heavy smoke over the county and the county's 24-hour PM2.5 reaches 35.5 µg/m³ (AQI unhealthy for sensitive groups).",
+        "smoke_days_55": "The same at 55.5 µg/m³ (AQI unhealthy), 2016-2023 mean."
+      },
+      "missing": [
+        {
+          "reason": "Outside the NOAA HMS smoke analysis area (Guam, American Samoa, Northern Mariana Islands)",
+          "fips": [
+            "60010",
+            "60020",
+            "60050",
+            "66010",
+            "69100",
+            "69110",
+            "69120"
+          ]
+        }
+      ]
+    },
+    "strategic": {
+      "title": "Strategic-site classes (nuclear family) and FEMA UASI shares by county",
+      "finished": "2026-09-26T18:49:36Z",
+      "sources": [
+        {
+          "name": "Ready Reckoner curated strategic sites (sites, class rules, metros, refineries, ports, FY2026 UASI table)",
+          "url": "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml",
+          "version": "strategic_sites/1 (reviewed), reviewed 2026-09-26",
+          "retrieved": "2026-09-26T18:49:33Z",
+          "sha256": "7447345cfd13379a0ffd703d1e5d3549227c878abaa2b2515bc4ded1bf85ae12",
+          "bytes": 91132,
+          "license": "Compiled by Ready Reckoner from the public sources listed in the file"
+        },
+        {
+          "name": "FEMA FY2026 Homeland Security Grant Program NOFO, Appendix I: UASI allocations",
+          "url": "https://www.fema.gov/sites/default/files/documents/fema_gpd_hsgp-nofo-fy2026.pdf",
+          "version": "figures transcribed into the curated file and checked row by row (fema.gov refuses scripted clients); pp. 71-73",
+          "retrieved": "2026-09-26T00:00:00Z",
+          "sha256": "b94875508f001bf3ff5d37b6fb3a5934941177bc4f41b7f7a7f24f15161cd9bd",
+          "bytes": 0,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Sentinel (GBSD) Final EIS, Volume I: missile-field county lists",
+          "url": "https://minutemanmissile.com/documents/SentinelFinalEISVolumeIFinalEIS.pdf",
+          "version": "county lists checked against sections 2.1.6.1 (p. 2-13), 2.1.7.1 (p. 2-33), 2.1.8.1 (p. 2-40); mirror of the AFGSC document",
+          "retrieved": "2026-09-26T00:00:00Z",
+          "sha256": "",
+          "bytes": 101019598,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2020 centers of population by county",
+          "url": "https://www2.census.gov/geo/docs/reference/cenpop2020/county/CenPop2020_Mean_CO.txt",
+          "version": "CenPop2020_Mean_CO",
+          "retrieved": "2026-09-26T18:49:33Z",
+          "sha256": "4f754a3bda9714e5820d73bfac44ef1dab2b8c371f6c136305474cda7a752014",
+          "bytes": 171276,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon and areas)",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
+          "version": "GENZ2024",
+          "retrieved": "2026-09-26T18:49:33Z",
+          "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
+          "bytes": 11626066,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 3221,
+      "rows_out": 3439,
+      "outputs": [
+        "core/strategic.csv",
+        "core/strategic_sites.toml"
+      ],
+      "notes": [
+        "Classes by county (population from NRI 2020): A 68 (3.5% of people), C1 128 (26.0% of people), B 533 (4.4% of people), C2 334 (28.9% of people), D 245 (5.8% of people), E 1924 (31.4% of people). The research first cut (internal points) gave A 60, B 537, C1 129, C2 332, D 245, E 1929.",
+        "Distances are from each county's Census 2020 centre of population (the rules measure where people live). 19 counties have no 2020 centre in the Census file and use their Gazetteer 2024 internal point: 09110, 09120, 09130, 09140, 09150, 09160, 09170, 09180, 09190, 60010, 60020, 60050, 66010, 69100, 69110, 69120, 78010, 78020, 78030.",
+        "Class B distances are measured from the Gazetteer internal point of each county holding launch facilities (23 counties; a stand-in for the 450 launch facilities, whose coordinates no public source reached here provides). The missile-field county lists match the Sentinel Final EIS Volume I (sections 2.1.6.1, 2.1.7.1, 2.1.8.1).",
+        "Counties whose land comes within 30 km of an A point site while their centre of population does not (for review; zip_facilities.csv gives each ZIP's own distance): 02290 (clear_sfs, now E); 06007 (beale_afb, now E); 06057 (beale_afb, now D); 06061 (beale_afb, now C2); 06079 (vandenberg_sfb, now E); 08043 (cheyenne_mountain, now E); 08043 (peterson_sfb, now E); 08069 (fe_warren_afb, now B); 08101 (cheyenne_mountain, now E); 08119 (cheyenne_mountain, now E); 08119 (peterson_sfb, now E); 12031 (kings_bay, now C2); 13127 (kings_bay, now E); 19071 (offutt_afb, now B); 22013 (barksdale_afb, now D); 22031 (barksdale_afb, now E); 22081 (barksdale_afb, now E); 22119 (barksdale_afb, now D); 24003 (pentagon, now C2); 24013 (raven_rock, now C2); 24017 (pentagon, now C1); 24021 (raven_rock, now C1); 25005 (cape_cod_sfs, now C2); 25007 (cape_cod_sfs, now E); 25023 (cape_cod_sfs, now C2); 29015 (whiteman_afb, now D); 29083 (whiteman_afb, now D); 29107 (whiteman_afb, now C2); 29195 (whiteman_afb, now D); 31177 (offutt_afb, now B); 35043 (kirtland_afb, now E); 35049 (kirtland_afb, now D); 35057 (kirtland_afb, now D); 35061 (kirtland_afb, now E); 40017 (tinker_afb, now C2); 40051 (tinker_afb, now C2); 40081 (tinker_afb, now B); 40087 (tinker_afb, now C2); 40125 (tinker_afb, now D); 42041 (raven_rock, now E); 46081 (ellsworth_afb, now B); 48381 (pantex, now E); 51061 (mount_weather, now C1); 51153 (mount_weather, now C1); 51153 (pentagon, now C1); 51157 (mount_weather, now C1); 53009 (kitsap_bangor, now E); 53029 (kitsap_bangor, now E); 53031 (kitsap_bangor, now E); 53033 (kitsap_bangor, now C2); 53045 (kitsap_bangor, now E); 53061 (kitsap_bangor, now C2); 54003 (mount_weather, now E).",
+        "strategic_site_ids: the sites or areas that put the county in its class, membership first (the county is in the metro, holds the launch facilities, and so on), then by distance; ids resolve in strategic_sites.toml (site ids, metro_<cbsa>, port_<rank>, refinery_<county>). strategic_km and strategic_bearing: distance (km, 1 decimal) and compass bearing (degrees clockwise from north) from the county's centre of population to the first distance-based reason, empty for membership and for class E.",
+        "uasi_share: the county's share of the national FY2026 UASI total ($584,250,000, 44 urban areas): the urban area's share split among its counties by 2020 population; 0 outside every funded urban area. uasi_area_share: the urban area's own share of that total, the same for every county in the area (0 outside). uasi_area: rank of that urban area in strategic_sites.toml. Amounts checked against FEMA's PDF (2026-09-26); county footprints are a proposal (UNVERIFIED: FEMA publishes none)."
+      ],
+      "definitions": {
+        "precedent": "FEMA, Protection in the Nuclear Age (H-20, 1985), p. 12: \"Designating a place as a 'risk' area does not mean that it will be attacked; it does indicate a greater potential for attack.\" NAPB-90 (1987, released 2005) is a method precedent, not a public one.",
+        "strategic_class": "A: counterforce and command sites; C1: largest cities, the capital region and weapons plants; B: missile-field fallout corridor; C2: other large cities, ports, refineries and bases; D: downwind of a target; E: remote from targets and fallout paths. Rules and f_S priors in strategic_sites.toml.",
+        "uasi_area_share": "The FEMA urban area's share of the national FY2026 Urban Area Security Initiative allocation (its dollars / $584,250,000), the same for every county in the urban area; 0 outside every funded urban area. The county footprints are Ready Reckoner's proposal, not a FEMA list."
+      }
+    },
+    "surge": {
+      "title": "NOAA/NHC storm-surge area shares by ZIP (optional pack; large rasters)",
+      "finished": "2026-09-26T18:19:44Z",
+      "sources": [
+        {
+          "name": "Census cartographic boundary ZCTAs 2020, 1:500,000",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_zcta520_500k.zip",
+          "version": "GENZ2020 cb_2020_us_zcta520_500k",
+          "retrieved": "2026-09-26T18:17:40Z",
+          "sha256": "c69a4ede8aebebfc7ed3a98a9075c6aaa1b75d514a129bc5c662fd806d2f3d17",
+          "bytes": 66655314,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2024 Gazetteer, ZCTAs (land area)",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_zcta_national.zip",
+          "version": "2024 Gazetteer; Last-Modified Fri, 30 Aug 2024 18:40:45 GMT",
+          "retrieved": "2026-09-26T18:17:47Z",
+          "sha256": "7b85c04a131672f58b38a950eb82855d5fd4054f0bd9bc3f69aa28897a714e3d",
+          "bytes": 1013803,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Texas to Maine (v2, 2016)",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/US_SLOSH_MOM_Inundation.zip",
+          "version": "US_SLOSH_MOM_Inundation.zip",
+          "retrieved": "2026-09-26T18:17:48Z",
+          "sha256": "9bec43a68025cdf0f7b032d11cd8d0b139122ed67bdd7ee17ad1eeb67b8a3048",
+          "bytes": 224067401,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Southern California (v3)",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/Southern_California_SLOSH_MOM_Inundation_v3.zip",
+          "version": "Southern_California_SLOSH_MOM_Inundation_v3.zip",
+          "retrieved": "2026-09-26T18:19:37Z",
+          "sha256": "2dcb93a50acb2ee8873af3f7b97ba29e63cb7d6123f340ac0c6df2bdf0539419",
+          "bytes": 4404341,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Hawaii",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/Hawaii_SLOSH_MOM_Inundation.zip",
+          "version": "Hawaii_SLOSH_MOM_Inundation.zip",
+          "retrieved": "2026-09-26T18:19:40Z",
+          "sha256": "976d7c720b5fe8e194b8965dc37c63de05c23d272c2c88bef0fadead4d5c4658",
+          "bytes": 8624841,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Puerto Rico",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/PR_SLOSH_MOM_Inundation.zip",
+          "version": "PR_SLOSH_MOM_Inundation.zip",
+          "retrieved": "2026-09-26T18:19:42Z",
+          "sha256": "6edd6660c211512b06c3e2d5846ea22937c5d056092aa14a654694433833dd74",
+          "bytes": 7271715,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), US Virgin Islands",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/USVI_SLOSH_MOM_Inundation.zip",
+          "version": "USVI_SLOSH_MOM_Inundation.zip",
+          "retrieved": "2026-09-26T18:19:43Z",
+          "sha256": "16597e35eef7681d84cc411d5614156a09c77a10fe22ac0272b8b44de27958a9",
+          "bytes": 956080,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Guam (v3)",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/Guam_SLOSH_MOM_Inundation_v3.zip",
+          "version": "Guam_SLOSH_MOM_Inundation_v3.zip",
+          "retrieved": "2026-09-26T18:19:43Z",
+          "sha256": "ebc0a284621f5f3d004c9782f251a00c39ddc8b1952070038a3684d786c645ac",
+          "bytes": 2825545,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), American Samoa (v3)",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/American_Samoa_SLOSH_MOM_Inundation_v3.zip",
+          "version": "American_Samoa_SLOSH_MOM_Inundation_v3.zip",
+          "retrieved": "2026-09-26T18:19:43Z",
+          "sha256": "f2149c135740f171ec1d1d84b80817006f235adc80be3c5ff8ce396f19dec415",
+          "bytes": 2090447,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        }
+      ],
+      "rows_in": 33791,
+      "rows_out": 26459,
+      "outputs": [
+        "opt/surge/zip_surge.csv"
+      ],
+      "notes": [
+        "Texas to Maine (v2, 2016): 25489 ZIPs sampled; Southern California (v3): 727 ZIPs sampled (Category 2 stands in for 3); Hawaii: 97 ZIPs sampled; Puerto Rico: 138 ZIPs sampled; US Virgin Islands: 6 ZIPs sampled; Guam (v3): 7 ZIPs sampled; American Samoa (v3): 1 ZIPs sampled. 3252 ZIPs have some Category 3 surge area. Lattice every 3 arc-seconds (about 90 m) inside each Census 2020 1:500k ZCTA outline; a point counts when its raster cell holds a depth class (1-21 feet bins); share = inundated points' area / the ZIP's land area (Census 2024 Gazetteer), capped at 1. ZIPs whose outline meets no raster have no row: outside the mapped area, which is not the same as no risk. Checks (Category 3 share): Miami Beach, FL (33139) 0.793, Key West, FL (33040) 0.634, Galveston, TX (77550) 0.899, Guam ZIPs sampled 7."
+      ],
+      "definitions": {
+        "surge_cat1_share": "Share of the ZIP code's area inside NOAA/NHC's Category 1 storm-surge area.",
+        "surge_cat3_share": "Share of the ZIP code's area inside NOAA/NHC's Category 3 storm-surge area (SLOSH Maximum of Maximums at high tide; it contains the Category 1 and 2 areas). Community-level awareness only; official evacuation zones decide who leaves."
+      }
+    },
+    "surge_proxy": {
+      "title": "County storm-surge proxy from NRI coastal-flood exposure, hurricane passages and evacuation zones",
+      "finished": "2026-09-26T17:27:34Z",
+      "sources": [],
+      "rows_in": 3232,
+      "rows_out": 3232,
+      "outputs": [
+        "core/surge_proxy.csv"
+      ],
+      "notes": [
+        "Classes: high 137 counties (9.0% of people), moderate 182 counties (13.3% of people), low 86 counties (6.4% of people), none 2827 counties (71.3% of people). Inputs: NRI v1.20 coastal-flooding people exposed / population, HURDAT2 tropical-storm and hurricane passages within 50 nmi (events.csv; NRI hurricane frequency for Guam, the Northern Mariana Islands and American Samoa), and published evacuation zones (statewide in FL, GA, MD, NC, SC, VA; coastal counties in TX, LA; Baldwin County, AL; Mobile County, AL; Jackson County, MS; Bronx County, NY (NYC Hurricane Evacuation Zone Finder); Kings County, NY; New York County, NY; Queens County, NY; Richmond County, NY). Rules: none if not an NRI coastal-flood county or tropical storms under 0.02 a year; high if at least 10% of residents in coastal-flood areas and at least 0.05 hurricanes a year; moderate if at least 2% and 0.1 tropical storms a year, or evacuation zones and 0.02 hurricanes a year; low otherwise.",
+        "A county proxy: it cannot say that an address is in a surge zone. NRI's coastal-flood areas are the 1% and 0.2% coastal floodplains plus high-tide flooding, smaller than NHC's Category 3 surge extent, so shares understate surge reach. No elevation is used (no national source cheap enough per ZIP); the optional `surge` pack (NOAA/NHC maps by ZIP) is the precise answer. Unconfirmed zone tools in the research (Mississippi statewide, New Jersey, Delaware, Connecticut, Rhode Island) are left out."
+      ],
+      "definitions": {
+        "coastal_flood_pop_share": "People in NRI v1.20 coastal-flood exposure areas / county population.",
+        "surge_proxy_class": "County storm-surge exposure: none, low, moderate or high, from NRI coastal-flood exposure, hurricane passages and official evacuation zones (a proxy; it does not place an address in or out of a zone)."
+      }
+    },
     "vulnerability": {
       "title": "Census Community Resilience Estimates 2024 and CDC SVI 2022",
       "finished": "2026-09-26T03:43:08Z",
@@ -1640,6 +2259,148 @@
           ]
         }
       ]
+    },
+    "water_systems": {
+      "title": "Community water systems with health-based violations in five years (EPA ECHO SDWA)",
+      "finished": "2026-09-26T17:15:57Z",
+      "sources": [
+        {
+          "name": "EPA ECHO SDWA system search download (all public water systems)",
+          "url": "https://echo.epa.gov/files/echodownloads/SDWA_system_search_download.zip",
+          "version": "SDWA_SYSTEM_SEARCH.csv; Last-Modified Mon, 21 Sep 2026 13:25:50 GMT",
+          "retrieved": "2026-09-26T17:13:44Z",
+          "sha256": "87b5b54dc1288a935621626c0b903b56562619b0fcc3b6c7b5af1dc900cc8a27",
+          "bytes": 34965432,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA ECHO SDWA latest downloads: SDWA_VIOLATIONS_ENFORCEMENT.csv",
+          "url": "https://echo.epa.gov/files/echodownloads/SDWA_latest_downloads.zip",
+          "version": "quarterly national download",
+          "retrieved": "2026-09-26T17:13:59Z",
+          "sha256": "a18a20f9091c2e0466c91c83d0bac5651473441642331d09504e447a6e2ac7a4",
+          "bytes": 423774232,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 2041774,
+      "rows_out": 3171,
+      "outputs": [
+        "core/water_systems.csv"
+      ],
+      "notes": [
+        "48519 active community water systems serving 326.9 million people; 22774 systems (58.8 million people) had a health-based violation (MCL, MRDL or treatment technique) open at some time between 2021-06-05 and 2026-06-05 (the file's latest begin date). Counting only violations that began in the window would flag 21307 systems (47.8 million people). 859 systems (4066601 people) list no county and 0 people sit under county codes that match nothing; both are left out.",
+        "Each system's population is split over the counties it lists in proportion to their residents (NRI 2020; EPA publishes no split); Connecticut's retired county codes are split to planning regions by land share first. Violations measure compliance, not the physical state of the pipes: one large system flips a whole county (New York City's open treatment-technique case since 2017, the uncovered Hillview Reservoir, flags all five boroughs; Asheville's post-Helene violations flag Buncombe County)."
+      ],
+      "definitions": {
+        "cws_pop_share": "Population served by active community water systems / county population (NRI 2020), capped at 1.",
+        "sdwis_violation_pop_share": "Share of the county's community-water-system population served by a system with at least one health-based violation (maximum contaminant level, maximum residual disinfectant level or treatment technique) open at some time in the 5 years to 2026-06-05."
+      },
+      "missing": [
+        {
+          "reason": "No active community water system on record in EPA's SDWA data",
+          "fips": [
+            "02105",
+            "02195",
+            "02198",
+            "02230",
+            "02275",
+            "15005",
+            "21037",
+            "21187",
+            "30079",
+            "31005",
+            "31115",
+            "31117",
+            "31173",
+            "32510",
+            "38085",
+            "51510",
+            "51520",
+            "51530",
+            "51540",
+            "51550",
+            "51570",
+            "51580",
+            "51590",
+            "51595",
+            "51600",
+            "51610",
+            "51620",
+            "51630",
+            "51640",
+            "51650",
+            "51660",
+            "51670",
+            "51678",
+            "51680",
+            "51683",
+            "51685",
+            "51690",
+            "51700",
+            "51710",
+            "51720",
+            "51730",
+            "51735",
+            "51740",
+            "51750",
+            "51760",
+            "51770",
+            "51775",
+            "51790",
+            "51800",
+            "51810",
+            "51820",
+            "51830",
+            "51840",
+            "54005",
+            "55078",
+            "69100",
+            "69110",
+            "69120",
+            "72033",
+            "72049",
+            "72137"
+          ]
+        }
+      ]
+    },
+    "wildfire_places": {
+      "title": "USFS Wildfire Risk to Communities by Census place, with ZIP-to-place shares (optional pack)",
+      "finished": "2026-09-26T18:20:10Z",
+      "sources": [
+        {
+          "name": "USDA Forest Service Wildfire Risk to Communities, tabular download (Communities sheet)",
+          "url": "https://wildfirerisk.org/wp-content/uploads/2026/04/wrc_download_20260415.xlsx",
+          "version": "wrc_download_20260415.xlsx (2nd edition; last update 2026-04-15)",
+          "retrieved": "2026-09-26T18:20:07Z",
+          "sha256": "437c25429eb2a1cfe755832c5a02f01f2707ffa4238712dd7ef1c4cccc76bdbd",
+          "bytes": 4968274,
+          "license": "USDA Forest Service data; free to use, citation requested",
+          "obligations": "Cite: USDA Forest Service. 2026. Wildfire Risk to Communities. https://wildfirerisk.org [date accessed]."
+        },
+        {
+          "name": "Census 2020 ZCTA to place relationship file",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_place20_natl.txt",
+          "version": "rel2020 zcta520-place20",
+          "retrieved": "2026-09-26T18:20:09Z",
+          "sha256": "698a5dad71ed419411677d0ffd8ecd9331067f59c472cdd239b92c12f698285d",
+          "bytes": 9811563,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 114918,
+      "rows_out": 67606,
+      "outputs": [
+        "opt/wildfire_places/places.csv",
+        "opt/wildfire_places/zip_places.csv"
+      ],
+      "notes": [
+        "32038 Census places from the Wildfire Risk to Communities Communities sheet (2nd edition, updated 2026-04-15); INSUFFICIENT_DATA places keep their name without values. buildings_direct / buildings_indirect: BUILDINGS_FRACTION_DE / _IE (share of the place's buildings directly / indirectly exposed); risk_national_rank: RISK_NATIONAL_RANK (national percentile of risk to homes). zip_places.csv: 35568 ZIP-place pairs from the Census 2020 ZCTA-to-place file where the place holds at least 1% of the ZIP's land."
+      ],
+      "definitions": {
+        "buildings_direct": "Share of the place's buildings directly exposed to wildfire (flames can reach them from adjacent burnable vegetation), USDA Forest Service Wildfire Risk to Communities."
+      }
     }
   },
   "attributions": [
@@ -1660,6 +2421,13 @@
       "accessed": "2026-09-26"
     },
     {
+      "source": "EPA ECHO SDWA",
+      "text": "Drinking-water system violations from the U.S. Environmental Protection Agency's Enforcement and Compliance History Online (ECHO), Safe Drinking Water Act data downloads.",
+      "license": "US Government work (public domain)",
+      "url": "https://echo.epa.gov/tools/data-downloads/sdwa-download-summary",
+      "accessed": "2026-09-26"
+    },
+    {
       "source": "EPA TRI, USACE NID, FEMA nuclear sites",
       "text": "Facility counts from EPA Toxics Release Inventory (2024), USACE National Inventory of Dams (2026-9-23) and FEMA's Operating Nuclear Power Plant Sites layer.",
       "license": "US Government work, public domain (17 U.S.C. 105)",
@@ -1672,6 +2440,14 @@
       "license": "US Government data; NRI Terms & Conditions",
       "url": "https://fema.maps.arcgis.com/home/item.html?id=39485e8035d446a5bff03259508ae355",
       "version": "1.20.0 (December 2025)",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "IGRF-14 and NERC TPL-007",
+      "text": "Geomagnetic latitude from the International Geomagnetic Reference Field, 14th generation (IAGA, distributed by NOAA NCEI); scaling factor from NERC's Benchmark Geomagnetic Disturbance Event Description (TPL-007).",
+      "license": "Open (IAGA coefficients); formula cited from NERC",
+      "url": "https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt",
+      "version": "IGRF-14 epoch 2025.0",
       "accessed": "2026-09-26"
     },
     {
@@ -1691,6 +2467,22 @@
       "accessed": "2026-09-26"
     },
     {
+      "source": "NOAA HMS and EPA AQS",
+      "text": "Smoke days from NOAA NESDIS Hazard Mapping System smoke analysis polygons and U.S. EPA Air Quality System daily PM2.5 data.",
+      "license": "US Government works (public domain)",
+      "url": "https://www.ospo.noaa.gov/products/land/hms.html",
+      "version": "2016-2023",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "NOAA NHC storm surge maps",
+      "text": "Storm-surge areas from NOAA's National Hurricane Center National Storm Surge Risk Maps (Zachry, B. C., Booth, W. J., Rhome, J. R., and Sharon, T. M., 2015: A National View of Storm Surge Risk and Inundation. Weather, Climate, and Society, 7(2), 109-117). For awareness at a community level; check your official evacuation zone.",
+      "license": "US Government work (public domain)",
+      "url": "https://www.nhc.noaa.gov/nationalsurge/",
+      "version": "v2 (2016) Texas to Maine; v3 and earlier elsewhere",
+      "accessed": "2026-09-26"
+    },
+    {
       "source": "ORNL EAGLE-I",
       "text": "Power outage statistics derived by Ready Reckoner from: Brelsford, C., Tennille, S., Myers, A., et al., The Environment for Analysis of Geo-Located Energy Information's Recorded Electricity Outages 2014-2025, Oak Ridge National Laboratory, figshare, doi:10.6084/m9.figshare.24237376 (CC BY 4.0).",
       "license": "CC BY 4.0",
@@ -1707,12 +2499,60 @@
       "accessed": "2026-09-26"
     },
     {
+      "source": "Storm-surge proxy",
+      "text": "County storm-surge proxy built by Ready Reckoner from the FEMA National Risk Index (coastal flooding exposure), NOAA NHC HURDAT2 storm tracks and state and local hurricane evacuation-zone tools.",
+      "license": "Derived from US Government works",
+      "url": "https://www.nhc.noaa.gov/nationalsurge/",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "Strategic sites",
+      "text": "Strategic-site classes compiled by Ready Reckoner from public sources: DoD MIRTA installation points, the Sentinel Final EIS (Department of the Air Force), NNSA, the Missile Defense Agency, Census metropolitan areas and centres of population, EIA refinery capacity, BTS port statistics and FEMA's FY2026 UASI allocations. A higher class does not mean an attack is likely.",
+      "license": "Compiled from public sources (US Government works are public domain)",
+      "url": "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml",
+      "version": "reviewed 2026-09-26",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "USACE National Levee Database",
+      "text": "People behind levees and levee risk ratings from the U.S. Army Corps of Engineers National Levee Database.",
+      "license": "US Government work (public domain)",
+      "url": "https://levees.sec.usace.army.mil/",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "USDA Forest Service Wildfire Risk to Communities",
+      "text": "USDA Forest Service. 2026. Wildfire Risk to Communities. https://wildfirerisk.org (accessed 2026-09-26).",
+      "license": "USDA Forest Service data (free to use; citation requested)",
+      "url": "https://wildfirerisk.org/",
+      "version": "2nd edition, tabular download of 2026-04-15",
+      "accessed": "2026-09-26"
+    },
+    {
       "source": "USGS National Seismic Hazard Model",
       "text": "Earthquake shaking probabilities from the U.S. Geological Survey National Seismic Hazard Model (2023 50-state model data release; Hawaii 2021.R2; Puerto Rico and U.S. Virgin Islands 2025).",
       "license": "US Government work, public domain (17 U.S.C. 105)",
       "url": "https://doi.org/10.5066/P9GNPCOD",
       "version": "NSHM 2023 grids, Hawaii 2021.R2 grid, PRVI 2025 service",
       "accessed": "2026-09-26"
+    },
+    {
+      "source": "USGS karst and landslide maps",
+      "text": "Karst: Weary, D.J., and Doctor, D.H., 2014, Karst in the United States: A digital map compilation and database, USGS Open-File Report 2014-1156. Landslides: USGS, Slope-Relief Threshold Landslide Susceptibility Models for the United States and Puerto Rico, 2024, doi:10.5066/P13KAGU3 (CC0).",
+      "license": "US Government works (public domain); CC0",
+      "url": "https://pubs.usgs.gov/of/2014/1156/",
+      "accessed": "2026-09-26"
     }
-  ]
+  ],
+  "sign_offs": {
+    "eviction_lab_odc_by": {
+      "approved": false,
+      "what": "Ship Eviction Lab county eviction filing rates (ODC-BY 1.0: attribution required; the credit line below goes on the About screen and in the packet sources). Set approved = true, fill in by, and run `rr-etl refresh --out data --only eviction`.",
+      "by": ""
+    }
+  },
+  "attribution_packs": {
+    "NOAA NHC storm surge maps": "surge",
+    "USDA Forest Service Wildfire Risk to Communities": "wildfire_places"
+  }
 }

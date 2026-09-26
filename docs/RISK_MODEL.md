@@ -12,7 +12,12 @@ stated), **PRIOR** (expert judgement, with a range).
 ## Hazard rates
 
 Owned by `crates/rr-hazards`. Entry point: `rr_hazards::assess(input, county, base_rates,
-location) -> HazardAssessment { profiles, rates, scenarios, notes }`.
+location) -> HazardAssessment { profiles, rates, scenarios, parts, also_checked, notes }`.
+`profiles` holds the ranked hazards, then the nine rare families (contract v2); `rates` holds the
+ranked hazards only, so no rare family ever reaches `rr-consequence`, a target or the budget.
+`also_checked` lists everything checked and found under 1 in 100,000 a year here, with its rate.
+`HazardAssessment::add_power_curve(per_year, years)` finishes the "power out for months" family
+once `rr-consequence` has the household's power curve (the plan pipeline calls it).
 
 ### What a rate means
 
@@ -65,12 +70,30 @@ or a PRIOR. It never guesses a field's meaning: NRI frequencies follow `afreq_ki
 | `climate.*` | the 2050 dial (keys below) |
 | `events.*` | episode rates (keys below) |
 
+**v2 exposure columns** (`CountyRecord::exposure`, data-hazard's `CountyExposure`; the ZIP-level
+dam count from `LocationResolved::exposure`). Absent means unknown: the row falls back as listed,
+and one note names the missing columns.
+
+| Column | Used for | Without it |
+| --- | --- | --- |
+| `strategic_class`, `strategic_places`, `strategic_km`, `strategic_bearing` | the nuclear family's class and "Why here"; the war row's near/far split | the population-weighted f_S (0.314, range 0.01–0.99); war at ×0.71 (0.3–1) |
+| `uasi_share`, `uasi_area` | the metro weight w_m of the attack, CBRN and nuclear-terrorism terms: the FEMA urban area's own share, looked up by `uasi_area` in the FY2026 table (`params::UASI_FY2026`) | a range from a small town to a 5 % metro |
+| `geomag_factor`, `geomag_lat` | the solar-storm location multiplier α ÷ 0.2285 | the national average (×1) |
+| `smoke_days_35`, `smoke_basis` | wildfire smoke (imputed counties get a ×/÷ 2 spread, monitored ×/÷ 1.3) | wildfire smoke left out |
+| `karst_share` | sinkholes | sinkholes left out |
+| `leveed_pop_share`, `levee_risk_high_share` | the levee part of dam or levee failure | no levee part |
+| `dams_high_total` (else `facilities.high_hazard_dams`), `dams_high_poor_condition` | the county part of dam failure; the poor-condition weight | ×1 for condition |
+| `dams_high_within_10km` (ZIP, `LocationResolved::exposure`) | the downstream part of dam failure | the county part |
+| `eviction_filing_rate` | eviction (only once the owner approves Eviction Lab's ODC-BY licence) | the national judgment rate |
+
 **`events` keys** (episodes a year; the pack's Storm Events, SPC and HURDAT2 types, then hazard
 ids as aliases): heat wave `heat`; cold wave `extreme_cold`; winter weather `winter_storm`; ice
 storm `ice_storm`; windstorm `high_wind` + `severe_wind_day` (added); major-hurricane share
 `major_hurricane_passage` ÷ `hurricane_passage`; boil-water notices `boil_water_notice`
-(household rate, if a source is ever added). Hail, tornado and landslide stay on NRI's frequency,
-because their footprint is NRI's loss ratio per NRI event.
+(household rate, if a source is ever added); dust storms `dust_storm` (v2; a county with no row
+recorded none); flash floods `flash_flood` and tropical cyclones `tropical_cyclone_impact` (their
+sub-cause notes only). Hail, tornado and landslide stay on NRI's frequency, because their
+footprint is NRI's loss ratio per NRI event.
 
 **`climate` keys**, in order of preference: a finished multiplier `<hazard_id>` (and
 `<hazard_id>_high`); county counts `<variable>_hist`, `_2050`, `_2050_high` for
@@ -85,7 +108,9 @@ cap; then the pack's ratio variables (future ÷ present at about +2 °C, optiona
 `ed_visits_per_100_persons_year`), `unintentional_injury_death_per_person_year` (or
 `accidental_death_per_person_year`), `pandemic_onset_per_year`, and optional overrides
 `grid_failure_per_year`, `cyber_outage_per_year`, `civil_unrest_per_year`,
-`supply_chain_disruption_per_year`, `hazmat_release_per_year`.
+`supply_chain_disruption_per_year`, `hazmat_release_per_year`. v2: `arrests_per_100k_{male,female}_<band>`
+(bands `10_17`, `18_24`, `25_34`, `35_44`, `45_54`, `55_64`, `65_plus`: the data-model series
+`fbi_arrests` passed as base rates) replace the built-in FBI table.
 
 ### Natural hazards
 
@@ -109,6 +134,9 @@ cap; then the pack's ratio variables (future ÷ present at about +2 °C, optiona
 | Volcanic activity | ash or mudflows reach the household | NRI | exposed share × 0.5 (0.2–1) | none | DERIVED + PRIOR |
 | Wildfire | must leave home, or loses power in a wildfire safety shutoff (two parts, kept apart: below) | NRI burn probability ×/÷ 1.5 | warnings to leave: exposed share × 20 households warned per home that burns (5–50); plus shutoffs 0.02/yr (0.005–0.1) in AZ, CA, CO, ID, MT, NM, NV, OR, UT, WA, WY | burn part urban ×0.3, rural ×2; shutoffs urban ×0.1, suburban ×0.5, rural ×1 | PRIOR |
 | Drought | a private well runs low; or water limits that change daily life | NRI frequency ÷ national median 13.43, bounded ×0.25–×4 | — | well 1 %/yr (0.3–3 %, research §9); public water 0.2 %/yr (0.05–1 %) | PRIOR |
+| Wildfire smoke (v2) | days of unhealthy smoke at home | the county's smoke days a year at 24-hour PM2.5 of 35.5 µg/m³ or more (NOAA HMS smoke maps with EPA AirData, 2016–2023 mean; data audit §3.2) ÷ 3 days an episode (2–5); ×/÷ 1.3, ×/÷ 2 when imputed | 1 (distant smoke reaches every home) | none; severity at least Serious for a child, someone 65+, pregnancy or a breathing device | DATA + PRIOR |
+| Dust storm (v2) | caught in a dust storm on the road or at home | Storm Events "Dust Storm" episodes (`dust_storm`) ×/÷ 1.3 | 0.3 (0.1–0.6) of a zone's episodes | none; the same severity floor as smoke | DATA + PRIOR |
+| Sinkhole (v2) | ground collapse damages the home | the county's share on karst (USGS OFR 2014-1156) | × 2 in 10,000 a year for a home on karst (5 in 100,000 – 1 in 1,000; Florida's reports and claims, hazard-expansion) | none | DATA + PRIOR (low confidence: not all karst has sinkholes) |
 
 NRI and Storm Events frequencies carry a ×/÷ 1.5 and ×/÷ 1.3 spread; earthquake models ×/÷ 2.
 
@@ -158,7 +186,9 @@ tornado 0.8, lightning 0.8, hail 0.1). Any shortfall ÷ 0.9 is added to windstor
 common cause. NRI records only 0.027 windstorms a year for Coos County, but a Coos home is caught
 in a county outage 1.09 times a year; the floor lifts Coos windstorms to 0.75 a year.
 
-Natural hazards under 1 in 100,000 a year are left out of the register and named in a note.
+Any ranked hazard under 1 in 100,000 a year today and around 2050 (natural, societal or personal)
+is left out of the register and listed in `also_checked` with its rate, unless a scenario hangs on
+it (see "Sub-causes and Also checked").
 
 ### Societal hazards
 
@@ -171,8 +201,14 @@ Natural hazards under 1 in 100,000 a year are left out of the register and named
 | Supply chain disruption | store shelves empty of what the household needs | 20 %/yr (10–40 %) | none | PRIOR, research §6.2 |
 | Chemical spill or release | a do-not-drink order or an order to stay inside | 2 %/yr (0.7–5 %) × TRI factor 1 + 0.5·log10((n + 1)/5), bounded ×0.65–×2 | TRI facilities in the county | PRIOR |
 | Nuclear plant accident | an order to shelter or leave | plant within 16 km: 2 in 10,000 a year (0.2 to 5 in 10,000); 16–80 km: 5 in 100,000 (1 to 20 in 100,000); beyond 80 km: not listed | distance | PRIOR (one US accident needing off-site action, Three Mile Island, in several thousand reactor-years) |
-| Nuclear attack (and EMP) | shown in the rare-catastrophe box | 1 in 2,000 to 1 in 400 a year worldwide (research §6.3, Forecasting Research Institute 2024); never a point estimate; the geometric middle, 1 in 894, is used only for arithmetic. Since v0.1.1 the sentence says it is "the chance of a nuclear catastrophe anywhere in the world ... not for your household" (hazard review H-01; the location-aware rebuild is v0.2.0) | none | PRIOR (published forecasts) |
-| Terrorist attack | shown in the rare-catastrophe box: an attack that shuts down the area where you live for half a day to two days; the sentence says it counts the disruption, not the chance of being hurt (H-03) | 1 in 10,000 to 1 in 1,000 a year for a city household | setting as unrest | PRIOR |
+| Dam or levee failure (v2) | told to leave because a dam or levee fails or threatens to | high-hazard dams whose listed downstream town is in the ZIP code × 1 in 10,000 a year per dam (3 in 100,000 – 5 in 10,000; ASDSO: about 2 in 10,000 failures per dam a year, all classes, and incidents such as Oroville 2017) × 0.3 of the ZIP's households (0.1–0.6); without a ZIP, the county's high-hazard dams × 0.01 of its households (0.003–0.03); dams in Poor or Unsatisfactory condition count ×3; plus the share of the county behind levees × 0.2 % a year (0.05–1 %; leveed land is mapped outside the flood zone, so the flood rate misses it), ×2 behind levees USACE rates High or Very High | footprints as stated | PRIOR stacked on the inventories: range only |
+| Phone or internet outage (v2) | phones and internet down for hours, 911 included | 0.3 a year (0.1–1): carrier-wide outages of several hours about once a year (FCC, AT&T 22 February 2024: 92 million calls, 25,000 calls to 911 blocked) × about a third of households on the failing carrier | none | PRIOR |
+| Medicine shortage (v2) | a daily medicine cannot be filled for days to weeks | 5 % a year per person on a daily prescription (2–15 %; ASHP: 323 active shortages at the start of 2024; openFDA: 70 medicines short on 2026-09-26) | ×1.5 (1.2–2) for a medicine that must stay cold (50 of openFDA's 70 are injectables); left out with no daily prescription | PRIOR |
+| Pay or benefits stop (v2) | federal pay or a benefit stops for weeks | federal pay: funding gaps of 14 days or more, 4 in fiscal years 1982–2026 (CRS RS20348): 0.089 a year (exact Poisson 90 %: 0.030–0.203); SNAP or WIC: × 0.25 (0.1–0.6) of those gaps (one of four, November 2025); SSI, SSDI and VA: 0.5 % a year (0.1–2 %), since they were paid through every shutdown; unemployment 1 % (0.2–4 %) | only for households with `finances.benefits`; the largest of their benefits' rates (one lapse stops them all) | DATA (federal pay) + PRIOR |
+| Attack or threat closes your area (v2; replaces the disruption half of terrorism) | a shelter order, closure or transit shutdown for half a day or more | 0.1 metro-wide attacks or threats a year (0.04–0.25; CSIS 1994–2025: Oklahoma City, 11 September, the anthrax letters, Boston) × the metro area's share of FEMA's FY2026 UASI money (New York-White Plains 24.39 %, Chicago 5.30 %, Philadelphia 2.84 %) × 0.3 of its households (0.1–0.8); outside every funded area 3 in a million a year (1 in a million – 3 in 100,000: 5 % of attacks over the 64 million households there, 40,000 households an order) | the metro weight | PRIOR: range only |
+
+The old nuclear-attack row (a worldwide catastrophe forecast shown to every household, H-01) and
+the terrorism row (retired in contract v2, H-02) are replaced by the rare families below.
 
 ### Personal hazards
 
@@ -186,9 +222,114 @@ Natural hazards under 1 in 100,000 a year are left out of the register and named
 | Break-in | a household burglary | 1 %/yr (0.5–2 %), to be replaced by the BJS victimization survey figure | none | PRIOR |
 | Death or disability of an earner | loss of an earner's income | 0.9 % per earner-year (0.5–1.5 %): disability about 0.6 % (SSA: 1 in 4 20-year-olds disabled before full retirement age) plus working-age death about 0.3 % | × earners | DERIVED + PRIOR |
 | Long illness in the household | someone sick at home for weeks | 1 % per person-year (0.5–3 %) | × people | PRIOR |
+| Burst pipe or water leak (v2) | a burst, frozen or leaking pipe or appliance floods part of the home | 1.5 % per home-year (1–2 %; III/ISO water damage and freezing, about 1 in 67 insured homes a year, 2019–2023) | ×1.3 (1.1–1.6) where 5 or more days a year stay below freezing (CMRA `icing_days_hist`); basement ×1.2 (1–1.5); renters ×0.8 (0.6–1); no housing-age column exists yet, so age is not a modifier | DATA + PRIOR (confidence medium: read through the publisher's summary) |
+| Eviction (v2) | a renting household is taken to court and ordered to leave | the county's eviction filings per renter household × 0.4 (0.3–0.55) that end in a judgment, when the pack has the column; otherwise 2.3 per 100 renter households a year (1–5; Eviction Lab 2016, confirm) | renters only; income stability as for job loss; ×0.5 (0.3–0.8) with three months of savings | PRIOR |
+| Arrest or detention (v2, owner decision 2026-09-26) | a household member is arrested | FBI arrests per 100,000 a year by age band, 2023–2025 (Crime Data Explorer, Tables 29, 39 and 40; the data-model series `fbi_arrests`): the men's and women's rates averaged, since the form does not ask sex. Adults 18–64 are the five FBI bands weighted by the years each covers (7, 10, 10, 10, 10): 3.31 per 100 a year; teens the 10–17 band, 1.47; 65 and over 0.31; children under 13 are not counted | summed over the household (events, not people); the range runs from the women's lowest year to the men's highest | DATA (confidence medium) |
 
 Job loss and earner loss are left out (with a note) when no one is marked as earning; vehicle
-stranding when there is no vehicle and no commute.
+stranding when there is no vehicle and no commute; medicine shortages when no one takes a daily
+prescription; eviction for owners; pay or benefits stopping without `finances.benefits`.
+
+The arrest sentence counts events: "For households with people the ages of yours, the FBI's
+counts come to about 7 arrests for every 100 households a year (2023–2025). This counts arrests,
+not guilt or convictions, and one person arrested twice counts twice." Its buckets are income and
+home loss (the legal-readiness checklist); `rr-consequence` owns the effects.
+
+### The rare families
+
+The nine rare families (REVIEW §2.3–§2.4, hazard-expansion Deliverable B) are shown in their own
+box, range only, sorted by the middle of their range (never shown), never by expected loss, and
+never handed to `rr-consequence`. Their factors are published forecasts and expert judgement
+stacked together, so their ranges multiply low by low and high by high (`Estimate::times_span`,
+the review's own arithmetic), not in quadrature. Each has `family` (its own id), `sub_causes`,
+`location_factor` where there is a location term, `range_only`, `if_it_reaches_you`,
+`what_it_changes`, and an `anchor_sentence`: the household's ranked hazard with the smallest rate
+above the row's upper bound ("Less likely than a regional blackout (about 5 in 100 for you in the
+next ten years)."). The sentence gives the range as natural frequencies over the horizon ("Between
+1 in 3,300 and 1 in 28 households like yours would …"); a range wider than a thousandfold is said
+in words ("At most about 1 in 58 …").
+
+**Nuclear attack.** Serious local effects (blast or dangerous fallout):
+r = λ_S·f_S(class) + λ_L·w_L·0.3 + λ_I·s_UASI·0.1, with λ_S = 4 in 10,000 a year (1 in 10,000 – 4
+in 1,000: FRI 2024's catastrophe forecasts × 0.33 reaching US soil; XPT 2023; Rethink Priorities
+2019; Barrett 2013), λ_L = 1 in 10,000 (2 in 100,000 – 5 in 10,000), λ_I = 5 in 100,000 (1 in a
+million – 5 in 10,000), w_L = 0.05 for class A counties and Hawaii and Guam, and s_UASI the metro
+weight. National disruption (λ_S + 0.5·λ_L), use abroad (λ_U = 5 in 1,000, 1–15 in 1,000) and the
+EMP of a high-altitude burst (λ_S × 0.5 + λ_L × 0.3; lower 48 states) are sub-causes that never
+enter the local rate. The class is the county's strategic-exposure class from
+`data/core/strategic_sites.toml` (research `strategic-sites.md`):
+
+| Class | Rule | f_S | Serious local effects a year | Ten years | Severity; if it reaches you |
+| --- | --- | --- | --- | --- | --- |
+| A | counterforce and command sites: missile fields, submarine and bomber bases, weapons storage, command and missile-defence sites | 0.9 (0.6–0.99) | 3.6 in 10,000 (6 in 100,000 – 4 in 1,000) | between 1 in 1,700 and 1 in 26 | 1.0; life-threatening |
+| B | downwind of the missile fields (bearing 45–135°, 800 km, or within 75 km) | 0.5 (0.2–0.8) | 2.0 in 10,000 (2 in 100,000 – 3 in 1,000) | between 1 in 5,000 and 1 in 32 | 0.5; serious disruption |
+| C1 | the ten largest metros, the National Capital Region, NNSA sites | 0.6 (0.3–0.9) | 2.4 in 10,000 (3 in 100,000 – 4 in 1,000) | between 1 in 3,300 and 1 in 28 | 1.0; life-threatening |
+| C2 | other metros of a million or more, big ports, large refineries, other major bases | 0.3 (0.1–0.6) | 1.2 in 10,000 (1 in 100,000 – 2 in 1,000) | between 1 in 10,000 and 1 in 42 | 0.5; serious disruption |
+| D | downwind (45–135°, 150 km) of an A site, an NNSA site or a C1 county | 0.15 (0.05–0.4) | 6 in 100,000 (5 in a million – 2 in 1,000) | between 1 in 20,000 and 1 in 63 | 0.5; serious disruption |
+| E | everything else | 0.03 (0.01–0.1) | 1.2 in 100,000 (1 in a million – 4 in 10,000) | between 1 in 100,000 and 1 in 250 | 0.3; shortages, power cuts and lost income |
+| unknown | the pack has no class | 0.314 (0.01–0.99), the population-weighted mean over the first cut | 1.3 in 10,000 | — | 0.5 |
+
+`location_factor.label` is the research's "Why here" template for the class (research
+`strategic-sites.md` §7), filled from the pack's resolved places, the distance in miles (to the
+nearest 10) and the 16-point bearing: "You live downwind of the nuclear missile fields in
+Wyoming, Nebraska and Colorado, about 240 miles to your northwest." A placeholder the data cannot
+fill falls back to plainer words, never a guess. What it changes: one free step, pick a shelter
+spot at home and at work, in classes A–D (FEMA's 72-hour guidance); nothing beyond the basics in
+class E.
+
+**Severe solar storm.** A Carrington-class storm, 3 in 1,000 a year (5 in 10,000 – 1.3 in 100:
+Riley 2012, Love, Riley and Love 2017, Moriña 2019, Lloyd's 2013) × the chance it cuts a
+household's power for days, 0.09 (0.06–0.12: Lloyd's 20–40 million of about 330 million people) ×
+α ÷ 0.2285, capped at one half. α is NERC TPL-007's factor by geomagnetic latitude (IGRF-14, 0.1 to
+1); 0.2285 is its population-weighted mean over every county (DERIVED from the pack's `geomag.csv`
+and NRI population). Minot (α 0.63): 7.4 in 10,000 a year; Philadelphia (0.29): 3.4 in 10,000;
+Miami (NERC's floor, 0.1): 1.2 in 10,000 (the review's 6 in 100,000 used α 0.06, below the floor).
+Ground conductivity (β) is not in the pack, and the "Why here" sentence says so. The asteroid
+moves to Also checked (3 in a billion a year).
+
+**Power out for months (any cause).** The solar-storm row × 0.1 of those outages lasting two
+months or more (0.02–0.3; Lloyd's worst case 16 days to a year or two), the EMP sub-cause × 0.1
+(0.02–0.3; EPRI 2019 found months-long nationwide blackouts unsupported; lower 48 states only), the
+war row × 0.02 (0.005–0.1), plus the household's own power curve at 60 days once
+`add_power_curve` runs (awaiting: plan and consequence). Confidence medium.
+
+**War with attacks on US infrastructure.** A great-power war, 0.5 % a year (0.2–1 %; FRI 2024's
+Russia–US conflict forecasts) × 0.5 (0.2–0.8) that attacks reach US power, water or phones near
+military sites, big cities, ports and refineries (classes A, C1, C2); ×0.3 far from them (B, D,
+E): 2.5 in 1,000 (4 in 10,000 – 8 in 1,000) near, 7.5 in 10,000 far.
+
+**Chemical, biological or radiological attack.** 0.03 disruptive attacks a year (0.01–0.1; START
+POICN: 517 CBRN events worldwide 1990–2017, about 76 % chemical) × the metro weight × 0.05
+(0.01–0.2) of its households under an order (buildings and blocks, as with the anthrax letters);
+outside the funded areas 1.5 in 10 million (1 in 100 million – 2 in a million). Sub-causes:
+chemical, biological, radiological.
+
+**The worldwide families.** Severe pandemic, 1.5 in 1,000 a year (5 in 10,000 – 5 in 1,000;
+Marani 2021); very large eruption anywhere, 1.8 in 1,000 (8 in 10,000 – 4 in 1,000; Cassidy and
+Mani 2022), with Yellowstone (1 in 730,000 a year, USGS) as a sub-cause and in Also checked;
+financial crisis with bank closures, 2 in 1,000 (5 in 10,000 – 1 in 100; one national bank holiday
+in about a century), with a single bank failing (about 23 a year 2001–2025, FDIC) as a sub-cause;
+mass shooting or bombing, 3 in 10 million per person a year (1–10 in 10 million; FBI 2024: 23
+killed and 83 wounded), × the people in the household, location not modelled, free actions only.
+Confidence is `prior` except the eruption, mass violence and the months-long blackout (`medium`).
+
+### Sub-causes and Also checked
+
+The hazard-candidates CSV names 52 sub-causes (its rows "c"). 51 are notes on ranked cards
+(`crates/rr-hazards/src/subcauses.rs`); the 52nd, a single bank failing, is on the financial-crisis
+family. A sub-cause has the same consequences as its parent, so it is named, not rated again: the
+parent already counts it. Where the pack or the CSV gives a number, the note carries its own range:
+flash floods (the county's Storm Events episodes × 0.3–5 %, else 0.1–5 % a year), basement flooding
+(0.05–0.5 %), carbon monoxide beside house fires (7–30 in 100,000 households a year, CDC; shown, not
+added), inland tropical flooding (the county's tropical-cyclone passages × 0.3–0.8). Three are
+placed elsewhere and say so: levee failure is on the dam and levee card, the heat-and-blackout
+compound is a named scenario in desert counties, and the new earthquake scenarios are with the
+scenarios. None re-rates its parent in this release: the pack has no column yet that measures
+rail, pipeline or plant releases, gas curtailment or dam releases.
+
+`also_checked` and its note list every ranked hazard under 1 in 100,000 a year here and the rare
+sub-rows too small to show (the asteroid, Yellowstone), each with its rate in words ("dust storms
+(none recorded here)", "a Yellowstone super-eruption (about 1 in 730,000 a year)").
 
 ### Climate: "around 2050"
 
@@ -226,10 +367,16 @@ for a scenario that does not apply is ignored with a note.
 | `new_madrid_m7` | 29 counties in AR, IL, KY, MO, TN | 7–10 % in 50 years → 0.18 %/yr (0.15–0.21 %) | — | off (rarer than the yardstick) | — |
 | `local_tsunami` | counties with a tsunami zone | the Cascadia rate (on the Cascadia coast) or 0.1 %/yr (0.03–0.3 %) elsewhere, × residents in the zone (NRI; else 10 %) | the long-run Cascadia rate × the same share | on (knowing the route costs nothing) | — |
 | `major_hurricane_direct_hit` | Gulf and Atlantic states with NRI hurricane frequency ≥ 0.1 a year | the major part of the hurricane rate: frequency × major share × 0.8 | — | on | — |
+| `wasatch_m7` (v2) | 9 Wasatch Front counties (Box Elder, Davis, Morgan, Salt Lake, Summit, Tooele, Utah, Wasatch, Weber) | 43 % chance of magnitude 6.75+ in 50 years (Working Group on Utah Earthquake Probabilities 2016; confirm) → 1.12 %/yr (0.71–1.69 %) | — | on (above half the yardstick) | — |
+| `san_andreas_south_m78` (v2) | 7 counties of the ShakeOut area (Imperial, Kern, Los Angeles, Orange, Riverside, San Bernardino, Ventura) | 19 % chance of magnitude 6.7+ on the southern San Andreas in 30 years (UCERF3; confirm) → 0.70 %/yr (0.43–1.09 %) | — | on | — |
+| `seattle_fault_m7` (v2) | King, Kitsap, Pierce and Snohomish | about 5 % chance of magnitude 6.5+ in 50 years (USGS and Washington DNR; confirm) → 0.10 %/yr (0.04–0.21 %) | — | on in Washington (Prepare in a Year), though rarer than the yardstick | — |
+| `heat_blackout` (v2) | counties with 60 or more days a year over 95 °F (CMRA baseline: 44 counties, the desert Southwest, South Texas, southwest Oklahoma; Maricopa 123, Pima 89, Clark 74) | heat episodes × power cuts of a day or more a year (the county's EAGLE-I record × its share over a day, else 2 %/yr, 0.5–6 %) × 3 days ÷ 365 (Stone et al. 2023) | — | on (the most dangerous combination; the answer is a cool place to go) | — |
 
-The earthquake card shows the county rate less the scenario's long-run share (never below a
-quarter of it) plus the scenario's own rate: Coos Bay 0.01981 − 0.0041 + 0.01022 = 0.0259 a
-year. The hurricane card shows the full hurricane rate (Category 1–2 plus major); the tsunami card
+The earthquake card shows the county rate less the long-run shares of every earthquake scenario
+that applies (never below a quarter of it) plus the scenarios' own rates: Coos Bay 0.01981 − 0.0041
++ 0.01022 = 0.0259 a year; King County takes out both Cascadia's and the Seattle fault's shares.
+The heat card shows the heat waves (the blackout scenario is one of them, taken out and added
+back). The hurricane card shows the full hurricane rate (Category 1–2 plus major); the tsunami card
 the county rate plus the local-source scenario. `rates` always carries the parent's full rate.
 
 ### Severity, confidence and sentences
@@ -240,9 +387,15 @@ $50 or less is 0, $500,000 or more is 1. Natural hazards: NRI expected annual lo
 per-event loss (PRIOR except house fire, $11.27 billion ÷ 344,600 fires = $32,700): job loss
 $12,000; emergency visit $2,000; stranding $300; local outage $100; break-in $2,500; earner loss
 $500,000; long illness $5,000; pandemic $5,000; regional blackout $1,000; cyber outage $300;
-curfew $300; shortages $100; chemical release $500; nuclear plant accident $20,000. Nuclear attack
-is 1 and terrorism 0.9 by definition. The fixed scale means a hazard's severity reads the same in
-every county, and likelihood and severity stay separate columns in the rare-catastrophe box.
+curfew $300; shortages $100; chemical release $500; nuclear plant accident $20,000; v2: burst pipe
+or leak $15,400 (III's average claim); smoke $300; dust storm $200; sinkhole $30,000; dam or levee
+failure $40,000; phone or internet outage $100; medicine shortage $500; pay or benefits stopping
+$1,500 (a month); eviction $5,000; an attack closing the area $800 (0.3, "a few days'
+disruption", H-10); an arrest $5,000. The rare families have a fixed severity by zone: nuclear 1.0
+in classes A and C1, 0.5 in B, C2 and D, 0.3 in E (0.5 when the class is unknown); solar storm,
+war and CBRN 0.5; months-long blackout and severe pandemic 0.8; eruption and financial crisis 0.3;
+mass violence 0.9. The fixed scale means a hazard's severity reads the same in every county, and
+likelihood and severity stay separate columns in the rare-catastrophe box.
 **Heat and cold for households at risk** (verification, 2026-09-26): NRI's expected loss already
 counts deaths and injuries, valued per statistical life, but spreading it over every household
 and every county episode makes heat read "Minor" (Philadelphia: about $85 an episode). A heat or
@@ -250,46 +403,63 @@ cold wave therefore shows at least 0.4, "Serious" (an emergency visit on the sam
 household has someone 65 or older, a baby, someone on a powered medical device, someone pregnant
 (heat), or no air conditioning (heat) or heating (cold) — the groups CDC names and the Chicago
 1995 findings (`cdc_heat_health`, `cdc_winter_safety`, `semenza_1996_heat_deaths`; PRIOR). A note
-says why. Severity is shown, not planned with: the targets do not change.
+says why. Smoke and dust get the same floor for a child, someone 65 or older, pregnancy or a
+breathing machine (EPA: children breathe more air for their size and N95s do not fit them; asthma
+and COPD are not asked, so age stands in). Severity is shown, not planned with: the targets do not
+change.
 
 **Confidence**: data within a factor of 1.6 either way is `high`, within 3 `medium`, wider `low`;
 a rate that rests partly on expert judgement is `medium` within a factor of 3, otherwise `low`;
-one that rests only on expert judgement is `prior`. The rare catastrophes are `prior`.
+one that rests only on expert judgement is `prior`. The rare families carry a fixed confidence
+(`prior`, or `medium` for the eruption, mass violence and the months-long blackout); water damage,
+arrests and the dust-storm test value are fixed at `medium` because their source was read through a
+summary or their sex mix is unknown.
 
 **Sentences**: `100 · (1 − e^(−T·r))` households of 100 over `T = dials.horizon_years`, at most
 two significant figures, whole numbers from 1 to 10, then "in 1,000" and "1 in N" for rarer
 hazards, "nearly every household" from 99.5, with "(about N times a year)" when r ≥ 1. The range
 is shown when the rate is an expert estimate. Around 2050 the horizon reads "in a ten-year
-stretch around 2050". Rare catastrophes get a range-only sentence.
+stretch around 2050". Rare catastrophes and ranked rates built from stacked expert judgement (dam
+or levee failure, an attack closing the area; `range_only`) get a range-only sentence ("Between 1 in
+490 and 1 in 31 households like yours would …"); arrests get an events sentence (see Personal
+hazards).
 
 **Order**: ranked hazards by today's rate, most likely first (so the 2050 dial never reorders
-the list), then the rare-catastrophe box.
+the list), then the nine rare families, most likely here first by the middle of their range.
 
 **Why we think this**: `rr_hazards::why_we_think_this(hazard)` gives one plain-language reason
 per hazard (the source, or for an expert estimate the reasoning and its size) for the drawer
 behind each card. `HazardAssessment::notes` carries the plain caveats for this household and
 county: county scale, missing outage records, capped heat days, the outage floor, hazards too
-rare to list, the 2050 changes in words ("heat waves 2.4 to 3 times as often"), ignored scenario
-settings, the rural ambulance note and the nuclear planning zone.
+rare to list with their rates ("Also checked"), the v2 data columns missing for the county, the
+2050 changes in words ("heat waves 2.4 to 3 times as often"), ignored scenario settings, the rural
+ambulance note, the nuclear planning zone, and the Serious floors for heat, cold and smoke.
 
 ### The fixture registers
 
 From `cargo run -p rr-hazards --example register -- <household> <fips>` on the hand-built fixture
 counties in `crates/rr-hazards/tests/data` (NRI v1.20 and CMRA 2025 values; research §8–§9
-outage rates). Top five by rate, per year and out of 100 households over ten years:
+outage rates; v2 exposure values from data-hazard's own pack rows). Top five by rate, per year
+and out of 100 households over ten years:
 
 | # | Philadelphia renters (42101) | per year | of 100 | Coos Bay well owners (41011) | per year | of 100 |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Heat wave | 3.69 | nearly all | Medical emergency | 0.95 | nearly all |
-| 2 | Medical emergency | 1.89 | nearly all | Windstorm | 0.75 | nearly all |
-| 3 | Cold wave | 0.40 | 98 | Stranded in a vehicle | 0.30 | 95 |
-| 4 | Winter storm | 0.35 | 97 | Winter storm | 0.29 | 94 |
-| 5 | Windstorm | 0.21 | 88 | Job loss | 0.25 | 92 |
+| 1 | Heat wave | 3.69 | nearly all | Wildfire smoke | 2.39 | nearly all |
+| 2 | Medical emergency | 1.89 | nearly all | Medical emergency | 0.95 | nearly all |
+| 3 | Cold wave | 0.40 | 98 | Windstorm | 0.75 | nearly all |
+| 4 | Wildfire smoke | 0.37 | 98 | Stranded in a vehicle | 0.30 | 95 |
+| 5 | Winter storm | 0.35 | 97 | Phone or internet outage | 0.30 | 95 |
 
-Philadelphia further down: store shortages 0.20, job loss 0.166 (81 in 100, research §8.3 row 1),
-flooding with the basement 0.0061, house fire 0.0052 (5 in 100), earthquake 0.0016. Coos Bay:
-earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092 (with
-`local_tsunami`), house fire 0.0026.
+Philadelphia further down: phone or internet outage 0.30, windstorm 0.21, store shortages 0.20,
+job loss 0.166 (81 in 100, research §8.3 row 1), arrests 0.069 (about 7 for every 100 households a
+year), medicine shortage 0.05, eviction 0.023, burst pipe or leak 0.019, flooding with the basement
+0.0061, house fire 0.0052 (5 in 100), earthquake 0.0016, an attack closing the area 0.00085 (range
+only). Its rare box: war 2.5 in 1,000, financial crisis 2 in 1,000, eruption 1.8 in 1,000, severe
+pandemic 1.5 in 1,000, solar storm 3.4 in 10,000, nuclear 2.4 in 10,000 (class C1, "between 1 in
+3,300 and 1 in 28"), months-long blackout 1.1 in 10,000, CBRN 4 in 100,000, mass violence 1.2 in a
+million (range middles, never shown). Coos Bay: earthquake 0.026 (with `cascadia_m9` on by default
+at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear class E, "between
+1 in 100,000 and 1 in 250".
 
 ### Decisions and known gaps
 
@@ -327,6 +497,56 @@ earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092
 - **Figures to confirm** against the source when the citations are written: UCERF3's 33 % for
   the Hayward fault, USGS's 7–10 % for New Madrid, the SSA "1 in 4" disability figure (checked 2026-09-26: the source says 1 in 4, not "more than"),
   the one-third major share of landfalling hurricanes, and the 1 % burglary prior.
+
+**v0.2.0 (contract v2).**
+
+- **Rare rows never enter Λ.** `rates` holds the ranked hazards only; the nine families are
+  display rows. The old nuclear effect row in `rr-consequence` (supplies, 1 day / 3 days) no longer
+  receives a rate. This drops the nuclear share from the supplies bucket (it was 1.1 in 1,000 a year
+  against a one-in-100 dial) and makes "never drive the budget" hold by construction.
+- **Ranges of the rare families span every combination.** The review computes its class ranges
+  as low × low to high × high, so the rare families do too (`Estimate::times_span`); the ranked
+  rates keep quadrature. The class examples reproduce REVIEW §2.3 within rounding and B1.5's ten-year
+  ranges word for word (`tests/v2.rs`).
+- **The UASI share is the urban area's, not the county's.** The attack, CBRN and nuclear-terrorism
+  formulas weigh the metro area (λ × w_m × the share of its households under an order). The pack's
+  `uasi_share` is the county's population split of its area's share, so the engine looks the area's
+  own share up by `uasi_area` in the FY2026 table. awaiting: data-hazard — a `uasi_area_share` column
+  would retire that table, and `LocationResolved::exposure.uasi_share` (the contract calls it the
+  metro area's share) should carry the area's share, not the county split.
+- **The solar-storm location term uses NERC's floor.** α never falls below 0.1, so Miami comes to
+  1.2 in 10,000 a year, not the review's 6 in 100,000 (which used α 0.06). The population mean of α
+  (0.2285) replaces the review's assumed 0.25. Ground conductivity (β) is not in the pack.
+- **Levee residual behind high-risk levees.** 0.2 % a year (0.05–1 %) ×2 behind levees rated High or
+  Very High puts the most exposed parishes (Concordia, Louisiana) at 4 in 1,000 a year (up to 2 in
+  100): a prior with a range-only card, flagged for the owner.
+- **Arrests are sex-averaged.** The household form does not ask sex; the range runs from the women's
+  lowest year to the men's highest, and confidence is fixed at `medium`. Arrests are events: the
+  chance that anyone in a household is arrested at least once is lower than the event rate implies,
+  which the sentence says.
+- **Eviction uses the national rate** until the owner approves Eviction Lab's ODC-BY licence; the
+  county column then takes over with filings × 0.4 to judgments. Income stability (the job-loss
+  modifier) and savings scale it, as the hazard-expansion CSV proposed.
+- **Medicine shortages and phone outages are national priors**; phone and internet outages (0.3 a
+  year) now rank near the top of most registers with a tiny severity ($100 an event).
+- **Recalibrations from the series.** The data-model series (OE-417, FCC DIRS, funding gaps, FDIC,
+  FBI arrests, openFDA) are used where a series measures the row: funding gaps (benefits), FBI
+  arrests, FDIC and openFDA (notes). OE-417 counts reports, not household outages, so the regional
+  blackout keeps its prior and gains the OE-417 physical-attack and cyber counts as sub-cause notes;
+  no FCC or CSB series measures cyber outages or chemical releases, so those priors stand.
+- **Outages by cause (M-18, M-10).** The outage floor can top up each storm hazard by its share of
+  recorded outages matched by date (`natural::shortfall_by_cause`), instead of counting every
+  shortfall as windstorms; it reads data-model's `OutageModel::causes` (awaiting: data-model), so
+  the v0.1 rule runs until then. The hurricane double count M-10 is `rr-consequence`'s (county curve
+  plus hurricane rows); `rr-hazards` already subtracts modelled hurricane outages in the floor.
+- **New scenarios need effects rows.** `wasatch_m7`, `san_andreas_south_m78`, `seattle_fault_m7`
+  and `heat_blackout` are offered with their rates and defaults; `rr-consequence` plans them once it
+  has effects rows (awaiting: consequence). `heat_blackout` overlaps the compound heat-and-outage
+  class `rr-consequence` is building; one of the two should own it.
+- **Figures to confirm** (hazard-expansion "UNVERIFIED items"): III's 1 in 67 and $15,400, Eviction
+  Lab's 2.3 in 100 and the 0.4 judgment share, the CSIS count of metro-wide closures, Riley 2012's
+  12 % a decade, the Wasatch 43 %, southern San Andreas 19 % and Seattle fault 5 % figures, and the
+  dust-storm rate in the Maricopa fixture (a test value until the Storm Events dust job lands).
 
 ## Consequences and targets
 

@@ -224,6 +224,73 @@ how to help neighbours; renters 43 and owners 87 insured; 63/22 power outage and
 risk and experience). The DataLumos archive the review suggested (project 218642) holds FEMA's
 2017–2023 survey data, not the 2024 findings deck.
 
+## Requested by hazards for v0.2.0 (2026-09-26)
+
+The v0.2.0 hazard rows (REVIEW §2, DESIGN-DELTA §1.2) cite these. None is in the registry yet;
+the content workstream writes each entry and checks the figure. "Confirm" marks a figure read only
+through a search summary or a secondary copy (hazard-expansion report, "UNVERIFIED items"). As
+with `county_boil_water_records`, each requested id is also listed in rr-content's
+`NOT_CITATIONS` (tests/citation_ids.rs) and rr-plan's `AWAITING_CONTENT` until its entry exists;
+rr-plan's test then says to remove it from both. Ids a data job already uses in its files keep
+that id (fbi_cde_arrests, crs_rs20348_funding_gaps, fdic_failed_banks, openfda_drug_shortages,
+pnnl_oe417_linkage: the data-model series files).
+
+| id | Title | Publisher, year | URL | Used for |
+| --- | --- | --- | --- | --- |
+| `rr_strategic_sites` | Strategic sites and county strategic-exposure classes (data/core/strategic_sites.toml) | Ready Reckoner, compiled 2026-09-26 from DoD MIRTA, the Sentinel EIS, NNSA, 10 U.S.C. 2674, Census, EIA and BTS, one public source per site | https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/data/core/strategic_sites.toml | the county class A–E of the nuclear family, the sites named in "Why here", and the near/far split of the war row. Nine sites' roles rest on secondary sources (research strategic-sites §1) |
+| `fema_protection_nuclear_age_1985` | Protection in the Nuclear Age (H-20) | FEMA, 1985 | https://www.nukepills.com/docs/FEMA_Nuclear_War_Survival.pdf (private copy; **confirm** with a FEMA, NARA or HathiTrust copy) | the public precedent for the class A and C1 sentences: a risk area "does not mean that it will be attacked" (p. 12) |
+| `fema_napb90` | Nuclear Attack Planning Base – 1990, Executive Summary | FEMA, 1987 (released 2005) | https://nuke.fas.org/guide/usa/napb-90/execsum.html | the method precedent for county blast and fallout classes (not a public precedent: it was restricted until 2005) |
+| `philippe_2023_icbm_fallout` | Who Would Take the Brunt of an Attack on U.S. Nuclear Missile Silos? | Scientific American (S. Philippe), 2023; Princeton, The Missiles on our Land | https://www.scientificamerican.com/article/who-would-take-the-brunt-of-an-attack-on-u-s-nuclear-missile-silos/ | the calibration of class B (fallout downwind of the missile fields) |
+| `fema_hsgp_fy2026` | Fiscal Year 2026 Homeland Security Grant Program NOFO, Appendix I: HSGP Allocations | FEMA, 2026 | https://www.fema.gov/sites/default/files/documents/fema_gpd_hsgp-nofo-fy2026.pdf | the metro weight of the attack, CBRN and nuclear-terrorism rows: each urban area's share of the $584,250,000 (New York-White Plains 24.39 %, Philadelphia 2.84 %) |
+| `nerc_tpl007_gmd` | Benchmark Geomagnetic Disturbance Event Description | NERC, 2014 | https://www.nerc.com/globalassets/standards/projects/2013-03/benchmark_gmd_event_aug27_clean.pdf | the scaling factor α = 0.001·e^(0.115·λ), bounded 0.1–1, by geomagnetic latitude |
+| `igrf14_coefficients` | International Geomagnetic Reference Field, 14th generation (coefficients) | IAGA; NOAA NCEI copy, 2024 | https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt | each county's geomagnetic latitude |
+| `noaa_hms_smoke` | Hazard Mapping System Fire and Smoke Product | NOAA OSPO | https://www.ospo.noaa.gov/products/land/hms.html | which days are smoke days |
+| `epa_aqs_daily_pm25` | AirData pre-generated files: daily PM2.5 and AQI by county | EPA | https://aqs.epa.gov/aqsweb/airdata/download_files.html | smoke days at 35.5 µg/m³ or more (2016–2023 mean): the wildfire-smoke rate |
+| `usgs_karst_2014` | Karst in the United States: A Digital Map Compilation and Database (Open-File Report 2014-1156) | USGS (Weary and Doctor), 2014 | https://pubs.usgs.gov/of/2014/1156 | the share of a county on karst: the sinkhole rate |
+| `usace_nid` | National Inventory of Dams | USACE | https://nid.sec.usace.army.mil/ | high-hazard dams, their condition and their listed downstream town |
+| `usace_nld` | National Levee Database | USACE | https://levees.sec.usace.army.mil/ | people behind levees and USACE's levee risk rating |
+| `asdso_dam_failures` | Estimated Rates of Failure of Dams in the United States | Association of State Dam Safety Officials | https://damsafety.org/reference/estimated-rates-failure-dams-united-states | 173 failures and 587 incidents, January 2005 to June 2013: about 2 in 10,000 failures per dam a year |
+| `eviction_lab_county_estimates` | Eviction Lab: national and county estimates, 2000–2018 | Princeton University Eviction Lab (ODC-BY 1.0: owner sign-off on the attribution licence pending, data audit §7) | https://evictionlab.org/map/ | about 2.3 eviction judgments per 100 renter households (2016; **confirm**), and about 0.9 million judgments from 2.3 million filings (**confirm**) |
+| `iii_water_damage` | Facts + Statistics: Homeowners and renters insurance | Insurance Information Institute (ISO data) | https://www.iii.org/fact-statistic/facts-statistics-homeowners-and-renters-insurance | water damage and freezing: about 1 in 67 insured homes a year (2019–2023), average claim about $15,400 (**confirm**: read through search summaries) |
+| `fcc_att_outage_2024` | February 22, 2024 AT&T Mobility Network Outage Report | FCC Public Safety and Homeland Security Bureau, 2024 | https://docs.fcc.gov/public/attachments/DOC-404150A1.pdf | more than 92 million calls and 25,000 calls to 911 blocked for at least 12 hours |
+| `ashp_shortages` | Drug Shortages Statistics | ASHP | https://www.ashp.org/drug-shortages/shortage-resources/drug-shortages-statistics | 323 active shortages in the first quarter of 2024 (headline only; the data behind it are proprietary) |
+| `openfda_drug_shortages` | openFDA drug shortages endpoint | US FDA (CC0) | https://open.fda.gov/apis/drug/drugshortages/ | 70 medicines listed as currently short on 2026-09-26, 50 of them injectables |
+| `crs_rs20348_funding_gaps` | Federal Funding Gaps: A Brief Overview (RS20348, version 48) | Congressional Research Service, 2026 | https://www.congress.gov/crs-product/RS20348 | funding gaps of 14 days or more in 4 of the 45 fiscal years 1982–2026 |
+| `snap_lapse_2025` | SNAP benefits and the government shutdown | CNBC, 12 November 2025 (with Axios, 14 November 2025) | https://www.cnbc.com/2025/11/12/snap-benefits-government-shutdown-negotiations.html | November 2025: the first lapse in SNAP payments, about 42 million people |
+| `csis_terrorism_2025` | CSIS US terrorism dataset: methodology | Center for Strategic and International Studies, 2024 | https://csis-website-prod.s3.amazonaws.com/s3fs-public/2024-10/241021_McCabe_Domestic_Methodology.pdf | 750 attacks and plots, 1994 to July 2025; three or four metro-wide closures in 31 years (**confirm**) |
+| `fbi_cde_arrests` | Crime in the United States: arrests by age and sex (Tables 29, 39 and 40) | FBI Uniform Crime Reporting, Crime Data Explorer, 2023–2025 | https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads | arrests per 100,000 people a year by age band and sex (data-model series fbi_arrests) |
+| `fbi_active_shooter_2024` | Active Shooter Incidents in the United States in 2024 | FBI, 2025 | https://www.fbi.gov/file-repository/reports-and-publications/2024-active-shooter-report | 24 incidents, 23 killed, 83 wounded |
+| `start_poicn` | Profiles of Incidents involving CBRN and Non-state Actors (POICN) | START, University of Maryland | https://www.start.umd.edu/research-projects/profiles-incidents-involving-cbrn-and-non-state-actors-poicn-database | 517 CBRN events worldwide 1990–2017, about 76 % chemical |
+| `xpt_2023_karger` | Forecasting Existential Risk: Evidence from a Long-Run Forecasting Tournament | Karger et al., Forecasting Research Institute, 2023 | https://forecastingresearch.org/pdf/existential-risk-persuasion-tournament.pdf | nuclear use killing more than 1,000 by 2030: experts 4.5 %, superforecasters 4 % |
+| `rp_2019_nuclear` | How likely is a nuclear exchange between the US and Russia? | Rethink Priorities (L. Rodriguez), 2019 | https://rethinkpriorities.org/research-area/how-likely-is-a-nuclear-exchange-between-the-us-and-russia/ | the 0.38 % a year aggregate for a US–Russia exchange |
+| `barrett_2013_inadvertent` | Analyzing and Reducing the Risks of Inadvertent Nuclear War Between the United States and Russia | Barrett, Baum and Hostetler, Science & Global Security 21(2), 2013 | https://scienceandglobalsecurity.org/archive/sgs21barrett.pdf | median 0.9 % a year (90 % interval 0.02–7 %) |
+| `fema_nuclear_72h_2023` | Nuclear Detonation Response Guidance: Planning for the First 72 Hours | FEMA, 2023 | https://www.fema.gov/sites/default/files/documents/fema_oet-72-hour-nuclear-detonation-response-guidance.pdf | the 50-mile shelter message and at least 24 hours inside |
+| `epri_2019_hemp` | High-Altitude Electromagnetic Pulse and the Bulk Power System (3002014979) | EPRI, 2019 | https://www.epri.com/research/products/000000003002014979 | large-transformer failures unlikely; no support for months-long nationwide blackouts |
+| `riley_2012_carrington` | On the probability of occurrence of extreme space weather events | Riley, Space Weather 10, 2012 | https://doi.org/10.1029/2011SW000734 | about 12 % a decade for a Carrington-class storm (**confirm**: read through Moriña 2019) |
+| `morina_2019_carrington` | Probability estimation of a Carrington-like geomagnetic storm | Moriña et al., Scientific Reports 9, 2019 | https://www.nature.com/articles/s41598-019-38918-8 | 0.46–1.88 % a decade |
+| `love_carrington` | Lognormality of historical magnetic-storm intensity statistics: implications for extreme-event probabilities | Love, USGS | https://www.usgs.gov/publications/lognormality-historical-magnetic-storm-intensity-statistics-implications-extreme-event | 1.13 Carrington-class storms per century (0.42–2.41) |
+| `lloyds_2013_solar` | Solar Storm Risk to the North American Electric Grid | Lloyd's and AER, 2013 | https://assets.lloyds.com/assets/pdf-solar-storm-risk-to-the-north-american-electric-grid/1/pdf-Solar-Storm-Risk-to-the-North-American-Electric-Grid.pdf | 20–40 million people at risk of a long outage; 16 days to a year or two for the worst hit; a return period of about 150 years |
+| `cassidy_mani_2022` | Huge volcanic eruptions: time to prepare | Cassidy and Mani, Nature 608, 2022 | https://doi.org/10.1038/d41586-022-02177-x | a one-in-six chance of a VEI 7 eruption this century |
+| `usgs_yvo` | Questions about supervolcanoes | USGS Yellowstone Volcano Observatory | https://www.usgs.gov/volcanoes/yellowstone/questions-about-supervolcanoes | about 1 in 730,000 a year for a caldera-forming eruption |
+| `nasa_tunguska_2019` | Tunguska Revisited: 111-year-old mystery impact inspires new, more optimistic asteroid predictions | NASA, 2019 | https://www.nasa.gov/solar-system/tunguska-revisited-111-year-old-mystery-impact-inspires-new-more-optimistic-asteroid-predictions/ | Tunguska-class impacts "on the order of millennia" |
+| `fdic_failed_banks` | Bank failures and assistance transactions (BankFind Suite) | FDIC | https://banks.data.fdic.gov/bankfind-suite/failures | 583 failures in 2001–2025, about 23 a year (data-model series fdic_failures) |
+| `npr_maria_2018` | 11 months after Hurricane Maria hit Puerto Rico, officials say all power is restored | NPR, 2018 | https://www.npr.org/2018/08/15/639001372/11-months-after-hurricane-maria-hit-puerto-rico-officials-say-all-power-is-resto | 328 days until every customer had power |
+| `utah_wguep_2016` | Earthquake Probabilities for the Wasatch Front Region in Utah, Idaho, and Wyoming (Miscellaneous Publication 16-3) | Working Group on Utah Earthquake Probabilities, Utah Geological Survey, 2016 | https://geology.utah.gov/hazards/earthquakes/earthquake-probabilities/ (**confirm** URL) | 43 % chance of a magnitude 6.75 or larger earthquake in 50 years (**confirm**) |
+| `usgs_seattle_fault` | The Seattle fault zone | USGS Earthquake Hazards Program with Washington DNR (**confirm** the page) | https://www.usgs.gov/programs/earthquake-hazards (**confirm**) | about 5 % chance of a magnitude 6.5 or larger earthquake in 50 years (**confirm**) |
+| `pnnl_oe417_linkage` | Event-correlated Outage Dataset in America | Pacific Northwest National Laboratory, OpenEI submission 6458 (CC BY 4.0: credit line required) | https://data.openei.org/submissions/6458 | OE-417 reports 2019–2023: 78.4 a year of physical attack, vandalism, sabotage or theft; 7.4 cyber (data-model series oe417) |
+| `cdc_co_quickstats` | QuickStats: Number of deaths resulting from unintentional carbon monoxide poisoning, 2010–2015 | CDC, MMWR 66(8), 2017 | https://www.cdc.gov/mmwr/volumes/66/wr/mm6608a9.htm | about 374 deaths a year |
+| `ftc_sentinel_2024` | Consumer Sentinel Network Data Book 2024 | FTC, 2025 | https://www.ftc.gov/reports/consumer-sentinel-network-data-book-2024 | 1.1 million identity-theft reports |
+| `usgs_barry_arm` | Potential landslide-generated tsunami in Prince William Sound's Barry Arm | USGS | https://www.usgs.gov/news/state-news-release/potential-landslide-generated-tsunami-prince-william-sounds-barry-arm | the fjord-landslide tsunami note |
+| `cdc_h5n1_situation` | H5 Bird Flu: Current Situation | CDC | https://www.cdc.gov/bird-flu/situation-summary/index.html | 70 US human cases since April 2024, none spread between people |
+| `iv_fluids_helene_2024` | IV fluid shortage after Hurricane Helene (commentary) | PubMed Central, 2024 | https://pmc.ncbi.nlm.nih.gov/articles/PMC11627566/ | the Baxter North Cove plant, about 60 % of US IV fluids |
+
+The v0.2.0 hazard rows also cite registry entries not listed above for hazards before:
+`ready_gov_floods`, `ready_gov_winter`, `ready_gov_hurricanes`, `ready_gov_earthquakes`,
+`ready_gov_tsunamis`, `ready_gov_chemical`, `ready_gov_pandemic`, `ready_gov_cybersecurity`,
+`ready_gov_power_outages`, `ready_gov_home_fires`, `epa_asheville_boil_notice_2024`,
+`cdc_co_basics`, `ftc_disaster_scams`, `cdc_pregnancy_emergency`, `usgs_bay_area_outlook_2016`
+and `stone_2023_heat_blackout` (sub-cause notes and the heat-and-blackout scenario).
+
 ## Registry index for the other workstreams
 
 Every id below is in `content/citations.toml`. Federal entries carry an exact quote where one was

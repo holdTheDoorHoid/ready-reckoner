@@ -10,13 +10,23 @@ use std::path::PathBuf;
 pub mod base_rates;
 pub mod climate;
 pub mod events;
+pub mod eviction;
 pub mod facilities;
 pub mod flood;
 pub mod geography;
+pub mod geomag;
+pub mod ground;
+pub mod levees;
 pub mod nri;
 pub mod outages;
 pub mod seismic;
+pub mod smoke;
+pub mod strategic;
+pub mod surge;
+pub mod surge_proxy;
 pub mod vulnerability;
+pub mod water_systems;
+pub mod wildfire_places;
 
 /// Shared state for a refresh.
 pub struct Ctx {
@@ -77,6 +87,9 @@ pub struct JobSpec {
     pub title: &'static str,
     /// Entry point.
     pub run: fn(&Ctx) -> Result<JobOutput>,
+    /// Runs in a plain `refresh` (and so in the quarterly Action). Heavy one-off jobs that build
+    /// optional packs are `false`: they run only when named with `--only` or with `--optional`.
+    pub default: bool,
 }
 
 /// All jobs, in run order (later jobs read earlier jobs' outputs, e.g. the county list).
@@ -85,60 +98,134 @@ pub const JOBS: &[JobSpec] = &[
         id: "geography",
         title: "Counties, ZIP-to-county shares, states and the Connecticut crosswalk",
         run: geography::run,
+        default: true,
     },
     JobSpec {
         id: "nri",
         title: "FEMA National Risk Index v1.20, trimmed to the model's county fields",
         run: nri::run,
+        default: true,
     },
     JobSpec {
         id: "outages",
         title: "Power outage frequency and duration per county from ORNL EAGLE-I 2014-2025",
         run: outages::run,
+        default: true,
     },
     JobSpec {
         id: "events",
         title: "Event rates per county from HURDAT2, SPC severe reports and NOAA Storm Events",
         run: events::run,
+        default: true,
     },
     JobSpec {
         id: "seismic",
         title: "USGS NSHM ground-shaking exceedance at county centroids",
         run: seismic::run,
+        default: true,
     },
     JobSpec {
         id: "climate",
         title: "Climate change multipliers from the NCA5 Atlas, LOCA2 and CMRA (projections)",
         run: climate::run,
+        default: true,
     },
     JobSpec {
         id: "flood",
         title: "Flood priors from OpenFEMA NFIP penetration rates and claims v3",
         run: flood::run,
+        default: true,
+    },
+    JobSpec {
+        id: "strategic",
+        title: "Strategic-site classes (nuclear family) and FEMA UASI shares by county",
+        run: strategic::run,
+        default: true,
+    },
+    JobSpec {
+        id: "geomag",
+        title: "Geomagnetic latitude (IGRF-14) and the NERC TPL-007 scaling factor by county",
+        run: geomag::run,
+        default: true,
+    },
+    JobSpec {
+        id: "ground",
+        title: "Karst (USGS OFR 2014-1156) and landslide-susceptible terrain (USGS 2024) by county",
+        run: ground::run,
+        default: true,
+    },
+    JobSpec {
+        id: "levees",
+        title: "People behind levees and levee risk ratings by county (USACE National Levee Database)",
+        run: levees::run,
+        default: true,
+    },
+    JobSpec {
+        id: "water_systems",
+        title: "Community water systems with health-based violations in five years (EPA ECHO SDWA)",
+        run: water_systems::run,
+        default: true,
+    },
+    JobSpec {
+        id: "smoke",
+        title: "Wildfire-smoke days per county from NOAA HMS smoke polygons and EPA AQS PM2.5",
+        run: smoke::run,
+        default: true,
     },
     JobSpec {
         id: "facilities",
         title: "Nuclear plants, TRI facilities and high-hazard dams by county and ZIP",
         run: facilities::run,
+        default: true,
+    },
+    JobSpec {
+        id: "surge_proxy",
+        title: "County storm-surge proxy from NRI coastal-flood exposure, hurricane passages and evacuation zones",
+        run: surge_proxy::run,
+        default: true,
+    },
+    JobSpec {
+        id: "eviction",
+        title: "Eviction filings per renter household (Eviction Lab; written only with the owner's sign-off)",
+        run: eviction::run,
+        default: true,
+    },
+    JobSpec {
+        id: "surge",
+        title: "NOAA/NHC storm-surge area shares by ZIP (optional pack; large rasters)",
+        run: surge::run,
+        default: false,
+    },
+    JobSpec {
+        id: "wildfire_places",
+        title: "USFS Wildfire Risk to Communities by Census place, with ZIP-to-place shares (optional pack)",
+        run: wildfire_places::run,
+        default: false,
     },
     JobSpec {
         id: "vulnerability",
         title: "Census Community Resilience Estimates 2024 and CDC SVI 2022",
         run: vulnerability::run,
+        default: true,
     },
     JobSpec {
         id: "base_rates",
         title: "National personal-risk base rates with sources",
         run: base_rates::run,
+        default: true,
     },
 ];
 
-/// Pack a file belongs to, from its path.
-pub fn pack_of(path: &str) -> &'static str {
+/// Pack a file belongs to, from its path: `geo/...` is the map, `opt/<name>/...` is the
+/// optional pack `<name>` (issue #15: loaded only when a feature asks for it), anything else is
+/// `core`.
+pub fn pack_of(path: &str) -> String {
     if path.starts_with("geo/") {
-        "geo"
+        "geo".to_string()
+    } else if let Some(rest) = path.strip_prefix("opt/") {
+        rest.split('/').next().unwrap_or("opt").to_string()
     } else {
-        "core"
+        "core".to_string()
     }
 }
 
@@ -146,9 +233,16 @@ pub fn pack_of(path: &str) -> &'static str {
 pub fn pack_description(name: &str) -> &'static str {
     match name {
         "geo" => "County boundaries for the map thumbnail and click-to-select. Loaded lazily.",
-        _ => {
+        "core" => {
             "Everything the engine needs for county-level planning. Loaded at start; works offline."
         }
+        "wildfire_places" => {
+            "Optional: USFS Wildfire Risk to Communities by Census place, with the ZIP-to-place shares to use it. Not needed to plan; loaded only when the wildfire detail is shown."
+        }
+        "surge" => {
+            "Optional: share of each ZIP code's land inside NOAA/NHC's Category 1 and Category 3 storm-surge areas. Built by hand (rr-etl refresh --only surge), not in the quarterly refresh. Not needed to plan."
+        }
+        _ => "Optional pack (not needed to plan; loaded only when a feature asks for it).",
     }
 }
 
@@ -239,8 +333,10 @@ pub struct RefreshSummary {
     pub changes: Vec<Written>,
 }
 
-/// Run the selected jobs (all when `only` is empty), update the manifest and `data/CHANGES.md`.
-pub fn refresh(ctx: &Ctx, only: &[String]) -> Result<RefreshSummary> {
+/// Run the selected jobs, update the manifest and `data/CHANGES.md`. With `only` empty every
+/// default job runs, plus the optional ones when `optional` is set; a job named in `only` runs
+/// whether it is a default job or not.
+pub fn refresh(ctx: &Ctx, only: &[String], optional: bool) -> Result<RefreshSummary> {
     for id in only {
         if !JOBS.iter().any(|j| j.id == id) {
             return Err(data_err(format!(
@@ -253,9 +349,23 @@ pub fn refresh(ctx: &Ctx, only: &[String]) -> Result<RefreshSummary> {
     std::fs::create_dir_all(ctx.data.join("geo"))?;
     let mut manifest = Manifest::load_or_default(&ctx.data)?;
     manifest.schema = crate::manifest::SCHEMA;
+    // Decisions a job waits for: present (unapproved) so a person knows where to approve.
+    manifest
+        .sign_offs
+        .entry(eviction::SIGN_OFF.to_string())
+        .or_insert_with(|| crate::manifest::SignOff {
+            approved: false,
+            what: eviction::SIGN_OFF_WHAT.to_string(),
+            by: String::new(),
+        });
     let mut summary = RefreshSummary::default();
     for job in JOBS {
-        if !only.is_empty() && !only.iter().any(|o| o == job.id) {
+        let selected = if only.is_empty() {
+            job.default || optional
+        } else {
+            only.iter().any(|o| o == job.id)
+        };
+        if !selected {
             continue;
         }
         eprintln!("== {} ({})", job.id, job.title);
@@ -335,13 +445,11 @@ fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
         pack.files.retain(|f| f.job != job.id);
     }
     for w in &out.written {
-        let pack = manifest
-            .packs
-            .entry(pack_of(&w.path).to_string())
-            .or_insert_with(|| Pack {
-                description: pack_description(pack_of(&w.path)).to_string(),
-                files: Vec::new(),
-            });
+        let name = pack_of(&w.path);
+        let pack = manifest.packs.entry(name.clone()).or_insert_with(|| Pack {
+            description: pack_description(&name).to_string(),
+            files: Vec::new(),
+        });
         pack.files.push(FileEntry {
             path: w.path.clone(),
             job: job.id.to_string(),
@@ -359,6 +467,20 @@ fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
         .cloned()
         .collect();
     attributions.extend(out.attributions.iter().cloned());
+    // A job whose files all sit in one optional pack: its credit lines belong to that pack.
+    let packs: BTreeSet<String> = out.written.iter().map(|w| pack_of(&w.path)).collect();
+    for a in &out.attributions {
+        match packs.iter().next() {
+            Some(p) if packs.len() == 1 && p != "core" && p != "geo" => {
+                manifest
+                    .attribution_packs
+                    .insert(a.source.clone(), p.clone());
+            }
+            _ => {
+                manifest.attribution_packs.remove(&a.source);
+            }
+        }
+    }
     attributions.sort_by(|a, b| a.source.cmp(&b.source));
     manifest.attributions = attributions;
     manifest.jobs.insert(
@@ -378,6 +500,7 @@ fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
 }
 
 fn finish_manifest(manifest: &mut Manifest) {
+    manifest.packs.retain(|_, p| !p.files.is_empty());
     for (name, pack) in manifest.packs.iter_mut() {
         pack.description = pack_description(name).to_string();
     }
@@ -442,6 +565,38 @@ pub fn arcgis_query(
     license: &str,
     obligations: &str,
 ) -> Result<ArcgisRows> {
+    arcgis_query_ex(
+        ctx,
+        name,
+        layer_url,
+        where_clause,
+        fields,
+        order_by,
+        geometry,
+        &[],
+        version,
+        license,
+        obligations,
+    )
+}
+
+/// [`arcgis_query`] with extra form parameters (for example `maxAllowableOffset` and
+/// `geometryPrecision` to generalise polygons on the server). The extra parameters are recorded
+/// in the source URL.
+#[allow(clippy::too_many_arguments)]
+pub fn arcgis_query_ex(
+    ctx: &Ctx,
+    name: &str,
+    layer_url: &str,
+    where_clause: &str,
+    fields: &[&str],
+    order_by: &str,
+    geometry: bool,
+    extra: &[(&str, String)],
+    version: &str,
+    license: &str,
+    obligations: &str,
+) -> Result<ArcgisRows> {
     let url = format!("{layer_url}/query");
     let mut acc = crate::http::Sha256Acc::new();
     let mut rows = Vec::new();
@@ -461,6 +616,7 @@ pub fn arcgis_query(
         if geometry {
             form.push(("outSR", "4326".to_string()));
         }
+        form.extend(extra.iter().cloned());
         let resp = ctx.http.post_form(&url, &form)?;
         acc.update(&resp.bytes);
         let v: serde_json::Value = serde_json::from_slice(&resp.bytes)?;
@@ -491,8 +647,12 @@ pub fn arcgis_query(
         source: SourceRecord {
             name: name.to_string(),
             url: format!(
-                "{url} (POST where={where_clause}; fields {}; ordered by {order_by})",
-                fields.join(",")
+                "{url} (POST where={where_clause}; fields {}; ordered by {order_by}{})",
+                fields.join(","),
+                extra
+                    .iter()
+                    .map(|(k, v)| format!("; {k}={v}"))
+                    .collect::<String>()
             ),
             version: version.to_string(),
             retrieved,
@@ -549,6 +709,72 @@ mod tests {
             key: vec!["fips".into()],
             diff,
         }
+    }
+
+    #[test]
+    fn optional_packs_have_their_own_names_and_jobs_are_registered_once() {
+        assert_eq!(pack_of("core/smoke.csv"), "core");
+        assert_eq!(pack_of("geo/counties.json"), "geo");
+        assert_eq!(pack_of("opt/surge/zip_surge.csv"), "surge");
+        assert_eq!(pack_of("opt/wildfire_places/places.csv"), "wildfire_places");
+        let mut ids: Vec<&str> = JOBS.iter().map(|j| j.id).collect();
+        let n = ids.len();
+        ids.sort_unstable();
+        ids.dedup();
+        assert_eq!(ids.len(), n, "duplicate job ids");
+        let optional: Vec<&str> = JOBS.iter().filter(|j| !j.default).map(|j| j.id).collect();
+        assert_eq!(optional, vec!["surge", "wildfire_places"]);
+        // Jobs that read other jobs' files come after them.
+        let pos = |id: &str| JOBS.iter().position(|j| j.id == id).unwrap();
+        assert!(pos("strategic") < pos("facilities"));
+        assert!(pos("events") < pos("surge_proxy") && pos("nri") < pos("surge_proxy"));
+        assert!(pos("nri") < pos("levees") && pos("nri") < pos("water_systems"));
+    }
+
+    #[test]
+    fn optional_pack_jobs_tag_their_credit_lines() {
+        let credit = |source: &str| Attribution {
+            source: source.into(),
+            text: "t".into(),
+            license: "l".into(),
+            url: "u".into(),
+            version: None,
+            accessed: "2026-09-26".into(),
+        };
+        let job = |id: &'static str| JobSpec {
+            id,
+            title: "t",
+            run: |_| Ok(JobOutput::default()),
+            default: false,
+        };
+        let mut m = Manifest::default();
+        let places = JobOutput {
+            written: vec![written(
+                "opt/wildfire_places/places.csv",
+                1,
+                DiffSummary::default(),
+            )],
+            attributions: vec![credit("USFS")],
+            ..Default::default()
+        };
+        record(&mut m, &job("wildfire_places"), &places);
+        let smoke = JobOutput {
+            written: vec![written("core/smoke.csv", 1, DiffSummary::default())],
+            attributions: vec![credit("HMS")],
+            ..Default::default()
+        };
+        record(&mut m, &job("smoke"), &smoke);
+        assert_eq!(m.attribution_packs.len(), 1);
+        assert_eq!(m.attribution_packs["USFS"], "wildfire_places");
+        assert_eq!(m.attributions.len(), 2);
+        // A source that moves into the core pack loses its optional tag.
+        let moved = JobOutput {
+            written: vec![written("core/places.csv", 1, DiffSummary::default())],
+            attributions: vec![credit("USFS")],
+            ..Default::default()
+        };
+        record(&mut m, &job("wildfire_places"), &moved);
+        assert!(m.attribution_packs.is_empty());
     }
 
     #[test]
