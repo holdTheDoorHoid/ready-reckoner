@@ -1,0 +1,246 @@
+{
+ "county": {
+  "fips": "42101",
+  "name": "Philadelphia",
+  "state_abbr": "PA",
+  "state_name": "Pennsylvania",
+  "centroid": {
+   "lat": 40.009,
+   "lon": -75.133
+  },
+  "nca_region": "northeast",
+  "coastal": false,
+  "tsunami_zone": false,
+  "population": 1602305,
+  "households": 640922,
+  "building_value_usd": 291700000000.0,
+  "nri_version": "1.20.0",
+  "nri": {
+   "coastal_flooding": {
+    "afreq": 3.692,
+    "afreq_kind": "events_per_year",
+    "alrb": 8.979e-06,
+    "ealb": 2619000.0,
+    "ealp": 0.01335,
+    "ealt": 2802000.0,
+    "expb": 12330000000.0,
+    "expp": 28120.0,
+    "hlrb": 0.003426,
+    "risk_score": 85.4
+   },
+   "cold_wave": {
+    "afreq": 0.7911,
+    "afreq_kind": "events_per_year",
+    "alrb": 4.154e-08,
+    "ealb": 12110.0,
+    "ealp": 4.163,
+    "ealt": 57040000.0,
+    "expb": 291700000000.0,
+    "expp": 1602000.0,
+    "hlrb": 5.253e-08,
+    "risk_score": 99.81
+   },
+   "drought": {
+    "afreq": 5.763,
+    "afreq_kind": "events_per_year",
+    "ealt": 4120.0,
+    "risk_score": 21.66
+   },
+   "earthquake": {
+    "afreq": 0.001618,
+    "afreq_kind": "annual_probability",
+    "alrb": 8.511e-05,
+    "ealb": 24820000.0,
+    "ealp": 1.227,
+    "ealt": 41630000.0,
+    "expb": 516200000000.0,
+    "expp": 1604000.0,
+    "hlrb": 0.02972,
+    "risk_score": 98.28
+   },
+   "hail": {
+    "afreq": 2.51,
+    "afreq_kind": "events_per_year",
+    "alrb": 6.87e-06,
+    "ealb": 2004000.0,
+    "ealp": 0.003736,
+    "ealt": 2055000.0,
+    "expb": 291700000000.0,
+    "expp": 1602000.0,
+    "hlrb": 2.737e-06,
+    "risk_score": 95.13
+   },
+   "heat_wave": {
+    "afreq": 11.07,
+    "afreq_kind": "events_per_year",
+    "alrb": 4.511e-09,
+    "ealb": 1316.0,
+    "ealp": 18.72,
+    "ealt": 256400000.0,
+    "expb": 291700000000.0,
+    "expp": 1602000.0,
+    "hlrb": 4.078e-10,
+    "risk_score": 99.97
+   },
+   "hurricane": {
+    "afreq": 0.09203,
+    "afreq_kind": "events_per_year",
+    "alrb": 3.95e-05,
+    "ealb": 11520000.0,
+    "ealp": 0.03626,
+    "ealt": 12020000.0,
+    "expb": 291600000000.0,
+    "expp": 1602000.0,
+    "hlrb": 0.0004294,
+    "risk_score": 94.28
+   },
+   "ice_storm": {
+    "afreq": 1.444,
+    "afreq_kind": "events_per_year",
+    "alrb": 1.409e-06,
+    "ealb": 411100.0,
+    "ealp": 0.04217,
+    "ealt": 988800.0,
+    "expb": 291200000000.0,
+    "expp": 1600000.0,
+    "hlrb": 9.774e-07,
+    "risk_score": 94.17
+   },
+   "landslide": {
+    "afreq": 0.05782,
+    "afreq_kind": "annual_probability",
+    "alrb": 2.454e-08,
+    "ealb": 7158.0,
+    "ealp": 6.599e-07,
+    "ealt": 7168.0,
+    "expb": 2267000000.0,
+    "expp": 10070.0,
+    "hlrb": 0.01086,
+    "risk_score": 76.34
+   },
+   "lightning": {
+    "afreq": 35.74,
+    "afreq_kind": "events_per_year",
+    "alrb": 4.2e-08,
+    "ealb": 12250.0,
+    "ealp": 0.1086,
+    "ealt": 1500000.0,
+    "expb": 291700000000.0,
+    "expp": 1602000.0,
+    "hlrb": 1.172e-09,
+    "risk_score": 96.25
+   },
+   "riverine_flooding": {
+    "afreq": 5.821,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.000901,
+    "ealb": 262800000.0,
+    "ealp": 0.2371,
+    "ealt": 266100000.0,
+    "expb": 291600000000.0,
+    "expp": 10790.0,
+    "hlrb": 0.0001548,
+    "risk_score": 99.59
+   },
+   "strong_wind": {
+    "afreq": 7.037,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.195e-06,
+    "ealb": 640300.0,
+    "ealp": 0.2088,
+    "ealt": 3501000.0,
+    "expb": 291700000000.0,
+    "expp": 1602000.0,
+    "hlrb": 3.12e-07,
+    "risk_score": 97.87
+   },
+   "tornado": {
+    "afreq": 0.07302,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.265e-05,
+    "ealb": 6606000.0,
+    "ealp": 1.058,
+    "ealt": 21100000.0,
+    "expb": 291700000000.0,
+    "expp": 1602000.0,
+    "hlrb": 0.0003102,
+    "risk_score": 98.66
+   },
+   "wildfire": {
+    "afreq": 9.148e-05,
+    "afreq_kind": "annual_probability",
+    "alrb": 2.513e-08,
+    "ealb": 7330.0,
+    "ealp": 0.0001076,
+    "ealt": 8805.0,
+    "expb": 1297000000.0,
+    "expp": 8352.0,
+    "hlrb": 0.1,
+    "risk_score": 28.69
+   },
+   "winter_weather": {
+    "afreq": 10.54,
+    "afreq_kind": "events_per_year",
+    "alrb": 6.588e-07,
+    "ealb": 192200.0,
+    "ealp": 0.1272,
+    "ealt": 1935000.0,
+    "expb": 291700000000.0,
+    "expp": 1602000.0,
+    "hlrb": 6.253e-08,
+    "risk_score": 99.78
+   }
+  },
+  "outages": {
+   "events_per_customer_year": 0.065,
+   "p_ge_1d": 0.08333,
+   "p_ge_3d": 0.02305,
+   "p_ge_7d": 0.00683,
+   "p_ge_14d": 0.002173,
+   "median_hours": 2.0,
+   "p90_hours": 20.0,
+   "years_covered": "2018-2025",
+   "event_definition": "County outage events with at least 0.5% of customers out, spike-filtered; household rate and fitted lognormal from research risk-model §8.2/§9.2 (EAGLE-I)"
+  },
+  "climate": {
+   "days_over_2in_2050": 2.012,
+   "days_over_2in_2050_high": 2.191,
+   "days_over_2in_hist": 1.471,
+   "days_over_90f_hist": 17.96,
+   "days_over_95f_2050": 19.04,
+   "days_over_95f_2050_high": 26.58,
+   "days_over_95f_hist": 3.277,
+   "dry_spell_days_2050": 22.59,
+   "dry_spell_days_2050_high": 22.77,
+   "dry_spell_days_hist": 22.96,
+   "icing_days_2050": 3.885,
+   "icing_days_2050_high": 2.418,
+   "icing_days_hist": 14.23
+  },
+  "facilities": {
+   "nearest_nuclear_km": 35.0,
+   "tri_facilities": 90,
+   "high_hazard_dams": 1
+  }
+ },
+ "location": {
+  "country": "US",
+  "county_fips": "42101",
+  "county_name": "Philadelphia",
+  "state_abbr": "PA",
+  "state_name": "Pennsylvania",
+  "centroid": {
+   "lat": 40.009,
+   "lon": -75.133
+  },
+  "nca_region": "northeast",
+  "coastal": false,
+  "tsunami_zone": false,
+  "facility_flags": {
+   "nuclear_plant_within_16km": false,
+   "nuclear_plant_within_80km": true,
+   "hazmat_facilities_within_5km": 0
+  },
+  "zip": "19147"
+ }
+}

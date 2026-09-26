@@ -6,9 +6,11 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-description = "Ready Reckoner: hazards"
+description = "Ready Reckoner: location + household -> per-hazard household event rates, profiles and named scenarios"
 
 [dependencies]
+rr-types = { path = "../rr-types" }
 serde.workspace = true
+
+[dev-dependencies]
 serde_json.workspace = true
-thiserror.workspace = true
