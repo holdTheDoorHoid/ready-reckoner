@@ -135,3 +135,99 @@ fn the_horizon_reaches_the_sentences() {
     // Targets do not depend on the horizon (it only changes the sentences).
     assert_eq!(days(&a, BucketId::Power), days(&b, BucketId::Power));
 }
+
+#[test]
+fn assumed_basics_are_credited_listed_and_can_be_switched_off() {
+    let content = rr_content::content();
+    let flagged: Vec<&str> = content
+        .items
+        .iter()
+        .filter(|i| i.assumed_basic)
+        .map(|i| i.id.as_str())
+        .collect();
+    let on = household("philadelphia-renters-4");
+    assert!(on.assume_basics, "on by default");
+    let mut off = on.clone();
+    off.assume_basics = false;
+    let (a, b) = (assess(&on), assess(&off));
+    assert!(!b.warnings.iter().any(|w| w.id == "assumed_basics"));
+    let spend = |o: &rr_types::PlanOutput| -> f32 {
+        o.plan
+            .months
+            .iter()
+            .flat_map(|m| &m.items)
+            .filter(|i| i.kind == PlanItemKind::Purchase && !i.done)
+            .map(|i| i.est_cost_usd)
+            .sum()
+    };
+    if flagged.is_empty() {
+        // The catalogue flags nothing yet: nothing to assume.
+        assert!(!a.warnings.iter().any(|w| w.id == "assumed_basics"));
+        return;
+    }
+    let note = a
+        .warnings
+        .iter()
+        .find(|w| w.id == "assumed_basics")
+        .expect("the assumption is recorded");
+    assert!(note.related.iter().all(|id| flagged.contains(&id.as_str())));
+    let month0 = &a.plan.months[0].items;
+    for id in &note.related {
+        let it = month0
+            .iter()
+            .find(|i| i.item_id == id.as_str() && i.done)
+            .unwrap_or_else(|| panic!("{id} is credited in month 0"));
+        assert_eq!(it.why, rr_plan::pipeline::ASSUMED_WHY);
+    }
+    assert!(
+        a.packet_markdown
+            .contains("What the plan assumes you already have")
+    );
+    assert!(
+        spend(&a) <= spend(&b) + 0.01,
+        "assuming basics never costs more"
+    );
+    // A household that lists a basic (even as none) keeps its own answer.
+    let mut listed = on.clone();
+    listed.existing.push(Owned {
+        item_id: ItemId::from(note.related[0].as_str()),
+        qty: 0.0,
+        paid_usd: None,
+    });
+    let c = assess(&listed);
+    let still = c
+        .warnings
+        .iter()
+        .find(|w| w.id == "assumed_basics")
+        .map(|w| w.related.clone())
+        .unwrap_or_default();
+    assert!(!still.contains(&note.related[0]));
+}
+
+#[test]
+fn the_rare_catastrophe_opt_in_reaches_the_budget() {
+    let content = rr_content::content();
+    let rare: Vec<&str> = content
+        .items
+        .iter()
+        .filter(|i| i.rare_catastrophic && !i.free)
+        .map(|i| i.id.as_str())
+        .collect();
+    let base = household("philadelphia-renters-4");
+    let mut opt_in = base.clone();
+    opt_in.dials.rare_catastrophic_opt_in = true;
+    let bought = |o: &rr_types::PlanOutput| -> Vec<String> {
+        o.plan
+            .months
+            .iter()
+            .flat_map(|m| &m.items)
+            .filter(|i| i.kind == PlanItemKind::Purchase && rare.contains(&i.item_id.as_str()))
+            .map(|i| i.item_id.as_str().to_owned())
+            .collect()
+    };
+    assert!(bought(&assess(&base)).is_empty(), "$0 unless opted in");
+    assert!(
+        !bought(&assess(&opt_in)).is_empty(),
+        "the allowance buys them"
+    );
+}

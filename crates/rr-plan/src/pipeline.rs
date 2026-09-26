@@ -66,6 +66,9 @@ pub struct Assessment {
     pub attributions: Vec<Attribution>,
     /// Existing inventory entries whose item id is not in the catalogue.
     pub unknown_existing: Vec<ItemId>,
+    /// Everyday basics credited as owned because `assume_basics` is on: (item, quantity in the
+    /// item's unit). The budget ran with these added to `existing`.
+    pub assumed: Vec<(ItemId, f64)>,
 }
 
 impl Assessment {
@@ -217,6 +220,19 @@ pub fn run<S: CountySource + ?Sized>(
         .collect();
     let offers = coverage::build(content, &sizer, &targets, &register);
 
+    // Everyday basics most homes have (blankets, a pot, a bag per person, three days of ordinary
+    // food): credited as owned when `assume_basics` is on, unless the household listed the item
+    // itself (any quantity, 0 included, is its own answer).
+    let assumed = assumed_basics(input, &offers, &lines);
+    let mut household = input.clone();
+    household
+        .existing
+        .extend(assumed.iter().map(|(id, qty)| rr_types::Owned {
+            item_id: id.clone(),
+            qty: *qty as f32,
+            paid_usd: None,
+        }));
+
     // Budget.
     // A curve for every duration bucket the catalogue can cover. A bucket with no part to buy
     // (nobody takes a prescription, so no medicine to stock) gets no curve: there is nothing to
@@ -272,7 +288,7 @@ pub fn run<S: CountySource + ?Sized>(
     };
     let items = offers.items();
     let budget_input = BudgetInput {
-        household: input,
+        household: &household,
         catalogue: &items,
         meta: &offers.meta,
         // The offers already fold in every requirement line (see `coverage`).
@@ -281,15 +297,23 @@ pub fn run<S: CountySource + ?Sized>(
         context: &context,
         options: BudgetOptions {
             max_months: MAX_PLAN_MONTHS,
-            // awaiting: rr-types (`Dials.rare_catastrophic_opt_in`, a pending contract tweak).
-            rare_catastrophic_opt_in: false,
+            rare_catastrophic_opt_in: input.dials.rare_catastrophic_opt_in,
             schedule: Schedule::Split {
                 reserve_share: RESERVE_SHARE,
             },
         },
     };
-    let budget = rr_budget::allocate_with_rule(&budget_input, &offers.rule)
+    let mut budget = rr_budget::allocate_with_rule(&budget_input, &offers.rule)
         .map_err(|e| internal("plan the purchases", e))?;
+    // The allocator lists what the household has as "You already have this"; say what was
+    // assumed instead.
+    for m in &mut budget.plan.months {
+        for it in &mut m.items {
+            if it.done && assumed.iter().any(|(id, _)| *id == it.item_id) {
+                it.why = ASSUMED_WHY.to_owned();
+            }
+        }
+    }
 
     // Final buckets: the plan's coverage.
     let inventory = {
@@ -383,14 +407,7 @@ pub fn run<S: CountySource + ?Sized>(
             warnings.push(w.clone());
         }
     }
-    // One sinking fund per item (docs/DESIGN.md §14, 2026-09-26): keep each item's latest.
-    let mut budget = budget;
-    let mut envelopes: Vec<rr_types::SavingsEnvelope> = Vec::new();
-    for e in budget.plan.envelopes.drain(..) {
-        envelopes.retain(|x| x.item_id != e.item_id);
-        envelopes.push(e);
-    }
-    budget.plan.envelopes = envelopes;
+
     let unknown_existing: Vec<ItemId> = {
         let mut v: Vec<ItemId> = input
             .existing
@@ -402,6 +419,26 @@ pub fn run<S: CountySource + ?Sized>(
         v.dedup();
         v
     };
+    if !assumed.is_empty() {
+        let names: Vec<String> = assumed
+            .iter()
+            .filter_map(|(id, _)| content.item(id.as_str()))
+            .map(|i| crate::packet::text::lower_first(&i.name))
+            .collect();
+        warnings.push(Warning {
+            id: "assumed_basics".to_owned(),
+            severity: WarningSeverity::Note,
+            message: format!(
+                "The plan counts everyday basics most homes already have: {}.",
+                crate::packet::text::join_and(&names)
+            ),
+            why: ASSUMED_HOW_TO_UNTICK.to_owned(),
+            related: assumed
+                .iter()
+                .map(|(id, _)| id.as_str().to_owned())
+                .collect(),
+        });
+    }
     if !unknown_existing.is_empty() {
         let names: Vec<&str> = unknown_existing.iter().map(|i| i.as_str()).collect();
         warnings.push(Warning {
@@ -432,5 +469,51 @@ pub fn run<S: CountySource + ?Sized>(
         warnings,
         attributions: source.attributions(),
         unknown_existing,
+        assumed,
     })
+}
+
+/// The "why" of a basic the plan assumed the household has.
+pub const ASSUMED_WHY: &str = "Assumed: most homes already have this, so the plan counts it \
+    instead of buying it. If yours does not, untick \"Assume everyday basics\" on the Have screen.";
+
+/// How to undo the assumption, for the note and the packet.
+pub const ASSUMED_HOW_TO_UNTICK: &str = "Most homes have these, so the plan does not ask you to \
+    buy them. If any is missing, untick \"Assume everyday basics\" on the Have screen, or list \
+    the item as not owned, and the plan will add it.";
+
+/// Days of a divisible basic (ordinary food) assumed on hand: the three-day step.
+pub const ASSUMED_DAYS: f64 = 3.0;
+
+/// The basics to credit: offered items the catalogue flags `assumed_basic`, not listed by the
+/// household, at the quantity the household needs (a divisible basic, such as ordinary food, at
+/// three days' worth or its line's days if fewer).
+fn assumed_basics(input: &PlanInput, offers: &Offers, lines: &[SizedLine]) -> Vec<(ItemId, f64)> {
+    if !input.assume_basics {
+        return Vec::new();
+    }
+    offers
+        .offered
+        .iter()
+        .filter(|o| o.item.assumed_basic && !o.item.free)
+        .filter(|o| !input.existing.iter().any(|e| e.item_id == o.item.id))
+        .filter_map(|o| {
+            let qty = if o.divisible {
+                // Three days of the line it meets, in the item's unit.
+                o.joins
+                    .iter()
+                    .filter_map(|j| {
+                        let l = lines.iter().find(|l| l.line.id == j.line_id)?;
+                        let per_day = l.per_day?;
+                        let days = l.days.unwrap_or(ASSUMED_DAYS).min(ASSUMED_DAYS);
+                        Some(per_day * days / j.units_per_item)
+                    })
+                    .fold(0.0_f64, f64::max)
+                    .ceil()
+            } else {
+                o.quantity
+            };
+            (qty > 0.0).then(|| (o.item.id.clone(), qty))
+        })
+        .collect()
 }

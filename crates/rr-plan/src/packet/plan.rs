@@ -114,11 +114,12 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
 
     out.push("### This month".to_owned());
     out.push(String::new());
+    // What the household already has (listed or assumed) is not a step to take.
     let bought0: Vec<&PlanItem> = first
         .map(|m| {
             m.items
                 .iter()
-                .filter(|i| i.kind != PlanItemKind::FreeAction)
+                .filter(|i| i.kind != PlanItemKind::FreeAction && !i.done)
                 .collect()
         })
         .unwrap_or_default();

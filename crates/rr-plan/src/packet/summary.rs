@@ -232,11 +232,42 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         }
         out.push(String::new());
     }
+    assumptions(cx, out);
     out.push(
         "Every number in this packet is explained, with its sources, in the sections that follow."
             .to_owned(),
     );
     out.push(String::new());
+}
+
+/// What the plan assumed the household already has (`assume_basics`), and how to undo it.
+fn assumptions(cx: &Ctx<'_>, out: &mut Vec<String>) {
+    let a = cx.a;
+    if !a.assumed.is_empty() {
+        out.push("### What the plan assumes you already have".to_owned());
+        out.push(String::new());
+        for (id, qty) in &a.assumed {
+            if let Some(it) = cx.item(id.as_str()) {
+                let amount = text::quantity(*qty, &it.unit);
+                let amount = if amount.is_empty() {
+                    String::new()
+                } else {
+                    format!(" ({})", md(&amount))
+                };
+                out.push(format!("- [x] {}{amount}", md(&it.name)));
+            }
+        }
+        out.push(String::new());
+        out.push(crate::pipeline::ASSUMED_HOW_TO_UNTICK.to_owned());
+        out.push(String::new());
+    } else if !a.input.assume_basics {
+        out.push(
+            "You unticked \"Assume everyday basics\", so the plan counts only what you listed as \
+             already owned."
+                .to_owned(),
+        );
+        out.push(String::new());
+    }
 }
 
 /// The three sentences that matter most: a threat paired with what to do about it.
