@@ -8,8 +8,9 @@
 //! goes through `LocationResolved.exposure` (DESIGN-DELTA §1.3) and carries a source id.
 //!
 //! Every field is optional or empty by default, so a pack without a given file still loads and
-//! the engine can say what it is missing. Field names are the pack's column names.
-//! awaiting: types2 (DESIGN-DELTA §1.3 `Exposure` on `LocationResolved` is built from these).
+//! the engine can say what it is missing. Field names are the pack's column names. The
+//! user-facing copy, [`Exposure`](crate::Exposure) on `LocationResolved` (DESIGN-DELTA §1.3), is
+//! filled from these by `rr_data::DataStore::location`, each value with its citation id.
 
 use serde::{Deserialize, Serialize};
 

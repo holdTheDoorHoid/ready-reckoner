@@ -143,7 +143,7 @@ pub const USGS_BAY_AREA_2016: &str = "usgs_bay_area_outlook_2016";
 
 /// Ready Reckoner's strategic-site table (`data/core/strategic_sites.toml`): the class rules,
 /// every site with one public source, the metros, ports and refineries (compiled 2026-09-26).
-pub const STRATEGIC_SITES: &str = "rr_strategic_sites_2026";
+pub const STRATEGIC_SITES: &str = "rr_strategic_sites";
 /// FEMA, *Protection in the Nuclear Age* (1985): a place designated a risk area "does not mean
 /// that it will be attacked"; the public precedent for the "Why here" sentence.
 pub const FEMA_PNA_1985: &str = "fema_protection_nuclear_age_1985";
@@ -155,10 +155,10 @@ pub const FEMA_NAPB90: &str = "fema_napb90";
 pub const PHILIPPE_2023: &str = "philippe_2023_icbm_fallout";
 /// FEMA FY2026 Homeland Security Grant Program notice, Appendix I.B: UASI allocations by urban
 /// area.
-pub const FEMA_UASI_FY2026: &str = "fema_uasi_fy2026";
+pub const FEMA_UASI_FY2026: &str = "fema_hsgp_fy2026";
 /// NERC TPL-007 benchmark geomagnetic disturbance event: the scaling factor by geomagnetic
 /// latitude.
-pub const NERC_TPL007: &str = "nerc_tpl007_benchmark";
+pub const NERC_TPL007: &str = "nerc_tpl007_gmd";
 /// IGRF-14 (IAGA, NOAA NCEI copy): the dipole behind each county's geomagnetic latitude.
 pub const IGRF14: &str = "igrf14_coefficients";
 /// NOAA Hazard Mapping System smoke polygons: which days count as smoke days.
@@ -175,7 +175,7 @@ pub const USACE_NLD: &str = "usace_nld";
 /// 587 incidents, 2005 to mid-2013).
 pub const ASDSO: &str = "asdso_dam_failures";
 /// Eviction Lab (Princeton): eviction filings and judgments by county (ODC-BY).
-pub const EVICTION_LAB: &str = "eviction_lab";
+pub const EVICTION_LAB: &str = "eviction_lab_county_estimates";
 /// Insurance Information Institute, facts and statistics on homeowners claims (ISO data): water
 /// damage and freezing, about 1 in 67 insured homes a year.
 pub const III_WATER: &str = "iii_water_damage";
