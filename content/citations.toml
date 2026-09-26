@@ -1394,6 +1394,15 @@ retrieved = "2026-09-25"
 license = "All rights reserved (paraphrased, not quoted)"
 
 [[citation]]
+id = "aap_talking_to_children"
+title = "Talking to Children About Disasters (archived 2014 version)"
+publisher = "American Academy of Pediatrics (HealthyChildren.org)"
+year = 2014
+url = "https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
 id = "sutter_diapers"
 title = "How many diapers a day should your newborn have?"
 publisher = "Sutter Health"
@@ -2013,6 +2022,66 @@ url = "https://bjs.ojp.gov/document/cv23.pdf"
 retrieved = "2026-09-25"
 quote = "A lower percentage of households were victims of burglary or trespassing in 2023 (1.01%) than in 2022 (1.12%)."
 license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
+# Requested by the supply workstream, added 2026-09-25: sources behind supply numbers that were
+# cited through rr_research_supply_standards. A maker's own specification sheet may be a source
+# here, so the registry may name the maker; item and guidance text never does.
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "petmd_dog_water"
+title = "How Much Water Should a Dog Drink?"
+publisher = "PetMD"
+year = 2020
+url = "https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "merck_vet_maintenance_fluids"
+title = "Maintenance Fluid Plan in Animals (Merck Veterinary Manual)"
+publisher = "Merck & Co., Inc."
+year = 2025
+url = "https://www.merckvetmanual.com/therapeutics/fluid-therapy/maintenance-fluid-plan-in-animals"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "bbk_vorsorgen_2025"
+title = "Vorsorgen für Krisen und Katastrophen (Preparing for crises and disasters), 2nd edition, November 2025"
+publisher = "Bundesamt für Bevölkerungsschutz und Katastrophenhilfe (BBK), Germany"
+year = 2025
+url = "https://www.bbk.bund.de/SharedDocs/Downloads/DE/Mediathek/Publikationen/Buergerinformationen/Ratgeber/ratgeber-notfallvorsorge.pdf?__blob=publicationFile"
+retrieved = "2026-09-25"
+license = "German federal government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "dema_prepared_for_crises"
+title = "Prepared for crises"
+publisher = "Danish Emergency Management Agency (Beredskabsstyrelsen)"
+url = "https://www.brs.dk/en/prepared/"
+retrieved = "2026-09-25"
+license = "Danish government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "cdc_yellow_book_heat_cold"
+title = "CDC Yellow Book 2026: Heat and Cold Illness in Travelers"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/yellow-book/hcp/environmental-hazards-risks/heat-and-cold-illness-in-travelers.html"
+retrieved = "2026-09-25"
+quote = "Although it is hypotonic (contains lower concentration of sodium than blood), sweat rates may reach 1 liter per hour, resulting in substantial fluid and sodium loss."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "honda_eu2200i_spec"
+title = "EU2200i Super Quiet Inverter Generator: specifications (archived 14 September 2026)"
+publisher = "American Honda Motor Co., Inc. (Honda Power Equipment)"
+year = 2026
+url = "https://web.archive.org/web/20260914102101/https://powerequipment.honda.com/generators/models/eu2200i"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
 
 # ---------------------------------------------------------------------------------------------
 # Ready Reckoner's own documents (research compilations, observation log, expert estimates)
