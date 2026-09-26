@@ -293,3 +293,11 @@ below compare with the pack before this workstream.
 | `core/temperature.csv` | 0 | 3107 | 3107 | 0 | 0 | new |
 | `opt/outage_events/county_events.csv` | 0 | 29878 | 29878 | 0 | 0 | new |
 | `opt/outage_events/holdout.csv` | 0 | 130 | 130 | 0 | 0 | new |
+
+## 2026-09-26T21:14:06Z — pack version 01a46abb2d5d
+
+No job run: `rr-etl manifest --rehash` recomputed the checksums, row counts and pack version from the files on disk. Merge of the data-model workstream into v0.2 (v0.2.0): the pack now holds both workstreams' files (the two sections above). `core/events.csv` is data-model's table (Storm Events times in UTC, 8 values changed) plus data-hazard's 340 `dust_storm` rows, so it matched neither side's checksum; every other file is byte-identical to one side's.
+
+| File | Rows before | Rows after | sha256 before | sha256 after |
+|---|---:|---:|---|---|
+| `core/events.csv` | 44057 | 44397 | `842d6c2dae85` | `1366f4179fc6` |

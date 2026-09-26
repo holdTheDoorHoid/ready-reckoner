@@ -74,10 +74,11 @@ cargo run -p rr-etl -- jobs
 
 ## 2. The packs
 
-Sizes are gzip -9 as a static host would serve them. The core pack totals **2.55 MB**
-gzipped file by file (budget 5 MB; data pack v2's exposure columns added 0.18 MB of it, §13) and
-9.6 MB uncompressed; a first visit fetches 2.13 MB of it (everything but the two ZIP tables,
-which load when a ZIP code is typed). `geo/counties.json` is **0.30 MB** gzipped (budget
+Sizes are gzip -9 as a static host would serve them. The core pack totals **2.86 MB**
+gzipped file by file (budget 5 MB; data pack v2's exposure columns added 0.18 MB of it, §13, and
+its calibration files and wider outage tables 0.30 MB, below) and 11.2 MB uncompressed; a first
+visit fetches about 2.4 MB of it (everything but the two ZIP tables, which load when a ZIP code is
+typed). `geo/counties.json` is **0.30 MB** gzipped (budget
 0.35 MB). The optional packs (§13.12) are not part of the core and load only when a feature asks.
 Until 2026-09-26 the core pack was 2.99 MB: it also shipped `zip_centroids.csv` and three NRI
 columns (`expb`, `ealb`, `alrb`) that nothing in the engine read.
@@ -181,7 +182,7 @@ doi:10.6084/m9.figshare.24237376 (v4, 2026-02-25), `MCC.csv`, `coverage_history.
 household counts. **CC BY 4.0: the credit line in §7 must be shown.** Refresh: yearly (a new year
 is added each spring).
 
-### core/events.csv (44,057 rows)
+### core/events.csv (44,397 rows)
 
 Long format: `fips`, `event_type`, `rate_per_year`, `share_damaging`, `median_days`, `p90_days`,
 `events`, `share_injury`, `source`, `years`. A missing row means no recorded event of that type in
@@ -338,7 +339,9 @@ into `CountyRecord` fields defined in `rr_types::calibration` (`outage_model`, `
 | `core/declarations.csv` | 3,232 | 14.1 KB | major-disaster declarations per county (OpenFEMA) |
 | `core/series/*.toml` (7 files) | 532 entries | 13.2 KB | national series (below) |
 
-These add **288 KB** gzipped to the core pack, which now totals **2.67 MB** gzipped file by file on this branch (budget 5 MB).
+These add **288 KB** gzipped to the core pack (0.30 MB with the `p_ge_30d` column added to the
+outage tables); with the exposure columns of §13 the core pack totals **2.86 MB** gzipped file by
+file (budget 5 MB).
 
 **core/outage_pooled.csv** — the regional pooled outage tail (§5.3): `basis` (`blend`,
 `region_only` for counties with no record of their own, `own_only` where no neighbour has one),
@@ -1185,14 +1188,17 @@ population-weighted surge shares (block data would be 3-4 GB); UASI footprints u
 
 Files under `data/opt/<pack>/` belong to the pack `<pack>` in the manifest (`pack_of`); the web app
 loads only `packs.core`, so optional packs cost nothing until a feature asks for them, and the core
-budget counts `core/` only. `rr-data` accepts them (`DataStore::zip_record` merges them into the
-ZIP record when loaded).
+budget counts `core/` only. `rr-data` accepts them (`DataStore::zip_record` merges `surge` and
+`wildfire_places` into the ZIP record when loaded; `outage_events` answers
+`DataStore::county_outage_events` and `DataStore::outage_holdout`).
 
 | Pack | File | Rows | Size (gz) |
 | --- | --- | ---: | ---: |
 | `surge` | `opt/surge/zip_surge.csv` | 26,459 | 80.9 KB |
 | `wildfire_places` | `opt/wildfire_places/places.csv` | 32,038 | 463.5 KB |
 | `wildfire_places` | `opt/wildfire_places/zip_places.csv` | 35,568 | 223.2 KB |
+| `outage_events` | `opt/outage_events/county_events.csv` | 29,878 | 356.0 KB |
+| `outage_events` | `opt/outage_events/holdout.csv` | 130 | 1.6 KB |
 
 An optional pack's credit line (NOAA NHC storm surge maps; USDA Forest Service Wildfire Risk to
 Communities) is listed by `DataStore::attributions()` only once a file of that pack is loaded
@@ -1210,6 +1216,11 @@ pack only.
   `opt/wildfire_places/zip_places.csv`: `zip`, `place`, `zip_land_share` (Census 2020 ZCTA-to-place,
   parts under 1% dropped). ZIP land outside every place has no place value. Checked on every build:
   Paradise, CA mostly directly exposed; New York City about 0.
+- `outage_events` (written by the default job `outage_model` alongside its core files, so it is
+  rebuilt by every refresh): every county outage of a day or more with its restoration curve and
+  cause, and the outage model's held-out test (§2, "Data-pack v2 calibration files"; §5.4). It has
+  no credit line of its own: it is built from EAGLE-I outage records matched to NOAA storm records
+  and the PNNL OE-417 linkage, all credited with the core pack (§7).
 
 ### 13.13 Citation ids for the exposure values
 

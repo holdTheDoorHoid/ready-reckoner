@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "pack_version": "2fb3538d5291",
+  "pack_version": "01a46abb2d5d",
   "generated": "2026-09-26T19:26:12Z",
   "packs": {
     "core": {
@@ -57,9 +57,9 @@
         {
           "path": "core/events.csv",
           "job": "events",
-          "sha256": "842d6c2dae850bdba360575de1c1d407c2739ac68e307deb68d151683a3fc2e3",
-          "bytes": 2710495,
-          "rows": 44057,
+          "sha256": "1366f4179fc657d9c34050663ed3242976c92c44fb3060fb160d1bfb0de1670f",
+          "bytes": 2733905,
+          "rows": 44397,
           "key": [
             "fips",
             "event_type"
@@ -1270,7 +1270,7 @@
         }
       ],
       "rows_in": 1461768,
-      "rows_out": 44057,
+      "rows_out": 44397,
       "outputs": [
         "core/events.csv"
       ],
