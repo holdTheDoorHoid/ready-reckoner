@@ -35,7 +35,7 @@ After `ambiguous_zip` the app asks the user to pick a county and stores it in
 | Function | Input | Output |
 | --- | --- | --- |
 | `engine_info()` | — | `EngineInfo { engine_version, api_version, data_pack_version?, content_version, packs_loaded: [string], attributions: [Attribution] }` |
-| `load_pack(name, bytes)` | pack name, bytes (Uint8Array) | `PackInfo { name, version, rows }`. The web app fetches packs (same origin) and hands the bytes in; the engine never fetches |
+| `load_pack(name, bytes)` | one data file: its path as `data/manifest.json` lists it (`manifest.json`, `core/nri_hazards.csv`, `geo/counties.json`), bytes (Uint8Array) | `PackInfo { name, version, rows }`: the path, the manifest's `pack_version`, the rows read. The web app fetches the files (same origin) and hands the bytes in, manifest first; the engine never fetches. See [Loading](#loading) |
 | `county_search(query)` | free text ("phila", "42101", "Cook, IL") | `[LocationResolved]`, up to 10 |
 | `resolve_location(json)` | `LocationInput` | `LocationResolved`, or `unknown_zip` / `unknown_county` / `ambiguous_zip` with suggestions |
 | `assess(json)` | `PlanInput` | `PlanOutput` |
@@ -275,6 +275,62 @@ Ids are stable snake_case strings. `rr-types` exposes them as enums with `ALL`, 
   The get-home bag is an item in the `get_home` bucket, not a tier.
 - **Return periods**: `one_in_10` "Common disruptions", `one_in_50` "Serious", `one_in_100` "Very
   serious" (default), `one_in_500` "Rare catastrophes".
+
+## Loading
+
+How the web app gets the engine and its data (`crates/rr-wasm`, `web/src/engine/wasm.ts`).
+
+**Build.** `bash crates/rr-wasm/build-web.sh` compiles `rr-wasm` with wasm-pack (`--target web`,
+the release profile at opt-level `s` unless `CARGO_PROFILE_RELEASE_OPT_LEVEL` says otherwise, then
+`wasm-opt -Os`; never `--profile`) into `web/public/pkg/` (`rr_wasm.js`, `rr_wasm_bg.wasm`) and
+copies `data/manifest.json`, `data/core/` and `data/geo/` into `web/public/data/` (both
+git-ignored). It prints the raw and gzipped size of the `.wasm`; the budget is 1.5 MB gzipped,
+content included. The Pages workflow runs it before `npm run build`. The site talks to the
+WebAssembly engine when `web/public/pkg/rr_wasm.js` exists at build time or `VITE_ENGINE=wasm`,
+otherwise to the mock (`VITE_ENGINE=mock` forces it).
+
+**Start.** `getEngine()` imports `pkg/rr_wasm.js` from the site's own origin, instantiates
+`pkg/rr_wasm_bg.wasm`, checks that `engine_info().api_version` equals the app's
+`ENGINE_API_VERSION`, and then loads the data.
+
+**Data, in this order.** `load_pack(name, bytes)` takes one file per call, named by its path in
+`data/manifest.json`.
+
+1. `manifest.json` first. The engine checks every later file against the sha256 it records (a file
+   loaded before the manifest is checked when the manifest arrives).
+2. Every file listed under `packs.core.files`, fetched at once and loaded one by one with
+   `core/counties.csv` last. The engine reassembles the county records after each file, which is
+   only real work once the county list is in, so this order is the fastest; any order gives the
+   same answers.
+3. `geo/counties.json` (county outlines for the map) only when a map is shown; nothing else needs
+   it.
+
+File URLs carry `?v=<pack_version>`, so a cached manifest is always paired with the files it
+describes; the service worker serves `data/` stale-while-revalidate.
+
+**Which data answers.** `engine_info()` tells the app which of three states the engine is in:
+
+| State | `packs_loaded` | `data_pack_version` | `assess`, `resolve_location`, `county_search` |
+| --- | --- | --- | --- |
+| No pack file loaded | `[]` | absent | The seven built-in sample counties, the fixture households' counties; any other place is `unknown_zip` or `unknown_county`. Plans carry `data_pack_version` `fixtures+…`, as the goldens do. The app shows "Sample counties only". |
+| Part-way: the manifest and some core files | the loaded files' paths | the manifest's `pack_version` | `pack_missing`, naming how many core files are in: the engine never plans from part of the core pack |
+| The manifest and every core file | `["core"]`, then `["core", "geo"]` | the manifest's `pack_version` | The national data. Attributions come from the manifest, the National Risk Index statement first. |
+
+Once any pack file is loaded the packs decide, and the sample counties no longer answer.
+
+**Errors.**
+
+- `load_pack` answers `bad_input` (one `schema` problem on `name`) for a file name the engine does
+  not know, and `pack_corrupt` for a file whose sha256 differs from the manifest's, a file the
+  loaded manifest does not list, or one that cannot be decoded. A refused file changes nothing;
+  files loaded before it stay loaded.
+- The loader treats a missing `data/manifest.json` (HTTP 404, or the dev server's HTML page in its
+  place) as a site built without data, and the engine keeps its sample counties. Any other failure
+  (a download that fails, a file the engine refuses, a contract version that does not match) stops
+  loading, and `getEngine()` falls back to the mock engine, with the reason on the About screen.
+- A panic inside the engine is a bug. The call traps, the adapter turns the trap into `internal`,
+  and every later call answers `internal` with the panic message rather than trapping again; the
+  page should be reloaded.
 
 ## Mock engine
 
