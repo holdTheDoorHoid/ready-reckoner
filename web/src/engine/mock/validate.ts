@@ -3,19 +3,29 @@
  * "Validation"): a structural pass (types, enums, unknown fields) reported as `schema` problems,
  * then the semantic checks in a fixed order. Messages are plain language, fit to show beside the
  * field the `field` path names.
+ *
+ * Contract v2: every new input is optional (absent means "not asked", or its default), and the one
+ * new check is `rare_opt_in`, whose entries must be family ids or `all` (`unknown_id`). Nothing in
+ * the family plan is ever a problem beyond its types: it is only tidied (`tidyFamilyPlan`).
  */
 import type { PlanInput, Problem, ProblemCode } from '../types';
 import {
+  ACCESS_NEEDS,
   AGE_BANDS,
   BACKUP_POWER_KINDS,
+  BENEFITS,
   CLIMATE_HORIZONS,
   COMMUTE_MODES,
+  COOKING_FUELS,
   COOLING_KINDS,
   FUELS,
   HEATING_KINDS,
+  HOLDS,
   HOUSING_KINDS,
   INCOME_STABILITIES,
   MOBILITY_LEVELS,
+  RARE_HAZARD_IDS,
+  RAW_WATER_SOURCES,
   RETURN_PERIODS,
   SETTINGS,
   SIMPLE_POWERED_DEVICES,
@@ -24,6 +34,7 @@ import {
   WASTEWATER_KINDS,
   WATER_LEVELS,
   WATER_SOURCES,
+  WATER_SYSTEM_RECORDS,
 } from '../types';
 
 type Schema =
@@ -42,6 +53,33 @@ const u8: Schema = { t: 'number', int: 'u8' };
 const bool: Schema = { t: 'bool' };
 const en = (values: readonly string[]): Schema => ({ t: 'enum', values });
 const obj = (fields: Record<string, Schema>, optional: readonly string[] = []): Schema => ({ t: 'object', fields, optional });
+const list = (of: Schema): Schema => ({ t: 'array', of });
+/** An object whose every field may be left out (the family plan and its parts). */
+const loose = (fields: Record<string, Schema>): Schema => obj(fields, Object.keys(fields));
+
+const CONTACT: Schema = loose({ name: str, phone: str });
+
+/** `FamilyPlan` (contract v2): free text only, every field optional. */
+const FAMILY_PLAN: Schema = loose({
+  meeting_place_near: str,
+  meeting_place_far: str,
+  out_of_area_contact: CONTACT,
+  school_pickup: str,
+  work_plans: str,
+  shelter_spot_home: str,
+  shelter_spot_work: str,
+  where_we_would_go: str,
+  routes: list(str),
+  neighbours_who_check: str,
+  who_takes_animals: str,
+  shutoff_gas: str,
+  shutoff_water: str,
+  shutoff_electric: str,
+  trusted_circle: list(loose({ name: str, phone: str, holds: list(en(HOLDS)) })),
+  lawyer: CONTACT,
+  roadside_assistance: str,
+  numbers_by_heart: list(str),
+});
 
 const PLAN_INPUT: Schema = obj(
   {
@@ -58,7 +96,11 @@ const PLAN_INPUT: Schema = obj(
       cooling: en(COOLING_KINDS),
       backup_power: en(BACKUP_POWER_KINDS),
       alarms: obj({ smoke: bool, co: bool, extinguisher: bool }),
-    }),
+      below_grade_bedroom: bool,
+      cooking: en(COOKING_FUELS),
+      raw_water_source: en(RAW_WATER_SOURCES),
+      water_system_record: en(WATER_SYSTEM_RECORDS),
+    }, ['below_grade_bedroom', 'cooking', 'raw_water_source', 'water_system_record']),
     people: {
       t: 'array',
       of: obj(
@@ -75,8 +117,9 @@ const PLAN_INPUT: Schema = obj(
           }),
           earner: bool,
           commute: obj({ distance_km: num, mode: en(COMMUTE_MODES), remote_possible: bool }),
+          access_needs: list(en(ACCESS_NEEDS)),
         },
-        ['commute'],
+        ['commute', 'access_needs'],
       ),
     },
     pets: obj({ dogs: u8, cats: u8, small: u8, large_animals: u8 }),
@@ -88,11 +131,15 @@ const PLAN_INPUT: Schema = obj(
         emergency_fund_months: num,
         monthly_expenses_usd: num,
         income: obj({ earners: u8, stability: en(INCOME_STABILITIES) }),
-        insurance: obj({ home_or_renters: bool, flood: bool, earthquake: bool }),
+        insurance: obj(
+          { home_or_renters: bool, flood: bool, earthquake: bool, sewer_backup: bool, life_or_disability: bool },
+          ['sewer_backup', 'life_or_disability'],
+        ),
+        benefits: list(en(BENEFITS)),
       },
-      ['monthly_expenses_usd'],
+      ['monthly_expenses_usd', 'benefits'],
     ),
-    existing: { t: 'array', of: obj({ item_id: str, qty: num, paid_usd: num }, ['paid_usd']) },
+    existing: { t: 'array', of: obj({ item_id: str, qty: num, paid_usd: num, tested_on: { t: 'date' } }, ['paid_usd', 'tested_on']) },
     assume_basics: bool,
     dials: obj(
       {
@@ -102,13 +149,17 @@ const PLAN_INPUT: Schema = obj(
         water_level: en(WATER_LEVELS),
         scenario_overrides: { t: 'array', of: obj({ id: str, on: bool }) },
         rare_catastrophic_opt_in: bool,
+        rare_opt_in: list(str),
+        minimum_kit: bool,
+        long_horizon: bool,
       },
-      ['water_level', 'scenario_overrides', 'rare_catastrophic_opt_in'],
+      ['water_level', 'scenario_overrides', 'rare_catastrophic_opt_in', 'rare_opt_in', 'minimum_kit', 'long_horizon'],
     ),
     stage: en(STAGES),
     confidence_1to5: u8,
+    family_plan: FAMILY_PLAN,
   },
-  ['stage', 'confidence_1to5', 'assume_basics'],
+  ['stage', 'confidence_1to5', 'assume_basics', 'family_plan'],
 );
 
 function problem(code: ProblemCode, field: string, message: string): Problem {
@@ -274,6 +325,14 @@ export function validatePlanInput(input: unknown): Problem[] {
       out.push(problem('duplicate_id', `dials.scenario_overrides[${i}].id`, 'This scenario is listed twice.'));
     }
     seen.add(toggle.id);
+  });
+  (p.dials.rare_opt_in ?? []).forEach((family, i) => {
+    const field = `dials.rare_opt_in[${i}]`;
+    if (!SNAKE.test(family)) {
+      out.push(problem('id_format', field, `"${family}" is not a family code. Family codes use lowercase letters, numbers and underscores, like nuclear_attack.`));
+    } else if (family !== 'all' && !(RARE_HAZARD_IDS as readonly string[]).includes(family)) {
+      out.push(problem('unknown_id', field, `"${family}" is not a rare-event family. Use ${RARE_HAZARD_IDS.join(', ')} or all.`));
+    }
   });
   return out;
 }

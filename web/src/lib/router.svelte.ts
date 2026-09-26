@@ -1,7 +1,9 @@
 /**
  * A small hash router: `#/where`, `#/who`, ... `#/learn/myths`. Hash routes work on GitHub Pages
  * under any base path and offline from the service worker, because there is only ever one page.
- * Hashes that do not start with `#/` are in-page anchors and leave the route alone.
+ * Hashes that do not start with `#/` are in-page anchors and leave the route alone. Three routes
+ * take a second part: a Learn article (`#/learn/myths`), a section of the family plan
+ * (`#/family/circle`) and a section of the packet (`#/packet/wallet-cards`).
  */
 import { getContext, setContext } from 'svelte';
 
@@ -20,6 +22,7 @@ export const ROUTE_IDS = [
   'maintain',
   'learn',
   'about',
+  'family',
   'missing',
 ] as const;
 export type RouteId = (typeof ROUTE_IDS)[number];
@@ -50,8 +53,12 @@ export const ROUTES: Record<RouteId, RouteInfo> = {
   maintain: { path: 'maintain', title: 'Keep it up' },
   learn: { path: 'learn', title: 'Learn' },
   about: { path: 'about', title: 'About and method' },
+  family: { path: 'family', title: 'Your family plan' },
   missing: { path: 'missing', title: 'Page not found' },
 };
+
+/** Routes whose address may carry a second part (an article, or a section to open at). */
+const WITH_PARAM: ReadonlySet<RouteId> = new Set<RouteId>(['learn', 'family', 'packet']);
 
 const BY_PATH = new Map(Object.entries(ROUTES).map(([id, info]) => [info.path, id as RouteId]));
 
@@ -70,7 +77,7 @@ export function parseHash(hash: string): Route | null {
   const id = BY_PATH.get(head);
   if (!id || id === 'missing') return { id: 'missing' };
   const param = rest.join('/');
-  if (param && id !== 'learn') return { id: 'missing' };
+  if (param && !WITH_PARAM.has(id)) return { id: 'missing' };
   return param ? { id, param } : { id };
 }
 
@@ -148,5 +155,6 @@ export function screenFor(field: string): RouteId {
   if (field.startsWith('people') || field.startsWith('pets')) return 'who';
   if (field.startsWith('finances')) return 'money';
   if (field.startsWith('dials')) return 'risks';
+  if (field.startsWith('family_plan')) return 'family';
   return 'start';
 }

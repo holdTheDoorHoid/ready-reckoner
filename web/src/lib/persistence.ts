@@ -5,6 +5,13 @@
  * "Export" saves as `ready-reckoner-plan.json` and "Import" reads back. Display preferences
  * (theme, expert view) live separately in `rr.prefs.v1` and are not exported.
  *
+ * Contract v2 answers live inside `input` like every other answer (the household's access needs,
+ * the new home and money questions, the dials, the family plan), so they are saved, exported and
+ * imported with no change to the file's version. The one v2 answer outside `input` is when an item
+ * that needs testing was last tried (`Owned.tested_on`): it is kept on the item's entry in
+ * `input.existing` when the household had it before the plan, otherwise on its latest check-off
+ * (`Purchase.tested_on`), and `engineInput` hands the engine the latest date for each item.
+ *
  * Nothing here ever leaves the browser.
  */
 import type { IsoDate, Owned, PlanInput, TierId } from '../engine/types';
@@ -27,6 +34,8 @@ export interface Purchase {
   qty: number;
   paid_usd?: number;
   date: IsoDate;
+  /** When it was last tried and worked (items that need testing; contract v2 `Owned.tested_on`). */
+  tested_on?: IsoDate;
 }
 
 export interface SavedPlan {
@@ -73,12 +82,13 @@ export function newPlan(input: PlanInput): SavedPlan {
 /**
  * One `Owned` entry per item: the starting inventory plus everything recorded on the plan. A paid
  * amount is sent only when every unit of the item has one, so a partial record never turns into a
- * misleading unit price.
+ * misleading unit price. The latest tested-on date of the item, wherever it was recorded, goes
+ * with it.
  */
 export function mergeOwned(baseline: readonly Owned[], purchases: readonly Purchase[]): Owned[] {
   const order: string[] = [];
-  const totals = new Map<string, { qty: number; paid: number; allPaid: boolean }>();
-  const add = (id: string, qty: number, paid: number | undefined) => {
+  const totals = new Map<string, { qty: number; paid: number; allPaid: boolean; tested?: IsoDate }>();
+  const add = (id: string, qty: number, paid: number | undefined, tested: IsoDate | undefined) => {
     let t = totals.get(id);
     if (!t) {
       t = { qty: 0, paid: 0, allPaid: true };
@@ -88,15 +98,57 @@ export function mergeOwned(baseline: readonly Owned[], purchases: readonly Purch
     t.qty += qty;
     if (paid === undefined) t.allPaid = false;
     else t.paid += paid;
+    if (tested !== undefined && (t.tested === undefined || tested > t.tested)) t.tested = tested;
   };
-  for (const o of baseline) add(o.item_id, o.qty, o.paid_usd);
-  for (const p of purchases) add(p.item_id, p.qty, p.paid_usd);
+  for (const o of baseline) add(o.item_id, o.qty, o.paid_usd, o.tested_on);
+  for (const p of purchases) add(p.item_id, p.qty, p.paid_usd, p.tested_on);
   return order.map((id) => {
     const t = totals.get(id)!;
     const out: Owned = { item_id: id, qty: Math.round(t.qty * 1000) / 1000 };
     if (t.allPaid) out.paid_usd = Math.round(t.paid * 100) / 100;
+    if (t.tested !== undefined) out.tested_on = t.tested;
     return out;
   });
+}
+
+// ---------------------------------------------------------------------------------------------
+// When an item that needs testing was last tried (contract v2 `Owned.tested_on`)
+// ---------------------------------------------------------------------------------------------
+
+/** How much of an item the household has: before the plan, plus what it checked off. */
+export function heldQuantity(plan: SavedPlan, itemId: string): number {
+  const before = plan.input.existing.filter((o) => o.item_id === itemId).reduce((s, o) => s + o.qty, 0);
+  const bought = plan.purchases.filter((p) => p.item_id === itemId).reduce((s, p) => s + p.qty, 0);
+  return before + bought;
+}
+
+/** The latest day the item was tried, wherever it was recorded. */
+export function testedOn(plan: SavedPlan, itemId: string): IsoDate | undefined {
+  let latest: IsoDate | undefined;
+  for (const d of [
+    ...plan.input.existing.filter((o) => o.item_id === itemId).map((o) => o.tested_on),
+    ...plan.purchases.filter((p) => p.item_id === itemId).map((p) => p.tested_on),
+  ]) {
+    if (d !== undefined && (latest === undefined || d > latest)) latest = d;
+  }
+  return latest;
+}
+
+/**
+ * Record (or clear) the day the item was last tried: on its entry in what the household had before
+ * the plan, or else on its latest check-off. Every other copy of the date is cleared, so the date
+ * shown is the one kept. False when the household has none of the item.
+ */
+export function setTestedOn(plan: SavedPlan, itemId: string, date: IsoDate | undefined): boolean {
+  const owned = plan.input.existing.find((o) => o.item_id === itemId && o.qty > 0);
+  const purchases = plan.purchases.filter((p) => p.item_id === itemId);
+  const latest = purchases.reduce<Purchase | undefined>((best, p) => (!best || p.date >= best.date ? p : best), undefined);
+  const home = owned ?? latest;
+  if (!home) return false;
+  for (const o of plan.input.existing) if (o.item_id === itemId) delete o.tested_on;
+  for (const p of purchases) delete p.tested_on;
+  if (date !== undefined) home.tested_on = date;
+  return true;
 }
 
 /** The `PlanInput` the engine sees: inventory merged with check-offs, earners kept consistent, confidence attached. */
@@ -152,6 +204,7 @@ export function checkSavedPlan(x: unknown): Check {
         p.qty >= 0 &&
         isDate(p.date) &&
         (p.paid_usd === undefined || (isNum(p.paid_usd) && p.paid_usd >= 0)) &&
+        (p.tested_on === undefined || isDate(p.tested_on)) &&
         (p.tier === undefined || (TIER_IDS as readonly unknown[]).includes(p.tier)),
     )
   ) {

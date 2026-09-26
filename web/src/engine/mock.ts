@@ -32,6 +32,7 @@ import { BUCKETS, HAZARDS, TIERS } from './mock/names';
 import type { CountyRow, StateRow } from './mock/places';
 import { COUNTIES, countyByFips, stateByFips, stateForZip, STATES, ZIP_MAJORITY, ZIPS } from './mock/places';
 import { validatePlanInput } from './mock/validate';
+import { tidyFamilyPlan } from '../lib/family';
 
 /** The JSON round trip the WebAssembly boundary imposes: no undefined, no shared references. */
 function wire<T>(value: T): T {
@@ -195,6 +196,12 @@ const GUIDANCE: GuidanceMeta[] = [
   { id: 'topic_myths', title: 'Disaster myths', applies_to: ['topic:myths'], citations: ['mock_social_capital'] },
 ];
 
+/**
+ * The defaults as the engine sends them (`PlanInput::defaults()`): the contract v2 fields that
+ * default (`below_grade_bedroom`, `access_needs`, `benefits` and the three new dials) are written
+ * out; the ones that mean "not asked" (`cooking`, `raw_water_source`, `water_system_record`, the
+ * insurance extras, `family_plan`) are left out.
+ */
 export function mockDefaults(): PlanInput {
   return {
     planning_date: '2026-10-01',
@@ -210,6 +217,7 @@ export function mockDefaults(): PlanInput {
       cooling: 'central',
       backup_power: 'none',
       alarms: { smoke: false, co: false, extinguisher: false },
+      below_grade_bedroom: false,
     },
     people: [
       {
@@ -217,6 +225,7 @@ export function mockDefaults(): PlanInput {
         pregnant_or_nursing: false,
         medical: { daily_rx: false, refrigerated_rx: false, powered_device: 'none', mobility: 'none', dietary: [], epinephrine: false },
         earner: true,
+        access_needs: [],
       },
     ],
     pets: { dogs: 0, cats: 0, small: 0, large_animals: 0 },
@@ -227,11 +236,35 @@ export function mockDefaults(): PlanInput {
       emergency_fund_months: 0,
       income: { earners: 1, stability: 'stable' },
       insurance: { home_or_renters: false, flood: false, earthquake: false },
+      benefits: [],
     },
     existing: [],
     assume_basics: true,
-    dials: { return_period: 'one_in_100', climate: 'today', horizon_years: 10, water_level: 'basic', scenario_overrides: [], rare_catastrophic_opt_in: false },
+    dials: {
+      return_period: 'one_in_100',
+      climate: 'today',
+      horizon_years: 10,
+      water_level: 'basic',
+      scenario_overrides: [],
+      rare_catastrophic_opt_in: false,
+      rare_opt_in: [],
+      minimum_kit: false,
+      long_horizon: false,
+    },
   };
+}
+
+/**
+ * What `PlanInput::from_json` does before validating: the family plan is trimmed and capped, and
+ * an empty one disappears (rr-types `PlanInput::tidy`). The caller's object is not changed.
+ */
+export function tidyInput(input: PlanInput): PlanInput {
+  if (input.family_plan === undefined) return input;
+  const out: PlanInput = { ...input };
+  const plan = tidyFamilyPlan(input.family_plan);
+  if (plan) out.family_plan = plan;
+  else delete out.family_plan;
+  return out;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -243,7 +276,7 @@ function run(input: PlanInput): Envelope<ReturnType<typeof assessModel>> {
   if (problems.length) return err('bad_input', MESSAGES.bad_input, { problems });
   const place = resolve(input.location);
   if (!place.ok) return place;
-  return { ok: true, value: assessModel(input, place.value.location, place.value.profile) };
+  return { ok: true, value: assessModel(tidyInput(input), place.value.location, place.value.profile) };
 }
 
 function guard<T>(f: () => Envelope<T>): Promise<Envelope<T>> {

@@ -4,16 +4,21 @@
  * cover the household's own answers.
  */
 import type {
+  AccessNeed,
   AgeBand,
   BackupPower,
+  Benefit,
   ClimateHorizon,
   CommuteMode,
+  CookingFuel,
   Cooling,
   Fuel,
   Heating,
+  Holds,
   HousingKind,
   IncomeStability,
   Mobility,
+  RawWaterSource,
   ReturnPeriod,
   Setting,
   SimplePoweredDevice,
@@ -22,6 +27,7 @@ import type {
   Wastewater,
   WaterLevel,
   WaterSource,
+  WaterSystemRecord,
 } from '../engine/types';
 
 export interface Choice {
@@ -125,6 +131,70 @@ export const STABILITY: Record<IncomeStability, Choice> = {
   variable: { label: 'Changes from month to month' },
   seasonal: { label: 'Seasonal work' },
   gig: { label: 'Gig or freelance work' },
+};
+
+// Contract v2 answers (web-interview) -------------------------------------------------------
+
+/**
+ * Needs that change how a person gets warnings, help or care in an emergency, grouped as
+ * planners group them (CMIST: communication, maintaining health, independence, support and
+ * safety, transportation). `short` is the phrase used inside a sentence ("person 3 is deaf or
+ * hard of hearing").
+ */
+export const ACCESS_NEED: Record<AccessNeed, Choice & { short: string }> = {
+  hearing: { label: 'Deaf or hard of hearing', help: 'May not hear a smoke alarm, a siren or a phone alert.', short: 'is deaf or hard of hearing' },
+  vision: { label: 'Blind or low vision', help: 'May not see a text alert or read a printed notice.', short: 'is blind or has low vision' },
+  limited_english: { label: 'Limited English', help: 'Alerts and officials may not use their language.', short: 'has limited English' },
+  cognitive: { label: 'Memory, thinking or understanding', help: 'For example dementia, or a developmental or mental health condition.', short: 'has trouble with memory, thinking or understanding' },
+  supervision: { label: 'Needs someone with them', help: 'Can’t be left alone, or needs help to leave.', short: 'needs someone with them' },
+  service_animal: { label: 'Has a service animal', help: 'A trained helper animal, not a pet.', short: 'has a service animal' },
+  dialysis: { label: 'Needs dialysis', help: 'Treatment can’t wait long if the usual center closes.', short: 'needs dialysis' },
+  home_health: { label: 'Gets home health care', help: 'A nurse or aide who visits, or equipment a service looks after.', short: 'gets home health care' },
+};
+
+/** The CMIST headings the access needs are shown under, in order. */
+export const ACCESS_NEED_GROUPS: { title: string; needs: AccessNeed[] }[] = [
+  { title: 'Getting warnings', needs: ['hearing', 'vision', 'limited_english'] },
+  { title: 'Support and safety', needs: ['cognitive', 'supervision', 'service_animal'] },
+  { title: 'Care that can’t wait', needs: ['dialysis', 'home_health'] },
+];
+
+export const COOKING: Record<CookingFuel, Choice> = {
+  gas: { label: 'Gas or propane stove', help: 'Can often still boil water in a power cut, while the gas flows.' },
+  electric: { label: 'Electric stove' },
+  induction: { label: 'Induction cooktop' },
+  none: { label: 'No stove', help: 'A microwave or hot plate only, or nothing.' },
+};
+
+export const RAW_WATER: Record<RawWaterSource, Choice> = {
+  none: { label: 'None nearby' },
+  well: { label: 'A well', help: 'One you could draw from without power, with a hand pump or bucket.' },
+  surface_nearby: { label: 'A river, lake, pond or creek', help: 'Within a short walk or drive.' },
+  rain_barrel: { label: 'A rain barrel or cistern' },
+  neighbour_well: { label: 'A neighbour’s well', help: 'Someone who has agreed to share it.' },
+};
+
+export const WATER_RECORD: Record<WaterSystemRecord, Choice> = {
+  fine: { label: 'No problems we know of' },
+  occasional_notices: { label: 'Now and then', help: 'A boil-water notice or a main break every year or two.' },
+  frequent_problems: { label: 'Often', help: 'Notices, outages or bad-tasting water several times a year.' },
+  unknown: { label: 'Not sure' },
+};
+
+export const BENEFIT: Record<Benefit, Choice> = {
+  federal_pay: { label: 'Federal pay', help: 'A federal job, or a contract paid by the federal government.' },
+  snap_wic: { label: 'SNAP or WIC', help: 'Food benefits.' },
+  ssi_ssdi: { label: 'SSI or SSDI', help: 'Supplemental Security Income or Social Security Disability.' },
+  va: { label: 'VA benefits', help: 'Veterans’ pay, pension or disability.' },
+  unemployment: { label: 'Unemployment benefits' },
+};
+
+/** What someone in the trusted circle holds for the household. */
+export const HOLD: Record<Holds, Choice & { short: string }> = {
+  spare_key: { label: 'A spare key', short: 'a spare key' },
+  documents: { label: 'Copies of our papers', short: 'copies of our papers' },
+  medical_poa: { label: 'Medical power of attorney', help: 'May talk with doctors for someone who can’t.', short: 'medical power of attorney' },
+  backup_codes: { label: 'Backup codes for our accounts', help: 'To sign in without the phone.', short: 'backup codes' },
 };
 
 export const STAGE: Record<Stage, Choice> = {

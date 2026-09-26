@@ -189,6 +189,14 @@ export function packetSections(markdown: string): PacketSection[] {
   return out;
 }
 
+/**
+ * The section that holds the wallet cards: the one whose heading names them ("Wallet cards"), or
+ * else the family plan they are printed with; undefined when the packet has neither.
+ */
+export function cardsSection(sections: readonly PacketSection[]): string | undefined {
+  return sections.find((s) => s.slug.includes('wallet'))?.slug ?? sections.find((s) => s.slug.includes('family-plan'))?.slug;
+}
+
 /** A section's heading and opening paragraphs, and the rest (from its first subheading). */
 export function splitIntro(markdown: string): { intro: string; rest: string } {
   const sub = markdown.slice(1).search(/^#{2,4} /m);

@@ -15,6 +15,7 @@
   import { provideApp } from './lib/app.svelte';
   import { formatHash, provideRouter, ROUTES, type RouteId, type Router } from './lib/router.svelte';
   import About from './screens/About.svelte';
+  import FamilyPlan from './screens/FamilyPlan.svelte';
   import Have from './screens/Have.svelte';
   import Learn from './screens/Learn.svelte';
   import Maintain from './screens/Maintain.svelte';
@@ -49,6 +50,7 @@
     maintain: Maintain,
     learn: Learn,
     about: About,
+    family: FamilyPlan,
     missing: NotFound,
   };
 
