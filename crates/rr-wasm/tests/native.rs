@@ -14,6 +14,9 @@ use rr_types::{
 use rr_wasm::api;
 use serde::de::DeserializeOwned;
 
+mod common;
+use common::{minify, value_text};
+
 fn repo() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
@@ -79,41 +82,6 @@ fn before_any_pack_the_sample_counties_answer_and_engine_info_says_so() {
     assert!(!api::engine_info().contains("data_pack_version"));
 }
 
-/// JSON text without the whitespace between tokens (strings untouched), so the pretty golden
-/// files compare with the compact envelope as text. Comparing text, not parsed values, matters:
-/// serde_json's default float parser can land one unit in the last place off, so a PlanOutput
-/// read back into Rust and written again can differ in the 17th digit although the engine's own
-/// output does not.
-fn minify(json: &str) -> String {
-    let mut out = String::with_capacity(json.len());
-    let (mut in_string, mut escaped) = (false, false);
-    for c in json.chars() {
-        if in_string {
-            out.push(c);
-            match (escaped, c) {
-                (true, _) => escaped = false,
-                (false, '\\') => escaped = true,
-                (false, '"') => in_string = false,
-                _ => {}
-            }
-        } else if c == '"' {
-            in_string = true;
-            out.push(c);
-        } else if !c.is_whitespace() {
-            out.push(c);
-        }
-    }
-    out
-}
-
-/// The `value` of an ok envelope, as the exact text the engine wrote.
-fn value_text(envelope: &str) -> &str {
-    envelope
-        .strip_prefix(r#"{"ok":true,"value":"#)
-        .and_then(|rest| rest.strip_suffix('}'))
-        .unwrap_or_else(|| panic!("not an ok envelope: {envelope:.300}"))
-}
-
 #[test]
 fn every_fixture_matches_its_golden_byte_for_byte() {
     for (name, _) in rr_types::fixtures::RAW {
@@ -132,14 +100,6 @@ fn every_fixture_matches_its_golden_byte_for_byte() {
         let output: PlanOutput = value(&envelope);
         assert!(output.data_pack_version.starts_with("fixtures+"));
     }
-}
-
-#[test]
-fn minify_keeps_strings_whole() {
-    assert_eq!(
-        minify("{\n  \"a b\": [1, 2],\n  \"q\": \"say \\\"hi\\\" \"\n}\n"),
-        r#"{"a b":[1,2],"q":"say \"hi\" "}"#
-    );
 }
 
 #[test]
