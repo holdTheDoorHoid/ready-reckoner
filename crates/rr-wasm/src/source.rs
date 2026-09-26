@@ -15,6 +15,12 @@
 //! when the manifest and every file of the `core` pack are in: a half-loaded core pack would give
 //! plausible but wrong numbers (county records without their hazard rows), so until then
 //! `assess`, `resolve_location` and `county_search` answer `pack_missing`.
+//!
+//! One exception keeps the first download small: the three ZIP tables ([`ZIP_FILES`]) are read
+//! only by ZIP-code lookups, so the web app loads them when a ZIP code is typed. With every other
+//! core file in, a county plans (and `county_search` answers) as it will with the whole pack; any
+//! location that carries a ZIP code answers `pack_missing` until the ZIP tables are in, because
+//! a ZIP code decides the county and the facility distances.
 
 use std::collections::BTreeSet;
 
@@ -31,15 +37,25 @@ pub const CORE_PACK: &str = "core";
 /// The manifest's own path; it is loaded first.
 pub const MANIFEST_PATH: &str = "manifest.json";
 
+/// The core files only ZIP-code lookups read: which counties a ZIP code covers, the ZIP centres,
+/// and facility distances from them. The web app loads them when a ZIP code is typed (the same
+/// list is `ZIP_FILES` in `web/src/engine/data-files.ts`).
+pub const ZIP_FILES: &[&str] = &[
+    "core/zip_county.csv",
+    "core/zip_centroids.csv",
+    "core/zip_facilities.csv",
+];
+
 /// Which data is answering.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
     /// No pack file has been loaded: the built-in sample counties answer.
     Fixtures,
-    /// Pack files are loading or loaded; `complete` once the manifest and the whole core pack are
-    /// in.
+    /// Pack files are loading or loaded.
     Packs {
-        /// The manifest and every core file are loaded.
+        /// The manifest and every core file except the ZIP tables are loaded: counties plan.
+        counties: bool,
+        /// The ZIP tables are loaded as well: the whole core pack is in.
         complete: bool,
     },
 }
@@ -71,8 +87,10 @@ impl WasmSource {
         if self.store.loaded().is_empty() {
             Mode::Fixtures
         } else {
+            let counties = self.core_loaded(false);
             Mode::Packs {
-                complete: self.core_complete(),
+                counties,
+                complete: counties && self.core_loaded(true),
             }
         }
     }
@@ -106,14 +124,20 @@ impl WasmSource {
         })
     }
 
-    /// The manifest and every file of the core pack are loaded.
-    fn core_complete(&self) -> bool {
+    /// The manifest is loaded and so is every core file: the ZIP tables among them when
+    /// `with_zip`, the others otherwise.
+    fn core_loaded(&self, with_zip: bool) -> bool {
         let Some(manifest) = self.store.manifest() else {
             return false;
         };
         let loaded = self.store.loaded();
         manifest.packs.get(CORE_PACK).is_some_and(|core| {
-            !core.files.is_empty() && core.files.iter().all(|f| loaded.contains_key(&f.path))
+            !core.files.is_empty()
+                && core
+                    .files
+                    .iter()
+                    .filter(|f| ZIP_FILES.contains(&f.path.as_str()) == with_zip)
+                    .all(|f| loaded.contains_key(&f.path))
         })
     }
 
@@ -126,14 +150,17 @@ impl WasmSource {
         }
     }
 
-    /// Why the packs cannot answer yet, when they cannot.
+    /// Why the packs cannot answer a county lookup yet, when they cannot.
     pub fn missing(&self) -> Option<EngineError> {
         match self.mode() {
-            Mode::Packs { complete: false } => Some(self.pack_missing()),
+            Mode::Packs {
+                counties: false, ..
+            } => Some(self.pack_missing()),
             _ => None,
         }
     }
 
+    /// The county data (every core file but the ZIP tables) is not all in.
     fn pack_missing(&self) -> EngineError {
         let loaded = self.store.loaded();
         let message = match self.store.manifest().and_then(|m| m.packs.get(CORE_PACK)) {
@@ -141,20 +168,39 @@ impl WasmSource {
                      the page."
                 .to_owned(),
             Some(core) => {
-                let have = core
-                    .files
-                    .iter()
-                    .filter(|f| loaded.contains_key(&f.path))
-                    .count();
+                let needed = || {
+                    core.files
+                        .iter()
+                        .filter(|f| !ZIP_FILES.contains(&f.path.as_str()))
+                };
+                let have = needed().filter(|f| loaded.contains_key(&f.path)).count();
                 format!(
                     "The county data has not finished loading ({have} of {} files). Wait a \
                      moment and try again, or reload the page.",
-                    core.files.len()
+                    needed().count()
                 )
             }
         };
         EngineError::new(ErrorCode::PackMissing, message)
     }
+
+    /// The ZIP tables are not all in.
+    fn zips_missing() -> EngineError {
+        EngineError::new(
+            ErrorCode::PackMissing,
+            "The list of ZIP codes has not loaded yet. Wait a moment and try again, or search \
+             for your county by name.",
+        )
+    }
+}
+
+/// The ZIP code a location carries, if any (blank counts as none).
+fn zip_of(input: &LocationInput) -> Option<&str> {
+    input
+        .zip
+        .as_deref()
+        .map(str::trim)
+        .filter(|z| !z.is_empty())
 }
 
 /// A `bad_input` error about the pack file name.
@@ -166,24 +212,30 @@ impl CountySource for WasmSource {
     fn county(&self, fips: &str) -> Option<&CountyRecord> {
         match self.mode() {
             Mode::Fixtures => self.fixtures.county(fips),
-            Mode::Packs { complete: true } => self.store.county(fips.trim()),
-            Mode::Packs { complete: false } => None,
+            Mode::Packs { counties: true, .. } => self.store.county(fips.trim()),
+            Mode::Packs {
+                counties: false, ..
+            } => None,
         }
     }
 
     fn resolve_zip(&self, zip: &str) -> Vec<(String, f32)> {
         match self.mode() {
             Mode::Fixtures => self.fixtures.resolve_zip(zip),
-            Mode::Packs { complete: true } => self.store.resolve_zip(zip),
-            Mode::Packs { complete: false } => Vec::new(),
+            Mode::Packs { complete: true, .. } => self.store.resolve_zip(zip),
+            Mode::Packs {
+                complete: false, ..
+            } => Vec::new(),
         }
     }
 
     fn search(&self, query: &str) -> Vec<LocationResolved> {
         match self.mode() {
             Mode::Fixtures => self.fixtures.search(query),
-            Mode::Packs { complete: true } => self.store.search_locations(query),
-            Mode::Packs { complete: false } => Vec::new(),
+            Mode::Packs { counties: true, .. } => self.store.search_locations(query),
+            Mode::Packs {
+                counties: false, ..
+            } => Vec::new(),
         }
     }
 
@@ -206,11 +258,17 @@ impl CountySource for WasmSource {
         all
     }
 
+    /// With a ZIP code, only once the ZIP tables are in: the ZIP code's facility distances
+    /// replace the county's.
     fn location(&self, county_fips: &str, zip: Option<&str>) -> Option<LocationResolved> {
+        let has_zip = zip.is_some_and(|z| !z.trim().is_empty());
         match self.mode() {
             Mode::Fixtures => self.fixtures.location(county_fips, zip),
-            Mode::Packs { complete: true } => self.store.location(county_fips.trim(), zip),
-            Mode::Packs { complete: false } => None,
+            Mode::Packs { complete: true, .. } => self.store.location(county_fips.trim(), zip),
+            Mode::Packs { counties: true, .. } if !has_zip => {
+                self.store.location(county_fips.trim(), None)
+            }
+            Mode::Packs { .. } => None,
         }
     }
 
@@ -253,17 +311,24 @@ impl CountySource for WasmSource {
     fn has_counties(&self) -> bool {
         match self.mode() {
             Mode::Fixtures => self.fixtures.has_counties(),
-            Mode::Packs { complete } => complete,
+            Mode::Packs { counties, .. } => counties,
         }
     }
 
     fn resolve(&self, input: &LocationInput) -> Result<LocationResolved, EngineError> {
         match self.mode() {
             Mode::Fixtures => self.fixtures.resolve(input),
+            Mode::Packs {
+                counties: false, ..
+            } => Err(self.pack_missing()),
+            // A ZIP code decides the county (or, with a county chosen, the facility distances), so
+            // it waits for the ZIP tables rather than silently planning without them.
+            Mode::Packs {
+                complete: false, ..
+            } if zip_of(input).is_some() => Err(Self::zips_missing()),
             // rr-data's own rules: the same ones as rr-plan's, plus nearby counties as suggestions
             // for an unknown ZIP code.
-            Mode::Packs { complete: true } => self.store.resolve(input),
-            Mode::Packs { complete: false } => Err(self.pack_missing()),
+            Mode::Packs { .. } => self.store.resolve(input),
         }
     }
 }

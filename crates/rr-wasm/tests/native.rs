@@ -13,6 +13,7 @@ use rr_types::{
     PackInfo, PlanInput, PlanOutput, ProblemCode,
 };
 use rr_wasm::api;
+use rr_wasm::source::ZIP_FILES;
 use serde::de::DeserializeOwned;
 
 mod common;
@@ -492,6 +493,77 @@ fn ambiguous_zip() -> String {
         .find(|(_, top)| *top > 0.3 && *top < 0.6)
         .map(|(zip, _)| zip)
         .expect("an ambiguous ZIP code")
+}
+
+/// The web app loads the ZIP tables only when a ZIP code is typed. Until then a county plans
+/// exactly as it will with the whole core pack, and anything with a ZIP code waits: it answers
+/// `pack_missing` rather than planning without the ZIP code's county and facility distances.
+#[test]
+fn without_the_zip_tables_a_county_plans_and_a_zip_code_waits_for_them() {
+    let manifest_bytes = read("data/manifest.json");
+    let manifest: serde_json::Value = serde_json::from_slice(&manifest_bytes).unwrap();
+    let _: PackInfo = value(&api::load_pack("manifest.json", &manifest_bytes));
+    let mut files = core_files(&manifest);
+    files.retain(|f| f != "core/counties.csv" && !ZIP_FILES.contains(&f.as_str()));
+    files.push("core/counties.csv".to_owned());
+    assert_eq!(
+        files.len() + ZIP_FILES.len(),
+        core_files(&manifest).len(),
+        "every ZIP table is in the manifest's core pack"
+    );
+    for f in &files {
+        let _: PackInfo = value(&api::load_pack(f, &read(&format!("data/{f}"))));
+    }
+
+    // A county plans from the national data, and county search answers.
+    let by_county = with_location(
+        "philadelphia-renters-4",
+        serde_json::json!({ "country": "US", "county_fips": "42101", "setting": "urban" }),
+    );
+    let before_zips = api::assess(&by_county);
+    let output: PlanOutput = value(&before_zips);
+    assert_eq!(output.location.county_fips, "42101");
+    assert_eq!(output.location.zip, None);
+    let found: Vec<LocationResolved> = value(&api::county_search("phila"));
+    assert_eq!(found[0].county_fips, "42101");
+
+    // Anything with a ZIP code waits for the ZIP tables: alone, with a county, and in a plan.
+    for location in [
+        r#"{"country":"US","zip":"19147","setting":"urban"}"#,
+        r#"{"country":"US","zip":"19147","county_fips":"42101","setting":"urban"}"#,
+    ] {
+        let e = error(&api::resolve_location(location));
+        assert_eq!(e.code, ErrorCode::PackMissing, "{location}");
+        assert!(e.message.contains("ZIP codes"), "{}", e.message);
+    }
+    let e = error(&api::assess(&fixture_json("philadelphia-renters-4")));
+    assert_eq!(e.code, ErrorCode::PackMissing);
+    // A problem with the answers themselves is still reported first.
+    let e = error(&api::resolve_location(
+        r#"{"country":"US","zip":"1914","setting":"urban"}"#,
+    ));
+    assert_eq!(e.code, ErrorCode::BadInput);
+    // Not the whole core pack yet: engine_info lists files, not "core".
+    let info: EngineInfo = value(&api::engine_info());
+    assert!(!info.packs_loaded.contains(&"core".to_owned()));
+    assert_eq!(
+        info.data_pack_version.as_deref(),
+        manifest["pack_version"].as_str()
+    );
+
+    // With the ZIP tables in: the whole core pack, the ZIP code plans as its golden file, and the
+    // county's plan is byte for byte what it was.
+    for f in ZIP_FILES {
+        let _: PackInfo = value(&api::load_pack(f, &read(&format!("data/{f}"))));
+    }
+    let info: EngineInfo = value(&api::engine_info());
+    assert_eq!(info.packs_loaded, ["core"]);
+    assert_eq!(api::assess(&by_county), before_zips);
+    let golden = String::from_utf8(read("fixtures/golden/philadelphia-renters-4.json")).unwrap();
+    assert_eq!(
+        value_text(&api::assess(&fixture_json("philadelphia-renters-4"))),
+        minify(&golden)
+    );
 }
 
 #[test]
