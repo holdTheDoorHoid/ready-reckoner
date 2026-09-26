@@ -38,9 +38,9 @@ pub const GAS_STOVE_ITEM_IDS: [&str; 1] = ["gas_stove"];
 /// Everything `rr-consequence` produces for one household.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ConsequenceAssessment {
-    /// Every bucket, in [`BucketId::ALL`] order. `covered` holds only what the household's home
-    /// already provides (a gas stove for boil-water notices, savings for income); the plan crate
-    /// adds the plan's coverage. Readiness checklists (`done`/`of`) are left at 0 for the plan
+    /// Every bucket, in [`BucketId::ALL`] order. `covered` and `covered_today` hold only what the
+    /// household's home already provides (a gas stove for boil-water notices, savings for
+    /// income); the plan crate replaces them with the plan's coverage and today's. Readiness checklists (`done`/`of`) are left at 0 for the plan
     /// crate to fill from `rr-supply`'s requirement lines. // awaiting: rr-plan
     pub buckets: Vec<BucketAssessment>,
     /// Named scenarios offered for this location, on or off, with what they change.
@@ -617,6 +617,11 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
             low: covered_days,
             high: covered_days,
         },
+        covered_today: Target::Days {
+            value: covered_days,
+            low: covered_days,
+            high: covered_days,
+        },
         tier_enough: tier_for_days(ladder),
         contributions: contributions(ctx, &owners),
         frequency_sentences: sentences,
@@ -734,6 +739,7 @@ fn readiness_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> BucketAssessment {
         name: bucket.name().to_owned(),
         target,
         covered: target,
+        covered_today: target,
         tier_enough: readiness_tier(ctx, p),
         contributions,
         frequency_sentences: sentences,
@@ -800,6 +806,7 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
         name: bucket.name().to_owned(),
         target,
         covered,
+        covered_today: covered,
         tier_enough: readiness_tier(ctx, p),
         contributions,
         frequency_sentences: sentences,
@@ -885,6 +892,7 @@ fn get_home_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, GetHomeDetail) {
             name: bucket.name().to_owned(),
             target,
             covered: target,
+            covered_today: target,
             tier_enough: if commuters.is_empty() {
                 TierId::Now
             } else {
@@ -957,6 +965,7 @@ fn home_loss_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, HomeLossDetail) {
             name: bucket.name().to_owned(),
             target,
             covered: target,
+            covered_today: target,
             tier_enough: TierId::Now,
             contributions,
             frequency_sentences: sentences,
@@ -1102,6 +1111,11 @@ fn income_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, IncomeDetail) {
             high,
         },
         covered: Target::Months {
+            value: covered_months,
+            low: covered_months,
+            high: covered_months,
+        },
+        covered_today: Target::Months {
             value: covered_months,
             low: covered_months,
             high: covered_months,

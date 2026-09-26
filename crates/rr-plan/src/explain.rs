@@ -170,10 +170,11 @@ fn bucket(a: &Assessment, content: &Content, id: &str) -> Result<Explanation, En
             let parts = a.offers.rule.parts_of(b);
             if !parts.is_empty() {
                 let covered = crate::coverage::target_days(&ba.covered);
+                let today = crate::coverage::target_days(&ba.covered_today);
                 let names: Vec<String> = parts.iter().map(|p| p.name.clone()).collect();
                 math.push(format!(
                     "Covered by the plan: {covered} of {value} days, the weakest of its parts \
-                     ({}).",
+                     ({}). Covered today, by what you have and have done: {today} days.",
                     names.join(", ")
                 ));
             }

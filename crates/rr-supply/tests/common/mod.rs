@@ -19,6 +19,7 @@ fn assessment(id: BucketId, target: Target) -> BucketAssessment {
         name: id.name().to_owned(),
         target,
         covered: target,
+        covered_today: target,
         tier_enough: TierId::H72,
         contributions: Vec::new(),
         frequency_sentences: Vec::new(),

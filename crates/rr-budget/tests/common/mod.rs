@@ -103,6 +103,7 @@ pub fn assessment(
         name: bucket.name().to_owned(),
         target,
         covered: target,
+        covered_today: target,
         tier_enough: TierId::H72,
         contributions: shares
             .iter()

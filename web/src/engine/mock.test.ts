@@ -61,12 +61,21 @@ describe('mock engine: shape of every fixture', () => {
         const info = cat.value.buckets.find((x) => x.id === b.id)!;
         expect(b.target.kind).toBe(info.target_kind);
         expect(b.covered.kind).toBe(b.target.kind);
-        if (b.target.kind === 'days' && b.covered.kind === 'days') {
+        expect(b.covered_today.kind).toBe(b.target.kind);
+        if (b.target.kind === 'days' && b.covered.kind === 'days' && b.covered_today.kind === 'days') {
           expect(TARGET_LADDER_DAYS).toContain(b.target.value);
           expect(b.target.low).toBeLessThanOrEqual(b.target.value);
           expect(b.target.high).toBeGreaterThanOrEqual(b.target.value);
           expect(b.covered.low).toBe(b.covered.value);
           expect(b.covered.high).toBe(b.covered.value);
+          expect(b.covered_today.low).toBe(b.covered_today.value);
+          expect(b.covered_today.high).toBe(b.covered_today.value);
+          // What the household has now never exceeds where the plan takes it, nor the target.
+          expect(b.covered_today.value).toBeLessThanOrEqual(b.covered.value);
+          expect(b.covered.value).toBeLessThanOrEqual(b.target.value);
+        }
+        if (b.covered.kind === 'readiness' && b.covered_today.kind === 'readiness') {
+          expect(b.covered_today.done).toBeLessThanOrEqual(b.covered.done);
         }
         if (b.relief) expect(b.relief.help_arrives_days).toBeLessThanOrEqual(b.relief.mostly_restored_days);
         const shares = b.contributions.reduce((s, c) => s + c.share, 0);
@@ -268,6 +277,21 @@ describe('mock engine: invariants', () => {
     }
   });
 
+  it('counts a finished plan as covered today', async () => {
+    for (const name of ['philadelphia-renters-4', 'coos-bay-well-owner-2'] as const) {
+      const base = await assess(withBudget(FIXTURES[name], 500, 0));
+      const done = new Map<string, number>();
+      for (const i of base.plan.months.flatMap((m) => m.items)) done.set(i.item_id, (done.get(i.item_id) ?? 0) + i.quantity);
+      const input = withBudget(FIXTURES[name], 500, 0);
+      input.existing = [...done].map(([item_id, qty]) => ({ item_id, qty }));
+      const after = await assess(input);
+      for (const b of after.buckets) {
+        const was = base.buckets.find((x) => x.id === b.id)!.covered;
+        if (b.covered_today.kind === 'days' && was.kind === 'days') expect(b.covered_today.value, `${name} ${b.id}`).toBe(was.value);
+      }
+    }
+  });
+
   it('marks an item done once the household records it, and does not lower coverage', async () => {
     for (const name of FIXTURE_NAMES) {
       const base = await assess(withBudget(FIXTURES[name], 60, 0));
@@ -279,8 +303,10 @@ describe('mock engine: invariants', () => {
       expect(same?.done, `${name}: ${first.item_id}`).toBe(true);
       expect(same?.paid_usd).toBeGreaterThan(0);
       for (const b of after.buckets) {
-        const before = base.buckets.find((x) => x.id === b.id)!.covered;
+        const was = base.buckets.find((x) => x.id === b.id)!;
+        const [before, beforeToday] = [was.covered, was.covered_today];
         if (b.covered.kind === 'days' && before.kind === 'days') expect(b.covered.value).toBeGreaterThanOrEqual(before.value);
+        if (b.covered_today.kind === 'days' && beforeToday.kind === 'days') expect(b.covered_today.value).toBeGreaterThanOrEqual(beforeToday.value);
       }
     }
   });

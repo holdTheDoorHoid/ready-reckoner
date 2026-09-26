@@ -892,6 +892,7 @@ fn run(
     };
 
     let covered = covered_targets(&ctx, &state, &checklist);
+    let covered_today = covered_targets(&ctx, &so_far, &checklist);
     let free_month_of: BTreeMap<usize, u16> =
         scheduled_free.iter().map(|&(m, i, _)| (i, m)).collect();
     let facts = guardrail_facts(
@@ -907,6 +908,7 @@ fn run(
     Ok(BudgetResult {
         plan,
         covered,
+        covered_today,
         coverage_by_month,
         money_by_month,
         sequence,

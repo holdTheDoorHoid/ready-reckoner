@@ -119,6 +119,12 @@ describe('what the screens show', () => {
     expect(text).toContain('Rare but severe');
     expect(text).toContain('Separate from your supplies budget');
     expect(r.target.querySelectorAll('[role="meter"]').length).toBeGreaterThanOrEqual(7);
+    // Each gauge says what the household has now and, until that is everything, where the plan
+    // takes it.
+    expect(text).toMatch(/You have (all )?[\w½ ]+ now/);
+    expect(text).toMatch(/Your plan covers (all )?[\w½ ]+/);
+    const power = r.target.querySelector('[data-bucket="power"] [role="meter"]')!;
+    expect(power.getAttribute('aria-valuetext')).toMatch(/^You have .* now(\. Your plan covers .*\.)?$/);
     // Philadelphia has no named scenarios, so none are offered.
     expect(text).not.toContain('Named scenarios');
   });

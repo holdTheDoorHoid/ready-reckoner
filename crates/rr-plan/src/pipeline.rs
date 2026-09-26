@@ -315,7 +315,9 @@ pub fn run<S: CountySource + ?Sized>(
         }
     }
 
-    // Final buckets: the plan's coverage.
+    // Final buckets: the plan's coverage (every step done) and today's (before the plan buys
+    // anything). The allocator lists what the household owns, listed or assumed, and the free
+    // steps it has done as done steps in month 0.
     let inventory = {
         let mut out: BTreeMap<ItemId, f64> = BTreeMap::new();
         for m in &budget.plan.months {
@@ -327,62 +329,54 @@ pub fn run<S: CountySource + ?Sized>(
         }
         out
     };
+    let today = {
+        let mut out: BTreeMap<ItemId, f64> = BTreeMap::new();
+        for m in &budget.plan.months {
+            for it in m.items.iter().filter(|it| it.done) {
+                *out.entry(it.item_id.clone()).or_insert(0.0) += f64::from(it.quantity);
+            }
+        }
+        out
+    };
+    // A go-bag itself, not a staging step packed into one.
+    let has_bag = |inv: &BTreeMap<ItemId, f64>| {
+        offers.offered.iter().any(|o| {
+            o.joins
+                .iter()
+                .any(|j| j.line_id == "evacuate.go_bag" && !j.via_alternative)
+                && inv.get(&o.item.id).copied().unwrap_or(0.0) > 0.0
+        })
+    };
+    let (bag_at_end, bag_today) = (has_bag(&inventory), has_bag(&today));
     for b in &mut buckets {
-        let covered = budget.covered.get(&b.id).copied();
         let nothing_to_buy =
             b.id.kind() == BucketKind::Duration && offers.rule.parts_of(b.id).is_empty();
-        b.covered = match (b.target, covered) {
-            (Target::Days { value, .. }, _) if nothing_to_buy => Target::Days {
-                value,
-                low: value,
-                high: value,
-            },
-            (Target::Days { value, .. }, Some(Target::Days { value: c, .. })) => {
-                let v = c.min(value).max(0.0);
-                Target::Days {
-                    value: v,
-                    low: v,
-                    high: v,
-                }
-            }
-            (
-                Target::Evacuate {
-                    p_need_10yr,
-                    notice_hours_low,
-                    notice_hours_high,
-                    days_away,
-                },
-                _,
-            ) => {
-                // A go-bag itself, not a staging step packed into one.
-                let bag = offers.offered.iter().any(|o| {
-                    o.joins
-                        .iter()
-                        .any(|j| j.line_id == "evacuate.go_bag" && !j.via_alternative)
-                        && inventory.get(&o.item.id).copied().unwrap_or(0.0) > 0.0
-                });
-                Target::Evacuate {
-                    p_need_10yr,
-                    notice_hours_low,
-                    notice_hours_high,
-                    days_away: if bag { days_away } else { 0.0 },
-                }
-            }
-            (Target::Readiness { p_need_10yr, .. }, Some(Target::Readiness { done, of, .. })) => {
-                b.target = Target::Readiness {
-                    p_need_10yr,
-                    done,
-                    of,
-                };
-                Target::Readiness {
-                    p_need_10yr,
-                    done,
-                    of,
-                }
-            }
-            (_, Some(c)) if c.kind() == b.target.kind() => c,
-            _ => b.covered,
-        };
+        let end = coverage_of(
+            b.target,
+            budget.covered.get(&b.id).copied(),
+            nothing_to_buy,
+            bag_at_end,
+        )
+        .unwrap_or(b.covered);
+        let now = coverage_of(
+            b.target,
+            budget.covered_today.get(&b.id).copied(),
+            nothing_to_buy,
+            bag_today,
+        )
+        .unwrap_or(b.covered_today);
+        // A checklist's size is the plan's: the target counts the steps the plan lists.
+        if let (Target::Readiness { p_need_10yr, .. }, Target::Readiness { done, of, .. }) =
+            (b.target, end)
+        {
+            b.target = Target::Readiness {
+                p_need_10yr,
+                done,
+                of,
+            };
+        }
+        b.covered = end;
+        b.covered_today = now;
     }
 
     // Warnings: the consequence crate's cliff warnings are canonical; drop the budget's duplicate
@@ -474,6 +468,57 @@ pub fn run<S: CountySource + ?Sized>(
         unknown_existing,
         assumed,
     })
+}
+
+/// A bucket's coverage in its target's kind, from the allocator's coverage for one state of the
+/// household (the plan's end, or today): duration days capped at the target (the whole target
+/// when there is nothing to buy for the bucket), the go-bag's days away when the household has a
+/// go-bag in that state, and a checklist's steps done. `None` when the allocator reports nothing
+/// usable, so the consequence crate's value stands.
+fn coverage_of(
+    target: Target,
+    covered: Option<Target>,
+    nothing_to_buy: bool,
+    bag: bool,
+) -> Option<Target> {
+    match (target, covered) {
+        (Target::Days { value, .. }, _) if nothing_to_buy => Some(Target::Days {
+            value,
+            low: value,
+            high: value,
+        }),
+        (Target::Days { value, .. }, Some(Target::Days { value: c, .. })) => {
+            let v = c.min(value).max(0.0);
+            Some(Target::Days {
+                value: v,
+                low: v,
+                high: v,
+            })
+        }
+        (
+            Target::Evacuate {
+                p_need_10yr,
+                notice_hours_low,
+                notice_hours_high,
+                days_away,
+            },
+            _,
+        ) => Some(Target::Evacuate {
+            p_need_10yr,
+            notice_hours_low,
+            notice_hours_high,
+            days_away: if bag { days_away } else { 0.0 },
+        }),
+        (Target::Readiness { p_need_10yr, .. }, Some(Target::Readiness { done, of, .. })) => {
+            Some(Target::Readiness {
+                p_need_10yr,
+                done,
+                of,
+            })
+        }
+        (_, Some(c)) if c.kind() == target.kind() => Some(c),
+        _ => None,
+    }
 }
 
 /// The "why" of a basic the plan assumed the household has.

@@ -139,8 +139,9 @@ pub const TARGET_LADDER_DAYS: [f32; 15] = [
 /// `evacuate`, readiness for the other readiness buckets and `home_loss`.
 ///
 /// `low` and `high` are the 10th and 90th percentiles of the target under uncertainty in the
-/// model's parameters. In [`BucketAssessment::covered`] there is no uncertainty, so `low` and
-/// `high` equal `value`, and `p_need_10yr` repeats the target's.
+/// model's parameters. In [`BucketAssessment::covered`] and [`BucketAssessment::covered_today`]
+/// there is no uncertainty, so `low` and `high` equal `value`, and `p_need_10yr` repeats the
+/// target's.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Target {
@@ -229,8 +230,13 @@ pub struct BucketAssessment {
     /// How much to be ready for: the design event at the household's return period. Its kind
     /// matches [`BucketId::target_kind`].
     pub target: Target,
-    /// How much the plan and what the household already has cover, in the same kind as `target`.
+    /// How much the plan and what the household already has cover once every step is done (the
+    /// plan's end point), in the same kind as `target`.
     pub covered: Target,
+    /// How much the household has covered today, before the plan buys anything: what it owns and
+    /// has checked off (`PlanInput::existing`, with the assumed basics when `assume_basics` is
+    /// on), in the same kind as `target`. Never more than `covered`.
+    pub covered_today: Target,
     /// The tier that is enough for this bucket; the plan stops adding to the bucket there.
     pub tier_enough: TierId,
     /// Which hazards drive the target, largest share first.
