@@ -4,13 +4,15 @@
  * expected loss. How likely is a range only; "why here" comes from the family's location factor;
  * "what it changes" is the engine's own words, with a check mark when it is "nothing beyond your
  * basics". The household may let the plan spend up to a tenth of its monthly budget on things made
- * for the families it ticks (`Dials.rare_opt_in`), and the box says what that bought.
+ * for the families it ticks (`Dials.rare_opt_in`, read and written by lib/dials.ts), and the box says
+ * what that bought.
  *
  * Also here: the "Also checked" line (every hazard and rare sub-row checked for this household and
  * found under 1 in 100,000 a year), which the engine writes into the packet's notes.
  */
 import type { Catalogue, Dials, HazardProfile, PlanItem, PlanOutput } from '../engine/types';
 import { RARE_HAZARD_IDS } from '../engine/types';
+import { rareFamilies } from './dials';
 import { catalogueItem } from './lookup';
 
 /** The engine's share of the monthly budget the rare allowance may use (DESIGN §4.7). */
@@ -40,34 +42,6 @@ export function changesNothing(h: HazardProfile): boolean {
 /** What the family changes in the plan; the engine always sends it for a rare row. */
 export function whatItChanges(h: HazardProfile): string {
   return h.what_it_changes ?? 'Nothing beyond your basics.';
-}
-
-/** The families the household lets the allowance buy for: `['all']` and the old yes/no both mean all nine. */
-export function optedInFamilies(dials: Pick<Dials, 'rare_opt_in' | 'rare_catastrophic_opt_in'>): string[] {
-  const list = dials.rare_opt_in ?? [];
-  if (dials.rare_catastrophic_opt_in || list.includes('all')) return [...RARE_HAZARD_IDS];
-  return RARE_HAZARD_IDS.filter((id) => list.includes(id));
-}
-
-/**
- * The dials after ticking or unticking one family (or `'all'`). Every family ticked is written as
- * `['all']`; the old yes/no is cleared, so the list alone says what the household chose.
- */
-export function withFamily(
-  dials: Pick<Dials, 'rare_opt_in' | 'rare_catastrophic_opt_in'>,
-  family: string,
-  on: boolean,
-): { rare_opt_in: string[]; rare_catastrophic_opt_in: false } {
-  let next: string[];
-  if (family === 'all') next = on ? ['all'] : [];
-  else {
-    const set = new Set(optedInFamilies(dials));
-    if (on) set.add(family);
-    else set.delete(family);
-    next = RARE_HAZARD_IDS.filter((id) => set.has(id));
-    if (next.length === RARE_HAZARD_IDS.length) next = ['all'];
-  }
-  return { rare_opt_in: next, rare_catastrophic_opt_in: false };
 }
 
 export interface AllowanceLine {
@@ -104,7 +78,7 @@ export function allowance(output: PlanOutput, cat: Catalogue | null, dials: Dial
     }
   }
   return {
-    families: optedInFamilies(dials),
+    families: rareFamilies(dials),
     monthly_usd: Math.max(0, monthlyBudget) * RARE_ALLOWANCE_SHARE,
     bought,
   };

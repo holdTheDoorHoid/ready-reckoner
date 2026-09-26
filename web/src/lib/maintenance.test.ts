@@ -4,7 +4,8 @@ import { FIXTURES } from '../engine/fixtures';
 import { createMockEngine } from '../engine/mock';
 import type { Catalogue } from '../engine/types';
 import { savedFor } from '../test/helpers';
-import { calendarFile, drillItems, lastTested, maintenanceTasks, markTested, nextSeasonStart, seasonalAnchors } from './maintenance';
+import { calendarFile, drillItems, maintenanceTasks, nextSeasonStart, seasonalAnchors } from './maintenance';
+import { setTestedOn, testedOn } from './persistence';
 
 async function catalogue(): Promise<Catalogue> {
   const r = await createMockEngine().catalogue();
@@ -97,19 +98,19 @@ describe('tests and seasons (contract v2)', () => {
     const before = maintenanceTasks(plan, cat).find((t) => t.key === 'test:radio_crank')!;
     expect(before).toMatchObject({ kind: 'test', title: 'Test: battery or hand-crank weather radio', interval_months: 6, due: '2027-04-05' });
     expect(before.last).toBeUndefined();
-    expect(markTested(plan, 'radio_crank', '2026-12-01')).toBe(true);
-    expect(lastTested(plan, 'radio_crank')).toBe('2026-12-01');
+    expect(setTestedOn(plan, 'radio_crank', '2026-12-01')).toBe(true);
+    expect(testedOn(plan, 'radio_crank')).toBe('2026-12-01');
     const after = maintenanceTasks(plan, cat).find((t) => t.key === 'test:radio_crank')!;
     expect(after).toMatchObject({ last: '2026-12-01', due: '2027-06-01' });
     // Something never owned cannot be marked tested.
-    expect(markTested(plan, 'generator_portable', '2026-12-01')).toBe(false);
+    expect(setTestedOn(plan, 'generator_portable', '2026-12-01')).toBe(false);
   });
 
-  it('keeps one tested-on date: on what the household had before the plan when it has the item there', async () => {
+  it('keeps one tested-on date (persistence, as the Have screen): on what the household had before the plan when it has the item there', async () => {
     const input = { ...FIXTURES['coos-bay-well-owner-2'], existing: [{ item_id: 'radio_crank', qty: 1, tested_on: '2026-01-10' }] };
     const plan = savedFor(input, { purchases: [{ item_id: 'radio_crank', tier: 'h72', qty: 1, date: '2026-10-05', tested_on: '2026-10-05' }] });
-    expect(lastTested(plan, 'radio_crank')).toBe('2026-10-05');
-    markTested(plan, 'radio_crank', '2026-11-11');
+    expect(testedOn(plan, 'radio_crank')).toBe('2026-10-05');
+    setTestedOn(plan, 'radio_crank', '2026-11-11');
     expect(plan.input.existing[0]!.tested_on).toBe('2026-11-11');
     expect(plan.purchases[0]!.tested_on).toBeUndefined();
   });

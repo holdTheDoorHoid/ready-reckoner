@@ -5,14 +5,16 @@
  * calendar. The file holds item names and dates only, never the address or household details.
  *
  * Contract v2 adds two kinds: **tests** for items with `Item.test_interval_months` (a jump pack, a
- * generator, a key safe: try it and record the day, `Owned.tested_on`), and **seasonal anchors**
+ * generator, a key safe: try it and record the day, `Owned.tested_on`, kept by persistence's
+ * `testedOn` / `setTestedOn` as on the Have screen), and **seasonal anchors**
  * for items with `Item.season` (have it before the season starts, or check it then; meteorological
  * seasons, so summer starts on 1 June with the hurricane season).
  */
 import type { Catalogue, IsoDate, Item, Season } from '../engine/types';
 import { SEASONS } from '../engine/types';
 import { addMonths } from './format';
-import type { Purchase, SavedPlan } from './persistence';
+import type { SavedPlan } from './persistence';
+import { testedOn } from './persistence';
 
 export type TaskKind = 'rotate' | 'check' | 'drill' | 'review' | 'test' | 'season';
 
@@ -80,33 +82,6 @@ export function nextSeasonStart(season: Season, from: IsoDate, after = false): I
   return passed ? start(y + 1) : thisYear;
 }
 
-/** The latest day the household tried the item, wherever it was recorded (its inventory entry or a check-off). */
-export function lastTested(plan: SavedPlan, itemId: string): IsoDate | undefined {
-  const dates = [
-    ...plan.input.existing.filter((o) => o.item_id === itemId).map((o) => o.tested_on),
-    ...plan.purchases.filter((p) => p.item_id === itemId).map((p) => p.tested_on),
-  ].filter((d): d is IsoDate => d !== undefined);
-  return dates.sort().at(-1);
-}
-
-/**
- * Record the day the household tried the item (contract v2 `Owned.tested_on`): on its entry in
- * what it had before the plan, or else on its latest check-off; any older copy is cleared, so one
- * date is kept. The same rule as the Have screen's "tested?" (persistence `setTestedOn` in the
- * interview workstream). False when the household has none of the item.
- */
-export function markTested(plan: SavedPlan, itemId: string, date: IsoDate): boolean {
-  const owned = plan.input.existing.find((o) => o.item_id === itemId && o.qty > 0);
-  const purchases = plan.purchases.filter((p) => p.item_id === itemId);
-  const latest = purchases.reduce<Purchase | undefined>((best, p) => (!best || p.date >= best.date ? p : best), undefined);
-  const home = owned ?? latest;
-  if (!home) return false;
-  for (const o of plan.input.existing) if (o.item_id === itemId) delete o.tested_on;
-  for (const p of purchases) delete p.tested_on;
-  home.tested_on = date;
-  return true;
-}
-
 /** Every task for what the household has, soonest first. */
 export function maintenanceTasks(plan: SavedPlan, catalogue: Catalogue): Task[] {
   const owned = new Set<string>();
@@ -140,7 +115,7 @@ export function maintenanceTasks(plan: SavedPlan, catalogue: Catalogue): Task[] 
     const fromInventory = bought === undefined;
     if (item.test_interval_months) {
       const key = `test:${id}`;
-      const last = lastTested(plan, id);
+      const last = testedOn(plan, id);
       const months = item.test_interval_months;
       tasks.push({ key, kind: 'test', item_id: id, title: titleFor('test', item), interval_months: months, due: addMonths(last ?? bought ?? plan.input.planning_date, months), from_inventory: fromInventory, ...(last ? { last } : {}) });
     }

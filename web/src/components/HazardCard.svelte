@@ -103,7 +103,7 @@
         href="#matrix-{hazard.id}"
         onclick={(e) => {
           if (jumpTo(`matrix-${hazard.id}`, { block: 'center' })) e.preventDefault();
-        }}>Back to the table<span class="visually-hidden"> of risks</span></a
+        }}>Back to the table<span class="visually-hidden">{' '}of risks</span></a
       >
     {/if}
   </footer>

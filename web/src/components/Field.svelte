@@ -12,6 +12,7 @@
     help,
     error,
     optional = false,
+    context,
     children,
   }: {
     id: string;
@@ -19,6 +20,8 @@
     help?: string;
     error?: string;
     optional?: boolean;
+    /** Words only screen readers hear after the label, when the same label repeats ("of person 2"). */
+    context?: string;
     children: Snippet<[{ id: string; describedBy: string | undefined; invalid: boolean }]>;
   } = $props();
 
@@ -26,7 +29,7 @@
 </script>
 
 <div class="field">
-  <label for={id}>{label}{#if optional}{' '}<span class="optional">(optional)</span>{/if}</label>
+  <label for={id}>{label}{#if context}<span class="visually-hidden">{' '}{context}</span>{/if}{#if optional}{' '}<span class="optional">(optional)</span>{/if}</label>
   {#if help}<span class="help" id="{id}-help">{help}</span>{/if}
   {@render children({ id, describedBy, invalid: !!error })}
   {#if error}

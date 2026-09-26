@@ -17,11 +17,9 @@ import {
   changesNothing,
   firstSentence,
   locationChain,
-  optedInFamilies,
   parseAlsoChecked,
   whatItChanges,
   whyHereShort,
-  withFamily,
 } from './rare';
 
 function rare(extra: Partial<HazardProfile>): HazardProfile {
@@ -87,23 +85,6 @@ describe('why here and what it changes', () => {
 });
 
 describe('the rare-event allowance', () => {
-  it('reads the list, "all" and the old yes/no as the engine does', () => {
-    expect(optedInFamilies({})).toEqual([]);
-    expect(optedInFamilies({ rare_opt_in: ['all'] })).toEqual([...RARE_HAZARD_IDS]);
-    expect(optedInFamilies({ rare_catastrophic_opt_in: true })).toEqual([...RARE_HAZARD_IDS]);
-    expect(optedInFamilies({ rare_opt_in: ['mass_violence', 'nuclear_attack', 'nonsense'] })).toEqual(['nuclear_attack', 'mass_violence']);
-  });
-
-  it('writes one family at a time, "all" when every family is ticked, and clears the old yes/no', () => {
-    expect(withFamily({}, 'nuclear_attack', true)).toEqual({ rare_opt_in: ['nuclear_attack'], rare_catastrophic_opt_in: false });
-    expect(withFamily({ rare_catastrophic_opt_in: true }, 'mass_violence', false).rare_opt_in).toEqual(
-      RARE_HAZARD_IDS.filter((id) => id !== 'mass_violence'),
-    );
-    const allButOne = RARE_HAZARD_IDS.filter((id) => id !== 'cbrn_attack');
-    expect(withFamily({ rare_opt_in: [...allButOne] }, 'cbrn_attack', true).rare_opt_in).toEqual(['all']);
-    expect(withFamily({ rare_opt_in: ['all'] }, 'all', false).rare_opt_in).toEqual([]);
-  });
-
   it('says what the plan buys: nothing before it is allowed, the radiation meter for the nuclear row after', async () => {
     const engine = createMockEngine();
     const cat = await engine.catalogue();
@@ -114,22 +95,20 @@ describe('the rare-event allowance', () => {
       input.dials = { ...input.dials, ...dials };
       return input;
     };
-    const off = await engine.assess(withDials({}));
-    if (!off.ok) throw new Error('assess');
-    expect(allowance(off.value, cat.value, withDials({}).dials, 400)).toEqual({ families: [], monthly_usd: 40, bought: [] });
-    // The v1 switch means every family (web-interview's mock validates the v2 list; either way the
-    // engine reads both through Dials::rare_families).
-    const on = await engine.assess(withDials({ rare_catastrophic_opt_in: true }));
-    if (!on.ok) throw new Error(`assess: ${JSON.stringify(on.error)}`);
-    const bought = allowance(on.value, cat.value, withDials({ rare_catastrophic_opt_in: true }).dials, 400);
-    expect(bought.families).toEqual([...RARE_HAZARD_IDS]);
-    expect(bought.bought.map((b) => [b.item.item_id, b.families])).toEqual([['radiation_meter', ['nuclear_attack']]]);
-    // A family ticked with nothing made for it: nothing bought, and the sentence names what was chosen.
-    expect(allowance(off.value, cat.value, withDials({ rare_opt_in: ['severe_pandemic'] }).dials, 400)).toEqual({
-      families: ['severe_pandemic'],
-      monthly_usd: 40,
-      bought: [],
-    });
+    const assess = async (dials: Partial<Dials>) => {
+      const r = await engine.assess(withDials(dials));
+      if (!r.ok) throw new Error(`assess: ${JSON.stringify(r.error)}`);
+      return allowance(r.value, cat.value, withDials(dials).dials, 400);
+    };
+    expect(await assess({})).toEqual({ families: [], monthly_usd: 40, bought: [] });
+    const nuclear = await assess({ rare_opt_in: ['nuclear_attack'] });
+    expect(nuclear.families).toEqual(['nuclear_attack']);
+    expect(nuclear.bought.map((b) => [b.item.item_id, b.families])).toEqual([['radiation_meter', ['nuclear_attack']]]);
+    // "all" and the v1 switch mean every family (lib/dials.ts reads both as the engine does).
+    expect((await assess({ rare_opt_in: ['all'] })).families).toEqual([...RARE_HAZARD_IDS]);
+    expect((await assess({ rare_catastrophic_opt_in: true })).bought).toHaveLength(1);
+    // A family ticked with nothing made for it buys nothing: the money stays in the main plan.
+    expect(await assess({ rare_opt_in: ['severe_pandemic'] })).toEqual({ families: ['severe_pandemic'], monthly_usd: 40, bought: [] });
   });
 
   it('lets the allowance buy only for a ticked family whose local ten-year chance is at least 1 in 1,000 (the mock’s rule, as rr-budget’s)', async () => {

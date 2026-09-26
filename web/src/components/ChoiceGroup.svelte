@@ -1,7 +1,8 @@
 <!--
   A set of radio buttons drawn as tappable cards, inside a fieldset with a legend. Native radios
   keep arrow-key movement and screen-reader grouping; the card shows the checked state with a
-  border and a filled radio, never with colour alone.
+  border and a filled radio, never with colour alone. With no value yet (a question not answered,
+  such as the optional contract v2 questions), no card is checked.
 -->
 <script lang="ts" generics="T extends string">
   import Icon from './Icon.svelte';
@@ -19,7 +20,7 @@
     legend: string;
     name: string;
     options: { value: T; label: string; help?: string }[];
-    value: T;
+    value: T | undefined;
     help?: string;
     error?: string;
     columns?: 1 | 2 | 3 | 4;

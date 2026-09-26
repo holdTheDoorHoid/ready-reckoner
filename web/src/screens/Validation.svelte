@@ -166,7 +166,7 @@
       <li>Every source for every event is listed in the full test.</li>
     </ul>
     <p>
-      <a href={VALIDATION_DOC_URL} target="_blank" rel="noopener noreferrer">Read the full test, with every source<span class="visually-hidden"> (opens in a new tab)</span></a>
+      <a href={VALIDATION_DOC_URL} target="_blank" rel="noopener noreferrer">Read the full test, with every source<span class="visually-hidden">{' '}(opens in a new tab)</span></a>
     </p>
   </section>
 

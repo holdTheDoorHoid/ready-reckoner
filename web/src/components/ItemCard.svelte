@@ -11,6 +11,7 @@
   import { bucketName, catalogueItem, hazardName, itemSourceIds, lowerFirst, requirementsFor } from '../lib/lookup';
   import { intervalLabel } from '../lib/maintenance';
   import ExplainButton from './ExplainButton.svelte';
+  import FamilyPlanLink from './FamilyPlanLink.svelte';
   import Icon from './Icon.svelte';
   import NumberField from './NumberField.svelte';
   import Sources from './Sources.svelte';
@@ -75,6 +76,7 @@
     </p>
     {#if withNames.length}<p class="item__with small"><strong>With:</strong> {withNames.map((n, i) => (i === 0 ? n : lowerFirst(n))).join(', ')}</p>{/if}
     <p class="item__why">{item.why}</p>
+    <FamilyPlanLink itemId={item.item_id} />
     {#if fromInventory}
       <p class="small muted">You already had this. Change it on the "What you already have" screen.</p>
     {/if}

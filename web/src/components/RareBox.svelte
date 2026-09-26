@@ -195,7 +195,7 @@
                     href="#matrix-{h.id}"
                     onclick={(e) => {
                       if (jumpTo(`matrix-${h.id}`, { block: 'center' })) e.preventDefault();
-                    }}>Back to the table<span class="visually-hidden"> of risks</span></a
+                    }}>Back to the table<span class="visually-hidden">{' '}of risks</span></a
                   >
                 {/if}
               </div>
@@ -248,7 +248,7 @@
           href="#matrix-{hazards[0]!.id}"
           onclick={(e) => {
             if (jumpTo(`matrix-${hazards[0]!.id}`, { block: 'center' })) e.preventDefault();
-          }}>Back to the table<span class="visually-hidden"> of risks</span></a
+          }}>Back to the table<span class="visually-hidden">{' '}of risks</span></a
         >
       {/if}
     </div>

@@ -99,6 +99,10 @@ describe('the rare-but-severe box, by family', () => {
     expect(body).toContain('the chance that your county would be in a blast or dangerous-fallout zone: about 6 in 10 (3 to 9 in 10)');
     expect(body).toContain('Why a range:');
     expect(drawer.querySelector('details.sources')).not.toBeNull();
+    // Hidden words keep their space (Svelte trims a hidden span's leading space): "Back to the table of risks".
+    const back = [...more.querySelectorAll('a')].find((a) => (a.textContent ?? '').startsWith('Back to the table'))!;
+    expect(back.textContent).toBe('Back to the table of risks');
+    expect(r.target.querySelector('#hazard-heat_wave a.back')!.textContent).toBe('Back to the table of risks');
     // Collapsing again hides it.
     (family.querySelector('button.expander') as HTMLButtonElement).click();
     flushSync();
@@ -120,8 +124,7 @@ describe('the rare-but-severe box, by family', () => {
       'risks',
       household('philadelphia-renters-4', (i) => {
         i.finances.monthly_budget_usd = 400;
-        // Every family, through the v1 switch this branch's mock validates (web-interview's accepts the v2 list too).
-        i.dials.rare_catastrophic_opt_in = true;
+        i.dials.rare_opt_in = ['nuclear_attack', 'severe_pandemic'];
       }),
     );
     current = r;
@@ -250,6 +253,9 @@ describe('the plan: bare minimum, decisions, "With:", the first savings goal and
     current = p;
     expect(p.app.result.output!.plan.long_horizon).toBeUndefined();
     expect(p.target.querySelector('#long-title')).toBeNull();
+    p.app.plan!.input.dials.long_horizon = true;
+    await until(() => !!p.target.querySelector('#long-title'), 'the long-horizon section');
+    expect(text(p.target.querySelector('#long-title')!.closest('section'))).toContain('You asked to see this part of the plan.');
   });
 });
 

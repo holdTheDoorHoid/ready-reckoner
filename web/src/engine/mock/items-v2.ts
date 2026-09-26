@@ -9,6 +9,7 @@
  * medicine) and the rare-event items the allowance may buy for a family the household ticks.
  */
 import type { BucketId, HazardId, Item, PlanInput, Season, TierId } from '../types';
+import { allowsRare } from '../../lib/dials';
 import type { RankedHazard } from './model';
 
 type V2Fields = Partial<Pick<Item, 'requires' | 'readiness_share' | 'decision' | 'long_horizon' | 'season' | 'test_interval_months'>>;
@@ -278,11 +279,8 @@ export const SEASON_START: Record<Season, number> = { spring: 3, summer: 6, fall
  * nuclear family's radiation meter is the one such item.
  */
 export function rareItemsFor(dials: PlanInput['dials'], register: readonly RankedHazard[]): { id: string; tier: TierId; qty: number }[] {
-  const list = dials.rare_opt_in ?? [];
-  const all = dials.rare_catastrophic_opt_in === true || list.includes('all');
   const nuclear = register.find((h) => h.seed.id === 'nuclear_attack');
-  const ticked = all || list.includes('nuclear_attack');
-  if (!ticked || !nuclear || nuclear.rate * 10 < 1e-3) return [];
+  if (!allowsRare(dials, 'nuclear_attack') || !nuclear || nuclear.rate * 10 < 1e-3) return [];
   return [{ id: 'radiation_meter', tier: 'm3', qty: 1 }];
 }
 

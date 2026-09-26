@@ -11,8 +11,8 @@
   import type { Problem } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { addMonths, formatDate } from '../lib/format';
-  import { calendarFile, drillItems, intervalLabel, maintenanceTasks, markTested, SEASON_WORDS, seasonalAnchors, type Task } from '../lib/maintenance';
-  import { engineInput, EXPORT_FILENAME, exportText, parseImport, type SavedPlan } from '../lib/persistence';
+  import { calendarFile, drillItems, intervalLabel, maintenanceTasks, SEASON_WORDS, seasonalAnchors, type Task } from '../lib/maintenance';
+  import { engineInput, EXPORT_FILENAME, exportText, parseImport, setTestedOn, type SavedPlan } from '../lib/persistence';
   import { useRouter } from '../lib/router.svelte';
 
   const app = useApp();
@@ -43,7 +43,7 @@
   function done(task: Task) {
     if (!app.plan) return;
     if (task.kind === 'review') app.plan.reviewed_on = today;
-    if (task.kind === 'test' && task.item_id) markTested(app.plan, task.item_id, today);
+    if (task.kind === 'test' && task.item_id) setTestedOn(app.plan, task.item_id, today);
     app.markDone(task.key, today);
     message = task.kind === 'test' ? `Tested today: ${task.title.replace(/^Test: /, '')}.` : `Marked as done today: ${task.title}.`;
   }
