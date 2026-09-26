@@ -540,11 +540,47 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   arrests, FDIC and openFDA (notes). OE-417 counts reports, not household outages, so the regional
   blackout keeps its prior and gains the OE-417 physical-attack and cyber counts as sub-cause notes;
   no FCC or CSB series measures cyber outages or chemical releases, so those priors stand.
-- **Outages by cause (M-18, M-10).** The outage floor can top up each storm hazard by its share of
+- **Outages by cause (M-18, M-10).** The outage floor tops up each storm hazard by its share of
   recorded outages matched by date (`natural::shortfall_by_cause`), instead of counting every
-  shortfall as windstorms; it reads data-model's `OutageModel::causes` (awaiting: data-model), so
-  the v0.1 rule runs until then. The hurricane double count M-10 is `rr-consequence`'s (county curve
-  plus hurricane rows); `rr-hazards` already subtracts modelled hurricane outages in the floor.
+  shortfall as windstorms. It reads the county record's `outage_model.causes` (the pack's
+  `core/outage_causes.csv`, since the data-model merge); a county without cause shares keeps the
+  v0.1 rule (all of the shortfall to windstorms), and its note says the records are not matched to
+  storms. Outages matched to no storm, or to wildfires, heat, floods or grid trouble, are put on no
+  storm (M-18's "cause not recorded"); `rr-consequence`'s power bucket counts them from the
+  county's outage record. The conversion from outages to household events and its limits:
+  - **Winter and ice storms cut the power at the share the records show.** Of the Storm Events
+    winter-storm episodes in each NCA5 region (`events.csv`), the share its outage records match an
+    outage to (`outages.csv` events × `outage_causes.csv` share, over the record's years): Midwest
+    0.284, Northeast 0.583, Northern Great Plains 0.185, Northwest 0.331, Southeast 0.806, Southern
+    Great Plains 0.474, Southwest 0.344, elsewhere the national 0.427 (22,758 matched outages in
+    53,296 episodes). Ice storms: Midwest 0.967, Northeast 0.46, elsewhere 1 (the ice cause also
+    holds sleet and freezing fog, so matches can outnumber ice-storm episodes; capped at 1). These
+    replace the 0.3 and 0.8 priors in the floor (`WINTER_CUT_SHARE`, `ICE_CUT_SHARE`; a unit test
+    re-derives them from the pack). The engine's copy of the outage record has no event count, so
+    the share is regional, not the county's own.
+  - **No storm beyond its record.** The floor never takes a storm past its Storm Events episode
+    rate (a power-cutting storm is a storm on record): winter-storm episodes, ice-storm episodes,
+    severe-wind days plus high-wind episodes for windstorms, and the larger of the tropical passage
+    and episode rates for hurricanes. It never lowers a rate either.
+  - **Hurricanes only within reach of the tracks.** A county with no hurricane rate from the track
+    record and no tropical passage or episode on record has no hurricane cause: outages matched to
+    a tropical storm there came from its remnants, count with windstorms, and a note says so.
+  - **Almost no windstorm on record, no matching.** Where the pack's Storm Events record holds
+    fewer than 0.1 severe-wind days plus high-wind episodes a year for a mainland county (fewer than
+    3 in 30 years: a gap in the zone records, as for western Washington's Puget Sound and coast and
+    much of Alaska), its outages could not be matched to windstorms, so the weather share (0.7) of
+    its outages matched to no storm still counts as windstorms, as the old rule did, uncapped, and
+    a note says so. Otherwise those counties would lose the windstorm row they plainly have
+    (Clallam, Washington: 0.67 → 0.0001 a year; Kitsap 0.90 → 0.002). Island grids (Puerto Rico,
+    the US Virgin Islands, Guam, American Samoa, the Northern Mariana Islands) keep the new
+    treatment: rr-data pools them as grids of their own, and Puerto Rico's island-wide record was
+    matched against the whole island's storms. The real fix is the zone-to-county mapping in the
+    events job.
+  The `wind` cause counts the modelled outages of windstorms, tornadoes, lightning and hail
+  together (data-model files all four under it), and a hurricane top-up also goes into the
+  Category 1–2 part, so the major-hurricane card still shows the full rate. The hurricane double
+  count M-10 is `rr-consequence`'s (county curve plus hurricane rows); `rr-hazards` already
+  subtracts modelled hurricane outages in the floor.
 - **New scenarios have effects rows** (rr-consequence, v0.2.0). `wasatch_m7`,
   `san_andreas_south_m78` and `seattle_fault_m7` take the New Madrid and Hayward priors;
   `heat_blackout` is rr-consequence's heat-plus-outage class and owns its durations and effects
