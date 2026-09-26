@@ -64,6 +64,7 @@ dependencies = [
 name = "rr-budget"
 version = "0.1.0"
 dependencies = [
+ "rr-types",
  "serde",
  "serde_json",
  "thiserror",
@@ -82,9 +83,12 @@ dependencies = [
 name = "rr-consequence"
 version = "0.1.0"
 dependencies = [
+ "rr-hazards",
+ "rr-types",
  "serde",
  "serde_json",
  "thiserror",
+ "toml",
 ]
 
 [[package]]

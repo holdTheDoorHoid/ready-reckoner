@@ -446,10 +446,10 @@ license = "US Government Work (public domain), subject to the National Risk Inde
 
 [[citation]]
 id = "fema_hazus_eq_restoration"
-title = "HAZUS-MH MR4 Earthquake Technical Manual, utility restoration functions (Tables 8.1.a–c)"
+title = "HAZUS-MH MR4 Earthquake Technical Manual, utility restoration functions (Tables 8.1.a–c; FEMA document, university mirror)"
 publisher = "FEMA"
 year = 2003
-url = "https://www.fema.gov/flood-maps/products-tools/hazus"
+url = "http://www.civil.ist.utl.pt/~mlopes/conteudos/DamageStates/hazus_mr4_earthquake_tech_manual.pdf"
 retrieved = "2026-09-25"
 license = "US Government Work (public domain)"
 
@@ -2043,6 +2043,19 @@ url = "https://bjs.ojp.gov/document/cv23.pdf"
 retrieved = "2026-09-25"
 quote = "A lower percentage of households were victims of burglary or trespassing in 2023 (1.01%) than in 2022 (1.12%)."
 license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
+# Requested by the consequence workstream (docs/CITATION_IDS.md), added 2026-09-25
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "inquirer_peco_outages"
+title = "Power outages in Philadelphia history: Peco's biggest storms"
+publisher = "The Philadelphia Inquirer"
+year = 2025
+url = "https://www.inquirer.com/weather/power-outages-peco-most-history-20250626.html"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
 
 # ---------------------------------------------------------------------------------------------
 # Requested by the data workstream (data/core/base_rates.toml), added 2026-09-25, with the

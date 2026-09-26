@@ -101,6 +101,57 @@ file used as a denominator), are now registry entries with the same ids. `nhtsa_
 points at the 2023 overview itself (DOT HS 813 705) rather than the Crash Stats home page, with the
 6.14 million crashes quoted.
 
+## Used by consequence
+
+`cargo test -p rr-consequence --test docs` checks that every id `crates/rr-consequence` can emit
+(`rr_consequence::citation_ids()`) is in `content/citations.toml` or listed here.
+
+### Already in `content/citations.toml`
+
+| id | What rr-consequence uses it for |
+| --- | --- |
+| `rr_risk_model_priors` | every expert estimate in `docs/RISK_MODEL.md` § "Consequences and targets": event shares, durations without records, coupling rules, income assumptions, uncertainty factors (prior = true) |
+| `oregon_resilience_plan_2013` | Cascadia restoration times (coast and valley), relief in 1–2 weeks on the coast and 72 hours inland; Tohoku and Maule restoration comparisons |
+| `ornl_eagle_i_outages` | county-wide storm outage rates and duration curves (the county override); the no-records fallback |
+| `ornl_repowrd_2022` | hurricane power restoration (Irma: half restored in 35 h, 90 % in 115 h; Michael: 116 h and 384 h) |
+| `eia_861_reliability_2024` | split of storm-day outages into short local ones (PECO major-event SAIFI) |
+| `epa_boil_water_report_2024` | most boil-water advisories come from main breaks and pressure loss (80 %); flood-caused notices |
+| `shaffer_2026_texas_boil_notices` | Texas boil-water notices: hurricane median 6 days, winter median 7 days, mode 3–4 days |
+| `water_2024_kentucky_advisories` | Kentucky advisories averaged 5 days |
+| `epa_asheville_boil_notice_2024` | Asheville's system-wide boil notice lasted about 7 weeks after Helene |
+| `fema_hazus_eq_restoration` | earthquake water and power restoration (wells extensive 10.5 days; treatment plant 32; storage tanks 93) |
+| `fema_nri_v120` | loss ratios as a screening check for home damage from floods and earthquakes |
+| `cdc_mmwr_stay_at_home_2020` | 2020 stay-home orders (median 45 days) behind the pandemic's two-week shopping disruption |
+| `census_pulse_displacement` | after a disaster a third are home within a week, 12 % are out over six months, 1 in 4 renters and 1 in 10 owners never return |
+| `aung_2025_displacement` | 1.5 % of adults displaced by a disaster in a year |
+| `usfa_residential_fires` | home fires: leaving home, fire readiness, displacement |
+| `cdc_nchs_ed_visits` | 47.3 emergency visits per 100 people (medical emergency readiness) |
+| `bls_work_experience_2024` | 8.3 % unemployed at some point in 2024 (job-loss base rate; spell lengths consistent with 21.5 % looking 27+ weeks) |
+| `bls_unemployment_duration` | current spells median 11.4 weeks (completed spells are shorter) |
+| `mell_2017_ems_response` | ambulances take longer to reach rural homes (the rural note) |
+| `stone_2023_heat_blackout` | a blackout during a heat wave is the most dangerous combination |
+| `ready_gov_nuclear` | get inside, stay inside at least 24 hours, stay tuned |
+| `dogami_tsunami_faq` | a local tsunami arrives in 15–20 minutes |
+
+### Also requested by hazards (same entry serves both)
+
+| id | What rr-consequence uses it for |
+| --- | --- |
+| `cdc_pandemic_history` | one of the five pandemics since 1918 (COVID-19) disrupted shopping and caused mass job loss |
+| `noaa_storm_events` | county episode lengths (snow-ins, heat and cold spells, drought) replacing default durations |
+
+### Requested by consequence
+
+`inquirer_peco_outages` is now in the registry (checked: PECO's second- and fourth-largest outages
+were the February 2014 and January 1994 ice storms, 713,802 and 520,016 customers).
+`county_boil_water_records` stays a placeholder listed here until the data workstream supplies a
+source; it has no URL yet, so it cannot be a registry entry.
+
+| id | Title | Publisher, year | URL | Used for |
+| --- | --- | --- | --- | --- |
+| `inquirer_peco_outages` | Power outages in Philadelphia history: Peco's biggest storms | The Philadelphia Inquirer, 2025 | https://www.inquirer.com/weather/power-outages-peco-most-history-20250626.html | two of PECO's five largest outages were ice storms (1994, 2014), outside the 2018–2025 records (big ice storm class) |
+| `county_boil_water_records` | a county's boil-water notice records, when a data pack provides them (none does yet; the id is a placeholder for the source the data workstream adds) | — | — | replacing the default boil-water duration with the county's median and 90th percentile |
+
 ## Registry index for the other workstreams
 
 Every id below is in `content/citations.toml`. Federal entries carry an exact quote where one was
@@ -141,4 +192,5 @@ checked; "prior" marks an expert estimate.
 
 ## Requested
 
-No open requests. Add rows here as described at the top.
+One placeholder is open: `county_boil_water_records` (see "Requested by consequence"), which
+waits for the data workstream to name a source. Add new rows here as described at the top.
