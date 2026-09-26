@@ -46,7 +46,7 @@ look_for = [
 ]
 avoid = [
   "Camp stoves, grills or generators indoors (carbon monoxide)",
-  "Boiling water that smells of fuel or chemicals: boiling does not make it safe (CDC)",
+  "Boiling water that may hold fuel or chemicals: boiling does not make it safe (CDC)",
   "Draining the water heater while its power or gas is still on",
   "Eating perishable food that has been above 40°F for two hours or more",
 ]
