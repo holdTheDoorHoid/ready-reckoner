@@ -1795,6 +1795,15 @@ prior = true
 sources = ["rr_expert_prior", "ready_gov_kit"]
 
 [[constant]]
+key = "household_ops_cap_days"
+label = "Days of a no-water target the household kits cover (paper tableware and trash bags)"
+unit = "day"
+default = 30.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "Paper plates and cups save the water that washing dishes takes while stored water is all there is. A target longer than the stored water also asks for a raw-water source and a way to treat it, so after the first month dishes are washed with treated water: at most three kits (30 days at one kit per 14), never 27 kits for a year."
+
+[[constant]]
 key = "food_storage_l_per_2000kcal"
 label = "Shelf space for 2,000 kcal of stored food (cans, jars, boxes and bags)"
 unit = "litre per 2,000 kcal"
@@ -1838,6 +1847,24 @@ unit = "kilogram per roll"
 default = 0.1
 prior = true
 sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "long_horizon_min_days"
+label = "A duration target at least this long brings in the long-horizon section and its items"
+unit = "day"
+default = 30.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "The design threshold for the long-horizon section (DESIGN-DELTA section 1.3; ENGINE-API Plan.long_horizon): rain catchment, hauling, a well hand pump, sanitation and food for months, shown when any duration target reaches 30 days or the household turns the section on."
+
+[[constant]]
+key = "clean_air_min_p10"
+label = "Ten-year chance of unhealthy air indoors below which the clean-air lines are left out"
+unit = "probability"
+default = 0.02
+prior = true
+sources = ["rr_expert_prior"]
+note = "The bar DESIGN section 4.4 sets for readiness capabilities (2 in 100 households in ten years, the allocator's rarely-needed threshold), applied to the clean-air bucket so that a county with no smoke, dust or chemical-air risk to speak of gets no respirators, air cleaner or clean-room plan."
 
 # ---------------------------------------------------------------------------------------------
 # Tables

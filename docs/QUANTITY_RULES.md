@@ -48,6 +48,31 @@ and renters' alarms are the landlord's (a note). The bleeding-control kit gets i
 (`bleeding_control_kit`) so it can be life-safety where it matters. New generic switch
 `once_if_house_ground_floor` for the outdoor motion light.
 
+**Round 2, v0.2.0 (2026-09-26).** Capabilities before consumables (practitioner review P-01 to
+P-23; the 28 rule changes are listed with their tests under "Round 2 rule changes, as implemented"
+below). Batteries stop at two weeks (`battery_pack_cap_days`) and a way to recharge takes over (new
+rule `recharge_capability`: a car charger, or a solar panel for a household with no vehicle); toilet
+paper follows the store target only; generator fuel is counted in run-hours; the medicine reserve
+claims at most 30 days and 60- to 90-day fills cover the rest (new rule `medication_fills`); a
+12-volt fridge keeps refrigerated medicine cold in hot counties (new rule `rx_fridge_units`); every
+long store target and every formula-fed baby under a boil notice gets a way to cook without power
+(new rule `cooking_capability`, propane where winters freeze, with `propane_cylinders` and
+`grill_propane_tank`); ready-to-feed formula covers a baby's first three days (new rule
+`infant_formula_rtf`); cash follows the household's expenses; an escape ladder wherever people sleep
+upstairs; bleach sits in the three-day tier and is replaced every six months; fans and cooling
+towels are optional in hot counties, where the cooling plan is the cover; the bleeding-control kit
+is life-safety for rural homes, with a wound-care add-on (new rule `wound_care_addon`); a walk-home
+filter only for long walks (new rule `get_home_filter`); toilet bags for the first month unless an
+earthquake drives the target. The clean-air bucket (contract v2) gets respirators for teens and
+adults by the county's smoke days, an air cleaner sized by EPA's table or the cheaper filter box,
+and a clean-room plan. The long-horizon section gets rain barrels by the state's rainfall and rules,
+water carriers, a hauling tote for animals, a well hand pump option, household kits and a free
+pointer (new switch `once_if_long_horizon`). Decisions (insurance, ID, home repairs) are free in the
+budget: four new insurance rules and four owner switches. Every line carries its share of the
+bare-minimum kit (`SizedLine::minimum`), and `rr_supply::storage_by_tier` gives the stored supplies'
+space and weight. The sections after "Which bucket's days size which line" explain the new item
+fields: `requires`, `readiness_share`, `season` and `test_interval_months`.
+
 ## Conventions
 
 - **Units.** A rule's quantity is in the item's own unit, with two exceptions: `gallon` rules give
@@ -168,7 +193,7 @@ days gets none either.
 | `toilet_bags` | sanitation | water_out | toilet_bags | people over 1, target(water_out), earthquake among the no-water target's hazards | ceil(people × days × 0.45) bags (0.3–0.6, *Prior*), counting both bags of a double-bagged load, where days = min(target, 30) (`toilet_supplies_cap_days`, *Prior*) unless an earthquake drives the target (it can break the sewer itself); past the cap the line says a working sewer or septic system is the better toilet | bag | person | rdpo_emergency_toilet, oregon_b2wr_toolkit, rr_expert_prior | implemented (requested by content); babies in diapers are not counted. Round 2, v0.2.0 (review P-16): capped at 30 days (a year without an earthquake: 27 bags for two, not 329) |
 | `toilet_cover_material` | sanitation | water_out | toilet_cover_material | people over 1, target(water_out), earthquake | 1 cup (0.5–1.5, *Prior*) of sawdust, shredded paper or similar per person-day, for the days `toilet_bags` counts | cup | person | rdpo_emergency_toilet, rr_expert_prior | rr-supply. Round 2, v0.2.0: capped with the bags |
 | `toilet_paper_rolls` | sanitation | supplies | toilet_paper | people over 1, target(supplies) | ceil(people × store target ÷ 5) rolls; *Prior*: about a roll a person every 5 days (Oregon: measure a week's use and double it) | roll | person | oregon_b2wr_toolkit, rr_expert_prior | implemented (requested by content); babies in diapers are not counted. Round 2, v0.2.0 (review P-04): the store target only; how much paper you use has nothing to do with the tap (Coos Bay: 24 rolls, not 146) |
-| `household_ops_kits` | sanitation | water_out | household_ops | target(water_out) | ceil(days ÷ 14) kits of paper plates, cups and utensils, garbage bags with ties and waterproof matches (`household_ops_kit_days`, *Prior*; all on Ready.gov's kit list), only when the no-water target is longer than the 14 stored days: paper plates save the water washing dishes takes | kit | household | rr_expert_prior, ready_gov_kit | implemented (Round 2, v0.2.0, review P-23, item N-16) |
+| `household_ops_kits` | sanitation | water_out | household_ops | target(water_out) | ceil(min(days, 30) ÷ 14) kits of paper plates, cups and utensils, garbage bags with ties and waterproof matches (`household_ops_kit_days`, `household_ops_cap_days`, *Prior*; all on Ready.gov's kit list), only when the no-water target is longer than the 14 stored days: paper plates save the water washing dishes takes, and after the first month dishes are washed with treated water (at most 3 kits) | kit | household | rr_expert_prior, ready_gov_kit | implemented (Round 2, v0.2.0, review P-23, item N-16) |
 | `soap_person_months` | sanitation | supplies | soap | people, target(supplies) | people × ceil(days ÷ 30) person-months, each 250 g of bathing soap and 200 g of laundry soap | person_month | person | sphere_2018 | implemented (requested by content) |
 | `menstrual_cycles` | sanitation | supplies | menstrual_products | adults and teens not pregnant or nursing, target(supplies) | ceil(half of them × cycles each), cycles each = 2, + 1 per 28 days beyond a month; about 20 products a cycle (15–30); *Prior*: sex is not asked | cycle | person | cdc_period_factsheet, sphere_2018, oregon_b2wr_toolkit, rr_expert_prior | implemented. Differs from the request: 2 cycles cover plans up to a month, as the research reads the CDC "2 cycles" advice (the request's 2 + floor(days ÷ 28) gives 3 at 28 days) |
 | `diapers` | sanitation | supplies | diapers | babies and toddlers, target(supplies) | (babies × 8 + toddlers × 6) × max(days, 3); *Prior* from newborns' 8–12 changes a day | diaper | person | sutter_diapers, cdc_infant_checklist, rr_expert_prior | implemented (requested by content) |
@@ -253,21 +278,219 @@ days gets none either.
 | `once_if_owned_house` | generic | any | (the item) | housing.tenure, housing.kind | 1 for a house (detached, rowhouse, mobile home or rural property) the household owns, else 0: roof, safe-room and wildfire decisions | item | household | (the item's own) | implemented (Round 2, v0.2.0, review RR-P10) |
 | `once_if_owned_detached` | generic | any | (the item) | housing.tenure, housing.kind | 1 for a detached house or one on rural land that the household owns, else 0: bolting a house to its foundation applies to a house on its own foundation | item | household | (the item's own) | implemented (Round 2, v0.2.0, review RR-P10) |
 | `once_if_owned_basement` | generic | any | (the item) | housing.tenure, housing.kind, housing.basement | 1 for an owned house with a basement, else 0: a backflow valve and a sump pump with battery backup | item | household | (the item's own) | implemented (Round 2, v0.2.0, review RR-P10) |
+| `once_if_long_horizon` | generic | any | (the item) | the bucket targets, dials.long_horizon | 1 when the plan has a long-horizon section: some duration target is at least 30 days (`long_horizon_min_days`, *Prior*, the design threshold) or the household turned the section on; else 0. Switches on the section's free pointers (`food_going_further`) | item | household | rr_expert_prior | implemented (Round 2, v0.2.0, the long-horizon section) |
 
 ## Which bucket's days size which line
 
-Duration lines use their own bucket's target, with these exceptions: `phone_power_wh` and
-`rx_cold_storage` use the **power** target (phones die and medicine warms when the power is out);
-`otc_medicines` and `ors_packets` use the **supplies** target (how long you can't reach a store; 14
-days when there is none); `cooking_fuel_canisters` uses the longer of **supplies** and
-**water_boil**, and `toilet_paper_rolls` the longer of **supplies** and **water_out**.
-`bleach_bottles` uses no days at all (one bottle whatever the target), and neither do
+Duration lines use their own bucket's target, with these exceptions: `phone_power_wh`,
+`rx_cold_storage` and `rx_fridge_units` use the **power** target (phones die and medicine warms when
+the power is out); `otc_medicines`, `ors_packets` and `wound_care_addon` use the **supplies** target
+(how long you can't reach a store; 14 days when there is none); `cooking_fuel_canisters` and
+`propane_cylinders` use the longer of **supplies** and **water_boil**. Since v0.2.0
+`toilet_paper_rolls` follows **supplies** only (review P-04), `household_ops_kits` covers at most the
+first 30 days of **water_out**, and `toilet_bags` and `toilet_cover_material` the first 30 unless an
+earthquake drives it. `n95_masks` counts the county's **smoke days** (`SupplyContext::smoke_days`),
+not a target. `bleach_bottles` uses no days at all (one bottle whatever the target), and neither do
 `fridge_thermometers`, `room_thermometer`, `generator_connection_units`, `fuel_cans` (sized by the
-fuel line) or `bleeding_control_kit`. Heat lines (`battery_fan`,
-`cooling_towel`, `cooling_plan`, `room_thermometer`) appear when `heat_wave` drives the thermal bucket, cold lines
-(`blankets`, `warm_layers`, `sleeping_bag_or_blanket`, `warm_room_plan`) when `cold_wave`,
-`winter_weather` or `ice_storm` does, and both when the assessment names neither; the thermal
-target decides whether `sleeping_bag_or_blanket` is a need (over 3 days) and its tier.
+fuel line), `bleeding_control_kit`, `infant_formula_rtf` (always three days), the clean-air lines
+(`air_cleaner_units`, `diy_filter_box`, `clean_room_plan`), `grill_propane_tank` or the insurance
+decisions. Heat lines (`battery_fan`, `cooling_towel`, `cooling_plan`, `room_thermometer`) appear
+when `heat_wave` drives the thermal bucket, cold lines (`blankets`, `warm_layers`,
+`sleeping_bag_or_blanket`, `warm_room_plan`) when `cold_wave`, `winter_weather` or `ice_storm` does,
+and both when the assessment names neither; the thermal target decides whether
+`sleeping_bag_or_blanket` is a need (over 3 days) and its tier. The clean-air lines appear only when
+the bucket's ten-year chance is at least 2 in 100 (`clean_air_min_p10`, DESIGN §4.4's bar for
+readiness capabilities).
+
+## Prerequisites: `requires`
+
+`Item.requires` (contract v2) lists what an accessory needs first, so the allocator never buys the
+batteries before a light or the fuel before its can (review P-12). **The list names alternatives:
+the item may be bought once any one of them is owned or bought the same month or earlier.** A single
+entry is therefore a plain prerequisite, and a chain says the order: the generator, then its fuel
+cans, then the fuel. Decisions are never required.
+
+| Item | Requires (any one) | Why |
+| --- | --- | --- |
+| Spare batteries (`power_batteries`) | `power_headlamp`, `power_lantern`, `comms_noaa_radio` | spare batteries for a light or the radio |
+| Generator fuel (`power_generator_fuel`) | `power_fuel_cans` | gasoline only in approved cans (CPSC) |
+| Fuel cans and the interlock (`power_fuel_cans`, `power_transfer_interlock`) | `power_generator` | the cans and the connection serve a generator |
+| Stove fuel (`food_cooking_fuel`, `food_propane_cylinders`) | `food_camp_stove` | fuel for the stove |
+| Toilet bags (`san_toilet_bags`) | `san_twin_bucket_toilet` | bags line the buckets |
+| Baby wipes (`san_baby_wipes`) | `san_diapers` | wipes go with diapers |
+| Wound-care add-on (`med_wound_splint_addon`) | `med_first_aid_kit` | an add-on to the kit |
+| Whistle (`evac_whistle`) | `evac_go_bag` | it goes in the bag |
+| Foil blankets (`thermal_emergency_blankets`) | `evac_go_bag`, `gethome_bag`, `gethome_car_kit` | foil blankets go in a bag or the car |
+| Walk-home filter (`water_personal_filter`) | `gethome_bag` | it goes in the walk-home bag |
+| Chlorine dioxide (`water_chlorine_dioxide`) | `gethome_bag`, `evac_go_bag`, `water_filter_gravity` | for a bag, or after a filter |
+
+## Readiness share
+
+Readiness buckets have no days: an item that meets one of their lines, or lists one first among
+its buckets, avoids the bucket's harm each time it is needed (rr-plan's `READINESS_HARM`). Before
+v0.2.0 every such item earned the whole of it, so a whistle outranked a headlamp and a HEPA cleaner
+counted as medical-emergency care (review P-05). `Item.readiness_share` (contract v2) is the share
+of that harm the item averts on its own, and every item that lists a readiness bucket carries one
+(a catalogue test checks it). The values are estimates, set on one scale:
+
+- **1.0, the capability itself:** the thing that makes the household ready, with nothing else on the
+  checklist doing its job: the go-bag, the get-home bag, the first-aid kit, working smoke alarms and
+  the escape plan, emergency alerts, the evacuation plan, a ride out for a household with no car,
+  the evacuation assistance plan, knowing two neighbours, and an air cleaner or filter box for the
+  clean room (the two are alternatives: the allocator buys the cheaper).
+- **0.5, a second core piece:** needed for the capability to work in a common case, or the core for
+  part of the household: the contact card, drills, the 48-hour list, pet and infant plans and the
+  pet go-kit, the older-adult and livestock plans, the car kit, the bleeding-control kit, the device
+  power plan and epinephrine, the carbon monoxide alarm, an extinguisher, an escape ladder, home
+  security basics, respirators, and the clean-room plan.
+- **0.2 to 0.3, supporting items:** they help a capability without being it: the weather radio, the
+  documents step and pouch, cash, the half tank, a headlamp for the go-bag, the jump starter, the
+  medicine list, the wound-care add-on, the pregnancy plan, over-the-counter medicines, shut-offs
+  and the shut-off wrench, water-heater straps, the motion light, the key safe, the shelter-in-place
+  kit and cleanup gear.
+- **0.05 to 0.1, accessories:** worth having, but no one is ready because of them: the whistle,
+  foil blankets, chlorine dioxide, the walk-home filter, warm layers for the walk, staged pet food
+  and water, the ID decision, gloves, the thermometer, the crisis line step and firearm storage
+  (which is about safety at home, not security).
+- **0.0:** the antibiotics conversation, which is not medical-emergency care (review P-05).
+
+| Bucket credited | Share | Items |
+| --- | --- | --- |
+| evacuate | 1.0 | `comms_wea_alerts_on`, `evac_know_zone`, `evac_go_bag`, `evac_ride_plan`, `special_access_needs_plan` |
+| evacuate | 0.5 | `comms_contact_card`, `evac_ten_minute_drills`, `evac_forecast_48h_checklist`, `special_pet_plan`, `special_pet_kit`, `special_infant_go_kit`, `special_older_adult_plan`, `special_livestock_plan` |
+| evacuate | 0.2–0.3 | `comms_noaa_radio`, `docs_effak`, `evac_half_tank` (0.3); `docs_document_pouch`, `docs_cash_reserve`, `power_headlamp` (0.2) |
+| evacuate | 0.05–0.1 | `decide_id_for_every_person`, `special_pet_go_water`, `special_pet_go_food` (0.1); `evac_whistle`, `special_pet_food`, `thermal_emergency_blankets` (0.05) |
+| get_home | 1.0, 0.5, 0.3 | `gethome_bag`; `gethome_car_kit`; `gethome_jump_pack` |
+| get_home | 0.05–0.1 | `thermal_warm_layers`, `water_personal_filter` (0.1); `water_chlorine_dioxide` (0.05) |
+| medical_emergency | 1.0 | `med_first_aid_kit` |
+| medical_emergency | 0.5 | `med_device_power_plan`, `med_bleeding_control_kit`, `med_epinephrine_plan` |
+| medical_emergency | 0.2–0.3 | `med_list_written`, `med_wound_splint_addon`, `special_pregnancy_plan` (0.3); `med_otc_basics` (0.2) |
+| medical_emergency | 0–0.1 | `med_988_saved`, `med_thermometer` (0.1); `san_nitrile_gloves` (0.05); `med_antibiotics_clinician_card` (0) |
+| fire | 1.0 | `fire_test_alarms`, `fire_smoke_alarm` |
+| fire | 0.5 | `fire_co_alarm`, `fire_extinguisher`, `fire_escape_ladder` |
+| fire | 0.2–0.3 | `fire_learn_shutoffs` (0.3); `fire_utility_wrench`, `water_heater_strap_kit` (0.2) |
+| security | 1.0, 0.5 | `community_know_two_neighbours`; `security_home_basics` |
+| security | 0.1–0.2 | `security_motion_light`, `security_key_safe` (0.2); `security_firearms_safe_storage` (0.1) |
+| clean_air | 1.0 | `fire_clean_air_room`, `fire_diy_filter_box` |
+| clean_air | 0.5 | `fire_clean_room_plan`, `med_n95_respirators` |
+| clean_air | 0.2–0.3 | `evac_shelter_in_place_kit` (0.3); `med_cleanup_ppe` (0.2) |
+
+The allocator (rr-budget) multiplies an item's readiness value by its share; an item with no share
+keeps the whole value, as before. rr-plan's `READINESS_HARM` gains a clean-air row (0.5
+day-equivalents, like security's, an estimate), since the research priced no clean-air harm.
+
+## Seasons and test intervals
+
+`Item.season` (contract v2) is the season to have the item by, or to check it in (meteorological
+seasons; summer starts 1 June, with the Atlantic hurricane season, `ready_gov_hurricanes`). The
+anchors: **spring** for stored water and bleach (with the six-month rotation, the other check falls
+in the fall), the weather radio (tornado season), rain barrels, the backflow valve and sump pump,
+and wildfire hardening; **summer** for fans, cooling towels, the room thermometer, the air cleaner
+and filter box (wildfire season), insect repellent and the tarp kit (hurricane season); **fall** for
+the generator and its upkeep, the carbon monoxide alarm (heating season), sleeping bags, blankets
+and warm layers, the camp stove and propane, the car kit and the jump starter (cold weakens
+batteries). The budget crate uses the anchors to buy a fan before summer when the cost order allows.
+
+`Item.test_interval_months` says how often to try the thing the way it would be used, because a
+backup nobody has tried may not work (the Deviant Ollam lessons). The maintenance calendar prints
+these as **Test** rows beside Check and Use-and-restock: switch on each light (every 6 months), start
+the generator and run it with something plugged in (every 3), charge the jump starter and try it
+(every 3), and open the key safe with its code and try the key in the door (every 6). The intervals
+are estimates (`rr_expert_prior`); the generator's matches its existing three-month check, and the
+lights' the lantern's six-month check. Only these five items carry one (a catalogue test checks it).
+
+## The bare-minimum kit
+
+`Dials::minimum_kit` (or a plan that would run past 36 months) asks the budget crate to schedule the
+smallest set that covers **three days** (`minimum::MINIMUM_KIT_DAYS`) of water, light, warmth and
+medicine continuity first. rr-supply marks each line's share of that kit in `SizedLine::minimum`
+(`rr_supply::minimum_kit` lists them):
+
+| Function | Line | Share in the kit |
+| --- | --- | --- |
+| Water | `water_out.water_gallons` | three days of the household's water (or the target, if shorter) |
+| Safe water | `water_boil.bleach_bottles` or `water_out.bleach_bottles` | the one bottle |
+| Light | `power.lights`, `power.battery_packs` | one light and one pack of batteries |
+| Warmth | `thermal.blankets`, `thermal.warm_layers`, `thermal.cooling_plan` | all of them: most homes have them, and the heat plan is free |
+| Medicine | `medication.medication_days`, `power.medical_device_wh` | three days (or the target) |
+| Medicine | `medication.rx_cold_storage` | the cooler bag's day |
+| Medicine | `power.device_battery_units` | every spare battery |
+| A baby's food | `supplies.infant_formula_rtf` | the three days of ready-to-feed formula (water and food at once) |
+
+Smoke and carbon monoxide alarms are not in it: they are life-safety lines, which the allocator
+orders first anyway.
+
+## Storage space and weight
+
+`rr_supply::storage_by_tier(lines)` gives, for each tier from three days to the highest tier the
+stored supplies reach, the space and weight of the bulky consumables: water (a litre weighs a
+kilogram), food (1.9 L and 0.8 kg per 2,000 kcal, packaging included), dry pet food (1 L a pound)
+and toilet paper (1.3 L and 0.1 kg a roll), all estimates (`food_storage_l_per_2000kcal` and the
+rest). A line that grows with days counts its share up to the tier's days. Gear (lights, radios, the
+first-aid kit) is not counted. The plan prints these as the "Where it lives" rows (review P-20).
+
+## The long-horizon section
+
+`Item.long_horizon` (contract v2) puts an item in the long-horizon section, which the plan shows
+when any duration target reaches 30 days (`long_horizon_min_days`) or the household turns it on
+(`rr_supply::long_horizon`). The flag groups items; it does not change how they are sized or
+bought: each still has its own rule (a rain barrel only for a house on town water with a no-water
+target over 14 days, carriers past the 14 stored days), so a 20-day target can still buy carriers.
+Flagged: the rain barrel, water carriers, the hauling tote for animals, the well hand pump (an
+option), household kits, the children's activity kit (morale), bulk staples, and the free pointer
+`food_going_further` (`once_if_long_horizon`). Canning, gardens and wells are pointers in the
+content workstream's "If it lasts for months" block, not a manual.
+
+## Decisions
+
+`Item.decision` (contract v2) marks a decision rather than a purchase: an insurance policy, ID, a
+home repair to weigh. Decisions are free items in tier now with a $0 band, so they never draw on the
+supplies budget; their notes say the cost is a quote, a premium or a fee (the passport fees quoted
+from 22 CFR 22.1). The insurance decisions meet the insurance lines (`insurance_home_or_renters`,
+`insurance_flood`, `insurance_earthquake`, `insurance_wind_deductible`, `insurance_sewer_backup`,
+`insurance_condo_unit`, `insurance_life_disability`); the earthquake and wind ones also need the
+hazard at 2 in 100 in ten years. The home repairs use the owner switches and a hazard: a FORTIFIED
+roof (`once_if_owned_house`; hurricane, strong wind, hail, tornado), a safe room (tornado,
+hurricane), a backflow valve and battery-backup sump pump (`once_if_owned_basement`; flooding, water
+damage), bolting a house to its foundation (`once_if_owned_detached`; earthquake) and wildfire
+hardening (wildfire), each with a grant or discount pointer. Water-heater straps stay a purchase
+(about $20, life-safety in earthquake country).
+
+## Round 2 rule changes, as implemented
+
+The practitioner's quantity-rule table (practitioner-review.md, "Quantity-rule changes"), with where
+each change lives and the test that reads its source (`crates/rr-supply` unless noted).
+
+| Change | As implemented | Test |
+| --- | --- | --- |
+| `rx_cold_storage` coverage | the bag counts 1 day; the rest needs power (v0.1.1), plus a 12-volt fridge in hot counties (`rx_fridge_units`) | `sugar_land_keeps_insulin_cold_and_feeds_the_baby_without_water` |
+| `power_station_units` | a need with refrigerated medicine, a power target of 2 days and no backup power (v0.1.1) | `requirements.rs` `the_pending_cold_chain_and_well_fixture_exercises_the_round_two_rules`, `sugar_land_...` |
+| `generator_units` (well) | pump-sized with 240 V, plus `generator_connection_units` (v0.1.1) | `requirements.rs` `livestock_on_a_well_store_two_weeks_until_pump_power_exists` |
+| `livestock_water` | 3 days only with pump power, 14 until then (v0.1.1); a hauling tote in a drought | `livestock_on_a_well_store_two_weeks_until_pump_power_exists`, `hays_hauls_water_in_a_drought` |
+| `water_treatment_capacity` coverage | the filter counts only with a raw-water source (well, a named source, or a rain barrel the plan makes a need) | `rain_barrels_are_the_source_the_filter_needs` |
+| new `rain_catchment_units` | barrels from the state's driest-months rain (NOAA nClimDiv) where NCSL's map lets households drink rainwater; optional otherwise | `rain_barrels_are_the_source_the_filter_needs` |
+| `battery_packs` | ceil(min(days, 14) ÷ 7), then `recharge_capability` | `coos_bay_stores_two_weeks_of_batteries_and_paper_for_the_store_target`, `a_long_power_target_asks_for_a_way_to_recharge` |
+| `toilet_paper_rolls` | the supplies target only | `coos_bay_...` |
+| `generator_fuel_gallons` coverage | run-hours at light and full load; the line's days are the days the fuel lasts | `coos_bay_...` |
+| `medication_days` coverage | at most 30 days; `medication_fills` covers the rest | `coos_bay_...` |
+| readiness value | × `readiness_share` (content; rr-budget multiplies) | rr-content `every_readiness_item_carries_a_share` |
+| `bleach_bottles` tier | always three days, one bottle | `rural_wound_care_and_the_long_walk_filter` |
+| extinguisher need rate | CPSC's all-fires rate in the line; the item is life-safety | `fire.rs` `the_extinguisher_line_counts_the_small_fires_nobody_reports`; rr-content `the_practitioner_items_exist_with_their_rules` |
+| `escape_ladder_count` | a house is assumed to sleep upstairs unless every bedroom is on the ground floor | `fire.rs` `apartments_count_one_level_and_ladders_follow_the_floor` |
+| new `cooking_capability` | a need with a store target of 14 days or a formula-fed baby under a boil notice; covered by a wood stove or gas range | `food.rs` `a_way_to_cook_without_power`, `sugar_land_...` |
+| `cooking_fuel_canisters` | + 0.3 lb per 2,000 kcal of staples; `propane_cylinders` where winters freeze | `food.rs` `camp_stove_canisters`, `a_way_to_cook_without_power` |
+| `battery_fan`, `cooling_towel` in hot counties | optional; the cooling plan is the cover and is life-safety with a power target | `hot_counties_count_a_place_to_go_not_a_fan` |
+| bleeding-control tier | three days; life-safety for rural homes or a likely medical emergency | `requirements.rs` `life_safety_lines_are_marked`; the add-on: `first_aid.rs` `the_wound_add_on_is_for_homes_far_from_help` |
+| `requires` (new item field) | content, with any-one-of semantics (above) | rr-content `accessories_require_their_device` |
+| `water_reused_bottles` | min(target days, 14) of water, at most 6 gallons | `chicago_meets_its_water_target_with_free_bottles` |
+| motion light, utility wrench | `once_if_house_ground_floor`, `once_if_house` | rr-content `the_practitioner_items_exist_with_their_rules` |
+| thermal plans | `warm_room_plan` and `cooling_plan` | rr-content, the same |
+| new `get_home_filter` | only where the walk's water passes 2.5 L outside hot counties | `rural_wound_care_and_the_long_walk_filter` |
+| `toilet_bags` | the first 30 days unless an earthquake drives the no-water target | `coos_bay_...` (earthquake: all 365) |
+| `infant_formula_oz` | three days of ready-to-feed (`infant_formula_rtf`), then powder | `sugar_land_...` |
+| `cash_reserve_usd` | max($100, half of 3 days of monthly expenses rounded down to $20) | `comms.rs` `philadelphia_comms` |
+| `n95_masks` | teens and adults, by the county's smoke days (5 when unknown, at most 30) | `clean_air_lines_follow_the_smoke_days` |
+| bleach rotation | 6 months, rule and item | rr-content `water_items_match_their_sources` |
 
 ## Citation ids
 

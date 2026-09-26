@@ -104,8 +104,15 @@ fn coos_bay_stores_two_weeks_of_batteries_and_paper_for_the_store_target() {
     assert!(!lines.iter().any(|l| l.line.rule == "rain_catchment_units"));
     // Carriers for hauling (365 days is past the 14 stored); two people carry two.
     assert_eq!(get(&lines, "water_out.water_carriers").quantity, 2.0);
-    // Household kits: one per 14 days of the 365-day target = 27.
-    assert_eq!(get(&lines, "water_out.household_ops_kits").quantity, 27.0);
+    // Paper tableware for the first month of the year-long target (30 days at a kit per 14 days =
+    // 3 kits), then dishes are washed with treated water: never 27 kits for a year.
+    let kits = get(&lines, "water_out.household_ops_kits");
+    assert_eq!(kits.quantity, 3.0);
+    assert!(
+        kits.line.plain.contains("the water you treat"),
+        "{}",
+        kits.line.plain
+    );
 }
 
 /// Round-2 review P-02, P-03: Hays' 60-day target is a drought, so hauling is the real work.
@@ -250,6 +257,19 @@ fn clean_air_lines_follow_the_smoke_days() {
     let diy = get(&lines, "clean_air.air_cleaner_units.alt.diy_filter_box");
     assert_eq!(diy.kind, LineKind::Alternative);
     assert_eq!(get(&lines, "clean_air.clean_room_plan").tier, TierId::Now);
+    // Below 2 in 100 in ten years (DESIGN §4.4's bar) the clean-air lines are left out.
+    let rare = sized_requirements(
+        &input,
+        &[common::readiness(BucketId::CleanAir, 0.01)],
+        &smoky,
+    );
+    assert!(!rare.iter().any(|l| l.line.bucket == BucketId::CleanAir));
+    let at_bar = sized_requirements(
+        &input,
+        &[common::readiness(BucketId::CleanAir, 0.02)],
+        &smoky,
+    );
+    assert!(has(&at_bar, "clean_air.clean_room_plan"));
     // No respirators counted under medical emergencies any more (round-2 review P-05).
     let old = sized_requirements(
         &input,
@@ -443,4 +463,38 @@ fn storage_space_and_weight_by_tier() {
     let lines = sized_requirements(&chicago, &common::generic(), &SupplyContext::default());
     let tiers = storage_by_tier(&lines);
     assert!(tiers.last().unwrap().volume_l > 0.0);
+}
+
+/// Contract v2's long-horizon section: present when a duration target reaches 30 days
+/// (`long_horizon_min_days`, the design threshold) or the household turns it on, and the rule
+/// `once_if_long_horizon` switches its free pointers on with it. An income target in months does
+/// not count: it is the savings track.
+#[test]
+fn the_long_horizon_section_follows_the_longest_target() {
+    use rr_supply::{ItemSizer, long_horizon};
+    let mut input = fixtures::get("philadelphia-renters-4").unwrap();
+    let short = vec![
+        common::days(BucketId::Power, 3.0),
+        common::days(BucketId::Supplies, 29.0),
+        common::months(6.0),
+    ];
+    assert!(!long_horizon(&input, &short));
+    let q = |input: &rr_types::PlanInput, b: &[rr_types::BucketAssessment]| {
+        ItemSizer::new(input, b, &SupplyContext::default())
+            .quantity("once_if_long_horizon")
+            .unwrap()
+            .quantity
+    };
+    assert_eq!(q(&input, &short), 0.0);
+    // Thirty days of any duration target brings the section in.
+    let long = vec![common::days(BucketId::WaterOut, 30.0)];
+    assert!(long_horizon(&input, &long));
+    assert_eq!(q(&input, &long), 1.0);
+    // Coos Bay's year without well water, too.
+    let coos = fixtures::get("coos-bay-well-owner-2").unwrap();
+    assert!(long_horizon(&coos, &coos_bay_long()));
+    // The household's own switch shows it below 30 days.
+    input.dials.long_horizon = true;
+    assert!(long_horizon(&input, &short));
+    assert_eq!(q(&input, &short), 1.0);
 }

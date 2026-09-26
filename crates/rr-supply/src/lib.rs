@@ -275,6 +275,7 @@ pub struct ItemSizer<'a> {
     ctx: SupplyContext,
     lines: Vec<SizedLine>,
     water_out_days: Option<f64>,
+    long_horizon: bool,
 }
 
 impl<'a> ItemSizer<'a> {
@@ -287,6 +288,7 @@ impl<'a> ItemSizer<'a> {
             ctx: *ctx,
             lines,
             water_out_days,
+            long_horizon: long_horizon(input, buckets),
         }
     }
 
@@ -305,6 +307,12 @@ impl<'a> ItemSizer<'a> {
     /// (over 14 days) or the home is on a well, else 0: the lines state the gallons to make safe,
     /// which one family filter far exceeds.
     pub fn quantity(&self, rule: &str) -> Option<ItemQuantity> {
+        if rule == "once_if_long_horizon" {
+            return Some(ItemQuantity {
+                quantity: if self.long_horizon { 1.0 } else { 0.0 },
+                per: Per::Household,
+            });
+        }
         if let Some((quantity, per)) = generic::quantity(rule, self.input, &self.ctx) {
             return Some(ItemQuantity { quantity, per });
         }
@@ -357,6 +365,19 @@ pub fn item_quantity(
     ctx: &SupplyContext,
 ) -> Option<ItemQuantity> {
     ItemSizer::new(input, buckets, ctx).quantity(rule)
+}
+
+/// Whether the plan has a long-horizon section (contract v2's `Plan.long_horizon`; DESIGN-DELTA
+/// §1.3): some duration target is at least `long_horizon_min_days` (30 days), or the household turned
+/// the section on (`Dials::long_horizon`). Items with `Item.long_horizon` belong to that section, and
+/// the rule `once_if_long_horizon` switches its free pointers on.
+pub fn long_horizon(input: &PlanInput, buckets: &[BucketAssessment]) -> bool {
+    let min = constants().value(constants::keys::LONG_HORIZON_MIN_DAYS);
+    let t = Targets::new(buckets);
+    input.dials.long_horizon
+        || BucketId::ALL
+            .iter()
+            .any(|b| t.days(*b).is_some_and(|d| d >= min))
 }
 
 const HEAT: &[HazardId] = &[HazardId::HeatWave];
@@ -1287,7 +1308,16 @@ pub fn sized_requirements(
             BucketId::CleanAir => {
                 // Unhealthy air indoors (contract v2): respirators for teens and adults sized by
                 // the county's smoke days, an air cleaner for the clean room or the cheaper box
-                // fan with a MERV 13 filter, and the clean-room plan.
+                // fan with a MERV 13 filter, and the clean-room plan. Left out where the ten-year
+                // chance is under 2 in 100 (`clean_air_min_p10`, DESIGN §4.4's bar).
+                let p = t.get(bucket).and_then(|a| match a.target {
+                    Target::Readiness { p_need_10yr, .. } => Some(p_need_10yr),
+                    _ => None,
+                });
+                let min = constants().value(constants::keys::CLEAN_AIR_MIN_P10);
+                if p.is_some_and(|p| !(p >= min)) {
+                    continue;
+                }
                 out.push(
                     bucket,
                     cited(bucket, clean_air::n95_masks(people, ctx.smoke_days)),

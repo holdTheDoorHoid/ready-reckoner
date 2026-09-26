@@ -135,9 +135,10 @@ pub fn toilet_cover_material(
 
 /// Paper tableware, garbage bags and ties, and waterproof matches for a no-water target longer than
 /// the 14 stored days (round-2 review P-23; item N-16): one kit per `household_ops_kit_days` (14, an
-/// estimate). Ready.gov's kit lists paper cups, plates, towels and plastic utensils, garbage bags and
-/// plastic ties, and matches in a waterproof container; paper plates save the water washing dishes
-/// would take. Rule `household_ops_kits`.
+/// estimate) for at most the first `household_ops_cap_days` (30, an estimate), after which dishes
+/// are washed with treated water. Ready.gov's kit lists paper cups, plates, towels and plastic
+/// utensils, garbage bags and plastic ties, and matches in a waterproof container; paper plates save
+/// the water washing dishes would take. Rule `household_ops_kits`.
 pub fn household_ops_kits(days: f64) -> Option<Sizing> {
     let cap = constants().value(keys::WATER_STORED_CAP_DAYS);
     if !(days > cap) {
@@ -145,13 +146,26 @@ pub fn household_ops_kits(days: f64) -> Option<Sizing> {
     }
     let mut b = Basis::new();
     let per = b.k(keys::HOUSEHOLD_OPS_KIT_DAYS);
-    let q = ceil_count(days / per);
-    let text = format!(
+    let most = constants().value(keys::HOUSEHOLD_OPS_CAP_DAYS);
+    let capped = days > most;
+    let d = if capped {
+        b.k(keys::HOUSEHOLD_OPS_CAP_DAYS)
+    } else {
+        days
+    };
+    let q = ceil_count(d / per);
+    let mut text = format!(
         "{} of paper plates, cups and utensils, garbage bags with ties, and waterproof matches, one for every {} of your {} no-water target: paper plates save the water that washing dishes takes.",
         count(q, "household kit", "household kits"),
         fmt_days(per),
         day_adjective(days)
     );
+    if capped {
+        text.push_str(&format!(
+            " They cover the first {}; after that, wash dishes with the water you treat.",
+            fmt_days(d)
+        ));
+    }
     Some(Sizing::new(
         &b,
         "household_ops_kits",

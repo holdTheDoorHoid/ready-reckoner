@@ -837,11 +837,14 @@ keys! {
     NFIP_CLAIMS_OUTSIDE_HIGH_RISK_SHARE = "nfip_claims_outside_high_risk_share",
     DISABILITY_BEFORE_RETIREMENT_SHARE = "disability_before_retirement_share",
     HOUSEHOLD_OPS_KIT_DAYS = "household_ops_kit_days",
+    HOUSEHOLD_OPS_CAP_DAYS = "household_ops_cap_days",
     FOOD_STORAGE_L_PER_2000KCAL = "food_storage_l_per_2000kcal",
     FOOD_STORAGE_KG_PER_2000KCAL = "food_storage_kg_per_2000kcal",
     PET_FOOD_L_PER_LB = "pet_food_l_per_lb",
     TOILET_PAPER_L_PER_ROLL = "toilet_paper_l_per_roll",
     TOILET_PAPER_KG_PER_ROLL = "toilet_paper_kg_per_roll",
+    LONG_HORIZON_MIN_DAYS = "long_horizon_min_days",
+    CLEAN_AIR_MIN_P10 = "clean_air_min_p10",
 }
 
 #[cfg(test)]

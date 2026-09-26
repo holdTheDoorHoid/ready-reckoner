@@ -45,6 +45,7 @@ pub const GENERIC_RULES: &[&str] = &[
     "once_if_owned_house",
     "once_if_owned_detached",
     "once_if_owned_basement",
+    "once_if_long_horizon",
 ];
 
 fn switch(on: bool) -> (f64, Per) {
@@ -149,6 +150,10 @@ pub(crate) fn quantity(rule: &str, input: &PlanInput, ctx: &SupplyContext) -> Op
                 && is_house(input.housing.kind)
                 && input.housing.basement,
         ),
+        // The long-horizon section's free pointers (contract v2's `Item.long_horizon`). Without the
+        // targets only the household's own switch is known; [`crate::ItemSizer`] also turns it on
+        // for a duration target of 30 days or more ([`crate::long_horizon`]).
+        "once_if_long_horizon" => switch(input.dials.long_horizon),
         _ => return None,
     })
 }
