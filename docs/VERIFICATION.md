@@ -24,7 +24,7 @@ harnesses added on this branch:
 | --- | --- | --- | --- |
 | V-01 | A year without power in 88 counties (every Puerto Rico municipio and ten mainland counties), from outage curves extrapolated far past their records | High | Fixed `2c4e45b` |
 | V-02 | The major-hurricane scenario counted two to four times over (share taken against hurricane-strength passages, applied to NRI's tropical-storm-strength count; missing rows read as one-third) | High | Fixed `c7b2f3b` |
-| V-10 | The plan screen crashes (`each_key_duplicate`) on the real engine's output whenever a sinking fund fills | High | Fixed by the web-engine merge (`keyedItems` in web/src/lib/lookup.ts); test `b448a68` now passes |
+| V-10 | The plan screen crashes (`each_key_duplicate`) on the real engine's output whenever a sinking fund fills | High | Fixed `098eba3` (agent/web-engine: `keyedItems` in web/src/lib/lookup.ts); the `b448a68` reproduction passes since `1cb8759` |
 | V-03 | Home-loss sentence "1 in 3 displaced households are back within a week" is not in the cited source | Medium | Fixed `688318b` |
 | V-04 | "Many states" allow 30-day emergency refills after a declaration; the source says 10 of 51 | Medium | Fixed `688318b` |
 | V-05 | The nuclear card calls our annualised range "experts' estimates" | Medium | Fixed `688318b` |
@@ -411,16 +411,19 @@ the risks screen, a dial change, the packet and the About screen.
 - The shared-origin question (DESIGN §10) stands: the saved household would be readable by any
   other page on `holdthedoorhoid.github.io`.
 
-**V-10 (High, fixed by the web-engine merge: `keyedItems` keys lists by kind, item and tier).** After the interview the plan screen never renders: Svelte
+**V-10 (High, fixed `098eba3`: `keyedItems` keys lists by kind, item and tier).** After the interview the plan screen never renders: Svelte
 throws `each_key_duplicate` (console: `https://svelte.dev/e/each_key_duplicate`) and the router
 stays on "Your risks". When a sinking fund fills, the engine lists that month's last deposit
 (`reserve`) and the purchase (`purchase`) for the same item and tier; `PlanScreen.svelte` keys its
 month lists by `item.item_id + item.tier`. It happens whenever a sinking fund fills (three of the
 seven goldens, Philadelphia, Hays and Phoenix, have 4–6 such months; so did the one-adult household
 of the browser run), never with the mock engine, so the screen tests pass.
-*Fix (web):* key by `item.item_id + item.tier + item.kind` (PlanScreen.svelte lines 113, 129, 134,
-143, 189, 213; ReadinessCard.svelte 34, 42; HazardCard.svelte 61). `web/src/screens/verify.real-output.test.ts`
-reproduces it with the real Philadelphia golden (recorded as `it.fails`; flip to `it` with the fix).
+*Fix (web, `098eba3` on agent/web-engine):* every plan-item list (PlanScreen.svelte,
+ReadinessCard.svelte, HazardCard.svelte) goes through `keyedItems()` in `web/src/lib/lookup.ts`,
+which keys by kind, item and tier and numbers any repeat, so a deposit and its purchase can never
+share a key. `web/src/screens/verify.real-output.test.ts` renders the real Philadelphia golden
+through the plan screen; recorded as `it.fails` in `b448a68`, flipped to `it` in `1cb8759` once the
+fix landed. It passes.
 
 ## 8. Follow-ups from FOLLOWUPS.md
 
