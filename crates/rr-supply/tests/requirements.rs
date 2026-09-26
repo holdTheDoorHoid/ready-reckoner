@@ -125,7 +125,7 @@ fn coos_bay_prefers_a_filter_and_a_source_to_a_hundred_gallons() {
         noted[0]
             .citations
             .iter()
-            .any(|c| c == "church_food_storage_2007")
+            .any(|c| c == "church_home_storage_2007")
     );
     assert_eq!(tier_recommended(&targets), TierId::M3);
 }
@@ -226,7 +226,7 @@ fn every_line_is_cited_and_well_formed() {
                 }
                 assert_eq!(
                     s.prior,
-                    l.citations.iter().any(|c| c == "prior_supply_estimate"),
+                    l.citations.iter().any(|c| c == "rr_expert_prior"),
                     "{}",
                     l.id
                 );

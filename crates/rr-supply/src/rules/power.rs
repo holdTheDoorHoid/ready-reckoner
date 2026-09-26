@@ -265,7 +265,7 @@ pub fn fridge_wh(days: f64) -> Option<Sizing> {
         .find(|a| a.label == "Chest freezer")
         .map(|a| a.value);
     if chest.is_some() {
-        b.cite("energy_star_freezers");
+        b.cite("epa_energy_star_refrigerators");
     }
     let fridge_hours = b.k(keys::FRIDGE_COLD_HOURS);
     let freezer_hours = b.k(keys::FREEZER_COLD_HOURS);

@@ -65,10 +65,10 @@ pub const ONE_MONTH_NOTE: &str = "No agency sets a one-month amount: this step s
 pub(crate) fn one_month_basis() -> Basis {
     let mut b = Basis::new();
     for id in [
-        "red_cross_survival_kit",
+        "redcross_survival_kit",
         "oregon_2_weeks_ready",
-        "wa_emd_prepare_in_a_year",
-        "church_food_storage_2007",
+        "washington_prepare_in_a_year",
+        "church_home_storage_2007",
     ] {
         b.cite(id);
     }

@@ -12,7 +12,7 @@
 //! - **Every number comes from the constants registry** ([`constants()`], `constants.toml`), with
 //!   its sources, range, alternatives and the note on where authorities disagree. Each line cites
 //!   exactly the sources of the numbers it used, plus the bucket target's own sources; lines that
-//!   rest on a planning estimate cite `prior_supply_estimate` and say so.
+//!   rest on a planning estimate cite `rr_expert_prior` and say so.
 //! - **Tier logic** ([`tiers`]): which tier covers a number of days, which tier is enough per
 //!   bucket, and the tier the household should reach.
 //! - **Line ids** say what kind of line each is ([`LineKind`]): needs, alternatives, optional

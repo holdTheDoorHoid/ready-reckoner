@@ -99,7 +99,7 @@ pub fn thermometer(people_list: &[Person]) -> Sizing {
     let base = b.k(keys::THERMOMETERS_PER_HOUSEHOLD);
     let baby = people_list.iter().any(|p| p.age_band == AgeBand::Infant);
     let q = if baby {
-        b.cite("cdc_infant_emergency_checklist");
+        b.cite("cdc_infant_checklist");
         base + 1.0
     } else {
         base

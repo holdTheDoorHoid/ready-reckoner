@@ -160,7 +160,7 @@ mod tests {
         // 21.7 mi ÷ 3 = 7.25 h × 0.71 = 5.1 L
         assert_eq!(w.quantity, 5.1);
         assert!(w.plain.contains("filter"));
-        assert!(w.citations.iter().any(|c| c == "niosh_heat_stress"));
+        assert!(w.citations.iter().any(|c| c == "cdc_niosh_heat_hydration"));
         assert_eq!(car_kit(2).unwrap().quantity, 2.0);
         assert!(car_kit(0).is_none());
     }

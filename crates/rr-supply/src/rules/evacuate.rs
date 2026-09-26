@@ -125,7 +125,7 @@ pub fn go_bag_water(
 pub fn go_bag_food(people_list: &[Person], days_away: f64) -> Option<Sizing> {
     let mut b = Basis::new();
     let bag_days = b.k(keys::GO_BAG_DAYS);
-    b.cite("wa_emd_prepare_in_a_year");
+    b.cite("washington_prepare_in_a_year");
     let per_day = household_kcal(&mut b, people_list);
     if per_day <= 0.0 {
         return None;
@@ -334,7 +334,7 @@ mod tests {
         assert!(bags.plain.contains("few hours"));
         let w = go_bag_water(&p.people, rr_types::WaterLevel::Basic, false, 3.0);
         assert_eq!(w.quantity, 12.0); // 4 people × 1 gal × 3 days (pets have their own kit)
-        assert!(w.citations.iter().any(|c| c == "red_cross_survival_kit"));
+        assert!(w.citations.iter().any(|c| c == "redcross_survival_kit"));
         let f = go_bag_food(&p.people, 3.0).unwrap();
         assert_eq!(f.quantity, 24_600.0);
         assert_eq!(pet_carrier(&p.pets).unwrap().quantity, 1.0);

@@ -395,7 +395,7 @@ pub fn water_treatment_boil(days: f64, people_list: &[Person], pets: &Pets, hot:
     let per_day = d.drinking_total_gal();
     let q = per_day * days;
     let how = how_to_treat(&mut b);
-    b.cite("cdc_co_poisoning");
+    b.cite("cdc_co_basics");
     let mut text = format!(
         "For a boil-water notice of up to {}: make about {} of drinking water safe each day, about {} in all. To make it safe, {}. A gas stove can boil water while the gas flows; never use a camp stove or grill indoors.",
         fmt_days(days),
@@ -434,7 +434,7 @@ pub fn boil_fuel(gallons_to_boil: f64) -> Sizing {
     let per_lb = b.k(keys::PROPANE_L_BOILED_PER_LB);
     let (lo, hi) = b.range(keys::PROPANE_L_BOILED_PER_LB);
     let max_small = b.k(keys::PROPANE_SMALL_CYLINDERS_INDOOR_MAX);
-    b.cite("cdc_co_poisoning");
+    b.cite("cdc_co_basics");
     let litres = gallons_to_boil * L_PER_GAL;
     let lb = litres / per_lb;
     let text = format!(
@@ -519,8 +519,8 @@ mod tests {
         for id in [
             "ready_gov_water",
             "cdc_water_storage",
-            "petmd_pet_water",
-            "prior_supply_estimate",
+            "rr_research_supply_standards",
+            "rr_expert_prior",
         ] {
             assert!(
                 s.citations.iter().any(|c| c == id),

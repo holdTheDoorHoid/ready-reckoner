@@ -464,7 +464,7 @@ pub fn infant_formula(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let mut b = Basis::new();
     let oz = b.k(keys::INFANT_FORMULA_OZ_DAY);
     b.cite("cdc_infant_feeding_disaster");
-    b.cite("cdc_infant_emergency_checklist");
+    b.cite("cdc_infant_checklist");
     let q = n as f64 * oz * days;
     let text = format!(
         "{} × {} oz of prepared formula a day (the most babies usually drink) × {} = {} oz. Ready-to-feed formula is safest in an emergency; powder needs safe water (counted in the water line). Check the amount every month as the baby grows.",
@@ -565,7 +565,7 @@ mod tests {
         // 2 × 2,261.7 + 1,666.7 + 2,009.1 = 8,199.2 kcal a day
         assert_eq!(s.quantity, 82_000.0);
         assert!((s.per_day.unwrap() - 8199.16).abs() < 0.01);
-        assert_eq!(s.citations, ["dga_2020_2025"]);
+        assert_eq!(s.citations, ["usda_dga_2020_2025"]);
         assert!(
             s.plain.contains("2 adults at about 2,262 kcal a day each"),
             "{}",

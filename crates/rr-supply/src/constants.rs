@@ -18,7 +18,7 @@ pub const CONSTANTS_TOML: &str = include_str!("constants.toml");
 
 /// The citation id of the planning-estimate source (`prior = true`): every number tagged `Prior`
 /// cites it.
-pub const PRIOR_SOURCE: &str = "prior_supply_estimate";
+pub const PRIOR_SOURCE: &str = "rr_expert_prior";
 
 /// The parsed registry. Parsed once per process (and once per WebAssembly instance).
 ///

@@ -182,8 +182,8 @@ mod tests {
         );
         for id in [
             "florida_dem_medication",
-            "cdc_diabetes_emergency",
-            "red_cross_survival_kit",
+            "cdc_diabetes_emergencies",
+            "redcross_survival_kit",
             "healthcare_ready_refill_laws",
         ] {
             assert!(s.citations.iter().any(|c| c == id), "{id}");
@@ -224,8 +224,12 @@ mod tests {
     fn antibiotics_are_always_zero_and_cited() {
         let s = antibiotics_none();
         assert_eq!(s.quantity, 0.0);
-        assert!(s.citations.iter().any(|c| c == "cdc_antibiotics_aware"));
-        assert!(s.citations.iter().any(|c| c == "fda_fish_antibiotics"));
+        assert!(s.citations.iter().any(|c| c == "cdc_antibiotic_use"));
+        assert!(
+            s.citations
+                .iter()
+                .any(|c| c == "fda_fish_antibiotics_warning_2023")
+        );
         let lower = s.plain.to_lowercase();
         assert!(lower.contains("clinician") && lower.contains("fish"));
         for dose in ["mg", "tablet", "every 8 hours", "twice a day"] {

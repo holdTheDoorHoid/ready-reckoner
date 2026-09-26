@@ -36,7 +36,7 @@ pub fn insurance_home_or_renters(finances: &Finances, housing: &Housing) -> Opti
     }
     let mut b = Basis::new();
     b.cite("fema_effak");
-    b.cite("ready_gov_financial_preparedness");
+    b.cite("ready_gov_financial");
     let kind = if housing.tenure == Tenure::Rent {
         "renters"
     } else {
@@ -66,7 +66,7 @@ pub fn insurance_flood(finances: &Finances, housing: &Housing) -> Option<Sizing>
     let wait = b.k(keys::NFIP_WAIT_DAYS);
     let building = b.k(keys::NFIP_BUILDING_LIMIT_USD);
     let contents = b.k(keys::NFIP_CONTENTS_LIMIT_USD);
-    b.cite("ready_gov_financial_preparedness");
+    b.cite("ready_gov_financial");
     let renter = housing.tenure == Tenure::Rent;
     let text = format!(
         "Home and renters policies usually don't cover floods. Decide on flood insurance before you need it: a new policy usually starts {} days after you buy it. It pays up to {} for the building and {} for belongings{}.",

@@ -131,7 +131,7 @@ pub fn warm_layers(people_list: &[Person]) -> Sizing {
 pub fn warm_room_plan(housing: &Housing, people_list: &[Person]) -> Sizing {
     let mut b = Basis::new();
     let hypothermia = b.k(keys::HYPOTHERMIA_F);
-    b.cite("cdc_co_poisoning");
+    b.cite("cdc_co_basics");
     let mut text = "A cold plan: pick one room to keep warm, close off the others, put towels under doors and cover windows at night. Never heat with a gas oven, grill, camp stove or generator indoors (carbon monoxide).".to_owned();
     match housing.heating {
         Heating::Wood => text.push_str(
