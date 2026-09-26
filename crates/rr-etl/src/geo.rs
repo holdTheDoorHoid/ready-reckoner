@@ -89,6 +89,72 @@ pub fn compass16(deg: f64) -> &'static str {
     NAMES[i]
 }
 
+/// An Albers equal-area conic projection on an ellipsoid (Snyder 1987, "Map Projections: A
+/// Working Manual", USGS Professional Paper 1395, equations 14-3 to 14-12). Used to measure areas
+/// in the native plane of layers published in Albers (the USGS karst map), where every lattice
+/// cell has the same area.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Albers {
+    a: f64,
+    e: f64,
+    lon0: f64,
+    n: f64,
+    c: f64,
+    rho0: f64,
+}
+
+impl Albers {
+    /// Build from the ellipsoid (semi-major axis in metres, inverse flattening) and the
+    /// projection parameters in degrees.
+    pub fn new(a: f64, inv_f: f64, lat0: f64, lon0: f64, lat1: f64, lat2: f64) -> Self {
+        let f = 1.0 / inv_f;
+        let e2 = 2.0 * f - f * f;
+        let e = e2.sqrt();
+        let m = |phi: f64| {
+            let s = phi.to_radians().sin();
+            phi.to_radians().cos() / (1.0 - e2 * s * s).sqrt()
+        };
+        let (m1, m2) = (m(lat1), m(lat2));
+        let (q0, q1, q2) = (Self::q(e, lat0), Self::q(e, lat1), Self::q(e, lat2));
+        let n = if (lat1 - lat2).abs() < 1e-12 {
+            lat1.to_radians().sin()
+        } else {
+            (m1 * m1 - m2 * m2) / (q2 - q1)
+        };
+        let c = m1 * m1 + n * q1;
+        let rho0 = a * (c - n * q0).sqrt() / n;
+        Self {
+            a,
+            e,
+            lon0,
+            n,
+            c,
+            rho0,
+        }
+    }
+
+    /// The GRS 1980 ellipsoid (NAD 83) with the given parameters in degrees.
+    pub fn grs80(lat0: f64, lon0: f64, lat1: f64, lat2: f64) -> Self {
+        Self::new(6_378_137.0, 298.257_222_101, lat0, lon0, lat1, lat2)
+    }
+
+    fn q(e: f64, phi_deg: f64) -> f64 {
+        let s = phi_deg.to_radians().sin();
+        let e2 = e * e;
+        (1.0 - e2)
+            * (s / (1.0 - e2 * s * s)
+                - (1.0 / (2.0 * e)) * rr_types::math::ln((1.0 - e * s) / (1.0 + e * s)))
+    }
+
+    /// Project a point (degrees) to plane coordinates in metres.
+    pub fn forward(&self, lat: f64, lon: f64) -> (f64, f64) {
+        let q = Self::q(self.e, lat);
+        let rho = self.a * (self.c - self.n * q).max(0.0).sqrt() / self.n;
+        let theta = self.n * (lon - self.lon0).to_radians();
+        (rho * theta.sin(), self.rho0 - rho * theta.cos())
+    }
+}
+
 /// Signed planar area of a ring (positive when counter-clockwise).
 pub fn ring_signed_area(ring: &[[f64; 2]]) -> f64 {
     let n = ring.len();
@@ -423,6 +489,30 @@ mod tests {
         assert!(!in_sector(90.0, 315.0, 45.0));
         assert_eq!(compass16(180.0), "south");
         assert_eq!(compass16(-90.0), "west");
+    }
+
+    #[test]
+    fn albers_matches_snyders_worked_example() {
+        // Snyder (1987) p. 292: Clarke 1866, standard parallels 29.5 and 45.5 N, origin 23 N 96 W;
+        // 35 N 75 W projects to x = 1,885,472.7 m, y = 1,535,925.0 m.
+        let a = Albers::new(6_378_206.4, 294.978_698_2, 23.0, -96.0, 29.5, 45.5);
+        let (x, y) = a.forward(35.0, -75.0);
+        assert!(
+            (x - 1_885_472.7).abs() < 1.0 && (y - 1_535_925.0).abs() < 1.0,
+            "{x} {y}"
+        );
+        // Equal area: a 1-degree cell at 40 N is about 9,480 km^2 (cos 40 x 111.2^2 x ~1.0).
+        let g = Albers::grs80(37.0, -96.0, 25.0, 50.0);
+        let p = [(40.0, -100.0), (40.0, -99.0), (41.0, -99.0), (41.0, -100.0)];
+        let xy: Vec<(f64, f64)> = p.iter().map(|(la, lo)| g.forward(*la, *lo)).collect();
+        let mut area = 0.0;
+        for i in 0..4 {
+            let (x1, y1) = xy[i];
+            let (x2, y2) = xy[(i + 1) % 4];
+            area += x1 * y2 - x2 * y1;
+        }
+        let km2 = area.abs() / 2.0 / 1e6;
+        assert!((km2 - 9_380.0).abs() < 150.0, "{km2}");
     }
 
     #[test]

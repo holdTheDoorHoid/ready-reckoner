@@ -13,6 +13,8 @@ pub mod events;
 pub mod facilities;
 pub mod flood;
 pub mod geography;
+pub mod geomag;
+pub mod ground;
 pub mod nri;
 pub mod outages;
 pub mod seismic;
@@ -131,6 +133,18 @@ pub const JOBS: &[JobSpec] = &[
         id: "strategic",
         title: "Strategic-site classes (nuclear family) and FEMA UASI shares by county",
         run: strategic::run,
+        default: true,
+    },
+    JobSpec {
+        id: "geomag",
+        title: "Geomagnetic latitude (IGRF-14) and the NERC TPL-007 scaling factor by county",
+        run: geomag::run,
+        default: true,
+    },
+    JobSpec {
+        id: "ground",
+        title: "Karst (USGS OFR 2014-1156) and landslide-susceptible terrain (USGS 2024) by county",
+        run: ground::run,
         default: true,
     },
     JobSpec {

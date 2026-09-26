@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "c535534b0e6c",
-  "generated": "2026-09-26T16:29:39Z",
+  "pack_version": "b5d9ae2bb099",
+  "generated": "2026-09-26T16:50:06Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -71,6 +71,26 @@
           "sha256": "7552994d78cc5ad659cf702d4e5ee06aab1ef542eb56ae91910da6803939df7e",
           "bytes": 190572,
           "rows": 3144,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/geomag.csv",
+          "job": "geomag",
+          "sha256": "467626dd0acf0cead6955ce7f76e9a3772de3701f09f3e72b1b1803dc3a2cb26",
+          "bytes": 50382,
+          "rows": 3232,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/ground.csv",
+          "job": "ground",
+          "sha256": "f90944f6277b295cdbc59799f1ca31fbb46f35abd64b5e1d01327d2899b8a5fb",
+          "bytes": 54145,
+          "rows": 3225,
           "key": [
             "fips"
           ]
@@ -1115,6 +1135,108 @@
         "states.csv: `coastal` means a marine (ocean, gulf or tidal estuary) shoreline; Pennsylvania counts through the tidal Delaware estuary. `great_lakes` means a Great Lakes shoreline. These two flags are curated, not downloaded."
       ]
     },
+    "geomag": {
+      "title": "Geomagnetic latitude (IGRF-14) and the NERC TPL-007 scaling factor by county",
+      "finished": "2026-09-26T16:40:55Z",
+      "sources": [
+        {
+          "name": "IGRF-14 spherical harmonic coefficients (IAGA; NOAA NCEI copy)",
+          "url": "https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt",
+          "version": "IGRF-14, main-field epoch 2025.0 (dipole terms)",
+          "retrieved": "2026-09-26T16:40:54Z",
+          "sha256": "8f8d88403028fc4ee92c4f38d97b46e0a87e2cfc496045b43c9e26c1d6b0903c",
+          "bytes": 42411,
+          "license": "Open coefficients published by IAGA for any use; NOAA NCEI distribution is a US Government work"
+        },
+        {
+          "name": "NERC Benchmark Geomagnetic Disturbance Event Description (TPL-007), Appendix II",
+          "url": "https://www.nerc.com/globalassets/standards/projects/2013-03/benchmark_gmd_event_aug27_clean.pdf",
+          "version": "draft of 2014-08-21; formula II.1 and Table II-1 transcribed (read 2026-09-26)",
+          "retrieved": "2026-09-26T00:00:00Z",
+          "sha256": "7fb2757bde8ac84d109399fc56de29ebe01dcd17237f25b7266478d83224ad2d",
+          "bytes": 0,
+          "license": "NERC publication; the formula is cited, not copied data",
+          "obligations": "Cite NERC as the source of the scaling formula."
+        }
+      ],
+      "rows_in": 3,
+      "rows_out": 3232,
+      "outputs": [
+        "core/geomag.csv"
+      ],
+      "notes": [
+        "Geomagnetic latitude: angle of each county's internal point from the IGRF-14 dipole equator (epoch 2025.0: g10 -29350, g11 -1410.3, h11 4545.5 nT; geomagnetic north pole 80.79 N, 72.76 W). geomag_factor: NERC's alpha = 0.001 x exp(0.115 x |latitude|), bounded 0.1 to 1 (TPL-007 benchmark, Appendix II, eq. II.1); the benchmark field is 8 V/km x alpha x beta.",
+        "Rounded to 0.1 degree of latitude and two significant figures of alpha.",
+        "Earth conductivity (NERC's beta, 0.2 to 1.2 across US earth models) is not included: NERC publishes its regions only as a map image. Values are the dipole geomagnetic latitude, not corrected geomagnetic coordinates, which differ by a degree or two over the US."
+      ],
+      "definitions": {
+        "geomag_factor": "NERC TPL-007 benchmark scaling factor alpha for geomagnetic latitude: 0.001 x exp(0.115 x L), 0.1 <= alpha <= 1.0 (1.0 at 60 degrees and above)."
+      }
+    },
+    "ground": {
+      "title": "Karst (USGS OFR 2014-1156) and landslide-susceptible terrain (USGS 2024) by county",
+      "finished": "2026-09-26T16:50:06Z",
+      "sources": [
+        {
+          "name": "USGS Slope-Relief Threshold Landslide Susceptibility Models for the US and Puerto Rico: county_analysis.csv",
+          "url": "https://www.sciencebase.gov/catalog/file/get/65ccea5bd34ef4b119cb3bac?f=__disk__8c%2Fda%2F66%2F8cda66bbacf51b14a8c4c1b649b8b26688d59d27",
+          "version": "doi:10.5066/P13KAGU3 (ScienceBase item 65ccea5bd34ef4b119cb3bac, 2024-08-22)",
+          "retrieved": "2026-09-26T16:49:38Z",
+          "sha256": "5f7d9fb6938fe20409b9f957373bee1b7680f5106545fba1d003162d5ebe10ed",
+          "bytes": 229563,
+          "license": "Creative Commons Zero v1.0 Universal (public domain dedication)"
+        },
+        {
+          "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon and areas)",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
+          "version": "GENZ2024",
+          "retrieved": "2026-09-26T16:49:38Z",
+          "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
+          "bytes": 11626066,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "USGS Karst in the United States: digital map compilation (OFR 2014-1156), shapefiles",
+          "url": "https://pubs.usgs.gov/of/2014/1156/downloads/USKarstMap.zip",
+          "version": "Open-File Report 2014-1156 (Weary and Doctor, 2014), USKarstMap.zip",
+          "retrieved": "2026-09-26T16:49:40Z",
+          "sha256": "9d3c11024fc2d5dfa2dd2368d0d8eb67f67fcdde2c942a0a37592ad24a4c555f",
+          "bytes": 282254948,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 3222,
+      "rows_out": 3225,
+      "outputs": [
+        "core/ground.csv"
+      ],
+      "notes": [
+        "karst_share: share of the county's land on carbonate or evaporite rock at or near the surface, or buried under insoluble or up to 50 feet of glacial sediment (USGS OFR 2014-1156 exposure classes E, B1 and B3); rock under more than 50 feet of glacial sediment (B2) is left out. Measured on a 1 km lattice in each region's Albers equal-area plane (the layers' own projection), with county outlines from the Census 1:500,000 file. Karst is where sinkholes can form, not how often they do.",
+        "contiguous US: Continguous48/Carbonates48.shp: 72565 polygons (5272 deeply buried left out), Continguous48/Evaporites48.shp: 8098 polygons (122 deeply buried left out); 3109 counties.",
+        "Alaska: Alaska/AKcarbonates.shp: 11390 polygons (0 deeply buried left out); 30 counties.",
+        "Hawaii: Hawaii/HIcarbonates.shp: 284 polygons (0 deeply buried left out); 5 counties.",
+        "Puerto Rico and US Virgin Islands: PuertoRico_VirginIslands/PRcarbonates.shp: 771 polygons (0 deeply buried left out), PuertoRico_VirginIslands/VIcarbonates.shp: 19 polygons (0 deeply buried left out); 81 counties.",
+        "landslide_susceptible_share: USGS 2024 slope-relief threshold model (https://www.sciencebase.gov/catalog/item/65ccea5bd34ef4b119cb3bac), county table (prop_susc: susceptible area / county area), matched by state and name; renamed or split counties by an override table, Connecticut's retired counties converted to planning regions by land share. No landslide value (the model covers the 50 states and Puerto Rico): 78010, 78020, 78030."
+      ],
+      "definitions": {
+        "karst_share": "Share of the county's land on karst-prone rock (carbonates and evaporites at or near the surface or under thin cover), USGS OFR 2014-1156.",
+        "landslide_susceptible_share": "Share of the county's area rated susceptible by the USGS 2024 slope-relief threshold landslide susceptibility model."
+      },
+      "missing": [
+        {
+          "reason": "Neither USGS source covers Guam, American Samoa or the Northern Mariana Islands",
+          "fips": [
+            "60010",
+            "60020",
+            "60050",
+            "66010",
+            "69100",
+            "69110",
+            "69120"
+          ]
+        }
+      ]
+    },
     "nri": {
       "title": "FEMA National Risk Index v1.20, trimmed to the model's county fields",
       "finished": "2026-09-26T08:24:01Z",
@@ -1761,6 +1883,14 @@
       "accessed": "2026-09-26"
     },
     {
+      "source": "IGRF-14 and NERC TPL-007",
+      "text": "Geomagnetic latitude from the International Geomagnetic Reference Field, 14th generation (IAGA, distributed by NOAA NCEI); scaling factor from NERC's Benchmark Geomagnetic Disturbance Event Description (TPL-007).",
+      "license": "Open (IAGA coefficients); formula cited from NERC",
+      "url": "https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt",
+      "version": "IGRF-14 epoch 2025.0",
+      "accessed": "2026-09-26"
+    },
+    {
       "source": "NCA5 Atlas and LOCA2",
       "text": "Climate projections: U.S. Global Change Research Program, Fifth National Climate Assessment Interactive Atlas and LOCA2 county summaries (CC BY 4.0). Ratios derived by Ready Reckoner.",
       "license": "CC BY 4.0",
@@ -1806,6 +1936,13 @@
       "license": "US Government work, public domain (17 U.S.C. 105)",
       "url": "https://doi.org/10.5066/P9GNPCOD",
       "version": "NSHM 2023 grids, Hawaii 2021.R2 grid, PRVI 2025 service",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "USGS karst and landslide maps",
+      "text": "Karst: Weary, D.J., and Doctor, D.H., 2014, Karst in the United States: A digital map compilation and database, USGS Open-File Report 2014-1156. Landslides: USGS, Slope-Relief Threshold Landslide Susceptibility Models for the United States and Puerto Rico, 2024, doi:10.5066/P13KAGU3 (CC0).",
+      "license": "US Government works (public domain); CC0",
+      "url": "https://pubs.usgs.gov/of/2014/1156/",
       "accessed": "2026-09-26"
     }
   ]

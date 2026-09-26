@@ -61,3 +61,27 @@ Jobs run: strategic.
 |---|---:|---:|---:|---:|---:|---|
 | `core/strategic.csv` | 0 | 3232 | 0 | 0 | 0 | new |
 | `core/strategic_sites.toml` | 0 | 207 | 0 | 0 | 0 | new |
+
+## 2026-09-26T16:39:49Z — pack version d886671badb4
+
+Jobs run: geomag.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/geomag.csv` | 0 | 3232 | 0 | 0 | 0 | new |
+
+## 2026-09-26T16:40:55Z — pack version faefbb31739f
+
+Jobs run: geomag.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/geomag.csv` | 3232 | 3232 | 0 | 0 | 3187 | changed |
+
+## 2026-09-26T16:50:06Z — pack version b5d9ae2bb099
+
+Jobs run: ground.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/ground.csv` | 0 | 3225 | 0 | 0 | 0 | new |

@@ -182,3 +182,59 @@ fn uasi_shares_sum_to_one_and_new_york_leads() {
     assert_eq!(exposure("41011").uasi_share, Some(0.0));
     assert_eq!(exposure("41011").uasi_area, None);
 }
+
+#[test]
+fn geomagnetic_factor_rises_to_the_north() {
+    if !has("core/geomag.csv") {
+        return;
+    }
+    // NERC alpha: floored at 0.1 in Miami, about 0.29 in Philadelphia, 0.63 in Minot, capped at
+    // 1 in Anchorage.
+    assert_eq!(exposure("12086").geomag_factor, Some(0.1));
+    assert_eq!(exposure("42101").geomag_factor, Some(0.29));
+    assert_eq!(exposure("38101").geomag_factor, Some(0.63));
+    assert_eq!(exposure("02020").geomag_factor, Some(1.0));
+    let lat = exposure("42101").geomag_lat.unwrap();
+    assert!((48.5..50.0).contains(&lat), "{lat}");
+}
+
+#[test]
+fn karst_and_landslide_shares_match_known_ground() {
+    if !has("core/ground.csv") {
+        return;
+    }
+    // Central Florida and Kentucky's cave country sit on karst; Philadelphia does not.
+    assert!(
+        exposure("12083").karst_share.unwrap() > 0.9,
+        "Marion County, FL"
+    );
+    assert!(
+        exposure("21227").karst_share.unwrap() > 0.8,
+        "Warren County, KY"
+    );
+    assert!(
+        exposure("42101").karst_share.unwrap() < 0.05,
+        "Philadelphia"
+    );
+    // Puerto Rico's mountains are landslide country; South Florida is not.
+    assert!(
+        exposure("72141").landslide_susceptible_share.unwrap() > 0.9,
+        "Utuado"
+    );
+    assert!(
+        exposure("12086").landslide_susceptible_share.unwrap() < 0.05,
+        "Miami-Dade"
+    );
+    // Shares are shares.
+    for c in store().counties() {
+        for v in [
+            c.exposure.karst_share,
+            c.exposure.landslide_susceptible_share,
+        ]
+        .into_iter()
+        .flatten()
+        {
+            assert!((0.0..=1.0).contains(&v), "{}: {v}", c.fips);
+        }
+    }
+}
