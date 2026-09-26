@@ -95,6 +95,8 @@ pub struct DiffSummary {
     pub identical: bool,
     /// True when there was no previous file.
     pub new_file: bool,
+    /// True when the job no longer writes this file (it was deleted).
+    pub removed_file: bool,
 }
 
 /// What was written.
@@ -156,8 +158,7 @@ pub fn write_table(data_dir: &Path, rel: &str, table: &Table) -> Result<Written>
                         added,
                         removed,
                         changed,
-                        identical: false,
-                        new_file: false,
+                        ..Default::default()
                     }
                 }
                 None => DiffSummary {

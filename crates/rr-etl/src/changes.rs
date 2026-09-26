@@ -34,7 +34,9 @@ pub fn append(data_dir: &Path, manifest: &Manifest, summary: &RefreshSummary) ->
         changes.sort_by(|a, b| a.path.cmp(&b.path));
         for w in &changes {
             let d = &w.diff;
-            let status = if d.new_file {
+            let status = if d.removed_file {
+                "removed"
+            } else if d.new_file {
                 "new"
             } else if d.identical {
                 "unchanged"

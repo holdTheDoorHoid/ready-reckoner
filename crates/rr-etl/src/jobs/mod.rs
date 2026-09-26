@@ -263,8 +263,20 @@ pub fn refresh(ctx: &Ctx, only: &[String]) -> Result<RefreshSummary> {
         match (job.run)(ctx) {
             Ok(out) => {
                 eprintln!("   done in {:.0} s", started.elapsed().as_secs_f64());
+                let previous: Vec<FileEntry> = manifest
+                    .packs
+                    .values()
+                    .flat_map(|p| p.files.iter())
+                    .filter(|f| f.job == job.id)
+                    .cloned()
+                    .collect();
+                let (changes, stale) = reconcile(&previous, &out.written);
+                for path in &stale {
+                    crate::http::remove_raw(&ctx.data.join(path))?;
+                    eprintln!("  removed {path} (no longer written by {})", job.id);
+                }
                 record(&mut manifest, job, &out);
-                summary.changes.extend(out.written.iter().cloned());
+                summary.changes.extend(changes);
                 summary.ok.push(job.id.to_string());
                 // Save after every job so partial progress is never lost.
                 finish_manifest(&mut manifest);
@@ -280,6 +292,41 @@ pub fn refresh(ctx: &Ctx, only: &[String]) -> Result<RefreshSummary> {
     manifest.save(&ctx.data)?;
     crate::changes::append(&ctx.data, &manifest, &summary)?;
     Ok(summary)
+}
+
+/// Compare a job's new files with the files it wrote last time: fill in the previous row count
+/// for rewritten text files (their diff cannot count rows) and list files the job no longer
+/// writes, as `removed` entries for `CHANGES.md` and as paths to delete.
+fn reconcile(previous: &[FileEntry], written: &[Written]) -> (Vec<Written>, Vec<String>) {
+    let mut changes: Vec<Written> = written.to_vec();
+    for w in &mut changes {
+        if !w.diff.new_file && !w.diff.identical && w.diff.previous_rows == 0 {
+            if let Some(p) = previous.iter().find(|p| p.path == w.path) {
+                w.diff.previous_rows = p.rows;
+            }
+        }
+    }
+    let mut stale = Vec::new();
+    for p in previous {
+        if written.iter().any(|w| w.path == p.path) {
+            continue;
+        }
+        stale.push(p.path.clone());
+        changes.push(Written {
+            path: p.path.clone(),
+            rows: 0,
+            bytes: 0,
+            sha256: String::new(),
+            key: p.key.clone(),
+            diff: crate::csvout::DiffSummary {
+                previous_rows: p.rows,
+                removed: p.rows,
+                removed_file: true,
+                ..Default::default()
+            },
+        });
+    }
+    (changes, stale)
 }
 
 fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
@@ -474,5 +521,89 @@ pub fn attr_str(row: &serde_json::Map<String, serde_json::Value>, key: &str) -> 
         serde_json::Value::String(s) => Some(s.trim().to_string()),
         serde_json::Value::Number(n) => Some(n.to_string()),
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::csvout::DiffSummary;
+
+    fn entry(path: &str, rows: u64) -> FileEntry {
+        FileEntry {
+            path: path.into(),
+            job: "climate".into(),
+            sha256: "x".into(),
+            bytes: 1,
+            rows,
+            key: vec!["fips".into()],
+        }
+    }
+
+    fn written(path: &str, rows: u64, diff: DiffSummary) -> Written {
+        Written {
+            path: path.into(),
+            rows,
+            bytes: 1,
+            sha256: "y".into(),
+            key: vec!["fips".into()],
+            diff,
+        }
+    }
+
+    #[test]
+    fn reconcile_lists_dropped_files_and_fills_text_row_counts() {
+        let previous = [
+            entry("core/climate.csv", 3202),
+            entry("core/climate_levels.csv", 26780),
+            entry("core/base_rates.toml", 25),
+        ];
+        let now = [
+            written(
+                "core/climate.csv",
+                3231,
+                DiffSummary {
+                    previous_rows: 3202,
+                    rows: 3231,
+                    added: 29,
+                    ..Default::default()
+                },
+            ),
+            // A rewritten TOML file: write_text cannot count the old rows.
+            written(
+                "core/base_rates.toml",
+                27,
+                DiffSummary {
+                    rows: 27,
+                    changed: 27,
+                    ..Default::default()
+                },
+            ),
+        ];
+        let (changes, stale) = reconcile(&previous, &now);
+        assert_eq!(stale, vec!["core/climate_levels.csv".to_string()]);
+        let dropped = changes
+            .iter()
+            .find(|w| w.path == "core/climate_levels.csv")
+            .unwrap();
+        assert!(dropped.diff.removed_file);
+        assert_eq!(
+            (
+                dropped.diff.previous_rows,
+                dropped.diff.rows,
+                dropped.diff.removed
+            ),
+            (26780, 0, 26780)
+        );
+        let toml = changes
+            .iter()
+            .find(|w| w.path == "core/base_rates.toml")
+            .unwrap();
+        assert_eq!(toml.diff.previous_rows, 25);
+        let csv = changes
+            .iter()
+            .find(|w| w.path == "core/climate.csv")
+            .unwrap();
+        assert_eq!(csv.diff.previous_rows, 3202);
     }
 }
