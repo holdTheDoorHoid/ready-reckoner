@@ -19,3 +19,5 @@ toml.workspace = true
 
 [dev-dependencies]
 serde_json.workspace = true
+# The backtest's frozen inputs are extracted from the data pack (tests/backtest.rs, `RR_WRITE_BACKTEST=1`).
+rr-data = { path = "../rr-data" }

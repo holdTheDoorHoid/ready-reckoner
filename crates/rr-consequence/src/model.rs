@@ -9,26 +9,50 @@ use std::collections::BTreeMap;
 
 use rr_types::math::Z_90;
 use rr_types::{
-    BucketId, CitationId, Cooling, CountyRecord, EventRate, Evidence, HazardId, HouseholdEventRate,
-    HousingKind, OutageStats, PlanInput, WaterSource,
+    Benefit, BucketId, CitationId, Cooling, CountyRecord, EventRate, Evidence, HazardId,
+    HouseholdEventRate, HousingKind, OutageStats, PlanInput, WaterSource, WaterSystemRecord,
 };
 use serde::Serialize;
 
 use crate::effects::{EffectRow, EffectsTable, Param, ReliefSpec, Requirement};
+use crate::pack::{self, OutageModel, PoolBasis, RestorationCurve, TemperatureProfile};
 use crate::survival::{EmpiricalCurve, Survival};
 use crate::words;
 
-/// County data the consequence model can use. Everything is optional.
+/// County data the consequence model can use. Everything is optional: with none of the data
+/// pack v2 fields, the model is the county-only model of v0.1 (and says so in the power
+/// bucket's sentences).
 #[derive(Debug, Clone, Copy, Default)]
 pub struct CountyData<'a> {
-    /// Power outage statistics (EAGLE-I): replace the county-scale storm outage class.
+    /// Power outage statistics (EAGLE-I): replace the county-scale storm outage class when the
+    /// regional outage model is missing, and give the short-outage shape when it is present.
     pub outages: Option<&'a OutageStats>,
-    /// Event records by type: their median/p90 days replace matching durations.
+    /// Event records by type: their median/p90 days replace matching durations, and their rates
+    /// drive the county-scale rows (`county_rate_keys`).
     pub events: Option<&'a BTreeMap<String, EventRate>>,
     /// The county touches the coast.
     pub coastal: bool,
     /// The county has a tsunami hazard zone.
     pub tsunami_zone: bool,
+    /// Two-letter state abbreviation ("" when unknown): territories have their own grids.
+    pub state_abbr: &'a str,
+    /// Fifth National Climate Assessment region id ("" when unknown): the outage-pooling region.
+    pub nca_region: &'a str,
+    /// The regional outage model: pooled tails with credibility weights, causes and the region's
+    /// worst event (data pack v2; model review M-01, M-02). awaiting: data-model
+    pub outage_model: Option<&'a OutageModel>,
+    /// Heat and cold shares during recorded outages (data pack v2; model review M-11).
+    /// awaiting: data-model
+    pub temperature: Option<&'a TemperatureProfile>,
+    /// Pooled restoration curves by region and cause (data pack v2; model review M-10), from
+    /// `rr_data::DataStore::restoration_curves()`. awaiting: data-model, plan
+    pub curves: &'a [RestorationCurve],
+    /// Share of the county's public-water customers served by a system with a health-based
+    /// violation in the last five years (EPA SDWIS; data pack v2). awaiting: data-hazard
+    pub sdwis_violation_share: Option<f64>,
+    /// Days a year with wildfire smoke and PM2.5 of 35.5 µg/m³ or more (data pack v2).
+    /// awaiting: data-hazard
+    pub smoke_days: Option<f64>,
 }
 
 impl<'a> CountyData<'a> {
@@ -39,7 +63,96 @@ impl<'a> CountyData<'a> {
             events: Some(&record.events),
             coastal: record.coastal,
             tsunami_zone: record.tsunami_zone,
+            state_abbr: &record.state_abbr,
+            nca_region: &record.nca_region,
+            // awaiting: data-model — `outage_model: record.outage_model.as_ref(),` and
+            // `temperature: record.temperature.as_ref(),` once `CountyRecord` carries them.
+            outage_model: None,
+            temperature: None,
+            curves: &[],
+            // awaiting: data-hazard — `sdwis_violation_share: record.exposure
+            // .sdwis_violation_pop_share.map(f64::from),` and `smoke_days: record.exposure
+            // .smoke_days_35.map(f64::from),` once `CountyRecord::exposure` is merged.
+            sdwis_violation_share: None,
+            smoke_days: None,
         }
+    }
+
+    /// The same county with the pack's pooled restoration curves (they are not per county:
+    /// `rr_data::DataStore::restoration_curves()`). awaiting: plan — `rr-plan` passes them.
+    pub fn with_curves(mut self, curves: &'a [RestorationCurve]) -> CountyData<'a> {
+        self.curves = curves;
+        self
+    }
+
+    /// The outage-pooling region: the NCA5 region, or `puerto_rico` / `virgin_islands`.
+    pub fn outage_region(&self) -> String {
+        pack::outage_region(self.state_abbr, self.nca_region)
+    }
+
+    /// The regional outage model, when it has a usable pooled tail.
+    pub fn pooled(&self) -> Option<&'a OutageModel> {
+        self.outage_model
+            .filter(|m| m.lam_ge.iter().all(|x| x.is_finite() && *x >= 0.0) && m.lam_ge[0] > 0.0)
+    }
+}
+
+/// States on the ERCOT, SPP and MISO-South grids, where the grid has failed in extreme cold: the
+/// cold-emergency class applies there when the regional outage records are not loaded (model
+/// review M-11).
+pub const COLD_GRID_STATES: [&str; 8] = ["TX", "OK", "KS", "NE", "LA", "AR", "MS", "NM"];
+
+/// How easily the household's public water system breaks, as a multiplier on the share of the
+/// fragile rows (model review M-03): the county's record (EPA SDWIS) times the household's own
+/// answer, bounded.
+#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
+pub struct Fragility {
+    /// The combined multiplier.
+    pub multiplier: f64,
+    /// From the county's drinking-water violations (1 when unknown).
+    pub county_factor: f64,
+    /// From the household's answer (1 when not asked or unknown).
+    pub household_factor: f64,
+    /// The county's violation share, when the pack has it.
+    pub violation_share: Option<f64>,
+    /// The household's answer, when given.
+    pub record: Option<WaterSystemRecord>,
+}
+
+impl Fragility {
+    pub(crate) fn of(input: &PlanInput, county: &CountyData<'_>, table: &EffectsTable) -> Self {
+        let p = &table.params;
+        let share = county
+            .sdwis_violation_share
+            .filter(|s| s.is_finite() && (0.0..=1.0).contains(s));
+        let county_factor = share.map_or(1.0, |s| {
+            let lo = p.fragility_county_clean.value;
+            lo + (p.fragility_county_flagged.value - lo) * s
+        });
+        let record = input
+            .housing
+            .water_system_record
+            .filter(|r| *r != WaterSystemRecord::Unknown);
+        let household_factor = match record {
+            Some(WaterSystemRecord::Fine) => p.fragility_record_fine.value,
+            Some(WaterSystemRecord::OccasionalNotices) => p.fragility_record_occasional.value,
+            Some(WaterSystemRecord::FrequentProblems) => p.fragility_record_frequent.value,
+            Some(WaterSystemRecord::Unknown) | None => 1.0,
+        };
+        let multiplier = (county_factor * household_factor)
+            .clamp(p.fragility_floor.value, p.fragility_cap.value);
+        Fragility {
+            multiplier,
+            county_factor,
+            household_factor,
+            violation_share: share,
+            record,
+        }
+    }
+
+    /// Nothing is known about the system: no county record and no answer.
+    pub fn unknown(&self) -> bool {
+        self.violation_share.is_none() && self.record.is_none()
     }
 }
 
@@ -118,6 +231,9 @@ pub(crate) struct Term {
     pub max_with: Option<MaxWith>,
     pub rate_param: Option<usize>,
     pub q_param: Option<usize>,
+    /// The shared water-system fragility draw (fragile rows and what derives from them): one
+    /// latent factor for every row it scales, so their draws move together (model review M-14).
+    pub frag_param: Option<usize>,
     pub dur_param: Option<usize>,
     pub evidence: Evidence,
     /// The duration rests on measured records (restoration curves, county outage records).
@@ -205,6 +321,10 @@ pub(crate) struct Household {
     pub mobile_home: bool,
     pub coastal: bool,
     pub earners: u8,
+    pub below_grade: bool,
+    pub food_benefit: bool,
+    pub income_benefit: bool,
+    pub cold_grid_region: bool,
 }
 
 impl Household {
@@ -237,6 +357,21 @@ impl Household {
             mobile_home: h.kind == HousingKind::MobileHome,
             coastal: county.coastal,
             earners: input.finances.income.earners,
+            below_grade: h.below_grade_bedroom,
+            food_benefit: input.finances.benefits.contains(&Benefit::SnapWic),
+            income_benefit: input.finances.benefits.iter().any(|b| {
+                matches!(
+                    b,
+                    Benefit::FederalPay | Benefit::SsiSsdi | Benefit::Va | Benefit::Unemployment
+                )
+            }),
+            cold_grid_region: match county.outage_model {
+                Some(m) => {
+                    m.causes.get("cold_grid").is_some_and(|x| *x > 0.0)
+                        || m.causes_ge_1d.get("cold_grid").is_some_and(|x| *x > 0.0)
+                }
+                None => COLD_GRID_STATES.contains(&county.state_abbr),
+            },
         }
     }
 
@@ -250,6 +385,10 @@ impl Household {
             Some(Requirement::NoHeating) => self.no_heating,
             Some(Requirement::MobileHome) => self.mobile_home,
             Some(Requirement::Coastal) => self.coastal,
+            Some(Requirement::BelowGrade) => self.below_grade,
+            Some(Requirement::FoodBenefit) => self.food_benefit,
+            Some(Requirement::IncomeBenefit) => self.income_benefit,
+            Some(Requirement::ColdGridRegion) => self.cold_grid_region,
         }
     }
 }
@@ -268,6 +407,14 @@ pub(crate) struct Model {
     pub notes: Vec<String>,
     /// The job-loss rate came from the national base rate, not `rr-hazards`.
     pub job_loss_fallback: bool,
+    /// How easily the household's public water system breaks (model review M-03).
+    pub fragility: Fragility,
+    /// Sentences a bucket's "why we think this" carries about the data behind it: the regional
+    /// outage records, or the fallback used where they are missing.
+    pub bucket_notes: Vec<(BucketId, String)>,
+    /// Buckets whose target rests on a fallback (a structural gap): their range is widened one
+    /// ladder step at the high end (model review M-14).
+    pub gaps: Vec<BucketId>,
 }
 
 impl Model {
@@ -451,18 +598,36 @@ fn scenario_variant(c: &ScenarioCandidate, county: &CountyData<'_>) -> String {
 pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
     let table = inp.table;
     let hh = Household::from_input(inp.plan, &inp.county, table);
+    let fragility = Fragility::of(inp.plan, &inp.county, table);
     let mut ps = ParamSet::default();
     let mut terms: Vec<Term> = Vec::new();
     let mut overrides: Vec<OverrideApplied> = Vec::new();
     let mut notes: Vec<String> = Vec::new();
+    let mut bucket_notes: Vec<(BucketId, String)> = Vec::new();
+    let mut gaps: Vec<BucketId> = Vec::new();
 
-    // Hazard rates: the first valid entry per hazard wins.
+    // Hazard rates: the first valid entry per hazard wins. Rare families are shown in their own
+    // box and never enter a bucket's curve (DESIGN §4.2, §4.7).
     let mut rates: BTreeMap<HazardId, &HouseholdEventRate> = BTreeMap::new();
     for r in inp.rates {
+        if r.hazard.is_rare() || r.hazard.is_retired() {
+            continue;
+        }
         if r.validate().is_ok() && r.rate_per_year > 0.0 {
             rates.entry(r.hazard).or_insert(r);
         }
     }
+    // One shared draw for how easily the public water system breaks, for every fragile row.
+    let frag_param = if hh.well {
+        None
+    } else {
+        ps.factor(
+            "share:water_fragility".to_owned(),
+            table.params.fragility_uncertainty.value,
+            "how easily the local public water system breaks".to_owned(),
+            Evidence::Prior,
+        )
+    };
     let rate_sources: BTreeMap<HazardId, Vec<CitationId>> =
         rates.iter().map(|(h, r)| (*h, r.sources.clone())).collect();
     let mut rate_param: BTreeMap<HazardId, Option<usize>> = BTreeMap::new();
@@ -536,7 +701,56 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
                 continue;
             }
         }
-        if !hh.meets(row.requires) {
+        if !hh.meets(row.requires) || !hh.meets(row.also_requires) {
+            continue;
+        }
+        // County-scale rows (a flood that shuts the water plant) and fixed-rate classes (a grid
+        // emergency in extreme cold) carry their own rate; they need their hazard in the register
+        // so the contributions name a hazard the household sees.
+        if !row.county_rate_keys.is_empty() || row.fixed_rate.is_some() {
+            if !rates.contains_key(&row.hazard) {
+                continue;
+            }
+            let (rate, rparam) = if let Some(name) = &row.fixed_rate {
+                let Some(p) = table.params.get(name) else {
+                    continue;
+                };
+                let id = ps.rate(
+                    format!("rate:fixed:{name}"),
+                    p.value,
+                    p.low.unwrap_or(p.value),
+                    p.high.unwrap_or(p.value),
+                    format!("how often {} happen", row.label),
+                    p.evidence,
+                );
+                (p.value, id)
+            } else {
+                let Some(r) = county_event_rate(inp.county.events, &row.county_rate_keys) else {
+                    continue;
+                };
+                let id = ps.factor(
+                    format!("rate:county_events:{}", row.county_rate_keys.join("+")),
+                    table.params.outage_stats_rate_factor.value,
+                    format!(
+                        "how often {} are recorded here",
+                        words::county_event_plural(&row.county_rate_keys)
+                    ),
+                    Evidence::Empirical,
+                );
+                (r, id)
+            };
+            let mut term = table_term(row, rate, rparam, None, inp, &mut ps, &mut overrides);
+            if row.fragile {
+                term.q = (term.q * fragility.multiplier).min(1.0);
+                term.frag_param = frag_param;
+            }
+            if row.bucket == BucketId::Power {
+                restoration(&mut term, row, inp, &mut ps, &mut overrides);
+            }
+            *table_share
+                .entry((term.owner(), row.class.clone(), row.bucket))
+                .or_insert(0.0) += row.p_given_event;
+            terms.push(term);
             continue;
         }
         let (rate, rparam, scenario) = match &row.scenario {
@@ -593,18 +807,42 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
                 (None, _) => continue,
             },
         };
-        let term = table_term(row, rate, rparam, scenario, inp, &mut ps, &mut overrides);
+        let mut term = table_term(row, rate, rparam, scenario, inp, &mut ps, &mut overrides);
+        if row.fragile {
+            term.q = (term.q * fragility.multiplier).min(1.0);
+            term.frag_param = frag_param;
+        }
+        if row.bucket == BucketId::Power {
+            restoration(&mut term, row, inp, &mut ps, &mut overrides);
+        }
         *table_share
             .entry((term.owner(), row.class.clone(), row.bucket))
             .or_insert(0.0) += row.p_given_event;
         terms.push(term);
     }
 
-    add_pool_terms(inp, &mut ps, &mut terms, &mut overrides, &mut notes);
+    add_pool_terms(
+        inp,
+        &mut ps,
+        &mut terms,
+        &mut overrides,
+        &mut notes,
+        &mut bucket_notes,
+        &mut gaps,
+    );
 
     let mut couplings: Vec<CouplingApplied> = Vec::new();
-    apply_couplings(&hh, inp, &mut ps, &mut terms, &table_share, &mut couplings);
+    apply_couplings(
+        &hh,
+        inp,
+        &mut ps,
+        &mut terms,
+        &table_share,
+        &mut couplings,
+        (&fragility, frag_param),
+    );
     household_notes(inp.plan, &hh, &mut couplings);
+    water_notes(&hh, &fragility, &mut bucket_notes, &mut gaps);
 
     let (income, job_loss_fallback) =
         income_terms(inp, &hh, &rates, &rate_param, &scenario_param, &mut ps);
@@ -626,6 +864,191 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
         rate_sources,
         notes,
         job_loss_fallback,
+        fragility,
+        bucket_notes,
+        gaps,
+    }
+}
+
+/// The county's recorded rate of damaging episodes of these NOAA Storm Events types (each type's
+/// yearly rate times its damaging share; all of it when the share is not recorded), or `None`
+/// where the county has no such record.
+fn county_event_rate(events: Option<&BTreeMap<String, EventRate>>, keys: &[String]) -> Option<f64> {
+    let events = events?;
+    let mut total = 0.0;
+    let mut any = false;
+    for k in keys {
+        if let Some(e) = events.get(k) {
+            let r = f64::from(e.rate_per_year);
+            let d = e.share_damaging.map_or(1.0, f64::from);
+            if r.is_finite() && r > 0.0 && d.is_finite() && d > 0.0 {
+                total += r * d.min(1.0);
+                any = true;
+            }
+        }
+    }
+    (any && total > 0.0).then_some(total)
+}
+
+/// A pooled restoration curve as a survival curve: its share of the peak still out at each day
+/// mark, plus the days to half and to nine in ten restored.
+pub(crate) fn curve_survival(c: &RestorationCurve) -> Option<Survival> {
+    let mut pts: Vec<(f64, f64)> = c
+        .share_out_at_days
+        .iter()
+        .map(|(d, s)| (f64::from(*d), f64::from(*s)))
+        .collect();
+    pts.push((f64::from(c.t50_days), 0.5));
+    pts.push((f64::from(c.t90_days), 0.1));
+    EmpiricalCurve::from_points(&pts).map(|(curve, _)| Survival::Empirical(curve))
+}
+
+/// Regional restoration for a power row (model review M-10): on an island grid with a
+/// hand-copied historic curve (Puerto Rico after Maria), that curve is the duration of the rows
+/// marked `island_curve`; otherwise, where the region's pooled curve for the row's cause rests on
+/// enough major events, the row's duration is stretched by the region's time to 90 % restored
+/// over the mainland's (bounded 0.5 to 5).
+fn restoration(
+    term: &mut Term,
+    row: &EffectRow,
+    inp: &BuildInput<'_>,
+    ps: &mut ParamSet,
+    overrides: &mut Vec<OverrideApplied>,
+) {
+    let Some(class) = row.curve_class.as_deref() else {
+        return;
+    };
+    let curves = inp.county.curves;
+    if curves.is_empty() {
+        return;
+    }
+    let region = inp.county.outage_region();
+    let eagle = CitationId::from("ornl_eagle_i_outages");
+    if row.island_curve {
+        if let Some(h) = pack::historic_curve(curves, &region) {
+            if let Some(surv) = curve_survival(h) {
+                let src = CitationId::from(words::historic_source(&h.class));
+                term.survival = surv;
+                term.duration_from_data = true;
+                term.dur_param = ps.factor(
+                    format!("dur:{}", h.class),
+                    inp.table.params.duration_factor_empirical.value,
+                    "how long the power stays out after a storm like the historic one here"
+                        .to_owned(),
+                    Evidence::Empirical,
+                );
+                term.sources.push(src.clone());
+                let name = words::historic_event(&h.class);
+                let plain = format!(
+                    "Power: {} use the restoration record of {name} here (half the customers back \
+                     after {}, nine in ten after {}), because this grid takes far longer to \
+                     restore than mainland grids.",
+                    row.label,
+                    words::days_phrase(f64::from(h.t50_days)),
+                    words::days_phrase(f64::from(h.t90_days)),
+                );
+                push_override(overrides, BucketId::Power, row.hazard, plain, vec![src]);
+                return;
+            }
+        }
+    }
+    let Some(c) = pack::curve(curves, &region, class) else {
+        return;
+    };
+    if f64::from(c.events) < inp.table.params.curve_min_events.value {
+        return;
+    }
+    let Some(f) = c
+        .factor
+        .map(f64::from)
+        .filter(|f| f.is_finite() && *f > 0.0)
+    else {
+        return;
+    };
+    let f = f.clamp(0.5, 5.0);
+    if (f - 1.0).abs() < 0.05 {
+        return;
+    }
+    term.survival = term.survival.scaled(f);
+    term.sources.push(eagle.clone());
+    let plain = format!(
+        "Power: {} take {} to restore here than on the mainland (the region's records since \
+         2014: nine in ten customers back after {}), so their durations are scaled by {}.",
+        row.label,
+        if f > 1.0 { "longer" } else { "less time" },
+        words::days_phrase(f64::from(c.t90_days)),
+        words::factor_phrase(f),
+    );
+    push_override(overrides, BucketId::Power, row.hazard, plain, vec![eagle]);
+}
+
+fn push_override(
+    overrides: &mut Vec<OverrideApplied>,
+    bucket: BucketId,
+    hazard: HazardId,
+    plain: String,
+    sources: Vec<CitationId>,
+) {
+    if overrides.iter().any(|o| o.plain == plain) {
+        return;
+    }
+    overrides.push(OverrideApplied {
+        bucket,
+        hazards: vec![hazard],
+        plain,
+        sources,
+    });
+}
+
+/// What the water buckets say about the system behind them, and the structural gap where
+/// nothing is known about it (model review M-03, Part 3.4).
+fn water_notes(
+    hh: &Household,
+    f: &Fragility,
+    bucket_notes: &mut Vec<(BucketId, String)>,
+    gaps: &mut Vec<BucketId>,
+) {
+    if hh.well {
+        return;
+    }
+    let mut parts = Vec::new();
+    if let Some(s) = f.violation_share {
+        parts.push(format!(
+            "about {} of 100 public-water customers in your county are served by a system with a \
+             health-based violation in the last five years (EPA)",
+            words::per_100(100.0 * s)
+        ));
+    }
+    if let Some(r) = f.record {
+        parts.push(format!(
+            "you said your water system {}",
+            match r {
+                WaterSystemRecord::Fine => "has had no problems you remember",
+                WaterSystemRecord::OccasionalNotices => "has a notice or a problem now and then",
+                WaterSystemRecord::FrequentProblems => "has frequent notices or outages",
+                WaterSystemRecord::Unknown => "record is unknown",
+            }
+        ));
+    }
+    let sentence = if parts.is_empty() {
+        for b in [BucketId::WaterOut, BucketId::WaterBoil] {
+            if !gaps.contains(&b) {
+                gaps.push(b);
+            }
+        }
+        "We have no record of how your public water system has held up, so this is an estimate \
+         that could be too short."
+            .to_owned()
+    } else {
+        format!(
+            "Water-system failures are counted {} as often as the national average here, because \
+             {} (an estimate).",
+            words::factor_phrase(f.multiplier),
+            parts.join(" and ")
+        )
+    };
+    for b in [BucketId::WaterOut, BucketId::WaterBoil] {
+        bucket_notes.push((b, sentence.clone()));
     }
 }
 
@@ -771,6 +1194,7 @@ fn table_term(
         max_with: None,
         rate_param: rparam,
         q_param,
+        frag_param: None,
         dur_param,
         evidence: row.evidence,
         duration_from_data,
@@ -783,16 +1207,77 @@ fn table_term(
     }
 }
 
-/// County-scale storm outages. With county outage statistics, they happen at the county's
-/// measured rate (`events_per_customer_year`) with its measured duration curve, split between the
-/// storm hazards in proportion to their short-outage rates. Without them, a third of short storm
-/// outages are taken to be county-scale (`storm_pool_fallback_ratio`).
+/// Pooled-tail causes and the hazard each is shown under (the regional outage model leaves out
+/// hurricanes, wildfires, floods, cold-driven grid emergencies and other grid failures, which
+/// have rows of their own).
+const POOL_CAUSES: [(&str, HazardId); 4] = [
+    ("wind", HazardId::StrongWind),
+    ("ice", HazardId::IceStorm),
+    ("winter", HazardId::WinterWeather),
+    ("heat", HazardId::HeatWave),
+];
+
+/// The pooled regional tail as one survival curve with its rate: the blended rates of outages
+/// lasting 1, 3, 7, 14 and 30 days over the pool's rate of outages of any length, with the
+/// county's own median and 90th-percentile hours for the short part where they fit below a day.
+/// `None` when fewer than two usable points remain.
+pub(crate) fn pooled_curve(
+    m: &OutageModel,
+    stats: Option<&OutageStats>,
+) -> Option<(Survival, f64)> {
+    let lam: Vec<f64> = m.lam_ge.iter().map(|x| f64::from(*x)).collect();
+    let mut rate = f64::from(m.rate);
+    // The pool's rate is the county's own; where its record is thin (no outages of its own, as in
+    // Manhattan's underground grid) the blended tail can exceed it. At most half of the outages
+    // then last a day or more.
+    let raised = !rate.is_finite() || rate < 2.0 * lam[0];
+    if raised {
+        rate = 2.0 * lam[0];
+    }
+    if rate <= 0.0 {
+        return None;
+    }
+    let mut pts: Vec<(f64, f64)> = pack::OUTAGE_MARKS_DAYS
+        .iter()
+        .zip(&lam)
+        .filter(|(_, l)| **l > 0.0)
+        .map(|(d, l)| (f64::from(*d), l / rate))
+        .collect();
+    let s1 = lam[0] / rate;
+    if let (false, Some(st)) = (raised, stats) {
+        let med = f64::from(st.median_hours) / 24.0;
+        let p90 = f64::from(st.p90_hours) / 24.0;
+        if med.is_finite() && med > 0.0 && med < 1.0 && s1 < 0.5 {
+            pts.push((med, 0.5));
+        }
+        if p90.is_finite() && p90 > med && p90 < 1.0 && s1 < 0.1 {
+            pts.push((p90, 0.1));
+        }
+    }
+    let (curve, _) = EmpiricalCurve::from_points(&pts)?;
+    Some((Survival::Empirical(curve), rate))
+}
+
+/// County-scale storm outages.
+///
+/// - **With the regional outage model** (data pack v2; model review M-01, M-02): they happen at
+///   the pool's rate with the blended regional tail ([`pooled_curve`]), shown under the storm
+///   hazards by the county's recorded causes (M-18), with the heat share of the county's outage
+///   hours when the temperature record has it (M-11). Hurricanes, wildfire shutoffs, floods,
+///   cold-driven grid emergencies and other grid failures are outside the pool: their own rows
+///   carry them, so nothing is counted twice (M-10).
+/// - **Without it** (the fallback, said in the power bucket's sentences): the county's own outage
+///   statistics (or its state's series), split between the storm hazards in proportion to their
+///   short-outage rates; without any record, a third of short storm outages are taken to be
+///   county-scale (`storm_pool_fallback_ratio`).
 fn add_pool_terms(
     inp: &BuildInput<'_>,
     ps: &mut ParamSet,
     terms: &mut Vec<Term>,
     overrides: &mut Vec<OverrideApplied>,
     notes: &mut Vec<String>,
+    bucket_notes: &mut Vec<(BucketId, String)>,
+    gaps: &mut Vec<BucketId>,
 ) {
     let table = inp.table;
     let pool_rows: Vec<usize> = terms
@@ -810,6 +1295,151 @@ fn add_pool_terms(
         .map(|(i, _)| i)
         .collect();
     let total: f64 = pool_rows.iter().map(|&i| terms[i].rate * terms[i].q).sum();
+    // Attribution by short-outage rate; with no storm rates at all, to strong wind.
+    let by_rows: Vec<(HazardId, f64, f64, f64)> = if total > 0.0 {
+        pool_rows
+            .iter()
+            .map(|&i| {
+                let t = &terms[i];
+                (t.hazard, t.rate * t.q / total, t.heat_share, t.cold_share)
+            })
+            .collect()
+    } else {
+        vec![(HazardId::StrongWind, 1.0, 0.15, 0.4)]
+    };
+    let source = CitationId::from("ornl_eagle_i_outages");
+    let hot_share = inp.county.temperature.and_then(|t| {
+        t.region_outage_hot_share
+            .or(t.outage_hot_share)
+            .map(f64::from)
+            .filter(|x| x.is_finite() && (0.0..=1.0).contains(x))
+    });
+
+    if let Some((m, (curve, rate))) = inp
+        .county
+        .pooled()
+        .and_then(|m| pooled_curve(m, inp.county.outages).map(|c| (m, c)))
+    {
+        let rp = ps.factor(
+            "rate:outage_pooled".to_owned(),
+            table.params.outage_stats_rate_factor.value,
+            "how often county-wide storm outages happen here and nearby".to_owned(),
+            Evidence::Empirical,
+        );
+        let dp = ps.factor(
+            "dur:outage_pooled".to_owned(),
+            table.params.duration_factor_empirical.value,
+            "how long county-wide storm outages last here and nearby".to_owned(),
+            Evidence::Empirical,
+        );
+        // Shares by recorded cause; unattributed outages and causes whose hazard is not in the
+        // table's pool rows follow the short-outage split.
+        let mut shares: BTreeMap<HazardId, (f64, f64, f64)> = BTreeMap::new();
+        let known: f64 = POOL_CAUSES
+            .iter()
+            .map(|(c, _)| m.causes.get(*c).map_or(0.0, |x| f64::from(*x)))
+            .sum::<f64>()
+            + m.causes.get("unattributed").map_or(0.0, |x| f64::from(*x));
+        let mut rest = 1.0;
+        if known > 0.0 {
+            rest = 0.0;
+            for (cause, hazard) in POOL_CAUSES {
+                let x = m.causes.get(cause).map_or(0.0, |x| f64::from(*x)) / known;
+                match by_rows.iter().find(|(h, ..)| *h == hazard) {
+                    Some(&(_, _, heat, cold)) if x > 0.0 => {
+                        let e = shares.entry(hazard).or_insert((0.0, heat, cold));
+                        e.0 += x;
+                    }
+                    _ => rest += x,
+                }
+            }
+            rest += m.causes.get("unattributed").map_or(0.0, |x| f64::from(*x)) / known;
+        }
+        for &(hazard, share, heat, cold) in &by_rows {
+            let e = shares.entry(hazard).or_insert((0.0, heat, cold));
+            e.0 += rest * share;
+        }
+        let mut hazards = Vec::new();
+        for (hazard, (share, heat, cold)) in shares {
+            if share <= 0.0 {
+                continue;
+            }
+            hazards.push(hazard);
+            terms.push(Term {
+                bucket: BucketId::Power,
+                hazard,
+                scenario: None,
+                class: "county".to_owned(),
+                label: "county-wide storm outages".to_owned(),
+                rate: rate * share,
+                q: 1.0,
+                survival: curve.clone(),
+                threshold: 0.0,
+                max_with: None,
+                rate_param: rp,
+                q_param: None,
+                frag_param: None,
+                dur_param: dp,
+                evidence: Evidence::Empirical,
+                duration_from_data: true,
+                sources: vec![source.clone()],
+                relief: None,
+                notice_hours: None,
+                heat_share: hot_share.unwrap_or(heat),
+                cold_share: cold,
+                origin: Origin::Pool,
+            });
+        }
+        let region_words = match m.basis {
+            PoolBasis::Blend => format!(
+                "this county's outage records blended with about {} nearby counties'",
+                words::round_nice(f64::from(m.region_counties.max(1)))
+            ),
+            PoolBasis::RegionOnly => format!(
+                "about {} nearby counties' outage records, because this county has too few of its \
+                 own",
+                words::round_nice(f64::from(m.region_counties.max(1)))
+            ),
+            PoolBasis::OwnOnly => {
+                "this county's own outage records (no nearby county has any)".to_owned()
+            }
+        };
+        let ge3 = f64::from(m.lam_ge[1]);
+        overrides.push(OverrideApplied {
+            bucket: BucketId::Power,
+            hazards,
+            plain: format!(
+                "Power: county-wide storm outages use {region_words} (2014-2025): a home here is \
+                 caught in one about {}, and in one lasting 3 days or more about {}. Hurricanes, \
+                 wildfire shutoffs, floods and grid emergencies have rows of their own.",
+                words::rate_phrase(rate),
+                words::rate_phrase(ge3),
+            ),
+            sources: vec![source],
+        });
+        let sentence = match m.basis {
+            PoolBasis::Blend => format!(
+                "Power cuts from storms here use your county's outage records since 2014, blended \
+                 with about {} nearby counties', because about eleven years is too short to see \
+                 the rare storms.",
+                words::round_nice(f64::from(m.region_counties.max(1)))
+            ),
+            PoolBasis::RegionOnly => format!(
+                "Power cuts from storms here use about {} nearby counties' outage records since \
+                 2014, because your county has too few of its own.",
+                words::round_nice(f64::from(m.region_counties.max(1)))
+            ),
+            PoolBasis::OwnOnly => {
+                gaps.push(BucketId::Power);
+                "Power cuts from storms here use only your county's own outage records since \
+                 2014 (no nearby county has any), so one big storm can push this up or down."
+                    .to_owned()
+            }
+        };
+        bucket_notes.push((BucketId::Power, sentence));
+        return;
+    }
+
     let from_stats = inp
         .county
         .outages
@@ -836,21 +1466,8 @@ fn add_pool_terms(
                 format!("how long county-wide storm outages last {place}"),
                 Evidence::Empirical,
             );
-            let source = CitationId::from("ornl_eagle_i_outages");
-            // Attribution: by short-outage rate; with no storm rates at all, to strong wind.
-            let shares: Vec<(HazardId, f64, f64, f64)> = if total > 0.0 {
-                pool_rows
-                    .iter()
-                    .map(|&i| {
-                        let t = &terms[i];
-                        (t.hazard, t.rate * t.q / total, t.heat_share, t.cold_share)
-                    })
-                    .collect()
-            } else {
-                vec![(HazardId::StrongWind, 1.0, 0.15, 0.4)]
-            };
             let mut hazards = Vec::new();
-            for (hazard, share, heat, cold) in shares {
+            for &(hazard, share, heat, cold) in &by_rows {
                 hazards.push(hazard);
                 new_terms.push(Term {
                     bucket: BucketId::Power,
@@ -865,13 +1482,14 @@ fn add_pool_terms(
                     max_with: None,
                     rate_param: rp,
                     q_param: None,
+                    frag_param: None,
                     dur_param: dp,
                     evidence: Evidence::Empirical,
                     duration_from_data: true,
                     sources: vec![source.clone()],
                     relief: None,
                     notice_hours: None,
-                    heat_share: heat,
+                    heat_share: hot_share.unwrap_or(heat),
                     cold_share: cold,
                     origin: Origin::Pool,
                 });
@@ -903,6 +1521,21 @@ fn add_pool_terms(
                      were missing or did not fit the others."
                 ));
             }
+            // The regional records are not loaded: say so, and widen the range (M-14).
+            gaps.push(BucketId::Power);
+            bucket_notes.push((
+                BucketId::Power,
+                match &stats.state_series {
+                    Some(state) => format!(
+                        "Power cuts from storms here use {state}'s outage records, not nearby \
+                         counties' blended with yours, so this is less certain than usual."
+                    ),
+                    None => "Power cuts from storms here use only your county's own outage \
+                             records: nearby counties' records are not blended in, so one big \
+                             storm can push this up or down."
+                        .to_owned(),
+                },
+            ));
         }
         None => {
             let p = &table.params.storm_pool_fallback_ratio;
@@ -939,6 +1572,7 @@ fn add_pool_terms(
                     max_with: None,
                     rate_param: t.rate_param,
                     q_param: qp,
+                    frag_param: None,
                     dur_param: dp,
                     evidence: Evidence::Prior,
                     duration_from_data: false,
@@ -949,6 +1583,15 @@ fn add_pool_terms(
                     cold_share: t.cold_share,
                     origin: Origin::Pool,
                 });
+            }
+            if !pool_rows.is_empty() {
+                gaps.push(BucketId::Power);
+                bucket_notes.push((
+                    BucketId::Power,
+                    "There are no outage records for this place, so power cuts from storms are an \
+                     estimate that could be too short."
+                        .to_owned(),
+                ));
             }
         }
     }
@@ -1002,6 +1645,7 @@ fn apply_couplings(
     terms: &mut Vec<Term>,
     table_share: &BTreeMap<(Owner, String, BucketId), f64>,
     couplings: &mut Vec<CouplingApplied>,
+    (fragility, frag_param): (&Fragility, Option<usize>),
 ) {
     let table = inp.table;
     let prm = &table.params;
@@ -1019,6 +1663,7 @@ fn apply_couplings(
         .collect();
     let mut derived: Vec<Term> = Vec::new();
     let mut floors: Vec<(usize, MaxWith, Option<usize>)> = Vec::new();
+    let mut water_floors: Vec<(usize, MaxWith)> = Vec::new();
     let mut fired: Vec<&'static str> = Vec::new();
     let water_rule = if hh.well {
         "well_pump"
@@ -1100,6 +1745,55 @@ fn apply_couplings(
                     fired.push("cooling_needs_power");
                 }
             }
+        }
+        // Public water keeps flowing on backup power for a few days; in a longer outage some
+        // systems lose pressure (Maria, Harvey, Laura). The event's own no-water rows then last
+        // at least as long as the power cut past the backup's days; other long power cuts stop
+        // the water for a share of homes, scaled by how easily the system breaks (M-03).
+        if !hh.well && !hh.high_rise_pumped {
+            let thr = prm.public_water_power_days.value;
+            let overlap: Vec<usize> = terms
+                .iter()
+                .enumerate()
+                .filter(|(_, w)| {
+                    w.bucket == BucketId::WaterOut
+                        && w.origin == Origin::Table
+                        && w.owner() == t.owner()
+                        && w.class == t.class
+                        && w.max_with.is_none()
+                })
+                .map(|(i, _)| i)
+                .collect();
+            if overlap.is_empty() {
+                let q = t.q * prm.public_water_power_share.value * fragility.multiplier;
+                if q > 0.0 && t.survival.sf(thr, 0.0) > 1e-9 {
+                    let mut d = derive(t, BucketId::WaterOut, q, thr, "public_water_power");
+                    d.frag_param = frag_param.or(t.frag_param);
+                    d.relief = None;
+                    derived.push(d);
+                    if !fired.contains(&"public_water_power") {
+                        fired.push("public_water_power");
+                    }
+                }
+            } else {
+                for i in overlap {
+                    water_floors.push((
+                        i,
+                        MaxWith {
+                            survival: t.survival.clone(),
+                            dur_param: t.dur_param,
+                            threshold: thr,
+                        },
+                    ));
+                }
+            }
+        }
+    }
+    for (i, floor) in water_floors {
+        let w = &mut terms[i];
+        if w.max_with.is_none() {
+            w.max_with = Some(floor);
+            w.sources.push(CitationId::from("rr_risk_model_priors"));
         }
     }
     for (i, floor, q_param) in floors {
@@ -1223,6 +1917,21 @@ fn apply_couplings(
             &coupling_src,
         );
     }
+    if fired.contains(&"public_water_power") {
+        coupling_note(
+            couplings,
+            "public_water_power",
+            format!(
+                "Public water systems keep pumping on backup power for about {} days; in longer \
+                 power cuts some lose pressure, more often where the system has a record of \
+                 problems.",
+                words::round_nice(prm.public_water_power_days.value)
+            ),
+            &[BucketId::WaterOut],
+            "rr-consequence",
+            &prm.public_water_power_share.sources,
+        );
+    }
     if hh.refrigerated_rx && f_rx {
         coupling_note(
             couplings,
@@ -1280,6 +1989,7 @@ fn fixed_rate_term(
         max_with: None,
         rate_param: rp,
         q_param: None,
+        frag_param: None,
         dur_param: None,
         evidence: p.evidence,
         duration_from_data: false,
@@ -1436,6 +2146,9 @@ fn income_terms(
     }
     let earners = f64::from(hh.earners);
     for row in &table.income {
+        if !hh.meets(row.requires) {
+            continue;
+        }
         let spell = Survival::from_dist(&row.spell_weeks);
         let dur_param = ps.factor(
             format!(
@@ -1516,7 +2229,11 @@ fn income_terms(
             },
             None => match rates.get(&row.hazard) {
                 Some(r) => (
-                    r.rate_per_year * row.per_earner * earners,
+                    if row.household_rate {
+                        r.rate_per_year * row.per_earner
+                    } else {
+                        r.rate_per_year * row.per_earner * earners
+                    },
                     rate_param[&row.hazard],
                     r.sources.clone(),
                 ),

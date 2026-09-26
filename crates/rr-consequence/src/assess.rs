@@ -5,8 +5,9 @@ use std::collections::BTreeMap;
 
 use rr_types::math;
 use rr_types::{
-    BucketAssessment, BucketId, CitationId, Contribution, Evidence, HazardId, HouseholdEventRate,
-    PlanInput, Relief, ReturnPeriod, ScenarioInfo, Target, TierId, Warning, WarningSeverity,
+    BucketAssessment, BucketId, CitationId, Contribution, CookingFuel, Date, Evidence, HazardId,
+    HouseholdEventRate, PlanInput, Relief, ReturnPeriod, ScenarioInfo, StressTest,
+    TARGET_LADDER_DAYS, Target, TierId, Warning, WarningSeverity, WaterSource,
 };
 use serde::Serialize;
 
@@ -35,12 +36,18 @@ pub const DURATION_BUCKETS: [BucketId; 7] = [
 /// (counted under floods from rivers or heavy rain), tsunami and chemical releases. Their short
 /// warning enters the evacuation warning band whenever they contribute to it at all, however
 /// small their share (model review M-08). Dam failure joins them when it becomes a hazard.
-pub const FAST_WARNING_HAZARDS: [HazardId; 4] = [
+pub const FAST_WARNING_HAZARDS: [HazardId; 6] = [
     HazardId::Wildfire,
     HazardId::RiverineFlooding,
     HazardId::Tsunami,
     HazardId::HazmatRelease,
+    HazardId::DamFailure,
+    HazardId::Sinkhole,
 ];
+
+/// A cause counts toward the short end of the evacuation warning when its own ten-year chance
+/// is at least this (model review M-08: 1 in 1,000).
+pub const WARNING_CAUSE_P10: f64 = 0.001;
 
 /// Catalogue item ids that count as existing coverage (`PlanInput::existing`).
 // awaiting: rr-content (the catalogue's id for "gas stove in the home").
@@ -70,6 +77,13 @@ pub struct ConsequenceAssessment {
     pub get_home: GetHomeDetail,
     /// Displacement probability and how long it tends to last.
     pub home_loss: HomeLossDetail,
+    /// The clean-air need: its ten-year chance and the unhealthy-air days a year.
+    pub clean_air: CleanAirDetail,
+    /// For each event that sets a duration target, the other needs the same event brings at once
+    /// (DESIGN §4.7's simultaneous-need check; the budget crate compares it with storage).
+    pub simultaneous: Vec<SimultaneousNeed>,
+    /// How easily the household's public water system breaks (model review M-03).
+    pub fragility: crate::model::Fragility,
     /// Household coupling rules that fired (one explainable line each).
     pub couplings: Vec<CouplingApplied>,
     /// County records that replaced national defaults.
@@ -78,6 +92,8 @@ pub struct ConsequenceAssessment {
     pub notes: Vec<String>,
     /// Yearly rate of the household's return period (1/N).
     pub dial_rate: f64,
+    /// The horizon of the natural-frequency sentences, in years.
+    pub horizon_years: f64,
     /// Monte Carlo draws behind the ranges.
     pub draws: usize,
 }
@@ -131,6 +147,94 @@ impl ConsequenceAssessment {
         }
         by.values().sum()
     }
+
+    /// The dial sentence, computed from the model (model review M-04, DESIGN-DELTA §3): "At this
+    /// setting, about 1 in 10 households like yours will face a longer disruption of any one
+    /// kind in 10 years; about 3 in 10 will face at least one kind that runs past its target."
+    pub fn dial_sentence(&self) -> String {
+        let years = self.horizon_years.max(1.0);
+        let one = crate::curve::natural_frequency(self.dial_rate, years);
+        let all = crate::curve::natural_frequency(self.joint_rate(), years).max(one);
+        let in_10 = |n: f64| {
+            let k = (n / 10.0 + 0.5).floor().clamp(1.0, 10.0) as i64;
+            format!("{k} in 10")
+        };
+        format!(
+            "At this setting, about {} households like yours will face a longer disruption of \
+             any one kind in {}; about {} will face at least one kind that runs past its target.",
+            in_10(one),
+            words::horizon_phrase(years as u8),
+            in_10(all)
+        )
+    }
+
+    /// Yearly rate of power cuts longer than `days` (Λ_power), for the rare
+    /// `multi_month_blackout` row, which the hazards crate shows from this number.
+    pub fn power_beyond(&self, days: f64) -> f64 {
+        self.curve(BucketId::Power).map_or(0.0, |c| c.lambda(days))
+    }
+
+    /// The power curve at two and three months (DESIGN-DELTA §3: `multi_month_blackout` is
+    /// computed from the plan's own power curve).
+    pub fn multi_month_blackout(&self) -> MultiMonthBlackout {
+        let (l60, l90) = (self.power_beyond(60.0), self.power_beyond(90.0));
+        let sources = self
+            .buckets
+            .iter()
+            .find(|b| b.id == BucketId::Power)
+            .map(|b| b.sources.clone())
+            .unwrap_or_default();
+        MultiMonthBlackout {
+            rate_60_days: l60,
+            rate_90_days: l90,
+            p10_60_days: p10(l60),
+            p10_90_days: p10(l90),
+            sources,
+        }
+    }
+}
+
+/// Power out for two or three months or more, from the household's own power curve.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct MultiMonthBlackout {
+    /// Power cuts a year lasting longer than 60 days.
+    pub rate_60_days: f64,
+    /// Power cuts a year lasting longer than 90 days.
+    pub rate_90_days: f64,
+    /// Chance of at least one longer than 60 days in ten years.
+    pub p10_60_days: f64,
+    /// Chance of at least one longer than 90 days in ten years.
+    pub p10_90_days: f64,
+    /// Where the power curve comes from.
+    pub sources: Vec<CitationId>,
+}
+
+/// The needs one design event brings at the same time (DESIGN §4.7).
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct SimultaneousNeed {
+    /// The event, in words ("major hurricanes (category 3 or a direct hit)").
+    pub event: String,
+    /// Its hazard (a scenario's family).
+    pub hazard: HazardId,
+    /// The named scenario, if it is one.
+    pub scenario: Option<String>,
+    /// The buckets whose target this event sets.
+    pub sets_target_of: Vec<BucketId>,
+    /// Every duration need the event brings, with the days at the design event's severity (on
+    /// the ladder) and the chance the event brings it at all.
+    pub needs: Vec<(BucketId, f32, f64)>,
+}
+
+/// The clean-air need (contract v2 `clean_air`, DESIGN §4.3).
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct CleanAirDetail {
+    /// Chance of needing clean air at home at least once in ten years.
+    pub p_need_10yr: f64,
+    /// Days a year with unhealthy air from smoke, dust or fumes.
+    pub days_per_year: f64,
+    /// The smoke part of `days_per_year` is the county's record (smoke days with PM2.5 of 35 or
+    /// more), not the model's episode count.
+    pub smoke_days_from_record: bool,
 }
 
 /// One way a bucket can be disrupted, as the expert view shows it.
@@ -181,6 +285,11 @@ pub struct BucketDetail {
     pub drivers: Vec<String>,
     /// The event class that dominates the design event.
     pub design_event: Option<String>,
+    /// The design event as (hazard, scenario index, class): the key the simultaneous-need check
+    /// groups buckets by.
+    pub design: Option<(HazardId, Option<usize>, String)>,
+    /// The target rests on a fallback (a structural gap), so its range was widened.
+    pub structural_gap: bool,
     /// Every term, largest share first.
     pub terms: Vec<TermSummary>,
 }
@@ -227,6 +336,14 @@ pub struct EvacuateDetail {
     pub days_away: f32,
     /// (hazard, label, events per year, notice band).
     pub causes: Vec<(HazardId, String, f64, [f64; 2])>,
+    /// The cause behind the short end of the warning band (model review M-08).
+    pub fastest_cause: Option<HazardId>,
+    /// The fastest cause that is not a fire at home, with its least warning in hours, when a fire
+    /// at home sets the short end.
+    pub fastest_outside: Option<(HazardId, f64)>,
+    /// The cause with the longest time away (90th percentile, days) among those with a ten-year
+    /// chance of 1 in 100 or more.
+    pub longest_away: Option<(HazardId, f64)>,
 }
 
 /// One commuter's walk home.
@@ -264,6 +381,16 @@ pub struct HomeLossDetail {
     pub share_over_six_months: f64,
     /// Share of households like this one (renter or owner) that never return.
     pub share_never_return: f64,
+    /// If damage forced the household out, the months by which nine in ten households like it
+    /// would be home again (the 90th percentile of the displacement durations, weighted by how
+    /// often each cause happens; model review M-08). 0 when there is no displacement risk.
+    pub months_away_p90: f64,
+    /// Months away at the household's dial: the displacement a 1-in-N year brings (0 when being
+    /// displaced at all is rarer than the dial).
+    pub months_away_at_dial: f64,
+    /// Living elsewhere for `months_away_p90`, at the housing share of the household's monthly
+    /// expenses (`None` without monthly expenses): what loss-of-use insurance pays for.
+    pub displacement_cost_usd: Option<f64>,
 }
 
 /// Scenario on/off: the candidate's default, then the user's override.
@@ -358,6 +485,7 @@ pub fn assess_full(
         table,
         model: &model,
         scenarios,
+        county,
         rate,
         years,
         draws: &draws,
@@ -378,13 +506,11 @@ pub fn assess_full(
         BucketId::MedicalEmergency,
         BucketId::Fire,
         BucketId::Security,
-        // awaiting: consequence — `clean_air` takes the generic readiness path until it gets its
-        // own need from smoke and dust episodes (DESIGN-DELTA §1.2, §3); with no effects rows yet
-        // its chance is zero.
-        BucketId::CleanAir,
     ] {
         by_bucket.insert(b, readiness_bucket(&ctx, b));
     }
+    let (ca_assessment, clean_air) = clean_air_bucket(&ctx);
+    by_bucket.insert(BucketId::CleanAir, ca_assessment);
     let (income_assessment, income) = income_bucket(&ctx);
     by_bucket.insert(BucketId::Income, income_assessment);
     let (hl_assessment, home_loss) = home_loss_bucket(&ctx);
@@ -392,6 +518,7 @@ pub fn assess_full(
 
     let scenario_infos = scenario_summaries(&binp, &model, &states, rate);
     let warnings = cliff_warnings(&ctx, &details);
+    let simultaneous = simultaneous_needs(&ctx, &details);
     let statement = statement(
         &ctx, &by_bucket, &details, &income, &evacuate, &get_home, &warnings,
     );
@@ -410,10 +537,14 @@ pub fn assess_full(
         evacuate,
         get_home,
         home_loss,
+        clean_air,
+        simultaneous,
+        fragility: model.fragility,
         couplings: model.couplings.clone(),
         overrides: model.overrides.clone(),
         notes: model.notes.clone(),
         dial_rate: rate,
+        horizon_years: years,
         draws: draws.n(),
     }
 }
@@ -424,6 +555,7 @@ struct Ctx<'a> {
     table: &'a EffectsTable,
     model: &'a Model,
     scenarios: &'a [ScenarioCandidate],
+    county: CountyData<'a>,
     rate: f64,
     years: f64,
     draws: &'a Draws,
@@ -524,11 +656,187 @@ fn coupling_sentences(ctx: &Ctx<'_>, bucket: BucketId) -> Vec<String> {
         .collect()
 }
 
+/// A gas range boils water while the gas flows: the household said so (contract v2
+/// `Housing::cooking`), or it lists a gas stove among what it has.
 fn has_gas_stove(input: &PlanInput) -> bool {
-    input
-        .existing
+    input.housing.cooking == Some(CookingFuel::Gas)
+        || input
+            .existing
+            .iter()
+            .any(|o| GAS_STOVE_ITEM_IDS.contains(&o.item_id.as_str()) && o.qty >= 1.0)
+}
+
+/// The next ladder step above `days` (365 stays 365): the structural widening of a range whose
+/// target rests on a fallback (model review M-14).
+fn next_step(days: f32) -> f32 {
+    TARGET_LADDER_DAYS
         .iter()
-        .any(|o| GAS_STOVE_ITEM_IDS.contains(&o.item_id.as_str()) && o.qty >= 1.0)
+        .copied()
+        .find(|&l| l > days)
+        .unwrap_or(TARGET_LADDER_DAYS[TARGET_LADDER_DAYS.len() - 1])
+}
+
+/// Share still out after `days` on a restoration curve given at a few day marks (share of the
+/// peak), interpolated on log days; 1 before the first mark's day 0, and the last mark's share
+/// (or nothing) after it.
+fn share_out_after(points: &[(f32, f32)], days: f64) -> f64 {
+    let mut pts: Vec<(f64, f64)> = points
+        .iter()
+        .map(|(d, s)| (f64::from(*d), f64::from(*s).clamp(0.0, 1.0)))
+        .filter(|(d, _)| d.is_finite() && *d > 0.0)
+        .collect();
+    pts.sort_by(|a, b| a.0.total_cmp(&b.0));
+    let Some(&(d0, s0)) = pts.first() else {
+        return 0.0;
+    };
+    if days <= d0 {
+        // From everyone out at the peak down to the first mark.
+        return 1.0 - (1.0 - s0) * (days / d0).clamp(0.0, 1.0);
+    }
+    for w in pts.windows(2) {
+        let ((a, sa), (b, sb)) = (w[0], w[1]);
+        if days <= b {
+            let t = (math::ln(days) - math::ln(a)) / (math::ln(b) - math::ln(a));
+            return sa + (sb - sa) * t;
+        }
+    }
+    pts.last().map_or(0.0, |p| p.1)
+}
+
+/// The worst event on record for a duration bucket (model review Part 3.3): the region's worst
+/// power cut from the regional outage table, and for homes on public water the worst documented
+/// water failure in the state. `covered_by_target` holds when nine in ten of the households it
+/// reached had service back by the target (the backtest's "covered" rule).
+fn stress_test(ctx: &Ctx<'_>, bucket: BucketId, target: f32) -> Option<StressTest> {
+    match bucket {
+        BucketId::Power => {
+            let e = ctx.county.outage_model.and_then(|m| m.stress.as_ref())?;
+            let date = Date::parse(&e.date).ok()?;
+            if e.share_out_at_days.is_empty() {
+                return None;
+            }
+            let peak = f64::from(e.peak_share).clamp(0.0, 1.0);
+            let historic = e.source.starts_with("historic:");
+            let region = if historic {
+                "the territory's records".to_owned()
+            } else {
+                match e.distance_km {
+                    Some(km) if km < 1.0 => "your county's records".to_owned(),
+                    Some(km) => format!(
+                        "your region's records (where it was worst, about {} away)",
+                        words::distance_phrase(f64::from(km))
+                    ),
+                    None => "your region's records".to_owned(),
+                }
+            };
+            let covered = share_out_after(&e.share_out_at_days, f64::from(target)) <= 0.1;
+            Some(StressTest {
+                event: e.event.clone(),
+                date,
+                region,
+                share_out_at_days: e
+                    .share_out_at_days
+                    .iter()
+                    .map(|(d, s)| (*d, (f64::from(*s) * peak) as f32))
+                    .collect(),
+                covered_by_target: covered,
+                sources: vec![CitationId::from(if historic {
+                    words::historic_source(&e.source)
+                } else {
+                    "ornl_eagle_i_outages"
+                })],
+            })
+        }
+        BucketId::WaterOut | BucketId::WaterBoil => {
+            if ctx.input.housing.water == WaterSource::Well || ctx.county.state_abbr.is_empty() {
+                return None;
+            }
+            let e = ctx
+                .table
+                .water_events
+                .iter()
+                .filter(|e| {
+                    e.bucket == bucket && e.states.iter().any(|s| s == ctx.county.state_abbr)
+                })
+                .max_by(|a, b| a.p90_days.total_cmp(&b.p90_days).then(b.id.cmp(&a.id)))?;
+            let date = Date::parse(&e.date).ok()?;
+            Some(StressTest {
+                event: e.event.clone(),
+                date,
+                region: e.place.clone(),
+                share_out_at_days: if e.p90_days > e.median_days {
+                    vec![(e.median_days as f32, 0.5), (e.p90_days as f32, 0.1)]
+                } else {
+                    vec![(e.median_days as f32, 1.0)]
+                },
+                covered_by_target: f64::from(target) >= e.p90_days,
+                sources: e.sources.clone(),
+            })
+        }
+        _ => None,
+    }
+}
+
+/// The stress line in words, for the bucket's sentences.
+fn stress_sentence(bucket: BucketId, st: &StressTest, target: f32) -> String {
+    let year = &st.date.to_string()[..4];
+    let what = match bucket {
+        BucketId::Power => "homes that lost power",
+        BucketId::WaterOut => "homes",
+        _ => "homes",
+    };
+    let at = share_out_after(&st.share_out_at_days, f64::from(target));
+    match bucket {
+        BucketId::Power => {
+            format!(
+                "The worst power cut in {} was {} ({year}); being ready for {} would have {}.",
+                st.region,
+                st.event,
+                words::ladder_phrase(target),
+                if st.covered_by_target {
+                    "outlasted it for at least 9 in 10 of the homes that lost power".to_owned()
+                } else {
+                    format!(
+                        "left some {what} still waiting (about {} in 100 of all customers there                          were still out)",
+                        words::per_100(100.0 * at)
+                    )
+                }
+            )
+        }
+        _ => {
+            let (lo, hi) = match st.share_out_at_days.as_slice() {
+                [(m, _), (p, _)] => (*m, *p),
+                [(m, _)] => (*m, *m),
+                _ => (0.0, 0.0),
+            };
+            let long = if (hi - lo).abs() < 0.5 {
+                words::days_phrase(f64::from(hi))
+            } else {
+                format!(
+                    "{} for most, up to {}",
+                    words::days_phrase(f64::from(lo)),
+                    words::days_phrase(f64::from(hi))
+                )
+            };
+            format!(
+                "The worst {} on record in your state was in {} after {} ({year}): {long}. Being \
+                 ready for {} {} that.",
+                if bucket == BucketId::WaterOut {
+                    "loss of tap water"
+                } else {
+                    "boil-water notice"
+                },
+                st.region,
+                st.event,
+                words::ladder_phrase(target),
+                if st.covered_by_target {
+                    "would have covered"
+                } else {
+                    "would not have covered all of"
+                }
+            )
+        }
+    }
 }
 
 /// The duration in the first frequency sentence: a day for utilities, three days for shopping
@@ -550,7 +858,14 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
     let range =
         ranges::duration_range(&mut eval, ctx.draws, ctx.rate, ladder, &[d1, d2], ctx.years);
     let low = range.low.min(ladder);
-    let high = range.high.max(ladder);
+    let mut high = range.high.max(ladder);
+    // A target that rests on a fallback (no regional outage records, nothing known about the
+    // water system) could be too short in ways the parameter draws cannot show: one ladder step
+    // more at the high end (model review M-14).
+    let gap = ladder > 0.0 && ctx.model.gaps.contains(&bucket);
+    if gap {
+        high = next_step(high);
+    }
     let at = if target_c > 0.0 { target_c } else { 0.0 };
     let shares = eval.shares(at);
     let owners = owner_shares(&eval, at);
@@ -584,7 +899,7 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
         Vec::new()
     };
 
-    let dial_table: Vec<DialPoint> = ReturnPeriod::ALL
+    let mut dial_table: Vec<DialPoint> = ReturnPeriod::ALL
         .iter()
         .map(|rp| {
             let r = dial_rate(*rp);
@@ -592,9 +907,11 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
                 return_period_years: rp.years(),
                 target_days: eval.target(r, 26),
                 ladder_days: eval.ladder_target(r),
+                cliff: false,
             }
         })
         .collect();
+    mark_cliffs(&eval, &mut dial_table);
     let curve = ExceedanceCurve::from_eval(bucket, &eval, target_c, ladder);
 
     // Relief for the design event.
@@ -662,12 +979,33 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
         [] => {}
     }
     sentences.extend(coupling_sentences(ctx, bucket));
+    // What the target rests on: the regional outage records or the fallback, the water system.
+    sentences.extend(
+        ctx.model
+            .bucket_notes
+            .iter()
+            .filter(|(b, _)| *b == bucket)
+            .map(|(_, s)| s.clone()),
+    );
+    // Rounding up to the ladder: say so when the raw number is just past a step (model review
+    // M-15: a 6 % change can move the target a whole step).
+    if let Some(note) = rounding_note(target_c, ladder) {
+        sentences.push(note);
+    }
     let gas_stove = bucket == BucketId::WaterBoil && has_gas_stove(ctx.input);
     if gas_stove {
         sentences.push(
             "Your gas stove can boil water during a boil-water notice, as long as the gas stays on."
                 .to_owned(),
         );
+    }
+    let stress = if ladder > 0.0 {
+        stress_test(ctx, bucket, ladder)
+    } else {
+        None
+    };
+    if let Some(st) = &stress {
+        sentences.push(stress_sentence(bucket, st, ladder));
     }
 
     let target = Target::Days {
@@ -698,11 +1036,13 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
             if let Some(r) = &relief {
                 s.extend(r.sources.iter().cloned());
             }
+            if let Some(st) = &stress {
+                s.extend(st.sources.iter().cloned());
+            }
             sorted_sources(s)
         },
         relief,
-        // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
-        stress_test: None,
+        stress_test: stress,
     };
     let detail = BucketDetail {
         bucket,
@@ -715,9 +1055,66 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
         dial_table,
         drivers: drivers.iter().map(|d| d.phrase()).collect(),
         design_event: design.map(|t| t.label.clone()),
+        design: design.map(|t| (t.hazard, t.scenario, t.class.clone())),
+        structural_gap: gap,
         terms,
     };
     (assessment, detail)
+}
+
+/// "This rounds up to 5 days: before rounding it is about 3.2 days, just past 3." when the raw
+/// target sits less than 15 % past the ladder step below the target (model review M-15).
+fn rounding_note(raw: f64, ladder: f32) -> Option<String> {
+    if raw <= 0.0 || ladder <= 0.0 {
+        return None;
+    }
+    let below = TARGET_LADDER_DAYS.iter().copied().rfind(|&l| l < ladder)?;
+    let b = f64::from(below);
+    if raw > b * 1.15 || raw <= b {
+        return None;
+    }
+    let raw_words = if raw < 10.0 {
+        format!("{:.1} days", (raw * 10.0 + 0.5).floor() / 10.0)
+    } else {
+        words::days_phrase(raw)
+    };
+    Some(format!(
+        "This rounds up to {}: before rounding it is about {raw_words}, just past {}.",
+        words::ladder_phrase(ladder),
+        words::ladder_phrase(below)
+    ))
+}
+
+/// Marks the dial settings where the target jumps from the setting before it by the engine's
+/// cliff rule (elasticity of at least 2 and 3 days or more), for the sweep (model review M-15:
+/// only true cliffs, not every log-normal tail).
+fn mark_cliffs(eval: &Eval<'_>, table: &mut [DialPoint]) {
+    let rates: Vec<f64> = ReturnPeriod::ALL.iter().map(|rp| dial_rate(*rp)).collect();
+    for j in 1..table.len() {
+        let (a, b) = (table[j - 1].target_days, table[j].target_days);
+        if a.is_nan() || b.is_nan() || b <= 0.0 {
+            continue;
+        }
+        let step = math::ln(rates[j - 1] / rates[j]).abs();
+        let e = math::ln((b + 0.05) / (a + 0.05)).abs() / step;
+        if e < CLIFF_ELASTICITY || (b - a).abs() < CLIFF_MIN_DAYS || a.min(b) < CLIFF_FROM_DAYS {
+            continue;
+        }
+        // One event dominates the jump's upper end, with a rate near that setting.
+        let owners = owner_shares(eval, b);
+        let Some(&(owner, share)) = owners.first() else {
+            continue;
+        };
+        let owner_rate: f64 = eval
+            .terms()
+            .iter()
+            .filter(|t| t.owner() == owner)
+            .map(|t| t.rate * t.q)
+            .sum();
+        if share >= 0.5 && owner_rate >= rates[j] / 3.0 && owner_rate <= rates[j] * 3.0 {
+            table[j].cliff = true;
+        }
+    }
 }
 
 /// Outages shorter than this do not count toward "mostly restored" for the design event: the
@@ -771,6 +1168,161 @@ fn relief_of(ctx: &Ctx<'_>, t: &Term) -> Option<Relief> {
         mostly_restored_days: restored as f32,
         sources: sorted_sources(sources),
     })
+}
+
+/// The clean-air need (contract v2): its ten-year chance from the smoke, dust, ash and chemical
+/// rows, and the unhealthy-air days a year for the sentence: the county's recorded smoke days
+/// where the pack has them, plus the model's dust, ash and fume days; otherwise the model's
+/// episodes times their typical length.
+fn clean_air_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, CleanAirDetail) {
+    let bucket = BucketId::CleanAir;
+    let (r, lo, hi, contributions, mut sources) = readiness_parts(ctx, bucket);
+    let p = p10(r);
+    let eval = Eval::central(ctx.model, bucket);
+    let days_of = |smoke: bool| -> f64 {
+        eval.terms()
+            .iter()
+            .filter(|t| (t.hazard == HazardId::WildfireSmoke) == smoke)
+            .map(|t| t.rate * t.q * t.survival.mean_days())
+            .sum()
+    };
+    let (smoke, from_record) = match ctx.county.smoke_days.filter(|d| d.is_finite() && *d >= 0.0) {
+        Some(d) => {
+            sources.push(CitationId::from("hms_aqs_smoke_days"));
+            (d, true)
+        }
+        None => (days_of(true), false),
+    };
+    let days = smoke + days_of(false);
+    let mut sentences = vec![readiness_sentence(ctx, bucket, r, lo, hi)];
+    if days >= 0.5 {
+        let n = words::round_nice(days);
+        sentences.push(format!(
+            "The air outside is unhealthy from smoke, dust or fumes about {n} day{} a year here{}.",
+            if n == "1" { "" } else { "s" },
+            if from_record {
+                " (smoke days with fine particles at unhealthy levels, 2016-2023)"
+            } else {
+                ""
+            }
+        ));
+    }
+    if p > 0.0 {
+        sentences.push(
+            "What helps: a room you can seal, an air cleaner or a box-fan filter, and \
+             well-fitting respirators for going outside."
+                .to_owned(),
+        );
+    }
+    let target = Target::Readiness {
+        p_need_10yr: p,
+        done: 0,
+        of: 0,
+    };
+    (
+        BucketAssessment {
+            id: bucket,
+            name: bucket.name().to_owned(),
+            target,
+            covered: target,
+            covered_today: target,
+            tier_enough: readiness_tier(ctx, p),
+            contributions,
+            frequency_sentences: sentences,
+            sources: sorted_sources(sources),
+            relief: None,
+            stress_test: None,
+        },
+        CleanAirDetail {
+            p_need_10yr: p,
+            days_per_year: days,
+            smoke_days_from_record: from_record,
+        },
+    )
+}
+
+/// DESIGN §4.7's simultaneous-need check: for each event class that sets a duration target, the
+/// other duration needs the same event brings, at the same severity (the co-monotone convention
+/// of the couplings): the design duration's survival level in the setting bucket, read off each
+/// other bucket's duration for that event. The budget crate compares the stored water, food and
+/// fuel with it (a warning, never a block).
+fn simultaneous_needs(ctx: &Ctx<'_>, details: &[BucketDetail]) -> Vec<SimultaneousNeed> {
+    let mut out: Vec<SimultaneousNeed> = Vec::new();
+    for d in details {
+        let Some((hazard, scenario, class)) = &d.design else {
+            continue;
+        };
+        if d.ladder_days <= 0.0 {
+            continue;
+        }
+        if let Some(n) = out.iter_mut().find(|n| {
+            n.hazard == ctx.owner_hazard(owner_of(*hazard, *scenario))
+                && n.scenario == scenario.map(|i| ctx.scenarios[i].id.clone())
+                && n.event
+                    == ctx
+                        .model
+                        .terms
+                        .iter()
+                        .find(|t| {
+                            t.hazard == *hazard && t.scenario == *scenario && &t.class == class
+                        })
+                        .map_or(String::new(), |t| t.label.clone())
+        }) {
+            if !n.sets_target_of.contains(&d.bucket) {
+                n.sets_target_of.push(d.bucket);
+            }
+            continue;
+        }
+        let same = |t: &&Term| t.hazard == *hazard && t.scenario == *scenario && &t.class == class;
+        let Some(anchor) = ctx
+            .model
+            .terms
+            .iter()
+            .filter(same)
+            .find(|t| t.bucket == d.bucket)
+        else {
+            continue;
+        };
+        let u = anchor
+            .survival
+            .sf(d.target_days, 0.0)
+            .clamp(1e-6, 1.0 - 1e-6);
+        let mut needs = Vec::new();
+        for b in DURATION_BUCKETS {
+            let Some(t) = ctx
+                .model
+                .terms
+                .iter()
+                .filter(same)
+                .filter(|t| t.bucket == b)
+                .max_by(|a, c| a.q.total_cmp(&c.q))
+            else {
+                continue;
+            };
+            let days = if b == d.bucket {
+                f64::from(d.ladder_days)
+            } else {
+                t.survival.quantile_days(1.0 - u).max(t.threshold)
+            };
+            let chance = (t.q / anchor.q.max(1e-12)).min(1.0);
+            needs.push((b, crate::curve::round_up_to_ladder(days), chance));
+        }
+        out.push(SimultaneousNeed {
+            event: anchor.label.clone(),
+            hazard: ctx.owner_hazard(anchor.owner()),
+            scenario: scenario.map(|i| ctx.scenarios[i].id.clone()),
+            sets_target_of: vec![d.bucket],
+            needs,
+        });
+    }
+    out
+}
+
+fn owner_of(hazard: HazardId, scenario: Option<usize>) -> Owner {
+    match scenario {
+        Some(i) => Owner::Scenario(i),
+        None => Owner::Hazard(hazard),
+    }
 }
 
 fn readiness_sentence(ctx: &Ctx<'_>, bucket: BucketId, r: f64, lo: f64, hi: f64) -> String {
@@ -840,7 +1392,6 @@ fn readiness_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> BucketAssessment {
         frequency_sentences: sentences,
         sources,
         relief: None,
-        // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
         stress_test: None,
     }
 }
@@ -852,21 +1403,72 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
     let shares = eval.shares(0.0);
     let mut notice = [f64::INFINITY, 0.0f64];
     let mut causes = Vec::new();
+    // Causes are the terms summed by hazard (a scenario counts under its family): the short end
+    // of the warning is the least warning among causes whose own ten-year chance is at least 1 in
+    // 1,000, however small their share (model review M-08: Lahaina's wildfire and local tsunami
+    // each held under 5 % of the rate). The long end stays the most warning among terms with at
+    // least 5 % of the rate.
+    let mut by_cause: BTreeMap<HazardId, (f64, f64)> = BTreeMap::new();
     for (t, s) in eval.terms().iter().zip(&shares) {
         let band = t.notice_hours.unwrap_or([0.0, 0.0]);
         causes.push((t.hazard, t.label.clone(), t.rate * t.q, band));
+        let h = ctx.owner_hazard(t.owner());
+        let e = by_cause.entry(h).or_insert((0.0, f64::INFINITY));
+        e.0 += t.rate * t.q;
+        if t.rate * t.q > 0.0 {
+            e.1 = e.1.min(band[0]);
+        }
         if *s >= 0.05 {
-            notice[0] = notice[0].min(band[0]);
             notice[1] = notice[1].max(band[1]);
-        } else if *s > 0.0 && FAST_WARNING_HAZARDS.contains(&t.hazard) {
-            // A fast hazard's short warning counts whenever it can force the household out at
-            // all (model review M-08: Lahaina read "as short as 2 hours" because the wildfire and
-            // local tsunami each held under 5 % of the rate).
-            notice[0] = notice[0].min(band[0]);
+        }
+    }
+    let mut fastest: Option<(HazardId, f64)> = None;
+    let mut fastest_outside: Option<(HazardId, f64)> = None;
+    for (h, (r, least)) in &by_cause {
+        if p10(*r) < WARNING_CAUSE_P10 || !least.is_finite() {
+            continue;
+        }
+        if fastest.is_none_or(|(_, n)| *least < n) {
+            fastest = Some((*h, *least));
+        }
+        if *h != HazardId::HouseFire && fastest_outside.is_none_or(|(_, n)| *least < n) {
+            fastest_outside = Some((*h, *least));
+        }
+    }
+    match fastest {
+        Some((_, n)) => notice[0] = n,
+        None => {
+            // No cause reaches 1 in 1,000: the least warning among the terms that matter.
+            for (t, s) in eval.terms().iter().zip(&shares) {
+                if *s >= 0.05 {
+                    notice[0] = notice[0].min(t.notice_hours.unwrap_or([0.0, 0.0])[0]);
+                }
+            }
         }
     }
     if !notice[0].is_finite() {
         notice = [0.0, 0.0];
+    }
+    if notice[1] < notice[0] {
+        notice[1] = notice[0];
+    }
+    let fastest_outside = fastest_outside
+        .filter(|(h, _)| fastest.is_some_and(|(f, _)| f == HazardId::HouseFire && *h != f));
+    // The longest time away among likely causes (90th percentile of their time away).
+    let mut longest: Option<(HazardId, f64)> = None;
+    for (h, (r, _)) in &by_cause {
+        if p10(*r) < 0.01 {
+            continue;
+        }
+        let p90 = eval
+            .terms()
+            .iter()
+            .filter(|t| ctx.owner_hazard(t.owner()) == *h)
+            .map(|t| t.survival.p90_days())
+            .fold(0.0_f64, f64::max);
+        if longest.is_none_or(|(_, d)| p90 > d) {
+            longest = Some((*h, p90));
+        }
     }
     causes.sort_by(|a, b| b.2.total_cmp(&a.2).then(a.0.cmp(&b.0)));
     // Typical time away: the median of the time-away mixture, on the ladder.
@@ -880,15 +1482,32 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
     let p = p10(r);
     let mut sentences = vec![readiness_sentence(ctx, bucket, r, lo, hi)];
     if p > 0.0 {
+        let cause = fastest.map_or(String::new(), |(h, _)| {
+            format!(" ({})", words::hazard_one(h))
+        });
         sentences.push(format!(
-            "Warning can be as short as {} or as long as {}.",
+            "Warning can be as short as {}{cause} or as long as {}.",
             notice_words(notice[0]),
             notice_words(notice[1])
         ));
+        if let Some((h, n)) = fastest_outside {
+            sentences.push(format!(
+                "For {}, plan for as little as {} of warning.",
+                words::hazard_plural(h),
+                notice_words(n)
+            ));
+        }
         sentences.push(format!(
             "Plan to be away for about {}.",
             words::ladder_phrase(days_away)
         ));
+        if let Some((h, d)) = longest.filter(|(_, d)| *d >= 2.0 * f64::from(days_away).max(1.0)) {
+            sentences.push(format!(
+                "Most evacuations last a few days, but after {} you could be away for {} or more.",
+                words::hazard_one(h),
+                words::days_phrase(d)
+            ));
+        }
     }
     sentences.extend(coupling_sentences(ctx, bucket));
     let target = Target::Evacuate {
@@ -914,7 +1533,6 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
         frequency_sentences: sentences,
         sources,
         relief: None,
-        // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
         stress_test: None,
     };
     let detail = EvacuateDetail {
@@ -923,6 +1541,9 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
         notice_hours: notice,
         days_away,
         causes,
+        fastest_cause: fastest.map(|(h, _)| h),
+        fastest_outside,
+        longest_away: longest,
     };
     (assessment, detail)
 }
@@ -1006,7 +1627,6 @@ fn get_home_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, GetHomeDetail) {
             frequency_sentences: sentences,
             sources,
             relief: None,
-            // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
             stress_test: None,
         },
         GetHomeDetail {
@@ -1057,6 +1677,42 @@ fn home_loss_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, HomeLossDetail) {
         words::round_nice(1.0 / never),
         if renter { "renters" } else { "homeowners" }
     ));
+    // Displacement cost (model review M-08): how long a household is out when damage forces it
+    // out, from the displacement durations on the home-loss rows weighted by how often each cause
+    // happens, and what living elsewhere that long costs.
+    let eval = Eval::central(ctx.model, bucket);
+    let months_p90 = if r > 0.0 {
+        eval.target(0.1 * r, 30) / 30.44
+    } else {
+        0.0
+    };
+    let months_at_dial = eval.target(ctx.rate, 30) / 30.44;
+    let housing = ctx
+        .input
+        .finances
+        .monthly_expenses_usd
+        .map(f64::from)
+        .filter(|x| x.is_finite() && *x > 0.0)
+        .map(|x| x * prm.housing_share_of_expenses.value);
+    let cost = housing.filter(|_| months_p90 > 0.0).map(|h| h * months_p90);
+    if months_p90 >= 0.5 && p > 0.0 {
+        let months = words::round_nice(months_p90.max(1.0));
+        let unit = if months == "1" { "month" } else { "months" };
+        sentences.push(match cost {
+            Some(c) => format!(
+                "If damage forced you out, 9 in 10 households like yours would be home again \
+                 within about {months} {unit}; living elsewhere that long costs about ${} at \
+                 {} % of your monthly spending, which loss-of-use insurance pays for.",
+                words::round_nice(c),
+                words::round_nice(100.0 * prm.housing_share_of_expenses.value)
+            ),
+            None => format!(
+                "If damage forced you out, 9 in 10 households like yours would be home again \
+                 within about {months} {unit}."
+            ),
+        });
+        sources.extend(prm.housing_share_of_expenses.sources.iter().cloned());
+    }
     sentences.extend(coupling_sentences(ctx, bucket));
     // "Most back within a month" and "never return" are both from the Household Pulse report
     // (`census_pulse_displacement`: 56 % of renters and 71 % of owners back in under a month).
@@ -1078,7 +1734,6 @@ fn home_loss_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, HomeLossDetail) {
             frequency_sentences: sentences,
             sources: sorted_sources(sources),
             relief: None,
-            // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
             stress_test: None,
         },
         HomeLossDetail {
@@ -1087,6 +1742,9 @@ fn home_loss_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, HomeLossDetail) {
             share_back_within_week: prm.displaced_back_within_week.value,
             share_over_six_months: prm.displaced_over_six_months.value,
             share_never_return: never,
+            months_away_p90: months_p90,
+            months_away_at_dial: months_at_dial,
+            displacement_cost_usd: cost,
         },
     )
 }
@@ -1238,7 +1896,6 @@ fn income_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, IncomeDetail) {
         frequency_sentences: sentences,
         sources,
         relief: None,
-        // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
         stress_test: None,
     };
     let detail = IncomeDetail {
@@ -1393,8 +2050,12 @@ fn scenario_summaries(
 /// The target must grow at least this fast with the return period between adjacent dial settings
 /// (elasticity ln(t₂/t₁) / ln(N₂/N₁); a log-normal tail gives about 1)…
 const CLIFF_ELASTICITY: f64 = 2.0;
-/// …and change by at least this many days, for the cliff warning.
+/// …and change by at least this many days, for the cliff warning…
 const CLIFF_MIN_DAYS: f64 = 3.0;
+/// …from a target of at least this many days on both sides: a target that appears from nothing
+/// at the next setting (none at 1 in 10, 5 days at 1 in 50) is the dial doing its job, not one
+/// event near the dial making the answer jump (model review M-15: mark only true cliffs).
+const CLIFF_FROM_DAYS: f64 = 0.5;
 
 /// The cliff rule (DESIGN §4.4, research §3.3): one hazard or scenario dominates a bucket's design
 /// event (half or more of Λ at the target), its rate for that bucket is within a factor of 3 of
@@ -1437,7 +2098,9 @@ fn cliff_warnings(ctx: &Ctx<'_>, details: &[BucketDetail]) -> Vec<Warning> {
             .any(|(j, p)| {
                 let dial_step = math::ln(dial_rate(ReturnPeriod::ALL[j]) / ctx.rate).abs();
                 let e = math::ln((p.target_days + 0.05) / (t0 + 0.05)).abs() / dial_step;
-                e >= CLIFF_ELASTICITY && (p.target_days - t0).abs() >= CLIFF_MIN_DAYS
+                e >= CLIFF_ELASTICITY
+                    && (p.target_days - t0).abs() >= CLIFF_MIN_DAYS
+                    && p.target_days.min(t0) >= CLIFF_FROM_DAYS
             });
         if !jumps {
             continue;

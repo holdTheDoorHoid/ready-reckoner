@@ -44,11 +44,25 @@ pub fn hazard_plural(h: HazardId) -> &'static str {
         Burglary => "break-ins",
         EarnerDeathOrDisability => "the death or disability of an earner",
         ExtendedHouseholdIllness => "long illnesses at home",
-        // awaiting: consequence — plain phrases for the contract v2 hazards (none is emitted yet).
-        WildfireSmoke | DustStorm | Sinkhole | GeomagneticStorm | Vei7Eruption | DamFailure
-        | NetworkOutage | DrugShortage | BenefitInterruption | AttackDisruption
-        | MultiMonthBlackout | WarInfrastructure | CbrnAttack | SeverePandemic
-        | FinancialCrisis | MassViolence | WaterDamage | Eviction | ArrestOrDetention => h.name(),
+        WildfireSmoke => "spells of wildfire smoke",
+        DustStorm => "dust storms",
+        Sinkhole => "sinkholes and ground collapses",
+        GeomagneticStorm => "severe solar storms",
+        Vei7Eruption => "very large volcanic eruptions",
+        DamFailure => "dam or levee failures",
+        NetworkOutage => "phone and internet outages",
+        DrugShortage => "medicine shortages",
+        BenefitInterruption => "lapses in pay or benefits",
+        AttackDisruption => "attacks or threats that close an area",
+        MultiMonthBlackout => "power cuts lasting months",
+        WarInfrastructure => "wars with attacks on US infrastructure",
+        CbrnAttack => "chemical, biological or radiological attacks",
+        SeverePandemic => "severe pandemics",
+        FinancialCrisis => "financial crises with bank closures",
+        MassViolence => "mass shootings or bombings",
+        WaterDamage => "burst pipes and leaks",
+        Eviction => "evictions",
+        ArrestOrDetention => "arrests or detentions",
     }
 }
 
@@ -92,11 +106,25 @@ pub fn hazard_one(h: HazardId) -> &'static str {
         Burglary => "a break-in",
         EarnerDeathOrDisability => "the death or disability of an earner",
         ExtendedHouseholdIllness => "a long illness",
-        // awaiting: consequence — plain phrases for the contract v2 hazards (none is emitted yet).
-        WildfireSmoke | DustStorm | Sinkhole | GeomagneticStorm | Vei7Eruption | DamFailure
-        | NetworkOutage | DrugShortage | BenefitInterruption | AttackDisruption
-        | MultiMonthBlackout | WarInfrastructure | CbrnAttack | SeverePandemic
-        | FinancialCrisis | MassViolence | WaterDamage | Eviction | ArrestOrDetention => h.name(),
+        WildfireSmoke => "a spell of wildfire smoke",
+        DustStorm => "a dust storm",
+        Sinkhole => "a sinkhole",
+        GeomagneticStorm => "a severe solar storm",
+        Vei7Eruption => "a very large volcanic eruption",
+        DamFailure => "a dam or levee failure",
+        NetworkOutage => "a phone or internet outage",
+        DrugShortage => "a medicine shortage",
+        BenefitInterruption => "a lapse in pay or benefits",
+        AttackDisruption => "an attack or threat that closes the area",
+        MultiMonthBlackout => "a power cut lasting months",
+        WarInfrastructure => "a war with attacks on US infrastructure",
+        CbrnAttack => "a chemical, biological or radiological attack",
+        SeverePandemic => "a severe pandemic",
+        FinancialCrisis => "a financial crisis with bank closures",
+        MassViolence => "a mass shooting or bombing",
+        WaterDamage => "a burst pipe or leak",
+        Eviction => "an eviction",
+        ArrestOrDetention => "an arrest or detention",
     }
 }
 
@@ -116,8 +144,7 @@ pub fn bucket_cause_verb(b: BucketId) -> &'static str {
         MedicalEmergency => "bring a medical emergency",
         Fire => "start a fire",
         Security => "threaten home security",
-        // awaiting: consequence — words for the contract v2 clean-air bucket.
-        CleanAir => "fill homes with smoke or dust",
+        CleanAir => "fill homes with smoke, dust or fumes",
         Income => "cut income",
         HomeLoss => "damage homes",
     }
@@ -139,7 +166,6 @@ pub fn bucket_noun_plural(b: BucketId) -> &'static str {
         MedicalEmergency => "medical emergencies",
         Fire => "fires",
         Security => "security problems",
-        // awaiting: consequence — words for the contract v2 clean-air bucket.
         CleanAir => "spells of unhealthy air",
         Income => "income gaps",
         HomeLoss => "displacements",
@@ -162,7 +188,6 @@ pub fn bucket_noun(b: BucketId) -> &'static str {
         MedicalEmergency => "emergency",
         Fire => "fire",
         Security => "problem",
-        // awaiting: consequence — words for the contract v2 clean-air bucket.
         CleanAir => "spell of unhealthy air",
         Income => "income gap",
         HomeLoss => "displacement",
@@ -185,8 +210,7 @@ pub fn bucket_verb(b: BucketId) -> &'static str {
         MedicalEmergency => "have a medical emergency",
         Fire => "have a home fire",
         Security => "have a break-in or a nearby curfew",
-        // awaiting: consequence — words for the contract v2 clean-air bucket.
-        CleanAir => "have unhealthy air at home",
+        CleanAir => "need to keep smoke, dust or fumes out of the home",
         Income => "lose income",
         HomeLoss => "have to leave home for a while because of damage",
     }
@@ -208,7 +232,6 @@ pub fn bucket_short(b: BucketId) -> &'static str {
         MedicalEmergency => "Medical emergency",
         Fire => "Fire",
         Security => "Security",
-        // awaiting: consequence — words for the contract v2 clean-air bucket.
         CleanAir => "Clean air",
         Income => "Income gap",
         HomeLoss => "Home damage",
@@ -403,6 +426,63 @@ pub fn distance_adjective(km: f64) -> String {
     let m = (miles + 0.5).floor().max(1.0) as i64;
     let k = (km + 0.5).floor().max(1.0) as i64;
     format!("{m}-mile ({k} km)")
+}
+
+/// The county-scale episodes a row counts, in words ("damaging river floods").
+pub fn county_event_plural(keys: &[String]) -> String {
+    let named: Vec<&str> = keys
+        .iter()
+        .map(|k| match k.as_str() {
+            "flood" => "damaging river floods",
+            "flash_flood" => "damaging flash floods",
+            "coastal_flood" | "storm_surge" => "damaging coastal floods",
+            _ => "damaging storms",
+        })
+        .collect();
+    let mut out: Vec<&str> = Vec::new();
+    for n in named {
+        if !out.contains(&n) {
+            out.push(n);
+        }
+    }
+    out.join(" and ")
+}
+
+/// A multiplier in words: "about twice", "about 3 times", "about half".
+pub fn factor_phrase(f: f64) -> String {
+    if !f.is_finite() || f <= 0.0 {
+        return "about as".to_owned();
+    }
+    if f < 0.4 {
+        "about a third".to_owned()
+    } else if f < 0.75 {
+        "about half".to_owned()
+    } else if f < 1.25 {
+        "about the same".to_owned()
+    } else if f < 1.75 {
+        "about one and a half times".to_owned()
+    } else if f < 2.5 {
+        "about twice".to_owned()
+    } else {
+        format!("about {} times", round_nice(f))
+    }
+}
+
+/// The event a hand-copied historic restoration curve (`historic:<id>`) records.
+pub fn historic_event(class: &str) -> &'static str {
+    match class {
+        "historic:maria_2017_pr" => "Hurricane Maria (2017)",
+        "historic:irma_maria_2017_vi" => "Hurricanes Irma and Maria (2017)",
+        _ => "the worst storm on record",
+    }
+}
+
+/// Citation id for a hand-copied historic restoration curve.
+pub fn historic_source(class: &str) -> &'static str {
+    match class {
+        "historic:maria_2017_pr" | "historic:irma_maria_2017_vi" => "doe_maria_situation_reports",
+        _ => "ornl_eagle_i_outages",
+    }
 }
 
 /// Citation id for a county event record type.

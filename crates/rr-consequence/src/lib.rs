@@ -53,6 +53,7 @@ pub mod curve;
 pub mod effects;
 pub mod income;
 pub mod model;
+pub mod pack;
 pub mod ranges;
 pub mod survival;
 pub mod words;
@@ -66,9 +67,12 @@ pub use curve::{
     CurveTerm, DialPoint, ExceedanceCurve, LADDER_TOLERANCE, ONE_IN_100_RATE, dial_rate,
     round_up_to_ladder,
 };
-pub use effects::{EffectRow, EffectsTable, IncomeRow, OverlapRow, PartRow, table};
+pub use effects::{EffectRow, EffectsTable, IncomeRow, OverlapRow, PartRow, WaterEvent, table};
 pub use income::{GapRule, IncomeCurve, MONTHS_LADDER, round_up_months};
-pub use model::{CountyData, CouplingApplied, OverrideApplied, ScenarioCandidate};
+pub use model::{
+    COLD_GRID_STATES, CountyData, CouplingApplied, Fragility, OverrideApplied, ScenarioCandidate,
+};
+pub use pack::{OutageModel, PoolBasis, RestorationCurve, StressEvent, TemperatureProfile};
 pub use ranges::DRAWS;
 pub use survival::{Survival, probit};
 
