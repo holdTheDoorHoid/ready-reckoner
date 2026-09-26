@@ -1611,15 +1611,22 @@ rr-plan's readiness harm estimates):
 | Item | Harm-days | Why |
 | --- | --- | --- |
 | `rare_radiation_meter` (dosimeter card) | 2 | tells a sheltering household when it is safe to go outside, the main decision after fallout (like the go-bag's 2) |
-| `rare_faraday_storage` | 0.5 | keeps a spare radio or phone working after an electromagnetic pulse, a supporting item (like the get-home bag's 0.5) |
+| `rare_faraday_storage` | 0.5 | keeps a spare radio or phone working after an electromagnetic pulse, a supporting item (like the get-home bag's 0.5); eligible through the months-long blackout family, not the nuclear one (a pulse reaches far beyond any blast or fallout zone) |
 | any other specialised item | 0.5 | a supporting item |
 
 Potassium iodide is free and keeps rr-supply's planning-zone rule (a free step near a plant, not an
 allowance purchase). Each allowance purchase says which ticked family it is for and that the chance
 here passes 1 in 1,000 (no point estimate: rare rows show ranges only). Rare items are on no
-readiness checklist. Fixtures: Minot (class A, nuclear ticked) buys the dosimeter card in month 4
-and Faraday storage in month 12; Philadelphia (C1) with the v1 switch buys both; Coos Bay (class E)
-buys nothing (about 1.2 in 10,000 over ten years).
+readiness checklist. The dosimeter card goes with the nuclear family and Faraday storage with the
+months-long blackout family (`multi_month_blackout`, whose block carries the EMP paragraph). That
+family's central estimate is not the same everywhere (it is built from the county's power curve and
+the latitude-scaled solar-storm row): from about 0.5 in 1,000 (Cameron Parish) to 1.5 in 1,000
+(Minot) over ten years, above 1 in 1,000 in Minot, Detroit, Chicago and Philadelphia only.
+Fixtures: Minot (class A; nuclear and solar storm ticked) buys the dosimeter card in month 4 and no
+Faraday storage, because the blackout family is not ticked (ticking it would add the bag in month
+12); Philadelphia with every family buys the card in month 10 and Faraday storage in month 21 (the
+blackout family at about 1.07 in 1,000, just over the line); Coos Bay with every family buys nothing
+(nuclear about 1.2 in 10,000, blackout about 6.9 in 10,000).
 
 ### Savings
 

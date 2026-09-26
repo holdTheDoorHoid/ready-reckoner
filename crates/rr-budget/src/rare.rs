@@ -41,7 +41,9 @@ pub const RARE_FAMILY_MAX_SHARE: f64 = 0.5;
 ///   decision after fallout (`ready_gov_nuclear`: get inside, stay inside, stay tuned): 2, like
 ///   the go-bag.
 /// - Faraday storage keeps a spare radio or phone working after an electromagnetic pulse, a
-///   supporting item: 0.5, like the get-home bag.
+///   supporting item: 0.5, like the get-home bag. It belongs to the months-long blackout family
+///   (`multi_month_blackout`), not the nuclear one: a pulse reaches far beyond any blast or
+///   fallout zone, so the local nuclear chance says nothing about it.
 pub const RARE_HARM_DAYS: &[(&str, f64)] =
     &[("rare_radiation_meter", 2.0), ("rare_faraday_storage", 0.5)];
 
@@ -83,7 +85,7 @@ pub fn families_of(hazard_extras: &[HazardId]) -> Vec<HazardId> {
 /// `families` are the ticked families that make it eligible (at least one). No chance is given as
 /// a number: rare rows are shown as ranges only, so the sentence names the threshold instead.
 pub fn allowance_sentence(families: &[HazardId], monthly_allowance_usd: f64) -> String {
-    let names: Vec<String> = families.iter().map(|f| lower_first(f.name())).collect();
+    let names: Vec<String> = families.iter().map(|f| family_words(*f)).collect();
     let what = join_or(&names);
     let allowance = if monthly_allowance_usd >= 0.5 {
         format!(
@@ -99,6 +101,14 @@ pub fn allowance_sentence(families: &[HazardId], monthly_allowance_usd: f64) -> 
          ticked: where you live, more than 1 in 1,000 households like yours face it in 10 years, \
          the least the allowance needs. Your basics cover the rare rows it does not buy for."
     )
+}
+
+/// A family's name inside a sentence: lower case, without a trailing aside ("Power out for months
+/// (any cause)" reads "power out for months").
+pub fn family_words(family: HazardId) -> String {
+    let name = family.name();
+    let short = name.split(" (").next().unwrap_or(name);
+    lower_first(short)
 }
 
 fn lower_first(s: &str) -> String {
@@ -152,6 +162,16 @@ mod tests {
         assert!(
             two.contains("nuclear attack and severe solar storm rows"),
             "{two}"
+        );
+        // Faraday storage's family, named without its aside.
+        let blackout = allowance_sentence(&[HazardId::MultiMonthBlackout], 5.0);
+        assert!(
+            blackout.contains("It is for the power out for months row you ticked"),
+            "{blackout}"
+        );
+        assert_eq!(
+            family_words(HazardId::MultiMonthBlackout),
+            "power out for months"
         );
     }
 }
