@@ -817,10 +817,18 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             _ => (None, ""),
         };
         let Some(d) = dist else { continue };
-        let basis = if parts.iter().any(|(f, _)| *f == PR_ISLAND) {
-            "island"
+        let island = parts.iter().any(|(f, _)| *f == PR_ISLAND);
+        let basis = if island { "island" } else { basis };
+        // Island rows carry the island's rates, but `customers` is the municipio's own count so
+        // that weighting rows by customers does not count the island 78 times.
+        let customers_col = if island {
+            county
+                .parse::<u32>()
+                .ok()
+                .and_then(|f| mcc.get(&f).copied())
+                .unwrap_or(0.0)
         } else {
-            basis
+            customers_total
         };
         let years_covered = match (years_all.first(), years_all.last()) {
             (Some(a), Some(b)) => format!("{a}-{b}"),
@@ -840,7 +848,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             basis.to_string(),
             sig4(get("epy")),
             sig4(events_total),
-            sig4(customers_total),
+            sig4(customers_col),
             sig4(get("saidi")),
             sig4(get("share")),
             sig4(longest as f64 / 3600.0),
@@ -864,7 +872,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     out.notes.push(format!(
         "Event definition: {DEFINITION} Counties with fewer than {MIN_EVENTS_FOR_COUNTY_DURATIONS} events use their state's pooled duration distribution (duration_basis = state; {state_basis} counties); the event rate is always the county's own."
     ));
-    out.notes.push("Puerto Rico: EAGLE-I files LUMA's outages by utility region, each under one hub municipio (the hubs' customer counts in the 2024 file sum to the island's 1.49 million). The hubs are summed into one island-wide series (customers = the sum of ORNL's modelled customers for all 78 municipios), and every municipio carries the island's figures (duration_basis = island). Data start in 2021.".into());
+    out.notes.push("Puerto Rico: EAGLE-I files LUMA's outages by utility region, each under one hub municipio (the hubs' customer counts in the 2024 file sum to the island's 1.49 million). The hubs are summed into one island-wide series (customers = the sum of ORNL's modelled customers for all 78 municipios), and every municipio carries the island's rates, durations and event counts (duration_basis = island); its customers column is its own modelled customer count, so weighting rows by customers counts the island once. Data start in 2021.".into());
     out.notes.push("Years of data: a month counts when the county has at least one record in it (EAGLE-I lists only snapshots with customers out), so years_of_data is months with data divided by 12. State-years in 2018-2022 where ORNL reports under 50% customer coverage are left out; ORNL publishes no coverage figures for other years, so partial utility coverage there biases rates low.".into());
     out.notes.push("Customer outages at the start of an event are counted from the event's start (they may have begun below the threshold) and customers still out when the county drops below the threshold are counted as restored then, so durations for the first and last customers in an event are slightly understated.".into());
     if !state.excluded_years.is_empty() {
