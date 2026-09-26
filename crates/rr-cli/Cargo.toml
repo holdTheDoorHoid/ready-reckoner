@@ -20,10 +20,10 @@ rr-consequence = { path = "../rr-consequence" }
 rr-supply = { path = "../rr-supply" }
 rr-budget = { path = "../rr-budget" }
 rr-plan = { path = "../rr-plan" }
-# `--data <dir>`: the packs are loaded into an `rr_data::DataStore` (checksums checked on load).
+# `--data <dir>`: the packs are loaded into an `rr_data::DataStore` (checksums checked on load);
+# `rr data verify` also runs `rr_data::verify` (the checks `rr-etl verify` runs: checksums, row
+# counts, joins across packs), so the CLI needs no network stack.
 rr-data = { path = "../rr-data" }
-# `rr data verify` runs the ETL's own file checks (checksums, row counts, joins across packs).
-rr-etl = { path = "../rr-etl" }
 clap = { version = "4.5", features = ["derive"] }
 serde.workspace = true
 serde_json.workspace = true

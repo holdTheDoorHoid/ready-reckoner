@@ -266,9 +266,10 @@ rr data info
 ```
 
 `verify` runs the data layer's own checks: the store's (every file loads by its manifest path,
-matches its sha256 and parses; row counts match the manifest), then `rr-etl verify`'s (every county
-joins across every pack or is listed as missing with a reason, the Connecticut crosswalk, ZIP
-shares), then that every fixture household resolves to a county. On the fixtures it says
+matches its sha256 and parses; row counts match the manifest), then the checks `rr-etl verify`
+runs (`rr_data::verify`, so `rr` needs no network stack: every county joins across every pack or
+is listed as missing with a reason, the Connecticut crosswalk, ZIP shares), then that every
+fixture household resolves to a county. On the fixtures it says
 `no data pack; fixture counties in use` and checks those instead.
 
 ```

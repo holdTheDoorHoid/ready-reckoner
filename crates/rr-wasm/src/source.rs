@@ -195,15 +195,12 @@ impl CountySource for WasmSource {
     }
 
     /// The National Risk Index statement first (its terms require it to be shown; the trait
-    /// promises it first), then the others in the source's order.
+    /// promises it first): both sources already order it so.
     fn attributions(&self) -> Vec<Attribution> {
-        let mut all = match self.mode() {
+        match self.mode() {
             Mode::Fixtures => self.fixtures.attributions(),
             Mode::Packs { .. } => self.store.attributions(),
-        };
-        // A stable sort on "is it the NRI statement" keeps the rest in order.
-        all.sort_by_key(|a| !a.source.contains("National Risk Index"));
-        all
+        }
     }
 
     fn location(&self, county_fips: &str, zip: Option<&str>) -> Option<LocationResolved> {

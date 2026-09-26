@@ -55,6 +55,10 @@ pub struct FileEntry {
     /// Data rows.
     #[serde(default)]
     pub rows: u64,
+    /// Key columns (CSV only) that identify a row; `verify` checks county coverage of files
+    /// keyed by `fips`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub key: Vec<String>,
 }
 
 /// A job record (abridged).
