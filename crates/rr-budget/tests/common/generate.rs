@@ -4,12 +4,13 @@
 use std::collections::BTreeMap;
 
 use rr_budget::{
-    BucketCurve, Cliff, Contributes, GuardrailContext, ItemMeta, ItemRole, ReadinessCredit, Risks,
+    BucketCurve, Cliff, Contributes, GuardrailContext, ItemMeta, ItemRole, MinimumShare,
+    ReadinessCredit, Risks,
 };
 use rr_types::rng::SplitMix64;
 use rr_types::{
     AgeBand, BackupPower, BucketId, BucketKind, HazardId, Item, ItemId, Owned, PlanInput,
-    PoweredDevice, Target, Tenure, TierId,
+    PoweredDevice, Season, Target, Tenure, TierId,
 };
 
 use super::{assessment, days_target, item, readiness_target};
@@ -108,13 +109,97 @@ pub fn case(seed: u64) -> Case {
         },
         ..GuardrailContext::default()
     };
-    Case {
+    let mut c = Case {
         seed,
         household,
         items,
         meta,
         risks,
         context,
+    };
+    v2(&mut c);
+    c
+}
+
+/// Contract v2 item fields and inputs, drawn from a second stream so the base draws (and every
+/// seed a property names) are unchanged: prerequisites (any one of, only on bought items, only
+/// naming earlier bought items, so never circular), readiness shares, an alternative group,
+/// season anchors, long-horizon items, decisions among the free steps, bare-minimum kit shares,
+/// rare families with local rates around the 1-in-1,000 line, ticked families, the bare-minimum
+/// dial and storm-surge facts.
+fn v2(c: &mut Case) {
+    let mut g = Gen::new(c.seed ^ 0x5DEE_CE66_D1CE_B00C);
+    let n = c.items.len();
+    for k in 0..n {
+        if !c.meta[k].readiness.is_empty() && g.chance(0.6) {
+            c.items[k].readiness_share = Some(g.pick(&[1.0, 1.0, 0.5, 0.3, 0.05]));
+        }
+        if c.items[k].free {
+            if g.chance(0.2) {
+                c.items[k].decision = true;
+            }
+            continue;
+        }
+        if g.chance(0.15) {
+            let earlier: Vec<usize> = (0..k)
+                .filter(|&j| !c.items[j].free && !c.items[j].rare_catastrophic)
+                .collect();
+            if !earlier.is_empty() {
+                let a = earlier[g.below(earlier.len())];
+                let first = c.items[a].id.clone();
+                c.items[k].requires.push(first);
+                let b = earlier[g.below(earlier.len())];
+                if b != a && g.chance(0.4) {
+                    let second = c.items[b].id.clone();
+                    c.items[k].requires.push(second);
+                }
+            }
+        }
+        if g.chance(0.12) {
+            c.items[k].season =
+                Some(g.pick(&[Season::Spring, Season::Summer, Season::Fall, Season::Winter]));
+        }
+        if g.chance(0.08) {
+            c.items[k].long_horizon = true;
+        }
+        if c.items[k].rare_catastrophic {
+            c.items[k].hazard_extras = vec![g.pick(HazardId::RARE)];
+        }
+    }
+    let ready: Vec<usize> = (0..n)
+        .filter(|&k| !c.items[k].free && !c.meta[k].readiness.is_empty())
+        .collect();
+    if ready.len() >= 2 && g.chance(0.4) {
+        let (a, b) = (ready[g.below(ready.len())], ready[g.below(ready.len())]);
+        if a != b {
+            c.items[a].alternative_group = Some("alternatives".into());
+            c.items[b].alternative_group = Some("alternatives".into());
+        }
+    }
+    let needs = [g.pick(&[1.0, 2.0, 4.0]), g.pick(&[1.0, 2.0, 4.0])];
+    for k in 0..n {
+        if !c.meta[k].contributes.is_empty() && g.chance(0.2) {
+            let l = g.below(2);
+            c.meta[k].minimum.push(MinimumShare {
+                line: format!("kit_line_{l}"),
+                units_per_item: g.pick(&[0.5, 1.0, 2.0]),
+                need: needs[l],
+            });
+        }
+    }
+    for f in HazardId::RARE {
+        if g.chance(0.6) {
+            c.risks
+                .register
+                .insert(*f, g.pick(&[1e-5, 5e-5, 2e-4, 1e-3]));
+        }
+    }
+    if g.chance(0.3) {
+        c.household.dials.rare_opt_in = vec![g.pick(HazardId::RARE).as_str().to_owned()];
+    }
+    c.household.dials.minimum_kit = g.chance(0.15);
+    if g.chance(0.2) {
+        c.context.surge_zip_share = Some(g.range(0.0, 1.0));
     }
 }
 

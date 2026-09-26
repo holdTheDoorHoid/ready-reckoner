@@ -126,7 +126,12 @@ pub enum Schedule {
     },
     /// Buy in one fixed priority order; when the next item costs more than the money on hand,
     /// save everything for it. The order never depends on the budget, so more money only ever
-    /// moves purchases earlier and every bucket is covered at least as well in every month.
+    /// moves purchases earlier and every bucket is covered at least as well in every month. Two
+    /// v2 rules keep this: the season rule and the automatic bare-minimum switch (a plan past
+    /// three years) apply to the split schedule only. The one exception is the rare allowance: it
+    /// starts once the three-day life-safety items are in hand, which comes sooner with more
+    /// money, and from then on the main plan receives 90 % of each month's money instead of all
+    /// of it, so with the allowance on the promise holds for the order, not month by month.
     FixedOrder,
     /// The research prototype's shortcuts (risk-model §4.2): when the next item is not
     /// affordable, buy the best affordable one instead, unless the next item costs at most twice

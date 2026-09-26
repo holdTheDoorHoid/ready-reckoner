@@ -679,7 +679,10 @@ fn run(
     );
     let future_money = ctx.monthly > EPS;
     let full_stop = normal.stopped.filter(|_| future_money);
-    let too_long = future_money
+    // The automatic switch belongs to the default split schedule: under the fixed-order schedule
+    // (the monotone reference) and the research one, only the household's own dial reorders.
+    let too_long = ctx.split
+        && future_money
         && match normal.stopped {
             Some(m) => m > PLAN_TOO_LONG_MONTHS,
             None => input.options.max_months >= PLAN_TOO_LONG_MONTHS,
@@ -773,7 +776,7 @@ fn plan_once(ctx: &Ctx<'_>, mode: Mode) -> Outcome {
     let finances = &input.household.finances;
     let monthly = ctx.monthly;
     let one_off = f64::from(finances.one_off_budget_usd).max(0.0);
-    let (mut rare_queue, rare_skipped, rare_families) = rare_queue(ctx, &state, one_off);
+    let (mut rare_queue, mut rare_skipped, rare_families) = rare_queue(ctx, &state, one_off);
 
     // ---- Month by month. ----
     let mut events: Vec<Vec<Event>> = Vec::new();
@@ -788,7 +791,7 @@ fn plan_once(ctx: &Ctx<'_>, mode: Mode) -> Outcome {
     let future_money = monthly > EPS;
     let mut cache = Cache::new(ctx, mode);
     cache.screen_rarely_needed(ctx, &state);
-    let checklist = readiness_checklist(ctx, &cache.low_p_ok, &rare_families);
+    let checklist = readiness_checklist(ctx, &cache.low_p_ok);
     // The rare allowance starts once the three-day tier's life-safety items are in hand.
     let mut basics_done = false;
     let mut minimum_done_month: Option<u16> = None;
@@ -994,11 +997,31 @@ fn plan_once(ctx: &Ctx<'_>, mode: Mode) -> Outcome {
             }
         }
 
-        // Rare-catastrophe allowance: its own queue, strictly in order.
-        while let Some(next) = rare_queue.last() {
+        // Rare-catastrophe allowance: its own queue, in order, where an item waits for one of
+        // its devices (and is dropped once the main plan is done and the device never came).
+        loop {
+            if stopped.is_some() {
+                let before = rare_queue.len();
+                let dropped: Vec<ItemId> = rare_queue
+                    .iter()
+                    .filter(|c| !ctx.requires_met(&credited, c.offer))
+                    .map(|c| ctx.offers[c.offer].item.id.clone())
+                    .collect();
+                rare_queue.retain(|c| ctx.requires_met(&credited, c.offer));
+                if rare_queue.len() < before {
+                    rare_skipped.extend(dropped);
+                }
+            }
+            let Some(pos) = rare_queue
+                .iter()
+                .rposition(|c| ctx.requires_met(&credited, c.offer))
+            else {
+                break;
+            };
+            let next = rare_queue[pos].clone();
             let (free, fund) = (rare.free, rare.fund);
             if next.cost <= free + fund + EPS {
-                let cand = rare_queue.pop().expect("checked");
+                let cand = rare_queue.remove(pos);
                 buy(
                     ctx,
                     &mut state,
@@ -1016,9 +1039,11 @@ fn plan_once(ctx: &Ctx<'_>, mode: Mode) -> Outcome {
                 continue;
             }
             if !future_money {
-                let fits = rare_queue.iter().rposition(|c| c.cost <= free + EPS);
-                if let Some(pos) = fits {
-                    let cand = rare_queue.remove(pos);
+                let fits = rare_queue
+                    .iter()
+                    .rposition(|c| c.cost <= free + EPS && ctx.requires_met(&credited, c.offer));
+                if let Some(p) = fits {
+                    let cand = rare_queue.remove(p);
                     buy(
                         ctx,
                         &mut state,
@@ -2161,12 +2186,99 @@ impl Cache {
                     }
                 }
             }
-            let Some(best) = picks.iter().map(Pick::density).reduce(f64::max) else {
+            // A worthwhile accessory whose devices can never earn a place on their own (what they
+            // do is covered already) pulls the cheapest one in at a token value, so the device
+            // still comes first and the accessory follows it.
+            for &i in main.iter().filter(|&&i| unlocked(i, k) && !available(i)) {
+                let low_p_ok = self.low_p_ok[i];
+                let worth = self
+                    .slot(ctx, state, i, ki)
+                    .is_some_and(|c| c.core + if low_p_ok { c.low_p } else { 0.0 } > VALUE_EPS);
+                if !worth {
+                    continue;
+                }
+                let devices: Vec<usize> = ctx.offers[i]
+                    .requires
+                    .iter()
+                    .copied()
+                    .filter(|j| main.contains(j))
+                    .collect();
+                let last = WALK.len() - 1;
+                let mut stuck = !devices.is_empty();
+                for &j in &devices {
+                    let low = self.low_p_ok[j];
+                    if self
+                        .slot(ctx, state, j, last)
+                        .is_some_and(|c| c.core + if low { c.low_p } else { 0.0 } > VALUE_EPS)
+                    {
+                        stuck = false;
+                    }
+                }
+                if !stuck {
+                    continue;
+                }
+                // The cheapest device that is itself available, walking up a chain of
+                // prerequisites (fuel, its cans, the generator) when the device waits too.
+                if devices.iter().any(|j| picks.iter().any(|p| p.offer == *j)) {
+                    continue;
+                }
+                let mut frontier = devices;
+                let mut seen: BTreeSet<usize> = BTreeSet::new();
+                let mut cheapest: Option<(usize, f64)> = None;
+                for _ in 0..4 {
+                    let mut next: Vec<usize> = Vec::new();
+                    for &j in &frontier {
+                        if !seen.insert(j) {
+                            continue;
+                        }
+                        if available(j) {
+                            if let Some(c) = self.slot(ctx, state, j, ki) {
+                                if cheapest.is_none_or(|(_, cost)| c.cost < cost) {
+                                    cheapest = Some((j, c.cost));
+                                }
+                            }
+                        } else {
+                            next.extend(
+                                ctx.offers[j]
+                                    .requires
+                                    .iter()
+                                    .copied()
+                                    .filter(|d| main.contains(d)),
+                            );
+                        }
+                    }
+                    if cheapest.is_some() || next.is_empty() {
+                        break;
+                    }
+                    frontier = next;
+                }
+                if let Some((j, cost)) =
+                    cheapest.filter(|(j, _)| !picks.iter().any(|p| p.offer == *j))
+                {
+                    picks.push(Pick {
+                        offer: j,
+                        ti: ki,
+                        cost,
+                        value: KIT_VALUE_FLOOR,
+                        promoted: false,
+                        minimum: false,
+                        class: 2,
+                    });
+                }
+            }
+            if picks.is_empty() {
                 continue;
-            };
+            }
             // Promotion: a later-tier item at least five times the tier's best per dollar joins,
             // valued at the first later tier where it qualifies. Tiers at which an offer's capped
-            // targets do not change give the same valuation, so only one of them is looked at.
+            // targets do not change give the same valuation, so only one of them is looked at. (A
+            // device pulled in at a token value is never the tier's best.)
+            let best = picks
+                .iter()
+                .filter(|p| p.value > KIT_VALUE_FLOOR * 2.0)
+                .map(Pick::density)
+                .reduce(f64::max)
+                .unwrap_or(f64::INFINITY);
             let taken: BTreeSet<usize> = picks.iter().map(|p| p.offer).collect();
             for &i in &main {
                 if taken.contains(&i) || !available(i) {
@@ -3071,16 +3183,13 @@ impl ChecklistEntry {
     }
 }
 
-/// The checklist of each readiness (and money) bucket: the free actions that name it, the items
-/// whose readiness credit for it counts (needed often enough, or screened in), and the
-/// specialised rare-catastrophe items the allowance may buy (`rare_ok`) that name it. An item
-/// bought for another need that merely lists the bucket is not a step on its checklist, and the
-/// members of an alternative group are one step.
-fn readiness_checklist(
-    ctx: &Ctx<'_>,
-    low_p_ok: &[bool],
-    rare_ok: &BTreeMap<usize, Vec<HazardId>>,
-) -> Vec<ChecklistEntry> {
+/// The checklist of each readiness (and money) bucket: the free actions that name it and the items
+/// whose readiness credit for it counts (needed often enough, or screened in). An item bought for
+/// another need that merely lists the bucket is not a step on its checklist, the members of an
+/// alternative group are one step, and specialised rare-catastrophe items are on none: the
+/// allowance values them by their family, not by a bucket, and what it can buy depends on the
+/// money (half the allowance per family).
+fn readiness_checklist(ctx: &Ctx<'_>, low_p_ok: &[bool]) -> Vec<ChecklistEntry> {
     let named = |o: &Offer<'_>| -> Vec<BucketId> {
         o.item
             .buckets
@@ -3092,10 +3201,10 @@ fn readiness_checklist(
     let mut out: Vec<ChecklistEntry> = Vec::new();
     let mut group_entry: BTreeMap<&str, usize> = BTreeMap::new();
     for (i, o) in ctx.offers.iter().enumerate() {
-        let buckets = if o.item.free || (o.item.rare_catastrophic && rare_ok.contains_key(&i)) {
-            named(o)
-        } else if o.item.rare_catastrophic {
+        let buckets = if o.item.rare_catastrophic {
             Vec::new()
+        } else if o.item.free {
+            named(o)
         } else {
             let mut list: Vec<BucketId> = Vec::new();
             for &(b, _) in &o.readiness {
