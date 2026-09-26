@@ -1,6 +1,7 @@
 ---
 id: topic_climate_horizon
 title: Today or 2050: the climate setting
+kind: topic
 applies_to: [topic:climate_horizon]
 citations: [rr_research_risk_model, cmra_2025, nca5_climate_trends]
 ---

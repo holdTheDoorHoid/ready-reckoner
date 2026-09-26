@@ -1,6 +1,7 @@
 ---
 id: bucket_comms
 title: No phone, internet or card payments
+kind: bucket
 applies_to: [bucket:comms]
 citations: [ready_gov_earthquakes, ready_gov_alerts, ready_gov_kit, nws_weather_radio, ready_gov_low_cost, ready_gov_financial, fcc_frs, fcc_text_911]
 ---

@@ -1,6 +1,7 @@
 ---
 id: hazard_unrest
 title: Civil unrest and attacks
+kind: hazard
 applies_to: [hazard:civil_unrest, hazard:terrorism]
 citations: [tierney_2006_disaster_myths, drury_2009_shared_identity, rr_research_risk_model, ready_gov_kit, ncpc_home_safety, cisa_deescalation, ready_gov_public_spaces]
 ---

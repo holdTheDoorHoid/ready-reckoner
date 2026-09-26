@@ -1,6 +1,7 @@
 ---
 id: hazard_heat
 title: Heat waves and drought
+kind: hazard
 applies_to: [hazard:heat_wave, hazard:drought]
 citations: [cdc_heat_health, stone_2023_heat_blackout, ready_gov_heat, ready_gov_drought, cdc_heat_related_illness]
 ---

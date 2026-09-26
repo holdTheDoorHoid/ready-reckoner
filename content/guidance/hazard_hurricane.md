@@ -1,6 +1,7 @@
 ---
 id: hazard_hurricane
 title: Hurricanes and tropical storms
+kind: hazard
 applies_to: [hazard:hurricane]
 citations: [ready_gov_hurricanes, noaa_hurdat2, epa_asheville_boil_notice_2024, ready_gov_floods, hcfl_ev_safety, cdc_co_basics, nws_hurricane_safety_brochure, ready_gov_hurricanes_2014, fema_hurricane_safety_tips_2012]
 ---

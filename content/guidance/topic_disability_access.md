@@ -1,6 +1,7 @@
 ---
 id: topic_disability_access
 title: Disability and access needs
+kind: topic
 applies_to: [topic:disability_access]
 citations: [fema_nhs_2024, ready_gov_disability, ready_gov_older_adults, cpuc_medical_baseline, psegli_critical_care, tdem_stear]
 ---

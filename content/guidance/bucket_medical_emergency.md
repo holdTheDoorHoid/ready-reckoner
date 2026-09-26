@@ -1,6 +1,7 @@
 ---
 id: bucket_medical_emergency
 title: A medical emergency when help is slow
+kind: bucket
 applies_to: [bucket:medical_emergency]
 citations: [cdc_nchs_ed_visits, mell_2017_ems_response, oregon_2_weeks_ready, dhs_stop_the_bleed, medlineplus_cpr, redcross_first_aid_kit, ready_gov_disability, fcc_text_911, ready_gov_cert, samhsa_988, cdc_antibiotic_use, gargano_2017_wtc_training]
 ---

@@ -1,6 +1,7 @@
 ---
 id: bucket_medication
 title: Keeping medicines and medical supplies going
+kind: bucket
 applies_to: [bucket:medication]
 citations: [rr_research_risk_model, redcross_survival_kit, florida_dem_medication, ready_gov_disability, medicare_drugs_disaster, healthcare_ready_refill_laws, hhs_aspr_epap, cdc_diabetes_emergencies, aace_diabetes_emergency, fda_insulin_emergency, cdc_insulin_emergency, ready_gov_power_outages, ada_insulin_storage, fda_expired_medicines, cdc_antibiotic_use]
 ---

@@ -1,6 +1,7 @@
 ---
 id: bucket_security
 title: Home and personal security
+kind: bucket
 applies_to: [bucket:security, hazard:burglary]
 citations: [bjs_criminal_victimization_2023, clarke_2002_panic, tierney_2006_disaster_myths, ncpc_home_safety, ready_gov_cybersecurity, cisa_deescalation, ready_gov_public_spaces, ftc_disaster_scams]
 ---

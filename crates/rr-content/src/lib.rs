@@ -14,7 +14,11 @@
 //!
 //! - [`parse`]: the [`Content`] container, file parsing, lookups and [`Catalogue`](rr_types::Catalogue).
 //! - [`validate`](mod@validate): the content validator and its [`Report`].
-//! - [`policy`]: the word lists the validator enforces (brands, firearm words, dosing units).
+//! - [`policy`]: the word lists the validator enforces (brands, firearm words, dosing units) and
+//!   the conditional spans of guidance blocks ([`policy::Condition`], [`policy::HouseholdFacts`]).
+//! - [`ids`]: the guidance kinds ([`GuidanceKind`]) and the ids content may name before engine
+//!   contract v2 reaches `rr-types`.
+//! - [`tables`]: the state table of zone lookups, registries, alert sign-ups and refill rules.
 //! - [`readability`]: word, sentence and syllable counts and the Flesch-Kincaid grade.
 //! - [`rules`]: the parser for the quantity-rule table in `docs/QUANTITY_RULES.md`.
 #![forbid(unsafe_code)]
@@ -24,13 +28,17 @@ mod embedded {
     include!(concat!(env!("OUT_DIR"), "/embedded.rs"));
 }
 
+pub mod ids;
 pub mod parse;
 pub mod policy;
 pub mod readability;
 pub mod rules;
+pub mod tables;
 pub mod validate;
 
+pub use ids::GuidanceKind;
 pub use parse::{Content, GlossaryEntry, Guidance, LoadError};
+pub use tables::{StateLine, StateRow, StateTable};
 pub use validate::{Finding, Report, Severity, validate};
 
 use std::sync::OnceLock;

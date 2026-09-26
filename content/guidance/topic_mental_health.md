@@ -1,6 +1,7 @@
 ---
 id: topic_mental_health
 title: Stress, mental health and the 988 line
+kind: topic
 applies_to: [topic:mental_health]
 citations: [fema_nhs_2024, gargano_2017_wtc_training, samhsa_988, samhsa_disaster_distress, rr_research_prior_art, oregon_2_weeks_ready, aap_talking_to_children]
 ---

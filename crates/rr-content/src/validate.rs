@@ -16,18 +16,22 @@
 //! | medical items: no dosing pattern; aquarium, fish or veterinary antibiotics only in `avoid` | error |
 //! | firearm and weapon words only in the one permitted free action, which is free, unpriced, in `security`, tier `now` | error |
 //! | potassium iodide only alongside "official" instructions | error |
-//! | guidance: `applies_to` resolves; footnotes match citations; under 300 words; bucket and hazard blocks open with `{frequency}` | error |
+//! | guidance: `kind` matches the id's prefix and at least one `applies_to` target; `applies_to` resolves; footnotes match citations; under 300 words; bucket, hazard and family blocks open with `{frequency}` | error |
+//! | guidance: conditional spans close, do not nest and stay in one paragraph; a hazard condition names one of the block's hazards (any hazard in plan, after and topic blocks); `need:`, `benefit:` and `has:` name known needs, benefits and catalogue items | error |
+//! | state table: every state, DC and Puerto Rico once; web addresses; a refill rule with sources that resolve; printed lines pass the text checks | error |
 //! | guidance reading level above grade 9 (Flesch-Kincaid) | warning |
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::str::FromStr;
 
-use rr_types::{BucketId, HazardId, Item, TierId, is_well_formed_id};
+use rr_types::{Item, TierId, is_well_formed_id};
 
+use crate::ids::{self, GuidanceKind};
 use crate::parse::{Content, LoadError};
-use crate::policy::{self, find_dosing, find_drug_dose, find_phrases, tokens};
+use crate::policy::{self, ConditionScope, find_dosing, find_drug_dose, find_phrases, tokens};
 use crate::readability;
+use crate::tables::{self, STATE_REGISTRIES_FILE};
 
 /// Most words allowed in a guidance block's prose (the Sources section is not counted).
 pub const MAX_GUIDANCE_WORDS: usize = 300;
@@ -165,6 +169,7 @@ pub fn validate(content: &Content, rules: &BTreeSet<String>) -> Report {
     check_items(content, rules, &mut r);
     check_guidance(content, &mut r);
     check_glossary(content, &mut r);
+    check_states(content, &mut r);
     r
 }
 
@@ -242,6 +247,16 @@ fn who_cites(content: &Content) -> BTreeMap<String, BTreeSet<String>> {
                 .entry(c.as_str().to_owned())
                 .or_default()
                 .insert(format!("glossary:{}", t.term));
+        }
+    }
+    for row in &content.states.state {
+        for line in row.lines() {
+            for c in &line.sources {
+                users
+                    .entry(c.as_str().to_owned())
+                    .or_default()
+                    .insert(format!("state:{}", row.code));
+            }
         }
     }
     users
@@ -588,39 +603,55 @@ fn check_permitted_firearm_item(item: &Item, loc: &str, r: &mut Report) {
     }
 }
 
-/// Resolves one `applies_to` entry.
-fn resolve_target(target: &str, topics: &BTreeSet<String>) -> Result<(), String> {
+/// Resolves one `applies_to` entry. `slugs` holds, for the topic, plan and after kinds, the
+/// slugs their blocks define (`topic_renters` defines `topic:renters`).
+fn resolve_target(
+    target: &str,
+    slugs: &BTreeMap<GuidanceKind, BTreeSet<String>>,
+) -> Result<(), String> {
     let (kind, id) = target
         .split_once(':')
         .ok_or_else(|| format!("`{target}` should be kind:id"))?;
+    let kind = kind.parse::<GuidanceKind>().map_err(|_| {
+        format!(
+            "`{kind}` is not a target kind (use bucket, hazard, tier, topic, plan, after or family)"
+        )
+    })?;
     match kind {
-        "bucket" => BucketId::from_str(id)
-            .map(|_| ())
-            .map_err(|e| e.to_string()),
-        "hazard" => HazardId::from_str(id)
-            .map(|_| ())
-            .map_err(|e| e.to_string()),
-        "tier" => TierId::from_str(id).map(|_| ()).map_err(|e| e.to_string()),
-        "topic" => {
-            if topics.contains(id) {
+        GuidanceKind::Bucket if ids::is_bucket(id) => Ok(()),
+        GuidanceKind::Bucket => Err(format!("`{id}` is not a bucket id")),
+        GuidanceKind::Hazard if ids::is_hazard(id) => Ok(()),
+        GuidanceKind::Hazard => Err(format!("`{id}` is not a hazard id")),
+        GuidanceKind::Tier => TierId::from_str(id).map(|_| ()).map_err(|e| e.to_string()),
+        GuidanceKind::Family if ids::is_rare_family(id) => Ok(()),
+        GuidanceKind::Family => Err(format!(
+            "`{id}` is not the lead hazard of a rare family (one of {:?})",
+            ids::RARE_FAMILIES
+        )),
+        GuidanceKind::Topic | GuidanceKind::Plan | GuidanceKind::After => {
+            if slugs.get(&kind).is_some_and(|s| s.contains(id)) {
                 Ok(())
             } else {
                 Err(format!(
-                    "no guidance block `topic_{id}` defines topic `{id}`"
+                    "no guidance block `{}{id}` defines {kind} `{id}`",
+                    kind.prefix()
                 ))
             }
         }
-        other => Err(format!(
-            "`{other}` is not a target kind (use bucket, hazard, tier or topic)"
-        )),
     }
 }
 
 fn check_guidance(content: &Content, r: &mut Report) {
-    let topics: BTreeSet<String> = content
-        .guidance
+    let mut slugs: BTreeMap<GuidanceKind, BTreeSet<String>> = BTreeMap::new();
+    for g in &content.guidance {
+        if let Some(slug) = g.meta.id.strip_prefix(&g.kind.prefix()) {
+            slugs.entry(g.kind).or_default().insert(slug.to_owned());
+        }
+    }
+    let items: BTreeSet<String> = content
+        .items
         .iter()
-        .filter_map(|g| g.meta.id.strip_prefix("topic_").map(str::to_owned))
+        .map(|i| i.id.as_str().to_owned())
         .collect();
     let mut seen = BTreeSet::new();
     for g in &content.guidance {
@@ -640,6 +671,23 @@ fn check_guidance(content: &Content, r: &mut Report) {
         if id != stem {
             r.error(&loc, format!("id `{id}` must equal the file name `{stem}`"));
         }
+        let prefix = g.kind.prefix();
+        if !id.starts_with(&prefix) {
+            r.error(
+                &loc,
+                format!("a `{}` block's id starts with `{prefix}`", g.kind),
+            );
+        }
+        let own_kind = format!("{}:", g.kind);
+        if !g.meta.applies_to.iter().any(|t| t.starts_with(&own_kind)) {
+            r.error(
+                &loc,
+                format!(
+                    "a `{}` block applies to at least one `{own_kind}` target",
+                    g.kind
+                ),
+            );
+        }
         if g.meta.title.trim().is_empty() {
             r.error(&loc, "missing title");
         }
@@ -647,7 +695,7 @@ fn check_guidance(content: &Content, r: &mut Report) {
             r.error(&loc, "applies_to is empty");
         }
         for t in &g.meta.applies_to {
-            if let Err(e) = resolve_target(t, &topics) {
+            if let Err(e) = resolve_target(t, &slugs) {
                 r.error(&loc, format!("applies_to: {e}"));
             }
         }
@@ -668,9 +716,20 @@ fn check_guidance(content: &Content, r: &mut Report) {
             .meta
             .applies_to
             .iter()
-            .filter_map(|t| t.strip_prefix("hazard:"))
+            .filter_map(|t| {
+                t.strip_prefix("hazard:")
+                    .or_else(|| t.strip_prefix("family:"))
+            })
             .collect();
-        for p in policy::condition_problems(&g.body, &hazards) {
+        let scope = ConditionScope {
+            hazards: if g.kind.any_hazard_condition() {
+                None
+            } else {
+                Some(&hazards)
+            },
+            items: Some(&items),
+        };
+        for p in policy::condition_problems_in(&g.body, scope) {
             r.error(&loc, p);
         }
 
@@ -683,12 +742,12 @@ fn check_guidance(content: &Content, r: &mut Report) {
                 format!("{words} words; the limit is {MAX_GUIDANCE_WORDS}"),
             );
         }
-        if (id.starts_with("bucket_") || id.starts_with("hazard_"))
+        if g.kind.opens_with_frequency()
             && !first_paragraph(prose).contains(policy::FREQUENCY_PLACEHOLDER)
         {
             r.error(
                 &loc,
-                "bucket and hazard blocks open with the household's own `{frequency}` sentence",
+                "bucket, hazard and family blocks open with the household's own `{frequency}` sentence",
             );
         }
         if let Some(grade) = readability::flesch_kincaid_grade(&plain)
@@ -703,6 +762,80 @@ fn check_guidance(content: &Content, r: &mut Report) {
         check_text(r, &loc, &all, false);
         check_potassium_iodide(r, &loc, &all);
         check_antibiotic_warnings(&plain, &loc, r);
+    }
+}
+
+/// A web address a household can type: `https://`, no spaces.
+fn is_web_address(url: &str) -> bool {
+    url.starts_with("https://") && !url.contains(char::is_whitespace) && url.len() > 12
+}
+
+/// The state table: every jurisdiction once, web addresses, a sourced refill rule, and printed
+/// lines that pass the same text checks as guidance.
+fn check_states(content: &Content, r: &mut Report) {
+    let rows = &content.states.state;
+    if rows.is_empty() {
+        return;
+    }
+    let mut seen = BTreeSet::new();
+    for row in rows {
+        let loc = format!("{STATE_REGISTRIES_FILE} `{}`", row.code);
+        if !tables::JURISDICTIONS.contains(&row.code.as_str()) {
+            r.error(
+                &loc,
+                "code is not a state, DC or PR two-letter postal code in capitals",
+            );
+        }
+        if !seen.insert(row.code.as_str()) {
+            r.error(&loc, "the state appears twice");
+        }
+        for (field, v) in [
+            ("name", &row.name),
+            ("em_agency", &row.em_agency),
+            ("local_office", &row.local_office),
+            ("refill", &row.refill),
+        ] {
+            if v.trim().is_empty() {
+                r.error(&loc, format!("missing `{field}`"));
+            }
+        }
+        for url in row.urls() {
+            if !is_web_address(url) {
+                r.error(&loc, format!("`{url}` is not an https web address"));
+            }
+        }
+        for e in [&row.zone, &row.registry, &row.alerts]
+            .into_iter()
+            .flatten()
+        {
+            if e.name.trim().is_empty() {
+                r.error(&loc, "a listed tool needs its name");
+            }
+        }
+        if row.refill_sources.is_empty() {
+            r.error(&loc, "the refill rule cites at least one source");
+        }
+        for line in row.lines() {
+            for c in &line.sources {
+                if content.citation(c.as_str()).is_none() {
+                    r.error(&loc, format!("citation `{c}` is not in citations.toml"));
+                }
+            }
+            check_text(r, &loc, &line.text, false);
+            if let Some(grade) = readability::flesch_kincaid_grade(&line.text)
+                && grade > 12.0
+            {
+                r.warn(
+                    &loc,
+                    format!("{} line reads at grade {grade:.1}", line.topic),
+                );
+            }
+        }
+    }
+    for code in tables::JURISDICTIONS {
+        if !seen.contains(code) {
+            r.error(STATE_REGISTRIES_FILE, format!("no row for `{code}`"));
+        }
     }
 }
 
@@ -1012,8 +1145,9 @@ hazard_extras = []
     }
 
     fn guide(id: &str, applies: &str, body: &str) -> String {
+        let kind = id.split('_').next().unwrap_or(id);
         format!(
-            "---\nid: {id}\ntitle: A title\napplies_to: [{applies}]\ncitations: [ready_gov_water]\n---\n{body}\n\n## Sources\n\n[^ready_gov_water]: FEMA, Water (2021).\n"
+            "---\nid: {id}\ntitle: A title\nkind: {kind}\napplies_to: [{applies}]\ncitations: [ready_gov_water]\n---\n{body}\n\n## Sources\n\n[^ready_gov_water]: FEMA, Water (2021).\n"
         )
     }
 
@@ -1083,6 +1217,195 @@ hazard_extras = []
         );
         let r = run(&[("citations.toml", CITES), ("guidance/topic_x.md", &warned)]);
         assert!(r.is_ok(), "{r}");
+    }
+
+    #[test]
+    fn kinds_match_ids_and_targets() {
+        let ok = guide(
+            "plan_shelter",
+            "plan:shelter",
+            "Pick a spot.[^ready_gov_water]",
+        );
+        let r = run(&[("citations.toml", CITES), ("guidance/plan_shelter.md", &ok)]);
+        assert!(r.is_ok(), "{r}");
+
+        // The id says hazard, the kind says topic.
+        let mismatch = guide("hazard_x", "topic:x", "{frequency} Text.[^ready_gov_water]")
+            .replace("kind: hazard", "kind: topic");
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("guidance/hazard_x.md", &mismatch),
+        ]);
+        let e = errors(&r);
+        assert!(e.iter().any(|m| m.contains("starts with `topic_`")), "{r}");
+
+        // A plan block that applies to no plan target.
+        let stray = guide(
+            "plan_shelter",
+            "hazard:tornado",
+            "Pick a spot.[^ready_gov_water]",
+        );
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("guidance/plan_shelter.md", &stray),
+        ]);
+        assert!(
+            errors(&r)
+                .iter()
+                .any(|m| m.contains("at least one `plan:` target")),
+            "{r}"
+        );
+
+        // After and plan targets resolve only to blocks that exist.
+        let orphan = guide(
+            "after_first_30_days",
+            "after:first_30_days, plan:nowhere",
+            "Return safely.[^ready_gov_water]",
+        );
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("guidance/after_first_30_days.md", &orphan),
+        ]);
+        assert!(errors(&r).iter().any(|m| m.contains("plan_nowhere")), "{r}");
+    }
+
+    #[test]
+    fn contract_v2_ids_and_family_targets_resolve() {
+        let smoke = guide(
+            "hazard_wildfire_smoke",
+            "hazard:wildfire_smoke",
+            "{frequency} Smoke travels far.[^ready_gov_water]",
+        );
+        let air = guide(
+            "bucket_clean_air",
+            "bucket:clean_air",
+            "{frequency} Clean air.[^ready_gov_water]",
+        );
+        let family = guide(
+            "family_solar_storm",
+            "family:geomagnetic_storm",
+            "{frequency} Rare.[^ready_gov_water]",
+        );
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("guidance/hazard_wildfire_smoke.md", &smoke),
+            ("guidance/bucket_clean_air.md", &air),
+            ("guidance/family_solar_storm.md", &family),
+        ]);
+        assert!(r.is_ok(), "{r}");
+
+        let not_rare = guide(
+            "family_x",
+            "family:tornado",
+            "{frequency} Rare.[^ready_gov_water]",
+        );
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("guidance/family_x.md", &not_rare),
+        ]);
+        assert!(
+            errors(&r)
+                .iter()
+                .any(|m| m.contains("lead hazard of a rare family")),
+            "{r}"
+        );
+        let no_frequency = guide("family_x", "family:cbrn_attack", "Rare.[^ready_gov_water]");
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("guidance/family_x.md", &no_frequency),
+        ]);
+        assert!(errors(&r).iter().any(|m| m.contains("{frequency}")), "{r}");
+    }
+
+    #[test]
+    fn conditions_follow_the_block_kind() {
+        let body = "Pick a spot. {if:tornado}Use the basement.{/if} \
+                    {if:has:water_stored}Keep water there.{/if}[^ready_gov_water]";
+        let item = item("water_stored", "water", "");
+        // A plan block may name any hazard, and a catalogue item.
+        let plan = guide("plan_shelter", "plan:shelter", body);
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("items/water.toml", &item),
+            ("guidance/plan_shelter.md", &plan),
+        ]);
+        assert!(r.is_ok(), "{r}");
+        // A hazard block may name only its own hazards.
+        let hazard = guide(
+            "hazard_x",
+            "hazard:earthquake",
+            &format!("{{frequency}} {body}"),
+        );
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("items/water.toml", &item),
+            ("guidance/hazard_x.md", &hazard),
+        ]);
+        assert!(
+            errors(&r).iter().any(|m| m.contains("does not apply to")),
+            "{r}"
+        );
+        // An item that is not in the catalogue, and an unknown need.
+        let bad = guide(
+            "plan_shelter",
+            "plan:shelter",
+            "A {if:has:jetpack}b{/if} {if:need:telepathy}c{/if}.[^ready_gov_water]",
+        );
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("items/water.toml", &item),
+            ("guidance/plan_shelter.md", &bad),
+        ]);
+        let e = errors(&r);
+        assert!(e.iter().any(|m| m.contains("jetpack")), "{r}");
+        assert!(e.iter().any(|m| m.contains("telepathy")), "{r}");
+    }
+
+    const STATE: &str = "[[state]]\ncode = \"KS\"\nname = \"Kansas\"\n\
+        checked = \"2026-09-26\"\nem_agency = \"Kansas Division of Emergency Management\"\n\
+        em_url = \"https://www.kansastag.gov/kdem\"\n\
+        refill = \"A pharmacist may give an emergency supply.\"\n\
+        refill_sources = [\"ready_gov_water\"]\n";
+
+    fn with_alert_sources() -> String {
+        format!(
+            "{CITES}\n[[citation]]\nid = \"ready_gov_disability\"\ntitle = \"People with Disabilities\"\n\
+             publisher = \"FEMA / Ready.gov\"\nurl = \"https://www.ready.gov/disability\"\n\
+             retrieved = \"2026-09-26\"\nlicense = \"US Government Work (public domain)\"\n\
+             \n[[citation]]\nid = \"ready_gov_evacuation\"\ntitle = \"Evacuation\"\n\
+             publisher = \"FEMA / Ready.gov\"\nurl = \"https://www.ready.gov/evacuation\"\n\
+             retrieved = \"2026-09-26\"\nlicense = \"US Government Work (public domain)\"\n\
+             \n[[citation]]\nid = \"ready_gov_alerts\"\ntitle = \"Emergency Alerts\"\n\
+             publisher = \"FEMA / Ready.gov\"\nurl = \"https://www.ready.gov/alerts\"\n\
+             retrieved = \"2026-09-26\"\nlicense = \"US Government Work (public domain)\"\n"
+        )
+    }
+
+    #[test]
+    fn the_state_table_is_checked() {
+        let cites = with_alert_sources();
+        let r = run(&[("citations.toml", &cites), (STATE_REGISTRIES_FILE, STATE)]);
+        let e = errors(&r);
+        // One row is not the whole table.
+        assert!(e.iter().any(|m| m.contains("no row for `AL`")), "{r}");
+        assert!(!e.iter().any(|m| m.contains("`KS`")), "{r}");
+
+        let bad = format!(
+            "{}{}",
+            STATE
+                .replace("https://www.kansastag.gov/kdem", "www.kansastag.gov")
+                .replace("[\"ready_gov_water\"]", "[\"nowhere\"]"),
+            STATE.replace("A pharmacist", "Act now: a pharmacist")
+        );
+        let r = run(&[("citations.toml", &cites), (STATE_REGISTRIES_FILE, &bad)]);
+        let e = errors(&r);
+        assert!(
+            e.iter().any(|m| m.contains("not an https web address")),
+            "{r}"
+        );
+        assert!(e.iter().any(|m| m.contains("`nowhere`")), "{r}");
+        assert!(e.iter().any(|m| m.contains("appears twice")), "{r}");
+        assert!(e.iter().any(|m| m.contains("act now")), "{r}");
     }
 
     #[test]
