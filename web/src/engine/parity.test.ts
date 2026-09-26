@@ -258,7 +258,7 @@ describe.runIf(BUILT)('parity: mock and WebAssembly engines, and the goldens', (
       }
       const r: ValueReport = { differences: [], numbers: 0, strings: 0 };
       compareValues(golden, out, '', r);
-      expect(r.differences, `${name}: the WebAssembly answer differs from fixtures/golden/${name}.json (rebuild with build-web.sh if the engine changed)`).toEqual([]);
+      expect(r.differences, `${name}: the WebAssembly answer differs from fixtures/golden/${name}.json. Either web/public/pkg is older than the engine (rebuild: bash crates/rr-wasm/build-web.sh) or the goldens are older than the engine (check: cargo test -p rr-plan --test goldens)`).toEqual([]);
       expect(JSON.stringify(out)).toBe(JSON.stringify(golden));
       lines.push(
         `${name}: ${r.numbers} numbers and ${r.strings} strings identical to the golden (${onPacks ? 'data packs' : 'sample counties'}); assess ${median(times).toFixed(0)} ms`,
