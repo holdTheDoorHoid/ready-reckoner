@@ -310,9 +310,15 @@ What the numbers mean:
   `envelopes` are sinking funds for items that cost more than a month's budget. `savings_track` is the
   emergency-fund goal for `income`, never funded from the supplies budget.
 - `first_milestone` (v2): the first savings step, one month of expenses or $500, whichever is
-  smaller, and the plan month it is reached. `minimum_kit` (v2): the plan is in bare-minimum mode.
+  smaller, and the plan month the supplies budget reaches it once the supplies plan is done; left
+  out when it is already saved or the plan never frees the budget. `minimum_kit` (v2): the plan is
+  in bare-minimum mode (the kit, with the three-day life-safety items, comes before the tiers).
   `long_horizon` (v2): the long-horizon section (rain catchment, fuel storage, sanitation for months),
-  present when a target passes 30 days or `dials.long_horizon` is on.
+  present when a target reaches 30 days or `dials.long_horizon` is on; its items stay in the months
+  too (the section only groups them, one line per item with its quantities added up).
+- Free steps: at most eight ordinary free steps a month (month 0 lists the first eight whatever
+  their kind). Decisions (`PlanItem.decision`), the long-horizon pointer, the clean-room plan and
+  the 90-day-fills step sit outside that count and are all scheduled by month 1.
 - `PlanItem.requires` (v2): items it needs first; the allocator never schedules it before them.
   `PlanItem.decision` (v2): an insurance or home-repair decision, not a purchase.
 - `recovery` (v2): facts for the "After a disaster: the first 30 days" page, such as how many federal
@@ -457,7 +463,7 @@ Ids are stable snake_case strings. `rr-types` exposes them as enums with `ALL`, 
 ## Warnings
 
 `Warning.id` is a stable string; the app can react to an id, never to the message. v2 adds the six
-marked below (`rr_types::Warning::V2_IDS`).
+marked below (`rr_types::Warning::V2_IDS`) and the `simultaneous_need` note.
 
 | Id | Emitted by | When |
 | --- | --- | --- |
@@ -475,9 +481,10 @@ marked below (`rr_types::Warning::V2_IDS`).
 | `surge_zone_stay_home` (v2) | rr-budget | a surge zone or a likely evacuation, and a plan that never says to leave (REVIEW S2) |
 | `cold_chain_power` (v2) | rr-budget | refrigerated medicine that needs a power source for a power target of 2 days or more, and none planned (S1) |
 | `benefit_lapse` (v2) | rr-budget | a household relying on federal pay or a benefit with no food buffer by month 3 (H7) |
-| `plan_too_long` (v2) | rr-budget | the full plan would run past 36 months; bare-minimum mode takes over (R6) |
+| `plan_too_long` (v2) | rr-budget | the full plan would run past 36 months; bare-minimum mode takes over (R6). `related` lists the items that fall beyond three years even so (the plan screen's deferred list) |
 | `no_raw_water_source` (v2) | rr-budget | a water filter in the plan and no raw water source named (S6) |
 | `no_cooking_capability` (v2) | rr-budget | no way to cook or boil water without power (K1) |
+| `simultaneous_need` (v2) | rr-budget | a note: the plan is done, but one event that sets a target would need more stored water, food or power at once than the plan holds (DESIGN §4.7's simultaneous-need check, from rr-consequence) |
 
 ## Loading
 

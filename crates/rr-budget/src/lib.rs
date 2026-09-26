@@ -2,10 +2,28 @@
 //! guardrails (DESIGN §4.7–§4.8, research risk-model §3.2, §4, §6.3).
 //!
 //! Given a household, its budget, the items on offer and each bucket's exceedance curve, it
-//! produces the month-by-month [`rr_types::Plan`]: free actions first (at most eight to do in any
-//! month, all within the first three months), then purchases in the order that buys the most risk
-//! reduction per dollar, a sinking fund for anything that costs more than a month's money, a stop
-//! when nothing more is worth buying, and the income savings goal on its own track.
+//! produces the month-by-month [`rr_types::Plan`]: free actions first (at most eight ordinary ones
+//! to do in any month; decisions and three planning steps outside that count, by month 1), then
+//! purchases in the order that buys the most risk reduction per dollar within each tier
+//! (life-safety first, then capabilities, then seasonal items that are due, long-horizon items
+//! last, and never an accessory before its device), a sinking fund for anything that costs more
+//! than a month's money, a stop when nothing more is worth buying, and the income savings goal on
+//! its own track with its first step.
+//!
+//! # Contract v2 (v0.2.0)
+//!
+//! - Readiness value per item (`Item::readiness_share`) and one credit per alternative group
+//!   (`Item::alternative_group`); prerequisites (`Item::requires`, any one of).
+//! - Bare-minimum mode (`Dials::minimum_kit`, or a plan past [`PLAN_TOO_LONG_MONTHS`] months):
+//!   the kit `rr-supply` marks, with the three-day life-safety items, before the tiers; every plan
+//!   reports `Plan::minimum_done_month` beside `Plan::done_month`.
+//! - Season-aware ordering ([`season`]) and the long-horizon section (`Plan::long_horizon`).
+//! - The rare allowance by family ([`rare`]): ticked families likely enough here, value from the
+//!   family's chance, half the allowance per family at most, nothing before the three-day basics.
+//! - Savings: `Plan::first_milestone`, the three-month point and the legal-emergency line
+//!   (`Dials::legal_opt_in`).
+//! - Guardrails `surge_zone_stay_home`, `cold_chain_power`, `benefit_lapse`, `plan_too_long`,
+//!   `no_raw_water_source`, `no_cooking_capability` and the `simultaneous_need` note.
 //!
 //! # Inputs
 //!
