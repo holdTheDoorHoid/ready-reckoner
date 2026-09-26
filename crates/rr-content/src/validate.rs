@@ -468,7 +468,10 @@ fn check_price(item: &Item, loc: &str, r: &mut Report) {
     } else if is_money_reserve(item) {
         // Money set aside (cash): one dollar buys one dollar, so there is nothing to observe.
         if band.note.as_deref().is_none_or(|n| n.trim().is_empty()) {
-            r.error(loc, "a money reserve needs a note saying how the amount is chosen");
+            r.error(
+                loc,
+                "a money reserve needs a note saying how the amount is chosen",
+            );
         }
     } else {
         if band.high <= 0.0 {

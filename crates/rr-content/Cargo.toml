@@ -14,3 +14,6 @@ rr-types = { path = "../rr-types" }
 serde.workspace = true
 toml.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
