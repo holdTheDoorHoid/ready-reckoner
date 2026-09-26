@@ -2,7 +2,10 @@ import axe from 'axe-core';
 import { flushSync, tick, type Component } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import MockBanner from '../components/MockBanner.svelte';
+import type { Engine } from '../engine/index';
 import { FIXTURE_NAMES, FIXTURES, type FixtureName } from '../engine/fixtures';
+import { createMockEngine } from '../engine/mock';
 import { STORAGE_KEY } from '../lib/persistence';
 import { render, savedFor, until, type Rendered } from '../test/helpers';
 import About from './About.svelte';
@@ -272,6 +275,39 @@ describe('what the screens show', () => {
     const r = await screen(About, 'about', 'philadelphia-renters-4');
     for (const a of r.app.info!.attributions) expect(r.text()).toContain(a.text);
     expect(r.text()).toContain('stand-in engine');
+  });
+
+  it('about and the banner: say when the real engine runs on its sample counties, and not once data is loaded', async () => {
+    // The mock standing in for the WebAssembly engine: a real engine version, and packs as given.
+    const realEngine = (packs: string[]): Engine => {
+      const engine = createMockEngine();
+      return {
+        ...engine,
+        engine_info: async () => {
+          const info = await engine.engine_info();
+          if (!info.ok) return info;
+          const value = { ...info.value, engine_version: '0.1.0', packs_loaded: packs };
+          if (packs.length) value.data_pack_version = 'e8b8cd6861e6';
+          else delete value.data_pack_version;
+          return { ok: true, value };
+        },
+      };
+    };
+    const plan = savedFor(FIXTURES['philadelphia-renters-4']);
+    current = await render(About, { plan, route: 'about', engine: realEngine([]) });
+    expect(current.app.source?.kind).toBe('wasm');
+    expect(current.text()).toContain('The national data is not loaded');
+    expect(current.text()).not.toContain('stand-in engine');
+    current.cleanup();
+    current = await render(MockBanner, { plan, engine: realEngine([]) });
+    expect(current.text()).toContain('Sample counties only');
+    current.cleanup();
+    current = await render(MockBanner, { plan, engine: realEngine(['core']) });
+    expect(current.text().trim()).toBe('');
+    current.cleanup();
+    current = await render(About, { plan, route: 'about', engine: realEngine(['core']) });
+    expect(current.text()).not.toContain('The national data is not loaded');
+    expect(current.text()).toContain('e8b8cd6861e6 (core)');
   });
 
   it('start: starting a plan takes the person to the first step with a dated plan', async () => {
