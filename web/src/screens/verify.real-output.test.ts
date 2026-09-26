@@ -10,7 +10,7 @@
  *
  * The fix belongs to the web workstream: key those lists by `item.item_id + item.tier +
  * item.kind` (PlanScreen.svelte lines 113, 129, 134, 143, 189, 213; ReadinessCard.svelte 34, 42;
- * HazardCard.svelte 61). When it lands, the `it.fails` below starts failing: change it to `it`.
+ * HazardCard.svelte 61). Fixed by the keyedItems helper (web/src/lib/lookup.ts): the test below now passes.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -66,7 +66,7 @@ describe('screens with the real engine output (verification)', () => {
     r.cleanup();
   });
 
-  it.fails('KNOWN BUG (V-10): the plan screen renders the real Philadelphia plan', async () => {
+  it('V-10 (fixed by keyedItems): the plan screen renders the real Philadelphia plan', async () => {
     const r = await render(PlanScreen, { plan: savedFor(FIXTURES[name]), route: 'plan', engine: answering(golden(name)) });
     try {
       expect(r.target.querySelector('h1')?.textContent).toContain('Your plan');
