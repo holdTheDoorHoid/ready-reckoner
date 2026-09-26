@@ -153,8 +153,13 @@ fn event_types_from_the_pack() {
 
 #[test]
 fn hurdat2_passages_give_the_county_major_hurricane_share() {
-    // Miami-Dade: passages within 50 nautical miles; half at major strength.
+    // Miami-Dade: passages within 50 nautical miles, 0.30 a year at tropical-storm strength,
+    // 0.20 at hurricane strength, 0.10 at major strength.
     let mut fixture = county("12086");
+    fixture
+        .county
+        .events
+        .insert("tropical_storm_passage".into(), event(0.30));
     fixture
         .county
         .events
@@ -171,11 +176,20 @@ fn hurdat2_passages_give_the_county_major_hurricane_share() {
         .iter()
         .find(|s| s.id == "major_hurricane_direct_hit")
         .unwrap();
-    // NRI 0.305 hurricanes a year × the HURDAT2 major share 0.5 × the 0.8 footprint.
+    // NRI's frequency counts tropical-storm-strength events, so the major share is taken
+    // against those passages (76 years of HURDAT2), shrunk toward the pooled 5.4 % with the
+    // weight of 5 passages: (7.6 + 0.27) / (22.8 + 5) = 0.283. Then × NRI 0.305 × the 0.8
+    // footprint.
+    let share = (0.10 * 76.0 + 5.0 * 0.054) / (0.30 * 76.0 + 5.0);
     assert!(
-        close(s.rate_per_year, 0.305 * 0.5 * 0.8, 1e-3),
+        close(s.rate_per_year, 0.305 * share * 0.8, 1e-3),
         "{}",
         s.rate_per_year
+    );
+    assert!(
+        s.applies_because.contains("about 1 in 4 of them"),
+        "{}",
+        s.applies_because
     );
     assert!(s.sources.iter().any(|x| x == "noaa_hurdat2"));
 }
@@ -244,32 +258,39 @@ fn base_rate_ids_from_the_pack() {
 }
 
 #[test]
-fn no_major_hurricane_passages_means_no_major_hurricane_scenario() {
+fn no_recorded_major_passage_gives_a_small_share_not_a_third() {
+    // Nine tropical-storm passages in 76 years and no major one (Sagadahoc County, Maine, in the
+    // pack): the record says none, shrunk toward the pooled share, not the old one-third.
     let mut fixture = county("12086");
     fixture
         .county
         .events
-        .insert("hurricane_passage".into(), event(0.20));
+        .insert("tropical_storm_passage".into(), event(9.0 / 76.0));
+    let mut input = household("miami-condo-retiree-1");
+    input.dials.climate = ClimateHorizon::Today;
+    let a = run(&input, &fixture);
+    let s = a
+        .scenarios
+        .iter()
+        .find(|s| s.id == "major_hurricane_direct_hit")
+        .expect("still offered: a short record does not rule a major storm out");
+    let share = (5.0 * 0.054) / (9.0 + 5.0);
+    assert!(
+        close(s.rate_per_year, 0.305 * share * 0.8, 1e-3),
+        "{}",
+        s.rate_per_year
+    );
+    assert!(s.rate_per_year < 0.305 / 3.0 * 0.8 / 10.0);
+    // A major rate of zero reads the same as no row.
     fixture
         .county
         .events
         .insert("major_hurricane_passage".into(), event(0.0));
-    // An event rate of zero is treated as absent, so the national one-third share applies ...
-    let a = run(&household("miami-condo-retiree-1"), &fixture);
-    assert!(
-        a.scenarios
-            .iter()
-            .any(|s| s.id == "major_hurricane_direct_hit")
-    );
-    // ... but a county whose record gives a major share of exactly zero gets no scenario.
-    fixture
-        .county
-        .events
-        .insert("major_hurricane_passage".into(), event(1.0e-9));
-    let a = run(&household("miami-condo-retiree-1"), &fixture);
-    assert!(
-        a.scenarios
-            .iter()
-            .all(|s| s.id != "major_hurricane_direct_hit")
-    );
+    let b = run(&input, &fixture);
+    let t = b
+        .scenarios
+        .iter()
+        .find(|s| s.id == "major_hurricane_direct_hit")
+        .unwrap();
+    assert!(close(t.rate_per_year, s.rate_per_year, 1e-9));
 }

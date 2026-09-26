@@ -121,6 +121,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push("### The ones most likely to reach you".to_owned());
         out.push(String::new());
     }
+    // Which card showed each family block, so a later card of the same family can point to it.
+    let mut shown: Vec<(&str, &str)> = Vec::new();
     for (i, (p, block)) in cards.iter().enumerate() {
         out.push(format!("#### {}. {}", i + 1, md(&p.name)));
         out.push(String::new());
@@ -135,6 +137,24 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             _ => out.push(lead),
         }
         out.push(String::new());
+        match block {
+            Some(g) => shown.push((g.meta.id.as_str(), p.name.as_str())),
+            None => {
+                // The family's block is on an earlier card (a cold wave and a winter storm share
+                // one): point there, so the threat still comes with what to do (PRINCIPLES §4).
+                let earlier = cx
+                    .blocks_for(&format!("hazard:{}", p.id))
+                    .into_iter()
+                    .find_map(|g| shown.iter().find(|(id, _)| *id == g.meta.id.as_str()));
+                if let Some((_, name)) = earlier {
+                    out.push(format!(
+                        "**What helps.** The steps under \"{}\" above apply here too.",
+                        md(name)
+                    ));
+                    out.push(String::new());
+                }
+            }
+        }
         for para in advice {
             out.push(para);
             out.push(String::new());

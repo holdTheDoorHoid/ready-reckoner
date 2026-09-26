@@ -20,6 +20,8 @@ pub const TYPICAL_FREQUENCY_SENTENCE: &str =
 /// `{frequency}` placeholder (replaced by [`TYPICAL_FREQUENCY_SENTENCE`]). Each non-empty line is
 /// kept as its own line.
 pub fn plain_text(markdown: &str) -> String {
+    // Conditional spans are scored as a reader who sees all of them would read them.
+    let markdown = crate::policy::apply_conditions(markdown, |_| true);
     let mut out = String::new();
     for raw in markdown.lines() {
         let mut line = raw.trim().to_owned();

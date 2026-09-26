@@ -162,7 +162,8 @@ fn nuclear_attack() -> HazardRate {
         (lo, hi),
         &[cite::FRI_NUCLEAR, cite::READY_NUCLEAR],
         sentence::range_only(
-            "Experts' estimates of a worldwide nuclear catastrophe range from",
+            "Forecasters asked in 2024 put the chance of a nuclear catastrophe (10 million or more \
+             deaths worldwide) before 2045 at 1 to 5 in 100. Spread over those years, that is",
             lo,
             hi,
             " No reliable estimate exists for effects where you live. The first 24 hours of \

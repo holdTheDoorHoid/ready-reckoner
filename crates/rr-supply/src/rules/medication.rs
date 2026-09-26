@@ -55,7 +55,7 @@ pub fn medication_days(target_days: Option<f64>, people_list: &[Person]) -> Opti
         Some(_) => {}
     }
     text.push_str(&format!(
-        " Keep a written list of each medicine, what it is for and the dose. After a disaster declaration many states let pharmacies give an emergency refill of up to {}; ask your pharmacist what yours allows.",
+        " Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to {}, and many allow only a few days; ask your pharmacist what yours allows.",
         fmt_days(refill)
     ));
     let math = vec![format!(

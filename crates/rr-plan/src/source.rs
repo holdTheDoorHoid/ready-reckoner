@@ -274,13 +274,6 @@ fn fixture_attributions() -> Vec<Attribution> {
     out
 }
 
-/// The National Risk Index credit line goes first (its terms require the statement; the About
-/// screen and the packet show it first); the rest keep their order.
-fn nri_first(mut list: Vec<Attribution>) -> Vec<Attribution> {
-    list.sort_by_key(|a| !a.source.contains("National Risk Index"));
-    list
-}
-
 impl CountySource for DataStore {
     fn county(&self, fips: &str) -> Option<&CountyRecord> {
         DataStore::county(self, fips.trim())
@@ -298,8 +291,9 @@ impl CountySource for DataStore {
         DataStore::base_rates(self)
     }
 
+    /// The store puts the National Risk Index statement first.
     fn attributions(&self) -> Vec<Attribution> {
-        nri_first(DataStore::attributions(self))
+        DataStore::attributions(self)
     }
 
     fn location(&self, county_fips: &str, zip: Option<&str>) -> Option<LocationResolved> {

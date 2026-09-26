@@ -61,9 +61,22 @@ pub(crate) const WINTER_FOOTPRINT: Triple = (0.05, 0.02, 0.15);
 pub(crate) const HURRICANE_FOOTPRINT: Triple = (0.5, 0.3, 0.8);
 /// PRIOR. Share of major-hurricane passages (Category 3+) that reach this household.
 pub(crate) const MAJOR_HURRICANE_FOOTPRINT: Triple = (0.8, 0.5, 1.0);
-/// PRIOR (informed by HURDAT2): share of hurricanes affecting a Gulf or Atlantic county that are
-/// major (Category 3+). About a third of US landfalling hurricanes since 1851 were major.
-pub(crate) const MAJOR_HURRICANE_SHARE: Triple = (1.0 / 3.0, 0.2, 0.45);
+/// DERIVED from HURDAT2 in the pack (verification, 2026-09-26): the share of NRI hurricane events
+/// that are major (Category 3+). NRI's hurricane frequency counts about as many events as
+/// HURDAT2's tropical-storm-strength passages within 50 nautical miles (median ratio 0.81 over
+/// 1,836 counties; 3.8 against hurricane-strength passages), so the share is taken against
+/// tropical-storm passages: 601 major passages in 11,155 tropical-storm passages across the 556
+/// counties the major-hurricane scenario can apply to, 5.4 %. The range is a PRIOR. (The older
+/// one-third was the share of *landfalling hurricanes* that are major, applied to NRI's
+/// tropical-storm-strength count, which inflated major storms about four times.)
+pub(crate) const MAJOR_HURRICANE_SHARE: Triple = (0.054, 0.03, 0.10);
+/// PRIOR. The weight, in tropical-storm passages, of [`MAJOR_HURRICANE_SHARE`] when a county's
+/// own HURDAT2 record sets its share: (majors + 5 × 0.054) ÷ (passages + 5). A short record then
+/// neither rules a major storm out nor lets one storm set the rate.
+pub(crate) const MAJOR_SHARE_PRIOR_PASSAGES: f64 = 5.0;
+/// The years of HURDAT2 track data behind the pack's passage rates (1950–2025, `events.csv`),
+/// to turn a rate back into a count.
+pub(crate) const HURDAT2_YEARS: f64 = 76.0;
 /// PRIOR. Mean damage to a home that hail damages, as a share of its value (a roof and siding
 /// claim on a typical home). The footprint is NRI's historic loss ratio divided by this.
 pub(crate) const HAIL_DAMAGE_RATIO: Triple = (0.02, 0.01, 0.05);
@@ -272,8 +285,9 @@ pub(crate) const PANDEMIC_DISRUPTIVE_SHARE: Triple = (0.25, 0.1, 0.4);
 pub(crate) const NUCLEAR_PLANT_EPZ: Triple = (2.0e-4, 2.0e-5, 5.0e-4);
 /// PRIOR. Same, for a plant 16–80 km away (food and water advisories in the ingestion zone).
 pub(crate) const NUCLEAR_PLANT_INGESTION: Triple = (5.0e-5, 1.0e-5, 2.0e-4);
-/// SRC (research §6.3, from the Forecasting Research Institute): experts' estimates of a
-/// worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. Never
+/// SRC (research §6.3, from the Forecasting Research Institute): superforecasters' and experts'
+/// medians of 1 % and 5 % for a catastrophe killing 10 million or more before 2045, spread over
+/// the years to 2045: about 1 in 2,000 to about 1 in 400 a year (our arithmetic). Never
 /// shown as a point estimate; the value used for arithmetic is the geometric middle.
 pub(crate) const NUCLEAR_ATTACK_RANGE: (f64, f64) = (1.0 / 2000.0, 1.0 / 400.0);
 /// PRIOR. An attack that disrupts daily life where a city household lives: 1 in 10,000 to 1 in
@@ -311,8 +325,8 @@ pub(crate) const WELL_LOCAL_OUTAGE: Triple = (0.01, 0.003, 0.03);
 /// PRIOR. A household burglary, about 1 in 100 homes a year (to be replaced by the BJS National
 /// Crime Victimization Survey figure).
 pub(crate) const BURGLARY: Triple = (0.01, 0.005, 0.02);
-/// DERIVED + PRIOR, per earner-year: disability onset ≈ 0.0061 (SSA: more than 1 in 4
-/// 20-year-olds disabled before 67, spread over 47 years) plus death at working age ≈ 0.003
+/// DERIVED + PRIOR, per earner-year: disability onset ≈ 0.0061 (SSA: 1 in 4 20-year-olds
+/// disabled before full retirement age, 67, spread over 47 years) plus death at working age ≈ 0.003
 /// (accidental deaths alone are 58.1 per 100,000, NCHS 2024).
 pub(crate) const EARNER_LOSS: Triple = (0.009, 0.005, 0.015);
 /// PRIOR. A long illness (weeks) that keeps someone sick at home, per person-year.
@@ -366,6 +380,13 @@ pub(crate) const SEVERITY_LOSS_ONE_USD: f64 = 500_000.0;
 /// Natural hazards never show a severity below this: even a windstorm that only cuts the power
 /// is more than nothing.
 pub(crate) const NATURAL_SEVERITY_FLOOR: f64 = 0.1;
+/// PRIOR. The severity a heat wave or cold wave shows at least, for a household with someone at
+/// higher risk from it: 0.4, "Serious", the severity of an emergency-department visit ($2,000 on
+/// the fixed scale). NRI's expected loss does count deaths and injuries (valued per statistical
+/// life), but spread over every household and every episode in the county, so the per-event
+/// loss reads "Minor" (Philadelphia heat: about $85 an episode) although heat is most dangerous
+/// for exactly these households (CDC; Semenza et al. 1996, Chicago 1995).
+pub(crate) const AT_RISK_TEMPERATURE_SEVERITY: f64 = 0.4;
 
 #[cfg(test)]
 mod tests {

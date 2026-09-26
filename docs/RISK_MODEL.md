@@ -99,7 +99,7 @@ cap; then the pack's ratio variables (future ÷ present at about +2 °C, optiona
 | Lightning | damages the home or cuts its power | NRI (days with strikes) | 1 in 10,000 (3 in 100,000 – 3 in 10,000) | power-line exposure | PRIOR |
 | Hail | damages the home or car | NRI | NRI loss ratio ÷ 0.02 mean damage (0.01–0.05); else 0.005 | none | DERIVED + PRIOR |
 | Tornado | damages or cuts off the neighborhood | NRI | loss ratio ÷ 0.25 (0.1–0.5) × 5 homes disrupted per home damaged (2–10), at most 1; else 0.005 | none | DERIVED + PRIOR |
-| Hurricane | cuts the power or damages the home | NRI | Category 1–2: 0.5 (0.3–0.8); major: 0.8 (0.5–1.0); major share from HURDAT2 passages, else 1/3 (0.2–0.45) | none | PRIOR (DERIVED share where the pack has it) |
+| Hurricane | cuts the power or damages the home | NRI (its frequency counts about as many events as HURDAT2's tropical-storm-strength passages) | Category 1–2 and tropical storms: 0.5 (0.3–0.8); major: 0.8 (0.5–1.0); major share = (HURDAT2 major passages + 5 × 5.4 %) ÷ (tropical-storm passages + 5), else 5.4 % (3–10 %) | none | PRIOR (DERIVED share where the pack has it) |
 | Earthquake | shaking strong enough to knock things off shelves (0.1 g, about intensity VI) | USGS yearly chance → −ln(1 − p); else the 100-year intensity-VI chance; else NRI; ×/÷ 2 | 1 | none | DATA (hazard model) |
 | Tsunami | a tsunami warning to leave the inundation zone | NRI | residents in the zone (NRI) × 0.3 of events bring a warning (0.1–0.6) | none | DERIVED + PRIOR |
 | Inland flooding | flood water reaches the home, or cuts off an upper-floor flat | flood-zone odds (below) | s·p_in + (1 − s)·p_out | basement ×1.5 (1.2–2); second floor or higher ×0.5 (0.3–0.8) | DERIVED + PRIOR |
@@ -154,7 +154,7 @@ Natural hazards under 1 in 100,000 a year are left out of the register and named
 | Stranded in a vehicle | a crash or breakdown away from home | 0.15 per vehicle-year (0.05–0.4); no vehicle: 0.03 per non-car commuter (0.01–0.1) | × vehicles | PRIOR (crashes: NHTSA 6.14 million a year) |
 | Local water or gas outage | public water: a boil-water notice or a main break; well: a gas leak or local fault | boil notice 5 %/yr (2–10 %) + main break 10 %/yr (5–20 %); well 1 %/yr (0.3–3 %) | water source (the well pump's own failures are an `rr-consequence` coupling) | PRIOR (research §6.1, §8) |
 | Break-in | a household burglary | 1 %/yr (0.5–2 %), to be replaced by the BJS victimization survey figure | none | PRIOR |
-| Death or disability of an earner | loss of an earner's income | 0.9 % per earner-year (0.5–1.5 %): disability about 0.6 % (SSA: more than 1 in 4 20-year-olds disabled before 67) plus working-age death about 0.3 % | × earners | DERIVED + PRIOR |
+| Death or disability of an earner | loss of an earner's income | 0.9 % per earner-year (0.5–1.5 %): disability about 0.6 % (SSA: 1 in 4 20-year-olds disabled before full retirement age) plus working-age death about 0.3 % | × earners | DERIVED + PRIOR |
 | Long illness in the household | someone sick at home for weeks | 1 % per person-year (0.5–3 %) | × people | PRIOR |
 
 Job loss and earner loss are left out (with a note) when no one is marked as earning; vehicle
@@ -213,6 +213,14 @@ $500,000; long illness $5,000; pandemic $5,000; regional blackout $1,000; cyber 
 curfew $300; shortages $100; chemical release $500; nuclear plant accident $20,000. Nuclear attack
 is 1 and terrorism 0.9 by definition. The fixed scale means a hazard's severity reads the same in
 every county, and likelihood and severity stay separate columns in the rare-catastrophe box.
+**Heat and cold for households at risk** (verification, 2026-09-26): NRI's expected loss already
+counts deaths and injuries, valued per statistical life, but spreading it over every household
+and every county episode makes heat read "Minor" (Philadelphia: about $85 an episode). A heat or
+cold wave therefore shows at least 0.4, "Serious" (an emergency visit on the same scale), when the
+household has someone 65 or older, a baby, someone on a powered medical device, someone pregnant
+(heat), or no air conditioning (heat) or heating (cold) — the groups CDC names and the Chicago
+1995 findings (`cdc_heat_health`, `cdc_winter_safety`, `semenza_1996_heat_deaths`; PRIOR). A note
+says why. Severity is shown, not planned with: the targets do not change.
 
 **Confidence**: data within a factor of 1.6 either way is `high`, within 3 `medium`, wider `low`;
 a rate that rests partly on expert judgement is `medium` within a factor of 3, otherwise `low`;
@@ -268,17 +276,26 @@ earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092
   for earthquakes, so with Cascadia on, the part of the county earthquake rate that is Cascadia's
   own long-run share (0.41 %/yr near Coos Bay) is planned both as a typical damaging earthquake
   and inside the scenario. The effect is small beside the scenario's own 1.02 %/yr.
-- **Missing event rows.** The pack writes no row for an event type a county never recorded. A
-  missing `major_hurricane_passage` row is read as "unknown" (the national one-third major
-  share), not "zero", which errs toward preparing; a recorded share near zero drops the
-  major-hurricane scenario.
+- **Missing event rows and the major-hurricane share** (changed in the verification pass,
+  2026-09-26). The pack writes no row for an event type a county never recorded, and HURDAT2
+  covers every county, so a missing `major_hurricane_passage` row next to passage rows means none
+  was recorded. The share of NRI's hurricane events that are major is taken against HURDAT2's
+  *tropical-storm-strength* passages, because NRI's frequency counts about as many events as those
+  (median ratio 0.81 over 1,836 counties; 3.8 against hurricane-strength passages), and it is
+  shrunk toward the pooled 5.4 % (601 majors in 11,155 tropical-storm passages in the 556 counties
+  the scenario can apply to) with the weight of 5 passages. The earlier rule (major ÷
+  hurricane-strength passages, a missing row read as the national one-third) put a direct hit by a
+  major hurricane on Hartford, Connecticut at 1 in 25 years (HURDAT2: 1 major passage in 76
+  years) and on Sagadahoc County, Maine at 1 in 36 (none recorded). Now the scenario rate is about
+  HURDAT2's own major-passage rate × the 0.8 direct-hit footprint (Miami-Dade 0.037 a year,
+  against 4 majors in 76 years × 0.8 = 0.042).
 - **Income stability.** The research's ×0.5 step is `IncomeStability::very_stable` (tenured, public
   sector, pension); `stable` still means the typical salaried job (×1), as in the Philadelphia
   example. The research report gives only the ×0.5 point estimate for that step; its 0.3–0.7 range
   is this crate's own prior (`docs/RISK_MODEL.md` §"Hazard rates" / `rr_risk_model_priors`), not a
   cited figure.
 - **Figures to confirm** against the source when the citations are written: UCERF3's 33 % for
-  the Hayward fault, USGS's 7–10 % for New Madrid, the SSA "more than 1 in 4" disability figure,
+  the Hayward fault, USGS's 7–10 % for New Madrid, the SSA "1 in 4" disability figure (checked 2026-09-26: the source says 1 in 4, not "more than"),
   the one-third major share of landfalling hurricanes, and the 1 % burglary prior.
 
 ## Consequences and targets
@@ -585,7 +602,13 @@ big windstorms, grid failure, Cascadia).
 - **Power (EAGLE-I).** With `OutageStats`, county-wide storm outages happen at the county's
   measured rate (`events_per_customer_year`) with its measured duration curve: a curve through the
   median, the 90th percentile and `p_ge_1d/3d/7d/14d`, linear in (ln d, normal score), so a
-  log-normal fit is reproduced exactly and the tail follows the county's own shares. The rate is
+  log-normal fit is reproduced exactly and the tail follows the county's own shares. Two bounds
+  (verification V-01, 2026-09-26): the first zero share past the last positive one is an upper
+  bound of 0.5 % at that length (no customer outage that long was recorded), not a missing point;
+  and beyond the last point the curve decays at least as fast as a log-normal with σ = 2. Without
+  them a small county's three points ran on to a year (Eddy County, North Dakota: longest recorded
+  event 62 hours, power target 365 days; now 5), and 88 counties were told to prepare for a year
+  without power. The rate is
   split between the storm hazards in proportion to their short-outage rates, for the
   contributions. Without records, county-wide outages are a third of short storm outages at 2 h /
   20 h (the Philadelphia fit, prior). Recorded in `overrides`; `ornl_eagle_i_outages` joins the
@@ -650,7 +673,7 @@ For every duration bucket, Λ_b(d) = Σ r_h · q_{h,b} · S_{h,b}(d) (thresholds
   warning among causes with at least 5 % of the rate) and the typical days away (median of the
   time-away mixture, on the ladder). `get_home` gives each commuter's walk and water. Tier `h72`
   when P_need ≥ 2 % (prior), else `now`. `home_loss`: the ten-year displacement chance and the
-  Household Pulse shares (a third back within a week, 12 % out over six months, 1 in 4 renters and
+  Household Pulse shares (most back within a month; 1 in 4 renters and
   1 in 10 owners never back).
 - **Tier enough**: the smallest tier whose days cover the ladder target; income `m3`.
 
@@ -763,7 +786,10 @@ counts should lower it). The Coos Bay fixture (well, Cascadia on; its own dial i
 1 in 100 gets power 14 d, water 90 d (its drought rate and ordinary 0.1 g earthquakes add to the
 research's classes), food 21 d, medicine 30 d. Miami's targets (3 weeks of power, a month of
 water) come from the major-hurricane scenario at about 0.1 a year; Hays, Kansas (well) gets 2
-months of water from the well-drought prior. Each household's rates are listed in the report.
+months of water from the well-drought prior. Each household's rates are listed in the report. *(Verification, 2026-09-26: this paragraph describes the earlier one-third major share. With the
+share taken against tropical-storm passages, Philadelphia's power target is 3 days on the data
+pack, as the research gives, and Miami's major-hurricane scenario runs at 0.037 a year: power 2
+weeks, tap water 3 weeks.)*
 
 ### Decisions and open questions
 

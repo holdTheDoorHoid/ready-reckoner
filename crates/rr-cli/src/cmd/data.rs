@@ -2,8 +2,9 @@
 //!
 //! `verify` runs the checks the data layer owns: the store's (every file the manifest lists
 //! loads by its manifest path, matches its sha256 and parses, and its row count matches the
-//! manifest) and the ETL's (`rr_etl::verify`: checksums, row counts, every county joins across
-//! every pack or is listed as missing with a reason, the Connecticut crosswalk, ZIP shares), then
+//! manifest) and the ETL's (`rr_data::verify`, the checks `rr-etl verify` runs: checksums, row
+//! counts, every county joins across every pack or is listed as missing with a reason, the
+//! Connecticut crosswalk, ZIP shares), then
 //! checks that every fixture household's location resolves. `info` prints the pack version,
 //! when each source was retrieved, and the attributions the app and the packet must show.
 
@@ -106,8 +107,8 @@ fn verify(data: &DataArgs) -> Result<Output, CliError> {
         }
     }
 
-    // 2. The ETL's own checks on the files.
-    match rr_etl::verify::verify(&dir) {
+    // 2. The ETL's own checks on the files (`rr_data::verify`, shared with `rr-etl verify`).
+    match rr_data::verify::verify(&dir) {
         Ok(rep) => {
             s.push_str(&format!(
                 "  {}  rr-etl verify: {} files, {} checks, {} problem{}\n",

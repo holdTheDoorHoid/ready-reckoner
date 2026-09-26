@@ -44,9 +44,11 @@ fn the_bucket_explanation_shows_lambda_at_the_target_and_the_value_integral() {
         .explain(ExplainKind::Bucket, "power", &input)
         .unwrap();
     let math = e.math.unwrap().join("\n");
-    assert!(math.contains("Λ(5) ="), "{math}");
-    assert!(math.contains("∫₀^5 Λ(t) dt"), "{math}");
-    assert!(math.contains("1 in 100: 5 days"), "{math}");
+    // Philadelphia's power target is 3 days (research: 2.8), since the major-hurricane share
+    // is taken against tropical-storm passages (verification V-02).
+    assert!(math.contains("Λ(3) ="), "{math}");
+    assert!(math.contains("∫₀^3 Λ(t) dt"), "{math}");
+    assert!(math.contains("1 in 100: 3 days"), "{math}");
     let hazard = engine()
         .explain(ExplainKind::Hazard, "heat_wave", &input)
         .unwrap();

@@ -49,7 +49,7 @@ Nearly every household like yours will go through a heat wave in a ten-year stre
 
 **What to avoid.** Do not rely on a fan when it is over 90°F indoors. It can make you hotter.[4] Never leave people or pets in a closed car on a warm day. Heat stroke is an emergency. Signs include a body temperature above 103°F, hot, red, dry skin, a fast pulse and confusion. Call 911.[5]
 
-**What it can do:** no power and dangerous heat or cold at home. **How bad:** Minor. **How sure:** Based on data.
+**What it can do:** no power and dangerous heat or cold at home. **How bad:** Serious. **How sure:** Based on data.
 
 #### 2. Medical emergency
 
@@ -65,9 +65,9 @@ Of 100 households like yours, about 99 will have someone need emergency care in 
 
 Of 100 households like yours, about 98 (68 to nearly all) will lose power or have damage in a windstorm in the next ten years.[2, 15]
 
-**What helps.** Pick your shelter spot now. A safe room or storm shelter is best. The next best is a small, windowless room or basement on the lowest floor of a sturdy building.[16] Sign up for your community's warnings, and learn what your sirens sound like.[16] Know the signs of a tornado: a rotating funnel cloud, a cloud of debris, or a roar like a freight train. In your shelter, protect your head and neck with your arms, and pile blankets or cushions around you.[16] When thunder roars, go indoors. Get into a building or a car with a roof.[17]
+**What helps.** Pick your shelter spot now. A safe room or storm shelter is best. The next best is a small, windowless room or basement on the lowest floor of a sturdy building.[16] Sign up for your community's warnings, and learn what your sirens sound like.[16] When thunder roars, go indoors. Get into a building or a car with a roof.[17]
 
-**What to avoid.** Stay away from windows, doors and outside walls.[16] There is no safe place in a car during a tornado, only less dangerous ones. If you are caught, stay buckled in and keep your head below the windows.[16] During a thunderstorm, avoid running water and electronics plugged into the wall.[17]
+**What to avoid.** Stay away from windows, doors and outside walls.[16] During a thunderstorm, avoid running water and electronics plugged into the wall.[17]
 
 **What it can do:** no power, no phone, internet or card payments and damage to the home. **How bad:** Minor. **How sure:** Rough data.
 
@@ -115,7 +115,7 @@ Of 100 households like yours, about 78 (39–98) will be stranded away from home
 | Death or disability of an earner | about 9 of 100[15, 43, 44] | Very severe | Mostly data |
 | Drought | about 8 of 100[3, 15, 45] | Moderate | Rough data |
 | Winter storm | about 8 of 100[2, 15] | Minor | Rough data |
-| Hurricane | about 7 of 100[15, 45, 46, 47] | Minor | Mostly data |
+| Hurricane | about 6 of 100[15, 45, 46, 47] | Minor | Mostly data |
 | House fire | about 5 of 100[15, 48] | Severe | Mostly data |
 | Regional blackout | about 5 of 100[15] | Moderate | Expert estimate |
 | Wildfire | about 3 of 100[3, 15, 45] | Moderate | Rough data |
@@ -131,7 +131,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 
 | What | How likely | How bad |
 | --- | --- | --- |
-| Nuclear attack | Experts' estimates of a worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[52, 53] | Very severe |
+| Nuclear attack | Forecasters asked in 2024 put the chance of a nuclear catastrophe (10 million or more deaths worldwide) before 2045 at 1 to 5 in 100. Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live. The first 24 hours of sheltering inside are covered by your basic supplies.[52, 53] | Very severe |
 | Terrorist attack | An attack that disrupts daily life where you live is rare: expert estimates range from about 1 in 10,000 to about 1 in 1,000 a year.[15] | Very severe |
 
 **What helps.** Get inside, stay inside, stay tuned.[53] Go to a basement or the middle of a large brick or concrete building. Stay there for 24 hours unless there is a fire or another immediate danger, or officials say it is safe to leave. Radiation levels drop fast during the first 24 hours.[53] Turn off fans and air conditioning that pull in outside air.[54] If you were outside, take off your outer layer of clothing. That can remove up to 90% of radioactive material. Then wash with soap and water.[54] If you live near a nuclear power plant, learn whether you are in its planning zone.[51]
@@ -148,6 +148,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 - Earthquakes, tsunamis and volcanoes, and risks such as job loss, house fires and pandemics, are not changed for 2050.
 - How often these will happen by 2050 is unclear, so they are left as today: hailstorms, landslides, lightning strikes, windstorms and tornadoes.
 - A nuclear power plant is within 50 miles (80 km), the zone where food and water may be checked; potassium iodide matters only inside the 10-mile zone and is handed out by the authorities.
+- Heat waves are marked Serious for this household because someone in it relies on a powered medical device; they are most dangerous for households like yours.
 
 ## Your targets
 
@@ -159,7 +160,7 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. Someth
 | Tap water must be treated | about 5 days (2–10) | not known | not known | two weeks |
 | No tap water at all | about 3 days (2–10) | not known | not known | three days |
 | Can't get to a store | about 10 days (7 days to 3 weeks) | not known | not known | two weeks |
-| Dangerous heat or cold indoors | about 3 days (2–7) | not known | not known | three days |
+| Dangerous heat or cold indoors | about 3 days (2–5) | not known | not known | three days |
 | Medication and medical-supply continuity | about 2 weeks (10 days to 1 month) | not known | not known | two weeks |
 | No phone, internet or card payments | about 3 days (1–7) | not known | not known | three days |
 
@@ -187,7 +188,7 @@ The range in brackets shows where the target could sit when the inputs behind it
 
 **What helps.** See "Supply chain disruption" under Your risks.
 
-### Dangerous heat or cold indoors: about 3 days (2–7)
+### Dangerous heat or cold indoors: about 3 days (2–5)
 
 **What helps.** Agree who checks on whom, especially older neighbours and anyone who lives alone.[4, 34] In heat, go where there is air conditioning. Dial 2-1-1 to find one.[4] Cover windows with drapes or shades.[5] In cold, close off rooms you don't need, stuff towels under doors, and cover windows with blankets at night. Have extra blankets, sleeping bags and warm coats.[34] Babies under one year old should never sleep in a cold room.[34]
 
@@ -267,10 +268,10 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 - Set aside $20 toward **backup battery for a powered medical device**.
 - [ ] **Heavy trash bags for the toilet bucket**: 2 bags, about under $1 (usually free). Adds 1 day of emergency toilet supplies for 1 person, bringing you to 2 of the 3-day goal.
 - [ ] **Extra toilet paper**: 2 rolls, about $2 (usually $1–2). Adds 10 days of toilet paper for 1 person, which completes the 10-day goal.
-- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3). Gets you ready for leaving home in a hurry.
+- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3). Gets you ready for leaving home quickly.
 - [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 4 days of one person's medicine, about $3 (usually $2–5). Adds 4 days of medicine, bringing you to 7 of the 14-day goal.
 - [ ] **Period products for two cycles**: 1 cycle's supply, about $6 (usually $4–7). Adds 10 days of period products, which completes the 10-day goal.
-- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home in a hurry.
+- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home quickly.
 
 ### Month by month
 
@@ -450,7 +451,7 @@ Fill this in together, and keep a copy in each go-bag and one on the fridge. Wri
 
 ### Leaving home: triggers and routes
 
-About 15 of 100 households like yours have to leave home quickly at least once in 10 years. Warning can be 1 minute to 3 days ahead. Plan to be away for about 2 days.[3, 15, 23, 40, 45, 46, 47, 48, 49]
+About 15 of 100 households like yours have to leave home quickly at least once in 10 years. Warning can be 1 minute to 2 hours ahead. Plan to be away for about 2 days.[3, 15, 23, 40, 45, 46, 47, 48, 49]
 
 - **Plan how you would leave: zone, routes, destination and triggers.** Look up your evacuation zone and routes on your state and county emergency management websites, mark two routes on a paper map, and pick where you would go, pet-friendly if you have pets (Ready.gov). For each likely hazard, write a go-or-stay card and an if-then trigger, such as 'If our zone gets an evacuation warning, we leave within 30 minutes.' Plans written in if-then form make people more likely to follow through.[24, 32, 79, 101, 102, 103, 104, 105]
 - **Keep your vehicle ready: half a tank, a charged battery, a good spare.** Keep at least half a tank of gas at all times and a full tank when an evacuation looks likely (Ready.gov); if you drive an electric car, keep it charged through storm season and pick destinations within its range (Hillsborough County, Florida). Check the spare tire with the others each month, and keep a phone charging cable in the car (NHTSA). Run the engine only outdoors, never in a garage (CDC).[31, 32, 33, 35, 36, 59, 90, 106]
@@ -511,7 +512,7 @@ Of 100 households like yours, about 20 (10–40) will have an income gap of more
 
 ### Medicine
 
-- 1 person takes prescription medicine every day: keep 14 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration many states let pharmacies give an emergency refill of up to 30 days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[15, 23, 41, 42, 45, 46, 47, 48, 69, 70, 71, 72, 120]
+- 1 person takes prescription medicine every day: keep 14 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[15, 23, 41, 42, 48, 69, 70, 71, 72, 120]
 
 - **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[10, 12, 14, 24, 69, 72, 73, 99, 120]
 
@@ -587,7 +588,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **131** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx **132** Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
 
-41 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+40 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

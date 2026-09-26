@@ -938,13 +938,14 @@ fn home_loss_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, HomeLossDetail) {
     };
     let mut sentences = vec![readiness_sentence(ctx, bucket, r, lo, hi)];
     sentences.push(format!(
-        "After a disaster, about 1 in 3 displaced households are back within a week, but about 1 in {} {} never return, so insurance and copies of documents matter more than supplies here.",
+        "After a disaster, most displaced households are back within a month, but about 1 in {} {} never return, so insurance and copies of documents matter more than supplies here.",
         words::round_nice(1.0 / never),
         if renter { "renters" } else { "homeowners" }
     ));
     sentences.extend(coupling_sentences(ctx, bucket));
+    // "Most back within a month" and "never return" are both from the Household Pulse report
+    // (`census_pulse_displacement`: 56 % of renters and 71 % of owners back in under a month).
     sources.extend(prm.never_return_renter.sources.iter().cloned());
-    sources.extend(prm.displaced_back_within_week.sources.iter().cloned());
     let target = Target::Readiness {
         p_need_10yr: p,
         done: 0,
@@ -1344,10 +1345,11 @@ fn cliff_warnings(ctx: &Ctx<'_>, details: &[BucketDetail]) -> Vec<Warning> {
             })
             .collect();
         let toggle = match owner {
-            Owner::Scenario(_) => {
-                " You can turn it off to see the plan without it; long outages are better met with ways to make water safe and stay warm than with bigger stockpiles."
-            }
-            Owner::Hazard(_) => "",
+            Owner::Scenario(_) => format!(
+                " You can turn it off to see the plan without it; {}",
+                capability_advice(d.bucket)
+            ),
+            Owner::Hazard(_) => String::new(),
         };
         out.push(Warning {
             id: format!("cliff_{}", d.bucket),
@@ -1364,6 +1366,32 @@ fn cliff_warnings(ctx: &Ctx<'_>, details: &[BucketDetail]) -> Vec<Warning> {
         });
     }
     out
+}
+
+/// The long-tail advice of a scenario cliff (DESIGN §4.4: capabilities over stockpiles), in the
+/// words of the bucket it is about, so a phone or medicine warning never talks about water.
+fn capability_advice(bucket: BucketId) -> &'static str {
+    match bucket {
+        BucketId::WaterOut | BucketId::WaterBoil => {
+            "a long outage is better met with a way to make water safe, such as a filter and a nearby water source, than with ever more stored water."
+        }
+        BucketId::Power => {
+            "a long outage is better met with ways to stay warm or cool, keep medicine cold and charge phones than with ever more fuel."
+        }
+        BucketId::Thermal => {
+            "a long spell is better met with one room you can keep warm or cool, warm layers and a place to go than with stored fuel."
+        }
+        BucketId::Supplies => {
+            "a long stretch is better met with staples you already eat and rotate, and with neighbours who share, than with ever bigger stockpiles."
+        }
+        BucketId::Medication => {
+            "a long gap is better met by asking the prescriber about an emergency supply and early refills than by stockpiling alone."
+        }
+        BucketId::Comms => {
+            "a long outage is better met with a battery or hand-crank radio, a way to charge phones and meeting places agreed in advance than with more gear."
+        }
+        _ => "a long disruption is better met with skills and plans than with bigger stockpiles.",
+    }
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1487,4 +1515,28 @@ fn statement(
         ));
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cliff_advice_speaks_about_its_own_bucket() {
+        for b in [
+            BucketId::Power,
+            BucketId::Thermal,
+            BucketId::Supplies,
+            BucketId::Medication,
+            BucketId::Comms,
+        ] {
+            let a = capability_advice(b);
+            assert!(!a.contains("water"), "{b}: {a}");
+        }
+        for b in [BucketId::WaterOut, BucketId::WaterBoil] {
+            assert!(capability_advice(b).contains("make water safe"));
+        }
+        assert!(capability_advice(BucketId::Comms).contains("radio"));
+        assert!(capability_advice(BucketId::Medication).contains("prescriber"));
+    }
 }

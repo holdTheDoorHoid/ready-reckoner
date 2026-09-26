@@ -208,9 +208,26 @@ pub(crate) fn natural_frequency(f: Frequency, verb: &str) -> String {
     if f.rate >= 1.0 {
         // "Nearly every household" hides how often; say it.
         s.pop();
-        s.push_str(&format!(" (about {} times a year).", sig2(f.rate)));
+        s.push_str(&format!(" ({}).", about_times_a_year(f.rate)));
     }
     s
+}
+
+/// A yearly rate in words: "about 2.4 times a year", "about once a year" (never "about 1 times
+/// a year"), "about once every 3 years".
+pub(crate) fn about_times_a_year(rate: f64) -> String {
+    if rate >= 1.05 {
+        format!("about {} times a year", sig2(rate))
+    } else if rate >= 0.75 {
+        "about once a year".to_owned()
+    } else if rate > 0.0 {
+        format!(
+            "about once every {} years",
+            thousands((1.0 / rate).round().max(2.0) as u64)
+        )
+    } else {
+        "never".to_owned()
+    }
 }
 
 /// A range-only sentence for a rare catastrophe (research §6.3): never a point estimate.
@@ -304,6 +321,17 @@ mod tests {
     }
 
     #[test]
+    fn about_once_a_year_not_1_times() {
+        let s = natural_frequency(freq(1.03, 0.8, 1.3, false), "go through a cold wave");
+        assert!(s.ends_with("(about once a year)."), "{s}");
+        assert!(!s.contains("1 times"), "{s}");
+        assert_eq!(about_times_a_year(2.44), "about 2.4 times a year");
+        assert_eq!(about_times_a_year(1.0), "about once a year");
+        assert_eq!(about_times_a_year(0.83), "about once a year");
+        assert_eq!(about_times_a_year(0.3), "about once every 3 years");
+    }
+
+    #[test]
     fn ranges_with_words() {
         let s = natural_frequency(freq(0.003, 0.0001, 0.2, true), "x");
         assert_eq!(
@@ -332,14 +360,14 @@ mod tests {
     #[test]
     fn rare_catastrophe_range_sentence() {
         let s = range_only(
-            "Experts' estimates of a worldwide nuclear catastrophe range from",
+            "Spread over those years, that is",
             1.0 / 2000.0,
             1.0 / 400.0,
             " No reliable estimate exists for effects where you live.",
         );
         assert_eq!(
             s,
-            "Experts' estimates of a worldwide nuclear catastrophe range from about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live."
+            "Spread over those years, that is about 1 in 2,000 to about 1 in 400 a year. No reliable estimate exists for effects where you live."
         );
     }
 }

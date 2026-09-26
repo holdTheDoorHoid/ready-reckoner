@@ -72,8 +72,8 @@ pub const NHAMCS_ED: &str = "cdc_nchs_ed_visits";
 pub const NHTSA_CRASHES: &str = "nhtsa_crashes_2023";
 /// CDC NCHS FastStats, accidental injury deaths: 58.1 per 100,000 people (2024).
 pub const NCHS_ACCIDENTS: &str = "nchs_accidental_injury_2024";
-/// Social Security Administration disability facts: more than 1 in 4 of today's 20-year-olds will
-/// become disabled before reaching full retirement age.
+/// Social Security Administration disability facts: a 20-year-old worker has a 1-in-4 chance of
+/// becoming disabled before reaching full retirement age.
 pub const SSA_DISABILITY: &str = "ssa_disability_facts";
 /// CDC pandemic history (1918, 1957, 1968, 2009) plus COVID-19: five pandemics in 108 years.
 pub const CDC_PANDEMICS: &str = "cdc_pandemic_history";

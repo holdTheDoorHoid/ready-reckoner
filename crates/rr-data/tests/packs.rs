@@ -375,6 +375,8 @@ fn base_rates_carry_sources_and_match_the_research() {
 fn attributions_include_required_credit_lines() {
     let s = store();
     let a = s.attributions();
+    // The NRI statement comes first, so no caller has to reorder (its terms require it shown).
+    assert_eq!(a[0].source, "FEMA National Risk Index");
     let nri = a
         .iter()
         .find(|x| x.source == "FEMA National Risk Index")

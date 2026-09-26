@@ -19,6 +19,9 @@ mod location;
 pub mod manifest;
 mod search;
 mod table;
+// Checks a data directory on disk (checksums, row counts, joins): native builds only.
+#[cfg(not(target_arch = "wasm32"))]
+pub mod verify;
 
 pub use climate::{CLIMATE_CLAMP, variables_for};
 pub use location::AMBIGUOUS_ZIP_SHARE;
@@ -929,13 +932,17 @@ impl DataStore {
         &self.map_ids
     }
 
-    /// Credit lines and disclaimers the app must show (from the manifest), sorted by source.
+    /// Credit lines and disclaimers the app must show (from the manifest): the FEMA National Risk
+    /// Index statement first (its terms require the dataset version, the access date and the
+    /// "not endorsed by FEMA" statement; the About screen and the packet show it first), then the
+    /// others in the manifest's order. Callers need not reorder.
     pub fn attributions(&self) -> Vec<Attribution> {
         let Some(m) = &self.manifest else {
             return Vec::new();
         };
         let fallback = Date::parse(m.generated.get(..10).unwrap_or("")).ok();
-        m.attributions
+        let mut out: Vec<Attribution> = m
+            .attributions
             .iter()
             .filter_map(|a| {
                 let accessed = Date::parse(&a.accessed).ok().or(fallback)?;
@@ -947,7 +954,10 @@ impl DataStore {
                     accessed,
                 })
             })
-            .collect()
+            .collect();
+        // A stable sort on "is it the NRI statement" keeps the rest in the manifest's order.
+        out.sort_by_key(|a| !a.source.contains("National Risk Index"));
+        out
     }
 }
 

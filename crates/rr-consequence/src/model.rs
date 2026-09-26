@@ -379,17 +379,48 @@ fn event_override<'e>(
     })
 }
 
+/// A share of 0 in a county's outage record bounds the curve there: no customer outage that long
+/// was recorded, so the curve may not pass above this share at that length (half a percent of
+/// customer outages, about the resolution of a small county's record: Eddy County, North Dakota,
+/// has 21 events). Without it the zero is only "not seen", and the curve through the shorter
+/// points ran on to a year (verification V-01).
+pub const ZERO_SHARE_BOUND: f64 = 0.005;
+
 /// The survival curve from county outage statistics, or `None` if they are unusable.
 pub(crate) fn outage_curve(stats: &OutageStats) -> Option<(Survival, usize)> {
-    let pts = [
-        (f64::from(stats.median_hours) / 24.0, 0.5),
-        (f64::from(stats.p90_hours) / 24.0, 0.1),
+    let shares = [
         (1.0, f64::from(stats.p_ge_1d)),
         (3.0, f64::from(stats.p_ge_3d)),
         (7.0, f64::from(stats.p_ge_7d)),
         (14.0, f64::from(stats.p_ge_14d)),
     ];
-    EmpiricalCurve::from_points(&pts).map(|(c, dropped)| (Survival::Empirical(c), dropped))
+    let mut pts = vec![
+        (f64::from(stats.median_hours) / 24.0, 0.5),
+        (f64::from(stats.p90_hours) / 24.0, 0.1),
+    ];
+    pts.extend(shares);
+    let (curve, dropped) = EmpiricalCurve::from_points(&pts)?;
+    // The first length past every positive share at which the record has none.
+    let last_positive = pts
+        .iter()
+        .filter(|(d, s)| d.is_finite() && *d > 0.0 && *s > 0.0 && *s < 1.0)
+        .map(|(d, _)| *d)
+        .fold(0.0_f64, f64::max);
+    let first_zero = shares
+        .iter()
+        .filter(|(d, s)| *d > last_positive && *s == 0.0)
+        .map(|(d, _)| *d)
+        .fold(f64::INFINITY, f64::min);
+    if first_zero.is_finite() && curve.sf(first_zero) > ZERO_SHARE_BOUND {
+        for p in &mut pts {
+            if p.0 == first_zero {
+                p.1 = ZERO_SHARE_BOUND;
+            }
+        }
+        return EmpiricalCurve::from_points(&pts)
+            .map(|(c, dropped)| (Survival::Empirical(c), dropped));
+    }
+    Some((Survival::Empirical(curve), dropped))
 }
 
 fn default_factor(table: &EffectsTable, evidence: Evidence, what: ParamWhat) -> f64 {
@@ -1434,4 +1465,48 @@ fn income_terms(
         });
     }
     (out, fallback)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn stats(p: [f32; 4], median_hours: f32, p90_hours: f32) -> OutageStats {
+        OutageStats {
+            events_per_customer_year: 1.9,
+            p_ge_1d: p[0],
+            p_ge_3d: p[1],
+            p_ge_7d: p[2],
+            p_ge_14d: p[3],
+            median_hours,
+            p90_hours,
+            years_covered: "2020-2025".to_owned(),
+            event_definition: String::new(),
+        }
+    }
+
+    #[test]
+    fn a_zero_share_bounds_the_curve_where_the_record_ends() {
+        // Eddy County, North Dakota (21 events): nothing recorded at 3 days or more. The curve
+        // may not sit above half a percent there, so the 1-in-100 outage stays near the record
+        // (it ran on to 365 days when the zeros were only "not seen").
+        let (curve, _) = outage_curve(&stats([0.1375, 0.0, 0.0, 0.0], 1.0, 61.5)).unwrap();
+        assert!(curve.sf(3.0, 0.0) <= ZERO_SHARE_BOUND + 1e-12);
+        assert!(curve.sf(7.0, 0.0) < 1e-4, "{}", curve.sf(7.0, 0.0));
+        // Philadelphia: 0.18 % at 3 days is already below the bound, so its zeros change
+        // nothing (the curve is the one the positive points give).
+        let phl = stats([0.09841, 0.001794, 0.0, 0.0], 5.0, 23.75);
+        let (with, _) = outage_curve(&phl).unwrap();
+        let pts = [
+            (5.0 / 24.0, 0.5),
+            (23.75 / 24.0, 0.1),
+            (1.0, f64::from(0.09841_f32)),
+            (3.0, f64::from(0.001794_f32)),
+        ];
+        let (plain, _) = EmpiricalCurve::from_points(&pts).unwrap();
+        let plain = Survival::Empirical(plain);
+        for d in [0.5, 1.0, 3.0, 7.0, 14.0] {
+            assert!((with.sf(d, 0.0) - plain.sf(d, 0.0)).abs() < 1e-12, "{d}");
+        }
+    }
 }

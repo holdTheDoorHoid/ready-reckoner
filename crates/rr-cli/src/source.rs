@@ -208,19 +208,6 @@ pub fn load_dir(dir: &Path) -> Result<Source, CliError> {
     })
 }
 
-/// The pack's attributions with the National Risk Index statement first, as
-/// `CountySource::attributions` promises (the store sorts them by source name).
-fn nri_first(mut v: Vec<Attribution>) -> Vec<Attribution> {
-    if let Some(i) = v
-        .iter()
-        .position(|a| a.source.contains("National Risk Index"))
-    {
-        let nri = v.remove(i);
-        v.insert(0, nri);
-    }
-    v
-}
-
 impl CountySource for Source {
     fn county(&self, fips: &str) -> Option<&CountyRecord> {
         match self {
@@ -253,7 +240,8 @@ impl CountySource for Source {
     fn attributions(&self) -> Vec<Attribution> {
         match self {
             Source::Fixtures(f) => CountySource::attributions(f),
-            Source::Pack { store, .. } => nri_first(store.attributions()),
+            // The store puts the National Risk Index statement first.
+            Source::Pack { store, .. } => store.attributions(),
         }
     }
 

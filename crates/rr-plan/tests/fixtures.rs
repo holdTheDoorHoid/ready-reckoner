@@ -146,6 +146,11 @@ fn the_packet_has_every_section_in_order_and_nothing_left_over() {
             !p.contains('\u{1}') && !p.contains('\u{2}'),
             "{name}: citation marker left"
         );
+        assert!(
+            !p.contains(rr_content::policy::CONDITION_OPEN)
+                && !p.contains(rr_content::policy::CONDITION_CLOSE),
+            "{name}: conditional marker left"
+        );
         assert!(!p.contains("[^"), "{name}: footnote reference left");
         // Markdown only: nothing that could be an HTML tag.
         let bytes = p.as_bytes();
@@ -414,8 +419,9 @@ fn targets_come_from_consequence_and_tiers_from_supply() {
 }
 
 /// `docs/RISK_MODEL.md` § "End to end with rr-hazards' rates": Philadelphia at the default dial
-/// gets power 5 d, boil-water 7 d, no tap water 3 d, food 10 d, heat or cold 3 d, medicine 14 d,
-/// phone 2 d, income 4 months; two weeks is enough.
+/// gets power 3 d (the research's 2.8; 5 before the major-hurricane share was taken against
+/// tropical-storm passages, verification V-02), boil-water 7 d, no tap water 3 d, food 10 d, heat
+/// or cold 3 d, medicine 14 d, phone 2 d, income 4 months; two weeks is enough.
 #[test]
 fn philadelphia_targets_match_the_risk_model_report() {
     let (_, _, out) = outputs()
@@ -427,7 +433,7 @@ fn philadelphia_targets_match_the_risk_model_report() {
         Target::Months { value, .. } => value,
         _ => f32::NAN,
     };
-    assert_eq!(days(BucketId::Power), 5.0);
+    assert_eq!(days(BucketId::Power), 3.0);
     assert_eq!(days(BucketId::WaterBoil), 7.0);
     assert_eq!(days(BucketId::WaterOut), 3.0);
     assert_eq!(days(BucketId::Supplies), 10.0);
@@ -469,4 +475,29 @@ fn duration_buckets_the_plan_covers_reach_their_targets() {
             }
         }
     }
+}
+
+#[test]
+fn family_blocks_keep_only_the_hazards_that_apply_here() {
+    let packet = |name: &str| {
+        outputs()
+            .iter()
+            .find(|(n, _, _)| *n == name)
+            .map(|(_, _, o)| o.packet_markdown.clone())
+            .unwrap()
+    };
+    // Philadelphia: avalanches and tsunamis do not reach a rowhouse, so the cold-wave card says
+    // nothing about beacons and no earthquake advice mentions the shore.
+    let phl = packet("philadelphia-renters-4");
+    assert!(
+        !phl.contains("avalanche"),
+        "avalanche advice in Philadelphia"
+    );
+    assert!(!phl.contains("walk to high ground"));
+    // Coos Bay, in a tsunami zone: the earthquake card keeps the tsunami steps.
+    let coos = packet("coos-bay-well-owner-2");
+    assert!(
+        coos.contains("walk to high ground or inland"),
+        "tsunami steps missing"
+    );
 }

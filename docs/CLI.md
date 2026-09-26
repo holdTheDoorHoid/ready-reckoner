@@ -111,7 +111,7 @@ $ rr risks --household philadelphia-renters-4
 Ranked, most important first (29 hazards)
 
   #  Hazard                              Next 10 years        Per year (range)             How bad      How sure
-  1  Heat wave                           almost all           4.5 (3.4–5.8)                Minor        Based on data
+  1  Heat wave                           almost all           4.5 (3.4–5.8)                Serious      Based on data
      Nearly every household like yours will go through a heat wave in the next ten years (about 4.5
      times a year).
      Sources: noaa_storm_events
@@ -136,11 +136,11 @@ and any warning that one event drives the answer.
 $ rr targets --household philadelphia-renters-4
 ...
  Need                                      Be ready for                        Plan covers  Help arrives  Mostly back   Enough at
- No grid power at home                     about 5 days (3–7)                  5 days       about 3 days  about 5 days  two weeks
-       Of 100 households like yours, about 35 (30–60) will lose grid power for a day or more in the
+ No grid power at home                     about 3 days (up to 7 days)         3 days       about 3 days  about 5 days  three days
+       Of 100 households like yours, about 35 (30–55) will lose grid power for a day or more in the
        next 10 years.
 ...
-       Driven by: Hurricane 70%, Strong wind 12%, Heat wave 8%, Cold wave 4%
+       Driven by: Hurricane 65%, Strong wind 14%, Heat wave 9%, Cold wave 5%
 ```
 
 `--sweep` runs the engine at every dial setting and shows the targets side by side, with what each
@@ -166,8 +166,8 @@ Days to be ready for (income in months), with the range in brackets. * marks the
 
  Worse, of 100 ten-year stretches          65           20            10             2
  Enough for this household                 two weeks    one month     three months   one year
- Plan done by month                        9            11            14             21
- Purchases in the plan                     $1,745       $2,106        $2,504         $3,563
+ Plan done by month                        4            6             9              15
+ Purchases in the plan                     $1,076       $1,386        $1,755         $2,634
 ...
 ```
 
@@ -188,12 +188,12 @@ that would work, closest first.
 $ rr explain bucket power --household philadelphia-renters-4
 No grid power at home
 
-Be ready for about 5 days (3–7) (two weeks is enough for this need).
+Be ready for about 3 days (up to 7 days) (three days is enough for this need).
 ...
 The arithmetic
   - Λ(d) = Σ r_h · q_h,b · S_h,b(d): disruptions a year lasting longer than d days. Dial rate Λ* =
     0.01054 a year (about 1 in 100).
-  - Design duration: the smallest d with Λ(d) ≤ Λ* is 3.27 days; on the day ladder 5 days (10th to
+  - Design duration: the smallest d with Λ(d) ≤ Λ* is 3.01 days; on the day ladder 3 days (10th to
     90th percentile 3 to 7).
 ...
 
@@ -266,9 +266,10 @@ rr data info
 ```
 
 `verify` runs the data layer's own checks: the store's (every file loads by its manifest path,
-matches its sha256 and parses; row counts match the manifest), then `rr-etl verify`'s (every county
-joins across every pack or is listed as missing with a reason, the Connecticut crosswalk, ZIP
-shares), then that every fixture household resolves to a county. On the fixtures it says
+matches its sha256 and parses; row counts match the manifest), then the checks `rr-etl verify`
+runs (`rr_data::verify`, so `rr` needs no network stack: every county joins across every pack or
+is listed as missing with a reason, the Connecticut crosswalk, ZIP shares), then that every
+fixture household resolves to a county. On the fixtures it says
 `no data pack; fixture counties in use` and checks those instead.
 
 ```
