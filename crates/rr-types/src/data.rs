@@ -67,8 +67,9 @@ pub struct CountyRecord {
     /// Social vulnerability measures.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub vulnerability: Option<Vulnerability>,
-    /// Data pack v2 exposure columns (strategic class, smoke, levees, karst, ...); empty when
-    /// the pack predates them. awaiting: types2 (DESIGN-DELTA §1.3 `Exposure`).
+    /// Data pack v2 exposure columns (strategic class, smoke, levees, karst, ...) for the hazard
+    /// and consequence crates; empty when the pack predates them. The app's copy is
+    /// `LocationResolved.exposure`.
     #[serde(default, skip_serializing_if = "CountyExposure::is_empty")]
     pub exposure: CountyExposure,
 }
