@@ -331,3 +331,49 @@ fn coverage_today_follows_what_the_household_has_done() {
         }
     }
 }
+
+/// The packet's "Spend" (verification V-18): a month's money out counts a deposit once and a
+/// purchase paid from savings only for the rest, so it never exceeds the month's budget plus what
+/// earlier months left unspent, and never more than the month's lines add up to.
+#[test]
+fn a_months_spend_never_exceeds_its_budget_plus_what_earlier_months_left() {
+    for (name, input) in rr_types::fixtures::all() {
+        let a = common::run(&input);
+        let (mut budget, mut spent) = (0.0_f64, 0.0_f64);
+        for m in &a.budget.plan.months {
+            budget += f64::from(m.budget_usd);
+            let s = a.month_spend(m.index);
+            assert!(
+                spent + s <= budget + 0.01,
+                "{name} month {}: spends {s:.2} with {:.2} available",
+                m.index,
+                budget - spent
+            );
+            spent += s;
+            let lines: f64 = m
+                .items
+                .iter()
+                .filter(|i| !i.done && i.kind != PlanItemKind::FreeAction)
+                .map(|i| f64::from(i.est_cost_usd))
+                .sum();
+            assert!(s <= lines + 1e-6, "{name} month {}", m.index);
+        }
+    }
+    // Philadelphia, month 14: the last $30 toward the cash reserve and the $100 it buys ($90
+    // of it saved) are $40 of that month's $60, not $130.
+    let a = common::run(&household("philadelphia-renters-4"));
+    assert!(
+        (a.month_spend(14) - 40.0).abs() < 0.01,
+        "{}",
+        a.month_spend(14)
+    );
+    assert!(a.input.finances.monthly_budget_usd >= 40.0);
+    let packet = assess(&household("philadelphia-renters-4")).packet_markdown;
+    assert!(
+        packet.contains(
+            "| 14 (December 2027) | save toward cash in small bills; Cash in small bills: $100, \
+             $90 of it from savings | $40 |"
+        ),
+        "the table row"
+    );
+}

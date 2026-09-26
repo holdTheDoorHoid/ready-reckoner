@@ -92,6 +92,38 @@ impl Assessment {
             .map_or(0.0, |p| p.rate_per_year)
     }
 
+    /// What the purchases of `item` in `month` drew from savings: money set aside in earlier
+    /// months (and the month's own deposit toward it).
+    pub fn from_savings(&self, month: u16, item: &ItemId) -> f64 {
+        self.budget
+            .sequence
+            .iter()
+            .filter(|p| p.month == month && p.item_id == *item)
+            .map(|p| p.from_savings_usd)
+            .sum()
+    }
+
+    /// The money that leaves a month's budget (the packet's "Spend"; verification V-18): every
+    /// deposit into savings once, and each purchase less what it draws from savings. Never more
+    /// than the month's budget plus what earlier months left unspent. What the household already
+    /// has costs nothing here.
+    pub fn month_spend(&self, month: u16) -> f64 {
+        let Some(m) = self.budget.plan.months.iter().find(|m| m.index == month) else {
+            return 0.0;
+        };
+        m.items
+            .iter()
+            .filter(|i| !i.done)
+            .map(|i| match i.kind {
+                PlanItemKind::Reserve => f64::from(i.est_cost_usd),
+                PlanItemKind::Purchase => {
+                    (f64::from(i.est_cost_usd) - self.from_savings(month, &i.item_id)).max(0.0)
+                }
+                PlanItemKind::FreeAction => 0.0,
+            })
+            .sum()
+    }
+
     /// Everything the household will have at the end of the plan: what it owns, the free actions
     /// and every purchase, by item id.
     pub fn final_inventory(&self) -> BTreeMap<ItemId, f64> {
