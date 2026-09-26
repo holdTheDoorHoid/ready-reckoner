@@ -95,7 +95,7 @@ avoid = [
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits; a chimney check costs extra." }
 quantity_rule = "once"
 citations = ["usfa_heating_fires", "cdc_winter_safety", "cdc_co_basics"]
-hazard_extras = []
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
 
 [[item]]
 id = "fire_learn_shutoffs"

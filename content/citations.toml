@@ -1928,6 +1928,17 @@ license = "CC BY-SA 4.0"
 prior = true
 
 [[citation]]
+id = "prior_harm_weights"
+title = "Harm weights used by the allocator (expert prior)"
+publisher = "Ready Reckoner"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md"
+retrieved = "2026-09-25"
+quote = "Harm weights: water and any daily medication 3; thermal with a vulnerable member 2; evacuation 2; supplies, power and communications 1."
+license = "CC BY-SA 4.0"
+prior = true
+
+[[citation]]
 id = "rr_risk_model_priors"
 title = "Ready Reckoner expert estimates for hazard rates and disruption durations (each one listed with its reasoning)"
 publisher = "Ready Reckoner contributors"

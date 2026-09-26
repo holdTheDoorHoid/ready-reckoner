@@ -355,3 +355,33 @@ fn catalogue_includes_name_tables_and_every_item() {
     let back: rr_types::Catalogue = serde_json::from_str(&json).expect("and parses back");
     assert_eq!(back, c);
 }
+
+#[test]
+fn thermal_items_point_one_way_heat_or_cold() {
+    use rr_types::HazardId;
+    let is_cold = |h: &HazardId| {
+        matches!(
+            h,
+            HazardId::ColdWave | HazardId::WinterWeather | HazardId::IceStorm
+        )
+    };
+    let mut thermal: Vec<&Item> = content().items_in_category("thermal").collect();
+    thermal.push(item("fire_heating_safety"));
+    for i in thermal {
+        let heat = i.hazard_extras.contains(&HazardId::HeatWave);
+        let cold = i.hazard_extras.iter().any(is_cold);
+        assert!(
+            heat != cold,
+            "{} must be tagged for heat or for cold, not both or neither",
+            i.id
+        );
+        if cold {
+            assert!(
+                i.hazard_extras.iter().filter(|h| is_cold(h)).count() == 3,
+                "{}",
+                i.id
+            );
+        }
+    }
+    assert!(content().citation("prior_harm_weights").unwrap().prior);
+}

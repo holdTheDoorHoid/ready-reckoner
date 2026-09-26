@@ -126,13 +126,14 @@ id = "special_older_adult_plan"
 name = "Plan for older adults in the household"
 category = "special_needs"
 unit = "action"
-buckets = ["evacuate", "thermal", "medical_emergency"]
+buckets = ["evacuate", "thermal", "medical_emergency", "income"]
 tier = "now"
 free = true
 spec = "Plan transport if help is needed to evacuate, copy Medicare and Medicaid cards, give someone in your support network a key and show them your equipment, and ask any clinic you rely on about its emergency plans (Ready.gov). Heat and cold are harder on people over 65, so set up daily check-ins in extreme weather."
 look_for = [
   "Copies of Medicare, Medicaid and insurance cards",
   "Someone with a key who knows where supplies are kept",
+  "Federal benefits by direct deposit or the Direct Express card, since disasters can delay mail",
   "A cooling and warming plan with daily check-ins",
 ]
 avoid = [

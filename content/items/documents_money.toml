@@ -121,28 +121,6 @@ citations = ["cfpb_emergency_fund", "finra_financial_foundations", "stlouisfed_e
 hazard_extras = []
 
 [[item]]
-id = "docs_direct_deposit"
-name = "Get federal benefits by direct deposit"
-category = "documents_money"
-unit = "action"
-buckets = ["income"]
-tier = "now"
-free = true
-spec = "If you receive federal benefits such as Social Security, switch to direct deposit or the Direct Express card: the Treasury recommends it, and disasters can hold up mail (Ready.gov)."
-look_for = [
-  "Direct deposit to a checking or savings account",
-  "Or the Direct Express prepaid card",
-]
-avoid = [
-  "Relying on paper checks in the mail",
-  "Keeping only one way to reach your money",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: one phone call or online form." }
-quantity_rule = "once_if_senior"
-citations = ["ready_gov_older_adults"]
-hazard_extras = []
-
-[[item]]
 id = "docs_unemployment_know"
 name = "Know how to file for unemployment in your state"
 category = "documents_money"

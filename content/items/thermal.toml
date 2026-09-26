@@ -2,28 +2,51 @@
 # docs/CONTENT_STANDARDS.md §3. Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
 
 [[item]]
-id = "thermal_warm_cool_room_plan"
-name = "Pick a warm room for cold and a cool room for heat"
+id = "thermal_warm_room_plan"
+name = "Pick a warm room for a winter outage"
 category = "thermal"
 unit = "action"
 buckets = ["thermal"]
 tier = "now"
 free = true
-spec = "In a winter outage, gather everyone in one room: close off unneeded rooms, stuff towels under doors and cover windows at night (CDC). In a heat wave, use the coolest room, cover sunny windows with drapes or shades, and take cool showers (Ready.gov)."
+spec = "If the heat goes off in winter, gather everyone in one small room: close off unneeded rooms, stuff towels in the cracks under doors, and cover windows with blankets at night (CDC). Wear layers and hats, and use sleeping bags."
 look_for = [
-  "A small interior room with few windows for cold",
-  "A shaded, low room for heat (heat rises)",
+  "A small interior room with few windows",
   "Blankets and towels you can use to seal gaps",
+  "A way to check on older relatives and neighbours",
 ]
 avoid = [
   "Heating with a gas oven or stovetop (CDC)",
   "Letting an infant sleep in a cold room (CDC)",
-  "Relying on a fan when the room is above 90°F (CDC)",
+  "Grills, camp stoves or generators indoors (carbon monoxide)",
 ]
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses what you have." }
 quantity_rule = "once"
-citations = ["cdc_winter_safety", "ready_gov_heat", "cdc_heat_health", "cdc_co_basics"]
-hazard_extras = []
+citations = ["cdc_winter_safety", "cdc_co_basics"]
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+
+[[item]]
+id = "thermal_cool_room_plan"
+name = "Pick a cool room for a heat wave"
+category = "thermal"
+unit = "action"
+buckets = ["thermal"]
+tier = "now"
+free = true
+spec = "In a heat wave, use the coolest, lowest room, cover sunny windows with drapes or shades, take cool showers or baths, and use the oven less (Ready.gov). If the room goes above 90°F, a fan stops helping, so go somewhere cooler (CDC)."
+look_for = [
+  "A shaded, low room (heat rises)",
+  "Drapes, shades or window reflectors for sunny windows",
+  "Light, loose clothing and water within reach",
+]
+avoid = [
+  "Relying on a fan when the room is above 90°F (CDC)",
+  "Leaving people or pets in a closed car (Ready.gov)",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses what you have." }
+quantity_rule = "once"
+citations = ["ready_gov_heat", "cdc_heat_health"]
+hazard_extras = ["heat_wave"]
 
 [[item]]
 id = "thermal_cooling_center"
@@ -93,7 +116,7 @@ price_band_usd = { low = 25.00, high = 55.99, per = "person", note = "Two retail
 retrieved = "2026-09-25"
 quantity_rule = "per_person"
 citations = ["ready_gov_kit", "cdc_winter_safety", "rr_price_observations_2026_09"]
-hazard_extras = []
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
 
 [[item]]
 id = "thermal_battery_fan"
@@ -139,7 +162,7 @@ price_band_usd = { low = 2.19, high = 15.49, per = "thermometer", note = "Two re
 retrieved = "2026-09-25"
 quantity_rule = "once"
 citations = ["cdc_heat_health", "cdc_winter_safety", "rr_price_observations_2026_09"]
-hazard_extras = []
+hazard_extras = ["heat_wave"]
 
 [[item]]
 id = "thermal_emergency_blankets"
@@ -162,4 +185,4 @@ price_band_usd = { low = 0.50, high = 4.95, per = "blanket", note = "Two retail 
 retrieved = "2026-09-25"
 quantity_rule = "per_person"
 citations = ["redcross_first_aid_kit", "rr_price_observations_2026_09"]
-hazard_extras = []
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
