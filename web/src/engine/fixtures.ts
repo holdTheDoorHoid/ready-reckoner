@@ -7,9 +7,6 @@
  * present with the right primitive type, and no field exists that `PlanInput` does not declare (at
  * any depth). Enum values are checked on the Rust side, which parses these files with unknown
  * fields and unknown ids rejected, and which compares the id lists in `types.ts` with its own.
- *
- * The dev server must be allowed to read the repository root (`server.fs.allow`) if app code
- * imports this module, because the fixtures live outside `web/`.
  */
 import type { PlanInput } from './types';
 
