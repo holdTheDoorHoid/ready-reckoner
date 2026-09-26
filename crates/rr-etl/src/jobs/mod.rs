@@ -14,8 +14,10 @@ pub mod facilities;
 pub mod flood;
 pub mod geography;
 pub mod nri;
+pub mod outage_model;
 pub mod outages;
 pub mod seismic;
+pub mod series;
 pub mod vulnerability;
 
 /// Shared state for a refresh.
@@ -133,14 +135,27 @@ pub const JOBS: &[JobSpec] = &[
         title: "National personal-risk base rates with sources",
         run: base_rates::run,
     },
+    JobSpec {
+        id: "series",
+        title: "National series: DOE OE-417 grid disturbances (PNNL), FDA drug shortages, FDIC bank failures, federal funding gaps, FCC outage reports, FBI arrests",
+        run: series::run,
+    },
+    JobSpec {
+        id: "outage_model",
+        title: "Outage causes, credibility-weighted regional tails, restoration curves and the worst-event stress table (EAGLE-I events)",
+        run: outage_model::run,
+    },
 ];
 
-/// Pack a file belongs to, from its path.
-pub fn pack_of(path: &str) -> &'static str {
+/// Pack a file belongs to, from its path: `geo/...` is the map pack, `opt/<name>/...` the
+/// optional pack `<name>` (issue #15), everything else the core pack.
+pub fn pack_of(path: &str) -> String {
     if path.starts_with("geo/") {
-        "geo"
+        "geo".to_string()
+    } else if let Some(rest) = path.strip_prefix("opt/") {
+        rest.split('/').next().unwrap_or("opt").to_string()
     } else {
-        "core"
+        "core".to_string()
     }
 }
 
@@ -148,6 +163,9 @@ pub fn pack_of(path: &str) -> &'static str {
 pub fn pack_description(name: &str) -> &'static str {
     match name {
         "geo" => "County boundaries for the map thumbnail and click-to-select. Loaded lazily.",
+        "outage_events" => {
+            "Optional: every county power outage of a day or more since 2014 with its restoration curve and cause, and the held-out test of the outage model. Loaded only by the expert views and the validation page."
+        }
         _ => {
             "Everything the engine needs for county-level planning. Loaded at start; works offline."
         }
@@ -343,9 +361,9 @@ fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
     for w in &out.written {
         let pack = manifest
             .packs
-            .entry(pack_of(&w.path).to_string())
+            .entry(pack_of(&w.path))
             .or_insert_with(|| Pack {
-                description: pack_description(pack_of(&w.path)).to_string(),
+                description: pack_description(&pack_of(&w.path)).to_string(),
                 files: Vec::new(),
             });
         pack.files.push(FileEntry {

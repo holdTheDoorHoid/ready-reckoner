@@ -1,0 +1,56 @@
+# Hand-copied power-outage events and event names for the `outage_model` job.
+#
+# [[event]]: restoration curves for events before EAGLE-I's records (Puerto Rico's EAGLE-I series
+# starts in 2021). `share_out` is the share of the peak still without power `days` after the
+# outage began, read from the sources listed; `unverified = true` marks figures not yet checked
+# against a primary source. The stress table uses an event here for a county in `states` when it
+# is worse, a week in, than anything in the county's region in EAGLE-I.
+#
+# [[name]]: display names for well-known non-tropical events, matched by cause, state and the
+# UTC date the county outage began. Tropical cyclones are named from HURDAT2.
+
+[[event]]
+id = "maria_2017_pr"
+name = "Hurricane Maria"
+storm_id = "AL152017"
+class = "hurricane"
+date = "2017-09-20"
+states = ["PR"]
+peak_share = 1.0
+days = [1, 3, 7, 14, 30, 42, 60, 90, 130, 208, 328]
+share_out = [1.0, 1.0, 0.97, 0.92, 0.85, 0.70, 0.60, 0.45, 0.35, 0.04, 0.0]
+sources = ["https://www.eia.gov/todayinenergy/detail.php?id=33452", "https://abcnews.com/amp/US/year-hurricane-maria-100-percent-customers-power-puerto/story?id=57175710"]
+unverified = true
+note = "Provisional: 30% of customers restored after six weeks, about 65% by the end of January 2018, 96% by April, the last on 14 August 2018 (as quoted in the round-2 model review); intermediate days interpolated."
+
+[[name]]
+name = "August 2020 Midwest derecho"
+classes = ["wind"]
+from = "2020-08-10"
+to = "2020-08-11"
+states = ["NE", "IA", "IL", "IN", "WI", "MN", "SD", "MO", "OH", "MI"]
+source = "NOAA National Weather Service event summaries, August 10, 2020 derecho"
+
+[[name]]
+name = "February 2021 winter storm and Texas blackout (Uri)"
+classes = ["winter", "ice", "cold_grid", "unattributed", "grid"]
+from = "2021-02-10"
+to = "2021-02-20"
+states = ["TX", "OK", "LA", "MS", "AR", "NM", "KS", "MO"]
+source = "University of Texas at Austin, The Timeline and Events of the February 2021 Texas Electric Grid Blackouts (2021)"
+
+[[name]]
+name = "December 2022 winter storm (Elliott)"
+classes = ["winter", "ice", "cold_grid", "wind", "unattributed", "grid"]
+from = "2022-12-22"
+to = "2022-12-27"
+states = ["TN", "NC", "SC", "KY", "VA", "WV", "GA", "AL", "MS", "NY", "PA", "OH", "MI", "ME", "NH", "VT", "MA"]
+source = "FERC and NERC, Winter Storm Elliott inquiry report (2023)"
+
+[[name]]
+name = "October 2020 Oklahoma ice storm"
+classes = ["ice", "winter"]
+from = "2020-10-26"
+to = "2020-10-29"
+states = ["OK", "TX", "KS"]
+source = "NOAA National Weather Service Norman, October 26-28, 2020 ice storm summary"
