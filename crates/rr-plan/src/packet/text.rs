@@ -114,6 +114,10 @@ fn plural(unit: &str, qty: f64) -> String {
         "24-pack" => return "24-packs".to_owned(),
         _ => {}
     }
+    // "gallon of tank space" -> "gallons of tank space": pluralise the head noun, not the tail.
+    if let Some((head, tail)) = unit.split_once(" of ") {
+        return format!("{} of {}", plural(head, qty), tail);
+    }
     let bytes = unit.as_bytes();
     let n = bytes.len();
     if n >= 2 && bytes[n - 1] == b'y' && !b"aeiou".contains(&bytes[n - 2]) {

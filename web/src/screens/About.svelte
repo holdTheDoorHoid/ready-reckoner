@@ -239,7 +239,7 @@
   <section aria-labelledby="privacy-title">
     <h2 id="privacy-title">Privacy</h2>
     <ul>
-      <li>Your answers, plan and check-offs are stored only in this browser (under the name <code>rr.plan.v1</code>), and in files you choose to save.</li>
+      <li>Your answers, plan and check-offs are stored only in this browser (under the names <code>rr.plan.v1</code> for the plan and <code>rr.prefs.v1</code> for display preferences), and in files you choose to save.</li>
       <li>The planning engine runs on this device and makes no network requests. The app loads only its own files and data.</li>
       <li>There are no accounts, cookies for tracking, analytics or third-party scripts.</li>
       <li>The site's host serves the app's files, like any website host, and never sees your answers.</li>

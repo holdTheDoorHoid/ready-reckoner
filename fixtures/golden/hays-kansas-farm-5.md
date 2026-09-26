@@ -337,7 +337,7 @@ Your monthly money starts next month, so this month is the free steps above.
 | 14 (December 2027) | save toward stock tank to hold water for horses and livestock; Store-bought bottled water: 67 gallons | $107 |
 | 15 (January 2028) | save toward stock tank to hold water for horses and livestock | $40 |
 | 16 (February 2028) | save toward stock tank to hold water for horses and livestock; Bleeding-control kit (tourniquet and pressure bandage): 1 kit | $111 |
-| 17 (March 2028) | save toward stock tank to hold water for horses and livestock; Stock tank to hold water for horses and livestock: 238 gallon of tank spaces, $280 of it from savings | $85 |
+| 17 (March 2028) | save toward stock tank to hold water for horses and livestock; Stock tank to hold water for horses and livestock: 238 gallons of tank space, $280 of it from savings | $85 |
 | 18 (April 2028) | save toward clean-air room for wildfire smoke | $40 |
 | 19 (May 2028) | save toward clean-air room for wildfire smoke; Clean-air room for wildfire smoke: 1 air cleaner, $80 of it from savings | $84 |
 | 20 (June 2028) | save toward pet go-kit: a carrier and a bag you pack from your supplies | $40 |
@@ -396,7 +396,7 @@ Tick these off as you go: one list per step, up to the step that is enough for y
 
 - [ ] Bar soap and laundry soap: 5 person-months
 - [ ] Bleeding-control kit (tourniquet and pressure bandage): 1 kit
-- [ ] Stock tank to hold water for horses and livestock: 238 gallon of tank spaces
+- [ ] Stock tank to hold water for horses and livestock: 238 gallons of tank space
 - [ ] Clean-air room for wildfire smoke: 1 air cleaner
 - [ ] Diapers: 60 diapers
 - [ ] License-free two-way radios (FRS), a pair: 2 pairs
