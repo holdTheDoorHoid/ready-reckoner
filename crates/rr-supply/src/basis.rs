@@ -7,8 +7,8 @@
 use rr_types::CitationId;
 
 use crate::constants::{
-    ChildShareTable, Constant, DgaTable, PRIOR_SOURCE, ShelfLifeTable, SolarTable, StaplesTable,
-    TfpSizeTable, constants,
+    ChildShareTable, Constant, DgaTable, PRIOR_SOURCE, RainRow, ShelfLifeTable, SolarTable,
+    StaplesTable, TfpSizeTable, constants,
 };
 
 /// The sources and the estimate tag gathered while a rule runs.
@@ -92,6 +92,15 @@ impl Basis {
             self.prior = true;
         }
         t
+    }
+
+    /// The rain row for a state (the driest months' rain and the state's rule); records the table's
+    /// sources when there is a row.
+    pub(crate) fn rain_row(&mut self, state_fips: u8) -> Option<&'static RainRow> {
+        let reg = constants();
+        let row = reg.rain_row(state_fips)?;
+        self.add(&reg.rain.sources);
+        Some(row)
     }
 
     /// Records one citation directly (for guidance in the text that has no number).

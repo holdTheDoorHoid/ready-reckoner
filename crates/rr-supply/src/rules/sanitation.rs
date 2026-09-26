@@ -5,8 +5,10 @@ use rr_types::{AgeBand, Per, Person};
 
 use super::Sizing;
 use crate::basis::Basis;
-use crate::constants::keys;
-use crate::format::{CUPS_PER_GAL, DAYS_PER_MONTH, ceil_count, count, days as fmt_days, num};
+use crate::constants::{constants, keys};
+use crate::format::{
+    CUPS_PER_GAL, DAYS_PER_MONTH, ceil_count, count, day_adjective, days as fmt_days, num,
+};
 
 /// Two buckets (pee and poo) with a seat for when toilets cannot flush. Rule `toilet_buckets`.
 pub fn toilet_buckets() -> Sizing {
@@ -35,9 +37,23 @@ fn toilet_users(people_list: &[Person]) -> f64 {
         .count() as f64
 }
 
-/// Heavy bags for the two-bucket toilet (an estimate from Oregon's and RDPO's guidance). Rule
-/// `toilet_bags`.
-pub fn toilet_bags(days: f64, people_list: &[Person]) -> Option<Sizing> {
+/// Days of toilet supplies to store: the no-water target, but no more than
+/// `toilet_supplies_cap_days` (30, an estimate) unless an earthquake drives the target, since a
+/// working sewer or septic system usually outlasts the tap water and an earthquake can break the
+/// sewer itself (round-2 review P-16: 329 bags for a year). Returns the days and whether the cap
+/// applied.
+fn toilet_days(b: &mut Basis, days: f64, earthquake: bool) -> (f64, bool) {
+    let cap = constants().value(keys::TOILET_SUPPLIES_CAP_DAYS);
+    if !earthquake && days > cap {
+        (b.k(keys::TOILET_SUPPLIES_CAP_DAYS), true)
+    } else {
+        (days, false)
+    }
+}
+
+/// Heavy bags for the two-bucket toilet (an estimate from Oregon's and RDPO's guidance), for the
+/// days [`toilet_days`] gives. Rule `toilet_bags`.
+pub fn toilet_bags(days: f64, people_list: &[Person], earthquake: bool) -> Option<Sizing> {
     let n = toilet_users(people_list);
     if n == 0.0 || days <= 0.0 {
         return None;
@@ -45,16 +61,24 @@ pub fn toilet_bags(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let mut b = Basis::new();
     let per = b.k(keys::TOILET_BAGS_PER_PERSON_DAY);
     let (lo, hi) = b.range(keys::TOILET_BAGS_PER_PERSON_DAY);
-    let q = ceil_count(n * per * days);
-    let text = format!(
+    let (d, capped) = toilet_days(&mut b, days, earthquake);
+    let q = ceil_count(n * per * d);
+    let mut text = format!(
         "Toilet bags: about {} heavy garbage bags a person a day ({} to {}), counting both bags of a double-bagged load: {} × {} = {} bags. Fill halfway, tie, double-bag, and store away from food, water, children and pets. Don't put them in curbside trash or bury them unless officials say so.",
         num(per, 2),
         num(lo, 1),
         num(hi, 1),
         count(n, "person", "people"),
-        fmt_days(days),
+        fmt_days(d),
         num(q, 0)
     );
+    if capped {
+        text.push_str(&format!(
+            " Bags are counted for the first {} of your {} target: if the sewer or septic system still works, it is a better toilet than bags, and officials will say when it is safe to flush.",
+            fmt_days(d),
+            day_adjective(days)
+        ));
+    }
     Some(
         Sizing::new(
             &b,
@@ -65,13 +89,17 @@ pub fn toilet_bags(days: f64, people_list: &[Person]) -> Option<Sizing> {
             Per::Person,
             text,
         )
-        .per_day(days, n * per),
+        .per_day(d, n * per),
     )
 }
 
-/// Dry cover material for the two-bucket toilet (an estimate from RDPO's "a handful per poo").
-/// Rule `toilet_cover_material`.
-pub fn toilet_cover_material(days: f64, people_list: &[Person]) -> Option<Sizing> {
+/// Dry cover material for the two-bucket toilet (an estimate from RDPO's "a handful per poo"), for
+/// the days [`toilet_days`] gives. Rule `toilet_cover_material`.
+pub fn toilet_cover_material(
+    days: f64,
+    people_list: &[Person],
+    earthquake: bool,
+) -> Option<Sizing> {
     let n = toilet_users(people_list);
     if n == 0.0 || days <= 0.0 {
         return None;
@@ -79,14 +107,15 @@ pub fn toilet_cover_material(days: f64, people_list: &[Person]) -> Option<Sizing
     let mut b = Basis::new();
     let per = b.k(keys::TOILET_COVER_CUPS_PER_PERSON_DAY);
     let (lo, hi) = b.range(keys::TOILET_COVER_CUPS_PER_PERSON_DAY);
-    let cups = ceil_count(n * per * days);
+    let (d, _) = toilet_days(&mut b, days, earthquake);
+    let cups = ceil_count(n * per * d);
     let text = format!(
         "Cover material for the poo bucket (sawdust, shredded paper, dry leaves or pet bedding): about {} a person a day ({} to {}) × {} × {} = {} cups, about {}.",
         count(per, "cup", "cups"),
         num(lo, 1),
         num(hi, 1),
         count(n, "person", "people"),
-        fmt_days(days),
+        fmt_days(d),
         num(cups, 0),
         crate::format::gallons(cups / CUPS_PER_GAL)
     );
@@ -100,8 +129,52 @@ pub fn toilet_cover_material(days: f64, people_list: &[Person]) -> Option<Sizing
             Per::Person,
             text,
         )
-        .per_day(days, n * per),
+        .per_day(d, n * per),
     )
+}
+
+/// Paper tableware, garbage bags and ties, and waterproof matches for a no-water target longer than
+/// the 14 stored days (round-2 review P-23; item N-16): one kit per `household_ops_kit_days` (14, an
+/// estimate) for at most the first `household_ops_cap_days` (30, an estimate), after which dishes
+/// are washed with treated water. Ready.gov's kit lists paper cups, plates, towels and plastic
+/// utensils, garbage bags and plastic ties, and matches in a waterproof container; paper plates save
+/// the water washing dishes would take. Rule `household_ops_kits`.
+pub fn household_ops_kits(days: f64) -> Option<Sizing> {
+    let cap = constants().value(keys::WATER_STORED_CAP_DAYS);
+    if days.is_nan() || days <= cap {
+        return None;
+    }
+    let mut b = Basis::new();
+    let per = b.k(keys::HOUSEHOLD_OPS_KIT_DAYS);
+    let most = constants().value(keys::HOUSEHOLD_OPS_CAP_DAYS);
+    let capped = days > most;
+    let d = if capped {
+        b.k(keys::HOUSEHOLD_OPS_CAP_DAYS)
+    } else {
+        days
+    };
+    let q = ceil_count(d / per);
+    let mut text = format!(
+        "{} of paper plates, cups and utensils, garbage bags with ties, and waterproof matches, one for every {} of your {} no-water target: paper plates save the water that washing dishes takes.",
+        count(q, "household kit", "household kits"),
+        fmt_days(per),
+        day_adjective(days)
+    );
+    if capped {
+        text.push_str(&format!(
+            " They cover the first {}; after that, wash dishes with the water you treat.",
+            fmt_days(d)
+        ));
+    }
+    Some(Sizing::new(
+        &b,
+        "household_ops_kits",
+        "household_ops",
+        q,
+        "kit",
+        Per::Household,
+        text,
+    ))
 }
 
 /// Toilet paper: about one roll per person every five days (an estimate; Oregon says measure a
@@ -298,9 +371,11 @@ mod tests {
         let p = fixtures::get("philadelphia-renters-4").unwrap();
         assert_eq!(toilet_buckets().quantity, 2.0);
         // 4 × 0.45 × 3 = 5.4 → 6 bags; 4 × 1 × 3 = 12 cups
-        assert_eq!(toilet_bags(3.0, &p.people).unwrap().quantity, 6.0);
+        assert_eq!(toilet_bags(3.0, &p.people, false).unwrap().quantity, 6.0);
         assert_eq!(
-            toilet_cover_material(3.0, &p.people).unwrap().quantity,
+            toilet_cover_material(3.0, &p.people, false)
+                .unwrap()
+                .quantity,
             12.0
         );
         // 4 people × 10 days ÷ 5 = 8 rolls
@@ -314,6 +389,28 @@ mod tests {
         assert_eq!(m.quantity, 2.0);
         assert!(m.prior && m.plain.contains("half") && m.plain.contains("40 products"));
         assert!(diapers(10.0, &p.people).is_none());
+    }
+
+    /// Round-2 review P-16: bags and cover material stop at 30 days unless an earthquake drives the
+    /// no-water target (Coos Bay's year bought 329 bags).
+    #[test]
+    fn toilet_supplies_stop_at_a_month_unless_an_earthquake_breaks_the_sewer() {
+        let p = fixtures::get("coos-bay-well-owner-2").unwrap();
+        // 2 people × 0.45 × 30 days = 27 bags, not 2 × 0.45 × 365 = 329.
+        let capped = toilet_bags(365.0, &p.people, false).unwrap();
+        assert_eq!(capped.quantity, 27.0);
+        assert_eq!(capped.days, Some(30.0));
+        assert!(capped.plain.contains("sewer or septic"), "{}", capped.plain);
+        assert!(capped.prior);
+        assert_eq!(toilet_bags(365.0, &p.people, true).unwrap().quantity, 329.0);
+        assert_eq!(
+            toilet_cover_material(365.0, &p.people, false)
+                .unwrap()
+                .quantity,
+            60.0
+        );
+        // Under the cap nothing changes.
+        assert_eq!(toilet_bags(14.0, &p.people, false).unwrap().quantity, 13.0);
     }
 
     #[test]
@@ -332,7 +429,7 @@ mod tests {
         assert_eq!(baby_wipes(7.0, &sl.people).unwrap().quantity, 2.0);
         assert_eq!(baby_wipes(28.0, &sl.people).unwrap().quantity, 4.0);
         // The baby is not a toilet user.
-        assert_eq!(toilet_bags(10.0, &sl.people).unwrap().quantity, 9.0); // 2 × 0.45 × 10
+        assert_eq!(toilet_bags(10.0, &sl.people, false).unwrap().quantity, 9.0); // 2 × 0.45 × 10
         let hays = fixtures::get("hays-kansas-farm-5").unwrap();
         assert_eq!(diapers(10.0, &hays.people).unwrap().quantity, 60.0); // toddler 6 a day
         // Adults and teens not pregnant: 1 adult + 1 teen → half → 1 × 2 cycles

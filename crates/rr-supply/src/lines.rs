@@ -72,6 +72,10 @@ pub struct SizedLine {
     /// The allocator orders it first within its tier (water, a dependent's medication, powered
     /// medical backup, smoke and CO alarms, infant formula).
     pub life_safety: bool,
+    /// The part of this line that belongs to the bare-minimum kit (`Dials::minimum_kit`): the
+    /// smallest set that covers three days of water, light, warmth and medicine continuity, in the
+    /// line's unit (`docs/QUANTITY_RULES.md`, "The bare-minimum kit"). `None` for lines outside it.
+    pub minimum: Option<f64>,
 }
 
 impl SizedLine {
@@ -148,6 +152,7 @@ pub(crate) fn make(
         math: s.math,
         prior: s.prior,
         life_safety,
+        minimum: None,
     }
 }
 

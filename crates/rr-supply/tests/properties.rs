@@ -218,7 +218,27 @@ fn hot_is_never_less_than_temperate() {
                 ..SupplyContext::default()
             },
         );
-        no_less(&temperate, &hot, &format!("case {case}"));
+        // In a hot county fans and cooling towels stop counting as heat cover (round-2 review
+        // P-09): they move from needs to optional lines. A long walk home carries more water
+        // instead of a filter, since there may be no water to filter (P-15). Nothing else may fall.
+        let comfort = ["thermal.battery_fan", "thermal.cooling_towel"];
+        let keep = |ls: &[SizedLine]| -> Vec<SizedLine> {
+            ls.iter()
+                .filter(|l| !comfort.contains(&l.line.id.as_str()))
+                .filter(|l| !l.line.id.starts_with("get_home.get_home_filter."))
+                .cloned()
+                .collect()
+        };
+        no_less(&keep(&temperate), &keep(&hot), &format!("case {case}"));
+        for id in comfort {
+            if needs(&temperate).contains_key(id) {
+                let optional = format!("{id}.optional");
+                assert!(
+                    hot.iter().any(|l| l.line.id == optional),
+                    "case {case}: {id} should be optional in heat"
+                );
+            }
+        }
         let water = |ls: &[SizedLine]| needs(ls).get("water_out.water_gallons").copied();
         assert!(water(&hot) >= water(&temperate), "case {case}");
     }

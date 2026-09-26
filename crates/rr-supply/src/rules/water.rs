@@ -1,12 +1,13 @@
 //! Water: stored water, making water safe, and livestock (research §1).
 
-use rr_types::{Per, Person, Pets, WaterLevel};
+use rr_types::{Housing, HousingKind, Per, Person, Pets, RawWaterSource, WaterLevel, WaterSource};
 
 use super::Sizing;
 use crate::basis::Basis;
 use crate::constants::{constants, keys};
 use crate::format::{
-    L_PER_GAL, OZ_PER_GAL, and_list, count, days as fmt_days, gallons, num, people, round_to,
+    DAYS_PER_MONTH, GAL_PER_SQFT_INCH, L_PER_GAL, OZ_PER_GAL, and_list, ceil_count, count,
+    days as fmt_days, gallons, num, people, round_to,
 };
 use crate::household::is_formula_fed;
 
@@ -88,6 +89,12 @@ pub(crate) fn daily(
     hot: bool,
 ) -> WaterDaily {
     daily_share(b, people, pets, level, hot, Share::All)
+}
+
+/// The household's water for one day at its level, in gallons (people, pregnancy, formula and
+/// pets), without recording sources: for sizing that cites its own numbers.
+pub(crate) fn daily_total_gal(people: &[Person], pets: &Pets, level: WaterLevel, hot: bool) -> f64 {
+    daily(&mut Basis::new(), people, pets, level, hot).total_gal()
 }
 
 /// [`daily`] for one share of the water. The drinking share is cited only when the amount uses
@@ -325,6 +332,41 @@ fn stored(b: &mut Basis, d: &WaterDaily, days: f64, dehydrated_person_days: f64)
     .math(math)
 }
 
+/// Where water beyond the stored days would come from, for the treatment line's wording and for
+/// whether a filter counts (round-2 review P-03, S6; contract v2's `Housing.raw_water_source`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RawSource {
+    /// The household's own well, which needs pump power (a generator through an interlock or
+    /// transfer switch) or a hand pump.
+    Well,
+    /// A source the household named in the interview.
+    Named(RawWaterSource),
+    /// The rain barrel the plan suggests (the rain line), where the state allows drinking it.
+    PlannedBarrel,
+    /// No source known: a filter adds nothing, and the water beyond the stored days has to be
+    /// carried in.
+    None,
+}
+
+impl RawSource {
+    /// Whether there is water to put through a filter.
+    pub fn exists(self) -> bool {
+        self != RawSource::None
+    }
+
+    /// The source for a household: its well, then the source it named, then a planned rain barrel.
+    pub fn of(housing: &Housing, planned_barrel: bool) -> RawSource {
+        if housing.water == WaterSource::Well {
+            return RawSource::Well;
+        }
+        match housing.raw_water_source {
+            Some(s) if s != RawWaterSource::None => RawSource::Named(s),
+            _ if planned_barrel => RawSource::PlannedBarrel,
+            _ => RawSource::None,
+        }
+    }
+}
+
 /// Stored water for a no-tap-water target, capped at the stored-water days (14) when the target
 /// is longer; beyond that, the second sizing is the water to make safe with a filter and a source
 /// (`water_treatment_capacity`, per household). Research §1.6 and §9.5; the brief's rule for
@@ -335,7 +377,7 @@ pub fn water_storage(
     pets: &Pets,
     level: WaterLevel,
     hot: bool,
-    well: bool,
+    source: RawSource,
 ) -> (Sizing, Option<Sizing>) {
     let cap = constants().value(keys::WATER_STORED_CAP_DAYS);
     let mut base = Basis::new();
@@ -354,38 +396,67 @@ pub fn water_storage(
         fmt_days(cap)
     );
     let line = line.extend(&sentence, &why);
-    let treat = treatment_beyond(&mut base, &d, target_days, well);
+    let treat = treatment_beyond(&mut base, &d, target_days, source);
     (line, Some(treat))
 }
 
 /// Water to make safe after the stored days run out (rule `water_treatment_capacity`). A filter
 /// counts only with a raw-water source, and the line names it: the household's own well (with a
-/// way to run its pump), or the source it picks in the water know-how step (a rain barrel where the
-/// state allows it, a creek or a pond).
-fn treatment_beyond(b: &mut Basis, d: &WaterDaily, target_days: f64, well: bool) -> Sizing {
+/// way to run its pump), the source it named, or the rain barrel the plan suggests; with none, the
+/// line says a filter adds nothing and the water has to be carried in.
+fn treatment_beyond(b: &mut Basis, d: &WaterDaily, target_days: f64, source: RawSource) -> Sizing {
     let cap = b.k(keys::WATER_STORED_CAP_DAYS);
     let extra_days = target_days - cap;
     let q = d.total_gal() * extra_days;
     let how = how_to_treat(b);
-    let source = if well {
-        "water from your well, which needs a way to run its pump in a power cut (a generator connected through an interlock or transfer switch an electrician installs, or a hand pump)"
-    } else {
-        "a raw-water source you pick now in your water plan: a rain barrel where your state allows it, a creek or a pond"
+    let source_words = match source {
+        RawSource::Well => {
+            "water from your well, which needs a way to run its pump in a power cut (a generator connected through an interlock or transfer switch an electrician installs, or a hand pump)"
+        }
+        RawSource::Named(RawWaterSource::SurfaceNearby) => {
+            "water from the stream, river or pond near you that you named"
+        }
+        RawSource::Named(RawWaterSource::NeighbourWell) => {
+            "water from your neighbour's well, which you said you may use"
+        }
+        RawSource::Named(RawWaterSource::RainBarrel) => "rain from your rain barrel",
+        RawSource::Named(_) => "the raw-water source you named",
+        RawSource::PlannedBarrel => {
+            "rain from a barrel on your downspout (see the rain line), where your state allows drinking it"
+        }
+        RawSource::None => "",
     };
-    let text = format!(
-        "After day {}, for the other {}: make about {} of water safe each day, about {} in all, with a water filter and {source}, instead of storing more. Filter it, then {}. If you have no raw-water source, store more water instead.",
-        num(cap, 1),
-        fmt_days(extra_days),
-        gallons(d.total_gal()),
-        gallons(super::round_quantity("gallon", q)),
-        how
-    );
+    let text = if source.exists() {
+        format!(
+            "After day {}, for the other {}: make about {} of water safe each day, about {} in all, with a water filter and {source_words}, instead of storing more. Filter it, then {}.",
+            num(cap, 1),
+            fmt_days(extra_days),
+            gallons(d.total_gal()),
+            gallons(super::round_quantity("gallon", q)),
+            how
+        )
+    } else {
+        format!(
+            "After day {}, for the other {}: your household needs about {} of safe water each day, about {} in all. You have not named a raw-water source, so a filter adds nothing yet: pick one in your water plan (a stream or pond you can reach, or a neighbour's well you may use), or plan to carry water from a distribution point (see the carriers line). Water you collect must be made safe: filter it, then {}.",
+            num(cap, 1),
+            fmt_days(extra_days),
+            gallons(d.total_gal()),
+            gallons(super::round_quantity("gallon", q)),
+            how
+        )
+    };
     let math = vec![format!(
-        "treat = {} gal/day × ({} − {}) days = {} gal",
+        "treat = {} gal/day × ({} − {}) days = {} gal; source: {}",
         num(d.total_gal(), 4),
         num(target_days, 2),
         num(cap, 2),
-        num(q, 3)
+        num(q, 3),
+        match source {
+            RawSource::Well => "the well",
+            RawSource::Named(_) => "named by the household",
+            RawSource::PlannedBarrel => "a planned rain barrel",
+            RawSource::None => "none",
+        }
     )];
     Sizing::new(
         b,
@@ -478,12 +549,15 @@ pub fn water_treatment_boil(days: f64, people_list: &[Person], pets: &Pets, hot:
     .math(math)
 }
 
-/// Tap water in clean reused drink bottles: three days of the household's water, but no more than
-/// it can bottle (6 gallons, an estimate). A free way to meet part of `water_gallons`. The line
-/// cites the household's water sources only when three days of water is under the cap (then that
-/// is the amount); otherwise the cap is the amount, and only its sources stand behind it. Rule
+/// Tap water in clean reused drink bottles: the household's water for the days it stores (the
+/// no-water target, at most the 14 stored days), but no more than it can bottle (6 gallons, an
+/// estimate). A free way to meet part, or for a small household all, of `water_gallons` (round-2
+/// review P-13: the zero-budget student was told to buy water it could fill for free). The line
+/// cites the household's water sources only when its water is under the cap (then that is the
+/// amount); otherwise the cap is the amount, and only its sources stand behind it. Rule
 /// `water_reused_bottles`.
 pub fn water_reused_bottles(
+    stored_days: f64,
     people_list: &[Person],
     pets: &Pets,
     level: WaterLevel,
@@ -491,11 +565,11 @@ pub fn water_reused_bottles(
 ) -> Sizing {
     let mut need = Basis::new();
     let d = daily(&mut need, people_list, pets, level, hot);
-    let days = f64::from(rr_types::TierId::H72.days());
-    let three_days = d.total_gal() * days;
+    let days = stored_days.max(0.0);
+    let all_days = d.total_gal() * days;
     let cap = constants().value(keys::REUSED_BOTTLES_MAX_GAL);
     let mut b = Basis::new();
-    let (q, amount) = if three_days >= cap {
+    let (q, amount) = if all_days >= cap {
         let max = b.k(keys::REUSED_BOTTLES_MAX_GAL);
         (
             max,
@@ -507,10 +581,10 @@ pub fn water_reused_bottles(
     } else {
         b.cite_all(need.cites());
         (
-            three_days,
+            all_days,
             format!(
-                "about {} ({} of your water)",
-                gallons(super::round_quantity("gallon", three_days)),
+                "about {} (all {} of your water)",
+                gallons(super::round_quantity("gallon", all_days)),
                 fmt_days(days)
             ),
         )
@@ -533,7 +607,7 @@ pub fn water_reused_bottles(
     .math(vec![format!(
         "min({} gal/day × {} days, {} gal) = {} gal",
         num(d.total_gal(), 4),
-        num(days, 0),
+        num(days, 2),
         num(cap, 1),
         num(q, 3)
     )])
@@ -738,6 +812,304 @@ pub fn livestock_water_stored(days: f64, large_animals: u8) -> Option<Sizing> {
     )
 }
 
+/// Whether the housing is a house with a roof and downspouts of its own.
+fn is_house(housing: &Housing) -> bool {
+    matches!(
+        housing.kind,
+        HousingKind::Detached
+            | HousingKind::Rowhouse
+            | HousingKind::MobileHome
+            | HousingKind::RuralProperty
+    )
+}
+
+/// What the rain line is: a need (the raw-water source for the filter), an optional line (washing
+/// and flushing only, where the state does not let a household drink rainwater, or no state rule is
+/// known), or a note (the driest months bring too little rain for barrels to help).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RainKind {
+    /// The raw-water source for the filter beyond the stored days.
+    Need,
+    /// For washing and flushing only, or where the state's rule is not known.
+    Optional,
+    /// Barrels would not refill in the driest months.
+    Note,
+}
+
+/// Rain barrels as the raw-water source for a long no-water target (round-2 review P-03; item
+/// N-04): for a house, a target longer than the 14 stored days, no drought behind it (a drought
+/// brings no rain), and no raw-water source already (a well, or one the household named). Barrels
+/// are sized so the rain of the state's driest three months between April and October (NOAA
+/// nClimDiv normals; barrels freeze in winter) on the roof area that drains to each downspout
+/// (`rain_catchment_sqft_per_barrel`, an estimate) brings in the household's monthly water, from 1
+/// to `rain_barrels_max` (4) and within the state's limit; if even that many would bring in less
+/// than `rain_dry_season_min_share` (a quarter) of it, the line is a note that points to hauling
+/// instead. The state's rule comes from NCSL's map: where it does not let a household drink
+/// rainwater, the barrels are optional, for washing and flushing. Returns the sizing and its kind.
+/// Rule `rain_catchment_units`.
+pub fn rain_catchment_units(
+    target_days: f64,
+    per_day_gal: f64,
+    housing: &Housing,
+    drought: bool,
+    state_fips: Option<u8>,
+) -> Option<(Sizing, RainKind)> {
+    let cap = constants().value(keys::WATER_STORED_CAP_DAYS);
+    let named = housing
+        .raw_water_source
+        .is_some_and(|s| s != RawWaterSource::None);
+    if !is_house(housing)
+        || target_days.is_nan()
+        || target_days <= cap
+        || drought
+        || named
+        || housing.water == WaterSource::Well
+        || per_day_gal <= 0.0
+    {
+        return None;
+    }
+    let mut b = Basis::new();
+    let barrel = b.k(keys::RAIN_BARREL_GAL);
+    let area = b.k(keys::RAIN_CATCHMENT_SQFT_PER_BARREL);
+    let most = b.k(keys::RAIN_BARRELS_MAX);
+    b.cite("cdc_water_disinfection");
+    let per_inch = area * GAL_PER_SQFT_INCH;
+    let month_need = per_day_gal * DAYS_PER_MONTH;
+    let row = state_fips.and_then(|s| b.rain_row(s));
+    let allowed_barrels = row.map_or(most, |r| {
+        let by_count = r.max_barrels.unwrap_or(most);
+        let by_volume = r.max_gal.map_or(most, |g| (g / barrel).floor().max(1.0));
+        most.min(by_count).min(by_volume)
+    });
+    let mut math = vec![format!(
+        "{} sq ft × {:.3} gal per sq ft per inch = {} gal an inch",
+        num(area, 0),
+        GAL_PER_SQFT_INCH,
+        num(per_inch, 1)
+    )];
+    // Barrels, and the rain each brings in a dry month, where the state's figure is known.
+    let (barrels, dry) = match row.and_then(|r| r.dry_in) {
+        Some(dry_in) => {
+            let month_rain = dry_in / 3.0;
+            let per_barrel = per_inch * month_rain;
+            let wanted = ceil_count(month_need / per_barrel.max(f64::MIN_POSITIVE));
+            let n = wanted.clamp(1.0, allowed_barrels);
+            math.push(format!(
+                "driest 3 months {} in ÷ 3 = {} in a month; {} gal a month per barrel; need {} gal a month; barrels = min(max(1, ceil({} ÷ {})), {}) = {}",
+                num(dry_in, 2),
+                num(month_rain, 2),
+                num(per_barrel, 1),
+                num(month_need, 1),
+                num(month_need, 1),
+                num(per_barrel, 1),
+                num(allowed_barrels, 0),
+                num(n, 0)
+            ));
+            (n, Some((dry_in, per_barrel)))
+        }
+        None => (1.0, None),
+    };
+    let state = row.map_or("your state", |r| r.state.as_str());
+    let too_dry = dry.is_some_and(|(_, per_barrel)| {
+        let share = constants().value(keys::RAIN_DRY_SEASON_MIN_SHARE);
+        allowed_barrels * per_barrel < share * month_need
+    });
+    if too_dry {
+        b.k(keys::RAIN_DRY_SEASON_MIN_SHARE);
+        let (dry_in, _) = dry.unwrap_or((0.0, 0.0));
+        let text = format!(
+            "Rain barrels will not carry you through the dry season: {state}'s driest three months between April and October bring only about {} inches of rain, too little to refill them. Plan to carry water from a distribution point or a neighbour's well instead (see the carriers line).",
+            num(dry_in, 1)
+        );
+        let s = Sizing::new(
+            &b,
+            "rain_catchment_units",
+            "raw_water_source",
+            1.0,
+            "barrel",
+            Per::Household,
+            text,
+        )
+        .math(math);
+        return Some((s, RainKind::Note));
+    }
+    let drinking = row.is_some_and(|r| r.drinking);
+    let mut text = format!(
+        "{} with a screened lid and a downspout diverter, about {} gallons each: an inch of rain on the roughly {} square feet of roof that drains to one downspout gives about {} gallons",
+        count(barrels, "rain barrel", "rain barrels"),
+        num(barrel, 0),
+        num(area, 0),
+        num(per_inch, 0)
+    );
+    match dry {
+        Some((dry_in, per_barrel)) => text.push_str(&format!(
+            ", and even {state}'s driest three months between April and October bring about {} inches, about {} a month for each barrel against the {} your household uses.",
+            num(dry_in, 1),
+            gallons(super::round_quantity("gallon", per_barrel)),
+            gallons(super::round_quantity("gallon", month_need))
+        )),
+        None => text.push('.'),
+    }
+    let kind = if drinking {
+        text.push_str(" This is the raw-water source for your filter: filter the rain, then disinfect it before drinking.");
+        RainKind::Need
+    } else {
+        match row.and_then(|r| r.note.as_deref()) {
+            Some(rule) => text.push_str(&format!(
+                " {state} limits rainwater to {rule}, so count it for washing and flushing, not drinking, unless you get the permit it asks for."
+            )),
+            None => text.push_str(" Check your state's and town's rules on catching rainwater before you count on drinking it."),
+        }
+        RainKind::Optional
+    };
+    if row.is_some_and(|r| r.max_gal.is_some() || r.max_barrels.is_some()) {
+        text.push_str(" The count stays within your state's limit.");
+    }
+    let s = Sizing::new(
+        &b,
+        "rain_catchment_units",
+        "raw_water_source",
+        barrels,
+        "barrel",
+        Per::Household,
+        text,
+    )
+    .math(math);
+    Some((s, kind))
+}
+
+/// Water carriers for hauling (round-2 review P-03; item N-05): two 5-gallon carriers, four for a
+/// household of four or more (estimates). A need when the no-water target is longer than the 14
+/// stored days (the rest comes from a distribution point, a neighbour's well or a spring, as it did
+/// for weeks after Hurricane Helene in Asheville); an option for a well or a tall building with a
+/// shorter target. Returns the sizing and whether it is a need. Rule `water_carriers`.
+pub fn water_carriers(
+    target_days: f64,
+    people: usize,
+    housing: &Housing,
+) -> Option<(Sizing, bool)> {
+    let cap = constants().value(keys::WATER_STORED_CAP_DAYS);
+    let long = target_days > cap;
+    let well = housing.water == WaterSource::Well;
+    let high_rise = housing.kind == HousingKind::ApartmentHighRise;
+    if target_days <= 0.0 || !(long || well || high_rise) {
+        return None;
+    }
+    let mut b = Basis::new();
+    let each = b.k(keys::WATER_CARRIER_GAL);
+    let q = if people >= 4 {
+        b.k(keys::WATER_CARRIERS_LARGE_HOUSEHOLD)
+    } else {
+        b.k(keys::WATER_CARRIERS_PER_HOUSEHOLD)
+    };
+    let pounds = each * WATER_LB_PER_GAL;
+    if long {
+        b.cite("epa_asheville_boil_notice_2024");
+    }
+    let why = if long {
+        format!(
+            "your target of {} runs past the {} of water you store, and the rest has to come from somewhere",
+            fmt_days(target_days),
+            fmt_days(cap)
+        )
+    } else if high_rise {
+        "in a tall building the pumps stop with the power, and water may have to come up the stairs"
+            .to_owned()
+    } else {
+        "a well stops with the power, and water may have to come from somewhere else".to_owned()
+    };
+    let text = format!(
+        "{} of about {} gallons each for hauling water from a distribution point, a neighbour's well or a spring, because {why}. A full one weighs about {} pounds, so choose a size you can carry, with a good handle.",
+        count(q, "water carrier", "water carriers"),
+        num(each, 0),
+        num(pounds, 0)
+    );
+    Some((
+        Sizing::new(
+            &b,
+            "water_carriers",
+            "water_carrier",
+            q,
+            "carrier",
+            Per::Household,
+            text,
+        ),
+        long,
+    ))
+}
+
+/// A haulable tote for large animals' water (round-2 review P-02, P-03; item N-06): one food-grade
+/// tote of about 275 gallons that fits a pickup, when there are horses or livestock and a drought
+/// drives the no-water target (a dry well is met by hauling) or the target runs past the 14 stored
+/// days. Its item class is the animals' water, so it is part of the same cover as the stock tank.
+/// Rule `livestock_haul_tank`.
+pub fn livestock_haul_tank(days: f64, large_animals: u8, drought: bool) -> Option<Sizing> {
+    let cap = constants().value(keys::WATER_STORED_CAP_DAYS);
+    if large_animals == 0 || days <= 0.0 || !(drought || days > cap) {
+        return None;
+    }
+    let mut b = Basis::new();
+    let tote = b.k(keys::LIVESTOCK_HAUL_TANK_GAL);
+    let l_each = b.k(keys::WATER_LIVESTOCK_L_DAY);
+    b.cite("aspca_disaster_prep");
+    let n = f64::from(large_animals);
+    let per_day = n * l_each / L_PER_GAL;
+    let why = if drought {
+        "when a drought dries the well"
+    } else {
+        "when the power or the water stays off longer than the stored water lasts"
+    };
+    let text = format!(
+        "1 food-grade tote of about {} gallons that fits a pickup, to haul water {why}: the {} drink about {} a day, so one load lasts about {}.",
+        num(tote, 0),
+        count(n, "large animal", "large animals"),
+        gallons(super::round_quantity("gallon", per_day)),
+        fmt_days(round_dp_1(tote / per_day))
+    );
+    Some(Sizing::new(
+        &b,
+        "livestock_haul_tank",
+        "livestock_water",
+        1.0,
+        "tote",
+        Per::Household,
+        text,
+    ))
+}
+
+/// A hand pump for the well (round-2 review P-02, P-03; item N-07): optional, for a household on a
+/// well with a no-water target of more than `hand_pump_min_days` (30, an estimate), as the research
+/// flagged for Coos Bay (risk-model §9.6): it draws water with no power where the water level is not
+/// too deep. Rule `well_hand_pump`.
+pub fn well_hand_pump(days: f64, housing: &Housing) -> Option<Sizing> {
+    let min = constants().value(keys::HAND_PUMP_MIN_DAYS);
+    if housing.water != WaterSource::Well || days.is_nan() || days <= min {
+        return None;
+    }
+    let mut b = Basis::new();
+    b.k(keys::HAND_PUMP_MIN_DAYS);
+    let text = format!(
+        "Optional for a {} no-water target: a hand pump fitted to your well draws water with no power at all, where the water level is not too deep for it; deep wells need a costlier pump, so ask a well contractor for a quote.",
+        crate::format::day_adjective(days)
+    );
+    Some(Sizing::new(
+        &b,
+        "well_hand_pump",
+        "well_hand_pump",
+        1.0,
+        "pump",
+        Per::Household,
+        text,
+    ))
+}
+
+/// Pounds in a gallon of water (8.34, a physical constant for water near room temperature).
+const WATER_LB_PER_GAL: f64 = 8.34;
+
+fn round_dp_1(x: f64) -> f64 {
+    crate::format::round_dp(x, 1)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -824,8 +1196,14 @@ mod tests {
     #[test]
     fn coos_bay_fifty_days_prefers_a_filter_to_a_hundred_gallons() {
         let p = fixtures::get("coos-bay-well-owner-2").unwrap();
-        let (stored, treat) =
-            water_storage(50.0, &p.people, &p.pets, WaterLevel::Basic, false, true);
+        let (stored, treat) = water_storage(
+            50.0,
+            &p.people,
+            &p.pets,
+            WaterLevel::Basic,
+            false,
+            RawSource::Well,
+        );
         let treat = treat.expect("a treatment line beyond 14 days");
         // The filter counts only with a raw-water source, and the line names it: their well.
         assert!(
@@ -838,14 +1216,41 @@ mod tests {
             "{}",
             treat.plain
         );
-        let (_, town) = water_storage(50.0, &p.people, &p.pets, WaterLevel::Basic, false, false);
+        // Town water with no source named: a filter adds nothing, and the line says to carry water.
+        let (_, town) = water_storage(
+            50.0,
+            &p.people,
+            &p.pets,
+            WaterLevel::Basic,
+            false,
+            RawSource::None,
+        );
         let town = town.unwrap();
         assert!(
-            town.plain.contains("raw-water source you pick"),
+            town.plain.contains("a filter adds nothing yet"),
             "{}",
             town.plain
         );
-        assert!(town.plain.contains("rain barrel"), "{}", town.plain);
+        assert!(town.plain.contains("carriers line"), "{}", town.plain);
+        // A planned rain barrel, or a source the household named, is named in the line.
+        let (_, barrel) = water_storage(
+            50.0,
+            &p.people,
+            &p.pets,
+            WaterLevel::Basic,
+            false,
+            RawSource::PlannedBarrel,
+        );
+        assert!(barrel.unwrap().plain.contains("rain line"));
+        let (_, creek) = water_storage(
+            50.0,
+            &p.people,
+            &p.pets,
+            WaterLevel::Basic,
+            false,
+            RawSource::Named(RawWaterSource::SurfaceNearby),
+        );
+        assert!(creek.unwrap().plain.contains("stream, river or pond"));
         // 2 people + 2 dogs × 0.3125 + 1 cat × 0.0625 = 2.6875 gal/day
         assert_eq!(stored.quantity, 37.6, "14 days stored");
         assert!(stored.quantity < 100.0);
@@ -867,7 +1272,14 @@ mod tests {
                 .any(|c| c == "epa_emergency_disinfection")
         );
         // At or under the cap there is no treatment line.
-        let (short, none) = water_storage(14.0, &p.people, &p.pets, WaterLevel::Basic, false, true);
+        let (short, none) = water_storage(
+            14.0,
+            &p.people,
+            &p.pets,
+            WaterLevel::Basic,
+            false,
+            RawSource::Well,
+        );
         assert!(none.is_none());
         assert_eq!(short.quantity, 37.6);
     }
@@ -960,7 +1372,7 @@ mod tests {
     #[test]
     fn reused_bottles_cite_only_what_their_amount_uses() {
         let p = philly();
-        let r = water_reused_bottles(&p.people, &p.pets, WaterLevel::Basic, false);
+        let r = water_reused_bottles(3.0, &p.people, &p.pets, WaterLevel::Basic, false);
         // 3 days would be 12.9 gallons; a household can gather about 6, so the cap is the amount
         // and the dog's water (PetMD, the 40 lb estimate) is not behind the line.
         assert_eq!(r.quantity, 6.0);
@@ -973,9 +1385,19 @@ mod tests {
         // One person: 3 days is 3 gallons, under the cap, so the water sources stand behind it
         // and the cap does not.
         let none = Pets::default();
-        let one = water_reused_bottles(&p.people[..1], &none, WaterLevel::Basic, false);
+        let one = water_reused_bottles(3.0, &p.people[..1], &none, WaterLevel::Basic, false);
         assert_eq!(one.quantity, 3.0);
-        assert!(one.plain.contains("3 days of your water"), "{}", one.plain);
+        assert!(
+            one.plain.contains("all 3 days of your water"),
+            "{}",
+            one.plain
+        );
+        // Round-2 review P-13: the whole stored target, not three days, up to the 6-gallon cap.
+        // One person, a 5-day target: 5 gallons, free.
+        let five = water_reused_bottles(5.0, &p.people[..1], &none, WaterLevel::Basic, false);
+        assert_eq!(five.quantity, 5.0);
+        let week = water_reused_bottles(7.0, &p.people[..1], &none, WaterLevel::Basic, false);
+        assert_eq!(week.quantity, 6.0);
         assert!(!one.prior, "{:?}", one.citations);
         assert!(!one.citations.iter().any(|c| c == "rr_research_risk_model"));
         assert!(one.citations.iter().any(|c| c == "ready_gov_water"));
@@ -1025,6 +1447,85 @@ mod tests {
         assert!(!c.citations.iter().any(|x| x == "who_wedc_tn9"));
         let hot = water_gallons(3.0, &p.people, &none, WaterLevel::Comfortable, true, 0.0);
         assert!(hot.citations.iter().any(|x| x == "who_wedc_tn9"));
+    }
+
+    /// Round-2 review P-03: rain barrels as the raw-water source, sized to the state's driest
+    /// months and within its rules.
+    #[test]
+    fn rain_barrels_follow_the_state_rain_and_rules() {
+        let mut house = fixtures::get("sugar-land-ev-household-3").unwrap().housing;
+        house.raw_water_source = None;
+        // Texas (48): driest April-October quarter 7.94 in → 2.65 in a month × 155.8 gal an inch
+        // = 412 gal a month per barrel against 3.56 × 30 = 107: one barrel, a need.
+        let (s, kind) = rain_catchment_units(50.0, 3.5625, &house, false, Some(48)).unwrap();
+        assert_eq!(kind, RainKind::Need);
+        assert_eq!(s.quantity, 1.0);
+        assert!(s.plain.contains("TX's driest three months"), "{}", s.plain);
+        assert!(s.citations.iter().any(|c| c == "noaa_nclimdiv"));
+        assert!(s.citations.iter().any(|c| c == "ncsl_rainwater"));
+        assert!(s.prior, "the roof area is an estimate");
+        // California (6) limits rainwater to outdoor uses: optional, and within its 360 gallons.
+        let (s, kind) = rain_catchment_units(50.0, 3.5625, &house, false, Some(6)).unwrap();
+        assert_eq!(kind, RainKind::Optional);
+        assert!(s.plain.contains("360 gallons"), "{}", s.plain);
+        // A household that uses 60 gallons a day in California's dry summer (0.64 in over
+        // Jul-Sep): four barrels bring in about 133 gallons a month against 1,800, less than a
+        // quarter, so the line is a note that points to hauling.
+        let (s, kind) = rain_catchment_units(50.0, 60.0, &house, false, Some(6)).unwrap();
+        assert_eq!(kind, RainKind::Note);
+        assert!(s.plain.contains("carriers line"), "{}", s.plain);
+        // Oregon (41): enough rain, but drinking rainwater may need a permit: optional, washing and
+        // flushing.
+        let (s, kind) = rain_catchment_units(50.0, 2.6875, &house, false, Some(41)).unwrap();
+        assert_eq!(kind, RainKind::Optional);
+        assert!(s.plain.contains("washing and flushing"), "{}", s.plain);
+        // Colorado (8) caps the count at two barrels whatever the need.
+        let (s, _) = rain_catchment_units(50.0, 40.0, &house, false, Some(8)).unwrap();
+        assert_eq!(s.quantity, 2.0);
+        // No barrel for a short target, a drought, an apartment, a well or a named source.
+        assert!(rain_catchment_units(14.0, 3.0, &house, false, Some(48)).is_none());
+        assert!(rain_catchment_units(50.0, 3.0, &house, true, Some(48)).is_none());
+        let mut named = house.clone();
+        named.raw_water_source = Some(RawWaterSource::SurfaceNearby);
+        assert!(rain_catchment_units(50.0, 3.0, &named, false, Some(48)).is_none());
+        let flat = fixtures::get("miami-condo-retiree-1").unwrap().housing;
+        assert!(rain_catchment_units(50.0, 3.0, &flat, false, Some(12)).is_none());
+        // Without a state figure: one barrel, optional until the rule is known.
+        let (s, kind) = rain_catchment_units(50.0, 3.0, &house, false, None).unwrap();
+        assert_eq!((s.quantity, kind), (1.0, RainKind::Optional));
+    }
+
+    #[test]
+    fn carriers_totes_and_hand_pumps() {
+        let philly = fixtures::get("philadelphia-renters-4").unwrap().housing;
+        // A long target: a need; four people carry four.
+        let (c, need) = water_carriers(30.0, 4, &philly).unwrap();
+        assert!(need);
+        assert_eq!(c.quantity, 4.0);
+        assert!(c.plain.contains("42 pounds"), "{}", c.plain);
+        assert!(
+            c.citations
+                .iter()
+                .any(|x| x == "epa_asheville_boil_notice_2024")
+        );
+        assert!(water_carriers(3.0, 4, &philly).is_none());
+        // A tall building or a well: optional for a short target.
+        let miami = fixtures::get("miami-condo-retiree-1").unwrap().housing;
+        let (c, need) = water_carriers(3.0, 1, &miami).unwrap();
+        assert!(!need && c.quantity == 2.0);
+        assert!(c.plain.contains("up the stairs"));
+        // Hays: 12 animals in a drought: one tote, 79.3 gallons a day, about 3.5 days a load.
+        let t = livestock_haul_tank(60.0, 12, true).unwrap();
+        assert_eq!(t.quantity, 1.0);
+        assert_eq!(t.item_class, "livestock_water");
+        assert!(t.plain.contains("3.5 days"), "{}", t.plain);
+        assert!(livestock_haul_tank(10.0, 12, false).is_none());
+        assert!(livestock_haul_tank(60.0, 0, true).is_none());
+        // A hand pump is optional past 30 days on a well.
+        let coos = fixtures::get("coos-bay-well-owner-2").unwrap().housing;
+        assert!(well_hand_pump(50.0, &coos).is_some());
+        assert!(well_hand_pump(30.0, &coos).is_none());
+        assert!(well_hand_pump(50.0, &philly).is_none());
     }
 
     #[test]

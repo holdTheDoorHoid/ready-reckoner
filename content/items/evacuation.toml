@@ -27,6 +27,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: planning, an
 quantity_rule = "once"
 citations = ["ready_gov_evacuation", "ready_gov_hurricanes", "ready_gov_pets", "aspca_disaster_prep", "ready_gov_kit", "gollwitzer_sheeran_2006", "wood_2018_milling", "rr_research_prior_art"]
 hazard_extras = []
+readiness_share = 1.0
 
 [[item]]
 id = "evac_half_tank"
@@ -54,6 +55,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits and c
 quantity_rule = "once_if_vehicle"
 citations = ["ready_gov_evacuation", "ready_gov_winter", "hcfl_ev_safety", "doe_afdc_stations", "doe_fueleconomy_ev", "nhtsa_tires", "cdc_co_basics", "rr_expert_prior"]
 hazard_extras = []
+readiness_share = 0.3
 
 [[item]]
 id = "evac_ten_minute_drills"
@@ -83,6 +85,7 @@ quantity_rule = "once"
 maintenance = { check_months = 6 }
 citations = ["ready_gov_home_fires", "vinnell_2020_shakeout", "gargano_2017_wtc_training", "ready_gov_earthquakes", "ready_gov_tornadoes", "nws_tsunami_safety", "ready_gov_tsunamis", "dogami_tsunami_faq", "ready_gov_floods", "nws_turn_around_dont_drown", "ready_gov_nuclear", "ready_gov_radiation"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "evac_go_bag"
@@ -93,11 +96,11 @@ buckets = ["evacuate"]
 tier = "h72"
 free = false
 assumed_basic = true
-spec = "Any sturdy backpack each person can carry, packed from the household's own supplies rather than bought as a kit: about three days of water and food that needs no cooking, medicines, copies of documents and the contact card, a light, a whistle, first-aid basics, a phone charger, cash, and a change of clothes and sturdy shoes (Ready.gov, CDC). Most homes already have a bag for each person."
+spec = "Any sturdy backpack each person can carry, packed from the household's own supplies rather than bought as a kit: about three days of water and food that needs no cooking, medicines and an old pair of glasses, copies of documents on paper and a flash drive, the contact card, a light, a whistle, first-aid basics, a phone charger, cash, and a change of clothes and sturdy shoes (Ready.gov, CDC). Most homes already have a bag for each person."
 look_for = [
   "Water and no-cook food moved from your stored supplies; refill the water every six months (CDC)",
-  "Three days of each person's medicines, and the written medicine list",
-  "Copies of documents and the contact card in a waterproof bag",
+  "Three days of each person's medicines, the written medicine list, and an old pair of glasses or spare contact lenses (Ready.gov)",
+  "Copies of documents and the contact card in a waterproof bag, and the same papers scanned onto a flash drive",
   "A headlamp or flashlight, spare batteries and a whistle",
   "First-aid basics, hand sanitizer and any masks you keep",
   "A phone charger or power bank, and cash in small bills",
@@ -112,8 +115,9 @@ price_band_usd = { low = 29.73, high = 38.8, per = "bag", note = "A sturdy backp
 retrieved = "2026-09-26"
 quantity_rule = "per_person"
 maintenance = { check_months = 6 }
-citations = ["ready_gov_evacuation", "cdc_evacuation_psa", "ready_gov_kit", "cdc_water_storage", "washington_prepare_in_a_year", "redcross_survival_kit", "rr_price_observations_2026_09"]
+citations = ["ready_gov_evacuation", "cdc_evacuation_psa", "ready_gov_kit", "cdc_water_storage", "washington_prepare_in_a_year", "redcross_survival_kit", "ollam_2022_lawyer_passport_locksmith_gun", "fema_effak", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 1.0
 
 [[item]]
 id = "evac_whistle"
@@ -137,13 +141,15 @@ retrieved = "2026-09-25"
 quantity_rule = "per_person"
 citations = ["ready_gov_kit", "ready_gov_earthquakes", "rr_price_observations_2026_09"]
 hazard_extras = []
+requires = ["evac_go_bag"]
+readiness_share = 0.05
 
 [[item]]
 id = "evac_shelter_in_place_kit"
 name = "Plastic sheeting and duct tape to shelter in place"
 category = "evacuation"
 unit = "kit"
-buckets = ["supplies"]
+buckets = ["clean_air", "supplies"]
 tier = "h72"
 free = false
 spec = "Thick plastic sheeting and duct tape to seal a room's windows, doors and vents if officials tell you to shelter in place from a chemical release (Ready.gov). Cut the sheets several inches wider than each opening ahead of time and label them."
@@ -161,6 +167,7 @@ retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["ready_gov_shelter", "ready_gov_chemical", "ready_gov_kit", "rr_price_observations_2026_09"]
 hazard_extras = ["hazmat_release", "nuclear_plant_incident"]
+readiness_share = 0.3
 
 [[item]]
 id = "evac_ride_plan"
@@ -184,3 +191,33 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a plan and a
 quantity_rule = "evacuation_ride_plan"
 citations = ["ready_gov_evacuation", "ready_gov_older_adults", "ready_gov_disability"]
 hazard_extras = []
+readiness_share = 1.0
+
+[[item]]
+id = "evac_forecast_48h_checklist"
+name = "When a storm, freeze or heat wave is forecast: the 48-hour list"
+category = "evacuation"
+unit = "action"
+buckets = ["evacuate", "power", "water_out", "supplies", "comms", "medication"]
+tier = "now"
+free = true
+spec = "Hurricanes, winter storms and heat waves usually come with days of warning, and the same short list makes the most of them (Red Cross, Ready.gov). Run it each time a warning or watch is issued for where you live."
+look_for = [
+  "Fill the bathtub and sinks for flushing and washing, and clean containers for drinking (CDC)",
+  "Charge phones, power banks, lights, the power station and any electric car",
+  "Fill the car's tank and get some cash",
+  "Refill prescriptions that are due",
+  "Set the fridge and freezer to their coldest, and freeze bottles of water",
+  "Bring in or tie down anything outside that wind could throw",
+  "Check your go-or-stay card and its trigger",
+  "Check on the neighbours on your contact card",
+]
+avoid = [
+  "Waiting for the storm to start before you prepare",
+  "Drinking bathtub water that has not been treated",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a checklist you run before each forecast storm." }
+quantity_rule = "once"
+citations = ["redcross_hurricane_checklist", "cdc_hurricane_prepare", "ready_gov_hurricanes", "ready_gov_power_outages", "ready_gov_winter", "ready_gov_heat"]
+hazard_extras = []
+readiness_share = 0.5

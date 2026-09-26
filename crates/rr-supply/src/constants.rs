@@ -269,6 +269,60 @@ pub struct SolarRow {
     pub city: String,
 }
 
+/// Rain barrels by state: the driest months' rain and what the state allows (round 2, v0.2.0).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RainTable {
+    /// Where the rain figures and the rules come from.
+    pub sources: Vec<CitationId>,
+    /// Caveats.
+    pub note: String,
+    /// One row per state, the District of Columbia and the territories.
+    #[serde(rename(deserialize = "row", serialize = "rows"))]
+    pub rows: Vec<RainRow>,
+}
+
+/// How a state treats catching rainwater, as NCSL's map classes it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RainRule {
+    /// No statewide law (local rules may apply).
+    None,
+    /// The state encourages it with incentives.
+    Encourages,
+    /// The state restricts who may collect it or how it is used.
+    Restricts,
+    /// No information (some territories).
+    Unknown,
+}
+
+/// One state's rain figure and rule.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RainRow {
+    /// Two-digit state FIPS code.
+    pub fips: u8,
+    /// Postal abbreviation.
+    pub state: String,
+    /// Normal (1991–2020) rain in the driest three months in a row between April and October, in
+    /// inches; absent where NOAA publishes no statewide figure.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dry_in: Option<f64>,
+    /// How the state treats catching rainwater.
+    pub rule: RainRule,
+    /// Whether the rule lets a household use the water in the house or for drinking.
+    pub drinking: bool,
+    /// Most gallons a household may keep without a permit or registration.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_gal: Option<f64>,
+    /// Most containers without a permit or registration.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_barrels: Option<f64>,
+    /// The restriction in plain words.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub note: Option<String>,
+}
+
 /// A disagreement between authorities that is not a single number the rules use.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -322,6 +376,8 @@ pub struct Constants {
     pub shelf_life: ShelfLifeTable,
     /// Winter solar output by latitude.
     pub solar: SolarTable,
+    /// Rain barrels by state.
+    pub rain: RainTable,
     /// Disagreements that are not a single number.
     #[serde(rename(deserialize = "disagreement", serialize = "disagreements"))]
     pub disagreements: Vec<Disagreement>,
@@ -380,6 +436,11 @@ impl Constants {
         self.constant(key).default
     }
 
+    /// The rain row for a state, by its two-digit FIPS code.
+    pub fn rain_row(&self, state_fips: u8) -> Option<&RainRow> {
+        self.rain.rows.iter().find(|r| r.fips == state_fips)
+    }
+
     /// The source with this citation id, if rr-supply lists it.
     pub fn source(&self, id: &str) -> Option<&Source> {
         self.source_index.get(id).map(|&i| &self.sources[i])
@@ -404,6 +465,7 @@ impl Constants {
         out.extend(self.shelf_life.sources.iter().cloned());
         out.extend(self.shelf_life.note_sources.iter().cloned());
         out.extend(self.solar.sources.iter().cloned());
+        out.extend(self.rain.sources.iter().cloned());
         for d in &self.disagreements {
             out.extend(d.sources.iter().cloned());
         }
@@ -523,6 +585,40 @@ impl Constants {
             if w[0].lat[1] != w[1].lat[0] {
                 p.push("solar bands must be contiguous".to_owned());
             }
+        }
+        let mut seen = BTreeSet::new();
+        for r in &self.rain.rows {
+            if !seen.insert(r.fips) {
+                p.push(format!("rain table lists state {} twice", r.fips));
+            }
+            if r.state.len() != 2 || !r.state.chars().all(|c| c.is_ascii_uppercase()) {
+                p.push(format!(
+                    "rain row {}: `{}` is not a postal code",
+                    r.fips, r.state
+                ));
+            }
+            if r.dry_in.is_some_and(|d| !d.is_finite() || d < 0.0) {
+                p.push(format!(
+                    "rain row {}: dry-season rain must be 0 or more",
+                    r.state
+                ));
+            }
+            let restricted = r.rule == RainRule::Restricts;
+            if restricted != r.note.is_some() {
+                p.push(format!(
+                    "rain row {}: a restricted state needs a note, and only a restricted state has one",
+                    r.state
+                ));
+            }
+            if matches!(r.rule, RainRule::None | RainRule::Encourages) && !r.drinking {
+                p.push(format!(
+                    "rain row {}: a state with no restriction allows household use",
+                    r.state
+                ));
+            }
+        }
+        if self.rain.rows.len() < 51 {
+            p.push("rain table must cover the 50 states and DC".to_owned());
         }
         p
     }
@@ -712,6 +808,43 @@ keys! {
     NOTICE_HOURS_BAND_HOURS = "notice_hours_band_hours",
     READINESS_P_NEED_THRESHOLD = "readiness_p_need_threshold",
     EVACUATION_PLANS_PER_PERSON = "evacuation_plans_per_person",
+    BATTERY_PACK_CAP_DAYS = "battery_pack_cap_days",
+    GENERATOR_RATIONED_HOURS_PER_DAY = "generator_rationed_hours_per_day",
+    RAIN_CATCHMENT_SQFT_PER_BARREL = "rain_catchment_sqft_per_barrel",
+    RAIN_BARREL_GAL = "rain_barrel_gal",
+    RAIN_BARRELS_MAX = "rain_barrels_max",
+    RAIN_DRY_SEASON_MIN_SHARE = "rain_dry_season_min_share",
+    WATER_CARRIERS_PER_HOUSEHOLD = "water_carriers_per_household",
+    WATER_CARRIERS_LARGE_HOUSEHOLD = "water_carriers_large_household",
+    WATER_CARRIER_GAL = "water_carrier_gal",
+    LIVESTOCK_HAUL_TANK_GAL = "livestock_haul_tank_gal",
+    HAND_PUMP_MIN_DAYS = "hand_pump_min_days",
+    TOILET_SUPPLIES_CAP_DAYS = "toilet_supplies_cap_days",
+    COOKING_CAPABILITY_MIN_DAYS = "cooking_capability_min_days",
+    STAPLES_FUEL_LB_PER_2000KCAL = "staples_fuel_lb_per_2000kcal",
+    PROPANE_CYLINDER_LB = "propane_cylinder_lb",
+    BUTANE_BOIL_F = "butane_boil_f",
+    PROPANE_BOIL_F = "propane_boil_f",
+    CASH_EXPENSE_DAYS = "cash_expense_days",
+    CASH_ESSENTIAL_SHARE = "cash_essential_share",
+    CASH_ROUND_USD = "cash_round_usd",
+    WOUND_ADDON_MIN_DAYS = "wound_addon_min_days",
+    RESPIRATOR_DAYS_MAX = "respirator_days_max",
+    AIR_CLEANER_CADR_PER_SQFT = "air_cleaner_cadr_per_sqft",
+    CLEAN_ROOM_SQFT = "clean_room_sqft",
+    RX_FRIDGE_MIN_DAYS = "rx_fridge_min_days",
+    RX_FILL_DAYS = "rx_fill_days",
+    NFIP_CLAIMS_OUTSIDE_HIGH_RISK_SHARE = "nfip_claims_outside_high_risk_share",
+    DISABILITY_BEFORE_RETIREMENT_SHARE = "disability_before_retirement_share",
+    HOUSEHOLD_OPS_KIT_DAYS = "household_ops_kit_days",
+    HOUSEHOLD_OPS_CAP_DAYS = "household_ops_cap_days",
+    FOOD_STORAGE_L_PER_2000KCAL = "food_storage_l_per_2000kcal",
+    FOOD_STORAGE_KG_PER_2000KCAL = "food_storage_kg_per_2000kcal",
+    PET_FOOD_L_PER_LB = "pet_food_l_per_lb",
+    TOILET_PAPER_L_PER_ROLL = "toilet_paper_l_per_roll",
+    TOILET_PAPER_KG_PER_ROLL = "toilet_paper_kg_per_roll",
+    LONG_HORIZON_MIN_DAYS = "long_horizon_min_days",
+    CLEAN_AIR_MIN_P10 = "clean_air_min_p10",
 }
 
 #[cfg(test)]

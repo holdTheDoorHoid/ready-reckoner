@@ -1,5 +1,6 @@
-//! First aid (research §3.1, §3.5–§3.8): the family kit, non-prescription medicines, masks, a
-//! thermometer and oral rehydration salts.
+//! First aid (research §3.1, §3.5–§3.8): the family kit, non-prescription medicines, a thermometer,
+//! oral rehydration salts, the bleeding-control kit and the wound-care add-on. Respirators moved to
+//! the clean-air lines in v0.2.0 (`clean_air.rs`).
 
 use rr_types::{AgeBand, Per, Person};
 
@@ -7,7 +8,6 @@ use super::Sizing;
 use crate::basis::Basis;
 use crate::constants::{constants, keys};
 use crate::format::{ceil_count, count, days as fmt_days, num};
-use crate::household::is_4_plus;
 
 /// One family first-aid kit (the Red Cross list for four people) per four people. Rule
 /// `first_aid_kit`.
@@ -44,7 +44,7 @@ pub fn otc_medicines(days: f64, people_list: &[Person]) -> Sizing {
     let each = ceil_count((days.max(0.0) / per_package * n / per_kit).max(1.0));
     let q = kinds * each;
     let text = format!(
-        "{} of each of {} kinds of non-prescription medicine (a pain reliever, an anti-diarrhea medicine, an antacid and a laxative): one package of each lasts about {} for {} people. That is {} for {}. Follow the label, and ask a pharmacist about children's versions.",
+        "{} of each of {} kinds of non-prescription medicine (a pain reliever, an anti-diarrhea medicine, an antacid and an allergy medicine): one package of each lasts about {} for {} people. That is {} for {}. Follow the label, and ask a pharmacist about children's versions.",
         count(each, "package", "packages"),
         num(kinds, 0),
         fmt_days(per_package),
@@ -61,36 +61,6 @@ pub fn otc_medicines(days: f64, people_list: &[Person]) -> Sizing {
         Per::Household,
         text,
     )
-}
-
-/// N95 masks for smoke or an outbreak: one a day per person aged 4 and over, for five days (an
-/// estimate; no agency publishes a count). Rule `n95_masks`.
-pub fn n95_masks(people_list: &[Person]) -> Option<Sizing> {
-    let n = people_list.iter().filter(|p| is_4_plus(p)).count();
-    if n == 0 {
-        return None;
-    }
-    let mut b = Basis::new();
-    let per_day = b.k(keys::N95_PER_PERSON_DAY);
-    let days = b.k(keys::N95_DAYS);
-    b.cite("ready_gov_kit");
-    let q = n as f64 * per_day * days;
-    let text = format!(
-        "N95 masks for wildfire smoke or an outbreak: {} a day for each of the {} aged 4 and over, for {} = {} masks. A well-fitting N95 protects more than a cloth or surgical mask.",
-        num(per_day, 0),
-        count(n as f64, "person", "people"),
-        fmt_days(days),
-        num(q, 0)
-    );
-    Some(Sizing::new(
-        &b,
-        "n95_masks",
-        "n95_mask",
-        q,
-        "mask",
-        Per::Person,
-        text,
-    ))
 }
 
 /// An oral thermometer, and an infant thermometer when there is a baby. Rule `thermometer`.
@@ -159,6 +129,46 @@ pub fn bleeding_control_kit(rural: bool, p_medical_10yr: Option<f64>) -> (Sizing
     (sizing, rural || likely)
 }
 
+/// A wound-care and splint add-on for the first-aid kit (round-2 review P-11, item N-12): wound
+/// irrigation, closure strips, an elastic wrap, a padded splint, shears, blister dressings and gauze
+/// for packing a wound (Wilderness Medical Society guidelines), for households far from help: rural
+/// homes (ambulances take longer, Mell 2017) or a can't-get-to-a-store target of at least
+/// `wound_addon_min_days` (14, an estimate). Returns the sizing and whether it belongs in the
+/// three-day tier (rural homes). Rule `wound_care_addon`.
+pub fn wound_care_addon(rural: bool, supplies_days: Option<f64>) -> Option<(Sizing, bool)> {
+    let min = constants().value(keys::WOUND_ADDON_MIN_DAYS);
+    let long = supplies_days.is_some_and(|d| d.is_finite() && d >= min);
+    if !rural && !long {
+        return None;
+    }
+    let mut b = Basis::new();
+    b.cite("wms_wound_2014");
+    b.cite("redcross_first_aid_kit");
+    let mut text = "A wound-care and splint add-on for the first-aid kit: an irrigation syringe to wash a wound with clean water, wound-closure strips, an elastic wrap, a padded splint, trauma shears, blister dressings and gauze for packing a deep wound. Washing a wound out with plenty of clean water is the key step.".to_owned();
+    if rural {
+        b.cite("mell_2017_ems_response");
+        text.push_str(
+            " Ambulances take longer to reach rural homes, so keep it with the first-aid kit.",
+        );
+    } else {
+        let days = b.k(keys::WOUND_ADDON_MIN_DAYS);
+        text.push_str(&format!(
+            " Your plan runs past {} without a store, when a small wound has to be cared for at home.",
+            fmt_days(days)
+        ));
+    }
+    let s = Sizing::new(
+        &b,
+        "wound_care_addon",
+        "wound_care",
+        1.0,
+        "kit",
+        Per::Household,
+        text,
+    );
+    Some((s, rural))
+}
+
 /// Oral rehydration salts: three packets per person per two weeks (an estimate), each mixed into a
 /// litre of safe water. Rule `ors_packets`.
 pub fn ors_packets(days: f64, people_list: &[Person]) -> Sizing {
@@ -196,7 +206,6 @@ mod tests {
         let p = fixtures::get("philadelphia-renters-4").unwrap();
         assert_eq!(first_aid_kit(&p.people).quantity, 1.0);
         assert_eq!(otc_medicines(10.0, &p.people).quantity, 4.0);
-        assert_eq!(n95_masks(&p.people).unwrap().quantity, 20.0);
         assert_eq!(thermometer(&p.people).quantity, 1.0);
         assert_eq!(ors_packets(10.0, &p.people).quantity, 12.0);
     }
@@ -206,9 +215,27 @@ mod tests {
         let p = fixtures::get("hays-kansas-farm-5").unwrap();
         assert_eq!(first_aid_kit(&p.people).quantity, 2.0);
         // 4 people aged 4+ (the toddler is left out) × 1 × 5
-        assert_eq!(n95_masks(&p.people).unwrap().quantity, 20.0);
         let sl = fixtures::get("sugar-land-ev-household-3").unwrap();
         assert_eq!(thermometer(&sl.people).quantity, 2.0);
+    }
+
+    #[test]
+    fn the_wound_add_on_is_for_homes_far_from_help() {
+        // Rural: the three-day tier, and the line says why.
+        let (s, h72) = wound_care_addon(true, Some(3.0)).unwrap();
+        assert!(h72);
+        assert!(s.plain.contains("irrigation syringe") && s.plain.contains("rural"));
+        assert!(s.citations.iter().any(|c| c == "mell_2017_ems_response"));
+        assert!(s.citations.iter().any(|c| c == "wms_wound_2014"));
+        // A town household with a two-week store target: not three-day, and an estimate.
+        let (s, h72) = wound_care_addon(false, Some(14.0)).unwrap();
+        assert!(!h72 && s.prior);
+        assert!(wound_care_addon(false, Some(10.0)).is_none());
+        assert!(wound_care_addon(false, None).is_none());
+        // The OTC kinds match the catalogue item: an allergy medicine, not a laxative.
+        let p = fixtures::get("philadelphia-renters-4").unwrap();
+        let otc = otc_medicines(10.0, &p.people);
+        assert!(otc.plain.contains("allergy medicine") && !otc.plain.contains("laxative"));
     }
 
     #[test]

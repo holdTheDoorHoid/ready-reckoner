@@ -23,6 +23,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free if your pet i
 quantity_rule = "once_if_pets"
 citations = ["ready_gov_pets", "aspca_disaster_prep"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "special_pet_kit"
@@ -50,6 +51,7 @@ quantity_rule = "per_pet"
 maintenance = { check_months = 6 }
 citations = ["ready_gov_pets", "aspca_disaster_prep", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "special_pet_food"
@@ -75,6 +77,7 @@ quantity_rule = "pet_food_lb"
 maintenance = { rotate_months = 2 }
 citations = ["aspca_disaster_prep", "ready_gov_pets", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.05
 
 [[item]]
 id = "special_infant_go_kit"
@@ -99,6 +102,7 @@ quantity_rule = "once_if_infant"
 maintenance = { check_months = 1 }
 citations = ["cdc_infant_checklist", "cdc_winter_safety"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "special_access_needs_plan"
@@ -122,6 +126,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free to plan; spar
 quantity_rule = "once_if_mobility_needs"
 citations = ["ready_gov_disability", "ready_gov_older_adults"]
 hazard_extras = []
+readiness_share = 1.0
 
 [[item]]
 id = "special_older_adult_plan"
@@ -146,6 +151,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: conversation
 quantity_rule = "once_if_senior"
 citations = ["ready_gov_older_adults", "cdc_heat_health", "cdc_winter_safety"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "special_pregnancy_plan"
@@ -169,6 +175,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: planning wit
 quantity_rule = "once_if_pregnant_or_nursing"
 citations = ["cdc_pregnancy_emergency", "cdc_water_disinfection", "iom_dri_water_2005"]
 hazard_extras = []
+readiness_share = 0.3
 
 [[item]]
 id = "special_livestock_plan"
@@ -192,6 +199,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free to plan." }
 quantity_rule = "once_if_large_animals"
 citations = ["aspca_disaster_prep", "sphere_2018"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "special_pet_go_water"
@@ -217,6 +225,7 @@ volume_l_per_unit = 3.785
 maintenance = { rotate_months = 2 }
 citations = ["aspca_disaster_prep", "petmd_dog_water", "merck_vet_maintenance_fluids"]
 hazard_extras = []
+readiness_share = 0.1
 
 [[item]]
 id = "special_pet_go_food"
@@ -241,6 +250,7 @@ quantity_rule = "pet_go_food"
 maintenance = { rotate_months = 2 }
 citations = ["aspca_disaster_prep", "ready_gov_pets"]
 hazard_extras = []
+readiness_share = 0.1
 
 [[item]]
 id = "special_nursing_supplies"
@@ -264,4 +274,30 @@ price_band_usd = { low = 44.98, high = 46.98, per = "kit", note = "Makers' list 
 retrieved = "2026-09-26"
 quantity_rule = "nursing_supplies"
 citations = ["cdc_infant_checklist", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "special_kids_activity_kit"
+name = "Activities for children: a card game, drawing things and a comfort item"
+category = "special_needs"
+unit = "kit"
+buckets = ["supplies"]
+tier = "w2"
+free = false
+long_horizon = true
+spec = "Books, games, puzzles or other activities for children, as Ready.gov's kit lists: a long outage or a stay away from home is easier on children with something familiar to do. Pack a comfort item your child already loves."
+look_for = [
+  "A deck of cards or a small card game",
+  "Crayons or colored pencils, and paper to draw on",
+  "Books from home or the library",
+  "The child's own comfort item, packed last",
+]
+avoid = [
+  "Toys that need batteries or a charger",
+  "Buying new toys when ones from home will do",
+]
+price_band_usd = { low = 14.97, high = 22.96, per = "kit", note = "Two supermarket sets: a card game ($4.99), 24 crayons ($3.99) and a drawing pad ($5.99), or the card game, colored pencils, markers and the pad ($22.96). Things you already have cost nothing." }
+retrieved = "2026-09-26"
+quantity_rule = "once_if_children"
+citations = ["ready_gov_kit", "rr_price_observations_2026_09"]
 hazard_extras = []

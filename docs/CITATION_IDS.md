@@ -542,6 +542,45 @@ current title.
   map answered 404 at the address tried; the supply worktree has since found its current address
   (ncsl_rainwater), which this branch does not add, to avoid a second id for one source.
 
+## Added for supply on 2026-09-26 (v0.2.0)
+
+The supply workstream's rules and items for round 2 (rain barrels, stoves and fuel, clean air,
+insurance and home decisions, the 48-hour list, key safes and passports). Each page was read on
+2026-09-26 and the claim checked against it; a quote is stored only where the wording was matched in
+the page's own text (the HTML or PDF), and pages that refuse automated reads were read in an
+ordinary browser. `rr_supply::citations_used()` lists the ones the supply lines emit.
+
+| id | Source | Used for | Check result |
+| --- | --- | --- | --- |
+| `noaa_nclimdiv` | NOAA NCEI, nClimDiv statewide monthly precipitation (climdiv-pcpnst-v1.0.0-20260904) | the rain table's driest three months between April and October, 1991–2020 normals, per state (rain_catchment_units) | downloaded and computed; no quote (a data file) |
+| `ncsl_rainwater` | NCSL, Map Monday: Is Catching Rainwater Legal in Your State? (updated 2025-09-08) | each state's rain-barrel rule and limit in the rain table | read on the page; paraphrased |
+| `nist_butane`, `nist_propane` | NIST Chemistry WebBook (SRD 69), phase change data | butane boils near 31.7 °F, propane near −43.7 °F (the camp stove and propane cylinders) | read on the pages (normal boiling points in kelvin, converted) |
+| `epa_air_cleaner_guide` | EPA, Guide to Air Cleaners in the Home | CADR large enough for the room (air_cleaner_units, 0.65 cfm per square foot) | confirmed, exact quote stored |
+| `floodsmart_flood_risk` | FEMA FloodSmart, What Is My Flood Risk? | 29 % of NFIP claims (2014–2024) from outside high-risk areas | confirmed, exact quote stored |
+| `naic_home_insurance_guide`, `naic_life_insurance_guide` | NAIC consumer guides (home; life) | wind and hurricane deductibles, sewer backup, condo unit-owners cover, additional living expenses; how much life cover | read in the PDFs; paraphrased |
+| `cdc_hurricane_prepare` | CDC, Preparing for Hurricanes or Other Tropical Storms | fill sinks and bathtubs with water for washing (the 48-hour list) | confirmed through a page fetch, exact quote stored |
+| `cdc_mosquitoes_after_flood` | CDC, What to Do After a Hurricane or Flood (mosquitoes) | floodwater mosquitoes increase in the weeks after flooding | confirmed in the page text, exact quote stored |
+| `cdc_preventing_mosquito_bites` | CDC, Preventing Mosquito Bites | use EPA-registered repellents; look for the EPA registration number | confirmed in the page text, exact quote stored |
+| `redcross_hurricane_checklist` | American Red Cross, Hurricane Safety Checklist (PDF) | the 48-hour list's steps | read in the PDF; paraphrased (redcross.org refuses plain HTTP clients) |
+| `fema_b526_eq_checklist` | FEMA B-526, Earthquake Safety Checklist (October 2023) | water heaters that could be pulled from their pipes; tall furniture that could topple | confirmed in the PDF text, exact quote stored |
+| `fema_sill_plate_bolting` | FEMA fact sheet, Bolt Sill Plates to Foundation (2008) | bolting a house to its foundation; a licensed contractor does the work | confirmed in the PDF, exact quote stored |
+| `crmp_earthquake_brace_bolt` | California Residential Mitigation Program, Earthquake Brace + Bolt | up to $3,000 toward a code-compliant retrofit of a pre-1980 raised-foundation house | read on the page (the program's own site redirects there); paraphrased |
+| `fema_p320_safe_room`, `fema_safe_room_funding` | FEMA P-320 (6th ed., 2025); FEMA Safe Room Funding | near-absolute protection; homeowners do not apply to FEMA directly | confirmed, exact quotes stored |
+| `fema_flood_smart_protect` | FEMA fact sheet, Be Flood Smart: Protect Your Property (2023) | a backflow valve; a sump pump with a battery backup; utilities above the flood level | confirmed in the page text |
+| `ibhs_fortified_incentives` | IBHS, FORTIFIED Home: Financial Incentives | Florida's retrofit grant; insurer discounts on the wind premium as high as 55 % in some states | read on the page; paraphrased |
+| `cdi_safer_from_wildfires` | California Department of Insurance, Safer from Wildfires | each listed mitigation step qualifies for an insurance discount | read on the page; paraphrased |
+| `cfr_22_1_consular_fees` | 22 CFR 22.1, Schedule of Fees for Consular Services (2025 edition, via govinfo) | passport book $130 ($50 + $80 surcharge), card $30, minor book $100, minor card $15, execution fee $35 | confirmed in the PDF text, exact quote stored. The State Department's fee page and its web-archive capture answered with a bot check, so the fee schedule in the Code of Federal Regulations is cited instead |
+| `epa_protect_from_ash` | EPA, Protect Yourself from Ash (updated 2026-07-28) | a NIOSH N95 or P100 respirator, goggles and work gloves for ash cleanup | confirmed in the page text, exact quote stored |
+| `fema_operation_blue_roof` | FEMA press release, Operation Blue Roof (release dated 2018-10-17) | the temporary tarp cover the tarp kit compares itself with | confirmed in the page text, exact quote stored (fema.gov refuses plain HTTP clients; read in a browser) |
+| `sold_secure_key_safes` | Sold Secure, rated key safes (Gold, Silver, Bronze) | the independent attack-test ratings the key safe points to | read on the page; paraphrased. Replaces a general "why we test" page that did not mention key safes |
+| `thurrock_key_safe_advice` | Thurrock Council (UK), key safes, with Essex Police advice | a five- or six-digit code, a hidden spot, a police-approved rating | read on the page; paraphrased |
+
+**Not cited.** No government source was found for a food-grade bathtub liner (review P-08), so the
+48-hour list says to treat bathtub water before drinking it. The practitioner's wording that
+chlorine dioxide is only somewhat effective against Cryptosporidium comes from CDC's backcountry
+page; the item cites CDC's emergency page, which says chlorine dioxide kills it when the directions
+are followed, and adds that boiling works better against parasites.
+
 ## Requested by data-model (2026-09-26)
 
 The data-model workstream's loaders emit these five ids (its `docs/DATA_SOURCES.md` §2, "Data-pack

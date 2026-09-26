@@ -103,10 +103,17 @@ fn price_bands_match_the_observation_log() {
 
 #[test]
 fn every_category_has_a_file_and_the_catalogue_size_is_in_range() {
-    let n = content().items.len();
+    // Decisions (insurance, ID, home repairs to weigh; contract v2's `decision`) are not things to
+    // acquire or do, so they are counted on their own (docs/CONTENT_STANDARDS.md §3).
+    let n = content().items.iter().filter(|i| !i.decision).count();
     assert!(
         (90..=140).contains(&n),
         "{n} items; the brief asked for about 100–140 before the free actions were grouped"
+    );
+    let decisions = content().items.iter().filter(|i| i.decision).count();
+    assert!(
+        decisions <= 20,
+        "{decisions} decision items; keep the list short"
     );
     for cat in policy::CATEGORIES {
         assert!(
@@ -168,7 +175,11 @@ fn free_actions_are_grouped_into_at_most_thirty_parents() {
     let free: Vec<&str> = content()
         .items
         .iter()
-        .filter(|i| i.free)
+        // Decisions and the long-horizon section's pointers are not free actions on the "now" list,
+        // and two v0.2.0 steps have their own line rules (the clean-room plan and 90-day fills), so
+        // the plan counts them on their own (docs/CONTENT_STANDARDS.md §3).
+        .filter(|i| i.free && !i.decision && !i.long_horizon)
+        .filter(|i| !["fire_clean_room_plan", "med_90_day_fills"].contains(&i.id.as_str()))
         .map(|i| i.id.as_str())
         .collect();
     // The polish round (2026-09-26) grouped the 78 free actions into 28 parents and added four
@@ -335,7 +346,9 @@ fn water_items_match_their_sources() {
     ] {
         assert!(bleach.spec.contains(s), "bleach spec lacks `{s}`");
     }
-    assert_eq!(bleach.maintenance.and_then(|m| m.rotate_months), Some(12)); // EPA: under a year
+    // A fresh bottle each time the stored water is replaced (CDC: every 6 months), as the
+    // `bleach_bottles` rule says (round-2 review P-21).
+    assert_eq!(bleach.maintenance.and_then(|m| m.rotate_months), Some(6));
     // boil: 1 minute; 3 minutes above 5,000 ft (EPA, the stricter altitude)
     let boil = item("water_boil_method");
     assert!(boil.spec.contains("1 minute") && boil.spec.contains("5,000 feet"));

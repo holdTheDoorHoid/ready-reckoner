@@ -34,8 +34,8 @@
 //! staples ([`LONG_STORE_FOOD`]) count only for the days beyond the first month, as `rr-supply`'s
 //! `long_term_staples` rule intends: the first month is food the household normally eats.
 //!
-//! Readiness buckets (leaving home, getting home, medical emergencies, fire, security) have no
-//! days. An item that meets one of their need lines, or (meeting none) lists one first among its
+//! Readiness buckets (leaving home, getting home, medical emergencies, fire, security, clean air)
+//! have no days. An item that meets one of their need lines, or (meeting none) lists one first among its
 //! buckets, is a step on that bucket's checklist and avoids the bucket's harm each time it is
 //! needed ([`READINESS_HARM`], an expert estimate, as the research prototype valued each
 //! capability). Life-safety follows DESIGN §4.7 (the catalogue's flags, plus any item that meets
@@ -221,12 +221,16 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
 /// security, which the research did not price. Expert estimates: they order readiness items
 /// against each other and against supplies, and never reach the user as numbers. (A medical
 /// emergency is needed about twice a year, so its small harm per use still adds up.)
-pub const READINESS_HARM: [(BucketId, f64); 5] = [
+pub const READINESS_HARM: [(BucketId, f64); 6] = [
     (BucketId::Evacuate, 2.0),
     (BucketId::GetHome, 0.5),
     (BucketId::MedicalEmergency, 0.1),
     (BucketId::Fire, 5.0),
     (BucketId::Security, 0.5),
+    // awaiting: plan — contract v2's clean-air bucket (respirators, an air cleaner or filter box,
+    // the clean-room plan). The research did not price it; 0.5, like security's, is the supply
+    // workstream's estimate, so its purchases are valued at all (without a row they never are).
+    (BucketId::CleanAir, 0.5),
 ];
 
 /// Citation ids behind the coverage model's own numbers (the readiness harm estimates come from

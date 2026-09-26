@@ -9,9 +9,12 @@ use crate::basis::Basis;
 use crate::constants::keys;
 use crate::format::{count, days as fmt_days, num};
 
-/// Battery fans: one for the home plus one per person most at risk from heat (an estimate). Rule
-/// `battery_fan`.
-pub fn battery_fan(people_list: &[Person]) -> Sizing {
+/// Battery fans: one for the home plus one per person most at risk from heat (an estimate). In a
+/// hot county (at least 30 days a year at 95 °F) a home without power soon passes the 90 °F above
+/// which a fan stops helping, so the fans are only an optional comfort there and the heat plan's
+/// place to go is the cover (round-2 review P-09); `sized_requirements` makes the line optional.
+/// Rule `battery_fan`.
+pub fn battery_fan(people_list: &[Person], hot: bool) -> Sizing {
     let mut b = Basis::new();
     let base = b.k(keys::BATTERY_FANS_BASE);
     let per_vulnerable = b.k(keys::BATTERY_FANS_PER_VULNERABLE);
@@ -32,12 +35,23 @@ pub fn battery_fan(people_list: &[Person]) -> Sizing {
     } else {
         String::new()
     };
-    let text = format!(
-        "{}: {} for the home{extra}. Fans help only while it is below {} °F indoors; above that, go to a cooling centre.",
-        count(q, "battery fan", "battery fans"),
-        num(base, 0),
-        num(max_f, 0)
-    );
+    let text = if hot {
+        b.k(keys::HOT_CLIMATE_DAYS_95F);
+        b.cite("stone_2023_heat_blackout");
+        format!(
+            "Optional: {}: {} for the home{extra}. In a county as hot as yours a home without power soon passes {} °F, and above that a fan stops helping, so fans do not count toward your heat plan: the place you would go does. In a study of three US cities, a blackout of several days during a heat wave more than doubled the expected heat deaths.",
+            count(q, "battery fan", "battery fans"),
+            num(base, 0),
+            num(max_f, 0)
+        )
+    } else {
+        format!(
+            "{}: {} for the home{extra}. Fans help only while it is below {} °F indoors; above that, go to a cooling centre.",
+            count(q, "battery fan", "battery fans"),
+            num(base, 0),
+            num(max_f, 0)
+        )
+    };
     Sizing::new(
         &b,
         "battery_fan",
@@ -49,15 +63,24 @@ pub fn battery_fan(people_list: &[Person]) -> Sizing {
     )
 }
 
-/// A cooling towel per person (an estimate). Rule `cooling_towel`.
-pub fn cooling_towel(people_list: &[Person]) -> Sizing {
+/// A cooling towel per person (an estimate); an optional comfort in a hot county, like the fans.
+/// Rule `cooling_towel`.
+pub fn cooling_towel(people_list: &[Person], hot: bool) -> Sizing {
     let mut b = Basis::new();
     let each = b.k(keys::COOLING_TOWELS_PER_PERSON);
     let q = (people_list.len() as f64 * each).max(1.0);
-    let text = format!(
-        "{}, one for each person: wet them and wear them on the neck in a heat wave.",
-        count(q, "cooling towel", "cooling towels")
-    );
+    let text = if hot {
+        b.k(keys::HOT_CLIMATE_DAYS_95F);
+        format!(
+            "Optional: {}, one for each person, to wet and wear on the neck. In a county as hot as yours they help, but they do not replace going somewhere cooler.",
+            count(q, "cooling towel", "cooling towels")
+        )
+    } else {
+        format!(
+            "{}, one for each person: wet them and wear them on the neck in a heat wave.",
+            count(q, "cooling towel", "cooling towels")
+        )
+    };
     Sizing::new(
         &b,
         "cooling_towel",
@@ -92,13 +115,24 @@ pub fn room_thermometer() -> Sizing {
     )
 }
 
-/// A heat plan: the nearest cooling centre, the coolest room, who checks on whom. Rule
-/// `cooling_plan`.
-pub fn cooling_plan() -> Sizing {
+/// A heat plan: the nearest cooling centre, the coolest room, who checks on whom. In a hot county
+/// it is the heat cover itself (fans stop helping above 90 °F indoors), so it carries a written
+/// trigger and a ride: "if the power is off and it is 90 °F inside, we go to ..." (round-2 review
+/// P-09); `sized_requirements` marks it life-safety there when a power cut is part of the plan.
+/// Rule `cooling_plan`.
+pub fn cooling_plan(hot: bool) -> Sizing {
     let mut b = Basis::new();
     b.cite("cdc_heat_health");
     b.cite("ready_gov_heat");
-    let text = "A heat plan: find your nearest cooling centre (dial 2-1-1), pick the coolest room, cover sunny windows, and agree who checks on whom. Never leave people or pets in a closed car.".to_owned();
+    let mut text = "A heat plan: find your nearest cooling centre (dial 2-1-1), pick the coolest room, cover sunny windows, and agree who checks on whom. Never leave people or pets in a closed car.".to_owned();
+    if hot {
+        let max_f = b.k(keys::FAN_MAX_INDOOR_F);
+        b.k(keys::HOT_CLIMATE_DAYS_95F);
+        text.push_str(&format!(
+            " In a county as hot as yours this plan is your heat cover: write down \"If the power is off and it is {} °F inside, we go to ___\" (a cooling centre, or a relative or friend with power), and how you will get there.",
+            num(max_f, 0)
+        ));
+    }
     Sizing::new(
         &b,
         "cooling_plan",
@@ -277,7 +311,8 @@ pub fn warm_room_plan(housing: &Housing, people_list: &[Person]) -> Sizing {
     let mut b = Basis::new();
     let hypothermia = b.k(keys::HYPOTHERMIA_F);
     b.cite("cdc_co_basics");
-    let mut text = "A cold plan: pick one room to keep warm, close off the others, put towels under doors and cover windows at night. Never heat with a gas oven, grill, camp stove or generator indoors (carbon monoxide).".to_owned();
+    b.cite("ready_gov_stay_safe_warm");
+    let mut text = "A cold plan: pick one room to keep warm, close off the others, put towels under doors and cover windows at night, and find your nearest warming centre in case the home gets too cold. Never heat with a gas oven, grill, camp stove or generator indoors (carbon monoxide).".to_owned();
     match housing.heating {
         Heating::Wood => text.push_str(
             " Your wood stove keeps you warm as long as you have dry wood; keep the chimney clear.",
@@ -320,11 +355,11 @@ mod tests {
     #[test]
     fn philadelphia_heat_and_cold() {
         let p = fixtures::get("philadelphia-renters-4").unwrap();
-        let fans = battery_fan(&p.people);
+        let fans = battery_fan(&p.people, false);
         assert_eq!(fans.quantity, 2.0); // 1 + the senior
         assert!(fans.plain.contains("90 °F"));
         assert!(fans.prior);
-        assert_eq!(cooling_towel(&p.people).quantity, 4.0);
+        assert_eq!(cooling_towel(&p.people, false).quantity, 4.0);
         let blankets = blankets(&p.people).unwrap();
         assert_eq!(blankets.quantity, 4.0);
         assert_eq!(blankets.unit, "blanket");
@@ -333,6 +368,34 @@ mod tests {
         let plan = warm_room_plan(&p.housing, &p.people);
         assert!(plan.plain.contains("furnaces usually need electricity"));
         assert!(plan.plain.contains("95 °F"));
+        assert!(plan.plain.contains("warming centre"), "{}", plan.plain);
+        assert!(
+            plan.citations
+                .iter()
+                .any(|c| c == "ready_gov_stay_safe_warm")
+        );
+    }
+
+    /// Round-2 review P-09: in a hot county fans and towels do not count as heat cover; the heat
+    /// plan's place to go does, with a written trigger.
+    #[test]
+    fn hot_counties_plan_a_place_to_go_not_a_fan() {
+        let p = fixtures::get("phoenix-apartment-cpap-1").unwrap();
+        let fans = battery_fan(&p.people, true);
+        assert!(fans.plain.starts_with("Optional"), "{}", fans.plain);
+        assert!(
+            fans.citations
+                .iter()
+                .any(|c| c == "stone_2023_heat_blackout")
+        );
+        assert!(cooling_towel(&p.people, true).plain.starts_with("Optional"));
+        let plan = cooling_plan(true);
+        assert!(
+            plan.plain.contains("90 °F inside, we go to"),
+            "{}",
+            plan.plain
+        );
+        assert!(!cooling_plan(false).plain.contains("we go to"));
     }
 
     #[test]
