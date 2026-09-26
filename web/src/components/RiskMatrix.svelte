@@ -53,7 +53,7 @@
             <a id="matrix-{h.id}" href="#hazard-{h.id}" onclick={(e) => go(e, `hazard-${h.id}`, 'h3')}>{h.name}</a>
           </th>
           <td>
-            {likely(h)}<span class="per-year"><span class="visually-hidden">; </span>{perYearWords(h.rate_per_year, h.annual_probability)}</span>
+            {likely(h)}<span class="per-year"><span class="visually-hidden">{'; '}</span>{perYearWords(h.rate_per_year, h.annual_probability)}</span>
           </td>
           <td><SeveritySwatch severity={h.severity} /></td>
           <td>{CONFIDENCE_LABELS[h.confidence]}</td>
