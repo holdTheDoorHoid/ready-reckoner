@@ -61,7 +61,10 @@ pub const RETIRED: &[(&str, &[&str])] = &[
 
 /// Successors of a retired county code, if it is one.
 pub fn successors(code: &str) -> Option<&'static [&'static str]> {
-    RETIRED.iter().find(|(old, _)| *old == code).map(|(_, new)| *new)
+    RETIRED
+        .iter()
+        .find(|(old, _)| *old == code)
+        .map(|(_, new)| *new)
 }
 
 impl Crosswalk {
@@ -99,9 +102,24 @@ impl Crosswalk {
 
     /// As a pack table.
     pub fn to_table(&self) -> Table {
-        let mut t = Table::new(&["old_fips", "region_fips", "land_share_of_old", "land_share_of_region", "towns"], 2);
+        let mut t = Table::new(
+            &[
+                "old_fips",
+                "region_fips",
+                "land_share_of_old",
+                "land_share_of_region",
+                "towns",
+            ],
+            2,
+        );
         for o in &self.overlaps {
-            t.push(vec![o.old.clone(), o.region.clone(), sig4(o.share_of_old), sig4(o.share_of_region), o.towns.to_string()]);
+            t.push(vec![
+                o.old.clone(),
+                o.region.clone(),
+                sig4(o.share_of_old),
+                sig4(o.share_of_region),
+                o.towns.to_string(),
+            ]);
         }
         t
     }
@@ -116,7 +134,10 @@ impl Crosswalk {
             col(&h, "land_share_of_region")?,
             col(&h, "towns")?,
         );
-        let parse = |s: &str| s.parse::<f64>().map_err(|_| data_err(format!("bad number {s} in {PATH}")));
+        let parse = |s: &str| {
+            s.parse::<f64>()
+                .map_err(|_| data_err(format!("bad number {s} in {PATH}")))
+        };
         let mut overlaps = Vec::new();
         for r in rows {
             overlaps.push(Overlap {
@@ -150,7 +171,10 @@ impl Crosswalk {
                 e.1 += o.share_of_region;
             }
         }
-        acc.into_iter().filter(|(_, (_, w))| *w > 0.0).map(|(k, (s, w))| (k, s / w)).collect()
+        acc.into_iter()
+            .filter(|(_, (_, w))| *w > 0.0)
+            .map(|(k, (s, w))| (k, s / w))
+            .collect()
     }
 
     /// Split old-county totals across regions by land area.
@@ -167,7 +191,8 @@ impl Crosswalk {
     /// Replace old-county keys in a per-county map by region keys using [`Self::intensive`].
     /// Non-Connecticut keys pass through unchanged; region keys already present win.
     pub fn apply_intensive(&self, values: BTreeMap<String, f64>) -> BTreeMap<String, f64> {
-        let (old, mut rest): (BTreeMap<_, _>, BTreeMap<_, _>) = values.into_iter().partition(|(k, _)| is_old_ct(k));
+        let (old, mut rest): (BTreeMap<_, _>, BTreeMap<_, _>) =
+            values.into_iter().partition(|(k, _)| is_old_ct(k));
         for (k, v) in self.intensive(&old) {
             rest.entry(k).or_insert(v);
         }
@@ -186,7 +211,15 @@ mod tests {
             ("09001".to_string(), "09120".to_string(), 30.0),
             ("09001".to_string(), "09190".to_string(), 70.0),
         ];
-        let rest = [("09003", "09110"), ("09005", "09160"), ("09007", "09130"), ("09009", "09170"), ("09011", "09180"), ("09013", "09150"), ("09015", "09140")];
+        let rest = [
+            ("09003", "09110"),
+            ("09005", "09160"),
+            ("09007", "09130"),
+            ("09009", "09170"),
+            ("09011", "09180"),
+            ("09013", "09150"),
+            ("09015", "09140"),
+        ];
         for (o, r) in rest {
             towns.push((o.to_string(), r.to_string(), 50.0));
         }

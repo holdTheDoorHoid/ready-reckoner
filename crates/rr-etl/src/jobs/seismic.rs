@@ -7,7 +7,7 @@
 //! - USGS "Chance of potentially damaging ground shaking (MMI VI) in 100 years" (2023 model,
 //!   variable Vs30, so soil amplification is included): the nearest 0.05-degree grid point.
 //!
-//! The service is called once per county (about 3,200 calls) by two workers at a time, each
+//! The service is called once per county (about 3,200 calls) by three workers at a time, each
 //! request waiting for the previous one, so the load stays modest. Guam, the Northern Mariana
 //! Islands and American Samoa have no model in the service.
 
@@ -33,7 +33,7 @@ const NSHM_DOI: &str = "https://doi.org/10.5066/P14VGAV4";
 /// Reference site condition (m/s): site class BC boundary, the USGS map default.
 pub const VS30: u32 = 760;
 /// Concurrent requests to the USGS service.
-pub const WORKERS: usize = 2;
+pub const WORKERS: usize = 3;
 
 /// Which model serves a point: (model id, lon min, lon max, lat min, lat max).
 const MODELS: &[(&str, f64, f64, f64, f64)] = &[
@@ -44,7 +44,11 @@ const MODELS: &[(&str, f64, f64, f64, f64)] = &[
 ];
 
 fn model_for(c: &County) -> Option<(&'static str, f64)> {
-    let lon = if c.state_abbr == "AK" && c.lon > 0.0 { c.lon - 360.0 } else { c.lon };
+    let lon = if c.state_abbr == "AK" && c.lon > 0.0 {
+        c.lon - 360.0
+    } else {
+        c.lon
+    };
     let conus = !super::is_outside_conus(&c.state_abbr);
     for (id, x0, x1, y0, y1) in MODELS {
         let right_region = match *id {
@@ -80,15 +84,31 @@ pub fn interp_loglog(xs: &[f64], ys: &[f64], x: f64) -> Option<f64> {
 /// Pull the total PGA curve out of a service response.
 fn pga_curve(v: &serde_json::Value) -> Option<(Vec<f64>, Vec<f64>)> {
     let curves = v["response"]["hazardCurves"].as_array()?;
-    let pga = curves.iter().find(|c| c["imt"]["value"].as_str() == Some("PGA"))?;
-    let total = pga["data"].as_array()?.iter().find(|d| d["component"].as_str() == Some("Total"))?;
-    let xs: Vec<f64> = total["values"]["xs"].as_array()?.iter().filter_map(|x| x.as_f64()).collect();
-    let ys: Vec<f64> = total["values"]["ys"].as_array()?.iter().filter_map(|x| x.as_f64()).collect();
+    let pga = curves
+        .iter()
+        .find(|c| c["imt"]["value"].as_str() == Some("PGA"))?;
+    let total = pga["data"]
+        .as_array()?
+        .iter()
+        .find(|d| d["component"].as_str() == Some("Total"))?;
+    let xs: Vec<f64> = total["values"]["xs"]
+        .as_array()?
+        .iter()
+        .filter_map(|x| x.as_f64())
+        .collect();
+    let ys: Vec<f64> = total["values"]["ys"]
+        .as_array()?
+        .iter()
+        .filter_map(|x| x.as_f64())
+        .collect();
     Some((xs, ys))
 }
 
+/// Grid points (lon, lat, probability) bucketed by quarter-degree cell.
+type Cells = HashMap<(i32, i32), Vec<(f64, f64, f64)>>;
+
 struct Grid {
-    cells: HashMap<(i32, i32), Vec<(f64, f64, f64)>>,
+    cells: Cells,
 }
 
 impl Grid {
@@ -118,7 +138,9 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let counties = load_counties(ctx)?;
 
     // --- MMI VI in 100 years ------------------------------------------------------------------
-    let mmi = ctx.http.get(MMI_ZIP, Some("seismic/US_ProbMMI_VI_100Yrs_varVs30.zip"))?;
+    let mmi = ctx
+        .http
+        .get(MMI_ZIP, Some("seismic/US_ProbMMI_VI_100Yrs_varVs30.zip"))?;
     out.source(super::source_from(
         "USGS chance of damaging shaking (MMI VI) in 100 years, 2023 NSHM, variable Vs30",
         &mmi,
@@ -129,11 +151,16 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let shp = read_shp(&zip_entry(&mmi.bytes, "_pts.shp")?)?;
     let dbf = read_dbf(&zip_entry(&mmi.bytes, "_pts.dbf")?)?;
     let iv = dbf.field("PctProb100")?;
-    let mut grid = Grid { cells: HashMap::new() };
+    let mut grid = Grid {
+        cells: HashMap::new(),
+    };
     for (s, r) in shp.iter().zip(&dbf.records) {
         if let (Shape::Point([x, y]), Ok(v)) = (s, r[iv].parse::<f64>()) {
             let x = if *x > 0.0 { x - 360.0 } else { *x };
-            grid.cells.entry(Grid::key(x, *y)).or_default().push((x, *y, v / 100.0));
+            grid.cells
+                .entry(Grid::key(x, *y))
+                .or_default()
+                .push((x, *y, v / 100.0));
         }
     }
     out.rows_in += shp.len() as u64;
@@ -171,19 +198,39 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                     let next = queue.lock().ok().and_then(|mut q| q.pop_front());
                     let Some((i, model, lon)) = next else { break };
                     let c = &counties[i];
-                    let url = format!("{SERVICE}/{model}/dynamic/hazard/{lon:.4}/{:.4}/{VS30}", c.lat);
+                    let url = format!(
+                        "{SERVICE}/{model}/dynamic/hazard/{lon:.4}/{:.4}/{VS30}",
+                        c.lat
+                    );
                     match ctx.http.get(&url, None) {
                         Ok(f) => {
-                            let v: Option<serde_json::Value> = serde_json::from_slice(&f.bytes).ok();
+                            let v: Option<serde_json::Value> =
+                                serde_json::from_slice(&f.bytes).ok();
                             let rates = v.as_ref().and_then(pga_curve).and_then(|(xs, ys)| {
                                 Some((interp_loglog(&xs, &ys, 0.1)?, interp_loglog(&xs, &ys, 0.2)?))
                             });
-                            let version = v
-                                .as_ref()
-                                .and_then(|v| v["response"]["metadata"]["server"]["version"].as_str().map(|s| s.to_string()));
-                            let base_url = f.final_url.split("/dynamic").next().unwrap_or(&f.final_url).to_string();
+                            let version = v.as_ref().and_then(|v| {
+                                v["response"]["metadata"]["server"]["version"]
+                                    .as_str()
+                                    .map(|s| s.to_string())
+                            });
+                            let base_url = f
+                                .final_url
+                                .split("/dynamic")
+                                .next()
+                                .unwrap_or(&f.final_url)
+                                .to_string();
                             if let Ok(mut r) = results.lock() {
-                                r.insert(i, Answer { model, rates, version, base_url, sha256: f.sha256 });
+                                r.insert(
+                                    i,
+                                    Answer {
+                                        model,
+                                        rates,
+                                        version,
+                                        base_url,
+                                        sha256: f.sha256,
+                                    },
+                                );
                                 let n = r.len();
                                 if n % 250 == 0 {
                                     eprintln!("    {n}/{total}");
@@ -200,10 +247,23 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             });
         }
     });
-    let results = results.into_inner().map_err(|_| data_err("seismic worker panicked"))?;
-    let failures = failures.into_inner().map_err(|_| data_err("seismic worker panicked"))?;
+    let results = results
+        .into_inner()
+        .map_err(|_| data_err("seismic worker panicked"))?;
+    let failures = failures
+        .into_inner()
+        .map_err(|_| data_err("seismic worker panicked"))?;
     let mut acc = Sha256Acc::new();
-    let mut table = Table::new(&["fips", "p_pga_ge_0_1g_per_year", "p_pga_ge_0_2g_per_year", "mmi6_100yr", "model"], 1);
+    let mut table = Table::new(
+        &[
+            "fips",
+            "p_pga_ge_0_1g_per_year",
+            "p_pga_ge_0_2g_per_year",
+            "mmi6_100yr",
+            "model",
+        ],
+        1,
+    );
     let mut covered = BTreeSet::new();
     let mut versions: BTreeSet<String> = BTreeSet::new();
     for (i, a) in &results {
@@ -215,7 +275,13 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         let Some((r1, r2)) = a.rates else { continue };
         let p = |rate: f64| -rr_types::math::exp_m1(-rate.max(0.0));
         let mmi6 = grid.nearest(if c.lon > 0.0 { c.lon - 360.0 } else { c.lon }, c.lat, 8.0);
-        table.push(vec![c.fips.clone(), sig4(p(r1)), sig4(p(r2)), mmi6.map(sig4).unwrap_or_default(), a.model.to_string()]);
+        table.push(vec![
+            c.fips.clone(),
+            sig4(p(r1)),
+            sig4(p(r2)),
+            mmi6.map(sig4).unwrap_or_default(),
+            a.model.to_string(),
+        ]);
         covered.insert(c.fips.clone());
     }
     out.rows_in += results.len() as u64;
@@ -242,7 +308,11 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         }
     });
     if !failed.is_empty() {
-        out.notes.push(format!("Service errors (after retries) for {} counties, e.g. {:?}.", failed.len(), failed.iter().next()));
+        out.notes.push(format!(
+            "Service errors (after retries) for {} counties, e.g. {:?}.",
+            failed.len(),
+            failed.iter().next()
+        ));
     }
     out.notes.push(format!(
         "Annual probability of peak ground acceleration of at least 0.1 g and 0.2 g on firm rock (Vs30 {VS30} m/s, site class BC) at the county's internal point, from the USGS mean hazard curve by log-log interpolation; p = 1 - exp(-annual rate). Softer soils shake more: mmi6_100yr (USGS, variable Vs30) includes that. mmi6_100yr is the chance of at least MMI VI shaking in 100 years at the nearest 0.05-degree grid point within 8 km (contiguous US, Alaska, Hawaii only). Yearly equivalent: 1 - (1 - p100)^(1/100)."
@@ -276,9 +346,18 @@ mod tests {
 
     #[test]
     fn models_route_by_region() {
-        let c = |st: &str, lat: f64, lon: f64| County { fips: "x".into(), name: "x".into(), state_abbr: st.into(), lat, lon };
+        let c = |st: &str, lat: f64, lon: f64| County {
+            fips: "x".into(),
+            name: "x".into(),
+            state_abbr: st.into(),
+            lat,
+            lon,
+        };
         assert_eq!(model_for(&c("PA", 40.0, -75.1)).unwrap().0, "conus-2023");
-        assert_eq!(model_for(&c("AK", 52.0, 174.0)).unwrap(), ("alaska-2023", 174.0 - 360.0));
+        assert_eq!(
+            model_for(&c("AK", 52.0, 174.0)).unwrap(),
+            ("alaska-2023", 174.0 - 360.0)
+        );
         assert_eq!(model_for(&c("HI", 21.3, -157.8)).unwrap().0, "hawaii-2021");
         assert_eq!(model_for(&c("PR", 18.4, -66.1)).unwrap().0, "prvi-2025");
         assert!(model_for(&c("GU", 13.4, 144.8)).is_none());

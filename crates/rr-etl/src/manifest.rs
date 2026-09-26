@@ -139,7 +139,10 @@ impl Manifest {
     pub fn load_or_default(data_dir: &Path) -> Result<Self> {
         let path = data_dir.join("manifest.json");
         if !path.exists() {
-            return Ok(Manifest { schema: SCHEMA, ..Default::default() });
+            return Ok(Manifest {
+                schema: SCHEMA,
+                ..Default::default()
+            });
         }
         let text = std::fs::read_to_string(&path)?;
         let m: Manifest = serde_json::from_str(&text)
@@ -151,7 +154,10 @@ impl Manifest {
     pub fn load(data_dir: &Path) -> Result<Self> {
         let path = data_dir.join("manifest.json");
         if !path.exists() {
-            return Err(data_err(format!("{} does not exist; run `rr-etl refresh` first", path.display())));
+            return Err(data_err(format!(
+                "{} does not exist; run `rr-etl refresh` first",
+                path.display()
+            )));
         }
         Self::load_or_default(data_dir)
     }
@@ -177,7 +183,10 @@ impl Manifest {
 
     /// Find a file entry by path.
     pub fn file(&self, path: &str) -> Option<&FileEntry> {
-        self.packs.values().flat_map(|p| p.files.iter()).find(|f| f.path == path)
+        self.packs
+            .values()
+            .flat_map(|p| p.files.iter())
+            .find(|f| f.path == path)
     }
 
     /// Every file entry across packs.

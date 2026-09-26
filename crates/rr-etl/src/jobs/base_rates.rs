@@ -31,16 +31,66 @@ struct Pub {
 }
 
 const PUBS: &[Pub] = &[
-    Pub { id: "census_cps_hh1_households", title: "Table HH-1. Households by Type: 1940 to Present", publisher: "U.S. Census Bureau, Current Population Survey", url: "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls" },
-    Pub { id: "usfa_residential_fire_estimates", title: "Residential Building Fire Estimates", publisher: "U.S. Fire Administration (FEMA)", url: "https://www.usfa.fema.gov/statistics/residential-fires/" },
-    Pub { id: "bls_jolts_layoffs", title: "Job Openings and Labor Turnover Survey: layoffs and discharges rate, total nonfarm (JTS000000000000000LDR)", publisher: "U.S. Bureau of Labor Statistics", url: "https://data.bls.gov/timeseries/JTS000000000000000LDR" },
-    Pub { id: "nchs_fastats_emergency_department", title: "FastStats: Emergency Department Visits (NHAMCS 2022)", publisher: "CDC National Center for Health Statistics", url: "https://www.cdc.gov/nchs/fastats/emergency-department.htm" },
-    Pub { id: "nchs_fastats_accidental_injury", title: "FastStats: Accidents or Unintentional Injuries", publisher: "CDC National Center for Health Statistics", url: "https://www.cdc.gov/nchs/fastats/accidental-injury.htm" },
-    Pub { id: "nhtsa_early_estimate_2025", title: "Early Estimate of Motor Vehicle Traffic Fatalities in 2025 (DOT HS 813 800)", publisher: "National Highway Traffic Safety Administration", url: "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813800" },
-    Pub { id: "nhtsa_traffic_safety_facts_2023", title: "Overview of Motor Vehicle Traffic Crashes in 2023 (DOT HS 813 705)", publisher: "National Highway Traffic Safety Administration", url: "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813705" },
-    Pub { id: "census_popest_vintage_2025", title: "Annual Estimates of the Resident Population, Vintage 2025 (NST-EST2025-ALLDATA)", publisher: "U.S. Census Bureau", url: POPEST },
-    Pub { id: "cdc_pandemic_history", title: "1918 Pandemic (H1N1 virus) and past pandemics", publisher: "Centers for Disease Control and Prevention", url: "https://archive.cdc.gov/www_cdc_gov/flu/pandemic-resources/1918-pandemic-h1n1.html" },
-    Pub { id: "eia_today_in_energy_66744", title: "Today in Energy: U.S. electricity customers averaged more hours of interruptions in 2024", publisher: "U.S. Energy Information Administration", url: "https://www.eia.gov/todayinenergy/detail.php?id=66744" },
+    Pub {
+        id: "census_cps_hh1_households",
+        title: "Table HH-1. Households by Type: 1940 to Present",
+        publisher: "U.S. Census Bureau, Current Population Survey",
+        url: "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls",
+    },
+    Pub {
+        id: "usfa_residential_fire_estimates",
+        title: "Residential Building Fire Estimates",
+        publisher: "U.S. Fire Administration (FEMA)",
+        url: "https://www.usfa.fema.gov/statistics/residential-fires/",
+    },
+    Pub {
+        id: "bls_jolts_layoffs",
+        title: "Job Openings and Labor Turnover Survey: layoffs and discharges rate, total nonfarm (JTS000000000000000LDR)",
+        publisher: "U.S. Bureau of Labor Statistics",
+        url: "https://data.bls.gov/timeseries/JTS000000000000000LDR",
+    },
+    Pub {
+        id: "nchs_fastats_emergency_department",
+        title: "FastStats: Emergency Department Visits (NHAMCS 2022)",
+        publisher: "CDC National Center for Health Statistics",
+        url: "https://www.cdc.gov/nchs/fastats/emergency-department.htm",
+    },
+    Pub {
+        id: "nchs_fastats_accidental_injury",
+        title: "FastStats: Accidents or Unintentional Injuries",
+        publisher: "CDC National Center for Health Statistics",
+        url: "https://www.cdc.gov/nchs/fastats/accidental-injury.htm",
+    },
+    Pub {
+        id: "nhtsa_early_estimate_2025",
+        title: "Early Estimate of Motor Vehicle Traffic Fatalities in 2025 (DOT HS 813 800)",
+        publisher: "National Highway Traffic Safety Administration",
+        url: "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813800",
+    },
+    Pub {
+        id: "nhtsa_traffic_safety_facts_2023",
+        title: "Overview of Motor Vehicle Traffic Crashes in 2023 (DOT HS 813 705)",
+        publisher: "National Highway Traffic Safety Administration",
+        url: "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813705",
+    },
+    Pub {
+        id: "census_popest_vintage_2025",
+        title: "Annual Estimates of the Resident Population, Vintage 2025 (NST-EST2025-ALLDATA)",
+        publisher: "U.S. Census Bureau",
+        url: POPEST,
+    },
+    Pub {
+        id: "cdc_pandemic_history",
+        title: "1918 Pandemic (H1N1 virus) and past pandemics",
+        publisher: "Centers for Disease Control and Prevention",
+        url: "https://archive.cdc.gov/www_cdc_gov/flu/pandemic-resources/1918-pandemic-h1n1.html",
+    },
+    Pub {
+        id: "eia_today_in_energy_66744",
+        title: "Today in Energy: U.S. electricity customers averaged more hours of interruptions in 2024",
+        publisher: "U.S. Energy Information Administration",
+        url: "https://www.eia.gov/todayinenergy/detail.php?id=66744",
+    },
 ];
 
 /// One output entry.
@@ -71,8 +121,16 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut out = JobOutput::default();
 
     // Live: population 2023 (Vintage 2025).
-    let pop = ctx.http.get(POPEST, Some("base_rates/NST-EST2025-ALLDATA.csv"))?;
-    out.source(super::source_from("Census population estimates, Vintage 2025 (national and state totals)", &pop, "NST-EST2025-ALLDATA", super::PUBLIC_DOMAIN, ""));
+    let pop = ctx
+        .http
+        .get(POPEST, Some("base_rates/NST-EST2025-ALLDATA.csv"))?;
+    out.source(super::source_from(
+        "Census population estimates, Vintage 2025 (national and state totals)",
+        &pop,
+        "NST-EST2025-ALLDATA",
+        super::PUBLIC_DOMAIN,
+        "",
+    ));
     let (h, rows) = parse_delimited(&pop.text(), b',')?;
     let (i_name, i_2023) = (col(&h, "NAME")?, col(&h, "POPESTIMATE2023")?);
     let pop2023: f64 = rows
@@ -83,18 +141,36 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
 
     // Live: JOLTS layoffs and discharges rate, monthly average for the last complete year.
     let bls = ctx.http.get(BLS, None)?;
-    out.source(super::source_from("BLS Public Data API v1: JTS000000000000000LDR", &bls, "JOLTS, latest release", super::PUBLIC_DOMAIN, ""));
+    out.source(super::source_from(
+        "BLS Public Data API v1: JTS000000000000000LDR",
+        &bls,
+        "JOLTS, latest release",
+        super::PUBLIC_DOMAIN,
+        "",
+    ));
     let v: serde_json::Value = serde_json::from_slice(&bls.bytes)?;
-    let last_year = (crate::timefmt::today_utc()[..4].parse::<i32>().unwrap_or(2026) - 1).to_string();
+    let last_year = (crate::timefmt::today_utc()[..4]
+        .parse::<i32>()
+        .unwrap_or(2026)
+        - 1)
+    .to_string();
     let monthly: Vec<f64> = v["Results"]["series"][0]["data"]
         .as_array()
         .ok_or_else(|| data_err("BLS: no data array"))?
         .iter()
-        .filter(|x| x["year"].as_str() == Some(last_year.as_str()) && x["period"].as_str().is_some_and(|p| p.starts_with('M') && p != "M13"))
+        .filter(|x| {
+            x["year"].as_str() == Some(last_year.as_str())
+                && x["period"]
+                    .as_str()
+                    .is_some_and(|p| p.starts_with('M') && p != "M13")
+        })
         .filter_map(|x| x["value"].as_str()?.parse::<f64>().ok())
         .collect();
     if monthly.len() != 12 {
-        return Err(data_err(format!("BLS JOLTS: expected 12 months for {last_year}, got {}", monthly.len())));
+        return Err(data_err(format!(
+            "BLS JOLTS: expected 12 months for {last_year}, got {}",
+            monthly.len()
+        )));
     }
     let layoff_pct = monthly.iter().sum::<f64>() / 12.0;
     let layoff = layoff_pct / 100.0;
@@ -148,24 +224,49 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         s.push_str(&format!("title = {}\n", toml_str(p.title)));
         s.push_str(&format!("publisher = {}\n", toml_str(p.publisher)));
         s.push_str(&format!("url = {}\n", toml_str(p.url)));
-        let how = if p.url == POPEST || p.id == "bls_jolts_layoffs" { "fetched on each refresh" } else { "transcribed" };
-        s.push_str(&format!("retrieved = {}\n", toml_str(if how == "transcribed" { TRANSCRIBED } else { "each refresh" })));
+        let how = if p.url == POPEST || p.id == "bls_jolts_layoffs" {
+            "fetched on each refresh"
+        } else {
+            "transcribed"
+        };
+        s.push_str(&format!(
+            "retrieved = {}\n",
+            toml_str(if how == "transcribed" {
+                TRANSCRIBED
+            } else {
+                "each refresh"
+            })
+        ));
         s.push_str(&format!("how = {}\n\n", toml_str(how)));
     }
     // The TOML must parse and every rate must cite a listed publication.
-    let parsed: toml::Table = s.parse().map_err(|e| data_err(format!("base_rates.toml does not parse: {e}")))?;
-    let n = parsed["rate"].as_array().map(|a| a.len()).unwrap_or(0) + parsed["publication"].as_array().map(|a| a.len()).unwrap_or(0);
+    let parsed: toml::Table = s
+        .parse()
+        .map_err(|e| data_err(format!("base_rates.toml does not parse: {e}")))?;
+    let n = parsed["rate"].as_array().map(|a| a.len()).unwrap_or(0)
+        + parsed["publication"]
+            .as_array()
+            .map(|a| a.len())
+            .unwrap_or(0);
     for r in &rates {
         if !PUBS.iter().any(|p| p.id == r.source) {
-            return Err(data_err(format!("rate {} cites unknown publication {}", r.id, r.source)));
+            return Err(data_err(format!(
+                "rate {} cites unknown publication {}",
+                r.id, r.source
+            )));
         }
     }
     out.text(ctx, BASE_RATES, &s, n as u64)?;
-    for p in PUBS.iter().filter(|p| p.url != POPEST && p.id != "bls_jolts_layoffs") {
+    for p in PUBS
+        .iter()
+        .filter(|p| p.url != POPEST && p.id != "bls_jolts_layoffs")
+    {
         out.source(SourceRecord {
             name: format!("{} ({})", p.title, p.publisher),
             url: p.url.to_string(),
-            version: "figures transcribed (the site refuses scripted clients or is not machine-readable)".into(),
+            version:
+                "figures transcribed (the site refuses scripted clients or is not machine-readable)"
+                    .into(),
             retrieved: format!("{TRANSCRIBED}T00:00:00Z"),
             sha256: String::new(),
             bytes: 0,

@@ -24,7 +24,8 @@ use std::collections::{BTreeMap, BTreeSet};
 pub const FLOOD: &str = "core/flood.csv";
 
 const API: &str = "https://www.fema.gov/api/open";
-const PENETRATION_PAGE: &str = "https://www.fema.gov/openfema-data-page/nfip-residential-penetration-rates-v1";
+const PENETRATION_PAGE: &str =
+    "https://www.fema.gov/openfema-data-page/nfip-residential-penetration-rates-v1";
 const CLAIMS_PAGE: &str = "https://www.fema.gov/openfema-data-page/nfip-redacted-claims-v3";
 
 /// FEMA's required statement for OpenFEMA data (OpenFEMA Terms and Conditions, "Citing Data";
@@ -53,7 +54,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let counties = load_counties(ctx)?;
     let cw = Crosswalk::load(&ctx.data)?;
     let canon: BTreeSet<String> = counties.iter().map(|c| c.fips.clone()).collect();
-    let last_year: i64 = crate::timefmt::today_utc()[..4].parse::<i64>().unwrap_or(2026) - 1;
+    let last_year: i64 = crate::timefmt::today_utc()[..4]
+        .parse::<i64>()
+        .unwrap_or(2026)
+        - 1;
 
     // --- Penetration rates ---------------------------------------------------------------------
     let mut acc = Sha256Acc::new();
@@ -61,11 +65,16 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut pen: Vec<serde_json::Value> = Vec::new();
     let mut as_of = String::new();
     loop {
-        let url = format!("{API}/v1/NfipResidentialPenetrationRates?$top=1000&$skip={}&$orderby=id", pen.len());
+        let url = format!(
+            "{API}/v1/NfipResidentialPenetrationRates?$top=1000&$skip={}&$orderby=id",
+            pen.len()
+        );
         let f = ctx.http.get(&url, None)?;
         acc.update(&f.bytes);
         let v: serde_json::Value = serde_json::from_slice(&f.bytes)?;
-        let rows = v["NfipResidentialPenetrationRates"].as_array().ok_or_else(|| data_err("OpenFEMA penetration: no rows"))?;
+        let rows = v["NfipResidentialPenetrationRates"]
+            .as_array()
+            .ok_or_else(|| data_err("OpenFEMA penetration: no rows"))?;
         let n = rows.len();
         pen.extend(rows.iter().cloned());
         if n < 1000 {
@@ -83,8 +92,11 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         retrieved: started,
         sha256: acc.finish(),
         bytes,
-        license: "OpenFEMA Terms and Conditions (public data; citation and statement required)".into(),
-        obligations: format!("Cite {PENETRATION_PAGE} with access date; show: {OPENFEMA_STATEMENT}"),
+        license: "OpenFEMA Terms and Conditions (public data; citation and statement required)"
+            .into(),
+        obligations: format!(
+            "Cite {PENETRATION_PAGE} with access date; show: {OPENFEMA_STATEMENT}"
+        ),
     });
     out.rows_in += pen.len() as u64;
     struct Pen {
@@ -95,11 +107,18 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     }
     let mut pens: BTreeMap<String, Pen> = BTreeMap::new();
     for r in &pen {
-        let Some(f) = r["fipsCode"].as_str() else { continue };
+        let Some(f) = r["fipsCode"].as_str() else {
+            continue;
+        };
         let g = |k: &str| r[k].as_f64().unwrap_or(0.0);
         pens.insert(
             f.to_string(),
-            Pen { structures: g("totalResStructures"), sfha: g("totalResStructuresSfha"), policies: g("resContractsInForce"), policies_sfha: g("resContractsInForceSfha") },
+            Pen {
+                structures: g("totalResStructures"),
+                sfha: g("totalResStructuresSfha"),
+                policies: g("resContractsInForce"),
+                policies_sfha: g("resContractsInForceSfha"),
+            },
         );
     }
 
@@ -123,7 +142,9 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         if let Some(e) = v.get("error") {
             return Err(data_err(format!("OpenFEMA claims error: {e}")));
         }
-        let rows = v["NfipClaims"].as_array().ok_or_else(|| data_err("OpenFEMA claims: no rows"))?;
+        let rows = v["NfipClaims"]
+            .as_array()
+            .ok_or_else(|| data_err("OpenFEMA claims: no rows"))?;
         if rows.is_empty() {
             break;
         }
@@ -138,10 +159,14 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                 no_county += 1;
                 continue;
             };
-            let paid: f64 = ["amountPaidOnBuildingClaim", "amountPaidOnContentsClaim", "amountPaidOnIncreasedCostOfComplianceClaim"]
-                .iter()
-                .map(|k| r[*k].as_f64().unwrap_or(0.0).max(0.0))
-                .sum();
+            let paid: f64 = [
+                "amountPaidOnBuildingClaim",
+                "amountPaidOnContentsClaim",
+                "amountPaidOnIncreasedCostOfComplianceClaim",
+            ]
+            .iter()
+            .map(|k| r[*k].as_f64().unwrap_or(0.0).max(0.0))
+            .sum();
             let e = claims.entry(code.to_string()).or_default();
             e.claims += 1.0;
             if paid > 0.0 {
@@ -210,10 +235,12 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             "policies_in_force",
             "sfha_policy_share",
             "claims_per_year",
+            "sfha_share_basis",
         ],
         1,
     );
     let mut covered = BTreeSet::new();
+    let mut lower_bound = 0u32;
     for c in &counties {
         let p = pens.get(&c.fips);
         let a = by_county.get(&c.fips);
@@ -221,13 +248,23 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         if p.structures <= 0.0 {
             continue;
         }
-        let share = p.sfha / p.structures;
+        // OpenFEMA leaves the flood-zone structure count at 0 in some counties that clearly have
+        // flood-zone homes (they have flood-zone policies). There, insured flood-zone homes /
+        // all homes is a lower bound on the share; label it so.
+        let (share, basis) = if p.sfha <= 0.0 && p.policies_sfha > 0.0 {
+            lower_bound += 1;
+            (p.policies_sfha / p.structures, "policies_lower_bound")
+        } else {
+            (p.sfha / p.structures, "structures")
+        };
         let rate = match a {
             Some(a) if p.policies > 0.0 => Some(1000.0 * a.claims / years / p.policies),
             None if p.policies > 0.0 => Some(0.0),
             _ => None,
         };
-        let mean_paid = a.filter(|a| a.paid_claims >= 1.0).map(|a| a.paid_total / a.paid_claims);
+        let mean_paid = a
+            .filter(|a| a.paid_claims >= 1.0)
+            .map(|a| a.paid_total / a.paid_claims);
         table.push(vec![
             c.fips.clone(),
             sig4(share),
@@ -236,8 +273,14 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             sig4(p.structures),
             sig4(p.sfha),
             sig4(p.policies),
-            if p.sfha > 0.0 { sig4(p.policies_sfha / p.sfha) } else { String::new() },
-            a.map(|a| sig4(a.claims / years)).unwrap_or_else(|| "0".into()),
+            if p.sfha > 0.0 {
+                sig4(p.policies_sfha / p.sfha)
+            } else {
+                String::new()
+            },
+            a.map(|a| sig4(a.claims / years))
+                .unwrap_or_else(|| "0".into()),
+            basis.to_string(),
         ]);
         covered.insert(c.fips.clone());
     }
@@ -253,10 +296,17 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         "sfha_home_share = residential structures in the Special Flood Hazard Area / all residential structures (penetration file as of {as_of}). claims_per_1000_policies_year = 1000 x residential NFIP claims with a loss in {FIRST_YEAR}-{last_year} / {years:.0} / residential policies in force today. mean_paid_usd = mean building + contents + increased-cost-of-compliance payment over paid claims (nominal dollars, not inflation-adjusted). {n_claims} residential claims read; {no_county} had no county code."
     ));
     out.notes.push("sfha_policy_share (policies in the flood zone / homes in the flood zone) shows how many flood-zone homes are insured; it can exceed 1 where a policy covers several structures.".into());
+    out.notes.push(format!(
+        "{lower_bound} counties report flood-zone policies but zero flood-zone structures (a gap in the OpenFEMA penetration file; e.g. St. Tammany Parish, Queens, Virginia Beach). For them sfha_home_share is insured flood-zone homes / all homes, a lower bound (sfha_share_basis = policies_lower_bound)."
+    ));
     if !unknown.is_empty() {
-        out.notes.push(format!("Claim county codes not in the 2024 county list (skipped): {}.", unknown.into_iter().collect::<Vec<_>>().join(", ")));
+        out.notes.push(format!(
+            "Claim county codes not in the 2024 county list (skipped): {}.",
+            unknown.into_iter().collect::<Vec<_>>().join(", ")
+        ));
     }
-    out.definitions.insert("openfema_statement".into(), OPENFEMA_STATEMENT.into());
+    out.definitions
+        .insert("openfema_statement".into(), OPENFEMA_STATEMENT.into());
     let date = crate::timefmt::today_utc();
     out.attributions.push(Attribution {
         source: "OpenFEMA (NFIP)".into(),

@@ -19,7 +19,11 @@ pub fn append(data_dir: &Path, manifest: &Manifest, summary: &RefreshSummary) ->
         crate::timefmt::now_utc(),
         manifest.pack_version
     ));
-    let ok = if summary.ok.is_empty() { "none".to_string() } else { summary.ok.join(", ") };
+    let ok = if summary.ok.is_empty() {
+        "none".to_string()
+    } else {
+        summary.ok.join(", ")
+    };
     text.push_str(&format!("Jobs run: {ok}.\n"));
     for (id, err) in &summary.failed {
         text.push_str(&format!("Job **{id} failed**: {err}\n"));
@@ -43,7 +47,10 @@ pub fn append(data_dir: &Path, manifest: &Manifest, summary: &RefreshSummary) ->
             ));
         }
     }
-    let mut f = std::fs::OpenOptions::new().create(true).append(true).open(&path)?;
+    let mut f = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)?;
     f.write_all(text.as_bytes())?;
     Ok(())
 }

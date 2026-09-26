@@ -27,7 +27,8 @@ pub const FACILITIES: &str = "core/facilities.csv";
 pub const ZIP_FACILITIES: &str = "core/zip_facilities.csv";
 
 const NUCLEAR: &str = "https://gis.fema.gov/arcgis/rest/services/Partner/Operating_Nuclear_Power_Plant_Sites/FeatureServer/0";
-const TRI_URL: &str = "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/{year}_US/csv";
+const TRI_URL: &str =
+    "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/{year}_US/csv";
 const NID_URL: &str = "https://nid.sec.usace.army.mil/api/nation/csv";
 const CB500: &str = "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip";
 
@@ -46,12 +47,18 @@ impl PointGrid {
     fn new(cell: f64, pts: &[(f64, f64)]) -> Self {
         let mut cells: HashMap<(i32, i32), Vec<(f64, f64)>> = HashMap::new();
         for &(lat, lon) in pts {
-            cells.entry(((lon / cell).floor() as i32, (lat / cell).floor() as i32)).or_default().push((lat, lon));
+            cells
+                .entry(((lon / cell).floor() as i32, (lat / cell).floor() as i32))
+                .or_default()
+                .push((lat, lon));
         }
         Self { cell, cells }
     }
     fn count_within(&self, lat: f64, lon: f64, km: f64) -> usize {
-        let (kx, ky) = ((lon / self.cell).floor() as i32, (lat / self.cell).floor() as i32);
+        let (kx, ky) = (
+            (lon / self.cell).floor() as i32,
+            (lat / self.cell).floor() as i32,
+        );
         let mut n = 0;
         for dx in -1..=1 {
             for dy in -1..=1 {
@@ -76,7 +83,12 @@ impl CountyIndex {
     fn new(polys: Vec<(String, Poly)>) -> Self {
         let mut grid: HashMap<(i32, i32), Vec<usize>> = HashMap::new();
         for (i, (_, p)) in polys.iter().enumerate() {
-            let (x0, y0, x1, y1) = (p.bbox[0].floor() as i32, p.bbox[1].floor() as i32, p.bbox[2].floor() as i32, p.bbox[3].floor() as i32);
+            let (x0, y0, x1, y1) = (
+                p.bbox[0].floor() as i32,
+                p.bbox[1].floor() as i32,
+                p.bbox[2].floor() as i32,
+                p.bbox[3].floor() as i32,
+            );
             // Guard against polygons spanning the antimeridian (Aleutians): index by each ring.
             if x1 - x0 > 180 {
                 for r in &p.rings {
@@ -103,7 +115,10 @@ impl CountyIndex {
     }
     fn locate(&self, lat: f64, lon: f64) -> Option<&str> {
         let cands = self.grid.get(&(lon.floor() as i32, lat.floor() as i32))?;
-        cands.iter().find(|i| self.polys[**i].1.contains(lon, lat)).map(|i| self.polys[*i].0.as_str())
+        cands
+            .iter()
+            .find(|i| self.polys[**i].1.contains(lon, lat))
+            .map(|i| self.polys[*i].0.as_str())
     }
 }
 
@@ -114,8 +129,16 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let canon: BTreeSet<String> = counties.iter().map(|c| c.fips.clone()).collect();
 
     // County polygons.
-    let cb = ctx.http.get(CB500, Some("facilities/cb_2024_us_county_500k.zip"))?;
-    out.source(super::source_from("Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon)", &cb, "GENZ2024", super::PUBLIC_DOMAIN, ""));
+    let cb = ctx
+        .http
+        .get(CB500, Some("facilities/cb_2024_us_county_500k.zip"))?;
+    out.source(super::source_from(
+        "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon)",
+        &cb,
+        "GENZ2024",
+        super::PUBLIC_DOMAIN,
+        "",
+    ));
     let shp = read_shp(&zip_entry(&cb.bytes, ".shp")?)?;
     let dbf = read_dbf(&zip_entry(&cb.bytes, ".dbf")?)?;
     let ig = dbf.field("GEOID")?;
@@ -142,9 +165,16 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         super::PUBLIC_DOMAIN,
         "",
     )?;
-    let sites: Vec<(f64, f64)> = q.rows.iter().filter_map(|r| Some((attr_f64(r, "latitude")?, attr_f64(r, "longitude")?))).collect();
+    let sites: Vec<(f64, f64)> = q
+        .rows
+        .iter()
+        .filter_map(|r| Some((attr_f64(r, "latitude")?, attr_f64(r, "longitude")?)))
+        .collect();
     if sites.len() < 40 {
-        return Err(data_err(format!("FEMA nuclear site layer returned only {} sites", sites.len())));
+        return Err(data_err(format!(
+            "FEMA nuclear site layer returned only {} sites",
+            sites.len()
+        )));
     }
     out.rows_in += sites.len() as u64;
     out.source(q.source);
@@ -158,14 +188,29 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut tri_year_used = 0;
     for year in (TRI_YEAR - 2..=TRI_YEAR).rev() {
         let url = TRI_URL.replace("{year}", &year.to_string());
-        let Ok(f) = ctx.http.get(&url, Some(&format!("facilities/tri_{year}_us.csv"))) else { continue };
+        let Ok(f) = ctx
+            .http
+            .get(&url, Some(&format!("facilities/tri_{year}_us.csv")))
+        else {
+            continue;
+        };
         let text = f.text();
         if text.len() < 1_000_000 {
             continue;
         }
-        out.source(super::source_from(&format!("EPA Toxics Release Inventory basic data file {year}, US"), &f, format!("TRI reporting year {year}"), super::PUBLIC_DOMAIN, ""));
+        out.source(super::source_from(
+            &format!("EPA Toxics Release Inventory basic data file {year}, US"),
+            &f,
+            format!("TRI reporting year {year}"),
+            super::PUBLIC_DOMAIN,
+            "",
+        ));
         let (h, rows) = parse_delimited(&text, b',')?;
-        let find = |suffix: &str| h.iter().position(|x| x.ends_with(suffix)).ok_or_else(|| data_err(format!("TRI: no column ending {suffix}")));
+        let find = |suffix: &str| {
+            h.iter()
+                .position(|x| x.ends_with(suffix))
+                .ok_or_else(|| data_err(format!("TRI: no column ending {suffix}")))
+        };
         let (i_id, i_lat, i_lon) = (find(". TRIFD")?, find(". LATITUDE")?, find(". LONGITUDE")?);
         let mut seen: BTreeMap<String, (f64, f64)> = BTreeMap::new();
         for r in &rows {
@@ -198,12 +243,23 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     // NID.
     let nid = ctx.http.get(NID_URL, Some("facilities/nid_nation.csv"))?;
     let text = nid.text();
-    let (first, rest) = text.split_once('\n').ok_or_else(|| data_err("NID: empty file"))?;
+    let (first, rest) = text
+        .split_once('\n')
+        .ok_or_else(|| data_err("NID: empty file"))?;
     let nid_date = first.split(',').nth(1).unwrap_or("").trim().to_string();
-    out.source(super::source_from("USACE National Inventory of Dams (nation CSV)", &nid, format!("Data Last Updated {nid_date}"), super::PUBLIC_DOMAIN, ""));
+    out.source(super::source_from(
+        "USACE National Inventory of Dams (nation CSV)",
+        &nid,
+        format!("Data Last Updated {nid_date}"),
+        super::PUBLIC_DOMAIN,
+        "",
+    ));
     let (h, rows) = parse_delimited(rest, b',')?;
     let (i_lat, i_lon) = (col(&h, "Latitude")?, col(&h, "Longitude")?);
-    let i_haz = h.iter().position(|x| x.starts_with("Hazard Potential")).ok_or_else(|| data_err("NID: no Hazard Potential column"))?;
+    let i_haz = h
+        .iter()
+        .position(|x| x.starts_with("Hazard Potential"))
+        .ok_or_else(|| data_err("NID: no Hazard Potential column"))?;
     let mut high: BTreeMap<String, u32> = BTreeMap::new();
     let mut significant: BTreeMap<String, u32> = BTreeMap::new();
     let mut nid_unplaced = 0u32;
@@ -217,7 +273,15 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             continue;
         };
         match index.locate(lat, lon) {
-            Some(c) => *(if haz == "High" { &mut high } else { &mut significant }).entry(c.to_string()).or_default() += 1,
+            Some(c) => {
+                *(if haz == "High" {
+                    &mut high
+                } else {
+                    &mut significant
+                })
+                .entry(c.to_string())
+                .or_default() += 1
+            }
             None => nid_unplaced += 1,
         }
     }
@@ -225,12 +289,23 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
 
     // County table.
     let mut table = Table::new(
-        &["fips", "nearest_nuclear_km", "tri_facilities", "high_hazard_dams", "nuclear_within_16km", "nuclear_within_80km", "significant_hazard_dams"],
+        &[
+            "fips",
+            "nearest_nuclear_km",
+            "tri_facilities",
+            "high_hazard_dams",
+            "nuclear_within_16km",
+            "nuclear_within_80km",
+            "significant_hazard_dams",
+        ],
         1,
     );
     let poly_of: BTreeMap<&str, &Poly> = index.polys.iter().map(|(f, p)| (f.as_str(), p)).collect();
     for c in &counties {
-        let nearest = sites.iter().map(|(lat, lon)| haversine_km(c.lat, c.lon, *lat, *lon)).fold(f64::INFINITY, f64::min);
+        let nearest = sites
+            .iter()
+            .map(|(lat, lon)| haversine_km(c.lat, c.lon, *lat, *lon))
+            .fold(f64::INFINITY, f64::min);
         let (w16, w80) = match poly_of.get(c.fips.as_str()) {
             Some(p) => {
                 let d = sites
@@ -259,9 +334,18 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let (iz, ilat, ilon) = (col(&zh, "zip")?, col(&zh, "lat")?, col(&zh, "lon")?);
     let mut zt = Table::new(&["zip", "nearest_nuclear_km", "tri_within_5km"], 1);
     for r in &zrows {
-        let (Ok(lat), Ok(lon)) = (r[ilat].parse::<f64>(), r[ilon].parse::<f64>()) else { continue };
-        let nearest = sites.iter().map(|(a, b)| haversine_km(lat, lon, *a, *b)).fold(f64::INFINITY, f64::min);
-        zt.push(vec![r[iz].clone(), fixed(nearest, 1), tri_grid.count_within(lat, lon, TRI_RADIUS_KM).to_string()]);
+        let (Ok(lat), Ok(lon)) = (r[ilat].parse::<f64>(), r[ilon].parse::<f64>()) else {
+            continue;
+        };
+        let nearest = sites
+            .iter()
+            .map(|(a, b)| haversine_km(lat, lon, *a, *b))
+            .fold(f64::INFINITY, f64::min);
+        zt.push(vec![
+            r[iz].clone(),
+            fixed(nearest, 1),
+            tri_grid.count_within(lat, lon, TRI_RADIUS_KM).to_string(),
+        ]);
     }
     out.table(ctx, ZIP_FACILITIES, &mut zt)?;
 

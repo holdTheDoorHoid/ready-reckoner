@@ -76,7 +76,12 @@ pub struct Poly {
 impl Poly {
     /// Build from rings.
     pub fn new(rings: Vec<Vec<[f64; 2]>>) -> Self {
-        let mut bbox = [f64::INFINITY, f64::INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY];
+        let mut bbox = [
+            f64::INFINITY,
+            f64::INFINITY,
+            f64::NEG_INFINITY,
+            f64::NEG_INFINITY,
+        ];
         for r in &rings {
             for p in r {
                 bbox[0] = bbox[0].min(p[0]);
@@ -166,7 +171,11 @@ impl Poly {
 fn seg_dist_origin(ax: f64, ay: f64, bx: f64, by: f64) -> f64 {
     let (dx, dy) = (bx - ax, by - ay);
     let len2 = dx * dx + dy * dy;
-    let t = if len2 == 0.0 { 0.0 } else { (-(ax * dx + ay * dy) / len2).clamp(0.0, 1.0) };
+    let t = if len2 == 0.0 {
+        0.0
+    } else {
+        (-(ax * dx + ay * dy) / len2).clamp(0.0, 1.0)
+    };
     let (px, py) = (ax + t * dx, ay + t * dy);
     (px * px + py * py).sqrt()
 }
@@ -186,7 +195,12 @@ pub fn point_segment_km(lat: f64, lon: f64, a: [f64; 2], b: [f64; 2]) -> f64 {
         }
         d
     };
-    seg_dist_origin(unwrap(a[0]) * kx, (a[1] - lat) * ky, unwrap(b[0]) * kx, (b[1] - lat) * ky)
+    seg_dist_origin(
+        unwrap(a[0]) * kx,
+        (a[1] - lat) * ky,
+        unwrap(b[0]) * kx,
+        (b[1] - lat) * ky,
+    )
 }
 
 /// Group shapefile rings (outer clockwise, holes counter-clockwise) into GeoJSON polygons that
@@ -205,7 +219,10 @@ pub fn group_rings_rfc7946(rings: &[Vec<[f64; 2]>]) -> Vec<Vec<Vec<[f64; 2]>>> {
     }
     // If a file used the opposite convention (no clockwise rings), treat every ring as outer.
     if outers.is_empty() {
-        outers = holes.drain(..).map(|i| (i, ring_signed_area(&rings[i]).abs())).collect();
+        outers = holes
+            .drain(..)
+            .map(|i| (i, ring_signed_area(&rings[i]).abs()))
+            .collect();
     }
     let mut polys: Vec<Vec<Vec<[f64; 2]>>> = outers
         .iter()
@@ -241,7 +258,10 @@ pub fn group_rings_rfc7946(rings: &[Vec<[f64; 2]>]) -> Vec<Vec<Vec<[f64; 2]>>> {
 pub fn round_ring(ring: &[[f64; 2]], places: usize) -> Option<Vec<[f64; 2]>> {
     let mut out: Vec<[f64; 2]> = Vec::with_capacity(ring.len());
     for p in ring {
-        let q = [crate::num::round_places(p[0], places), crate::num::round_places(p[1], places)];
+        let q = [
+            crate::num::round_places(p[0], places),
+            crate::num::round_places(p[1], places),
+        ];
         if out.last() != Some(&q) {
             out.push(q);
         }
@@ -276,7 +296,13 @@ mod tests {
     use super::*;
 
     fn square(x0: f64, y0: f64, s: f64, cw: bool) -> Vec<[f64; 2]> {
-        let mut r = vec![[x0, y0], [x0 + s, y0], [x0 + s, y0 + s], [x0, y0 + s], [x0, y0]];
+        let mut r = vec![
+            [x0, y0],
+            [x0 + s, y0],
+            [x0 + s, y0 + s],
+            [x0, y0 + s],
+            [x0, y0],
+        ];
         if cw {
             r.reverse();
         }
@@ -285,7 +311,10 @@ mod tests {
 
     #[test]
     fn containment_with_hole() {
-        let p = Poly::new(vec![square(0.0, 0.0, 10.0, true), square(4.0, 4.0, 2.0, false)]);
+        let p = Poly::new(vec![
+            square(0.0, 0.0, 10.0, true),
+            square(4.0, 4.0, 2.0, false),
+        ]);
         assert!(p.contains(1.0, 1.0));
         assert!(!p.contains(5.0, 5.0));
         assert!(!p.contains(11.0, 5.0));
@@ -309,7 +338,8 @@ mod tests {
 
     #[test]
     fn grouping_orients_rings() {
-        let polys = group_rings_rfc7946(&[square(0.0, 0.0, 10.0, true), square(4.0, 4.0, 2.0, false)]);
+        let polys =
+            group_rings_rfc7946(&[square(0.0, 0.0, 10.0, true), square(4.0, 4.0, 2.0, false)]);
         assert_eq!(polys.len(), 1);
         assert!(ring_signed_area(&polys[0][0]) > 0.0);
         assert!(ring_signed_area(&polys[0][1]) < 0.0);
@@ -318,6 +348,9 @@ mod tests {
     #[test]
     fn rounding_drops_tiny_rings() {
         assert!(round_ring(&square(0.0, 0.0, 0.0001, true), 3).is_none());
-        assert_eq!(round_ring(&square(0.0, 0.0, 1.0, true), 3).unwrap().len(), 5);
+        assert_eq!(
+            round_ring(&square(0.0, 0.0, 1.0, true), 3).unwrap().len(),
+            5
+        );
     }
 }

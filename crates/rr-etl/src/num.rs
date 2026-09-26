@@ -81,9 +81,9 @@ pub fn round_places(x: f64, places: usize) -> f64 {
     format!("{x:.places$}").parse().unwrap_or(x)
 }
 
-/// Linear interpolation of the `q` quantile (0..=1) of an already sorted slice of
-/// `(value, weight)` pairs, using the weighted empirical CDF. Returns `None` for an empty slice
-/// or zero total weight.
+/// The `q` quantile (0..=1) of an already sorted slice of `(value, weight)` pairs: the smallest
+/// value whose cumulative weight reaches `q` of the total (weighted empirical CDF, no
+/// interpolation). Returns `None` for an empty slice or zero total weight.
 pub fn weighted_quantile(sorted: &[(f64, f64)], q: f64) -> Option<f64> {
     let total: f64 = sorted.iter().map(|(_, w)| *w).sum();
     if sorted.is_empty() || total <= 0.0 {
@@ -131,7 +131,7 @@ mod tests {
 
     #[test]
     fn sig4_is_idempotent() {
-        for x in [0.1234567, 98765.4321, 1e-9 * 3.14159, 2.5e12, 0.0625, 7.0] {
+        for x in [0.1234567, 98765.4321, 1e-9 * 2.71, 2.5e12, 0.0625, 7.0] {
             let once = sig4(x);
             let twice = sig4(once.parse().unwrap());
             assert_eq!(once, twice);

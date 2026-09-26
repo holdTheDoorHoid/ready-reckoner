@@ -64,7 +64,11 @@ pub fn read_shp(bytes: &[u8]) -> Result<Vec<Shape>> {
                 let mut rings = Vec::with_capacity(nparts);
                 for i in 0..nparts {
                     let a = starts[i];
-                    let b = if i + 1 < nparts { starts[i + 1] } else { npoints };
+                    let b = if i + 1 < nparts {
+                        starts[i + 1]
+                    } else {
+                        npoints
+                    };
                     if a > b || b > npoints {
                         return Err(data_err("shapefile polygon has bad part offsets"));
                     }
@@ -100,7 +104,12 @@ impl Dbf {
         self.fields
             .iter()
             .position(|f| f.eq_ignore_ascii_case(name))
-            .ok_or_else(|| data_err(format!("DBF has no field {name}; fields are {:?}", self.fields)))
+            .ok_or_else(|| {
+                data_err(format!(
+                    "DBF has no field {name}; fields are {:?}",
+                    self.fields
+                ))
+            })
     }
 }
 
@@ -126,14 +135,18 @@ pub fn read_dbf(bytes: &[u8]) -> Result<Dbf> {
     let mut records = Vec::with_capacity(nrec);
     for i in 0..nrec {
         let start = header_len + i * rec_len;
-        let rec = bytes.get(start..start + rec_len).ok_or_else(|| data_err("DBF record truncated"))?;
+        let rec = bytes
+            .get(start..start + rec_len)
+            .ok_or_else(|| data_err("DBF record truncated"))?;
         if rec[0] == b'*' {
             continue;
         }
         let mut at = 1;
         let mut row = Vec::with_capacity(widths.len());
         for w in &widths {
-            let cell = rec.get(at..at + w).ok_or_else(|| data_err("DBF field truncated"))?;
+            let cell = rec
+                .get(at..at + w)
+                .ok_or_else(|| data_err("DBF field truncated"))?;
             row.push(String::from_utf8_lossy(cell).trim().to_string());
             at += w;
         }

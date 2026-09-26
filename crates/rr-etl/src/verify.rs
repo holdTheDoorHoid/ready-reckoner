@@ -33,7 +33,9 @@ pub struct Report {
 /// Count data rows in a pack file the same way the ETL does.
 pub fn count_rows(path: &str, bytes: &[u8]) -> Result<u64> {
     if path.ends_with(".csv") {
-        let mut rdr = csv::ReaderBuilder::new().has_headers(true).from_reader(bytes);
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(true)
+            .from_reader(bytes);
         let mut n = 0;
         for r in rdr.records() {
             r?;
@@ -42,11 +44,19 @@ pub fn count_rows(path: &str, bytes: &[u8]) -> Result<u64> {
         Ok(n)
     } else if path.ends_with(".json") || path.ends_with(".geojson") {
         let v: serde_json::Value = serde_json::from_slice(bytes)?;
-        Ok(v.get("features").and_then(|f| f.as_array()).map(|a| a.len() as u64).unwrap_or(1))
+        Ok(v.get("features")
+            .and_then(|f| f.as_array())
+            .map(|a| a.len() as u64)
+            .unwrap_or(1))
     } else if path.ends_with(".toml") {
-        let text = std::str::from_utf8(bytes).map_err(|e| data_err(format!("{path} is not UTF-8: {e}")))?;
-        let v: toml::Table = text.parse().map_err(|e| data_err(format!("{path} is not valid TOML: {e}")))?;
-        Ok(v.values().map(|x| x.as_array().map(|a| a.len() as u64).unwrap_or(0)).sum())
+        let text = std::str::from_utf8(bytes)
+            .map_err(|e| data_err(format!("{path} is not UTF-8: {e}")))?;
+        let v: toml::Table = text
+            .parse()
+            .map_err(|e| data_err(format!("{path} is not valid TOML: {e}")))?;
+        Ok(v.values()
+            .map(|x| x.as_array().map(|a| a.len() as u64).unwrap_or(0))
+            .sum())
     } else {
         Ok(0)
     }
@@ -65,22 +75,35 @@ pub fn verify(data_dir: &Path) -> Result<Report> {
         let bytes = match std::fs::read(&path) {
             Ok(b) => b,
             Err(e) => {
-                rep.problems.push(format!("{} is listed in the manifest but cannot be read: {e}", f.path));
+                rep.problems.push(format!(
+                    "{} is listed in the manifest but cannot be read: {e}",
+                    f.path
+                ));
                 continue;
             }
         };
         let sha = sha256_hex(&bytes);
         if sha != f.sha256 {
-            rep.problems.push(format!("{}: sha256 {} does not match manifest {}", f.path, sha, f.sha256));
+            rep.problems.push(format!(
+                "{}: sha256 {} does not match manifest {}",
+                f.path, sha, f.sha256
+            ));
         }
         rep.checks += 1;
         match count_rows(&f.path, &bytes) {
             Ok(n) if n == f.rows => {}
-            Ok(n) => rep.problems.push(format!("{}: {} rows, manifest says {}", f.path, n, f.rows)),
-            Err(e) => rep.problems.push(format!("{}: cannot count rows: {e}", f.path)),
+            Ok(n) => rep
+                .problems
+                .push(format!("{}: {} rows, manifest says {}", f.path, n, f.rows)),
+            Err(e) => rep
+                .problems
+                .push(format!("{}: cannot count rows: {e}", f.path)),
         }
     }
-    rep.lines.push(format!("checked {} files against manifest (pack version {})", rep.files, manifest.pack_version));
+    rep.lines.push(format!(
+        "checked {} files against manifest (pack version {})",
+        rep.files, manifest.pack_version
+    ));
 
     // Canonical counties.
     let counties_path = crate::jobs::geography::COUNTIES;
@@ -90,11 +113,13 @@ pub fn verify(data_dir: &Path) -> Result<Report> {
             rows.iter().map(|r| r[i].clone()).collect()
         }
         Err(e) => {
-            rep.problems.push(format!("canonical county list missing: {e}"));
+            rep.problems
+                .push(format!("canonical county list missing: {e}"));
             return Ok(rep);
         }
     };
-    rep.lines.push(format!("canonical county list: {} counties", canon.len()));
+    rep.lines
+        .push(format!("canonical county list: {} counties", canon.len()));
 
     // 2. Map counties.
     let geo_path = data_dir.join(crate::jobs::geography::GEO_COUNTIES);
@@ -102,15 +127,26 @@ pub fn verify(data_dir: &Path) -> Result<Report> {
         let v: serde_json::Value = serde_json::from_slice(&bytes)?;
         let ids: Vec<String> = v["features"]
             .as_array()
-            .map(|a| a.iter().filter_map(|f| f["id"].as_str().map(|s| s.to_string())).collect())
+            .map(|a| {
+                a.iter()
+                    .filter_map(|f| f["id"].as_str().map(|s| s.to_string()))
+                    .collect()
+            })
             .unwrap_or_default();
         rep.checks += 1;
         for id in &ids {
             if !canon.contains(id) {
-                rep.problems.push(format!("{}: feature {id} is not in the canonical county list", crate::jobs::geography::GEO_COUNTIES));
+                rep.problems.push(format!(
+                    "{}: feature {id} is not in the canonical county list",
+                    crate::jobs::geography::GEO_COUNTIES
+                ));
             }
         }
-        rep.lines.push(format!("map features: {} (all in canonical list: {})", ids.len(), ids.iter().all(|i| canon.contains(i))));
+        rep.lines.push(format!(
+            "map features: {} (all in canonical list: {})",
+            ids.len(),
+            ids.iter().all(|i| canon.contains(i))
+        ));
     }
 
     // Missing lists per job.
@@ -123,13 +159,21 @@ pub fn verify(data_dir: &Path) -> Result<Report> {
     }
 
     // 3 & 4. County-keyed files.
-    let regions: BTreeSet<&str> = ["09110", "09120", "09130", "09140", "09150", "09160", "09170", "09180", "09190"].into_iter().collect();
+    let regions: BTreeSet<&str> = [
+        "09110", "09120", "09130", "09140", "09150", "09160", "09170", "09180", "09190",
+    ]
+    .into_iter()
+    .collect();
     for f in manifest.all_files() {
         if !f.path.ends_with(".csv") || f.path == crate::ct::PATH {
             continue;
         }
-        let Ok((h, rows)) = read_table(data_dir, &f.path) else { continue };
-        let fips_col = ["fips", "county_fips"].iter().find_map(|c| h.iter().position(|x| x == c));
+        let Ok((h, rows)) = read_table(data_dir, &f.path) else {
+            continue;
+        };
+        let fips_col = ["fips", "county_fips"]
+            .iter()
+            .find_map(|c| h.iter().position(|x| x == c));
         let Some(fc) = fips_col else { continue };
         rep.checks += 1;
         let present: BTreeSet<String> = rows.iter().map(|r| r[fc].clone()).collect();
@@ -137,14 +181,24 @@ pub fn verify(data_dir: &Path) -> Result<Report> {
         if !old_ct.is_empty() {
             rep.problems.push(format!("{}: uses old Connecticut county codes {old_ct:?}; apply the planning-region crosswalk", f.path));
         }
-        let stray: Vec<&String> = present.iter().filter(|p| !canon.contains(*p)).take(10).collect();
+        let stray: Vec<&String> = present
+            .iter()
+            .filter(|p| !canon.contains(*p))
+            .take(10)
+            .collect();
         if !stray.is_empty() {
-            rep.problems.push(format!("{}: county codes not in the canonical list, e.g. {stray:?}", f.path));
+            rep.problems.push(format!(
+                "{}: county codes not in the canonical list, e.g. {stray:?}",
+                f.path
+            ));
         }
         // Coverage applies to per-county tables (not the ZIP crosswalk, whose rows are ZIPs).
         if f.key.first().map(|k| k.as_str()) == Some("fips") {
             let missing_ok = missing_by_job.get(&f.job).cloned().unwrap_or_default();
-            let uncovered: Vec<&String> = canon.iter().filter(|c| !present.contains(*c) && !missing_ok.contains(*c)).collect();
+            let uncovered: Vec<&String> = canon
+                .iter()
+                .filter(|c| !present.contains(*c) && !missing_ok.contains(*c))
+                .collect();
             rep.checks += 1;
             if !uncovered.is_empty() {
                 rep.problems.push(format!(
@@ -154,14 +208,27 @@ pub fn verify(data_dir: &Path) -> Result<Report> {
                     uncovered.iter().take(8).collect::<Vec<_>>()
                 ));
             }
-            let listed_but_present: Vec<&String> = missing_ok.iter().filter(|m| present.contains(*m)).take(5).collect();
+            let listed_but_present: Vec<&String> = missing_ok
+                .iter()
+                .filter(|m| present.contains(*m))
+                .take(5)
+                .collect();
             if !listed_but_present.is_empty() {
-                rep.lines.push(format!("{}: note: counties listed as missing but present: {listed_but_present:?}", f.path));
+                rep.lines.push(format!(
+                    "{}: note: counties listed as missing but present: {listed_but_present:?}",
+                    f.path
+                ));
             }
-            let has_regions = regions.iter().filter(|r| present.contains(**r) || missing_ok.contains(**r)).count();
+            let has_regions = regions
+                .iter()
+                .filter(|r| present.contains(**r) || missing_ok.contains(**r))
+                .count();
             rep.checks += 1;
             if has_regions != regions.len() {
-                rep.problems.push(format!("{}: only {has_regions} of 9 Connecticut planning regions present or explained", f.path));
+                rep.problems.push(format!(
+                    "{}: only {has_regions} of 9 Connecticut planning regions present or explained",
+                    f.path
+                ));
             }
             rep.lines.push(format!(
                 "{}: {} counties present, {} explained as missing",
@@ -183,10 +250,15 @@ pub fn verify(data_dir: &Path) -> Result<Report> {
             e.1 = e.1.max(s);
         }
         rep.checks += 1;
-        let bad: Vec<(&String, &(f64, f64))> =
-            sums.iter().filter(|(_, (s, _))| !(*s > 0.0 && *s <= 1.0005)).take(5).collect();
+        let bad: Vec<(&String, &(f64, f64))> = sums
+            .iter()
+            .filter(|(_, (s, _))| !(*s > 0.0 && *s <= 1.0005))
+            .take(5)
+            .collect();
         if !bad.is_empty() {
-            rep.problems.push(format!("zip_county.csv: ZIP share sums out of range, e.g. {bad:?}"));
+            rep.problems.push(format!(
+                "zip_county.csv: ZIP share sums out of range, e.g. {bad:?}"
+            ));
         }
         let ambiguous = sums.values().filter(|(_, max)| *max < 0.8).count();
         rep.lines.push(format!(
@@ -197,4 +269,92 @@ pub fn verify(data_dir: &Path) -> Result<Report> {
         ));
     }
     Ok(rep)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::manifest::{FileEntry, JobRecord, Missing, Pack};
+
+    fn write(dir: &Path, rel: &str, text: &str) -> FileEntry {
+        let p = dir.join(rel);
+        std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+        std::fs::write(&p, text).unwrap();
+        FileEntry {
+            path: rel.into(),
+            job: if rel.contains("counties") {
+                "geography".into()
+            } else {
+                "flood".into()
+            },
+            sha256: sha256_hex(text.as_bytes()),
+            bytes: text.len() as u64,
+            rows: count_rows(rel, text.as_bytes()).unwrap(),
+            key: vec!["fips".into()],
+        }
+    }
+
+    fn fixture(dir: &Path, flood_missing: &[&str]) {
+        let counties = "fips,name,state_abbr,lat,lon\n01001,Autauga,AL,32.5,-86.6\n09110,Capitol,CT,41.8,-72.6\n09120,Greater Bridgeport,CT,41.2,-73.2\n09130,Lower Connecticut River Valley,CT,41.4,-72.5\n09140,Naugatuck Valley,CT,41.5,-73.1\n09150,Northeastern Connecticut,CT,41.8,-72\n09160,Northwest Hills,CT,41.9,-73.2\n09170,South Central Connecticut,CT,41.3,-72.8\n09180,Southeastern Connecticut,CT,41.5,-72.1\n09190,Western Connecticut,CT,41.3,-73.4\n";
+        let mut flood = String::from("fips,sfha_home_share\n");
+        for f in [
+            "01001", "09110", "09120", "09130", "09140", "09150", "09160", "09170", "09180",
+            "09190",
+        ] {
+            if !flood_missing.contains(&f) {
+                flood.push_str(&format!("{f},0.01\n"));
+            }
+        }
+        let e1 = write(dir, "core/counties.csv", counties);
+        let e2 = write(dir, "core/flood.csv", &flood);
+        let mut m = Manifest::default();
+        m.packs.insert(
+            "core".into(),
+            Pack {
+                description: String::new(),
+                files: vec![e1, e2],
+            },
+        );
+        m.jobs.insert("flood".into(), JobRecord::default());
+        m.save(dir).unwrap();
+    }
+
+    #[test]
+    fn verify_passes_a_consistent_pack_and_catches_problems() {
+        let dir = std::env::temp_dir().join(format!("rr-etl-verify-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        fixture(&dir, &[]);
+        let r = verify(&dir).unwrap();
+        assert!(r.problems.is_empty(), "{:?}", r.problems);
+
+        // A county without a row and without a stated reason fails...
+        fixture(&dir, &["01001"]);
+        assert!(!verify(&dir).unwrap().problems.is_empty());
+        // ...and passes once the job lists it as missing with a reason.
+        let mut m = Manifest::load(&dir).unwrap();
+        m.jobs.get_mut("flood").unwrap().missing = vec![Missing {
+            reason: "no data".into(),
+            fips: vec!["01001".into()],
+        }];
+        m.save(&dir).unwrap();
+        assert!(verify(&dir).unwrap().problems.is_empty());
+
+        // A changed byte breaks the checksum.
+        std::fs::write(
+            dir.join("core/flood.csv"),
+            "fips,sfha_home_share\n09001,0.5\n",
+        )
+        .unwrap();
+        let problems = verify(&dir).unwrap().problems;
+        assert!(
+            problems.iter().any(|p| p.contains("sha256")),
+            "{problems:?}"
+        );
+        // ...and the old Connecticut code is reported.
+        assert!(
+            problems.iter().any(|p| p.contains("old Connecticut")),
+            "{problems:?}"
+        );
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
 }

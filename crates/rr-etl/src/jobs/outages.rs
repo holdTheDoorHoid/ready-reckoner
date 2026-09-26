@@ -33,7 +33,8 @@ pub const OUTAGES_STATE: &str = "core/outages_state.csv";
 
 const ARTICLE: &str = "https://api.figshare.com/v2/articles/24237376";
 /// CDC/ATSDR SVI 2022 county file, used for household counts (the floor on customers).
-pub const SVI_COUNTY: &str = "https://svi.cdc.gov/Documents/Data/2022/csv/states_counties/SVI_2022_US_county.csv";
+pub const SVI_COUNTY: &str =
+    "https://svi.cdc.gov/Documents/Data/2022/csv/states_counties/SVI_2022_US_county.csv";
 const DOI: &str = "https://doi.org/10.6084/m9.figshare.24237376";
 
 /// Share of county customers that must be out for an event to start.
@@ -142,9 +143,14 @@ impl Unit {
         let mut queue: VecDeque<(usize, f64)> = VecDeque::new();
         let mut arrivals = v[0];
         queue.push_back((0, v[0]));
-        let depart = |queue: &mut VecDeque<(usize, f64)>, mut x: f64, at: usize, durs: &mut BTreeMap<u32, f64>| {
+        let depart = |queue: &mut VecDeque<(usize, f64)>,
+                      mut x: f64,
+                      at: usize,
+                      durs: &mut BTreeMap<u32, f64>| {
             while x > 1e-9 {
-                let Some(front) = queue.front_mut() else { break };
+                let Some(front) = queue.front_mut() else {
+                    break;
+                };
                 let m = front.1.min(x);
                 *durs.entry((at - front.0) as u32).or_default() += m;
                 front.1 -= m;
@@ -190,13 +196,22 @@ impl Unit {
         }
         self.last_t = t;
         self.cust_hours_all += n * (SLOT_S as f64 / 3600.0);
-        if self.open.as_ref().is_some_and(|ev| t - ev.last_active > BRIDGE_S) {
+        if self
+            .open
+            .as_ref()
+            .is_some_and(|ev| t - ev.last_active > BRIDGE_S)
+        {
             self.close();
         }
         match self.open.as_mut() {
             None => {
                 if n >= self.threshold {
-                    self.open = Some(OpenEvent { start: t, last_active: t, start_snapshots: 1, rows: vec![(t, n)] });
+                    self.open = Some(OpenEvent {
+                        start: t,
+                        last_active: t,
+                        start_snapshots: 1,
+                        rows: vec![(t, n)],
+                    });
                 }
             }
             Some(ev) => {
@@ -280,7 +295,10 @@ fn summarise(durations: &BTreeMap<u32, f64>) -> Option<Dist> {
         return None;
     }
     let ge = |slots: u32| durations.range(slots..).map(|(_, w)| *w).sum::<f64>() / total;
-    let sorted: Vec<(f64, f64)> = durations.iter().map(|(s, w)| (*s as f64 * SLOT_S as f64 / 3600.0, *w)).collect();
+    let sorted: Vec<(f64, f64)> = durations
+        .iter()
+        .map(|(s, w)| (*s as f64 * SLOT_S as f64 / 3600.0, *w))
+        .collect();
     Some(Dist {
         p1: ge(96),
         p3: ge(288),
@@ -311,29 +329,57 @@ fn process_year(
     state_of: &dyn Fn(u32) -> String,
     coverage: &BTreeMap<(String, u16), f64>,
 ) -> Result<YearDiag> {
-    let mut rdr = csv::ReaderBuilder::new().has_headers(true).buffer_capacity(1 << 20).from_reader(BufReader::with_capacity(1 << 20, reader));
+    let mut rdr = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .buffer_capacity(1 << 20)
+        .from_reader(BufReader::with_capacity(1 << 20, reader));
     let headers = rdr.byte_headers()?.clone();
-    let find = |names: &[&str]| headers.iter().position(|h| names.iter().any(|n| h.eq_ignore_ascii_case(n.as_bytes())));
-    let i_f = find(&["fips_code", "fips"]).ok_or_else(|| data_err("EAGLE-I: no fips_code column"))?;
-    let i_n = find(&["customers_out", "sum"]).ok_or_else(|| data_err("EAGLE-I: no customers_out/sum column"))?;
-    let i_t = find(&["run_start_time"]).ok_or_else(|| data_err("EAGLE-I: no run_start_time column"))?;
+    let find = |names: &[&str]| {
+        headers
+            .iter()
+            .position(|h| names.iter().any(|n| h.eq_ignore_ascii_case(n.as_bytes())))
+    };
+    let i_f =
+        find(&["fips_code", "fips"]).ok_or_else(|| data_err("EAGLE-I: no fips_code column"))?;
+    let i_n = find(&["customers_out", "sum"])
+        .ok_or_else(|| data_err("EAGLE-I: no customers_out/sum column"))?;
+    let i_t =
+        find(&["run_start_time"]).ok_or_else(|| data_err("EAGLE-I: no run_start_time column"))?;
     let mut rec = csv::ByteRecord::new();
     let mut diag = YearDiag::default();
     let mut stamps: HashSet<i64> = HashSet::with_capacity(40_000);
     while rdr.read_byte_record(&mut rec)? {
         diag.rows += 1;
-        let (Some(f), Some(n), Some(t)) = (rec.get(i_f), rec.get(i_n), rec.get(i_t)) else { continue };
-        let Some(fips) = std::str::from_utf8(f).ok().and_then(|s| s.trim().parse::<u32>().ok()) else { continue };
-        let Some(n) = std::str::from_utf8(n).ok().and_then(|s| s.trim().parse::<f64>().ok()) else { continue };
+        let (Some(f), Some(n), Some(t)) = (rec.get(i_f), rec.get(i_n), rec.get(i_t)) else {
+            continue;
+        };
+        let Some(fips) = std::str::from_utf8(f)
+            .ok()
+            .and_then(|s| s.trim().parse::<u32>().ok())
+        else {
+            continue;
+        };
+        let Some(n) = std::str::from_utf8(n)
+            .ok()
+            .and_then(|s| s.trim().parse::<f64>().ok())
+        else {
+            continue;
+        };
         let Some(t) = parse_time(t) else { continue };
         stamps.insert(t);
         let st = state_of(fips);
         let (y, m) = year_month(t);
-        if coverage.get(&(st.clone(), y)).is_some_and(|c| *c < MIN_STATE_COVERAGE) {
+        if coverage
+            .get(&(st.clone(), y))
+            .is_some_and(|c| *c < MIN_STATE_COVERAGE)
+        {
             state.excluded_years.insert((st, y));
             continue;
         }
-        let unit = state.units.entry(fips).or_insert_with(|| Unit::new(mcc.get(&fips).copied().unwrap_or(0.0)));
+        let unit = state
+            .units
+            .entry(fips)
+            .or_insert_with(|| Unit::new(mcc.get(&fips).copied().unwrap_or(0.0)));
         if unit.customers <= 0.0 {
             continue;
         }
@@ -369,23 +415,50 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         meta["published_date"].as_str().unwrap_or("?"),
         meta["doi"].as_str().unwrap_or("?")
     );
-    let license = meta["license"]["name"].as_str().unwrap_or("CC BY 4.0").to_string();
+    let license = meta["license"]["name"]
+        .as_str()
+        .unwrap_or("CC BY 4.0")
+        .to_string();
     if !license.contains("CC BY") {
-        return Err(data_err(format!("EAGLE-I licence is now {license}; review before redistributing derived data")));
+        return Err(data_err(format!(
+            "EAGLE-I licence is now {license}; review before redistributing derived data"
+        )));
     }
-    out.source(super::source_from("ORNL EAGLE-I recorded outages: figshare article metadata", &article, version.clone(), &license, ""));
+    out.source(super::source_from(
+        "ORNL EAGLE-I recorded outages: figshare article metadata",
+        &article,
+        version.clone(),
+        &license,
+        "",
+    ));
     let files: Vec<(String, String)> = meta["files"]
         .as_array()
         .ok_or_else(|| data_err("EAGLE-I article has no files list"))?
         .iter()
-        .filter_map(|f| Some((f["name"].as_str()?.to_string(), f["download_url"].as_str()?.to_string())))
+        .filter_map(|f| {
+            Some((
+                f["name"].as_str()?.to_string(),
+                f["download_url"].as_str()?.to_string(),
+            ))
+        })
         .collect();
-    let url_of = |name: &str| files.iter().find(|(n, _)| n == name).map(|(_, u)| u.clone());
+    let url_of = |name: &str| {
+        files
+            .iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, u)| u.clone())
+    };
 
     // Modelled customers per county.
     let mcc_url = url_of("MCC.csv").ok_or_else(|| data_err("EAGLE-I: MCC.csv not in article"))?;
     let mcc_doc = ctx.http.get(&mcc_url, Some("outages/MCC.csv"))?;
-    out.source(super::source_from("ORNL EAGLE-I modelled county customers (MCC.csv)", &mcc_doc, version.clone(), &license, "Credit ORNL EAGLE-I (CC BY 4.0)."));
+    out.source(super::source_from(
+        "ORNL EAGLE-I modelled county customers (MCC.csv)",
+        &mcc_doc,
+        version.clone(),
+        &license,
+        "Credit ORNL EAGLE-I (CC BY 4.0).",
+    ));
     let (mh, mrows) = parse_delimited(&mcc_doc.text(), b',')?;
     let (mi_f, mi_c) = (col(&mh, "County_FIPS")?, col(&mh, "Customers")?);
     let mut mcc: BTreeMap<u32, f64> = BTreeMap::new();
@@ -397,8 +470,16 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
 
     // Households: every household is at least one electricity customer, so the customer count is
     // the larger of MCC and households (MCC is far below the household count in some counties).
-    let svi = ctx.http.get(SVI_COUNTY, Some("outages/SVI_2022_US_county.csv"))?;
-    out.source(super::source_from("CDC/ATSDR Social Vulnerability Index 2022, counties (households E_HH)", &svi, "SVI 2022", super::PUBLIC_DOMAIN, "Cite CDC/ATSDR SVI 2022."));
+    let svi = ctx
+        .http
+        .get(SVI_COUNTY, Some("outages/SVI_2022_US_county.csv"))?;
+    out.source(super::source_from(
+        "CDC/ATSDR Social Vulnerability Index 2022, counties (households E_HH)",
+        &svi,
+        "SVI 2022",
+        super::PUBLIC_DOMAIN,
+        "Cite CDC/ATSDR SVI 2022.",
+    ));
     let (sh, srows) = parse_delimited(&svi.text(), b',')?;
     let (si_f, si_h) = (col(&sh, "FIPS")?, col(&sh, "E_HH")?);
     let mut households: BTreeMap<String, f64> = BTreeMap::new();
@@ -437,27 +518,56 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     ));
 
     // State coverage 2018-2022.
-    let cov_url = url_of("coverage_history.csv").ok_or_else(|| data_err("EAGLE-I: coverage_history.csv not in article"))?;
-    let cov_doc = ctx.http.get(&cov_url, Some("outages/coverage_history.csv"))?;
-    out.source(super::source_from("ORNL EAGLE-I state coverage history", &cov_doc, version.clone(), &license, "Credit ORNL EAGLE-I (CC BY 4.0)."));
+    let cov_url = url_of("coverage_history.csv")
+        .ok_or_else(|| data_err("EAGLE-I: coverage_history.csv not in article"))?;
+    let cov_doc = ctx
+        .http
+        .get(&cov_url, Some("outages/coverage_history.csv"))?;
+    out.source(super::source_from(
+        "ORNL EAGLE-I state coverage history",
+        &cov_doc,
+        version.clone(),
+        &license,
+        "Credit ORNL EAGLE-I (CC BY 4.0).",
+    ));
     let (ch, crows) = parse_delimited(&cov_doc.text(), b',')?;
-    let (ci_y, ci_s, ci_max) = (col(&ch, "year")?, col(&ch, "state")?, col(&ch, "max_pct_covered")?);
+    let (ci_y, ci_s, ci_max) = (
+        col(&ch, "year")?,
+        col(&ch, "state")?,
+        col(&ch, "max_pct_covered")?,
+    );
     let mut coverage: BTreeMap<(String, u16), f64> = BTreeMap::new();
     for r in &crows {
-        let year = r[ci_y].rsplit('/').next().and_then(|y| y.parse::<u16>().ok()).map(|y| if y < 100 { 2000 + y } else { y });
+        let year = r[ci_y]
+            .rsplit('/')
+            .next()
+            .and_then(|y| y.parse::<u16>().ok())
+            .map(|y| if y < 100 { 2000 + y } else { y });
         if let (Some(y), Ok(c)) = (year, r[ci_max].parse::<f64>()) {
             coverage.insert((r[ci_s].clone(), y), c);
         }
     }
 
-    let abbr_by_fips: BTreeMap<u32, &str> =
-        crate::jobs::geography::STATE_FACTS.iter().filter_map(|(f, a, _, _)| Some((f.parse::<u32>().ok()?, *a))).collect();
-    let state_of = |fips: u32| abbr_by_fips.get(&(fips / 1000)).map(|s| s.to_string()).unwrap_or_default();
+    let abbr_by_fips: BTreeMap<u32, &str> = crate::jobs::geography::STATE_FACTS
+        .iter()
+        .filter_map(|(f, a, _, _)| Some((f.parse::<u32>().ok()?, *a)))
+        .collect();
+    let state_of = |fips: u32| {
+        abbr_by_fips
+            .get(&(fips / 1000))
+            .map(|s| s.to_string())
+            .unwrap_or_default()
+    };
 
     // Years to process (all, unless RR_ETL_EAGLEI_YEARS limits them for a development run).
     let mut years: Vec<u16> = files
         .iter()
-        .filter_map(|(n, _)| n.strip_prefix("eaglei_outages_")?.strip_suffix(".csv")?.parse::<u16>().ok())
+        .filter_map(|(n, _)| {
+            n.strip_prefix("eaglei_outages_")?
+                .strip_suffix(".csv")?
+                .parse::<u16>()
+                .ok()
+        })
         .collect();
     years.sort_unstable();
     let dev_years = std::env::var("RR_ETL_EAGLEI_YEARS").ok();
@@ -472,7 +582,8 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut diags = Vec::new();
     for y in &years {
         let name = format!("eaglei_outages_{y}.csv");
-        let url = url_of(&name).ok_or_else(|| data_err(format!("EAGLE-I: {name} not in article")))?;
+        let url =
+            url_of(&name).ok_or_else(|| data_err(format!("EAGLE-I: {name} not in article")))?;
         eprintln!("  streaming {name}");
         let snapshot = state.clone();
         let (diag, streamed) = ctx.http.stream(&url, None, |reader| {
@@ -513,11 +624,17 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             by_county.entry(code).or_default().push((*fips, 1.0));
         } else if is_old_ct(&code) {
             for o in cw.overlaps.iter().filter(|o| o.old == code) {
-                by_county.entry(o.region.clone()).or_default().push((*fips, o.share_of_region));
+                by_county
+                    .entry(o.region.clone())
+                    .or_default()
+                    .push((*fips, o.share_of_region));
             }
         } else if let Some(new) = crate::ct::successors(&code) {
             for n in new {
-                by_county.entry(n.to_string()).or_default().push((*fips, 1.0));
+                by_county
+                    .entry(n.to_string())
+                    .or_default()
+                    .push((*fips, 1.0));
             }
         } else {
             unknown.insert(code);
@@ -541,13 +658,30 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         e.1 += 1;
     }
     let mut st_table = Table::new(
-        &["state_abbr", "events_per_customer_year", "p_ge_1d", "p_ge_3d", "p_ge_7d", "p_ge_14d", "median_hours", "p90_hours", "units_with_data", "events"],
+        &[
+            "state_abbr",
+            "events_per_customer_year",
+            "p_ge_1d",
+            "p_ge_3d",
+            "p_ge_7d",
+            "p_ge_14d",
+            "median_hours",
+            "p90_hours",
+            "units_with_data",
+            "events",
+        ],
         1,
     );
     let mut pool_dist: BTreeMap<String, Dist> = BTreeMap::new();
     for (st, (u, n)) in &pools {
-        let Some(d) = summarise(&u.durations) else { continue };
-        let epcy = if u.customers > 0.0 { u.arrivals / u.customers } else { 0.0 };
+        let Some(d) = summarise(&u.durations) else {
+            continue;
+        };
+        let epcy = if u.customers > 0.0 {
+            u.arrivals / u.customers
+        } else {
+            0.0
+        };
         st_table.push(vec![
             st.clone(),
             sig4(epcy),
@@ -604,12 +738,22 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                 continue;
             }
             let yrs = u.months.len() as f64 / 12.0;
-            let add = |acc: &mut BTreeMap<&str, f64>, k: &'static str, v: f64| *acc.entry(k).or_default() += w * v;
+            let add = |acc: &mut BTreeMap<&str, f64>, k: &'static str, v: f64| {
+                *acc.entry(k).or_default() += w * v
+            };
             add(&mut acc, "epcy", u.arrivals / u.customers / yrs);
             add(&mut acc, "epy", u.events as f64 / yrs);
             add(&mut acc, "yrs", yrs);
             add(&mut acc, "saidi", u.cust_hours_all / u.customers / yrs);
-            add(&mut acc, "share", if u.cust_hours_all > 0.0 { u.cust_hours_events / u.cust_hours_all } else { 0.0 });
+            add(
+                &mut acc,
+                "share",
+                if u.cust_hours_all > 0.0 {
+                    u.cust_hours_events / u.cust_hours_all
+                } else {
+                    0.0
+                },
+            );
             wsum += w;
             years_all.extend(u.years.iter().copied());
             events_total += w * u.events as f64;
@@ -624,8 +768,16 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             continue;
         }
         let get = |k: &str| acc.get(k).copied().unwrap_or(0.0) / wsum;
-        let st = counties.iter().find(|c| &c.fips == county).map(|c| c.state_abbr.clone()).unwrap_or_default();
-        let (dist, basis) = match (n_events >= MIN_EVENTS_FOR_COUNTY_DURATIONS, summarise(&merged), pool_dist.get(&st)) {
+        let st = counties
+            .iter()
+            .find(|c| &c.fips == county)
+            .map(|c| c.state_abbr.clone())
+            .unwrap_or_default();
+        let (dist, basis) = match (
+            n_events >= MIN_EVENTS_FOR_COUNTY_DURATIONS,
+            summarise(&merged),
+            pool_dist.get(&st),
+        ) {
             (true, Some(d), _) => (Some(d), "county"),
             (_, _, Some(p)) => {
                 state_basis += 1;
@@ -672,15 +824,21 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             "No usable EAGLE-I records for this county (utility not tracked, or no modelled customer count)".to_string()
         }
     });
-    out.definitions.insert("event_definition".into(), DEFINITION.into());
+    out.definitions
+        .insert("event_definition".into(), DEFINITION.into());
     out.notes.push(format!(
         "Event definition: {DEFINITION} Counties with fewer than {MIN_EVENTS_FOR_COUNTY_DURATIONS} events use their state's pooled duration distribution (duration_basis = state; {state_basis} counties); the event rate is always the county's own."
     ));
     out.notes.push("Years of data: a month counts when the county has at least one record in it (EAGLE-I lists only snapshots with customers out), so years_of_data is months with data divided by 12. State-years in 2018-2022 where ORNL reports under 50% customer coverage are left out; ORNL publishes no coverage figures for other years, so partial utility coverage there biases rates low.".into());
     out.notes.push("Customer outages at the start of an event are counted from the event's start (they may have begun below the threshold) and customers still out when the county drops below the threshold are counted as restored then, so durations for the first and last customers in an event are slightly understated.".into());
     if !state.excluded_years.is_empty() {
-        let list: Vec<String> = state.excluded_years.iter().map(|(s, y)| format!("{s} {y}")).collect();
-        out.notes.push(format!("Excluded for low coverage: {}.", list.join(", ")));
+        let list: Vec<String> = state
+            .excluded_years
+            .iter()
+            .map(|(s, y)| format!("{s} {y}"))
+            .collect();
+        out.notes
+            .push(format!("Excluded for low coverage: {}.", list.join(", ")));
     }
     let oo: u64 = state.units.values().map(|u| u.out_of_order).sum();
     let dups: u64 = state.units.values().map(|u| u.duplicates).sum();
@@ -785,7 +943,10 @@ mod tests {
         // Flicker of 10% during a restoration is removed; the fill is monotone.
         let v = [0.0, 100.0, 90.0, 99.0, 80.0, 88.0, 50.0, 55.0, 20.0, 0.0];
         let f = zigzag(&v, 5.0, 0.5);
-        assert_eq!(f, vec![0.0, 100.0, 90.0, 90.0, 80.0, 80.0, 50.0, 50.0, 20.0, 0.0]);
+        assert_eq!(
+            f,
+            vec![0.0, 100.0, 90.0, 90.0, 80.0, 80.0, 50.0, 50.0, 20.0, 0.0]
+        );
         // A genuine second storm (trough 10 -> 90) is kept as a new rise.
         let v = [0.0, 100.0, 40.0, 10.0, 90.0, 30.0, 0.0];
         let f = zigzag(&v, 5.0, 0.5);

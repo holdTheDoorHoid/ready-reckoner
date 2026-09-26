@@ -19,11 +19,11 @@
 //! holds the Atlas ratios at 1.5, 2 and 3 °C for sensitivity displays.
 
 use super::{Ctx, JobOutput, arcgis_query, attr_f64, attr_str, load_counties, missing_groups};
+use crate::Result;
 use crate::csvout::Table;
 use crate::ct::Crosswalk;
 use crate::manifest::Attribution;
 use crate::num::sig4;
-use crate::Result;
 use std::collections::{BTreeMap, BTreeSet};
 
 /// 2050-dial multipliers.
@@ -52,26 +52,109 @@ enum Kind {
 
 /// Atlas variables: (output name, Atlas field stem, kind, plain definition).
 const ATLAS_VARS: &[(&str, &str, Kind, &str)] = &[
-    ("hot_days_95f", "tmax_days_ge_95f", Kind::Days("LOCA2_Ensemble_SSP585_Hot_Days_1950_2100", "TMAXDAYSGE95F"), "days a year with a high of at least 95 °F"),
-    ("hot_days_100f", "tmax_days_ge_100f", Kind::Days("LOCA2_Ensemble_SSP585_Hot_Days_1950_2100", "TMAXDAYSGE100F"), "days a year with a high of at least 100 °F"),
-    ("hot_days_105f", "tmax_days_ge_105f", Kind::Days("LOCA2_Ensemble_SSP585_Hot_Days_1950_2100", "TMAXDAYSGE105F"), "days a year with a high of at least 105 °F"),
-    ("warm_nights_70f", "tmin_days_ge_70f", Kind::Days("LOCA2_Ensemble_SSP585_Warm_Nights_1950_2100", "TMINDAYSGE70F"), "nights a year with a low of at least 70 °F"),
-    ("freezing_nights", "tmin_days_le_32f", Kind::Days("LOCA2_Ensemble_SSP585_Cold_Days_1950_2100", "TMINDAYSLE32F"), "nights a year with a low at or below 32 °F"),
-    ("very_cold_nights_0f", "tmin_days_le_0f", Kind::Days("LOCA2_Ensemble_SSP585_Cold_Days_1950_2100", "TMINDAYSLE0F"), "nights a year with a low at or below 0 °F"),
-    ("wettest_day", "prmax1day", Kind::Percent, "rain on the wettest day of the year"),
-    ("wettest_day_5yr", "prmax5yr", Kind::Percent, "rain on the wettest day in five years"),
-    ("extreme_rain_total", "pr_above_nonzero_99th", Kind::Percent, "yearly rain that falls on days in the top 1% of historical daily amounts"),
-    ("extreme_rain_days", "pr_days_above_nonzero_99th", Kind::Percent, "days a year with rain in the top 1% of historical daily amounts"),
-    ("annual_rain", "pr_annual", Kind::Percent, "total yearly precipitation"),
+    (
+        "hot_days_95f",
+        "tmax_days_ge_95f",
+        Kind::Days("LOCA2_Ensemble_SSP585_Hot_Days_1950_2100", "TMAXDAYSGE95F"),
+        "days a year with a high of at least 95 °F",
+    ),
+    (
+        "hot_days_100f",
+        "tmax_days_ge_100f",
+        Kind::Days("LOCA2_Ensemble_SSP585_Hot_Days_1950_2100", "TMAXDAYSGE100F"),
+        "days a year with a high of at least 100 °F",
+    ),
+    (
+        "hot_days_105f",
+        "tmax_days_ge_105f",
+        Kind::Days("LOCA2_Ensemble_SSP585_Hot_Days_1950_2100", "TMAXDAYSGE105F"),
+        "days a year with a high of at least 105 °F",
+    ),
+    (
+        "warm_nights_70f",
+        "tmin_days_ge_70f",
+        Kind::Days(
+            "LOCA2_Ensemble_SSP585_Warm_Nights_1950_2100",
+            "TMINDAYSGE70F",
+        ),
+        "nights a year with a low of at least 70 °F",
+    ),
+    (
+        "freezing_nights",
+        "tmin_days_le_32f",
+        Kind::Days("LOCA2_Ensemble_SSP585_Cold_Days_1950_2100", "TMINDAYSLE32F"),
+        "nights a year with a low at or below 32 °F",
+    ),
+    (
+        "very_cold_nights_0f",
+        "tmin_days_le_0f",
+        Kind::Days("LOCA2_Ensemble_SSP585_Cold_Days_1950_2100", "TMINDAYSLE0F"),
+        "nights a year with a low at or below 0 °F",
+    ),
+    (
+        "wettest_day",
+        "prmax1day",
+        Kind::Percent,
+        "rain on the wettest day of the year",
+    ),
+    (
+        "wettest_day_5yr",
+        "prmax5yr",
+        Kind::Percent,
+        "rain on the wettest day in five years",
+    ),
+    (
+        "extreme_rain_total",
+        "pr_above_nonzero_99th",
+        Kind::Percent,
+        "yearly rain that falls on days in the top 1% of historical daily amounts",
+    ),
+    (
+        "extreme_rain_days",
+        "pr_days_above_nonzero_99th",
+        Kind::Percent,
+        "days a year with rain in the top 1% of historical daily amounts",
+    ),
+    (
+        "annual_rain",
+        "pr_annual",
+        Kind::Percent,
+        "total yearly precipitation",
+    ),
 ];
 
 /// CMRA variables: (output name, field stem, minimum historical value for a ratio, definition).
 const CMRA_VARS: &[(&str, &str, f64, &str)] = &[
-    ("consecutive_dry_days_mid45", "CONSECDD", 2.0, "longest run of days without rain in a year"),
-    ("dry_days_mid45", "PRLT0IN", 2.0, "days a year with less than 0.01 in of rain"),
-    ("hot_days_90f_mid45", "TMAX90F", 2.0, "days a year with a high above 90 °F"),
-    ("cooling_degree_days_mid45", "CDD", 50.0, "cooling degree days (a measure of air-conditioning need)"),
-    ("heavy_rain_days_1in_mid45", "PR1IN", 1.0, "days a year with more than 1 in of rain"),
+    (
+        "consecutive_dry_days_mid45",
+        "CONSECDD",
+        2.0,
+        "longest run of days without rain in a year",
+    ),
+    (
+        "dry_days_mid45",
+        "PRLT0IN",
+        2.0,
+        "days a year with less than 0.01 in of rain",
+    ),
+    (
+        "hot_days_90f_mid45",
+        "TMAX90F",
+        2.0,
+        "days a year with a high above 90 °F",
+    ),
+    (
+        "cooling_degree_days_mid45",
+        "CDD",
+        50.0,
+        "cooling degree days (a measure of air-conditioning need)",
+    ),
+    (
+        "heavy_rain_days_1in_mid45",
+        "PR1IN",
+        1.0,
+        "days a year with more than 1 in of rain",
+    ),
 ];
 
 /// Smallest baseline (days per year) for a day-count ratio.
@@ -88,7 +171,11 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut changes: BTreeMap<&str, BTreeMap<String, BTreeMap<&str, f64>>> = BTreeMap::new();
     for (label, service, suffix) in LEVELS {
         let fields: Vec<String> = std::iter::once("FIPS".to_string())
-            .chain(ATLAS_VARS.iter().map(|(_, stem, _, _)| format!("{stem}_{suffix}")))
+            .chain(
+                ATLAS_VARS
+                    .iter()
+                    .map(|(_, stem, _, _)| format!("{stem}_{suffix}")),
+            )
             .collect();
         let field_refs: Vec<&str> = fields.iter().map(|s| s.as_str()).collect();
         let q = arcgis_query(
@@ -107,7 +194,9 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         out.source(q.source);
         let m = changes.entry(label).or_default();
         for r in &q.rows {
-            let Some(f) = attr_str(r, "FIPS") else { continue };
+            let Some(f) = attr_str(r, "FIPS") else {
+                continue;
+            };
             let e = m.entry(f).or_default();
             for (_, stem, _, _) in ATLAS_VARS {
                 if let Some(v) = attr_f64(r, &format!("{stem}_{suffix}")) {
@@ -144,7 +233,9 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         out.source(q.source);
         let mut sums: BTreeMap<(String, &str), (f64, u32)> = BTreeMap::new();
         for r in &q.rows {
-            let Some(g) = attr_str(r, "GEOID") else { continue };
+            let Some(g) = attr_str(r, "GEOID") else {
+                continue;
+            };
             for f in fields {
                 if let Some(v) = attr_f64(r, f) {
                     let e = sums.entry((g.clone(), f)).or_insert((0.0, 0));
@@ -163,18 +254,26 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     // Harmonise to 2024 counties first (the Atlas and CMRA report Connecticut's old counties,
     // LOCA2 its planning regions), then form ratios.
     let fix = |m: BTreeMap<String, f64>| -> BTreeMap<String, f64> {
-        cw.apply_intensive(m).into_iter().filter(|(k, _)| canon.contains(k)).collect()
+        cw.apply_intensive(m)
+            .into_iter()
+            .filter(|(k, _)| canon.contains(k))
+            .collect()
     };
     let mut base_by_field: BTreeMap<&str, BTreeMap<String, f64>> = BTreeMap::new();
     for ((fips, field), v) in baselines {
         base_by_field.entry(field).or_default().insert(fips, v);
     }
-    let base_by_field: BTreeMap<&str, BTreeMap<String, f64>> = base_by_field.into_iter().map(|(f, m)| (f, fix(m))).collect();
+    let base_by_field: BTreeMap<&str, BTreeMap<String, f64>> = base_by_field
+        .into_iter()
+        .map(|(f, m)| (f, fix(m)))
+        .collect();
     let mut ratios: BTreeMap<&str, BTreeMap<&str, BTreeMap<String, f64>>> = BTreeMap::new(); // level -> var -> fips -> ratio
     for (label, per_county) in &changes {
         for (name, stem, kind, _) in ATLAS_VARS {
-            let raw: BTreeMap<String, f64> =
-                per_county.iter().filter_map(|(f, vals)| vals.get(stem).map(|v| (f.clone(), *v))).collect();
+            let raw: BTreeMap<String, f64> = per_county
+                .iter()
+                .filter_map(|(f, vals)| vals.get(stem).map(|v| (f.clone(), *v)))
+                .collect();
             for (fips, ch) in fix(raw) {
                 let ratio = match kind {
                     Kind::Percent => Some(1.0 + ch / 100.0),
@@ -185,7 +284,12 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                         .map(|b| ((b + ch) / b).max(0.0)),
                 };
                 if let Some(r) = ratio {
-                    ratios.entry(label).or_default().entry(name).or_default().insert(fips, r);
+                    ratios
+                        .entry(label)
+                        .or_default()
+                        .entry(name)
+                        .or_default()
+                        .insert(fips, r);
                 }
             }
         }
@@ -214,19 +318,27 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     out.source(q.source);
     let mut cmra: BTreeMap<&str, BTreeMap<String, f64>> = BTreeMap::new();
     for r in &q.rows {
-        let Some(g) = attr_str(r, "GEOID") else { continue };
+        let Some(g) = attr_str(r, "GEOID") else {
+            continue;
+        };
         for (name, stem, min_hist, _) in CMRA_VARS {
-            let (Some(h), Some(f)) = (attr_f64(r, &format!("HISTORIC_MEAN_{stem}")), attr_f64(r, &format!("RCP45MID_MEAN_{stem}"))) else {
+            let (Some(h), Some(f)) = (
+                attr_f64(r, &format!("HISTORIC_MEAN_{stem}")),
+                attr_f64(r, &format!("RCP45MID_MEAN_{stem}")),
+            ) else {
                 continue;
             };
             if h >= *min_hist {
-                cmra.entry(name).or_default().insert(g.clone(), (f / h).max(0.0));
+                cmra.entry(name)
+                    .or_default()
+                    .insert(g.clone(), (f / h).max(0.0));
             }
         }
     }
 
     // CMRA reports Connecticut's old counties: convert its ratios to planning regions.
-    let cmra: BTreeMap<&str, BTreeMap<String, f64>> = cmra.into_iter().map(|(v, m)| (v, fix(m))).collect();
+    let cmra: BTreeMap<&str, BTreeMap<String, f64>> =
+        cmra.into_iter().map(|(v, m)| (v, fix(m))).collect();
 
     // climate.csv: 2 °C Atlas ratios + CMRA ratios.
     let mut header = vec!["fips".to_string()];
@@ -239,7 +351,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         let mut row = vec![c.fips.clone()];
         let mut any = false;
         for (name, _, _, _) in ATLAS_VARS {
-            let v = gwl2.and_then(|m| m.get(name)).and_then(|m| m.get(&c.fips)).copied();
+            let v = gwl2
+                .and_then(|m| m.get(name))
+                .and_then(|m| m.get(&c.fips))
+                .copied();
             any |= v.is_some();
             row.push(v.map(sig4).unwrap_or_default());
         }
@@ -259,7 +374,13 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut levels = Table::new(&["fips", "variable", "gwl15", "gwl2", "gwl3"], 2);
     for c in &counties {
         for (name, _, _, _) in ATLAS_VARS {
-            let get = |l: &str| ratios.get(l).and_then(|m| m.get(name)).and_then(|m| m.get(&c.fips)).copied();
+            let get = |l: &str| {
+                ratios
+                    .get(l)
+                    .and_then(|m| m.get(name))
+                    .and_then(|m| m.get(&c.fips))
+                    .copied()
+            };
             let (a, b, d) = (get("gwl15"), get("gwl2"), get("gwl3"));
             if a.is_none() && b.is_none() && d.is_none() {
                 continue;
@@ -277,7 +398,8 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
 
     out.missing = missing_groups(&counties, &covered, |c| {
         if super::is_outside_conus(&c.state_abbr) {
-            "The NCA5 Atlas, LOCA2 and CMRA county projections cover the contiguous US only".to_string()
+            "The NCA5 Atlas, LOCA2 and CMRA county projections cover the contiguous US only"
+                .to_string()
         } else {
             "No county projection values".to_string()
         }
@@ -285,9 +407,14 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     for (name, stem, kind, def) in ATLAS_VARS {
         let how = match kind {
             Kind::Percent => format!("1 + change/100 of NCA5 Atlas `{stem}` at +2 °C"),
-            Kind::Days(_, f) => format!("(baseline + change) / baseline, change = NCA5 Atlas `{stem}` at +2 °C, baseline = LOCA2 `{f}` 1990-2019 mean; empty when the baseline is under {MIN_BASELINE_DAYS} day a year"),
+            Kind::Days(_, f) => format!(
+                "(baseline + change) / baseline, change = NCA5 Atlas `{stem}` at +2 °C, baseline = LOCA2 `{f}` 1990-2019 mean; empty when the baseline is under {MIN_BASELINE_DAYS} day a year"
+            ),
         };
-        out.definitions.insert(name.to_string(), format!("Projected multiplier for {def}: {how}."));
+        out.definitions.insert(
+            name.to_string(),
+            format!("Projected multiplier for {def}: {how}."),
+        );
     }
     for (name, stem, min_hist, def) in CMRA_VARS {
         out.definitions.insert(

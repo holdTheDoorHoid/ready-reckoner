@@ -29,11 +29,19 @@ fn run(args: &[String]) -> rr_etl::Result<i32> {
             }
             Ok(0)
         }
-        Command::Refresh { out, only, keep_raw } => {
+        Command::Refresh {
+            out,
+            only,
+            keep_raw,
+        } => {
             let http = Http::new(out.join("raw"), keep_raw)?;
             let ctx = Ctx { data: out, http };
             let summary = refresh(&ctx, &only)?;
-            println!("refresh finished: {} job(s) ok, {} failed", summary.ok.len(), summary.failed.len());
+            println!(
+                "refresh finished: {} job(s) ok, {} failed",
+                summary.ok.len(),
+                summary.failed.len()
+            );
             for (id, e) in &summary.failed {
                 println!("  {id}: {e}");
             }
@@ -45,7 +53,10 @@ fn run(args: &[String]) -> rr_etl::Result<i32> {
                 println!("{line}");
             }
             if report.problems.is_empty() {
-                println!("verify: OK ({} files, {} checks)", report.files, report.checks);
+                println!(
+                    "verify: OK ({} files, {} checks)",
+                    report.files, report.checks
+                );
                 Ok(0)
             } else {
                 for p in &report.problems {

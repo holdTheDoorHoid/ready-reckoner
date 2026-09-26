@@ -19,12 +19,20 @@ pub struct Table {
 impl Table {
     /// New empty table with the given header; the first `key_cols` columns form the key.
     pub fn new(header: &[&str], key_cols: usize) -> Self {
-        Self { header: header.iter().map(|s| s.to_string()).collect(), rows: Vec::new(), key_cols }
+        Self {
+            header: header.iter().map(|s| s.to_string()).collect(),
+            rows: Vec::new(),
+            key_cols,
+        }
     }
 
     /// New table from owned column names.
     pub fn with_header(header: Vec<String>, key_cols: usize) -> Self {
-        Self { header, rows: Vec::new(), key_cols }
+        Self {
+            header,
+            rows: Vec::new(),
+            key_cols,
+        }
     }
 
     /// Append a row. Panics in debug builds if the width is wrong.
@@ -36,10 +44,15 @@ impl Table {
     /// Sort rows by the key columns (then by the full row) and fail on duplicate keys.
     pub fn sort_and_check(&mut self) -> Result<()> {
         let k = self.key_cols.max(1);
-        self.rows.sort_by(|a, b| a[..k].cmp(&b[..k]).then_with(|| a.cmp(b)));
+        self.rows
+            .sort_by(|a, b| a[..k].cmp(&b[..k]).then_with(|| a.cmp(b)));
         for w in self.rows.windows(2) {
             if w[0][..k] == w[1][..k] {
-                return Err(data_err(format!("duplicate key {:?} in table with columns {:?}", &w[0][..k], self.header)));
+                return Err(data_err(format!(
+                    "duplicate key {:?} in table with columns {:?}",
+                    &w[0][..k],
+                    self.header
+                )));
             }
         }
         Ok(())
@@ -60,7 +73,8 @@ impl Table {
         for r in &self.rows {
             w.write_record(r)?;
         }
-        w.into_inner().map_err(|e| data_err(format!("CSV writer: {e}")))
+        w.into_inner()
+            .map_err(|e| data_err(format!("CSV writer: {e}")))
     }
 }
 
@@ -101,7 +115,9 @@ pub struct Written {
 }
 
 fn keyed_rows(bytes: &[u8], key_cols: usize) -> Option<BTreeMap<Vec<String>, Vec<String>>> {
-    let mut rdr = csv::ReaderBuilder::new().has_headers(true).from_reader(bytes);
+    let mut rdr = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_reader(bytes);
     let mut out = BTreeMap::new();
     for rec in rdr.records() {
         let rec = rec.ok()?;
@@ -128,8 +144,12 @@ pub fn write_table(data_dir: &Path, rel: &str, table: &Table) -> Result<Written>
             match keyed_rows(&old, table.key_cols) {
                 Some(old_map) => {
                     let added = new_map.keys().filter(|k| !old_map.contains_key(*k)).count() as u64;
-                    let removed = old_map.keys().filter(|k| !new_map.contains_key(*k)).count() as u64;
-                    let changed = new_map.iter().filter(|(k, v)| old_map.get(*k).is_some_and(|o| o != *v)).count() as u64;
+                    let removed =
+                        old_map.keys().filter(|k| !new_map.contains_key(*k)).count() as u64;
+                    let changed = new_map
+                        .iter()
+                        .filter(|(k, v)| old_map.get(*k).is_some_and(|o| o != *v))
+                        .count() as u64;
                     DiffSummary {
                         previous_rows: old_map.len() as u64,
                         rows: new_map.len() as u64,
@@ -140,10 +160,17 @@ pub fn write_table(data_dir: &Path, rel: &str, table: &Table) -> Result<Written>
                         new_file: false,
                     }
                 }
-                None => DiffSummary { rows: table.rows.len() as u64, ..Default::default() },
+                None => DiffSummary {
+                    rows: table.rows.len() as u64,
+                    ..Default::default()
+                },
             }
         }
-        Err(_) => DiffSummary { rows: table.rows.len() as u64, new_file: true, ..Default::default() },
+        Err(_) => DiffSummary {
+            rows: table.rows.len() as u64,
+            new_file: true,
+            ..Default::default()
+        },
     };
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
@@ -164,24 +191,50 @@ pub fn write_text(data_dir: &Path, rel: &str, text: &str, rows: u64) -> Result<W
     let bytes = text.as_bytes();
     let path = data_dir.join(rel);
     let diff = match std::fs::read(&path) {
-        Ok(old) if old == bytes => DiffSummary { previous_rows: rows, rows, identical: true, ..Default::default() },
-        Ok(_) => DiffSummary { rows, changed: rows, ..Default::default() },
-        Err(_) => DiffSummary { rows, new_file: true, ..Default::default() },
+        Ok(old) if old == bytes => DiffSummary {
+            previous_rows: rows,
+            rows,
+            identical: true,
+            ..Default::default()
+        },
+        Ok(_) => DiffSummary {
+            rows,
+            changed: rows,
+            ..Default::default()
+        },
+        Err(_) => DiffSummary {
+            rows,
+            new_file: true,
+            ..Default::default()
+        },
     };
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
     std::fs::write(&path, bytes)?;
-    Ok(Written { path: rel.to_string(), rows, bytes: bytes.len() as u64, sha256: sha256_hex(bytes), key: Vec::new(), diff })
+    Ok(Written {
+        path: rel.to_string(),
+        rows,
+        bytes: bytes.len() as u64,
+        sha256: sha256_hex(bytes),
+        key: Vec::new(),
+        diff,
+    })
 }
 
 /// Read a CSV pack file from the data directory into header + rows (for jobs that build on
 /// earlier jobs' outputs, and for `verify`).
 pub fn read_table(data_dir: &Path, rel: &str) -> Result<(Vec<String>, Vec<Vec<String>>)> {
     let path = data_dir.join(rel);
-    let bytes = std::fs::read(&path)
-        .map_err(|e| data_err(format!("{} is needed but could not be read ({e}); run the job that builds it first", path.display())))?;
-    let mut rdr = csv::ReaderBuilder::new().has_headers(true).from_reader(bytes.as_slice());
+    let bytes = std::fs::read(&path).map_err(|e| {
+        data_err(format!(
+            "{} is needed but could not be read ({e}); run the job that builds it first",
+            path.display()
+        ))
+    })?;
+    let mut rdr = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_reader(bytes.as_slice());
     let header: Vec<String> = rdr.headers()?.iter().map(|s| s.to_string()).collect();
     let mut rows = Vec::new();
     for rec in rdr.records() {
@@ -207,7 +260,11 @@ pub fn parse_delimited(text: &str, delimiter: u8) -> Result<(Vec<String>, Vec<Ve
         .has_headers(true)
         .flexible(true)
         .from_reader(text.as_bytes());
-    let header: Vec<String> = rdr.headers()?.iter().map(|s| s.split_whitespace().collect::<Vec<_>>().join(" ")).collect();
+    let header: Vec<String> = rdr
+        .headers()?
+        .iter()
+        .map(|s| s.split_whitespace().collect::<Vec<_>>().join(" "))
+        .collect();
     let mut rows = Vec::new();
     for rec in rdr.records() {
         let rec = rec?;

@@ -52,7 +52,9 @@ pub enum Command {
 
 /// Parse arguments (without the program name).
 pub fn parse(args: &[String]) -> Result<Command> {
-    let Some(cmd) = args.first() else { return Ok(Command::Help) };
+    let Some(cmd) = args.first() else {
+        return Ok(Command::Help);
+    };
     let mut dir: Option<PathBuf> = None;
     let mut only = Vec::new();
     let mut keep_raw = false;
@@ -68,11 +70,18 @@ pub fn parse(args: &[String]) -> Result<Command> {
                 return Ok(v);
             }
             i += 1;
-            args.get(i).cloned().ok_or_else(|| data_err(format!("{flag} needs a value")))
+            args.get(i)
+                .cloned()
+                .ok_or_else(|| data_err(format!("{flag} needs a value")))
         };
         match flag {
             "--out" | "--data" => dir = Some(PathBuf::from(value()?)),
-            "--only" => only.extend(value()?.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty())),
+            "--only" => only.extend(
+                value()?
+                    .split(',')
+                    .map(|s| s.trim().to_string())
+                    .filter(|s| !s.is_empty()),
+            ),
             "--keep-raw" => keep_raw = true,
             "-h" | "--help" => return Ok(Command::Help),
             other => return Err(data_err(format!("unknown option {other}\n\n{USAGE}"))),
@@ -85,7 +94,9 @@ pub fn parse(args: &[String]) -> Result<Command> {
             only,
             keep_raw,
         }),
-        "verify" => Ok(Command::Verify { data: dir.ok_or_else(|| data_err("verify needs --data <DIR>"))? }),
+        "verify" => Ok(Command::Verify {
+            data: dir.ok_or_else(|| data_err("verify needs --data <DIR>"))?,
+        }),
         "jobs" => Ok(Command::Jobs),
         "help" | "-h" | "--help" => Ok(Command::Help),
         other => Err(data_err(format!("unknown command {other}\n\n{USAGE}"))),
@@ -102,18 +113,47 @@ mod tests {
 
     #[test]
     fn parses_refresh() {
-        let c = parse(&s(&["refresh", "--out", "data", "--only", "nri,geography", "--keep-raw"])).unwrap();
+        let c = parse(&s(&[
+            "refresh",
+            "--out",
+            "data",
+            "--only",
+            "nri,geography",
+            "--keep-raw",
+        ]))
+        .unwrap();
         assert_eq!(
             c,
-            Command::Refresh { out: "data".into(), only: vec!["nri".into(), "geography".into()], keep_raw: true }
+            Command::Refresh {
+                out: "data".into(),
+                only: vec!["nri".into(), "geography".into()],
+                keep_raw: true
+            }
         );
-        let c = parse(&s(&["refresh", "--out=data", "--only=nri", "--only", "flood"])).unwrap();
-        assert_eq!(c, Command::Refresh { out: "data".into(), only: vec!["nri".into(), "flood".into()], keep_raw: false });
+        let c = parse(&s(&[
+            "refresh",
+            "--out=data",
+            "--only=nri",
+            "--only",
+            "flood",
+        ]))
+        .unwrap();
+        assert_eq!(
+            c,
+            Command::Refresh {
+                out: "data".into(),
+                only: vec!["nri".into(), "flood".into()],
+                keep_raw: false
+            }
+        );
     }
 
     #[test]
     fn parses_verify_and_errors() {
-        assert_eq!(parse(&s(&["verify", "--data", "d"])).unwrap(), Command::Verify { data: "d".into() });
+        assert_eq!(
+            parse(&s(&["verify", "--data", "d"])).unwrap(),
+            Command::Verify { data: "d".into() }
+        );
         assert!(parse(&s(&["verify"])).is_err());
         assert!(parse(&s(&["refresh", "--out", "d", "--bogus"])).is_err());
         assert_eq!(parse(&[]).unwrap(), Command::Help);

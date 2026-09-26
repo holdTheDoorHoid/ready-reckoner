@@ -12,8 +12,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 /// User-Agent sent with every request.
-pub const USER_AGENT: &str =
-    "ready-reckoner-etl/0.1 (+https://github.com/holdTheDoorHoid/ready-reckoner; build-time data refresh)";
+pub const USER_AGENT: &str = "ready-reckoner-etl/0.1 (+https://github.com/holdTheDoorHoid/ready-reckoner; build-time data refresh)";
 
 /// A fetched document held in memory.
 #[derive(Debug, Clone)]
@@ -164,7 +163,12 @@ impl Http {
             .timeout(None::<Duration>)
             .build()
             .map_err(|e| EtlError::Http(format!("could not build HTTP client: {e}")))?;
-        Ok(Self { client, raw_dir, keep_raw, attempts: 4 })
+        Ok(Self {
+            client,
+            raw_dir,
+            keep_raw,
+            attempts: 4,
+        })
     }
 
     fn backoff(attempt: u32) {
@@ -234,7 +238,14 @@ impl Http {
                     if let (true, Some(name)) = (self.keep_raw, raw_name) {
                         self.save_raw(name, &bytes)?;
                     }
-                    return Ok(Fetched { url: url.to_string(), final_url, bytes, sha256, retrieved, last_modified });
+                    return Ok(Fetched {
+                        url: url.to_string(),
+                        final_url,
+                        bytes,
+                        sha256,
+                        retrieved,
+                        last_modified,
+                    });
                 }
                 Err(e) => last = format!("{url}: body read failed: {e}"),
             }
@@ -286,7 +297,15 @@ impl Http {
                     // Drain anything the consumer did not read so the hash covers the whole body.
                     std::io::copy(&mut reader, &mut std::io::sink())?;
                     let (sha256, bytes) = reader.finish()?;
-                    return Ok((v, Streamed { final_url, sha256, bytes, retrieved }));
+                    return Ok((
+                        v,
+                        Streamed {
+                            final_url,
+                            sha256,
+                            bytes,
+                            retrieved,
+                        },
+                    ));
                 }
                 Err(e) => {
                     last = format!("{url}: {e}");
@@ -324,12 +343,17 @@ pub fn zip_entry(zip_bytes: &[u8], name_suffix: &str) -> Result<Vec<u8>> {
     let mut found = None;
     for i in 0..archive.len() {
         let entry = archive.by_index(i)?;
-        if entry.name().to_ascii_lowercase().ends_with(&name_suffix.to_ascii_lowercase()) {
+        if entry
+            .name()
+            .to_ascii_lowercase()
+            .ends_with(&name_suffix.to_ascii_lowercase())
+        {
             found = Some(i);
             break;
         }
     }
-    let idx = found.ok_or_else(|| crate::data_err(format!("ZIP has no entry ending in {name_suffix}")))?;
+    let idx = found
+        .ok_or_else(|| crate::data_err(format!("ZIP has no entry ending in {name_suffix}")))?;
     let mut entry = archive.by_index(idx)?;
     let mut out = Vec::with_capacity(entry.size() as usize);
     entry.read_to_end(&mut out)?;

@@ -81,28 +81,74 @@ pub struct JobSpec {
 
 /// All jobs, in run order (later jobs read earlier jobs' outputs, e.g. the county list).
 pub const JOBS: &[JobSpec] = &[
-    JobSpec { id: "geography", title: "Counties, ZIP-to-county shares, states and the Connecticut crosswalk", run: geography::run },
-    JobSpec { id: "nri", title: "FEMA National Risk Index v1.20, trimmed to the model's county fields", run: nri::run },
-    JobSpec { id: "outages", title: "Power outage frequency and duration per county from ORNL EAGLE-I 2014-2025", run: outages::run },
-    JobSpec { id: "events", title: "Event rates per county from HURDAT2, SPC severe reports and NOAA Storm Events", run: events::run },
-    JobSpec { id: "seismic", title: "USGS NSHM ground-shaking exceedance at county centroids", run: seismic::run },
-    JobSpec { id: "climate", title: "Climate change multipliers from the NCA5 Atlas, LOCA2 and CMRA (projections)", run: climate::run },
-    JobSpec { id: "flood", title: "Flood priors from OpenFEMA NFIP penetration rates and claims v3", run: flood::run },
-    JobSpec { id: "facilities", title: "Nuclear plants, TRI facilities and high-hazard dams by county and ZIP", run: facilities::run },
-    JobSpec { id: "vulnerability", title: "Census Community Resilience Estimates 2024 and CDC SVI 2022", run: vulnerability::run },
-    JobSpec { id: "base_rates", title: "National personal-risk base rates with sources", run: base_rates::run },
+    JobSpec {
+        id: "geography",
+        title: "Counties, ZIP-to-county shares, states and the Connecticut crosswalk",
+        run: geography::run,
+    },
+    JobSpec {
+        id: "nri",
+        title: "FEMA National Risk Index v1.20, trimmed to the model's county fields",
+        run: nri::run,
+    },
+    JobSpec {
+        id: "outages",
+        title: "Power outage frequency and duration per county from ORNL EAGLE-I 2014-2025",
+        run: outages::run,
+    },
+    JobSpec {
+        id: "events",
+        title: "Event rates per county from HURDAT2, SPC severe reports and NOAA Storm Events",
+        run: events::run,
+    },
+    JobSpec {
+        id: "seismic",
+        title: "USGS NSHM ground-shaking exceedance at county centroids",
+        run: seismic::run,
+    },
+    JobSpec {
+        id: "climate",
+        title: "Climate change multipliers from the NCA5 Atlas, LOCA2 and CMRA (projections)",
+        run: climate::run,
+    },
+    JobSpec {
+        id: "flood",
+        title: "Flood priors from OpenFEMA NFIP penetration rates and claims v3",
+        run: flood::run,
+    },
+    JobSpec {
+        id: "facilities",
+        title: "Nuclear plants, TRI facilities and high-hazard dams by county and ZIP",
+        run: facilities::run,
+    },
+    JobSpec {
+        id: "vulnerability",
+        title: "Census Community Resilience Estimates 2024 and CDC SVI 2022",
+        run: vulnerability::run,
+    },
+    JobSpec {
+        id: "base_rates",
+        title: "National personal-risk base rates with sources",
+        run: base_rates::run,
+    },
 ];
 
 /// Pack a file belongs to, from its path.
 pub fn pack_of(path: &str) -> &'static str {
-    if path.starts_with("geo/") { "geo" } else { "core" }
+    if path.starts_with("geo/") {
+        "geo"
+    } else {
+        "core"
+    }
 }
 
 /// Pack descriptions for the manifest.
 pub fn pack_description(name: &str) -> &'static str {
     match name {
         "geo" => "County boundaries for the map thumbnail and click-to-select. Loaded lazily.",
-        _ => "Everything the engine needs for county-level planning. Loaded at start; works offline.",
+        _ => {
+            "Everything the engine needs for county-level planning. Loaded at start; works offline."
+        }
     }
 }
 
@@ -124,38 +170,57 @@ pub struct County {
 /// Load the canonical county list written by the geography job.
 pub fn load_counties(ctx: &Ctx) -> Result<Vec<County>> {
     let (h, rows) = read_table(&ctx.data, geography::COUNTIES)?;
-    let (i_f, i_n, i_s, i_lat, i_lon) =
-        (col(&h, "fips")?, col(&h, "name")?, col(&h, "state_abbr")?, col(&h, "lat")?, col(&h, "lon")?);
+    let (i_f, i_n, i_s, i_lat, i_lon) = (
+        col(&h, "fips")?,
+        col(&h, "name")?,
+        col(&h, "state_abbr")?,
+        col(&h, "lat")?,
+        col(&h, "lon")?,
+    );
     rows.iter()
         .map(|r| {
             Ok(County {
                 fips: r[i_f].clone(),
                 name: r[i_n].clone(),
                 state_abbr: r[i_s].clone(),
-                lat: r[i_lat].parse().map_err(|_| data_err(format!("bad lat for {}", r[i_f])))?,
-                lon: r[i_lon].parse().map_err(|_| data_err(format!("bad lon for {}", r[i_f])))?,
+                lat: r[i_lat]
+                    .parse()
+                    .map_err(|_| data_err(format!("bad lat for {}", r[i_f])))?,
+                lon: r[i_lon]
+                    .parse()
+                    .map_err(|_| data_err(format!("bad lon for {}", r[i_f])))?,
             })
         })
         .collect()
 }
 
 /// Group the counties that a job did not cover by a reason chosen per county.
-pub fn missing_groups(counties: &[County], covered: &BTreeSet<String>, reason: impl Fn(&County) -> String) -> Vec<Missing> {
+pub fn missing_groups(
+    counties: &[County],
+    covered: &BTreeSet<String>,
+    reason: impl Fn(&County) -> String,
+) -> Vec<Missing> {
     let mut groups: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for c in counties {
         if !covered.contains(&c.fips) {
             groups.entry(reason(c)).or_default().push(c.fips.clone());
         }
     }
-    groups.into_iter().map(|(reason, mut fips)| {
-        fips.sort();
-        Missing { reason, fips }
-    }).collect()
+    groups
+        .into_iter()
+        .map(|(reason, mut fips)| {
+            fips.sort();
+            Missing { reason, fips }
+        })
+        .collect()
 }
 
 /// States and territories outside the contiguous US (plus DC is inside).
 pub fn is_outside_conus(state_abbr: &str) -> bool {
-    matches!(state_abbr, "AK" | "HI" | "PR" | "VI" | "GU" | "AS" | "MP" | "UM")
+    matches!(
+        state_abbr,
+        "AK" | "HI" | "PR" | "VI" | "GU" | "AS" | "MP" | "UM"
+    )
 }
 
 /// Island territories other than Puerto Rico.
@@ -223,10 +288,13 @@ fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
         pack.files.retain(|f| f.job != job.id);
     }
     for w in &out.written {
-        let pack = manifest.packs.entry(pack_of(&w.path).to_string()).or_insert_with(|| Pack {
-            description: pack_description(pack_of(&w.path)).to_string(),
-            files: Vec::new(),
-        });
+        let pack = manifest
+            .packs
+            .entry(pack_of(&w.path).to_string())
+            .or_insert_with(|| Pack {
+                description: pack_description(pack_of(&w.path)).to_string(),
+                files: Vec::new(),
+            });
         pack.files.push(FileEntry {
             path: w.path.clone(),
             job: job.id.to_string(),
@@ -237,8 +305,12 @@ fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
         });
         pack.files.sort_by(|a, b| a.path.cmp(&b.path));
     }
-    let mut attributions: Vec<Attribution> =
-        manifest.attributions.iter().filter(|a| !out.attributions.iter().any(|b| b.source == a.source)).cloned().collect();
+    let mut attributions: Vec<Attribution> = manifest
+        .attributions
+        .iter()
+        .filter(|a| !out.attributions.iter().any(|b| b.source == a.source))
+        .cloned()
+        .collect();
     attributions.extend(out.attributions.iter().cloned());
     attributions.sort_by(|a, b| a.source.cmp(&b.source));
     manifest.attributions = attributions;
@@ -269,7 +341,11 @@ fn finish_manifest(manifest: &mut Manifest) {
 /// Parse a number cell, treating empty as `None`.
 pub fn num(s: &str) -> Option<f64> {
     let t = s.trim();
-    if t.is_empty() { None } else { t.parse::<f64>().ok().filter(|v| v.is_finite()) }
+    if t.is_empty() {
+        None
+    } else {
+        t.parse::<f64>().ok().filter(|v| v.is_finite())
+    }
 }
 
 /// Build a [`SourceRecord`] for a fetched document.
@@ -344,12 +420,18 @@ pub fn arcgis_query(
         if let Some(err) = v.get("error") {
             return Err(data_err(format!("{name}: ArcGIS query error: {err}")));
         }
-        let feats = v["features"].as_array().ok_or_else(|| data_err(format!("{name}: no features array")))?;
+        let feats = v["features"]
+            .as_array()
+            .ok_or_else(|| data_err(format!("{name}: no features array")))?;
         let n = feats.len();
         for f in feats {
             if let Some(a) = f["attributes"].as_object() {
                 rows.push(a.clone());
-                geoms.push(f.get("geometry").cloned().unwrap_or(serde_json::Value::Null));
+                geoms.push(
+                    f.get("geometry")
+                        .cloned()
+                        .unwrap_or(serde_json::Value::Null),
+                );
             }
         }
         let more = v["exceededTransferLimit"].as_bool().unwrap_or(false);
@@ -361,7 +443,10 @@ pub fn arcgis_query(
     Ok(ArcgisRows {
         source: SourceRecord {
             name: name.to_string(),
-            url: format!("{url} (POST where={where_clause}; fields {}; ordered by {order_by})", fields.join(",")),
+            url: format!(
+                "{url} (POST where={where_clause}; fields {}; ordered by {order_by})",
+                fields.join(",")
+            ),
             version: version.to_string(),
             retrieved,
             sha256: acc.finish(),
