@@ -61,7 +61,9 @@ Severity palette is colour-blind safe and paired with labels.
 ## Persistence
 
 `localStorage` key `rr.plan.v1` holding the household, dials, check-offs and purchases. Export and
-import as JSON (`ready-reckoner-plan.json`). A "forget everything" button clears storage and says so.
+import as JSON (`ready-reckoner-plan.json`). Display preferences (theme, expert view) are kept
+separately under `rr.prefs.v1`; they hold no household data and are not part of export/import. A
+"forget everything" button clears both keys (and anything else under `rr.`) and says so.
 
 ## Non-goals for v1
 

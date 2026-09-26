@@ -6,10 +6,12 @@ place to report results.
 
 ## Phase 0 — Plan and scaffold (2026-09-25)
 
-Interview, decisions, `docs/`, workspace skeleton, CI, public repository, milestone issues. Done in
-the founding session.
+**Status: done.** Interview, decisions, `docs/`, workspace skeleton, CI, public repository, milestone
+issues. Done in the founding session.
 
 ## Phase 1 — Foundations (parallel)
+
+**Status: done.** Every crate and directory below exists on `main` and does what it says.
 
 Tier 0 (gates everything): `rr-types` shared contract + `docs/ENGINE-API.md` + fixture households.
 
@@ -28,6 +30,9 @@ Tier 1 workstreams:
 
 ## Phase 2 — Integration
 
+**Status: done.** The real engine runs behind the website (no feature gate needed any more), the CLI
+prints full packets, and CI diffs every fixture household against its golden packet.
+
 | Workstream | Produces |
 | --- | --- |
 | plan | `rr-plan`: pipeline orchestration, packet generation (Markdown), explanations |
@@ -39,8 +44,54 @@ Tier 1 workstreams:
 
 ## Phase 3 — Verification and release
 
-Adversarial verifier (numbers vs sources, monotonicity, guardrails, prompt of every dial), accessibility
-audit, plain-language pass, README with screenshots, Pages deploy, data-refresh Action live.
+**Status: mostly done**, released as v0.1.0 (September 2026). Of the six items below, five are done;
+one is not started.
+
+- Adversarial verifier (numbers vs sources, monotonicity, guardrails, prompt of every dial) — done;
+  results and open findings in [VERIFICATION.md](VERIFICATION.md).
+- Plain-language pass — done; packets measure at a grade 5.7–6.8 reading level (target: 9 or below).
+- README with screenshots — done (this release).
+- Pages deploy — done; live at the project's GitHub Pages address.
+- Data-refresh Action live — done; runs quarterly, opens a pull request, nothing merges without a
+  person reading it.
+- Accessibility audit — **not started.** The interface is built to the WCAG 2.2 AA target set in
+  `docs/UI.md` (keyboard navigation, colour-blind-safe severity colours, reduced motion), but no one
+  has yet run a dedicated audit to confirm it meets that bar the way the numbers and the reading
+  level have been checked.
+
+## Next
+
+Concrete, near-term follow-ups, mostly from the verification pass
+([VERIFICATION.md](VERIFICATION.md)) and from workstream hand-off notes. Day-to-day, these are
+tracked as GitHub issues; the list here is the standing summary. See
+[CHANGELOG.md](../CHANGELOG.md)'s "Known limitations" for how each of these reads to a user today.
+
+- Run the accessibility audit called for above.
+- Give the 79 counties without their own outage history a state-level fallback instead of today's
+  simpler estimate.
+- Re-check the earthquake and outage numbers for Pacific coast counties reading unexpectedly high
+  (Coos Bay, Oregon is the known example).
+- Keep each hazard card's guidance specific to that hazard (stop a cold-wave card from showing
+  avalanche advice, and similar cases).
+- Add a household-vulnerability factor to heat-wave and cold-wave severity, not just dollar cost, so
+  a household with a baby, an older adult, or no cooling/heating is rated correctly.
+- Re-size livestock water on a well where a generator is already planned to keep the pump running.
+- Fix the printed packet's month-by-month spending so a completed sinking fund and its purchase
+  don't both count toward the same month's total.
+- Lay out the packet's source list in columns and stop a section splitting across a printed page.
+- Replace source links that point to a mirror or a search results page with direct links.
+- Recheck price bands that are running high against current prices.
+- Show the first several steps of a long checklist with a way to see the rest, instead of every step
+  at once.
+- Move data loading off the main thread (a Web Worker) so the page does not pause while the ZIP list
+  or the first county data batch comes in.
+- Add `BucketAssessment.covered_today` so the plan screen can show progress already made, not only
+  progress at the end of the plan.
+- Trim four unused hazard-data columns and one unused ZIP file from the data pack (roughly 0.65 MB
+  smaller first load).
+- Confirm offline use (the service worker) across more browsers.
+- Decide on a dedicated hosting address, separate from the owner's other projects (see
+  [PRIVACY.md](PRIVACY.md)).
 
 ## Later
 
