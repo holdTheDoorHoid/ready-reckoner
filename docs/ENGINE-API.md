@@ -254,6 +254,13 @@ JavaScript: `CountyRecord` (with `NriHazard`, `OutageStats`, `EventRate`, `Seism
 σ = ln(p90 / median) / z₀.₉ with z₀.₉ = 1.2815515655446004). `Effect` and `DurationDist` are also
 mirrored in `types.ts` for an expert view.
 
+`FloodPriors.sfha_basis` names how `sfha_home_share` was computed: `"structures"` (residential
+structure counts, the normal case) or `"policies_lower_bound"` (OpenFEMA reports zero flood-zone
+structures for some counties that clearly have them, so the share falls back to insured flood-zone
+homes ÷ all homes — a lower bound, since not everyone in the zone carries flood insurance). Absent
+when the pack's `sfha_share_basis` cell is empty for that county. Not read by `rr-hazards` yet, and
+not mirrored in `types.ts`: like the rest of `FloodPriors`, it never crosses into JavaScript.
+
 ## Ids
 
 Ids are stable snake_case strings. `rr-types` exposes them as enums with `ALL`, `as_str()`,

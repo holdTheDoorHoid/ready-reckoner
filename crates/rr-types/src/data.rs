@@ -181,6 +181,14 @@ pub struct FloodPriors {
     /// Mean paid claim, in US dollars.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mean_paid_usd: Option<f32>,
+    /// How `sfha_home_share` was computed: `"structures"` (residential structure counts in and
+    /// out of the flood zone, the normal case) or `"policies_lower_bound"` (OpenFEMA reports zero
+    /// flood-zone structures for this county even though it clearly has some, so the share falls
+    /// back to insured flood-zone homes ÷ all homes, which understates the true share, since not
+    /// everyone in the zone carries flood insurance). Absent when a county's cell in the pack's
+    /// `sfha_share_basis` column is empty. Not read by rr-hazards yet.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sfha_basis: Option<String>,
 }
 
 /// Facilities in or near a county that change hazard chances.

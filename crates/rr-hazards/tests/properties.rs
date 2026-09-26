@@ -371,6 +371,7 @@ fn nfip_flood_zone_share_and_claims_are_used_when_present() {
         sfha_home_share: 0.10,
         claims_per_1000_policies_year: Some(20.0),
         mean_paid_usd: None,
+        sfha_basis: Some("structures".into()),
     });
     let a = run(&household("philadelphia-renters-4"), &fixture);
     let p = profile(&a, H::RiverineFlooding);
