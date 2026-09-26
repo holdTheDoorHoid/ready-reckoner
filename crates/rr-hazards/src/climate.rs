@@ -359,6 +359,8 @@ mod tests {
             flood: None,
             facilities: None,
             vulnerability: None,
+            // Added with data pack v2 (data-hazard); nothing here reads it.
+            exposure: Default::default(),
         }
     }
 

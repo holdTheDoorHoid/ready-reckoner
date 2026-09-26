@@ -8,7 +8,7 @@ pub const USAGE: &str = "\
 rr-etl — build Ready Reckoner's data packs from public sources
 
 USAGE:
-    rr-etl refresh --out <DIR> [--only <JOB>[,<JOB>...]] [--keep-raw]
+    rr-etl refresh --out <DIR> [--only <JOB>[,<JOB>...]] [--optional] [--keep-raw]
     rr-etl verify --data <DIR>
     rr-etl jobs
 
@@ -19,11 +19,14 @@ COMMANDS:
               <DIR>/raw/, which git ignores).
     verify    Recompute every pack file's checksum and row count against the manifest and check
               that every county joins across every pack.
-    jobs      List the jobs in run order.
+    jobs      List the jobs in run order (optional jobs are marked).
 
 OPTIONS:
     --out, --data <DIR>   Data directory (normally `data`).
-    --only <JOBS>         Run only these jobs (comma separated or repeated).
+    --only <JOBS>         Run only these jobs (comma separated or repeated). Optional jobs
+                          (heavy one-off builds of optional packs) run only when named here
+                          or with --optional.
+    --optional            With no --only: run every job, the optional ones included.
     --keep-raw            Keep raw downloads under <DIR>/raw/.
 ";
 
@@ -34,8 +37,10 @@ pub enum Command {
     Refresh {
         /// Data directory.
         out: PathBuf,
-        /// Jobs to run (empty = all).
+        /// Jobs to run (empty = all default jobs).
         only: Vec<String>,
+        /// Also run the optional jobs when `only` is empty.
+        optional: bool,
         /// Keep raw downloads.
         keep_raw: bool,
     },
@@ -58,6 +63,7 @@ pub fn parse(args: &[String]) -> Result<Command> {
     let mut dir: Option<PathBuf> = None;
     let mut only = Vec::new();
     let mut keep_raw = false;
+    let mut optional = false;
     let mut i = 1;
     while i < args.len() {
         let a = args[i].as_str();
@@ -83,6 +89,7 @@ pub fn parse(args: &[String]) -> Result<Command> {
                     .filter(|s| !s.is_empty()),
             ),
             "--keep-raw" => keep_raw = true,
+            "--optional" => optional = true,
             "-h" | "--help" => return Ok(Command::Help),
             other => return Err(data_err(format!("unknown option {other}\n\n{USAGE}"))),
         }
@@ -92,6 +99,7 @@ pub fn parse(args: &[String]) -> Result<Command> {
         "refresh" => Ok(Command::Refresh {
             out: dir.ok_or_else(|| data_err("refresh needs --out <DIR>"))?,
             only,
+            optional,
             keep_raw,
         }),
         "verify" => Ok(Command::Verify {
@@ -127,6 +135,7 @@ mod tests {
             Command::Refresh {
                 out: "data".into(),
                 only: vec!["nri".into(), "geography".into()],
+                optional: false,
                 keep_raw: true
             }
         );
@@ -143,9 +152,16 @@ mod tests {
             Command::Refresh {
                 out: "data".into(),
                 only: vec!["nri".into(), "flood".into()],
+                optional: false,
                 keep_raw: false
             }
         );
+    }
+
+    #[test]
+    fn parses_optional() {
+        let c = parse(&s(&["refresh", "--out", "data", "--optional"])).unwrap();
+        assert!(matches!(c, Command::Refresh { optional: true, .. }));
     }
 
     #[test]

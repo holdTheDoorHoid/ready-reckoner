@@ -29,6 +29,132 @@ pub fn haversine_km(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     2.0 * EARTH_RADIUS_KM * a.sqrt().min(1.0).asin()
 }
 
+/// Initial great-circle bearing (forward azimuth) from point 1 to point 2, in degrees clockwise
+/// from true north, in `[0, 360)`.
+///
+/// ```
+/// // Due east along the equator is 90 degrees; due north is 0.
+/// assert!((rr_etl::geo::bearing_deg(0.0, 0.0, 0.0, 1.0) - 90.0).abs() < 1e-9);
+/// assert!(rr_etl::geo::bearing_deg(40.0, -100.0, 41.0, -100.0).abs() < 1e-9);
+/// ```
+pub fn bearing_deg(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
+    let (p1, p2) = (lat1.to_radians(), lat2.to_radians());
+    let dl = (lon2 - lon1).to_radians();
+    let y = dl.sin() * p2.cos();
+    let x = p1.cos() * p2.sin() - p1.sin() * p2.cos() * dl.cos();
+    let b = y.atan2(x).to_degrees();
+    let b = if b < 0.0 { b + 360.0 } else { b };
+    if b >= 360.0 { 0.0 } else { b }
+}
+
+/// True when `bearing` (degrees) lies in the clockwise sector from `from` to `to` (degrees),
+/// both ends included. Handles sectors that wrap through north (for example 315 to 45).
+pub fn in_sector(bearing: f64, from: f64, to: f64) -> bool {
+    let norm = |x: f64| x.rem_euclid(360.0);
+    let (b, f, t) = (norm(bearing), norm(from), norm(to));
+    if f <= t {
+        b >= f && b <= t
+    } else {
+        b >= f || b <= t
+    }
+}
+
+/// The 16-point compass name of a bearing in degrees ("north", "north-northeast", ...).
+///
+/// ```
+/// assert_eq!(rr_etl::geo::compass16(0.0), "north");
+/// assert_eq!(rr_etl::geo::compass16(292.0), "west-northwest");
+/// assert_eq!(rr_etl::geo::compass16(359.0), "north");
+/// ```
+pub fn compass16(deg: f64) -> &'static str {
+    const NAMES: [&str; 16] = [
+        "north",
+        "north-northeast",
+        "northeast",
+        "east-northeast",
+        "east",
+        "east-southeast",
+        "southeast",
+        "south-southeast",
+        "south",
+        "south-southwest",
+        "southwest",
+        "west-southwest",
+        "west",
+        "west-northwest",
+        "northwest",
+        "north-northwest",
+    ];
+    let i = ((deg.rem_euclid(360.0) + 11.25) / 22.5).floor() as usize % 16;
+    NAMES[i]
+}
+
+/// An Albers equal-area conic projection on an ellipsoid (Snyder 1987, "Map Projections: A
+/// Working Manual", USGS Professional Paper 1395, equations 14-3 to 14-12). Used to measure areas
+/// in the native plane of layers published in Albers (the USGS karst map), where every lattice
+/// cell has the same area.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Albers {
+    a: f64,
+    e: f64,
+    lon0: f64,
+    n: f64,
+    c: f64,
+    rho0: f64,
+}
+
+impl Albers {
+    /// Build from the ellipsoid (semi-major axis in metres, inverse flattening) and the
+    /// projection parameters in degrees.
+    pub fn new(a: f64, inv_f: f64, lat0: f64, lon0: f64, lat1: f64, lat2: f64) -> Self {
+        let f = 1.0 / inv_f;
+        let e2 = 2.0 * f - f * f;
+        let e = e2.sqrt();
+        let m = |phi: f64| {
+            let s = phi.to_radians().sin();
+            phi.to_radians().cos() / (1.0 - e2 * s * s).sqrt()
+        };
+        let (m1, m2) = (m(lat1), m(lat2));
+        let (q0, q1, q2) = (Self::q(e, lat0), Self::q(e, lat1), Self::q(e, lat2));
+        let n = if (lat1 - lat2).abs() < 1e-12 {
+            lat1.to_radians().sin()
+        } else {
+            (m1 * m1 - m2 * m2) / (q2 - q1)
+        };
+        let c = m1 * m1 + n * q1;
+        let rho0 = a * (c - n * q0).sqrt() / n;
+        Self {
+            a,
+            e,
+            lon0,
+            n,
+            c,
+            rho0,
+        }
+    }
+
+    /// The GRS 1980 ellipsoid (NAD 83) with the given parameters in degrees.
+    pub fn grs80(lat0: f64, lon0: f64, lat1: f64, lat2: f64) -> Self {
+        Self::new(6_378_137.0, 298.257_222_101, lat0, lon0, lat1, lat2)
+    }
+
+    fn q(e: f64, phi_deg: f64) -> f64 {
+        let s = phi_deg.to_radians().sin();
+        let e2 = e * e;
+        (1.0 - e2)
+            * (s / (1.0 - e2 * s * s)
+                - (1.0 / (2.0 * e)) * rr_types::math::ln((1.0 - e * s) / (1.0 + e * s)))
+    }
+
+    /// Project a point (degrees) to plane coordinates in metres.
+    pub fn forward(&self, lat: f64, lon: f64) -> (f64, f64) {
+        let q = Self::q(self.e, lat);
+        let rho = self.a * (self.c - self.n * q).max(0.0).sqrt() / self.n;
+        let theta = self.n * (lon - self.lon0).to_radians();
+        (rho * theta.sin(), self.rho0 - rho * theta.cos())
+    }
+}
+
 /// Signed planar area of a ring (positive when counter-clockwise).
 pub fn ring_signed_area(ring: &[[f64; 2]]) -> f64 {
     let n = ring.len();
@@ -343,6 +469,50 @@ mod tests {
         assert_eq!(polys.len(), 1);
         assert!(ring_signed_area(&polys[0][0]) > 0.0);
         assert!(ring_signed_area(&polys[0][1]) < 0.0);
+    }
+
+    #[test]
+    fn bearings_and_sectors() {
+        // Hays, KS lies east-southeast of the F.E. Warren missile field.
+        let b = bearing_deg(41.23, -103.85, 38.91, -99.32);
+        assert!(in_sector(b, 45.0, 135.0), "{b}");
+        // Seen from Hays the field lies to the north-west (305 degrees).
+        let back = bearing_deg(38.91, -99.32, 41.23, -103.85);
+        assert!((back - 305.2).abs() < 0.5, "{back}");
+        assert_eq!(compass16(back), "northwest");
+        assert_eq!(
+            compass16(bearing_deg(0.0, 0.0, 0.4, -1.0)),
+            "west-northwest"
+        );
+        assert!(in_sector(350.0, 315.0, 45.0));
+        assert!(in_sector(10.0, 315.0, 45.0));
+        assert!(!in_sector(90.0, 315.0, 45.0));
+        assert_eq!(compass16(180.0), "south");
+        assert_eq!(compass16(-90.0), "west");
+    }
+
+    #[test]
+    fn albers_matches_snyders_worked_example() {
+        // Snyder (1987) p. 292: Clarke 1866, standard parallels 29.5 and 45.5 N, origin 23 N 96 W;
+        // 35 N 75 W projects to x = 1,885,472.7 m, y = 1,535,925.0 m.
+        let a = Albers::new(6_378_206.4, 294.978_698_2, 23.0, -96.0, 29.5, 45.5);
+        let (x, y) = a.forward(35.0, -75.0);
+        assert!(
+            (x - 1_885_472.7).abs() < 1.0 && (y - 1_535_925.0).abs() < 1.0,
+            "{x} {y}"
+        );
+        // Equal area: a 1-degree cell at 40 N is about 9,480 km^2 (cos 40 x 111.2^2 x ~1.0).
+        let g = Albers::grs80(37.0, -96.0, 25.0, 50.0);
+        let p = [(40.0, -100.0), (40.0, -99.0), (41.0, -99.0), (41.0, -100.0)];
+        let xy: Vec<(f64, f64)> = p.iter().map(|(la, lo)| g.forward(*la, *lo)).collect();
+        let mut area = 0.0;
+        for i in 0..4 {
+            let (x1, y1) = xy[i];
+            let (x2, y2) = xy[(i + 1) % 4];
+            area += x1 * y2 - x2 * y1;
+        }
+        let km2 = area.abs() / 2.0 / 1e6;
+        assert!((km2 - 9_380.0).abs() < 150.0, "{km2}");
     }
 
     #[test]
