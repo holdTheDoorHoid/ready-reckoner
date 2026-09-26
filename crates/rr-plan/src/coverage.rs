@@ -38,9 +38,10 @@
 //! days. An item that meets one of their need lines, or (meeting none) lists one first among its
 //! buckets, is a step on that bucket's checklist and avoids the bucket's harm each time it is
 //! needed ([`READINESS_HARM`], an expert estimate, as the research prototype valued each
-//! capability).
-//! A go-bag is life-safety for a household with a ten-year chance of having to leave of 10 % or
-//! more, the level at which the allocator's guardrail expects one by month six.
+//! capability). Life-safety follows DESIGN §4.7 (the catalogue's flags, plus any item that meets
+//! a line `rr-supply` marks life-safety: water, a dependent's medicine, a medical device's power,
+//! alarms, formula); a go-bag is not on that list, and the allocator's guardrail warns when an
+//! evacuation-heavy household has none by month six.
 //!
 //! Items are offered only when the household needs them: the item's rule gives a quantity above
 //! zero, it does not rest only on an optional line (a generator, a solar panel), and a
@@ -213,10 +214,6 @@ pub const LONG_STORE_FOOD: [&str; 1] = ["food_bulk_staples"];
 /// Days of a supplies target that food the household normally eats must cover first.
 pub const FIRST_MONTH_DAYS: f64 = 30.0;
 
-/// A ten-year chance of having to leave at or above this makes a go-bag life-safety (the
-/// allocator's evacuation-heavy threshold).
-pub const GO_BAG_LIFE_SAFETY_P10: f64 = rr_budget::EVACUATION_HEAVY_P10;
-
 /// Heat-wave hazards, for the heat-and-cold fallback.
 const HEAT: [HazardId; 1] = [HazardId::HeatWave];
 /// Winter hazards, for the heat-and-cold fallback.
@@ -379,7 +376,6 @@ pub fn build(
     sizer: &ItemSizer<'_>,
     targets: &BTreeMap<BucketId, f64>,
     register: &BTreeMap<HazardId, f64>,
-    evacuate_p10: f64,
 ) -> Offers {
     let lines = sizer.lines();
     let need = |l: &&SizedLine| l.kind == LineKind::Need && l.quantity > 0.0;
@@ -566,8 +562,7 @@ pub fn build(
                 .iter()
                 .any(|l| l.line.id == j.line_id && l.life_safety)
         });
-        let go_bag = joins.iter().any(|j| j.line_id == "evacuate.go_bag");
-        item.life_safety |= life_safety_line || (go_bag && evacuate_p10 >= GO_BAG_LIFE_SAFETY_P10);
+        item.life_safety |= life_safety_line;
         offered.push(Offered {
             item,
             quantity,

@@ -479,7 +479,6 @@ Your budget is $200 a month, plus $1,000 once at the start. The plan does the fr
 - [ ] **Insulated bag and cold packs for refrigerated medicine**: 1 set, about $26 (usually $15–37). Adds 21 days of medicine (cold storage), which completes the 21-day goal. About 70 of 100 households like yours can't get medicine refilled for a day or more in the next 10 years. Main causes here: hurricane and cyberattack on services. Also helps with power cuts.
 - [ ] **Store-bought bottled water**: 24 gallons, about $24 (usually $21–27). Adds 4.1 days of drinking and washing water (stored water) for 3 people, bringing you to 5.2 of the 7-day goal. About 25 of 100 households like yours lose tap water for a day or more in the next 10 years. Main causes here: hurricane and local water or gas outage. Also helps with boil-water notices.
 - [ ] **Infant formula (ready-to-feed first, then powder)**: 15 ounces of powder, about $21 (usually $18–24). Adds 3 days of food and supplies (baby formula) for 3 people, bringing you to 3 of the 10-day goal. About 35 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic. Also helps with boil-water notices.
-- [ ] **Go-bag for each person**: 2 backpacks, about $140 (usually $120–160). Gets you ready for leaving home in a hurry. About 50 of 100 households like yours need this in the next 10 years. Main cause here: hurricane.
 - [ ] **Whistle for each go-bag**: 3 whistles, about $6 (usually $4–8). Gets you ready for leaving home in a hurry. About 50 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with getting home.
 - [ ] **Heavy trash bags for the toilet bucket**: 7 bags, about $1 (usually $1). Adds 2.3 days of drinking and washing water (toilet) for 3 people, bringing you to 2.3 of the 7-day goal. About 25 of 100 households like yours lose tap water for a day or more in the next 10 years. Main causes here: hurricane and local water or gas outage.
 - [ ] **Extra toilet paper**: 4 rolls, about $3 (usually $2–4). Adds 10 days of food and supplies (toilet paper) for 3 people, which completes the 10-day goal. About 35 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic. Also helps with losing tap water.
@@ -500,6 +499,7 @@ Your budget is $200 a month, plus $1,000 once at the start. The plan does the fr
 - [ ] **Personal straw or squeeze filter for a bag**: 2 filters, about $47 (usually $36–58). Gets you ready for getting home if you are stranded. About 95 of 100 households like yours need this in the next 10 years. Main cause here: stranded in a vehicle.
 - [ ] **Cash in small bills**: $100, about $100 (usually $100). Adds 5 days of cash for when card payments are down, which completes the 5-day goal. About 15 of 100 households like yours can't pay by card for a day or more in the next 10 years. Main cause here: hurricane. Also helps with leaving home quickly and getting food and supplies.
 - [ ] **Extra shelf-stable food you already eat**: 10,000 kcal, about $47 (usually $42–52). Adds 2.2 days of food and supplies (food) for 3 people, bringing you to 2.2 of the 10-day goal. About 35 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic.
+- [ ] **Go-bag for each person**: 2 backpacks, about $140 (usually $120–160). Gets you ready for leaving home in a hurry. About 50 of 100 households like yours need this in the next 10 years. Main cause here: hurricane.
 - [ ] **Bar soap and laundry soap**: 3 person-months, about $18 (usually $6–30). Adds 10 days of food and supplies (soap) for 3 people, which completes the 10-day goal. About 35 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic.
 - [ ] **Get-home bag for each commuter**: 2 bags, about $140 (usually $120–160). Gets you ready for getting home if you are stranded. About 95 of 100 households like yours need this in the next 10 years. Main cause here: stranded in a vehicle.
 
@@ -695,7 +695,6 @@ After an emergency, you may need to get by on your own for several days.[61] For
 
 - [ ] Insulated bag and cold packs for refrigerated medicine: 1 set
 - [ ] Infant formula (ready-to-feed first, then powder): 15 ounces of powder
-- [ ] Go-bag for each person: 2 backpacks
 - [ ] Whistle for each go-bag: 3 whistles
 - [ ] Heavy trash bags for the toilet bucket: 7 bags
 - [ ] Extra toilet paper: 4 rolls
@@ -715,6 +714,7 @@ After an emergency, you may need to get by on your own for several days.[61] For
 - [ ] Personal straw or squeeze filter for a bag: 2 filters
 - [ ] Cash in small bills: $100
 - [ ] Extra shelf-stable food you already eat: 14,000 kcal
+- [ ] Go-bag for each person: 2 backpacks
 - [ ] Get-home bag for each commuter: 2 bags
 - [ ] Wrench kept for turning off utilities: 1 wrench
 - [ ] Multipurpose fire extinguisher: 2 extinguishers

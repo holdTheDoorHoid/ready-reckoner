@@ -215,15 +215,7 @@ pub fn run<S: CountySource + ?Sized>(
         .iter()
         .map(|p| (p.id, p.rate_per_year))
         .collect();
-    let evacuate_p10 = match buckets
-        .iter()
-        .find(|b| b.id == BucketId::Evacuate)
-        .map(|b| b.target)
-    {
-        Some(Target::Evacuate { p_need_10yr, .. }) => p_need_10yr,
-        _ => 0.0,
-    };
-    let offers = coverage::build(content, &sizer, &targets, &register, evacuate_p10);
+    let offers = coverage::build(content, &sizer, &targets, &register);
 
     // Budget.
     // A curve for every duration bucket the catalogue can cover. A bucket with no part to buy

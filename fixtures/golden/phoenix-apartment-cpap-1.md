@@ -452,7 +452,6 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 
 - [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 14 days of one person's medicine, about $12 (usually $6–19). Adds 14 days of medicine, which completes the 14-day goal. About 65 of 100 households like yours can't get medicine refilled for a day or more in the next 10 years. Main causes here: cyberattack on services and pandemic.
 - [ ] **Unscented household bleach (for treating water)**: 1 bottle, about $8 (usually $7–9). Adds 2.5 days of safe water during boil notices for 1 person, which completes the 5-day goal. About 25 of 100 households like yours are told to boil their tap water for 2 days or more in the next 10 years. Main cause here: local water or gas outage. Also helps with losing tap water.
-- [ ] **Go-bag for each person**: 1 backpack, about $70 (usually $60–80). Gets you ready for leaving home in a hurry. About 15 of 100 households like yours need this in the next 10 years. Main causes here: house fire and chemical spill or release.
 - [ ] **Carbon monoxide alarm on each sleeping level**: 1 alarm, about $38 (usually $34–41). Gets you ready for a fire at home. About 5 of 100 households like yours need this in the next 10 years. Main cause here: house fire. Also helps with power cuts.
 - [ ] **Heavy trash bags for the toilet bucket**: 3 bags, about under $1 (usually free). Adds 1.7 days of drinking and washing water (toilet) for 1 person, bringing you to 1.7 of the 5-day goal. About 15 of 100 households like yours lose tap water for a day or more in the next 10 years. Main causes here: chemical spill or release and local water or gas outage.
 - [ ] **Extra toilet paper**: 2 rolls, about $2 (usually $1–2). Adds 10 days of food and supplies (toilet paper) for 1 person, which completes the 10-day goal. About 40 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: pandemic and supply chain disruption. Also helps with losing tap water.
@@ -461,9 +460,12 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 - [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home in a hurry. About 15 of 100 households like yours need this in the next 10 years. Main causes here: house fire and chemical spill or release. Also helps with dangerous heat or cold and getting home.
 - [ ] **N95 respirators**: 5 respirators, about $5 (usually $4–7). Gets you ready for a medical emergency before help arrives. Nearly all households like yours need this in the next 10 years. Main cause here: medical emergency. Also helps with getting food and supplies.
 - [ ] **Headlamp or flashlight for each person**: 1 headlamp, about $19 (usually $15–23). Adds 3 days of cover for power cuts (lights), which completes the 3-day goal. About 7 of 100 households like yours lose power for a day or more in the next 10 years. Main causes here: heat wave and hurricane. Also helps with leaving home quickly.
-- [ ] **Extra shelf-stable food you already eat**: 2,000 kcal, about $9 (usually $8–10). Adds 0.9 days of food and supplies (food) for 1 person, bringing you to 0.9 of the 10-day goal. About 40 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: pandemic and supply chain disruption.
+- [ ] **Extra shelf-stable food you already eat**: 6,000 kcal, about $28 (usually $25–31). Adds 2.7 days of food and supplies (food) for 1 person, bringing you to 2.7 of the 10-day goal. About 40 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: pandemic and supply chain disruption.
 - [ ] **Spare batteries for lights and the radio**: 1 24-pack, about $15 (usually $10–20). Adds 3 days of cover for power cuts (batteries), which completes the 3-day goal. About 7 of 100 households like yours lose power for a day or more in the next 10 years. Main causes here: heat wave and hurricane. Also helps with phone and internet outages.
 - [ ] **Bar soap and laundry soap**: 1 person-month, about $6 (usually $2–10). Adds 10 days of food and supplies (soap) for 1 person, which completes the 10-day goal. About 40 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: pandemic and supply chain disruption.
+- [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17). Gets you ready for getting home if you are stranded. About 80 of 100 households like yours need this in the next 10 years. Main cause here: stranded in a vehicle. Also helps with boil-water notices and leaving home quickly.
+- [ ] **Personal straw or squeeze filter for a bag**: 1 filter, about $23 (usually $18–29). Gets you ready for getting home if you are stranded. About 80 of 100 households like yours need this in the next 10 years. Main cause here: stranded in a vehicle.
+- [ ] **Battery or rechargeable fan**: 1 fan, about $17 (usually $11–23). Adds 1.5 days of protection from dangerous heat, bringing you to 1.5 of the 3-day goal. About 20 of 100 households like yours face dangerous heat at home for a day or more in the next 10 years. Main cause here: heat wave. Also helps with power cuts.
 
 ### Next month: Month 1 (from November 1, 2026), $40 to spend
 
@@ -476,8 +478,7 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 - [ ] Keep a paper map of your area (free)
 - [ ] Turn on emergency alerts on every phone (free)
 - **Save toward: Backup battery for a powered medical device**: $20. Sets aside $20 toward backup battery for a powered medical device ($20 of $234 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
-- [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17). Gets you ready for getting home if you are stranded. About 80 of 100 households like yours need this in the next 10 years. Main cause here: stranded in a vehicle. Also helps with boil-water notices and leaving home quickly.
-- [ ] **Extra shelf-stable food you already eat**: 2,000 kcal, about $9 (usually $8–10). Adds 0.9 days of food and supplies (food) for 1 person, bringing you to 1.8 of the 10-day goal. About 40 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: pandemic and supply chain disruption.
+- [ ] **Extra shelf-stable food you already eat**: 2,000 kcal, about $9 (usually $8–10). Adds 0.9 days of food and supplies (food) for 1 person, bringing you to 3.5 of the 10-day goal. About 30 of 100 households like yours can't get to a store for 2 days or more in the next 10 years. Main causes here: pandemic and supply chain disruption.
 
 ### Month by month
 
@@ -492,7 +493,7 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 - [ ] Write a go-or-stay card for each likely hazard (free)
 - [ ] Agree if-then triggers for leaving (free)
 - **Save toward: Backup battery for a powered medical device**: $20. Sets aside $20 toward backup battery for a powered medical device ($40 of $234 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
-- [ ] **Extra shelf-stable food you already eat**: 4,000 kcal, about $19 (usually $17–21). Adds 1.8 days of food and supplies (food) for 1 person, bringing you to 3.5 of the 10-day goal. About 40 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: pandemic and supply chain disruption.
+- [ ] **Wrench kept for turning off utilities**: 1 wrench, about $29 (usually $27–32). Gets you ready for a fire at home. About 5 of 100 households like yours need this in the next 10 years. Main cause here: house fire. Also helps with losing tap water.
 
 **Month 3 (from January 1, 2027), $40 to spend**
 
@@ -505,7 +506,6 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 - [ ] Written medicine list for each person (free)
 - [ ] Antibiotics: talk with your own clinician (no stockpile) (free)
 - **Save toward: Backup battery for a powered medical device**: $20. Sets aside $20 toward backup battery for a powered medical device ($60 of $234 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
-- [ ] **Battery or rechargeable fan**: 1 fan, about $17 (usually $11–23). Adds 1.5 days of protection from dangerous heat, which completes the 3-day goal. About 20 of 100 households like yours face dangerous heat at home for a day or more in the next 10 years. Main cause here: heat wave. Also helps with power cuts.
 
 **Month 4 (from February 1, 2027), $40 to spend**
 
@@ -518,7 +518,7 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 - [ ] Heat safely: space heaters 3 feet from anything that burns (free)
 - [ ] Learn where your water, gas and power shut-offs are (free)
 - **Save toward: Backup battery for a powered medical device**: $20. Sets aside $20 toward backup battery for a powered medical device ($80 of $234 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
-- [ ] **Personal straw or squeeze filter for a bag**: 1 filter, about $23 (usually $18–29). Gets you ready for getting home if you are stranded. About 80 of 100 households like yours need this in the next 10 years. Main cause here: stranded in a vehicle.
+- [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $38 (usually $22–55). Gets you ready for leaving home in a hurry. About 15 of 100 households like yours need this in the next 10 years. Main causes here: house fire and chemical spill or release. Also helps with a damaged home.
 
 **Month 5 (from March 1, 2027), $40 to spend**
 
@@ -543,7 +543,7 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 - [ ] Write a bare-bones budget you could switch to (free)
 - [ ] Know how long the fridge and freezer keep food cold (free)
 - **Save toward: Backup battery for a powered medical device**: $20. Sets aside $20 toward backup battery for a powered medical device ($120 of $234 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
-- [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $38 (usually $22–55). Gets you ready for leaving home in a hurry. About 15 of 100 households like yours need this in the next 10 years. Main causes here: house fire and chemical spill or release. Also helps with a damaged home.
+- [ ] **Family first-aid kit**: 1 kit, about $42 (usually $35–50). Gets you ready for a medical emergency before help arrives. Nearly all households like yours need this in the next 10 years. Main cause here: medical emergency.
 
 **Month 7 (from May 1, 2027), $40 to spend**
 
@@ -559,7 +559,7 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 **Month 8 (from June 1, 2027), $40 to spend**
 
 - **Save toward: Backup battery for a powered medical device**: $20. Sets aside $20 toward backup battery for a powered medical device ($160 of $234 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
-- [ ] **Family first-aid kit**: 1 kit, about $42 (usually $35–50). Gets you ready for a medical emergency before help arrives. Nearly all households like yours need this in the next 10 years. Main cause here: medical emergency.
+- [ ] **Warm sleeping bag or heavy wool blanket for each person**: 1 (one per person), about $41 (usually $25–56). Adds 1.5 days of protection from dangerous cold, which completes the 3-day goal. About 20 of 100 households like yours face dangerous cold at home for a day or more in the next 10 years.
 
 **Month 9 (from July 1, 2027), $40 to spend**
 
@@ -587,7 +587,6 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 **Month 14 (from December 1, 2027), $40 to spend**
 
 - **Save toward: NOAA Weather Radio with a tone alert**: $20. Sets aside $20 toward nOAA Weather Radio with a tone alert ($20 of $60 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
-- [ ] **Wrench kept for turning off utilities**: 1 wrench, about $29 (usually $27–32). Gets you ready for a fire at home. About 5 of 100 households like yours need this in the next 10 years. Main cause here: house fire. Also helps with losing tap water.
 
 **Month 15 (from January 1, 2028), $40 to spend**
 
@@ -596,21 +595,20 @@ Your budget is $40 a month, plus $200 once at the start. The plan does the free 
 
 **Month 16 (from February 1, 2028), $40 to spend**
 
-- **Save toward: Cash in small bills**: $20. Sets aside $20 toward cash in small bills ($20 of $100 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
+- [ ] **Go-bag for each person**: 1 backpack, about $70 (usually $60–80). Gets you ready for leaving home in a hurry. About 15 of 100 households like yours need this in the next 10 years. Main causes here: house fire and chemical spill or release.
 
 **Month 17 (from March 1, 2028), $40 to spend**
 
-- **Save toward: Cash in small bills**: $20. Sets aside $20 toward cash in small bills ($40 of $100 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
-- [ ] **Warm sleeping bag or heavy wool blanket for each person**: 1 (one per person), about $41 (usually $25–56). Adds 1.5 days of protection from dangerous cold, which completes the 3-day goal. About 20 of 100 households like yours face dangerous cold at home for a day or more in the next 10 years.
+- **Save toward: Cash in small bills**: $20. Sets aside $20 toward cash in small bills ($20 of $100 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
 
 **Month 18 (from April 1, 2028), $40 to spend**
 
-- **Save toward: Cash in small bills**: $20. Sets aside $20 toward cash in small bills ($60 of $100 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
+- **Save toward: Cash in small bills**: $20. Sets aside $20 toward cash in small bills ($40 of $100 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
 
 **Month 19 (from May 1, 2028), $40 to spend**
 
-- **Save toward: Cash in small bills**: $20. Sets aside $20 toward cash in small bills ($80 of $100 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
-- [ ] **Cash in small bills**: $100, about $100 (usually $100). Adds 1 day of cash for when card payments are down, which completes the 1-day goal. About 4 of 100 households like yours can't pay by card for a day or more in the next 10 years. Main causes here: strong wind and cyberattack on services. Also helps with leaving home quickly and getting food and supplies. Paid with $80 saved in earlier months.
+- **Save toward: Cash in small bills**: $20. Sets aside $20 toward cash in small bills ($60 of $100 saved). It costs more than a month's budget, so the plan puts half of each month's money toward it and spends the rest on other items.
+- [ ] **Cash in small bills**: $100, about $100 (usually $100). Adds 1 day of cash for when card payments are down, which completes the 1-day goal. About 4 of 100 households like yours can't pay by card for a day or more in the next 10 years. Main causes here: strong wind and cyberattack on services. Also helps with leaving home quickly and getting food and supplies. Paid with $60 saved in earlier months.
 
 **Month 20 (from June 1, 2028), $40 to spend**
 
@@ -752,6 +750,7 @@ By month 49 (November 2030) every need is covered to the step that is enough for
 ### Things to watch
 
 - **Worth acting on: No backup power for a medical device by month 3.** A breathing machine or other powered device stops when the power goes out. Ask the device supplier which battery or backup works with it, and ask your power company about its medical-needs list.
+- **Worth acting on: No go-bag in the first six months. About 15 of 100 households like yours have to leave home quickly in the next 10 years.** A packed bag by the door turns a scramble into a few minutes' work.
 
 ## Checklists
 
@@ -838,7 +837,6 @@ After an emergency, you may need to get by on your own for several days.[27] For
 **When it is enough.** Three days covers most power cuts and boil-water notices. In 2024, 88 of every 100 people who had set supplies aside said they would last more than three days.[141] If any of your targets is longer than three days, the plan moves on to two weeks.
 
 - [ ] Unscented household bleach (for treating water): 1 bottle
-- [ ] Go-bag for each person: 1 backpack
 - [ ] Carbon monoxide alarm on each sleeping level: 1 alarm
 - [ ] Heavy trash bags for the toilet bucket: 3 bags
 - [ ] Extra toilet paper: 2 rolls
@@ -850,16 +848,17 @@ After an emergency, you may need to get by on your own for several days.[27] For
 - [ ] Extra shelf-stable food you already eat: 8,000 kcal
 - [ ] Spare batteries for lights and the radio: 1 24-pack
 - [ ] Chlorine dioxide water treatment: 1 pack
-- [ ] Battery or rechargeable fan: 1 fan
 - [ ] Personal straw or squeeze filter for a bag: 1 filter
+- [ ] Battery or rechargeable fan: 1 fan
+- [ ] Wrench kept for turning off utilities: 1 wrench
 - [ ] Fire-resistant, waterproof document pouch: 1 pouch
 - [ ] Family first-aid kit: 1 kit
+- [ ] Warm sleeping bag or heavy wool blanket for each person: 1 (one per person)
 - [ ] Backup battery for a powered medical device: 1 battery
 - [ ] Get-home bag for each commuter: 1 bag
 - [ ] Over-the-counter medicine basics: 1 set
-- [ ] Wrench kept for turning off utilities: 1 wrench
 - [ ] NOAA Weather Radio with a tone alert: 1 radio
-- [ ] Warm sleeping bag or heavy wool blanket for each person: 1 (one per person)
+- [ ] Go-bag for each person: 1 backpack
 - [ ] Cash in small bills: $100
 - [ ] Multipurpose fire extinguisher: 1 extinguisher
 - [ ] Phone power bank (about 20,000 mAh): 1 power bank
@@ -1063,15 +1062,16 @@ Supplies only help if they still work. Dates count from when each item enters yo
 | --- | --- |
 | Every month | Check: carbon monoxide alarm on each sleeping level; Check: multipurpose fire extinguisher; Check: test smoke and carbon monoxide alarms every month; Replace or use and restock: extra supply of daily prescription medicine (toward 14 days) |
 | Every 3 months | Check: phone power bank (about 20,000 mAh); Check: backup battery for a powered medical device; Check: portable battery power station (about 1,000 watt-hours) |
-| April 1, 2027 | Check: go-bag for each person (then every 6 months); Check: make a home fire escape plan with two ways out (then every 6 months); Replace or use and restock: tap water in clean reused bottles (then every 6 months) |
+| April 1, 2027 | Check: make a home fire escape plan with two ways out (then every 6 months); Replace or use and restock: tap water in clean reused bottles (then every 6 months) |
 | July 1, 2027 | Check: run ten-minute drills twice a year (then every 6 months); Check: written medicine list for each person (then every 6 months) |
-| October 1, 2027 | Replace or use and restock: extra shelf-stable food you already eat (then every year); Check: spare batteries for lights and the radio (then every year); Replace or use and restock: unscented household bleach (for treating water) (then every year); Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
+| October 1, 2027 | Replace or use and restock: extra shelf-stable food you already eat (then every year); Check: family first-aid kit (then every 6 months); Check: spare batteries for lights and the radio (then every year); Replace or use and restock: unscented household bleach (for treating water) (then every year); Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
 | November 1, 2027 | Check: written contact card for each person (then every year) |
-| December 1, 2027 | Check: make a family emergency plan (then every year); Check: copy and protect your key documents (then every year); Check: family first-aid kit (then every 6 months) |
+| December 1, 2027 | Check: make a family emergency plan (then every year); Check: copy and protect your key documents (then every year) |
 | February 1, 2028 | Check: store-bought bottled water (then every 6 months) |
 | March 1, 2028 | Check: make a simple street contact list (then every year) |
 | April 1, 2028 | Check: photograph or video your home and belongings (then every year); Check: review your insurance: home or renters, flood, earthquake (then every year); Check: get-home bag for each commuter (then every 6 months) |
 | July 1, 2028 | Check: NOAA Weather Radio with a tone alert (then every 6 months) |
+| August 1, 2028 | Check: go-bag for each person (then every 6 months) |
 | November 1, 2028 | Check: over-the-counter medicine basics (then every year) |
 | May 1, 2029 | Check: car emergency kit (then every 6 months) |
 | October 1, 2031 | Replace or use and restock: carbon monoxide alarm on each sleeping level (then every 5 years) |

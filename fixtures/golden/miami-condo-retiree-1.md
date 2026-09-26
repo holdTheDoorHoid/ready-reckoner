@@ -451,9 +451,14 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Make a family emergency plan (free)
 - [ ] Copy and protect your key documents (free)
 - [ ] Know your evacuation zone, routes and where you would go (free)
-- [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 3 days of one person's medicine, about $3 (usually $1–4). Adds 3 days of medicine (prescriptions), bringing you to 3 of the 30-day goal. About 75 of 100 households like yours can't get medicine refilled for a day or more in the next 10 years. Main causes here: hurricane and cyberattack on services.
+- [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 5 days of one person's medicine, about $4 (usually $2–7). Adds 5 days of medicine (prescriptions), bringing you to 5 of the 30-day goal. About 75 of 100 households like yours can't get medicine refilled for a day or more in the next 10 years. Main causes here: hurricane and cyberattack on services.
 - [ ] **Insulated bag and cold packs for refrigerated medicine**: 1 set, about $26 (usually $15–37). Adds 30 days of medicine (cold storage), which completes the 30-day goal. About 75 of 100 households like yours can't get medicine refilled for a day or more in the next 10 years. Main causes here: hurricane and cyberattack on services. Also helps with power cuts.
-- [ ] **Go-bag for each person**: 1 backpack, about $70 (usually $60–80). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane.
+- [ ] **Carbon monoxide alarm on each sleeping level**: 1 alarm, about $38 (usually $34–41). Gets you ready for a fire at home. About 4 of 100 households like yours need this in the next 10 years. Main cause here: house fire. Also helps with power cuts.
+- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with getting home.
+- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with dangerous heat or cold and getting home.
+- [ ] **Extra pet food in an airtight container**: 2 pounds of dry food, about $8 (usually $8). Adds 13 days of food and supplies (pet food) for 1 person, bringing you to 13 of the 21-day goal. About 60 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic. Also helps with leaving home quickly.
+- [ ] **Heavy trash bags for the toilet bucket**: 14 bags, about $2 (usually $2). Adds 10 days of drinking and washing water (toilet) for 1 person, bringing you to 20 of the 30-day goal. About 15 of 100 households like yours lose tap water for 10 days or more in the next 10 years. Main cause here: hurricane.
+- [ ] **Extra toilet paper**: 6 rolls, about $5 (usually $3–7). Adds 21 days of food and supplies (toilet paper) for 1 person, which completes the 21-day goal. About 60 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic. Also helps with losing tap water.
 
 ### Month by month
 
@@ -467,16 +472,14 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Pet plan: microchip, records, a photo and a buddy (free)
 - [ ] Plan for access and mobility needs (free)
 - [ ] Plan for older adults in the household (free)
-- [ ] **Carbon monoxide alarm on each sleeping level**: 1 alarm, about $38 (usually $34–41). Gets you ready for a fire at home. About 4 of 100 households like yours need this in the next 10 years. Main cause here: house fire. Also helps with power cuts.
-- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with getting home.
-- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with dangerous heat or cold and getting home.
-- [ ] **Extra pet food in an airtight container**: 2 pounds of dry food, about $8 (usually $8). Adds 13 days of food and supplies (pet food) for 1 person, bringing you to 13 of the 21-day goal. About 60 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic. Also helps with leaving home quickly.
-- [ ] **Heavy trash bags for the toilet bucket**: 14 bags, about $2 (usually $2). Adds 10 days of drinking and washing water (toilet) for 1 person, bringing you to 20 of the 30-day goal. About 15 of 100 households like yours lose tap water for 10 days or more in the next 10 years. Main cause here: hurricane.
-- [ ] **Extra toilet paper**: 6 rolls, about $5 (usually $3–7). Adds 21 days of food and supplies (toilet paper) for 1 person, which completes the 21-day goal. About 60 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic. Also helps with losing tap water.
-- [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 7 days of one person's medicine, about $6 (usually $3–9). Adds 7 days of medicine (prescriptions), bringing you to 10 of the 30-day goal. About 55 of 100 households like yours can't get medicine refilled for 3 days or more in the next 10 years. Main causes here: hurricane and cyberattack on services.
 - [ ] **Headlamp or flashlight for each person**: 1 headlamp, about $19 (usually $15–23). Adds 21 days of cover for power cuts (lights), which completes the 21-day goal. About 55 of 100 households like yours lose power for a day or more in the next 10 years. Main cause here: hurricane. Also helps with leaving home quickly.
-- [ ] **Store-bought bottled water**: 4 gallons, about $4 (usually $4–5). Adds 3.8 days of drinking and washing water (stored water) for 1 person, bringing you to 7.5 of the 30-day goal. About 40 of 100 households like yours lose tap water for 3 days or more in the next 10 years. Main cause here: hurricane. Also helps with boil-water notices.
+- [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 9 days of one person's medicine, about $8 (usually $4–12). Adds 9 days of medicine (prescriptions), bringing you to 14 of the 30-day goal. About 40 of 100 households like yours can't get medicine refilled for 5 days or more in the next 10 years. Main causes here: hurricane and cyberattack on services.
+- [ ] **Store-bought bottled water**: 11 gallons, about $11 (usually $10–12). Adds 10 days of drinking and washing water (stored water) for 1 person, bringing you to 14 of the 30-day goal. About 40 of 100 households like yours lose tap water for 3 days or more in the next 10 years. Main cause here: hurricane. Also helps with boil-water notices.
 - [ ] **Spare batteries for lights and the radio**: 1 24-pack, about $15 (usually $10–20). Adds 7 days of cover for power cuts (batteries), bringing you to 7 of the 21-day goal. About 55 of 100 households like yours lose power for a day or more in the next 10 years. Main cause here: hurricane. Also helps with phone and internet outages.
+- [ ] **Bar soap and laundry soap**: 1 person-month, about $6 (usually $2–10). Adds 21 days of food and supplies (soap) for 1 person, which completes the 21-day goal. About 60 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic.
+- [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $38 (usually $22–55). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with a damaged home.
+- [ ] **Extra shelf-stable food you already eat**: 2,000 kcal, about $9 (usually $8–10). Adds 1 day of food and supplies (food) for 1 person, bringing you to 1 of the 21-day goal. About 60 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic.
+- [ ] **N95 respirators**: 5 respirators, about $5 (usually $4–7). Gets you ready for a medical emergency before help arrives. Nearly all households like yours need this in the next 10 years. Main cause here: medical emergency. Also helps with getting food and supplies.
 
 **Month 3 (from January 1, 2027), $100 to spend**
 
@@ -488,12 +491,9 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Antibiotics: talk with your own clinician (no stockpile) (free)
 - [ ] Learn bleeding control, first aid and hands-only CPR (free)
 - [ ] Save 988 and the Disaster Distress Helpline (free)
-- [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 11 days of one person's medicine, about $10 (usually $4–15). Adds 11 days of medicine (prescriptions), bringing you to 21 of the 30-day goal. About 20 of 100 households like yours can't get medicine refilled for 10 days or more in the next 10 years. Main causes here: hurricane and cyberattack on services.
-- [ ] **Bar soap and laundry soap**: 1 person-month, about $6 (usually $2–10). Adds 21 days of food and supplies (soap) for 1 person, which completes the 21-day goal. About 60 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic.
-- [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $38 (usually $22–55). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with a damaged home.
-- [ ] **Store-bought bottled water**: 7 gallons, about $7 (usually $6–8). Adds 6.5 days of drinking and washing water (stored water) for 1 person, bringing you to 14 of the 30-day goal. About 25 of 100 households like yours lose tap water for 7 days or more in the next 10 years. Main cause here: hurricane. Also helps with boil-water notices.
-- [ ] **Extra shelf-stable food you already eat**: 4,000 kcal, about $19 (usually $17–21). Adds 2 days of food and supplies (food) for 1 person, bringing you to 2 of the 21-day goal. About 60 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic.
-- [ ] **N95 respirators**: 5 respirators, about $5 (usually $4–7). Gets you ready for a medical emergency before help arrives. Nearly all households like yours need this in the next 10 years. Main cause here: medical emergency. Also helps with getting food and supplies.
+- [ ] **Extra shelf-stable food you already eat**: 2,000 kcal, about $9 (usually $8–10). Adds 1 day of food and supplies (food) for 1 person, bringing you to 2 of the 21-day goal. About 60 of 100 households like yours can't get to a store for a day or more in the next 10 years. Main causes here: hurricane and pandemic.
+- [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 7 days of one person's medicine, about $6 (usually $3–9). Adds 7 days of medicine (prescriptions), bringing you to 21 of the 30-day goal. About 15 of 100 households like yours can't get medicine refilled for 14 days or more in the next 10 years. Main causes here: hurricane and cyberattack on services.
+- [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $60 (usually $55–65). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with phone and internet outages and power cuts.
 
 **Month 4 (from February 1, 2027), $100 to spend**
 
@@ -505,7 +505,7 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Pick your tornado shelter spot (free)
 - [ ] If you own firearms: safe storage and training (free)
 - [ ] Lock up, light up, and keep the spare key with a neighbour (free)
-- [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $60 (usually $55–65). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with phone and internet outages and power cuts.
+- [ ] **Pet go-kit**: 1 (one per pet), about $67 (usually $35–100). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with getting food and supplies.
 
 **Month 5 (from March 1, 2027), $100 to spend**
 
@@ -517,7 +517,7 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Learn where your water, gas and power shut-offs are (free)
 - [ ] Photograph or video your home and belongings (free)
 - [ ] Review your insurance: home or renters, flood, earthquake (free)
-- [ ] **Pet go-kit**: 1 (one per pet), about $67 (usually $35–100). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane. Also helps with getting food and supplies.
+- [ ] **Go-bag for each person**: 1 backpack, about $70 (usually $60–80). Gets you ready for leaving home in a hurry. About 65 of 100 households like yours need this in the next 10 years. Main cause here: hurricane.
 - [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17). Gets you ready for getting home if you are stranded. About 80 of 100 households like yours need this in the next 10 years. Main cause here: stranded in a vehicle. Also helps with boil-water notices and leaving home quickly.
 
 **Month 6 (from April 1, 2027), $100 to spend**
@@ -665,9 +665,7 @@ After an emergency, you may need to get by on your own for several days.[55] For
 
 **When it is enough.** Three days covers most power cuts and boil-water notices. In 2024, 88 of every 100 people who had set supplies aside said they would last more than three days.[131] If any of your targets is longer than three days, the plan moves on to two weeks.
 
-- [ ] Extra supply of daily prescription medicine (toward 14 days): 3 days of one person's medicine
 - [ ] Insulated bag and cold packs for refrigerated medicine: 1 set
-- [ ] Go-bag for each person: 1 backpack
 - [ ] Carbon monoxide alarm on each sleeping level: 1 alarm
 - [ ] Whistle for each go-bag: 1 whistle
 - [ ] Foil emergency blankets: 1 blanket
@@ -680,6 +678,7 @@ After an emergency, you may need to get by on your own for several days.[55] For
 - [ ] N95 respirators: 5 respirators
 - [ ] NOAA Weather Radio with a tone alert: 1 radio
 - [ ] Pet go-kit: 1 (one per pet)
+- [ ] Go-bag for each person: 1 backpack
 - [ ] Chlorine dioxide water treatment: 1 pack
 - [ ] Cash in small bills: $100
 - [ ] Family first-aid kit: 1 kit
@@ -698,7 +697,7 @@ Two weeks is where much official advice meets. The Red Cross suggests two weeks 
 
 **When it is enough.** For most households, two weeks is the tier that covers every consequence target. The plan tells you when you can stop.
 
-- [ ] Extra supply of daily prescription medicine (toward 14 days): 7 days of one person's medicine
+- [ ] Extra supply of daily prescription medicine (toward 14 days): 14 days of one person's medicine
 - [ ] Store-bought bottled water: 11 gallons
 - [ ] Bar soap and laundry soap: 1 person-month
 - [ ] Spare batteries for lights and the radio: 1 24-pack
@@ -719,7 +718,7 @@ No major U.S. authority sets a one-month household standard. Ready Reckoner uses
 **When it is enough.** When each target that is longer than two weeks is covered, the plan stops here or moves on.
 
 - [ ] Heavy trash bags for the toilet bucket: 14 bags
-- [ ] Extra supply of daily prescription medicine (toward 14 days): 20 days of one person's medicine
+- [ ] Extra supply of daily prescription medicine (toward 14 days): 16 days of one person's medicine
 - [ ] Unscented household bleach (for treating water): 3 bottles
 - [ ] Gravity water filter (removes bacteria and parasites): 1 filter
 - [ ] Two-bucket emergency toilet kit: 1 kit
@@ -917,20 +916,18 @@ Supplies only help if they still work. Dates count from when each item enters yo
 | Every 2 months | Replace or use and restock: extra pet food in an airtight container |
 | Every 3 months | Check: phone power bank (about 20,000 mAh) |
 | April 1, 2027 | Check: make a home fire escape plan with two ways out (then every 6 months); Replace or use and restock: tap water in clean reused bottles (then every 6 months) |
-| May 1, 2027 | Check: go-bag for each person (then every 6 months) |
 | June 1, 2027 | Check: run ten-minute drills twice a year (then every 6 months); Check: store-bought bottled water (then every 6 months) |
-| July 1, 2027 | Check: written medicine list for each person (then every 6 months) |
-| August 1, 2027 | Check: NOAA Weather Radio with a tone alert (then every 6 months) |
-| September 1, 2027 | Check: pet go-kit (then every 6 months) |
+| July 1, 2027 | Check: NOAA Weather Radio with a tone alert (then every 6 months); Check: written medicine list for each person (then every 6 months) |
+| August 1, 2027 | Check: pet go-kit (then every 6 months) |
+| September 1, 2027 | Check: go-bag for each person (then every 6 months) |
 | October 1, 2027 | Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
 | November 1, 2027 | Check: written contact card for each person (then every year); Check: make a family emergency plan (then every year); Check: copy and protect your key documents (then every year); Check: family first-aid kit (then every 6 months) |
-| December 1, 2027 | Check: spare batteries for lights and the radio (then every year) |
-| January 1, 2028 | Replace or use and restock: extra shelf-stable food you already eat (then every year) |
+| December 1, 2027 | Replace or use and restock: extra shelf-stable food you already eat (then every year); Check: spare batteries for lights and the radio (then every year) |
 | February 1, 2028 | Check: make a simple street contact list (then every year) |
 | March 1, 2028 | Check: photograph or video your home and belongings (then every year); Check: review your insurance: home or renters, flood, earthquake (then every year); Check: car emergency kit (then every 6 months) |
 | April 1, 2028 | Replace or use and restock: unscented household bleach (for treating water) (then every year) |
 | May 1, 2028 | Check: over-the-counter medicine basics (then every year) |
-| December 1, 2031 | Replace or use and restock: carbon monoxide alarm on each sleeping level (then every 5 years) |
+| November 1, 2031 | Replace or use and restock: carbon monoxide alarm on each sleeping level (then every 5 years) |
 
 The intervals come from each item's sources.[1, 9, 11, 18, 19, 23, 26, 27, 28, 30, 35, 37, 54, 55, 56, 57, 61, 63, 64, 65, 67, 69, 76, 80, 81, 82, 87, 88, 92, 94, 95, 97, 98, 99, 101, 102, 104, 105, 108, 115, 117, 119, 120, 121, 132, 133, 140, 143, 149, 158, 159]
 
