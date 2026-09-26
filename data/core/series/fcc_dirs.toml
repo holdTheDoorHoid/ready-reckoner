@@ -1,0 +1,221 @@
+# Cell sites out of service after major hurricanes (FCC Disaster Information Reporting System). Written by rr-etl (job `series`); see docs/DATA_SOURCES.md.
+
+id = "fcc_dirs"
+title = "Cell sites out of service after major hurricanes (FCC Disaster Information Reporting System)"
+publisher = "Federal Communications Commission, Public Safety and Homeland Security Bureau"
+url = "https://docs.fcc.gov/public/attachments/DOC-353805A1.pdf"
+licence = "US Government work, public domain (17 U.S.C. 105)"
+attribution = ""
+source = "fcc_dirs_reports"
+retrieved = "2026-09-26"
+how = "transcribed"
+notes = [
+  "Daily Communications Status Reports (docs.fcc.gov/public/attachments/<DOC id>.pdf) read from their per-county tables; shares are cell sites out / cell sites served in the reporting area. The FCC widens and later narrows that area, which moves the area-wide share; the worst county counts only counties with 20 or more sites. Site outages include sites down for power or backhaul and do not map one to one onto lost service.",
+  "Transcribed by a research agent with pdftotext and a per-county parse, checked against the reports' headline sentence (the FCC's own headline is wrong on Helene 2024-09-28 and 10-01; the tables are used). Not re-read line by line here, so the rates carry unverified = true.",
+]
+
+[[rate]]
+id = "cell_sites_out_peak_area_share_median"
+value = 0.119
+unit = "median peak share of cell sites out across a hurricane's reporting area"
+low = 0.019
+high = 0.956
+year = 2024
+period = "8 hurricanes, 2017-2024"
+figure = "Hurricane Harvey 2017 4.7%; Hurricane Maria 2017, Puerto Rico 95.6%; Hurricane Michael 2018 18.8%; Hurricane Ida 2021 28.1%; Hurricane Ian 2022 10.9%; Hurricane Idalia 2023 1.9%; Hurricane Helene 2024 11.5%; Hurricane Milton 2024 12.3%"
+derivation = "median of the events' peak area-wide shares; range = lowest and highest"
+note = ""
+unverified = true
+
+[[rate]]
+id = "cell_sites_out_worst_county_share_median"
+value = 0.84
+unit = "median peak share of cell sites out in the hardest-hit county (20 or more sites)"
+low = 0.512
+high = 1
+year = 2024
+period = "8 hurricanes, 2017-2024"
+figure = "Calhoun TX 85.2%; 48 of 78 municipios 100.0%; Bay FL 78.3%; Terrebonne LA 100.0%; Glades FL 82.8%; Hamilton FL 59.1%; Tazewell VA 97.7%; Hardee FL 51.2%"
+derivation = "median over events"
+note = ""
+unverified = true
+
+[[rate]]
+id = "cell_sites_days_until_under_5pct_median"
+value = 5.5
+unit = "median days from the first report until the area-wide share of cell sites out stayed under 5%"
+low = 0
+high = 155
+year = 2024
+period = "8 hurricanes, 2017-2024 (Maria in the Virgin Islands never fell under 5%)"
+figure = "Hurricane Harvey 2017 0; Hurricane Maria 2017, Puerto Rico 155; Hurricane Michael 2018 12; Hurricane Ida 2021 8; Hurricane Ian 2022 3; Hurricane Idalia 2023 3; Hurricane Helene 2024 21; Hurricane Milton 2024 3"
+derivation = "median over events"
+note = "The hardest-hit counties take longer: Buncombe NC 21 days after Helene, San Juan PR about 4 months after Maria."
+unverified = true
+
+[[row]]
+table = "event"
+event = "Hurricane Harvey 2017"
+states = "TX, LA"
+first_report = "2017-08-26"
+last_report = "2017-09-05"
+first_doc = "DOC-346368A1"
+last_doc = "DOC-346499A1"
+peak_area_share = 0.047
+worst_county = "Calhoun TX"
+worst_county_share = 0.852
+days_first_under_5pct = 0
+days_stayed_under_5pct = 0
+
+[[row]]
+table = "event"
+event = "Hurricane Maria 2017, Puerto Rico"
+states = "PR"
+first_report = "2017-09-21"
+last_report = "2018-03-21"
+first_doc = "DOC-346840A1"
+last_doc = "DOC-349827A1"
+peak_area_share = 0.956
+worst_county = "48 of 78 municipios"
+worst_county_share = 1
+days_first_under_5pct = 155
+days_stayed_under_5pct = 155
+
+[[row]]
+table = "event"
+event = "Hurricane Maria 2017, US Virgin Islands"
+states = "VI"
+first_report = "2017-09-21"
+last_report = "2018-03-21"
+first_doc = "DOC-346840A1"
+last_doc = "DOC-349827A1"
+peak_area_share = 0.766
+worst_county = "all three islands"
+worst_county_share = 0.6
+days_first_under_5pct = 182
+days_stayed_under_5pct = "never"
+
+[[row]]
+table = "event"
+event = "Hurricane Michael 2018"
+states = "FL, GA, AL"
+first_report = "2018-10-11"
+last_report = "2018-10-26"
+first_doc = "DOC-354510A1"
+last_doc = "DOC-354814A1"
+peak_area_share = 0.188
+worst_county = "Bay FL"
+worst_county_share = 0.783
+days_first_under_5pct = 5
+days_stayed_under_5pct = 12
+
+[[row]]
+table = "event"
+event = "Hurricane Ida 2021"
+states = "LA, MS"
+first_report = "2021-08-30"
+last_report = "2021-09-20"
+first_doc = "DOC-375318A1"
+last_doc = "DOC-375878A1"
+peak_area_share = 0.281
+worst_county = "Terrebonne LA"
+worst_county_share = 1
+days_first_under_5pct = 8
+days_stayed_under_5pct = 8
+
+[[row]]
+table = "event"
+event = "Hurricane Ian 2022"
+states = "FL, GA, SC, NC"
+first_report = "2022-09-28"
+last_report = "2022-10-10"
+first_doc = "DOC-387679A1"
+last_doc = "DOC-388051A1"
+peak_area_share = 0.109
+worst_county = "Glades FL"
+worst_county_share = 0.828
+days_first_under_5pct = 3
+days_stayed_under_5pct = 3
+
+[[row]]
+table = "event"
+event = "Hurricane Idalia 2023"
+states = "FL, GA, SC"
+first_report = "2023-08-30"
+last_report = "2023-09-04"
+first_doc = "DOC-396514A1"
+last_doc = "DOC-396621A1"
+peak_area_share = 0.019
+worst_county = "Hamilton FL"
+worst_county_share = 0.591
+days_first_under_5pct = 0
+days_stayed_under_5pct = 3
+
+[[row]]
+table = "event"
+event = "Hurricane Helene 2024"
+states = "FL, GA, NC, SC, TN, VA"
+first_report = "2024-09-26"
+last_report = "2024-10-19"
+first_doc = "DOC-405827A1"
+last_doc = "DOC-406771A1"
+peak_area_share = 0.115
+worst_county = "Tazewell VA"
+worst_county_share = 0.977
+days_first_under_5pct = 10
+days_stayed_under_5pct = 21
+
+[[row]]
+table = "event"
+event = "Hurricane Milton 2024"
+states = "FL"
+first_report = "2024-10-10"
+last_report = "2024-10-14"
+first_doc = "DOC-406468A1"
+last_doc = "DOC-406535A1"
+peak_area_share = 0.123
+worst_county = "Hardee FL"
+worst_county_share = 0.512
+days_first_under_5pct = 3
+days_stayed_under_5pct = 3
+
+[[row]]
+table = "county"
+fips = "37021"
+county = "Buncombe NC"
+event = "Hurricane Helene 2024"
+peak_share = 0.819
+days_stayed_under_5pct = 21
+
+[[row]]
+table = "county"
+fips = "22051"
+county = "Jefferson LA"
+event = "Hurricane Ida 2021"
+peak_share = 0.699
+days_stayed_under_5pct = 11
+
+[[row]]
+table = "county"
+fips = "48201"
+county = "Harris TX"
+event = "Hurricane Harvey 2017"
+peak_share = 0.051
+days_stayed_under_5pct = 4
+
+[[row]]
+table = "county"
+fips = "72127"
+county = "San Juan PR"
+event = "Hurricane Maria 2017"
+peak_share = 0.913
+days_stayed_under_5pct = 123
+
+[[row]]
+table = "county"
+fips = "12005"
+county = "Bay FL"
+event = "Hurricane Michael 2018"
+peak_share = 0.783
+days_stayed_under_5pct = "not by the last report"
+
