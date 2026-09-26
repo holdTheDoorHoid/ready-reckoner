@@ -3419,6 +3419,19 @@ retrieved = "2026-09-26"
 quote = "To determine risk levels for U.S. counties, NAPB-90 employed the combined results of 12 \"most-likely\" wind patterns--one such pattern for each month of the year--and used the highest resulting radiation effect in each county as its potential risk level."
 license = "US Government Work (public domain)"
 
+# Added 2026-09-26 (hazards2c follow-up): the public precedent for the class A and C1 "Why here"
+# sentences. FEMA's address no longer serves the file, so the Internet Archive capture of that
+# address is cited (docs/CONTENT_STANDARDS.md §2, removed federal documents).
+[[citation]]
+id = "fema_slg101_nuclear_1996"
+title = "SLG 101: Guide for All-Hazard Emergency Operations Planning, Tab 2 to Attachment F: Nuclear Conflict"
+publisher = "FEMA (via Internet Archive)"
+year = 1996
+url = "https://web.archive.org/web/20090108212857/http://www.fema.gov/pdf/plan/6-ch-f-2.pdf"
+retrieved = "2026-09-26"
+quote = "Under the current international climate, it is unlikely that an organized attack on the United States would occur. However, if an attack did occur, areas potentially at risk might include:"
+license = "US Government Work (public domain)"
+
 [[citation]]
 id = "igrf14_coefficients"
 title = "International Geomagnetic Reference Field, 14th generation (IGRF-14): coefficients"
@@ -3533,6 +3546,27 @@ title = "Crime in the United States, 2024: persons arrested (Table 29, estimated
 publisher = "FBI Uniform Crime Reporting Program (Crime Data Explorer)"
 year = 2025
 url = "https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+# Added 2026-09-26 (hazards2c follow-up): the three editions the arrest rates average, and the
+# population they divide by (census_popest_vintage_2025 is the state-totals file, which has no
+# ages). fbi_cde_arrests above stays the 2024 edition that the arrest block's footnote copies.
+[[citation]]
+id = "fbi_cius_arrests_2023_2025"
+title = "Crime in the United States, 2023, 2024 and 2025 editions: persons arrested (Table 29, estimated number of arrests; Tables 39 and 40, arrests by age and sex)"
+publisher = "FBI Uniform Crime Reporting Program (Crime Data Explorer)"
+year = 2026
+url = "https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "census_popest_agesex_2025"
+title = "Annual Estimates of the Resident Population by Single Year of Age and Sex for the United States: April 1, 2020 to July 1, 2025 (NC-EST2025-AGESEX-RES)"
+publisher = "U.S. Census Bureau, Population Division"
+year = 2026
+url = "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/national/asrh/nc-est2025-agesex-res.csv"
 retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 

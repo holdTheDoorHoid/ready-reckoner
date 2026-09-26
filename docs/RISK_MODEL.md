@@ -224,7 +224,7 @@ the terrorism row (retired in contract v2, H-02) are replaced by the rare famili
 | Long illness in the household | someone sick at home for weeks | 1 % per person-year (0.5–3 %) | × people | PRIOR |
 | Burst pipe or water leak (v2) | a burst, frozen or leaking pipe or appliance floods part of the home | 1.5 % per home-year (1–2 %; III/ISO water damage and freezing, about 1 in 67 insured homes a year, 2019–2023) | ×1.3 (1.1–1.6) where 5 or more days a year stay below freezing (CMRA `icing_days_hist`); basement ×1.2 (1–1.5); renters ×0.8 (0.6–1); no housing-age column exists yet, so age is not a modifier | DATA + PRIOR (confidence medium: read through the publisher's summary) |
 | Eviction (v2) | a renting household is taken to court and ordered to leave | the county's eviction filings per renter household × 0.4 (0.3–0.55) that end in a judgment, when the pack has the column; otherwise 2.3 per 100 renter households a year (1–5; Eviction Lab 2016, confirm) | renters only; income stability as for job loss; ×0.5 (0.3–0.8) with three months of savings | PRIOR |
-| Arrest or detention (v2, owner decision 2026-09-26) | a household member is arrested | FBI arrests per 100,000 a year by age band, 2023–2025 (Crime Data Explorer, Tables 29, 39 and 40; the data-model series `fbi_arrests`): the men's and women's rates averaged, since the form does not ask sex. Adults 18–64 are the five FBI bands weighted by the years each covers (7, 10, 10, 10, 10): 3.31 per 100 a year; teens the 10–17 band, 1.47; 65 and over 0.31; children under 13 are not counted | summed over the household (events, not people); the range runs from the women's lowest year to the men's highest | DATA (confidence medium) |
+| Arrest or detention (v2, owner decision 2026-09-26) | a household member is arrested | FBI arrests per 100,000 a year by age band, 2023–2025 (Crime in the United States, the 2023, 2024 and 2025 editions, Tables 29, 39 and 40, over the Census Bureau's Vintage 2025 population by age and sex; the data-model series `fbi_arrests`): the men's and women's rates averaged, since the form does not ask sex. Adults 18–64 are the five FBI bands weighted by the years each covers (7, 10, 10, 10, 10): 3.31 per 100 a year; teens the 10–17 band, 1.47; 65 and over 0.31; children under 13 are not counted | summed over the household (events, not people); the range runs from the women's lowest year to the men's highest | DATA (confidence medium) |
 
 Job loss and earner loss are left out (with a note) when no one is marked as earning; vehicle
 stranding when there is no vehicle and no commute; medicine shortages when no one takes a daily
@@ -379,7 +379,7 @@ for a scenario that does not apply is ignored with a note.
 
 The earthquake card shows the county rate less the long-run shares of every earthquake scenario
 that applies (never below a quarter of it) plus the scenarios' own rates: Coos Bay 0.01981 − 0.0041
-+ 0.01022 = 0.0259 a year; King County takes out both Cascadia's and the Seattle fault's shares.
++ 0.01022 = 0.0259 a year; King County takes out both Cascadia's and the Puget Sound scenario's shares.
 The heat card shows the heat waves (the blackout scenario is one of them, taken out and added
 back). The hurricane card shows the full hurricane rate (Category 1–2 plus major); the tsunami card
 the county rate plus the local-source scenario. `rates` always carries the parent's full rate.
@@ -910,24 +910,24 @@ big windstorms, grid failure, Cascadia).
 | *hayward_m7* | home_loss | event | a magnitude 7 Hayward fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | *hayward_m7* | evacuate | event | a magnitude 7 Hayward fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
 | *hayward_m7* | get_home | event | a magnitude 7 Hayward fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
-| *wasatch_m7* | power | event | a magnitude 7 Wasatch fault earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
-| *wasatch_m7* | water_out | event | a magnitude 7 Wasatch fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
-| *wasatch_m7* | water_out | event | a magnitude 7 Wasatch fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
-| *wasatch_m7* | supplies | event | a magnitude 7 Wasatch fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
-| *wasatch_m7* | medication | event | a magnitude 7 Wasatch fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
-| *wasatch_m7* | comms | event | a magnitude 7 Wasatch fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
-| *wasatch_m7* | home_loss | event | a magnitude 7 Wasatch fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
-| *wasatch_m7* | evacuate | event | a magnitude 7 Wasatch fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
-| *wasatch_m7* | get_home | event | a magnitude 7 Wasatch fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
-| *seattle_fault_m7* | power | event | a magnitude 7 Seattle fault earthquake | 1 | 3 d | 14 d | prior | in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
-| *seattle_fault_m7* | water_out | event | a magnitude 7 Seattle fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
-| *seattle_fault_m7* | water_out | event | a magnitude 7 Seattle fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
-| *seattle_fault_m7* | supplies | event | a magnitude 7 Seattle fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
-| *seattle_fault_m7* | medication | event | a magnitude 7 Seattle fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
-| *seattle_fault_m7* | comms | event | a magnitude 7 Seattle fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
-| *seattle_fault_m7* | home_loss | event | a magnitude 7 Seattle fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
-| *seattle_fault_m7* | evacuate | event | a magnitude 7 Seattle fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
-| *seattle_fault_m7* | get_home | event | a magnitude 7 Seattle fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *wasatch_m7* | power | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *wasatch_m7* | water_out | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *wasatch_m7* | water_out | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *wasatch_m7* | supplies | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *wasatch_m7* | medication | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *wasatch_m7* | comms | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *wasatch_m7* | home_loss | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *wasatch_m7* | evacuate | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *wasatch_m7* | get_home | event | a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *seattle_fault_m7* | power | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 1 | 3 d | 14 d | prior | in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *seattle_fault_m7* | water_out | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *seattle_fault_m7* | water_out | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *seattle_fault_m7* | supplies | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *seattle_fault_m7* | medication | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *seattle_fault_m7* | comms | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *seattle_fault_m7* | home_loss | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *seattle_fault_m7* | evacuate | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *seattle_fault_m7* | get_home | event | a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | *san_andreas_south_m78* | power | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.3 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
 | *san_andreas_south_m78* | water_out | event | a magnitude 7.8 southern San Andreas earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
 | *san_andreas_south_m78* | water_out | event | a magnitude 7.8 southern San Andreas earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
@@ -949,8 +949,8 @@ big windstorms, grid failure, Cascadia).
 | *major_hurricane_direct_hit*: the local economy after a major hurricane | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *new_madrid_m7*: the regional economy after a New Madrid earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *hayward_m7*: the regional economy after a Hayward fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
-| *wasatch_m7*: the regional economy after a Wasatch fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
-| *seattle_fault_m7*: the regional economy after a Seattle fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *wasatch_m7*: the regional economy after a magnitude 6.75 or larger earthquake on the Wasatch Front | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *seattle_fault_m7*: the regional economy after a magnitude 6.5 or larger shallow earthquake around Puget Sound | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *san_andreas_south_m78*: the regional economy after a southern San Andreas earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | benefit_interruption: federal pay or benefits that stop | 1 | 2 wk | 6 wk | no | prior | cfpb_shutdown_2013, rr_risk_model_priors |
 | arrest_or_detention: an arrest or detention | 1 | 1 wk | 6 wk | no | prior | fbi_cde_arrests, rr_risk_model_priors |
@@ -968,8 +968,8 @@ big windstorms, grid failure, Cascadia).
 | *cascadia_m9* | earthquake | The county earthquake rate includes Cascadia's own shaking (0.41 %/yr near Coos Bay, the long-run recurrence). |
 | *hayward_m7* | earthquake | The Bay Area earthquake rate includes Hayward fault ruptures. |
 | *new_madrid_m7* | earthquake | The county earthquake rate includes New Madrid ruptures. |
-| *wasatch_m7* | earthquake | The Wasatch Front earthquake rate includes Wasatch fault ruptures. |
-| *seattle_fault_m7* | earthquake | The Puget Sound earthquake rate includes Seattle fault ruptures (and Cascadia's, taken out separately). |
+| *wasatch_m7* | earthquake | The Wasatch Front earthquake rate includes these earthquakes (on the Wasatch fault or any other fault in the region). |
+| *seattle_fault_m7* | earthquake | The Puget Sound earthquake rate includes these shallow earthquakes, on the Seattle fault or any other (and Cascadia's, taken out separately). |
 | *san_andreas_south_m78* | earthquake | The southern California earthquake rate includes southern San Andreas ruptures. |
 | *heat_blackout* | heat_wave | The county's heat-wave rate includes the heat waves that come with a blackout of a day or more. |
 

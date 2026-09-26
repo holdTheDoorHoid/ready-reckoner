@@ -150,6 +150,12 @@ pub const STRATEGIC_SITES: &str = "rr_strategic_sites";
 /// county from blast and from fallout, the method precedent for the classes. It "merely
 /// identifies areas and populations which are at potential risk" (p. 2).
 pub const FEMA_NAPB90: &str = "fema_napb90";
+/// FEMA, SLG 101 (1996), Tab 2 to Attachment F, "Nuclear Conflict" (Internet Archive capture of
+/// FEMA's address): an organised attack is unlikely, but if one came the areas potentially at risk
+/// include the military installations behind the nation's nuclear retaliatory forces and large
+/// metros important to government or finance. The public precedent for the class A and C1 "Why
+/// here" sentences.
+pub const FEMA_SLG101_NUCLEAR: &str = "fema_slg101_nuclear_1996";
 /// Philippe (2023), Scientific American and Princeton's *The Missiles on our Land*: fallout from
 /// an attack on the missile silos, the calibration of the downwind class.
 pub const PHILIPPE_2023: &str = "philippe_2023_icbm_fallout";
@@ -192,8 +198,12 @@ pub const SNAP_LAPSE_2025: &str = "snap_lapse_2025";
 /// CSIS, methodology of its US terrorism dataset (October 2024): 725 attacks and plots from
 /// 1 January 1994 to 30 April 2024.
 pub const CSIS_TERRORISM: &str = "csis_terrorism_2025";
-/// FBI, Crime in the United States: arrests by age and sex (Crime Data Explorer).
-pub const FBI_ARRESTS: &str = "fbi_cde_arrests";
+/// FBI, Crime in the United States, 2023, 2024 and 2025 editions: persons arrested (Table 29,
+/// the national estimate; Tables 39 and 40, arrests by age and sex), from the Crime Data Explorer.
+pub const FBI_ARRESTS: &str = "fbi_cius_arrests_2023_2025";
+/// US Census Bureau, Vintage 2025 national population by single year of age and sex
+/// (NC-EST2025-AGESEX-RES): the population each arrest rate divides by.
+pub const CENSUS_AGESEX_2025: &str = "census_popest_agesex_2025";
 /// FBI, Active Shooter Incidents in the United States in 2024.
 pub const FBI_ACTIVE_SHOOTER: &str = "fbi_active_shooter_2024";
 /// START, Profiles of Incidents involving CBRN and Non-state Actors (POICN): 517 events
@@ -317,6 +327,7 @@ pub const ALL: &[&str] = &[
     USGS_BAY_AREA_2016,
     STRATEGIC_SITES,
     FEMA_NAPB90,
+    FEMA_SLG101_NUCLEAR,
     PHILIPPE_2023,
     FEMA_UASI_FY2026,
     NERC_TPL007,
@@ -336,6 +347,7 @@ pub const ALL: &[&str] = &[
     SNAP_LAPSE_2025,
     CSIS_TERRORISM,
     FBI_ARRESTS,
+    CENSUS_AGESEX_2025,
     FBI_ACTIVE_SHOOTER,
     START_POICN,
     XPT_2023,

@@ -1009,8 +1009,14 @@ fn the_three_new_fault_scenarios_have_rows() {
     let input = research::philadelphia_household();
     let rates = vec![rate(HazardId::Earthquake, 0.02)];
     for (id, name) in [
-        ("wasatch_m7", "A magnitude 7 Wasatch fault earthquake"),
-        ("seattle_fault_m7", "A magnitude 7 Seattle fault earthquake"),
+        (
+            "wasatch_m7",
+            "A magnitude 6.75 or larger earthquake on the Wasatch Front",
+        ),
+        (
+            "seattle_fault_m7",
+            "A magnitude 6.5 or larger shallow earthquake around Puget Sound",
+        ),
         (
             "san_andreas_south_m78",
             "A magnitude 7.8 southern San Andreas earthquake",

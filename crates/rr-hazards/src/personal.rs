@@ -347,7 +347,7 @@ fn arrest_or_detention(ctx: &Ctx<'_>) -> Option<HazardRate> {
         }
     }
     let adult = (adult.0 / weight, adult.1 / weight, adult.2 / weight);
-    let sources: &[&str] = &[cite::FBI_ARRESTS];
+    let sources: &[&str] = &[cite::FBI_ARRESTS, cite::CENSUS_AGESEX_2025];
     let mut total: Option<Estimate> = None;
     for p in &ctx.input.people {
         let t = match p.age_band {
