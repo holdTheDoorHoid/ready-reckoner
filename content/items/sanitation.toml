@@ -44,8 +44,8 @@ avoid = [
   "An airtight lid on the poo bucket: waste should be able to dry",
   "Pool noodles as a seat (they cannot be cleaned)",
 ]
-price_band_usd = { low = 39.98, high = 52.99, per = "kit", note = "A bucket toilet with seat ($25.99) plus a second bucket ($13.99), or a complete bucket-toilet set at $52.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 25.95, high = 29.97, per = "kit", note = "Two combinations: two 5-gallon buckets ($3.98 each, home center) with a snap-on bucket toilet seat ($17.99, maker's list price), or a bucket toilet with seat ($25.99, maker's list price) plus a second bucket." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["rdpo_emergency_toilet", "oregon_b2wr_toolkit", "rr_price_observations_2026_09"]
 hazard_extras = []
@@ -169,16 +169,15 @@ hazard_extras = []
 
 [[item]]
 id = "san_diapers"
-name = "Diapers and baby wipes"
+name = "Diapers"
 category = "sanitation"
 unit = "diaper"
 buckets = ["supplies"]
 tier = "h72"
 free = false
-spec = "Diapers in the size your baby wears now, plus wipes, rash cream and gallon zip-top bags for dirty diapers, as CDC's family checklist lists. After the first week, a newborn has more than six wet diapers a day (Sutter Health)."
+spec = "Diapers in the size your baby wears now, plus rash cream and gallon zip-top bags for dirty diapers, as CDC's family checklist lists. After the first week, a newborn has more than six wet diapers a day (Sutter Health)."
 look_for = [
   "The current size, plus a pack of the next size up",
-  "At least two packs of wipes (CDC)",
   "Zip-top bags for used diapers and dirty clothes",
 ]
 avoid = [
@@ -189,4 +188,27 @@ price_band_usd = { low = 0.32, high = 0.47, per = "diaper", note = "Two listings
 retrieved = "2026-09-25"
 quantity_rule = "diapers"
 citations = ["cdc_infant_checklist", "sutter_diapers", "rdpo_emergency_toilet", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "san_baby_wipes"
+name = "Baby wipes"
+category = "sanitation"
+unit = "pack"
+buckets = ["supplies", "water_out"]
+tier = "h72"
+free = false
+spec = "Packs of baby wipes for each baby or toddler, which CDC's checklist for families with young children includes. Ready.gov's basic kit also lists moist towelettes for personal sanitation."
+look_for = [
+  "Fragrance-free wipes in packs that reseal",
+  "At least two packs for each child (CDC)",
+]
+avoid = [
+  "Flushing wipes, even ones labeled flushable",
+  "Putting used wipes in the toilet bucket: they go in regular trash (RDPO)",
+]
+price_band_usd = { low = 2.29, high = 2.69, per = "pack", note = "Two supermarket listings for packs of 56 to 72 wipes: $2.29 and $2.69." }
+retrieved = "2026-09-26"
+quantity_rule = "baby_wipes"
+citations = ["cdc_infant_checklist", "ready_gov_kit", "rdpo_emergency_toilet", "rr_price_observations_2026_09"]
 hazard_extras = []

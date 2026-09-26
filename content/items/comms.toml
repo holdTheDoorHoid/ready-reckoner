@@ -75,8 +75,8 @@ avoid = [
   "Radios without the weather band",
   "A radio stored with dead batteries",
 ]
-price_band_usd = { low = 54.99, high = 64.99, per = "radio", note = "Two retail listings: a desktop alert radio at $54.99 and a hand-crank model at $64.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 36.99, high = 42.5, per = "radio", note = "Two home-center listings for weather radios with a NOAA alert: $36.99 and $42.50." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 maintenance = { check_months = 6 }
 citations = ["nws_weather_radio", "ready_gov_kit", "rr_price_observations_2026_09"]
@@ -100,9 +100,33 @@ avoid = [
   "Buying GMRS-only radios without the $35 FCC license",
   "Believing the long ranges printed on the box",
 ]
-price_band_usd = { low = 74.99, high = 89.99, per = "pair", note = "Two retail listings for pairs of FRS radios: $74.99 and $89.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 38.98, high = 44.99, per = "pair", note = "Two home-center listings for pairs of license-free two-way radios: $38.98 and $44.99." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 maintenance = { check_months = 6 }
 citations = ["fcc_frs", "fcc_gmrs", "ecfr_47_1_1102", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "comms_phone_basic"
+name = "A charged mobile phone: alerts, calls and a backup light"
+category = "comms"
+unit = "phone"
+buckets = ["comms", "power"]
+tier = "now"
+free = true
+assumed_basic = true
+spec = "The plan counts a charged mobile phone for each teenager and adult as already owned. A charged phone gets free Wireless Emergency Alerts and can call 911 (Ready.gov, FCC), and most have a built-in light. Treat it as a backup light, not the only one, because the battery you use for light is the battery you need for alerts and calls."
+look_for = [
+  "Emergency alerts switched on",
+  "A charger for the car and a power bank",
+  "Important numbers also written on paper",
+]
+avoid = [
+  "Using the phone as your only light",
+  "Letting it run down before a storm",
+]
+price_band_usd = { low = 0, high = 0, per = "phone", note = "Not bought by the plan: most people already have a phone." }
+quantity_rule = "per_person_13_plus"
+citations = ["ready_gov_alerts", "fcc_wea", "fcc_text_911", "ready_gov_kit", "ready_gov_low_cost"]
 hazard_extras = []

@@ -3,27 +3,30 @@
 
 [[item]]
 id = "gethome_bag"
-name = "Get-home bag for each commuter"
+name = "Get-home bag for each commuter: a small bag you stock from home"
 category = "get_home"
 unit = "bag"
 buckets = ["get_home"]
 tier = "h72"
 free = false
-spec = "A small backpack kept at work or in the car with a water bottle, snacks, a rain layer, comfortable walking shoes and socks, medicines, a phone charger, cash and a paper map. Ready.gov's work-kit advice includes food, water, medicines and comfortable walking shoes."
+spec = "A small bag kept at work or in the car and stocked from home: a filled water bottle, snacks, comfortable walking shoes and socks, a rain layer, medicines, a phone charger, cash and a paper map (Ready.gov). The bag you already carry can be it."
 look_for = [
-  "Walking shoes you have already broken in",
-  "A refillable bottle and a filter if the walk is long",
-  "Food that needs no cooking, and a copy of the contact card",
+  "A filled water bottle, refilled every six months (CDC); a filter if the walk is long",
+  "Snacks that need no cooking, swapped before they expire",
+  "Walking shoes you have already broken in, and warm socks",
+  "A day of your medicines and a copy of the contact card",
+  "A phone charger, cash in small bills and a paper map",
 ]
 avoid = [
   "A bag so heavy you would leave it behind",
+  "Buying a kit that repeats what you keep at home",
   "Letting snacks and medicines expire",
 ]
-price_band_usd = { low = 59.99, high = 79.99, per = "bag", note = "Two retail listings for 30–35 liter backpacks: $59.99 and $79.99. Filters, lights and food are priced as separate items." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 29.73, high = 38.8, per = "bag", note = "A bag you already carry to work costs nothing. New, two home-center listings for basic backpacks: $29.73 and $38.80. Water and snacks come from home; a filter is a separate item." }
+retrieved = "2026-09-26"
 quantity_rule = "per_commuter"
 maintenance = { check_months = 6 }
-citations = ["ready_gov_kit_2020", "ready_gov_kit", "rr_price_observations_2026_09"]
+citations = ["ready_gov_kit_2020", "ready_gov_kit", "cdc_water_storage", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]
@@ -44,8 +47,8 @@ avoid = [
   "Running the engine with snow blocking the exhaust pipe",
   "Leaving the kit's water and snacks to expire",
 ]
-price_band_usd = { low = 129.95, high = 149.74, per = "kit", note = "Two retail car survival kits: $129.95 and $149.74. Assembling your own from the list, using what you already own, usually costs less." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 34.97, high = 87.89, per = "kit", note = "Two home-center listings for packed roadside kits: $34.97 and $87.89. Assembling the Ready.gov list from what you already own costs less." }
+retrieved = "2026-09-26"
 quantity_rule = "per_vehicle"
 maintenance = { check_months = 6 }
 citations = ["ready_gov_winter", "cdc_winter_safety", "rr_price_observations_2026_09"]

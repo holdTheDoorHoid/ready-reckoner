@@ -26,24 +26,26 @@ hazard_extras = []
 
 [[item]]
 id = "special_pet_kit"
-name = "Pet go-kit"
+name = "Pet go-kit: a carrier and a bag you pack from your supplies"
 category = "special_needs"
 unit = "pet"
 buckets = ["evacuate", "supplies"]
 tier = "h72"
 free = false
-spec = "For each pet, a carrier or leash, bowls, a pet first-aid kit, two weeks of any medicine, litter supplies for cats, and copies of records in a waterproof bag (Ready.gov, ASPCA)."
+spec = "For each pet, a carrier or a leash and collar with ID, packed from what you already have: bowls, two weeks of any medicine, litter supplies for cats, copies of records and a recent photo in a waterproof bag, plus the food and water you set aside for the kit (Ready.gov, ASPCA)."
 look_for = [
-  "A carrier big enough for your pet to stand and turn around",
-  "Two weeks of your pet's medicines",
-  "Collapsible bowls and a spare leash",
+  "A sturdy carrier or crate, ideally one for each pet",
+  "Two weeks of your pet's medicines in a waterproof container",
+  "Collapsible bowls, a spare leash and waste bags or a litter tray",
+  "Records, a recent photo of you with your pet, and your contact details",
+  "The food and water set aside for the kit, swapped every two months",
 ]
 avoid = [
   "A carrier your pet has never been inside: practice first",
-  "Leaving medicines out of the kit",
+  "Buying a packed kit that repeats what you already have",
 ]
-price_band_usd = { low = 34.95, high = 100.00, per = "pet", note = "Two retail listings: a pet first-aid kit at $34.95 and a packed dog go-kit at $100. Food is priced separately." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 29.93, high = 34.99, per = "pet", note = "A carrier you already own costs nothing. New, two home-center listings for medium soft pet carriers: $29.93 and $34.99. Food, water and medicine come from your household supply." }
+retrieved = "2026-09-26"
 quantity_rule = "per_pet"
 maintenance = { check_months = 6 }
 citations = ["ready_gov_pets", "aspca_disaster_prep", "rr_price_observations_2026_09"]
@@ -67,8 +69,8 @@ avoid = [
   "Switching foods suddenly during a stressful time",
   "Letting the stored food go stale",
 ]
-price_band_usd = { low = 3.81, high = 4.09, per = "pound of dry food", note = "Two online listings for 21–22 pound bags of dry dog food: $3.81 and $4.09 a pound. Prices vary widely by brand." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 0.74, high = 1.73, per = "pound of dry food", note = "Two supermarket listings for dry dog food: a 38-pound bag at $0.74 a pound and a 13-pound bag at $1.73 a pound. Prices vary by brand." }
+retrieved = "2026-09-26"
 quantity_rule = "pet_food_lb"
 maintenance = { rotate_months = 2 }
 citations = ["aspca_disaster_prep", "ready_gov_pets", "rr_expert_prior", "rr_price_observations_2026_09"]
@@ -238,4 +240,28 @@ price_band_usd = { low = 0, high = 0, per = "pet-day", note = "Free: food moved 
 quantity_rule = "pet_go_food"
 maintenance = { rotate_months = 2 }
 citations = ["aspca_disaster_prep", "ready_gov_pets"]
+hazard_extras = []
+
+[[item]]
+id = "special_nursing_supplies"
+name = "Nursing supplies: a manual pump and nursing pads"
+category = "special_needs"
+unit = "kit"
+buckets = ["supplies"]
+tier = "h72"
+free = false
+spec = "A manual breast pump and one or two boxes of disposable nursing pads for a breastfed baby, which CDC's emergency checklist for families with infants lists. A manual pump needs no power."
+look_for = [
+  "A manual pump that you have tried before you need it",
+  "One or two boxes of disposable nursing pads",
+  "Clean containers or bags for milk, and a way to wash parts with safe water",
+]
+avoid = [
+  "Relying only on an electric pump in an outage",
+  "Packing reusable pads, which need washing (CDC)",
+]
+price_band_usd = { low = 44.98, high = 46.98, per = "kit", note = "Makers' list prices: a manual pump ($34.99) with a box of disposable nursing pads from either of two makers ($9.99 or $11.99)." }
+retrieved = "2026-09-26"
+quantity_rule = "nursing_supplies"
+citations = ["cdc_infant_checklist", "rr_price_observations_2026_09"]
 hazard_extras = []

@@ -145,7 +145,10 @@ fn the_free_actions_named_in_the_brief_exist() {
         assert_eq!(i.tier, TierId::Now, "{id} must be in tier now");
         assert_eq!(i.price_band_usd.high, 0.0, "{id} must cost nothing");
         let words = format!("{} {} {}", i.name, i.spec, i.look_for.join(" "));
-        assert!(words.contains(step), "{id} should include the step `{step}`");
+        assert!(
+            words.contains(step),
+            "{id} should include the step `{step}`"
+        );
     }
 }
 
@@ -158,12 +161,14 @@ fn free_actions_are_grouped_into_at_most_thirty_parents() {
         .map(|i| i.id.as_str())
         .collect();
     // The polish round (2026-09-26) grouped the 78 free actions into 28 parents and added four
-    // for need lines nothing met (a ride plan, epinephrine, and the pet go-kit's water and food).
+    // for need lines nothing met (a ride plan, epinephrine, and the pet go-kit's water and food),
+    // plus the phone, an assumed basic the plan never buys.
     let added = [
         "evac_ride_plan",
         "med_epinephrine_plan",
         "special_pet_go_water",
         "special_pet_go_food",
+        "comms_phone_basic",
     ];
     let grouped = free.iter().filter(|id| !added.contains(id)).count();
     assert!(grouped <= 30, "{grouped} grouped free actions: {free:?}");
@@ -174,15 +179,14 @@ fn free_actions_are_grouped_into_at_most_thirty_parents() {
 
 #[test]
 fn community_items_carry_real_weight() {
-    for id in ["community_know_two_neighbours"] {
-        let i = item(id);
-        assert_eq!(i.category, "community");
-        assert!(i.buckets.len() >= 3, "{id} should help several buckets");
-        assert!(
-            i.citations.iter().any(|c| !c.as_str().starts_with("rr_")),
-            "{id} cites outside evidence"
-        );
-    }
+    let i = item("community_know_two_neighbours");
+    assert_eq!(i.category, "community");
+    assert!(i.buckets.len() >= 3, "{} should help several buckets", i.id);
+    assert!(
+        i.citations.iter().any(|c| !c.as_str().starts_with("rr_")),
+        "{} cites outside evidence",
+        i.id
+    );
 }
 
 #[test]
@@ -404,4 +408,63 @@ fn thermal_items_point_one_way_heat_or_cold() {
         }
     }
     assert!(content().citation("prior_harm_weights").unwrap().prior);
+}
+
+#[test]
+fn assumed_basics_are_everyday_things_most_homes_have() {
+    // POLISH_ROUND content 1: the plan credits these when `assume_basics` is on. Each one's rule
+    // counts per person or per household, so what is credited matches what a home holds.
+    let expected = [
+        ("thermal_blankets", "blankets"),
+        ("thermal_warm_layers", "warm_layers"),
+        ("food_cooking_pot", "once"),
+        ("food_manual_can_opener", "once"),
+        ("comms_phone_basic", "per_person_13_plus"),
+        ("evac_go_bag", "per_person"),
+        ("food_three_days_basic", "per_person"),
+        ("thermal_cooling_towel", "cooling_towel"),
+    ];
+    for (id, rule) in expected {
+        let i = item(id);
+        assert!(i.assumed_basic, "{id} should be an assumed basic");
+        assert_eq!(i.quantity_rule, rule, "{id}");
+    }
+    let flagged: Vec<&str> = content()
+        .items
+        .iter()
+        .filter(|i| i.assumed_basic)
+        .map(|i| i.id.as_str())
+        .collect();
+    assert_eq!(flagged.len(), expected.len(), "{flagged:?}");
+    // A full family first-aid kit is not something most homes have, so it is not assumed.
+    assert!(!item("med_first_aid_kit").assumed_basic);
+    // Three days of ordinary food, at about 2,100 kcal a day.
+    assert_eq!(
+        item("food_three_days_basic").energy_kcal_per_unit,
+        Some(6300.0)
+    );
+}
+
+#[test]
+fn kits_are_containers_packed_from_household_supplies() {
+    // POLISH_ROUND content 3: the go-bag, get-home bag and pet go-kit are priced as the bag or
+    // carrier ($20-40 new, nothing if reused), not as pre-packed kits.
+    for id in ["evac_go_bag", "gethome_bag", "special_pet_kit"] {
+        let i = item(id);
+        assert!(
+            i.price_band_usd.high <= 40.0,
+            "{id} is priced as a kit, not a container"
+        );
+        let note = i.price_band_usd.note.as_deref().unwrap_or("");
+        assert!(
+            note.contains("costs nothing"),
+            "{id}: say that reuse is free"
+        );
+        assert!(i.look_for.len() >= 3, "{id}: list what goes inside");
+    }
+    // The staged water and food for the pet go-kit are free steps drawn from the household stock.
+    for id in ["special_pet_go_water", "special_pet_go_food"] {
+        let i = item(id);
+        assert!(i.free && i.price_band_usd.high == 0.0);
+    }
 }

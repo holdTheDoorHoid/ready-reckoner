@@ -52,26 +52,26 @@ hazard_extras = ["heat_wave"]
 
 [[item]]
 id = "thermal_sleeping_bag"
-name = "Warm sleeping bag or heavy wool blanket for each person"
+name = "Cold-weather sleeping bag for each person (an upgrade on blankets)"
 category = "thermal"
-unit = "person"
+unit = "sleeping bag"
 buckets = ["thermal"]
 tier = "h72"
 free = false
-spec = "A sleeping bag rated for your coldest nights, or a heavy wool blanket, for each person, as Ready.gov lists in its basic kit. With a warm room plan this covers a winter outage when the heating needs electricity."
+spec = "A sleeping bag rated for your coldest nights, on top of the blankets and warm layers most homes already have. The plan adds it when a winter outage could last more than three days, or for anyone 65 or older; with a warm room plan it covers a long outage when the heating needs electricity (Ready.gov, CDC)."
 look_for = [
   "A temperature rating near your area's coldest nights",
-  "Wool or synthetic fill that stays warm if damp",
-  "Warm hats and layers for everyone too",
+  "Synthetic fill that stays warm if damp",
+  "A size that fits each person, including children",
 ]
 avoid = [
-  "Thin blankets alone in a cold climate",
+  "Buying bags before the blankets and layers you already own are counted",
   "Storing it where mice or damp can reach it",
 ]
-price_band_usd = { low = 25.00, high = 55.99, per = "person", note = "Two retail listings: a heavy wool blanket at $25.00 and a 0°F sleeping bag at $55.99." }
-retrieved = "2026-09-25"
-quantity_rule = "per_person"
-citations = ["ready_gov_kit", "cdc_winter_safety", "rr_price_observations_2026_09"]
+price_band_usd = { low = 43.48, high = 94.49, per = "sleeping bag", note = "Two home-center listings: a three-season sleeping bag at $43.48 and a cold-weather bag at $94.49." }
+retrieved = "2026-09-26"
+quantity_rule = "sleeping_bag_or_blanket"
+citations = ["ready_gov_kit", "cdc_winter_safety", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
 
 [[item]]
@@ -142,3 +142,75 @@ retrieved = "2026-09-25"
 quantity_rule = "per_person"
 citations = ["redcross_first_aid_kit", "rr_price_observations_2026_09"]
 hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+
+[[item]]
+id = "thermal_blankets"
+name = "A warm blanket for each person"
+category = "thermal"
+unit = "blanket"
+buckets = ["thermal"]
+tier = "h72"
+free = false
+assumed_basic = true
+spec = "A warm blanket for each person aged one and over, which Ready.gov's basic kit lists; most homes already have them. Babies under one sleep in warm sleepwear or a sleep sack instead of loose blankets (CDC)."
+look_for = [
+  "One warm blanket per person, beyond what is already on the beds",
+  "Fleece or wool, which stay warm if damp",
+]
+avoid = [
+  "Loose blankets in a baby's crib",
+  "Blankets near a space heater: keep 3 feet clear (USFA)",
+]
+price_band_usd = { low = 14.37, high = 19.98, per = "blanket", note = "A blanket you already own costs nothing. New: a twin fleece blanket at a restaurant supplier, $14.37 each in a case of four, and a throw at its regular supermarket price, $19.98." }
+retrieved = "2026-09-26"
+quantity_rule = "blankets"
+citations = ["ready_gov_kit", "cdc_winter_safety", "usfa_heating_fires", "rr_price_observations_2026_09"]
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+
+[[item]]
+id = "thermal_warm_layers"
+name = "Warm layers for each person: a coat, hat and gloves"
+category = "thermal"
+unit = "set"
+buckets = ["thermal", "get_home"]
+tier = "h72"
+free = false
+assumed_basic = true
+spec = "A warm coat, a hat and gloves or mittens for each person; CDC advises dressing in several layers of loose-fitting clothing in the cold. Most homes already have them, and with a warm room plan they are the first defense in a winter outage."
+look_for = [
+  "A warm hat and gloves for everyone, children included",
+  "Wool or fleece layers that stay warm if damp",
+]
+avoid = [
+  "Cotton next to the skin in wet cold, which chills fast",
+  "Going outside without layers in a winter outage",
+]
+price_band_usd = { low = 16.18, high = 21.69, per = "set", note = "Most households already own coats, so the band prices a knit hat and insulated gloves from a restaurant and uniform supplier: $16.18 and $21.69 a set. A coat costs more." }
+retrieved = "2026-09-26"
+quantity_rule = "warm_layers"
+citations = ["ready_gov_kit", "cdc_winter_safety", "rr_price_observations_2026_09"]
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+
+[[item]]
+id = "thermal_cooling_towel"
+name = "Towels to wet and cool down"
+category = "thermal"
+unit = "towel"
+buckets = ["thermal"]
+tier = "h72"
+free = false
+assumed_basic = true
+spec = "A towel or cloth for each person to wet and put on the body in a heat wave: CDC's advice for someone with heat exhaustion is to move them to a cool place, give them water and put cool wet cloths on their body. Ordinary bath towels work, and most homes have them."
+look_for = [
+  "One towel or cloth per person, kept near the water",
+  "A bowl or bucket to re-wet them",
+]
+avoid = [
+  "Waiting for heat illness to get worse: call 911 for heat stroke (Ready.gov)",
+  "Using wet towels instead of moving somewhere cooler",
+]
+price_band_usd = { low = 7.5, high = 13.84, per = "towel", note = "A towel you already own costs nothing. New, two home-center listings for bath towels: $7.50 each in a four-piece set, $13.84 each in a set of two." }
+retrieved = "2026-09-26"
+quantity_rule = "cooling_towel"
+citations = ["cdc_hot_weather_psa", "ready_gov_heat", "rr_price_observations_2026_09"]
+hazard_extras = ["heat_wave"]

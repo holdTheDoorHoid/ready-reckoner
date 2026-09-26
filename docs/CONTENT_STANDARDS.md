@@ -70,6 +70,26 @@ One `[[item]]` per distinct thing a household would acquire or do. Fields are in
 - `free = true` for actions that cost nothing (documents, plans, phone numbers, testing alarms).
   Free items have a $0 band, sit in tier `now`, and still have a `quantity_rule` (usually `once`).
   Purchases never sit in `now`.
+- **Free actions are grouped.** At most 30 free parent actions (one "household plan", one
+  "documents", one "alarms", one "know your shut-offs", and so on); a parent's `look_for` lists its
+  steps. A new free step joins the closest parent. It stands alone only when the plan must count it
+  on its own: it has its own quantity rule (`evacuation_ride_plan`, `epinephrine_check`, the staged
+  pet food and water) or a `once_if_*` rule keys on its id. The catalogue test
+  `free_actions_are_grouped_into_at_most_thirty_parents` holds the cap.
+- **Assumed basics.** `assumed_basic = true` marks an everyday thing most homes already have:
+  blankets, warm layers, a cooking pot, a manual can opener, a phone, a bag for each person, three
+  days of ordinary food, bath towels. The plan credits them when "assume basics" is on and lists them
+  in the packet, so the household can check rather than buy. Flag only what most homes really have;
+  be honest, not generous (a stocked family first-aid kit is not assumed). An assumed item keeps a
+  real price band, what it costs if it is missing (the phone is the exception: the plan never buys
+  one, so it is a free item), and a quantity rule that counts it the way a home holds it: per person
+  (blankets, layers, towels, bags, food), per teenager and adult (phone) or once (pot, can opener).
+- **Kits are containers.** A go-bag, get-home bag or pet go-kit is priced as the bag or carrier alone
+  (about $20 to $40 new; its note says a bag you already own costs nothing), and its `look_for` is a
+  contents checklist packed from supplies the plan already counts, so nothing is bought twice. Food
+  and water staged in a bag use the `staged_*` rule variants in `docs/QUANTITY_RULES.md`
+  (`go_bag_water`, `pet_go_food`, ...), and only free steps (moving what you have into the bag)
+  carry them.
 - `rare_catastrophic = true` marks items for rare, severe events (a year-long outage, a nuclear
   emergency). They sit in tier `y1`, even when free, and the app shows them only on request.
 - `quantity_rule` is `once` or a row in `docs/QUANTITY_RULES.md`, the table shared with `rr-supply`.

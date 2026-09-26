@@ -77,8 +77,8 @@ avoid = [
   "Alarms right next to the stove or bathroom, which cause false alarms",
   "Alarms more than 10 years old",
 ]
-price_band_usd = { low = 20.49, high = 30.99, per = "alarm", note = "Two listings for battery-operated smoke alarms: $20.49 and $30.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 18.97, high = 32.47, per = "alarm", note = "Two home-center listings: an AA-battery photoelectric alarm at $18.97 and a 10-year sealed-battery alarm at $32.47." }
+retrieved = "2026-09-26"
 quantity_rule = "smoke_alarm_count"
 maintenance = { rotate_months = 120, check_months = 1 }
 citations = ["usfa_smoke_alarms", "ready_gov_home_fires", "rr_price_observations_2026_09"]
@@ -103,8 +103,8 @@ avoid = [
   "Relying on a smoke alarm to detect carbon monoxide unless it is a combination alarm",
   "Alarms past their replacement date",
 ]
-price_band_usd = { low = 33.99, high = 41.49, per = "alarm", note = "Two listings: a battery carbon monoxide alarm at $33.99 and a plug-in with battery backup at $41.49." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 23.47, high = 29.97, per = "alarm", note = "Two home-center listings for battery carbon monoxide alarms, one with a digital display: $23.47 and $29.97." }
+retrieved = "2026-09-26"
 quantity_rule = "co_alarm_count"
 maintenance = { rotate_months = 60, check_months = 1 }
 citations = ["cdc_co_basics", "ready_gov_power_outages", "rr_price_observations_2026_09"]
@@ -118,7 +118,7 @@ unit = "extinguisher"
 buckets = ["fire"]
 tier = "h72"
 free = false
-spec = "A multipurpose extinguisher labeled A-B-C, which works on most home fires, kept near the kitchen and an exit (USFA). Use it only on a small fire with a clear way out: pull the pin, aim at the base, squeeze and sweep."
+spec = "A multipurpose extinguisher labeled A-B-C, which works on most home fires (USFA). The plan counts one for each floor you live on, an estimate, with one near the kitchen. Use it only on a small fire with a clear way out: pull the pin, aim at the base, squeeze and sweep."
 look_for = [
   "An A-B-C rating and a testing-lab listing",
   "A size you can lift and aim: 2.5 to 5 pounds",
@@ -128,8 +128,8 @@ avoid = [
   "Fighting a fire that is spreading: get out and call 911",
   "Extinguishers with the gauge needle out of the green",
 ]
-price_band_usd = { low = 40.49, high = 48.49, per = "extinguisher", note = "Three restaurant-supply listings for 2.5–5 pound A-B-C extinguishers: $40.49, $45.49 and $48.49." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 22.49, high = 44.47, per = "extinguisher", note = "Two home-center listings for 2.5-pound A-B-C extinguishers: $22.49 each in a two-pack, or $44.47 for a rechargeable one." }
+retrieved = "2026-09-26"
 quantity_rule = "extinguisher_count"
 maintenance = { check_months = 1 }
 citations = ["usfa_extinguishers", "ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
@@ -153,21 +153,21 @@ avoid = [
   "Keeping it boxed in the garage",
   "Never practicing how to hook it on (practice on the ground floor)",
 ]
-price_band_usd = { low = 69.99, high = 114.99, per = "ladder", note = "Two listings: a two-story ladder at $69.99 and a three-story ladder at $114.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 58.99, high = 59.97, per = "ladder", note = "Two home-center listings for 13-foot two-story escape ladders: $58.99 and $59.97. Three-story ladders cost more." }
+retrieved = "2026-09-26"
 quantity_rule = "escape_ladder_count"
 citations = ["ready_gov_home_fires", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]
 id = "fire_utility_wrench"
-name = "Wrench kept for turning off utilities"
+name = "Shut-off wrench for gas and water"
 category = "fire"
 unit = "wrench"
 buckets = ["fire", "water_out"]
 tier = "h72"
 free = false
-spec = "An adjustable wrench kept by the gas meter or water valve so anyone can shut them quickly; Ready.gov's basic kit lists a wrench or pliers to turn off utilities. Use one you own if it fits."
+spec = "A shut-off wrench kept by the gas meter or water valve so anyone can turn them off quickly; Ready.gov's basic kit lists a wrench or pliers to turn off utilities. An adjustable wrench you already own works if it fits."
 look_for = [
   "A size that fits your gas and water valves",
   "Tied or hung where it will stay",
@@ -176,8 +176,8 @@ avoid = [
   "Storing it in a toolbox you cannot find in the dark",
   "A wrench too small to turn a stiff valve",
 ]
-price_band_usd = { low = 26.99, high = 31.99, per = "wrench", note = "Two listings for adjustable wrenches: $26.99 and $31.99. A wrench you already own works too." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 11.63, high = 21.99, per = "wrench", note = "Two home-center listings for gas-and-water shut-off wrenches: $11.63 and $21.99. A wrench you already own works if it fits." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["ready_gov_kit", "rr_price_observations_2026_09"]
 hazard_extras = []
@@ -200,8 +200,8 @@ avoid = [
   "Air cleaners that make ozone",
   "Leaving windows open or running a whole-house fan in smoke",
 ]
-price_band_usd = { low = 119.99, high = 129.99, per = "air cleaner", note = "Two retail listings for room air cleaners with HEPA filters: $119.99 and $129.99. A box fan with a filter costs less." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 99.99, high = 149, per = "air cleaner", note = "Two home-center listings for room air cleaners with HEPA filters: $99.99 and $149. A box fan with a MERV 13 filter costs less (EPA)." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["epa_diy_air_cleaners", "epa_wildfire_indoor_air", "ready_gov_wildfires", "rr_price_observations_2026_09"]
 hazard_extras = ["wildfire"]

@@ -73,8 +73,8 @@ avoid = [
   "Storing it where you cannot reach it quickly",
   "Keeping original documents only in the pouch, with no other copies",
 ]
-price_band_usd = { low = 21.99, high = 54.99, per = "pouch", note = "Two restaurant-supply listings: a fire-resistant document bag at $21.99 and a small case at $54.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 22.98, high = 33.15, per = "pouch", note = "Two home-center listings for fire- and water-resistant document bags: $22.98 and $33.15." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["fema_effak", "rr_price_observations_2026_09"]
 hazard_extras = []

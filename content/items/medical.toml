@@ -151,8 +151,8 @@ avoid = [
   "Kits padded with dozens of tiny bandages and little else",
   "Used or expired items left in the kit",
 ]
-price_band_usd = { low = 34.95, high = 49.95, per = "kit", note = "Two listings from a non-profit's store: a 299-piece kit at $34.95 and a 115-piece family kit at $49.95." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 27.47, high = 43.97, per = "kit", note = "Two home-center listings for 260- and 328-piece first-aid kits: $27.47 and $43.97." }
+retrieved = "2026-09-26"
 quantity_rule = "first_aid_kit"
 maintenance = { check_months = 6 }
 citations = ["redcross_first_aid_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
@@ -269,7 +269,7 @@ buckets = ["medication", "medical_emergency"]
 tier = "now"
 free = true
 life_safety = true
-spec = "Anyone prescribed an epinephrine auto-injector should always carry two, because one dose may not be enough and a device set off by accident cannot be used (FDA-approved patient information). Check the expiry dates, replace a used one right away, and show family, caregivers and teachers where they are and how to use them. Ask the prescriber how many to keep at home, at school and in the go-bag."
+spec = "Anyone prescribed an epinephrine auto-injector should always carry two, because one dose may not be enough (FDA-approved patient information). Check the expiry dates, replace a used one right away, and show family, caregivers and teachers where they are and how to use them. Ask the prescriber how many to keep at home, at school and in the go-bag."
 look_for = [
   "Two auto-injectors with the person at all times, and a refill ordered before they expire",
   "A calendar reminder a month before the expiry date",
@@ -282,4 +282,28 @@ avoid = [
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a habit and a talk with the prescriber; the auto-injectors themselves are a prescription." }
 quantity_rule = "epinephrine_check"
 citations = ["dailymed_epinephrine_autoinjector", "ready_gov_disability"]
+hazard_extras = []
+
+[[item]]
+id = "med_thermometer"
+name = "Thermometers: one for the family, and one for a baby"
+category = "medical"
+unit = "thermometer"
+buckets = ["medical_emergency"]
+tier = "h72"
+free = false
+spec = "A digital thermometer that is not glass or mercury, as in the Red Cross family kit, plus an infant thermometer if there is a baby, as CDC's checklist for families with infants lists."
+look_for = [
+  "A digital thermometer with a flexible tip",
+  "Spare batteries for it",
+  "Its own case, kept with the first-aid kit",
+]
+avoid = [
+  "Glass or mercury thermometers",
+  "Sharing one thermometer between mouths without cleaning it",
+]
+price_band_usd = { low = 7.49, high = 8.49, per = "thermometer", note = "Two supermarket listings for flexible-tip digital thermometers: $7.49 and $8.49." }
+retrieved = "2026-09-26"
+quantity_rule = "thermometer"
+citations = ["redcross_first_aid_kit", "cdc_infant_checklist", "rr_price_observations_2026_09"]
 hazard_extras = []

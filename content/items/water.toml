@@ -239,3 +239,28 @@ retrieved = "2026-09-25"
 quantity_rule = "once"
 citations = ["cdc_water_disinfection", "rr_price_observations_2026_09"]
 hazard_extras = []
+
+[[item]]
+id = "water_livestock_tank"
+name = "Stock tank to hold water for horses and livestock"
+category = "water"
+unit = "gallon of tank space"
+buckets = ["water_out"]
+tier = "w2"
+free = false
+spec = "A stock tank or trough big enough to hold several days of water for large animals, filled before a storm or outage, because an electric well pump stops when the power does. Large and medium animals need about 20 to 30 liters (5 to 8 gallons) of water each a day (Sphere), and ASPCA advises filling bathtubs and sinks before a power loss so animals have water."
+look_for = [
+  "A tank sized for your animals and the days you plan for",
+  "A spot near the animals where it can be filled from a hose",
+  "A lid or float to keep the water clean",
+]
+avoid = [
+  "Relying on an electric pump for animal water in an outage",
+  "Letting stored water go stagnant: empty, scrub and refill it",
+]
+price_band_usd = { low = 1.13, high = 1.6, per = "gallon of tank space", note = "Two home-center listings for stock tanks: 350 gallons at $397 ($1.13 a gallon of space) and 100 gallons at $159.98 ($1.60)." }
+retrieved = "2026-09-26"
+quantity_rule = "livestock_water"
+volume_l_per_unit = 3.785
+citations = ["sphere_2018", "aspca_disaster_prep", "rr_price_observations_2026_09"]
+hazard_extras = []
