@@ -260,10 +260,12 @@ the expected number of times per year this household faces a *b*-disruption long
 Because one event feeds several buckets, correlation between buckets is preserved automatically. From
 this one curve:
 
-1. **Target.** The dial is a return period *N*; the target is the smallest ladder value *d\** with
-   Λ_b(d\*) ≤ 1/N. The default, one-in-100, is close to "90 % sure nothing in the next ten years is
-   worse" (exp(−10 · Λ) = 0.9 gives Λ = 0.0105) and is the same one-percent-a-year yardstick behind
-   FEMA flood maps. In ordinary counties it reproduces official guidance (Philadelphia: about 3 days of
+1. **Target.** The dial is a return period; the target is the smallest ladder value *d\** with
+   Λ_b(d\*) ≤ Λ\*, where the default `one_in_100` is defined as "90 % sure nothing in the next ten
+   years is worse": Λ\* = −ln(0.9)/10 ≈ 0.01054 per year (about 1-in-95, shown as "about 1-in-100"),
+   the same one-percent-a-year yardstick behind FEMA flood maps. The other settings are exactly 0.10,
+   0.02 and 0.002. A raw target within 3 % above a ladder step counts as that step (3.003 days is
+   "3 days", not "5"). In ordinary counties it reproduces official guidance (Philadelphia: about 3 days of
    power and water, 10 days of food, 2 weeks of medication).
 
    | Dial | Label | Annual rate | Chance in 10 years |
@@ -277,8 +279,9 @@ this one curve:
    disruption longer than *d* in the next *T* years.
 3. **Value of the x-th day of supplies** equals Λ_b(x): the marginal value of one more day is the
    annual rate of events that outlast it. Diminishing returns fall out of the mathematics (for
-   Philadelphia water the first three days cover about 60 times more expected disruption-days than
-   days 30–33; for Coos Bay well water only 19 times, which is why the coast stores deeper).
+   Philadelphia water the first three days cover roughly 60 times more expected disruption-days than
+   days 30–33, and for power hundreds of times; for Coos Bay well water only 10–20 times, which is why
+   the coast stores deeper; the exact ratios depend on the priors and are recomputed by the engine).
 4. **Consumption** (for rotation and cost): Σ_h r_h q_{h,b} E[D] days per year.
 
 **Ranges.** Every rate and duration carries a stated uncertainty; the engine propagates it (seeded,
@@ -381,8 +384,9 @@ target, over a ten-year horizon is
 
 expected weighted disruption-days covered per decade. Readiness items use
 V = 10 · w · r_need · (day-equivalents of harm avoided). Harm weights *w_b* (`Prior`, documented,
-shown in the expert view): water and a dependent's medication 3; thermal with a vulnerable member 2;
-food, power, communications 1; a powered medical device triples `power`. Because Λ falls with *d*,
+shown in the expert view): water and anyone's daily prescription medication 3; thermal with a
+vulnerable member 2; evacuation 2; supplies, power, communications 1; a powered medical device triples
+`power`. Because Λ falls with *d*,
 the first day of a bucket is always worth more than the fourteenth and cheap early coverage floats to
 the top without special cases. Baseline inventory sets the starting *x*.
 
@@ -391,8 +395,11 @@ tests, refill-at-seven rule, water-heater reserve, neighbours) and updates cover
 tiers in order with each bucket's target capped at the tier horizon; (3) orders candidates life-safety
 first, then value per dollar, and buys the best affordable one; (4) **promotes** a cheap later-tier
 item whose value per dollar is at least five times the current tier's best (an extra week of a
-dependent's medication); (5) keeps a **sinking fund** when the best item costs up to twice the monthly
-budget and the affordable alternative is worth less than a quarter of it; (6) stops when no tier has a
+dependent's medication); (5) runs a **split schedule**: when the top-priority item costs more than a month's money, half of
+each month's new money is reserved toward it and the rest buys the best affordable items, so a small
+budget shows progress every month and an expensive life-safety item (a CPAP battery) still arrives in
+bounded time; a fully monotone fixed-order schedule and the research shortcut schedule remain as
+options; (6) stops when no tier has a
 positive-value candidate and reports "you are done for your risk; here is the maintenance calendar",
 routing any surplus to the income savings track or suggesting a more cautious dial. Recorded actual
 prices replace band midpoints. A simultaneous-need check runs on the shared event list so a major
@@ -580,6 +587,13 @@ guidance beyond safe storage and training pointers.
 ## 14. Decision log (append only)
 
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
+- 2026-09-26 — Budget allocator decisions (agent/budget): default schedule is Split (reserve half toward
+  an item costing more than a month's money, spend the rest); any person's daily prescription has harm
+  weight 3; guardrail thresholds: evacuation-heavy = 10 % ten-year chance, go-bag expected by month 6,
+  cold chain by month 3; one-off money lands in month 0 and the monthly budget starts in month 1;
+  `one_in_100` ⇒ Λ* = −ln(0.9)/10; ladder rounding tolerates 3 % above a step; the consequence crate's
+  cliff warning is canonical; heat and cold coverage are separate parts (`thermal_heat` / `thermal_cold`
+  requirement classes); pending contract tweak `Dials.rare_catastrophic_opt_in`.
 - 2026-09-25 — `rr-types` merged (agent/types 7cf13e0). Decisions made there: deterministic
   transcendental math via `rr_types::math` on pure-Rust `libm` (browser and glibc round `exp`/`ln`
   differently; `clippy.toml` now forbids the std methods in the workspace); z₀.₉ = 1.2815515655446004;
