@@ -6,8 +6,8 @@
 //! `rr-data` loads them, `rr-hazards` and `rr-consequence` read them. Every field is optional
 //! or defaulted so a pack without the new files still loads.
 //!
-//! awaiting: types2 — the output types (`StressTest`, `RecoveryInfo`) are the contract's; these
-//! are the pack records they are filled from. Field names follow DESIGN-DELTA §1.3.
+//! The output types they fill, [`crate::StressTest`] and [`crate::RecoveryInfo`], are the
+//! contract's; these are the pack records behind them. Field names follow DESIGN-DELTA §1.3.
 
 use std::collections::BTreeMap;
 
