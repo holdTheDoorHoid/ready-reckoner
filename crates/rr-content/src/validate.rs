@@ -12,7 +12,7 @@
 //! | `look_for` and `avoid` have 2–5 entries | error |
 //! | free items cost $0 and sit in tier `now` (rare-catastrophic items excepted); priced items have a note, a `retrieved` date and cite the price-observation log | error |
 //! | `rare_catastrophic` items sit in tier `y1` | error |
-//! | no brand names outside the citation registry; no pressure phrases; no drug name with a dose anywhere | error |
+//! | no brand names (a citation's URL may name a maker; its title, publisher and quote may not); no pressure phrases; no drug name with a dose anywhere | error |
 //! | medical items: no dosing pattern; aquarium, fish or veterinary antibiotics only in `avoid` | error |
 //! | firearm and weapon words only in the one permitted free action, which is free, unpriced, in `security`, tier `now` | error |
 //! | potassium iodide only alongside "official" instructions | error |
@@ -168,32 +168,20 @@ pub fn validate(content: &Content, rules: &BTreeSet<String>) -> Report {
     r
 }
 
-/// What a piece of text may contain beyond the rules every text follows.
-#[derive(Debug, Clone, Copy, Default)]
-struct Allow {
-    /// Firearm words: only the permitted free action and the sources it alone cites.
-    firearms: bool,
-    /// Brand and model names: only the citation registry (and the `## Sources` footnotes of a
-    /// guidance block, which copy it), where a maker's own document can be the source, for
-    /// example a generator's fuel specification. Never in item or guidance text.
-    brands: bool,
-}
-
-/// Brand, pressure-phrase, firearm and drug-dose checks shared by every kind of text.
-fn check_text(r: &mut Report, loc: &str, text: &str, allow: Allow) {
+/// Brand, pressure-phrase, firearm and drug-dose checks shared by every kind of text. For a
+/// citation this is the displayed part (title, publisher, quote); its URL may name a maker.
+fn check_text(r: &mut Report, loc: &str, text: &str, allow_firearms: bool) {
     let toks = tokens(text);
-    if !allow.brands {
-        for b in find_phrases(&toks, policy::BRANDS) {
-            r.error(
-                loc,
-                format!("brand name `{b}`: use the generic word instead"),
-            );
-        }
+    for b in find_phrases(&toks, policy::BRANDS) {
+        r.error(
+            loc,
+            format!("brand name `{b}`: use the generic word instead"),
+        );
     }
     for p in find_phrases(&toks, policy::BANNED_PHRASES) {
         r.error(loc, format!("`{p}` breaks the calm, no-pressure voice"));
     }
-    if !allow.firearms {
+    if !allow_firearms {
         for f in find_phrases(&toks, policy::FIREARM_TOKENS) {
             r.error(
                 loc,
@@ -314,15 +302,7 @@ fn check_citations(content: &Content, r: &mut Report) {
         let only_permitted = users
             .get(c.id.as_str())
             .is_some_and(|u| !u.is_empty() && u.iter().all(|x| *x == permitted));
-        check_text(
-            r,
-            &loc,
-            &text,
-            Allow {
-                firearms: only_permitted,
-                brands: true,
-            },
-        );
+        check_text(r, &loc, &text, only_permitted);
     }
 }
 
@@ -442,15 +422,7 @@ fn check_items(content: &Content, rules: &BTreeSet<String>, r: &mut Report) {
 
         let permitted = id == policy::PERMITTED_FIREARM_ITEM;
         let text = item_text(item);
-        check_text(
-            r,
-            &loc,
-            &text,
-            Allow {
-                firearms: permitted,
-                brands: false,
-            },
-        );
+        check_text(r, &loc, &text, permitted);
         check_potassium_iodide(r, &loc, &text);
         if item.category == "medical" {
             check_medical(item, &loc, r);
@@ -706,7 +678,7 @@ fn check_guidance(content: &Content, r: &mut Report) {
             );
         }
         let all = format!("{}\n{}", g.meta.title, prose);
-        check_text(r, &loc, &all, Allow::default());
+        check_text(r, &loc, &all, false);
         check_potassium_iodide(r, &loc, &all);
         check_antibiotic_warnings(&plain, &loc, r);
     }
@@ -813,7 +785,7 @@ fn check_glossary(content: &Content, r: &mut Report) {
             }
         }
         let text = format!("{}\n{}\n{}", t.plain, t.term, t.definition);
-        check_text(r, &loc, &text, Allow::default());
+        check_text(r, &loc, &text, false);
         check_potassium_iodide(r, &loc, &text);
     }
 }
@@ -895,22 +867,24 @@ hazard_extras = []
     }
 
     #[test]
-    fn a_brand_is_allowed_in_the_citation_registry_only() {
-        // A maker's own specification sheet can be the source of a number, so the registry may
-        // name the maker; item text still may not.
-        let cites = format!(
-            "{CITES}\n[[citation]]\nid = \"maker_spec\"\ntitle = \"Honda EU2200i specifications\"\n\
-             publisher = \"American Honda Motor Co.\"\nurl = \"https://example.org/spec\"\n\
-             retrieved = \"2026-09-25\"\nlicense = \"All rights reserved (paraphrased, not quoted)\"\n"
-        );
+    fn a_citation_url_may_name_a_maker_but_its_title_may_not() {
+        // A maker's specification sheet can be the source of a number. Its URL names the maker;
+        // the title and publisher shown in the packet's source list stay neutral.
+        let entry = |title: &str| {
+            format!(
+                "{CITES}\n[[citation]]\nid = \"maker_spec\"\ntitle = \"{title}\"\n\
+                 publisher = \"Manufacturer specification sheet, archived\"\n\
+                 url = \"https://web.archive.org/web/2026/https://powerequipment.honda.com/eu2200i\"\n\
+                 retrieved = \"2026-09-25\"\nlicense = \"All rights reserved (paraphrased, not quoted)\"\n"
+            )
+        };
         let body = item("water_stored", "water", "");
-        let r = run(&[("citations.toml", &cites), ("items/water.toml", &body)]);
+        let neutral =
+            entry("Portable inverter generator (2.2 kW class): manufacturer specification");
+        let r = run(&[("citations.toml", &neutral), ("items/water.toml", &body)]);
         assert!(r.is_ok(), "{r}");
-        let body = body.replace(
-            "Water in clean food-grade containers.",
-            "Water, and a Honda generator.",
-        );
-        let r = run(&[("citations.toml", &cites), ("items/water.toml", &body)]);
+        let branded = entry("Honda EU2200i specifications");
+        let r = run(&[("citations.toml", &branded), ("items/water.toml", &body)]);
         assert!(errors(&r).iter().any(|e| e.contains("honda")), "{r}");
     }
 

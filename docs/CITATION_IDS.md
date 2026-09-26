@@ -66,8 +66,9 @@ publisher, year and URL and what the number is used for, and mark figures you to
 Supply cited these through `rr_research_supply_standards` until they had their own entries; its
 constants can now point at them directly. Only the CDC page is federal, so only it stores a quote;
 the others were read on the retrieval date and are paraphrased. A maker's specification sheet is a
-legitimate source, so the registry may name the maker; item and guidance text never does (the
-validator allows brand names in `citations.toml` only).
+legitimate source: its URL names the maker, but its title and publisher are neutral so the packet's
+source list stays brand-free. Item and guidance text never names a maker either (the validator
+checks citation titles, publishers and quotes for brand names; only URLs are exempt).
 
 | id | Source | Supply number it backs | Check result |
 | --- | --- | --- | --- |

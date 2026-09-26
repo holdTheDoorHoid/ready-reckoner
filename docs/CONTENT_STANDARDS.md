@@ -33,9 +33,11 @@ a price observation), forums, influencer content, product marketing.
   that lists each estimate with its reasoning (`docs/QUANTITY_RULES.md`, `docs/RISK_MODEL.md`), and
   every number citing it is shown as an estimate.
 - **Makers as sources.** A maker's own specification sheet can be the best source for a number (a
-  generator's fuel use). The registry, and the `## Sources` footnotes of a guidance block that copy
-  it, may therefore name the maker. Brand names stay out of everything else: item text, guidance
-  prose, glossary and UI copy. The validator applies its brand list everywhere except the registry.
+  generator's fuel use). Keep its exact URL, which may name the maker, but give it a neutral `title`
+  and `publisher` ("Portable inverter generator (2.2 kW class): manufacturer specification";
+  "Manufacturer specification sheet, archived"), because titles appear in the packet's source list.
+  Brand names stay out of item text, guidance prose, the glossary and UI copy too. The validator
+  checks every citation's title, publisher and quote against its brand list; only URLs are exempt.
 - **Firearm words** may appear in a citation only when the permitted free action (§5) is the only
   thing that cites it.
 - **Prices.** Every priced item cites the price-observation log (`rr_price_observations_…`), and its

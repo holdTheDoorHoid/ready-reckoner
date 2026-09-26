@@ -2026,7 +2026,8 @@ license = "US Government Work (public domain)"
 # ---------------------------------------------------------------------------------------------
 # Requested by the supply workstream, added 2026-09-25: sources behind supply numbers that were
 # cited through rr_research_supply_standards. A maker's own specification sheet may be a source
-# here, so the registry may name the maker; item and guidance text never does.
+# here; its URL names the maker, but its title and publisher stay neutral so the packet's source
+# list is brand-free (planner, 2026-09-25). The validator checks titles, publishers and quotes.
 # ---------------------------------------------------------------------------------------------
 
 [[citation]]
@@ -2076,8 +2077,8 @@ license = "US Government Work (public domain)"
 
 [[citation]]
 id = "honda_eu2200i_spec"
-title = "EU2200i Super Quiet Inverter Generator: specifications (archived 14 September 2026)"
-publisher = "American Honda Motor Co., Inc. (Honda Power Equipment)"
+title = "Portable inverter generator (2.2 kW class): manufacturer specification"
+publisher = "Manufacturer specification sheet, archived"
 year = 2026
 url = "https://web.archive.org/web/20260914102101/https://powerequipment.honda.com/generators/models/eu2200i"
 retrieved = "2026-09-25"
