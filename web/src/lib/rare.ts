@@ -181,3 +181,37 @@ export function parseAlsoChecked(packet: string | undefined): AlsoChecked | null
   });
   return { lead: text.slice(0, colon).trim(), items };
 }
+
+/**
+ * The "Also checked" list for the Risks screen: the engine's note when the packet carries one;
+ * otherwise every hazard the engine can check that is not on this household's list, by name only.
+ */
+export function alsoCheckedFor(output: PlanOutput, cat: Catalogue | null): AlsoChecked | null {
+  const note = parseAlsoChecked(output.packet_markdown);
+  if (note) return note;
+  const listed = new Set<string>(output.register.map((h) => h.id));
+  const rest = (cat?.hazards ?? []).filter((h) => !listed.has(h.id));
+  if (rest.length === 0) return null;
+  return { lead: 'Also checked, and not on your list', items: rest.map((h) => ({ name: h.name })) };
+}
+
+/** "6 in 10", or "3 in 100" below one in ten. */
+function shareOf(x: number, per100: boolean): string {
+  return per100 ? `${Math.max(1, Math.round(x * 100))}` : `${Math.max(1, Math.round(x * 10))}`;
+}
+
+/**
+ * The location term as a link in the chain, where it has a plain meaning of its own: for the
+ * nuclear family, the chance that the county would be in a blast or dangerous-fallout zone if a
+ * large attack happened (its strategic-site group's factor). Null for the other families, whose
+ * "why here" sentence already says what their factor does.
+ */
+export function locationChain(h: HazardProfile): string | null {
+  const f = h.location_factor;
+  if (!f || h.id !== 'nuclear_attack') return null;
+  const [lo, mid, hi] = f.multiplier;
+  if (!(mid > 0 && hi >= lo)) return null;
+  const per100 = lo < 0.095;
+  const unit = per100 ? 'in 100' : 'in 10';
+  return `If a large attack on the country happened, the chance that your county would be in a blast or dangerous-fallout zone: about ${shareOf(mid, per100)} ${unit} (${shareOf(lo, per100)} to ${shareOf(hi, per100)} ${unit}).`;
+}

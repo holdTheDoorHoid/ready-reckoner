@@ -194,6 +194,19 @@
     </p>
   </section>
 
+  <section aria-labelledby="checked-title">
+    <h2 id="checked-title">How well do these numbers hold up?</h2>
+    <p>
+      {#if info?.validation}
+        We checked the planner against {info.validation.events_tested} real disasters: it covered {info.validation.covered}, partly covered
+        {info.validation.partial} and fell short on {info.validation.short}{info.validation.not_modelled ? `; ${info.validation.not_modelled} it cannot model yet` : ''}.
+      {:else}
+        We check the planner against real disasters and publish every result, misses included.
+      {/if}
+      <a href={href('validation')}>See every event and what we changed</a>
+    </p>
+  </section>
+
   {#if info?.attributions.length}
     <section aria-labelledby="credits-title">
       <h2 id="credits-title">Credits and disclaimers</h2>

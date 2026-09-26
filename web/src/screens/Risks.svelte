@@ -7,6 +7,7 @@
   catastrophic hazards have their own box. Every hazard is shown with what in the plan answers it.
 -->
 <script lang="ts">
+  import { tick } from 'svelte';
   import BucketGauge from '../components/BucketGauge.svelte';
   import CheckRow from '../components/CheckRow.svelte';
   import ChoiceGroup from '../components/ChoiceGroup.svelte';
@@ -29,6 +30,7 @@
   import { helpsFor } from '../lib/helps';
   import { CLIMATE, dialSentence, HORIZONS, RETURN_PERIOD, stageLine, WATER_LEVEL } from '../lib/labels';
   import { allPlanItems } from '../lib/lookup';
+  import { alsoCheckedFor } from '../lib/rare';
   import { href } from '../lib/router.svelte';
   import type { ComparisonRow } from '../lib/ui-types';
 
@@ -58,6 +60,16 @@
     if (!app.plan) return;
     app.plan.input.dials.rare_catastrophic_opt_in = on;
     announcement = on ? 'Rare-catastrophe budget allowed.' : 'Rare-catastrophe budget switched off.';
+  }
+
+  /** "Choose what the plan may spend on" in the rare box: open the settings at the rare-event allowance. */
+  async function chooseRare() {
+    settingsOpen = true;
+    await tick();
+    const panel = document.getElementById('settings-panel');
+    const target = panel?.querySelector<HTMLElement>('.rare-opt-in input') ?? panel?.querySelector<HTMLElement>('input[type="checkbox"]');
+    panel?.scrollIntoView?.({ block: 'start' });
+    target?.focus();
   }
 
   function bucketItems(output: PlanOutput, bucketId: string): PlanItem[] {
@@ -183,7 +195,7 @@
               </div>
             </section>
           {/if}
-          <RiskMatrix {ranked} {rare} {years} />
+          <RiskMatrix {ranked} {rare} {years} alsoChecked={alsoCheckedFor(output, app.catalogue)} />
         </div>
         <CountyMap location={output.location} />
       </div>
@@ -247,7 +259,7 @@
         </div>
       </section>
 
-      <RareBox hazards={rare} {years} backToTable />
+      <RareBox hazards={rare} {years} backToTable onchoose={chooseRare} />
 
       <SavingsTrack
         income={output.buckets.find((b) => b.id === 'income')}
@@ -256,6 +268,7 @@
         homeItems={bucketItems(output, 'home_loss')}
         planningDate={app.plan?.input.planning_date}
         doneMonth={output.plan.done_month}
+        firstMilestone={output.plan.first_milestone}
       />
 
       <section class="support card" aria-labelledby="support-title">

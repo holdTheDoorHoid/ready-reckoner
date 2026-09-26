@@ -13,13 +13,14 @@ import type { RankedHazard } from './model';
 
 type V2Fields = Partial<Pick<Item, 'requires' | 'readiness_share' | 'decision' | 'long_horizon' | 'season' | 'test_interval_months'>>;
 
-/** v2 fields on items already in the mock catalogue. */
+/**
+ * v2 fields on items already in the mock catalogue. (The interview workstream gives the lights, the
+ * power station and the generator their test intervals in items.ts itself; they are not repeated.)
+ */
 const FIELDS: Record<string, V2Fields> = {
   batteries_spare: { requires: ['flashlights_headlamps'], readiness_share: 0.05 },
-  flashlights_headlamps: { test_interval_months: 6 },
   radio_crank: { test_interval_months: 6 },
-  power_station: { test_interval_months: 3 },
-  generator_portable: { test_interval_months: 3, season: 'fall' },
+  generator_portable: { season: 'fall' },
   fans_cooling: { season: 'summer' },
   smoke_air_filter: { season: 'summer' },
   n95_masks: { season: 'summer' },
@@ -284,3 +285,11 @@ export function rareItemsFor(dials: PlanInput['dials'], register: readonly Ranke
   if (!ticked || !nuclear || nuclear.rate * 10 < 1e-3) return [];
   return [{ id: 'radiation_meter', tier: 'm3', qty: 1 }];
 }
+
+/** Why each decision is in the plan (the mock's `PlanItem.why`). */
+export const DECISION_WHY: Record<string, string> = {
+  decision_renters_insurance: 'Renters insurance usually pays for your things and a place to stay after a fire or flood. Deciding costs nothing; the policy is a monthly bill, not a supply.',
+  decision_flood_insurance: 'Standard home insurance leaves out flood damage, and a flood policy takes 30 days to start. Decide before storm season.',
+  decision_sewer_backup: 'With a basement, sewage can back up in heavy rain, and standard policies leave it out. The add-on is usually small; ask and decide.',
+  id_for_every_person: 'Replacing ID after a disaster is slow, and aid often needs it. The fees are not part of your supplies budget.',
+};

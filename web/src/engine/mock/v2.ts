@@ -738,7 +738,7 @@ const WORST_WATER: Record<string, { water_out?: WorstWater; water_boil?: WorstWa
     water_boil: { event: 'the February 2021 winter storm (Uri)', date: '2021-02-17', place: 'Austin', median: 6, p90: 6 },
   },
   FL: { water_boil: { event: 'Hurricane Ian', date: '2022-09-28', place: 'Lee County', median: 5, p90: 10 } },
-  PA: { water_boil: { event: 'a main break', date: '2023-03-24', place: 'Philadelphia', median: 1, p90: 3 } },
+  PA: { water_boil: { event: 'a water main break', date: '2023-03-24', place: 'Philadelphia', median: 1, p90: 3 } },
 };
 
 /** The stress test for a duration bucket, where the mock has a record for the place. */

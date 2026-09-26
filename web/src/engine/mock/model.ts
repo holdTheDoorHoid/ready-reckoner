@@ -46,7 +46,7 @@ import { buildPacket } from './packet';
 import type { ByDial, DurationBucket, EvacuateSeed, HazardSeed, RegionProfile, ScenarioSeed } from './regions';
 import { DURATION_BUCKETS, PROFILES, tierForDays } from './regions';
 import { firstMilestone, RANGE_ONLY_RANKED, rangeSentence, rareFamilies, stressTestFor, subCausesFor, v2Seeds } from './v2';
-import { LONG_HORIZON_ITEMS, MINIMUM_KIT, rareItemsFor } from './items-v2';
+import { DECISION_WHY, LONG_HORIZON_ITEMS, MINIMUM_KIT, rareItemsFor } from './items-v2';
 
 export const MOCK_ENGINE_VERSION = 'mock-0.1.0';
 export const MOCK_CONTENT_VERSION = 'mock-content-2026-09-25';
@@ -1428,6 +1428,7 @@ const FREE_WHY: Record<string, string> = {
 
 function whyFor(ctx: Ctx, buckets: BucketAssessment[], c: Chunk): string {
   const id = c.item.id;
+  if (c.item.decision && DECISION_WHY[id]) return DECISION_WHY[id];
   if (c.item.free) return FREE_WHY[id] ?? `Costs nothing and helps with: ${c.item.buckets.map(bucketName).join(', ').toLowerCase()}.`;
   const level = c.level;
   switch (id) {

@@ -1,13 +1,16 @@
 <!--
   "Why?": opens a short explanation from the engine, fetched only when opened. The arithmetic is
-  shown in the expert view.
+  shown in the expert view. A caller may put its own content first (the driver bars of a target);
+  every drawer ends with a link to how well the numbers hold up against real disasters.
 -->
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import type { ExplainKind, Explanation } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
+  import { href } from '../lib/router.svelte';
   import Sources from './Sources.svelte';
 
-  let { kind, id, label = 'Why?' }: { kind: ExplainKind; id: string; label?: string } = $props();
+  let { kind, id, label = 'Why?', children }: { kind: ExplainKind; id: string; label?: string; children?: Snippet } = $props();
   const app = useApp();
 
   let explanation = $state<Explanation | null>(null);
@@ -36,6 +39,7 @@
 >
   <summary>{label}</summary>
   <div class="explain__body" aria-live="polite" aria-busy={loading}>
+    {@render children?.()}
     {#if loading && !explanation}
       <p class="muted">Working it out…</p>
     {:else if failed}
@@ -50,6 +54,7 @@
       {/if}
       <Sources ids={explanation.sources.map((s) => s.id)} />
     {/if}
+    <p class="explain__check"><a href={href('validation')}>How well do these numbers hold up?</a></p>
   </div>
 </details>
 
@@ -67,6 +72,9 @@
   }
   .explain__title {
     font-weight: 650;
+  }
+  .explain__check {
+    margin: var(--s2) 0 0;
   }
   .explain__math {
     font-family: var(--font-mono);

@@ -25,6 +25,7 @@
   import Risks from './screens/Risks.svelte';
   import Start from './screens/Start.svelte';
   import Travel from './screens/Travel.svelte';
+  import Validation from './screens/Validation.svelte';
   import Where from './screens/Where.svelte';
   import Who from './screens/Who.svelte';
   import { article } from './learn/articles';
@@ -48,6 +49,7 @@
     packet: Packet,
     maintain: Maintain,
     learn: Learn,
+    validation: Validation,
     about: About,
     missing: NotFound,
   };

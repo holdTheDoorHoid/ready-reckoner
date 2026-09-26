@@ -27,6 +27,8 @@ export interface Purchase {
   qty: number;
   paid_usd?: number;
   date: IsoDate;
+  /** When it was last tried and worked (items that need testing; contract v2 `Owned.tested_on`). */
+  tested_on?: IsoDate;
 }
 
 export interface SavedPlan {

@@ -19,6 +19,7 @@ export const ROUTE_IDS = [
   'packet',
   'maintain',
   'learn',
+  'validation',
   'about',
   'missing',
 ] as const;
@@ -49,6 +50,7 @@ export const ROUTES: Record<RouteId, RouteInfo> = {
   packet: { path: 'packet', title: 'Your packet' },
   maintain: { path: 'maintain', title: 'Keep it up' },
   learn: { path: 'learn', title: 'Learn' },
+  validation: { path: 'validation', title: 'How well do these numbers hold up?' },
   about: { path: 'about', title: 'About and method' },
   missing: { path: 'missing', title: 'Page not found' },
 };

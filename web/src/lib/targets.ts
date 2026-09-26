@@ -76,38 +76,51 @@ export interface StressLine {
  * The stress line under a target, for example: "In the worst power cut in your region's records
  * (Hurricane Helene, 2024), some homes were without power for up to 1 month. A target of 2 weeks
  * would have left about 20 in 100 homes there still waiting."
+ *
+ * Power events carry the share of customers still out after 1, 3, 7, 14 and 30 days; a water event
+ * carries the median home and the ninth in ten (`[[median, 0.5], [p90, 0.1]]`), or one duration.
  */
 export function stressLine(st: StressTest, bucket: BucketId, targetDays: number): StressLine {
   const noun = EVENT_NOUN[bucket] ?? 'disruption';
   const without = WITHOUT[bucket] ?? 'without it';
   const year = st.date.slice(0, 4);
   const event = /\b\d{4}\b/.test(st.event) ? st.event : `${st.event}, ${year}`;
-  // "your region's records (where it was worst, about 40 miles away)": keep brackets unnested.
+  // "your region's records (where it was worst, about 40 miles away)": the aside gets its own sentence.
   const m = /^(.*?)\s*\((.*)\)\s*$/.exec(st.region);
   const region = m ? m[1]! : st.region;
-  const aside = m ? `; ${m[2]!}` : '';
-  const lead = `In the worst ${noun} in ${region} (${event}${aside})`;
+  const aside = m ? m[2]!.replace(/^where it was worst,\s*/i, 'It was worst ') : '';
+  const lead = `In the worst ${noun} in ${region} (${event})`;
 
   const pts = [...st.share_out_at_days].sort((a, b) => a[0] - b[0]);
+  const isWater = bucket === 'water_out' || bucket === 'water_boil';
   let howLong: string;
-  const lastOut = pts.filter(([, s]) => s >= BACK).at(-1);
-  if (!lastOut) {
-    howLong = `nearly every home had it back within ${dayPhrase(pts[0]?.[0] ?? 1)}`;
+  if (isWater && pts.length === 2 && pts[0]![1] >= 0.5 && pts[1]![1] <= 0.1) {
+    howLong = `it lasted about ${dayPhrase(pts[0]![0])} for most homes and up to ${dayPhrase(pts[1]![0])} for some`;
+  } else if (isWater && pts.length === 1) {
+    howLong = `it lasted about ${dayPhrase(pts[0]![0])}`;
   } else {
-    const after = pts.find(([d, s]) => d > lastOut[0] && s < BACK);
-    howLong = after
-      ? `some homes were ${without} for up to ${dayPhrase(after[0])}`
-      : `some homes were still ${without} after ${dayPhrase(lastOut[0])}`;
+    const lastOut = pts.filter(([, s]) => s >= BACK).at(-1);
+    if (!lastOut) {
+      howLong = `nearly every home had it back within ${dayPhrase(pts[0]?.[0] ?? 1)}`;
+    } else {
+      const after = pts.find(([d, s]) => d > lastOut[0] && s < BACK);
+      howLong = after
+        ? `some homes were ${without} for up to ${dayPhrase(after[0])}`
+        : `some homes were still ${without} after ${dayPhrase(lastOut[0])}`;
+    }
   }
 
   const target = dayPhrase(targetDays);
   const left = shareOutAfter(pts, targetDays);
   const verdict = st.covered_by_target
     ? `A target of ${target} would have covered at least 9 in 10 homes there.`
-    : left >= BACK
+    : !isWater && left >= BACK
       ? `A target of ${target} would have left ${inHundred(left)} homes there still waiting.`
       : `A target of ${target} would have fallen short for some homes there.`;
-  return { text: `${lead}, ${howLong}. ${verdict}`, covered: st.covered_by_target };
+  const text = [`${lead}, ${howLong}.`, aside ? `${aside.charAt(0).toUpperCase()}${aside.slice(1).replace(/\.?$/, '.')}` : '', verdict]
+    .filter(Boolean)
+    .join(' ');
+  return { text, covered: st.covered_by_target };
 }
 
 // ---------------------------------------------------------------------------------------------

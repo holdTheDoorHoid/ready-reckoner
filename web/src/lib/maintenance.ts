@@ -1,14 +1,20 @@
 /**
- * The maintenance calendar (docs/UI.md screen 9): what to rotate, check and practise, and when,
- * computed from the dates the household recorded. The app never sends reminders (it never
+ * The maintenance calendar (docs/UI.md screen 9): what to rotate, check, test and practise, and
+ * when, computed from the dates the household recorded. The app never sends reminders (it never
  * contacts anyone); the calendar can be downloaded as an .ics file for the household's own
  * calendar. The file holds item names and dates only, never the address or household details.
+ *
+ * Contract v2 adds two kinds: **tests** for items with `Item.test_interval_months` (a jump pack, a
+ * generator, a key safe: try it and record the day, `Owned.tested_on`), and **seasonal anchors**
+ * for items with `Item.season` (have it before the season starts, or check it then; meteorological
+ * seasons, so summer starts on 1 June with the hurricane season).
  */
-import type { Catalogue, IsoDate, Item } from '../engine/types';
+import type { Catalogue, IsoDate, Item, Season } from '../engine/types';
+import { SEASONS } from '../engine/types';
 import { addMonths } from './format';
-import type { SavedPlan } from './persistence';
+import type { Purchase, SavedPlan } from './persistence';
 
-export type TaskKind = 'rotate' | 'check' | 'drill' | 'review';
+export type TaskKind = 'rotate' | 'check' | 'drill' | 'review' | 'test' | 'season';
 
 export interface Task {
   /** Stable key into `SavedPlan.done_dates`. */
@@ -41,14 +47,64 @@ export function intervalLabel(months: number): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+/** The month each season starts (meteorological seasons). */
+export const SEASON_MONTH: Record<Season, number> = { spring: 3, summer: 6, fall: 9, winter: 12 };
+
+/** "summer" as a reader says it, with when it starts: "summer (June)". */
+export const SEASON_WORDS: Record<Season, { name: string; month: string }> = {
+  spring: { name: 'spring', month: 'March' },
+  summer: { name: 'summer', month: 'June' },
+  fall: { name: 'fall', month: 'September' },
+  winter: { name: 'winter', month: 'December' },
+};
+
 function titleFor(kind: TaskKind, item: Item): string {
-  // Free steps are already phrased as actions ("Test smoke alarms..."), so they keep their names.
-  if (item.free) return kind === 'rotate' ? `${item.name} (swap it for fresh)` : item.name;
   // Only the first letter is lowered, so "CO alarm" stays "CO alarm".
   const name = item.name.charAt(0).toLowerCase() + item.name.slice(1);
+  if (kind === 'test') return `Test: ${name}`;
+  if (kind === 'season') return `Before ${item.season ? SEASON_WORDS[item.season].name : 'the season'}: ${item.free ? name : `check ${name}`}`;
+  // Free steps are already phrased as actions ("Test smoke alarms..."), so they keep their names.
+  if (item.free) return kind === 'rotate' ? `${item.name} (swap it for fresh)` : item.name;
   if (kind === 'rotate') return `Use and replace: ${name}`;
   if (kind === 'drill') return `Practise: ${name}`;
   return `Check: ${name}`;
+}
+
+/** The first day of `season` on or after `from` (strictly after, when `after` is set). */
+export function nextSeasonStart(season: Season, from: IsoDate, after = false): IsoDate {
+  const [y, m, d] = from.split('-').map(Number) as [number, number, number];
+  const month = SEASON_MONTH[season];
+  const start = (year: number) => `${year}-${String(month).padStart(2, '0')}-01`;
+  const thisYear = start(y);
+  const passed = after ? thisYear <= from : m > month || (m === month && d > 1);
+  return passed ? start(y + 1) : thisYear;
+}
+
+/** The latest day the household tried the item, wherever it was recorded (its inventory entry or a check-off). */
+export function lastTested(plan: SavedPlan, itemId: string): IsoDate | undefined {
+  const dates = [
+    ...plan.input.existing.filter((o) => o.item_id === itemId).map((o) => o.tested_on),
+    ...plan.purchases.filter((p) => p.item_id === itemId).map((p) => p.tested_on),
+  ].filter((d): d is IsoDate => d !== undefined);
+  return dates.sort().at(-1);
+}
+
+/**
+ * Record the day the household tried the item (contract v2 `Owned.tested_on`): on its entry in
+ * what it had before the plan, or else on its latest check-off; any older copy is cleared, so one
+ * date is kept. The same rule as the Have screen's "tested?" (persistence `setTestedOn` in the
+ * interview workstream). False when the household has none of the item.
+ */
+export function markTested(plan: SavedPlan, itemId: string, date: IsoDate): boolean {
+  const owned = plan.input.existing.find((o) => o.item_id === itemId && o.qty > 0);
+  const purchases = plan.purchases.filter((p) => p.item_id === itemId);
+  const latest = purchases.reduce<Purchase | undefined>((best, p) => (!best || p.date >= best.date ? p : best), undefined);
+  const home = owned ?? latest;
+  if (!home) return false;
+  for (const o of plan.input.existing) if (o.item_id === itemId) delete o.tested_on;
+  for (const p of purchases) delete p.tested_on;
+  home.tested_on = date;
+  return true;
 }
 
 /** Every task for what the household has, soonest first. */
@@ -76,6 +132,25 @@ export function maintenanceTasks(plan: SavedPlan, catalogue: Catalogue): Task[] 
       tasks.push({ key, kind, item_id: id, title: titleFor(kind, item), interval_months: m.check_months, due: addMonths(last ?? start, m.check_months), from_inventory: fromInventory, ...(last ? { last } : {}) });
     }
   }
+  // Contract v2: tests and seasonal anchors, for what the household has.
+  for (const id of owned) {
+    const item = catalogue.items.find((i) => i.id === id);
+    if (!item) continue;
+    const bought = lastPurchase(plan, id);
+    const fromInventory = bought === undefined;
+    if (item.test_interval_months) {
+      const key = `test:${id}`;
+      const last = lastTested(plan, id);
+      const months = item.test_interval_months;
+      tasks.push({ key, kind: 'test', item_id: id, title: titleFor('test', item), interval_months: months, due: addMonths(last ?? bought ?? plan.input.planning_date, months), from_inventory: fromInventory, ...(last ? { last } : {}) });
+    }
+    if (item.season) {
+      const key = `season:${id}`;
+      const last = plan.done_dates[key];
+      const due = last ? nextSeasonStart(item.season, last, true) : nextSeasonStart(item.season, plan.input.planning_date);
+      tasks.push({ key, kind: 'season', item_id: id, title: titleFor('season', item), interval_months: 12, due, from_inventory: fromInventory, ...(last ? { last } : {}) });
+    }
+  }
   const reviewed = plan.reviewed_on ?? plan.done_dates.review;
   tasks.push({
     key: 'review',
@@ -87,6 +162,23 @@ export function maintenanceTasks(plan: SavedPlan, catalogue: Catalogue): Task[] 
     ...(reviewed ? { last: reviewed } : {}),
   });
   return tasks.sort((a, b) => a.due.localeCompare(b.due) || a.title.localeCompare(b.title));
+}
+
+/** One season's anchors for the "Through the year" view: the items to have ready or check when it starts. */
+export interface SeasonAnchors {
+  season: Season;
+  items: Item[];
+}
+
+/**
+ * The seasonal anchors of what the household has and what its plan still holds, season by season
+ * from spring; seasons with nothing are left out.
+ */
+export function seasonalAnchors(catalogue: Catalogue, itemIds: ReadonlySet<string>): SeasonAnchors[] {
+  return SEASONS.map((season) => ({
+    season,
+    items: catalogue.items.filter((i) => i.season === season && itemIds.has(i.id)),
+  })).filter((s) => s.items.length > 0);
 }
 
 /** Drills in the catalogue that apply to this plan (free actions practised on a schedule). */
