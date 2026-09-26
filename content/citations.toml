@@ -47,7 +47,7 @@ title = "Food"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/food"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "The refrigerator will keep food cold for about four hours if it is unopened."
 license = "US Government Work (public domain)"
 
@@ -107,7 +107,7 @@ title = "Shelter"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/shelter"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Seal all windows, doors and air vents with thick plastic sheeting and duct tape."
 license = "US Government Work (public domain)"
 
@@ -196,7 +196,7 @@ title = "Low and No Cost Preparedness"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/low-and-no-cost"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Make sure you store important phone numbers somewhere besides just your cell phone."
 license = "US Government Work (public domain)"
 
@@ -242,11 +242,11 @@ license = "US Government Work (public domain)"
 
 [[citation]]
 id = "ready_gov_public_spaces"
-title = "Public Spaces (Run. Hide. Fight.)"
+title = "Mass Gathering Incidents (Run. Hide. Fight.)"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/public-spaces"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Getting away from the attacker is the top priority."
 license = "US Government Work (public domain)"
 
@@ -948,7 +948,7 @@ title = "Turn Around Don't Drown"
 publisher = "NOAA National Weather Service"
 year = 2026
 url = "https://www.weather.gov/safety/flood-turn-around-dont-drown"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -1562,7 +1562,7 @@ title = "Medication (personal and family plans)"
 publisher = "Florida Division of Emergency Management"
 year = 2026
 url = "https://www.floridadisaster.org/planprepare/disability/personal-and-family-plans/medication/"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "State government publication (paraphrased, not quoted)"
 
 [[citation]]
@@ -2788,4 +2788,276 @@ year = 2026
 url = "https://www.epa.gov/system/files/documents/2026-06/protect-your-lungs-factsheet.pdf"
 retrieved = "2026-09-26"
 quote = "Children ages 2 years and older can wear respirators; however, NIOSH Approved respirators do NOT come in sizes suitable for young children."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "iii_homeowners_losses"
+title = "Facts + Statistics: Homeowners and renters insurance (average losses by cause, 2019–2023)"
+publisher = "Insurance Information Institute (Triple-I), from ISO data"
+year = 2026
+url = "https://www.iii.org/fact-statistic/facts-statistics-homeowners-and-renters-insurance"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "iii_water_damage_protect"
+title = "How to protect your home from water damage"
+publisher = "Insurance Information Institute (Triple-I)"
+year = 2026
+url = "https://www.iii.org/article/how-to-protect-your-home-from-water-damage"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fema_dam_residual_risk_2018"
+title = "Risk Exposure and Residual Risk Related to Dams (fact sheet)"
+publisher = "FEMA"
+year = 2018
+url = "https://www.fema.gov/sites/default/files/2020-08/fact-sheet_risk-exposure-residual-risk-related-to-dams.pdf"
+retrieved = "2026-09-26"
+quote = "Dams are classified by various regulating agencies according to potential consequences should the dam fail."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_living_with_levees"
+title = "Living with Levees for Homeowners, Renters, Business Owners and the General Public"
+publisher = "FEMA"
+year = 2023
+url = "https://www.fema.gov/flood-maps/living-levees/homeowners-business"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_nfip_levees_2021"
+title = "NFIP and Levees: An Overview (fact sheet)"
+publisher = "FEMA"
+year = 2021
+url = "https://www.fema.gov/sites/default/files/documents/fema_nfip-levees.pdf"
+retrieved = "2026-09-26"
+quote = "FEMA accreditation of a levee does not guarantee protection; therefore, FIRMs carry a notice that overtopping or failure of levees is possible and flood insurance protection and adherence to evacuation procedures are strongly recommended."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usace_nld"
+title = "National Levee Database"
+publisher = "U.S. Army Corps of Engineers"
+year = 2026
+url = "https://levees.sec.usace.army.mil/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "mo_sema_dam_failure"
+title = "Dam Failures"
+publisher = "Missouri State Emergency Management Agency"
+year = 2026
+url = "https://sema.dps.mo.gov/plan_and_prepare/dam_failure.php"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "fcc_network_outage_2024"
+title = "February 22, 2024 nationwide wireless network outage: report and findings"
+publisher = "Federal Communications Commission, Public Safety and Homeland Security Bureau"
+year = 2024
+url = "https://docs.fcc.gov/public/attachments/DOC-404150A1.pdf"
+retrieved = "2026-09-26"
+quote = "All such attempted 911 calls therefore failed preventing more than 25,000 calls to PSAPs or 911 call centers."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fda_drug_shortages"
+title = "Drug Shortages"
+publisher = "U.S. Food and Drug Administration"
+year = 2026
+url = "https://www.fda.gov/drugs/drug-safety-and-availability/drug-shortages"
+retrieved = "2026-09-26"
+quote = "Drug Shortages can occur for many reasons, including manufacturing and quality problems, delays, and discontinuations."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fda_drug_shortages_faq"
+title = "Frequently Asked Questions about Drug Shortages"
+publisher = "U.S. Food and Drug Administration"
+year = 2026
+url = "https://www.fda.gov/drugs/drug-shortages/frequently-asked-questions-about-drug-shortages"
+retrieved = "2026-09-26"
+quote = "Check multiple stores or pharmacies, or ask your health care provider or pharmacist if there is an alternative to the medicine you’re looking for."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fda_besaferx"
+title = "BeSafeRx: Your Source for Online Pharmacy Information"
+publisher = "U.S. Food and Drug Administration"
+year = 2020
+url = "https://www.fda.gov/drugs/buying-using-medicine-safely/besaferx-your-source-online-pharmacy-information"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "me_dhhs_snap_2025"
+title = "Due to Federal Government Shutdown, USDA Notifies States that SNAP Benefits Won't Be Issued for November"
+publisher = "Maine Department of Health and Human Services"
+year = 2025
+url = "https://www.maine.gov/dhhs/news/due-federal-government-shutdown-usda-notifies-states-snap-benefits-wont-be-issued-november-tue-10212025-1200"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "usda_hunger_hotline"
+title = "USDA National Hunger Hotline"
+publisher = "U.S. Department of Agriculture"
+year = 2025
+url = "https://www.fna.usda.gov/national-hunger-hotline"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "dol_ucfe_furlough_2023"
+title = "Federal Furloughs: UCFE Fact Sheet (current as of September 2023)"
+publisher = "U.S. Department of Labor"
+year = 2023
+url = "https://www.dol.gov/sites/dolgov/files/general/plans/Unemployment-Compensation-for-Federal-Employees-Fact-Sheet.pdf"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cfpb_shutdown_2013"
+title = "Regulators Encourage Institutions to Work with Borrowers Affected by Government Shutdown"
+publisher = "Consumer Financial Protection Bureau"
+year = 2013
+url = "https://www.consumerfinance.gov/archive/newsroom/regulators-encourage-institutions-to-work-with-borrowers-affected-by-government-shutdown/"
+retrieved = "2026-09-26"
+quote = "Those affected by the government shutdown are encouraged to contact their lenders immediately should financial strain occur."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cfpb_payday_loans"
+title = "What is a payday loan?"
+publisher = "Consumer Financial Protection Bureau"
+year = 2026
+url = "https://www.consumerfinance.gov/ask-cfpb/what-is-a-payday-loan-en-1567/"
+retrieved = "2026-09-26"
+quote = "A typical two-week payday loan with a $15 per $100 fee equates to an annual percentage rate (APR) of almost 400 percent."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eviction_lab_national"
+title = "National Estimates: Eviction in America"
+publisher = "Eviction Lab, Princeton University"
+year = 2026
+url = "https://evictionlab.org/national-estimates/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cfpb_rent_help"
+title = "Get help paying rent and bills"
+publisher = "Consumer Financial Protection Bureau"
+year = 2026
+url = "https://www.consumerfinance.gov/housing/housing-insecurity/help-for-renters/get-help-paying-rent-and-bills/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cfpb_facing_eviction"
+title = "What to do if you’re facing eviction"
+publisher = "Consumer Financial Protection Bureau"
+year = 2026
+url = "https://www.consumerfinance.gov/housing/housing-insecurity/help-for-renters/what-to-do-if-youre-facing-eviction/"
+retrieved = "2026-09-26"
+quote = "Too many renters give up before they have a chance to go to court."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "lsc_get_legal_help"
+title = "I Need Legal Help"
+publisher = "Legal Services Corporation"
+year = 2026
+url = "https://www.lsc.gov/about-lsc/what-legal-aid/i-need-legal-help"
+retrieved = "2026-09-26"
+license = "Federally funded nonprofit publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "fema_hsgp_fy2026"
+title = "Fiscal Year 2026 Homeland Security Grant Program: Notice of Funding Opportunity"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/sites/default/files/documents/fema_gpd_hsgp-nofo-fy2026.pdf"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nws_dust_storms"
+title = "Dust Storms and Haboobs"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/wind-dust-storm"
+retrieved = "2026-09-26"
+quote = "Make sure all of your lights are off when you park off the roadway."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_valley_fever"
+title = "About Valley Fever"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/valley-fever/about/index.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_sinkholes"
+title = "Sinkholes (Water Science School)"
+publisher = "U.S. Geological Survey"
+year = 2026
+url = "https://www.usgs.gov/water-science-school/science/sinkholes"
+retrieved = "2026-09-26"
+quote = "The most damage from sinkholes tends to occur in Florida, Texas, Alabama, Missouri, Kentucky, Tennessee, and Pennsylvania."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fl_dep_sinkhole_faq"
+title = "Sinkhole FAQ"
+publisher = "Florida Department of Environmental Protection, Florida Geological Survey"
+year = 2026
+url = "https://floridadep.gov/fgs/sinkholes/content/sinkhole-faq"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "fbi_cde_arrests_2024"
+title = "Crime Data Explorer: national arrest counts, January to December 2024"
+publisher = "FBI Uniform Crime Reporting Program"
+year = 2026
+url = "https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/explorer/crime/arrest"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "aclu_stopped_by_police"
+title = "Know Your Rights: Stopped by Police"
+publisher = "American Civil Liberties Union"
+year = 2026
+url = "https://www.aclu.org/know-your-rights/stopped-by-police"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "nlg_mass_defense"
+title = "Mass Defense Resources (legal hotlines)"
+publisher = "National Lawyers Guild"
+year = 2026
+url = "https://www.nlg.org/massdefenseprogram/protest-tools/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "nia_affairs_checklist"
+title = "Getting Your Affairs in Order Checklist: Documents to Prepare for the Future"
+publisher = "National Institute on Aging"
+year = 2026
+url = "https://www.nia.nih.gov/health/advance-care-planning/getting-your-affairs-order-checklist-documents-prepare-future"
+retrieved = "2026-09-26"
+quote = "A durable power of attorney for health care names your health care proxy, a person who can make health care decisions for you if you are unable to communicate these yourself."
 license = "US Government Work (public domain)"

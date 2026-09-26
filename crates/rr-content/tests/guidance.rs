@@ -19,25 +19,14 @@ fn block(id: &str) -> &'static rr_content::Guidance {
 /// hazard and family blocks, DESIGN-DELTA §3).
 const AWAITING_BUCKETS: &[BucketId] = &[];
 const AWAITING_HAZARDS: &[HazardId] = &[
-    HazardId::WildfireSmoke,
-    HazardId::DustStorm,
-    HazardId::Sinkhole,
     HazardId::GeomagneticStorm,
     HazardId::Vei7Eruption,
-    HazardId::DamFailure,
-    HazardId::NetworkOutage,
-    HazardId::DrugShortage,
-    HazardId::BenefitInterruption,
-    HazardId::AttackDisruption,
     HazardId::MultiMonthBlackout,
     HazardId::WarInfrastructure,
     HazardId::CbrnAttack,
     HazardId::SeverePandemic,
     HazardId::FinancialCrisis,
     HazardId::MassViolence,
-    HazardId::WaterDamage,
-    HazardId::Eviction,
-    HazardId::ArrestOrDetention,
 ];
 
 /// awaiting: this branch — family blocks still to write (removed one by one as they land).
