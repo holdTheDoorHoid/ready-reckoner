@@ -641,8 +641,9 @@ For every duration bucket, Λ_b(d) = Σ r_h · q_{h,b} · S_{h,b}(d) (thresholds
   [s(1−ρ)·min(D, 26) + s·max(D − 26, 0)] / 4.345 months, ρ = 0.5 (prior); spells median 10 weeks,
   bad case 36 (prior, consistent with BLS). Streams: job loss (rr-hazards' household rate), job
   losses in a pandemic (0.11 per earner), the regional economy after Cascadia (0.3 per earner,
-  spells median 26 weeks, bad case 78) or another named scenario (0.1 per earner). The death or disability of an earner is left
-  to insurance (a sentence says so), not added to the savings target.
+  spells median 26 weeks, bad case 78) or another named scenario (0.1 per earner). The death or
+  disability of an earner is left to insurance (a sentence says so), not added to the savings
+  target.
 - **Readiness**: P_need = 1 − e^(−10·Σ r·q). `evacuate` adds the warning band (least and most
   warning among causes with at least 5 % of the rate) and the typical days away (median of the
   time-away mixture, on the ladder). `get_home` gives each commuter's walk and water. Tier `h72`
@@ -677,8 +678,8 @@ phone may take two to three times as long.
 A warning `cliff_<bucket>` ("Your answer depends mostly on one event: …") when one hazard or
 scenario (1) supplies half or more of Λ at the design duration, (2) has a rate for that bucket
 within a factor of 3 of the dial rate, and (3) makes the target jump between the chosen setting
-and a neighbouring one: it grows at least as fast as the square of the dial's return period (elasticity
-ln(t₂/t₁)/ln(rate₁/rate₂) ≥ 2) and by 3 days or more. The third condition keeps ordinary heavy
+and a neighbouring one: it grows at least as fast as the square of the dial's return period
+(elasticity ln(t₂/t₁)/ln(rate₁/rate₂) ≥ 2) and by 3 days or more. The third condition keeps ordinary heavy
 tails (chemical do-not-drink notices, a store shortage at 1-in-10) from being called cliffs; a
 log-normal tail gives an elasticity near 1. The warning gives the targets at the chosen setting and
 its two neighbours (1 in 50, 100 and 500 at the default; 1 in 10, 50 and 100 at 1 in 50) and, for a
@@ -693,7 +694,7 @@ Rows keyed by scenario id (and `coast`/`valley` for Cascadia, from the candidate
 Tohoku-based priors; no regional restoration study was at hand), `local_tsunami` (15–20 minutes'
 warning; rr-hazards' rate already counts only households in the zone). The user's toggle in
 `dials.scenario_overrides` wins. `ScenarioInfo.effect_summary` compares the ladder targets with and
-without the scenario ("Power: 5 days → 14 days; Tap water: 21 days → 60 days …") and, for
+without the scenario (Coos Bay: "Power: 3 days → 14 days; Tap water: 14 days → 60 days …") and, for
 evacuation-only scenarios, the ten-year chance of leaving.
 
 ### Relief rating
@@ -723,8 +724,7 @@ income target is the longest).
 Research households with rates that reproduce the prototype's event classes through the table's
 shares (`tests/support/research.rs`), compared at the same dial rates. 48 of the 54 design
 durations in research §8.4 and §9.4 are within 25 % (or 6 hours below a day); the six others are
-explained and listed in
-`tests/calibration.rs` (Coos Bay income at 1 in 50, 95 and 500: the research gave the 55- and
+explained and listed in `tests/calibration.rs` (Coos Bay income at 1 in 50, 95 and 500: the research gave the 55- and
 58-year-old earners longer spells, and PlanInput has age bands, not ages; Philadelphia heat or cold
 at 1 in 50, 95 and 500: more coupled classes than the prototype, county-wide winter outages and the
 ice storm of record also stop the furnace). Natural frequencies match the research register
@@ -742,7 +742,7 @@ here).
 | Coos Bay well water (Cascadia on) | 50 d | 56.6 d | **60 d** |
 | Coos Bay well water at `one_in_50` | 14 d | 14.5 d | **21 d** (3.4 % above the 14-day step, past the 3 % tolerance) |
 
-Coos Bay water is 57 d rather than 50 because the well coupling holds the water outage at least as
+Coos Bay water is about 57 d rather than 50 because the well coupling holds the water outage at least as
 long as the power cut (the research's single "power plus damage" row, 90/270 d, sat below the
 90/180-day power cut for the first three months). Without Cascadia, Coos Bay gives power 3.0 d,
 food 9.3 d, medicine 10 d, water 13 d (research: about 3, 9, 9 and 14); with Cascadia at its
@@ -776,7 +776,7 @@ months of water from the well-drought prior. Each household's rates are listed i
    With every county episode counted and no county lengths, a home without air conditioning gets
    long targets from the log-normal tail: 3 weeks in Philadelphia (3.7 episodes a year), 2 weeks in
    Chicago, a month in Phoenix (17 a year), against 3 days with air conditioning.
-5. **Gas stove** coverage waits for a catalogue id (`gas_stove` assumed). // awaiting: rr-content
+5. **Gas stove** coverage waits for a catalogue id (`gas_stove` assumed until rr-content has one).
 
 ### Citations
 
