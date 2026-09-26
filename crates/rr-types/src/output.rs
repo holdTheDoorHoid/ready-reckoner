@@ -76,6 +76,10 @@ pub struct Exposure {
     /// Share of the ZIP code inside the Category 1–3 storm-surge zone (NOAA/NHC), 0 to 1.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub surge_cat3_share: Option<Sourced<f64>>,
+    /// The core pack's storm-surge proxy class (`none`, `low`, `moderate`, `high`) where the
+    /// Category 1–3 surge share is not available (DESIGN-DELTA §2; data audit §5).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub surge_proxy_class: Option<Sourced<String>>,
     /// Days a year with wildfire smoke and PM2.5 of at least 35.5 µg/m³ (unhealthy for sensitive
     /// groups), county mean.
     #[serde(default, skip_serializing_if = "Option::is_none")]

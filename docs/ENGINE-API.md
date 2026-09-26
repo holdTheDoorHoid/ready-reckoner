@@ -204,7 +204,7 @@ LocationResolved { country, county_fips, county_name, state_abbr, state_name, zi
                                      hazmat_facilities_within_5km: u16 },
                    data_note?,
                    exposure?: Exposure }                                   # v2
-Exposure { strategic_class?, strategic_km?, surge_cat3_share?, smoke_days_35?, leveed_pop_share?,
+Exposure { strategic_class?, strategic_km?, surge_cat3_share?, surge_proxy_class?, smoke_days_35?, leveed_pop_share?,
            dams_high_within_10km?, karst_share?, landslide_susceptible_share?, water_system_flag?,
            geomag_factor?, uasi_share?, eviction_rate? }    # v2; each a Sourced { value, source }
 

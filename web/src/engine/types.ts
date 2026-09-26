@@ -588,6 +588,7 @@ export interface Exposure {
   strategic_km?: Sourced<number>;
   /** Share of the ZIP code in the Category 1–3 storm-surge zone, 0 to 1. */
   surge_cat3_share?: Sourced<number>;
+  surge_proxy_class?: Sourced<string>;
   /** Days a year with smoke and PM2.5 of at least 35.5 µg/m³. */
   smoke_days_35?: Sourced<number>;
   /** Share of the county's people behind a levee, 0 to 1. */
