@@ -807,13 +807,14 @@ line says "some amounts are estimates".
 | Need | Rule | Evidence |
 | --- | --- | --- |
 | Water, basic | 1 gal a person a day (survival 0.8, comfortable 4.0); drinking share doubled in a hot county (basic becomes 1.75); +0.29 pregnant or nursing, +0.25 formula baby; pets by weight | DATA (Ready.gov, CDC, Sphere, DRI); DERIVED heat split; PRIOR pet weights and the 30-day hot threshold |
-| Water, long outages | Store up to 14 days; beyond that, treat water from a source (filter, bleach, boiling) | DATA (BYU/Church 14 gal plus purification, Oregon, Washington) |
+| Water, long outages | Store up to 14 days; beyond that, treat water from a source (filter, bleach, boiling). One bottle of bleach whatever the target (at ½ mL a gallon it treats thousands of gallons), a fresh one every 6 months | DATA (BYU/Church 14 gal plus purification, Oregon, Washington; CDC bottle and dose); PRIOR the 6-month replacement |
 | Boil-water notice | Make the drinking share safe; boil 1 minute (3 above 5,000 ft), bleach by strength (EPA) | DATA |
 | Food | kcal by age band, DGA Table A2-2 moderately active, men and women averaged; +400 pregnancy or nursing; costs three ways (USDA Thrifty $8.44, bulk staples $2.15–2.85, freeze-dried $9–39 per 2,000 kcal); bulk staples for days beyond 30 (BYU 2019 list, Ensign child shares) | DATA; DERIVED band averages |
 | Medication | Target clamped to 7–30 days (14 when there is none) for daily or refrigerated prescriptions; cold storage for the power target; antibiotics always 0 with the clinician card | DATA (Red Cross, CDC, Florida) |
 | Power | CPAP 170 Wh a night; oxygen 300 W and other devices by watts; phones 15 Wh a day; generator 2.8 gal a day capped at the 25-gallon storage limit; December solar by latitude band | DATA (SIL, ENERGY STAR, fire code, PVWatts); PRIOR oxygen watts, phone Wh, band proxy |
 | Sanitation | Twin-bucket toilet: 0.45 bags and 1 cup of cover a person-day; soap by person-month (Sphere); 2 cycles of period products for half the adults and teens (sex not asked) | DATA (RDPO, Oregon, Sphere, CDC); PRIOR bag and cover rates |
-| Readiness | Go-bags per person 4+ with 3 days of water and food (Red Cross); get-home bags sized to the walk (3 mph, 0.5 L an hour; 0.71 in heat, NIOSH); first-aid kit per 4 people; alarms per level when missing | DATA; PRIOR walking pace and hourly water |
+| Heat and cold | Fans only below 90 °F indoors and a cooling plan; for cold, a blanket and warm layers for everyone first (most homes have them), then a sleeping bag or extra heavy blanket only beyond 3 days of cold or for people 65 and over (an optional upgrade with a wood stove) | DATA (CDC, Ready.gov, Sphere); PRIOR the 3-day threshold |
+| Readiness | Go-bags per person 4+ (a bag already owned will do) whose 3 days of water and food are staged from the household's own supplies, never bought twice (Red Cross); get-home bags sized to the walk (3 mph, 0.5 L an hour; 0.71 in heat, NIOSH) with water and snacks from home; first-aid kit per 4 people; alarms per level when missing; one extinguisher per floor people live on; an escape ladder only for floors 2–3 | DATA; PRIOR walking pace, hourly water, floor counts |
 
 ### Tiers
 
@@ -837,6 +838,10 @@ medication 14; Coos Bay: power 13, no-water 50, food 17, medication 21):
 | Generator fuel | none (no generator) | 25 gal stored (13 days needs 36.4) |
 | Phone power | 140 Wh | 390 Wh |
 | Toilet bags / cover | 6 bags, 12 cups | 45 bags, 100 cups |
+| Bleach | 1 bottle (was 1) | 1 bottle (was 4) |
+| Extinguishers / escape ladder | 2 / none (was 3 / 1) | owns an extinguisher / no ladder (was 1) |
+| Cold bedding | 4 blankets and 4 sets of layers (assumed basics), 1 sleeping bag or extra heavy blanket for the senior (was 4 sleeping bags or blankets) | none (wood stove, no cold target) |
+| Go-bag water and food | 12 gal and 24,600 kcal, staged from the stored water and food | 6 gal and 13,600 kcal, staged |
 | Tier recommended | two weeks | three months |
 
 ### Decisions and known gaps
@@ -853,3 +858,26 @@ medication 14; Coos Bay: power 13, no-water 50, food 17, medication 21):
   stored water and treatment (`water_stored`, `water_treatment_capacity`).
 - **Readiness lines are emitted whatever the chance of need**; the allocator decides with value
   per dollar, and `tier_enough` applies the 2 % threshold.
+- **Polish round (2026-09-26), from the first end-to-end plans:**
+  - *Bleach* is one bottle per household whatever the target (CDC says to store a bottle; at
+    ½ mL a gallon it treats thousands of gallons), replaced every six months because it weakens
+    (an estimate: no agency gives a shelf life). A one-year target no longer buys 27 bottles.
+  - *Staged supplies.* The go-bags' water and food, the pet go-kit's, and each commuter's water and
+    snacks for the walk home come out of the household's stored water and food. They are
+    alternative lines of the bag they go in (`evacuate.go_bag.alt.staged_water`,
+    `get_home.get_home_bag.alt.staged_food.person_1`), never added to a purchase; their amounts
+    follow their own standards (Red Cross three days, ASPCA a week) and say what to set aside.
+  - *Fire.* One extinguisher per floor people live on (apartment 1, house 2, not the basement), the
+    kitchen assumed to be on the floor with the way out; an escape ladder only when the household
+    lives on floor 2 or 3. The form's floor stands for where people sleep, so a house at street
+    level is not assumed to sleep upstairs: its escape plan asks for a second way out of any
+    upstairs bedroom instead.
+  - *Cold.* Blankets and warm layers first (content flags them as assumed basics); a sleeping bag
+    or extra heavy blanket is a need only beyond a 3-day cold target (everyone aged 1 and over) or
+    for people 65 and over (CDC: most at risk in the cold). A wood stove heats without power, so
+    there it is an optional upgrade; a gas furnace is not assumed to work without power. Babies
+    get a sleep sack, never loose bedding.
+  - *Per-line citations.* Each line cites only the sources behind its own amount and words: the
+    reused-bottles line at its cap no longer carries the pet-water sources, the boil-water line
+    cites the drinking share alone, and lines the target's days do not size do not cite the
+    target.

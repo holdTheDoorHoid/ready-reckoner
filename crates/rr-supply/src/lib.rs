@@ -858,7 +858,17 @@ pub fn sized_requirements(
                 out.push(bucket, get_home::car_kit(h.vehicles()), Need, h72, false);
             }
             BucketId::MedicalEmergency => {
-                let days = days_of(BucketId::Supplies).unwrap_or(f64::from(TierId::W2.days()));
+                let supplies = days_of(BucketId::Supplies);
+                let days = supplies.unwrap_or(f64::from(TierId::W2.days()));
+                // The supplies target's sources stand behind the medicine counts only when its days
+                // size them (two weeks otherwise).
+                let by_days = |s: Sizing| {
+                    if supplies.is_some() {
+                        s.also_cite(t.sources(BucketId::Supplies))
+                    } else {
+                        s
+                    }
+                };
                 out.push(
                     bucket,
                     Some(first_aid::first_aid_kit(people)),
@@ -868,7 +878,7 @@ pub fn sized_requirements(
                 );
                 out.push(
                     bucket,
-                    Some(first_aid::otc_medicines(days, people)),
+                    Some(by_days(first_aid::otc_medicines(days, people))),
                     Need,
                     h72,
                     false,
@@ -883,7 +893,7 @@ pub fn sized_requirements(
                 );
                 out.push(
                     bucket,
-                    Some(first_aid::ors_packets(days, people)),
+                    Some(by_days(first_aid::ors_packets(days, people))),
                     Need,
                     h72,
                     false,

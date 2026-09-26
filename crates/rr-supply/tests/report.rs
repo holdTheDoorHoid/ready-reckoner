@@ -45,7 +45,7 @@ fn section(out: &mut String, name: &str, ctx: &SupplyContext) {
     let _ = writeln!(out, "Tier recommended: {}.\n", tier_recommended(&targets));
     let _ = writeln!(
         out,
-        "| line | kind | tier | quantity | unit | estimate | plain |\n| --- | --- | --- | --- | --- | --- | --- |"
+        "| line | kind | tier | quantity | unit | estimate | plain | cites |\n| --- | --- | --- | --- | --- | --- | --- | --- |"
     );
     for l in &lines {
         let kind = match l.kind {
@@ -56,13 +56,19 @@ fn section(out: &mut String, name: &str, ctx: &SupplyContext) {
         };
         let _ = writeln!(
             out,
-            "| `{}` | {kind} | {} | {} | {} | {} | {} |",
+            "| `{}` | {kind} | {} | {} | {} | {} | {} | {} |",
             l.line.id,
             l.tier,
             l.line.quantity,
             l.line.unit,
             if l.prior { "yes" } else { "" },
-            l.line.plain.replace('|', "/")
+            l.line.plain.replace('|', "/"),
+            l.line
+                .citations
+                .iter()
+                .map(|c| c.as_str())
+                .collect::<Vec<_>>()
+                .join(", ")
         );
     }
     let _ = writeln!(out);
@@ -96,4 +102,12 @@ fn write_the_fixture_report() {
     assert!(out.contains("`water_out.water_gallons` | need | h72 | 12.9 | gallon"));
     assert!(out.contains("`water_out.water_gallons` | need | w2 | 37.6 | gallon"));
     assert!(out.contains("`water_out.water_treatment_capacity` | need | m3 | 96.8 | gallon"));
+    // Polish round: one bottle of bleach whatever the target, one extinguisher per floor, a
+    // sleeping bag for the senior only, and the go-bags' water staged from the stored water.
+    assert!(out.contains("`water_boil.bleach_bottles` | need | h72 | 1 | bottle"));
+    assert!(out.contains("`water_out.bleach_bottles` | need | h72 | 1 | bottle"));
+    assert!(out.contains("`fire.extinguisher_count` | need | h72 | 2 | extinguisher"));
+    assert!(out.contains("`thermal.sleeping_bag_or_blanket` | need | h72 | 1 | item"));
+    assert!(out.contains("`evacuate.go_bag.alt.staged_water` | alternative | h72 | 12 | gallon"));
+    assert!(!out.contains("`fire.escape_ladder_count`"));
 }
