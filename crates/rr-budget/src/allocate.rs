@@ -951,7 +951,13 @@ fn buy(
         // Money in an envelope for another item stays in `cash`; the envelope simply closes.
     }
     *cash = (*cash - cand.cost).max(0.0);
-    apply(ctx, state, cand);
+    if rare {
+        // The rare-catastrophe allowance never changes what the main plan sees, so its timing
+        // (which depends on the budget) cannot reorder the main plan.
+        state.owned[cand.offer] += cand.qty;
+    } else {
+        apply(ctx, state, cand);
+    }
     purchase_months.entry(cand.offer).or_insert(month);
     sequence.push(Purchase {
         month,
@@ -969,13 +975,17 @@ fn buy(
     });
 }
 
-/// Puts everything on hand toward `top` (a sinking fund), recording this month's deposit.
+/// Puts everything on hand toward `top` (a sinking fund), recording this month's deposit. An
+/// envelope opens only when money goes into it.
 fn save_toward(env: &mut Option<Envelope>, top: &Candidate, cash: f64, events: &mut Vec<Event>) {
     let previous = match env {
         Some(e) if e.offer == top.offer => e.saved,
         _ => 0.0,
     };
     let deposit = cash - previous;
+    if cash <= EPS {
+        return;
+    }
     *env = Some(Envelope {
         offer: top.offer,
         qty: top.qty,
