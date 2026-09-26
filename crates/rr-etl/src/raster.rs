@@ -24,6 +24,9 @@ use std::collections::{BTreeSet, HashMap};
 /// `facilities`).
 pub const CB500: &str = "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip";
 
+/// The rings of one polygon or multipolygon (outer rings and holes, even-odd rule).
+pub type Rings = Vec<Vec<[f64; 2]>>;
+
 /// Shift positive longitudes by -360 (see the module notes).
 pub fn norm_lon(lon: f64) -> f64 {
     if lon > 0.0 { lon - 360.0 } else { lon }

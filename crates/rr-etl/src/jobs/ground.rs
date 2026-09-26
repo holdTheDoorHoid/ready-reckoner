@@ -22,7 +22,7 @@ use crate::geo::{Albers, Poly};
 use crate::http::zip_entry_file;
 use crate::manifest::Attribution;
 use crate::num::sig;
-use crate::raster::{CountyGeo, Lattice};
+use crate::raster::{CountyGeo, Lattice, Rings};
 use crate::shp::{Shape, read_dbf_field, read_shp};
 use crate::{Result, data_err};
 use std::collections::{BTreeMap, BTreeSet};
@@ -181,7 +181,7 @@ pub fn landslide_shares(
 }
 
 /// Karst polygons of one layer, in the layer's own plane, without the excluded exposure classes.
-fn karst_layer(shp: &[u8], dbf: &[u8]) -> Result<(Vec<Vec<Vec<[f64; 2]>>>, usize, usize)> {
+fn karst_layer(shp: &[u8], dbf: &[u8]) -> Result<(Vec<Rings>, usize, usize)> {
     let shapes = read_shp(shp)?;
     let exposure = read_dbf_field(dbf, "Exposure").unwrap_or_default();
     let mut polys = Vec::new();
