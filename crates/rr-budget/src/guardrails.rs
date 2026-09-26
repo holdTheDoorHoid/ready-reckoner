@@ -4,7 +4,7 @@
 //! | --- | --- | --- |
 //! | `zero_budget` | note | no monthly and no one-off money |
 //! | `device_power_plan` | warn | a powered medical device, no backup power at home, and no device-power item by month 3 |
-//! | `cold_chain_plan` | warn | refrigerated medicine and no way to keep it cold by month 3 (the design gives no month; this reuses the device rule's) |
+//! | `cold_chain_plan` | warn | refrigerated medicine, and by month 3 no cooler for it or, where it needs a power source (a power target of 2 days or more and no backup power: rr-supply's `power_for_cold_medicine` line), nothing that covers that power (the design gives no month; this reuses the device rule's) |
 //! | `no_stored_water_by_month_3` | warn | free steps (refilled drink bottles) leave the stored-water need short, and no stored water is owned or bought by month 3 |
 //! | `evacuation_no_go_bag` | warn | a ten-year chance of having to leave of 10 % or more (`Prior`) and no go-bag by month 6 (`Prior`) |
 //! | `insurance_flood` / `insurance_quake` | warn | an owner in a flood- or quake-prone area without that policy |
@@ -19,6 +19,12 @@ use crate::value::{annual_rate_from_10yr, per_100};
 
 /// Month by which a powered medical device (and refrigerated medicine) should have a plan.
 pub const DEVICE_PLAN_BY_MONTH: u16 = 3;
+
+/// The part of the power bucket that keeps refrigerated medicine cold: `rr-plan` names parts
+/// after `rr-supply`'s item classes, and the power station line for refrigerated medicine that
+/// needs a power source has the class `power_for_cold_medicine` (`rr_supply::COLD_MEDICINE_POWER_CLASS`).
+/// The cold-chain guardrail stays on until this part is covered.
+pub const COLD_MEDICINE_POWER_PART: &str = "power for cold medicine";
 
 /// Ten-year chance of having to leave at or above which a household counts as evacuation-heavy
 /// (`Prior`).
@@ -36,7 +42,8 @@ pub const STORED_WATER_BY_MONTH: u16 = 3;
 pub(crate) struct Facts {
     /// First month a device-power item is in hand (owned, free, or bought), if ever.
     pub device_power_month: Option<u16>,
-    /// First month a cold-chain item is in hand.
+    /// First month the cold chain is in hand: a cold-chain item and, where refrigerated medicine
+    /// needs a power source ([`COLD_MEDICINE_POWER_PART`]), something that covers that power.
     pub cold_chain_month: Option<u16>,
     /// First month a go-bag is in hand.
     pub go_bag_month: Option<u16>,
@@ -109,10 +116,12 @@ pub(crate) fn check(
         out.push(warning(
             "cold_chain_plan",
             WarningSeverity::Warn,
-            "No way to keep refrigerated medicine cold by month 3.".into(),
-            "Some medicines, like insulin, spoil without cooling in a long power cut. A cooler and \
-             a plan for ice cost little. Ask your pharmacist how long yours can stay out of the \
-             fridge.",
+            "No way to keep refrigerated medicine cool through a power cut by month 3.".into(),
+            "Insulin keeps working out of the fridge for a while if it stays cool, but a home \
+             without power in hot weather can get too warm, and other medicines must stay in the \
+             fridge. A cooler bag with cold packs helps only for a short time; a battery power \
+             station can keep a small cooler or the fridge running. Ask your pharmacist how long \
+             yours can stay out of the fridge.",
             &["medication", "power"],
         ));
     }

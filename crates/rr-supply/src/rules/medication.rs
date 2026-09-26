@@ -130,7 +130,7 @@ pub fn rx_cold_storage(
         format!("{} need", people(n as f64))
     };
     let mut text = format!(
-        "{who} medicine kept cold, such as insulin. An insulated bag with fresh cold packs keeps it cool, but never frozen, for about {}: enough to leave home or ride out a short outage. Insulin in its vial or pen keeps working for up to {} between {} °F and {} °F, so in a longer power cut keep it in the shade and below {} °F; it does not have to stay fridge-cold, but do not use insulin that has frozen. For any other medicine that must stay cold, ask your pharmacist now how long it keeps out of the fridge, and write the answer on your medicine list.",
+        "{who} medicine kept cold, such as insulin. An insulated bag with fresh cold packs keeps it cool, never frozen, for about {}. Insulin in its vial or pen keeps working up to {} between {} °F and {} °F, so in a longer power cut keep it in the shade and below {} °F; never use insulin that froze. For other medicines, ask your pharmacist now how long they keep out of the fridge and write it on your medicine list.",
         fmt_days(hold),
         fmt_days(insulin_days),
         num(low_f, 0),
@@ -141,7 +141,7 @@ pub fn rx_cold_storage(
     if needed {
         let min = b.k(keys::RX_POWER_MIN_DAYS);
         text.push_str(&format!(
-            " Your power target is {}: plan to keep it cool for all of it with a battery power station that runs a small 12-volt cooler or the fridge (see the power station line), and know where you could take it if the power stays off.",
+            " Your power target is {}: plan a battery power station to run a small 12-volt cooler or the fridge (see its line), and a place with power you could go to.",
             fmt_days(cold_days)
         ));
         math.push(format!(

@@ -438,6 +438,8 @@ pub fn sized_requirements(
                 let fuel_gallons = fuel.as_ref().map_or(0.0, |f| f.quantity);
                 if h.has_generator() {
                     out.push(bucket, cited(bucket, fuel), Need, None, false);
+                    // Gasoline the plan buys needs approved cans first (CPSC): life-safety, so the
+                    // cans come before the fuel, never after it.
                     out.push(
                         bucket,
                         cited(
@@ -446,7 +448,7 @@ pub fn sized_requirements(
                         ),
                         Need,
                         Some(tier_for_days(days)),
-                        false,
+                        true,
                     );
                 } else if generator_for_pump {
                     // The fuel to keep for the generator the plan buys for the pump: said, but not
