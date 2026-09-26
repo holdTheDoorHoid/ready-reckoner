@@ -5,6 +5,7 @@
 
 pub mod generate;
 pub mod philadelphia;
+pub mod setup;
 
 use std::collections::BTreeMap;
 
