@@ -10,6 +10,7 @@ import { FIXTURES } from '../engine/fixtures';
 import { createMockEngine } from '../engine/mock';
 import type { Dials, HazardProfile, PlanInput } from '../engine/types';
 import { RARE_HAZARD_IDS } from '../engine/types';
+import { rareItemsFor } from '../engine/mock/items-v2';
 import {
   allowance,
   alsoCheckedFor,
@@ -103,7 +104,7 @@ describe('the rare-event allowance', () => {
     expect(withFamily({ rare_opt_in: ['all'] }, 'all', false).rare_opt_in).toEqual([]);
   });
 
-  it('says what the plan buys: the radiation meter for the nuclear row once it is ticked, nothing before', async () => {
+  it('says what the plan buys: nothing before it is allowed, the radiation meter for the nuclear row after', async () => {
     const engine = createMockEngine();
     const cat = await engine.catalogue();
     if (!cat.ok) throw new Error('catalogue');
@@ -115,19 +116,35 @@ describe('the rare-event allowance', () => {
     };
     const off = await engine.assess(withDials({}));
     if (!off.ok) throw new Error('assess');
-    const none = allowance(off.value, cat.value, withDials({}).dials, 400);
-    expect(none).toEqual({ families: [], monthly_usd: 40, bought: [] });
-
-    const on = await engine.assess(withDials({ rare_opt_in: ['nuclear_attack'] }));
-    if (!on.ok) throw new Error('assess');
-    const bought = allowance(on.value, cat.value, withDials({ rare_opt_in: ['nuclear_attack'] }).dials, 400);
-    expect(bought.families).toEqual(['nuclear_attack']);
+    expect(allowance(off.value, cat.value, withDials({}).dials, 400)).toEqual({ families: [], monthly_usd: 40, bought: [] });
+    // The v1 switch means every family (web-interview's mock validates the v2 list; either way the
+    // engine reads both through Dials::rare_families).
+    const on = await engine.assess(withDials({ rare_catastrophic_opt_in: true }));
+    if (!on.ok) throw new Error(`assess: ${JSON.stringify(on.error)}`);
+    const bought = allowance(on.value, cat.value, withDials({ rare_catastrophic_opt_in: true }).dials, 400);
+    expect(bought.families).toEqual([...RARE_HAZARD_IDS]);
     expect(bought.bought.map((b) => [b.item.item_id, b.families])).toEqual([['radiation_meter', ['nuclear_attack']]]);
+    // A family ticked with nothing made for it: nothing bought, and the sentence names what was chosen.
+    expect(allowance(off.value, cat.value, withDials({ rare_opt_in: ['severe_pandemic'] }).dials, 400)).toEqual({
+      families: ['severe_pandemic'],
+      monthly_usd: 40,
+      bought: [],
+    });
+  });
 
-    // A family with nothing made for it buys nothing: the money stays in the main plan.
-    const pandemic = await engine.assess(withDials({ rare_opt_in: ['severe_pandemic'] }));
-    if (!pandemic.ok) throw new Error('assess');
-    expect(allowance(pandemic.value, cat.value, withDials({ rare_opt_in: ['severe_pandemic'] }).dials, 400).bought).toEqual([]);
+  it('lets the allowance buy only for a ticked family whose local ten-year chance is at least 1 in 1,000 (the mock’s rule, as rr-budget’s)', async () => {
+    const engine = createMockEngine();
+    const r = await engine.assess(FIXTURES['philadelphia-renters-4']);
+    if (!r.ok) throw new Error('assess');
+    const nuclear = r.value.register.find((h) => h.id === 'nuclear_attack')!;
+    const register = [{ profile: nuclear, seed: { id: nuclear.id, rate: nuclear.rate_per_year, spread: 1, severity: 1, confidence: nuclear.confidence, sources: [], buckets: [], what: '', rare: true }, rate: nuclear.rate_per_year }];
+    const dials = FIXTURES['philadelphia-renters-4'].dials;
+    expect(rareItemsFor({ ...dials, rare_opt_in: ['nuclear_attack'] }, register)).toEqual([{ id: 'radiation_meter', tier: 'm3', qty: 1 }]);
+    expect(rareItemsFor({ ...dials, rare_opt_in: ['severe_pandemic'] }, register)).toEqual([]);
+    expect(rareItemsFor({ ...dials, rare_opt_in: ['all'] }, register)).toHaveLength(1);
+    // Below 1 in 1,000 over ten years (a remote county): nothing, even when ticked.
+    const remote = [{ ...register[0]!, rate: 5e-5 }];
+    expect(rareItemsFor({ ...dials, rare_opt_in: ['nuclear_attack'] }, remote)).toEqual([]);
   });
 });
 

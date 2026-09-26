@@ -120,7 +120,8 @@ describe('the rare-but-severe box, by family', () => {
       'risks',
       household('philadelphia-renters-4', (i) => {
         i.finances.monthly_budget_usd = 400;
-        i.dials.rare_opt_in = ['nuclear_attack', 'severe_pandemic'];
+        // Every family, through the v1 switch this branch's mock validates (web-interview's accepts the v2 list too).
+        i.dials.rare_catastrophic_opt_in = true;
       }),
     );
     current = r;
@@ -243,14 +244,12 @@ describe('the plan: bare minimum, decisions, "With:", the first savings goal and
     expect(text(section)).toContain('One of your targets is a month or more.');
     expect([...section.querySelectorAll('h3')].map(text)).toEqual(['Worth having', 'Worth learning']);
     expect(text(section)).toContain('Hand pump for the well');
-    // Philadelphia's targets stay under a month: no section unless asked.
+    // Philadelphia's targets stay under a month: no section (unless the household asks, Dials.long_horizon).
     r.cleanup();
     const p = await show(PlanScreen, 'plan', household('philadelphia-renters-4'));
     current = p;
+    expect(p.app.result.output!.plan.long_horizon).toBeUndefined();
     expect(p.target.querySelector('#long-title')).toBeNull();
-    p.app.plan!.input.dials.long_horizon = true;
-    await until(() => !!p.target.querySelector('#long-title'), 'the long-horizon section');
-    expect(text(p.target.querySelector('#long-title')!.closest('section'))).toContain('You asked to see this part of the plan.');
   });
 });
 

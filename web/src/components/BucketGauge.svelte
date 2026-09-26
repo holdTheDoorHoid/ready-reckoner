@@ -68,7 +68,7 @@
           <span class="big">{mainText}</span>
           <span class="range">{targetText.slice(mainText.length).trim()}</span>
           {#if confidence}
-            <span class="badge badge--{confidence}"><span class="visually-hidden">How sure: </span>{CONFIDENCE_BADGE[confidence]}</span>
+            <span class="badge badge--{confidence}"><span class="visually-hidden">How sure:</span> {CONFIDENCE_BADGE[confidence]}</span>
           {/if}
         </p>
       {/if}

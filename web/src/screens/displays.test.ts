@@ -39,8 +39,9 @@ async function screenWith(Screen: typeof Risks, route: string, name = NAME, outp
   return { r: current, out };
 }
 
-/** What a matrix row's "How likely" cell should say for a hazard over `years`. */
+/** What a matrix row's "How likely" cell should say for a hazard over `years` (a range-only row: its range, and its range a year). */
 function likelyCell(h: PlanOutput['register'][number], years = 10): string {
+  if (h.range_only) return `${rangeOnly(h.rate_range[0], h.rate_range[1], years)}; ${rangeOnly(h.rate_range[0], h.rate_range[1], 1)} a year`;
   const p = chanceWithin(h.rate_per_year, years);
   const chance = h.confidence === 'prior' ? chanceShort(p, chanceWithin(h.rate_range[0], years), chanceWithin(h.rate_range[1], years)) : chanceShort(p);
   return `${chance}; ${perYearWords(h.rate_per_year, h.annual_probability)}`;
@@ -207,15 +208,29 @@ describe('the Risks cards and targets', () => {
     expect(text(r.target)).not.toMatch(/\bn95\b/);
     // Each card lists its first three, each with "free", a price, or "have it" / "done" when the
     // household already has it (the heat card's towels are an assumed everyday basic).
-    let owned = 0;
     for (const h of out.register.filter((x) => x.display === 'ranked')) {
       for (const i of helpsFor(out, cat, h.id).slice(0, 3)) {
         const note = i.done ? (i.kind === 'free_action' ? 'done' : 'have it') : i.kind === 'free_action' ? 'free' : usd(i.est_cost_usd);
         expect(helps(h.id), `${h.id}: ${i.item_id}`).toContain(`${lowerFirst(i.name)} (${note})`);
-        if (i.done) owned += 1;
       }
     }
-    expect(owned, 'at least one card offers something the household already has').toBeGreaterThan(0);
+    // What the household already has is never priced. Done items sort last, so the golden's own
+    // assumed basics rarely reach a card's first three (since the v0.2 catalogue): mark every step
+    // done and every card must say "have it" or "done", never a price.
+    current!.cleanup();
+    current = undefined;
+    const allDone = structuredClone(out);
+    for (const m of allDone.plan.months) for (const i of m.items) i.done = true;
+    const { r: r2 } = await screenWith(Risks, 'risks', NAME, allDone);
+    let owned = 0;
+    for (const h of allDone.register.filter((x) => x.display === 'ranked')) {
+      const words = text(r2.target.querySelector(`#hazard-${h.id} .helps`));
+      if (!words) continue;
+      expect(words, h.id).not.toMatch(/\(\$\d/);
+      expect(words, h.id).not.toMatch(/\(free\)/);
+      owned += (words.match(/\((have it|done)\)/g) ?? []).length;
+    }
+    expect(owned, 'cards offer what the household already has').toBeGreaterThan(0);
   });
 
   it('passes axe (jsdom; contrast is checked in a real browser)', async () => {

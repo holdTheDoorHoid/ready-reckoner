@@ -60,7 +60,7 @@ export interface ValidationEvent {
 /** When and against what these verdicts were recorded (docs/VALIDATION.md "Results"). */
 export const VALIDATION_RUN = {
   /** The run the rows report: this version, with the data pack v2 tables and the v2 answers. */
-  label: 'this version, with the data pack v2 tables',
+  label: 'this version, with the data pack v2 tables and the households’ answers to the new questions',
   recorded: '2026-09-26',
   /** The tally before this round's changes (and of the first version), for comparison. */
   first: { covered: 6, partial: 5, short: 10, not_modelled: 1 },

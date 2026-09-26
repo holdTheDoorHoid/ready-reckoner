@@ -26,7 +26,6 @@
   );
   const tested = $derived(summary?.events_tested ?? rows.length);
   const matches = $derived(!summary || agrees(summary, rows));
-  const docUrl = $derived(summary?.url_anchor ? `${VALIDATION_DOC_URL}#${summary.url_anchor}` : VALIDATION_DOC_URL);
 
   const ICON: Record<Verdict, IconName> = { covered: 'check', partial: 'circle', short: 'minus', not_modelled: 'info' };
 
@@ -167,7 +166,7 @@
       <li>Every source for every event is listed in the full test.</li>
     </ul>
     <p>
-      <a href={docUrl} target="_blank" rel="noopener noreferrer">Read the full test, with every source<span class="visually-hidden"> (opens in a new tab)</span></a>
+      <a href={VALIDATION_DOC_URL} target="_blank" rel="noopener noreferrer">Read the full test, with every source<span class="visually-hidden"> (opens in a new tab)</span></a>
     </p>
   </section>
 

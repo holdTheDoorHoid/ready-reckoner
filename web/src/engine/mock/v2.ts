@@ -815,5 +815,5 @@ export function firstMilestone(track: SavingsTrack, expenses: number, doneMonth:
 
 /** `EngineInfo.validation`: the tally of the frozen backtest (docs/VALIDATION.md), as bundled with the engine. */
 export function validationSummary(dataPack: string): ValidationSummary {
-  return { events_tested: 22, covered: 6, partial: 9, short: 6, not_modelled: 1, data_pack: dataPack, url_anchor: 'results' };
+  return { events_tested: 22, covered: 6, partial: 9, short: 6, not_modelled: 1, data_pack: dataPack, url_anchor: '#/validation' };
 }
