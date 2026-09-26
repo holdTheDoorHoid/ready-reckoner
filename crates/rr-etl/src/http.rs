@@ -243,13 +243,13 @@ impl Http {
     }
 
     /// Stream a large download through `consume` without holding it in memory or on disk
-    /// (unless `--keep-raw`, which tees it to `raw_dir/raw_name`). The whole stream is retried
+    /// (unless `--keep-raw` and `raw_name` is given, which tees it to `raw_dir/raw_name`). The whole stream is retried
     /// from the start if the connection fails, so `consume` must be restartable: it is called
     /// once per attempt and must reset its own state.
     pub fn stream<T>(
         &self,
         url: &str,
-        raw_name: &str,
+        raw_name: Option<&str>,
         mut consume: impl FnMut(&mut dyn Read) -> Result<T>,
     ) -> Result<(T, Streamed)> {
         let mut last = String::new();
@@ -274,7 +274,12 @@ impl Http {
                 }
             };
             let final_url = resp.url().to_string();
-            let tee = if self.keep_raw { Some(self.raw_file(raw_name)?) } else { None };
+            // `raw_name: None` means never keep a copy (used for multi-gigabyte inputs, which
+            // would break the disk budget even with --keep-raw).
+            let tee = match (self.keep_raw, raw_name) {
+                (true, Some(name)) => Some(self.raw_file(name)?),
+                _ => None,
+            };
             let mut reader = HashingReader::new(resp, tee);
             match consume(&mut reader) {
                 Ok(v) => {

@@ -943,9 +943,13 @@ dependencies = [
 name = "rr-data"
 version = "0.1.0"
 dependencies = [
+ "csv",
+ "rr-types",
  "serde",
  "serde_json",
+ "sha2",
  "thiserror",
+ "toml",
 ]
 
 [[package]]

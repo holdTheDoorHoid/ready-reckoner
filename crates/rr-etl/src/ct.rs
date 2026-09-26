@@ -48,6 +48,22 @@ pub fn is_old_ct(fips: &str) -> bool {
     fips.len() == 5 && fips.starts_with("090")
 }
 
+/// Retired county codes that older records still use, with their 2024 successors. Counts are
+/// split evenly among successors; rates are copied to each.
+pub const RETIRED: &[(&str, &[&str])] = &[
+    ("02261", &["02063", "02066"]), // Valdez-Cordova Census Area, split in 2019
+    ("02270", &["02158"]),          // Wade Hampton Census Area, renamed Kusilvak in 2015
+    ("02280", &["02195", "02275"]), // Wrangell-Petersburg Census Area, split in 2008
+    ("12025", &["12086"]),          // Dade County, renamed Miami-Dade in 1997
+    ("46113", &["46102"]),          // Shannon County, renamed Oglala Lakota in 2015
+    ("51515", &["51019"]),          // Bedford city, merged into Bedford County in 2013
+];
+
+/// Successors of a retired county code, if it is one.
+pub fn successors(code: &str) -> Option<&'static [&'static str]> {
+    RETIRED.iter().find(|(old, _)| *old == code).map(|(_, new)| *new)
+}
+
 impl Crosswalk {
     /// Build from town rows `(old county fips, region fips, town land area m²)`.
     pub fn from_towns(towns: &[(String, String, f64)]) -> Result<Self> {

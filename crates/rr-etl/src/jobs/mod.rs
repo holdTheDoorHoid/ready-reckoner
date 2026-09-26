@@ -294,3 +294,100 @@ pub fn source_from(
 
 /// Licence text for US Government works.
 pub const PUBLIC_DOMAIN: &str = "US Government work, public domain (17 U.S.C. 105)";
+
+/// Result of a paged ArcGIS FeatureServer query.
+pub struct ArcgisRows {
+    /// Attribute maps, in the order returned (ordered by `order_by`).
+    pub rows: Vec<serde_json::Map<String, serde_json::Value>>,
+    /// Geometries (when requested), parallel to `rows`.
+    pub geometry: Vec<serde_json::Value>,
+    /// Source record for the manifest (sha256 over all pages in request order).
+    pub source: SourceRecord,
+}
+
+/// Page through an ArcGIS FeatureServer layer with POST queries.
+#[allow(clippy::too_many_arguments)]
+pub fn arcgis_query(
+    ctx: &Ctx,
+    name: &str,
+    layer_url: &str,
+    where_clause: &str,
+    fields: &[&str],
+    order_by: &str,
+    geometry: bool,
+    version: &str,
+    license: &str,
+    obligations: &str,
+) -> Result<ArcgisRows> {
+    let url = format!("{layer_url}/query");
+    let mut acc = crate::http::Sha256Acc::new();
+    let mut rows = Vec::new();
+    let mut geoms = Vec::new();
+    let retrieved = crate::timefmt::now_utc();
+    let page = 1000usize;
+    loop {
+        let mut form = vec![
+            ("where", where_clause.to_string()),
+            ("outFields", fields.join(",")),
+            ("orderByFields", order_by.to_string()),
+            ("resultOffset", rows.len().to_string()),
+            ("resultRecordCount", page.to_string()),
+            ("returnGeometry", geometry.to_string()),
+            ("f", "json".to_string()),
+        ];
+        if geometry {
+            form.push(("outSR", "4326".to_string()));
+        }
+        let resp = ctx.http.post_form(&url, &form)?;
+        acc.update(&resp.bytes);
+        let v: serde_json::Value = serde_json::from_slice(&resp.bytes)?;
+        if let Some(err) = v.get("error") {
+            return Err(data_err(format!("{name}: ArcGIS query error: {err}")));
+        }
+        let feats = v["features"].as_array().ok_or_else(|| data_err(format!("{name}: no features array")))?;
+        let n = feats.len();
+        for f in feats {
+            if let Some(a) = f["attributes"].as_object() {
+                rows.push(a.clone());
+                geoms.push(f.get("geometry").cloned().unwrap_or(serde_json::Value::Null));
+            }
+        }
+        let more = v["exceededTransferLimit"].as_bool().unwrap_or(false);
+        if n == 0 || (!more && n < page) {
+            break;
+        }
+    }
+    let bytes = acc.len();
+    Ok(ArcgisRows {
+        source: SourceRecord {
+            name: name.to_string(),
+            url: format!("{url} (POST where={where_clause}; fields {}; ordered by {order_by})", fields.join(",")),
+            version: version.to_string(),
+            retrieved,
+            sha256: acc.finish(),
+            bytes,
+            license: license.to_string(),
+            obligations: obligations.to_string(),
+        },
+        rows,
+        geometry: geoms,
+    })
+}
+
+/// A numeric attribute from an ArcGIS row.
+pub fn attr_f64(row: &serde_json::Map<String, serde_json::Value>, key: &str) -> Option<f64> {
+    match row.get(key)? {
+        serde_json::Value::Number(n) => n.as_f64().filter(|v| v.is_finite()),
+        serde_json::Value::String(s) => s.trim().parse::<f64>().ok().filter(|v| v.is_finite()),
+        _ => None,
+    }
+}
+
+/// A string attribute from an ArcGIS row (numbers are formatted).
+pub fn attr_str(row: &serde_json::Map<String, serde_json::Value>, key: &str) -> Option<String> {
+    match row.get(key)? {
+        serde_json::Value::String(s) => Some(s.trim().to_string()),
+        serde_json::Value::Number(n) => Some(n.to_string()),
+        _ => None,
+    }
+}
