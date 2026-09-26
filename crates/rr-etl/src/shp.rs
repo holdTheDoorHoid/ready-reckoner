@@ -148,7 +148,7 @@ mod tests {
 
     fn shp_with_square() -> Vec<u8> {
         // One polygon record: unit square, clockwise.
-        let pts = [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0]];
+        let pts: [[f64; 2]; 5] = [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0]];
         let mut content = Vec::new();
         content.extend_from_slice(&5i32.to_le_bytes());
         for v in [0.0f64, 0.0, 1.0, 1.0] {
