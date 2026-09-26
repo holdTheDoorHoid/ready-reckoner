@@ -3,7 +3,7 @@
 //! covering days x₀ to x₁ (DESIGN §4.4, research §3.2).
 
 use rr_types::math;
-use rr_types::{BucketId, HazardId, TARGET_LADDER_DAYS};
+use rr_types::{BucketId, HazardId, ReturnPeriod, TARGET_LADDER_DAYS};
 use serde::Serialize;
 
 use crate::model::{Model, Owner, Term, UParam};
@@ -258,9 +258,10 @@ impl<'m> Eval<'m> {
         math::exp(hi)
     }
 
-    /// The target on the day ladder: the smallest ladder value L with Λ(L) ≤ `rate`
-    /// ([`TARGET_LADDER_DAYS`]); 0 when disruptions of any length are rarer than `rate`; 365 when
-    /// even a year is not enough.
+    /// The target on the day ladder ([`TARGET_LADDER_DAYS`]): the raw design duration rounded up,
+    /// where a raw value within [`LADDER_TOLERANCE`] above a step counts as that step. In terms of
+    /// Λ: the smallest ladder value L with Λ(L · 1.03) ≤ `rate`. 0 when disruptions of any length
+    /// are rarer than `rate`; 365 when even a year is not enough.
     pub fn ladder_target(&self, rate: f64) -> f32 {
         if self.lambda0() <= rate {
             return 0.0;
@@ -269,7 +270,7 @@ impl<'m> Eval<'m> {
         let (mut lo, mut hi) = (0usize, ladder.len());
         while lo < hi {
             let mid = (lo + hi) / 2;
-            if self.lambda(f64::from(ladder[mid])) <= rate {
+            if self.lambda(step_limit(ladder[mid])) <= rate {
                 hi = mid;
             } else {
                 lo = mid + 1;
@@ -289,14 +290,14 @@ impl<'m> Eval<'m> {
     }
 
     /// The ladder target for one draw, searching outward from ladder index `start` (the central
-    /// answer, where most draws land) and remembering Λ at each ladder value in `cache` (NaN =
+    /// answer, where most draws land) and remembering Λ at each step's limit in `cache` (NaN =
     /// not computed yet). Same result as [`Eval::ladder_target`].
     pub fn ladder_target_from(&self, rate: f64, start: usize, cache: &mut [f64; 15]) -> f32 {
         let ladder = &TARGET_LADDER_DAYS;
         let n = ladder.len();
         let at = |k: usize, cache: &mut [f64; 15]| -> f64 {
             if cache[k].is_nan() {
-                cache[k] = self.lambda(f64::from(ladder[k]));
+                cache[k] = self.lambda(step_limit(ladder[k]));
             }
             cache[k]
         };
@@ -321,14 +322,16 @@ impl<'m> Eval<'m> {
             ladder[n - 1]
         }
     }
+}
 
-    /// Λ at ladder index `k`, from `cache` when already computed.
-    pub fn lambda_at_ladder(&self, k: usize, cache: &mut [f64; 15]) -> f64 {
-        if cache[k].is_nan() {
-            cache[k] = self.lambda(f64::from(TARGET_LADDER_DAYS[k]));
-        }
-        cache[k]
-    }
+/// A raw target within this fraction above a ladder step counts as that step (planner decision,
+/// 2026-09-25: 3.003 days is "3 days", not 5).
+pub const LADDER_TOLERANCE: f64 = 0.03;
+
+/// The largest raw value that still rounds to ladder step `step`.
+#[inline]
+pub(crate) fn step_limit(step: f32) -> f64 {
+    f64::from(step) * (1.0 + LADDER_TOLERANCE)
 }
 
 /// Index of a ladder value (or of the smallest ladder value at or above `days`).
@@ -344,19 +347,31 @@ pub(crate) fn natural_frequency(lambda: f64, years: f64) -> f64 {
     (-100.0 * math::exp_m1(-years * lambda)).clamp(0.0, 100.0)
 }
 
-/// The yearly rate for a return period of `years` years: 1 / N.
-pub fn dial_rate(return_period_years: u16) -> f64 {
-    1.0 / f64::from(return_period_years)
+/// The default dial, "90 % sure nothing in the next ten years is worse": Λ* = −ln(0.9)/10
+/// = 0.010536051565782628 a year, shown as "about 1 in 100" (planner decision, 2026-09-25;
+/// research §3.3).
+pub const ONE_IN_100_RATE: f64 = 0.010_536_051_565_782_628;
+
+/// The yearly rate behind each dial setting: `one_in_10` 0.1, `one_in_50` 0.02, `one_in_100`
+/// [`ONE_IN_100_RATE`] (≈ 1 in 95), `one_in_500` 0.002.
+pub fn dial_rate(rp: ReturnPeriod) -> f64 {
+    match rp {
+        ReturnPeriod::OneIn10 => 0.1,
+        ReturnPeriod::OneIn50 => 0.02,
+        ReturnPeriod::OneIn100 => ONE_IN_100_RATE,
+        ReturnPeriod::OneIn500 => 0.002,
+    }
 }
 
-/// Rounds a continuous duration up to the day ladder (the rule [`Eval::ladder_target`] applies
-/// to Λ directly): 0 stays 0, anything above a year is 365.
+/// Rounds a raw duration up to the day ladder, a value within [`LADDER_TOLERANCE`] above a step
+/// counting as that step (the rule [`Eval::ladder_target`] applies through Λ): 0 stays 0,
+/// anything above a year is 365.
 pub fn round_up_to_ladder(days: f64) -> f32 {
     if days.is_nan() || days <= 0.0 {
         return 0.0;
     }
     for &l in &TARGET_LADDER_DAYS {
-        if f64::from(l) >= days {
+        if step_limit(l) >= days {
             return l;
         }
     }
@@ -536,7 +551,7 @@ impl ExceedanceCurve {
         math::exp(hi)
     }
 
-    /// The ladder target for any yearly rate (the smallest ladder value L with Λ(L) ≤ `rate`).
+    /// The ladder target for any yearly rate (same rule as [`Eval::ladder_target`]).
     pub fn ladder_at(&self, rate: f64) -> f32 {
         if self.target_at(rate) == 0.0 {
             return 0.0;
@@ -544,7 +559,7 @@ impl ExceedanceCurve {
         TARGET_LADDER_DAYS
             .iter()
             .copied()
-            .find(|&l| self.lambda(f64::from(l)) <= rate)
+            .find(|&l| self.lambda(step_limit(l)) <= rate)
             .unwrap_or(TARGET_LADDER_DAYS[TARGET_LADDER_DAYS.len() - 1])
     }
 
@@ -595,16 +610,26 @@ mod tests {
         assert_eq!(round_up_to_ladder(0.2), 0.5);
         assert_eq!(round_up_to_ladder(2.8), 3.0);
         assert_eq!(round_up_to_ladder(3.0), 3.0);
-        assert_eq!(round_up_to_ladder(3.001), 5.0);
+        // Within 3 % above a step counts as the step.
+        assert_eq!(round_up_to_ladder(3.003), 3.0);
+        assert_eq!(round_up_to_ladder(3.09), 3.0);
+        assert_eq!(round_up_to_ladder(3.1), 5.0);
+        assert_eq!(round_up_to_ladder(61.0), 60.0);
+        assert_eq!(round_up_to_ladder(62.0), 90.0);
         assert_eq!(round_up_to_ladder(12.0), 14.0);
         assert_eq!(round_up_to_ladder(200.0), 365.0);
         assert_eq!(round_up_to_ladder(5000.0), 365.0);
     }
 
     #[test]
-    fn dial_rates_are_one_over_n() {
-        assert_eq!(dial_rate(100), 0.01);
-        assert_eq!(dial_rate(10), 0.1);
+    fn dial_rates_follow_the_planner_decision() {
+        assert_eq!(dial_rate(ReturnPeriod::OneIn10), 0.1);
+        assert_eq!(dial_rate(ReturnPeriod::OneIn50), 0.02);
+        assert_eq!(dial_rate(ReturnPeriod::OneIn500), 0.002);
+        // −ln(0.9)/10, "90 % sure nothing in the next ten years is worse".
+        let r = dial_rate(ReturnPeriod::OneIn100);
+        assert!((r - (-math::ln(0.9) / 10.0)).abs() < 1e-18, "{r}");
+        assert!((natural_frequency(r, 10.0) - 10.0).abs() < 1e-12);
     }
 
     #[test]

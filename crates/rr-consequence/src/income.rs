@@ -9,7 +9,7 @@
 //!
 //! with unemployment insurance replacing `ρ` of wages for `W` weeks (streams without insurance use
 //! ρ = 0). Λ_income(g) = Σ streams R · P(D > gap⁻¹(g)), and the target is the smallest g with
-//! Λ_income(g) ≤ 1/N, rounded up to [`MONTHS_LADDER`].
+//! Λ_income(g) ≤ the dial rate, rounded up to [`MONTHS_LADDER`] (3 % tolerance, as for days).
 
 use rr_types::math;
 
@@ -164,7 +164,8 @@ impl<'m> IncomeEval<'m> {
         hi
     }
 
-    /// The target on [`MONTHS_LADDER`]: the smallest ladder value g with Λ(g) ≤ `rate`.
+    /// The target on [`MONTHS_LADDER`], rounded up with the 3 % tolerance (the smallest step g
+    /// with Λ(g · 1.03) ≤ `rate`).
     pub fn ladder_target(&self, rate: f64) -> f32 {
         let total: f64 = self.rate.iter().sum();
         if total <= rate {
@@ -173,7 +174,7 @@ impl<'m> IncomeEval<'m> {
         let (mut lo, mut hi) = (0usize, MONTHS_LADDER.len());
         while lo < hi {
             let mid = (lo + hi) / 2;
-            if self.lambda(f64::from(MONTHS_LADDER[mid])) <= rate {
+            if self.lambda(month_limit(MONTHS_LADDER[mid])) <= rate {
                 hi = mid;
             } else {
                 lo = mid + 1;
@@ -237,7 +238,13 @@ impl IncomeCurve {
     }
 }
 
-/// Rounds months up to [`MONTHS_LADDER`].
+/// The largest raw value that still rounds to months-ladder step `step` (the same 3 % tolerance
+/// as the day ladder).
+fn month_limit(step: f32) -> f64 {
+    f64::from(step) * (1.0 + crate::curve::LADDER_TOLERANCE)
+}
+
+/// Rounds months up to [`MONTHS_LADDER`], a value within 3 % above a step counting as that step.
 pub fn round_up_months(months: f64) -> f32 {
     if months.is_nan() || months <= 0.0 {
         return 0.0;
@@ -245,7 +252,7 @@ pub fn round_up_months(months: f64) -> f32 {
     MONTHS_LADDER
         .iter()
         .copied()
-        .find(|&m| f64::from(m) >= months)
+        .find(|&m| month_limit(m) >= months)
         .unwrap_or(MONTHS_LADDER[MONTHS_LADDER.len() - 1])
 }
 
@@ -299,6 +306,8 @@ mod tests {
         }
         assert_eq!(e.ladder_target(0.01), 4.0);
         assert_eq!(round_up_months(3.94), 4.0);
+        assert_eq!(round_up_months(4.1), 4.0);
+        assert_eq!(round_up_months(4.2), 5.0);
         assert_eq!(round_up_months(0.0), 0.0);
     }
 }

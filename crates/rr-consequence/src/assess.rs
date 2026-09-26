@@ -286,7 +286,7 @@ pub fn assess_with_draws(
         table,
     };
     let model = model::build(&binp);
-    let rate = dial_rate(input.dials.return_period.years());
+    let rate = dial_rate(input.dials.return_period);
     let years = f64::from(input.dials.horizon_years.max(1));
     let draws = Draws::new(&model.params, draws.max(10));
     let ctx = Ctx {
@@ -519,7 +519,7 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
     let dial_table: Vec<DialPoint> = ReturnPeriod::ALL
         .iter()
         .map(|rp| {
-            let r = dial_rate(rp.years());
+            let r = dial_rate(*rp);
             DialPoint {
                 return_period_years: rp.years(),
                 target_days: eval.target(r, 26),
@@ -1020,7 +1020,7 @@ fn income_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, IncomeDetail) {
     let dial_table = ReturnPeriod::ALL
         .iter()
         .map(|rp| {
-            let r = dial_rate(rp.years());
+            let r = dial_rate(*rp);
             (rp.years(), eval.target(r, 60), eval.ladder_target(r))
         })
         .collect();
@@ -1272,14 +1272,14 @@ const CLIFF_MIN_DAYS: f64 = 3.0;
 /// The cliff rule (DESIGN §4.4, research §3.3): one hazard or scenario dominates a bucket's design
 /// event (half or more of Λ at the target), its rate for that bucket is within a factor of 3 of
 /// the dial rate, and the target jumps between adjacent dial settings (it grows at least as fast
-/// as the square of the return period, and by 3 days or more). One warning per event, listing the
-/// buckets.
+/// as the square of the return period, and by 3 days or more). One warning per bucket, id
+/// `cliff_<bucket>`, naming the event (rr-plan drops rr-budget's duplicate).
 fn cliff_warnings(ctx: &Ctx<'_>, details: &[BucketDetail]) -> Vec<Warning> {
-    let mut found: BTreeMap<Owner, Vec<BucketId>> = BTreeMap::new();
     let here = ReturnPeriod::ALL
         .iter()
         .position(|r| *r == ctx.input.dials.return_period)
         .unwrap_or(2);
+    let mut out = Vec::new();
     for d in details {
         if d.target_days.is_nan() || d.target_days <= 0.0 {
             continue;
@@ -1301,84 +1301,64 @@ fn cliff_warnings(ctx: &Ctx<'_>, details: &[BucketDetail]) -> Vec<Warning> {
         if owner_rate < ctx.rate / 3.0 || owner_rate > ctx.rate * 3.0 {
             continue;
         }
+        // Does the target jump between this dial setting and a neighbouring one?
         let t0 = d.target_days;
-        let n0 = f64::from(ReturnPeriod::ALL[here].years());
         let jumps = [here.checked_sub(1), Some(here + 1)]
             .into_iter()
             .flatten()
             .filter_map(|j| d.dial_table.get(j).map(|p| (j, p)))
             .any(|(j, p)| {
-                let nj = f64::from(ReturnPeriod::ALL[j].years());
-                let e =
-                    math::ln((p.target_days + 0.05) / (t0 + 0.05)).abs() / math::ln(nj / n0).abs();
+                let dial_step = math::ln(dial_rate(ReturnPeriod::ALL[j]) / ctx.rate).abs();
+                let e = math::ln((p.target_days + 0.05) / (t0 + 0.05)).abs() / dial_step;
                 e >= CLIFF_ELASTICITY && (p.target_days - t0).abs() >= CLIFF_MIN_DAYS
             });
-        if jumps {
-            found.entry(owner).or_default().push(d.bucket);
+        if !jumps {
+            continue;
         }
-    }
-    found
-        .into_iter()
-        .map(|(owner, buckets)| {
-            let name = ctx.owner_name(owner);
-            let (id, owner_rate) = match owner {
-                Owner::Hazard(h) => (
-                    format!("cliff_{h}"),
-                    ctx.model
-                        .terms
-                        .iter()
-                        .find(|t| t.owner() == owner)
-                        .map_or(0.0, |t| t.rate),
-                ),
-                Owner::Scenario(i) => (
-                    format!("cliff_{}", ctx.scenarios[i].id),
-                    ctx.scenarios[i].rate_per_year,
-                ),
-            };
-            let tables: Vec<String> = buckets
-                .iter()
-                .filter_map(|b| details.iter().find(|d| d.bucket == *b))
-                .map(|d| {
-                    let cells: Vec<String> = d
-                        .dial_table
-                        .iter()
-                        .filter(|p| p.return_period_years >= 50)
-                        .map(|p| {
-                            format!(
-                                "{} at 1 in {}",
-                                target_words(d.bucket, p.ladder_days),
-                                p.return_period_years
-                            )
-                        })
-                        .collect();
-                    format!("{}: {}", words::bucket_short(d.bucket).to_lowercase(), cells.join(", "))
-                })
-                .collect();
-            let toggle = match owner {
-                Owner::Scenario(_) => {
-                    " You can turn it off to see the plan without it; long outages are better met with ways to make water safe and stay warm than with bigger stockpiles."
-                }
-                Owner::Hazard(_) => "",
-            };
-            let mut related = vec![match owner {
-                Owner::Hazard(h) => h.as_str().to_owned(),
-                Owner::Scenario(i) => ctx.scenarios[i].id.clone(),
-            }];
-            related.extend(buckets.iter().map(|b| b.as_str().to_owned()));
-            Warning {
-                id,
-                severity: WarningSeverity::Warn,
-                message: format!("Your answer depends mostly on one event: {name}."),
-                why: format!(
-                    "It happens about {} here, close to the level you chose (once in {} years), so small changes in either move your targets a lot. {}.{toggle}",
-                    words::rate_phrase(owner_rate),
-                    ctx.input.dials.return_period.years(),
-                    tables.join("; ")
-                ),
-                related,
+        let name = ctx.owner_name(owner);
+        let (owner_id, event_rate) = match owner {
+            Owner::Hazard(h) => (
+                h.as_str().to_owned(),
+                eval.terms()
+                    .iter()
+                    .find(|t| t.owner() == owner)
+                    .map_or(0.0, |t| t.rate),
+            ),
+            Owner::Scenario(i) => (ctx.scenarios[i].id.clone(), ctx.scenarios[i].rate_per_year),
+        };
+        let cells: Vec<String> = d
+            .dial_table
+            .iter()
+            .filter(|p| p.return_period_years >= 50)
+            .map(|p| {
+                format!(
+                    "{} at 1 in {}",
+                    target_words(d.bucket, p.ladder_days),
+                    p.return_period_years
+                )
+            })
+            .collect();
+        let toggle = match owner {
+            Owner::Scenario(_) => {
+                " You can turn it off to see the plan without it; long outages are better met with ways to make water safe and stay warm than with bigger stockpiles."
             }
-        })
-        .collect()
+            Owner::Hazard(_) => "",
+        };
+        out.push(Warning {
+            id: format!("cliff_{}", d.bucket),
+            severity: WarningSeverity::Warn,
+            message: format!("Your answer depends mostly on one event: {name}."),
+            why: format!(
+                "It happens about {} here, close to the level you chose (about once in {} years), so small changes in either move your {} target a lot: {}.{toggle}",
+                words::rate_phrase(event_rate),
+                ctx.input.dials.return_period.years(),
+                words::bucket_short(d.bucket).to_lowercase(),
+                cells.join(", ")
+            ),
+            related: vec![owner_id, d.bucket.as_str().to_owned()],
+        });
+    }
+    out
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1473,7 +1453,12 @@ fn statement(
             words::per_100(100.0 * evacuate.p_need_10yr)
         ));
     }
+    let mut said: Vec<&str> = Vec::new();
     for w in warnings {
+        if said.contains(&w.message.as_str()) {
+            continue;
+        }
+        said.push(&w.message);
         out.push(w.message.clone());
         if let Some(d) = details
             .iter()

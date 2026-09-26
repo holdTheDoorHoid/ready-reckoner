@@ -547,13 +547,23 @@ fn the_cliff_rule_names_cascadia_on_the_coast_and_nothing_in_philadelphia() {
         &research::coos_scenarios(true),
         TEST_DRAWS,
     );
-    let w = coos
-        .warnings
+    for bucket in ["power", "water_out"] {
+        let w = coos
+            .warnings
+            .iter()
+            .find(|w| w.id == format!("cliff_{bucket}"))
+            .unwrap_or_else(|| panic!("cliff warning for {bucket}: {:?}", coos.warnings));
+        assert!(w.message.contains("Cascadia"), "{}", w.message);
+        assert_eq!(w.related, vec!["cascadia_m9".to_owned(), bucket.to_owned()]);
+        assert_eq!(w.severity, rr_types::WarningSeverity::Warn);
+    }
+    // The statement names the event once, not once per bucket.
+    let named = coos
+        .statement
         .iter()
-        .find(|w| w.id == "cliff_cascadia_m9")
-        .expect("cliff warning");
-    assert!(w.message.contains("Cascadia"));
-    assert!(w.related.iter().any(|r| r == "power") && w.related.iter().any(|r| r == "water_out"));
+        .filter(|s| s.contains("depends mostly on"))
+        .count();
+    assert_eq!(named, 1, "{:?}", coos.statement);
     // Far from the dial (1 in 500 against about 1 in 100 a year), no cliff.
     let rare = assess_with_draws(
         &with_dial(&research::coos_household(), ReturnPeriod::OneIn500),

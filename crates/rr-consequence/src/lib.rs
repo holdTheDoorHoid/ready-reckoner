@@ -62,12 +62,40 @@ pub use assess::{
     GAS_STOVE_ITEM_IDS, GetHomeDetail, HomeLossDetail, IncomeDetail, TermSummary, assess,
     assess_with_draws,
 };
-pub use curve::{CurveTerm, DialPoint, ExceedanceCurve, dial_rate, round_up_to_ladder};
+pub use curve::{
+    CurveTerm, DialPoint, ExceedanceCurve, LADDER_TOLERANCE, ONE_IN_100_RATE, dial_rate,
+    round_up_to_ladder,
+};
 pub use effects::{EffectRow, EffectsTable, IncomeRow, table};
 pub use income::{GapRule, IncomeCurve, MONTHS_LADDER, round_up_months};
 pub use model::{CountyData, CouplingApplied, OverrideApplied, ScenarioCandidate};
 pub use ranges::DRAWS;
 pub use survival::{Survival, probit};
+
+/// Citation ids this crate emits from code rather than from `effects.toml` (county records, the
+/// rural-EMS note, coupling and displacement notes).
+pub const CODE_CITATIONS: [&str; 6] = [
+    "census_pulse_displacement",
+    "county_boil_water_records",
+    "eagle_i_outages",
+    "mell_2017_ems",
+    "noaa_storm_events",
+    "prior_rr_coupling",
+];
+
+/// Every citation id this crate can put in an output, sorted: the effects table's and
+/// [`CODE_CITATIONS`]. Each must resolve in `content/citations.toml`.
+pub fn citation_ids() -> Vec<rr_types::CitationId> {
+    let mut ids = effects::table().citation_ids();
+    ids.extend(
+        CODE_CITATIONS
+            .iter()
+            .map(|s| rr_types::CitationId::from(*s)),
+    );
+    ids.sort();
+    ids.dedup();
+    ids
+}
 
 /// Crate name, used by the CLI's `--version` and by the about screen.
 pub const CRATE: &str = "rr-consequence";

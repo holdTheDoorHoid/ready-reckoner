@@ -136,7 +136,7 @@ pub(crate) fn quantile(values: &mut [f64], q: f64) -> f64 {
 }
 
 /// 10th and 90th percentiles of a duration bucket's ladder target, and of its natural frequencies
-/// at `days` (each a ladder value, so the search's cached Λ values are reused).
+/// at `days`.
 pub(crate) struct DurationRange {
     pub low: f32,
     pub high: f32,
@@ -154,19 +154,14 @@ pub(crate) fn duration_range(
 ) -> DurationRange {
     let n = draws.n();
     let start = crate::curve::ladder_index(f64::from(central));
-    let idx: Vec<usize> = days
-        .iter()
-        .map(|&d| crate::curve::ladder_index(d))
-        .collect();
     let mut targets = Vec::with_capacity(n);
     let mut freqs: Vec<Vec<f64>> = vec![Vec::with_capacity(n); days.len()];
     for i in 0..n {
         eval.set_draw_from(draws, i);
         let mut cache = [f64::NAN; 15];
         targets.push(f64::from(eval.ladder_target_from(rate, start, &mut cache)));
-        for (j, &k) in idx.iter().enumerate() {
-            let lam = eval.lambda_at_ladder(k, &mut cache);
-            freqs[j].push(crate::curve::natural_frequency(lam, years));
+        for (j, &d) in days.iter().enumerate() {
+            freqs[j].push(eval.natural_frequency(d, years));
         }
     }
     eval.reset();
