@@ -174,10 +174,17 @@ export const RAW_WATER: Record<RawWaterSource, Choice> = {
   neighbour_well: { label: 'A neighbour’s well', help: 'Someone who has agreed to share it.' },
 };
 
+/**
+ * What the household knows of its water system over the last 10 years. The engine scales the
+ * water-outage rows by this answer (fine ×0.5, occasional ×1.5, frequent ×3, with the county's EPA
+ * record), so "frequent" carries the consequence workstream's definition: out of water or under a
+ * boil notice for more than a week in the last 10 years. The labels read naturally in the packet's
+ * "you told us your water has had frequent problems".
+ */
 export const WATER_RECORD: Record<WaterSystemRecord, Choice> = {
-  fine: { label: 'No problems we know of' },
-  occasional_notices: { label: 'Now and then', help: 'A boil-water notice or a main break every year or two.' },
-  frequent_problems: { label: 'Often', help: 'Notices, outages or bad-tasting water several times a year.' },
+  fine: { label: 'No notices or outages we remember' },
+  occasional_notices: { label: 'Occasional problems', help: 'A boil notice or an outage of a few days, now and then.' },
+  frequent_problems: { label: 'Frequent problems', help: 'Out of water, or under a boil notice, for more than a week in the last 10 years.' },
   unknown: { label: 'Not sure' },
 };
 

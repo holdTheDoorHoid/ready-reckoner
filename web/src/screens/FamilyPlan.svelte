@@ -183,13 +183,14 @@
         summary="How to plan staying in touch"
         fallback="Plan four ways to reach each other, each one for when the one before fails: call, then text, then everyone texts one contact out of the area, then go to the place you agreed to meet. Write the numbers on a card for each person, and learn two or three by heart."
       />
-      <fieldset class="group">
+      <fieldset class="group" aria-describedby="fp-contact-help">
         <legend>Someone out of the area everyone checks in with</legend>
-        <p class="help">Everyone texts this person to say they are safe, and they pass the news along. A call out of the area may get through when a local one doesn't.</p>
+        <p class="help" id="fp-contact-help">Everyone texts this person to say they are safe, and they pass the news along. A call out of the area may get through when a local one doesn't.</p>
         <div class="pair">
           <TextField
             id="fp-contact-name"
             label="Name"
+            context="of the contact out of the area"
             value={plan?.out_of_area_contact?.name}
             maxlength={FAMILY_PLAN_SHORT_MAX}
             oninput={(t) => contact('out_of_area_contact', 'name', t)}
@@ -198,6 +199,7 @@
           <TextField
             id="fp-contact-phone"
             label="Phone"
+            context="of the contact out of the area"
             value={plan?.out_of_area_contact?.phone}
             maxlength={FAMILY_PLAN_SHORT_MAX}
             inputmode="tel"
@@ -212,6 +214,7 @@
         help="If you can't get back inside: a neighbour's porch, the corner mailbox."
         value={plan?.meeting_place_near}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('meeting_place_near', t)}
         onleave={() => noteLeft('meeting_place_near')}
       />
@@ -221,12 +224,13 @@
         help="If you can't get home at all: a library, a relative's house, a place of worship."
         value={plan?.meeting_place_far}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('meeting_place_far', t)}
         onleave={() => noteLeft('meeting_place_far')}
       />
-      <fieldset class="group">
+      <fieldset class="group" aria-describedby="fp-numbers-help">
         <legend>Numbers to know by heart</legend>
-        <p class="help">Two or three numbers everyone learns, in case a phone is lost or dead. Up to {NUMBERS_BY_HEART_MAX}.</p>
+        <p class="help" id="fp-numbers-help">Two or three numbers everyone learns, in case a phone is lost or dead. Up to {NUMBERS_BY_HEART_MAX}.</p>
         {#each plan?.numbers_by_heart ?? [] as number, i (i)}
           <div class="entry">
             <div class="entry__field">
@@ -265,6 +269,7 @@
           help="Schools and child care release children only to adults on their list. Keep that list up to date."
           value={plan?.school_pickup}
           maxlength={FAMILY_PLAN_TEXT_MAX}
+          multiline
           oninput={(t) => note('school_pickup', t)}
           onleave={() => noteLeft('school_pickup')}
         />
@@ -275,6 +280,7 @@
         help="Stay put, come home, or follow the workplace's own plan."
         value={plan?.work_plans}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('work_plans', t)}
         onleave={() => noteLeft('work_plans')}
       />
@@ -294,6 +300,7 @@
         help="Where everyone goes when a warning comes."
         value={plan?.shelter_spot_home}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('shelter_spot_home', t)}
         onleave={() => noteLeft('shelter_spot_home')}
       />
@@ -303,6 +310,7 @@
         help="Ask where the building's shelter area is."
         value={plan?.shelter_spot_work}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('shelter_spot_work', t)}
         onleave={() => noteLeft('shelter_spot_work')}
       />
@@ -316,18 +324,20 @@
         help="A friend or relative out of the area, or a town with hotels."
         value={plan?.where_we_would_go}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('where_we_would_go', t)}
         onleave={() => noteLeft('where_we_would_go')}
       />
-      <fieldset class="group">
+      <fieldset class="group" aria-describedby="fp-routes-help">
         <legend>Two ways out</legend>
-        <p class="help">Two different roads or transit lines, in case one is closed.{hasVehicle(input) ? '' : ' Without a car, name the bus or train, or who would drive you.'}</p>
+        <p class="help" id="fp-routes-help">Two different roads or transit lines, in case one is closed.{hasVehicle(input) ? '' : ' Without a car, name the bus or train, or who would drive you.'}</p>
         {#each ROUTE_LABELS.slice(0, ROUTES_MAX) as label, i (i)}
           <TextField
             id="fp-route-{i}"
             {label}
             value={plan?.routes?.[i]}
             maxlength={FAMILY_PLAN_TEXT_MAX}
+            multiline
             oninput={(t) => app.plan && setRoute(app.plan.input, i, t)}
             onleave={() => app.plan && tidyRoute(app.plan.input, i)}
           />
@@ -340,6 +350,7 @@
           help="Someone who has agreed, and knows where the carriers, leashes and food are."
           value={plan?.who_takes_animals}
           maxlength={FAMILY_PLAN_TEXT_MAX}
+          multiline
           oninput={(t) => note('who_takes_animals', t)}
           onleave={() => noteLeft('who_takes_animals')}
         />
@@ -368,6 +379,7 @@
         help={hasGas(input) ? 'Where it is, and the tool that turns it.' : 'Where it is, and the tool that turns it. Leave it blank if you have no gas.'}
         value={plan?.shutoff_gas}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('shutoff_gas', t)}
         onleave={() => noteLeft('shutoff_gas')}
       />
@@ -377,6 +389,7 @@
         help="Often near the water meter, where the pipe comes into the home."
         value={plan?.shutoff_water}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('shutoff_water', t)}
         onleave={() => noteLeft('shutoff_water')}
       />
@@ -386,6 +399,7 @@
         help="Where it is, and which switch turns off everything."
         value={plan?.shutoff_electric}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('shutoff_electric', t)}
         onleave={() => noteLeft('shutoff_electric')}
       />
@@ -395,6 +409,7 @@
         help="Neighbours are the first help in most disasters."
         value={plan?.neighbours_who_check}
         maxlength={FAMILY_PLAN_TEXT_MAX}
+        multiline
         oninput={(t) => note('neighbours_who_check', t)}
         onleave={() => noteLeft('neighbours_who_check')}
       />
@@ -420,6 +435,7 @@
                 <TextField
                   id="fp-circle-{i}-name"
                   label="Name"
+                  context="of person {i + 1}"
                   value={person.name}
                   maxlength={FAMILY_PLAN_SHORT_MAX}
                   oninput={(t) => app.plan && setTrustedPart(app.plan.input, i, 'name', t)}
@@ -428,6 +444,7 @@
                 <TextField
                   id="fp-circle-{i}-phone"
                   label="Phone"
+                  context="of person {i + 1}"
                   value={person.phone}
                   maxlength={FAMILY_PLAN_SHORT_MAX}
                   inputmode="tel"
@@ -436,7 +453,7 @@
                 />
               </div>
               <fieldset>
-                <legend>What they hold for you</legend>
+                <legend>What {person.name?.trim() || `person ${i + 1}`} holds for you</legend>
                 <div class="choices choices--2">
                   {#each HOLDS as what (what)}
                     <label class="choice">
@@ -479,6 +496,7 @@
         <TextField
           id="fp-lawyer-phone"
           label="Phone"
+          context="of the lawyer"
           value={plan?.lawyer?.phone}
           maxlength={FAMILY_PLAN_SHORT_MAX}
           inputmode="tel"
@@ -549,9 +567,20 @@
   .group {
     margin-bottom: var(--s5);
   }
+  .group > :global(.field:last-child) {
+    margin-bottom: 0;
+  }
+  /* A name and a phone side by side when there is room; the grid gap spaces them either way. */
   .pair {
     display: grid;
-    gap: 0 var(--s4);
+    gap: var(--s3) var(--s4);
+    margin-bottom: var(--s5);
+  }
+  .pair :global(.field) {
+    margin-bottom: 0;
+  }
+  .group > .pair:last-child {
+    margin-bottom: 0;
   }
   @media (min-width: 36rem) {
     .pair {
@@ -566,7 +595,7 @@
     margin-bottom: var(--s3);
   }
   .entry__field {
-    flex: 1 1 14rem;
+    flex: 0 1 20rem;
   }
   .entry__field label {
     display: block;

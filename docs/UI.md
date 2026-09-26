@@ -205,8 +205,11 @@ All optional; a question never answered stays absent ("not asked") and the engin
   can't wait* (needs dialysis; gets home health care). The yes/no question that reveals the details
   now names "extra help in an emergency"; answering No clears both folds and says so.
 - **Where you live.** "Someone sleeps below street level", only with a basement or a flat below
-  ground (a hidden question keeps no answer); "Has your water system had problems?" (no problems we
-  know of / now and then / often / not sure), public water only and cleared on switching to a well;
+  ground (a hidden question keeps no answer); "Has your water system had problems?", thinking of the
+  last 10 years (no notices or outages we remember / occasional problems: a boil notice or an outage
+  of a few days, now and then / frequent problems: out of water, or under a boil notice, for more than
+  a week in the last 10 years / not sure; the engine scales the water-outage rows by this answer, so
+  "frequent" carries that definition), public water only and cleared on switching to a well;
   "Is there water nearby you could filter if the taps stopped?" (none nearby, a well, a river, lake,
   pond or creek, a rain barrel or cistern, a neighbour's well); "What do you cook on?" (gas or propane
   stove, electric stove, induction cooktop, no stove).

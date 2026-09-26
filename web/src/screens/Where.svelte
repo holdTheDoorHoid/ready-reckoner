@@ -390,7 +390,7 @@
         <ChoiceGroup
           legend="Has your water system had problems?"
           name="water-record"
-          help="Optional. Some systems have more boil-water notices and main breaks. Your answer is combined with EPA records for your county."
+          help="Optional. Think of the last 10 years. Your answer is combined with EPA records for your county."
           options={WATER_SYSTEM_RECORDS.map((v) => ({ value: v, label: WATER_RECORD[v].label, help: WATER_RECORD[v].help }))}
           value={input.housing.water_system_record}
           onchange={(v) => (input.housing.water_system_record = v)}

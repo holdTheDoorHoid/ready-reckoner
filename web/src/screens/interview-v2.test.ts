@@ -136,6 +136,21 @@ describe('Your family plan', () => {
     expect(JSON.parse(r.storage.getItem(STORAGE_KEY)!).input.family_plan).toBeUndefined();
   });
 
+  it('keeps each note on one line: Enter adds no break, and pasted line breaks become spaces', async () => {
+    const r = await open(FamilyPlan, 'family', fixture('philadelphia-renters-4'));
+    const box = r.target.querySelector('#fp-shelter-home') as HTMLTextAreaElement;
+    expect(box.tagName).toBe('TEXTAREA');
+    expect(box.maxLength).toBe(300);
+    const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+    box.dispatchEvent(enter);
+    expect(enter.defaultPrevented).toBe(true);
+    type(box as unknown as HTMLInputElement, 'Inner hallway\ndownstairs', false);
+    expect(box.value).toBe('Inner hallway downstairs');
+    expect(r.app.plan!.input.family_plan?.shelter_spot_home).toBe('Inner hallway downstairs');
+    // Names and numbers stay one-line fields.
+    expect((r.target.querySelector('#fp-contact-phone') as HTMLElement).tagName).toBe('INPUT');
+  });
+
   it('keeps up to five numbers and up to four people, with what each holds', async () => {
     const r = await open(FamilyPlan, 'family', fixture('philadelphia-renters-4'));
     for (let i = 0; i < 5; i++) {
@@ -159,7 +174,11 @@ describe('Your family plan', () => {
     expect(r.target.querySelectorAll('.circle__person')).toHaveLength(4);
     expect(r.text()).toContain('That is four people, the most the plan keeps.');
     await until(() => document.activeElement?.id === 'fp-circle-3-name', 'focus on the new name field');
+    // The same labels repeat for each person, so screen readers hear whose they are.
+    const words = (el: Element | null) => el?.textContent?.replace(/\s+/g, ' ').trim();
+    expect(words(r.target.querySelector('label[for="fp-circle-1-name"]'))).toBe('Name of person 2');
     type(r.target.querySelector('#fp-circle-0-name') as HTMLInputElement, 'Rosa');
+    expect(words(r.target.querySelectorAll('.circle__person')[0]!.querySelector('legend'))).toBe('What Rosa holds for you');
     choice(r, 'A spare key', r.target.querySelectorAll('.circle__person')[0]!).click();
     flushSync();
     expect(r.app.plan!.input.family_plan?.trusted_circle?.[0]).toEqual({ name: 'Rosa', holds: ['spare_key'] });
@@ -272,7 +291,7 @@ describe('the new interview questions', () => {
     expect(r.app.plan!.input.housing.cooking).toBeUndefined();
     choice(r, 'Gas or propane stove').click();
     choice(r, 'A rain barrel or cistern').click();
-    choice(r, 'Now and then').click();
+    choice(r, 'Occasional problems').click();
     flushSync();
     expect(r.app.plan!.input.housing).toMatchObject({ cooking: 'gas', raw_water_source: 'rain_barrel', water_system_record: 'occasional_notices' });
     await noAxeViolations(r, 'where with the v2 questions');
