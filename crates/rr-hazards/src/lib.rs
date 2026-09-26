@@ -664,7 +664,7 @@ fn join_plain(items: &[String]) -> String {
 }
 
 /// A hazard's plural name for lists in notes ("heat waves", "tornadoes"), lower case.
-fn plural(hazard: HazardId) -> &'static str {
+pub(crate) fn plural(hazard: HazardId) -> &'static str {
     use HazardId::*;
     match hazard {
         WildfireSmoke => "days of unhealthy wildfire smoke",
@@ -710,7 +710,7 @@ fn too_few_of(hazard: HazardId) -> &'static str {
     }
 }
 
-fn join_lower(names: &[&str]) -> String {
+pub(crate) fn join_lower(names: &[&str]) -> String {
     let lower: Vec<String> = names.iter().map(|n| n.to_lowercase()).collect();
     match lower.len() {
         0 => String::new(),

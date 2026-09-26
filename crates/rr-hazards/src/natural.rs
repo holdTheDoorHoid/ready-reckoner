@@ -18,6 +18,8 @@
 //! What one "household-significant event" means for each hazard is in the `verb` of each rate
 //! and in `docs/RISK_MODEL.md` § "Hazard rates".
 
+use std::collections::BTreeMap;
+
 use rr_types::{HazardId, math};
 
 use crate::cite;
@@ -838,6 +840,10 @@ fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
     if !(recorded.is_finite() && recorded > 0.0) {
         return;
     }
+    if let Some(causes) = outage_causes(ctx) {
+        floor_by_cause(recorded, causes, rates, &records, &homes, notes);
+        return;
+    }
     let weather = spread(recorded, OUTAGE_RATE_SPREAD, &[cite::EAGLE_I]).times(&prior(
         OUTAGE_WEATHER_SHARE,
         &[cite::DO_2023, cite::RR_HAZARD_PRIORS],
@@ -875,6 +881,132 @@ fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
             .with_climate(Climate::Unclear),
         ),
     }
+}
+
+/// Share of the county's recorded outages by cause, attributed by event date (model review
+/// M-18): keys `hurricane`, `ice`, `winter`, `wind`, `wildfire`, `heat`, `cold_grid`, `flood`,
+/// `grid` and `unattributed`, as data-model's `OutageModel::causes` writes them.
+/// awaiting: data-model — `CountyRecord::outage_model` is not merged; once it is, this returns
+/// `ctx.county.outage_model.as_ref().map(|m| &m.causes).filter(|c| !c.is_empty())`.
+fn outage_causes<'a>(_ctx: &Ctx<'a>) -> Option<&'a BTreeMap<String, f32>> {
+    None
+}
+
+/// The storm hazards the outage floor tops up: their cause key in the attribution and their
+/// verb.
+const FLOOR_CAUSES: [(HazardId, &str, &str); 4] = [
+    (
+        HazardId::StrongWind,
+        "wind",
+        "lose power or have damage in a windstorm",
+    ),
+    (
+        HazardId::WinterWeather,
+        "winter",
+        "be snowed in or lose power in a winter storm",
+    ),
+    (
+        HazardId::IceStorm,
+        "ice",
+        "lose power or be stuck at home in an ice storm",
+    ),
+    (
+        HazardId::Hurricane,
+        "hurricane",
+        "lose power or have damage from a hurricane or tropical storm",
+    ),
+];
+
+/// The outage floor by cause (model review M-18, M-10): each storm hazard must explain the
+/// outages attributed to it by date, its own share of the county's recorded outages plus its part
+/// of the weather share of the unattributed ones. A shortfall is that hazard's, not the
+/// windstorms'. `modelled` holds each hazard's rate × its chance of cutting the power. Returns
+/// the extra household events a year for each storm hazard that falls short.
+pub(crate) fn shortfall_by_cause(
+    recorded: f64,
+    causes: &BTreeMap<String, f32>,
+    modelled: &[(HazardId, f64)],
+) -> Vec<(HazardId, f64)> {
+    let share = |k: &str| {
+        causes
+            .get(k)
+            .map(|v| f64::from(*v))
+            .filter(|v| v.is_finite() && *v > 0.0)
+            .unwrap_or(0.0)
+    };
+    let storm_total: f64 = FLOOR_CAUSES.iter().map(|(_, k, _)| share(k)).sum();
+    let unattributed = share("unattributed") * OUTAGE_WEATHER_SHARE.0;
+    let mut out = Vec::new();
+    for (h, key, _) in FLOOR_CAUSES {
+        let own = share(key);
+        // The weather part of the unattributed outages, in proportion to the attributed storm
+        // shares (all to windstorms when none is attributed).
+        let part = if storm_total > 0.0 {
+            unattributed * own / storm_total
+        } else if h == HazardId::StrongWind {
+            unattributed
+        } else {
+            0.0
+        };
+        let needed = recorded * (own + part);
+        let have = modelled
+            .iter()
+            .filter(|(m, _)| *m == h)
+            .map(|(_, r)| *r)
+            .sum::<f64>();
+        let c = outage_share(h).unwrap_or(1.0);
+        if needed > have && c > 0.0 {
+            out.push((h, (needed - have) / c));
+        }
+    }
+    out
+}
+
+/// Applies [`shortfall_by_cause`] to the rates, with a note.
+fn floor_by_cause(
+    recorded: f64,
+    causes: &BTreeMap<String, f32>,
+    rates: &mut Vec<HazardRate>,
+    records: &str,
+    homes: &str,
+    notes: &mut Notes,
+) {
+    let modelled: Vec<(HazardId, f64)> = rates
+        .iter()
+        .filter_map(|r| outage_share(r.hazard).map(|c| (r.hazard, r.today.value * c)))
+        .collect();
+    let extras = shortfall_by_cause(recorded, causes, &modelled);
+    if extras.is_empty() {
+        return;
+    }
+    let mut named = Vec::new();
+    for (h, extra) in extras {
+        let e = spread(
+            extra,
+            OUTAGE_RATE_SPREAD,
+            &[cite::EAGLE_I, cite::HURDAT2, cite::STORM_EVENTS],
+        );
+        let verb = FLOOR_CAUSES
+            .iter()
+            .find(|(x, _, _)| *x == h)
+            .map_or("lose power", |(_, _, v)| *v);
+        named.push(crate::plural(h));
+        match rates.iter_mut().find(|r| r.hazard == h) {
+            Some(r) => {
+                r.today = r.today.plus(&e);
+                r.future = r.future.plus(&e);
+                r.county_average += e.value;
+            }
+            None => rates.push(HazardRate::new(h, e, verb, 300.0).with_climate(Climate::Unclear)),
+        }
+    }
+    notes.add(format!(
+        "{records} show {homes} caught in an outage {}. Matched by date to the storms behind \
+         them, some outages come from {} more often than the county's storm records explain, so \
+         the difference is counted under each cause.",
+        crate::sentence::about_times_a_year(recorded),
+        crate::join_lower(&named)
+    ));
 }
 
 /// Every natural hazard the county has, for this household, today and around 2050.
@@ -938,4 +1070,43 @@ pub(crate) fn assess(ctx: &Ctx<'_>, notes: &mut Notes) -> Natural {
     outage_floor(ctx, &mut out.rates, notes);
     out.rates.sort_by_key(|r| r.hazard);
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn outages_are_topped_up_under_the_cause_the_dates_give() {
+        // Recorded: 1 outage a customer a year; half windstorms, a fifth hurricanes, a tenth winter
+        // storms, a fifth unattributed (70 % of those weather). Modelled: windstorms explain 0.2
+        // outages, winter storms 0.09, hurricanes none.
+        let causes: BTreeMap<String, f32> = [
+            ("wind", 0.5f32),
+            ("hurricane", 0.2),
+            ("winter", 0.1),
+            ("unattributed", 0.2),
+        ]
+        .into_iter()
+        .map(|(k, v)| (k.to_owned(), v))
+        .collect();
+        let modelled = [(HazardId::StrongWind, 0.2), (HazardId::WinterWeather, 0.09)];
+        let got = shortfall_by_cause(1.0, &causes, &modelled);
+        let get = |h: HazardId| got.iter().find(|(x, _)| *x == h).map(|(_, v)| *v);
+        let unattributed = 0.2 * 0.7;
+        let storms = 0.5 + 0.2 + 0.1;
+        let want_wind = (0.5 + unattributed * 0.5 / storms - 0.2) / 0.9;
+        let want_hurricane = (0.2 + unattributed * 0.2 / storms) / 0.9;
+        let want_winter = (0.1 + unattributed * 0.1 / storms - 0.09) / 0.3;
+        assert!((get(HazardId::StrongWind).unwrap() - want_wind).abs() < 1e-6);
+        assert!((get(HazardId::Hurricane).unwrap() - want_hurricane).abs() < 1e-6);
+        assert!((get(HazardId::WinterWeather).unwrap() - want_winter).abs() < 1e-6);
+        assert!(
+            get(HazardId::IceStorm).is_none(),
+            "no ice-storm outages recorded"
+        );
+        // Nothing unattributed to share out and every cause explained: no top-up.
+        let explained = shortfall_by_cause(0.1, &causes, &[(HazardId::StrongWind, 1.0)]);
+        assert!(explained.iter().all(|(h, _)| *h != HazardId::StrongWind));
+    }
 }
