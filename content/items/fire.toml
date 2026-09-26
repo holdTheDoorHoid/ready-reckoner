@@ -197,7 +197,7 @@ readiness_share = 0.2
 
 [[item]]
 id = "fire_clean_air_room"
-name = "Air cleaner for the clean room: a HEPA air cleaner, or a box fan with a MERV 13 filter"
+name = "Air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter)"
 category = "fire"
 unit = "air cleaner"
 buckets = ["clean_air"]
