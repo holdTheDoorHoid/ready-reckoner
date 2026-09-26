@@ -33,7 +33,7 @@ fn the_rules_table_matches_the_code() {
     let doc = documented();
     let doc_ids: BTreeSet<&str> = doc.iter().map(|(id, _)| id.as_str()).collect();
     assert_eq!(doc_ids.len(), doc.len(), "a rule is listed twice");
-    let code: BTreeSet<&str> = rr_supply::RULE_IDS.iter().copied().collect();
+    let code: BTreeSet<&str> = rr_supply::rule_ids().into_iter().collect();
     let missing: Vec<_> = code.difference(&doc_ids).collect();
     assert!(
         missing.is_empty(),
@@ -67,7 +67,7 @@ fn every_emitted_rule_has_the_documented_unit() {
                 .get(&l.rule)
                 .unwrap_or_else(|| panic!("{} undocumented", l.rule));
             assert!(
-                unit.split(['(', ',', ' ']).any(|u| u == l.unit),
+                unit.split(',').any(|u| u.trim() == l.unit),
                 "{name}: {} has unit {} but the table says {unit}",
                 l.id,
                 l.unit

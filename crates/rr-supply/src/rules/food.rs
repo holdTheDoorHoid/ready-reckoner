@@ -455,35 +455,39 @@ pub fn long_term_staples(days: f64, people_list: &[Person]) -> Vec<Sizing> {
     out
 }
 
-/// Prepared formula for formula-fed babies (AAP maximum of 32 oz a day). Rule `infant_formula`.
-pub fn infant_formula(days: f64, people_list: &[Person]) -> Option<Sizing> {
-    let n = people_list.iter().filter(|p| is_formula_fed(p)).count();
-    if n == 0 || days <= 0.0 {
+/// Powdered formula for formula-fed babies: 32 oz of prepared formula a day at most (AAP), about
+/// 5 oz of powder (labels differ), for at least three days. Rule `infant_formula_oz`.
+pub fn infant_formula_oz(days: f64, people_list: &[Person]) -> Option<Sizing> {
+    let n = people_list.iter().filter(|p| is_formula_fed(p)).count() as f64;
+    if n == 0.0 || days <= 0.0 {
         return None;
     }
     let mut b = Basis::new();
-    let oz = b.k(keys::INFANT_FORMULA_OZ_DAY);
+    let prepared = b.k(keys::INFANT_FORMULA_OZ_DAY);
+    let powder = b.k(keys::FORMULA_POWDER_OZ_PER_DAY);
+    let min_days = b.k(keys::BABY_SUPPLY_MIN_DAYS);
     b.cite("cdc_infant_feeding_disaster");
-    b.cite("cdc_infant_checklist");
-    let q = n as f64 * oz * days;
+    let d = days.max(min_days);
+    let q = n * powder * d;
     let text = format!(
-        "{} × {} oz of prepared formula a day (the most babies usually drink) × {} = {} oz. Ready-to-feed formula is safest in an emergency; powder needs safe water (counted in the water line). Check the amount every month as the baby grows.",
-        count(n as f64, "baby on formula", "babies on formula"),
-        num(oz, 0),
-        fmt_days(days),
+        "{}: up to {} oz of prepared formula a day, about {} oz of powder (labels differ), × {} = {} oz of powder. Ready-to-feed formula is safest in an emergency; powder needs safe water (counted in the water line). Check the amount every month as the baby grows.",
+        count(n, "baby on formula", "babies on formula"),
+        num(prepared, 0),
+        num(powder, 0),
+        fmt_days(d),
         num(q, 0)
     );
     Some(
         Sizing::new(
             &b,
-            "infant_formula",
+            "infant_formula_oz",
             "infant_formula",
             q,
             "oz",
             Per::Person,
             text,
         )
-        .per_day(days, n as f64 * oz),
+        .per_day(d, n * powder),
     )
 }
 
@@ -518,27 +522,82 @@ pub fn nursing_supplies(people_list: &[Person]) -> Option<Sizing> {
     ))
 }
 
-/// Food for household pets for `days` days, counted in pet-days (no per-pet calorie figure is
-/// published). Rule `pet_food`.
-pub fn pet_food(days: f64, pets: &Pets) -> Option<Sizing> {
+/// Food for household pets, in pet-days, for the supplies target but at least a week (ASPCA 7–10
+/// days; no per-pet calorie figure is published). Rule `pet_food_days`.
+pub fn pet_food_days(days: f64, pets: &Pets) -> Option<Sizing> {
     let n = u32::from(pets.dogs) + u32::from(pets.cats) + u32::from(pets.small);
     if n == 0 || days <= 0.0 {
         return None;
     }
     let mut b = Basis::new();
+    let min_days = b.k(keys::PET_FOOD_MIN_DAYS);
     b.cite("ready_gov_pets");
-    b.cite("aspca_disaster_prep");
-    let q = f64::from(n) * days;
+    let d = days.max(min_days);
+    let q = f64::from(n) * d;
     let text = format!(
-        "Food for {} for {} ({} pet-days): what {} now, in an airtight, waterproof container.",
+        "Food for {} for {} ({} pet-days, at least a week): what {} now, in an airtight, waterproof container.",
         pets_phrase([pets.dogs, pets.cats, pets.small]),
-        fmt_days(days),
+        fmt_days(d),
         num(q, 1),
         if n == 1 { "it eats" } else { "they eat" }
     );
     Some(
-        Sizing::new(&b, "pet_food", "pet_food", q, "pet_day", Per::Pet, text)
-            .per_day(days, f64::from(n)),
+        Sizing::new(
+            &b,
+            "pet_food_days",
+            "pet_food",
+            q,
+            "pet_day",
+            Per::Pet,
+            text,
+        )
+        .per_day(d, f64::from(n)),
+    )
+}
+
+/// Fuel canisters for a camp stove: about 0.2 lb a person a day to boil drinking water and heat one
+/// meal, in 8-ounce canisters, at least two (estimates). Optional line (rule
+/// `cooking_fuel_canisters`).
+pub fn cooking_fuel_canisters(days: f64, people_list: &[Person]) -> Option<Sizing> {
+    let n = people_list.len() as f64;
+    if n == 0.0 || days <= 0.0 {
+        return None;
+    }
+    let mut b = Basis::new();
+    let lb = b.k(keys::COOKING_FUEL_LB_PER_PERSON_DAY);
+    let per_canister = b.k(keys::FUEL_CANISTER_LB);
+    let min = b.k(keys::COOKING_FUEL_MIN_CANISTERS);
+    b.cite("cdc_co_basics");
+    let fuel = n * days * lb;
+    let q = crate::format::ceil_count(fuel / per_canister).max(min);
+    let text = format!(
+        "If you cook or boil water on a camp stove: about {} lb of fuel a person a day × {} × {} = {} lb, or {} of {} lb each. Use it outdoors only, never indoors (carbon monoxide).",
+        num(lb, 1),
+        count(n, "person", "people"),
+        fmt_days(days),
+        num(fuel, 1),
+        count(q, "canister", "canisters"),
+        num(per_canister, 1)
+    );
+    Some(
+        Sizing::new(
+            &b,
+            "cooking_fuel_canisters",
+            "stove_fuel",
+            q,
+            "canister",
+            Per::Household,
+            text,
+        )
+        .math(vec![format!(
+            "max({}, ceil({} × {} days × {} lb ÷ {} lb)) = {}",
+            num(min, 0),
+            num(n, 0),
+            num(days, 2),
+            num(lb, 2),
+            num(per_canister, 2),
+            num(q, 0)
+        )]),
     )
 }
 
@@ -654,21 +713,42 @@ mod tests {
     #[test]
     fn formula_and_nursing() {
         let p = fixtures::get("sugar-land-ev-household-3").unwrap();
-        let f = infant_formula(7.0, &p.people).unwrap();
-        assert_eq!(f.quantity, 224.0);
+        let f = infant_formula_oz(7.0, &p.people).unwrap();
+        assert_eq!(f.quantity, 35.0); // 5 oz of powder × 7 days
+        assert_eq!(infant_formula_oz(1.0, &p.people).unwrap().quantity, 15.0); // at least 3 days
         assert!(nursing_supplies(&p.people).is_none());
         let mut breastfed = p.people.clone();
         breastfed[2].medical.dietary.clear();
-        assert!(infant_formula(7.0, &breastfed).is_none());
+        assert!(infant_formula_oz(7.0, &breastfed).is_none());
         assert_eq!(nursing_supplies(&breastfed).unwrap().quantity, 1.0);
     }
 
     #[test]
     fn pet_food_counts_pet_days() {
         let p = fixtures::get("coos-bay-well-owner-2").unwrap();
-        let s = pet_food(17.0, &p.pets).unwrap();
+        let s = pet_food_days(17.0, &p.pets).unwrap();
         assert_eq!(s.quantity, 51.0);
         assert!(s.plain.contains("the 2 dogs and the cat"));
-        assert!(pet_food(17.0, &Pets::default()).is_none());
+        assert_eq!(
+            pet_food_days(3.0, &p.pets).unwrap().quantity,
+            21.0,
+            "at least a week"
+        );
+        assert!(pet_food_days(17.0, &Pets::default()).is_none());
+    }
+
+    #[test]
+    fn camp_stove_canisters() {
+        let p = fixtures::get("philadelphia-renters-4").unwrap();
+        // 4 × 10 days × 0.2 lb = 8 lb ÷ 0.5 lb = 16 canisters
+        let s = cooking_fuel_canisters(10.0, &p.people).unwrap();
+        assert_eq!(s.quantity, 16.0);
+        assert!(s.prior && s.plain.contains("never indoors"));
+        let one = fixtures::get("chicago-student-zero-budget-1").unwrap();
+        assert_eq!(
+            cooking_fuel_canisters(1.0, &one.people).unwrap().quantity,
+            2.0,
+            "at least 2"
+        );
     }
 }

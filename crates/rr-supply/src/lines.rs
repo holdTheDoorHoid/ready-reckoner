@@ -43,6 +43,8 @@ impl LineKind {
 pub struct SizedLine {
     /// The contract line (docs/ENGINE-API.md).
     pub line: RequirementLine,
+    /// The quantity as an `f64` (the contract line holds it as `f32`), for exact arithmetic.
+    pub quantity: f64,
     /// Need, alternative, optional or note.
     pub kind: LineKind,
     /// The tier this line belongs to.
@@ -99,6 +101,7 @@ pub(crate) fn make(
     };
     let tier = tier.unwrap_or_else(|| s.days.map_or(TierId::H72, tier_for_days));
     SizedLine {
+        quantity: s.quantity,
         line: RequirementLine {
             id,
             bucket,

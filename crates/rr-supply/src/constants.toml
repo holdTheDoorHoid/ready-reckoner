@@ -204,6 +204,27 @@ sources = ["cdc_water_storage", "ready_gov_water"]
 note = "CDC, Ready.gov, the Church and Washington say every 6 months; the ASPCA says every 2 months for bottled water in a pet kit."
 note_sources = ["cdc_water_storage", "ready_gov_water", "church_emergency_prep_manual", "washington_prepare_in_a_year", "aspca_disaster_prep"]
 
+
+[[constant]]
+key = "reused_bottles_max_gal"
+label = "Most water a household can bottle in clean reused drink bottles"
+unit = "gallon"
+default = 6.0
+prior = true
+sources = ["rr_expert_prior", "rr_research_risk_model"]
+note = "The clean drink bottles a household can collect in about a month; milk jugs leak and are not used. The research example fills about 6 gallons this way in month 0."
+
+[[constant]]
+key = "bleach_strength_pct"
+label = "Strength of household bleach to use for water (sodium hypochlorite)"
+unit = "percent"
+default = 6.0
+low = 5.0
+high = 9.0
+sources = ["cdc_water_storage", "epa_emergency_disinfection"]
+note = "CDC: the label should say it contains between 5 % and 9 % sodium hypochlorite; use unscented bleach, not the splashless kind."
+note_sources = ["cdc_water_storage", "cdc_bleach_disinfecting"]
+
 [[constant]]
 key = "bleach_drops_per_gal_6pct"
 label = "Drops of 6 % unscented bleach per gallon of clear water"
@@ -233,6 +254,16 @@ label = "Wait after adding bleach"
 unit = "minute"
 default = 30.0
 sources = ["epa_emergency_disinfection", "cdc_water_disinfection"]
+
+
+[[constant]]
+key = "bleach_bottle_days"
+label = "Days one bottle of unscented bleach covers water treatment and cleaning"
+unit = "day"
+default = 14.0
+prior = true
+sources = ["rr_expert_prior", "rr_research_supply_standards", "cdc_bleach_disinfecting"]
+note = "One 64 to 121 oz bottle covers a household's water treatment and surface cleaning for about two weeks (an assumption). Bleach loses strength over time."
 
 [[constant]]
 key = "boil_minutes"
@@ -276,6 +307,32 @@ note = "Physics plus two assumptions (a 40 % efficient stove and 4.2 lb per gall
 # ---------------------------------------------------------------------------------------------
 # Food (research §2)
 # ---------------------------------------------------------------------------------------------
+
+
+[[constant]]
+key = "cooking_fuel_lb_per_person_day"
+label = "Camp-stove fuel per person per day to boil drinking water and heat one meal"
+unit = "pound per person per day"
+default = 0.2
+prior = true
+sources = ["rr_expert_prior", "rr_research_supply_standards", "eia_btu"]
+note = "About 5 L boiled a day at 25 to 30 L per pound of propane or butane."
+
+[[constant]]
+key = "fuel_canister_lb"
+label = "Fuel in one 8-ounce stove canister"
+unit = "pound"
+default = 0.5
+prior = true
+sources = ["rr_expert_prior", "rr_price_observations_2026_09"]
+
+[[constant]]
+key = "cooking_fuel_min_canisters"
+label = "Fewest stove canisters worth keeping"
+unit = "canister"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior"]
 
 [[constant]]
 key = "kcal_pregnant_or_nursing_add"
@@ -385,6 +442,25 @@ sources = ["aap_formula_amounts"]
 note = "AAP: about 2 1/2 oz per pound of body weight a day, usually no more than 32 oz. The plan uses 32 oz so the supply still fits as the baby grows. CDC: ready-to-feed formula is safest in an emergency."
 note_sources = ["aap_formula_amounts", "cdc_infant_feeding_disaster"]
 
+
+[[constant]]
+key = "formula_powder_oz_per_day"
+label = "Powdered formula to make a day's 32 oz of prepared formula"
+unit = "ounce of powder per day"
+default = 5.0
+prior = true
+sources = ["rr_expert_prior", "aap_formula_amounts"]
+note = "Labels differ; check yours."
+
+[[constant]]
+key = "baby_supply_min_days"
+label = "Fewest days of formula and diapers to keep"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["cdc_infant_checklist", "rr_expert_prior"]
+note = "CDC: check the kit monthly so there is enough formula for several days."
+
 [[constant]]
 key = "nursing_pad_boxes"
 label = "Boxes of disposable nursing pads per breastfed baby"
@@ -404,6 +480,18 @@ sources = ["cdc_infant_checklist"]
 # ---------------------------------------------------------------------------------------------
 # Medication (research §3.2–3.4)
 # ---------------------------------------------------------------------------------------------
+
+
+[[constant]]
+key = "pet_food_min_days"
+label = "Fewest days of pet food to keep at home"
+unit = "day"
+default = 7.0
+low = 7.0
+high = 10.0
+sources = ["aspca_disaster_prep"]
+note = "ASPCA: 7 to 10 days of pet food; Ready.gov: several days."
+note_sources = ["aspca_disaster_prep", "ready_gov_pets"]
 
 [[constant]]
 key = "rx_days_on_hand"
@@ -650,6 +738,55 @@ sources = ["ready_gov_disability"]
 # Communications and cash (research §7, §8.1)
 # ---------------------------------------------------------------------------------------------
 
+
+[[constant]]
+key = "battery_pack_days"
+label = "Days one pack of AA or AAA batteries runs a household's lights and radio"
+unit = "day"
+default = 7.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_kit"]
+
+[[constant]]
+key = "power_station_max_units"
+label = "Most power stations the plan suggests for a medical device"
+unit = "power station"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "power_station_upgrade_days"
+label = "Outage target from which a power station is offered as an upgrade"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "generator_min_days"
+label = "Outage target from which a generator is offered for a house"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior", "rr_research_supply_standards"]
+
+[[constant]]
+key = "generator_min_days_well"
+label = "Outage target from which a generator is offered for a house on a well"
+unit = "day"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior", "rr_research_supply_standards"]
+
+[[constant]]
+key = "solar_panel_min_days"
+label = "Outage target from which a solar panel is offered"
+unit = "day"
+default = 7.0
+prior = true
+sources = ["rr_expert_prior", "nlr_pvwatts_v8"]
+
 [[constant]]
 key = "noaa_radios_per_household"
 label = "Battery or hand-crank radio with NOAA Weather Radio"
@@ -714,6 +851,17 @@ sources = ["fema_effak", "rr_expert_prior"]
 # Sanitation and hygiene (research §4)
 # ---------------------------------------------------------------------------------------------
 
+
+[[constant]]
+key = "cash_default_usd"
+label = "Cash to keep at home until the household sets its own amount"
+unit = "US dollar"
+default = 100.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_financial"]
+note = "No agency gives a dollar figure; the research example keeps $100."
+note_sources = ["ready_gov_financial", "rr_research_risk_model"]
+
 [[constant]]
 key = "toilet_buckets_per_household"
 label = "Buckets for a two-bucket emergency toilet (pee and poo)"
@@ -742,6 +890,16 @@ high = 1.5
 prior = true
 sources = ["rdpo_emergency_toilet", "rr_expert_prior"]
 note = "RDPO: about a handful per poo. A handful is taken as 1/2 to 1 cup, at 1 to 1 1/2 a day."
+
+
+[[constant]]
+key = "toilet_paper_person_days_per_roll"
+label = "Person-days one roll of toilet paper lasts"
+unit = "person-day per roll"
+default = 5.0
+prior = true
+sources = ["rr_expert_prior", "oregon_b2wr_toolkit"]
+note = "Oregon: measure your household's weekly use and double it for two weeks."
 
 [[constant]]
 key = "soap_bath_g_per_person_month"
@@ -796,7 +954,7 @@ sources = ["rr_expert_prior"]
 key = "diapers_per_day_infant"
 label = "Diapers per baby per day"
 unit = "diaper per day"
-default = 10.0
+default = 8.0
 low = 6.0
 high = 12.0
 prior = true
@@ -967,6 +1125,31 @@ unit = "level"
 default = 1.0
 prior = true
 sources = ["rr_expert_prior"]
+
+
+[[constant]]
+key = "people_per_bedroom"
+label = "People per bedroom, for counting smoke alarms in sleeping rooms (the form does not ask)"
+unit = "person per bedroom"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior", "usfa_smoke_alarms"]
+
+[[constant]]
+key = "escape_ladder_lowest_floor"
+label = "Lowest apartment floor that needs an escape ladder"
+unit = "floor"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_home_fires"]
+
+[[constant]]
+key = "escape_ladder_highest_floor"
+label = "Highest apartment floor an escape ladder reaches"
+unit = "floor"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_home_fires"]
 
 [[constant]]
 key = "co_alarm_replace_years"
@@ -2279,3 +2462,31 @@ short = "Wilderness Medical Society"
 title = "Wilderness Medical Society Practice Guidelines for Basic Wound Management in the Austere Environment: 2014 Update"
 publisher = "Quinn R.H. et al., Wilderness and Environmental Medicine"
 url = "https://doi.org/10.1016/j.wem.2014.08.015"
+
+[[source]]
+id = "cdc_bleach_disinfecting"
+short = "CDC"
+title = "Cleaning and Disinfecting with Bleach"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/hygiene/about/cleaning-and-disinfecting-with-bleach.html"
+
+[[source]]
+id = "rr_research_risk_model"
+short = "Ready Reckoner research"
+title = "Quantitative core model specification (research report): hazards, consequence buckets, durations"
+publisher = "Ready Reckoner contributors"
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/risk-model.md"
+
+[[source]]
+id = "usfa_smoke_alarms"
+short = "USFA"
+title = "Smoke alarms"
+publisher = "U.S. Fire Administration"
+url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/smoke-alarms/"
+
+[[source]]
+id = "usfa_extinguishers"
+short = "USFA"
+title = "Fire extinguishers"
+publisher = "U.S. Fire Administration"
+url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/fire-extinguishers/"

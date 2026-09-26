@@ -40,7 +40,7 @@ pub fn battery_fan(people_list: &[Person]) -> Sizing {
     Sizing::new(
         &b,
         "battery_fan",
-        "battery_fan",
+        "thermal_heat",
         q,
         "fan",
         Per::Household,
@@ -60,7 +60,7 @@ pub fn cooling_towel(people_list: &[Person]) -> Sizing {
     Sizing::new(
         &b,
         "cooling_towel",
-        "cooling_towel",
+        "thermal_heat",
         q,
         "towel",
         Per::Person,
@@ -78,7 +78,7 @@ pub fn cooling_plan() -> Sizing {
     Sizing::new(
         &b,
         "cooling_plan",
-        "cooling_plan",
+        "thermal_heat",
         1.0,
         "plan",
         Per::Household,
@@ -98,7 +98,7 @@ pub fn sleeping_bag_or_blanket(people_list: &[Person]) -> Sizing {
     Sizing::new(
         &b,
         "sleeping_bag_or_blanket",
-        "sleeping_bag",
+        "thermal_cold",
         q,
         "item",
         Per::Person,
@@ -118,7 +118,7 @@ pub fn warm_layers(people_list: &[Person]) -> Sizing {
     Sizing::new(
         &b,
         "warm_layers",
-        "warm_layers",
+        "thermal_cold",
         q,
         "set",
         Per::Person,
@@ -159,7 +159,7 @@ pub fn warm_room_plan(housing: &Housing, people_list: &[Person]) -> Sizing {
     Sizing::new(
         &b,
         "warm_room_plan",
-        "warm_room_plan",
+        "thermal_cold",
         1.0,
         "plan",
         Per::Household,

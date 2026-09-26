@@ -1,14 +1,16 @@
 //! Ready Reckoner — `rr-supply`: turns a household and its bucket targets into cited requirement
-//! lines (DESIGN §4.6).
+//! lines (DESIGN §4.6), and sizes catalogue items by their quantity rule.
 //!
 //! ```text
-//! PlanInput + [BucketAssessment] ──► requirements() ──► [RequirementLine]
+//! PlanInput + [BucketAssessment] ──► requirements()   ──► [RequirementLine]   (per bucket)
+//!                                 └─► ItemSizer::new() ──► quantity(rule)      (per catalogue item)
 //! ```
 //!
-//! - **Quantity rules** ([`rules`]) are pure functions: water, food, medication, first aid,
-//!   sanitation, power, heat and cold, communications, documents and money, getting home,
-//!   leaving home and special needs. `docs/QUANTITY_RULES.md` lists every rule id; catalogue
-//!   items name the rule that sizes them.
+//! - **Quantity rules** ([`rules`], [`generic`]) are pure functions: water, food, medication,
+//!   first aid, sanitation, power, heat and cold, communications, documents and money, getting
+//!   home, leaving home and special needs, plus generic counts and `once_if_*` switches.
+//!   `docs/QUANTITY_RULES.md` lists every rule id ([`rule_ids`]); catalogue items name the rule that
+//!   sizes them.
 //! - **Every number comes from the constants registry** ([`constants()`], `constants.toml`), with
 //!   its sources, range, alternatives and the note on where authorities disagree. Each line cites
 //!   exactly the sources of the numbers it used, plus the bucket target's own sources; lines that
@@ -26,6 +28,7 @@
 mod basis;
 pub mod constants;
 mod format;
+pub mod generic;
 mod household;
 pub mod lines;
 pub mod rules;
@@ -36,6 +39,7 @@ use std::collections::BTreeSet;
 
 use rr_types::{
     BucketAssessment, BucketId, CitationId, HazardId, Per, PlanInput, RequirementLine, TierId,
+    WaterSource,
 };
 
 pub use constants::{Constant, Constants, constants};
@@ -50,44 +54,49 @@ use targets::Targets;
 /// Crate name, used by the CLI's `--version` and by the about screen.
 pub const CRATE: &str = "rr-supply";
 
-/// Every rule id rr-supply implements, including the generic ones (`once`, `per_person`, ...)
-/// that the plan sizes with [`generic_quantity`]. `docs/QUANTITY_RULES.md` lists the same ids; a
-/// test keeps the two in step.
-pub const RULE_IDS: &[&str] = &[
+/// Rules that emit requirement lines, in the order `docs/QUANTITY_RULES.md` lists them.
+pub const LINE_RULES: &[&str] = &[
     "water_gallons",
+    "water_reused_bottles",
     "water_treatment_capacity",
+    "bleach_bottles",
     "boil_fuel",
     "livestock_water",
     "food_kcal",
     "food_cost_estimate",
     "food_kit_check",
     "long_term_staples",
-    "infant_formula",
+    "cooking_fuel_canisters",
+    "infant_formula_oz",
     "nursing_supplies",
-    "pet_food",
+    "pet_food_days",
     "medication_days",
     "rx_cold_storage",
     "antibiotics_none",
     "epinephrine_check",
     "medical_device_wh",
+    "device_battery_units",
     "lights",
-    "generator_fuel",
-    "power_station_wh",
+    "battery_packs",
+    "power_station_units",
+    "generator_units",
+    "generator_fuel_gallons",
+    "solar_panel_units",
     "fridge_wh",
     "well_pump_wh",
-    "solar_panel_watts",
     "wheelchair_battery",
     "noaa_radio",
     "phone_power_wh",
     "two_way_radios",
     "contact_cards",
     "local_map",
-    "cash_days",
+    "cash_reserve_usd",
     "toilet_buckets",
     "toilet_bags",
     "toilet_cover_material",
-    "soap_grams",
-    "menstrual_products",
+    "toilet_paper_rolls",
+    "soap_person_months",
+    "menstrual_cycles",
     "diapers",
     "baby_wipes",
     "first_aid_kit",
@@ -101,10 +110,11 @@ pub const RULE_IDS: &[&str] = &[
     "sleeping_bag_or_blanket",
     "warm_layers",
     "warm_room_plan",
-    "smoke_alarm",
-    "co_alarm",
-    "fire_extinguisher",
     "fire_escape_plan",
+    "smoke_alarm_count",
+    "co_alarm_count",
+    "extinguisher_count",
+    "escape_ladder_count",
     "neighbour_contacts",
     "document_kit",
     "insurance_home_or_renters",
@@ -123,22 +133,37 @@ pub const RULE_IDS: &[&str] = &[
     "fuel_half_tank",
     "evacuation_ride_plan",
     "evacuation_assistance_plan",
-    "once",
-    "per_person",
-    "per_vehicle",
-    "per_pet",
-    "per_commuter",
 ];
 
+/// Every rule id rr-supply implements: the line rules and the generic ones
+/// ([`generic::GENERIC_RULES`]). `docs/QUANTITY_RULES.md` lists the same ids; a test keeps the two
+/// in step.
+pub fn rule_ids() -> Vec<&'static str> {
+    LINE_RULES
+        .iter()
+        .chain(generic::GENERIC_RULES)
+        .copied()
+        .collect()
+}
+
+/// Whether rr-supply implements a rule with this id.
+pub fn is_rule(id: &str) -> bool {
+    LINE_RULES.contains(&id) || generic::GENERIC_RULES.contains(&id)
+}
+
 /// Facts about the location that sharpen the sizing. Everything is optional: without them the
-/// water is sized for a temperate climate and there is no winter-solar note.
+/// water is sized for a temperate climate, there is no winter-solar figure, and the nuclear-plant
+/// switch is off.
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub struct SupplyContext {
     /// Days a year at or above 95 °F in the county under the chosen climate dial (NCA5 Atlas /
     /// CMRA `tmax_days_ge_95f`). At 30 or more (an estimate) water uses the hot-climate amount.
     pub days_at_or_above_95f: Option<f64>,
-    /// The county centroid's latitude, for the winter-solar note.
+    /// The county centroid's latitude, for the winter-solar figure.
     pub latitude: Option<f64>,
+    /// A nuclear power plant within 16 km (`LocationResolved.facility_flags`), for
+    /// `once_if_near_nuclear_plant`.
+    pub nuclear_plant_within_16km: Option<bool>,
 }
 
 impl SupplyContext {
@@ -168,36 +193,107 @@ pub fn requirements_with(
         .collect()
 }
 
-/// A generic rule's quantity for a catalogue item (`once`, `per_person`, `per_vehicle`,
-/// `per_pet`, `per_commuter`): no requirement line is emitted for these; the plan sizes the item
-/// directly.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct GenericQuantity {
-    /// How many.
-    pub quantity: f64,
-    /// What it scales with.
-    pub per: Per,
-}
-
-/// The quantity for an item that uses a generic rule, or `None` if `rule` is not generic.
-pub fn generic_quantity(rule: &str, input: &PlanInput) -> Option<GenericQuantity> {
-    let h = Household::new(input);
-    let (quantity, per) = match rule {
-        "once" => (1.0, Per::Household),
-        "per_person" => (h.n() as f64, Per::Person),
-        "per_vehicle" => (h.vehicles() as f64, Per::Household),
-        "per_pet" => (f64::from(h.household_pets()), Per::Pet),
-        "per_commuter" => (h.commuters().len() as f64, Per::Commuter),
-        _ => return None,
-    };
-    Some(GenericQuantity { quantity, per })
-}
-
 /// Every citation id rr-supply can emit on its own (the `[[source]]` table of the constants
 /// registry). Each must resolve to `content/citations.toml`. Lines also carry their bucket
 /// target's sources, which the hazard and consequence crates own.
 pub fn citations_used() -> BTreeSet<CitationId> {
     constants().sources.iter().map(|s| s.id.clone()).collect()
+}
+
+/// How many of a catalogue item a household needs, by the item's quantity rule.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ItemQuantity {
+    /// In the item's own unit, except that `gallon` rules give gallons of water and `kcal` rules
+    /// give food energy (convert with the item's `volume_l_per_unit` / `energy_kcal_per_unit`).
+    /// Zero means the item is not needed by this household.
+    pub quantity: f64,
+    /// What the quantity scales with.
+    pub per: Per,
+}
+
+/// Sizes catalogue items for one household: computes the requirement lines once, then answers
+/// [`ItemSizer::quantity`] for any rule id (docs/QUANTITY_RULES.md).
+#[derive(Debug, Clone)]
+pub struct ItemSizer<'a> {
+    input: &'a PlanInput,
+    ctx: SupplyContext,
+    lines: Vec<SizedLine>,
+    water_out_days: Option<f64>,
+}
+
+impl<'a> ItemSizer<'a> {
+    /// Computes the household's lines for these targets.
+    pub fn new(input: &'a PlanInput, buckets: &[BucketAssessment], ctx: &SupplyContext) -> Self {
+        let lines = sized_requirements(input, buckets, ctx);
+        let water_out_days = Targets::new(buckets).days(BucketId::WaterOut);
+        Self {
+            input,
+            ctx: *ctx,
+            lines,
+            water_out_days,
+        }
+    }
+
+    /// The lines behind the answers.
+    pub fn lines(&self) -> &[SizedLine] {
+        &self.lines
+    }
+
+    /// The quantity for an item that uses `rule`, or `None` if rr-supply has no such rule.
+    ///
+    /// Generic rules count people, pets, vehicles or commuters, or switch an item on (1) or off (0).
+    /// Line rules give the quantity of the household's line for that rule: summed over people for
+    /// per-person lines (each commuter needs a bag), and the largest over buckets otherwise (one
+    /// stock serves every bucket that needs it). A rule with no line for this household gives 0.
+    /// `water_treatment_capacity` gives 1 filter when stored water cannot cover the no-water target
+    /// (over 14 days) or the home is on a well, else 0: the lines state the gallons to make safe,
+    /// which one family filter far exceeds.
+    pub fn quantity(&self, rule: &str) -> Option<ItemQuantity> {
+        if let Some((quantity, per)) = generic::quantity(rule, self.input, &self.ctx) {
+            return Some(ItemQuantity { quantity, per });
+        }
+        if !LINE_RULES.contains(&rule) {
+            return None;
+        }
+        if rule == "water_treatment_capacity" {
+            let cap = constants().value(constants::keys::WATER_STORED_CAP_DAYS);
+            let long = self.water_out_days.is_some_and(|d| d > cap);
+            let well = self.input.housing.water == WaterSource::Well;
+            let quantity = if long || well { 1.0 } else { 0.0 };
+            return Some(ItemQuantity {
+                quantity,
+                per: Per::Household,
+            });
+        }
+        let mine: Vec<&SizedLine> = self.lines.iter().filter(|l| l.line.rule == rule).collect();
+        let Some(first) = mine.first() else {
+            return Some(ItemQuantity {
+                quantity: 0.0,
+                per: Per::Household,
+            });
+        };
+        let per_person = mine.iter().any(|l| l.line.id.contains(".person_"));
+        let quantity = if per_person {
+            mine.iter().map(|l| l.quantity).sum()
+        } else {
+            mine.iter().map(|l| l.quantity).fold(0.0, f64::max)
+        };
+        Some(ItemQuantity {
+            quantity,
+            per: first.line.per,
+        })
+    }
+}
+
+/// The quantity for one catalogue item (see [`ItemSizer::quantity`]); build an [`ItemSizer`] when
+/// sizing many items for the same household.
+pub fn item_quantity(
+    rule: &str,
+    input: &PlanInput,
+    buckets: &[BucketAssessment],
+    ctx: &SupplyContext,
+) -> Option<ItemQuantity> {
+    ItemSizer::new(input, buckets, ctx).quantity(rule)
 }
 
 const HEAT: &[HazardId] = &[HazardId::HeatWave];
@@ -267,6 +363,12 @@ pub fn sized_requirements(
     // Duration lines also cite the target's own sources (the hazard and duration data behind the
     // days).
     let cited = |b: BucketId, s: Option<Sizing>| s.map(|s| s.also_cite(t.sources(b)));
+    let longest = |a: BucketId, b: BucketId| match (days_of(a), days_of(b)) {
+        (Some(x), Some(y)) => Some((x.max(y), if x >= y { a } else { b })),
+        (Some(x), None) => Some((x, a)),
+        (None, Some(y)) => Some((y, b)),
+        (None, None) => None,
+    };
 
     for &bucket in BucketId::ALL {
         if t.get(bucket).is_none() {
@@ -284,22 +386,47 @@ pub fn sized_requirements(
                     None,
                     true,
                 );
+                out.push(bucket, power::device_battery_units(people), Need, h72, true);
                 out.push(bucket, Some(power::lights(people)), Need, h72, false);
+                out.push(
+                    bucket,
+                    cited(bucket, power::battery_packs(days)),
+                    Need,
+                    h72,
+                    false,
+                );
                 if h.has_generator() {
                     out.push(
                         bucket,
-                        cited(bucket, power::generator_fuel(days, housing)),
+                        cited(bucket, power::generator_fuel_gallons(days, housing)),
                         Need,
                         None,
                         false,
                     );
                 }
                 out.push(bucket, power::wheelchair_battery(people), Need, h72, false);
+                if let Some((s, needed)) = power::power_station_units(days, people) {
+                    let shape = if needed { Need } else { Optional };
+                    out.push(
+                        bucket,
+                        cited(bucket, Some(s)),
+                        shape,
+                        Some(tier_for_days(days)),
+                        needed,
+                    );
+                }
                 out.push(
                     bucket,
-                    cited(bucket, power::power_station_wh(days, people)),
+                    cited(bucket, power::generator_units(days, housing)),
                     Optional,
-                    None,
+                    Some(tier_for_days(days)),
+                    false,
+                );
+                out.push(
+                    bucket,
+                    cited(bucket, power::solar_panel_units(days, ctx.latitude, people)),
+                    Optional,
+                    Some(tier_for_days(days)),
                     false,
                 );
                 out.push(
@@ -316,15 +443,6 @@ pub fn sized_requirements(
                     None,
                     false,
                 );
-                if let Some(lat) = ctx.latitude {
-                    out.push(
-                        bucket,
-                        power::solar_panel_watts(lat, people),
-                        Note,
-                        h72,
-                        false,
-                    );
-                }
             }
             BucketId::WaterBoil => {
                 let Some(days) = days_of(bucket) else {
@@ -333,6 +451,15 @@ pub fn sized_requirements(
                 let treat = water::water_treatment_boil(days, people, pets, hot);
                 let fuel = water::boil_fuel(treat.quantity);
                 out.push(bucket, cited(bucket, Some(treat)), Need, None, false);
+                if let Some((bleach_days, src)) = longest(BucketId::WaterBoil, BucketId::WaterOut) {
+                    out.push(
+                        bucket,
+                        cited(src, Some(water::bleach_bottles(bleach_days))),
+                        Need,
+                        h72,
+                        false,
+                    );
+                }
                 out.push(
                     bucket,
                     Some(fuel),
@@ -349,11 +476,31 @@ pub fn sized_requirements(
                 out.push(bucket, cited(bucket, Some(stored)), Need, None, true);
                 out.push(
                     bucket,
+                    Some(water::water_reused_bottles(people, pets, level, hot)),
+                    Shape::Alternative {
+                        of: "water_gallons",
+                        variant: "reused_bottles",
+                    },
+                    now,
+                    false,
+                );
+                out.push(
+                    bucket,
                     cited(bucket, treat),
                     Need,
                     Some(tier_for_days(days)),
                     false,
                 );
+                // Bleach goes with the boil-water lines when there are any, otherwise here.
+                if days_of(BucketId::WaterBoil).is_none() {
+                    out.push(
+                        bucket,
+                        cited(bucket, Some(water::bleach_bottles(days))),
+                        Need,
+                        h72,
+                        false,
+                    );
+                }
                 out.push(
                     bucket,
                     cited(bucket, water::livestock_water(days, pets.large_animals)),
@@ -418,7 +565,7 @@ pub fn sized_requirements(
                 out.push(bucket, food::food_kit_check(people), Note, tier, false);
                 out.push(
                     bucket,
-                    cited(bucket, food::infant_formula(days, people)),
+                    cited(bucket, food::infant_formula_oz(days, people)),
                     Need,
                     None,
                     true,
@@ -426,21 +573,39 @@ pub fn sized_requirements(
                 out.push(bucket, food::nursing_supplies(people), Need, h72, false);
                 out.push(
                     bucket,
-                    cited(bucket, food::pet_food(days, pets)),
+                    cited(bucket, food::pet_food_days(days, pets)),
                     Need,
                     None,
                     false,
                 );
+                if let Some((fuel_days, src)) = longest(BucketId::Supplies, BucketId::WaterBoil) {
+                    out.push(
+                        bucket,
+                        cited(src, food::cooking_fuel_canisters(fuel_days, people)),
+                        Optional,
+                        tier,
+                        false,
+                    );
+                }
+                if let Some((tp_days, src)) = longest(BucketId::Supplies, BucketId::WaterOut) {
+                    out.push(
+                        bucket,
+                        cited(src, sanitation::toilet_paper_rolls(tp_days, people)),
+                        Need,
+                        Some(tier_for_days(tp_days)),
+                        false,
+                    );
+                }
                 out.push(
                     bucket,
-                    cited(bucket, sanitation::soap_grams(days, people)),
+                    cited(bucket, sanitation::soap_person_months(days, people)),
                     Need,
-                    None,
+                    tier,
                     false,
                 );
                 out.push(
                     bucket,
-                    cited(bucket, sanitation::menstrual_products(days, people)),
+                    cited(bucket, sanitation::menstrual_cycles(days, people)),
                     Need,
                     tier,
                     false,
@@ -557,7 +722,7 @@ pub fn sized_requirements(
                 out.push(bucket, Some(comms::local_map()), Need, now, false);
                 out.push(
                     bucket,
-                    cited(bucket, Some(comms::cash_days(days))),
+                    cited(bucket, Some(comms::cash_reserve_usd(days))),
                     Need,
                     None,
                     false,
@@ -676,9 +841,16 @@ pub fn sized_requirements(
                     now,
                     false,
                 );
-                out.push(bucket, fire::smoke_alarm(housing), Need, h72, true);
-                out.push(bucket, fire::co_alarm(housing), Need, h72, true);
-                out.push(bucket, fire::fire_extinguisher(housing), Need, h72, false);
+                out.push(
+                    bucket,
+                    fire::smoke_alarm_count(housing, people.len()),
+                    Need,
+                    h72,
+                    true,
+                );
+                out.push(bucket, fire::co_alarm_count(housing), Need, h72, true);
+                out.push(bucket, fire::extinguisher_count(housing), Need, h72, false);
+                out.push(bucket, fire::escape_ladder_count(housing), Need, h72, false);
             }
             BucketId::Security => {
                 out.push(bucket, Some(fire::neighbour_contacts()), Need, now, false);
@@ -721,6 +893,5 @@ pub fn sized_requirements(
             }
         }
     }
-
     out.lines
 }

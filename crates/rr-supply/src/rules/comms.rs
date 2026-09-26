@@ -129,19 +129,31 @@ pub fn local_map() -> Sizing {
     Sizing::new(&b, "local_map", "paper_map", q, "map", Per::Household, text)
 }
 
-/// Days of cash for basics: the communications target clamped to 3–14 days. The household picks
-/// the daily amount; no agency gives one. Rule `cash_days`.
-pub fn cash_days(target_days: f64) -> Sizing {
+/// Cash in small bills: $100 to start (an estimate; no agency gives a figure), or the household's
+/// own daily spending for the communications target clamped to 3–14 days. Rule
+/// `cash_reserve_usd`.
+pub fn cash_reserve_usd(target_days: f64) -> Sizing {
     let mut b = Basis::new();
+    let usd_default = b.k(keys::CASH_DEFAULT_USD);
     let lo = b.k(keys::CASH_DAYS_MIN);
     let hi = b.k(keys::CASH_DAYS_MAX);
     b.cite("fema_effak");
     let d = target_days.clamp(lo, hi);
     let text = format!(
-        "Cash in small bills for about {} of basics (food, fuel, medicine), kept with your documents, because ATMs and cards may not work. No agency gives a dollar amount: choose your own daily figure.",
+        "Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about {} to start, or enough for about {} of basics (food, fuel, medicine) at your own daily spending. No agency gives a dollar amount.",
+        usd(usd_default),
         fmt_days(d)
     );
-    Sizing::new(&b, "cash_days", "cash", d, "day", Per::Household, text).days(d)
+    Sizing::new(
+        &b,
+        "cash_reserve_usd",
+        "cash",
+        usd_default,
+        "usd",
+        Per::Household,
+        text,
+    )
+    .days(d)
 }
 
 #[cfg(test)]
@@ -158,9 +170,10 @@ mod tests {
         assert!(pb.prior);
         assert_eq!(two_way_radios(&p.people).unwrap().quantity, 3.0);
         assert_eq!(contact_cards(&p.people).quantity, 4.0);
-        assert_eq!(cash_days(1.4).quantity, 3.0);
-        assert_eq!(cash_days(6.0).quantity, 6.0);
-        assert_eq!(cash_days(60.0).quantity, 14.0);
+        let cash = cash_reserve_usd(1.4);
+        assert_eq!(cash.quantity, 100.0);
+        assert!(cash.prior && cash.plain.contains("$100") && cash.plain.contains("3 days"));
+        assert!(cash_reserve_usd(60.0).plain.contains("14 days"));
     }
 
     #[test]

@@ -281,7 +281,7 @@ fn stored(b: &mut Basis, d: &WaterDaily, days: f64, dehydrated_person_days: f64)
     Sizing::new(
         b,
         "water_gallons",
-        "stored_water",
+        "water_stored",
         total,
         "gallon",
         Per::Person,
@@ -347,7 +347,7 @@ fn treatment_beyond(b: &mut Basis, d: &WaterDaily, target_days: f64) -> Sizing {
     Sizing::new(
         b,
         "water_treatment_capacity",
-        "water_treatment",
+        "water_treatment_capacity",
         q,
         "gallon",
         Per::Household,
@@ -418,7 +418,7 @@ pub fn water_treatment_boil(days: f64, people_list: &[Person], pets: &Pets, hot:
     Sizing::new(
         &b,
         "water_treatment_capacity",
-        "water_treatment",
+        "water_treatment_capacity",
         q,
         "gallon",
         Per::Household,
@@ -426,6 +426,73 @@ pub fn water_treatment_boil(days: f64, people_list: &[Person], pets: &Pets, hot:
     )
     .per_day(days, per_day)
     .math(math)
+}
+
+/// Tap water in clean reused drink bottles: three days of the household's water, but no more than
+/// it can bottle (6 gallons, an estimate). A free way to meet part of `water_gallons`. Rule
+/// `water_reused_bottles`.
+pub fn water_reused_bottles(
+    people_list: &[Person],
+    pets: &Pets,
+    level: WaterLevel,
+    hot: bool,
+) -> Sizing {
+    let mut b = Basis::new();
+    let d = daily(&mut b, people_list, pets, level, hot);
+    let max = b.k(keys::REUSED_BOTTLES_MAX_GAL);
+    let rotate = b.k(keys::WATER_ROTATION_MONTHS);
+    b.cite("church_emergency_prep_manual");
+    let days = f64::from(rr_types::TierId::H72.days());
+    let three_days = d.total_gal() * days;
+    let q = three_days.min(max);
+    let text = format!(
+        "Free first step: fill clean drink bottles you already have with tap water, about {} ({} of your water, up to the {} a household can usually gather). Not milk jugs: they leak. Label them and replace the water every {}.",
+        gallons(super::round_quantity("gallon", q)),
+        fmt_days(days),
+        gallons(max),
+        count(rotate, "month", "months")
+    );
+    Sizing::new(
+        &b,
+        "water_reused_bottles",
+        "water_stored",
+        q,
+        "gallon",
+        Per::Household,
+        text,
+    )
+    .math(vec![format!(
+        "min({} gal/day × {} days, {} gal) = {} gal",
+        num(d.total_gal(), 4),
+        num(days, 0),
+        num(max, 1),
+        num(q, 3)
+    )])
+}
+
+/// Unscented bleach for disinfecting water and surfaces: a bottle per two weeks of the longer of
+/// the boil-notice and no-water targets, at least one (an estimate). Rule `bleach_bottles`.
+pub fn bleach_bottles(days: f64) -> Sizing {
+    let mut b = Basis::new();
+    let per = b.k(keys::BLEACH_BOTTLE_DAYS);
+    let (lo, hi) = b.range(keys::BLEACH_STRENGTH_PCT);
+    let q = crate::format::ceil_count((days.max(0.0) / per).max(1.0));
+    let text = format!(
+        "{} of plain unscented bleach ({} to {} % sodium hypochlorite, not the splashless kind), for disinfecting water and cleaning: one bottle lasts a household about {}. Bleach weakens over time, so buy fresh when you rotate your water.",
+        count(q, "bottle", "bottles"),
+        num(lo, 0),
+        num(hi, 0),
+        fmt_days(per)
+    );
+    Sizing::new(
+        &b,
+        "bleach_bottles",
+        "water_treatment_capacity",
+        q,
+        "bottle",
+        Per::Household,
+        text,
+    )
 }
 
 /// Propane to boil `gallons_to_boil` on a camp stove outdoors (an estimate). Rule `boil_fuel`.
@@ -448,7 +515,7 @@ pub fn boil_fuel(gallons_to_boil: f64) -> Sizing {
     Sizing::new(
         &b,
         "boil_fuel",
-        "stove_fuel",
+        "water_treatment_capacity",
         lb,
         "lb",
         Per::Household,
@@ -637,6 +704,21 @@ mod tests {
         assert_eq!(s.quantity, 237.8);
         assert_eq!(s.citations[0], "sphere_2018");
         assert!(livestock_water(3.0, 0).is_none());
+    }
+
+    #[test]
+    fn reused_bottles_and_bleach() {
+        let p = philly();
+        let r = water_reused_bottles(&p.people, &p.pets, WaterLevel::Basic, false);
+        // 3 days would be 12.9 gallons; a household can gather about 6.
+        assert_eq!(r.quantity, 6.0);
+        assert!(r.prior && r.plain.contains("milk jugs"));
+        let none = Pets::default();
+        let one = water_reused_bottles(&p.people[..1], &none, WaterLevel::Basic, false);
+        assert_eq!(one.quantity, 3.0);
+        assert_eq!(bleach_bottles(3.0).quantity, 1.0);
+        assert_eq!(bleach_bottles(50.0).quantity, 4.0);
+        assert!(bleach_bottles(3.0).plain.contains("5 to 9 %"));
     }
 
     #[test]

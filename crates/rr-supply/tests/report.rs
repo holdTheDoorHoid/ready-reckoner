@@ -79,6 +79,7 @@ fn write_the_fixture_report() {
         &SupplyContext {
             days_at_or_above_95f: Some(3.3),
             latitude: Some(39.95),
+            ..SupplyContext::default()
         },
     );
     section(
@@ -87,6 +88,7 @@ fn write_the_fixture_report() {
         &SupplyContext {
             days_at_or_above_95f: Some(0.0),
             latitude: Some(43.37),
+            ..SupplyContext::default()
         },
     );
     let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../target/supply-report.md");

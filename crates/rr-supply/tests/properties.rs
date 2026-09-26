@@ -214,6 +214,7 @@ fn hot_is_never_less_than_temperate() {
             &SupplyContext {
                 days_at_or_above_95f: Some(100.0),
                 latitude: None,
+                ..SupplyContext::default()
             },
         );
         no_less(&temperate, &hot, &format!("case {case}"));
@@ -255,6 +256,7 @@ fn same_input_same_lines() {
         let ctx = SupplyContext {
             days_at_or_above_95f: Some(r.next_f64() * 100.0),
             latitude: Some(r.next_f64() * 60.0 + 20.0),
+            ..SupplyContext::default()
         };
         let a = sized_requirements(&input, &ts, &ctx);
         let b = sized_requirements(&input, &ts, &ctx);
@@ -276,6 +278,7 @@ fn every_line_cites_on_random_households() {
         let ctx = SupplyContext {
             days_at_or_above_95f: Some(r.next_f64() * 100.0),
             latitude: Some(r.next_f64() * 60.0 + 20.0),
+            ..SupplyContext::default()
         };
         let lines = sized_requirements(&input, &ts, &ctx);
         let mut ids = std::collections::BTreeSet::new();

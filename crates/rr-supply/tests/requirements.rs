@@ -6,8 +6,8 @@ mod common;
 use std::collections::BTreeSet;
 
 use rr_supply::{
-    LineKind, ONE_MONTH_NOTE, RULE_IDS, SupplyContext, citations_used, requirements,
-    requirements_with, sized_requirements, tier_recommended,
+    LineKind, ONE_MONTH_NOTE, SupplyContext, citations_used, requirements, requirements_with,
+    rule_ids, sized_requirements, tier_recommended,
 };
 use rr_types::{BucketId, Per, RequirementLine, TierId, fixtures};
 
@@ -61,10 +61,10 @@ fn philadelphia_matches_the_research() {
     assert_eq!(line(&lines, "medication.medication_days").quantity, 14.0);
     assert_eq!(line(&lines, "medication.antibiotics_none").quantity, 0.0);
     assert_eq!(line(&lines, "comms.phone_power_wh").quantity, 140.0);
-    assert_eq!(line(&lines, "comms.cash_days").quantity, 3.0);
-    assert_eq!(line(&lines, "fire.co_alarm").quantity, 3.0);
+    assert_eq!(line(&lines, "comms.cash_reserve_usd").quantity, 100.0);
+    assert_eq!(line(&lines, "fire.co_alarm_count").quantity, 2.0);
     assert!(
-        !has(&lines, "fire.smoke_alarm"),
+        !has(&lines, "fire.smoke_alarm_count"),
         "the household has smoke alarms"
     );
     assert_eq!(line(&lines, "income.emergency_fund_months").quantity, 3.8);
@@ -104,7 +104,7 @@ fn coos_bay_prefers_a_filter_and_a_source_to_a_hundred_gallons() {
     assert_eq!(treat.quantity, 96.8); // 36 days × 2.6875 gal
     assert!(treat.plain.contains("filter") && treat.plain.contains("source"));
 
-    assert_eq!(line(&lines, "power.generator_fuel").quantity, 25.0);
+    assert_eq!(line(&lines, "power.generator_fuel_gallons").quantity, 25.0);
     assert!(has(&lines, "power.well_pump_wh.optional"));
     assert!(has(&lines, "home_loss.insurance_earthquake"));
     assert!(
@@ -133,7 +133,7 @@ fn coos_bay_prefers_a_filter_and_a_source_to_a_hundred_gallons() {
 #[test]
 fn every_line_is_cited_and_well_formed() {
     let known = citations_used();
-    let rules: BTreeSet<&str> = RULE_IDS.iter().copied().collect();
+    let rules: BTreeSet<&str> = rule_ids().into_iter().collect();
     let units = [
         "gallon",
         "litre",
@@ -142,12 +142,11 @@ fn every_line_is_cited_and_well_formed() {
         "day",
         "person_day",
         "pet_day",
+        "person_month",
         "month",
         "lb",
         "oz",
         "Wh",
-        "watt",
-        "gram",
         "course",
         "person",
         "light",
@@ -157,7 +156,8 @@ fn every_line_is_cited_and_well_formed() {
         "bucket",
         "bag",
         "cup",
-        "product",
+        "roll",
+        "cycle",
         "diaper",
         "pack",
         "kit",
@@ -172,12 +172,18 @@ fn every_line_is_cited_and_well_formed() {
         "set",
         "alarm",
         "extinguisher",
+        "ladder",
         "contact",
         "decision",
         "carrier",
         "vehicle",
         "battery",
         "tablet",
+        "bottle",
+        "canister",
+        "power station",
+        "generator",
+        "panel",
     ];
     for (name, input, targets) in common::all() {
         for ctx in [
@@ -185,6 +191,7 @@ fn every_line_is_cited_and_well_formed() {
             SupplyContext {
                 days_at_or_above_95f: Some(120.0),
                 latitude: Some(33.4),
+                ..SupplyContext::default()
             },
         ] {
             let lines = sized_requirements(&input, &targets, &ctx);
@@ -378,6 +385,7 @@ fn hot_counties_store_more_drinking_water() {
         &SupplyContext {
             days_at_or_above_95f: Some(110.0),
             latitude: None,
+            ..SupplyContext::default()
         },
     );
     assert_eq!(line(&temperate, "water_out.water_gallons").quantity, 3.0);
@@ -396,6 +404,7 @@ fn hot_counties_store_more_drinking_water() {
         &SupplyContext {
             days_at_or_above_95f: Some(3.3),
             latitude: None,
+            ..SupplyContext::default()
         },
     );
     assert_eq!(line(&cool, "water_out.water_gallons").quantity, 12.9);
@@ -410,21 +419,32 @@ fn hot_counties_store_more_drinking_water() {
 }
 
 #[test]
-fn latitude_adds_the_winter_solar_note() {
+fn latitude_adds_the_winter_solar_figures() {
     let input = fixtures::get("philadelphia-renters-4").unwrap();
+    // A 7-day power target brings the optional solar panel line (content rule: 7 days or more).
+    let mut targets = common::philadelphia();
+    targets[0] = common::days(BucketId::Power, 7.0);
     let with = requirements_with(
         &input,
-        &common::philadelphia(),
+        &targets,
         &SupplyContext {
-            days_at_or_above_95f: None,
             latitude: Some(39.95),
+            ..SupplyContext::default()
         },
     );
-    let solar = line(&with, "power.solar_panel_watts.note");
-    assert!(solar.plain.contains("261 Wh"));
+    let solar = line(&with, "power.solar_panel_units.optional");
+    assert_eq!(solar.quantity, 1.0);
+    assert!(solar.plain.contains("261 Wh"), "{}", solar.plain);
+    let without = requirements(&input, &targets);
+    assert!(
+        line(&without, "power.solar_panel_units.optional")
+            .plain
+            .contains("northern winter")
+    );
+    // A 3-day target offers no panel.
     assert!(!has(
         &requirements(&input, &common::philadelphia()),
-        "power.solar_panel_watts.note"
+        "power.solar_panel_units.optional"
     ));
 }
 
@@ -435,7 +455,7 @@ fn per_day_rates_reproduce_the_quantities() {
             let (Some(days), Some(per_day)) = (s.days, s.per_day) else {
                 continue;
             };
-            if s.line.rule == "generator_fuel" || s.line.rule == "cash_days" {
+            if s.line.rule == "generator_fuel_gallons" || s.line.rule == "cash_reserve_usd" {
                 continue; // capped or clamped
             }
             let raw = per_day * days;
@@ -469,7 +489,7 @@ fn life_safety_lines_are_marked() {
         "water_out.water_gallons",
         "medication.medication_days",
         "medication.rx_cold_storage",
-        "supplies.infant_formula",
+        "supplies.infant_formula_oz",
     ] {
         let s = sized
             .iter()
@@ -500,13 +520,72 @@ fn readiness_below_the_threshold_is_enough_at_free_actions() {
 }
 
 #[test]
-fn generic_rules_size_simple_items() {
+fn items_are_sized_by_their_rule() {
     let input = fixtures::get("philadelphia-renters-4").unwrap();
-    let q = |r| rr_supply::generic_quantity(r, &input).map(|g| (g.quantity, g.per));
+    let targets = common::philadelphia();
+    let sizer = rr_supply::ItemSizer::new(&input, &targets, &SupplyContext::default());
+    let q = |r| sizer.quantity(r).map(|g| (g.quantity, g.per));
     assert_eq!(q("once"), Some((1.0, Per::Household)));
     assert_eq!(q("per_person"), Some((4.0, Per::Person)));
     assert_eq!(q("per_vehicle"), Some((1.0, Per::Household)));
     assert_eq!(q("per_pet"), Some((1.0, Per::Pet)));
     assert_eq!(q("per_commuter"), Some((2.0, Per::Commuter)));
-    assert_eq!(q("water_gallons"), None);
+    assert_eq!(q("once_if_ev"), Some((0.0, Per::Household)));
+    // Line rules give the line's quantity.
+    assert_eq!(q("water_gallons").unwrap().0, 12.9);
+    assert_eq!(q("food_kcal").unwrap().0, 82_000.0);
+    assert_eq!(q("medication_days").unwrap().0, 14.0);
+    assert_eq!(q("water_reused_bottles").unwrap().0, 6.0);
+    // Per-commuter lines add up: 2 L + 0.6 L.
+    assert_eq!(q("get_home_water").unwrap().0, 2.6);
+    assert_eq!(q("get_home_bag").unwrap().0, 2.0);
+    // No filter for a short no-water target on city water; no line means 0.
+    assert_eq!(q("water_treatment_capacity").unwrap().0, 0.0);
+    assert_eq!(q("infant_formula_oz").unwrap().0, 0.0);
+    assert_eq!(q("no_such_rule"), None);
+    // Coos Bay: a well and a 50-day target need one filter.
+    let coos = fixtures::get("coos-bay-well-owner-2").unwrap();
+    let c = rr_supply::item_quantity(
+        "water_treatment_capacity",
+        &coos,
+        &common::coos_bay(),
+        &SupplyContext::default(),
+    );
+    assert_eq!(c.unwrap().quantity, 1.0);
+    // Every rule in the table answers for every fixture.
+    for (name, input, targets) in common::all() {
+        let sizer = rr_supply::ItemSizer::new(&input, &targets, &SupplyContext::default());
+        for r in rule_ids() {
+            let got = sizer.quantity(r).unwrap_or_else(|| panic!("{name}: {r}"));
+            assert!(
+                got.quantity.is_finite() && got.quantity >= 0.0,
+                "{name}: {r}"
+            );
+        }
+    }
+}
+
+#[test]
+fn directional_cover_has_its_own_item_class() {
+    // Heat cover is never cold cover, and stored water is not treatment (budget coverage parts).
+    for (name, input, targets) in common::all() {
+        for l in requirements(&input, &targets) {
+            assert_ne!(l.item_class, "thermal", "{name}: {}", l.id);
+            if l.bucket == BucketId::Thermal {
+                let heat =
+                    ["battery_fan", "cooling_towel", "cooling_plan"].contains(&l.rule.as_str());
+                let want = if heat { "thermal_heat" } else { "thermal_cold" };
+                assert_eq!(l.item_class, want, "{name}: {}", l.id);
+            }
+            match l.rule.as_str() {
+                "water_gallons" | "water_reused_bottles" => {
+                    assert_eq!(l.item_class, "water_stored", "{}", l.id)
+                }
+                "water_treatment_capacity" | "bleach_bottles" | "boil_fuel" => {
+                    assert_eq!(l.item_class, "water_treatment_capacity", "{}", l.id)
+                }
+                _ => {}
+            }
+        }
+    }
 }

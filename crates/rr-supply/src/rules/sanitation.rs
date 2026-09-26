@@ -1,5 +1,5 @@
-//! Sanitation and hygiene (research §4): the two-bucket toilet, soap, period products, diapers and
-//! wipes.
+//! Sanitation and hygiene (research §4): the two-bucket toilet, toilet paper, soap, period
+//! products, diapers and wipes.
 
 use rr_types::{AgeBand, Per, Person};
 
@@ -27,17 +27,18 @@ pub fn toilet_buckets() -> Sizing {
     )
 }
 
-fn toilet_users(people_list: &[Person]) -> usize {
+/// Everyone but babies under 1 (who are in diapers).
+fn toilet_users(people_list: &[Person]) -> f64 {
     people_list
         .iter()
         .filter(|p| p.age_band != AgeBand::Infant)
-        .count()
+        .count() as f64
 }
 
 /// Heavy bags for the two-bucket toilet (an estimate from Oregon's and RDPO's guidance). Rule
 /// `toilet_bags`.
 pub fn toilet_bags(days: f64, people_list: &[Person]) -> Option<Sizing> {
-    let n = toilet_users(people_list) as f64;
+    let n = toilet_users(people_list);
     if n == 0.0 || days <= 0.0 {
         return None;
     }
@@ -71,7 +72,7 @@ pub fn toilet_bags(days: f64, people_list: &[Person]) -> Option<Sizing> {
 /// Dry cover material for the two-bucket toilet (an estimate from RDPO's "a handful per poo").
 /// Rule `toilet_cover_material`.
 pub fn toilet_cover_material(days: f64, people_list: &[Person]) -> Option<Sizing> {
-    let n = toilet_users(people_list) as f64;
+    let n = toilet_users(people_list);
     if n == 0.0 || days <= 0.0 {
         return None;
     }
@@ -103,8 +104,40 @@ pub fn toilet_cover_material(days: f64, people_list: &[Person]) -> Option<Sizing
     )
 }
 
-/// Bathing and laundry soap for the supplies target (Sphere). Rule `soap_grams`.
-pub fn soap_grams(days: f64, people_list: &[Person]) -> Option<Sizing> {
+/// Toilet paper: about one roll per person every five days (an estimate; Oregon says measure a
+/// week's use and double it). Rule `toilet_paper_rolls`.
+pub fn toilet_paper_rolls(days: f64, people_list: &[Person]) -> Option<Sizing> {
+    let n = toilet_users(people_list);
+    if n == 0.0 || days <= 0.0 {
+        return None;
+    }
+    let mut b = Basis::new();
+    let per_roll = b.k(keys::TOILET_PAPER_PERSON_DAYS_PER_ROLL);
+    let q = ceil_count(n * days / per_roll);
+    let text = format!(
+        "Toilet paper: about 1 roll a person every {} × {} × {} = {} rolls. Better still, measure a week's use and double it for two weeks.",
+        fmt_days(per_roll),
+        count(n, "person", "people"),
+        fmt_days(days),
+        num(q, 0)
+    );
+    Some(
+        Sizing::new(
+            &b,
+            "toilet_paper_rolls",
+            "toilet_paper",
+            q,
+            "roll",
+            Per::Person,
+            text,
+        )
+        .per_day(days, n / per_roll),
+    )
+}
+
+/// Bathing and laundry soap in person-months (Sphere: 250 g and 200 g a person a month). Rule
+/// `soap_person_months`.
+pub fn soap_person_months(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let n = people_list.len() as f64;
     if n == 0.0 || days <= 0.0 {
         return None;
@@ -112,24 +145,32 @@ pub fn soap_grams(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let mut b = Basis::new();
     let bath = b.k(keys::SOAP_BATH_G_PER_PERSON_MONTH);
     let laundry = b.k(keys::SOAP_LAUNDRY_G_PER_PERSON_MONTH);
-    let q = (bath + laundry) * n * days / DAYS_PER_MONTH;
+    let months = ceil_count(days / DAYS_PER_MONTH);
+    let q = n * months;
     let text = format!(
-        "Soap: {} g of bathing soap and {} g of laundry soap a person a month × {} × {} = about {} g.",
+        "Soap for {}: {} × {}. Each is {} g of bathing soap and {} g of laundry soap, about {} g in all.",
+        count(q, "person-month", "person-months"),
+        count(n, "person", "people"),
+        count(months, "month", "months"),
         num(bath, 0),
         num(laundry, 0),
-        count(n, "person", "people"),
-        fmt_days(days),
-        num(super::round_quantity("gram", q), 0)
+        num(q * (bath + laundry), 0)
     );
-    Some(
-        Sizing::new(&b, "soap_grams", "soap", q, "gram", Per::Person, text)
-            .per_day(days, (bath + laundry) * n / DAYS_PER_MONTH),
-    )
+    Some(Sizing::new(
+        &b,
+        "soap_person_months",
+        "soap",
+        q,
+        "person_month",
+        Per::Person,
+        text,
+    ))
 }
 
-/// Period products for two cycles, plus one per 28 days beyond a month, for the adults and teens
-/// who may need them (half of them, because the form does not ask sex). Rule `menstrual_products`.
-pub fn menstrual_products(days: f64, people_list: &[Person]) -> Option<Sizing> {
+/// Period products in cycles: two cycles (plus one per 28 days beyond a month) for half of the
+/// adults and teens who are not pregnant or nursing, because the form does not ask sex. Rule
+/// `menstrual_cycles`.
+pub fn menstrual_cycles(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let candidates = people_list
         .iter()
         .filter(|p| matches!(p.age_band, AgeBand::Adult | AgeBand::Teen) && !p.pregnant_or_nursing)
@@ -142,38 +183,36 @@ pub fn menstrual_products(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let base_cycles = b.k(keys::MENSTRUAL_CYCLES_KIT);
     let per_cycle = b.k(keys::MENSTRUAL_PRODUCTS_PER_CYCLE);
     let (lo, hi) = b.range(keys::MENSTRUAL_PRODUCTS_PER_CYCLE);
-    let month = DAYS_PER_MONTH;
-    let cycles = if days > month {
+    let cycles_each = if days > DAYS_PER_MONTH {
         let cycle_days = b.k(keys::MENSTRUAL_CYCLE_DAYS);
-        base_cycles + ceil_count((days - month) / cycle_days)
+        base_cycles + ceil_count((days - DAYS_PER_MONTH) / cycle_days)
     } else {
         base_cycles
     };
     b.cite("oregon_b2wr_toolkit");
-    let people_eq = candidates * share;
-    let q = ceil_count(people_eq * cycles * per_cycle);
+    let q = ceil_count(candidates * share * cycles_each);
     let text = format!(
-        "Period products for {} cycles, about {} a cycle ({} to {}). The form doesn't ask sex, so the plan counts half of the {} aged 13 to 64 who are not pregnant or nursing: {} products. Keep soap, clean underwear and pain relievers with them, and put used products in a separate bag.",
-        num(cycles, 0),
+        "Period products for {} each, about {} products a cycle ({} to {}). The form doesn't ask sex, so the plan counts half of the {} aged 13 to 64 who are not pregnant or nursing: {}, about {} products. Keep soap, clean underwear and pain relievers with them, and put used products in a separate bag.",
+        count(cycles_each, "cycle", "cycles"),
         num(per_cycle, 0),
         num(lo, 0),
         num(hi, 0),
         count(candidates, "person", "people"),
-        num(q, 0)
+        count(q, "cycle's worth", "cycles' worth"),
+        num(q * per_cycle, 0)
     );
     Some(Sizing::new(
         &b,
-        "menstrual_products",
+        "menstrual_cycles",
         "menstrual_products",
         q,
-        "product",
+        "cycle",
         Per::Person,
         text,
     ))
 }
 
-/// Diapers for babies and toddlers (estimates; CDC asks for at least one large pack). Rule
-/// `diapers`.
+/// Diapers for babies and toddlers (estimates), for at least three days. Rule `diapers`.
 pub fn diapers(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let infants = people_list
         .iter()
@@ -187,6 +226,8 @@ pub fn diapers(days: f64, people_list: &[Person]) -> Option<Sizing> {
         return None;
     }
     let mut b = Basis::new();
+    let min_days = b.k(keys::BABY_SUPPLY_MIN_DAYS);
+    let d = days.max(min_days);
     let mut per_day = 0.0;
     let mut parts = Vec::new();
     if infants > 0.0 {
@@ -194,7 +235,7 @@ pub fn diapers(days: f64, people_list: &[Person]) -> Option<Sizing> {
         let (lo, hi) = b.range(keys::DIAPERS_PER_DAY_INFANT);
         per_day += infants * each;
         parts.push(format!(
-            "about {} a day for each baby ({} to {})",
+            "about {} a day for each baby ({} to {}; newborns use the most)",
             num(each, 0),
             num(lo, 0),
             num(hi, 0)
@@ -208,17 +249,14 @@ pub fn diapers(days: f64, people_list: &[Person]) -> Option<Sizing> {
             num(each, 0)
         ));
     }
-    let q = ceil_count(per_day * days);
+    let q = ceil_count(per_day * d);
     let text = format!(
         "Diapers: {}, × {} = {} diapers. Keep at least one large pack on hand.",
         crate::format::and_list(&parts),
-        fmt_days(days),
+        fmt_days(d),
         num(q, 0)
     );
-    Some(
-        Sizing::new(&b, "diapers", "diapers", q, "diaper", Per::Person, text)
-            .per_day(days, per_day),
-    )
+    Some(Sizing::new(&b, "diapers", "diapers", q, "diaper", Per::Person, text).per_day(d, per_day))
 }
 
 /// Baby wipes: two packs per child in diapers for up to two weeks, more for longer (CDC). Rule
@@ -265,37 +303,39 @@ mod tests {
             toilet_cover_material(3.0, &p.people).unwrap().quantity,
             12.0
         );
-        // (250 + 200) × 4 × 10 / 30 = 600 g
-        assert_eq!(soap_grams(10.0, &p.people).unwrap().quantity, 600.0);
-        // half of 2 adults × 2 cycles × 20 = 40
-        let m = menstrual_products(10.0, &p.people).unwrap();
-        assert_eq!(m.quantity, 40.0);
-        assert!(m.prior && m.plain.contains("half"));
+        // 4 people × 10 days ÷ 5 = 8 rolls
+        assert_eq!(toilet_paper_rolls(10.0, &p.people).unwrap().quantity, 8.0);
+        // 4 people × 1 month (250 g + 200 g each)
+        let soap = soap_person_months(10.0, &p.people).unwrap();
+        assert_eq!(soap.quantity, 4.0);
+        assert!(soap.plain.contains("1,800 g"), "{}", soap.plain);
+        // half of 2 adults × 2 cycles
+        let m = menstrual_cycles(10.0, &p.people).unwrap();
+        assert_eq!(m.quantity, 2.0);
+        assert!(m.prior && m.plain.contains("half") && m.plain.contains("40 products"));
         assert!(diapers(10.0, &p.people).is_none());
     }
 
     #[test]
     fn longer_plans_add_cycles() {
         let p = fixtures::get("philadelphia-renters-4").unwrap();
-        // 60 days: 2 + ceil(30 / 28) = 4 cycles × 20 = 80
-        assert_eq!(menstrual_products(60.0, &p.people).unwrap().quantity, 80.0);
+        // 60 days: 2 + ceil(30 / 28) = 4 cycles each, for half of 2 people
+        assert_eq!(menstrual_cycles(60.0, &p.people).unwrap().quantity, 4.0);
+        assert_eq!(menstrual_cycles(30.0, &p.people).unwrap().quantity, 2.0);
     }
 
     #[test]
     fn babies_and_toddlers() {
         let sl = fixtures::get("sugar-land-ev-household-3").unwrap();
-        assert_eq!(diapers(7.0, &sl.people).unwrap().quantity, 70.0);
+        assert_eq!(diapers(7.0, &sl.people).unwrap().quantity, 56.0); // 8 × 7
+        assert_eq!(diapers(1.0, &sl.people).unwrap().quantity, 24.0); // at least 3 days
         assert_eq!(baby_wipes(7.0, &sl.people).unwrap().quantity, 2.0);
         assert_eq!(baby_wipes(28.0, &sl.people).unwrap().quantity, 4.0);
-        // The infant is not a toilet user.
+        // The baby is not a toilet user.
         assert_eq!(toilet_bags(10.0, &sl.people).unwrap().quantity, 9.0); // 2 × 0.45 × 10
         let hays = fixtures::get("hays-kansas-farm-5").unwrap();
-        // Toddler: 6 a day (an estimate).
-        assert_eq!(diapers(10.0, &hays.people).unwrap().quantity, 60.0);
-        // Adults and teens not pregnant: 1 adult + 1 teen → half → 1 × 2 × 20
-        assert_eq!(
-            menstrual_products(10.0, &hays.people).unwrap().quantity,
-            40.0
-        );
+        assert_eq!(diapers(10.0, &hays.people).unwrap().quantity, 60.0); // toddler 6 a day
+        // Adults and teens not pregnant: 1 adult + 1 teen → half → 1 × 2 cycles
+        assert_eq!(menstrual_cycles(10.0, &hays.people).unwrap().quantity, 2.0);
     }
 }

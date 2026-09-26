@@ -80,6 +80,11 @@ pub(crate) fn days(n: f64) -> String {
     count(n, "day", "days")
 }
 
+/// "13-day", as in "a 13-day outage".
+pub(crate) fn day_adjective(n: f64) -> String {
+    format!("{}-day", num(n, 1))
+}
+
 /// "1 gallon", "12.9 gallons".
 pub(crate) fn gallons(n: f64) -> String {
     format!(
