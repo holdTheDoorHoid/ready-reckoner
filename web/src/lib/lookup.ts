@@ -22,8 +22,12 @@ export function allPlanItems(output: PlanOutput): { item: PlanItem; month: numbe
   return output.plan.months.flatMap((m) => m.items.map((item) => ({ item, month: m.index })));
 }
 
-/** Lower-case the first letter, for names used inside a sentence. */
+/**
+ * Lower-case the first letter, for names used inside a sentence. A name that starts with an
+ * acronym or a model name keeps it as written: "N95 respirators", "NOAA Weather Radio".
+ */
 export function lowerFirst(s: string): string {
+  if (/^[A-Z0-9]{2,}(?![a-z])/.test(s)) return s;
   return s.charAt(0).toLowerCase() + s.slice(1);
 }
 

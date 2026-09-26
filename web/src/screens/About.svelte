@@ -10,6 +10,7 @@
   import type { Phase } from '../engine/loader';
   import { useApp } from '../lib/app.svelte';
   import { formatDate } from '../lib/format';
+  import { STATUS_LINE } from '../lib/labels';
   import { href } from '../lib/router.svelte';
 
   const app = useApp();
@@ -91,6 +92,7 @@
   <p class="lead">
     Ready Reckoner is a free, open planner. It works out your risks and plan on this device from bundled public data, and it shows its work.
   </p>
+  <p class="status-line card">{STATUS_LINE}</p>
 
   <section aria-labelledby="engine-title">
     <h2 id="engine-title">What is running</h2>
@@ -270,6 +272,10 @@
 </div>
 
 <style>
+  .status-line {
+    margin: 0 0 var(--s5);
+    font-weight: 560;
+  }
   .mock {
     border-left: 6px solid var(--mock-edge);
     background: var(--mock-bg);

@@ -23,7 +23,6 @@ import type {
   WaterLevel,
   WaterSource,
 } from '../engine/types';
-import { per100 } from './format';
 
 export interface Choice {
   label: string;
@@ -138,14 +137,6 @@ export const STAGE: Record<Stage, Choice> = {
 
 const N: Record<ReturnPeriod, number> = { one_in_10: 10, one_in_50: 50, one_in_100: 100, one_in_500: 500 };
 
-/** "about 10 of 100": households like yours that would see something longer in ten years. */
-export function tenYearWords(rp: ReturnPeriod): string {
-  const v = per100(1 - Math.exp(-10 / N[rp]));
-  if (v.kind === 'almost_all') return 'almost all';
-  if (v.kind === 'fewer') return 'fewer than 1 of 100';
-  return `about ${v.n} of 100`;
-}
-
 export const RETURN_PERIOD: Record<ReturnPeriod, Choice & { jargon: string }> = {
   one_in_10: { label: 'Common disruptions', jargon: '1-in-10' },
   one_in_50: { label: 'Serious', jargon: '1-in-50' },
@@ -153,9 +144,47 @@ export const RETURN_PERIOD: Record<ReturnPeriod, Choice & { jargon: string }> = 
   one_in_500: { label: 'Rare catastrophes', jargon: '1-in-500' },
 };
 
-export function returnPeriodHelp(rp: ReturnPeriod): string {
-  return `Something longer reaches ${tenYearWords(rp)} households like yours in ten years.`;
+/**
+ * How many ten-year stretches bring something worse than one need's target at this setting:
+ * "about 1 of every 10" at 1-in-100. Each target is set for its own need; the needs together run
+ * past at least one target more often (see `dialJointSentence`).
+ */
+export function perNeedWords(rp: ReturnPeriod): string {
+  const p = 1 - Math.exp(-10 / N[rp]);
+  if (p >= 0.095) return `about ${Math.max(1, Math.round(p * 10))} of every 10`;
+  return `about ${Math.max(1, Math.round(p * 100))} of every 100`;
 }
+
+/** One dial setting's line: what its targets promise for any one need. */
+export function returnPeriodHelp(rp: ReturnPeriod): string {
+  return `For any one need, something worse than its target comes in ${perNeedWords(rp)} ten-year stretches.`;
+}
+
+/**
+ * What the targets mean for all the needs together. The "roughly 1 in 3" was worked out for the
+ * usual 1-in-100 setting (round-2 model review, M-04: 32 to 47 of 100 across seven needs), so the
+ * other settings say "higher" without a number rather than a figure nobody computed.
+ */
+export function dialJointSentence(rp: ReturnPeriod): string {
+  const joint =
+    rp === 'one_in_100'
+      ? 'Across all your needs together, the chance that at least one runs out is higher, roughly 1 in 3.'
+      : 'Across all your needs together, the chance that at least one runs out is higher.';
+  return `${joint} That is why the plan also gives you ways to cope when a target runs out.`;
+}
+
+/** The dial sentence (COMMON-P1's canonical wording at the usual 1-in-100 setting). */
+export function dialSentence(rp: ReturnPeriod): string {
+  return `${returnPeriodHelp(rp)} ${dialJointSentence(rp)}`;
+}
+
+/** Start screen and About (the packet prints it from the engine). Canonical wording; do not edit. */
+export const STATUS_LINE =
+  'Ready Reckoner is an independent, open-source planning aid. It is not official emergency guidance, and not medical, legal or financial advice. Follow instructions from your local officials first.';
+
+/** Under every table that shows the nuclear row, until the location-aware version lands. */
+export const NUCLEAR_NOTE =
+  'The nuclear figure is the chance of a nuclear catastrophe anywhere in the world, not for your county; a location-aware version is coming.';
 
 export const CLIMATE: Record<ClimateHorizon, Choice> = {
   today: { label: "Today's climate" },

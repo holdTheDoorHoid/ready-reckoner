@@ -1,17 +1,18 @@
 <!--
   The return-period dial: four labelled settings, each with the plain phrase, the jargon in
-  brackets, and a one-line explanation of the ten-year chance.
+  brackets, and what its targets promise for any one need. A note under the settings says what
+  that means for all the needs together (the dial sentence, M-04), for the setting chosen.
 -->
 <script lang="ts">
   import type { ReturnPeriod } from '../engine/types';
   import { RETURN_PERIODS } from '../engine/types';
-  import { RETURN_PERIOD, returnPeriodHelp } from '../lib/labels';
+  import { dialJointSentence, RETURN_PERIOD, returnPeriodHelp } from '../lib/labels';
 
   let { value, onchange }: { value: ReturnPeriod; onchange: (rp: ReturnPeriod) => void } = $props();
   const uid = $props.id();
 </script>
 
-<fieldset class="dial" aria-describedby="{uid}-help">
+<fieldset class="dial" aria-describedby="{uid}-help {uid}-joint">
   <legend>How rare an event to be ready for</legend>
   <p class="help" id="{uid}-help">
     A more cautious setting plans for longer, rarer disruptions. "1-in-100" means an event that size has about a 1 in 100 chance each year.
@@ -31,6 +32,7 @@
     {/each}
   </div>
   </div>
+  <p class="dial__joint" id="{uid}-joint">{dialJointSentence(value)}</p>
 </fieldset>
 
 <style>
@@ -116,6 +118,10 @@
   }
   .dial__help {
     color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+  .dial__joint {
+    margin: var(--s3) 0 0;
     font-size: var(--text-sm);
   }
 </style>
