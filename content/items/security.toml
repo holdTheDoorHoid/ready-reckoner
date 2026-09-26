@@ -75,3 +75,28 @@ retrieved = "2026-09-25"
 quantity_rule = "once_if_house_ground_floor"
 citations = ["ncpc_home_safety", "rr_price_observations_2026_09"]
 hazard_extras = []
+
+[[item]]
+id = "security_lockout_plan"
+name = "Lockout plan: a spare key and a locksmith you checked"
+category = "security"
+unit = "action"
+buckets = ["security", "get_home"]
+tier = "now"
+free = true
+spec = "Plan now for being locked out of your home or car. Leave a spare key with a family member, neighbour or friend. Find a local locksmith before you need one and save the number, because some locksmiths who advertise are not local or trained (FTC)."
+look_for = [
+  "A spare house key with someone nearby",
+  "A locksmith's number in your phone and on paper",
+  "A test call to the locksmith's after-hours line",
+  "Your roadside or insurance number for a car lockout or tow",
+]
+avoid = [
+  "Choosing a locksmith from an ad while you are locked out",
+  "A cheap combination key box that is easy to open",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a spare key and a saved number." }
+quantity_rule = "once"
+maintenance = { check_months = 12 }
+citations = ["ftc_2008_locksmith", "ollam_2022_lawyer_passport_locksmith_gun"]
+hazard_extras = []

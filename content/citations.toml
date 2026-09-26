@@ -27,7 +27,7 @@ title = "Build A Kit"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/kit"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Water (one gallon per person per day for several days, for drinking and sanitation)"
 license = "US Government Work (public domain)"
 
@@ -47,7 +47,7 @@ title = "Food"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/food"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "The refrigerator will keep food cold for about four hours if it is unopened."
 license = "US Government Work (public domain)"
 
@@ -57,7 +57,7 @@ title = "Power Outages"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/power-outages"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "If the power is out for more than a day, discard any medication that should be refrigerated, unless the drug’s label says otherwise."
 license = "US Government Work (public domain)"
 
@@ -77,7 +77,7 @@ title = "People with Disabilities"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/disability"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Talk to your doctor or pharmacist about how you can create an emergency supply of medicines."
 license = "US Government Work (public domain)"
 
@@ -87,7 +87,7 @@ title = "Older Adults"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/older-adults"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Make sure at least one person in your support network has an extra key to your home, knows where you keep your emergency supplies, and knows how to use lifesaving equipment or administer medicine."
 license = "US Government Work (public domain)"
 
@@ -97,7 +97,7 @@ title = "Evacuation"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/evacuation"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Keep a full tank of gas if an evacuation seems likely. Keep a half tank of gas in it at all times in case of an unexpected need to evacuate."
 license = "US Government Work (public domain)"
 
@@ -107,7 +107,7 @@ title = "Shelter"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/shelter"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Seal all windows, doors and air vents with thick plastic sheeting and duct tape."
 license = "US Government Work (public domain)"
 
@@ -117,7 +117,7 @@ title = "Extreme Heat"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/heat"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Fans create air flow and a false sense of comfort, but do not reduce body temperature or prevent heat-related illnesses."
 license = "US Government Work (public domain)"
 
@@ -157,7 +157,7 @@ title = "Make A Plan"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/plan"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Know how you’ll contact one another and reconnect if separated. Establish a family meeting place that’s familiar and easy to find."
 license = "US Government Work (public domain)"
 
@@ -167,7 +167,7 @@ title = "Family Communication Plan fillable card"
 publisher = "FEMA / Ready.gov"
 year = 2025
 url = "https://www.ready.gov/sites/default/files/2025-06/family-communication-plan_fillable-card.pdf"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -176,7 +176,7 @@ title = "Pandemic"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/pandemic"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Buy supplies slowly to ensure that everyone has the opportunity to buy what they need."
 license = "US Government Work (public domain)"
 
@@ -186,7 +186,7 @@ title = "Emergency Alerts"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/alerts"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "You are not charged for receiving WEAs, and there is no need to subscribe."
 license = "US Government Work (public domain)"
 
@@ -196,7 +196,7 @@ title = "Low and No Cost Preparedness"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/low-and-no-cost"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Make sure you store important phone numbers somewhere besides just your cell phone."
 license = "US Government Work (public domain)"
 
@@ -206,7 +206,7 @@ title = "Earthquakes"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/earthquakes"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "A standard homeowner’s insurance policy does not cover earthquake damage."
 license = "US Government Work (public domain)"
 
@@ -236,17 +236,17 @@ title = "Radiation Emergencies"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/radiation"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "The best way to stay safe in any radiation emergency is to get inside, stay inside and stay tuned."
 license = "US Government Work (public domain)"
 
 [[citation]]
 id = "ready_gov_public_spaces"
-title = "Public Spaces (Run. Hide. Fight.)"
+title = "Mass Gathering Incidents (Run. Hide. Fight.)"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/public-spaces"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Getting away from the attacker is the top priority."
 license = "US Government Work (public domain)"
 
@@ -266,7 +266,7 @@ title = "Tornadoes"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/tornadoes"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "The next best protection is a small, interior, windowless room or basement on the lowest level of a sturdy building."
 license = "US Government Work (public domain)"
 
@@ -296,7 +296,7 @@ title = "Hurricanes"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/hurricanes"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "You may have to evacuate quickly due to a hurricane if you live in an evacuation zone."
 license = "US Government Work (public domain)"
 
@@ -306,7 +306,7 @@ title = "Chemicals and Hazardous Materials Incidents"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/chemical"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Identify an above-ground shelter room with as few openings as possible."
 license = "US Government Work (public domain)"
 
@@ -326,7 +326,7 @@ title = "Cybersecurity"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/cybersecurity"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Use a password manager and two methods of verification."
 license = "US Government Work (public domain)"
 
@@ -582,7 +582,7 @@ title = "Carbon Monoxide Poisoning Basics"
 publisher = "Centers for Disease Control and Prevention"
 year = 2026
 url = "https://www.cdc.gov/carbon-monoxide/about/index.html"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Never use a generator inside your home or garage, even if doors and windows are open."
 license = "US Government Work (public domain)"
 
@@ -737,7 +737,7 @@ title = "Potassium Iodide (KI)"
 publisher = "Centers for Disease Control and Prevention"
 year = 2025
 url = "https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Do not take KI unless you are instructed by public health or emergency response officials or a healthcare provider."
 license = "US Government Work (public domain)"
 
@@ -788,7 +788,7 @@ title = "Research on DIY Air Cleaners to Reduce Wildfire Smoke Indoors"
 publisher = "U.S. Environmental Protection Agency"
 year = 2026
 url = "https://www.epa.gov/air-research/research-diy-air-cleaners-reduce-wildfire-smoke-indoors"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Do-It-Yourself (DIY) air cleaners, made with a box fan and MERV 13 air filter, are a cost-effective method for reducing smoke concentrations."
 license = "US Government Work (public domain)"
 
@@ -798,7 +798,7 @@ title = "Wildfires and Indoor Air Quality"
 publisher = "U.S. Environmental Protection Agency"
 year = 2026
 url = "https://www.epa.gov/indoor-air-quality-iaq/wildfires-and-indoor-air-quality-iaq"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -816,7 +816,7 @@ title = "City of Asheville lifts systemwide boil water notice issued after Hurri
 publisher = "U.S. Environmental Protection Agency"
 year = 2024
 url = "https://www.epa.gov/newsreleases/city-asheville-lifts-systemwide-boil-water-notice-issued-after-hurricane-helene"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -907,7 +907,7 @@ title = "A dataset of recorded electricity outages by United States county 2014�
 publisher = "Brelsford C. et al., Oak Ridge National Laboratory"
 year = 2024
 url = "https://doi.org/10.1038/s41597-024-03095-5"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "CC BY 4.0"
 
 [[citation]]
@@ -948,7 +948,7 @@ title = "Turn Around Don't Drown"
 publisher = "NOAA National Weather Service"
 year = 2026
 url = "https://www.weather.gov/safety/flood-turn-around-dont-drown"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -1137,7 +1137,7 @@ title = "Stop the Bleed"
 publisher = "U.S. Department of Homeland Security"
 year = 2026
 url = "https://www.dhs.gov/stopthebleed"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -1459,7 +1459,7 @@ title = "A Review of State Emergency Prescription Protocols"
 publisher = "Healthcare Ready"
 year = 2023
 url = "https://healthcareready.org/a-review-of-state-emergency-prescription-protocols/"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
 [[citation]]
@@ -1495,7 +1495,7 @@ title = "Staying Safe with Electric Vehicles (hurricane season and flooding)"
 publisher = "Hillsborough County, Florida"
 year = 2025
 url = "https://hcfl.gov/residents/sustainability-and-green/green-hillsborough/staying-safe-with-electric-vehicles"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "Local government publication (paraphrased, not quoted)"
 
 [[citation]]
@@ -1562,7 +1562,7 @@ title = "Medication (personal and family plans)"
 publisher = "Florida Division of Emergency Management"
 year = 2026
 url = "https://www.floridadisaster.org/planprepare/disability/personal-and-family-plans/medication/"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "State government publication (paraphrased, not quoted)"
 
 [[citation]]
@@ -1571,7 +1571,7 @@ title = "Emergency Toilet Guidebook (twin-bucket toilet)"
 publisher = "Regional Disaster Preparedness Organization, Portland Metro Region"
 year = 2024
 url = "https://www.rdpo.net/emergency-toilet"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
 [[citation]]
@@ -1580,7 +1580,7 @@ title = "Home Fuel Storage Limits (International Fire Code and NFPA 58 summary)"
 publisher = "Lehi City Fire Department, Utah"
 year = 2025
 url = "https://www.lehi-ut.gov/departments/fire-department/fire-prevention/home-fuel-storage-limits/"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "Local government publication (paraphrased, not quoted)"
 
 [[citation]]
@@ -1831,7 +1831,7 @@ title = "Can Humanity Achieve a Century of Nuclear Peace?"
 publisher = "Forecasting Research Institute"
 year = 2024
 url = "https://forecastingresearch.org/research/nuclear-risk"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
 [[citation]]
@@ -2209,7 +2209,7 @@ title = "Quantitative core model specification (research report): hazards, conse
 publisher = "Ready Reckoner contributors"
 year = 2026
 url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/risk-model.md"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "CC BY-SA 4.0"
 
 [[citation]]
@@ -2572,4 +2572,1118 @@ year = 2015
 url = "https://www.dhs.gov/sites/default/files/publications/Trauma-Kits-TN_1015-508_0.pdf"
 retrieved = "2026-09-26"
 quote = "the counterfeit tourniquets have been shown to fail before the necessary force to stop bleeding can be applied, possibly leading to catastrophic results."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nacds_2018_emergency_refills"
+title = "South Carolina, North Carolina, Virginia, Maryland, and District of Columbia Emergency Refill Protocols (laws and protocols as of September 2018)"
+publisher = "National Association of Chain Drug Stores"
+year = 2018
+url = "https://www.nacds.org/ceo/2018/0913/emergency-refill.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fl_bop_emergency_refills"
+title = "Tropical Storm: Early Prescription Refills Permitted Under State of Emergency"
+publisher = "Florida Board of Pharmacy"
+year = 2024
+url = "https://floridaspharmacy.gov/early-prescription-refills-permitted-under-state-of-emergency/"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "tx_pharmacy_disaster_2024"
+title = "Severe Weather Disaster: Emergency Dispensing of Prescription Medications"
+publisher = "Texas State Board of Pharmacy"
+year = 2024
+url = "https://www.pharmacy.texas.gov/files_pdf/2024-severe-weather-disaster-notification.pdf"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "ready_gov_recovering"
+title = "Recovering from Disaster"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/recovering-disaster"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_home_inspections"
+title = "Home Inspections (Individual Assistance)"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/assistance/individual/after-applying/home-inspections"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_disaster_fraud"
+title = "Disaster Fraud"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/about/offices/security/disaster-fraud"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_ihp"
+title = "Individuals and Households Program"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/assistance/individual/program"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "disasterassistance_gov"
+title = "DisasterAssistance.gov: apply for disaster assistance"
+publisher = "U.S. Department of Homeland Security"
+year = 2026
+url = "https://www.disasterassistance.gov/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "floodsmart_start_claim"
+title = "Start a Claim"
+publisher = "FEMA, National Flood Insurance Program (FloodSmart)"
+year = 2026
+url = "https://www.floodsmart.gov/recover/start-a-claim"
+retrieved = "2026-09-26"
+quote = "Report the flood and your loss to your insurance provider as soon as possible. They’ll partner you with an insurance adjuster who will inspect your property after you file your claim."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ftc_scams_after_disasters"
+title = "How To Avoid Scams After Weather Emergencies and Natural Disasters"
+publisher = "Federal Trade Commission"
+year = 2026
+url = "https://consumer.ftc.gov/articles/how-avoid-scams-after-weather-emergencies-and-natural-disasters"
+retrieved = "2026-09-26"
+quote = "Know that FEMA doesn’t charge application fees."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "healthcare_ready_rx_open"
+title = "Rx Open: open pharmacies in disaster areas"
+publisher = "Healthcare Ready"
+year = 2026
+url = "https://healthcareready.org/rxopen/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "usa_gov_replace_ids"
+title = "How to replace lost or stolen ID cards"
+publisher = "USAGov"
+year = 2026
+url = "https://www.usa.gov/replace-vital-documents"
+retrieved = "2026-09-26"
+quote = "Many require you to show an official document, like your birth certificate. This proves your identity or citizenship."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_clean_room"
+title = "Create a Clean Room to Protect Indoor Air Quality During a Wildfire"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/emergencies-iaq/create-clean-room-protect-indoor-air-quality-during-wildfire"
+retrieved = "2026-09-26"
+quote = "A clean room is a room that is set up to keep levels of smoke and other particles as low as possible during wildfire smoke events."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "texasready_hurricanes"
+title = "Hurricanes: what to do before, during and after"
+publisher = "Texas Department of State Health Services (TexasReady)"
+year = 2026
+url = "https://texasready.gov/be-informed/natural-disasters/hurricanes.html"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "nws_aly_cold_safety"
+title = "Cold Weather Safety Tips (public service announcement)"
+publisher = "NOAA National Weather Service, Albany NY office"
+year = 2019
+url = "https://www.weather.gov/media/aly/PSAs/ExtremeCold.pdf"
+retrieved = "2026-09-26"
+quote = "Let hot and cold water trickle or drip at night from a faucet."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_pace_flyer"
+title = "Set Your PACE: Prepare Your Critical Communications for Out-of-the-Ordinary Situations"
+publisher = "Cybersecurity and Infrastructure Security Agency (SAFECOM/NCSWIC)"
+year = 2025
+url = "https://www.cisa.gov/sites/default/files/2025-02/Updated_PACE_Flyer_022025.pdf"
+retrieved = "2026-09-26"
+quote = "PACE produces strategies and redundancies that maintain communications despite disrupted communications networks"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_back_to_school_2026"
+title = "Back to School, Back to Safety"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/blog/back-school-back-safety"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ollam_2022_lawyer_passport_locksmith_gun"
+title = "A Talk About Risk & Preparedness (SAINTCON 2022 keynote)"
+publisher = "Deviant Ollam (video and slides)"
+year = 2022
+url = "https://www.youtube.com/watch?v=6ihrGNGesfI"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted; cited for principles, never for numbers)"
+
+[[citation]]
+id = "aspr_cmist"
+title = "At-Risk Individuals with Access and Functional Needs (the CMIST Framework)"
+publisher = "HHS Administration for Strategic Preparedness and Response (ASPR)"
+year = 2026
+url = "https://www.aspr.gov/readiness-response/response-operations/risk-individuals/access-functional-needs-cross-cutting-resources/risk-individuals-access-functional-needs"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usfa_fire_safety_disabilities"
+title = "Fire Safety for People with Disabilities"
+publisher = "U.S. Fire Administration"
+year = 2026
+url = "https://www.usfa.fema.gov/prevention/home-fires/at-risk-audiences/people-with-disabilities/index.html"
+retrieved = "2026-09-26"
+quote = "If you are deaf or hard of hearing, use smoke alarms with a vibrating pad, flashing light or strobe light."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_your_language"
+title = "Ready in Your Language"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/ready-your-language"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "aspr_tracie_hha_rule"
+title = "Home Health Agency Requirements: CMS Emergency Preparedness Final Rule (updates effective March 26, 2021)"
+publisher = "HHS ASPR TRACIE"
+year = 2021
+url = "https://files.asprtracie.hhs.gov/documents/aspr-tracie-cms-ep-rule-home-health-agency-requirements.pdf"
+retrieved = "2026-09-26"
+quote = "Individual plans for each patient must be included as part of the comprehensive patient assessment"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_protect_lungs_2026"
+title = "Protect Your Lungs From Wildfire Smoke and Ash (fact sheet)"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/system/files/documents/2026-06/protect-your-lungs-factsheet.pdf"
+retrieved = "2026-09-26"
+quote = "Children ages 2 years and older can wear respirators; however, NIOSH Approved respirators do NOT come in sizes suitable for young children."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "iii_water_damage"
+title = "Facts + Statistics: Homeowners and renters insurance (average losses by cause, 2019–2023)"
+publisher = "Insurance Information Institute (Triple-I), from ISO data"
+year = 2026
+url = "https://www.iii.org/fact-statistic/facts-statistics-homeowners-and-renters-insurance"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "iii_water_damage_protect"
+title = "How to protect your home from water damage"
+publisher = "Insurance Information Institute (Triple-I)"
+year = 2026
+url = "https://www.iii.org/article/how-to-protect-your-home-from-water-damage"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fema_dam_residual_risk_2018"
+title = "Risk Exposure and Residual Risk Related to Dams (fact sheet)"
+publisher = "FEMA"
+year = 2018
+url = "https://www.fema.gov/sites/default/files/2020-08/fact-sheet_risk-exposure-residual-risk-related-to-dams.pdf"
+retrieved = "2026-09-26"
+quote = "Dams are classified by various regulating agencies according to potential consequences should the dam fail."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_living_with_levees"
+title = "Living with Levees for Homeowners, Renters, Business Owners and the General Public"
+publisher = "FEMA"
+year = 2023
+url = "https://www.fema.gov/flood-maps/living-levees/homeowners-business"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_nfip_levees_2021"
+title = "NFIP and Levees: An Overview (fact sheet)"
+publisher = "FEMA"
+year = 2021
+url = "https://www.fema.gov/sites/default/files/documents/fema_nfip-levees.pdf"
+retrieved = "2026-09-26"
+quote = "FEMA accreditation of a levee does not guarantee protection; therefore, FIRMs carry a notice that overtopping or failure of levees is possible and flood insurance protection and adherence to evacuation procedures are strongly recommended."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usace_nld"
+title = "National Levee Database"
+publisher = "U.S. Army Corps of Engineers"
+year = 2026
+url = "https://levees.sec.usace.army.mil/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "mo_sema_dam_failure"
+title = "Dam Failures"
+publisher = "Missouri State Emergency Management Agency"
+year = 2026
+url = "https://sema.dps.mo.gov/plan_and_prepare/dam_failure.php"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "fcc_att_outage_2024"
+title = "February 22, 2024 nationwide wireless network outage: report and findings"
+publisher = "Federal Communications Commission, Public Safety and Homeland Security Bureau"
+year = 2024
+url = "https://docs.fcc.gov/public/attachments/DOC-404150A1.pdf"
+retrieved = "2026-09-26"
+quote = "All such attempted 911 calls therefore failed preventing more than 25,000 calls to PSAPs or 911 call centers."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fda_drug_shortages"
+title = "Drug Shortages"
+publisher = "U.S. Food and Drug Administration"
+year = 2026
+url = "https://www.fda.gov/drugs/drug-safety-and-availability/drug-shortages"
+retrieved = "2026-09-26"
+quote = "Drug Shortages can occur for many reasons, including manufacturing and quality problems, delays, and discontinuations."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fda_drug_shortages_faq"
+title = "Frequently Asked Questions about Drug Shortages"
+publisher = "U.S. Food and Drug Administration"
+year = 2026
+url = "https://www.fda.gov/drugs/drug-shortages/frequently-asked-questions-about-drug-shortages"
+retrieved = "2026-09-26"
+quote = "Check multiple stores or pharmacies, or ask your health care provider or pharmacist if there is an alternative to the medicine you’re looking for."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fda_besaferx"
+title = "BeSafeRx: Your Source for Online Pharmacy Information"
+publisher = "U.S. Food and Drug Administration"
+year = 2020
+url = "https://www.fda.gov/drugs/buying-using-medicine-safely/besaferx-your-source-online-pharmacy-information"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "me_dhhs_snap_2025"
+title = "Due to Federal Government Shutdown, USDA Notifies States that SNAP Benefits Won't Be Issued for November"
+publisher = "Maine Department of Health and Human Services"
+year = 2025
+url = "https://www.maine.gov/dhhs/news/due-federal-government-shutdown-usda-notifies-states-snap-benefits-wont-be-issued-november-tue-10212025-1200"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "usda_hunger_hotline"
+title = "USDA National Hunger Hotline"
+publisher = "U.S. Department of Agriculture"
+year = 2025
+url = "https://www.fna.usda.gov/national-hunger-hotline"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "dol_ucfe_furlough_2023"
+title = "Federal Furloughs: UCFE Fact Sheet (current as of September 2023)"
+publisher = "U.S. Department of Labor"
+year = 2023
+url = "https://www.dol.gov/sites/dolgov/files/general/plans/Unemployment-Compensation-for-Federal-Employees-Fact-Sheet.pdf"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cfpb_shutdown_2013"
+title = "Regulators Encourage Institutions to Work with Borrowers Affected by Government Shutdown"
+publisher = "Consumer Financial Protection Bureau"
+year = 2013
+url = "https://www.consumerfinance.gov/archive/newsroom/regulators-encourage-institutions-to-work-with-borrowers-affected-by-government-shutdown/"
+retrieved = "2026-09-26"
+quote = "Those affected by the government shutdown are encouraged to contact their lenders immediately should financial strain occur."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cfpb_payday_loans"
+title = "What is a payday loan?"
+publisher = "Consumer Financial Protection Bureau"
+year = 2026
+url = "https://www.consumerfinance.gov/ask-cfpb/what-is-a-payday-loan-en-1567/"
+retrieved = "2026-09-26"
+quote = "A typical two-week payday loan with a $15 per $100 fee equates to an annual percentage rate (APR) of almost 400 percent."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eviction_lab_national"
+title = "National Estimates: Eviction in America"
+publisher = "Eviction Lab, Princeton University"
+year = 2026
+url = "https://evictionlab.org/national-estimates/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cfpb_rent_help"
+title = "Get help paying rent and bills"
+publisher = "Consumer Financial Protection Bureau"
+year = 2026
+url = "https://www.consumerfinance.gov/housing/housing-insecurity/help-for-renters/get-help-paying-rent-and-bills/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cfpb_facing_eviction"
+title = "What to do if you’re facing eviction"
+publisher = "Consumer Financial Protection Bureau"
+year = 2026
+url = "https://www.consumerfinance.gov/housing/housing-insecurity/help-for-renters/what-to-do-if-youre-facing-eviction/"
+retrieved = "2026-09-26"
+quote = "Too many renters give up before they have a chance to go to court."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "lsc_get_legal_help"
+title = "I Need Legal Help"
+publisher = "Legal Services Corporation"
+year = 2026
+url = "https://www.lsc.gov/about-lsc/what-legal-aid/i-need-legal-help"
+retrieved = "2026-09-26"
+license = "Federally funded nonprofit publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "fema_hsgp_fy2026"
+title = "Fiscal Year 2026 Homeland Security Grant Program: Notice of Funding Opportunity"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/sites/default/files/documents/fema_gpd_hsgp-nofo-fy2026.pdf"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nws_dust_storms"
+title = "Dust Storms and Haboobs"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/wind-dust-storm"
+retrieved = "2026-09-26"
+quote = "Make sure all of your lights are off when you park off the roadway."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_valley_fever"
+title = "About Valley Fever"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/valley-fever/about/index.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_sinkholes"
+title = "Sinkholes (Water Science School)"
+publisher = "U.S. Geological Survey"
+year = 2026
+url = "https://www.usgs.gov/water-science-school/science/sinkholes"
+retrieved = "2026-09-26"
+quote = "The most damage from sinkholes tends to occur in Florida, Texas, Alabama, Missouri, Kentucky, Tennessee, and Pennsylvania."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fl_dep_sinkhole_faq"
+title = "Sinkhole FAQ"
+publisher = "Florida Department of Environmental Protection, Florida Geological Survey"
+year = 2026
+url = "https://floridadep.gov/fgs/sinkholes/content/sinkhole-faq"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "aclu_stopped_by_police"
+title = "Know Your Rights: Stopped by Police"
+publisher = "American Civil Liberties Union"
+year = 2026
+url = "https://www.aclu.org/know-your-rights/stopped-by-police"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "nlg_mass_defense"
+title = "Mass Defense Resources (legal hotlines)"
+publisher = "National Lawyers Guild"
+year = 2026
+url = "https://www.nlg.org/massdefenseprogram/protest-tools/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "nia_affairs_checklist"
+title = "Getting Your Affairs in Order Checklist: Documents to Prepare for the Future"
+publisher = "National Institute on Aging"
+year = 2026
+url = "https://www.nia.nih.gov/health/advance-care-planning/getting-your-affairs-order-checklist-documents-prepare-future"
+retrieved = "2026-09-26"
+quote = "A durable power of attorney for health care names your health care proxy, a person who can make health care decisions for you if you are unable to communicate these yourself."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "missilesonourland_2023"
+title = "The Missiles on our Land"
+publisher = "Princeton University, Program on Science and Global Security"
+year = 2023
+url = "https://missilesonourland.org/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "dod_mirta_points"
+title = "DoD Sites - Point (Military Installations, Ranges and Training Areas)"
+publisher = "U.S. Department of Defense, Defense Installations Spatial Data Infrastructure"
+year = 2024
+url = "https://services7.arcgis.com/n1YM8pTrFmm7L4hs/arcgis/rest/services/mirta/FeatureServer/0"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "census_cbsa_pop_2024"
+title = "Annual Estimates of the Resident Population for Metropolitan Statistical Areas in the United States and Puerto Rico: April 1, 2020 to July 1, 2024 (CBSA-MET-EST2024-POP)"
+publisher = "U.S. Census Bureau"
+year = 2025
+url = "https://www2.census.gov/programs-surveys/popest/tables/2020-2024/metro/totals/cbsa-met-est2024-pop.xlsx"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usc_10_2674"
+title = "10 U.S. Code § 2674(f)(2): definition of the National Capital Region"
+publisher = "U.S. Code (Cornell Legal Information Institute)"
+year = 2026
+url = "https://www.law.cornell.edu/uscode/text/10/2674"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nnsa_locations"
+title = "Locations (National Nuclear Security Administration)"
+publisher = "U.S. Department of Energy, National Nuclear Security Administration"
+year = 2026
+url = "https://www.energy.gov/nnsa/locations"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eia_refinery_capacity_2026"
+title = "Refinery Capacity Report, Table 3: Capacity of Operable Petroleum Refineries by State as of January 1, 2026"
+publisher = "U.S. Energy Information Administration"
+year = 2026
+url = "https://www.eia.gov/petroleum/refinerycapacity/table3.pdf"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_nuclear_72h_2023"
+title = "Nuclear Detonation Response Guidance: Planning for the First 72 Hours"
+publisher = "FEMA"
+year = 2023
+url = "https://www.fema.gov/sites/default/files/documents/fema_oet-72-hour-nuclear-detonation-response-guidance.pdf"
+retrieved = "2026-09-26"
+quote = "Prepare to stay inside for at least 24 hours unless officials provide other instructions, or your building is threatened by fire or collapse."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "morina_2019_carrington"
+title = "Probability estimation of a Carrington-like geomagnetic storm (Scientific Reports 9:2393)"
+publisher = "Moriña D. et al."
+year = 2019
+url = "https://www.nature.com/articles/s41598-019-38918-8"
+retrieved = "2026-09-26"
+license = "CC BY 4.0 (paraphrased)"
+
+[[citation]]
+id = "nerc_tpl007_gmd"
+title = "Benchmark Geomagnetic Disturbance Event Description (Project 2013-03, TPL-007)"
+publisher = "North American Electric Reliability Corporation"
+year = 2014
+url = "https://www.nerc.com/globalassets/standards/projects/2013-03/benchmark_gmd_event_aug27_clean.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "swpc_power_grid"
+title = "Electric Power Transmission (space weather impacts)"
+publisher = "NOAA / NWS Space Weather Prediction Center"
+year = 2026
+url = "https://www.swpc.noaa.gov/impacts/electric-power-transmission"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nasa_tunguska_2019"
+title = "Tunguska Revisited: 111-Year-Old Mystery Impact Inspires New, More Optimistic Asteroid Predictions"
+publisher = "NASA"
+year = 2019
+url = "https://www.nasa.gov/solar-system/tunguska-revisited-111-year-old-mystery-impact-inspires-new-more-optimistic-asteroid-predictions/"
+retrieved = "2026-09-26"
+quote = "The research revealed that such relatively small but regionally devastating impacts happen on the order of millennia – not centuries, as previously thought."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eia_maria_2017"
+title = "Puerto Rico’s electricity service is slow to return after Hurricane Maria (Today in Energy)"
+publisher = "U.S. Energy Information Administration"
+year = 2017
+url = "https://www.eia.gov/todayinenergy/detail.php?id=33452"
+retrieved = "2026-09-26"
+quote = "PREPA reported all 1,570,000 of its electricity customers were without power after the storm."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "npr_maria_2018"
+title = "11 Months After Hurricane Maria Hit Puerto Rico, Officials Say All Power Is Restored"
+publisher = "NPR"
+year = 2018
+url = "https://www.npr.org/2018/08/15/639001372/11-months-after-hurricane-maria-hit-puerto-rico-officials-say-all-power-is-resto"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "powermag_epri_2019_hemp"
+title = "EMP Threat Real but Limited, EPRI Says in Much-Anticipated Report"
+publisher = "POWER magazine"
+year = 2019
+url = "https://www.powermag.com/emp-threat-real-but-limited-epri-says-in-anticipated-report/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "pry_2015_emp_testimony"
+title = "The EMP Threat: The State of Preparedness Against the Threat of an Electromagnetic Pulse (EMP) Event (statement for the record, May 13, 2015)"
+publisher = "U.S. House Committee on Oversight and Government Reform (statement of Peter Vincent Pry)"
+year = 2015
+url = "https://oversight.house.gov/wp-content/uploads/2015/05/Pry-Statement-5-13-EMP.pdf"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_volt_typhoon_2024"
+title = "PRC State-Sponsored Actors Compromise and Maintain Persistent Access to U.S. Critical Infrastructure (AA24-038A)"
+publisher = "Cybersecurity and Infrastructure Security Agency"
+year = 2024
+url = "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-038a"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "start_poicn"
+title = "Profiles of Incidents Involving CBRN and Non-state Actors (POICN) Database"
+publisher = "START, University of Maryland"
+year = 2026
+url = "https://www.start.umd.edu/research-projects/profiles-incidents-involving-cbrn-and-non-state-actors-poicn-database"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "ready_gov_biohazard"
+title = "Biohazard Exposure"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/bioterrorism"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "duke_2021_pandemics"
+title = "Statistics Say Large Pandemics Are More Likely Than We Thought"
+publisher = "Duke Global Health Institute"
+year = 2021
+url = "https://globalhealth.duke.edu/news/statistics-say-large-pandemics-are-more-likely-we-thought"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cassidy_mani_2022"
+title = "Risk of volcano catastrophe ‘a roll of the dice’, say experts (on Cassidy and Mani, Nature 608, 2022)"
+publisher = "University of Cambridge"
+year = 2022
+url = "https://www.cam.ac.uk/research/news/risk-of-volcano-catastrophe-a-roll-of-the-dice-say-experts"
+retrieved = "2026-09-26"
+license = "CC BY-NC-SA 4.0 (paraphrased, not quoted)"
+
+[[citation]]
+id = "usgs_yvo"
+title = "Questions About Supervolcanoes (Yellowstone Volcano Observatory)"
+publisher = "U.S. Geological Survey"
+year = 2026
+url = "https://www.usgs.gov/volcanoes/yellowstone/questions-about-supervolcanoes"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fdic_deposit_insurance"
+title = "Deposit Insurance"
+publisher = "Federal Deposit Insurance Corporation"
+year = 2026
+url = "https://www.fdic.gov/resources/deposit-insurance"
+retrieved = "2026-09-26"
+quote = "Your deposits are automatically insured to at least $250,000 at each FDIC-insured bank."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fdic_history_1930s"
+title = "FDIC history timeline, 1930–1939"
+publisher = "Federal Deposit Insurance Corporation"
+year = 2026
+url = "https://www.fdic.gov/history/1930-1939"
+retrieved = "2026-09-26"
+quote = "March 6, 1933 President Franklin D. Roosevelt declares a nationwide bank holiday."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fbi_active_shooter_2024"
+title = "FBI report on active attacker incidents in the United States in 2024"
+publisher = "FBI (via Internet Archive)"
+year = 2025
+url = "https://web.archive.org/web/20260904170718/https://www.fbi.gov/file-repository/reports-and-publications/2024-active-shooter-report/view"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "pnnl_2015_rainwater"
+title = "Rainwater Harvesting: State Regulations and Technical Resources (PNNL-24347)"
+publisher = "Loper S.A., Pacific Northwest National Laboratory (for the U.S. Department of Energy)"
+year = 2015
+url = "https://www.pnnl.gov/main/publications/external/technical_reports/PNNL-24347.pdf"
+retrieved = "2026-09-26"
+quote = "rainwater harvesting is not regulated by the federal government but rather it is up to individual states to regulate the collection and use of rainwater"
+license = "Report prepared for the U.S. Department of Energy (paraphrased; general finding only, the 2015 state-by-state details are not used)"
+
+[[citation]]
+id = "cdc_rainwater_collection"
+title = "Collecting Rainwater and Your Health: An Overview"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/drinking-water/about/collecting-rainwater-and-your-health-an-overview.html"
+retrieved = "2026-09-26"
+quote = "Rainwater is not necessarily safe to drink without first removing germs and chemicals from it."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "vdh_storm_wells"
+title = "Before and After the Storm: Private Wells and Onsite Sewage Systems"
+publisher = "Virginia Department of Health"
+year = 2024
+url = "https://www.vdh.virginia.gov/environmental-health/onsite-sewage-water-services-updated/before-and-after-the-storm-private-wells-and-onsite-sewage-systems/"
+retrieved = "2026-09-26"
+quote = "If your home is served by a well, the well pump will not work when the power goes out."
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "wsc_wellcare_help_2025"
+title = "Emergency Preparedness for Homeowners with Water Wells (Homeowner Emergency Localized Plan)"
+publisher = "Water Systems Council (wellcare program)"
+year = 2025
+url = "https://wellcarehotline.org/wp-content/uploads/2025/04/HELP-for-Well-Owners.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cdc_botulism_home_canning"
+title = "Home-Canned Foods (botulism prevention)"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/botulism/prevention/home-canned-foods.html"
+retrieved = "2026-09-26"
+quote = "Pressure canning is the only recommended method for canning low-acid foods."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nchfp_home"
+title = "National Center for Home Food Preservation (research-based home canning recommendations)"
+publisher = "University of Georgia Cooperative Extension (founded with USDA funding)"
+year = 2026
+url = "https://nchfp.uga.edu/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cdc_managing_stress"
+title = "Managing Stress"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/mental-health/living-with/index.html"
+retrieved = "2026-09-26"
+quote = "Take breaks from news and social media."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "rr_design_decision_log_2026"
+title = "Design document, section 14 decision log: the round-2 review and the v0.2.0 decisions (entry of 2026-09-26)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/DESIGN.md"
+retrieved = "2026-09-26"
+license = "CC BY-SA 4.0"
+
+[[citation]]
+id = "state_dept_passport_card"
+title = "Get a Passport Card"
+publisher = "U.S. Department of State (via Internet Archive)"
+year = 2026
+url = "https://travel.state.gov/content/travel/en/passports/need-passport/card.html"
+retrieved = "2026-09-26"
+quote = "The card is proof of U.S. citizenship and identity, and has the same length of validity as the passport book."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "state_dept_child_passport"
+title = "Apply for a Child's Passport Under 16"
+publisher = "U.S. Department of State (via Internet Archive)"
+year = 2026
+url = "https://travel.state.gov/content/travel/en/passports/need-passport/under-16.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ftc_2008_locksmith"
+title = "FTC Urges Consumers to Use Caution When Seeking a Locksmith"
+publisher = "Federal Trade Commission"
+year = 2008
+url = "https://www.ftc.gov/news-events/news/press-releases/2008/05/ftc-urges-consumers-use-caution-when-seeking-locksmith"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_data_backup_2012"
+title = "Data Backup Options"
+publisher = "Ruggiero P. and Heckathorn M.A., US-CERT (now CISA)"
+year = 2012
+url = "https://www.cisa.gov/sites/default/files/publications/data_backup_options.pdf"
+retrieved = "2026-09-26"
+quote = "Store 1 copy offsite (e.g., outside your home or business facility)."
+license = "Published by US-CERT, now CISA (paraphrased)"
+
+[[citation]]
+id = "rr_strategic_sites"
+title = "Strategic sites and county strategic-exposure classes (curated list; method in docs/DATA_SOURCES.md section 13.1)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml"
+retrieved = "2026-09-26"
+license = "Compiled by Ready Reckoner from the public sources listed in the file"
+
+[[citation]]
+id = "philippe_2023_icbm_fallout"
+title = "Who Would Take the Brunt of an Attack on U.S. Nuclear Missile Silos?"
+publisher = "Philippe S., Scientific American"
+year = 2023
+url = "https://www.scientificamerican.com/article/who-would-take-the-brunt-of-an-attack-on-u-s-nuclear-missile-silos/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "igrf14_coefficients"
+title = "International Geomagnetic Reference Field, 14th generation (IGRF-14): coefficients"
+publisher = "IAGA (NOAA NCEI copy)"
+year = 2024
+url = "https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt"
+retrieved = "2026-09-26"
+license = "Open coefficients published by IAGA for any use; NOAA NCEI distribution is a US Government work"
+
+[[citation]]
+id = "noaa_hms_smoke"
+title = "Hazard Mapping System Fire and Smoke Product"
+publisher = "NOAA NESDIS Office of Satellite and Product Operations"
+year = 2026
+url = "https://www.ospo.noaa.gov/products/land/hms.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_aqs_daily_pm25"
+title = "AirData pre-generated files: daily PM2.5 by monitor (FRM/FEM, parameter 88101)"
+publisher = "U.S. Environmental Protection Agency, Air Quality System"
+year = 2026
+url = "https://aqs.epa.gov/aqsweb/airdata/download_files.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_karst_2014"
+title = "Karst in the United States: A Digital Map Compilation and Database (Open-File Report 2014-1156)"
+publisher = "Weary D.J. and Doctor D.H., U.S. Geological Survey"
+year = 2014
+url = "https://pubs.usgs.gov/of/2014/1156/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usace_nid"
+title = "National Inventory of Dams"
+publisher = "U.S. Army Corps of Engineers"
+year = 2026
+url = "https://nid.sec.usace.army.mil/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "asdso_dam_failures"
+title = "Dam Failures and Incidents"
+publisher = "Association of State Dam Safety Officials"
+year = 2025
+url = "https://damsafety.org/dam-failures"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "eviction_lab_county_estimates"
+title = "Estimating Eviction Prevalence across the United States (county estimates, 2000-2018)"
+publisher = "Gromis A. et al., Princeton University Eviction Lab"
+year = 2022
+url = "https://data-downloads.evictionlab.org/"
+retrieved = "2026-09-26"
+license = "Open Data Commons Attribution License (ODC-BY 1.0): credit line required; the owner's sign-off on the attribution is pending (data audit section 7)"
+
+[[citation]]
+id = "ashp_shortages"
+title = "Drug Shortages Statistics (national drug shortages, January 2001 to June 2026)"
+publisher = "American Society of Health-System Pharmacists (data from the University of Utah Drug Information Service)"
+year = 2026
+url = "https://www.ashp.org/drug-shortages/shortage-resources/drug-shortages-statistics"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "openfda_drug_shortages"
+title = "openFDA drug shortages endpoint"
+publisher = "U.S. Food and Drug Administration (openFDA)"
+year = 2026
+url = "https://open.fda.gov/apis/drug/drugshortages/"
+retrieved = "2026-09-26"
+license = "CC0 1.0 (openFDA data)"
+
+[[citation]]
+id = "crs_rs20348_funding_gaps"
+title = "Federal Funding Gaps: A Brief Overview (RS20348)"
+publisher = "Congressional Research Service"
+year = 2026
+url = "https://www.congress.gov/crs-product/RS20348"
+retrieved = "2026-09-26"
+license = "CRS reports are works of the US Government, not subject to copyright"
+
+[[citation]]
+id = "snap_lapse_2025"
+title = "Where SNAP benefits stand amid government shutdown negotiations"
+publisher = "CNBC"
+year = 2025
+url = "https://www.cnbc.com/2025/11/12/snap-benefits-government-shutdown-negotiations.html"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "csis_terrorism_2025"
+title = "Methodology and Codebook: The Rising Threat of Anti-Government Domestic Terrorism"
+publisher = "Center for Strategic and International Studies, Warfare, Irregular Threats, and Terrorism Program"
+year = 2024
+url = "https://csis-website-prod.s3.amazonaws.com/s3fs-public/2024-10/241021_McCabe_Domestic_Methodology.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fbi_cde_arrests"
+title = "Crime in the United States, 2024: persons arrested (Table 29, estimated number of arrests; Tables 39 and 40, arrests by age and sex)"
+publisher = "FBI Uniform Crime Reporting Program (Crime Data Explorer)"
+year = 2025
+url = "https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "xpt_2023_karger"
+title = "Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament (FRI Working Paper 1)"
+publisher = "Karger E. et al., Forecasting Research Institute"
+year = 2023
+url = "https://forecastingresearch.org/pdf/existential-risk-persuasion-tournament.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "rp_2019_nuclear"
+title = "How likely is a nuclear exchange between the US and Russia?"
+publisher = "Rodriguez L., Rethink Priorities"
+year = 2019
+url = "https://rethinkpriorities.org/research-area/how-likely-is-a-nuclear-exchange-between-the-us-and-russia/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "barrett_2013_inadvertent"
+title = "Analyzing and Reducing the Risks of Inadvertent Nuclear War Between the United States and Russia (Science & Global Security 21(2))"
+publisher = "Barrett A.M., Baum S.D. and Hostetler K."
+year = 2013
+url = "https://scienceandglobalsecurity.org/archive/sgs21barrett.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "love_carrington"
+title = "On the lognormality of historical magnetic-storm intensity statistics: Implications for extreme-event probabilities (Geophysical Research Letters)"
+publisher = "Love J.J., Rigler E.J., Pulkkinen A. and Riley P. (U.S. Geological Survey publication record)"
+year = 2015
+url = "https://www.usgs.gov/publications/lognormality-historical-magnetic-storm-intensity-statistics-implications-extreme-event"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "lloyds_2013_solar"
+title = "Solar Storm Risk to the North American Electric Grid"
+publisher = "Lloyd's and Atmospheric and Environmental Research"
+year = 2013
+url = "https://assets.lloyds.com/assets/pdf-solar-storm-risk-to-the-north-american-electric-grid/1/pdf-Solar-Storm-Risk-to-the-North-American-Electric-Grid.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fdic_failed_banks"
+title = "Bank Failures and Assistance Transactions (BankFind Suite)"
+publisher = "Federal Deposit Insurance Corporation"
+year = 2026
+url = "https://banks.data.fdic.gov/bankfind-suite/failures"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "utah_wguep_2016"
+title = "Utah Earthquake Probabilities (Working Group on Utah Earthquake Probabilities: the 2016 forecast for the Wasatch Front region)"
+publisher = "Utah Geological Survey"
+year = 2016
+url = "https://geology.utah.gov/hazards/info/workshops/working-groups/earthquake-probabilities/"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "usgs_seattle_fault"
+title = "Earthquake probabilities and hazards in the U.S. Pacific Northwest"
+publisher = "Wirth E.A. et al., U.S. Geological Survey"
+year = 2025
+url = "https://www.usgs.gov/publications/earthquake-probabilities-and-hazards-us-pacific-northwest"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "pnnl_oe417_linkage"
+title = "Event-correlated Outage Dataset in America (OpenEI submission 6458)"
+publisher = "Pacific Northwest National Laboratory (Open Energy Data Initiative)"
+year = 2024
+url = "https://data.openei.org/submissions/6458"
+retrieved = "2026-09-26"
+license = "CC BY 4.0 (credit line required)"
+
+[[citation]]
+id = "cdc_co_quickstats"
+title = "QuickStats: Number of Deaths Resulting from Unintentional Carbon Monoxide Poisoning, by Month and Year, United States, 2010-2015 (MMWR 66(8))"
+publisher = "Centers for Disease Control and Prevention"
+year = 2017
+url = "https://www.cdc.gov/mmwr/volumes/66/wr/mm6608a9.htm"
+retrieved = "2026-09-26"
+quote = "During 2010–2015, a total of 2,244 deaths resulted from unintentional carbon monoxide poisoning, with the highest numbers of deaths each year occurring in winter months."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ftc_sentinel_2024"
+title = "Consumer Sentinel Network Data Book 2024"
+publisher = "Federal Trade Commission"
+year = 2025
+url = "https://www.ftc.gov/reports/consumer-sentinel-network-data-book-2024"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_barry_arm"
+title = "Potential Landslide-Generated Tsunami in Prince William Sound's Barry Arm Likely Less Severe than Previously Thought"
+publisher = "U.S. Geological Survey"
+year = 2021
+url = "https://www.usgs.gov/news/state-news-release/potential-landslide-generated-tsunami-prince-william-sounds-barry-arm"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_h5n1_situation"
+title = "A(H5) Bird Flu: Current Situation"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/bird-flu/situation-summary/index.html"
+retrieved = "2026-09-26"
+quote = "There is no known person-to-person spread at this time"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "iv_fluids_helene_2024"
+title = "Weathering The Storm: Commentary on the Hurricane Helene IV Fluid Shortage (Journal of Pediatric Pharmacology and Therapeutics 29(6):667)"
+publisher = "Journal of Pediatric Pharmacology and Therapeutics"
+year = 2024
+url = "https://doi.org/10.5863/1551-6776-29.6.667"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "nhc_storm_surge_maps"
+title = "National Storm Surge Risk Maps (SLOSH Maximum of Maximums)"
+publisher = "NOAA National Hurricane Center"
+year = 2026
+url = "https://www.nhc.noaa.gov/nationalsurge/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "rr_surge_proxy"
+title = "County storm-surge proxy (method in docs/DATA_SOURCES.md section 13.8)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/DATA_SOURCES.md"
+retrieved = "2026-09-26"
+license = "CC BY-SA 4.0"
+
+[[citation]]
+id = "usgs_landslide_2024"
+title = "Slope-Relief Threshold Landslide Susceptibility Models for the United States and Puerto Rico"
+publisher = "U.S. Geological Survey (ScienceBase)"
+year = 2024
+url = "https://doi.org/10.5066/P13KAGU3"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_echo_sdwa"
+title = "ECHO Safe Drinking Water Act data downloads (download summary and data element dictionary)"
+publisher = "U.S. Environmental Protection Agency, Enforcement and Compliance History Online"
+year = 2026
+url = "https://echo.epa.gov/tools/data-downloads/sdwa-download-summary"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"

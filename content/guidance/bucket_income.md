@@ -1,6 +1,7 @@
 ---
 id: bucket_income
 title: Losing income
+kind: bucket
 applies_to: [bucket:income]
 citations: [bls_work_experience_2024, bls_unemployment_duration, fed_shed_2024, cfpb_emergency_fund, finra_financial_foundations, dol_unemployment_insurance, ssa_disability_facts]
 ---

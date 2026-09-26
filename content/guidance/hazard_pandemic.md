@@ -1,6 +1,7 @@
 ---
 id: hazard_pandemic
 title: Pandemics
+kind: hazard
 applies_to: [hazard:pandemic]
 citations: [ready_gov_pandemic, marani_2021_pandemics, cdc_mmwr_stay_at_home_2020, rr_research_risk_model, cdc_masks, cfpb_emergency_fund]
 ---

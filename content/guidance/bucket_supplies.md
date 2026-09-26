@@ -1,6 +1,7 @@
 ---
 id: bucket_supplies
 title: Can't get to a store
+kind: bucket
 applies_to: [bucket:supplies, hazard:supply_chain_disruption]
 citations: [cdc_mmwr_stay_at_home_2020, rr_research_risk_model, ready_gov_food, fsis_shelf_stable, ready_gov_pandemic, rr_research_supply_standards, usda_dga_2020_2025]
 ---

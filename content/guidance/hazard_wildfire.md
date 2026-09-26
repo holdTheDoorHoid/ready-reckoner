@@ -1,6 +1,7 @@
 ---
 id: hazard_wildfire
 title: Wildfire and smoke
+kind: hazard
 applies_to: [hazard:wildfire]
 citations: [ready_gov_wildfires, epa_wildfire_indoor_air, rr_research_risk_model, epa_children_wildfire_smoke, epa_diy_air_cleaners]
 ---
