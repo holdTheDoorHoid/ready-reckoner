@@ -1,9 +1,14 @@
 # Engine API (contract between `rr-wasm` / `rr-cli` and the web app)
 
-`ENGINE_API_VERSION = 1`. Bump it whenever a type, id or function below changes shape; update
+`ENGINE_API_VERSION = 2`. Bump it whenever a type, id or function below changes shape; update
 `crates/rr-types`, `web/src/engine/types.ts` and `web/src/engine/mock.ts` in the same commit.
 `cargo test -p rr-types` fails if `types.ts` drifts from the Rust types (fields, optional markers,
 id lists) or if this file stops naming a function or error code.
+
+Version 2 is the v0.2.0 contract (`~/Desktop/ready-reckoner-briefs/round2/phase2/DESIGN-DELTA.md`
+§1). Every addition is optional or defaults when absent, so a saved v1 plan (`rr.plan.v1`) still
+loads; the one breaking change is the retired hazard id `terrorism`. See
+[Changes from v1](#changes-from-v1).
 
 All functions take and return JSON strings (wasm-bindgen `String`), so the mock engine in TypeScript
 and the WebAssembly engine are interchangeable behind `web/src/engine/index.ts` (`interface Engine`;
@@ -34,7 +39,7 @@ After `ambiguous_zip` the app asks the user to pick a county and stores it in
 
 | Function | Input | Output |
 | --- | --- | --- |
-| `engine_info()` | — | `EngineInfo { engine_version, api_version, data_pack_version?, content_version, packs_loaded: [string], attributions: [Attribution] }` |
+| `engine_info()` | — | `EngineInfo { engine_version, api_version, data_pack_version?, content_version, packs_loaded: [string], attributions: [Attribution], validation?: ValidationSummary }` |
 | `load_pack(name, bytes)` | one data file: its path as `data/manifest.json` lists it (`manifest.json`, `core/nri_hazards.csv`, `geo/counties.json`), bytes (Uint8Array) | `PackInfo { name, version, rows }`: the path, the manifest's `pack_version`, the rows read. The web app fetches the files (same origin) and hands the bytes in, manifest first; the engine never fetches. See [Loading](#loading) |
 | `county_search(query)` | free text ("phila", "42101", "Cook, IL") | `[LocationResolved]`, up to 10 |
 | `resolve_location(json)` | `LocationInput` | `LocationResolved`, or `unknown_zip` / `unknown_county` / `ambiguous_zip` with suggestions |
@@ -74,6 +79,12 @@ FEMA does not endorse the app; CC BY sources (EAGLE-I, the NCA5 Atlas) need cred
 - Deterministic: same input, same output, byte for byte, on every target. Engine crates compute
   exp, ln, pow and the normal distribution with `rr_types::math` (pure-Rust libm), because the
   platform maths library differs between native builds and WebAssembly in the last bit.
+- Old files keep working. Input fields added in v2 are optional (absent means "not asked") or
+  default when absent; output fields added in v2 are left out when empty (absent, `[]` or
+  `false`), so a v1 output reads back byte for byte and the app can tolerate a stored output that
+  lacks them. The app recomputes outputs on load, so a stored output's ids never outlive the
+  engine. Retired ids still parse (`HazardId::is_retired`); the engine never emits them, and engine
+  crates build output from `HazardId::ACTIVE`, never from `ALL`.
 
 ## Validation
 
@@ -84,11 +95,19 @@ Codes: `schema` (the JSON does not match the types), `unsupported_country` (not 
 `location_missing` (neither ZIP nor county), `zip_format` and `county_fips_format` (not exactly five
 digits), `no_people`, `negative_value`, `not_finite`, `out_of_range` (horizon outside 1–50 years,
 device watts not above 0, `confidence_1to5` outside 1–5), `earners_mismatch`
-(`finances.income.earners` differs from the people marked `earner`), `id_format` (an item or
-scenario id that is not snake_case), `duplicate_id` (a scenario toggled twice).
+(`finances.income.earners` differs from the people marked `earner`), `id_format` (an item,
+scenario or family id that is not snake_case), `duplicate_id` (a scenario toggled twice),
+`unknown_id` (a `dials.rare_opt_in` entry that names no rare family and is not `all`; v2).
 
 Unusual but meaningful choices (a zero budget, no insurance, qty 0) are not problems. The plan's
 guardrail warnings handle those, and they never block.
+
+`PlanInput::from_json` tidies before it validates: the family plan's free text is trimmed, cut to
+`FAMILY_PLAN_TEXT_MAX` (300) characters for notes and `FAMILY_PLAN_SHORT_MAX` (80) for names and
+phone numbers, its lists to `ROUTES_MAX` (2), `TRUSTED_CIRCLE_MAX` (4) and `NUMBERS_BY_HEART_MAX`
+(5) entries; blank text becomes absent, empty entries are dropped, and an empty plan disappears.
+Nothing in the family plan is ever required or reported as a problem. The limits are exported in
+`types.ts` for the form's `maxlength`.
 
 ## Types
 
@@ -103,11 +122,18 @@ PlanInput { planning_date, location: LocationInput, housing: Housing, people: [P
             assume_basics?: bool,                                  # defaults to true when absent
             dials: Dials,
             stage?: not_thought_about|thinking|have_some_things|have_a_plan|maintaining,
-            confidence_1to5?: u8 }
+            confidence_1to5?: u8,
+            family_plan?: FamilyPlan }                             # v2; never computed with
 LocationInput { country: "US", zip?, county_fips?, setting: urban|suburban|rural }
 Housing { kind, tenure, floor: i8, basement, water: municipal|well, sewer: sewer|septic, heating,
-          cooling, backup_power, alarms: { smoke, co, extinguisher } }
-Person { age_band, pregnant_or_nursing, medical: Medical, earner, commute?: Commute }
+          cooling, backup_power, alarms: { smoke, co, extinguisher },
+          below_grade_bedroom: bool,                               # v2; defaults to false
+          cooking?: electric|gas|induction|none,                   # v2; absent = not asked
+          raw_water_source?: none|well|surface_nearby|rain_barrel|neighbour_well,   # v2
+          water_system_record?: fine|occasional_notices|frequent_problems|unknown } # v2
+Person { age_band, pregnant_or_nursing, medical: Medical, earner, commute?: Commute,
+         access_needs: [hearing|vision|limited_english|cognitive|supervision|service_animal
+                        |dialysis|home_health] }                   # v2; defaults to []
 Medical { daily_rx, refrigerated_rx, powered_device, mobility: none|limited|wheelchair,
           dietary: [string], epinephrine }
   powered_device: "none" | "cpap" | "oxygen" | { "other": { "watts": f32 } }
@@ -116,13 +142,26 @@ Pets { dogs, cats, small, large_animals }                      # u8 counts
 HouseholdMobility { vehicles: [{ fuel: gas|diesel|hybrid|ev }] }   # JSON field `mobility`
 Finances { monthly_budget_usd, one_off_budget_usd, emergency_fund_months, monthly_expenses_usd?,
            income: { earners: u8, stability: very_stable|stable|variable|seasonal|gig },
-           insurance: { home_or_renters, flood, earthquake } }
-Owned { item_id, qty: f32, paid_usd? }
+           insurance: { home_or_renters, flood, earthquake,
+                        sewer_backup?: bool, life_or_disability?: bool },   # v2; absent = not asked
+           benefits: [federal_pay|snap_wic|ssi_ssdi|va|unemployment] }       # v2; defaults to []
+Owned { item_id, qty: f32, paid_usd?, tested_on?: date }       # tested_on: v2
 Dials { return_period: one_in_10|one_in_50|one_in_100|one_in_500,
         climate: today|y2050, horizon_years: u8,
         water_level: survival|basic|comfortable,               # defaults to basic when absent
         scenario_overrides: [{ id, on }],                      # defaults to [] when absent
-        rare_catastrophic_opt_in: bool }                       # defaults to false when absent
+        rare_catastrophic_opt_in: bool,                        # defaults to false when absent
+        rare_opt_in: [string],                                 # v2; family ids or ["all"]; defaults to []
+        minimum_kit: bool,                                     # v2; defaults to false
+        long_horizon: bool }                                   # v2; defaults to false
+FamilyPlan { meeting_place_near?, meeting_place_far?, out_of_area_contact?: Contact,
+             school_pickup?, work_plans?, shelter_spot_home?, shelter_spot_work?,
+             where_we_would_go?, routes?: [string], neighbours_who_check?, who_takes_animals?,
+             shutoff_gas?, shutoff_water?, shutoff_electric?,
+             trusted_circle?: [TrustedPerson], lawyer?: Contact, roadside_assistance?,
+             numbers_by_heart?: [string] }                     # v2; every field free text
+Contact { name?, phone? }
+TrustedPerson { name?, phone?, holds?: [spare_key|documents|medical_poa|backup_codes] }
 ```
 
 `existing` is the baseline inventory. A free action counts as done when it appears there with `qty`
@@ -133,6 +172,29 @@ per person, three days of ordinary food — unless the Have screen says otherwis
 what was assumed. Those items are the ones with `Item.assumed_basic` set. `defaults()` uses
 `return_period` `one_in_100` and `horizon_years` 10.
 
+v2 inputs, in plain terms:
+
+- `access_needs` (CMIST: communication, maintaining health, independence, support and safety,
+  transportation) drive the communication plan, the registries and evacuation help; mobility and
+  powered devices keep their own fields in `medical`.
+- `below_grade_bedroom`: someone sleeps below street level (flash-flood card, water alarm).
+  `cooking`: the main stove; a gas range can boil water through a power cut. `raw_water_source`:
+  water the household could filter; a filter's days count only with a source. `water_system_record`
+  is combined with the county's EPA drinking-water violations. Absent means "not asked": the engine
+  assumes no gas range, no raw source and an unknown record.
+- `benefits`: only households that tick one see the benefit-interruption hazard.
+  `insurance.sewer_backup` and `insurance.life_or_disability` feed the insurance decisions.
+- `Owned.tested_on`: when the household last tried an item that needs testing (items with
+  `Item.test_interval_months`).
+- `rare_opt_in` names the rare families the rare allowance may buy for (a family id is the id of
+  the rare hazard that heads it; see [Ids](#ids)), or `["all"]`. `rare_catastrophic_opt_in` stays
+  and means `["all"]`; engine crates read both through `Dials::rare_families()`. `minimum_kit`
+  turns on bare-minimum mode (the engine also switches it on, and warns, when a plan would run past
+  36 months). `long_horizon` shows the long-horizon section even when no target passes 30 days.
+- `family_plan` is the household's own plan from a device-only screen: echoed into the packet and
+  the wallet cards, stored in the saved plan file (it is the household's own file), never used for
+  computation, and never sent anywhere.
+
 ### Outputs
 
 ```
@@ -140,19 +202,30 @@ LocationResolved { country, county_fips, county_name, state_abbr, state_name, zi
                    zip_county_share?: f32, centroid: { lat, lon }, nca_region, coastal, tsunami_zone,
                    facility_flags: { nuclear_plant_within_16km, nuclear_plant_within_80km,
                                      hazmat_facilities_within_5km: u16 },
-                   data_note? }
+                   data_note?,
+                   exposure?: Exposure }                                   # v2
+Exposure { strategic_class?, strategic_km?, surge_cat3_share?, surge_proxy_class?, smoke_days_35?, leveed_pop_share?,
+           dams_high_within_10km?, karst_share?, landslide_susceptible_share?, water_system_flag?,
+           geomag_factor?, uasi_share?, eviction_rate? }    # v2; each a Sourced { value, source }
 
 HazardProfile { id, name, tier: natural|societal|personal, display: ranked|rare_catastrophic,
                 rate_per_year, rate_range: [lo, hi], annual_probability, probability_range: [lo, hi],
                 severity, eal_per_household_usd?, climate_multiplier,
                 confidence: high|medium|low|prior, sources: [CitationId], frequency_sentence,
-                buckets: [BucketId] }
+                buckets: [BucketId],
+                family?, sub_causes?: [SubCause], location_factor?: LocationFactor,  # v2
+                range_only?: bool, anchor_sentence?, if_it_reaches_you?, what_it_changes? } # v2
+SubCause { id, name, note, rate_range?: [lo, hi], sources: [CitationId] }            # v2
+LocationFactor { class, label, multiplier: [lo, mid, hi], sources: [CitationId] }    # v2
 
 BucketAssessment { id, name, target: Target, covered: Target, covered_today: Target,
                    tier_enough: TierId,
                    contributions: [{ hazard, share }], frequency_sentences: [string],
                    sources: [CitationId],
-                   relief?: { help_arrives_days, mostly_restored_days, sources } }
+                   relief?: { help_arrives_days, mostly_restored_days, sources },
+                   stress_test?: StressTest }                              # v2
+StressTest { event, date, region, share_out_at_days: [[days, share], …], covered_by_target,
+             sources: [CitationId] }                                        # v2
 Target = { kind: "days", value, low, high }                                # duration buckets
        | { kind: "months", value, low, high }                              # income
        | { kind: "evacuate", p_need_10yr, notice_hours_low, notice_hours_high, days_away }
@@ -163,26 +236,42 @@ RequirementLine { id, bucket, item_class, quantity, unit, per: household|person|
 
 PlanItem { item_id, name, kind: free_action|purchase|reserve, quantity, unit, est_cost_usd,
            price_band: { low, high }, buckets: [BucketId], hazards: [HazardId], why,
-           risk_reduction, tier: TierId, done?, paid_usd? }
+           risk_reduction, tier: TierId, done?, paid_usd?,
+           requires?: [ItemId], decision?: bool }                               # v2
 
 PlanOutput { engine_version, api_version, data_pack_version, content_version,
              location: LocationResolved, register: [HazardProfile], buckets: [BucketAssessment],
              scenarios: [ScenarioInfo], tier_reached: TierId, tier_recommended: TierId,
              plan: Plan, requirements: [RequirementLine], warnings: [Warning],
-             packet_markdown, provenance: [Citation] }
+             packet_markdown, provenance: [Citation],
+             recovery?: RecoveryInfo }                                           # v2
+RecoveryInfo { county_declarations_5yr?: u16, sources: [CitationId] }            # v2
 Plan { months: [{ index, budget_usd, items: [PlanItem] }], done_month?,
        envelopes: [{ item_id, saved_usd, needed_usd }],
-       savings_track?: { target_months, target_usd, current_months, monthly_suggestion_usd, why } }
+       savings_track?: { target_months, target_usd, current_months, monthly_suggestion_usd, why },
+       first_milestone?: { months, usd, by_month },                              # v2
+       minimum_kit?: bool, long_horizon?: [PlanItem] }                           # v2
 ScenarioInfo { id, name, applies_because, on, effect_summary, sources: [CitationId] }
 Warning { id, severity: note|warn, message, why, related: [string] }
 ```
 
 What the numbers mean:
 
-- `register`: `ranked` hazards first, most important first; then the `rare_catastrophic` ones
-  (nuclear attack and EMP, war, terrorism), which the app shows in their own box with likelihood
-  and severity as two columns, never ranked by expected loss. `rate_per_year` is the household event
-  rate r_h; `annual_probability` is 1 − e^(−r_h).
+- `register`: `ranked` hazards first, most important first; then the `rare_catastrophic` ones (the
+  nine rare families), which the app shows in their own box, sorted by how likely here and never
+  by expected loss: likelihood as a range only, "if it reaches you" in zone-conditional words,
+  "why here" from `location_factor`, and "what it changes in your plan". `rate_per_year` is the
+  household event rate r_h; `annual_probability` is 1 − e^(−r_h). With `range_only` set (every
+  rare row, and any rate built on stacked expert judgement) the app shows only the range, never a
+  point estimate. `family` names the family a rare row heads; `sub_causes` are the named causes
+  inside a hazard (the EMP of a high-altitude burst, Yellowstone, a dam release), each a note with
+  sources and, where known, its own rate range; they are data, not ids. `anchor_sentence` compares
+  the row with the household's own list ("less likely than a house fire, about 5 in 100 for you").
+- `location.exposure`: what the data pack knows about the place's exposure to the v2 hazards
+  (strategic class A–E, distance to a strategic site, storm-surge share, smoke days, leveed
+  population, high-hazard dams, karst, landslide susceptibility, drinking-water violations,
+  geomagnetic factor, UASI share, eviction filings), each value with its source, for the "Why
+  here" drawers and the About data page. Absent fields are unknown, not zero.
 - `buckets` come in `BucketId` order. The target's kind follows the bucket: days for the duration
   buckets, months for `income`, `evacuate` for `evacuate`, readiness for the other readiness buckets
   and for `home_loss` (an insurance-and-documents decision with no stockpile target).
@@ -198,6 +287,9 @@ What the numbers mean:
   `tier_enough` is where the plan stops adding to that bucket.
 - `relief` (duration buckets, where known): when outside help plausibly arrives and when service is
   mostly restored for the design event (the Oregon Resilience Plan's two-tier rating).
+- `stress_test` (v2; power and water buckets where the pack has the record): the worst event in the
+  region's record, how many customers were still out after so many days, and whether the target
+  would have outlasted it.
 - `scenarios`: named scenarios (for example `cascadia_m9`) that apply to this location, with the
   engine's default or the user's override from `dials.scenario_overrides`.
 - `RequirementLine.quantity` is for the whole household, already multiplied out by `per`.
@@ -207,6 +299,15 @@ What the numbers mean:
   first, and receives the one-off budget. `done_month` is the month by which every bucket is covered.
   `envelopes` are sinking funds for items that cost more than a month's budget. `savings_track` is the
   emergency-fund goal for `income`, never funded from the supplies budget.
+- `first_milestone` (v2): the first savings step, one month of expenses or $500, whichever is
+  smaller, and the plan month it is reached. `minimum_kit` (v2): the plan is in bare-minimum mode.
+  `long_horizon` (v2): the long-horizon section (rain catchment, fuel storage, sanitation for months),
+  present when a target passes 30 days or `dials.long_horizon` is on.
+- `PlanItem.requires` (v2): items it needs first; the allocator never schedules it before them.
+  `PlanItem.decision` (v2): an insurance or home-repair decision, not a purchase.
+- `recovery` (v2): facts for the "After a disaster: the first 30 days" page, such as how many federal
+  disaster declarations covered the county in the last five years.
+- `warnings`: guardrails, identified by stable ids; see [Warnings](#warnings).
 
 ### Content (`docs/DESIGN.md` §4.6)
 
@@ -218,8 +319,12 @@ Item { id, name, category, unit, buckets: [BucketId], tier: TierId, free,
        spec, look_for: [string], avoid: [string],
        price_band_usd: { low, high, per, note? }, retrieved?,  # when the price band was observed
        quantity_rule, maintenance?: { rotate_months?, check_months? }, citations: [CitationId],
-       hazard_extras: [HazardId], energy_kcal_per_unit?, volume_l_per_unit? }
-GuidanceMeta { id, title, applies_to: [string], citations: [CitationId] }
+       hazard_extras: [HazardId], energy_kcal_per_unit?, volume_l_per_unit?,
+       requires: [ItemId], decision, long_horizon,             # v2; default to [] / false when absent
+       readiness_share?: f32, season?: spring|summer|fall|winter,
+       test_interval_months?: u16 }                            # v2
+GuidanceMeta { id, title, applies_to: [string], citations: [CitationId],
+               kind?: after|plan|hazard|bucket|tier|topic|family }   # v2
 ```
 
 - `Citation.prior`: the source is an expert judgement, not data. Every number that cites it is shown
@@ -232,12 +337,30 @@ GuidanceMeta { id, title, applies_to: [string], citations: [CitationId] }
   when `PlanInput.assume_basics` is on (see above); off by default.
 - `energy_kcal_per_unit` and `volume_l_per_unit` let the app show cost per 2,000 kcal and per litre or
   gallon.
+- v2: `Item.requires` lists the items an accessory needs first (batteries need the light, fuel the
+  can). `readiness_share` (0 to 1) is the share of its readiness bucket's value the item carries, so
+  a whistle no longer outranks a headlamp. `decision` marks an insurance or mitigation decision that
+  costs the supplies budget nothing. `long_horizon` puts the item in the long-horizon section.
+  `season` is its maintenance anchor: have it before the season starts, or check it then
+  (meteorological seasons; summer starts 1 June with the hurricane season). `test_interval_months`
+  says how often to try it; `Owned.tested_on` records the last time.
+- v2: `GuidanceMeta.kind` says where a block belongs: `after` (the recovery page), `plan` (shelter
+  plan, 48-hour list, communication plan), `hazard`, `bucket`, `tier`, `topic`, or `family` (a rare
+  family, with its "what it changes in your plan" paragraph; `applies_to` holds the family id).
+  Blocks not yet classified leave it out.
+- v2 renderer conditions (implemented in `rr-content`): besides `{if:<hazard>}…{/if}`, a block may
+  keep a span only for a housing kind (`{if:home:<kind>}`, `{if:not_home:<kind>}`), an access need
+  (`{if:need:<access_need>}`), an item the plan holds (`{if:has:<item_id>}`) or a benefit
+  (`{if:benefit:<benefit>}`). Spans do not nest.
 
 ### Function arguments and results
 
 ```
 EngineInfo { engine_version, api_version, data_pack_version?, content_version,
-             packs_loaded: [string], attributions: [Attribution] }
+             packs_loaded: [string], attributions: [Attribution],
+             validation?: ValidationSummary }                              # v2
+ValidationSummary { events_tested, covered, partial, short, not_modelled: u16,
+                    data_pack, url_anchor }                                # v2
 Attribution { source, text, url, version?, accessed }         # show `text` exactly
 PackInfo { name, version, rows: u32 }
 Catalogue { items, citations, guidance, hazards: [HazardInfo], buckets: [BucketInfo],
@@ -249,7 +372,12 @@ EngineError { code, message, details? }
 Problem { code, field, message }
 ```
 
-`data_pack_version` is absent from `EngineInfo` until a pack is loaded.
+`data_pack_version` is absent from `EngineInfo` until a pack is loaded. `validation` (v2) summarises
+the backtest against the frozen set of past disasters in `docs/VALIDATION.md` (how many
+event-and-household pairs the target covered, partly covered, fell short on or could not model),
+from a table bundled with the engine, for the public `#/validation` page; absent when no table is
+bundled. `catalogue().hazards` lists every hazard the engine may emit (`HazardId::ACTIVE`), so it
+leaves out the retired `terrorism`.
 
 ### Engine-internal types (Rust only)
 
@@ -274,14 +402,69 @@ Ids are stable snake_case strings. `rr-types` exposes them as enums with `ALL`, 
 `FromStr` and `Display`; `types.ts` exposes each as an `as const` list and a union type.
 `catalogue()` returns the plain names, so the UI never hard-codes them.
 
-- **Hazards** (35; `docs/DESIGN.md` §4.2): 18 natural (the NRI hazards), 9 societal, 8 personal.
-- **Buckets** (14): duration `power`, `water_boil`, `water_out`, `supplies`, `thermal`,
-  `medication`, `comms`; readiness `evacuate`, `get_home`, `medical_emergency`, `fire`, `security`;
-  money `income`, `home_loss`.
+- **Hazards** (54 ids, 53 active; `docs/DESIGN.md` §4.2): 23 natural (the 18 NRI hazards, then
+  `wildfire_smoke`, `dust_storm`, `sinkhole`, `geomagnetic_storm`, `vei7_eruption`), 20 societal
+  (the nine of v1, then `dam_failure`, `network_outage`, `drug_shortage`, `benefit_interruption`,
+  `attack_disruption`, `multi_month_blackout`, `war_infrastructure`, `cbrn_attack`,
+  `severe_pandemic`, `financial_crisis`, `mass_violence`), 11 personal (the eight of v1, then
+  `water_damage`, `eviction`, `arrest_or_detention`). `HazardId::is_nri` marks the 18 whose county
+  rates come from the National Risk Index.
+- **Retired hazard ids**: `terrorism` (retired in v2; `#[deprecated]` in Rust, `RETIRED_HAZARD_IDS`
+  in `types.ts`). It still parses so v1 plans load; it is never emitted and is left out of
+  `HazardId::ACTIVE` and `catalogue().hazards`. Its two halves are `attack_disruption` (ranked: an
+  attack or threat closes your area) and `mass_violence` (rare: being caught up in a shooting or
+  bombing).
+- **Rare families** (9): each rare hazard heads one family, and the family id is that hazard's id
+  (`HazardId::family`; `RARE_HAZARD_IDS` in `types.ts`). Everything else in a family is a
+  sub-cause. `Dials.rare_opt_in` takes these ids or `"all"`.
+
+  | Family id | Shown as | Sub-causes (examples) |
+  | --- | --- | --- |
+  | `geomagnetic_storm` | Severe solar storm | asteroid or comet |
+  | `vei7_eruption` | Very large volcanic eruption | Yellowstone |
+  | `nuclear_attack` | Nuclear attack | limited strike, device in a city, use abroad, EMP |
+  | `multi_month_blackout` | Power out for months (any cause) | computed from the power curve and the rows above |
+  | `war_infrastructure` | War with attacks on US infrastructure | — |
+  | `cbrn_attack` | Chemical, biological or radiological attack | chemical, biological, radiological |
+  | `severe_pandemic` | Severe pandemic | 1918-class, engineered |
+  | `financial_crisis` | Financial crisis with bank closures | — |
+  | `mass_violence` | Mass shooting or bombing | — |
+
+- **Buckets** (15): duration `power`, `water_boil`, `water_out`, `supplies`, `thermal`,
+  `medication`, `comms`; readiness `evacuate`, `get_home`, `medical_emergency`, `fire`, `security`,
+  `clean_air` (v2: "Unhealthy air indoors", a checklist sized by smoke and dust days); money
+  `income`, `home_loss`.
 - **Tiers** (7): `now` (0 days), `h72` (3), `w2` (14), `m1` (30), `m3` (90), `m6` (180), `y1` (365).
   The get-home bag is an item in the `get_home` bucket, not a tier.
 - **Return periods**: `one_in_10` "Common disruptions", `one_in_50` "Serious", `one_in_100` "Very
   serious" (default), `one_in_500` "Rare catastrophes".
+- **Seasons** (v2): `spring`, `summer`, `fall`, `winter`. **Guidance kinds** (v2): `after`, `plan`,
+  `hazard`, `bucket`, `tier`, `topic`, `family`.
+
+## Warnings
+
+`Warning.id` is a stable string; the app can react to an id, never to the message. v2 adds the six
+marked below (`rr_types::Warning::V2_IDS`).
+
+| Id | Emitted by | When |
+| --- | --- | --- |
+| `zero_budget` | rr-budget | no monthly and no one-off money |
+| `device_power_plan` | rr-budget | a powered medical device and no backup power by month 3 |
+| `cold_chain_plan` | rr-budget | refrigerated medicine and no way to keep it cool by month 3 |
+| `no_stored_water_by_month_3` | rr-budget | no stored water beyond refilled bottles by month 3 |
+| `smoke_alarms_landlord` | rr-budget | renters with no working smoke alarms |
+| `evacuation_no_go_bag` | rr-budget | a 10 % ten-year chance of leaving and no go-bag by month 6 |
+| `insurance_flood`, `insurance_quake` | rr-budget | an owner in a flood- or quake-prone area without that policy |
+| `uncovered_<bucket>` | rr-budget | the plan ran out of things to buy before the bucket's goal |
+| `cliff_<bucket>` | rr-consequence | one event near the dial drives the bucket's target |
+| `assumed_basics`, `unknown_existing_items` | rr-plan | basics were credited; unknown item ids were ignored |
+| `citation_missing` | rr-plan | a number points to a source still being added |
+| `surge_zone_stay_home` (v2) | rr-budget | a surge zone or a likely evacuation, and a plan that never says to leave (REVIEW S2) |
+| `cold_chain_power` (v2) | rr-budget | refrigerated medicine that needs a power source for a power target of 2 days or more, and none planned (S1) |
+| `benefit_lapse` (v2) | rr-budget | a household relying on federal pay or a benefit with no food buffer by month 3 (H7) |
+| `plan_too_long` (v2) | rr-budget | the full plan would run past 36 months; bare-minimum mode takes over (R6) |
+| `no_raw_water_source` (v2) | rr-budget | a water filter in the plan and no raw water source named (S6) |
+| `no_cooking_capability` (v2) | rr-budget | no way to cook or boil water without power (K1) |
 
 ## Loading
 
@@ -365,3 +548,91 @@ Once any pack file is loaded the packs decide, and the sample counties no longer
 fixture households (`web/src/engine/fixtures.ts`), so screens can be built and screenshot-tested
 before the engine exists. A parity test asserts that the mock and wasm outputs have identical JSON
 shapes for each fixture.
+
+## Changes from v1
+
+Contract v2 ships with v0.2.0. It comes from `DESIGN-DELTA.md` §1 (in
+`~/Desktop/ready-reckoner-briefs/round2/phase2/`), which turns the round-2 review
+(`../REVIEW.md`; finding ids below) and the owner's decisions of 2026-09-26 into contract changes.
+Everything is additive except the retired `terrorism` id.
+
+**Loading v1 files.** A v1 plan (`rr.plan.v1`) parses unchanged: every new input field is optional
+or has a default, and `terrorism` still parses. A v1 `PlanOutput` parses and re-serialises byte for
+byte (tested against the goldens), because every new output field is left out when empty. The app
+recomputes outputs on load and ignores ids it does not know in a stored output.
+
+### Inputs
+
+| Field | Type | When absent | Why |
+| --- | --- | --- | --- |
+| `Person.access_needs` | `[AccessNeed]`: `hearing`, `vision`, `limited_english`, `cognitive`, `supervision`, `service_animal`, `dialysis`, `home_health` | `[]` | CMIST needs for the communication plan, registries and evacuation help (§1.1; REVIEW N3) |
+| `Housing.below_grade_bedroom` | bool | `false` | someone sleeps below street level: flash-flood card and water alarm (§1.1; R3, backtest M-09) |
+| `Housing.cooking` | `electric` \| `gas` \| `induction` \| `none` | absent (not asked) | cooking capability; a gas range activates the boil-water coupling (§1.1; K1) |
+| `Housing.raw_water_source` | `none` \| `well` \| `surface_nearby` \| `rain_barrel` \| `neighbour_well` | absent (counts as none) | a filter's coverage counts only with a source (§1.1; S6) |
+| `Housing.water_system_record` | `fine` \| `occasional_notices` \| `frequent_problems` \| `unknown` | absent (counts as unknown) | self-report combined with SDWIS for water-system fragility (§1.1; R2) |
+| `Finances.benefits` | `[Benefit]`: `federal_pay`, `snap_wic`, `ssi_ssdi`, `va`, `unemployment` | `[]` | the benefit-interruption hazard, shown only to households that tick one (§1.1; H7) |
+| `Insurance.sewer_backup` | bool | absent (not asked) | insurance decisions (§1.1; N4) |
+| `Insurance.life_or_disability` | bool | absent (not asked) | insurance decisions; the earner-death row gets an action (§1.1; N4) |
+| `Owned.tested_on` | date | absent | "tested?" on the Have screen for items with `Item.test_interval_months` (§4a, Deviant Ollam lessons) |
+| `Dials.rare_opt_in` | `[string]`: family ids, or `["all"]` | `[]` | rare allowance by family (§1.1; H8, REVIEW §2.4). `rare_catastrophic_opt_in` stays and maps to `["all"]` (`Dials::rare_families()`) |
+| `Dials.minimum_kit` | bool | `false` | bare-minimum mode (§1.1; R6); the engine also warns past 36 months |
+| `Dials.long_horizon` | bool | `false` | show the long-horizon section below 30-day targets (§1.1) |
+| `PlanInput.family_plan` | `FamilyPlan` (with `Contact`, `TrustedPerson`, `Holds`) | absent | the device-only family-plan screen, printed in the packet and on wallet cards; never computed with; trimmed and length-capped, never required (§1.1; N1; trusted circle, lawyer, roadside number and numbers by heart from §4a) |
+
+### Ids
+
+| Change | Ids | Why |
+| --- | --- | --- |
+| 10 new ranked hazards | `water_damage` (personal), `wildfire_smoke`, `dust_storm`, `sinkhole` (natural), `dam_failure`, `network_outage`, `drug_shortage`, `benefit_interruption`, `attack_disruption` (societal), `eviction` (personal) | §1.2; REVIEW §2.2, H4–H7 |
+| 1 new ranked personal hazard | `arrest_or_detention` | §1.2, owner decision 2026-09-26 (Deviant Ollam talk) |
+| 8 new rare families | `geomagnetic_storm`, `vei7_eruption` (natural), `multi_month_blackout`, `war_infrastructure`, `cbrn_attack`, `severe_pandemic`, `financial_crisis`, `mass_violence` (societal) | §1.2; REVIEW §2.3, H1–H3 |
+| Kept, now a family | `nuclear_attack` (its EMP, limited-strike, nuclear-terrorism and use-abroad rows are sub-causes) | §1.2; H1, H3 |
+| **Retired (breaking)** | `terrorism`: parses, never emitted, not in `ACTIVE` or the catalogue | §1; H2 |
+| New bucket | `clean_air` ("Unhealthy air indoors"), readiness; the 15th bucket | §1.2; H6, owner decision |
+| New enums | `AccessNeed`, `CookingFuel`, `RawWaterSource`, `WaterSystemRecord`, `Benefit`, `Holds`, `Season`, `GuidanceKind` | as above |
+| New problem code | `unknown_id` | a `rare_opt_in` entry that names no family |
+
+The natural tier now means weather, geology, fire and space weather: the 18 NRI hazards
+(`HazardId::is_nri`) plus five the Index does not cover. Engine crates iterate `HazardId::ACTIVE`
+when they build output and `HazardId::RARE` for the families.
+
+### Outputs
+
+| Field | Type | When empty | Why |
+| --- | --- | --- | --- |
+| `HazardProfile.family` | string (the family id) | left out (ranked rows) | rare rows shown as families (§1.3; REVIEW §2.4) |
+| `HazardProfile.sub_causes` | `[SubCause { id, name, note, rate_range?, sources }]` | left out | the 52 named sub-causes; data, not ids (§1.3; H9) |
+| `HazardProfile.location_factor` | `LocationFactor { class, label, multiplier: [lo, mid, hi], sources }` | left out | "Why here": strategic class, metro tier, magnetic latitude (§1.3; H1, REVIEW §2.3) |
+| `HazardProfile.range_only` | bool | left out when false | range-only display for priors (§1.3; H1) |
+| `HazardProfile.anchor_sentence` | string | left out | one comparison with the household's own list (§1.3; REVIEW §2.4) |
+| `HazardProfile.if_it_reaches_you` | string | left out | zone-conditional severity words (§1.3; H9) |
+| `HazardProfile.what_it_changes` | string | left out | "what it changes in your plan" (§1.3; REVIEW §2.4) |
+| `LocationResolved.exposure` | `Exposure` of optional `Sourced { value, source }` fields | left out when every field is unknown | "Why here" drawers and the About data page (§1.3, §2) |
+| `BucketAssessment.stress_test` | `StressTest { event, date, region, share_out_at_days, covered_by_target, sources }` | left out | the worst event in the region's record (§1.3; R10) |
+| `Plan.first_milestone` | `SavingsMilestone { months, usd, by_month }` | left out | a first savings step within reach (§1.3; N4) |
+| `Plan.minimum_kit` | bool | left out when false | bare-minimum mode is on (§1.3; R6) |
+| `Plan.long_horizon` | `[PlanItem]` | left out | the long-horizon section (§1.3) |
+| `PlanItem.requires` | `[ItemId]` | left out | accessories never before their device (§1.3; K4) |
+| `PlanItem.decision` | bool | left out when false | insurance and mitigation decisions, no purchase (§1.3; N4, N5) |
+| `PlanOutput.recovery` | `RecoveryInfo { county_declarations_5yr?, sources }` | left out | the recovery page (§1.3; N2) |
+| `EngineInfo.validation` | `ValidationSummary { events_tested, covered, partial, short, not_modelled, data_pack, url_anchor }` | left out | the public validation page (§1.3; R10, C3) |
+| `Warning.id` | six new ids (see [Warnings](#warnings)) | — | §1.3; S1, S2, S6, H7, R6, K1 |
+
+### Content and catalogue
+
+| Field | Type | When absent | Why |
+| --- | --- | --- | --- |
+| `Item.requires` | `[ItemId]` | `[]` | §1.3; K4 |
+| `Item.readiness_share` | f32, 0 to 1 | absent | per-item readiness value (§1.3; K3) |
+| `Item.decision` | bool | `false` | decision items (§1.3; N4, N5) |
+| `Item.long_horizon` | bool | `false` | long-horizon section (§1.3) |
+| `Item.season` | `spring` \| `summer` \| `fall` \| `winter` | absent | seasonal maintenance anchors and season-aware ordering (§1.3; N8) |
+| `Item.test_interval_months` | u16 | absent | "Test" maintenance items (§4a) |
+| `GuidanceMeta.kind` | `after` \| `plan` \| `hazard` \| `bucket` \| `tier` \| `topic` \| `family` | absent (not yet classified) | where a block prints (§1.3) |
+| renderer conditions | `{if:home:…}`, `{if:not_home:…}`, `{if:need:…}`, `{if:has:…}`, `{if:benefit:…}` | — | §1.3; implemented in `rr-content` |
+| `catalogue().hazards` | the 53 active hazards | — | the retired id is left out |
+
+`types.ts` gains the matching lists (`RARE_HAZARD_IDS`, `RETIRED_HAZARD_IDS`, `ACCESS_NEEDS`,
+`COOKING_FUELS`, `RAW_WATER_SOURCES`, `WATER_SYSTEM_RECORDS`, `BENEFITS`, `HOLDS`, `SEASONS`,
+`GUIDANCE_KINDS`) and the family-plan limits (`FAMILY_PLAN_TEXT_MAX`, `FAMILY_PLAN_SHORT_MAX`,
+`TRUSTED_CIRCLE_MAX`, `ROUTES_MAX`, `NUMBERS_BY_HEART_MAX`); the mirror test checks all of them.

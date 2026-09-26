@@ -171,6 +171,16 @@ pub const HARM_WEIGHTS: &[HarmWeightRule] = &[
         design: false,
         why: "Readiness items carry their harm in the per-use estimate, so the weight stays at the base value.",
     },
+    // awaiting: budget — the clean-air bucket's weight; 1.0 is the value `harm_weight` already
+    // gives a bucket with no row, like the other readiness buckets.
+    HarmWeightRule {
+        id: "clean_air",
+        bucket: BucketId::CleanAir,
+        weight: 1.0,
+        applies: Applies::Always,
+        design: false,
+        why: "Readiness items carry their harm in the per-use estimate, so the weight stays at the base value.",
+    },
     HarmWeightRule {
         id: "income",
         bucket: BucketId::Income,

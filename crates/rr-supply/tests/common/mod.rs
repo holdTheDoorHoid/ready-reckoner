@@ -25,6 +25,7 @@ fn assessment(id: BucketId, target: Target) -> BucketAssessment {
         frequency_sentences: Vec::new(),
         sources: vec![CitationId::from(TARGET_SOURCE)],
         relief: None,
+        stress_test: None,
     }
 }
 

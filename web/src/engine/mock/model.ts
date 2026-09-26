@@ -37,11 +37,11 @@ import type {
   TierId,
   Warning,
 } from '../types';
-import { BUCKET_IDS, HAZARD_IDS, RETURN_PERIODS, TARGET_LADDER_DAYS, TIER_IDS } from '../types';
+import { BUCKET_IDS, ENGINE_API_VERSION, RETURN_PERIODS, TARGET_LADDER_DAYS, TIER_IDS } from '../types';
 import { chanceWithin, dayPhrase, frequencySentence, monthsPhrase } from '../../lib/format';
 import { citation } from './citations';
 import { catalogueItem } from './items';
-import { BUCKETS, hazardName } from './names';
+import { BUCKETS, hazardName, hazardTier as tierOf } from './names';
 import { buildPacket } from './packet';
 import type { ByDial, DurationBucket, EvacuateSeed, HazardSeed, RegionProfile, ScenarioSeed } from './regions';
 import { DURATION_BUCKETS, PROFILES, tierForDays } from './regions';
@@ -224,8 +224,7 @@ export function householdFacts(input: PlanInput, profile: RegionProfile): Facts 
 // ---------------------------------------------------------------------------------------------
 
 function hazardTier(id: HazardId): HazardTier {
-  const i = HAZARD_IDS.indexOf(id);
-  return i < 18 ? 'natural' : i < 27 ? 'societal' : 'personal';
+  return tierOf(id);
 }
 
 function commonSeeds(f: Facts, loc: LocationResolved): HazardSeed[] {
@@ -243,7 +242,9 @@ function commonSeeds(f: Facts, loc: LocationResolved): HazardSeed[] {
     { id: 'burglary', rate: urban ? 0.02 : f.setting === 'suburban' ? 0.012 : 0.008, spread: 1.5, severity: 0.2, confidence: 'high', sources: ['mock_burglary'], buckets: ['security'], what: 'have a burglary' },
     { id: 'extended_household_illness', rate: 0.015 * f.n, spread: 2, severity: 0.4, confidence: 'prior', sources: ['mock_societal_prior'], buckets: ['income', 'supplies', 'medication'], what: 'have someone ill for weeks' },
     { id: 'nuclear_attack', rate: 0.0003, spread: 5, severity: 1, confidence: 'prior', sources: ['mock_rare_prior', 'mock_nuclear_guidance'], buckets: ['supplies', 'power', 'water_out', 'comms'], what: 'be affected by a nuclear attack or EMP', rare: true },
-    { id: 'terrorism', rate: urban ? 0.0005 : 0.0001, spread: 5, severity: 0.6, confidence: 'prior', sources: ['mock_rare_prior'], buckets: ['security', 'medical_emergency'], what: 'be caught up in a terrorist attack', rare: true },
+    // Contract v2 retired `terrorism`; its personal-safety half is the rare `mass_violence` family
+    // (awaiting: web-risks — the mock's rare families).
+    { id: 'mass_violence', rate: urban ? 0.0005 : 0.0001, spread: 5, severity: 0.6, confidence: 'prior', sources: ['mock_rare_prior'], buckets: ['security', 'medical_emergency'], what: 'be caught up in a mass shooting or bombing', rare: true },
   ];
   if (f.earners > 0) {
     seeds.push(
@@ -1080,7 +1081,7 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
 
   const output: PlanOutput = {
     engine_version: MOCK_ENGINE_VERSION,
-    api_version: 1,
+    api_version: ENGINE_API_VERSION,
     data_pack_version: MOCK_DATA_VERSION,
     content_version: MOCK_CONTENT_VERSION,
     location,

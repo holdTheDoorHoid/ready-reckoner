@@ -1,7 +1,7 @@
 //! Turning a ZIP code or county code into a [`LocationResolved`].
 
 use crate::DataStore;
-use rr_types::{EngineError, ErrorCode, FacilityFlags, LocationInput, LocationResolved};
+use rr_types::{EngineError, ErrorCode, Exposure, FacilityFlags, LocationInput, LocationResolved};
 
 /// A ZIP code resolves to one county only when that county holds at least this share of the ZIP's
 /// land; otherwise the engine answers `ambiguous_zip` and the app asks the user to choose.
@@ -65,6 +65,8 @@ impl DataStore {
             tsunami_zone: c.tsunami_zone,
             facility_flags,
             data_note: Some(data_note.to_string()),
+            // awaiting: data-hazard — fill from the exposure columns (DESIGN-DELTA §1.3, §2).
+            exposure: Exposure::default(),
         })
     }
 

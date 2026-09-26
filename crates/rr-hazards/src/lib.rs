@@ -393,6 +393,16 @@ fn profile(ctx: &Ctx<'_>, r: &HazardRate, e: &Estimate) -> HazardProfile {
         sources: e.sources.clone(),
         frequency_sentence,
         buckets: buckets::for_hazard(r.hazard),
+        // Contract v2: a rare row names the family it heads (a family's id is its hazard's id).
+        family: r.hazard.family().map(str::to_owned),
+        // awaiting: hazards — sub-causes, location factor, range-only display, the anchor sentence
+        // and the "if it reaches you" / "what it changes" words (DESIGN-DELTA §1.3).
+        sub_causes: Vec::new(),
+        location_factor: None,
+        range_only: false,
+        anchor_sentence: None,
+        if_it_reaches_you: None,
+        what_it_changes: None,
     }
 }
 

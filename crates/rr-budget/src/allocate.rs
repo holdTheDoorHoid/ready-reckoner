@@ -965,6 +965,11 @@ fn run(
         done_month,
         envelopes,
         savings_track,
+        // awaiting: budget — the first savings milestone, bare-minimum mode and the long-horizon
+        // section (DESIGN-DELTA §1.3).
+        first_milestone: None,
+        minimum_kit: false,
+        long_horizon: Vec::new(),
     };
 
     let covered = covered_targets(&ctx, &state, &checklist);
@@ -1990,6 +1995,9 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
                 tier: *tier,
                 done: false,
                 paid_usd: None,
+                // awaiting: budget — `requires` honoured and decision items (DESIGN-DELTA §1.3).
+                requires: Vec::new(),
+                decision: false,
             }
         }
     }
@@ -2054,6 +2062,9 @@ fn line(
         tier,
         done,
         paid_usd: paid,
+        // awaiting: budget — `requires` honoured and decision items (DESIGN-DELTA §1.3).
+        requires: Vec::new(),
+        decision: false,
     }
 }
 
