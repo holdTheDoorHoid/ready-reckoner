@@ -28,6 +28,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: phone settin
 quantity_rule = "once"
 citations = ["ready_gov_alerts", "fcc_wea", "ready_gov_plan", "ready_gov_power_outages", "fcc_text_911"]
 hazard_extras = []
+readiness_share = 1.0
 
 [[item]]
 id = "comms_contact_card"
@@ -58,6 +59,7 @@ quantity_rule = "once"
 maintenance = { check_months = 12 }
 citations = ["ready_gov_plan", "ready_gov_family_comm_card", "ready_gov_low_cost", "ready_gov_earthquakes", "ready_gov_kit_2020", "fema_effak"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "comms_noaa_radio"
@@ -83,6 +85,8 @@ quantity_rule = "once"
 maintenance = { check_months = 6 }
 citations = ["nws_weather_radio", "ready_gov_kit", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.3
+season = "spring"
 
 [[item]]
 id = "comms_frs_radios"

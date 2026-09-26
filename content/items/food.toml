@@ -56,6 +56,7 @@ energy_kcal_per_unit = 2000
 maintenance = { check_months = 12 }
 citations = ["church_home_storage_2007", "church_hsc_order_form_2026", "byu_longer_term_storage_2019", "usu_food_storage_booklet", "bls_average_prices", "usda_fooddata_central", "rr_price_observations_2026_09"]
 hazard_extras = []
+long_horizon = true
 
 [[item]]
 id = "food_freeze_dried"
@@ -110,38 +111,41 @@ hazard_extras = []
 
 [[item]]
 id = "food_camp_stove"
-name = "One-burner camp stove (outdoor use only)"
+name = "One-burner camp stove that burns propane (outdoors only)"
 category = "food"
 unit = "stove"
 buckets = ["water_boil", "supplies"]
 tier = "h72"
 free = false
-spec = "A butane or propane camp stove for boiling water and heating food outdoors when the power or gas is off. CDC says never use a portable gas camp stove indoors, because of carbon monoxide."
+spec = "A one-burner camp stove for boiling water and heating food outdoors when the power is out. Choose one that burns 1-pound propane cylinders, which keep working in freezing weather when butane does not (NIST); a butane-only stove suits only places where winters stay mild. Never use it indoors, in a garage or on a closed porch, because of carbon monoxide (CDC)."
 look_for = [
+  "A stove that takes 1-pound propane cylinders (dual-fuel stoves take butane canisters too)",
   "A stable base that holds a pot big enough for boiling water",
-  "Fuel canisters that match the stove",
-  "A lighter or matches in a waterproof bag",
+  "A lighter or waterproof matches kept with it",
 ]
 avoid = [
   "Using it indoors, in a garage or on a closed porch",
+  "A butane-only stove where winters freeze",
   "Keeping fuel near heat or in a hot car",
   "Leaving it burning unattended",
 ]
-price_band_usd = { low = 26.35, high = 39.99, per = "stove", note = "Two home-center listings for one-burner butane stoves: $26.35 and $39.99." }
+price_band_usd = { low = 29.99, high = 40.75, per = "stove", note = "Two home-center listings for one-burner stoves that burn propane or butane: $29.99 and $40.75." }
 retrieved = "2026-09-26"
-quantity_rule = "once"
-citations = ["cdc_co_basics", "cdc_infant_checklist", "rr_price_observations_2026_09"]
+quantity_rule = "cooking_capability"
+citations = ["cdc_co_basics", "cdc_infant_checklist", "nist_propane", "nist_butane", "oregon_2_weeks_ready", "rr_price_observations_2026_09"]
 hazard_extras = []
+maintenance = { check_months = 12 }
+season = "fall"
 
 [[item]]
 id = "food_cooking_fuel"
-name = "Fuel canisters for the camp stove"
+name = "Butane canisters for the camp stove (places with mild winters)"
 category = "food"
 unit = "8-ounce canister"
 buckets = ["water_boil", "supplies"]
 tier = "h72"
 free = false
-spec = "Enough canisters to boil drinking water and heat one meal a day for your household. Store them cool and dry, away from flames, and use the oldest first."
+spec = "Enough canisters to boil drinking water and heat one meal a day for your household, plus fuel to cook any dry staples the plan counts. Butane stops turning to gas near 32 °F (NIST), so where winters freeze the plan counts 1-pound propane cylinders instead. Store canisters cool and dry, away from flames, and use the oldest first."
 look_for = [
   "The fuel type your stove takes",
   "Undented canisters with intact caps",
@@ -156,22 +160,23 @@ price_band_usd = { low = 1.46, high = 2.71, per = "8-ounce canister", note = "Tw
 retrieved = "2026-09-25"
 quantity_rule = "cooking_fuel_canisters"
 maintenance = { check_months = 12 }
-citations = ["eia_btu", "rr_research_supply_standards", "rr_expert_prior", "rr_price_observations_2026_09"]
+citations = ["eia_btu", "rr_research_supply_standards", "rr_expert_prior", "nist_butane", "rr_price_observations_2026_09"]
 hazard_extras = []
+requires = ["food_camp_stove"]
 
 [[item]]
 id = "food_infant_formula"
-name = "Infant formula (ready-to-feed first, then powder)"
+name = "Infant formula powder (after the first three days)"
 category = "food"
 unit = "ounce of powder"
 buckets = ["supplies", "water_boil"]
 tier = "h72"
 free = false
 life_safety = true
-spec = "Breastfeeding remains best; if your baby takes formula, keep ready-to-feed formula for the first days, because it needs no water (CDC). Keep powder for longer, mixed only with bottled water or water boiled for 1 minute and cooled."
+spec = "Breastfeeding remains best. If your baby takes formula, keep powder for the days after the ready-to-feed formula's first three (its own line), mixed only with bottled water or with water boiled for 1 minute and cooled (CDC)."
 look_for = [
   "The formula your baby already takes",
-  "Ready-to-feed bottles for the first days, then powder",
+  "Bottled water or a way to boil water for mixing it",
   "Use-by dates past your next check: formula dates are about safety, not just quality",
 ]
 avoid = [
@@ -280,4 +285,109 @@ retrieved = "2026-09-26"
 quantity_rule = "per_person"
 energy_kcal_per_unit = 6300.0
 citations = ["fema_nhs_2024", "ready_gov_food", "usda_tfp_aug2026", "usda_food_plans_aug2026", "usda_dga_2020_2025", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_propane_cylinders"
+name = "1-pound propane cylinders for the camp stove"
+category = "food"
+unit = "cylinder"
+buckets = ["water_boil", "supplies"]
+tier = "h72"
+free = false
+spec = "Small propane cylinders for the camp stove, which keep working far below freezing: propane stops turning to gas only near −44 °F, butane near 32 °F (NIST). Store them outside the living space, with no more than two inside the home or an attached garage (fire code, as Lehi, Utah sets it out)."
+look_for = [
+  "Cylinders with undamaged valves and their caps on",
+  "A cool, dry, ventilated spot outside the living space",
+  "The fitting your stove takes",
+]
+avoid = [
+  "Using the stove indoors or in a garage (carbon monoxide, CDC)",
+  "Storing cylinders in a hot car or near a heater",
+  "Refilling cylinders sold as disposable",
+]
+price_band_usd = { low = 5.98, high = 5.99, per = "cylinder", note = "Two home-center listings: a two-pack of 1-pound cylinders at $11.98 ($5.99 each) and a single 14.1-ounce cylinder at $5.98." }
+retrieved = "2026-09-26"
+quantity_rule = "propane_cylinders"
+maintenance = { check_months = 12 }
+citations = ["nist_propane", "nist_butane", "lehi_fuel_storage", "cdc_co_basics", "eia_btu", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+requires = ["food_camp_stove"]
+season = "fall"
+
+[[item]]
+id = "food_grill_spare_tank"
+name = "Spare filled 20-pound propane cylinder for an outdoor grill"
+category = "food"
+unit = "cylinder"
+buckets = ["water_boil", "supplies"]
+tier = "w2"
+free = false
+spec = "If you already cook on an outdoor gas grill, a spare filled 20-pound cylinder is the cheapest way to boil water and cook through a long outage. Use the grill outdoors only, away from the house, and keep the cylinder outside, never indoors or in a garage (CDC; fire code, as Lehi, Utah sets it out)."
+look_for = [
+  "An exchange or a refill if you already have an empty spare",
+  "A cylinder with no rust, dents or smell of gas",
+  "A shaded spot outdoors, upright and away from doors and windows",
+]
+avoid = [
+  "Using the grill indoors, in a garage or on a covered porch (carbon monoxide, CDC)",
+  "Storing the cylinder inside the house or garage",
+]
+price_band_usd = { low = 21.94, high = 67.94, per = "cylinder", note = "Two home-center listings: a filled cylinder in exchange for an empty one at $21.94, or a new filled cylinder at $67.94." }
+retrieved = "2026-09-26"
+quantity_rule = "grill_propane_tank"
+citations = ["lehi_fuel_storage", "cdc_co_basics", "eia_btu", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_infant_formula_rtf"
+name = "Ready-to-feed infant formula for the first three days"
+category = "food"
+unit = "fl oz"
+buckets = ["supplies"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "Formula that comes ready to drink needs no water, so it is the safest formula in an emergency (CDC); the plan counts up to 32 ounces a day for each baby on formula (AAP) for the first three days, then powder. Keep the kind your baby already takes, and check the dates every month (CDC)."
+look_for = [
+  "The formula your baby already takes, in ready-to-feed bottles or cartons",
+  "Single-serving bottles, so an opened one is not wasted",
+  "Use-by dates past your next monthly check",
+]
+avoid = [
+  "Watering formula down to make it last",
+  "Keeping an opened bottle longer than its label allows",
+  "Homemade formula",
+]
+price_band_usd = { low = 0.34, high = 0.48, per = "fl oz", note = "Two supermarket listings at the regular price: a 32-ounce ready-to-feed bottle at $10.99 ($0.34 an ounce) and a six-pack of 8-ounce bottles at $22.99 ($0.48 an ounce). Breastfeeding needs no water and costs nothing." }
+retrieved = "2026-09-26"
+quantity_rule = "infant_formula_rtf"
+maintenance = { check_months = 1 }
+citations = ["cdc_infant_feeding_disaster", "aap_formula_amounts", "cdc_infant_checklist", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_going_further"
+name = "Going further: food for months"
+category = "food"
+unit = "action"
+buckets = ["supplies"]
+tier = "now"
+free = true
+long_horizon = true
+spec = "For a plan that runs months, grow the pantry the way food-storage guides suggest: first about three months of the foods you already eat, then long-keeping staples such as wheat, white rice and dry beans, stored airtight in a cool, dry place (Church guidance, Utah State University Extension). Your state's Cooperative Extension service publishes tested guides for storing, canning and growing food."
+look_for = [
+  "A three-month supply of what you already eat, used and replaced as you go",
+  "Staples in airtight containers, dated and off the floor",
+  "A way to cook them: dry beans and whole grains need long cooking, so count the fuel",
+  "Your county Extension office's food-storage and canning guides",
+]
+avoid = [
+  "Buying food your household will not eat",
+  "Canning without a tested recipe",
+  "Storing food in a hot garage or a damp basement",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: planning; the staples are their own line." }
+quantity_rule = "once_if_long_horizon"
+citations = ["church_emergency_prep_manual", "church_home_storage_2007", "usu_food_storage_booklet", "rr_research_supply_standards"]
 hazard_extras = []

@@ -148,8 +148,6 @@ their open product feeds. Composite rows add two listings bought together, as be
 | `san_twin_bucket_toilet` | relianceoutdoors.com + homedepot.com (browser) | Composite: bucket toilet with seat ($25.99 maker's list price) + a second 5-gallon bucket ($3.98) | 29.97 | 1 | 29.97 | kit | https://relianceoutdoors.com/products/luggable-loo-portable-toilet |
 | `san_baby_wipes` | kroger.com (browser) | Fragrance-free baby wipes, 72 count (store brand) | 2.29 | 1 | 2.29 | pack | https://www.kroger.com/search?query=baby%20wipes |
 | `san_baby_wipes` | kroger.com (browser) | Unscented sensitive baby wipes, 56 count | 2.69 | 1 | 2.69 | pack | https://www.kroger.com/search?query=baby%20wipes |
-| `food_camp_stove` | homedepot.com (browser) | One-burner butane stove, 7,650 BTU (model GS-1000G-H) | 26.35 | 1 | 26.35 | stove | https://www.homedepot.com/s/butane%20camp%20stove |
-| `food_camp_stove` | homedepot.com (browser) | Classic one-burner butane camping stove (model 2157595) | 39.99 | 1 | 39.99 | stove | https://www.homedepot.com/s/butane%20camp%20stove |
 | `food_cooler` | homedepot.com (browser) | 50 qt chest cooler (model 51179) | 49.98 | 1 | 49.98 | cooler | https://www.homedepot.com/s/igloo%20cooler%20quart |
 | `food_cooler` | homedepot.com (browser) | 52 qt hard cooler (model 2182646, online price) | 54.99 | 1 | 54.99 | cooler | https://www.homedepot.com/s/cooler%2048%20quart |
 | `food_infant_formula` | kroger.com (browser) | Infant formula powder, store brand, 34 oz at the regular price ($31.99 on sale) | 36.99 | 34 | 1.09 | ounce of powder | https://www.kroger.com/search?query=infant%20formula%20powder |
@@ -198,3 +196,61 @@ the lowest to the highest. The fuel-can rows add each can's share of a bottle of
 | `power_transfer_interlock` | epicelectrical.com | The same, high end of the range | 1400.00 | 1 | 1400.00 | installed kit | https://epicelectrical.com/generator-interlock-kit-affordable-connection/ |
 | `power_fuel_cans` | homedepot.com (browser) | Composite: 5-gallon gas can (model FSCG571, $24.97) + a quarter of an 8 oz fuel stabilizer that treats 20 gallons (model 22208, $8.97) | 27.21 | 1 | 27.21 | can | https://www.homedepot.com/s/5%20gallon%20gas%20can |
 | `power_fuel_cans` | homedepot.com (browser) | Composite: 5-gallon gasoline can with view stripe (model 1460, $39.12) + an eighth of an 8 oz stabilizer that treats 40 gallons (model GDE-22288, $10.97) | 40.49 | 1 | 40.49 | can | https://www.homedepot.com/s/fuel%20stabilizer |
+
+## Round 2, v0.2.0 (observed 2026-09-26)
+
+Rows for the items the round-2 practitioner review proposed (N-03 to N-20), the clean-air filter box,
+the key safe and jump starter from the Deviant Ollam lessons, and a camp stove that burns propane,
+which replaces the two butane stove rows above (the stove must work where winters freeze; review
+P-07). Home-center and supermarket prices were read from the stores' search pages in an ordinary
+browser, as in the polish round; stores that answered with a bot check were skipped. The research note
+behind this round (`research/price-observations.md` in the round-2 briefs) found most of these items
+through search-engine snippets only; every row here was read on the seller's own page instead.
+Composite rows add up the listed parts. The hand pump has one fixed-price listing for wells up to
+100 feet deep; deeper wells are priced by quote, so that end is marked UNVERIFIED in the item's note.
+
+| Item | Source | Listing | Listed price (USD) | Units | Unit price (USD) | Per | URL |
+|---|---|---|---|---|---|---|---|
+| `power_car_charger_inverter` | homedepot.com (browser) | Two-port USB car charger, 54 W (model ACC8-1022-BLK) | 6.99 | 1 | 6.99 | charger | https://www.homedepot.com/s/usb%20car%20charger%2012v |
+| `power_car_charger_inverter` | homedepot.com (browser) | 150-watt cup-holder power inverter (model PWD150C) | 40.49 | 1 | 40.49 | charger | https://www.homedepot.com/s/150%20watt%20power%20inverter |
+| `power_car_charger_inverter` | homedepot.com (browser) | 140-watt car power inverter with two USB ports (model DXAEPI140) | 49.98 | 1 | 49.98 | charger | https://www.homedepot.com/s/150%20watt%20power%20inverter |
+| `gethome_jump_pack` | homedepot.com (browser) | 1,000-amp lithium jump starter (model SL1672) | 53.99 | 1 | 53.99 | jump starter | https://www.homedepot.com/s/lithium%20jump%20starter |
+| `gethome_jump_pack` | homedepot.com (browser) | 1,000-amp lithium jump starter for engines up to 6 liters (model GB40) | 99.95 | 1 | 99.95 | jump starter | https://www.homedepot.com/s/lithium%20jump%20starter |
+| `water_heater_strap_kit` | homedepot.com (browser) | Water heater restraining strap kit for tanks up to 80 gallons (model QS-50-H) | 18.79 | 1 | 18.79 | kit | https://www.homedepot.com/s/water%20heater%20earthquake%20strap |
+| `water_heater_strap_kit` | homedepot.com (browser) | Earthquake strap kit with wall spacers and mounting hardware (model SP13345) | 26.94 | 1 | 26.94 | kit | https://www.homedepot.com/s/water%20heater%20earthquake%20strap |
+| `water_rain_barrel` | homedepot.com (browser) | Composite: 50-gallon rain barrel with spigot (model 551000300A8081, $119.00) + downspout diverter kit with hole saw (model 81052, $31.77) | 150.77 | 1 | 150.77 | barrel | https://www.homedepot.com/s/rain%20barrel%20with%20diverter |
+| `water_rain_barrel` | homedepot.com (browser) | 55-gallon rain barrel with diverter, filters and spigot (model PTH0936) | 167.73 | 1 | 167.73 | barrel | https://www.homedepot.com/s/rain%20barrel%20with%20diverter |
+| `water_carriers` | relianceoutdoors.com | 5.5-gallon (23 L) water carrier with spout and vent cap, maker's list price | 21.99 | 1 | 21.99 | carrier | https://relianceoutdoors.com/products/rhino-pak |
+| `water_carriers` | homedepot.com (browser) | 5-gallon military-style water can with reversible spout, two-pack (model 4933) | 79.99 | 2 | 40.00 | carrier | https://www.homedepot.com/s/5%20gallon%20water%20container |
+| `water_livestock_haul_tank` | tank-depot.com | Rebottled 275-gallon IBC tote, food-grade HDPE | 249.99 | 1 | 249.99 | tote | https://www.tank-depot.com/water-tanks/hauling/ibc-tote-tanks/ |
+| `water_livestock_haul_tank` | homedepot.com (browser) | 275-gallon intermediate bulk container (IBC) tank (model IBC-275-1) | 328.90 | 1 | 328.90 | tote | https://www.homedepot.com/s/275%20gallon%20ibc%20tote |
+| `water_well_hand_pump` | homedepot.com (browser) | Cast-iron pitcher pump for shallow wells, about 25 ft of lift (model PP500NL) | 57.79 | 1 | 57.79 | pump | https://www.homedepot.com/s/well%20hand%20pump |
+| `water_well_hand_pump` | preppersfoodsource.com | Emergency manual well pump sold in 25, 50 and 100 ft versions at $399.00 to $675.00: the top of the range | 675.00 | 1 | 675.00 | pump | https://preppersfoodsource.com/product/emergency-manual-well-pump-25-50-and-100-feet/ |
+| `food_camp_stove` | homedepot.com (browser) | Propane and butane dual-fuel portable stove (model GS-3400P) | 29.99 | 1 | 29.99 | stove | https://www.homedepot.com/s/propane%20camp%20stove%20single%20burner |
+| `food_camp_stove` | homedepot.com (browser) | Dual-fuel butane and propane one-burner camping stove (model YSNVT-505-B) | 40.75 | 1 | 40.75 | stove | https://www.homedepot.com/s/propane%20camp%20stove%20single%20burner |
+| `food_propane_cylinders` | homedepot.com (browser) | 1-pound all-purpose propane cylinders, two-pack (model BZO2PK16) | 11.98 | 2 | 5.99 | cylinder | https://www.homedepot.com/s/1%20lb%20propane%20cylinder |
+| `food_propane_cylinders` | homedepot.com (browser) | 14.1-ounce propane cylinder (model TX9) | 5.98 | 1 | 5.98 | cylinder | https://www.homedepot.com/s/1%20lb%20propane%20cylinder |
+| `food_grill_spare_tank` | homedepot.com (browser) | 20-pound propane tank exchange: a filled cylinder for an empty one | 21.94 | 1 | 21.94 | cylinder | https://www.homedepot.com/s/20%20lb%20propane%20tank |
+| `food_grill_spare_tank` | homedepot.com (browser) | 20-pound propane tank purchase, filled, no exchange | 67.94 | 1 | 67.94 | cylinder | https://www.homedepot.com/s/20%20lb%20propane%20tank |
+| `food_infant_formula_rtf` | kroger.com (browser) | Ready-to-feed infant formula with iron, 32-fl-oz bottle, regular price | 10.99 | 32 | 0.34 | fl oz | https://www.kroger.com/search?query=ready%20to%20feed%20infant%20formula |
+| `food_infant_formula_rtf` | kroger.com (browser) | Ready-to-feed sensitive infant formula, six 8-fl-oz bottles | 22.99 | 48 | 0.48 | fl oz | https://www.kroger.com/search?query=ready%20to%20feed%20infant%20formula |
+| `med_wound_splint_addon` | rescue-essentials.com | Composite: 12 cc irrigation syringe ($1.25) + wound-closure strips, 4 packs of 3 ($6.95) + 36-inch padded splint with elastic wraps ($19.64) + 7.5-inch shears ($3.45) + moleskin, 6-pack ($2.95) + z-folded compressed gauze ($3.85) | 38.09 | 1 | 38.09 | kit | https://rescue-essentials.com/search?q=wound |
+| `med_wound_splint_addon` | rescue-essentials.com | Composite: wound irrigation set ($5.15) + reinforced skin-closure strips, 20 ($9.50) + 36-inch padded splint with cohesive wrap ($17.15) + trauma shears ($10.99) + blister pads, 5-pack ($11.55) + compressed gauze ($4.49) | 58.83 | 1 | 58.83 | kit | https://rescue-essentials.com/search?q=wound |
+| `med_rx_12v_fridge` | homedepot.com (browser) | 23-quart 12-volt compressor car fridge (model HD02204) | 179.99 | 1 | 179.99 | fridge | https://www.homedepot.com/s/12v%20compressor%20portable%20refrigerator |
+| `med_rx_12v_fridge` | homedepot.com (browser) | 31.7-quart 12-volt single-zone compressor car fridge (sale; list $223.28) | 209.88 | 1 | 209.88 | fridge | https://www.homedepot.com/s/12v%20compressor%20portable%20refrigerator |
+| `med_cleanup_ppe` | homedepot.com (browser) | Composite: reusable P100 respirator for mold and lead paint (model 6297PA1-A, $29.98) + anti-fog safety goggles (model DPG82-11C, $12.59) + suede leather-palm work gloves (model 65023-72, $4.97) | 47.54 | 1 | 47.54 | set | https://www.homedepot.com/s/p100%20half%20mask%20respirator |
+| `med_cleanup_ppe` | homedepot.com (browser) | Composite: P100 multi-purpose respirator and anti-fog goggles bundle ($64.96) + grain cowhide leather work gloves (model HD84000, $8.56) | 73.52 | 1 | 73.52 | set | https://www.homedepot.com/s/safety%20goggles%20anti%20fog |
+| `med_insect_repellent` | kroger.com (browser) | Mosquito repellent aerosol, 6 oz | 7.99 | 1 | 7.99 | can | https://www.kroger.com/search?query=insect%20repellent%20deet |
+| `med_insect_repellent` | kroger.com (browser) | Deep-woods mosquito repellent aerosol, 6 oz | 10.49 | 1 | 10.49 | can | https://www.kroger.com/search?query=insect%20repellent%20deet |
+| `san_nitrile_gloves` | homedepot.com (browser) | 3.5-mil disposable nitrile gloves, 100-count (model 24570-06) | 15.98 | 1 | 15.98 | box | https://www.homedepot.com/s/nitrile%20gloves%20100%20count |
+| `san_nitrile_gloves` | homedepot.com (browser) | 4-mil disposable nitrile work gloves, 100-count (model 22892-06) | 24.97 | 1 | 24.97 | box | https://www.homedepot.com/s/nitrile%20gloves%20100%20count |
+| `san_household_ops_kit` | kroger.com (browser) + homedepot.com (browser) | Composite: 100 store-brand paper plates ($6.79) + 48-piece plastic utensil set ($2.59) + 51 foam cups (regular price $2.19) + 20 store-brand 30-gallon drawstring trash bags ($7.49) + 25 weatherproof matches ($8.98, home center) | 28.04 | 1 | 28.04 | kit | https://www.kroger.com/search?query=paper%20plates |
+| `san_household_ops_kit` | kroger.com (browser) + homedepot.com (browser) | Composite: 90 name-brand paper plates ($6.79) + 48 heavier plastic utensils ($4.59) + 50 plastic cups ($6.49) + 28 name-brand 30-gallon drawstring bags ($10.99) + windproof match kit ($14.94, home center) | 43.80 | 1 | 43.80 | kit | https://www.kroger.com/search?query=plastic%20cutlery |
+| `security_key_safe` | homedepot.com (browser) | Wall-mounted two-key lock box with push-button combination (model 001004), in store | 37.00 | 1 | 37.00 | key safe | https://www.homedepot.com/s/wall%20mount%20key%20lock%20box%20push%20button |
+| `security_key_safe` | homedepot.com (browser) | Resettable push-button lock box (model 5423DHC) | 62.57 | 1 | 62.57 | key safe | https://www.homedepot.com/s/wall%20mount%20key%20lock%20box%20push%20button |
+| `special_kids_activity_kit` | kroger.com (browser) | Composite: memory card game ($4.99) + 24 washable crayons ($3.99) + giant drawing pad ($5.99) | 14.97 | 1 | 14.97 | kit | https://www.kroger.com/search?query=coloring%20book%20crayons |
+| `special_kids_activity_kit` | kroger.com (browser) | Composite: memory card game ($4.99) + 24 colored pencils ($4.99) + 16 washable markers ($6.99) + giant drawing pad ($5.99) | 22.96 | 1 | 22.96 | kit | https://www.kroger.com/search?query=coloring%20book%20crayons |
+| `fire_diy_filter_box` | homedepot.com (browser) | Composite: 20-inch three-speed box fan (model B20201, $24.98) + one 20 x 20 x 1 MERV 13 filter from a four-pack ($39.97, $9.99 each) | 34.97 | 1 | 34.97 | filter box | https://www.homedepot.com/s/20%20in%20box%20fan |
+| `fire_diy_filter_box` | homedepot.com (browser) | Composite: 20-inch box fan with weather-shield design (model B20540, $36.98) + single 20 x 20 x 1 MERV 13 pleated filter (model 61201.012020, $23.97) | 60.95 | 1 | 60.95 | filter box | https://www.homedepot.com/s/20x20x1%20merv%2013 |
+| `fire_home_tarp_kit` | homedepot.com (browser) | Composite: 10 x 12 ft heavy-duty tarp (model SPT010012, $25.95) + 3/8 in x 100 ft braided rope (model 14156, $6.58) + 60-yard duct tape (model 242760, $6.98) | 39.51 | 1 | 39.51 | kit | https://www.homedepot.com/s/heavy%20duty%20tarp%2010%20ft%20x%2012%20ft |
+| `fire_home_tarp_kit` | homedepot.com (browser) | Composite: 10 x 12 ft 14-mil heavy-duty tarp (model TS-101-10x12, $38.48) + 1/2 in x 100 ft braided rope (model 72465, $19.26) + 30-yard heavy duct tape (model 106718, $9.94) | 67.68 | 1 | 67.68 | kit | https://www.homedepot.com/s/rope%20100%20ft |

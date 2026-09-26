@@ -27,3 +27,4 @@ quantity_rule = "once"
 maintenance = { check_months = 12 }
 citations = ["aldrich_sawada_2015", "ye_aldrich_2019", "fema_nhs_2024", "semenza_1996_heat_deaths", "ready_gov_older_adults", "cdc_heat_health", "listos_california", "ready_gov_cert", "dhs_stop_the_bleed", "gargano_2017_wtc_training", "redcross_first_aid_kit"]
 hazard_extras = []
+readiness_share = 1.0

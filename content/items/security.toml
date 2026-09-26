@@ -24,6 +24,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free action: the p
 quantity_rule = "once"
 citations = ["anglemyer_2014_firearm_access", "samhsa_988"]
 hazard_extras = []
+readiness_share = 0.1
 
 [[item]]
 id = "security_home_basics"
@@ -51,6 +52,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits and a
 quantity_rule = "once"
 citations = ["ncpc_home_safety", "ready_gov_cybersecurity", "cisa_secure_our_world", "ftc_disaster_scams", "cisa_deescalation", "ready_gov_public_spaces"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "security_motion_light"
@@ -75,3 +77,31 @@ retrieved = "2026-09-25"
 quantity_rule = "once_if_house_ground_floor"
 citations = ["ncpc_home_safety", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.2
+
+[[item]]
+id = "security_key_safe"
+name = "Key safe for a spare house key"
+category = "security"
+unit = "key safe"
+buckets = ["security", "get_home"]
+tier = "w2"
+free = false
+spec = "A sturdy key safe bolted to the wall out of sight, with a push-button or dial code, so family, a neighbour or a responder can let you in when you are locked out, away or hurt. Where you can, choose a model an independent test lab has attack-tested and rated (Sold Secure publishes its list); cheap boxes with four small dials are easy to pry off or decode."
+look_for = [
+  "Solid metal, bolted into brick, concrete or framing, never hung on a doorknob",
+  "A code of five digits or more that you can change (Thurrock Council, UK)",
+  "A spot hidden from the street",
+  "A test every six months: open it with the code and try the key in the door",
+]
+avoid = [
+  "A cheap four-dial box or a fake rock",
+  "Leaving the factory code, or writing the code on the box",
+]
+price_band_usd = { low = 37.0, high = 62.57, per = "key safe", note = "Two home-center listings for wall-mounted push-button key safes: $37.00 and $62.57. A spare key with a trusted neighbour costs nothing." }
+retrieved = "2026-09-26"
+quantity_rule = "once_if_house"
+citations = ["sold_secure_key_safes", "thurrock_key_safe_advice", "ollam_2022_lawyer_passport_locksmith_gun", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+readiness_share = 0.2
+test_interval_months = 6

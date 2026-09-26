@@ -2740,20 +2740,21 @@ retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
 [[citation]]
-id = "state_dept_passport_fees"
-title = "Passport Fees"
-publisher = "U.S. Department of State"
-year = 2026
-url = "https://travel.state.gov/content/travel/en/passports/how-apply/fees.html"
+id = "cfr_22_1_consular_fees"
+title = "22 CFR 22.1, Schedule of Fees for Consular Services (passport book, card and execution fees), 2025 edition"
+publisher = "U.S. Government Publishing Office (Code of Federal Regulations)"
+year = 2025
+url = "https://www.govinfo.gov/content/pkg/CFR-2025-title22-vol1/pdf/CFR-2025-title22-vol1-sec22-1.pdf"
 retrieved = "2026-09-26"
+quote = "Passport Book or Card Execution: Required for first-time applicants and others who must apply in person"
 license = "US Government Work (public domain)"
 
 [[citation]]
-id = "sold_secure_testing"
-title = "Why Do We Test? Independent attack testing and ratings for security products, key safes included"
-publisher = "Sold Secure (Master Locksmiths Association test house, UK)"
+id = "sold_secure_key_safes"
+title = "Rated key safes: models that passed independent attack tests (Gold, Silver and Bronze)"
+publisher = "Sold Secure (independent test house, UK)"
 year = 2026
-url = "https://soldsecure.com/why-do-we-test"
+url = "https://soldsecure.com/category/domestic-buildings/type/key-safe"
 retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
@@ -2765,3 +2766,60 @@ year = 2022
 url = "https://www.youtube.com/watch?v=6ihrGNGesfI"
 retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted; cited for principles, never for numbers)"
+
+[[citation]]
+id = "thurrock_key_safe_advice"
+title = "Crime prevention: key safes (with Essex Police advice)"
+publisher = "Thurrock Council, UK"
+year = 2026
+url = "https://www.thurrock.gov.uk/crime-prevention/key-safes"
+retrieved = "2026-09-26"
+license = "Local government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "epa_protect_from_ash"
+title = "Protect Yourself from Ash"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/wildfires/protect-yourself-ash"
+retrieved = "2026-09-26"
+quote = "Wear goggles and head coverings to keep ash out of your eyes and hair."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_operation_blue_roof"
+title = "U.S. Army Corps of Engineers and FEMA begin Operation Blue Roof in Florida"
+publisher = "FEMA"
+year = 2018
+url = "https://www.fema.gov/press-release/20250121/us-army-corps-engineers-and-fema-begin-operation-blue-roof-florida"
+retrieved = "2026-09-26"
+quote = "The program, named Operation Blue Roof, provides a temporary covering of blue plastic sheeting to help reduce further damage to property until permanent repairs can be made."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_preventing_mosquito_bites"
+title = "Preventing Mosquito Bites"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/mosquitoes/prevention/index.html"
+retrieved = "2026-09-26"
+quote = "Use Environmental Protection Agency (EPA)-registered insect repellents."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "crmp_earthquake_brace_bolt"
+title = "Earthquake Brace + Bolt: seismic retrofit grants for older raised-foundation houses"
+publisher = "California Residential Mitigation Program"
+year = 2026
+url = "https://www.crmp.org/our-seismic-retrofit-programs/the-retrofits/ebb-retrofit"
+retrieved = "2026-09-26"
+license = "State program publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "cdi_safer_from_wildfires"
+title = "Safer from Wildfires: insurance discounts for wildfire mitigation"
+publisher = "California Department of Insurance"
+year = 2026
+url = "https://www.insurance.ca.gov/01-consumers/200-wrr/Safer-from-Wildfires.cfm"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"

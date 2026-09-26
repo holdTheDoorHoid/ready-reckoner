@@ -85,8 +85,29 @@ One `[[item]]` per distinct thing a household would acquire or do. Fields are in
   "documents", one "alarms", one "know your shut-offs", and so on); a parent's `look_for` lists its
   steps. A new free step joins the closest parent. It stands alone only when the plan must count it
   on its own: it has its own quantity rule (`evacuation_ride_plan`, `epinephrine_check`, the staged
-  pet food and water) or a `once_if_*` rule keys on its id. The catalogue test
-  `free_actions_are_grouped_into_at_most_thirty_parents` holds the cap.
+  pet food and water, since v0.2.0 the clean-room plan and 90-day fills) or a `once_if_*` rule keys on
+  its id. Decisions and the long-horizon pointers are not free actions on the "now" list and are not
+  counted. The catalogue test `free_actions_are_grouped_into_at_most_thirty_parents` holds the cap.
+- **Decisions** (`decision = true`, contract v2): an insurance policy, ID or a home repair to weigh
+  (a FORTIFIED roof, a safe room, a backflow valve, a retrofit, wildfire hardening). A decision is
+  free, in tier `now`, in category `documents_money`, with a $0 band whose note says the cost is a
+  quote, a premium or a fee; any fee it names is cited (the passport fees cite 22 CFR 22.1). It
+  names its grant or discount pointer with a citation. Decisions are counted apart from the
+  catalogue's 90–140 items (at most 20).
+- **Long-horizon items** (`long_horizon = true`) belong to the long-horizon section, which the plan
+  shows when a target reaches 30 days or the household asks: rain catchment, hauling, a hand pump,
+  household kits, morale, staples. Their free pointers use `once_if_long_horizon`, point to sources,
+  and never become a manual.
+- **`requires`** lists what an item needs first, as alternatives: the item can be bought once any one
+  of them is owned or bought (batteries name the lights and the radio). Never a decision, never a
+  cycle (`catalogue_v020.rs` checks both).
+- **`readiness_share`**: every item that lists a readiness bucket (leaving, getting home, medical
+  emergency, fire, security, clean air) carries its share of that bucket's value, on the scale in
+  `docs/QUANTITY_RULES.md` ("Readiness share"): 1.0 for the capability itself down to 0.05 for an
+  accessory.
+- **`season`** is the season to have the item by or check it in; **`test_interval_months`** only for
+  things worth trying the way they are used (the lights, the generator, a jump starter, a key safe),
+  with the interval an estimate citing `rr_expert_prior`.
 - **Assumed basics.** `assumed_basic = true` marks an everyday thing most homes already have:
   blankets, warm layers, a cooking pot, a manual can opener, a phone, a bag for each person, three
   days of ordinary food, bath towels. The plan credits them when "assume basics" is on and lists them

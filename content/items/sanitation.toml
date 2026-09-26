@@ -38,6 +38,7 @@ look_for = [
   "Two sturdy buckets that can hold an adult's weight",
   "A seat made for the bucket",
   "Labels: PEE on one, POO on the other",
+  "Pee diluted with water and poured on a lawn or other soil (RDPO)",
 ]
 avoid = [
   "Burying bagged waste or putting it in the curbside trash unless officials say so",
@@ -73,6 +74,7 @@ retrieved = "2026-09-25"
 quantity_rule = "toilet_bags"
 citations = ["rdpo_emergency_toilet", "oregon_b2wr_toolkit", "ready_gov_kit", "rr_price_observations_2026_09"]
 hazard_extras = []
+requires = ["san_twin_bucket_toilet"]
 
 [[item]]
 id = "san_toilet_paper"
@@ -211,4 +213,54 @@ price_band_usd = { low = 2.29, high = 2.69, per = "pack", note = "Two supermarke
 retrieved = "2026-09-26"
 quantity_rule = "baby_wipes"
 citations = ["cdc_infant_checklist", "ready_gov_kit", "rdpo_emergency_toilet", "rr_price_observations_2026_09"]
+hazard_extras = []
+requires = ["san_diapers"]
+
+[[item]]
+id = "san_nitrile_gloves"
+name = "Disposable gloves, a box of 100"
+category = "sanitation"
+unit = "box"
+buckets = ["water_out", "medical_emergency", "supplies"]
+tier = "h72"
+free = false
+spec = "A box of disposable nitrile gloves for emptying the toilet bucket, cleaning up and caring for someone who is sick; a first-aid kit holds only a pair or two (Red Cross). Wash your hands after taking them off."
+look_for = [
+  "Nitrile, not latex, in sizes that fit your household",
+  "A box of 100 kept with the toilet kit",
+]
+avoid = [
+  "Reusing disposable gloves",
+  "Touching your face while wearing them",
+]
+price_band_usd = { low = 15.98, high = 24.97, per = "box", note = "Two home-center listings for 100-count boxes of disposable nitrile gloves: $15.98 and $24.97." }
+retrieved = "2026-09-26"
+quantity_rule = "once"
+citations = ["redcross_first_aid_kit", "cdc_hygiene_emergency", "rr_price_observations_2026_09"]
+hazard_extras = []
+readiness_share = 0.05
+
+[[item]]
+id = "san_household_ops_kit"
+name = "Household kit: paper plates, cups, utensils, trash bags, waterproof matches"
+category = "sanitation"
+unit = "kit"
+buckets = ["water_out", "supplies"]
+tier = "w2"
+free = false
+long_horizon = true
+spec = "Paper plates, cups and plastic utensils save the water that washing dishes would take, and trash bags with ties keep waste contained, as Ready.gov's kit lists, with matches in a waterproof container. The plan counts one kit for every two weeks of the first month of a no-water target longer than two weeks (an estimate); after that, dishes are washed with the water you treat."
+look_for = [
+  "About 100 paper plates, with cups and utensils to match",
+  "Heavy trash bags with ties",
+  "Waterproof or windproof matches in a sealed case",
+]
+avoid = [
+  "Washing dishes with stored drinking water",
+  "Bagged trash left where animals can reach it",
+]
+price_band_usd = { low = 28.04, high = 43.8, per = "kit", note = "Two sets from a supermarket's store brands with home-center matches: 100 plates, 48 utensils, 51 cups, 20 large trash bags and weatherproof matches at $28.04, or name-brand versions with a windproof match kit at $43.80." }
+retrieved = "2026-09-26"
+quantity_rule = "household_ops_kits"
+citations = ["ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []

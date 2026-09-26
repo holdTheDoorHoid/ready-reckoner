@@ -28,6 +28,7 @@ quantity_rule = "per_commuter"
 maintenance = { check_months = 6 }
 citations = ["ready_gov_kit_2020", "ready_gov_kit", "cdc_water_storage", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 1.0
 
 [[item]]
 id = "gethome_car_kit"
@@ -39,9 +40,10 @@ tier = "h72"
 free = false
 spec = "The Ready.gov car kit: jumper cables, sand, a flashlight, warm clothes, blankets, bottled water and non-perishable snacks. If stranded in snow, CDC advises running the engine about 10 minutes an hour with a window slightly open and the exhaust pipe clear."
 look_for = [
-  "Jumper cables and a flashlight with fresh batteries",
+  "Jumper cables and a flashlight with fresh batteries, or a jump starter (its own line)",
   "Blankets or a sleeping bag and warm clothes",
   "Sand or cat litter and an ice scraper in snow country",
+  "Your roadside-assistance number, and how far your insurance or auto club will tow, in your phone and on paper",
 ]
 avoid = [
   "Running the engine with snow blocking the exhaust pipe",
@@ -51,5 +53,34 @@ price_band_usd = { low = 34.97, high = 87.89, per = "kit", note = "Two home-cent
 retrieved = "2026-09-26"
 quantity_rule = "per_vehicle"
 maintenance = { check_months = 6 }
-citations = ["ready_gov_winter", "cdc_winter_safety", "rr_price_observations_2026_09"]
+citations = ["ready_gov_winter", "cdc_winter_safety", "ollam_2022_lawyer_passport_locksmith_gun", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.5
+season = "fall"
+
+[[item]]
+id = "gethome_jump_pack"
+name = "Portable jump starter for the car"
+category = "get_home"
+unit = "jump starter"
+buckets = ["get_home", "evacuate"]
+tier = "w2"
+free = false
+spec = "A charged battery pack that starts the car on its own, with no second car, and that also charges a phone. It helps only if it holds a charge, so charge it and try it every three months (an estimate) and before winter."
+look_for = [
+  "Rated for your engine's size and fuel",
+  "Clamps that warn you, or stay off, if they are connected the wrong way",
+  "A USB port to charge a phone",
+]
+avoid = [
+  "Leaving it in the car for months without charging it",
+  "Letting the clamps touch each other once one is on the battery",
+]
+price_band_usd = { low = 53.99, high = 99.95, per = "jump starter", note = "Two home-center listings for lithium jump starters of about 1,000 peak amps: $53.99 and $99.95. Jumper cables cost less but need a second car." }
+retrieved = "2026-09-26"
+quantity_rule = "per_vehicle"
+citations = ["ready_gov_winter", "ollam_2022_lawyer_passport_locksmith_gun", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+readiness_share = 0.3
+season = "fall"
+test_interval_months = 3
