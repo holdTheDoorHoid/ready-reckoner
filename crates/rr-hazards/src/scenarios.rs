@@ -103,10 +103,15 @@ pub(crate) struct Detected {
     pub today: Estimate,
     pub future: Estimate,
     /// The parent hazard's rate without the part this scenario stands for (today, around 2050),
-    /// when the parent's rate already contains it. Used only for the register card, which shows
-    /// remainder + scenario so nothing is counted twice there; the rate handed to
-    /// `rr-consequence` stays the parent's full rate.
+    /// when the split is exact (the hurricane's Category 1–2 part). Used only for the register
+    /// card, which shows remainder + scenario so nothing is counted twice there; the rate handed
+    /// to `rr-consequence` stays the parent's full rate.
     pub remainder: Option<(Estimate, Estimate)>,
+    /// The part of the parent's rate this scenario stands for, a year (today, around 2050), when
+    /// the parent already contains it (an earthquake on a named fault is inside the hazard
+    /// model's shaking chance; a blackout during a heat wave is one of the heat waves). The card
+    /// takes out the shares of every such scenario, never below a quarter of the parent.
+    pub share: Option<(f64, f64)>,
 }
 
 /// Zones for Cascadia.
@@ -220,7 +225,7 @@ const REMAINDER_FLOOR: f64 = 0.25;
 const DEFAULT_DIAL_RATE: f64 = 0.01;
 
 /// The parent's estimate with `share` a year taken out, never below a quarter of itself.
-fn without(parent: &Estimate, share: f64) -> Estimate {
+pub(crate) fn without(parent: &Estimate, share: f64) -> Estimate {
     let f = |x: f64| (x - share).max(REMAINDER_FLOOR * x);
     let mut out = parent.clone();
     out.value = f(parent.value);
@@ -256,6 +261,7 @@ struct Draft {
     applies_because: String,
     sources: Vec<CitationId>,
     remainder: Option<(Estimate, Estimate)>,
+    share: Option<(f64, f64)>,
 }
 
 fn cascadia(ctx: &Ctx<'_>, natural: &Natural) -> Option<(Draft, Margin, Zone)> {
@@ -340,16 +346,7 @@ fn cascadia(ctx: &Ctx<'_>, natural: &Natural) -> Option<(Draft, Margin, Zone)> {
             sources.push(id);
         }
     }
-    let remainder = natural
-        .rates
-        .iter()
-        .find(|r| r.hazard == HazardId::Earthquake)
-        .map(|r| {
-            (
-                without(&r.today, recurrence),
-                without(&r.future, recurrence),
-            )
-        });
+    let _ = natural;
     let draft = Draft {
         id: "cascadia_m9",
         name: "Magnitude 9 Cascadia earthquake",
@@ -361,44 +358,57 @@ fn cascadia(ctx: &Ctx<'_>, natural: &Natural) -> Option<(Draft, Margin, Zone)> {
         default_on,
         applies_because: format!("{place} {chance}{why_default}"),
         sources,
-        remainder,
+        remainder: None,
+        share: Some((recurrence, recurrence)),
     };
     Some((draft, margin, zone))
 }
 
+/// A named earthquake scenario on a fault near the county. `guidance` names state guidance that
+/// turns it on by default whatever its rate (as Washington's two-weeks-ready guidance does for
+/// Cascadia); otherwise it is on when its rate reaches half the one-in-100 yardstick.
+#[allow(clippy::too_many_arguments)]
 fn named_quake(
     ctx: &Ctx<'_>,
-    natural: &Natural,
     id: &'static str,
     name: &'static str,
     today: Estimate,
     lead: &str,
+    guidance: Option<(&str, &str)>,
 ) -> Draft {
     let county = ctx.county_label();
-    let default_on = today.value >= 0.5 * DEFAULT_DIAL_RATE;
-    let why = if default_on {
-        "That is more than the one-in-100-a-year yardstick, so the plan includes it."
-    } else {
-        "That is rarer than the one-in-100-a-year yardstick, so it is off unless you turn it on."
+    let (default_on, why, mut sources) = match guidance {
+        Some((sentence, source)) => (true, sentence.to_owned(), {
+            let mut s = today.sources.clone();
+            s.push(CitationId::from(source));
+            s
+        }),
+        None => {
+            let on = today.value >= 0.5 * DEFAULT_DIAL_RATE;
+            let why = if on {
+                "That is more than the one-in-100-a-year yardstick, so the plan includes it."
+            } else {
+                "That is rarer than the one-in-100-a-year yardstick, so it is off unless you turn \
+                 it on."
+            };
+            (on, why.to_owned(), today.sources.clone())
+        }
     };
+    sources.dedup();
     let share = today.value;
-    let remainder = natural
-        .rates
-        .iter()
-        .find(|r| r.hazard == HazardId::Earthquake)
-        .map(|r| (without(&r.today, share), without(&r.future, share)));
     Draft {
         id,
         name,
         hazard: HazardId::Earthquake,
         variant: None,
-        sources: today.sources.clone(),
+        sources,
         future: today.clone(),
         today,
         alternatives: Vec::new(),
         default_on,
         applies_because: format!("{county} {lead} {why}"),
-        remainder,
+        remainder: None,
+        share: Some((share, share)),
     }
 }
 
@@ -480,6 +490,7 @@ fn local_tsunami(ctx: &Ctx<'_>, cascadia: Option<(Margin, Zone)>) -> Option<Draf
         ),
         sources,
         remainder: None,
+        share: None,
     })
 }
 
@@ -521,6 +532,118 @@ fn major_hurricane(ctx: &Ctx<'_>, natural: &Natural) -> Option<Draft> {
         ),
         sources,
         remainder: Some((split.cat12_today.clone(), split.cat12_future.clone())),
+        share: None,
+    })
+}
+
+/// Counties on the Wasatch Front (Working Group on Utah Earthquake Probabilities 2016).
+const WASATCH: &[&str] = &[
+    "49003", // Box Elder
+    "49011", // Davis
+    "49029", // Morgan
+    "49035", // Salt Lake
+    "49043", // Summit
+    "49045", // Tooele
+    "49049", // Utah
+    "49051", // Wasatch
+    "49057", // Weber
+];
+
+/// Counties shaken hard by a magnitude 7.8 on the southern San Andreas fault (the ShakeOut
+/// scenario's area).
+const SAN_ANDREAS_SOUTH: &[&str] = &[
+    "06025", // Imperial
+    "06029", // Kern
+    "06037", // Los Angeles
+    "06059", // Orange
+    "06065", // Riverside
+    "06071", // San Bernardino
+    "06111", // Ventura
+];
+
+/// Counties on or next to the Seattle fault zone.
+const SEATTLE_FAULT: &[&str] = &[
+    "53033", // King
+    "53035", // Kitsap
+    "53053", // Pierce
+    "53061", // Snohomish
+];
+
+/// A power cut of a day or more during a heat wave in a desert county (Stone et al. 2023): the
+/// county's heat episodes × the chance that an outage of a day or more starts during one
+/// (outages of a day or more a year × the episode's length in years). On by default in the
+/// hottest counties (60 days a year or more over 95 °F): there a blackout in a heat wave is the
+/// most dangerous thing that can happen, and the plan's answer is a place to go.
+fn heat_blackout(ctx: &Ctx<'_>, natural: &Natural) -> Option<Draft> {
+    let hot = ctx
+        .county
+        .climate
+        .get("days_over_95f_hist")
+        .map(|v| f64::from(*v))
+        .filter(|d| d.is_finite() && *d >= DESERT_HEAT_DAYS_95F)?;
+    let heat = natural
+        .rates
+        .iter()
+        .find(|r| r.hazard == HazardId::HeatWave)?;
+    let county = ctx.county_label();
+    let (outage, from_record) = match ctx.county.outages.as_ref() {
+        Some(o)
+            if o.events_per_customer_year.is_finite()
+                && o.p_ge_1d.is_finite()
+                && o.events_per_customer_year > 0.0
+                && o.state_series.is_none() =>
+        {
+            let r = f64::from(o.events_per_customer_year) * f64::from(o.p_ge_1d);
+            (
+                Estimate::data(
+                    r,
+                    r / OUTAGE_RATE_SPREAD,
+                    r * OUTAGE_RATE_SPREAD,
+                    &[cite::EAGLE_I],
+                ),
+                true,
+            )
+        }
+        _ => (
+            prior(
+                OUTAGE_GE_1D_FALLBACK,
+                &[cite::EAGLE_I, cite::RR_HAZARD_PRIORS],
+            ),
+            false,
+        ),
+    };
+    let overlap = outage.scaled(HEAT_EPISODE_DAYS.0 / 365.0);
+    let today = heat.today.times(&overlap).cite(&[cite::STONE_2023]);
+    let future = heat.future.times(&overlap).cite(&[cite::STONE_2023]);
+    let record = if from_record {
+        "the county's outage records"
+    } else {
+        "national outage records"
+    };
+    let (t, f) = (today.value, future.value);
+    Some(Draft {
+        id: "heat_blackout",
+        name: "Blackout during a heat wave",
+        hazard: HazardId::HeatWave,
+        variant: None,
+        today,
+        future,
+        alternatives: Vec::new(),
+        default_on: true,
+        applies_because: format!(
+            "{county} has about {hot:.0} days a year over 95 °F. If the power failed for a day or \
+             more during a heat wave, air conditioning would fail for everyone at once; a study \
+             of a two-day blackout in a Phoenix heat wave found it the most dangerous combination \
+             of all. From {record}, it is rare, but the harm is so high that the plan includes it: \
+             the answer is a cool place to go and a way to get there."
+        ),
+        sources: vec![
+            CitationId::from(cite::STONE_2023),
+            CitationId::from(cite::EAGLE_I),
+            CitationId::from(cite::CMRA),
+        ],
+        remainder: None,
+        share: Some((t, f)),
     })
 }
 
@@ -544,12 +667,12 @@ pub(crate) fn detect(ctx: &Ctx<'_>, natural: &Natural, notes: &mut Notes) -> Vec
         );
         drafts.push(named_quake(
             ctx,
-            natural,
             "new_madrid_m7",
             "Magnitude 7 New Madrid earthquake",
             today,
             "is near the New Madrid fault zone. The USGS puts the chance of a repeat of the \
              1811–1812 earthquakes at 7 to 10 in 100 over the next 50 years.",
+            None,
         ));
     }
     if HAYWARD.contains(&fips) {
@@ -563,17 +686,76 @@ pub(crate) fn detect(ctx: &Ctx<'_>, natural: &Natural, notes: &mut Notes) -> Vec
         );
         drafts.push(named_quake(
             ctx,
-            natural,
             "hayward_m7",
             "Magnitude 7 Hayward fault earthquake",
             today,
             "is near the Hayward and Rodgers Creek faults. The USGS puts the chance of a \
              magnitude 6.7 or larger earthquake on them at about 33 in 100 over the next 30 \
              years.",
+            None,
+        ));
+    }
+    if WASATCH.contains(&fips) {
+        let (p, lo, hi) = WASATCH_50YR;
+        let today = Estimate::data(
+            rate_from_chance(p, 50.0),
+            rate_from_chance(lo, 50.0),
+            rate_from_chance(hi, 50.0),
+            &[cite::UTAH_WGUEP],
+        );
+        drafts.push(named_quake(
+            ctx,
+            "wasatch_m7",
+            "Magnitude 7 Wasatch fault earthquake",
+            today,
+            "is on the Wasatch Front. Utah's earthquake working group puts the chance of a \
+             magnitude 6.75 or larger earthquake there at about 43 in 100 over the next 50 years.",
+            None,
+        ));
+    }
+    if SAN_ANDREAS_SOUTH.contains(&fips) {
+        let (p, lo, hi) = SAN_ANDREAS_SOUTH_30YR;
+        let today = Estimate::data(
+            rate_from_chance(p, 30.0),
+            rate_from_chance(lo, 30.0),
+            rate_from_chance(hi, 30.0),
+            &[cite::UCERF3],
+        );
+        drafts.push(named_quake(
+            ctx,
+            "san_andreas_south_m78",
+            "Magnitude 7.8 southern San Andreas earthquake",
+            today,
+            "is near the southern San Andreas fault. The USGS puts the chance of a magnitude 6.7 \
+             or larger earthquake on it at about 19 in 100 over the next 30 years.",
+            None,
+        ));
+    }
+    if SEATTLE_FAULT.contains(&fips) {
+        let (p, lo, hi) = SEATTLE_FAULT_50YR;
+        let today = Estimate::data(
+            rate_from_chance(p, 50.0),
+            rate_from_chance(lo, 50.0),
+            rate_from_chance(hi, 50.0),
+            &[cite::USGS_SEATTLE_FAULT],
+        );
+        drafts.push(named_quake(
+            ctx,
+            "seattle_fault_m7",
+            "Magnitude 7 Seattle fault earthquake",
+            today,
+            "is on the Seattle fault zone, which last broke about 1,100 years ago. Scientists put \
+             the chance of a magnitude 6.5 or larger earthquake on it at about 5 in 100 over the \
+             next 50 years.",
+            Some((
+                "Washington asks every household to be two weeks ready, so the plan includes it.",
+                cite::WA_TWO_WEEKS,
+            )),
         ));
     }
     drafts.extend(local_tsunami(ctx, cascadia_where));
     drafts.extend(major_hurricane(ctx, natural));
+    drafts.extend(heat_blackout(ctx, natural));
 
     let overrides = &ctx.input.dials.scenario_overrides;
     for o in overrides {
@@ -617,6 +799,7 @@ pub(crate) fn detect(ctx: &Ctx<'_>, natural: &Natural, notes: &mut Notes) -> Vec
                 today: d.today,
                 future: d.future,
                 remainder: d.remainder,
+                share: d.share,
             }
         })
         .collect()
@@ -641,16 +824,38 @@ mod tests {
 
     #[test]
     fn county_lists_are_valid_fips_without_repeats() {
-        let mut all: Vec<&str> = CASCADIA.iter().map(|(f, _, _)| *f).collect();
-        all.extend(HAYWARD);
-        all.extend(NEW_MADRID);
-        for f in &all {
-            assert!(f.len() == 5 && f.bytes().all(|b| b.is_ascii_digit()), "{f}");
+        let cascadia: Vec<&str> = CASCADIA.iter().map(|(f, _, _)| *f).collect();
+        for list in [
+            &cascadia[..],
+            HAYWARD,
+            NEW_MADRID,
+            WASATCH,
+            SAN_ANDREAS_SOUTH,
+            SEATTLE_FAULT,
+        ] {
+            for f in list {
+                assert!(f.len() == 5 && f.bytes().all(|b| b.is_ascii_digit()), "{f}");
+            }
+            let mut sorted = list.to_vec();
+            sorted.sort();
+            sorted.dedup();
+            assert_eq!(
+                sorted.len(),
+                list.len(),
+                "a county is listed twice in one list"
+            );
         }
-        let mut sorted = all.clone();
-        sorted.sort();
-        sorted.dedup();
-        assert_eq!(sorted.len(), all.len(), "a county is listed twice");
+        // The Seattle fault's counties are also Cascadia's inland valley: both scenarios apply.
+        assert!(SEATTLE_FAULT.iter().all(|f| cascadia.contains(f)));
+    }
+
+    #[test]
+    fn the_new_scenarios_published_chances() {
+        // Wasatch: 43 % in 50 years -> 1.12 % a year; southern San Andreas: 19 % in 30 years ->
+        // 0.70 % a year; Seattle fault: 5 % in 50 years -> 0.10 % a year.
+        assert!((rate_from_chance(0.43, 50.0) - 0.011_242).abs() < 1e-6);
+        assert!((rate_from_chance(0.19, 30.0) - 0.007_024).abs() < 1e-6);
+        assert!((rate_from_chance(0.05, 50.0) - 0.001_026).abs() < 1e-6);
     }
 
     #[test]

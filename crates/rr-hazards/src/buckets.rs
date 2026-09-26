@@ -45,7 +45,7 @@ pub(crate) fn for_hazard(hazard: HazardId) -> Vec<BucketId> {
         H::SupplyChainDisruption => vec![Supplies, Medication],
         H::HazmatRelease => vec![WaterOut, Supplies, Evacuate],
         H::NuclearPlantIncident => vec![Supplies, Evacuate],
-        H::NuclearAttack => vec![WaterOut, Supplies, Evacuate],
+        H::NuclearAttack => vec![Power, Supplies, Medication, Comms, Evacuate, Income],
         H::Terrorism => vec![Supplies, Security],
         H::JobLoss => vec![Income],
         H::HouseFire => vec![Evacuate, Fire, HomeLoss],
@@ -55,27 +55,26 @@ pub(crate) fn for_hazard(hazard: HazardId) -> Vec<BucketId> {
         H::Burglary => vec![Security],
         H::EarnerDeathOrDisability => vec![Income],
         H::ExtendedHouseholdIllness => vec![Supplies, Medication, Income],
-        // awaiting: hazards — the buckets of the contract v2 hazards (REVIEW §2.2, §2.3); none
-        // is emitted yet.
-        H::WildfireSmoke
-        | H::DustStorm
-        | H::Sinkhole
-        | H::GeomagneticStorm
-        | H::Vei7Eruption
-        | H::DamFailure
-        | H::NetworkOutage
-        | H::DrugShortage
-        | H::BenefitInterruption
-        | H::AttackDisruption
-        | H::MultiMonthBlackout
-        | H::WarInfrastructure
-        | H::CbrnAttack
-        | H::SeverePandemic
-        | H::FinancialCrisis
-        | H::MassViolence
-        | H::WaterDamage
-        | H::Eviction
-        | H::ArrestOrDetention => vec![],
+        // Contract v2 (REVIEW §2.2, §2.3; hazard-candidates.csv "buckets").
+        H::WildfireSmoke => vec![MedicalEmergency, CleanAir],
+        H::DustStorm => vec![Supplies, GetHome, CleanAir],
+        H::Sinkhole => vec![Evacuate, HomeLoss],
+        H::GeomagneticStorm => vec![Power, WaterOut, Medication, Comms],
+        H::Vei7Eruption => vec![Supplies, Income],
+        H::DamFailure => vec![Power, WaterOut, Evacuate, HomeLoss],
+        H::NetworkOutage => vec![Comms, MedicalEmergency],
+        H::DrugShortage => vec![Medication],
+        H::BenefitInterruption => vec![Supplies, Income],
+        H::AttackDisruption => vec![Supplies, Comms, GetHome, Security],
+        H::MultiMonthBlackout => vec![Power, WaterOut, Medication],
+        H::WarInfrastructure => vec![Power, WaterOut, Supplies, Comms],
+        H::CbrnAttack => vec![Supplies, Medication, Comms, Evacuate],
+        H::SeverePandemic => vec![Supplies, Medication, Income],
+        H::FinancialCrisis => vec![Comms, Income],
+        H::MassViolence => vec![MedicalEmergency, Security],
+        H::WaterDamage => vec![WaterOut, HomeLoss],
+        H::Eviction => vec![Evacuate, Income, HomeLoss],
+        H::ArrestOrDetention => vec![Income, HomeLoss],
     };
     v.sort();
     v.dedup();
@@ -86,39 +85,20 @@ pub(crate) fn for_hazard(hazard: HazardId) -> Vec<BucketId> {
 mod tests {
     use super::*;
 
-    /// awaiting: hazards — the contract v2 hazards, whose buckets arrive with their rates.
-    const AWAITING: &[HazardId] = &[
-        HazardId::WildfireSmoke,
-        HazardId::DustStorm,
-        HazardId::Sinkhole,
-        HazardId::GeomagneticStorm,
-        HazardId::Vei7Eruption,
-        HazardId::DamFailure,
-        HazardId::NetworkOutage,
-        HazardId::DrugShortage,
-        HazardId::BenefitInterruption,
-        HazardId::AttackDisruption,
-        HazardId::MultiMonthBlackout,
-        HazardId::WarInfrastructure,
-        HazardId::CbrnAttack,
-        HazardId::SeverePandemic,
-        HazardId::FinancialCrisis,
-        HazardId::MassViolence,
-        HazardId::WaterDamage,
-        HazardId::Eviction,
-        HazardId::ArrestOrDetention,
-    ];
-
     #[test]
     fn every_hazard_feeds_at_least_one_bucket_in_order() {
         for h in HazardId::ALL {
             let b = for_hazard(*h);
-            if AWAITING.contains(h) {
-                continue;
-            }
             assert!(!b.is_empty(), "{h}");
             assert!(b.windows(2).all(|w| w[0] < w[1]), "{h}");
         }
         assert_eq!(for_hazard(HazardId::JobLoss), [BucketId::Income]);
+        // Smoke and dust fill the clean-air bucket (owner decision, REVIEW §8).
+        assert!(for_hazard(HazardId::WildfireSmoke).contains(&BucketId::CleanAir));
+        assert!(for_hazard(HazardId::DustStorm).contains(&BucketId::CleanAir));
+        assert_eq!(
+            for_hazard(HazardId::ArrestOrDetention),
+            [BucketId::Income, BucketId::HomeLoss]
+        );
     }
 }

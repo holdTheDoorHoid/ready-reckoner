@@ -1301,6 +1301,7 @@ dependencies = [
 name = "rr-hazards"
 version = "0.1.1"
 dependencies = [
+ "rr-data",
  "rr-types",
  "serde",
  "serde_json",
