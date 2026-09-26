@@ -104,15 +104,17 @@ fn medical_emergency(ctx: &Ctx<'_>, notes: &mut Notes) -> HazardRate {
             None => data(ED_VISITS, &[cite::NHAMCS_ED]),
         },
     };
+    let mut today = per_person.scaled(ctx.people() as f64);
     if ctx.setting() == rr_types::Setting::Rural {
         notes.add(
             "Ambulances take longer to reach rural homes, so first-aid skills and supplies count \
              for more here.",
         );
+        today = today.cite(&[cite::MELL_2017_EMS]);
     }
     HazardRate::new(
         HazardId::MedicalEmergency,
-        per_person.scaled(ctx.people() as f64),
+        today,
         "have someone need emergency care",
         2_000.0,
     )

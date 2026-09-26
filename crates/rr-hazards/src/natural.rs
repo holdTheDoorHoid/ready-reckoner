@@ -10,14 +10,14 @@
 //!   historic loss ratio ÷ a typical damage ratio for hail, tornado and landslide; flood-zone
 //!   share for floods; a floor from recorded outages for windstorms), otherwise the PRIOR table
 //!   in `params`.
-//! - m_h, the household modifier: cooling and heating (heat and cold waves count only when the
-//!   home's system could fail), floor and basement (floods), setting (power-line exposure,
-//!   wildfire), well or public water (drought).
+//! - m_h, the household modifier: floor and basement (floods), setting (power-line exposure,
+//!   wildfire), well or public water (drought). Heat and cold waves reach every household in the
+//!   county; the home's cooling and heating change what they do, which `rr-consequence` applies.
 //!
 //! What one "household-significant event" means for each hazard is in the `verb` of each rate
 //! and in `docs/RISK_MODEL.md` § "Hazard rates".
 
-use rr_types::{Cooling, HazardId, Heating, math};
+use rr_types::{HazardId, math};
 
 use crate::cite;
 use crate::climate::{self, Climate};
@@ -178,22 +178,11 @@ fn heat_wave(ctx: &Ctx<'_>, notes: &mut Notes) -> Option<HazardRate> {
         let lam = spread(days, NRI_FREQUENCY_SPREAD, &lam_sources);
         (lam.times(&per_episode(HEAT_EPISODE_DAYS)), days)
     };
-    let cooled = ctx.input.housing.cooling != Cooling::None;
-    let (m, verb) = if cooled {
-        (
-            prior(COOLING_FAILS, &[cite::RR_HAZARD_PRIORS]),
-            "have their cooling fail during a heat wave",
-        )
-    } else {
-        (
-            Estimate::exact(1.0),
-            "go through a dangerous heat wave at home",
-        )
-    };
-    let m_avg = (1.0 - US_AIR_CONDITIONED_SHARE) + US_AIR_CONDITIONED_SHARE * COOLING_FAILS.0;
+    // A heat wave reaches every household in the county. What it does depends on the home's
+    // cooling (no air conditioning: dangerous heat indoors; air conditioning: danger only if the
+    // power fails), which rr-consequence applies with its coupling rules.
     Some(
-        HazardRate::new(h, episodes.times(&m), verb, 500.0)
-            .with_county_average(episodes.value * m_avg)
+        HazardRate::new(h, episodes, "go through a heat wave", 500.0)
             .with_eal(ctx.eal_per_household(h))
             .with_climate(climate::treatment(
                 ctx.county,
@@ -207,22 +196,10 @@ fn heat_wave(ctx: &Ctx<'_>, notes: &mut Notes) -> Option<HazardRate> {
 fn cold_wave(ctx: &Ctx<'_>) -> Option<HazardRate> {
     let h = HazardId::ColdWave;
     let (episodes, _) = episodes(ctx, h, COLD_EPISODE_DAYS)?;
-    let heated = ctx.input.housing.heating != Heating::None;
-    let (m, verb) = if heated {
-        (
-            prior(HEATING_FAILS, &[cite::RR_HAZARD_PRIORS]),
-            "have their heat fail during a cold spell",
-        )
-    } else {
-        (
-            Estimate::exact(1.0),
-            "go through a dangerous cold spell at home",
-        )
-    };
-    let m_avg = US_UNHEATED_SHARE + (1.0 - US_UNHEATED_SHARE) * HEATING_FAILS.0;
+    // Like heat waves, a cold wave reaches every household; rr-consequence decides what it does
+    // given the home's heating.
     Some(
-        HazardRate::new(h, episodes.times(&m), verb, 500.0)
-            .with_county_average(episodes.value * m_avg)
+        HazardRate::new(h, episodes, "go through a spell of dangerous cold", 500.0)
             .with_eal(ctx.eal_per_household(h))
             .with_climate(climate::treatment(ctx.county, h, 0.0, ctx.ground_level())),
     )

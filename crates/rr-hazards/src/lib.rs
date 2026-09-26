@@ -19,8 +19,8 @@
 //! (`Effect::p_given_event`) and by the duration curve. What one event means for each hazard is
 //! stated in `docs/RISK_MODEL.md` § "Hazard rates" (and in the frequency sentence), for example:
 //!
-//! - heat and cold waves count only when this home's cooling or heating could fail (every
-//!   heat wave for a home without air conditioning); do not apply a cooling coupling again;
+//! - heat and cold waves count every episode in the county: they reach every household, and
+//!   `rr-consequence` decides what they do given the home's cooling and heating;
 //! - windstorms, ice storms and lightning count when they cut this household's power or damage
 //!   the home; winter storms when they keep the household in or cut the power;
 //! - floods count when water reaches the home (or cuts off an upper-floor flat);
@@ -30,8 +30,9 @@
 //! # Scenarios
 //!
 //! A named scenario ([`ScenarioCandidate`]) is a rare, severe version of a hazard. Its parent's
-//! entry in [`HazardAssessment::rates`] excludes it; `rr-consequence` adds it as its own event
-//! class when `on` (see the `scenarios` module docs).
+//! entry in [`HazardAssessment::rates`] is the parent's full rate; `rr-consequence` adds the
+//! scenario as its own event class when `on` and drops the parent's overlapping class (see the
+//! `scenarios` module docs).
 //!
 //! # Determinism
 //!
@@ -57,11 +58,11 @@ mod societal;
 use serde::{Deserialize, Serialize};
 
 use rr_types::{
-    BaseRate, Cooling, CountyRecord, HazardDisplay, HazardId, HazardProfile, Heating,
-    HouseholdEventRate, LocationResolved, PlanInput, math,
+    BaseRate, CountyRecord, HazardDisplay, HazardId, HazardProfile, HouseholdEventRate,
+    LocationResolved, PlanInput, math,
 };
 
-pub use scenarios::{AlternativeRate, ScenarioCandidate, ScenarioZone};
+pub use scenarios::{AlternativeRate, ScenarioCandidate};
 
 use climate::Climate;
 use ctx::{Ctx, Notes};
@@ -84,7 +85,7 @@ pub struct HazardAssessment {
     /// `rare_catastrophic` ones.
     pub profiles: Vec<HazardProfile>,
     /// Household event rates for `rr-consequence`, one per hazard in the register, in
-    /// `HazardId` order. A hazard with a named scenario excludes the scenario's share.
+    /// `HazardId` order: each hazard's full rate (a named scenario is an extra event class).
     pub rates: Vec<HouseholdEventRate>,
     /// Named scenarios that apply to this location, with defaults and the user's overrides.
     pub scenarios: Vec<ScenarioCandidate>,
@@ -136,7 +137,6 @@ pub fn assess(
             rates.push(r.clone());
         }
     }
-    household_notes(&ctx, &rates, &mut notes);
     if !negligible.is_empty() {
         notes.add(format!(
             "Also checked, and too rare here to list (under 1 in 100,000 a year): {}.",
@@ -150,9 +150,11 @@ pub fn assess(
     rates.extend(personal::assess(&ctx, &mut notes));
     rates.sort_by_key(|r| r.hazard);
 
+    // rr-consequence gets each hazard's full rate; a named scenario is an extra event class
+    // (see the `scenarios` module).
     let household_rates = rates
         .iter()
-        .map(|r| household_rate(r.hazard, parent_rate(r, &detected, y2050)))
+        .map(|r| household_rate(r.hazard, r.effective(y2050)))
         .collect();
 
     let mut cards: Vec<(f64, HazardProfile)> = rates
@@ -182,24 +184,6 @@ pub fn assess(
         rates: household_rates,
         scenarios: detected.into_iter().map(|d| d.candidate).collect(),
         notes: notes.0,
-    }
-}
-
-/// The rate `rr-consequence` gets for a hazard: without its scenario's share, if it has one.
-fn parent_rate<'a>(r: &'a HazardRate, detected: &'a [Detected], y2050: bool) -> &'a Estimate {
-    match detected
-        .iter()
-        .filter(|d| d.candidate.hazard == r.hazard)
-        .find_map(|d| d.remainder.as_ref())
-    {
-        Some((today, future)) => {
-            if y2050 {
-                future
-            } else {
-                today
-            }
-        }
-        None => r.effective(y2050),
     }
 }
 
@@ -291,23 +275,6 @@ fn join_lower(names: &[&str]) -> String {
         0 => String::new(),
         1 => lower[0].clone(),
         n => format!("{} and {}", lower[..n - 1].join(", "), lower[n - 1]),
-    }
-}
-
-/// Notes that explain how the household changes the natural rates.
-fn household_notes(ctx: &Ctx<'_>, rates: &[HazardRate], notes: &mut Notes) {
-    let has = |h: HazardId| rates.iter().any(|r| r.hazard == h);
-    if has(HazardId::HeatWave) && ctx.input.housing.cooling != Cooling::None {
-        notes.add(
-            "Your home has air conditioning, so heat waves count only when the cooling could \
-             fail (a power cut or a breakdown).",
-        );
-    }
-    if has(HazardId::ColdWave) && ctx.input.housing.heating != Heating::None {
-        notes.add(
-            "Your home is heated, so cold spells count only when the heat could fail (a power \
-             cut, a breakdown or running out of fuel).",
-        );
     }
 }
 

@@ -1,8 +1,9 @@
 //! Citation ids this crate attaches to rates and profiles.
 //!
 //! Each id must resolve to an entry in `content/citations.toml` (owned by the content
-//! workstream). The ids and what they stand for are listed in `docs/CITATION_IDS.md` with the
-//! status "requested by hazards"; a test checks that every id here appears in that table.
+//! workstream). Most are already defined there; the ones this crate adds are listed in
+//! `docs/CITATION_IDS.md` as "requested by hazards". A test checks that every id here is either
+//! in `content/citations.toml` or in that table.
 
 /// FEMA National Risk Index v1.20 (December 2025), county table: annualised frequencies,
 /// exposure, historic loss ratios and expected annual losses.
@@ -11,7 +12,7 @@ pub const NRI: &str = "fema_nri_v120";
 /// centre.
 pub const USGS_NSHM: &str = "usgs_nshm_2023";
 /// ORNL EAGLE-I county outage records 2014–2025 (Brelsford et al. 2024; CC BY 4.0).
-pub const EAGLE_I: &str = "ornl_eagle_i";
+pub const EAGLE_I: &str = "ornl_eagle_i_outages";
 /// Do et al. (2023), Nature Communications 14:2470: 62.1 % of county outages of 8 hours or more
 /// coincided with extreme weather.
 pub const DO_2023: &str = "do_2023_outages";
@@ -27,15 +28,22 @@ pub const FEMA_FLOOD_ZONES: &str = "fema_flood_zones";
 /// SSP2-4.5 and SSP5-8.5, 2036–2065).
 pub const CMRA: &str = "cmra_2025";
 /// Fifth National Climate Assessment (2023), chapter 2: stronger tropical cyclones.
-pub const NCA5: &str = "nca5_2023";
+pub const NCA5: &str = "nca5_climate_trends";
 /// Goldfinger et al. (2012), USGS Professional Paper 1661-F, as reported by Oregon State
 /// University: 40 % chance of a major Cascadia earthquake near Coos Bay in 50 years; 19
 /// full-margin and 22 southern-only ruptures in 10,000 years.
-pub const CASCADIA_2012: &str = "goldfinger_2012_cascadia";
-/// The Oregon Resilience Plan (2013): prepare for a minimum of two weeks.
-pub const ORP_2013: &str = "orp_2013";
-/// Washington Emergency Management Division, "2 Weeks Ready".
-pub const WA_TWO_WEEKS: &str = "wa_emd_2_weeks_ready";
+pub const CASCADIA_2012: &str = "osu_cascadia_2012";
+/// Goldfinger et al. (2012), USGS Professional Paper 1661-F: the Cascadia turbidite record.
+pub const CASCADIA_PP1661F: &str = "usgs_pp1661f_cascadia";
+/// Oregon Department of Emergency Management, "2 Weeks Ready": a plan and supplies to get through
+/// at least two weeks after a disaster.
+pub const OREGON_TWO_WEEKS: &str = "oregon_2_weeks_ready";
+/// The Oregon Resilience Plan (2013): prepare for a minimum of two weeks; coast and valley
+/// restoration times after a Cascadia earthquake.
+pub const ORP_2013: &str = "oregon_resilience_plan_2013";
+/// Washington Emergency Management Division, "Prepare in a Year": one hour a month for a year to
+/// become two weeks ready.
+pub const WA_TWO_WEEKS: &str = "washington_prepare_in_a_year";
 /// DOGAMI Oregon Tsunami Clearinghouse: waves arrive 15–20 minutes after a local earthquake.
 pub const DOGAMI_TSUNAMI: &str = "dogami_tsunami_faq";
 /// USGS Fact Sheet 2015-3009 (UCERF3): 33 % chance of magnitude 6.7 or more on the
@@ -47,16 +55,16 @@ pub const NEW_MADRID: &str = "usgs_new_madrid";
 /// landfalling hurricanes are major (Category 3 or stronger).
 pub const HURDAT2: &str = "noaa_hurdat2";
 /// US Fire Administration, residential fire statistics, 2023: 344,600 fires, $11.27 billion loss.
-pub const USFA_FIRES: &str = "usfa_residential_fires_2023";
+pub const USFA_FIRES: &str = "usfa_residential_fires";
 /// US Census Bureau, Current Population Survey table HH-1: 131,434,000 households in 2023.
-pub const CENSUS_HH1: &str = "census_cps_hh1";
+pub const CENSUS_HH1: &str = "census_households_cps";
 /// BLS, Work Experience of the Population, 2024: 8.3 % of people who worked or looked for work
 /// were unemployed at some point in the year.
 pub const BLS_WORK_EXPERIENCE: &str = "bls_work_experience_2024";
 /// BLS JOLTS layoffs and discharges rate: 1.117 % of workers per month on average in 2025.
-pub const BLS_JOLTS: &str = "bls_jolts_2025";
+pub const BLS_JOLTS: &str = "bls_jolts_layoffs";
 /// CDC NCHS FastStats, emergency department visits (NHAMCS 2022): 47.3 per 100 people a year.
-pub const NHAMCS_ED: &str = "cdc_nhamcs_ed_2022";
+pub const NHAMCS_ED: &str = "cdc_nchs_ed_visits";
 /// NHTSA Traffic Safety Facts, 2023: 6.14 million police-reported crashes, 2.44 million injured.
 pub const NHTSA_CRASHES: &str = "nhtsa_crashes_2023";
 /// CDC NCHS FastStats, accidental injury deaths: 58.1 per 100,000 people (2024).
@@ -79,18 +87,19 @@ pub const FEMA_NUCLEAR_SITES: &str = "fema_nuclear_sites";
 pub const EPA_TRI: &str = "epa_tri_2024";
 /// EPA (2024), Report to Congress on boil water advisories: no national tracking; 80 % of the
 /// advisories located were for main breaks and pressure loss.
-pub const EPA_BWA: &str = "epa_bwa_rtc_2024";
+pub const EPA_BWA: &str = "epa_boil_water_report_2024";
 /// Shaffer et al. (2026), Environmental Science & Technology: Texas boil water notices 2010–2022.
-pub const TEXAS_BWN: &str = "shaffer_2026_texas_bwn";
+pub const TEXAS_BWN: &str = "shaffer_2026_texas_boil_notices";
 /// Mell et al. (2017), JAMA Surgery: emergency medical services take longer to reach rural
 /// addresses.
-pub const MELL_2017_EMS: &str = "mell_2017_ems";
-/// Ready Reckoner risk-model research report (2026), expert estimates tagged PRIOR (§6.2 societal
-/// rates, §2.7 household modifiers). A `prior = true` citation.
-pub const RR_PRIORS: &str = "rr_priors";
-/// Ready Reckoner `docs/RISK_MODEL.md` § "Hazard rates": the footprint, episode-length and
-/// household-modifier estimates this crate adds. A `prior = true` citation.
-pub const RR_HAZARD_PRIORS: &str = "rr_hazard_priors";
+pub const MELL_2017_EMS: &str = "mell_2017_ems_response";
+/// Ready Reckoner expert estimates for hazard rates, each listed with its reasoning in
+/// `docs/RISK_MODEL.md` § "Hazard rates": the research priors (risk-model §6.2, §2.7) and the
+/// footprint, episode-length and household-modifier estimates this crate adds. A `prior = true`
+/// citation.
+pub const RR_PRIORS: &str = "rr_risk_model_priors";
+/// The same citation as [`RR_PRIORS`], named for the estimates this crate adds.
+pub const RR_HAZARD_PRIORS: &str = RR_PRIORS;
 
 /// Every id above, for tests.
 pub const ALL: &[&str] = &[
@@ -104,6 +113,8 @@ pub const ALL: &[&str] = &[
     CMRA,
     NCA5,
     CASCADIA_2012,
+    CASCADIA_PP1661F,
+    OREGON_TWO_WEEKS,
     ORP_2013,
     WA_TWO_WEEKS,
     DOGAMI_TSUNAMI,
@@ -128,5 +139,4 @@ pub const ALL: &[&str] = &[
     TEXAS_BWN,
     MELL_2017_EMS,
     RR_PRIORS,
-    RR_HAZARD_PRIORS,
 ];

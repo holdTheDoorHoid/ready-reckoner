@@ -84,15 +84,15 @@ fn main() {
     println!("\nscenarios:");
     for s in &a.scenarios {
         println!(
-            "  {} ({}) on={} default={} rate={:.5} [{:.5}, {:.5}] zone={:?} alt={:?}\n    {}",
+            "  {} ({}) on={} default={} rate={:.5} [{:.5}, {:.5}] variant={:?} alt={:?}\n    {}",
             s.id,
             s.hazard,
             s.on,
             s.default_on,
-            s.rate.rate_per_year,
-            s.rate.low,
-            s.rate.high,
-            s.zone,
+            s.rate_per_year,
+            s.low,
+            s.high,
+            s.variant,
             s.alternatives
                 .iter()
                 .map(|a| format!("{:.5}", a.rate_per_year))

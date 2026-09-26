@@ -3,7 +3,7 @@
     "id": "house_fire_per_household_year",
     "value": 0.002622,
     "unit": "per household per year",
-    "source": "usfa_residential_fires_2023",
+    "source": "usfa_residential_fires",
     "year": 2023,
     "note": "344,600 reported residential building fires (USFA 2023) / 131,434,000 households (Census CPS HH-1, 2023)."
   },
@@ -19,7 +19,7 @@
     "id": "layoff_per_worker_month",
     "value": 0.01117,
     "unit": "per worker per month",
-    "source": "bls_jolts_2025",
+    "source": "bls_jolts_layoffs",
     "year": 2025,
     "note": "JOLTS layoffs and discharges rate, monthly average for 2025 (series JTS000000000000000LDR)."
   },
@@ -27,7 +27,7 @@
     "id": "ed_visits_per_100_persons_year",
     "value": 47.3,
     "unit": "per 100 persons per year",
-    "source": "cdc_nhamcs_ed_2022",
+    "source": "cdc_nchs_ed_visits",
     "year": 2022,
     "note": "155.4 million emergency department visits in 2022 (NCHS FastStats, NHAMCS)."
   },

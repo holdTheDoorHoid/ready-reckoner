@@ -107,7 +107,7 @@ fn every_profile_and_rate_is_well_formed() {
             assert!(seen.contains(&r.hazard));
         }
         for s in &a.scenarios {
-            assert_eq!(s.rate.validate(), Ok(()), "{label}: {}", s.id);
+            assert_eq!(s.household_rate().validate(), Ok(()), "{label}: {}", s.id);
             assert!(!s.sources.is_empty() && !s.applies_because.is_empty());
         }
     }
@@ -284,20 +284,17 @@ fn floods_follow_the_floor_and_basement() {
 }
 
 #[test]
-fn air_conditioning_turns_heat_waves_into_cooling_failures() {
+fn heat_waves_reach_every_household_whatever_its_cooling() {
+    // NRI: 11.07 heat-wave days a year in Philadelphia, 3 days per episode. Whether a heat wave is
+    // dangerous indoors depends on the home's cooling, which rr-consequence applies; the rate of
+    // heat waves reaching the household does not.
     let fixture = county("42101");
     let mut input = household("philadelphia-renters-4");
-    let cooled = profile(&run(&input, &fixture), H::HeatWave).clone();
+    let cooled = profile(&run(&input, &fixture), H::HeatWave).rate_per_year;
     input.housing.cooling = Cooling::None;
-    let hot = profile(&run(&input, &fixture), H::HeatWave).clone();
-    // NRI: 11.07 heat-wave days a year / 3 days per episode; with AC, 3 % of them.
-    assert!(close(hot.rate_per_year, 11.07 / 3.0, 1e-6));
-    assert!(close(cooled.rate_per_year, 0.03 * 11.07 / 3.0, 1e-6));
-    assert!(
-        hot.frequency_sentence
-            .contains("dangerous heat wave at home")
-    );
-    assert!(cooled.frequency_sentence.contains("cooling fail"));
+    let hot = profile(&run(&input, &fixture), H::HeatWave).rate_per_year;
+    assert_eq!(cooled, hot);
+    assert!(close(hot, 11.07 / 3.0, 1e-6));
 }
 
 #[test]
@@ -355,7 +352,8 @@ fn storm_events_episodes_are_preferred_to_nri_event_days() {
     );
     let a = run(&household("philadelphia-renters-4"), &fixture);
     let p = profile(&a, H::HeatWave);
-    assert!(close(p.rate_per_year, 2.5 * 0.03, 1e-12));
+    // 2.5 heat-wave episodes a year from Storm Events, not NRI's 11.07 event-days ÷ 3.
+    assert!(close(p.rate_per_year, 2.5, 1e-12));
     assert!(p.sources.iter().any(|s| s == "noaa_storm_events"));
 }
 

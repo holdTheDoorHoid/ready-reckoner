@@ -51,10 +51,7 @@ pub(crate) fn of(rate: &HazardRate) -> f64 {
 /// How much to trust a rate.
 pub(crate) fn confidence(e: &Estimate) -> DataConfidence {
     let k = e.range_factor();
-    let only_priors = !e.sources.is_empty()
-        && e.sources
-            .iter()
-            .all(|s| s == cite::RR_PRIORS || s == cite::RR_HAZARD_PRIORS);
+    let only_priors = !e.sources.is_empty() && e.sources.iter().all(|s| s == cite::RR_PRIORS);
     match e.evidence {
         Evidence::Empirical if k <= 1.6 => DataConfidence::High,
         Evidence::Empirical if k <= 3.0 => DataConfidence::Medium,

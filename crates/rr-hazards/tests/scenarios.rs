@@ -4,7 +4,6 @@
 mod common;
 
 use common::*;
-use rr_hazards::ScenarioZone;
 use rr_types::{HazardId as H, ScenarioToggle};
 
 /// Philadelphia's record, relabelled as another county.
@@ -37,8 +36,8 @@ fn cascadia_inland_counties_get_the_valley_zone_and_the_full_margin_rate() {
     );
     assert_eq!(ids(&a), ["cascadia_m9"]);
     let c = &a.scenarios[0];
-    assert_eq!(c.zone, Some(ScenarioZone::Valley));
-    assert!(close(c.rate.rate_per_year, 0.0019, 1e-12));
+    assert_eq!(c.variant.as_deref(), Some("valley"));
+    assert!(close(c.rate_per_year, 0.0019, 1e-12));
     assert!(c.on && c.default_on && c.alternatives.is_empty());
     assert!(c.applies_because.contains("inland from the Cascadia fault"));
 }
@@ -51,7 +50,11 @@ fn washington_and_california_cascadia_counties() {
     );
     let c = &a.scenarios[0];
     assert!(c.on && c.applies_because.contains("Washington asks"));
-    assert!(c.sources.iter().any(|s| s == "wa_emd_2_weeks_ready"));
+    assert!(
+        c.sources
+            .iter()
+            .any(|s| s == "washington_prepare_in_a_year")
+    );
     // Humboldt County, California: southern margin, 1 %/yr, on because it reaches the
     // one-in-100 yardstick.
     let a = run(
@@ -75,14 +78,17 @@ fn hayward_is_on_and_new_madrid_is_off_by_default() {
     let h = &a.scenarios[0];
     assert!(h.on && h.default_on);
     assert!(close(
-        h.rate.rate_per_year,
+        h.rate_per_year,
         -rr_types::math::ln_1p(-0.33) / 30.0,
         1e-12
     ));
-    // The earthquake rate handed on excludes the scenario but never drops below a quarter.
+    // rr-consequence gets the county's full earthquake rate; the card shows the county rate
+    // less the scenario's share (never below a quarter of it) plus the scenario.
     let quake = rate(&a, H::Earthquake).rate_per_year;
     let nri = -rr_types::math::ln_1p(-f64::from(0.001618f32));
-    assert!(close(quake, 0.25 * nri, 1e-9), "{quake}");
+    assert!(close(quake, nri, 1e-9), "{quake}");
+    let card = profile(&a, H::Earthquake).rate_per_year;
+    assert!(close(card, 0.25 * nri + h.rate_per_year, 1e-9), "{card}");
     // USGS: 7–10 % chance of a repeat of 1811–12 in 50 years -> about 0.18 %/yr: off by
     // default, rarer than the one-in-100 yardstick.
     let a = run(
@@ -93,7 +99,7 @@ fn hayward_is_on_and_new_madrid_is_off_by_default() {
     let n = &a.scenarios[0];
     assert!(!n.on && !n.default_on);
     assert!(close(
-        n.rate.rate_per_year,
+        n.rate_per_year,
         -rr_types::math::ln_1p(-0.085) / 50.0,
         1e-12
     ));
@@ -118,7 +124,7 @@ fn a_tsunami_zone_outside_cascadia_uses_the_local_source_prior() {
     let t = &a.scenarios[0];
     assert!(t.applies_because.contains("within minutes"));
     // No NRI tsunami exposure in the moved record: 1 in 1,000 a year × the 10 % fallback share.
-    assert!(close(t.rate.rate_per_year, 0.001 * 0.1, 1e-12));
+    assert!(close(t.rate_per_year, 0.001 * 0.1, 1e-12));
 }
 
 #[test]

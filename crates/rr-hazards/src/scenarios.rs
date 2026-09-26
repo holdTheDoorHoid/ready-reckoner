@@ -6,36 +6,26 @@
 //! one-in-100 yardstick), and the user can override it with `dials.scenario_overrides`.
 //!
 //! **How a scenario relates to its parent hazard.** The parent's entry in
-//! [`crate::HazardAssessment::rates`] *excludes* the scenario: for earthquakes the scenario's
-//! long-run share is taken out of the county's earthquake rate (never below a quarter of it);
-//! for hurricanes the parent keeps the Category 1–2 part and the scenario takes the major part.
-//! `rr-consequence` adds the scenario as its own event class, with its own durations, only when
-//! `on` is true. The parent's register card (`HazardProfile`) shows the full rate either way,
-//! because the register describes the place, not the plan.
+//! [`crate::HazardAssessment::rates`] is the parent's *full* rate. `rr-consequence` adds the
+//! scenario as its own event class, with its own durations, when `on` is true, and drops the
+//! parent's overlapping event class when the scenario is offered (its effects table marks those
+//! rows `replaced_by`, as for major hurricanes), so the same event is not planned for twice.
+//!
+//! The parent's register card (`HazardProfile`) shows the de-duplicated total whether the
+//! scenario is on or off, because the register describes the place, not the plan: for
+//! hurricanes the Category 1–2 part plus the major part (which is the full rate); for
+//! earthquakes the county rate less the scenario's long-run share (never below a quarter of it)
+//! plus the scenario's own rate; for tsunamis the county rate plus the local-source scenario.
 
 use serde::{Deserialize, Serialize};
 
-use rr_types::{CitationId, HazardId, HouseholdEventRate, math};
+use rr_types::{CitationId, Evidence, HazardId, HouseholdEventRate, math};
 
 use crate::cite;
 use crate::ctx::{Ctx, Notes};
 use crate::estimate::Estimate;
 use crate::natural::Natural;
 use crate::params::*;
-
-/// Where in the scenario's footprint the household is, which decides the durations
-/// `rr-consequence` uses (the Oregon Resilience Plan gives different numbers for the coast and
-/// the inland valleys).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ScenarioZone {
-    /// On the coast, near the fault (Cascadia coast counties).
-    Coast,
-    /// Inland from the fault (the Willamette Valley, Puget Sound, southern Oregon valleys).
-    Valley,
-    /// In or near a tsunami inundation zone.
-    InundationZone,
-}
 
 /// Another published reading of a scenario's rate, shown beside the one used.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -49,6 +39,10 @@ pub struct AlternativeRate {
 }
 
 /// A named scenario that applies to this location (for example `cascadia_m9`).
+///
+/// The fields `id`, `name`, `hazard`, `rate_per_year`, `low`, `high`, `on`, `applies_because`,
+/// `variant` and `sources` have the same names and meaning as `rr-consequence`'s own
+/// `ScenarioCandidate`, so the plan crate can copy them across; the rest are extra.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ScenarioCandidate {
     /// Stable id (`cascadia_m9`, `new_madrid_m7`, `hayward_m7`, `local_tsunami`,
@@ -57,39 +51,78 @@ pub struct ScenarioCandidate {
     pub id: String,
     /// Plain name.
     pub name: String,
-    /// The hazard it is a severe version of.
+    /// The hazard it is a severe version of (the family it is counted under).
     pub hazard: HazardId,
-    /// Where the household sits in the scenario's footprint, when that changes the durations.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub zone: Option<ScenarioZone>,
-    /// The household rate when the scenario is on (climate multiplier applied), with its range,
-    /// evidence and sources. `rate.hazard` is the parent hazard.
-    pub rate: HouseholdEventRate,
-    /// Other published readings of the rate (for Cascadia near Coos Bay: the long-run
-    /// recurrence, about 0.4 % a year, beside the time-dependent 1.0 % a year that is used).
-    pub alternatives: Vec<AlternativeRate>,
-    /// On by default here.
-    pub default_on: bool,
-    /// On in this plan: the default, or the user's override.
+    /// Household events a year when the scenario is on (climate multiplier applied).
+    pub rate_per_year: f64,
+    /// Low end of the plausible rate.
+    pub low: f64,
+    /// High end of the plausible rate.
+    pub high: f64,
+    /// What the rate rests on.
+    pub evidence: Evidence,
+    /// On in this plan: the default, or the user's override from `dials.scenario_overrides`.
     pub on: bool,
+    /// On by default here (state guidance addresses it, or its rate reaches half the one-in-100
+    /// yardstick).
+    pub default_on: bool,
     /// The user's override decided `on`.
     pub overridden: bool,
     /// Why it applies here and why it is on or off by default, in plain language.
     pub applies_because: String,
+    /// Which set of consequences applies: `coast` or `valley` for Cascadia (the Oregon Resilience
+    /// Plan gives different restoration times for each); absent otherwise.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub variant: Option<String>,
+    /// Other published readings of the rate (for Cascadia near Coos Bay: the long-run
+    /// recurrence, about 0.4 % a year, beside the time-dependent 1.0 % a year that is used).
+    pub alternatives: Vec<AlternativeRate>,
     /// Where the scenario, its rate and its default come from.
     pub sources: Vec<CitationId>,
 }
 
-/// A detected scenario plus what it does to its parent hazard.
+impl ScenarioCandidate {
+    /// The scenario's rate as a [`HouseholdEventRate`] of its parent hazard.
+    pub fn household_rate(&self) -> HouseholdEventRate {
+        HouseholdEventRate {
+            hazard: self.hazard,
+            rate_per_year: self.rate_per_year,
+            low: self.low,
+            high: self.high,
+            evidence: self.evidence,
+            sources: self.sources.clone(),
+        }
+    }
+}
+
+/// A detected scenario plus what it does to its parent hazard's register card.
 #[derive(Debug, Clone)]
 pub(crate) struct Detected {
     pub candidate: ScenarioCandidate,
     /// The scenario's household rate today and around 2050.
     pub today: Estimate,
     pub future: Estimate,
-    /// The parent hazard's rate without this scenario (today, around 2050), when the parent
-    /// includes it and must be reduced.
+    /// The parent hazard's rate without the part this scenario stands for (today, around 2050),
+    /// when the parent's rate already contains it. Used only for the register card, which shows
+    /// remainder + scenario so nothing is counted twice there; the rate handed to
+    /// `rr-consequence` stays the parent's full rate.
     pub remainder: Option<(Estimate, Estimate)>,
+}
+
+/// Zones for Cascadia.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Zone {
+    Coast,
+    Valley,
+}
+
+impl Zone {
+    fn variant(self) -> &'static str {
+        match self {
+            Zone::Coast => "coast",
+            Zone::Valley => "valley",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -100,10 +133,10 @@ enum Margin {
     North,
 }
 
-use ScenarioZone::{Coast, Valley};
+use Zone::{Coast, Valley};
 
 /// Counties shaken hard by a Cascadia subduction earthquake, with their zone and margin.
-const CASCADIA: &[(&str, ScenarioZone, Margin)] = &[
+const CASCADIA: &[(&str, Zone, Margin)] = &[
     ("41007", Coast, Margin::North),  // Clatsop, OR
     ("41057", Coast, Margin::North),  // Tillamook, OR
     ("41041", Coast, Margin::North),  // Lincoln, OR
@@ -186,17 +219,6 @@ const REMAINDER_FLOOR: f64 = 0.25;
 /// The one-in-100 yardstick of the default dial.
 const DEFAULT_DIAL_RATE: f64 = 0.01;
 
-fn household_rate(hazard: HazardId, e: &Estimate) -> HouseholdEventRate {
-    HouseholdEventRate {
-        hazard,
-        rate_per_year: e.value,
-        low: e.low,
-        high: e.high,
-        evidence: e.evidence,
-        sources: e.sources.clone(),
-    }
-}
-
 /// The parent's estimate with `share` a year taken out, never below a quarter of itself.
 fn without(parent: &Estimate, share: f64) -> Estimate {
     let f = |x: f64| (x - share).max(REMAINDER_FLOOR * x);
@@ -226,7 +248,7 @@ struct Draft {
     id: &'static str,
     name: &'static str,
     hazard: HazardId,
-    zone: Option<ScenarioZone>,
+    variant: Option<&'static str>,
     today: Estimate,
     future: Estimate,
     alternatives: Vec<AlternativeRate>,
@@ -236,7 +258,7 @@ struct Draft {
     remainder: Option<(Estimate, Estimate)>,
 }
 
-fn cascadia(ctx: &Ctx<'_>, natural: &Natural) -> Option<(Draft, Margin, ScenarioZone)> {
+fn cascadia(ctx: &Ctx<'_>, natural: &Natural) -> Option<(Draft, Margin, Zone)> {
     let &(_, zone, margin) = CASCADIA.iter().find(|(f, _, _)| *f == ctx.county.fips)?;
     let county = ctx.county_label();
     let state = ctx.county.state_abbr.as_str();
@@ -293,7 +315,7 @@ fn cascadia(ctx: &Ctx<'_>, natural: &Natural) -> Option<(Draft, Margin, Scenario
             " Oregon asks every household to be ready for at least two weeks, so the plan \
              includes it."
                 .to_owned(),
-            ids(&[cite::CASCADIA_2012, cite::ORP_2013]),
+            ids(&[cite::CASCADIA_2012, cite::OREGON_TWO_WEEKS, cite::ORP_2013]),
         ),
         "WA" => (
             true,
@@ -312,8 +334,12 @@ fn cascadia(ctx: &Ctx<'_>, natural: &Natural) -> Option<(Draft, Margin, Scenario
             (on, why.to_owned(), ids(&[cite::CASCADIA_2012]))
         }
     };
-    sources.push(CitationId::from(cite::ORP_2013));
-    sources.dedup();
+    for id in [cite::CASCADIA_PP1661F, cite::ORP_2013] {
+        let id = CitationId::from(id);
+        if !sources.contains(&id) {
+            sources.push(id);
+        }
+    }
     let remainder = natural
         .rates
         .iter()
@@ -328,7 +354,7 @@ fn cascadia(ctx: &Ctx<'_>, natural: &Natural) -> Option<(Draft, Margin, Scenario
         id: "cascadia_m9",
         name: "Magnitude 9 Cascadia earthquake",
         hazard: HazardId::Earthquake,
-        zone: Some(zone),
+        variant: Some(zone.variant()),
         future: today.clone(),
         today,
         alternatives,
@@ -365,7 +391,7 @@ fn named_quake(
         id,
         name,
         hazard: HazardId::Earthquake,
-        zone: None,
+        variant: None,
         sources: today.sources.clone(),
         future: today.clone(),
         today,
@@ -376,7 +402,7 @@ fn named_quake(
     }
 }
 
-fn local_tsunami(ctx: &Ctx<'_>, cascadia: Option<(Margin, ScenarioZone)>) -> Option<Draft> {
+fn local_tsunami(ctx: &Ctx<'_>, cascadia: Option<(Margin, Zone)>) -> Option<Draft> {
     if !(ctx.county.tsunami_zone || ctx.location.tsunami_zone) {
         return None;
     }
@@ -442,7 +468,7 @@ fn local_tsunami(ctx: &Ctx<'_>, cascadia: Option<(Margin, ScenarioZone)>) -> Opt
         id: "local_tsunami",
         name: "Tsunami from a nearby earthquake",
         hazard: HazardId::Tsunami,
-        zone: Some(ScenarioZone::InundationZone),
+        variant: None,
         future: today.clone(),
         today,
         alternatives,
@@ -477,7 +503,7 @@ fn major_hurricane(ctx: &Ctx<'_>, natural: &Natural) -> Option<Draft> {
         id: "major_hurricane_direct_hit",
         name: "Direct hit by a major hurricane",
         hazard: HazardId::Hurricane,
-        zone: None,
+        variant: None,
         today: split.major_today.clone(),
         future: split.major_future.clone(),
         alternatives: Vec::new(),
@@ -570,13 +596,16 @@ pub(crate) fn detect(ctx: &Ctx<'_>, natural: &Natural, notes: &mut Notes) -> Vec
                     id: d.id.to_owned(),
                     name: d.name.to_owned(),
                     hazard: d.hazard,
-                    zone: d.zone,
-                    rate: household_rate(d.hazard, effective),
-                    alternatives: d.alternatives,
-                    default_on: d.default_on,
+                    rate_per_year: effective.value,
+                    low: effective.low,
+                    high: effective.high,
+                    evidence: effective.evidence,
                     on: toggle.map_or(d.default_on, |t| t.on),
+                    default_on: d.default_on,
                     overridden: toggle.is_some(),
                     applies_because: d.applies_because,
+                    variant: d.variant.map(str::to_owned),
+                    alternatives: d.alternatives,
                     sources,
                 },
                 today: d.today,

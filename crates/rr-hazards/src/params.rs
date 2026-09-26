@@ -1,10 +1,10 @@
 //! Every number this crate uses that does not come from the county record or the base-rate pack,
 //! with its plausible range and where it comes from.
 //!
-//! Values are `(value, low, high)`. Items marked **PRIOR** are expert judgement: from the
-//! risk-model research (`rr_priors`) or added by this crate and documented in
-//! `docs/RISK_MODEL.md` § "Hazard rates" (`rr_hazard_priors`). The app shows them as estimates.
-//! Items marked **DATA** or **DERIVED** cite the source they come from.
+//! Values are `(value, low, high)`. Items marked **PRIOR** are expert judgement, from the
+//! risk-model research or added by this crate, each listed with its reasoning in
+//! `docs/RISK_MODEL.md` § "Hazard rates" and cited as `rr_risk_model_priors`. The app shows them
+//! as estimates. Items marked **DATA** or **DERIVED** cite the source they come from.
 
 use rr_types::{IncomeStability, Setting};
 
@@ -174,19 +174,6 @@ pub(crate) const PSPS_STATES: &[&str] = &[
 // Household modifiers (m_h; DESIGN §4.3, research §2.7).
 // ---------------------------------------------------------------------------------------------
 
-/// PRIOR. Chance that a heat wave makes a home with air conditioning dangerously hot, because a
-/// power cut or breakdown stops the cooling. Research §8 models heat-coincident outages at about
-/// 0.05 a year for a Philadelphia home against about 3.7 heat waves a year (≈ 0.014 per heat
-/// wave); breakdowns at peak demand roughly double it.
-pub(crate) const COOLING_FAILS: Triple = (0.03, 0.01, 0.1);
-/// PRIOR. Chance that a cold wave leaves a heated home without heat (power cut, breakdown,
-/// fuel).
-pub(crate) const HEATING_FAILS: Triple = (0.03, 0.01, 0.1);
-/// PRIOR. Share of US homes with air conditioning (about 9 in 10), used only to average the heat
-/// modifier over a county for severity.
-pub(crate) const US_AIR_CONDITIONED_SHARE: f64 = 0.9;
-/// PRIOR. Share of US homes with no heating system, used only to average the cold modifier.
-pub(crate) const US_UNHEATED_SHARE: f64 = 0.01;
 /// PRIOR. A basement takes on water in heavy rain and sewer backups outside the mapped flood
 /// zone.
 pub(crate) const FLOOD_BASEMENT: Triple = (1.5, 1.2, 2.0);
@@ -410,8 +397,6 @@ mod tests {
             ("sfha fallback", SFHA_SHARE_FALLBACK),
             ("local tsunami", LOCAL_TSUNAMI_OTHER),
             ("tsunami zone share", TSUNAMI_ZONE_SHARE_FALLBACK),
-            ("cooling", COOLING_FAILS),
-            ("heating", HEATING_FAILS),
             ("basement", FLOOD_BASEMENT),
             ("upper floor", FLOOD_UPPER_FLOOR),
             ("attached", FIRE_ATTACHED),

@@ -51,12 +51,22 @@ fn philadelphia_emergency_care_is_47_visits_per_100_people() {
 }
 
 #[test]
-fn philadelphia_winter_storms_and_windstorms_lead_the_natural_hazards() {
+fn philadelphia_heat_waves_lead_then_winter_storms_and_windstorms() {
+    // Heat and cold waves reach every household in the county (NRI: 11.07 heat-wave days and
+    // 0.79 cold-wave days a year), so they come first; among storms, winter storms and
+    // windstorms lead.
     let a = assess("philadelphia-renters-4", "42101");
-    let top: Vec<H> = natural(&a).iter().take(2).map(|p| p.id).collect();
+    let nat = natural(&a);
+    assert_eq!(nat[0].id, H::HeatWave);
+    let storms: Vec<H> = nat
+        .iter()
+        .map(|p| p.id)
+        .filter(|h| !matches!(h, H::HeatWave | H::ColdWave))
+        .take(2)
+        .collect();
     assert!(
-        top.contains(&H::WinterWeather) && top.contains(&H::StrongWind),
-        "top natural hazards: {top:?}"
+        storms.contains(&H::WinterWeather) && storms.contains(&H::StrongWind),
+        "top storm hazards: {storms:?}"
     );
 }
 
@@ -64,8 +74,8 @@ fn philadelphia_winter_storms_and_windstorms_lead_the_natural_hazards() {
 fn philadelphia_job_loss_and_house_fire_outrank_the_dramatic_natural_hazards() {
     // "Prepare for Tuesday before doomsday": a lost job and a house fire are more likely than an
     // earthquake, a tornado, hail damage, a landslide or coastal flooding reaching the home.
-    // (Winter storms, windstorms, ice storms, tropical storms and heat waves with a cooling
-    // failure do reach a Philadelphia household more often than a house fire does.)
+    // (Heat and cold waves, winter storms, windstorms, ice storms and tropical storms do reach a
+    // Philadelphia household more often than a house fire does.)
     let a = assess("philadelphia-renters-4", "42101");
     let job = profile(&a, H::JobLoss).rate_per_year;
     let fire = profile(&a, H::HouseFire).rate_per_year;
@@ -81,8 +91,9 @@ fn philadelphia_job_loss_and_house_fire_outrank_the_dramatic_natural_hazards() {
         let r = profile(&a, h).rate_per_year;
         assert!(fire > r && job > r, "{h}: {r} vs fire {fire}, job {job}");
     }
-    // Job loss outranks every natural hazard except the two most common kinds of weather.
-    for p in natural(&a).iter().skip(2) {
+    // Job loss outranks every natural hazard except heat and cold waves, winter storms and
+    // windstorms.
+    for p in natural(&a).iter().skip(4) {
         assert!(job > p.rate_per_year, "{} {}", p.id, p.rate_per_year);
     }
 }
@@ -96,11 +107,11 @@ fn philadelphia_register_top_five() {
     assert_eq!(
         top,
         [
+            H::HeatWave,
             H::MedicalEmergency,
+            H::ColdWave,
             H::WinterWeather,
-            H::StrongWind,
-            H::SupplyChainDisruption,
-            H::JobLoss
+            H::StrongWind
         ]
     );
 }
@@ -162,41 +173,36 @@ fn coos_bay_has_earthquake_tsunami_and_cascadia_on_by_default() {
         .expect("cascadia_m9");
     assert!(c.default_on && c.on && !c.overridden);
     assert_eq!(c.hazard, H::Earthquake);
-    assert_eq!(c.zone, Some(rr_hazards::ScenarioZone::Coast));
+    assert_eq!(c.variant.as_deref(), Some("coast"));
     // Research S31: 40 % in 50 years near Coos Bay -> 1.02 %/yr (research §3.3: 1.0 %/yr) ...
     let want = -rr_types::math::ln_1p(-0.40) / 50.0;
-    assert!(
-        close(c.rate.rate_per_year, want, 1e-9),
-        "{}",
-        c.rate.rate_per_year
-    );
-    assert!((c.rate.rate_per_year - 0.0102).abs() < 0.0001);
+    assert!(close(c.rate_per_year, want, 1e-9), "{}", c.rate_per_year);
+    assert!((c.rate_per_year - 0.0102).abs() < 0.0001);
     // ... against the time-independent recurrence, 41 ruptures in 10,000 years (≈ 0.4 %/yr).
     assert_eq!(c.alternatives.len(), 1);
     assert!((c.alternatives[0].rate_per_year - 0.0041).abs() < 1e-12);
     assert!(c.applies_because.contains("Oregon asks every household"));
-    assert!(c.sources.iter().any(|s| s == "orp_2013"));
+    assert!(c.sources.iter().any(|s| s == "oregon_resilience_plan_2013"));
 }
 
 #[test]
-fn coos_bay_earthquake_rate_to_consequence_excludes_cascadia_but_the_card_shows_it() {
-    // NRI v1.20: damaging shaking 0.01962 a year as a probability -> rate 0.01981. The
-    // hazard model already contains Cascadia at its recurrence (0.0041), so the rate handed to
-    // rr-consequence is 0.01572 and the scenario adds 0.01022 when on. The register card shows
-    // both: 0.02594.
+fn coos_bay_earthquake_card_counts_cascadia_once() {
+    // NRI v1.20: damaging shaking 0.01962 a year as a probability -> rate 0.01981, handed to
+    // rr-consequence in full (the scenario is an extra event class there). The hazard model
+    // already contains Cascadia at its long-run rate (0.0041), so the register card shows
+    // 0.01981 − 0.0041 + 0.01022 (the time-dependent Cascadia rate) = 0.02593.
     let a = assess("coos-bay-well-owner-2", "41011");
     let nri = -rr_types::math::ln_1p(-0.01962);
-    let base = rate(&a, H::Earthquake).rate_per_year;
     // The record stores f32 values (about 7 significant digits), hence the 1e-6 tolerances.
-    assert!(close(base, nri - 0.0041, 1e-6), "{base}");
-    let cascadia = &a.scenarios[0].rate.rate_per_year;
+    assert!(close(rate(&a, H::Earthquake).rate_per_year, nri, 1e-6));
+    let cascadia = a.scenarios[0].rate_per_year;
     let card = profile(&a, H::Earthquake).rate_per_year;
-    assert!(close(card, base + cascadia, 1e-12), "{card}");
+    assert!(close(card, nri - 0.0041 + cascadia, 1e-6), "{card}");
     assert!(
         profile(&a, H::Earthquake)
             .sources
             .iter()
-            .any(|s| s == "goldfinger_2012_cascadia")
+            .any(|s| s == "osu_cascadia_2012")
     );
 }
 
@@ -213,8 +219,8 @@ fn coos_bay_local_tsunami_uses_the_share_of_residents_in_the_zone() {
     assert!(t.on && t.default_on);
     let share = 11_060.0 / 64_845.0;
     assert!(close(
-        t.rate.rate_per_year,
-        a.scenarios[0].rate.rate_per_year * share,
+        t.rate_per_year,
+        a.scenarios[0].rate_per_year * share,
         1e-9
     ));
     assert!(t.applies_because.contains("about 17 in 100 residents"));
@@ -233,7 +239,7 @@ fn coos_bay_cascadia_can_be_turned_off() {
     let a = run(&input, &fixture);
     let c = a.scenarios.iter().find(|s| s.id == "cascadia_m9").unwrap();
     assert!(!c.on && c.default_on && c.overridden);
-    // The rate to rr-consequence already excludes Cascadia, so it does not change.
+    // The rate to rr-consequence is the county's full earthquake rate either way.
     let on = assess("coos-bay-well-owner-2", "41011");
     assert_eq!(rate(&a, H::Earthquake), rate(&on, H::Earthquake));
     // The tsunami scenario keeps its own default.
@@ -270,7 +276,7 @@ fn coos_bay_windstorms_are_lifted_to_the_recorded_outage_rate() {
     assert!(close(explained, 0.7 * 1.09, 1e-4), "{explained}");
     let wind = profile(&a, H::StrongWind);
     assert!(wind.rate_per_year > 0.7, "{}", wind.rate_per_year);
-    assert!(wind.sources.iter().any(|s| s == "ornl_eagle_i"));
+    assert!(wind.sources.iter().any(|s| s == "ornl_eagle_i_outages"));
 }
 
 #[test]
@@ -340,11 +346,13 @@ fn gulf_and_atlantic_counties_get_the_major_hurricane_scenario() {
             .find(|s| s.id == "major_hurricane_direct_hit")
             .unwrap_or_else(|| panic!("{name}"));
         assert!(s.on && s.default_on, "{name}");
-        // The card shows the whole hurricane rate; rr-consequence gets the Category 1–2 part
-        // and the scenario the major part.
+        // The card and rr-consequence both get the whole hurricane rate; the scenario is the
+        // major part of it (rr-consequence drops the parent's major-storm rows when the
+        // scenario is offered).
         let card = profile(&a, H::Hurricane).rate_per_year;
         let parent = rate(&a, H::Hurricane).rate_per_year;
-        assert!(close(card, parent + s.rate.rate_per_year, 1e-12), "{name}");
+        assert!(close(card, parent, 1e-12), "{name}");
+        assert!(s.rate_per_year < parent, "{name}");
     }
     // Philadelphia's hurricane frequency (0.092 a year) is under the 0.1 threshold; Phoenix is
     // not on the Gulf or Atlantic.
@@ -369,18 +377,14 @@ fn miami_2050_raises_major_hurricanes_not_hurricane_frequency() {
     let a = assess("miami-condo-retiree-1", "12086");
     let card = profile(&a, H::Hurricane);
     assert!(card.climate_multiplier > 1.0 && card.climate_multiplier < 1.1);
-    let major = &a
+    let major = a
         .scenarios
         .iter()
         .find(|s| s.id == "major_hurricane_direct_hit")
         .unwrap()
-        .rate;
+        .rate_per_year;
     let today = 0.305 * (1.0 / 3.0) * 0.8;
-    assert!(
-        close(major.rate_per_year, today * 1.2, 1e-3),
-        "{}",
-        major.rate_per_year
-    );
+    assert!(close(major, today * 1.2, 1e-3), "{major}");
 }
 
 #[test]
