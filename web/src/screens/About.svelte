@@ -11,6 +11,8 @@
   const app = useApp();
   const info = $derived(app.info);
   const citations = $derived([...(app.catalogue?.citations ?? [])].sort((a, b) => a.title.localeCompare(b.title)));
+  /** The real engine is answering without the national data packs (engine_info lists none). */
+  const sampleCounties = $derived(app.source?.kind === 'wasm' && info !== null && info.packs_loaded.length === 0);
 </script>
 
 <div class="page page--narrow">
@@ -29,6 +31,14 @@
           numbers for real decisions yet.
         </p>
         {#if app.source.fallback}<p class="small">The full engine was expected but did not load: {app.source.fallback}</p>{/if}
+      </div>
+    {:else if sampleCounties}
+      <div class="mock card">
+        <p>
+          <strong>The national data is not loaded.</strong> The real planning engine is running on seven hand-built sample counties
+          instead: the places the example households live. Any other ZIP code or county will not be found. Reload the page to try
+          loading the data again.
+        </p>
       </div>
     {/if}
     <!-- Wide tables scroll sideways on phones; a focusable, labelled region lets keyboard users scroll it. -->

@@ -6,9 +6,24 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-description = "Ready Reckoner: wasm"
+description = "Ready Reckoner: the engine as WebAssembly for the web app (docs/ENGINE-API.md)"
+
+[lib]
+# cdylib is the .wasm wasm-pack builds; rlib lets the native tests call the same functions.
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+rr-types = { path = "../rr-types" }
+rr-data = { path = "../rr-data" }
+rr-plan = { path = "../rr-plan" }
 serde.workspace = true
 serde_json.workspace = true
-thiserror.workspace = true
+wasm-bindgen = "0.2"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+# wasm-pack runs wasm-opt after wasm-bindgen. Optimise for size: the engine answers in a few
+# milliseconds either way, and the download is what the user waits for.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-Os"]

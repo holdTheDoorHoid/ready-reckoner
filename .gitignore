@@ -7,6 +7,8 @@ Cargo.lock.bak
 web/node_modules
 web/dist
 web/public/pkg
+# Copies of data/ that crates/rr-wasm/build-web.sh puts next to the site
+web/public/data
 web/.vite
 web/coverage
 
