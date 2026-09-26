@@ -22,7 +22,7 @@ fn every_bucket_has_its_own_block() {
         let g = block(&id);
         let target = format!("bucket:{}", b.as_str());
         assert!(
-            g.meta.applies_to.iter().any(|a| *a == target),
+            g.meta.applies_to.contains(&target),
             "{id} does not apply to {target}"
         );
     }
@@ -45,7 +45,7 @@ fn every_tier_has_its_own_block() {
         let id = format!("tier_{}", t.as_str());
         let target = format!("tier:{}", t.as_str());
         assert!(
-            block(&id).meta.applies_to.iter().any(|a| *a == target),
+            block(&id).meta.applies_to.contains(&target),
             "{id} does not apply to {target}"
         );
     }
@@ -72,7 +72,7 @@ fn the_topics_named_in_the_brief_exist() {
     ] {
         let g = block(&format!("topic_{slug}"));
         let target = format!("topic:{slug}");
-        assert!(g.meta.applies_to.iter().any(|a| *a == target));
+        assert!(g.meta.applies_to.contains(&target));
     }
 }
 
