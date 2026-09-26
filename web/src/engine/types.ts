@@ -14,8 +14,8 @@
  * not mirrored: the web app hands pack bytes to `load_pack` without reading them.
  */
 
-/** Version of the contract; `engine_info().api_version` must equal it. */
-export const ENGINE_API_VERSION = 1;
+/** Version of the contract; `engine_info().api_version` must equal it. Version 2: v0.2.0. */
+export const ENGINE_API_VERSION = 2;
 
 /** A date written `YYYY-MM-DD`. */
 export type IsoDate = string;
@@ -32,7 +32,11 @@ export type ItemId = string;
 export const HAZARD_TIERS = ['natural', 'societal', 'personal'] as const;
 export type HazardTier = (typeof HAZARD_TIERS)[number];
 
-/** The 35 hazards: 18 natural, 9 societal, 8 personal. */
+/**
+ * Every hazard id (54): 23 natural (the 18 National Risk Index hazards first), 20 societal, 11
+ * personal. `terrorism` is retired in contract v2: it still parses (saved v1 plans) but the engine
+ * never emits it (`RETIRED_HAZARD_IDS`). Nine ids are rare families (`RARE_HAZARD_IDS`).
+ */
 export const HAZARD_IDS = [
   'avalanche',
   'coastal_flooding',
@@ -52,6 +56,11 @@ export const HAZARD_IDS = [
   'volcanic_activity',
   'wildfire',
   'winter_weather',
+  'wildfire_smoke',
+  'dust_storm',
+  'sinkhole',
+  'geomagnetic_storm',
+  'vei7_eruption',
   'pandemic',
   'grid_failure',
   'cyber_outage',
@@ -61,6 +70,17 @@ export const HAZARD_IDS = [
   'nuclear_plant_incident',
   'nuclear_attack',
   'terrorism',
+  'dam_failure',
+  'network_outage',
+  'drug_shortage',
+  'benefit_interruption',
+  'attack_disruption',
+  'multi_month_blackout',
+  'war_infrastructure',
+  'cbrn_attack',
+  'severe_pandemic',
+  'financial_crisis',
+  'mass_violence',
   'job_loss',
   'house_fire',
   'medical_emergency',
@@ -69,8 +89,33 @@ export const HAZARD_IDS = [
   'burglary',
   'earner_death_or_disability',
   'extended_household_illness',
+  'water_damage',
+  'eviction',
+  'arrest_or_detention',
 ] as const;
 export type HazardId = (typeof HAZARD_IDS)[number];
+
+/**
+ * The nine rare hazards, one per family, shown in the rare box range only and never ranked by
+ * expected loss. A family's id is its hazard's id: it is what `HazardProfile.family` holds and what
+ * `Dials.rare_opt_in` lists (or `'all'` for every family).
+ */
+export const RARE_HAZARD_IDS = [
+  'geomagnetic_storm',
+  'vei7_eruption',
+  'nuclear_attack',
+  'multi_month_blackout',
+  'war_infrastructure',
+  'cbrn_attack',
+  'severe_pandemic',
+  'financial_crisis',
+  'mass_violence',
+] as const;
+export type RareHazardId = (typeof RARE_HAZARD_IDS)[number];
+
+/** Ids kept only so saved v1 plans parse; the engine never emits them (contract v2). */
+export const RETIRED_HAZARD_IDS = ['terrorism'] as const;
+export type RetiredHazardId = (typeof RETIRED_HAZARD_IDS)[number];
 
 /** How a bucket's target is expressed: the `kind` of a `Target`. */
 export const TARGET_KINDS = ['days', 'months', 'evacuate', 'readiness'] as const;
@@ -81,9 +126,9 @@ export const BUCKET_KINDS = ['duration', 'readiness', 'money'] as const;
 export type BucketKind = (typeof BUCKET_KINDS)[number];
 
 /**
- * The 14 consequence buckets. Duration: power..comms (targets in days). Readiness: evacuate..security
- * (evacuate has its own target shape; the rest are checklists). Money: income (months), home_loss
- * (a checklist: insurance and documents).
+ * The 15 consequence buckets. Duration: power..comms (targets in days). Readiness: evacuate..clean_air
+ * (evacuate has its own target shape; the rest are checklists; clean_air joined in contract v2).
+ * Money: income (months), home_loss (a checklist: insurance and documents).
  */
 export const BUCKET_IDS = [
   'power',
@@ -98,6 +143,7 @@ export const BUCKET_IDS = [
   'medical_emergency',
   'fire',
   'security',
+  'clean_air',
   'income',
   'home_loss',
 ] as const;
@@ -223,6 +269,8 @@ export interface PlanInput {
   stage?: Stage;
   /** Self-rated confidence, 1 to 5, asked before and after the plan. */
   confidence_1to5?: number;
+  /** The household's own emergency plan (device-only screen; printed on wallet cards). Never computed with. */
+  family_plan?: FamilyPlan;
 }
 
 /**
@@ -251,7 +299,27 @@ export interface Housing {
   cooling: Cooling;
   backup_power: BackupPower;
   alarms: Alarms;
+  /** Someone sleeps below street level. Defaults to false when absent. */
+  below_grade_bedroom?: boolean;
+  /** What the main stove runs on; absent if not asked. */
+  cooking?: CookingFuel;
+  /** Untreated water the household could filter; absent if not asked (counts as none). */
+  raw_water_source?: RawWaterSource;
+  /** What the household knows of its public water system; absent if not asked (counts as unknown). */
+  water_system_record?: WaterSystemRecord;
 }
+
+/** What the main stove runs on. A gas range can boil water in a power cut while the gas flows. */
+export const COOKING_FUELS = ['electric', 'gas', 'induction', 'none'] as const;
+export type CookingFuel = (typeof COOKING_FUELS)[number];
+
+/** A source of untreated water to filter or treat if the taps stop. */
+export const RAW_WATER_SOURCES = ['none', 'well', 'surface_nearby', 'rain_barrel', 'neighbour_well'] as const;
+export type RawWaterSource = (typeof RAW_WATER_SOURCES)[number];
+
+/** What the household knows of its public water system's record. */
+export const WATER_SYSTEM_RECORDS = ['fine', 'occasional_notices', 'frequent_problems', 'unknown'] as const;
+export type WaterSystemRecord = (typeof WATER_SYSTEM_RECORDS)[number];
 
 export interface Alarms {
   smoke: boolean;
@@ -265,7 +333,22 @@ export interface Person {
   medical: Medical;
   earner: boolean;
   commute?: Commute;
+  /** CMIST needs (communication, health, independence, support and safety, transport). Defaults to [] when absent. */
+  access_needs?: AccessNeed[];
 }
+
+/** Needs that change how a person gets warnings, help or care in an emergency (CMIST). */
+export const ACCESS_NEEDS = [
+  'hearing',
+  'vision',
+  'limited_english',
+  'cognitive',
+  'supervision',
+  'service_animal',
+  'dialysis',
+  'home_health',
+] as const;
+export type AccessNeed = (typeof ACCESS_NEEDS)[number];
 
 export interface Medical {
   daily_rx: boolean;
@@ -319,7 +402,13 @@ export interface Finances {
   monthly_expenses_usd?: number;
   income: Income;
   insurance: Insurance;
+  /** Pay or benefits a government shutdown can stop; only these households see that hazard. Defaults to []. */
+  benefits?: Benefit[];
 }
+
+/** Pay or a benefit that a government shutdown or a funding lapse can stop. */
+export const BENEFITS = ['federal_pay', 'snap_wic', 'ssi_ssdi', 'va', 'unemployment'] as const;
+export type Benefit = (typeof BENEFITS)[number];
 
 export interface Income {
   /** Must equal the number of people with `earner: true`. */
@@ -331,6 +420,10 @@ export interface Insurance {
   home_or_renters: boolean;
   flood: boolean;
   earthquake: boolean;
+  /** Sewer or water backup cover; absent if not asked. */
+  sewer_backup?: boolean;
+  /** Life or disability insurance for the earners; absent if not asked. */
+  life_or_disability?: boolean;
 }
 
 /** Something already owned, or a free action done (qty 1 or more). */
@@ -340,6 +433,8 @@ export interface Owned {
   qty: number;
   /** Total paid for this quantity, so the plan can use real prices. */
   paid_usd?: number;
+  /** When it was last tried and worked (items with `Item.test_interval_months`). */
+  tested_on?: IsoDate;
 }
 
 export interface Dials {
@@ -354,9 +449,16 @@ export interface Dials {
   /**
    * Allow up to 10% of the monthly budget for rare-catastrophe items (a radiation meter,
    * potassium iodide only on official instruction, Faraday storage). Defaults to false when
-   * absent: those items otherwise get $0 (`Item.rare_catastrophic`).
+   * absent: those items otherwise get $0 (`Item.rare_catastrophic`). Since contract v2 it means
+   * `rare_opt_in: ['all']`.
    */
   rare_catastrophic_opt_in?: boolean;
+  /** Rare families the allowance may buy for (ids from `RARE_HAZARD_IDS`), or `['all']`. Defaults to []. */
+  rare_opt_in?: string[];
+  /** Bare-minimum mode: the smallest three-day kit first. Defaults to false. */
+  minimum_kit?: boolean;
+  /** Show the long-horizon section even when no target passes 30 days. Defaults to false. */
+  long_horizon?: boolean;
 }
 
 export interface ScenarioToggle {
@@ -364,6 +466,59 @@ export interface ScenarioToggle {
   id: string;
   on: boolean;
 }
+
+/** The engine trims family-plan text and cuts notes at this many characters (use it as the form's maxlength). */
+export const FAMILY_PLAN_TEXT_MAX = 300;
+/** Names, phone numbers and numbers by heart are cut at this many characters. */
+export const FAMILY_PLAN_SHORT_MAX = 80;
+/** Most people in the trusted circle. */
+export const TRUSTED_CIRCLE_MAX = 4;
+/** Most routes out of the area. */
+export const ROUTES_MAX = 2;
+/** Most numbers known by heart. */
+export const NUMBERS_BY_HEART_MAX = 5;
+
+/**
+ * The household's own emergency plan: free text only, never required, never used for computation.
+ * The engine only trims it and caps its length (the limits above).
+ */
+export interface FamilyPlan {
+  meeting_place_near?: string;
+  meeting_place_far?: string;
+  out_of_area_contact?: Contact;
+  school_pickup?: string;
+  work_plans?: string;
+  shelter_spot_home?: string;
+  shelter_spot_work?: string;
+  where_we_would_go?: string;
+  /** Two different routes out of the area. */
+  routes?: string[];
+  neighbours_who_check?: string;
+  who_takes_animals?: string;
+  shutoff_gas?: string;
+  shutoff_water?: string;
+  shutoff_electric?: string;
+  /** Up to four people who have agreed to help. */
+  trusted_circle?: TrustedPerson[];
+  lawyer?: Contact;
+  roadside_assistance?: string;
+  numbers_by_heart?: string[];
+}
+
+export interface Contact {
+  name?: string;
+  phone?: string;
+}
+
+export interface TrustedPerson {
+  name?: string;
+  phone?: string;
+  holds?: Holds[];
+}
+
+/** What a member of the trusted circle holds for the household. */
+export const HOLDS = ['spare_key', 'documents', 'medical_poa', 'backup_codes'] as const;
+export type Holds = (typeof HOLDS)[number];
 
 // ---------------------------------------------------------------------------------------------
 // Validation: `bad_input` errors carry `{ problems: Problem[] }` in `details`.
@@ -382,6 +537,7 @@ export const PROBLEM_CODES = [
   'earners_mismatch',
   'id_format',
   'duplicate_id',
+  'unknown_id',
 ] as const;
 export type ProblemCode = (typeof PROBLEM_CODES)[number];
 
@@ -414,6 +570,43 @@ export interface LocationResolved {
   facility_flags: FacilityFlags;
   /** For example "your county; tract-level data not yet loaded". */
   data_note?: string;
+  /** Exposure to the v2 hazards, each value with its source ("Why here"); absent when nothing is known. */
+  exposure?: Exposure;
+}
+
+/** A data-pack value with its source. */
+export interface Sourced<T> {
+  value: T;
+  source: CitationId;
+}
+
+/** A place's exposure to the v2 hazards. Every field is optional and carries its source. */
+export interface Exposure {
+  /** "A", "B", "C1", "C2", "D" or "E". */
+  strategic_class?: Sourced<string>;
+  /** Kilometres from the ZIP code's centre to the nearest listed strategic site. */
+  strategic_km?: Sourced<number>;
+  /** Share of the ZIP code in the Category 1–3 storm-surge zone, 0 to 1. */
+  surge_cat3_share?: Sourced<number>;
+  surge_proxy_class?: Sourced<string>;
+  /** Days a year with smoke and PM2.5 of at least 35.5 µg/m³. */
+  smoke_days_35?: Sourced<number>;
+  /** Share of the county's people behind a levee, 0 to 1. */
+  leveed_pop_share?: Sourced<number>;
+  /** High-hazard dams within 10 km whose listed downstream town is in the ZIP code. */
+  dams_high_within_10km?: Sourced<number>;
+  /** Share of the county on karst ground, 0 to 1. */
+  karst_share?: Sourced<number>;
+  /** Share of the county susceptible to landslides, 0 to 1. */
+  landslide_susceptible_share?: Sourced<number>;
+  /** Share of public-water customers served by a system with a health-based violation (5 years), 0 to 1. */
+  water_system_flag?: Sourced<number>;
+  /** NERC geomagnetic scaling factor for the county's latitude. */
+  geomag_factor?: Sourced<number>;
+  /** The metro's share of FEMA UASI money, 0 to 1. */
+  uasi_share?: Sourced<number>;
+  /** Eviction filings per renter household per year. */
+  eviction_rate?: Sourced<number>;
 }
 
 export interface LatLon {
@@ -431,7 +624,7 @@ export interface FacilityFlags {
 export const DATA_CONFIDENCE_LEVELS = ['high', 'medium', 'low', 'prior'] as const;
 export type DataConfidence = (typeof DATA_CONFIDENCE_LEVELS)[number];
 
-/** Ranked list, or the separate rare-catastrophe box (never ranked by expected loss). */
+/** Ranked list, or the separate rare-catastrophe box (the nine families; never ranked by expected loss). */
 export const HAZARD_DISPLAYS = ['ranked', 'rare_catastrophic'] as const;
 export type HazardDisplay = (typeof HAZARD_DISPLAYS)[number];
 
@@ -457,6 +650,39 @@ export interface HazardProfile {
   sources: CitationId[];
   frequency_sentence: string;
   buckets: BucketId[];
+  /** For a rare row, the family it heads (its own id). */
+  family?: string;
+  /** Named causes inside the hazard; data, not ids. */
+  sub_causes?: SubCause[];
+  /** The location term behind the rate ("Why here"). */
+  location_factor?: LocationFactor;
+  /** Show only the range, never a point estimate. Absent means false. */
+  range_only?: boolean;
+  /** One comparison with the household's own ranked list. */
+  anchor_sentence?: string;
+  /** Zone-conditional words: "life-threatening", "serious disruption", … */
+  if_it_reaches_you?: string;
+  /** Usually "nothing beyond your basics", or one free step. */
+  what_it_changes?: string;
+}
+
+export interface SubCause {
+  id: string;
+  name: string;
+  note: string;
+  /** [low, high] yearly rate, where known. */
+  rate_range?: [number, number];
+  sources: CitationId[];
+}
+
+export interface LocationFactor {
+  /** For example "A" (near a strategic military site). */
+  class: string;
+  /** The class in words. */
+  label: string;
+  /** [low, middle, high] */
+  multiplier: [number, number, number];
+  sources: CitationId[];
 }
 
 /**
@@ -533,6 +759,19 @@ export interface BucketAssessment {
   frequency_sentences: string[];
   sources: CitationId[];
   relief?: Relief;
+  /** The worst event in the region's record for this bucket. */
+  stress_test?: StressTest;
+}
+
+/** The worst event in the region's record for one bucket, and whether the target covers it. */
+export interface StressTest {
+  event: string;
+  date: IsoDate;
+  region: string;
+  /** [days, share still out] pairs. */
+  share_out_at_days: [number, number][];
+  covered_by_target: boolean;
+  sources: CitationId[];
 }
 
 /** What a requirement line's quantity scales with. */
@@ -581,6 +820,10 @@ export interface PlanItem {
   /** Absent means false. */
   done?: boolean;
   paid_usd?: number;
+  /** Items this one needs first; never scheduled before them. */
+  requires?: ItemId[];
+  /** A decision (insurance, a home repair), not a purchase. Absent means false. */
+  decision?: boolean;
 }
 
 export interface PlanMonth {
@@ -614,6 +857,19 @@ export interface Plan {
   done_month?: number;
   envelopes: SavingsEnvelope[];
   savings_track?: SavingsTrack;
+  /** One month of expenses or $500, whichever is smaller, and the month it is reached. */
+  first_milestone?: SavingsMilestone;
+  /** Bare-minimum mode. Absent means false. */
+  minimum_kit?: boolean;
+  /** The long-horizon section. */
+  long_horizon?: PlanItem[];
+}
+
+export interface SavingsMilestone {
+  months: number;
+  usd: number;
+  /** Plan month, counted from 0. */
+  by_month: number;
 }
 
 /** A named scenario (for example "cascadia_m9") that applies here; toggle via `Dials.scenario_overrides`. */
@@ -629,7 +885,11 @@ export interface ScenarioInfo {
 export const WARNING_SEVERITIES = ['note', 'warn'] as const;
 export type WarningSeverity = (typeof WARNING_SEVERITIES)[number];
 
-/** A guardrail: the plan looks off, but it never blocks. */
+/**
+ * A guardrail: the plan looks off, but it never blocks. `id` is stable; contract v2 adds
+ * surge_zone_stay_home, cold_chain_power, benefit_lapse, plan_too_long, no_raw_water_source and
+ * no_cooking_capability (docs/ENGINE-API.md lists every id).
+ */
 export interface Warning {
   id: string;
   severity: WarningSeverity;
@@ -660,6 +920,14 @@ export interface PlanOutput {
   packet_markdown: string;
   /** Every citation referenced above. */
   provenance: Citation[];
+  /** Facts for the recovery page; absent when nothing is known. */
+  recovery?: RecoveryInfo;
+}
+
+export interface RecoveryInfo {
+  /** Federal disaster declarations for the county in the last five years. */
+  county_declarations_5yr?: number;
+  sources: CitationId[];
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -707,7 +975,23 @@ export interface Item {
   energy_kcal_per_unit?: number;
   /** Litres in one unit (water and liquids), for cost per litre or gallon. */
   volume_l_per_unit?: number;
+  /** Items this one needs first (an accessory's device). The engine always sends it. */
+  requires?: ItemId[];
+  /** Share of its readiness bucket's value, 0 to 1. */
+  readiness_share?: number;
+  /** A decision, not a purchase; never paid from the supplies budget. The engine always sends it. */
+  decision?: boolean;
+  /** Belongs to the long-horizon section. The engine always sends it. */
+  long_horizon?: boolean;
+  /** Have it before this season, or check it then (maintenance anchor). */
+  season?: Season;
+  /** Try it every this many months (jump pack, generator, key safe, flashlights). */
+  test_interval_months?: number;
 }
+
+/** Meteorological seasons: spring Mar–May, summer Jun–Aug, fall Sep–Nov, winter Dec–Feb. */
+export const SEASONS = ['spring', 'summer', 'fall', 'winter'] as const;
+export type Season = (typeof SEASONS)[number];
 
 /** Price of one unit, in US dollars. */
 export interface PriceBand {
@@ -725,10 +1009,15 @@ export interface Maintenance {
 export interface GuidanceMeta {
   id: string;
   title: string;
-  /** Bucket, hazard, tier or topic ids. */
+  /** Bucket, hazard, tier, topic or family ids. */
   applies_to: string[];
   citations: CitationId[];
+  /** What kind of block; absent in blocks not yet classified. */
+  kind?: GuidanceKind;
 }
+
+export const GUIDANCE_KINDS = ['after', 'plan', 'hazard', 'bucket', 'tier', 'topic', 'family'] as const;
+export type GuidanceKind = (typeof GUIDANCE_KINDS)[number];
 
 // ---------------------------------------------------------------------------------------------
 // Effects (docs/DESIGN.md §4.3)
@@ -826,6 +1115,19 @@ export interface EngineInfo {
   content_version: string;
   packs_loaded: string[];
   attributions: Attribution[];
+  /** The backtest summary for `#/validation`; absent when no table is bundled. */
+  validation?: ValidationSummary;
+}
+
+/** How the model did against the frozen set of past disasters (docs/VALIDATION.md). */
+export interface ValidationSummary {
+  events_tested: number;
+  covered: number;
+  partial: number;
+  short: number;
+  not_modelled: number;
+  data_pack: string;
+  url_anchor: string;
 }
 
 /** What `load_pack` returns. */
@@ -854,7 +1156,7 @@ export interface TierInfo {
   days: number;
 }
 
-/** What `catalogue()` returns: content plus the plain name of every id. */
+/** What `catalogue()` returns: content plus the plain name of every id (hazards: every id except the retired ones). */
 export interface Catalogue {
   items: Item[];
   citations: Citation[];

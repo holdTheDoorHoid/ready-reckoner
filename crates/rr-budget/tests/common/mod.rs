@@ -112,6 +112,7 @@ pub fn assessment(
         frequency_sentences: Vec::new(),
         sources: vec![CitationId::from("stub_research_prototype")],
         relief: None,
+        stress_test: None,
     }
 }
 
@@ -171,6 +172,12 @@ pub fn item(
         hazard_extras: Vec::new(),
         energy_kcal_per_unit: None,
         volume_l_per_unit: None,
+        requires: Vec::new(),
+        readiness_share: None,
+        decision: false,
+        long_horizon: false,
+        season: None,
+        test_interval_months: None,
     }
 }
 

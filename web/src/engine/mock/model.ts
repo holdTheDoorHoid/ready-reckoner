@@ -37,11 +37,12 @@ import type {
   TierId,
   Warning,
 } from '../types';
-import { BUCKET_IDS, HAZARD_IDS, RETURN_PERIODS, TARGET_LADDER_DAYS, TIER_IDS } from '../types';
+import { BUCKET_IDS, ENGINE_API_VERSION, RETURN_PERIODS, TARGET_LADDER_DAYS, TIER_IDS } from '../types';
+import { allowsRare } from '../../lib/dials';
 import { chanceWithin, dayPhrase, frequencySentence, monthsPhrase } from '../../lib/format';
 import { citation } from './citations';
 import { catalogueItem } from './items';
-import { BUCKETS, hazardName } from './names';
+import { BUCKETS, hazardName, hazardTier as tierOf } from './names';
 import { buildPacket } from './packet';
 import type { ByDial, DurationBucket, EvacuateSeed, HazardSeed, RegionProfile, ScenarioSeed } from './regions';
 import { DURATION_BUCKETS, PROFILES, tierForDays } from './regions';
@@ -140,6 +141,10 @@ export interface Facts {
   floor: number;
   highRiseCoupled: boolean;
   well: boolean;
+  /** A gas stove (contract v2 `housing.cooking`): boils water while the gas flows. */
+  gasStove: boolean;
+  /** The household said it has no raw water to filter (contract v2; absent = not asked). */
+  noRawWater: boolean;
   woodHeat: boolean;
   gasHeat: boolean;
   heatNeedsPower: boolean;
@@ -207,6 +212,8 @@ export function householdFacts(input: PlanInput, profile: RegionProfile): Facts 
     floor: h.floor,
     highRiseCoupled: h.kind === 'apartment_high_rise' && h.floor >= 7,
     well: h.water === 'well',
+    gasStove: h.cooking === 'gas',
+    noRawWater: h.raw_water_source === 'none',
     woodHeat: h.heating === 'wood',
     gasHeat: h.heating === 'gas' || h.heating === 'propane' || h.heating === 'oil',
     heatNeedsPower: h.heating !== 'wood' && h.heating !== 'none',
@@ -224,8 +231,7 @@ export function householdFacts(input: PlanInput, profile: RegionProfile): Facts 
 // ---------------------------------------------------------------------------------------------
 
 function hazardTier(id: HazardId): HazardTier {
-  const i = HAZARD_IDS.indexOf(id);
-  return i < 18 ? 'natural' : i < 27 ? 'societal' : 'personal';
+  return tierOf(id);
 }
 
 function commonSeeds(f: Facts, loc: LocationResolved): HazardSeed[] {
@@ -243,7 +249,9 @@ function commonSeeds(f: Facts, loc: LocationResolved): HazardSeed[] {
     { id: 'burglary', rate: urban ? 0.02 : f.setting === 'suburban' ? 0.012 : 0.008, spread: 1.5, severity: 0.2, confidence: 'high', sources: ['mock_burglary'], buckets: ['security'], what: 'have a burglary' },
     { id: 'extended_household_illness', rate: 0.015 * f.n, spread: 2, severity: 0.4, confidence: 'prior', sources: ['mock_societal_prior'], buckets: ['income', 'supplies', 'medication'], what: 'have someone ill for weeks' },
     { id: 'nuclear_attack', rate: 0.0003, spread: 5, severity: 1, confidence: 'prior', sources: ['mock_rare_prior', 'mock_nuclear_guidance'], buckets: ['supplies', 'power', 'water_out', 'comms'], what: 'be affected by a nuclear attack or EMP', rare: true },
-    { id: 'terrorism', rate: urban ? 0.0005 : 0.0001, spread: 5, severity: 0.6, confidence: 'prior', sources: ['mock_rare_prior'], buckets: ['security', 'medical_emergency'], what: 'be caught up in a terrorist attack', rare: true },
+    // Contract v2 retired `terrorism`; its personal-safety half is the rare `mass_violence` family
+    // (awaiting: web-risks — the mock's rare families).
+    { id: 'mass_violence', rate: urban ? 0.0005 : 0.0001, spread: 5, severity: 0.6, confidence: 'prior', sources: ['mock_rare_prior'], buckets: ['security', 'medical_emergency'], what: 'be caught up in a mass shooting or bombing', rare: true },
   ];
   if (f.earners > 0) {
     seeds.push(
@@ -473,7 +481,8 @@ export function coverage(owned: Owned, f: Facts, t: Targets): Record<DurationBuc
   if (has(owned, 'water_reused_bottles')) gallons += FREE_BOTTLE_GALLONS;
   if (has(owned, 'water_boil_method')) gallons += heaterGallons(f);
   const waterDays = f.galPerDay > 0 ? gallons / f.galPerDay : 0;
-  const filter = has(owned, 'water_filter') ? (f.setting === 'urban' ? 7 : 30) : 0;
+  // A filter's days count only with water to filter: none when the household says it has none.
+  const filter = has(owned, 'water_filter') && !f.noRawWater ? (f.setting === 'urban' ? 7 : 30) : 0;
 
   let supplies = f.peopleEquiv > 0 ? q(owned, 'food_shelf_stable') / f.peopleEquiv : t.days.supplies.value;
   if (f.infants > 0) supplies = Math.min(supplies, q(owned, 'infant_formula_reserve') / f.infants);
@@ -514,7 +523,7 @@ export function coverage(owned: Owned, f: Facts, t: Targets): Record<DurationBuc
   if (has(owned, 'alerts_signup')) comms += 0.5;
   if (has(owned, 'plan_family_contacts')) comms += 0.5;
 
-  const waterBoil = has(owned, 'water_bleach') || has(owned, 'water_filter') ? t.days.water_boil.value : waterDays;
+  const waterBoil = has(owned, 'water_bleach') || has(owned, 'water_filter') || f.gasStove ? t.days.water_boil.value : waterDays;
   return {
     power,
     water_boil: waterBoil,
@@ -693,7 +702,7 @@ function buildChunks(ctx: Ctx): Chunk[] {
       out.push(chunk(ctx, 'water_containers', tier, qty, { resource: 'water', perUnit: 7, level }));
       waterPlanned += qty * 7;
     } else {
-      if (!filterPlanned) {
+      if (!filterPlanned && !f.noRawWater) {
         out.push(chunk(ctx, 'water_filter', tier, 1, { level }));
         filterPlanned = true;
         waterPlanned += (f.setting === 'urban' ? 7 : 30) * f.galPerDay;
@@ -777,8 +786,9 @@ function buildChunks(ctx: Ctx): Chunk[] {
   }
 
   // Rare catastrophes: $0 by default; opted in, a single item in a late month (real allocator
-  // caps this at 10% of the monthly budget, `Dials.rare_catastrophic_opt_in`).
-  if (ctx.input.dials.rare_catastrophic_opt_in) {
+  // caps this at 10% of the monthly budget). The allowance is by family since contract v2
+  // (`Dials.rare_opt_in`, the v1 switch meaning all): the meter answers the nuclear family.
+  if (allowsRare(ctx.input.dials, 'nuclear_attack')) {
     out.push(chunk(ctx, 'radiation_meter', 'm3', 1));
   }
   return out;
@@ -1080,7 +1090,7 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
 
   const output: PlanOutput = {
     engine_version: MOCK_ENGINE_VERSION,
-    api_version: 1,
+    api_version: ENGINE_API_VERSION,
     data_pack_version: MOCK_DATA_VERSION,
     content_version: MOCK_CONTENT_VERSION,
     location,

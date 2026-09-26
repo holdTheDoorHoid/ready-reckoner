@@ -12,7 +12,12 @@ stated), **PRIOR** (expert judgement, with a range).
 ## Hazard rates
 
 Owned by `crates/rr-hazards`. Entry point: `rr_hazards::assess(input, county, base_rates,
-location) -> HazardAssessment { profiles, rates, scenarios, notes }`.
+location) -> HazardAssessment { profiles, rates, scenarios, parts, also_checked, notes }`.
+`profiles` holds the ranked hazards, then the nine rare families (contract v2); `rates` holds the
+ranked hazards only, so no rare family ever reaches `rr-consequence`, a target or the budget.
+`also_checked` lists everything checked and found under 1 in 100,000 a year here, with its rate.
+`HazardAssessment::add_power_curve(per_year, years)` finishes the "power out for months" family
+once `rr-consequence` has the household's power curve (the plan pipeline calls it).
 
 ### What a rate means
 
@@ -65,12 +70,30 @@ or a PRIOR. It never guesses a field's meaning: NRI frequencies follow `afreq_ki
 | `climate.*` | the 2050 dial (keys below) |
 | `events.*` | episode rates (keys below) |
 
+**v2 exposure columns** (`CountyRecord::exposure`, data-hazard's `CountyExposure`; the ZIP-level
+dam count from `LocationResolved::exposure`). Absent means unknown: the row falls back as listed,
+and one note names the missing columns.
+
+| Column | Used for | Without it |
+| --- | --- | --- |
+| `strategic_class`, `strategic_places`, `strategic_km`, `strategic_bearing` | the nuclear family's class and "Why here"; the war row's near/far split | the population-weighted f_S (0.314, range 0.01–0.99); war at ×0.71 (0.3–1) |
+| `uasi_area_share`, `uasi_area` | the metro weight w_m of the attack, CBRN and nuclear-terrorism terms: the FEMA urban area's own share of the FY2026 UASI money (the same for every county in the area; 0 outside the funded areas), and the area's name for "Why here" | a share of 0, as outside every funded area, with a note that those rows are too low in a big city |
+| `geomag_factor`, `geomag_lat` | the solar-storm location multiplier α ÷ 0.2285 | the national average (×1) |
+| `smoke_days_35`, `smoke_basis` | wildfire smoke (imputed counties get a ×/÷ 2 spread, monitored ×/÷ 1.3) | wildfire smoke left out |
+| `karst_share` | sinkholes | sinkholes left out |
+| `leveed_pop_share`, `levee_risk_high_share` | the levee part of dam or levee failure | no levee part |
+| `dams_high_total` (else `facilities.high_hazard_dams`), `dams_high_poor_condition` | the county part of dam failure; the poor-condition weight | ×1 for condition |
+| `dams_high_within_10km` (ZIP, `LocationResolved::exposure`) | the downstream part of dam failure | the county part |
+| `eviction_filing_rate` | eviction (only once the owner approves Eviction Lab's ODC-BY licence) | the national judgment rate |
+
 **`events` keys** (episodes a year; the pack's Storm Events, SPC and HURDAT2 types, then hazard
 ids as aliases): heat wave `heat`; cold wave `extreme_cold`; winter weather `winter_storm`; ice
 storm `ice_storm`; windstorm `high_wind` + `severe_wind_day` (added); major-hurricane share
 `major_hurricane_passage` ÷ `hurricane_passage`; boil-water notices `boil_water_notice`
-(household rate, if a source is ever added). Hail, tornado and landslide stay on NRI's frequency,
-because their footprint is NRI's loss ratio per NRI event.
+(household rate, if a source is ever added); dust storms `dust_storm` (v2; a county with no row
+recorded none); flash floods `flash_flood` and tropical cyclones `tropical_cyclone_impact` (their
+sub-cause notes only). Hail, tornado and landslide stay on NRI's frequency, because their
+footprint is NRI's loss ratio per NRI event.
 
 **`climate` keys**, in order of preference: a finished multiplier `<hazard_id>` (and
 `<hazard_id>_high`); county counts `<variable>_hist`, `_2050`, `_2050_high` for
@@ -85,7 +108,9 @@ cap; then the pack's ratio variables (future ÷ present at about +2 °C, optiona
 `ed_visits_per_100_persons_year`), `unintentional_injury_death_per_person_year` (or
 `accidental_death_per_person_year`), `pandemic_onset_per_year`, and optional overrides
 `grid_failure_per_year`, `cyber_outage_per_year`, `civil_unrest_per_year`,
-`supply_chain_disruption_per_year`, `hazmat_release_per_year`.
+`supply_chain_disruption_per_year`, `hazmat_release_per_year`. v2: `arrests_per_100k_{male,female}_<band>`
+(bands `10_17`, `18_24`, `25_34`, `35_44`, `45_54`, `55_64`, `65_plus`: the data-model series
+`fbi_arrests` passed as base rates) replace the built-in FBI table.
 
 ### Natural hazards
 
@@ -109,6 +134,9 @@ cap; then the pack's ratio variables (future ÷ present at about +2 °C, optiona
 | Volcanic activity | ash or mudflows reach the household | NRI | exposed share × 0.5 (0.2–1) | none | DERIVED + PRIOR |
 | Wildfire | must leave home, or loses power in a wildfire safety shutoff (two parts, kept apart: below) | NRI burn probability ×/÷ 1.5 | warnings to leave: exposed share × 20 households warned per home that burns (5–50); plus shutoffs 0.02/yr (0.005–0.1) in AZ, CA, CO, ID, MT, NM, NV, OR, UT, WA, WY | burn part urban ×0.3, rural ×2; shutoffs urban ×0.1, suburban ×0.5, rural ×1 | PRIOR |
 | Drought | a private well runs low; or water limits that change daily life | NRI frequency ÷ national median 13.43, bounded ×0.25–×4 | — | well 1 %/yr (0.3–3 %, research §9); public water 0.2 %/yr (0.05–1 %) | PRIOR |
+| Wildfire smoke (v2) | days of unhealthy smoke at home | the county's smoke days a year at 24-hour PM2.5 of 35.5 µg/m³ or more (NOAA HMS smoke maps with EPA AirData, 2016–2023 mean; data audit §3.2) ÷ 3 days an episode (2–5); ×/÷ 1.3, ×/÷ 2 when imputed | 1 (distant smoke reaches every home) | none; severity at least Serious for a child, someone 65+, pregnancy or a breathing device | DATA + PRIOR |
+| Dust storm (v2) | caught in a dust storm on the road or at home | Storm Events "Dust Storm" episodes (`dust_storm`) ×/÷ 1.3 | 0.3 (0.1–0.6) of a zone's episodes | none; the same severity floor as smoke | DATA + PRIOR |
+| Sinkhole (v2) | ground collapse damages the home | the county's share on karst (USGS OFR 2014-1156) | × 2 in 10,000 a year for a home on karst (5 in 100,000 – 1 in 1,000; Florida's reports and claims, hazard-expansion) | none | DATA + PRIOR (low confidence: not all karst has sinkholes) |
 
 NRI and Storm Events frequencies carry a ×/÷ 1.5 and ×/÷ 1.3 spread; earthquake models ×/÷ 2.
 
@@ -158,7 +186,9 @@ tornado 0.8, lightning 0.8, hail 0.1). Any shortfall ÷ 0.9 is added to windstor
 common cause. NRI records only 0.027 windstorms a year for Coos County, but a Coos home is caught
 in a county outage 1.09 times a year; the floor lifts Coos windstorms to 0.75 a year.
 
-Natural hazards under 1 in 100,000 a year are left out of the register and named in a note.
+Any ranked hazard under 1 in 100,000 a year today and around 2050 (natural, societal or personal)
+is left out of the register and listed in `also_checked` with its rate, unless a scenario hangs on
+it (see "Sub-causes and Also checked").
 
 ### Societal hazards
 
@@ -171,8 +201,14 @@ Natural hazards under 1 in 100,000 a year are left out of the register and named
 | Supply chain disruption | store shelves empty of what the household needs | 20 %/yr (10–40 %) | none | PRIOR, research §6.2 |
 | Chemical spill or release | a do-not-drink order or an order to stay inside | 2 %/yr (0.7–5 %) × TRI factor 1 + 0.5·log10((n + 1)/5), bounded ×0.65–×2 | TRI facilities in the county | PRIOR |
 | Nuclear plant accident | an order to shelter or leave | plant within 16 km: 2 in 10,000 a year (0.2 to 5 in 10,000); 16–80 km: 5 in 100,000 (1 to 20 in 100,000); beyond 80 km: not listed | distance | PRIOR (one US accident needing off-site action, Three Mile Island, in several thousand reactor-years) |
-| Nuclear attack (and EMP) | shown in the rare-catastrophe box | 1 in 2,000 to 1 in 400 a year worldwide (research §6.3, Forecasting Research Institute 2024); never a point estimate; the geometric middle, 1 in 894, is used only for arithmetic. Since v0.1.1 the sentence says it is "the chance of a nuclear catastrophe anywhere in the world ... not for your household" (hazard review H-01; the location-aware rebuild is v0.2.0) | none | PRIOR (published forecasts) |
-| Terrorist attack | shown in the rare-catastrophe box: an attack that shuts down the area where you live for half a day to two days; the sentence says it counts the disruption, not the chance of being hurt (H-03) | 1 in 10,000 to 1 in 1,000 a year for a city household | setting as unrest | PRIOR |
+| Dam or levee failure (v2) | told to leave because a dam or levee fails or threatens to | high-hazard dams whose listed downstream town is in the ZIP code × 1 in 10,000 a year per dam (3 in 100,000 – 5 in 10,000; ASDSO: about 2 in 10,000 failures per dam a year, all classes, and incidents such as Oroville 2017) × 0.3 of the ZIP's households (0.1–0.6); without a ZIP, the county's high-hazard dams × 0.01 of its households (0.003–0.03); dams in Poor or Unsatisfactory condition count ×3; plus the share of the county behind levees × 0.2 % a year (0.05–1 %; leveed land is mapped outside the flood zone, so the flood rate misses it), ×2 behind levees USACE rates High or Very High | footprints as stated | PRIOR stacked on the inventories: range only |
+| Phone or internet outage (v2) | phones and internet down for hours, 911 included | 0.3 a year (0.1–1): carrier-wide outages of several hours about once a year (FCC, AT&T 22 February 2024: 92 million calls, 25,000 calls to 911 blocked) × about a third of households on the failing carrier | none | PRIOR |
+| Medicine shortage (v2) | a daily medicine cannot be filled for days to weeks | 5 % a year per person on a daily prescription (2–15 %; ASHP: 323 active shortages at the start of 2024; openFDA: 70 medicines short on 2026-09-26) | ×1.5 (1.2–2) for a medicine that must stay cold (50 of openFDA's 70 are injectables); left out with no daily prescription | PRIOR |
+| Pay or benefits stop (v2) | federal pay or a benefit stops for weeks | federal pay: funding gaps of 14 days or more, 4 in fiscal years 1982–2026 (CRS RS20348): 0.089 a year (exact Poisson 90 %: 0.030–0.203); SNAP or WIC: × 0.25 (0.1–0.6) of those gaps (one of four, November 2025); SSI, SSDI and VA: 0.5 % a year (0.1–2 %), since they were paid through every shutdown; unemployment 1 % (0.2–4 %) | only for households with `finances.benefits`; the largest of their benefits' rates (one lapse stops them all) | DATA (federal pay) + PRIOR |
+| Attack or threat closes your area (v2; replaces the disruption half of terrorism) | a shelter order, closure or transit shutdown for half a day or more | 0.1 metro-wide attacks or threats a year (0.04–0.25; CSIS 1994–2025: Oklahoma City, 11 September, the anthrax letters, Boston) × the metro area's share of FEMA's FY2026 UASI money (New York-White Plains 24.39 %, Chicago 5.30 %, Philadelphia 2.84 %) × 0.3 of its households (0.1–0.8); outside every funded area 3 in a million a year (1 in a million – 3 in 100,000: 5 % of attacks over the 64 million households there, 40,000 households an order) | the metro weight | PRIOR: range only |
+
+The old nuclear-attack row (a worldwide catastrophe forecast shown to every household, H-01) and
+the terrorism row (retired in contract v2, H-02) are replaced by the rare families below.
 
 ### Personal hazards
 
@@ -186,9 +222,114 @@ Natural hazards under 1 in 100,000 a year are left out of the register and named
 | Break-in | a household burglary | 1 %/yr (0.5–2 %), to be replaced by the BJS victimization survey figure | none | PRIOR |
 | Death or disability of an earner | loss of an earner's income | 0.9 % per earner-year (0.5–1.5 %): disability about 0.6 % (SSA: 1 in 4 20-year-olds disabled before full retirement age) plus working-age death about 0.3 % | × earners | DERIVED + PRIOR |
 | Long illness in the household | someone sick at home for weeks | 1 % per person-year (0.5–3 %) | × people | PRIOR |
+| Burst pipe or water leak (v2) | a burst, frozen or leaking pipe or appliance floods part of the home | 1.5 % per home-year (1–2 %; III/ISO water damage and freezing, about 1 in 67 insured homes a year, 2019–2023) | ×1.3 (1.1–1.6) where 5 or more days a year stay below freezing (CMRA `icing_days_hist`); basement ×1.2 (1–1.5); renters ×0.8 (0.6–1); no housing-age column exists yet, so age is not a modifier | DATA + PRIOR (confidence medium: read through the publisher's summary) |
+| Eviction (v2) | a renting household is taken to court and ordered to leave | the county's eviction filings per renter household × 0.4 (0.3–0.55) that end in a judgment, when the pack has the column; otherwise 2.3 per 100 renter households a year (1–5; Eviction Lab 2016, confirm) | renters only; income stability as for job loss; ×0.5 (0.3–0.8) with three months of savings | PRIOR |
+| Arrest or detention (v2, owner decision 2026-09-26) | a household member is arrested | FBI arrests per 100,000 a year by age band, 2023–2025 (Crime Data Explorer, Tables 29, 39 and 40; the data-model series `fbi_arrests`): the men's and women's rates averaged, since the form does not ask sex. Adults 18–64 are the five FBI bands weighted by the years each covers (7, 10, 10, 10, 10): 3.31 per 100 a year; teens the 10–17 band, 1.47; 65 and over 0.31; children under 13 are not counted | summed over the household (events, not people); the range runs from the women's lowest year to the men's highest | DATA (confidence medium) |
 
 Job loss and earner loss are left out (with a note) when no one is marked as earning; vehicle
-stranding when there is no vehicle and no commute.
+stranding when there is no vehicle and no commute; medicine shortages when no one takes a daily
+prescription; eviction for owners; pay or benefits stopping without `finances.benefits`.
+
+The arrest sentence counts events: "For households with people the ages of yours, the FBI's
+counts come to about 7 arrests for every 100 households a year (2023–2025). This counts arrests,
+not guilt or convictions, and one person arrested twice counts twice." Its buckets are income and
+home loss (the legal-readiness checklist); `rr-consequence` owns the effects.
+
+### The rare families
+
+The nine rare families (REVIEW §2.3–§2.4, hazard-expansion Deliverable B) are shown in their own
+box, range only, sorted by the middle of their range (never shown), never by expected loss, and
+never handed to `rr-consequence`. Their factors are published forecasts and expert judgement
+stacked together, so their ranges multiply low by low and high by high (`Estimate::times_span`,
+the review's own arithmetic), not in quadrature. Each has `family` (its own id), `sub_causes`,
+`location_factor` where there is a location term, `range_only`, `if_it_reaches_you`,
+`what_it_changes`, and an `anchor_sentence`: the household's ranked hazard with the smallest rate
+above the row's upper bound ("Less likely than a regional blackout (about 5 in 100 for you in the
+next ten years)."). The sentence gives the range as natural frequencies over the horizon ("Between
+1 in 3,300 and 1 in 28 households like yours would …"); a range wider than a thousandfold is said
+in words ("At most about 1 in 58 …").
+
+**Nuclear attack.** Serious local effects (blast or dangerous fallout):
+r = λ_S·f_S(class) + λ_L·w_L·0.3 + λ_I·s_UASI·0.1, with λ_S = 4 in 10,000 a year (1 in 10,000 – 4
+in 1,000: FRI 2024's catastrophe forecasts × 0.33 reaching US soil; XPT 2023; Rethink Priorities
+2019; Barrett 2013), λ_L = 1 in 10,000 (2 in 100,000 – 5 in 10,000), λ_I = 5 in 100,000 (1 in a
+million – 5 in 10,000), w_L = 0.05 for class A counties and Hawaii and Guam, and s_UASI the metro
+weight. National disruption (λ_S + 0.5·λ_L), use abroad (λ_U = 5 in 1,000, 1–15 in 1,000) and the
+EMP of a high-altitude burst (λ_S × 0.5 + λ_L × 0.3; lower 48 states) are sub-causes that never
+enter the local rate. The class is the county's strategic-exposure class from
+`data/core/strategic_sites.toml` (research `strategic-sites.md`):
+
+| Class | Rule | f_S | Serious local effects a year | Ten years | Severity; if it reaches you |
+| --- | --- | --- | --- | --- | --- |
+| A | counterforce and command sites: missile fields, submarine and bomber bases, weapons storage, command and missile-defence sites | 0.9 (0.6–0.99) | 3.6 in 10,000 (6 in 100,000 – 4 in 1,000) | between 1 in 1,700 and 1 in 26 | 1.0; life-threatening |
+| B | downwind of the missile fields (bearing 45–135°, 800 km, or within 75 km) | 0.5 (0.2–0.8) | 2.0 in 10,000 (2 in 100,000 – 3 in 1,000) | between 1 in 5,000 and 1 in 32 | 0.5; serious disruption |
+| C1 | the ten largest metros, the National Capital Region, NNSA sites | 0.6 (0.3–0.9) | 2.4 in 10,000 (3 in 100,000 – 4 in 1,000) | between 1 in 3,300 and 1 in 28 | 1.0; life-threatening |
+| C2 | other metros of a million or more, big ports, large refineries, other major bases | 0.3 (0.1–0.6) | 1.2 in 10,000 (1 in 100,000 – 2 in 1,000) | between 1 in 10,000 and 1 in 42 | 0.5; serious disruption |
+| D | downwind (45–135°, 150 km) of an A site, an NNSA site or a C1 county | 0.15 (0.05–0.4) | 6 in 100,000 (5 in a million – 2 in 1,000) | between 1 in 20,000 and 1 in 63 | 0.5; serious disruption |
+| E | everything else | 0.03 (0.01–0.1) | 1.2 in 100,000 (1 in a million – 4 in 10,000) | between 1 in 100,000 and 1 in 250 | 0.3; shortages, power cuts and lost income |
+| unknown | the pack has no class | 0.314 (0.01–0.99), the population-weighted mean over the first cut | 1.3 in 10,000 | — | 0.5 |
+
+`location_factor.label` is the research's "Why here" template for the class (research
+`strategic-sites.md` §7), filled from the pack's resolved places, the distance in miles (to the
+nearest 10) and the 16-point bearing: "You live downwind of the nuclear missile fields in
+Wyoming, Nebraska and Colorado, about 240 miles to your northwest." A placeholder the data cannot
+fill falls back to plainer words, never a guess. What it changes: one free step, pick a shelter
+spot at home and at work, in classes A–D (FEMA's 72-hour guidance); nothing beyond the basics in
+class E.
+
+**Severe solar storm.** A Carrington-class storm, 3 in 1,000 a year (5 in 10,000 – 1.3 in 100:
+Riley 2012, Love, Riley and Love 2017, Moriña 2019, Lloyd's 2013) × the chance it cuts a
+household's power for days, 0.09 (0.06–0.12: Lloyd's 20–40 million of about 330 million people) ×
+α ÷ 0.2285, capped at one half. α is NERC TPL-007's factor by geomagnetic latitude (IGRF-14, 0.1 to
+1); 0.2285 is its population-weighted mean over every county (DERIVED from the pack's `geomag.csv`
+and NRI population). Minot (α 0.63): 7.4 in 10,000 a year; Philadelphia (0.29): 3.4 in 10,000;
+Miami (NERC's floor, 0.1): 1.2 in 10,000 (the review's 6 in 100,000 used α 0.06, below the floor).
+Ground conductivity (β) is not in the pack, and the "Why here" sentence says so. The asteroid
+moves to Also checked (3 in a billion a year).
+
+**Power out for months (any cause).** The solar-storm row × 0.1 of those outages lasting two
+months or more (0.02–0.3; Lloyd's worst case 16 days to a year or two), the EMP sub-cause × 0.1
+(0.02–0.3; EPRI 2019 found months-long nationwide blackouts unsupported; lower 48 states only), the
+war row × 0.02 (0.005–0.1), plus the household's own power curve at 60 days once
+`add_power_curve` runs (awaiting: plan and consequence). Confidence medium.
+
+**War with attacks on US infrastructure.** A great-power war, 0.5 % a year (0.2–1 %; FRI 2024's
+Russia–US conflict forecasts) × 0.5 (0.2–0.8) that attacks reach US power, water or phones near
+military sites, big cities, ports and refineries (classes A, C1, C2); ×0.3 far from them (B, D,
+E): 2.5 in 1,000 (4 in 10,000 – 8 in 1,000) near, 7.5 in 10,000 far.
+
+**Chemical, biological or radiological attack.** 0.03 disruptive attacks a year (0.01–0.1; START
+POICN: 517 CBRN events worldwide 1990–2017, about 76 % chemical) × the metro weight × 0.05
+(0.01–0.2) of its households under an order (buildings and blocks, as with the anthrax letters);
+outside the funded areas 1.5 in 10 million (1 in 100 million – 2 in a million). Sub-causes:
+chemical, biological, radiological.
+
+**The worldwide families.** Severe pandemic, 1.5 in 1,000 a year (5 in 10,000 – 5 in 1,000;
+Marani 2021); very large eruption anywhere, 1.8 in 1,000 (8 in 10,000 – 4 in 1,000; Cassidy and
+Mani 2022), with Yellowstone (1 in 730,000 a year, USGS) as a sub-cause and in Also checked;
+financial crisis with bank closures, 2 in 1,000 (5 in 10,000 – 1 in 100; one national bank holiday
+in about a century), with a single bank failing (about 23 a year 2001–2025, FDIC) as a sub-cause;
+mass shooting or bombing, 3 in 10 million per person a year (1–10 in 10 million; FBI 2024: 23
+killed and 83 wounded), × the people in the household, location not modelled, free actions only.
+Confidence is `prior` except the eruption, mass violence and the months-long blackout (`medium`).
+
+### Sub-causes and Also checked
+
+The hazard-candidates CSV names 52 sub-causes (its rows "c"). 51 are notes on ranked cards
+(`crates/rr-hazards/src/subcauses.rs`); the 52nd, a single bank failing, is on the financial-crisis
+family. A sub-cause has the same consequences as its parent, so it is named, not rated again: the
+parent already counts it. Where the pack or the CSV gives a number, the note carries its own range:
+flash floods (the county's Storm Events episodes × 0.3–5 %, else 0.1–5 % a year), basement flooding
+(0.05–0.5 %), carbon monoxide beside house fires (7–30 in 100,000 households a year, CDC; shown, not
+added), inland tropical flooding (the county's tropical-cyclone passages × 0.3–0.8). Three are
+placed elsewhere and say so: levee failure is on the dam and levee card, the heat-and-blackout
+compound is a named scenario in desert counties, and the new earthquake scenarios are with the
+scenarios. None re-rates its parent in this release: the pack has no column yet that measures
+rail, pipeline or plant releases, gas curtailment or dam releases.
+
+`also_checked` and its note list every ranked hazard under 1 in 100,000 a year here and the rare
+sub-rows too small to show (the asteroid, Yellowstone), each with its rate in words ("dust storms
+(none recorded here)", "a Yellowstone super-eruption (about 1 in 730,000 a year)").
 
 ### Climate: "around 2050"
 
@@ -226,10 +367,16 @@ for a scenario that does not apply is ignored with a note.
 | `new_madrid_m7` | 29 counties in AR, IL, KY, MO, TN | 7–10 % in 50 years → 0.18 %/yr (0.15–0.21 %) | — | off (rarer than the yardstick) | — |
 | `local_tsunami` | counties with a tsunami zone | the Cascadia rate (on the Cascadia coast) or 0.1 %/yr (0.03–0.3 %) elsewhere, × residents in the zone (NRI; else 10 %) | the long-run Cascadia rate × the same share | on (knowing the route costs nothing) | — |
 | `major_hurricane_direct_hit` | Gulf and Atlantic states with NRI hurricane frequency ≥ 0.1 a year | the major part of the hurricane rate: frequency × major share × 0.8 | — | on | — |
+| `wasatch_m7` (v2) | 9 Wasatch Front counties (Box Elder, Davis, Morgan, Salt Lake, Summit, Tooele, Utah, Wasatch, Weber) | 43 % chance of magnitude 6.75+ in 50 years (Working Group on Utah Earthquake Probabilities 2016; confirm) → 1.12 %/yr (0.71–1.69 %) | — | on (above half the yardstick) | — |
+| `san_andreas_south_m78` (v2) | 7 counties of the ShakeOut area (Imperial, Kern, Los Angeles, Orange, Riverside, San Bernardino, Ventura) | 19 % chance of magnitude 6.7+ on the southern San Andreas in 30 years (UCERF3; confirm) → 0.70 %/yr (0.43–1.09 %) | — | on | — |
+| `seattle_fault_m7` (v2) | King, Kitsap, Pierce and Snohomish | about 5 % chance of magnitude 6.5+ in 50 years (USGS and Washington DNR; confirm) → 0.10 %/yr (0.04–0.21 %) | — | on in Washington (Prepare in a Year), though rarer than the yardstick | — |
+| `heat_blackout` (v2) | counties with 60 or more days a year over 95 °F (CMRA baseline: 44 counties, the desert Southwest, South Texas, southwest Oklahoma; Maricopa 123, Pima 89, Clark 74) | heat episodes × power cuts of a day or more a year (the county's EAGLE-I record × its share over a day, else 2 %/yr, 0.5–6 %) × 3 days ÷ 365 (Stone et al. 2023) | — | on (the most dangerous combination; the answer is a cool place to go) | — |
 
-The earthquake card shows the county rate less the scenario's long-run share (never below a
-quarter of it) plus the scenario's own rate: Coos Bay 0.01981 − 0.0041 + 0.01022 = 0.0259 a
-year. The hurricane card shows the full hurricane rate (Category 1–2 plus major); the tsunami card
+The earthquake card shows the county rate less the long-run shares of every earthquake scenario
+that applies (never below a quarter of it) plus the scenarios' own rates: Coos Bay 0.01981 − 0.0041
++ 0.01022 = 0.0259 a year; King County takes out both Cascadia's and the Seattle fault's shares.
+The heat card shows the heat waves (the blackout scenario is one of them, taken out and added
+back). The hurricane card shows the full hurricane rate (Category 1–2 plus major); the tsunami card
 the county rate plus the local-source scenario. `rates` always carries the parent's full rate.
 
 ### Severity, confidence and sentences
@@ -240,9 +387,15 @@ $50 or less is 0, $500,000 or more is 1. Natural hazards: NRI expected annual lo
 per-event loss (PRIOR except house fire, $11.27 billion ÷ 344,600 fires = $32,700): job loss
 $12,000; emergency visit $2,000; stranding $300; local outage $100; break-in $2,500; earner loss
 $500,000; long illness $5,000; pandemic $5,000; regional blackout $1,000; cyber outage $300;
-curfew $300; shortages $100; chemical release $500; nuclear plant accident $20,000. Nuclear attack
-is 1 and terrorism 0.9 by definition. The fixed scale means a hazard's severity reads the same in
-every county, and likelihood and severity stay separate columns in the rare-catastrophe box.
+curfew $300; shortages $100; chemical release $500; nuclear plant accident $20,000; v2: burst pipe
+or leak $15,400 (III's average claim); smoke $300; dust storm $200; sinkhole $30,000; dam or levee
+failure $40,000; phone or internet outage $100; medicine shortage $500; pay or benefits stopping
+$1,500 (a month); eviction $5,000; an attack closing the area $800 (0.3, "a few days'
+disruption", H-10); an arrest $5,000. The rare families have a fixed severity by zone: nuclear 1.0
+in classes A and C1, 0.5 in B, C2 and D, 0.3 in E (0.5 when the class is unknown); solar storm,
+war and CBRN 0.5; months-long blackout and severe pandemic 0.8; eruption and financial crisis 0.3;
+mass violence 0.9. The fixed scale means a hazard's severity reads the same in every county, and
+likelihood and severity stay separate columns in the rare-catastrophe box.
 **Heat and cold for households at risk** (verification, 2026-09-26): NRI's expected loss already
 counts deaths and injuries, valued per statistical life, but spreading it over every household
 and every county episode makes heat read "Minor" (Philadelphia: about $85 an episode). A heat or
@@ -250,46 +403,63 @@ cold wave therefore shows at least 0.4, "Serious" (an emergency visit on the sam
 household has someone 65 or older, a baby, someone on a powered medical device, someone pregnant
 (heat), or no air conditioning (heat) or heating (cold) — the groups CDC names and the Chicago
 1995 findings (`cdc_heat_health`, `cdc_winter_safety`, `semenza_1996_heat_deaths`; PRIOR). A note
-says why. Severity is shown, not planned with: the targets do not change.
+says why. Smoke and dust get the same floor for a child, someone 65 or older, pregnancy or a
+breathing machine (EPA: children breathe more air for their size and N95s do not fit them; asthma
+and COPD are not asked, so age stands in). Severity is shown, not planned with: the targets do not
+change.
 
 **Confidence**: data within a factor of 1.6 either way is `high`, within 3 `medium`, wider `low`;
 a rate that rests partly on expert judgement is `medium` within a factor of 3, otherwise `low`;
-one that rests only on expert judgement is `prior`. The rare catastrophes are `prior`.
+one that rests only on expert judgement is `prior`. The rare families carry a fixed confidence
+(`prior`, or `medium` for the eruption, mass violence and the months-long blackout); water damage,
+arrests and the dust-storm test value are fixed at `medium` because their source was read through a
+summary or their sex mix is unknown.
 
 **Sentences**: `100 · (1 − e^(−T·r))` households of 100 over `T = dials.horizon_years`, at most
 two significant figures, whole numbers from 1 to 10, then "in 1,000" and "1 in N" for rarer
 hazards, "nearly every household" from 99.5, with "(about N times a year)" when r ≥ 1. The range
 is shown when the rate is an expert estimate. Around 2050 the horizon reads "in a ten-year
-stretch around 2050". Rare catastrophes get a range-only sentence.
+stretch around 2050". Rare catastrophes and ranked rates built from stacked expert judgement (dam
+or levee failure, an attack closing the area; `range_only`) get a range-only sentence ("Between 1 in
+490 and 1 in 31 households like yours would …"); arrests get an events sentence (see Personal
+hazards).
 
 **Order**: ranked hazards by today's rate, most likely first (so the 2050 dial never reorders
-the list), then the rare-catastrophe box.
+the list), then the nine rare families, most likely here first by the middle of their range.
 
 **Why we think this**: `rr_hazards::why_we_think_this(hazard)` gives one plain-language reason
 per hazard (the source, or for an expert estimate the reasoning and its size) for the drawer
 behind each card. `HazardAssessment::notes` carries the plain caveats for this household and
 county: county scale, missing outage records, capped heat days, the outage floor, hazards too
-rare to list, the 2050 changes in words ("heat waves 2.4 to 3 times as often"), ignored scenario
-settings, the rural ambulance note and the nuclear planning zone.
+rare to list with their rates ("Also checked"), the v2 data columns missing for the county, the
+2050 changes in words ("heat waves 2.4 to 3 times as often"), ignored scenario settings, the rural
+ambulance note, the nuclear planning zone, and the Serious floors for heat, cold and smoke.
 
 ### The fixture registers
 
 From `cargo run -p rr-hazards --example register -- <household> <fips>` on the hand-built fixture
 counties in `crates/rr-hazards/tests/data` (NRI v1.20 and CMRA 2025 values; research §8–§9
-outage rates). Top five by rate, per year and out of 100 households over ten years:
+outage rates; v2 exposure values from data-hazard's own pack rows). Top five by rate, per year
+and out of 100 households over ten years:
 
 | # | Philadelphia renters (42101) | per year | of 100 | Coos Bay well owners (41011) | per year | of 100 |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Heat wave | 3.69 | nearly all | Medical emergency | 0.95 | nearly all |
-| 2 | Medical emergency | 1.89 | nearly all | Windstorm | 0.75 | nearly all |
-| 3 | Cold wave | 0.40 | 98 | Stranded in a vehicle | 0.30 | 95 |
-| 4 | Winter storm | 0.35 | 97 | Winter storm | 0.29 | 94 |
-| 5 | Windstorm | 0.21 | 88 | Job loss | 0.25 | 92 |
+| 1 | Heat wave | 3.69 | nearly all | Wildfire smoke | 2.39 | nearly all |
+| 2 | Medical emergency | 1.89 | nearly all | Medical emergency | 0.95 | nearly all |
+| 3 | Cold wave | 0.40 | 98 | Windstorm | 0.75 | nearly all |
+| 4 | Wildfire smoke | 0.37 | 98 | Stranded in a vehicle | 0.30 | 95 |
+| 5 | Winter storm | 0.35 | 97 | Phone or internet outage | 0.30 | 95 |
 
-Philadelphia further down: store shortages 0.20, job loss 0.166 (81 in 100, research §8.3 row 1),
-flooding with the basement 0.0061, house fire 0.0052 (5 in 100), earthquake 0.0016. Coos Bay:
-earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092 (with
-`local_tsunami`), house fire 0.0026.
+Philadelphia further down: phone or internet outage 0.30, windstorm 0.21, store shortages 0.20,
+job loss 0.166 (81 in 100, research §8.3 row 1), arrests 0.069 (about 7 for every 100 households a
+year), medicine shortage 0.05, eviction 0.023, burst pipe or leak 0.019, flooding with the basement
+0.0061, house fire 0.0052 (5 in 100), earthquake 0.0016, an attack closing the area 0.00085 (range
+only). Its rare box: war 2.5 in 1,000, financial crisis 2 in 1,000, eruption 1.8 in 1,000, severe
+pandemic 1.5 in 1,000, solar storm 3.4 in 10,000, nuclear 2.4 in 10,000 (class C1, "between 1 in
+3,300 and 1 in 28"), months-long blackout 1.1 in 10,000, CBRN 4 in 100,000, mass violence 1.2 in a
+million (range middles, never shown). Coos Bay: earthquake 0.026 (with `cascadia_m9` on by default
+at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear class E, "between
+1 in 100,000 and 1 in 250".
 
 ### Decisions and known gaps
 
@@ -328,6 +498,58 @@ earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092
   the Hayward fault, USGS's 7–10 % for New Madrid, the SSA "1 in 4" disability figure (checked 2026-09-26: the source says 1 in 4, not "more than"),
   the one-third major share of landfalling hurricanes, and the 1 % burglary prior.
 
+**v0.2.0 (contract v2).**
+
+- **Rare rows never enter Λ.** `rates` holds the ranked hazards only; the nine families are
+  display rows. The old nuclear effect row in `rr-consequence` (supplies, 1 day / 3 days) no longer
+  receives a rate. This drops the nuclear share from the supplies bucket (it was 1.1 in 1,000 a year
+  against a one-in-100 dial) and makes "never drive the budget" hold by construction.
+- **Ranges of the rare families span every combination.** The review computes its class ranges
+  as low × low to high × high, so the rare families do too (`Estimate::times_span`); the ranked
+  rates keep quadrature. The class examples reproduce REVIEW §2.3 within rounding and B1.5's ten-year
+  ranges word for word (`tests/v2.rs`).
+- **The UASI share is the urban area's, not the county's.** The attack, CBRN and nuclear-terrorism
+  formulas weigh the metro area (λ × w_m × the share of its households under an order), so they read
+  the pack's `uasi_area_share` (source `fema_hsgp_fy2026`), not `uasi_share`, the county's
+  population split of that share. Without the column the three terms fall back to a share of 0 (the
+  rates outside every funded area) and a note says the rows are too low in a big city; the county
+  split is never used in its place. `LocationResolved::exposure.uasi_share` (the contract calls it
+  the metro area's share) still carries the county split and is not read.
+- **The solar-storm location term uses NERC's floor.** α never falls below 0.1, so Miami comes to
+  1.2 in 10,000 a year, not the review's 6 in 100,000 (which used α 0.06). The population mean of α
+  (0.2285) replaces the review's assumed 0.25. Ground conductivity (β) is not in the pack.
+- **Levee residual behind high-risk levees.** 0.2 % a year (0.05–1 %) ×2 behind levees rated High or
+  Very High puts the most exposed parishes (Concordia, Louisiana) at 4 in 1,000 a year (up to 2 in
+  100): a prior with a range-only card, flagged for the owner.
+- **Arrests are sex-averaged.** The household form does not ask sex; the range runs from the women's
+  lowest year to the men's highest, and confidence is fixed at `medium`. Arrests are events: the
+  chance that anyone in a household is arrested at least once is lower than the event rate implies,
+  which the sentence says.
+- **Eviction uses the national rate** until the owner approves Eviction Lab's ODC-BY licence; the
+  county column then takes over with filings × 0.4 to judgments. Income stability (the job-loss
+  modifier) and savings scale it, as the hazard-expansion CSV proposed.
+- **Medicine shortages and phone outages are national priors**; phone and internet outages (0.3 a
+  year) now rank near the top of most registers with a tiny severity ($100 an event).
+- **Recalibrations from the series.** The data-model series (OE-417, FCC DIRS, funding gaps, FDIC,
+  FBI arrests, openFDA) are used where a series measures the row: funding gaps (benefits), FBI
+  arrests, FDIC and openFDA (notes). OE-417 counts reports, not household outages, so the regional
+  blackout keeps its prior and gains the OE-417 physical-attack and cyber counts as sub-cause notes;
+  no FCC or CSB series measures cyber outages or chemical releases, so those priors stand.
+- **Outages by cause (M-18, M-10).** The outage floor can top up each storm hazard by its share of
+  recorded outages matched by date (`natural::shortfall_by_cause`), instead of counting every
+  shortfall as windstorms; it reads data-model's `OutageModel::causes` (awaiting: data-model), so
+  the v0.1 rule runs until then. The hurricane double count M-10 is `rr-consequence`'s (county curve
+  plus hurricane rows); `rr-hazards` already subtracts modelled hurricane outages in the floor.
+- **New scenarios have effects rows** (rr-consequence, v0.2.0). `wasatch_m7`,
+  `san_andreas_south_m78` and `seattle_fault_m7` take the New Madrid and Hayward priors;
+  `heat_blackout` is rr-consequence's heat-plus-outage class and owns its durations and effects
+  (see "Blackouts during heat waves" under Consequences), so there is no second, overlapping
+  class.
+- **Figures to confirm** (hazard-expansion "UNVERIFIED items"): III's 1 in 67 and $15,400, Eviction
+  Lab's 2.3 in 100 and the 0.4 judgment share, the CSIS count of metro-wide closures, Riley 2012's
+  12 % a decade, the Wasatch 43 %, southern San Andreas 19 % and Seattle fault 5 % figures, and the
+  dust-storm rate in the Maricopa fixture (a test value until the Storm Events dust job lands).
+
 ## Consequences and targets
 
 Owned by `crates/rr-consequence`. Entry point: `rr_consequence::assess(input, rates, county,
@@ -356,7 +578,17 @@ rr_consequence::assess(
 ) -> ConsequenceAssessment
 ```
 
-`ConsequenceAssessment` carries the 14 `BucketAssessment`s (in `BucketId::ALL` order), the
+`CountyData::from_record` reads the county record. Data pack v2 adds optional fields, each
+absent until its branch merges (the county-only model of v0.1 runs without them and says so):
+`outage_model` (the regional outage model: pooled tails with credibility weights, causes, the
+region's worst event; `agent/data-model`), `temperature` (outage hours on hot and cold days),
+`curves` (pooled restoration curves by region and cause, handed in with
+`CountyData::with_curves(store.restoration_curves())` because they are not per county),
+`sdwis_violation_share` and `smoke_days` (read from `CountyRecord::exposure`, data-hazard's
+`sdwis_violation_pop_share` and `smoke_days_35`, merged in v0.2). Until agent/data-model merges,
+`crates/rr-consequence/src/pack.rs` mirrors its loader types field for field.
+
+`ConsequenceAssessment` carries the 15 `BucketAssessment`s (in `BucketId::ALL` order), the
 `ScenarioInfo`s, cliff `Warning`s, the self-sufficiency statement, and the numbers behind every
 target: per duration bucket an `ExceedanceCurve` (`lambda`, `unmet_days`, `value_between`,
 `consumption_days_per_year`, `natural_frequency`, `sample`, `target_at`, `ladder_at`), the raw
@@ -407,6 +639,32 @@ reproduce the research prototype's event classes:
   Coos Bay: 0.41 %/yr, its long-run recurrence). Major hurricanes use `replaced_by` instead (a
   class, not a share). "Off" therefore means the plan leaves the scenario's event out entirely.
 
+- **Contract v2 hazards** (v0.2.0; rates from rr-hazards, the definitions in
+  `round2/reports/hazard-candidates.csv`): every wildfire-smoke episode (the county's smoke days
+  with PM2.5 of 35 or more, about three days to an episode) and every dust storm that reaches the
+  household means unhealthy air indoors (`clean_air`); a burst pipe shuts the water at the main
+  for hours and 1 in 20 moves the household out; a dam or levee failure (or its threat) orders
+  the household out with minutes to hours of warning; a network outage cuts phones for hours; a
+  medicine shortage leaves one daily prescription unfilled for days (median 5, bad case 21: the
+  patient-level gap, not the national shortage); a benefit lapse leaves a SNAP household short of
+  food money for one to four weeks and stops federal pay or a benefit for two to six weeks (an
+  income stream at the household's rate); an eviction puts a renting household out for one to
+  three months; an attack or credible threat keeps the area inside for half a day to two days;
+  an arrest stops one earner's pay for a week or more.
+- **Rare families never enter a curve.** The nine rare hazards (`HazardId::is_rare`) are shown in
+  their own box: their rates are skipped when the model is built, and the table rejects rows for
+  them (the nuclear-attack row went, and the retired `terrorism` rows with it). Their "what it
+  changes" text is content's; the plan's own power curve at 60 and 90 days, with its 10th and
+  90th percentiles under the same draws as the targets (`ConsequenceAssessment::multi_month`,
+  read with `multi_month_blackout()`), is the number behind the `multi_month_blackout` row:
+  `power_curve_60_days()` returns it as the `(value, low, high)` that
+  `rr_hazards::HazardAssessment::add_power_curve` takes (awaiting: plan, which calls it after
+  assessing). Rare families never enter the curve, so nothing is counted twice.
+- **Hurricanes come in two parts** (v0.2.0): `cat12` and `major`, with fallback shares 0.94 and
+  0.06 that reproduce the earlier fixed split; when rr-hazards passes the county's own split (its
+  HURDAT2 major share: Utuado about 17 %, Asheville about 2 %) the rows use it
+  (awaiting: hazards).
+
 The calibration households use these rates (a year; `tests/support/research.rs`), set so that the
 shares reproduce the research's event classes. Compare them with rr-hazards' rates in
 `target/pipeline.md` to see where the two workstreams' numbers differ.
@@ -449,15 +707,15 @@ big windstorms, grid failure, Cascadia).
 | avalanche | supplies | slide | avalanches closing roads | 1 | 1 d | 4 d | prior |  | rr_risk_model_priors |
 | avalanche | get_home | slide | avalanches closing roads | 0.3 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | avalanche | evacuate | slide | avalanches closing roads | 0.05 | 2 d | 7 d | prior | warning 0.5–12 h | rr_risk_model_priors |
-| avalanche | home_loss | slide | avalanches closing roads | 0.01 | — | — | prior |  | rr_risk_model_priors |
+| avalanche | home_loss | slide | avalanches closing roads | 0.01 | 30 d | 180 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | coastal_flooding | evacuate | surge | flooding from the sea | 0.5 | 3 d | 30 d | prior | warning 12–72 h | rr_risk_model_priors |
-| coastal_flooding | home_loss | surge | flooding from the sea | 0.2 | — | — | prior |  | fema_nri_v120, rr_risk_model_priors |
-| coastal_flooding | water_boil | surge | flooding from the sea | 0.1 | 3 d | 10 d | prior | homes on public water | epa_boil_water_report_2024, rr_risk_model_priors |
-| coastal_flooding | power | surge | flooding from the sea | 0.3 | 1 d | 5 d | prior | in heat 0.2; in cold 0.3 | rr_risk_model_priors |
+| coastal_flooding | home_loss | surge | flooding from the sea | 0.2 | 30 d | 180 d | prior |  | fema_nri_v120, rr_risk_model_priors, census_pulse_displacement |
+| coastal_flooding | water_boil | surge | flooding from the sea | 0.1 | 3 d | 10 d | prior | homes on public water; scaled by how easily the water system breaks | epa_boil_water_report_2024, rr_risk_model_priors |
+| coastal_flooding | power | surge | flooding from the sea | 0.3 | 1 d | 5 d | prior | regional restoration: flood; in heat 0.2; in cold 0.3 | rr_risk_model_priors |
 | coastal_flooding | supplies | surge | flooding from the sea | 0.3 | 1 d | 5 d | prior |  | rr_risk_model_priors |
 | coastal_flooding | medication | surge | flooding from the sea | 0.1 | 5 d | 30 d | prior |  | rr_risk_model_priors |
 | cold_wave | power | extreme_cold | extreme cold straining the grid | 0.005 | 1 d | 3 d | prior | in cold 1 | rr_risk_model_priors |
-| cold_wave | water_boil | extreme_cold | extreme cold straining the grid | 0.003 | 7 d | 21 d | prior | homes on public water | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
+| cold_wave | water_boil | extreme_cold | extreme cold straining the grid | 0.003 | 7 d | 21 d | prior | homes on public water; scaled by how easily the water system breaks | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
 | cold_wave | water_out | extreme_cold | extreme cold straining the grid | 0.005 | 1 d | 5 d | prior |  | rr_risk_model_priors |
 | cold_wave | thermal | no_heating | cold waves in a home with no heating | 1 | 2 d | 5 d | prior | homes without heating; county events: cold_wave, extreme_cold, extreme_cold_wind_chill, cold_wind_chill | rr_risk_model_priors |
 | cold_wave | supplies | extreme_cold | extreme cold straining the grid | 0.1 | 1 d | 2 d | prior |  | rr_risk_model_priors |
@@ -469,24 +727,24 @@ big windstorms, grid failure, Cascadia).
 | earthquake | medication | shaking | earthquake shaking that knocks things off shelves | 0.07 | 2 d | 7 d | prior |  | rr_risk_model_priors |
 | earthquake | comms | shaking | earthquake shaking that knocks things off shelves | 0.3 | 12 h | 3 d | prior |  | rr_risk_model_priors |
 | earthquake | evacuate | shaking | earthquake shaking that knocks things off shelves | 0.02 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
-| earthquake | home_loss | shaking | earthquake shaking that knocks things off shelves | 0.02 | — | — | prior |  | fema_nri_v120, rr_risk_model_priors |
+| earthquake | home_loss | shaking | earthquake shaking that knocks things off shelves | 0.02 | 30 d | 365 d | prior |  | fema_nri_v120, rr_risk_model_priors, census_pulse_displacement |
 | earthquake | get_home | shaking | earthquake shaking that knocks things off shelves | 0.1 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | hail | power | local | short storm outages | 0.1 | 3 h | 10 h | prior | county outage records replace the county-wide part; in heat 0.3 | rr_risk_model_priors |
-| hail | home_loss | local | short storm outages | 0.002 | — | — | prior |  | rr_risk_model_priors |
+| hail | home_loss | local | short storm outages | 0.002 | 14 d | 60 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | heat_wave | power | heat_outage | heat waves straining the grid | 0.02 | 4 h | 20 h | prior | county outage records replace the county-wide part; in heat 1 | stone_2023_heat_blackout, rr_risk_model_priors |
 | heat_wave | thermal | no_cooling | heat waves in a home without air conditioning | 1 | 3 d | 7 d | prior | homes without air conditioning; county events: heat_wave, excessive_heat, heat | rr_risk_model_priors |
-| hurricane | power | cat12 | hurricanes and tropical storms | 0.45 | 1.5 d | 5 d | duration data, share prior | in heat 0.5 | ornl_repowrd_2022, rr_risk_model_priors |
-| hurricane | power | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 5 d | 16 d | duration data, share prior | in heat 0.5; dropped when *major_hurricane_direct_hit* is offered | ornl_repowrd_2022, rr_risk_model_priors |
-| hurricane | water_boil | cat12 | hurricanes and tropical storms | 0.15 | 6 d | 18 d | prior | homes on public water | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
-| hurricane | supplies | cat12 | hurricanes and tropical storms | 0.1 | 2 d | 5 d | prior |  | rr_risk_model_priors |
-| hurricane | supplies | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 5 d | 14 d | prior | dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
-| hurricane | medication | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 7 d | 21 d | prior | dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
-| hurricane | comms | cat12 | hurricanes and tropical storms | 0.1 | 12 h | 2 d | prior |  | rr_risk_model_priors |
-| hurricane | comms | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 3 d | 10 d | prior | dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
-| hurricane | evacuate | cat12 | hurricanes and tropical storms | 0.1 | 3 d | 14 d | prior | warning 24–72 h | rr_risk_model_priors |
+| hurricane | power | cat12 | hurricanes and tropical storms | 0.48 | 1.5 d | 5 d | duration data, share prior | share of the hurricanes and tropical storms below category 3 (part `cat12`); regional restoration: hurricane; in heat 0.5 | ornl_repowrd_2022, rr_risk_model_priors |
+| hurricane | power | cat3plus | major hurricanes (category 3 or a direct hit) | 1 | 5 d | 16 d | duration data, share prior | share of the major hurricanes (category 3 or a direct hit) (part `major`); regional restoration: hurricane; island grids: historic curve; in heat 0.5; dropped when *major_hurricane_direct_hit* is offered | ornl_repowrd_2022, rr_risk_model_priors |
+| hurricane | water_boil | cat12 | hurricanes and tropical storms | 0.16 | 6 d | 18 d | prior | share of the hurricanes and tropical storms below category 3 (part `cat12`); homes on public water; scaled by how easily the water system breaks | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
+| hurricane | supplies | cat12 | hurricanes and tropical storms | 0.11 | 2 d | 5 d | prior | share of the hurricanes and tropical storms below category 3 (part `cat12`) | rr_risk_model_priors |
+| hurricane | supplies | cat3plus | major hurricanes (category 3 or a direct hit) | 1 | 5 d | 14 d | prior | share of the major hurricanes (category 3 or a direct hit) (part `major`); dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
+| hurricane | medication | cat3plus | major hurricanes (category 3 or a direct hit) | 1 | 7 d | 21 d | prior | share of the major hurricanes (category 3 or a direct hit) (part `major`); dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
+| hurricane | comms | cat12 | hurricanes and tropical storms | 0.11 | 12 h | 2 d | prior | share of the hurricanes and tropical storms below category 3 (part `cat12`) | rr_risk_model_priors |
+| hurricane | comms | cat3plus | major hurricanes (category 3 or a direct hit) | 1 | 3 d | 10 d | prior | share of the major hurricanes (category 3 or a direct hit) (part `major`); dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
+| hurricane | evacuate | cat12 | hurricanes and tropical storms | 0.11 | 3 d | 14 d | prior | share of the hurricanes and tropical storms below category 3 (part `cat12`); warning 24–72 h | rr_risk_model_priors |
 | hurricane | evacuate | mobile_home | wind warnings for mobile homes | 0.2 | 2 d | 7 d | prior | mobile homes; warning 24–72 h | rr_risk_model_priors |
-| hurricane | home_loss | cat12 | hurricanes and tropical storms | 0.01 | — | — | prior |  | rr_risk_model_priors |
-| hurricane | home_loss | cat3plus | major hurricanes (category 3 or a direct hit) | 0.02 | — | — | prior | dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
+| hurricane | home_loss | cat12 | hurricanes and tropical storms | 0.011 | 14 d | 90 d | prior | share of the hurricanes and tropical storms below category 3 (part `cat12`) | rr_risk_model_priors, census_pulse_displacement |
+| hurricane | home_loss | cat3plus | major hurricanes (category 3 or a direct hit) | 0.33 | 60 d | 365 d | prior | share of the major hurricanes (category 3 or a direct hit) (part `major`); dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors, census_pulse_displacement |
 | ice_storm | power | local | short storm outages | 0.65 | 3 h | 10 h | prior | county outage records replace the county-wide part; in cold 1 | rr_risk_model_priors |
 | ice_storm | power | major | big ice storms | 0.1 | 1.5 d | 5 d | prior | in cold 1 | inquirer_peco_outages, rr_risk_model_priors |
 | ice_storm | power | record | an ice storm of record | 0.017 | 5 d | 14 d | prior | in cold 1 | rr_risk_model_priors |
@@ -498,13 +756,13 @@ big windstorms, grid failure, Cascadia).
 | landslide | supplies | slide | landslides closing roads | 0.5 | 1 d | 5 d | prior |  | rr_risk_model_priors |
 | landslide | power | slide | landslides closing roads | 0.1 | 12 h | 2 d | prior | in cold 0.5 | rr_risk_model_priors |
 | landslide | evacuate | damage | landslides damaging the home | 1 | 5 d | 60 d | prior | share of the landslides that damage the home (part `damage`); warning 0–2 h | rr_risk_model_priors |
-| landslide | home_loss | damage | landslides damaging the home | 1 | — | — | prior | share of the landslides that damage the home (part `damage`) | rr_risk_model_priors |
+| landslide | home_loss | damage | landslides damaging the home | 1 | 60 d | 365 d | prior | share of the landslides that damage the home (part `damage`) | rr_risk_model_priors, census_pulse_displacement |
 | landslide | get_home | slide | landslides closing roads | 0.1 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | lightning | power | local | short storm outages | 0.5 | 3 h | 10 h | prior | county outage records replace the county-wide part; in heat 0.3 | rr_risk_model_priors |
 | riverine_flooding | evacuate | flood | floods at or near the home | 0.3 | 3 d | 30 d | prior | warning 1–12 h | rr_risk_model_priors |
-| riverine_flooding | home_loss | flood | floods at or near the home | 0.15 | — | — | prior |  | fema_nri_v120, rr_risk_model_priors |
-| riverine_flooding | water_boil | flood | floods at or near the home | 0.1 | 3 d | 10 d | prior | homes on public water | epa_boil_water_report_2024, rr_risk_model_priors |
-| riverine_flooding | power | flood | floods at or near the home | 0.1 | 12 h | 3 d | prior | in heat 0.2; in cold 0.3 | rr_risk_model_priors |
+| riverine_flooding | home_loss | flood | floods at or near the home | 0.15 | 30 d | 180 d | prior |  | fema_nri_v120, rr_risk_model_priors, census_pulse_displacement |
+| riverine_flooding | water_boil | flood | floods at or near the home | 0.1 | 3 d | 10 d | prior | homes on public water; scaled by how easily the water system breaks | epa_boil_water_report_2024, rr_risk_model_priors |
+| riverine_flooding | power | flood | floods at or near the home | 0.1 | 12 h | 3 d | prior | regional restoration: flood; in heat 0.2; in cold 0.3 | rr_risk_model_priors |
 | riverine_flooding | supplies | flood | floods at or near the home | 0.2 | 1 d | 4 d | prior |  | rr_risk_model_priors |
 | riverine_flooding | medication | flood | floods at or near the home | 0.15 | 5 d | 30 d | prior |  | rr_risk_model_priors |
 | riverine_flooding | get_home | flood | floods at or near the home | 0.05 | — | — | prior | households with a commuter | rr_risk_model_priors |
@@ -515,28 +773,47 @@ big windstorms, grid failure, Cascadia).
 | tornado | supplies | path | tornadoes | 0.3 | 1 d | 3 d | prior |  | rr_risk_model_priors |
 | tornado | comms | path | tornadoes | 0.3 | 12 h | 2 d | prior |  | rr_risk_model_priors |
 | tornado | medication | path | tornadoes | 0.1 | 2 d | 7 d | prior |  | rr_risk_model_priors |
-| tornado | home_loss | path | tornadoes | 0.3 | — | — | prior |  | rr_risk_model_priors |
+| tornado | home_loss | path | tornadoes | 0.3 | 30 d | 180 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | tornado | evacuate | mobile_home | wind warnings for mobile homes | 0.5 | 1 d | 7 d | prior | mobile homes; warning 0.1–0.5 h | rr_risk_model_priors |
 | tsunami | evacuate | distant | tsunamis from distant earthquakes | 1 | 1 d | 7 d | prior | warning 2–12 h | rr_risk_model_priors |
-| tsunami | home_loss | distant | tsunamis from distant earthquakes | 0.1 | — | — | prior |  | rr_risk_model_priors |
+| tsunami | home_loss | distant | tsunamis from distant earthquakes | 0.1 | 30 d | 180 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | volcanic_activity | supplies | ash | volcanic ash | 0.5 | 2 d | 7 d | prior |  | rr_risk_model_priors |
 | volcanic_activity | evacuate | ash | volcanic ash | 0.2 | 5 d | 30 d | prior | warning 1–48 h | rr_risk_model_priors |
 | volcanic_activity | power | ash | volcanic ash | 0.2 | 1 d | 5 d | prior | in cold 0.4 | rr_risk_model_priors |
 | volcanic_activity | water_boil | ash | volcanic ash | 0.2 | 2 d | 7 d | prior | homes on public water | rr_risk_model_priors |
 | volcanic_activity | comms | ash | volcanic ash | 0.1 | 1 d | 3 d | prior |  | rr_risk_model_priors |
-| volcanic_activity | home_loss | ash | volcanic ash | 0.02 | — | — | prior |  | rr_risk_model_priors |
+| volcanic_activity | home_loss | ash | volcanic ash | 0.02 | 14 d | 90 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | wildfire | evacuate | threat | wildfires | 1 | 3 d | 30 d | prior | share of the wildfire warnings to leave (part `burn`); warning 0.25–12 h | rr_risk_model_priors |
 | wildfire | power | shutoff | wildfire safety power shutoffs | 1 | 1 d | 3 d | prior | share of the wildfire safety power shutoffs (part `shutoff`); in heat 0.3 | rr_risk_model_priors |
-| wildfire | supplies | smoke | wildfire smoke | 0.3 | 2 d | 7 d | prior |  | rr_risk_model_priors |
-| wildfire | home_loss | threat | wildfires | 0.05 | — | — | prior | share of the wildfire warnings to leave (part `burn`) | rr_risk_model_priors |
+| wildfire | home_loss | threat | wildfires | 0.05 | 180 d | 730 d | prior | share of the wildfire warnings to leave (part `burn`) | rr_risk_model_priors, census_pulse_displacement |
 | winter_weather | supplies | snowed_in | snow and ice storms | 1 | 1 d | 2 d | prior | county events: winter_weather, winter_storm, blizzard, heavy_snow | rr_risk_model_priors |
 | winter_weather | power | local | short storm outages | 0.3 | 3 h | 10 h | prior | county outage records replace the county-wide part; in cold 1 | rr_risk_model_priors |
 | winter_weather | comms | local | short storm outages | 0.02 | 10 h | 1.8 d | prior |  | rr_risk_model_priors |
 | winter_weather | get_home | snowed_in | snow and ice storms | 0.05 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| cold_wave | power | cold_emergency | a grid emergency in extreme cold (rolling blackouts) | 1 | 1.1 d | 1.9 d | duration data, share prior | places whose grid has failed in extreme cold; rate from `cold_emergency_rate`; regional restoration: cold_grid; in cold 1 | ornl_eagle_i_outages, rr_risk_model_priors |
+| cold_wave | water_boil | cold_emergency | a grid emergency in extreme cold (rolling blackouts) | 0.3 | 7 d | 21 d | prior | places whose grid has failed in extreme cold; homes on public water; scaled by how easily the water system breaks; rate from `cold_emergency_rate` | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
+| cold_wave | water_out | cold_emergency | a grid emergency in extreme cold (rolling blackouts) | 0.1 | 2 d | 10 d | prior | places whose grid has failed in extreme cold; homes on public water; scaled by how easily the water system breaks; rate from `cold_emergency_rate` | rr_risk_model_priors |
+| cold_wave | supplies | cold_emergency | a grid emergency in extreme cold (rolling blackouts) | 0.5 | 2 d | 5 d | prior | places whose grid has failed in extreme cold; rate from `cold_emergency_rate` | rr_risk_model_priors |
+| hurricane | water_out | cat12 | hurricanes and tropical storms | 0.032 | 3 d | 14 d | prior | share of the hurricanes and tropical storms below category 3 (part `cat12`); homes on public water; scaled by how easily the water system breaks | rr_risk_model_priors |
+| hurricane | water_out | cat3plus | major hurricanes (category 3 or a direct hit) | 0.5 | 7 d | 49 d | prior | share of the major hurricanes (category 3 or a direct hit) (part `major`); homes on public water; scaled by how easily the water system breaks; dropped when *major_hurricane_direct_hit* is offered | epa_asheville_boil_notice_2024, rr_risk_model_priors |
+| hurricane | water_boil | cat3plus | major hurricanes (category 3 or a direct hit) | 0.5 | 10 d | 45 d | prior | share of the major hurricanes (category 3 or a direct hit) (part `major`); homes on public water; scaled by how easily the water system breaks; dropped when *major_hurricane_direct_hit* is offered | epa_asheville_boil_notice_2024, shaffer_2026_texas_boil_notices, rr_risk_model_priors |
+| riverine_flooding | water_out | plant_flood | a flood that knocks out the water system | 0.005 | 7 d | 30 d | prior | homes on public water; scaled by how easily the water system breaks; county-scale: share of the county's damaging flood episodes | noaa_storm_events, epa_asheville_boil_notice_2024, rr_risk_model_priors |
+| riverine_flooding | water_boil | plant_flood | a flood that knocks out the water system | 0.005 | 14 d | 45 d | prior | homes on public water; scaled by how easily the water system breaks; county-scale: share of the county's damaging flood episodes | noaa_storm_events, epa_asheville_boil_notice_2024, rr_risk_model_priors |
+| riverine_flooding | evacuate | below_grade | flash flooding in rooms below street level | 0.3 | 2 d | 30 d | prior | homes where someone sleeps below street level; warning 0.05–1 h | nws_turn_around_dont_drown, rr_risk_model_priors |
+| coastal_flooding | water_out | plant_surge | storm surge that knocks out the water system | 0.01 | 5 d | 14 d | prior | homes on public water; scaled by how easily the water system breaks; county-scale: share of the county's damaging coastal_flood and storm_surge episodes | noaa_storm_events, rr_risk_model_priors |
+| coastal_flooding | water_boil | plant_surge | storm surge that knocks out the water system | 0.01 | 7 d | 21 d | prior | homes on public water; scaled by how easily the water system breaks; county-scale: share of the county's damaging coastal_flood and storm_surge episodes | noaa_storm_events, rr_risk_model_priors |
+| volcanic_activity | clean_air | ash | volcanic ash | 0.5 | 2 d | 7 d | prior |  | ready_gov_volcanoes, rr_risk_model_priors |
+| wildfire_smoke | clean_air | smoke | days of wildfire smoke | 1 | 2 d | 7 d | prior |  | cdc_wildfire_smoke, epa_wildfire_indoor_air, rr_risk_model_priors |
+| wildfire_smoke | supplies | smoke | days of wildfire smoke | 0.2 | 1 d | 4 d | prior |  | cdc_wildfire_smoke, rr_risk_model_priors |
+| dust_storm | clean_air | dust | dust storms | 1 | 3 h | 12 h | prior |  | nws_dust_storms, noaa_storm_events, rr_risk_model_priors |
+| dust_storm | supplies | dust | dust storms | 0.5 | 6 h | 1 d | prior |  | nws_dust_storms, noaa_storm_events, rr_risk_model_priors |
+| dust_storm | get_home | dust | dust storms | 0.3 | — | — | prior | households with a commuter | nws_dust_storms, noaa_storm_events, rr_risk_model_priors |
+| sinkhole | home_loss | collapse | ground collapsing or settling under the home | 0.2 | 30 d | 180 d | prior |  | usgs_sinkholes, census_pulse_displacement, rr_risk_model_priors |
+| sinkhole | evacuate | collapse | ground collapsing or settling under the home | 0.05 | 14 d | 90 d | prior | warning 0–24 h | usgs_sinkholes, rr_risk_model_priors |
 | pandemic | supplies | stay_home | a pandemic that disrupts shopping | 0.9 | 14 d | 45 d | prior |  | cdc_mmwr_stay_at_home_2020, cdc_pandemic_history, rr_risk_model_priors |
 | pandemic | medication | stay_home | a pandemic that disrupts shopping | 0.9 | 7 d | 30 d | prior |  | cdc_pandemic_history, rr_risk_model_priors |
-| grid_failure | power | regional | a regional blackout | 1 | 1 d | 3 d | prior | in heat 0.3; in cold 0.4 | rr_risk_model_priors |
-| grid_failure | water_out | regional | a regional blackout | 0.4 | 1 d | 3 d | prior | homes on public water | rr_risk_model_priors |
+| grid_failure | power | regional | a regional blackout | 1 | 1 d | 3 d | prior | regional restoration: grid; in heat 0.3; in cold 0.4 | rr_risk_model_priors |
+| grid_failure | water_out | regional | a regional blackout | 0.4 | 1 d | 3 d | prior | homes on public water; scaled by how easily the water system breaks | rr_risk_model_priors |
 | grid_failure | comms | regional | a regional blackout | 0.5 | 1 d | 3 d | prior |  | rr_risk_model_priors |
 | grid_failure | get_home | regional | a regional blackout | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | cyber_outage | medication | pharmacy_it | pharmacy or insurer computer outages | 1 | 5 d | 21 d | prior |  | rr_risk_model_priors |
@@ -551,32 +828,44 @@ big windstorms, grid failure, Cascadia).
 | hazmat_release | evacuate | release | chemical releases | 0.1 | 1 d | 3 d | prior | warning 0.1–2 h | rr_risk_model_priors |
 | nuclear_plant_incident | evacuate | release | a nuclear plant accident | 1 | 7 d | 60 d | prior | warning 1–12 h | rr_risk_model_priors |
 | nuclear_plant_incident | supplies | release | a nuclear plant accident | 1 | 1 d | 3 d | prior |  | rr_risk_model_priors |
-| nuclear_plant_incident | home_loss | release | a nuclear plant accident | 0.05 | — | — | prior |  | rr_risk_model_priors |
-| nuclear_attack | supplies | shelter | a nuclear attack | 1 | 1 d | 3 d | prior |  | ready_gov_nuclear, rr_risk_model_priors |
-| terrorism | supplies | lockdown | a terrorist attack | 0.3 | 12 h | 2 d | prior |  | rr_risk_model_priors |
-| terrorism | comms | lockdown | a terrorist attack | 0.2 | 12 h | 2 d | prior |  | rr_risk_model_priors |
-| terrorism | evacuate | lockdown | a terrorist attack | 0.05 | 1 d | 3 d | prior | warning 0–1 h | rr_risk_model_priors |
-| terrorism | security | lockdown | a terrorist attack | 0.5 | — | — | prior |  | rr_risk_model_priors |
+| nuclear_plant_incident | home_loss | release | a nuclear plant accident | 0.05 | 90 d | 730 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| hazmat_release | clean_air | release | chemical releases | 0.4 | 6 h | 1 d | prior |  | ready_gov_chemical, rr_risk_model_priors |
+| dam_failure | evacuate | release | a dam or levee failure, or the threat of one | 1 | 3 d | 30 d | prior | warning 0.25–6 h | fema_dam_residual_risk_2018, rr_risk_model_priors |
+| dam_failure | home_loss | release | a dam or levee failure, or the threat of one | 0.3 | 30 d | 180 d | prior |  | fema_dam_residual_risk_2018, census_pulse_displacement, rr_risk_model_priors |
+| dam_failure | power | release | a dam or levee failure, or the threat of one | 0.3 | 1 d | 7 d | prior |  | rr_risk_model_priors |
+| dam_failure | water_out | release | a dam or levee failure, or the threat of one | 0.2 | 7 d | 30 d | prior | homes on public water; scaled by how easily the water system breaks | rr_risk_model_priors |
+| network_outage | comms | network | phone or internet network outages | 1 | 6 h | 1 d | prior |  | fcc_att_outage_2024, rr_risk_model_priors |
+| drug_shortage | medication | shortage | a shortage of a daily prescription | 1 | 5 d | 21 d | prior |  | fda_drug_shortages, rr_risk_model_priors |
+| benefit_interruption | supplies | lapse | a lapse in food benefits | 1 | 10 d | 30 d | prior | households that rely on SNAP or WIC | me_dhhs_snap_2025, rr_risk_model_priors |
+| attack_disruption | supplies | lockdown | an attack or threat that closes your area | 1 | 12 h | 2 d | prior |  | rr_risk_model_priors |
+| attack_disruption | comms | lockdown | an attack or threat that closes your area | 0.3 | 12 h | 2 d | prior |  | rr_risk_model_priors |
+| attack_disruption | get_home | lockdown | an attack or threat that closes your area | 0.5 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| attack_disruption | security | lockdown | an attack or threat that closes your area | 0.5 | — | — | prior |  | rr_risk_model_priors |
+| attack_disruption | evacuate | lockdown | an attack or threat that closes your area | 0.05 | 1 d | 3 d | prior | warning 0–1 h | rr_risk_model_priors |
 | house_fire | evacuate | fire | a fire at home or next door | 1 | 3 d | 60 d | prior | warning 0.02–0.1 h | usfa_residential_fires, rr_risk_model_priors |
 | house_fire | fire | fire | a fire at home or next door | 1 | — | — | data |  | usfa_residential_fires |
-| house_fire | home_loss | fire | a fire at home or next door | 0.5 | — | — | prior |  | usfa_residential_fires, census_pulse_displacement, rr_risk_model_priors |
+| house_fire | home_loss | fire | a fire at home or next door | 0.5 | 60 d | 365 d | prior |  | usfa_residential_fires, census_pulse_displacement, rr_risk_model_priors |
 | house_fire | medication | fire | a fire at home or next door | 1 | 5 d | 30 d | prior |  | rr_risk_model_priors |
 | medical_emergency | medical_emergency | emergency | medical emergencies | 1 | — | — | data |  | cdc_nchs_ed_visits |
 | vehicle_stranding | get_home | stranded | being stranded by a breakdown or closed roads | 1 | — | — | prior |  | rr_risk_model_priors |
 | local_utility_outage | water_out | pressure_loss | water main breaks | 0.667 | 6 h | 1 d | prior | homes on public water | epa_boil_water_report_2024, rr_risk_model_priors |
-| local_utility_outage | water_boil | notice | local water problems | 0.333 | 2 d | 6 d | prior | homes on public water; county events: boil_water_notice, boil_water | shaffer_2026_texas_boil_notices, water_2024_kentucky_advisories, rr_risk_model_priors |
-| local_utility_outage | water_out | system_failure | a major water system failure | 0.0267 | 7 d | 30 d | prior | homes on public water | epa_asheville_boil_notice_2024, rr_risk_model_priors |
+| local_utility_outage | water_boil | notice | local water problems | 0.333 | 2 d | 6 d | prior | homes on public water; scaled by how easily the water system breaks; county events: boil_water_notice, boil_water | shaffer_2026_texas_boil_notices, water_2024_kentucky_advisories, rr_risk_model_priors |
+| local_utility_outage | water_out | system_failure | a major water system failure | 0.0267 | 7 d | 30 d | prior | homes on public water; scaled by how easily the water system breaks | epa_asheville_boil_notice_2024, rr_risk_model_priors |
 | local_utility_outage | evacuate | gas_leak | gas leaks and building emergencies | 0.02 | 1 d | 5 d | prior | warning 0.1–1 h | rr_risk_model_priors |
 | local_utility_outage | medication | gas_leak | gas leaks and building emergencies | 0.02 | 5 d | 30 d | prior |  | rr_risk_model_priors |
 | burglary | security | break_in | break-ins | 1 | — | — | prior |  | rr_risk_model_priors |
 | extended_household_illness | medical_emergency | illness | a long illness at home | 0.5 | — | — | prior |  | rr_risk_model_priors |
+| local_utility_outage | water_boil | system_failure | a major water system failure | 0.0267 | 14 d | 45 d | prior | homes on public water; scaled by how easily the water system breaks | epa_asheville_boil_notice_2024, rr_risk_model_priors |
+| water_damage | water_out | leak | a burst pipe or leak at home | 1 | 6 h | 2 d | prior |  | iii_water_damage_protect, rr_risk_model_priors |
+| water_damage | home_loss | leak | a burst pipe or leak at home | 0.05 | 14 d | 60 d | prior |  | iii_water_damage_protect, census_pulse_displacement, rr_risk_model_priors |
+| eviction | home_loss | eviction | an eviction | 1 | 30 d | 90 d | prior |  | eviction_lab_national, rr_risk_model_priors |
 | *cascadia_m9* (coast) | power | event | a magnitude 9 Cascadia earthquake | 1 | 90 d | 180 d | prior | in cold 0.4; relief: help 14 d, mostly restored 180 d | oregon_resilience_plan_2013 |
 | *cascadia_m9* (coast) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 365 d | 1095 d | prior | homes on public water; relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013 |
 | *cascadia_m9* (coast) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 90 d | 270 d | prior | homes on a private well; relief: help 14 d, mostly restored 270 d | oregon_resilience_plan_2013, rr_risk_model_priors |
 | *cascadia_m9* (coast) | supplies | event | a magnitude 9 Cascadia earthquake | 1 | 21 d | 60 d | prior | relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013, rr_risk_model_priors |
 | *cascadia_m9* (coast) | medication | event | a magnitude 9 Cascadia earthquake | 1 | 30 d | 90 d | prior | relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013, rr_risk_model_priors |
 | *cascadia_m9* (coast) | comms | event | a magnitude 9 Cascadia earthquake | 1 | 14 d | 60 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
-| *cascadia_m9* (coast) | home_loss | event | a magnitude 9 Cascadia earthquake | 0.1 | — | — | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (coast) | home_loss | event | a magnitude 9 Cascadia earthquake | 0.1 | 180 d | 730 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors, census_pulse_displacement |
 | *cascadia_m9* (coast) | get_home | event | a magnitude 9 Cascadia earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | *cascadia_m9* (valley) | power | event | a magnitude 9 Cascadia earthquake | 1 | 30 d | 90 d | prior | in cold 0.4; relief: help 3 d, mostly restored 90 d | oregon_resilience_plan_2013 |
 | *cascadia_m9* (valley) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 30 d | 365 d | prior | homes on public water; relief: help 3 d, mostly restored 365 d | oregon_resilience_plan_2013 |
@@ -584,25 +873,25 @@ big windstorms, grid failure, Cascadia).
 | *cascadia_m9* (valley) | supplies | event | a magnitude 9 Cascadia earthquake | 1 | 7 d | 21 d | prior | relief: help 3 d, mostly restored 365 d | oregon_resilience_plan_2013, rr_risk_model_priors |
 | *cascadia_m9* (valley) | medication | event | a magnitude 9 Cascadia earthquake | 1 | 14 d | 60 d | prior | relief: help 3 d, mostly restored 540 d | oregon_resilience_plan_2013, rr_risk_model_priors |
 | *cascadia_m9* (valley) | comms | event | a magnitude 9 Cascadia earthquake | 1 | 7 d | 30 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
-| *cascadia_m9* (valley) | home_loss | event | a magnitude 9 Cascadia earthquake | 0.05 | — | — | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (valley) | home_loss | event | a magnitude 9 Cascadia earthquake | 0.05 | 90 d | 730 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors, census_pulse_displacement |
 | *cascadia_m9* (valley) | get_home | event | a magnitude 9 Cascadia earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | *local_tsunami* | evacuate | event | a tsunami from a nearby earthquake | 1 | 3 d | 90 d | prior | warning 0.25–0.33 h | dogami_tsunami_faq, rr_risk_model_priors |
-| *local_tsunami* | home_loss | event | a tsunami from a nearby earthquake | 0.5 | — | — | prior |  | rr_risk_model_priors |
-| *major_hurricane_direct_hit* | power | event | a direct hit by a major hurricane | 1 | 5 d | 16 d | data | in heat 0.5 | ornl_repowrd_2022 |
-| *major_hurricane_direct_hit* | water_out | event | a direct hit by a major hurricane | 0.5 | 7 d | 49 d | prior | homes on public water | epa_asheville_boil_notice_2024, rr_risk_model_priors |
-| *major_hurricane_direct_hit* | water_boil | event | a direct hit by a major hurricane | 0.5 | 6 d | 18 d | prior | homes on public water | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
+| *local_tsunami* | home_loss | event | a tsunami from a nearby earthquake | 0.5 | 180 d | 730 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *major_hurricane_direct_hit* | power | event | a direct hit by a major hurricane | 1 | 5 d | 16 d | data | regional restoration: hurricane; island grids: historic curve; in heat 0.5 | ornl_repowrd_2022 |
+| *major_hurricane_direct_hit* | water_out | event | a direct hit by a major hurricane | 0.5 | 7 d | 49 d | prior | homes on public water; scaled by how easily the water system breaks | epa_asheville_boil_notice_2024, rr_risk_model_priors |
+| *major_hurricane_direct_hit* | water_boil | event | a direct hit by a major hurricane | 0.5 | 10 d | 45 d | prior | homes on public water; scaled by how easily the water system breaks | shaffer_2026_texas_boil_notices, epa_asheville_boil_notice_2024, rr_risk_model_priors |
 | *major_hurricane_direct_hit* | supplies | event | a direct hit by a major hurricane | 1 | 5 d | 14 d | prior |  | rr_risk_model_priors |
 | *major_hurricane_direct_hit* | medication | event | a direct hit by a major hurricane | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
 | *major_hurricane_direct_hit* | comms | event | a direct hit by a major hurricane | 1 | 2 d | 7 d | prior |  | rr_risk_model_priors |
 | *major_hurricane_direct_hit* | evacuate | event | a direct hit by a major hurricane | 0.8 | 5 d | 30 d | prior | warning 24–72 h | rr_risk_model_priors |
-| *major_hurricane_direct_hit* | home_loss | event | a direct hit by a major hurricane | 0.3 | — | — | prior |  | rr_risk_model_priors |
+| *major_hurricane_direct_hit* | home_loss | event | a direct hit by a major hurricane | 0.3 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | *new_madrid_m7* | power | event | a magnitude 7 New Madrid earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
 | *new_madrid_m7* | water_out | event | a magnitude 7 New Madrid earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
 | *new_madrid_m7* | water_out | event | a magnitude 7 New Madrid earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
 | *new_madrid_m7* | supplies | event | a magnitude 7 New Madrid earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
 | *new_madrid_m7* | medication | event | a magnitude 7 New Madrid earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
 | *new_madrid_m7* | comms | event | a magnitude 7 New Madrid earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
-| *new_madrid_m7* | home_loss | event | a magnitude 7 New Madrid earthquake | 0.1 | — | — | prior |  | rr_risk_model_priors |
+| *new_madrid_m7* | home_loss | event | a magnitude 7 New Madrid earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | *new_madrid_m7* | evacuate | event | a magnitude 7 New Madrid earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
 | *new_madrid_m7* | get_home | event | a magnitude 7 New Madrid earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | *hayward_m7* | power | event | a magnitude 7 Hayward fault earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.3 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
@@ -611,9 +900,39 @@ big windstorms, grid failure, Cascadia).
 | *hayward_m7* | supplies | event | a magnitude 7 Hayward fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
 | *hayward_m7* | medication | event | a magnitude 7 Hayward fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
 | *hayward_m7* | comms | event | a magnitude 7 Hayward fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
-| *hayward_m7* | home_loss | event | a magnitude 7 Hayward fault earthquake | 0.1 | — | — | prior |  | rr_risk_model_priors |
+| *hayward_m7* | home_loss | event | a magnitude 7 Hayward fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | *hayward_m7* | evacuate | event | a magnitude 7 Hayward fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
 | *hayward_m7* | get_home | event | a magnitude 7 Hayward fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *wasatch_m7* | power | event | a magnitude 7 Wasatch fault earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *wasatch_m7* | water_out | event | a magnitude 7 Wasatch fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *wasatch_m7* | water_out | event | a magnitude 7 Wasatch fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *wasatch_m7* | supplies | event | a magnitude 7 Wasatch fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *wasatch_m7* | medication | event | a magnitude 7 Wasatch fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *wasatch_m7* | comms | event | a magnitude 7 Wasatch fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *wasatch_m7* | home_loss | event | a magnitude 7 Wasatch fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *wasatch_m7* | evacuate | event | a magnitude 7 Wasatch fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *wasatch_m7* | get_home | event | a magnitude 7 Wasatch fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *seattle_fault_m7* | power | event | a magnitude 7 Seattle fault earthquake | 1 | 3 d | 14 d | prior | in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *seattle_fault_m7* | water_out | event | a magnitude 7 Seattle fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *seattle_fault_m7* | water_out | event | a magnitude 7 Seattle fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *seattle_fault_m7* | supplies | event | a magnitude 7 Seattle fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *seattle_fault_m7* | medication | event | a magnitude 7 Seattle fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *seattle_fault_m7* | comms | event | a magnitude 7 Seattle fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *seattle_fault_m7* | home_loss | event | a magnitude 7 Seattle fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *seattle_fault_m7* | evacuate | event | a magnitude 7 Seattle fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *seattle_fault_m7* | get_home | event | a magnitude 7 Seattle fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *san_andreas_south_m78* | power | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.3 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *san_andreas_south_m78* | water_out | event | a magnitude 7.8 southern San Andreas earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *san_andreas_south_m78* | water_out | event | a magnitude 7.8 southern San Andreas earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *san_andreas_south_m78* | supplies | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *san_andreas_south_m78* | medication | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *san_andreas_south_m78* | comms | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *san_andreas_south_m78* | home_loss | event | a magnitude 7.8 southern San Andreas earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *san_andreas_south_m78* | evacuate | event | a magnitude 7.8 southern San Andreas earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *san_andreas_south_m78* | get_home | event | a magnitude 7.8 southern San Andreas earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *heat_blackout* | power | event | a blackout during a heat wave | 1 | 2 d | 5 d | prior | in heat 1 | stone_2023_heat_blackout, rr_risk_model_priors |
+| *heat_blackout* | thermal | event | a blackout during a heat wave | 1 | 3 d | 7 d | prior | homes without air conditioning; county events: heat_wave, excessive_heat, heat | rr_risk_model_priors |
+| *heat_blackout* | supplies | event | a blackout during a heat wave | 0.5 | 1 d | 3 d | prior |  | rr_risk_model_priors |
 
 | Income stream | Per earner | Spell median | Spell bad case | Unemployment insurance | Evidence | Sources |
 |---|---|---|---|---|---|---|
@@ -623,11 +942,18 @@ big windstorms, grid failure, Cascadia).
 | *major_hurricane_direct_hit*: the local economy after a major hurricane | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *new_madrid_m7*: the regional economy after a New Madrid earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *hayward_m7*: the regional economy after a Hayward fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *wasatch_m7*: the regional economy after a Wasatch fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *seattle_fault_m7*: the regional economy after a Seattle fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *san_andreas_south_m78*: the regional economy after a southern San Andreas earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| benefit_interruption: federal pay or benefits that stop | 1 | 2 wk | 6 wk | no | prior | cfpb_shutdown_2013, rr_risk_model_priors |
+| arrest_or_detention: an arrest or detention | 1 | 1 wk | 6 wk | no | prior | fbi_cde_arrests, rr_risk_model_priors |
 
 | Hazard | Part | Events it counts | Share when no split is passed | Why |
 |---|---|---|---|---|
 | wildfire | `burn` | wildfire warnings to leave | 0.15 | rr-hazards: NRI burn probability x residents exposed x 20 households warned per home that burns (model review M-06: these used to be added to the shutoffs and re-split 15/85, which undercounted evacuations 4 to 7 times). |
 | wildfire | `shutoff` | wildfire safety power shutoffs | 0.85 | rr-hazards: 0.02 a year in the western shutoff states (less in cities), none elsewhere. |
+| hurricane | `cat12` | hurricanes and tropical storms below category 3 | 0.94 | rr-hazards: the county's hurricane rate times the share of HURDAT2 passages below major strength (shrunk toward the pooled 5.4 %), times the category 1-2 footprint. The fallback 0.94 reproduces the fixed split used before the county split was passed (model review M-10). |
+| hurricane | `major` | major hurricanes (category 3 or a direct hit) | 0.06 | rr-hazards: the county's hurricane rate times its share of major passages (HURDAT2, shrunk toward the pooled 5.4 %), times the major-storm footprint; Utuado's is about 17 %, Asheville's about 2 %. Offered as the major-hurricane scenario on the Gulf and Atlantic coasts, which then replaces these rows. |
 | landslide | `damage` | landslides that damage the home | 0.1 | rr-hazards: exposed residents x NRI loss ratio / damage ratio 0.3, bounded by NRI's expected annual loss over the county's building value and by 1 in 100 a year (the high-risk flood-zone yardstick); roads cut off are 10 times as many (3 to 30). |
 
 | Scenario | Parent hazard whose ordinary rows give up the scenario's long-run share | Why |
@@ -635,6 +961,21 @@ big windstorms, grid failure, Cascadia).
 | *cascadia_m9* | earthquake | The county earthquake rate includes Cascadia's own shaking (0.41 %/yr near Coos Bay, the long-run recurrence). |
 | *hayward_m7* | earthquake | The Bay Area earthquake rate includes Hayward fault ruptures. |
 | *new_madrid_m7* | earthquake | The county earthquake rate includes New Madrid ruptures. |
+| *wasatch_m7* | earthquake | The Wasatch Front earthquake rate includes Wasatch fault ruptures. |
+| *seattle_fault_m7* | earthquake | The Puget Sound earthquake rate includes Seattle fault ruptures (and Cascadia's, taken out separately). |
+| *san_andreas_south_m78* | earthquake | The southern California earthquake rate includes southern San Andreas ruptures. |
+| *heat_blackout* | heat_wave | The county's heat-wave rate includes the heat waves that come with a blackout of a day or more. |
+
+| Water failure on record (stress line) | Bucket | States | Began | Median | 9 in 10 back | Sources |
+|---|---|---|---|---|---|---|
+| Hurricane Helene, Asheville, North Carolina | water_out | NC | 2024-09-27 | 18 d | 21 d | avl_watchdog_water_2024, nchn_asheville_water_2024 |
+| Hurricane Helene, Asheville, North Carolina | water_boil | NC | 2024-09-27 | 52 d | 52 d | epa_asheville_boil_notice_2024 |
+| the Jackson water crisis, Jackson, Mississippi | water_boil | MS | 2022-07-29 | 48 d | 48 d | npr_jackson_boil_2022 |
+| the Jackson water crisis, Jackson, Mississippi | water_out | MS | 2022-08-29 | 7 d | 10 d | npr_jackson_water_restored_2022 |
+| Superstorm Sandy, Long Beach, New York | water_out | NY | 2012-10-29 | 13 d | 13 d | cbs_long_beach_water_2012 |
+| Winter Storm Uri, Austin, Texas | water_boil | TX | 2021-02-17 | 6 d | 6 d | kut_austin_boil_2021 |
+| Hurricane Maria, Puerto Rico | water_out | PR | 2017-09-20 | 68 d | 150 d | kishore_2018_maria |
+| the August 2003 Northeast blackout, Cleveland, Ohio | water_boil | OH | 2003-08-14 | 3 d | 3 d | cleveland19_blackout_2003 |
 <!-- effects-table:end -->
 
 ### County overrides
@@ -657,6 +998,34 @@ big windstorms, grid failure, Cascadia).
   Guam, the Northern Mariana Islands) are county-wide outages a third of short storm outages at
   2 h / 20 h (the Philadelphia fit, prior). Recorded in `overrides`; `ornl_eagle_i_outages` joins
   the power bucket's sources.
+- **Regional outage records** (v0.2.0; model review M-01, M-02). With the data pack's regional
+  outage model, county-wide storm outages happen at the pool's rate with the blended regional
+  tail: the rates of outages lasting 1, 3, 7, 14 and 30 days per customer-year, each the county's
+  own blended with its neighbours' within 400 km (800 km from a week) by a credibility weight
+  (λ̂ = Z·λ_county + (1 − Z)·λ_region, Z = E/(E + 5) with E the qualifying events a county like
+  this one would expect in its own record; `agent/data-model`), over the pool's rate of outages of
+  any length (at least twice the one-day rate, where a county's own record is thin: Manhattan's
+  underground grid records none), with the county's own median and 90th-percentile hours for the
+  part under a day. The pool leaves out outages attributed to hurricanes, wildfires, floods,
+  cold-driven grid emergencies and other grid failures: their own rows carry them, so the
+  hurricane double count is gone (M-10). The pooled outages are shown under the storm hazards by
+  the county's recorded causes (wind, ice, winter, heat; the cause-not-recorded share follows the
+  short-outage split, M-18), and the heat share of the county's outage hours (days of 95 °F or
+  more, nClimGrid-Daily) replaces the rows' fixed heat shares when the pack has it (M-11). The
+  power bucket says whose records these are ("blended with about 450 nearby counties'"). Linn
+  County, Iowa, goes from 10 days (the 2020 derecho in its own record) to 5; Oklahoma City from
+  10 to 7.
+- **Fallback, said out loud.** Without the regional model the county's own statistics are used
+  as before (or its state's series, V-15), the power bucket says "only your county's own outage
+  records", and the range is widened one ladder step at the high end (a structural gap, M-14).
+- **Regional restoration** (v0.2.0; M-10). A power row with a `curve_class` (hurricane,
+  cold_grid, flood, grid) is stretched by its region's restoration factor, the region's time to
+  90 % restored for that cause over the mainland's (bounded 0.5 to 5), where the region's curve
+  pools at least five major county events: Puerto Rico's hurricane factor is about 4.5, the
+  southern Great Plains' 1.6, the Northeast's 0.76. On an island grid with a hand-copied historic
+  curve, the major-hurricane rows take that curve itself: Maria for Puerto Rico (half the
+  customers back after about 90 days, nine in ten after about 170), Irma and Maria for the US
+  Virgin Islands. San Juan's power target goes from a month to 3 months.
 - **County event records.** A `county.events` entry whose key is in a row's `event_keys` and that
   has `median_days` replaces the row's duration (its `p90_days` too, or the row's ratio): snow-ins
   (`winter_storm` …), heat and cold spells for homes without cooling or heating (`heat`,
@@ -678,6 +1047,8 @@ something for the household.
 | `cooling_needs_power` | central or window air conditioning | power cuts during dangerous heat (each row's `heat_share`) become dangerous-heat days | rr-consequence |
 | `no_cooling` | no air conditioning | heat waves themselves are dangerous-heat days (3 d / 7 d, or county records) | rr-consequence |
 | `refrigerated_medicine` | anyone with refrigerated medicine | power cuts longer than a day interrupt medicine (with the same floor where the table has a medicine row for the event) | rr-consequence |
+| `public_water_power` | public water (not a pumped high-rise) | power cuts past 3 days (a system's backup power) stop the water for 0.1 × the fragility multiplier of households; where the event has its own no-water rows, those last at least as long as the power cut past 3 days (co-monotone) | rr-consequence |
+| gas range | `housing.cooking` is gas (or a gas stove is listed as owned) | boil-water notices are covered while the gas flows | rr-consequence |
 | `mobile_home` | mobile home | evacuation for hurricane winds and tornado warnings | rr-consequence |
 | `commute` | anyone who commutes | walk home at 3 mph, half a litre of water an hour in heat; get-home events count | rr-consequence |
 | `rural_ems` | rural setting | a sentence on slower ambulances (`mell_2017_ems_response`) | rr-consequence |
@@ -685,6 +1056,115 @@ something for the household.
 | `infant`, `pets` | an infant; any pets | water +50 % and formula; pet water, food and carriers | note for rr-supply |
 | `powered_device`, `senior`, `renter_no_generator` | a powered device; someone 65+; renting | harm weight ×3 on power; thermal weight; no generator or transfer switch | note for rr-budget |
 | `attached_housing` | rowhouse or apartment | fire rate ×2 | note for rr-hazards |
+
+### Water-system fragility (v0.2.0)
+
+Model review M-03: no flood or storm row could take out the tap water, and nothing measured how
+fragile a system already is (Asheville 3 days against weeks, Jackson 3 against 7, Long Beach 3
+against 13). Rows marked `fragile` (public water only) have their share scaled by a multiplier:
+
+- **the county's record**: ×0.5 where no public-water customer is on a system with a
+  health-based violation in five years (EPA SDWIS, `epa_echo_sdwa`), rising linearly to ×3 where
+  all are; the population-weighted mean share is about 0.19, so the national rate holds on
+  average (×0.96). Narrower than the review's ×0.5 to ×5 because a violation is a compliance
+  record: one large system flips a county (all five New York City counties show 1.0 for one
+  reservoir-cover case), and a five-year window can include the failure itself (Buncombe's 0.94
+  is mostly after Helene; its record before was clean);
+- **the household's answer** (`housing.water_system_record`): fine ×0.5, a notice or problem now
+  and then ×1.5, frequent problems ×3 (the review's "out, or under a notice, for more than a week
+  in ten years"), unknown ×1;
+- together bounded ×0.25 to ×9, with one shared uncertainty draw (×/÷2) for every fragile row, so
+  their draws move together (M-14).
+
+Fragile rows: local water problems' boil notices and the major system failure (7 d / 30 d out,
+14 d / 45 d boil after it; Asheville and Jackson anchor the bad cases); a flood or storm surge
+that shuts the water plant (county-scale: 1 in 200 of the county's damaging river floods and 1
+in 100 damaging coastal floods in NOAA Storm Events, 7 d / 30 d and 5 d / 14 d, Long Beach's 13
+days anchoring the surge bad case); hurricanes (3 % of lesser storms, 3 d / 14 d; half of major
+hits, 7 d / 49 d, with a 10 d / 45 d boil notice); a grid emergency in extreme cold (below); a
+regional blackout's pressure loss; boil notices after floods and surge. The water buckets say
+what the multiplier rests on, and where nothing is known (no county record, no answer): "We have
+no record of how your public water system has held up, so this is an estimate that could be too
+short", with the range widened one step.
+
+### Grid emergencies in extreme cold (v0.2.0)
+
+Model review M-11: Uri was one event that took power, heat, water and roads together; the model
+had its power in the county record and its water as a cold-wave row at 1 in 300 per episode. A
+`cold_emergency` class under cold waves now runs at a fixed PRIOR rate of 1 in 30 a year (1 in 60
+to 1 in 15) where the county's records show a cold-driven grid emergency (the regional model's
+`cold_grid` cause), or, without those records, in the ERCOT, SPP and MISO-South states: power
+(half back in 1.1 days, nine in ten in 1.9: the pooled EAGLE-I record of 269 such events, stretched
+by the region's factor; the review had guessed 2 to 4 days; every such cut is in the cold, so homes
+whose heat needs power face dangerous cold), a boil notice for 3 in 10 public-water homes (Texas
+winter median 7 days), no tap water for 1 in 10 (2 d / 10 d), and iced roads for half. The pooled
+tail leaves these outages out, so they are counted once.
+
+### Blackouts during heat waves (v0.2.0)
+
+The heat-plus-outage class of M-11 is rr-hazards' named scenario `heat_blackout` (from
+agent/hazards2): a power cut of a day or more that starts during a heat wave, offered
+and on by default in the 44 counties with 60 or more days a year over 95 °F (Maricopa, Pima,
+Clark ...), at the county's heat-wave rate times the chance a day-long outage overlaps a
+three-day episode. Its rows here: power for two days, back over the next three (median 2 d, 90th
+percentile 5 d: the design Stone et al. 2023 studied, PRIOR), every hour of it in dangerous heat,
+so an air-conditioned home's heat need lasts exactly as long as the power cut and wells,
+high-rise pumps, refrigerated medicine and public water follow through the usual links; the heat
+wave itself (3 d / 7 d) for homes without air conditioning; stores dark for half (1 d / 3 d). An
+`[[overlap]]` takes the scenario's share out of the ordinary heat waves, as rr-hazards' heat card
+does, so each heat wave is counted once. The ordinary power cuts on hot days stay in the pooled
+county record, with the county's own share of outage hours on days of 95 °F or more (above);
+there is no second, overlapping class. At about 1 in 1,000 a year the scenario does not move a
+target at the default setting ("Does not change your targets at this setting"); it matters only at
+the more cautious settings.
+
+### Clean air (v0.2.0)
+
+The 15th bucket, `clean_air` (readiness): the ten-year chance of needing clean air at home, from
+wildfire-smoke episodes, dust storms, volcanic ash and chemical releases (shelter in place), and
+the unhealthy-air days a year for the sentence: the county's smoke days (PM2.5 of 35 or more,
+NOAA HMS and EPA AQS, 2016-2023) where the pack has them, plus the model's dust, ash and fume
+days; otherwise every episode times its typical length. The checklist (a room you can seal, an
+air cleaner or box-fan filter, respirators) is sized by rr-supply.
+
+### Evacuation and displacement (v0.2.0)
+
+Model review M-08. The short end of the warning band is the least warning among causes (terms
+summed by hazard, a scenario under its family) whose own ten-year chance is at least 1 in 1,000,
+and the sentence names it; when something with no warning sets it (a fire at home, an
+earthquake), the two fastest of the hazards that give minutes or hours (wildfire, flash flooding,
+tsunami, a chemical release, a dam or levee failure, a sinkhole; the more likely first on a tie)
+get their own sentence (Lahaina: "For chemical spills and releases, plan for as little as a few
+minutes of warning; for tsunamis, 15 minutes"). The long end is
+the most warning among terms with at least 5 % of the rate. "Plan to be away" stays the median
+(the go-bag's horizon), and the likely cause with the longest time away gets a sentence ("after a
+wildfire you could be away for a month or more"). Home loss adds the displacement estimate: if
+damage forced the household out, the months by which nine in ten households like it would be home
+(the 90th percentile of the home-loss rows' displacement durations, weighted by how often each
+cause happens), and what living elsewhere that long costs at 30 % of monthly expenses: what
+loss-of-use insurance pays for. The IHP table (months away by incident type) replaces the
+displacement durations when it lands (awaiting: data-model).
+
+### The worst event on record (v0.2.0)
+
+`BucketAssessment::stress_test` (model review Part 3.3): for power, the worst event in the
+county's region from the regional outage table (the event with the most customers still out a
+week after the peak, as recorded where it was worst; Maria for Puerto Rico from the historic
+table), with the share of all customers still out at 1, 3, 7, 14 and 30 days, and
+`covered_by_target` when nine in ten of the households it reached were back by the target (the
+backtest's "covered" rule). For the water buckets (public water only), the worst documented
+failure in the state from the effects table's `[[water_event]]` list (the backtest's water
+events: Asheville 2024, Jackson 2022, Long Beach 2012, Austin 2021, Puerto Rico 2017, Cleveland
+2003), because the data pack has no water-outage records. The bucket's sentences say it.
+
+### Needs that come together (v0.2.0)
+
+DESIGN §4.7's simultaneous-need check: for each event class that sets a duration target,
+`ConsequenceAssessment::simultaneous` lists every duration need the same event brings, at the
+design event's severity (the setting bucket's survival level read off each other bucket's
+duration for that event, the couplings' co-monotone convention) and with the chance the event
+brings it at all. rr-budget compares the stored water, food and fuel with it (a warning, never a
+block).
 
 ### The dial and the targets
 
@@ -731,7 +1211,12 @@ For every duration bucket, Λ_b(d) = Σ r_h · q_{h,b} · S_{h,b}(d) (thresholds
   1-in-100 setting the ten-year chance is 26 to 39 in 100 for ten of the twelve fixture and
   backtest households (Philadelphia 36; the review's hand calculation gave 32) and about 20 in 100
   for Coos Bay and Miami, where one named scenario drives most targets at once. The packet, the
-  CLI and the web app say "roughly 1 in 3" (the canonical dial sentence).
+  CLI and the web app say "roughly 1 in 3" (the canonical dial sentence); since v0.2.0
+  `ConsequenceAssessment::dial_sentence()` computes the household's own ("about 3 in 10 will face
+  at least one kind that runs past its target") for rr-plan to print (awaiting: plan).
+- **Rounding note** (v0.2.0, M-15): where the raw target sits less than 15 % past the step below
+  the ladder target, the bucket says so ("This rounds up to 5 days: before rounding it is about
+  3.2 days, just past 3 days").
 
 ### Ranges
 
@@ -743,7 +1228,10 @@ a fixed constant and the parameter's name. So the ranges are deterministic, addi
 row never reshuffles another parameter's draws, a coupled term shares its source's draws, and the
 10th and 90th percentiles move with the dial in the same direction as the target. `low`/`high`
 are the 10th and 90th percentiles of the ladder target over the draws, widened to include the
-central value. The one or two inputs that move the target most (one at a time, each at its 10th
+central value, and one more ladder step at the high end where the target rests on a fallback (no
+regional outage records, nothing known about the water system; model review M-14: the backtest's
+misses sat above the high end because a mechanism was missing, which no parameter draw shows).
+Every fragile row shares one draw of the water-system multiplier. The one or two inputs that move the target most (one at a time, each at its 10th
 and 90th percentile) are named in the bucket's last frequency sentence.
 
 Timing of one `assess` call (`cargo run -p rr-consequence --example calibrate --release` for
@@ -762,7 +1250,10 @@ within a factor of 3 of the dial rate, and (3) makes the target jump between the
 and a neighbouring one: it grows at least as fast as the square of the dial's return period
 (elasticity ln(t₂/t₁)/ln(rate₁/rate₂) ≥ 2) and by 3 days or more. The third condition keeps ordinary heavy
 tails (chemical do-not-drink notices, a store shortage at 1-in-10) from being called cliffs; a
-log-normal tail gives an elasticity near 1. The warning gives the targets at the chosen setting and
+log-normal tail gives an elasticity near 1; since v0.2.0 both targets must be at least half a day,
+so a target that appears from nothing at the next setting (none at 1 in 10, 5 days at 1 in 50) is
+the dial at work, not a cliff (M-15). `DialPoint::cliff` marks the settings where the rule fires,
+so the sweep can mark only those. The warning gives the targets at the chosen setting and
 its two neighbours (1 in 50, 100 and 500 at the default; 1 in 10, 50 and 100 at 1 in 50) and, for a
 scenario, says it can be turned off and that long tails are better met with capabilities
 than stockpiles. The statement names each event once.
@@ -773,7 +1264,12 @@ Rows keyed by scenario id (and `coast`/`valley` for Cascadia, from the candidate
 `coastal` flag): `cascadia_m9` (Oregon Resilience Plan restoration times), `major_hurricane_direct_hit`
 (ORNL Michael restoration; Asheville water), `new_madrid_m7` and `hayward_m7` (Hazus- and
 Tohoku-based priors; no regional restoration study was at hand), `local_tsunami` (15–20 minutes'
-warning; rr-hazards' rate already counts only households in the zone). The user's toggle in
+warning; rr-hazards' rate already counts only households in the zone). v0.2.0 adds rows for the
+four scenarios rr-hazards offers since agent/hazards2 merged: `wasatch_m7`,
+`seattle_fault_m7` and `san_andreas_south_m78` take the New Madrid and Hayward priors for a major
+urban earthquake with their own labels (no restoration study for those faults is registered; the
+ShakeOut magnitude 7.8 would likely run longer), each with an `[[overlap]]` so the county
+earthquake rate gives up its share; `heat_blackout` is described above. The user's toggle in
 `dials.scenario_overrides` wins. `ScenarioInfo.effect_summary` compares the ladder targets with and
 without the scenario (Coos Bay: "Power: 3 days → 14 days; Tap water: 14 days → 60 days …") and, for
 evacuation-only scenarios, the ten-year chance of leaving.
@@ -854,6 +1350,14 @@ share taken against tropical-storm passages, Philadelphia's power target is 3 da
 pack, as the research gives, and Miami's major-hurricane scenario runs at 0.037 a year: power 2
 weeks, tap water 3 weeks.)*
 
+**v0.2.0.** The research households have no water-system record, so the fragile rows run at ×1:
+Philadelphia's boil-water targets now sit above the research's (6 against 4 days at 1 in 95; the
+research had no boil notice after a system failure, listed in `tests/calibration.rs` as a known
+deviation), and its no-tap-water raw target is 3.3 days against 2.8 (within the tolerance, but
+past the 3-day step, so 5 days on the ladder). With the pack's record for Philadelphia (no
+violations, ×0.5) no tap water is 2.6 days (3 on the ladder, as in the research) and boil water
+3.3 days (5 on the ladder, as the research's 4 days).
+
 ### Decisions and open questions
 
 1. **Decided by the planner** (2026-09-25): the dial rates above, the 3 % ladder tolerance, and
@@ -874,6 +1378,15 @@ weeks, tap water 3 weeks.)*
    itself is not in the data yet: the county-average hurricane and coastal-flood rates dilute a
    barrier island. Per-ZIP surge shares from NOAA NHC's National Storm Surge Hazard Maps (a flag,
    never the official zone) come in v0.2.0 (review S2, RR-P02).
+
+7. **v0.2.0 decisions** (agent/consequence2, 2026-09-26): the water-system multiplier's county
+   range is ×0.5 to ×3 (normalised to the population mean), not the review's ×0.5 to ×5, and a
+   household that has seen its system out for more than a week counts as "frequent problems"
+   (×3); the medicine-shortage gap is 5 d / 21 d, not the hazard table's 7 d / 30 d (the
+   patient's gap, not the shortage's length); the pooled tail's rate is at least twice its
+   one-day rate; restoration factors apply only where a region pools five or more major events;
+   the cliff rule needs a target of half a day or more on both sides; the water stress line comes
+   from a short hand-copied list until the data pack has water-outage records.
 
 ### Citations
 

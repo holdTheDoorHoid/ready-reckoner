@@ -1,7 +1,11 @@
 //! Turning a ZIP code or county code into a [`LocationResolved`].
 
 use crate::DataStore;
-use rr_types::{EngineError, ErrorCode, FacilityFlags, LocationInput, LocationResolved};
+use crate::exposure::{clean_f64, exposure_source};
+use rr_types::{
+    CitationId, CountyRecord, EngineError, ErrorCode, Exposure, FacilityFlags, LocationInput,
+    LocationResolved, Sourced,
+};
 
 /// A ZIP code resolves to one county only when that county holds at least this share of the ZIP's
 /// land; otherwise the engine answers `ambiguous_zip` and the app asks the user to choose.
@@ -51,6 +55,7 @@ impl DataStore {
         } else {
             "Hazards and facility counts describe your whole county. Tract-level data is not loaded yet."
         };
+        let exposure = self.location_exposure(c, zip.as_deref());
         Some(LocationResolved {
             country: "US".to_string(),
             county_fips: c.fips.clone(),
@@ -65,7 +70,63 @@ impl DataStore {
             tsunami_zone: c.tsunami_zone,
             facility_flags,
             data_note: Some(data_note.to_string()),
+            exposure,
         })
+    }
+
+    /// The exposure values for a county, reached through a ZIP code when one is given (DESIGN-DELTA
+    /// §1.3): the ZIP's own values where the pack has them (nearest strategic site, dams naming
+    /// the ZIP's town, the optional surge pack), the county's otherwise. Each carries the
+    /// citation id from [`crate::EXPOSURE_SOURCES`].
+    pub fn location_exposure(&self, c: &CountyRecord, zip: Option<&str>) -> Exposure {
+        let e = &c.exposure;
+        let z = zip.and_then(|z| self.zip_record(z));
+        let src = |field: &str| CitationId::from(exposure_source(field));
+        let num = |v: Option<f32>, field: &str| {
+            v.map(|x| Sourced {
+                value: clean_f64(x),
+                source: src(field),
+            })
+        };
+        let text = |v: Option<&str>, field: &str| {
+            v.map(|x| Sourced {
+                value: x.to_string(),
+                source: src(field),
+            })
+        };
+        // Strategic distance: the ZIP's nearest point site within 150 km, else the county's
+        // distance to the place behind its class (the "Why here" sentence's distance).
+        let strategic_km = z.as_ref().and_then(|z| z.strategic_km).or(e.strategic_km);
+        Exposure {
+            strategic_class: text(e.strategic_class.map(|k| k.as_str()), "strategic_class"),
+            strategic_km: num(strategic_km, "strategic_km"),
+            surge_cat3_share: num(
+                z.as_ref().and_then(|z| z.surge_cat3_share),
+                "surge_cat3_share",
+            ),
+            surge_proxy_class: text(e.surge_proxy_class.map(|k| k.as_str()), "surge_proxy_class"),
+            smoke_days_35: num(e.smoke_days_35, "smoke_days_35"),
+            leveed_pop_share: num(e.leveed_pop_share, "leveed_pop_share"),
+            dams_high_within_10km: z
+                .as_ref()
+                .and_then(|z| z.dams_high_within_10km_naming_town)
+                .map(|n| Sourced {
+                    value: n,
+                    source: src("dams_high_within_10km"),
+                }),
+            karst_share: num(e.karst_share, "karst_share"),
+            landslide_susceptible_share: num(
+                e.landslide_susceptible_share,
+                "landslide_susceptible_share",
+            ),
+            water_system_flag: num(e.sdwis_violation_pop_share, "water_system_flag"),
+            geomag_factor: num(e.geomag_factor, "geomag_factor"),
+            // The app-facing field is the urban area's share (what rr-hazards weights the attack,
+            // CBRN and crude-device terms by), not the county split, so the number a user sees
+            // is the number the engine used.
+            uasi_share: num(e.uasi_area_share, "uasi_share"),
+            eviction_rate: num(e.eviction_filing_rate, "eviction_rate"),
+        }
     }
 
     /// Resolve a [`LocationInput`]. A county code wins over a ZIP code. A ZIP code whose largest

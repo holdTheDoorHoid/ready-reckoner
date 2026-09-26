@@ -4,9 +4,11 @@
 //!
 //! - `citations.toml`: `[[citation]]` tables, each a [`Citation`].
 //! - `items/<category>.toml`: `[[item]]` tables, each an [`Item`]; one file per category.
-//! - `guidance/<id>.md`: a front-matter block between `---` lines (`id`, `title`, `applies_to`,
-//!   `citations`, exactly the fields of [`GuidanceMeta`]) followed by Markdown.
+//! - `guidance/<id>.md`: a front-matter block between `---` lines (`id`, `title`, `kind`,
+//!   `applies_to`, `citations`: the fields of [`GuidanceMeta`] plus the block's
+//!   [`GuidanceKind`]) followed by Markdown.
 //! - `glossary.toml`: `[[term]]` tables, each a [`GlossaryEntry`].
+//! - `tables/state_registries.toml`: `[[state]]` tables, each a [`StateRow`].
 //! - `VERSION`: the human part of [`crate::CONTENT_VERSION`].
 //!
 //! Unknown fields anywhere are errors (the shared types deny them), so a typo in a content file
@@ -19,6 +21,9 @@ use rr_types::{
     TierInfo,
 };
 use serde::{Deserialize, Serialize};
+
+use crate::ids::GuidanceKind;
+use crate::tables::{STATE_REGISTRIES_FILE, StateRow, StateTable};
 
 /// A content file could not be parsed.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
@@ -57,7 +62,7 @@ pub struct GlossaryEntry {
 /// A guidance block: its metadata and its Markdown body.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Guidance {
-    /// The front matter.
+    /// The front matter. `meta.kind` is always set: the parser requires the field.
     pub meta: GuidanceMeta,
     /// The Markdown after the front matter, including the closing `## Sources` section.
     pub body: String,
@@ -69,17 +74,28 @@ impl Guidance {
     /// The body with the household's frequency sentence in place of `{frequency}`. With `None`
     /// the placeholder is removed (for the generic, household-free view).
     ///
-    /// Conditional spans (`{if:<hazard>}…{/if}`, `{if:home:<kind>}…{/if}`,
-    /// [`crate::policy::CONDITION_OPEN`]) are all kept here, without their markers; the packet
-    /// keeps only those about hazards likely enough for the household and about its kind of home.
+    /// Conditional spans ([`crate::policy::CONDITION_OPEN`]) are all kept here, without their
+    /// markers; [`Guidance::render_for`] keeps only those whose condition holds for a household.
     pub fn render(&self, frequency: Option<&str>) -> String {
         let body = crate::policy::apply_conditions(&self.body, |_| true);
-        match frequency {
-            Some(sentence) => body.replace(crate::policy::FREQUENCY_PLACEHOLDER, sentence),
-            None => body
-                .replace(&format!("{} ", crate::policy::FREQUENCY_PLACEHOLDER), "")
-                .replace(crate::policy::FREQUENCY_PLACEHOLDER, ""),
-        }
+        fill_frequency(&body, frequency)
+    }
+
+    /// The body for one household: conditional spans kept only when their condition holds
+    /// ([`crate::policy::apply_conditions_for`]), and the household's frequency sentence in
+    /// place of `{frequency}` (the placeholder is dropped with `None`).
+    pub fn render_for(
+        &self,
+        frequency: Option<&str>,
+        household: &impl crate::policy::HouseholdFacts,
+    ) -> String {
+        let body = crate::policy::apply_conditions_for(&self.body, household);
+        fill_frequency(&body, frequency)
+    }
+
+    /// What the block is for (the `kind` front-matter field, which the parser requires).
+    pub fn kind(&self) -> GuidanceKind {
+        self.meta.kind.unwrap_or(GuidanceKind::Topic)
     }
 
     /// The prose part of the body: everything before the `## Sources` heading.
@@ -127,6 +143,16 @@ impl Guidance {
     }
 }
 
+/// `body` with `{frequency}` replaced, or dropped with the space after it.
+fn fill_frequency(body: &str, frequency: Option<&str>) -> String {
+    match frequency {
+        Some(sentence) => body.replace(crate::policy::FREQUENCY_PLACEHOLDER, sentence),
+        None => body
+            .replace(&format!("{} ", crate::policy::FREQUENCY_PLACEHOLDER), "")
+            .replace(crate::policy::FREQUENCY_PLACEHOLDER, ""),
+    }
+}
+
 /// Byte offset of the `## Sources` heading, if the body has one.
 fn find_sources_heading(body: &str) -> Option<usize> {
     let mut offset = 0;
@@ -170,6 +196,8 @@ pub struct Content {
     pub guidance: Vec<Guidance>,
     /// Every glossary entry.
     pub glossary: Vec<GlossaryEntry>,
+    /// The state table (`tables/state_registries.toml`); empty if the file is absent.
+    pub states: StateTable,
     /// The human part of the version (`content/VERSION`), if present.
     pub version: Option<String>,
     citation_index: BTreeMap<String, usize>,
@@ -186,6 +214,7 @@ impl Content {
         let mut item_files = Vec::new();
         let mut guidance = Vec::new();
         let mut glossary = Vec::new();
+        let mut states = StateTable::default();
         let mut version = None;
         let mut sorted: Vec<&(&str, &str)> = files.iter().collect();
         sorted.sort_by(|a, b| a.0.cmp(b.0));
@@ -201,6 +230,8 @@ impl Content {
                 glossary.extend(f.term);
             } else if path == "VERSION" {
                 version = Some(text.trim().to_owned());
+            } else if path == STATE_REGISTRIES_FILE {
+                states = toml::from_str(&text).map_err(|e| LoadError::new(path, e.to_string()))?;
             } else if let Some(rest) = path.strip_prefix("items/") {
                 if !rest.ends_with(".toml") || rest.contains('/') {
                     return Err(LoadError::new(path, "item files are items/<category>.toml"));
@@ -219,7 +250,7 @@ impl Content {
             } else {
                 return Err(LoadError::new(
                     path,
-                    "unexpected file in content/ (expected citations.toml, glossary.toml, VERSION, items/*.toml or guidance/*.md)",
+                    "unexpected file in content/ (expected citations.toml, glossary.toml, VERSION, items/*.toml, guidance/*.md or tables/state_registries.toml)",
                 ));
             }
         }
@@ -232,6 +263,7 @@ impl Content {
             item_files,
             guidance,
             glossary,
+            states,
             version,
             citation_index,
             item_index,
@@ -260,6 +292,24 @@ impl Content {
         self.guidance
             .iter()
             .filter(move |g| g.meta.applies_to.iter().any(|a| a == target))
+    }
+
+    /// Guidance blocks of one kind, in content order.
+    pub fn guidance_of_kind(&self, kind: GuidanceKind) -> impl Iterator<Item = &Guidance> + '_ {
+        self.guidance.iter().filter(move |g| g.kind() == kind)
+    }
+
+    /// The family block for a rare hazard: the block of kind `family` that applies to
+    /// `family:<hazard id>` (the family's lead hazard, [`rr_types::HazardId::family`]).
+    pub fn family_block(&self, hazard: &str) -> Option<&Guidance> {
+        let target = format!("family:{hazard}");
+        self.guidance_of_kind(GuidanceKind::Family)
+            .find(|g| g.meta.applies_to.contains(&target))
+    }
+
+    /// The state table's row for a two-letter postal code (`FL`, `DC`, `PR`).
+    pub fn state_row(&self, code: &str) -> Option<&StateRow> {
+        self.states.row(code)
     }
 
     /// Items that help with this bucket.
@@ -323,7 +373,8 @@ fn first_index<'a>(ids: impl Iterator<Item = &'a str>) -> BTreeMap<String, usize
     map
 }
 
-/// Parses one guidance file: `---`, `key: value` lines, `---`, then Markdown.
+/// Parses one guidance file: `---`, `key: value` lines (`id`, `title`, `kind`, `applies_to`,
+/// `citations`, all required), `---`, then Markdown.
 fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
     let rest = text.strip_prefix("---\n").ok_or_else(|| {
         LoadError::new(path, "guidance must start with a `---` front-matter line")
@@ -336,6 +387,7 @@ fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
 
     let mut id = None;
     let mut title = None;
+    let mut kind = None;
     let mut applies_to = None;
     let mut citations = None;
     for (n, line) in front.lines().enumerate() {
@@ -352,13 +404,14 @@ fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
         let slot = match key.trim() {
             "id" => &mut id,
             "title" => &mut title,
+            "kind" => &mut kind,
             "applies_to" => &mut applies_to,
             "citations" => &mut citations,
             other => {
                 return Err(LoadError::new(
                     path,
                     format!(
-                        "unknown front-matter field `{other}` (allowed: id, title, applies_to, citations)"
+                        "unknown front-matter field `{other}` (allowed: id, title, kind, applies_to, citations)"
                     ),
                 ));
             }
@@ -376,6 +429,9 @@ fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
     };
     let id = unquote(&need(id, "id")?);
     let title = unquote(&need(title, "title")?);
+    let kind = unquote(&need(kind, "kind")?)
+        .parse::<GuidanceKind>()
+        .map_err(|e| LoadError::new(path, e.to_string()))?;
     let applies_to = parse_list(path, "applies_to", &need(applies_to, "applies_to")?)?;
     let citations = parse_list(path, "citations", &need(citations, "citations")?)?
         .into_iter()
@@ -387,6 +443,7 @@ fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
             title,
             applies_to,
             citations,
+            kind: Some(kind),
         },
         body,
         file: path.to_owned(),
@@ -431,7 +488,7 @@ retrieved = "2026-09-25"
 license = "US Government Work (public domain)"
 "#;
 
-    const GUIDE: &str = "---\nid: bucket_water_out\ntitle: No tap water at all\napplies_to: [bucket:water_out, hazard:earthquake]\ncitations: [ready_gov_water]\n---\n{frequency} Store water.[^ready_gov_water]\n\n## Sources\n\n[^ready_gov_water]: FEMA, Water (2021).\n";
+    const GUIDE: &str = "---\nid: bucket_water_out\ntitle: No tap water at all\nkind: bucket\napplies_to: [bucket:water_out, hazard:earthquake]\ncitations: [ready_gov_water]\n---\n{frequency} Store water.[^ready_gov_water]\n\n## Sources\n\n[^ready_gov_water]: FEMA, Water (2021).\n";
 
     #[test]
     fn parses_front_matter_body_and_footnotes() {
@@ -442,6 +499,10 @@ license = "US Government Work (public domain)"
         .unwrap();
         let g = c.guidance("bucket_water_out").unwrap();
         assert_eq!(g.meta.title, "No tap water at all");
+        assert_eq!(g.kind(), GuidanceKind::Bucket);
+        assert_eq!(g.meta.kind, Some(GuidanceKind::Bucket));
+        assert_eq!(c.guidance_of_kind(GuidanceKind::Bucket).count(), 1);
+        assert_eq!(c.guidance_of_kind(GuidanceKind::Topic).count(), 0);
         assert_eq!(
             g.meta.applies_to,
             vec!["bucket:water_out", "hazard:earthquake"]
@@ -468,6 +529,66 @@ license = "US Government Work (public domain)"
         let bad = GUIDE.replace("title:", "reading_level: 8\ntitle:");
         let e = Content::from_files(&[("guidance/bucket_water_out.md", &bad)]).unwrap_err();
         assert!(e.message.contains("reading_level"), "{e}");
+    }
+
+    #[test]
+    fn kind_is_required_and_must_be_known() {
+        let missing = GUIDE.replace("kind: bucket\n", "");
+        let e = Content::from_files(&[("guidance/bucket_water_out.md", &missing)]).unwrap_err();
+        assert!(e.message.contains("missing `kind`"), "{e}");
+        let unknown = GUIDE.replace("kind: bucket", "kind: recipe");
+        let e = Content::from_files(&[("guidance/bucket_water_out.md", &unknown)]).unwrap_err();
+        assert!(e.message.contains("recipe"), "{e}");
+    }
+
+    #[test]
+    fn render_for_applies_the_household_conditions() {
+        struct House;
+        impl crate::policy::HouseholdFacts for House {
+            fn hazard_relevant(&self, h: &str) -> bool {
+                h == "earthquake"
+            }
+            fn home(&self) -> rr_types::HousingKind {
+                rr_types::HousingKind::Detached
+            }
+            fn has_access_need(&self, _: &str) -> bool {
+                false
+            }
+            fn has_item(&self, i: &str) -> bool {
+                i == "water_drum_55gal"
+            }
+            fn has_benefit(&self, _: &str) -> bool {
+                false
+            }
+        }
+        let guide = GUIDE.replace(
+            "Store water.[^ready_gov_water]",
+            "Store water.[^ready_gov_water] {if:has:water_drum_55gal}Rotate the drum.{/if} {if:need:hearing}Use a strobe.{/if}",
+        );
+        let c = Content::from_files(&[("guidance/bucket_water_out.md", &guide)]).unwrap();
+        let g = c.guidance("bucket_water_out").unwrap();
+        let out = g.render_for(Some("Often."), &House);
+        assert!(
+            out.starts_with("Often. Store water.[^ready_gov_water] Rotate the drum."),
+            "{out}"
+        );
+        assert!(!out.contains("strobe"));
+        assert!(g.render(None).contains("Use a strobe."));
+    }
+
+    #[test]
+    fn the_state_table_parses_and_finds_rows() {
+        let table = "[[state]]\ncode = \"KS\"\nname = \"Kansas\"\nchecked = \"2026-09-26\"\n\
+                     em_agency = \"Kansas Division of Emergency Management\"\n\
+                     em_url = \"https://www.kansastag.gov/kdem\"\nrefill = \"Ask.\"\n\
+                     refill_sources = [\"ready_gov_water\"]\n";
+        let c = Content::from_files(&[(STATE_REGISTRIES_FILE, table)]).unwrap();
+        assert_eq!(c.states.state.len(), 1);
+        assert_eq!(c.state_row("ks").unwrap().name, "Kansas");
+        assert!(c.state_row("KY").is_none());
+        let bad = table.replace("refill =", "colour = \"red\"\nrefill =");
+        let e = Content::from_files(&[(STATE_REGISTRIES_FILE, &bad)]).unwrap_err();
+        assert!(e.message.contains("colour"), "{e}");
     }
 
     #[test]

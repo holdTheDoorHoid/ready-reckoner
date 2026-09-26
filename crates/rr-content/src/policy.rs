@@ -8,14 +8,21 @@
 /// The placeholder the engine replaces with the household's own natural-frequency sentence.
 pub const FREQUENCY_PLACEHOLDER: &str = "{frequency}";
 
-/// Opens a conditional span of a guidance block. Two kinds of condition (see [`Condition`]):
+/// Opens a conditional span of a guidance block. Six kinds of condition (see [`Condition`]):
 ///
 /// - a hazard: `{if:avalanche}In avalanche country, get training ...{/if}`. The packet keeps the
 ///   span when that hazard is likely enough for the household (a ten-year chance of at least 1 in
-///   100) and drops it otherwise. The hazard must be one the block `applies_to`.
+///   100) and drops it otherwise. In a hazard, family, bucket or tier block the hazard must be one
+///   the block applies to; plan, after-disaster and topic blocks may name any hazard.
 /// - the kind of home: `{if:home:apartment_high_rise}…{/if}` keeps the span only for those homes,
 ///   `{if:not_home:apartment_low_rise|apartment_high_rise}…{/if}` only for the others. Kinds are
 ///   `HousingKind` strings, several joined with `|`.
+/// - an access or functional need: `{if:need:hearing|vision}…{/if}` keeps the span when anyone in
+///   the household has one of these needs ([`crate::ids::ACCESS_NEEDS`]).
+/// - an item: `{if:has:power_generator}…{/if}` keeps the span when the household has one of
+///   these catalogue items: it already owns it, or the plan includes it.
+/// - a benefit: `{if:benefit:snap_wic}…{/if}` keeps the span when the household relies on one of
+///   these benefits ([`crate::ids::BENEFITS`]).
 ///
 /// Every household-free view keeps every span. Spans do not nest and stay within one paragraph.
 pub const CONDITION_OPEN: &str = "{if:";
@@ -29,6 +36,15 @@ pub const HOME_PREFIX: &str = "home:";
 /// Prefix of a condition on the kind of home: kept for every other kind of home.
 pub const NOT_HOME_PREFIX: &str = "not_home:";
 
+/// Prefix of a condition on the household's access and functional needs.
+pub const NEED_PREFIX: &str = "need:";
+
+/// Prefix of a condition on a catalogue item the household has.
+pub const HAS_PREFIX: &str = "has:";
+
+/// Prefix of a condition on a benefit the household relies on.
+pub const BENEFIT_PREFIX: &str = "benefit:";
+
 /// What a conditional span depends on (the text between `{if:` and `}`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Condition {
@@ -38,18 +54,99 @@ pub enum Condition {
     Home(Vec<rr_types::HousingKind>),
     /// `not_home:<kind>|<kind>…`: kept when the home is none of these kinds.
     NotHome(Vec<rr_types::HousingKind>),
+    /// `need:<need>|<need>…`: kept when anyone in the household has one of these access or
+    /// functional needs.
+    Need(Vec<String>),
+    /// `has:<item id>|<item id>…`: kept when the household has one of these catalogue items.
+    Has(Vec<String>),
+    /// `benefit:<id>|<id>…`: kept when the household relies on one of these benefits.
+    Benefit(Vec<String>),
+}
+
+/// What a household looks like to the conditions in a guidance block. The packet and the web
+/// implement it from the plan input and outputs, and [`Condition::holds`] and
+/// [`apply_conditions_for`] use it, so every renderer applies the same rules.
+pub trait HouseholdFacts {
+    /// Whether this hazard is likely enough for the household to keep advice about it (the
+    /// packet's cut is a ten-year chance of at least 1 in 100). Unknown ids should return true.
+    fn hazard_relevant(&self, hazard: &str) -> bool;
+    /// The household's kind of home.
+    fn home(&self) -> rr_types::HousingKind;
+    /// Whether anyone in the household has this access or functional need
+    /// ([`crate::ids::ACCESS_NEEDS`]).
+    fn has_access_need(&self, need: &str) -> bool;
+    /// Whether the household has this catalogue item: it already owns it, or the plan includes
+    /// it.
+    fn has_item(&self, item: &str) -> bool;
+    /// Whether the household relies on this benefit ([`crate::ids::BENEFITS`]).
+    fn has_benefit(&self, benefit: &str) -> bool;
+}
+
+/// Splits `a|b|c` into its parts, rejecting an empty or repeated part.
+fn split_values<'a>(id: &str, values: &'a str) -> Result<Vec<&'a str>, String> {
+    let mut out: Vec<&str> = Vec::new();
+    for v in values.split('|').map(str::trim) {
+        if v.is_empty() {
+            return Err(format!("`{{if:{id}}}` has an empty value"));
+        }
+        if out.contains(&v) {
+            return Err(format!("`{{if:{id}}}` lists `{v}` twice"));
+        }
+        out.push(v);
+    }
+    Ok(out)
+}
+
+/// The values of a `need:` or `benefit:` condition, each one of `allowed`.
+fn listed_values(
+    id: &str,
+    values: &str,
+    allowed: &[&str],
+    what: &str,
+) -> Result<Vec<String>, String> {
+    let parts = split_values(id, values)?;
+    for v in &parts {
+        if !allowed.contains(v) {
+            return Err(format!(
+                "`{{if:{id}}}` names `{v}`, which is not {what} (one of {allowed:?})"
+            ));
+        }
+    }
+    Ok(parts.into_iter().map(str::to_owned).collect())
 }
 
 impl Condition {
     /// Reads a condition. A `home:` or `not_home:` condition needs at least one known kind of
-    /// home and no unknown one; anything else is taken as a hazard id (the validator checks the
-    /// hazard against the block's `applies_to`).
+    /// home and no unknown one; `need:` and `benefit:` need known needs and benefits; `has:`
+    /// needs well-formed item ids (the validator checks them against the catalogue). Anything
+    /// else is taken as a hazard id (the validator checks it).
     ///
     /// # Errors
     ///
-    /// A plain-language problem: an unknown kind of home, or none.
+    /// A plain-language problem: an unknown kind of home, need or benefit, a malformed item id,
+    /// an empty or repeated value.
     pub fn parse(id: &str) -> Result<Condition, String> {
         let id = id.trim();
+        if let Some(v) = id.strip_prefix(NEED_PREFIX) {
+            return listed_values(id, v, crate::ids::ACCESS_NEEDS, "an access need")
+                .map(Condition::Need);
+        }
+        if let Some(v) = id.strip_prefix(BENEFIT_PREFIX) {
+            return listed_values(id, v, crate::ids::BENEFITS, "a benefit").map(Condition::Benefit);
+        }
+        if let Some(v) = id.strip_prefix(HAS_PREFIX) {
+            let parts = split_values(id, v)?;
+            for p in &parts {
+                if !rr_types::is_well_formed_id(p) {
+                    return Err(format!(
+                        "`{{if:{id}}}` names `{p}`, which is not an item id"
+                    ));
+                }
+            }
+            return Ok(Condition::Has(
+                parts.into_iter().map(str::to_owned).collect(),
+            ));
+        }
         let (negated, kinds) = match (
             id.strip_prefix(HOME_PREFIX),
             id.strip_prefix(NOT_HOME_PREFIX),
@@ -79,12 +176,27 @@ impl Condition {
     }
 
     /// Whether a span with this condition belongs in a packet for this kind of home: `Some` for
-    /// the home conditions, `None` for a hazard (which depends on the household's rates).
+    /// the home conditions, `None` for the others (which depend on more than the home).
     pub fn for_home(&self, kind: rr_types::HousingKind) -> Option<bool> {
         match self {
-            Condition::Hazard(_) => None,
             Condition::Home(kinds) => Some(kinds.contains(&kind)),
             Condition::NotHome(kinds) => Some(!kinds.contains(&kind)),
+            Condition::Hazard(_)
+            | Condition::Need(_)
+            | Condition::Has(_)
+            | Condition::Benefit(_) => None,
+        }
+    }
+
+    /// Whether a span with this condition belongs in this household's text.
+    pub fn holds(&self, h: &impl HouseholdFacts) -> bool {
+        match self {
+            Condition::Hazard(id) => h.hazard_relevant(id),
+            Condition::Home(kinds) => kinds.contains(&h.home()),
+            Condition::NotHome(kinds) => !kinds.contains(&h.home()),
+            Condition::Need(needs) => needs.iter().any(|n| h.has_access_need(n)),
+            Condition::Has(items) => items.iter().any(|i| h.has_item(i)),
+            Condition::Benefit(benefits) => benefits.iter().any(|b| h.has_benefit(b)),
         }
     }
 }
@@ -123,10 +235,43 @@ pub fn apply_conditions(text: &str, keep: impl Fn(&str) -> bool) -> String {
     out
 }
 
+/// `text` with each conditional span kept only when its condition holds for this household
+/// ([`Condition::holds`]). A malformed condition keeps its text; the validator rejects it.
+pub fn apply_conditions_for(text: &str, household: &impl HouseholdFacts) -> String {
+    apply_conditions(text, |id| {
+        Condition::parse(id)
+            .map(|c| c.holds(household))
+            .unwrap_or(true)
+    })
+}
+
+/// Which conditions a block may use (see [`condition_problems_in`]).
+#[derive(Debug, Clone, Copy, Default)]
+pub struct ConditionScope<'a> {
+    /// The hazards a hazard condition may name. `None` accepts any hazard id content may name
+    /// ([`crate::ids::is_hazard`]).
+    pub hazards: Option<&'a [&'a str]>,
+    /// The catalogue item ids a `has:` condition may name. `None` accepts any well-formed id.
+    pub items: Option<&'a std::collections::BTreeSet<String>>,
+}
+
 /// Problems with the conditional spans of a guidance body: an unclosed or nested span, a hazard
-/// id that is not one of `allowed` (the block's own `hazard:` targets), or a `home:` /
-/// `not_home:` condition that names no kind of home or an unknown one (see [`Condition`]).
+/// id that is not one of `allowed` (the block's own `hazard:` targets), or a malformed condition
+/// (see [`Condition`]). Same as [`condition_problems_in`] with only the hazards restricted.
 pub fn condition_problems(body: &str, allowed: &[&str]) -> Vec<String> {
+    condition_problems_in(
+        body,
+        ConditionScope {
+            hazards: Some(allowed),
+            items: None,
+        },
+    )
+}
+
+/// Problems with the conditional spans of a guidance body: an unclosed or nested span, a span
+/// that runs past its paragraph, a hazard or item outside `scope`, or a malformed condition
+/// (an unknown kind of home, need or benefit; see [`Condition`]).
+pub fn condition_problems_in(body: &str, scope: ConditionScope<'_>) -> Vec<String> {
     let mut problems = Vec::new();
     let mut rest = body;
     while let Some(start) = rest.find(CONDITION_OPEN) {
@@ -137,13 +282,26 @@ pub fn condition_problems(body: &str, allowed: &[&str]) -> Vec<String> {
         };
         let id = after_open[..id_end].trim();
         match Condition::parse(id) {
-            Ok(Condition::Hazard(h)) if !allowed.contains(&h.as_str()) => {
-                problems.push(format!(
+            Ok(Condition::Hazard(h)) => match scope.hazards {
+                Some(allowed) if !allowed.contains(&h.as_str()) => problems.push(format!(
                     "`{{if:{id}}}` names a hazard this block does not apply to (its applies_to lists {allowed:?})"
-                ));
-            }
+                )),
+                None if !crate::ids::is_hazard(&h) => problems.push(format!(
+                    "`{{if:{id}}}` names `{h}`, which is not a hazard id"
+                )),
+                _ => {}
+            },
             Ok(Condition::Home(kinds) | Condition::NotHome(kinds)) if kinds.is_empty() => {
                 problems.push(format!("`{{if:{id}}}` names no kind of home"));
+            }
+            Ok(Condition::Has(items)) => {
+                if let Some(known) = scope.items {
+                    for i in items.iter().filter(|i| !known.contains(i.as_str())) {
+                        problems.push(format!(
+                            "`{{if:{id}}}` names `{i}`, which is not a catalogue item"
+                        ));
+                    }
+                }
             }
             Ok(_) => {}
             Err(p) => problems.push(p),
@@ -772,6 +930,101 @@ mod tests {
         assert!(Condition::parse("home:castle").is_err());
         assert!(Condition::parse("home:").is_err());
         assert!(Condition::parse("home:detached|detached").is_err());
+    }
+
+    /// A household for the condition tests: a high-rise flat, someone who is deaf, a generator,
+    /// SNAP, and tornadoes likely enough to matter.
+    struct Flat;
+
+    impl HouseholdFacts for Flat {
+        fn hazard_relevant(&self, hazard: &str) -> bool {
+            hazard == "tornado"
+        }
+        fn home(&self) -> rr_types::HousingKind {
+            rr_types::HousingKind::ApartmentHighRise
+        }
+        fn has_access_need(&self, need: &str) -> bool {
+            need == "hearing"
+        }
+        fn has_item(&self, item: &str) -> bool {
+            item == "power_generator"
+        }
+        fn has_benefit(&self, benefit: &str) -> bool {
+            benefit == "snap_wic"
+        }
+    }
+
+    #[test]
+    fn need_has_and_benefit_conditions_parse() {
+        assert_eq!(
+            Condition::parse("need:hearing|vision"),
+            Ok(Condition::Need(vec!["hearing".into(), "vision".into()]))
+        );
+        assert_eq!(
+            Condition::parse("has:power_generator"),
+            Ok(Condition::Has(vec!["power_generator".into()]))
+        );
+        assert_eq!(
+            Condition::parse("benefit:snap_wic|federal_pay"),
+            Ok(Condition::Benefit(vec![
+                "snap_wic".into(),
+                "federal_pay".into()
+            ]))
+        );
+        assert!(Condition::parse("need:telepathy").is_err());
+        assert!(Condition::parse("need:").is_err());
+        assert!(Condition::parse("need:hearing|hearing").is_err());
+        assert!(Condition::parse("benefit:lottery").is_err());
+        assert!(Condition::parse("has:Power Generator").is_err());
+        assert!(Condition::parse("has:a||b").is_err());
+        // They say nothing about the kind of home on their own.
+        let need = Condition::parse("need:hearing").unwrap();
+        assert_eq!(need.for_home(rr_types::HousingKind::Detached), None);
+    }
+
+    #[test]
+    fn every_condition_kind_is_applied_for_a_household() {
+        let text = "A. {if:tornado}B.{/if} {if:hurricane}C.{/if} {if:home:apartment_high_rise}D.{/if} \
+                    {if:not_home:apartment_high_rise}E.{/if} {if:need:hearing|vision}F.{/if} \
+                    {if:need:dialysis}G.{/if} {if:has:power_generator}H.{/if} \
+                    {if:has:water_drum_55gal}I.{/if} {if:benefit:snap_wic}J.{/if} \
+                    {if:benefit:va}K.{/if} Z.";
+        assert_eq!(apply_conditions_for(text, &Flat), "A. B. D. F. H. J. Z.");
+        // A household-free view keeps every span.
+        assert_eq!(
+            apply_conditions(text, |_| true),
+            "A. B. C. D. E. F. G. H. I. J. K. Z."
+        );
+        // A malformed condition keeps its text.
+        assert_eq!(apply_conditions_for("{if:need:x}Y.{/if}", &Flat), "Y.");
+    }
+
+    #[test]
+    fn conditions_are_checked_against_their_scope() {
+        let items: std::collections::BTreeSet<String> =
+            ["power_generator".to_owned()].into_iter().collect();
+        let strict = ConditionScope {
+            hazards: Some(&["tornado"]),
+            items: Some(&items),
+        };
+        assert!(condition_problems_in("{if:tornado}a{/if}", strict).is_empty());
+        assert!(!condition_problems_in("{if:hurricane}a{/if}", strict).is_empty());
+        assert!(condition_problems_in("{if:has:power_generator}a{/if}", strict).is_empty());
+        assert!(!condition_problems_in("{if:has:jetpack}a{/if}", strict).is_empty());
+        assert!(!condition_problems_in("{if:need:telepathy}a{/if}", strict).is_empty());
+        // Plan blocks may name any hazard, including one contract v2 adds, but not a made-up one.
+        let open = ConditionScope {
+            hazards: None,
+            items: Some(&items),
+        };
+        assert!(condition_problems_in("{if:hurricane}a{/if}", open).is_empty());
+        assert!(condition_problems_in("{if:wildfire_smoke}a{/if}", open).is_empty());
+        assert!(!condition_problems_in("{if:zombies}a{/if}", open).is_empty());
+        // Spans still do not nest, whatever their kind.
+        assert!(
+            !condition_problems_in("{if:need:hearing}a {if:has:power_generator}b{/if}", open)
+                .is_empty()
+        );
     }
 
     #[test]

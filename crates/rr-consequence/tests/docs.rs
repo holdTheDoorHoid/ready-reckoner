@@ -59,6 +59,27 @@ fn row_line(r: &EffectRow) -> String {
     if let Some(req) = r.requires {
         extra.push(req.describe().to_owned());
     }
+    if let Some(req) = r.also_requires {
+        extra.push(req.describe().to_owned());
+    }
+    if r.fragile {
+        extra.push("scaled by how easily the water system breaks".to_owned());
+    }
+    if !r.county_rate_keys.is_empty() {
+        extra.push(format!(
+            "county-scale: share of the county's damaging {} episodes",
+            r.county_rate_keys.join(" and ")
+        ));
+    }
+    if let Some(f) = &r.fixed_rate {
+        extra.push(format!("rate from `{f}`"));
+    }
+    if let Some(c) = &r.curve_class {
+        extra.push(format!("regional restoration: {c}"));
+    }
+    if r.island_curve {
+        extra.push("island grids: historic curve".to_owned());
+    }
     if r.pool {
         extra.push("county outage records replace the county-wide part".to_owned());
     }
@@ -165,6 +186,27 @@ fn generated_table() -> String {
     let _ = writeln!(out, "|---|---|---|");
     for o in &table().overlaps {
         let _ = writeln!(out, "| *{}* | {} | {} |", o.scenario, o.hazard, o.note);
+    }
+    let _ = writeln!(out);
+    let _ = writeln!(
+        out,
+        "| Water failure on record (stress line) | Bucket | States | Began | Median | 9 in 10 back | Sources |"
+    );
+    let _ = writeln!(out, "|---|---|---|---|---|---|---|");
+    for e in &table().water_events {
+        let sources: Vec<&str> = e.sources.iter().map(|c| c.as_str()).collect();
+        let _ = writeln!(
+            out,
+            "| {}, {} | {} | {} | {} | {} | {} | {} |",
+            e.event,
+            e.place,
+            e.bucket,
+            e.states.join(", "),
+            e.date,
+            days(e.median_days),
+            days(e.p90_days),
+            sources.join(", ")
+        );
     }
     let _ = write!(out, "{END}");
     out

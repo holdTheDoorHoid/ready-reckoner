@@ -647,9 +647,11 @@ mod tests {
     fn semantics_cover_all_18_hazards_once() {
         let ids: BTreeSet<&str> = SEMANTICS.iter().map(|s| s.id).collect();
         assert_eq!(ids.len(), 18);
+        // Since contract v2 the natural tier also holds five hazards the NRI does not cover;
+        // `is_nri` marks the 18 it does.
         let natural: BTreeSet<&str> = rr_types::HazardId::ALL
             .iter()
-            .filter(|h| h.tier() == rr_types::HazardTier::Natural)
+            .filter(|h| h.is_nri())
             .map(|h| h.as_str())
             .collect();
         assert_eq!(ids, natural);

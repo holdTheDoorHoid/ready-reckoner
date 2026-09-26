@@ -1,6 +1,7 @@
 ---
 id: topic_neighbours
 title: Neighbours and mutual aid
+kind: topic
 applies_to: [topic:neighbours]
 citations: [aldrich_sawada_2015, ye_aldrich_2019, semenza_1996_heat_deaths, fema_nhs_2024, ready_gov_older_adults, listos_california, ready_gov_cert]
 ---

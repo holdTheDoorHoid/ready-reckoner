@@ -233,8 +233,8 @@ fn county_search_catalogue_defaults_and_explain_answer() {
 
     let catalogue: Catalogue = value(&api::catalogue());
     assert!(catalogue.items.len() > 50 && catalogue.citations.len() > 50);
-    assert_eq!(catalogue.buckets.len(), 14);
-    assert_eq!(catalogue.hazards.len(), 35);
+    assert_eq!(catalogue.buckets.len(), 15); // contract v2: + clean_air
+    assert_eq!(catalogue.hazards.len(), 53); // contract v2: the active ids
 
     let defaults: PlanInput = value(&api::defaults());
     assert!(defaults.validate().is_empty());
@@ -340,10 +340,14 @@ fn the_data_packs_load_file_by_file_and_then_answer_for_every_fixture() {
         info.data_pack_version.as_deref(),
         Some(pack_version.as_str())
     );
-    // Attributions now come from the manifest, the National Risk Index statement first.
+    // Attributions now come from the manifest, the National Risk Index statement first. Credit
+    // lines of optional packs (manifest `attribution_packs`) wait until their pack is loaded.
+    let optional = manifest["attribution_packs"]
+        .as_object()
+        .map_or(0, serde_json::Map::len);
     assert_eq!(
         info.attributions.len(),
-        manifest["attributions"].as_array().unwrap().len()
+        manifest["attributions"].as_array().unwrap().len() - optional
     );
     assert_eq!(info.attributions[0].source, "FEMA National Risk Index");
     assert!(info.attributions[0].text.contains("not endorsed by FEMA"));

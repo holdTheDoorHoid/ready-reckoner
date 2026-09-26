@@ -48,7 +48,7 @@ fn with_dial(input: &PlanInput, rp: ReturnPeriod) -> PlanInput {
 fn every_fixture_gives_well_formed_buckets() {
     for (name, input) in rr_types::fixtures::all() {
         let a = run(&input);
-        assert_eq!(a.buckets.len(), 14, "{name}");
+        assert_eq!(a.buckets.len(), 15, "{name}"); // contract v2: + clean_air
         for (b, id) in a.buckets.iter().zip(BucketId::ALL) {
             assert_eq!(b.id, *id, "{name}: bucket order");
             assert_eq!(b.target.kind(), id.target_kind(), "{name} {id}");

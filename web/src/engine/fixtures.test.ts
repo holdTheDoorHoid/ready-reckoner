@@ -26,6 +26,6 @@ describe('fixtures', () => {
   });
 
   it('exports the contract version', () => {
-    expect(ENGINE_API_VERSION).toBe(1);
+    expect(ENGINE_API_VERSION).toBe(2);
   });
 });

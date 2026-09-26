@@ -137,6 +137,7 @@ fn more_people_never_need_less_water() {
         },
         earner: false,
         commute: None,
+        access_needs: Vec::new(),
     });
     assert!(water(&more) > before);
 }
@@ -306,6 +307,7 @@ fn coverage_today_follows_what_the_household_has_done() {
                 item_id: id.as_str().into(),
                 qty,
                 paid_usd: None,
+                tested_on: None,
             })
             .collect();
         let after = assess(&all_done);

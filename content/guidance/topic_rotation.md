@@ -1,6 +1,7 @@
 ---
 id: topic_rotation
 title: Rotating supplies through everyday use
+kind: topic
 applies_to: [topic:rotation]
 citations: [fsis_shelf_stable, church_home_storage_2007, cdc_water_storage, usfa_smoke_alarms, redcross_first_aid_kit, fema_effak, aspca_disaster_prep, lally_2010_habits, usu_food_storage_booklet]
 ---

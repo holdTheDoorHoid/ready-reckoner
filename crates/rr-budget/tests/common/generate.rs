@@ -351,6 +351,7 @@ fn existing(g: &mut Gen, items: &[Item]) -> Vec<Owned> {
                 item_id: ItemId::from(it.id.as_str()),
                 qty,
                 paid_usd: paid,
+                tested_on: None,
             });
         }
     }

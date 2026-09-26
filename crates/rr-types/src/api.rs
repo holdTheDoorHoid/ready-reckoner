@@ -285,6 +285,39 @@ pub struct EngineInfo {
     pub packs_loaded: Vec<String>,
     /// Credit lines and disclaimers the app must show.
     pub attributions: Vec<Attribution>,
+    /// How the model did against past disasters, from the bundled validation table, for the
+    /// `#/validation` page (contract v2; REVIEW R10). Omitted when no table is bundled.
+    #[serde(default, skip_serializing_if = "ValidationSummary::is_empty")]
+    pub validation: ValidationSummary,
+}
+
+/// How the model did against the frozen set of past disasters in `docs/VALIDATION.md` (contract
+/// v2; REVIEW R10): how many event-and-household pairs the target covered, partly covered, fell
+/// short on, or could not model.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ValidationSummary {
+    /// Event-and-household pairs tested.
+    pub events_tested: u16,
+    /// Pairs whose target covered what happened.
+    pub covered: u16,
+    /// Pairs covered in part.
+    pub partial: u16,
+    /// Pairs whose target fell short.
+    pub short: u16,
+    /// Pairs the model could not represent.
+    pub not_modelled: u16,
+    /// Version of the data pack the backtest ran on.
+    pub data_pack: String,
+    /// Where the app shows the full table, for example `"#/validation"`.
+    pub url_anchor: String,
+}
+
+impl ValidationSummary {
+    /// True when no table is bundled (every count zero and no pack named).
+    pub fn is_empty(&self) -> bool {
+        *self == ValidationSummary::default()
+    }
 }
 
 /// What `load_pack(name, bytes)` returns.
@@ -369,9 +402,10 @@ impl From<TierId> for TierInfo {
 }
 
 impl HazardInfo {
-    /// Every hazard, in [`HazardId::ALL`] order.
+    /// Every hazard the engine may emit, in [`HazardId::ACTIVE`] order: the retired `terrorism`
+    /// is left out.
     pub fn all() -> Vec<HazardInfo> {
-        HazardId::ALL.iter().map(|&h| h.into()).collect()
+        HazardId::ACTIVE.iter().map(|&h| h.into()).collect()
     }
 }
 
@@ -400,7 +434,7 @@ pub struct Catalogue {
     pub citations: Vec<Citation>,
     /// Every guidance block's metadata.
     pub guidance: Vec<GuidanceMeta>,
-    /// Every hazard id with its name and tier ([`HazardInfo::all`]).
+    /// Every hazard id the engine may emit, with its name and tier ([`HazardInfo::all`]).
     pub hazards: Vec<HazardInfo>,
     /// Every bucket id with its name and kinds ([`BucketInfo::all`]).
     pub buckets: Vec<BucketInfo>,
@@ -478,6 +512,7 @@ mod tests {
                 hazmat_facilities_within_5km: 3,
             },
             data_note: None,
+            exposure: crate::Exposure::default(),
         }
     }
 
@@ -611,17 +646,28 @@ mod tests {
     #[test]
     fn name_tables_cover_every_id() {
         let h = HazardInfo::all();
-        assert_eq!(h.len(), 35);
+        assert_eq!(
+            h.len(),
+            53,
+            "every active hazard; the retired terrorism is left out"
+        );
         assert_eq!(h[0].id, HazardId::Avalanche);
         assert_eq!(h[0].name, "Avalanche");
+        assert!(h.iter().all(|i| !i.id.is_retired()));
+        let listed: Vec<HazardId> = h.iter().map(|i| i.id).collect();
+        assert_eq!(listed, HazardId::ACTIVE);
         let b = BucketInfo::all();
-        assert_eq!(b.len(), 14);
-        assert_eq!(b[12].id, BucketId::Income);
-        assert_eq!(b[12].kind, BucketKind::Money);
-        assert_eq!(b[12].target_kind, TargetKind::Months);
-        assert_eq!(b[13].id, BucketId::HomeLoss);
+        assert_eq!(b.len(), 15);
+        assert_eq!(b[12].id, BucketId::CleanAir);
+        assert_eq!(b[12].name, "Unhealthy air indoors");
+        assert_eq!(b[12].kind, BucketKind::Readiness);
+        assert_eq!(b[12].target_kind, TargetKind::Readiness);
+        assert_eq!(b[13].id, BucketId::Income);
         assert_eq!(b[13].kind, BucketKind::Money);
-        assert_eq!(b[13].target_kind, TargetKind::Readiness);
+        assert_eq!(b[13].target_kind, TargetKind::Months);
+        assert_eq!(b[14].id, BucketId::HomeLoss);
+        assert_eq!(b[14].kind, BucketKind::Money);
+        assert_eq!(b[14].target_kind, TargetKind::Readiness);
         let t = TierInfo::all();
         assert_eq!(t.len(), 7);
         let json = serde_json::to_value(&t).unwrap();

@@ -32,9 +32,28 @@ fn every_bucket_has_its_own_block() {
 fn every_hazard_is_explained_by_a_block() {
     for h in HazardId::ALL {
         let target = format!("hazard:{}", h.as_str());
+        // A rare hazard may be explained by its family block instead (`family:<id>`).
+        let by_family = h.is_rare() && content().family_block(h.as_str()).is_some();
         assert!(
-            content().guidance_for(&target).next().is_some(),
+            by_family || content().guidance_for(&target).next().is_some(),
             "no guidance block applies to {target}"
+        );
+    }
+}
+
+#[test]
+fn every_rare_family_has_a_family_block() {
+    // A rare family is named by its lead hazard id; its block applies to `family:<id>` and says
+    // what the family changes in the plan.
+    for id in rr_types::rare_family_ids() {
+        let g = content()
+            .family_block(id)
+            .unwrap_or_else(|| panic!("no family block applies to family:{id}"));
+        assert_eq!(g.kind(), rr_content::GuidanceKind::Family);
+        assert!(
+            g.prose().contains("**What it changes in your plan.**"),
+            "{}: say what the family changes in the plan",
+            g.meta.id
         );
     }
 }
@@ -62,13 +81,18 @@ fn the_topics_named_in_the_brief_exist() {
         "drills",
         "rotation",
         "renters",
-        "disability_access",
+        "access_needs",
         "pets",
         "evs",
         "mental_health",
         "the_dial",
         "climate_horizon",
         "antibiotics",
+        // v0.2.0 (content brief, round 2 phase 2).
+        "long_horizon",
+        "validation",
+        "strategic_sites",
+        "before_you_need_them",
     ] {
         let g = block(&format!("topic_{slug}"));
         let target = format!("topic:{slug}");
@@ -183,4 +207,58 @@ fn the_glossary_covers_the_terms_the_brief_names() {
             t.term
         );
     }
+}
+
+/// The blocks the v0.2.0 content brief added, which it caps at 250 words each (the validator's
+/// limit for every block is 300). Run with `--nocapture` for the word-count table.
+const NEW_IN_V0_2: &[&str] = &[
+    "after_first_30_days",
+    "plan_shelter",
+    "plan_forecast_48h",
+    "plan_communication",
+    "topic_access_needs",
+    "bucket_clean_air",
+    "hazard_water_damage",
+    "hazard_wildfire_smoke",
+    "hazard_dam_levee",
+    "hazard_network_outage",
+    "hazard_drug_shortage",
+    "hazard_benefit_interruption",
+    "hazard_eviction",
+    "hazard_attack_disruption",
+    "hazard_dust_storm",
+    "hazard_sinkhole",
+    "hazard_arrest_or_detention",
+    "family_nuclear",
+    "family_solar_storm",
+    "family_long_blackout",
+    "family_war_infrastructure",
+    "family_cbrn",
+    "family_severe_pandemic",
+    "family_large_eruption",
+    "family_financial_crisis",
+    "family_mass_violence",
+    "topic_long_horizon",
+    "topic_validation",
+    "topic_strategic_sites",
+    "topic_before_you_need_them",
+];
+
+#[test]
+fn new_blocks_stay_within_the_briefs_word_budget() {
+    println!("| Block | Words | Grade |\n| --- | ---: | ---: |");
+    let mut total = 0;
+    let mut over = Vec::new();
+    for id in NEW_IN_V0_2 {
+        let plain = rr_content::readability::plain_text(block(id).prose());
+        let words = rr_content::readability::words(&plain).len();
+        let grade = rr_content::readability::flesch_kincaid_grade(&plain).unwrap_or(0.0);
+        println!("| `{id}` | {words} | {grade:.1} |");
+        total += words;
+        if words > 250 {
+            over.push(format!("{id} ({words})"));
+        }
+    }
+    println!("| total ({} blocks) | {total} | |", NEW_IN_V0_2.len());
+    assert!(over.is_empty(), "over the brief's 250 words: {over:?}");
 }

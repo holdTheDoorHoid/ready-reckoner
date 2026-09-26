@@ -16,7 +16,9 @@ fn every_citation_id_is_defined_or_requested() {
     let listed = repo_file("docs/CITATION_IDS.md").expect("docs/CITATION_IDS.md");
     let registry = repo_file("content/citations.toml").unwrap_or_default();
     for id in rr_hazards::CITATION_IDS {
-        let in_list = listed.contains(&format!("`{id}`"));
+        // Registered ids appear in backticks; ids requested and not yet written appear in bold
+        // (the rr-content index test checks every backticked id against the registry).
+        let in_list = listed.contains(&format!("`{id}`")) || listed.contains(&format!("**{id}**"));
         let in_registry = registry.contains(&format!("id = \"{id}\""));
         assert!(
             in_list || in_registry,

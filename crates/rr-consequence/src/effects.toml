@@ -38,11 +38,30 @@
 #                      this event (Oregon Resilience Plan two-tier rating).
 #   duration_factor /  uncertainty: the 90th-percentile multiplier on the duration or the share
 #   p_factor           (defaults come from [params]).
+#   also_requires      a second condition (a place and public water, say).
+#   fragile            the share is scaled by how easily the household's public water system breaks:
+#                      the county's drinking-water violations (EPA SDWIS) times the household's own
+#                      answer about its system (model review M-03); only rows for homes on public water.
+#   county_rate_keys   the events are county-scale and happen at the county's recorded rate of these
+#                      NOAA Storm Events episodes (damaging share applied): a flood can shut the water
+#                      plant without reaching the home. p_given_event is then per recorded episode.
+#   fixed_rate         the events happen at the rate of this [params] entry (a class the hazard's own
+#                      count does not see: a grid emergency in extreme cold).
+#   curve_class        the regional restoration-curve class that scales this power row's duration
+#                      (hurricane, cold_grid, flood, grid): the region's time to 90 % restored over
+#                      the mainland's, bounded 0.5 to 5 (model review M-10).
+#   island_curve       on an island grid with a hand-copied historic curve (Puerto Rico: Maria; the US
+#                      Virgin Islands: Irma and Maria), that curve is the duration.
+#
+# Durations on home_loss rows are the time until the home is livable again (for the displacement
+# cost, model review M-08); on clean_air rows, the length of a smoke, dust or chemical-air episode
+# (for the "days a year" figure). Rare families (nuclear attack, solar storms, ...) have no rows:
+# they are shown in their own box and never enter a bucket's curve.
 #
 # Hazard rates (how often each hazard reaches the household) are NOT in this file: rr-hazards
 # supplies them as HouseholdEventRate. See docs/RISK_MODEL.md, "Consequences and targets".
 
-version = "2026-09-25"
+version = "2026-09-26"
 
 # ---------------------------------------------------------------------------------------------
 # Parameters used by the coupling rules, the money buckets and the ranges.
@@ -273,6 +292,101 @@ evidence = "prior"
 sources = ["rr_risk_model_priors"]
 note = "County outage rates from 2014-2025 records are uncertain by about a factor of 1.3."
 
+[params.fragility_county_clean]
+value = 0.5
+unit = "times the national water-system failure rate, county with no violations"
+evidence = "prior"
+sources = ["epa_echo_sdwa", "rr_risk_model_priors"]
+note = "Model review M-03: where no public-water customer in the county was served by a system with a health-based violation in the last five years (EPA SDWIS), water-system failures are taken as half as likely as the national rate."
+
+[params.fragility_county_flagged]
+value = 3.0
+unit = "times the national water-system failure rate, county where every system had a violation"
+evidence = "prior"
+sources = ["epa_echo_sdwa", "rr_risk_model_priors"]
+note = "Linear in the share of customers served by a system with a health-based violation, from x0.5 to x3. The population-weighted mean share is about 0.19, which gives about x1, so the national rate holds on average. Narrower than the review's x0.5 to x5 because a violation is a compliance record, not a measure of fragility: one large system flips a whole county (New York City's reservoir-cover case), and a five-year window can include the failure itself (data audit section 6.1)."
+
+[params.fragility_record_fine]
+value = 0.5
+unit = "times, household says its system has been fine"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "The household's own answer about its public water system (contract v2 Housing.water_system_record): no notices or problems it remembers."
+
+[params.fragility_record_occasional]
+value = 1.5
+unit = "times, household reports a notice or a problem now and then"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A boil-water notice or an outage now and then."
+
+[params.fragility_record_frequent]
+value = 3.0
+unit = "times, household reports frequent notices or outages"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Model review M-03: a household whose system has been out, or under a notice, for more than a week in the last ten years gets x3."
+
+[params.fragility_cap]
+value = 9.0
+unit = "largest combined multiplier"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "The county's record times the household's answer, at most x9 (x3 by x3)."
+
+[params.fragility_floor]
+value = 0.25
+unit = "smallest combined multiplier"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "At least a quarter of the national rate: no public system is failure-free."
+
+[params.fragility_uncertainty]
+value = 2.0
+unit = "90th-percentile multiplier"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "How easily a given system breaks is uncertain by about a factor of 2 either way."
+
+[params.cold_emergency_rate]
+value = 0.033
+low = 0.017
+high = 0.067
+unit = "grid emergencies in extreme cold per year"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Model review M-11: about 1 in 30 a year (1 in 60 to 1 in 15) where the grid has failed in extreme cold (Texas, February 2011 and 2021; the Southeast, December 2022)."
+
+[params.public_water_power_share]
+value = 0.1
+low = 0.03
+high = 0.3
+unit = "share of long power cuts that also stop public water"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A public water system keeps pumping on backup power for a few days; in longer regional outages some lose pressure (Hurricane Maria, where households averaged 68 days without water; Harvey; Laura). Scaled by how easily the system breaks."
+
+[params.public_water_power_days]
+value = 3.0
+unit = "days"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "About how long a public system's backup power lasts before pressure can fail."
+
+[params.housing_share_of_expenses]
+value = 0.3
+unit = "share of monthly expenses"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Housing is about 30 percent of a household's monthly spending (model review M-08: the displacement cost uses 30 percent of monthly expenses when no housing cost is given)."
+
+[params.curve_min_events]
+value = 5.0
+unit = "major county events"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A region's restoration curve for a cause is used only when it pools at least this many major county events; otherwise the row keeps its national duration."
+
 # ---------------------------------------------------------------------------------------------
 # Natural hazards
 # ---------------------------------------------------------------------------------------------
@@ -317,8 +431,9 @@ bucket = "home_loss"
 class = "slide"
 label = "avalanches closing roads"
 p_given_event = 0.01
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 180.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "coastal_flooding"
@@ -338,8 +453,9 @@ bucket = "home_loss"
 class = "surge"
 label = "flooding from the sea"
 p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 180.0 }
 evidence = "prior"
-sources = ["fema_nri_v120", "rr_risk_model_priors"]
+sources = ["fema_nri_v120", "rr_risk_model_priors", "census_pulse_displacement"]
 note = "Share of flooded homes left unlivable for a while (the National Risk Index loss ratio is used only to check this is material)."
 
 [[effect]]
@@ -350,6 +466,7 @@ label = "flooding from the sea"
 p_given_event = 0.1
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 10.0 }
 requires = "municipal"
+fragile = true
 evidence = "prior"
 sources = ["epa_boil_water_report_2024", "rr_risk_model_priors"]
 
@@ -362,6 +479,7 @@ p_given_event = 0.3
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
 heat_share = 0.2
 cold_share = 0.3
+curve_class = "flood"
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
@@ -406,6 +524,7 @@ label = "extreme cold straining the grid"
 p_given_event = 0.003
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
 requires = "municipal"
+fragile = true
 evidence = "prior"
 sources = ["shaffer_2026_texas_boil_notices", "rr_risk_model_priors"]
 note = "About 1 in 300 county cold waves breaks mains widely enough for a boil-water notice (winter notices in Texas lasted a median of 7 days)."
@@ -542,8 +661,9 @@ bucket = "home_loss"
 class = "shaking"
 label = "earthquake shaking that knocks things off shelves"
 p_given_event = 0.02
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 365.0 }
 evidence = "prior"
-sources = ["fema_nri_v120", "rr_risk_model_priors"]
+sources = ["fema_nri_v120", "rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "earthquake"
@@ -574,8 +694,9 @@ bucket = "home_loss"
 class = "local"
 label = "short storm outages"
 p_given_event = 0.002
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "heat_wave"
@@ -605,12 +726,14 @@ note = "Without air conditioning, dangerous heat indoors lasts as long as the he
 
 [[effect]]
 hazard = "hurricane"
+part = "cat12"
 bucket = "power"
 class = "cat12"
 label = "hurricanes and tropical storms"
-p_given_event = 0.45
+p_given_event = 0.48
 duration = { kind = "log_normal", median_days = 1.5, p90_days = 5.0 }
 heat_share = 0.5
+curve_class = "hurricane"
 duration_evidence = "empirical"
 evidence = "prior"
 sources = ["ornl_repowrd_2022", "rr_risk_model_priors"]
@@ -618,13 +741,16 @@ note = "Duration from ORNL restoration records (Irma: restoration rate 0.02 per 
 
 [[effect]]
 hazard = "hurricane"
+part = "major"
 bucket = "power"
 class = "cat3plus"
 label = "major hurricanes (category 3 or a direct hit)"
-p_given_event = 0.06
+p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 5.0, p90_days = 16.0 }
 heat_share = 0.5
 replaced_by = "major_hurricane_direct_hit"
+curve_class = "hurricane"
+island_curve = true
 duration_evidence = "empirical"
 evidence = "prior"
 sources = ["ornl_repowrd_2022", "rr_risk_model_priors"]
@@ -632,32 +758,36 @@ note = "Duration from ORNL restoration records (Michael: rate 0.006 per hour, ha
 
 [[effect]]
 hazard = "hurricane"
+part = "cat12"
 bucket = "water_boil"
 class = "cat12"
 label = "hurricanes and tropical storms"
-p_given_event = 0.15
+p_given_event = 0.16
 duration = { kind = "log_normal", median_days = 6.0, p90_days = 18.0 }
 requires = "municipal"
+fragile = true
 evidence = "prior"
 sources = ["shaffer_2026_texas_boil_notices", "rr_risk_model_priors"]
 note = "Hurricane boil-water notices in Texas lasted a median of 6 days."
 
 [[effect]]
 hazard = "hurricane"
+part = "cat12"
 bucket = "supplies"
 class = "cat12"
 label = "hurricanes and tropical storms"
-p_given_event = 0.1
+p_given_event = 0.11
 duration = { kind = "log_normal", median_days = 2.0, p90_days = 5.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
 [[effect]]
 hazard = "hurricane"
+part = "major"
 bucket = "supplies"
 class = "cat3plus"
 label = "major hurricanes (category 3 or a direct hit)"
-p_given_event = 0.06
+p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 5.0, p90_days = 14.0 }
 replaced_by = "major_hurricane_direct_hit"
 evidence = "prior"
@@ -665,10 +795,11 @@ sources = ["rr_risk_model_priors"]
 
 [[effect]]
 hazard = "hurricane"
+part = "major"
 bucket = "medication"
 class = "cat3plus"
 label = "major hurricanes (category 3 or a direct hit)"
-p_given_event = 0.06
+p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
 replaced_by = "major_hurricane_direct_hit"
 evidence = "prior"
@@ -676,20 +807,22 @@ sources = ["rr_risk_model_priors"]
 
 [[effect]]
 hazard = "hurricane"
+part = "cat12"
 bucket = "comms"
 class = "cat12"
 label = "hurricanes and tropical storms"
-p_given_event = 0.1
+p_given_event = 0.11
 duration = { kind = "log_normal", median_days = 0.5, p90_days = 2.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
 [[effect]]
 hazard = "hurricane"
+part = "major"
 bucket = "comms"
 class = "cat3plus"
 label = "major hurricanes (category 3 or a direct hit)"
-p_given_event = 0.06
+p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 10.0 }
 replaced_by = "major_hurricane_direct_hit"
 evidence = "prior"
@@ -697,10 +830,11 @@ sources = ["rr_risk_model_priors"]
 
 [[effect]]
 hazard = "hurricane"
+part = "cat12"
 bucket = "evacuate"
 class = "cat12"
 label = "hurricanes and tropical storms"
-p_given_event = 0.1
+p_given_event = 0.11
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
 notice_hours = [24.0, 72.0]
 evidence = "prior"
@@ -722,22 +856,26 @@ note = "Mobile homes are told to leave for hurricane-force winds that most house
 
 [[effect]]
 hazard = "hurricane"
+part = "cat12"
 bucket = "home_loss"
 class = "cat12"
 label = "hurricanes and tropical storms"
-p_given_event = 0.01
+p_given_event = 0.011
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 90.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "hurricane"
+part = "major"
 bucket = "home_loss"
 class = "cat3plus"
 label = "major hurricanes (category 3 or a direct hit)"
-p_given_event = 0.02
+p_given_event = 0.33
+duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
 replaced_by = "major_hurricane_direct_hit"
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "ice_storm"
@@ -866,8 +1004,9 @@ bucket = "home_loss"
 class = "damage"
 label = "landslides damaging the home"
 p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "landslide"
@@ -909,8 +1048,9 @@ bucket = "home_loss"
 class = "flood"
 label = "floods at or near the home"
 p_given_event = 0.15
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 180.0 }
 evidence = "prior"
-sources = ["fema_nri_v120", "rr_risk_model_priors"]
+sources = ["fema_nri_v120", "rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "riverine_flooding"
@@ -920,6 +1060,7 @@ label = "floods at or near the home"
 p_given_event = 0.1
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 10.0 }
 requires = "municipal"
+fragile = true
 evidence = "prior"
 sources = ["epa_boil_water_report_2024", "rr_risk_model_priors"]
 
@@ -932,6 +1073,7 @@ p_given_event = 0.1
 duration = { kind = "log_normal", median_days = 0.5, p90_days = 3.0 }
 heat_share = 0.2
 cold_share = 0.3
+curve_class = "flood"
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
@@ -1050,8 +1192,9 @@ bucket = "home_loss"
 class = "path"
 label = "tornadoes"
 p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 180.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "tornado"
@@ -1084,8 +1227,9 @@ bucket = "home_loss"
 class = "distant"
 label = "tsunamis from distant earthquakes"
 p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 180.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "volcanic_activity"
@@ -1146,8 +1290,9 @@ bucket = "home_loss"
 class = "ash"
 label = "volcanic ash"
 p_given_event = 0.02
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 90.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "wildfire"
@@ -1177,24 +1322,14 @@ note = "Every event of the shutoff part cuts the power. Utilities cut power for 
 
 [[effect]]
 hazard = "wildfire"
-bucket = "supplies"
-class = "smoke"
-label = "wildfire smoke"
-p_given_event = 0.3
-duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
-evidence = "prior"
-sources = ["rr_risk_model_priors"]
-note = "Heavy smoke keeps people indoors for days."
-
-[[effect]]
-hazard = "wildfire"
 part = "burn"
 bucket = "home_loss"
 class = "threat"
 label = "wildfires"
 p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 180.0, p90_days = 730.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 note = "One home burns for every 20 households warned to leave (rr-hazards' households warned per home that burns, 5 to 50)."
 
 [[effect]]
@@ -1242,6 +1377,271 @@ evidence = "prior"
 sources = ["rr_risk_model_priors"]
 note = "A storm can catch a commuter away from home with roads closed."
 
+# --- v0.2.0: water systems that fail in floods, storms and freezes (model review M-03) -----------
+
+[[effect]]
+hazard = "cold_wave"
+bucket = "power"
+class = "cold_emergency"
+label = "a grid emergency in extreme cold (rolling blackouts)"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 1.1, p90_days = 1.9 }
+fixed_rate = "cold_emergency_rate"
+requires = "cold_grid_region"
+cold_share = 1.0
+curve_class = "cold_grid"
+duration_evidence = "empirical"
+evidence = "prior"
+sources = ["ornl_eagle_i_outages", "rr_risk_model_priors"]
+note = "Model review M-11: one event takes power, heat, water and roads together (Texas, February 2021: load shed reached 20,000 MW). The duration is the pooled EAGLE-I record of 269 cold-driven grid emergencies across the mainland (half the customers back in 1.1 days, nine in ten in 1.9), stretched by the region's own record where the pack has it (the Southwest's is about 5 times longer); the review's guess was 2 to 4 days. Outages of this kind leave the pooled county record, so they are counted once, here."
+
+[[effect]]
+hazard = "cold_wave"
+bucket = "water_boil"
+class = "cold_emergency"
+label = "a grid emergency in extreme cold (rolling blackouts)"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+fixed_rate = "cold_emergency_rate"
+requires = "cold_grid_region"
+also_requires = "municipal"
+fragile = true
+evidence = "prior"
+sources = ["shaffer_2026_texas_boil_notices", "rr_risk_model_priors"]
+note = "Treatment plants lose power and mains break: in February 2021 about half of Texas's people were under a boil-water notice (Austin: 17 to 23 February); Texas winter notices lasted a median of 7 days."
+
+[[effect]]
+hazard = "cold_wave"
+bucket = "water_out"
+class = "cold_emergency"
+label = "a grid emergency in extreme cold (rolling blackouts)"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 10.0 }
+fixed_rate = "cold_emergency_rate"
+requires = "cold_grid_region"
+also_requires = "municipal"
+fragile = true
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Pressure fails when pumps stop and pipes burst; a fragile system can be out for weeks (Jackson, Mississippi, February 2021)."
+
+[[effect]]
+hazard = "cold_wave"
+bucket = "supplies"
+class = "cold_emergency"
+label = "a grid emergency in extreme cold (rolling blackouts)"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 5.0 }
+fixed_rate = "cold_emergency_rate"
+requires = "cold_grid_region"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Iced roads and dark stores keep people home for days."
+
+[[effect]]
+hazard = "hurricane"
+part = "cat12"
+bucket = "water_out"
+class = "cat12"
+label = "hurricanes and tropical storms"
+p_given_event = 0.032
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+requires = "municipal"
+fragile = true
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A few storms flood or cut the power to a water plant (Beaumont, Texas, after Harvey, about 10 days; Lumberton, North Carolina, after Matthew). Scaled by how easily the local system breaks."
+
+[[effect]]
+hazard = "hurricane"
+part = "major"
+bucket = "water_out"
+class = "cat3plus"
+label = "major hurricanes (category 3 or a direct hit)"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 49.0 }
+requires = "municipal"
+fragile = true
+replaced_by = "major_hurricane_direct_hit"
+evidence = "prior"
+sources = ["epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
+note = "Half of direct hits take out tap water somewhere in the county (the scenario's row), for about a week and up to 7 weeks (Asheville after Helene)."
+
+[[effect]]
+hazard = "hurricane"
+part = "major"
+bucket = "water_boil"
+class = "cat3plus"
+label = "major hurricanes (category 3 or a direct hit)"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 10.0, p90_days = 45.0 }
+requires = "municipal"
+fragile = true
+replaced_by = "major_hurricane_direct_hit"
+evidence = "prior"
+sources = ["epa_asheville_boil_notice_2024", "shaffer_2026_texas_boil_notices", "rr_risk_model_priors"]
+note = "After a direct hit, notices run for weeks (Asheville, 7 weeks after Helene)."
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "water_out"
+class = "plant_flood"
+label = "a flood that knocks out the water system"
+p_given_event = 0.005
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+county_rate_keys = ["flood"]
+requires = "municipal"
+fragile = true
+evidence = "prior"
+sources = ["noaa_storm_events", "epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
+note = "Model review M-03. Treatment plants, intakes and mains sit by rivers: about 1 in 200 of a county's damaging river floods (NOAA Storm Events) takes its water system out for days, scaled by how easily the system breaks. Median a week; the bad case is Asheville after Helene (running water back to most users only after 3 to 5 weeks) and Jackson, Mississippi, in 2022 (service virtually stopped for about a week)."
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "water_boil"
+class = "plant_flood"
+label = "a flood that knocks out the water system"
+p_given_event = 0.005
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 45.0 }
+county_rate_keys = ["flood"]
+requires = "municipal"
+fragile = true
+evidence = "prior"
+sources = ["noaa_storm_events", "epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
+note = "When the water comes back it must be boiled for weeks: Asheville's notice was lifted about 7 weeks after Helene, Jackson's after nearly 7 weeks in 2022."
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "evacuate"
+class = "below_grade"
+label = "flash flooding in rooms below street level"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 30.0 }
+notice_hours = [0.05, 1.0]
+requires = "below_grade"
+evidence = "prior"
+sources = ["nws_turn_around_dont_drown", "rr_risk_model_priors"]
+note = "Model review M-09: water fills a basement room in minutes (Queens, September 2021, where 11 people drowned in basement homes outside the high-risk flood zone)."
+
+[[effect]]
+hazard = "coastal_flooding"
+bucket = "water_out"
+class = "plant_surge"
+label = "storm surge that knocks out the water system"
+p_given_event = 0.01
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 14.0 }
+county_rate_keys = ["coastal_flood", "storm_surge"]
+requires = "municipal"
+fragile = true
+evidence = "prior"
+sources = ["noaa_storm_events", "rr_risk_model_priors"]
+note = "Model review M-03: about 1 in 100 damaging coastal floods in a county takes a water plant or its mains out; the bad case is Long Beach, New York, after Sandy (water declared safe and sewers back 13 days after landfall)."
+
+[[effect]]
+hazard = "coastal_flooding"
+bucket = "water_boil"
+class = "plant_surge"
+label = "storm surge that knocks out the water system"
+p_given_event = 0.01
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+county_rate_keys = ["coastal_flood", "storm_surge"]
+requires = "municipal"
+fragile = true
+evidence = "prior"
+sources = ["noaa_storm_events", "rr_risk_model_priors"]
+note = "After a surge the water must be boiled or not drunk until tests clear it."
+
+[[effect]]
+hazard = "volcanic_activity"
+bucket = "clean_air"
+class = "ash"
+label = "volcanic ash"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+evidence = "prior"
+sources = ["ready_gov_volcanoes", "rr_risk_model_priors"]
+note = "Ash in the air: stay inside with windows closed and wear a well-fitting mask outside."
+
+# --- v0.2.0: new natural hazards -----------------------------------------------------------------
+
+[[effect]]
+hazard = "wildfire_smoke"
+bucket = "clean_air"
+class = "smoke"
+label = "days of wildfire smoke"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+evidence = "prior"
+sources = ["cdc_wildfire_smoke", "epa_wildfire_indoor_air", "rr_risk_model_priors"]
+note = "rr-hazards counts smoke episodes (the county's smoke days with PM2.5 of 35 or more, about 3 days to an episode). Every episode means unhealthy air outdoors; the need is clean air indoors: a sealed room, an air cleaner or a filter box, respirators for going out."
+
+[[effect]]
+hazard = "wildfire_smoke"
+bucket = "supplies"
+class = "smoke"
+label = "days of wildfire smoke"
+p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 4.0 }
+evidence = "prior"
+sources = ["cdc_wildfire_smoke", "rr_risk_model_priors"]
+note = "Heavy smoke keeps people, above all those with heart or lung disease, older adults and children, inside for days."
+
+[[effect]]
+hazard = "dust_storm"
+bucket = "clean_air"
+class = "dust"
+label = "dust storms"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.5 }
+evidence = "prior"
+sources = ["nws_dust_storms", "noaa_storm_events", "rr_risk_model_priors"]
+note = "rr-hazards counts dust-storm episodes that reach the household; the dust fouls indoor air for hours."
+
+[[effect]]
+hazard = "dust_storm"
+bucket = "supplies"
+class = "dust"
+label = "dust storms"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 0.25, p90_days = 1.0 }
+evidence = "prior"
+sources = ["nws_dust_storms", "noaa_storm_events", "rr_risk_model_priors"]
+note = "Near-zero visibility keeps people off the roads for hours."
+
+[[effect]]
+hazard = "dust_storm"
+bucket = "get_home"
+class = "dust"
+label = "dust storms"
+p_given_event = 0.3
+requires = "commuter"
+evidence = "prior"
+sources = ["nws_dust_storms", "noaa_storm_events", "rr_risk_model_priors"]
+note = "A commuter caught on the highway must pull off and wait it out."
+
+[[effect]]
+hazard = "sinkhole"
+bucket = "home_loss"
+class = "collapse"
+label = "ground collapsing or settling under the home"
+p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 180.0 }
+evidence = "prior"
+sources = ["usgs_sinkholes", "census_pulse_displacement", "rr_risk_model_priors"]
+note = "rr-hazards counts ground collapse or settling that damages or threatens a home in limestone country; about 1 in 5 makes it unlivable for a while."
+
+[[effect]]
+hazard = "sinkhole"
+bucket = "evacuate"
+class = "collapse"
+label = "ground collapsing or settling under the home"
+p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 90.0 }
+notice_hours = [0.0, 24.0]
+evidence = "prior"
+sources = ["usgs_sinkholes", "rr_risk_model_priors"]
+note = "A sinkhole can open with no warning, or cracks can show for days first."
+
 # ---------------------------------------------------------------------------------------------
 # Societal hazards
 # ---------------------------------------------------------------------------------------------
@@ -1276,6 +1676,7 @@ p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
 heat_share = 0.3
 cold_share = 0.4
+curve_class = "grid"
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 note = "The 2003 Northeast blackout lasted up to 4 days where it hit."
@@ -1288,6 +1689,7 @@ label = "a regional blackout"
 p_given_event = 0.4
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
 requires = "municipal"
+fragile = true
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 note = "Water systems without backup power lose pressure in a long blackout."
@@ -1447,57 +1849,152 @@ bucket = "home_loss"
 class = "release"
 label = "a nuclear plant accident"
 p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 90.0, p90_days = 730.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
+
+# --- v0.2.0: new societal hazards ----------------------------------------------------------------
+
+[[effect]]
+hazard = "hazmat_release"
+bucket = "clean_air"
+class = "release"
+label = "chemical releases"
+p_given_event = 0.4
+duration = { kind = "log_normal", median_days = 0.25, p90_days = 1.0 }
+evidence = "prior"
+sources = ["ready_gov_chemical", "rr_risk_model_priors"]
+note = "An air release means sheltering in place with windows shut and the air system off: the sealed-room plan."
+
+[[effect]]
+hazard = "dam_failure"
+bucket = "evacuate"
+class = "release"
+label = "a dam or levee failure, or the threat of one"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [0.25, 6.0]
+evidence = "prior"
+sources = ["fema_dam_residual_risk_2018", "rr_risk_model_priors"]
+note = "rr-hazards counts failures or spillway emergencies that order households downstream or behind a levee to leave; warning can be minutes to hours."
+
+[[effect]]
+hazard = "dam_failure"
+bucket = "home_loss"
+class = "release"
+label = "a dam or levee failure, or the threat of one"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 180.0 }
+evidence = "prior"
+sources = ["fema_dam_residual_risk_2018", "census_pulse_displacement", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "dam_failure"
+bucket = "power"
+class = "release"
+label = "a dam or levee failure, or the threat of one"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 7.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
 [[effect]]
-hazard = "nuclear_attack"
-bucket = "supplies"
-class = "shelter"
-label = "a nuclear attack"
-p_given_event = 1.0
-duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+hazard = "dam_failure"
+bucket = "water_out"
+class = "release"
+label = "a dam or levee failure, or the threat of one"
+p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+requires = "municipal"
+fragile = true
 evidence = "prior"
-sources = ["ready_gov_nuclear", "rr_risk_model_priors"]
-note = "Official advice is to get inside, stay inside for at least 24 hours, and stay tuned; what happens after that is unknown."
+sources = ["rr_risk_model_priors"]
+note = "Where the reservoir is the town's supply, or the flood reaches the plant."
 
 [[effect]]
-hazard = "terrorism"
+hazard = "network_outage"
+bucket = "comms"
+class = "network"
+label = "phone or internet network outages"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 0.25, p90_days = 1.0 }
+evidence = "prior"
+sources = ["fcc_att_outage_2024", "rr_risk_model_priors"]
+note = "A carrier or internet outage cuts calls and texts, 911 included, for hours (AT&T, February 2024: about 12 hours)."
+
+[[effect]]
+hazard = "drug_shortage"
+bucket = "medication"
+class = "shortage"
+label = "a shortage of a daily prescription"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["fda_drug_shortages", "rr_risk_model_priors"]
+note = "rr-hazards counts, for each person on a daily prescription, a year's chance that it cannot be filled. A national shortage can last months, but a patient usually gets another strength, maker or pharmacy within days (median 5 days), weeks at worst (21 days; the hazard table's 7 d / 30 d describes the shortage, not the gap). Refill rules keep practical buffers near a month, so the rest is the prescriber conversation."
+
+[[effect]]
+hazard = "benefit_interruption"
+bucket = "supplies"
+class = "lapse"
+label = "a lapse in food benefits"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 10.0, p90_days = 30.0 }
+requires = "food_benefit"
+evidence = "prior"
+sources = ["me_dhhs_snap_2025", "rr_risk_model_priors"]
+note = "Model review M-12: November 2025 SNAP allotments were suspended from 1 November, with partial and then full payments after 12 November; food money runs short for one to four weeks."
+
+[[effect]]
+hazard = "attack_disruption"
 bucket = "supplies"
 class = "lockdown"
-label = "a terrorist attack"
+label = "an attack or threat that closes your area"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 0.5, p90_days = 2.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "rr-hazards counts attacks or credible threats that put the household's area under a shelter or stay-away order (Boston, April 2013: a day)."
+
+[[effect]]
+hazard = "attack_disruption"
+bucket = "comms"
+class = "lockdown"
+label = "an attack or threat that closes your area"
 p_given_event = 0.3
 duration = { kind = "log_normal", median_days = 0.5, p90_days = 2.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
+note = "Phone networks jam as everyone calls at once."
 
 [[effect]]
-hazard = "terrorism"
-bucket = "comms"
+hazard = "attack_disruption"
+bucket = "get_home"
 class = "lockdown"
-label = "a terrorist attack"
-p_given_event = 0.2
-duration = { kind = "log_normal", median_days = 0.5, p90_days = 2.0 }
+label = "an attack or threat that closes your area"
+p_given_event = 0.5
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Transit stops and roads close; a commuter may have to walk home or wait it out."
+
+[[effect]]
+hazard = "attack_disruption"
+bucket = "security"
+class = "lockdown"
+label = "an attack or threat that closes your area"
+p_given_event = 0.5
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
 [[effect]]
-hazard = "terrorism"
+hazard = "attack_disruption"
 bucket = "evacuate"
 class = "lockdown"
-label = "a terrorist attack"
+label = "an attack or threat that closes your area"
 p_given_event = 0.05
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
 notice_hours = [0.0, 1.0]
-evidence = "prior"
-sources = ["rr_risk_model_priors"]
-
-[[effect]]
-hazard = "terrorism"
-bucket = "security"
-class = "lockdown"
-label = "a terrorist attack"
-p_given_event = 0.5
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
@@ -1532,6 +2029,7 @@ bucket = "home_loss"
 class = "fire"
 label = "a fire at home or next door"
 p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
 evidence = "prior"
 sources = ["usfa_residential_fires", "census_pulse_displacement", "rr_risk_model_priors"]
 note = "Long displacement is most common after fires."
@@ -1586,6 +2084,7 @@ p_given_event = 0.333
 duration = { kind = "log_normal", median_days = 2.0, p90_days = 6.0 }
 requires = "municipal"
 event_keys = ["boil_water_notice", "boil_water"]
+fragile = true
 evidence = "prior"
 sources = ["shaffer_2026_texas_boil_notices", "water_2024_kentucky_advisories", "rr_risk_model_priors"]
 note = "Texas notices (2010-2022) most often lasted 3 to 4 days; Kentucky advisories averaged 5 days."
@@ -1598,6 +2097,7 @@ label = "a major water system failure"
 p_given_event = 0.0267
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
 requires = "municipal"
+fragile = true
 evidence = "prior"
 sources = ["epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
 note = "Rare system-wide failures (Jackson 2022, Asheville 2024) left cities without safe tap water for weeks."
@@ -1641,6 +2141,54 @@ p_given_event = 0.5
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 note = "A long illness at home often brings urgent care visits."
+
+# --- v0.2.0: new personal hazards ----------------------------------------------------------------
+
+[[effect]]
+hazard = "local_utility_outage"
+bucket = "water_boil"
+class = "system_failure"
+label = "a major water system failure"
+p_given_event = 0.0267
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 45.0 }
+requires = "municipal"
+fragile = true
+evidence = "prior"
+sources = ["epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
+note = "When a failed system comes back, the water must be boiled for weeks while it is flushed and tested (Asheville about 7 weeks after Helene; Jackson nearly 7 weeks in 2022)."
+
+[[effect]]
+hazard = "water_damage"
+bucket = "water_out"
+class = "leak"
+label = "a burst pipe or leak at home"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 0.25, p90_days = 2.0 }
+evidence = "prior"
+sources = ["iii_water_damage_protect", "rr_risk_model_priors"]
+note = "The water is shut off at the main until the pipe is fixed: hours, sometimes a day or two."
+
+[[effect]]
+hazard = "water_damage"
+bucket = "home_loss"
+class = "leak"
+label = "a burst pipe or leak at home"
+p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
+evidence = "prior"
+sources = ["iii_water_damage_protect", "census_pulse_displacement", "rr_risk_model_priors"]
+note = "About 1 in 20 floods rooms badly enough to move out while they dry and are repaired."
+
+[[effect]]
+hazard = "eviction"
+bucket = "home_loss"
+class = "eviction"
+label = "an eviction"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 90.0 }
+evidence = "prior"
+sources = ["eviction_lab_national", "rr_risk_model_priors"]
+note = "rr-hazards counts eviction filings that end with the household having to leave (renters only); finding a new home takes weeks to months."
 
 # ---------------------------------------------------------------------------------------------
 # Named scenarios (rates come from rr-hazards' scenario candidates)
@@ -1739,8 +2287,9 @@ bucket = "home_loss"
 class = "event"
 label = "a magnitude 9 Cascadia earthquake"
 p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 180.0, p90_days = 730.0 }
 evidence = "prior"
-sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors", "census_pulse_displacement"]
 note = "Some homes outside the tsunami zone will be too damaged to live in."
 
 [[effect]]
@@ -1847,8 +2396,9 @@ bucket = "home_loss"
 class = "event"
 label = "a magnitude 9 Cascadia earthquake"
 p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 90.0, p90_days = 730.0 }
 evidence = "prior"
-sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "earthquake"
@@ -1882,8 +2432,9 @@ bucket = "home_loss"
 class = "event"
 label = "a tsunami from a nearby earthquake"
 p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 180.0, p90_days = 730.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "hurricane"
@@ -1894,6 +2445,8 @@ label = "a direct hit by a major hurricane"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 5.0, p90_days = 16.0 }
 heat_share = 0.5
+curve_class = "hurricane"
+island_curve = true
 evidence = "empirical"
 sources = ["ornl_repowrd_2022"]
 note = "Michael (2018): restoration rate 0.006 per hour, half restored in 116 hours, 90 percent in 384 hours."
@@ -1907,6 +2460,7 @@ label = "a direct hit by a major hurricane"
 p_given_event = 0.5
 duration = { kind = "log_normal", median_days = 7.0, p90_days = 49.0 }
 requires = "municipal"
+fragile = true
 evidence = "prior"
 sources = ["epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
 
@@ -1917,10 +2471,12 @@ bucket = "water_boil"
 class = "event"
 label = "a direct hit by a major hurricane"
 p_given_event = 0.5
-duration = { kind = "log_normal", median_days = 6.0, p90_days = 18.0 }
+duration = { kind = "log_normal", median_days = 10.0, p90_days = 45.0 }
 requires = "municipal"
+fragile = true
 evidence = "prior"
-sources = ["shaffer_2026_texas_boil_notices", "rr_risk_model_priors"]
+sources = ["shaffer_2026_texas_boil_notices", "epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
+note = "After a direct hit, notices run for weeks (Asheville, 7 weeks after Helene; Jackson, 7 weeks in 2022): median 10 days, bad case 45 (Texas hurricane notices had a median of 6 days)."
 
 [[effect]]
 hazard = "hurricane"
@@ -1974,8 +2530,9 @@ bucket = "home_loss"
 class = "event"
 label = "a direct hit by a major hurricane"
 p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "earthquake"
@@ -2057,8 +2614,9 @@ bucket = "home_loss"
 class = "event"
 label = "a magnitude 7 New Madrid earthquake"
 p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "earthquake"
@@ -2161,8 +2719,9 @@ bucket = "home_loss"
 class = "event"
 label = "a magnitude 7 Hayward fault earthquake"
 p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
 
 [[effect]]
 hazard = "earthquake"
@@ -2187,6 +2746,378 @@ requires = "commuter"
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
+# v0.2.0: the three fault scenarios rr-hazards offers (agent/hazards2, merged).
+# No restoration study for these faults is registered, so they take the New Madrid and Hayward
+# priors for a major urban earthquake (expert estimate; the ShakeOut magnitude 7.8 would likely
+# be longer). Heat and cold shares follow the nearest existing scenario: Seattle as Cascadia
+# (no dangerous-heat share), the Wasatch Front as New Madrid, southern California as Hayward.
+
+[[effect]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+bucket = "power"
+class = "event"
+label = "a magnitude 7 Wasatch fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+cold_share = 0.4
+heat_share = 0.1
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "No regional restoration study was available; expert estimate for a major urban earthquake (Tohoku restored over 90 percent of power in 10 days)."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7 Wasatch fault earthquake"
+p_given_event = 0.7
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "rr_risk_model_priors"]
+note = "Hazus: an extensively damaged treatment plant is out for 32 days on average, storage tanks 93."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7 Wasatch fault earthquake"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 8.0, p90_days = 20.0 }
+requires = "well"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+bucket = "supplies"
+class = "event"
+label = "a magnitude 7 Wasatch fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+bucket = "medication"
+class = "event"
+label = "a magnitude 7 Wasatch fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+bucket = "comms"
+class = "event"
+label = "a magnitude 7 Wasatch fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "After Tohoku, 90 percent of phone lines were back in two weeks."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+bucket = "home_loss"
+class = "event"
+label = "a magnitude 7 Wasatch fault earthquake"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+bucket = "evacuate"
+class = "event"
+label = "a magnitude 7 Wasatch fault earthquake"
+p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [0.0, 0.05]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+bucket = "get_home"
+class = "event"
+label = "a magnitude 7 Wasatch fault earthquake"
+p_given_event = 0.27
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+bucket = "power"
+class = "event"
+label = "a magnitude 7 Seattle fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+cold_share = 0.4
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "No regional restoration study was available; expert estimate for a major urban earthquake (Tohoku restored over 90 percent of power in 10 days)."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7 Seattle fault earthquake"
+p_given_event = 0.7
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "rr_risk_model_priors"]
+note = "Hazus: an extensively damaged treatment plant is out for 32 days on average, storage tanks 93."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7 Seattle fault earthquake"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 8.0, p90_days = 20.0 }
+requires = "well"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+bucket = "supplies"
+class = "event"
+label = "a magnitude 7 Seattle fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+bucket = "medication"
+class = "event"
+label = "a magnitude 7 Seattle fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+bucket = "comms"
+class = "event"
+label = "a magnitude 7 Seattle fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "After Tohoku, 90 percent of phone lines were back in two weeks."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+bucket = "home_loss"
+class = "event"
+label = "a magnitude 7 Seattle fault earthquake"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+bucket = "evacuate"
+class = "event"
+label = "a magnitude 7 Seattle fault earthquake"
+p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [0.0, 0.05]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+bucket = "get_home"
+class = "event"
+label = "a magnitude 7 Seattle fault earthquake"
+p_given_event = 0.27
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+bucket = "power"
+class = "event"
+label = "a magnitude 7.8 southern San Andreas earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+cold_share = 0.3
+heat_share = 0.1
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "No regional restoration study was available; expert estimate for a major urban earthquake (Tohoku restored over 90 percent of power in 10 days)."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7.8 southern San Andreas earthquake"
+p_given_event = 0.7
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "rr_risk_model_priors"]
+note = "Hazus: an extensively damaged treatment plant is out for 32 days on average, storage tanks 93."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7.8 southern San Andreas earthquake"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 8.0, p90_days = 20.0 }
+requires = "well"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+bucket = "supplies"
+class = "event"
+label = "a magnitude 7.8 southern San Andreas earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+bucket = "medication"
+class = "event"
+label = "a magnitude 7.8 southern San Andreas earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+bucket = "comms"
+class = "event"
+label = "a magnitude 7.8 southern San Andreas earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "After Tohoku, 90 percent of phone lines were back in two weeks."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+bucket = "home_loss"
+class = "event"
+label = "a magnitude 7.8 southern San Andreas earthquake"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 60.0, p90_days = 365.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors", "census_pulse_displacement"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+bucket = "evacuate"
+class = "event"
+label = "a magnitude 7.8 southern San Andreas earthquake"
+p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [0.0, 0.05]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+bucket = "get_home"
+class = "event"
+label = "a magnitude 7.8 southern San Andreas earthquake"
+p_given_event = 0.27
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+# v0.2.0: a blackout during a heat wave (rr-hazards' `heat_blackout` scenario, from
+# agent/hazards2). This is the model's heat-plus-outage compound class (model review M-11): the
+# power row carries every dangerous-heat hour (heat_share 1), so an air-conditioned home's heat
+# need lasts as long as the power cut, and wells, high-rise pumps, refrigerated medicine and
+# public water follow through the usual links. Ordinary power cuts on hot days stay in the
+# county's pooled record, with the county's own hot-day share (temperature profile).
+
+[[effect]]
+hazard = "heat_wave"
+scenario = "heat_blackout"
+bucket = "power"
+class = "event"
+label = "a blackout during a heat wave"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 5.0 }
+heat_share = 1.0
+evidence = "prior"
+sources = ["stone_2023_heat_blackout", "rr_risk_model_priors"]
+note = "A power cut of a day or more that starts during a heat wave, where there are 60 or more days a year over 95 °F. The length is the design Stone et al. (2023) studied for Phoenix, Atlanta and Detroit: two days dark, then power back over the next three. Air conditioning fails for everyone at once, so the answer is a cool place to go and a way to get there."
+
+[[effect]]
+hazard = "heat_wave"
+scenario = "heat_blackout"
+bucket = "thermal"
+class = "event"
+label = "a blackout during a heat wave"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 7.0 }
+requires = "no_cooling"
+event_keys = ["heat_wave", "excessive_heat", "heat"]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Homes without air conditioning face the heat wave itself, as in any heat wave; this one is taken out of the ordinary heat waves, so it is counted once."
+
+[[effect]]
+hazard = "heat_wave"
+scenario = "heat_blackout"
+bucket = "supplies"
+class = "event"
+label = "a blackout during a heat wave"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Dark stores and card readers, and heat too dangerous for a long walk."
+
 # ---------------------------------------------------------------------------------------------
 # Scenario overlaps. rr-hazards passes each hazard's full rate, which already contains the named
 # scenario's long-run share (a Cascadia rupture shakes the county too). When the scenario is
@@ -2196,6 +3127,8 @@ sources = ["rr_risk_model_priors"]
 # rate. Major hurricanes use `replaced_by` rows instead (a class, not a share). The local tsunami
 # has no overlap: the county tsunami rows are distant-source tsunamis (NRI's historical record;
 # the last Cascadia tsunami was in 1700), and rr-hazards' tsunami card adds the two.
+# A blackout during a heat wave is one of the county's heat waves, so it takes its share out of
+# them the same way (rr-hazards' heat card does the same).
 # ---------------------------------------------------------------------------------------------
 
 [[overlap]]
@@ -2212,6 +3145,26 @@ note = "The Bay Area earthquake rate includes Hayward fault ruptures."
 scenario = "new_madrid_m7"
 hazard = "earthquake"
 note = "The county earthquake rate includes New Madrid ruptures."
+
+[[overlap]]
+scenario = "wasatch_m7"
+hazard = "earthquake"
+note = "The Wasatch Front earthquake rate includes Wasatch fault ruptures."
+
+[[overlap]]
+scenario = "seattle_fault_m7"
+hazard = "earthquake"
+note = "The Puget Sound earthquake rate includes Seattle fault ruptures (and Cascadia's, taken out separately)."
+
+[[overlap]]
+scenario = "san_andreas_south_m78"
+hazard = "earthquake"
+note = "The southern California earthquake rate includes southern San Andreas ruptures."
+
+[[overlap]]
+scenario = "heat_blackout"
+hazard = "heat_wave"
+note = "The county's heat-wave rate includes the heat waves that come with a blackout of a day or more."
 
 # ---------------------------------------------------------------------------------------------
 # Income streams (money bucket `income`, research §3.5). Spell lengths are in WEEKS.
@@ -2280,6 +3233,60 @@ unemployment_insurance = true
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
+# v0.2.0: the three fault scenarios of agent/hazards2, as Hayward and New Madrid.
+[[income]]
+hazard = "earthquake"
+scenario = "wasatch_m7"
+label = "the regional economy after a Wasatch fault earthquake"
+per_earner = 0.1
+spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
+unemployment_insurance = true
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[income]]
+hazard = "earthquake"
+scenario = "seattle_fault_m7"
+label = "the regional economy after a Seattle fault earthquake"
+per_earner = 0.1
+spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
+unemployment_insurance = true
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[income]]
+hazard = "earthquake"
+scenario = "san_andreas_south_m78"
+label = "the regional economy after a southern San Andreas earthquake"
+per_earner = 0.1
+spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
+unemployment_insurance = true
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[income]]
+hazard = "benefit_interruption"
+label = "federal pay or benefits that stop"
+per_earner = 1.0
+spell_weeks = { kind = "log_normal", median_days = 2.0, p90_days = 6.0 }
+unemployment_insurance = false
+household_rate = true
+requires = "income_benefit"
+evidence = "prior"
+sources = ["cfpb_shutdown_2013", "rr_risk_model_priors"]
+note = "Funding gaps lasted 16 days (2013), 34 days (2018-19) and 42 days (2025); pay or benefits usually come back afterwards, but the gap has to be bridged."
+
+[[income]]
+hazard = "arrest_or_detention"
+label = "an arrest or detention"
+per_earner = 1.0
+spell_weeks = { kind = "log_normal", median_days = 1.0, p90_days = 6.0 }
+unemployment_insurance = false
+household_rate = true
+evidence = "prior"
+sources = ["fbi_cde_arrests", "rr_risk_model_priors"]
+note = "rr-hazards counts arrests of household members (events, never guilt). Most people are released within days; some are held for weeks, and pay stops meanwhile."
+
 # ---------------------------------------------------------------------------------------------
 # Parts of a hazard's rate (rows with `part = ...` take the part's rate instead of the whole).
 # rr-hazards passes each part's rate (rr_hazards::RatePart); `fallback_share` is used only when a
@@ -2301,8 +3308,124 @@ label = "wildfire safety power shutoffs"
 note = "rr-hazards: 0.02 a year in the western shutoff states (less in cities), none elsewhere."
 
 [[part]]
+hazard = "hurricane"
+part = "cat12"
+fallback_share = 0.94
+label = "hurricanes and tropical storms below category 3"
+note = "rr-hazards: the county's hurricane rate times the share of HURDAT2 passages below major strength (shrunk toward the pooled 5.4 %), times the category 1-2 footprint. The fallback 0.94 reproduces the fixed split used before the county split was passed (model review M-10)."
+
+[[part]]
+hazard = "hurricane"
+part = "major"
+fallback_share = 0.06
+label = "major hurricanes (category 3 or a direct hit)"
+note = "rr-hazards: the county's hurricane rate times its share of major passages (HURDAT2, shrunk toward the pooled 5.4 %), times the major-storm footprint; Utuado's is about 17 %, Asheville's about 2 %. Offered as the major-hurricane scenario on the Gulf and Atlantic coasts, which then replaces these rows."
+
+[[part]]
 hazard = "landslide"
 part = "damage"
 fallback_share = 0.1
 label = "landslides that damage the home"
 note = "rr-hazards: exposed residents x NRI loss ratio / damage ratio 0.3, bounded by NRI's expected annual loss over the county's building value and by 1 in 100 a year (the high-risk flood-zone yardstick); roads cut off are 10 times as many (3 to 30)."
+
+# ---------------------------------------------------------------------------------------------
+# Documented public water failures, for the water buckets' "worst event on record" line. The data
+# pack's worst-event table covers power only; these are the backtest's water events (docs/
+# VALIDATION.md), with the numbers the sources give. A county sees the event for its state.
+# ---------------------------------------------------------------------------------------------
+
+[[water_event]]
+id = "helene_asheville_2024"
+event = "Hurricane Helene"
+place = "Asheville, North Carolina"
+states = ["NC"]
+date = "2024-09-27"
+bucket = "water_out"
+median_days = 18.0
+p90_days = 21.0
+sources = ["avl_watchdog_water_2024", "nchn_asheville_water_2024"]
+note = "About 20 percent of customers kept or regained water early; water began returning to the other 80 percent about 17 days after landfall, 75 to 80 percent of all customers had it on 16 October (day 19) and 90 to 95 percent on 18 October (day 21). The median is read from those figures, not from a customer count."
+
+[[water_event]]
+id = "helene_asheville_2024_boil"
+event = "Hurricane Helene"
+place = "Asheville, North Carolina"
+states = ["NC"]
+date = "2024-09-27"
+bucket = "water_boil"
+median_days = 52.0
+p90_days = 52.0
+sources = ["epa_asheville_boil_notice_2024"]
+note = "The system-wide boil notice was lifted on 18 November 2024."
+
+[[water_event]]
+id = "jackson_2022"
+event = "the Jackson water crisis"
+place = "Jackson, Mississippi"
+states = ["MS"]
+date = "2022-07-29"
+bucket = "water_boil"
+median_days = 48.0
+p90_days = 48.0
+sources = ["npr_jackson_boil_2022"]
+note = "A city-wide boil notice from late July to 15 September 2022 (nearly 7 weeks)."
+
+[[water_event]]
+id = "jackson_2022_out"
+event = "the Jackson water crisis"
+place = "Jackson, Mississippi"
+states = ["MS"]
+date = "2022-08-29"
+bucket = "water_out"
+median_days = 7.0
+p90_days = 10.0
+sources = ["npr_jackson_water_restored_2022"]
+note = "Most customers lost service for several days from 29 August; running water was restored by 7 September. The 90th percentile is not in the source (set at 10 days, UNVERIFIED)."
+
+[[water_event]]
+id = "sandy_long_beach_2012"
+event = "Superstorm Sandy"
+place = "Long Beach, New York"
+states = ["NY"]
+date = "2012-10-29"
+bucket = "water_out"
+median_days = 13.0
+p90_days = 13.0
+sources = ["cbs_long_beach_water_2012"]
+note = "Water declared safe and sewers back on 11 November 2012, 13 days after landfall."
+
+[[water_event]]
+id = "uri_austin_2021"
+event = "Winter Storm Uri"
+place = "Austin, Texas"
+states = ["TX"]
+date = "2021-02-17"
+bucket = "water_boil"
+median_days = 6.0
+p90_days = 6.0
+sources = ["kut_austin_boil_2021"]
+note = "Citywide boil notice from 17 to 23 February 2021."
+
+[[water_event]]
+id = "maria_puerto_rico_2017"
+event = "Hurricane Maria"
+place = "Puerto Rico"
+states = ["PR"]
+date = "2017-09-20"
+bucket = "water_out"
+median_days = 68.0
+p90_days = 150.0
+sources = ["kishore_2018_maria"]
+note = "Households averaged 68 days without water (Kishore et al. 2018, read from a summary, UNVERIFIED); the mean stands in for the median, and the 90th percentile (150 days) is an estimate from the power restoration record, UNVERIFIED."
+
+[[water_event]]
+id = "blackout_cleveland_2003"
+event = "the August 2003 Northeast blackout"
+place = "Cleveland, Ohio"
+states = ["OH"]
+date = "2003-08-14"
+bucket = "water_boil"
+median_days = 3.0
+p90_days = 3.0
+sources = ["cleveland19_blackout_2003"]
+note = "Three-day boil advisories in Cleveland after the pumps lost power."

@@ -32,6 +32,17 @@ pub enum Requirement {
     MobileHome,
     /// A coastal county.
     Coastal,
+    /// Someone sleeps below street level (contract v2 `Housing::below_grade_bedroom`).
+    BelowGrade,
+    /// The household relies on SNAP or WIC for food (contract v2 `Finances::benefits`).
+    FoodBenefit,
+    /// The household relies on federal pay, SSI or SSDI, VA benefits or unemployment insurance
+    /// for income (contract v2 `Finances::benefits`).
+    IncomeBenefit,
+    /// The county's records show a grid emergency in extreme cold (rolling blackouts), or, where
+    /// the regional outage table is missing, it lies in a state on the ERCOT, SPP or MISO-South
+    /// grids (model review M-11).
+    ColdGridRegion,
 }
 
 impl Requirement {
@@ -45,6 +56,27 @@ impl Requirement {
             Requirement::NoHeating => "homes without heating",
             Requirement::MobileHome => "mobile homes",
             Requirement::Coastal => "coastal counties",
+            Requirement::BelowGrade => "homes where someone sleeps below street level",
+            Requirement::FoodBenefit => "households that rely on SNAP or WIC",
+            Requirement::IncomeBenefit => "households that rely on federal pay or a benefit",
+            Requirement::ColdGridRegion => "places whose grid has failed in extreme cold",
+        }
+    }
+
+    /// Snake-case name, for row keys.
+    pub const fn key(self) -> &'static str {
+        match self {
+            Requirement::Municipal => "municipal",
+            Requirement::Well => "well",
+            Requirement::Commuter => "commuter",
+            Requirement::NoCooling => "no_cooling",
+            Requirement::NoHeating => "no_heating",
+            Requirement::MobileHome => "mobile_home",
+            Requirement::Coastal => "coastal",
+            Requirement::BelowGrade => "below_grade",
+            Requirement::FoodBenefit => "food_benefit",
+            Requirement::IncomeBenefit => "income_benefit",
+            Requirement::ColdGridRegion => "cold_grid_region",
         }
     }
 }
@@ -61,6 +93,19 @@ pub struct ReliefSpec {
     /// Where the numbers come from.
     pub sources: Vec<CitationId>,
 }
+
+/// Restoration-curve classes a power row may name in `curve_class` (the causes the regional
+/// outage model keeps out of its pooled tail, plus the pooled storm causes).
+pub const CURVE_CLASSES: [&str; 8] = [
+    "hurricane",
+    "cold_grid",
+    "flood",
+    "grid",
+    "wildfire",
+    "ice",
+    "wind",
+    "winter",
+];
 
 /// One row of the effects table.
 #[derive(Debug, Clone, PartialEq, Deserialize)]
@@ -96,6 +141,10 @@ pub struct EffectRow {
     /// Households the row applies to (all when absent).
     #[serde(default)]
     pub requires: Option<Requirement>,
+    /// A second condition, for rows that need two (a grid emergency in extreme cold that brings a
+    /// boil-water notice: the place and public water).
+    #[serde(default)]
+    pub also_requires: Option<Requirement>,
     /// A short storm outage whose county-scale part comes from county outage statistics.
     #[serde(default)]
     pub pool: bool,
@@ -127,6 +176,29 @@ pub struct EffectRow {
     /// rate into separate event classes (see [`PartRow`]); absent, the whole rate.
     #[serde(default)]
     pub part: Option<String>,
+    /// The share is scaled by how easily the household's public water system breaks: the county's
+    /// drinking-water violations and the household's own answer (model review M-03). Only rows
+    /// for homes on public water.
+    #[serde(default)]
+    pub fragile: bool,
+    /// The row's events are county-scale and happen at the county's recorded rate of these NOAA
+    /// Storm Events episodes (damaging share applied), not at the household's rate: a flood can
+    /// shut the water plant without reaching the home. `p_given_event` is then the share of those
+    /// episodes that cause the consequence. The row is left out where the county has no record.
+    #[serde(default)]
+    pub county_rate_keys: Vec<String>,
+    /// The row's events happen at the rate of this `[params]` entry instead of the hazard's rate
+    /// (a class the hazard's own count does not see, such as a grid emergency in extreme cold).
+    #[serde(default)]
+    pub fixed_rate: Option<String>,
+    /// The regional restoration-curve class (`core/outage_curves.csv`) that scales this power
+    /// row's duration: `hurricane`, `cold_grid`, `flood`, `grid` (model review M-10).
+    #[serde(default)]
+    pub curve_class: Option<String>,
+    /// On an island grid with a hand-copied historic curve (Puerto Rico, the US Virgin Islands),
+    /// that curve is this row's duration (model review M-10: Maria's restoration).
+    #[serde(default)]
+    pub island_curve: bool,
     /// Why we think this.
     #[serde(default)]
     pub note: String,
@@ -157,16 +229,11 @@ impl EffectRow {
             Some(s) => format!("scenario:{s}:{}", self.variant.as_deref().unwrap_or("any")),
             None => format!("hazard:{}", self.hazard),
         };
-        let req = self.requires.map_or("all", |r| match r {
-            Requirement::Municipal => "municipal",
-            Requirement::Well => "well",
-            Requirement::Commuter => "commuter",
-            Requirement::NoCooling => "no_cooling",
-            Requirement::NoHeating => "no_heating",
-            Requirement::MobileHome => "mobile_home",
-            Requirement::Coastal => "coastal",
-        });
-        format!("{owner}:{}:{}:{req}", self.bucket, self.class)
+        let req = self.requires.map_or("all", Requirement::key);
+        match self.also_requires {
+            Some(r) => format!("{owner}:{}:{}:{req}+{}", self.bucket, self.class, r.key()),
+            None => format!("{owner}:{}:{}:{req}", self.bucket, self.class),
+        }
     }
 }
 
@@ -188,6 +255,14 @@ pub struct IncomeRow {
     pub spell_weeks: DurationDist,
     /// Unemployment insurance replaces part of the wages for the first weeks.
     pub unemployment_insurance: bool,
+    /// The hazard's rate is already per household (like job loss): the stream runs at
+    /// `r_h × per_earner`, and each spell costs one earner's share. Otherwise `r_h × per_earner ×
+    /// earners`.
+    #[serde(default)]
+    pub household_rate: bool,
+    /// Households the stream applies to (all when absent).
+    #[serde(default)]
+    pub requires: Option<Requirement>,
     /// What the numbers rest on.
     pub evidence: Evidence,
     /// Citation ids.
@@ -264,6 +339,19 @@ pub struct Params {
     pub p_factor_empirical: Param,
     pub p_factor_prior: Param,
     pub outage_stats_rate_factor: Param,
+    pub fragility_county_clean: Param,
+    pub fragility_county_flagged: Param,
+    pub fragility_record_fine: Param,
+    pub fragility_record_occasional: Param,
+    pub fragility_record_frequent: Param,
+    pub fragility_cap: Param,
+    pub fragility_floor: Param,
+    pub fragility_uncertainty: Param,
+    pub cold_emergency_rate: Param,
+    pub public_water_power_share: Param,
+    pub public_water_power_days: Param,
+    pub housing_share_of_expenses: Param,
+    pub curve_min_events: Param,
 }
 
 impl Params {
@@ -302,7 +390,30 @@ impl Params {
             ("p_factor_empirical", &self.p_factor_empirical),
             ("p_factor_prior", &self.p_factor_prior),
             ("outage_stats_rate_factor", &self.outage_stats_rate_factor),
+            ("fragility_county_clean", &self.fragility_county_clean),
+            ("fragility_county_flagged", &self.fragility_county_flagged),
+            ("fragility_record_fine", &self.fragility_record_fine),
+            (
+                "fragility_record_occasional",
+                &self.fragility_record_occasional,
+            ),
+            ("fragility_record_frequent", &self.fragility_record_frequent),
+            ("fragility_cap", &self.fragility_cap),
+            ("fragility_floor", &self.fragility_floor),
+            ("fragility_uncertainty", &self.fragility_uncertainty),
+            ("cold_emergency_rate", &self.cold_emergency_rate),
+            ("public_water_power_share", &self.public_water_power_share),
+            ("public_water_power_days", &self.public_water_power_days),
+            ("housing_share_of_expenses", &self.housing_share_of_expenses),
+            ("curve_min_events", &self.curve_min_events),
         ]
+    }
+
+    /// The parameter named `name`, if there is one (for rows with a `fixed_rate`).
+    pub fn get(&self, name: &str) -> Option<&Param> {
+        self.all()
+            .into_iter()
+            .find_map(|(n, p)| (n == name).then_some(p))
     }
 }
 
@@ -340,6 +451,35 @@ pub struct OverlapRow {
     pub note: String,
 }
 
+/// A well-documented public water failure, for the "worst event on record" line of the water
+/// buckets (`BucketAssessment::stress_test`). The data pack's worst-event table covers power only,
+/// so these few are copied by hand from the sources named, and a county is matched by state.
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct WaterEvent {
+    /// Stable id.
+    pub id: String,
+    /// The event, as the stress line names it ("Hurricane Helene").
+    pub event: String,
+    /// Where it was recorded ("Asheville, North Carolina").
+    pub place: String,
+    /// States whose households see this event as their record (two-letter abbreviations).
+    pub states: Vec<String>,
+    /// The day it began (`YYYY-MM-DD`).
+    pub date: String,
+    /// `water_out` (no tap water) or `water_boil` (a boil-water notice).
+    pub bucket: BucketId,
+    /// Days until about half of the affected households had service back.
+    pub median_days: f64,
+    /// Days until about nine in ten had it back.
+    pub p90_days: f64,
+    /// Citation ids.
+    pub sources: Vec<CitationId>,
+    /// What the numbers rest on and what is not checked.
+    #[serde(default)]
+    pub note: String,
+}
+
 /// The whole table.
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -360,6 +500,9 @@ pub struct EffectsTable {
     /// Parts of hazard rates that rows can take instead of the whole rate.
     #[serde(rename = "part", default)]
     pub parts: Vec<PartRow>,
+    /// Documented water failures for the water buckets' stress line.
+    #[serde(rename = "water_event", default)]
+    pub water_events: Vec<WaterEvent>,
 }
 
 /// Why the effects table was rejected.
@@ -487,13 +630,70 @@ impl EffectsTable {
                     )));
                 }
             }
+            // Rare families are shown in their own box and never enter a bucket's curve (DESIGN
+            // §4.2, §4.7); retired ids are never emitted.
+            if row.hazard.is_rare() || row.hazard.is_retired() {
+                return Err(fail(format!(
+                    "{} is a rare family or a retired id: it never enters a bucket's curve",
+                    row.hazard
+                )));
+            }
+            if row.fragile
+                && row.requires != Some(Requirement::Municipal)
+                && row.also_requires != Some(Requirement::Municipal)
+            {
+                return Err(fail("fragile rows are for homes on public water".into()));
+            }
+            let own_rate = [
+                row.scenario.is_some(),
+                row.part.is_some(),
+                !row.county_rate_keys.is_empty(),
+                row.fixed_rate.is_some(),
+            ];
+            if own_rate.iter().filter(|x| **x).count() > 1 {
+                return Err(fail(
+                    "a row takes at most one of scenario, part, county_rate_keys and fixed_rate"
+                        .into(),
+                ));
+            }
+            if row
+                .county_rate_keys
+                .iter()
+                .any(|k| !rr_types::is_well_formed_id(k))
+            {
+                return Err(fail("county_rate_keys must be snake_case".into()));
+            }
+            if let Some(name) = &row.fixed_rate {
+                if self.params.get(name).is_none() {
+                    return Err(fail(format!("fixed_rate `{name}` is not a parameter")));
+                }
+            }
+            if let Some(c) = &row.curve_class {
+                if row.bucket != BucketId::Power || !CURVE_CLASSES.contains(&c.as_str()) {
+                    return Err(fail(format!(
+                        "curve_class `{c}` needs a power row and one of {CURVE_CLASSES:?}"
+                    )));
+                }
+            }
+            if row.island_curve && row.curve_class.as_deref() != Some("hurricane") {
+                return Err(fail("island_curve is for hurricane power rows".into()));
+            }
+            let basis = if !row.county_rate_keys.is_empty() {
+                "county".to_owned()
+            } else if let Some(f) = &row.fixed_rate {
+                format!("fixed:{f}")
+            } else {
+                row.part.as_deref().unwrap_or("whole").to_owned()
+            };
             let group = format!(
-                "{}:{}:{}:{}:{}",
+                "{}:{}:{}:{}:{}+{}",
                 row.scenario.as_deref().unwrap_or(row.hazard.as_str()),
                 row.variant.as_deref().unwrap_or("any"),
-                row.part.as_deref().unwrap_or("whole"),
+                basis,
                 row.bucket,
-                row.requires.map_or("all".to_owned(), |r| format!("{r:?}"))
+                row.requires.map_or("all".to_owned(), |r| format!("{r:?}")),
+                row.also_requires
+                    .map_or("all".to_owned(), |r| format!("{r:?}"))
             );
             let total = shares.entry(group.clone()).or_insert(0.0);
             *total += row.p_given_event;
@@ -532,7 +732,30 @@ impl EffectsTable {
                 )));
             }
         }
+        for (i, e) in self.water_events.iter().enumerate() {
+            let ok = !e.states.is_empty()
+                && matches!(e.bucket, BucketId::WaterOut | BucketId::WaterBoil)
+                && e.median_days > 0.0
+                && e.p90_days >= e.median_days
+                && e.p90_days.is_finite()
+                && !e.sources.is_empty()
+                && rr_types::Date::parse(&e.date).is_ok()
+                && rr_types::is_well_formed_id(&e.id);
+            if !ok {
+                return Err(TableError::Other(format!(
+                    "water event {i} ({}) needs states, a water bucket, 0 < median <= p90, a date \
+                     and a source",
+                    e.id
+                )));
+            }
+        }
         for (i, s) in self.income.iter().enumerate() {
+            if s.hazard.is_rare() || s.hazard.is_retired() {
+                return Err(TableError::Other(format!(
+                    "income stream {i} ({}): rare families and retired ids never enter a target",
+                    s.label
+                )));
+            }
             if !(0.0..=1.0).contains(&s.per_earner) || s.sources.is_empty() {
                 return Err(TableError::Other(format!(
                     "income stream {i} ({}) needs a share in [0, 1] and a source",
@@ -598,6 +821,7 @@ impl EffectsTable {
                     .chain(r.relief.iter().flat_map(|x| x.sources.iter()))
             })
             .chain(self.income.iter().flat_map(|s| s.sources.iter()))
+            .chain(self.water_events.iter().flat_map(|e| e.sources.iter()))
             .chain(
                 self.params
                     .all()
@@ -663,7 +887,9 @@ mod tests {
     fn embedded_table_parses_and_validates() {
         let t = EffectsTable::parse(EFFECTS_TOML).unwrap();
         assert!(t.effects.len() > 150, "{}", t.effects.len());
-        assert_eq!(t.income.len(), 6);
+        // Job loss, pandemic, seven named scenarios (the three v0.2.0 faults among them), the
+        // benefit lapse and an arrest.
+        assert_eq!(t.income.len(), 11);
     }
 
     #[test]
@@ -691,16 +917,56 @@ mod tests {
     }
 
     #[test]
-    fn every_hazard_reaches_some_bucket_except_the_insurance_one() {
+    fn every_ranked_hazard_reaches_some_bucket_and_no_rare_one_does() {
         let t = table();
-        for h in HazardId::ALL {
+        for h in HazardId::ACTIVE {
             let buckets = t.buckets_for(*h);
             if *h == HazardId::EarnerDeathOrDisability {
                 // An insurance question, not a savings or stockpile target (see docs).
                 assert!(buckets.is_empty());
+            } else if h.is_rare() {
+                // Rare families are shown in their own box and never enter a bucket's curve.
+                assert!(buckets.is_empty(), "{h} is rare but feeds {buckets:?}");
             } else {
                 assert!(!buckets.is_empty(), "{h} feeds no bucket");
             }
+        }
+        #[allow(deprecated)]
+        let retired = t.buckets_for(HazardId::Terrorism);
+        assert!(
+            retired.is_empty(),
+            "the retired terrorism id still has rows"
+        );
+    }
+
+    #[test]
+    fn rows_for_rare_or_retired_hazards_are_rejected() {
+        let rare = format!(
+            "{EFFECTS_TOML}\n[[effect]]\nhazard = \"geomagnetic_storm\"\nbucket = \"power\"\nclass = \"storm\"\nlabel = \"x\"\np_given_event = 0.1\nduration = {{ kind = \"log_normal\", median_days = 3.0, p90_days = 30.0 }}\nevidence = \"prior\"\nsources = [\"rr_risk_model_priors\"]\n"
+        );
+        assert!(matches!(
+            EffectsTable::parse(&rare),
+            Err(TableError::Row { .. })
+        ));
+        let retired = format!(
+            "{EFFECTS_TOML}\n[[effect]]\nhazard = \"terrorism\"\nbucket = \"security\"\nclass = \"lockdown\"\nlabel = \"x\"\np_given_event = 0.1\nevidence = \"prior\"\nsources = [\"rr_risk_model_priors\"]\n"
+        );
+        assert!(EffectsTable::parse(&retired).is_err());
+        // A fragile row must be for homes on public water.
+        let fragile = format!(
+            "{EFFECTS_TOML}\n[[effect]]\nhazard = \"burglary\"\nbucket = \"water_out\"\nclass = \"odd\"\nlabel = \"x\"\np_given_event = 0.1\nduration = {{ kind = \"log_normal\", median_days = 1.0, p90_days = 3.0 }}\nfragile = true\nevidence = \"prior\"\nsources = [\"rr_risk_model_priors\"]\n"
+        );
+        assert!(EffectsTable::parse(&fragile).is_err());
+    }
+
+    #[test]
+    fn water_events_name_a_water_bucket_and_a_source() {
+        let t = table();
+        assert!(!t.water_events.is_empty());
+        for e in &t.water_events {
+            assert!(matches!(e.bucket, BucketId::WaterOut | BucketId::WaterBoil));
+            assert!(e.median_days <= e.p90_days, "{}", e.id);
+            assert!(!e.sources.is_empty(), "{}", e.id);
         }
     }
 

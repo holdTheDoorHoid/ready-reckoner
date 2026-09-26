@@ -16,15 +16,17 @@
   import Icon from '../components/Icon.svelte';
   import PlanGate from '../components/PlanGate.svelte';
   import RareBox from '../components/RareBox.svelte';
+  import RareOptIn from '../components/RareOptIn.svelte';
   import ReadinessCard from '../components/ReadinessCard.svelte';
   import RiskMatrix from '../components/RiskMatrix.svelte';
   import SavingsTrack from '../components/SavingsTrack.svelte';
   import ScenarioToggle from '../components/ScenarioToggle.svelte';
   import Sources from '../components/Sources.svelte';
   import Warning from '../components/Warning.svelte';
-  import type { ClimateHorizon, Dials, PlanItem, PlanOutput, ReturnPeriod, WaterLevel } from '../engine/types';
+  import type { ClimateHorizon, Dials, PlanItem, PlanOutput, RareHazardId, ReturnPeriod, WaterLevel } from '../engine/types';
   import { CLIMATE_HORIZONS, WATER_LEVELS } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
+  import { isRareFamily, longHorizon, minimumKit, rareSummary, setLongHorizon, setMinimumKit } from '../lib/dials';
   import { dayPhrase, targetDays } from '../lib/format';
   import { helpsFor } from '../lib/helps';
   import { CLIMATE, dialSentence, HORIZONS, RETURN_PERIOD, stageLine, WATER_LEVEL } from '../lib/labels';
@@ -54,11 +56,20 @@
     announcement = on ? 'Scenario switched on; targets updated.' : 'Scenario switched off; targets updated.';
   }
 
-  function setRareCatastrophicOptIn(on: boolean) {
+  function setMinimum(on: boolean) {
     if (!app.plan) return;
-    app.plan.input.dials.rare_catastrophic_opt_in = on;
-    announcement = on ? 'Rare-catastrophe budget allowed.' : 'Rare-catastrophe budget switched off.';
+    setMinimumKit(app.plan.input.dials, on);
+    announcement = on ? 'Bare minimum first: the plan starts with the smallest kit.' : 'Bare-minimum mode switched off.';
   }
+
+  function setLong(on: boolean) {
+    if (!app.plan) return;
+    setLongHorizon(app.plan.input.dials, on);
+    announcement = on ? 'The long-horizon part of the plan is shown.' : 'The long-horizon part is shown only when a target passes a month.';
+  }
+
+  /** Plain names of the rare families, from the catalogue. */
+  const hazardNames = $derived(new Map((app.catalogue?.hazards ?? []).map((h) => [h.id as string, h.name])));
 
   function bucketItems(output: PlanOutput, bucketId: string): PlanItem[] {
     const seen = new Set<string>();
@@ -124,7 +135,9 @@
                   <p class="small">
                     Ready for <strong>{RETURN_PERIOD[dials.return_period].label.toLowerCase()} events ({RETURN_PERIOD[dials.return_period].jargon})</strong>;
                     {CLIMATE[dials.climate].label.toLowerCase()}; {WATER_LEVEL[dials.water_level ?? 'basic'].label.toLowerCase()} water; chances over
-                    {dials.horizon_years} {dials.horizon_years === 1 ? 'year' : 'years'}.
+                    {dials.horizon_years} {dials.horizon_years === 1 ? 'year' : 'years'}{minimumKit(dials) ? '; bare minimum first' : ''}{rareSummary(dials) === 'none'
+                      ? ''
+                      : `; rare-catastrophe allowance: ${rareSummary(dials)}`}.
                   </p>
                 </div>
                 <button
@@ -168,10 +181,22 @@
                   columns={3}
                 />
                 <CheckRow
-                  label="Allow up to 10% of my budget for rare catastrophes (off by default)"
-                  help="Covers items like a radiation meter, potassium iodide only on official instruction, or Faraday storage. See Rare but severe below."
-                  checked={dials.rare_catastrophic_opt_in ?? false}
-                  onchange={setRareCatastrophicOptIn}
+                  label="Show me the bare minimum first"
+                  help="The plan starts with the smallest kit that covers three days of water, light, warmth and medicine; the rest waits until that is done."
+                  checked={minimumKit(dials)}
+                  onchange={setMinimum}
+                />
+                <CheckRow
+                  label="Show the long-horizon part of the plan"
+                  help="Ways to manage for months without services (rain catchment, fuel, sanitation). It appears anyway when a target passes a month."
+                  checked={longHorizon(dials)}
+                  onchange={setLong}
+                />
+                <RareOptIn
+                  {dials}
+                  names={hazardNames}
+                  order={rare.map((h) => h.id).filter((id): id is RareHazardId => isRareFamily(id))}
+                  onchange={(words) => (announcement = words)}
                 />
                 <div class="settings__live" aria-hidden="true">
                   {#each duration.filter((b) => ['power', 'water_out', 'supplies'].includes(b.id)) as b (b.id)}

@@ -221,6 +221,40 @@
    "nearest_nuclear_km": 35.0,
    "tri_facilities": 90,
    "high_hazard_dams": 1
+  },
+  "exposure": {
+   "strategic_class": "C1",
+   "strategic_site_ids": [
+    "metro_37980"
+   ],
+   "strategic_places": [
+    {
+     "id": "metro_37980",
+     "name": "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
+     "kind": "metro",
+     "sources": [
+      "census_cbsa_pop_2024",
+      "census_delineation_2023"
+     ]
+    }
+   ],
+   "uasi_share": 0.007295,
+   "uasi_area_share": 0.02842,
+   "uasi_area": "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
+   "geomag_lat": 49.2,
+   "geomag_factor": 0.29,
+   "smoke_days_35": 1.12,
+   "smoke_days_55": 0.75,
+   "smoke_trend": 0.655,
+   "hms_smoke_days": 14.2,
+   "smoke_basis": "monitor",
+   "karst_share": 0.00273,
+   "landslide_susceptible_share": 0.341,
+   "leveed_pop_share": 0.0,
+   "levee_risk_high_share": 0.0,
+   "dams_high_total": 1,
+   "sdwis_violation_pop_share": 0.0,
+   "cws_pop_share": 0.999
   }
  },
  "location": {

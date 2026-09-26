@@ -702,6 +702,29 @@ pub fn zcta_points(ctx: &Ctx) -> Result<ZctaPoints> {
     })
 }
 
+/// ZIP (ZCTA) land areas in square metres from the Census 2024 Gazetteer (for shares of a ZIP's
+/// land), with the download's source record.
+pub fn zcta_land(ctx: &Ctx) -> Result<(BTreeMap<String, f64>, crate::manifest::SourceRecord)> {
+    let gz = ctx
+        .http
+        .get(GAZ_ZCTA, Some("geography/2024_Gaz_zcta_national.zip"))?;
+    let source = source_from(
+        "Census 2024 Gazetteer, ZCTAs (land area)",
+        &gz,
+        version_of(&gz, "2024 Gazetteer"),
+        PUBLIC_DOMAIN,
+        "",
+    );
+    let ztext = String::from_utf8_lossy(&zip_entry(&gz.bytes, ".txt")?).to_string();
+    let (h, rows) = parse_delimited(&ztext, b'\t')?;
+    let (ig, il) = (col(&h, "GEOID")?, col(&h, "ALAND")?);
+    let land = rows
+        .iter()
+        .filter_map(|r| Some((r[ig].clone(), r[il].parse::<f64>().ok()?)))
+        .collect();
+    Ok((land, source))
+}
+
 fn geojson(
     map: &[CbCounty],
     points: &BTreeMap<String, (f64, f64, f64)>,

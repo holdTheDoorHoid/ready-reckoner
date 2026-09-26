@@ -26,6 +26,10 @@ pub struct Manifest {
     /// Credit lines the app must show.
     #[serde(default)]
     pub attributions: Vec<ManifestAttribution>,
+    /// Attributions that belong to an optional pack (attribution source -> pack name): shown only
+    /// once that pack is loaded.
+    #[serde(default)]
+    pub attribution_packs: BTreeMap<String, String>,
 }
 
 /// A pack.

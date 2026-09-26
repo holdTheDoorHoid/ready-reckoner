@@ -1,6 +1,8 @@
 <!--
   Screen 5, What you already have (optional): safety equipment, quantities of common supplies, and
-  free steps already done. Everything entered here comes off the plan. Skippable.
+  free steps already done. Everything entered here comes off the plan. Skippable. Items that need
+  trying now and then (a generator, a jump pack, flashlights: `Item.test_interval_months`) ask
+  when they were last tried, once the household has some (contract v2 `Owned.tested_on`).
 -->
 <script lang="ts">
   import CheckRow from '../components/CheckRow.svelte';
@@ -10,7 +12,9 @@
   import ProgressSteps from '../components/ProgressSteps.svelte';
   import type { Item } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
-  import { plural } from '../lib/format';
+  import { formatDate, plural } from '../lib/format';
+  import { intervalLabel } from '../lib/maintenance';
+  import { heldQuantity, setTestedOn, testedOn } from '../lib/persistence';
   import { useRouter } from '../lib/router.svelte';
 
   const app = useApp();
@@ -95,6 +99,29 @@
     }
   }
 
+  /** Items that need trying ask when, once the household has some. */
+  function asksTested(item: Item): boolean {
+    return !!item.test_interval_months && !!app.plan && heldQuantity(app.plan, item.id) > 0;
+  }
+
+  let testedProblem = $state<Record<string, string>>({});
+
+  function setTested(item: Item, value: string) {
+    if (!app.plan) return;
+    if (value === '') {
+      setTestedOn(app.plan, item.id, undefined);
+      testedProblem = { ...testedProblem, [item.id]: '' };
+      return;
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return;
+    if (value > app.today()) {
+      testedProblem = { ...testedProblem, [item.id]: 'Enter a day on or before today.' };
+      return;
+    }
+    testedProblem = { ...testedProblem, [item.id]: '' };
+    setTestedOn(app.plan, item.id, value);
+  }
+
   function firstSentence(text: string): string {
     const m = /^.*?[.!?](?=\s|$)/.exec(text);
     return m ? m[0] : text;
@@ -105,6 +132,38 @@
     router.go('risks');
   }
 </script>
+
+{#snippet testedField(item: Item)}
+  {@const last = app.plan ? testedOn(app.plan, item.id) : undefined}
+  {@const problem = testedProblem[item.id]}
+  <div class="tested">
+    <label for="tested-{item.id}">When did you last try it?<span class="visually-hidden">{' '}({item.name})</span></label>
+    <span class="help" id="tested-{item.id}-help">
+      Things kept for emergencies can fail in storage. Trying it proves it works; {intervalLabel(item.test_interval_months ?? 12).toLowerCase()} is
+      about right. Leave it blank if you're not sure.
+    </span>
+    <div class="tested__row">
+      <input
+        id="tested-{item.id}"
+        class="input input--medium"
+        type="date"
+        max={app.today()}
+        value={last ?? ''}
+        aria-describedby="tested-{item.id}-help{problem ? ` tested-${item.id}-error` : ''}"
+        aria-invalid={problem ? true : undefined}
+        onchange={(e) => setTested(item, (e.currentTarget as HTMLInputElement).value)}
+      />
+      <button type="button" class="button button--small" onclick={() => setTested(item, app.today())}>
+        Tried it today<span class="visually-hidden">: {item.name}</span>
+      </button>
+    </div>
+    {#if problem}
+      <p class="error-text" id="tested-{item.id}-error"><Icon name="alert" /><span>{problem}</span></p>
+    {:else if last}
+      <p class="small muted">Last tried {formatDate(last)}.</p>
+    {/if}
+  </div>
+{/snippet}
 
 {#snippet itemField(item: Item)}
   {#if item.energy_kcal_per_unit}
@@ -171,14 +230,20 @@
       <p class="section-intro">Leave blank anything you don't have. Rough numbers are fine.</p>
       {#each basics as group (group.name)}
         <h3>{group.name}</h3>
-        {#each group.items as item (item.id)}{@render itemField(item)}{/each}
+        {#each group.items as item (item.id)}
+          {@render itemField(item)}
+          {#if asksTested(item)}{@render testedField(item)}{/if}
+        {/each}
       {/each}
       {#if more.length}
         <details class="more">
           <summary>More things you might have</summary>
           {#each more as group (group.name)}
             <h3>{group.name}</h3>
-            {#each group.items as item (item.id)}{@render itemField(item)}{/each}
+            {#each group.items as item (item.id)}
+              {@render itemField(item)}
+              {#if asksTested(item)}{@render testedField(item)}{/if}
+            {/each}
           {/each}
         </details>
       {/if}
@@ -219,5 +284,25 @@
   }
   .more {
     margin-top: var(--s4);
+  }
+  .tested {
+    margin: calc(-1 * var(--s3)) 0 var(--s5);
+    padding: var(--s2) 0 0 var(--s4);
+    border-left: 3px solid var(--border);
+  }
+  .tested label {
+    display: block;
+  }
+  .tested__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s3);
+    align-items: center;
+  }
+  .tested__row .input {
+    flex: 0 1 12rem;
+  }
+  .tested p {
+    margin: var(--s1) 0 0;
   }
 </style>

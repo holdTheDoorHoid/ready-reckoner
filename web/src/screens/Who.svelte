@@ -1,6 +1,7 @@
 <!--
   Screen 2, Who is in your household: a card per person (age group, earns income, pregnant or
-  nursing), medical needs revealed only when the household says someone has them, and pets.
+  nursing), medical needs and help in an emergency (access and functional needs, contract v2)
+  revealed only when the household says someone has them, and pets.
 -->
 <script lang="ts">
   import ChoiceGroup from '../components/ChoiceGroup.svelte';
@@ -11,10 +12,10 @@
   import NumberField from '../components/NumberField.svelte';
   import ProgressSteps from '../components/ProgressSteps.svelte';
   import Stepper from '../components/Stepper.svelte';
-  import type { AgeBand, Person } from '../engine/types';
-  import { AGE_BANDS, MOBILITY_LEVELS } from '../engine/types';
+  import type { AccessNeed, AgeBand, Person } from '../engine/types';
+  import { ACCESS_NEEDS, AGE_BANDS, MOBILITY_LEVELS } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
-  import { AGE, DEVICE, MOBILITY } from '../lib/labels';
+  import { ACCESS_NEED, ACCESS_NEED_GROUPS, AGE, DEVICE, MOBILITY } from '../lib/labels';
 
   const app = useApp();
   const input = $derived(app.plan?.input);
@@ -24,7 +25,19 @@
     return m.daily_rx || m.refrigerated_rx || m.powered_device !== 'none' || m.mobility !== 'none' || m.dietary.length > 0 || m.epinephrine;
   }
 
-  let medicalOpen = $state<'yes' | 'no'>(app.plan?.input.people.some(hasMedical) ? 'yes' : 'no');
+  /** Needs that change how the person gets warnings, help or care (CMIST). */
+  function hasAccess(p: Person): boolean {
+    return (p.access_needs?.length ?? 0) > 0;
+  }
+
+  function setNeed(p: Person, need: AccessNeed, on: boolean) {
+    const chosen = new Set(p.access_needs ?? []);
+    if (on) chosen.add(need);
+    else chosen.delete(need);
+    p.access_needs = ACCESS_NEEDS.filter((n) => chosen.has(n));
+  }
+
+  let medicalOpen = $state<'yes' | 'no'>(app.plan?.input.people.some((p) => hasMedical(p) || hasAccess(p)) ? 'yes' : 'no');
   let status = $state('');
 
   function syncEarners() {
@@ -69,10 +82,11 @@
     if (v === 'no' && app.plan) {
       let cleared = false;
       for (const p of app.plan.input.people) {
-        if (hasMedical(p)) cleared = true;
+        if (hasMedical(p) || hasAccess(p)) cleared = true;
         p.medical = { daily_rx: false, refrigerated_rx: false, powered_device: 'none', mobility: 'none', dietary: [], epinephrine: false };
+        if (p.access_needs) p.access_needs = [];
       }
-      if (cleared) status = 'Medical details cleared.';
+      if (cleared) status = 'Medical details and help in an emergency cleared.';
     }
   }
 
@@ -102,7 +116,7 @@
             <h2>Person {i + 1}</h2>
             {#if input.people.length > 1}
               <button type="button" class="button button--quiet button--small" onclick={() => removePerson(i)}>
-                <Icon name="trash" /> Remove<span class="visually-hidden"> person {i + 1}</span>
+                <Icon name="trash" /> Remove<span class="visually-hidden">{' '}person {i + 1}</span>
               </button>
             {/if}
           </div>
@@ -190,6 +204,24 @@
               <CheckRow label="Carries an epinephrine auto-injector" help="The plan keeps a spare in the go-bag." bind:checked={person.medical.epinephrine} />
               </fieldset>
             </details>
+            <details class="access" open={hasAccess(person)}>
+              <summary>Help in an emergency for person {i + 1}{hasAccess(person) ? '' : ': none so far'}</summary>
+              <fieldset>
+                <legend class="visually-hidden">Help in an emergency for person {i + 1}</legend>
+                <p class="help">So the plan can add ways to get warnings, help leaving, and where to sign up for help locally. Tick any that apply.</p>
+                {#each ACCESS_NEED_GROUPS as group (group.title)}
+                  <h3 class="access__group">{group.title}</h3>
+                  {#each group.needs as need (need)}
+                    <CheckRow
+                      label={ACCESS_NEED[need].label}
+                      help={ACCESS_NEED[need].help}
+                      checked={person.access_needs?.includes(need) ?? false}
+                      onchange={(on) => setNeed(person, need, on)}
+                    />
+                  {/each}
+                {/each}
+              </fieldset>
+            </details>
           {/if}
         </li>
       {/each}
@@ -197,9 +229,9 @@
     <p><button type="button" class="button" onclick={addPerson}><Icon name="plus" /> Add a person</button></p>
 
     <ChoiceGroup
-      legend="Does anyone need daily medicine, a powered medical device, help getting around, or a special diet?"
+      legend="Does anyone need daily medicine, a powered medical device, help getting around, a special diet, or extra help in an emergency?"
       name="medical-open"
-      help="If yes, you can add details for each person above. Details stay on this device."
+      help="Extra help means things like trouble hearing alarms, limited English, dialysis or home health care. If yes, you can add details for each person above. Details stay on this device."
       options={[
         { value: 'no', label: 'No' },
         { value: 'yes', label: 'Yes' },
@@ -248,7 +280,20 @@
     padding-top: var(--s2);
     border-top: 1px solid var(--border);
   }
-  .medical > fieldset {
+  .medical > fieldset,
+  .access > fieldset {
     padding-top: var(--s3);
+  }
+  .access {
+    margin-top: var(--s2);
+    padding-top: var(--s2);
+    border-top: 1px solid var(--border);
+  }
+  .access__group {
+    margin: var(--s4) 0 var(--s2);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 </style>

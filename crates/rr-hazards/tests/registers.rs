@@ -58,10 +58,11 @@ fn philadelphia_heat_waves_lead_then_winter_storms_and_windstorms() {
     let a = assess("philadelphia-renters-4", "42101");
     let nat = natural(&a);
     assert_eq!(nat[0].id, H::HeatWave);
+    // Wildfire smoke (1.12 smoke days a year at 35.5 µg/m³ or more, contract v2) is not a storm.
     let storms: Vec<H> = nat
         .iter()
         .map(|p| p.id)
-        .filter(|h| !matches!(h, H::HeatWave | H::ColdWave))
+        .filter(|h| !matches!(h, H::HeatWave | H::ColdWave | H::WildfireSmoke))
         .take(2)
         .collect();
     assert!(
@@ -97,9 +98,9 @@ fn philadelphia_job_loss_and_house_fire_outrank_the_dramatic_natural_hazards() {
             .map_or(0.0, |p| p.rate_per_year);
         assert!(fire > r && job > r, "{h}: {r} vs fire {fire}, job {job}");
     }
-    // Job loss outranks every natural hazard except heat and cold waves, winter storms and
-    // windstorms.
-    for p in natural(&a).iter().skip(4) {
+    // Job loss outranks every natural hazard except heat and cold waves, wildfire smoke, winter
+    // storms and windstorms.
+    for p in natural(&a).iter().skip(5) {
         assert!(job > p.rate_per_year, "{} {}", p.id, p.rate_per_year);
     }
 }
@@ -108,6 +109,9 @@ fn philadelphia_job_loss_and_house_fire_outrank_the_dramatic_natural_hazards() {
 fn philadelphia_register_top_five() {
     // The register the planner sanity-checks (see the hazards report). A deliberate change to a
     // prior may reorder it; update this list in the same commit and say why.
+    // v0.2.0: wildfire smoke joins at 4th (REVIEW H6: 1.12 smoke days a year at 35.5 µg/m³ or
+    // more, 2016–2023, three days an episode: 0.37 a year), ahead of winter storms (0.35);
+    // windstorms (0.21) drop to 7th behind phone and internet outages (0.3).
     let a = assess("philadelphia-renters-4", "42101");
     let top: Vec<H> = a.profiles.iter().take(5).map(|p| p.id).collect();
     assert_eq!(
@@ -116,8 +120,8 @@ fn philadelphia_register_top_five() {
             H::HeatWave,
             H::MedicalEmergency,
             H::ColdWave,
-            H::WinterWeather,
-            H::StrongWind
+            H::WildfireSmoke,
+            H::WinterWeather
         ]
     );
 }
@@ -145,42 +149,72 @@ fn philadelphia_has_no_named_scenarios_and_shows_rare_catastrophes_last() {
     let a = assess("philadelphia-renters-4", "42101");
     assert!(a.scenarios.is_empty(), "{:?}", a.scenarios);
     let n = a.profiles.len();
-    let rare: Vec<H> = a.profiles[n - 2..].iter().map(|p| p.id).collect();
-    assert_eq!(rare, [H::NuclearAttack, H::Terrorism]);
-    for p in &a.profiles[n - 2..] {
+    // Contract v2: the nine rare families close the register; `terrorism` is never emitted.
+    assert!(a.profiles.iter().all(|p| !p.id.is_retired()));
+    let rare: Vec<H> = a.profiles[n - 9..].iter().map(|p| p.id).collect();
+    let mut families = rare.clone();
+    families.sort();
+    assert_eq!(families, H::RARE);
+    for p in &a.profiles[n - 9..] {
         assert_eq!(p.display, HazardDisplay::RareCatastrophic);
         assert!(!p.frequency_sentence.contains("Of 100"));
-    }
-    let nuke = profile(&a, H::NuclearAttack);
-    // Research §6.3: "about 1 in 2,000 to about 1 in 400 per year", never a point estimate.
-    assert!(
-        nuke.frequency_sentence
-            .contains("about 1 in 2,000 to about 1 in 400 a year")
-    );
-    assert_eq!(nuke.rate_range, [0.0005, 0.0025]);
-    // The figure is the world's, not the household's (hazard review H-01), and the terrorism row
-    // says what it counts: a closure of the area, not the chance of being hurt (H-03).
-    assert!(
-        nuke.frequency_sentence.contains("anywhere in the world")
-            && nuke.frequency_sentence.contains("not for your household"),
-        "{}",
-        nuke.frequency_sentence
-    );
-    let terror = profile(&a, H::Terrorism);
-    assert!(
-        terror.frequency_sentence.contains("half a day to two days")
-            && terror
-                .frequency_sentence
-                .contains("not the chance of being hurt"),
-        "{}",
-        terror.frequency_sentence
-    );
-    // Both rare rows carry the range the web shows instead of a point.
-    for p in &a.profiles[n - 2..] {
         let [lo, hi] = p.rate_range;
         assert!(lo > 0.0 && hi >= 4.0 * lo, "{}: {lo} {hi}", p.id);
         assert!(lo <= p.rate_per_year && p.rate_per_year <= hi);
     }
+    // The nuclear row: class C1 (the Philadelphia metro area), serious local effects 2.4 in
+    // 10,000 a year (3 in 100,000 to 3.6 in 1,000), REVIEW §2.3; hazard review H-02's own example
+    // sentence: "between 1 in 3,300 and 1 in 28 households like yours over 10 years".
+    let nuke = profile(&a, H::NuclearAttack);
+    assert!(
+        close(nuke.rate_per_year, 2.4e-4, 0.01),
+        "{}",
+        nuke.rate_per_year
+    );
+    assert!(
+        nuke.frequency_sentence
+            .starts_with("Between 1 in 3,300 and 1 in 28 households like yours"),
+        "{}",
+        nuke.frequency_sentence
+    );
+    assert_eq!(nuke.family.as_deref(), Some("nuclear_attack"));
+    let lf = nuke.location_factor.as_ref().unwrap();
+    assert_eq!(lf.class, "C1");
+    assert_eq!(lf.multiplier, [0.3, 0.6, 0.9]);
+    assert!(
+        lf.label
+            .starts_with("You live in the Philadelphia metro area.")
+    );
+    assert_eq!(
+        nuke.if_it_reaches_you.as_deref(),
+        Some("Life-threatening: blast or heavy fallout near likely targets.")
+    );
+    assert!(
+        nuke.what_it_changes
+            .as_deref()
+            .unwrap()
+            .starts_with("One free step: pick your shelter spot")
+    );
+    // Its anchor: the household's ranked hazard with the smallest rate above the row's upper
+    // bound (3.6 in 1,000): a regional blackout, 5 in 1,000 a year.
+    assert_eq!(
+        nuke.anchor_sentence.as_deref(),
+        Some(
+            "Less likely than a regional blackout (about 5 in 100 for you in the next ten years)."
+        )
+    );
+    // National disruption and use abroad are shown as sub-causes and never enter the local rate.
+    let ids: Vec<&str> = nuke.sub_causes.iter().map(|s| s.id.as_str()).collect();
+    for id in [
+        "limited_strike",
+        "nuclear_terrorism",
+        "emp",
+        "national_disruption",
+        "use_abroad",
+    ] {
+        assert!(ids.contains(&id), "{id}");
+    }
+    assert!(nuke.rate_range[1] < 5.0e-3, "use abroad is not added in");
     // A plant within 80 km (Limerick): the incident appears, ranked, with a tiny rate.
     let plant = profile(&a, H::NuclearPlantIncident);
     assert_eq!(plant.display, HazardDisplay::Ranked);
@@ -344,16 +378,19 @@ fn coos_bay_well_and_income_modifiers() {
 
 #[test]
 fn coos_bay_register_top_five() {
+    // v0.2.0: wildfire smoke leads (7.17 smoke days a year at 35.5 µg/m³ or more, imputed from
+    // satellite maps: 2.4 episodes a year); phone and internet outages (0.3) tie with stranding
+    // and push winter storms and job loss out of the top five.
     let a = assess("coos-bay-well-owner-2", "41011");
     let top: Vec<H> = a.profiles.iter().take(5).map(|p| p.id).collect();
     assert_eq!(
         top,
         [
+            H::WildfireSmoke,
             H::MedicalEmergency,
             H::StrongWind,
             H::VehicleStranding,
-            H::WinterWeather,
-            H::JobLoss
+            H::NetworkOutage
         ]
     );
 }
