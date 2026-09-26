@@ -232,7 +232,7 @@ stop.
 
 ```
 $ rr citations --missing
-Checked 217 citation ids referred to by the content, the engine crates and the data (data pack 25f3ed156688 (data)).
+Checked 219 citation ids referred to by the content, the engine crates and the data (data pack 25f3ed156688 (data)).
 1 is not defined in content/citations.toml:
 
  Id                         Status                                       Referred to by
@@ -326,14 +326,14 @@ debug builds and CI machines are slower than the target describes.
 ```
 $ cargo run --release -p rr-cli -- doctor
 rr doctor: 7 fixture households on data pack 25f3ed156688 (data)
-Engine 0.1.0 (API 1), content 2026.09.25+0e9448c9, release build, 5 timed runs each
+Engine 0.1.0 (API 1), content 2026.09.25+1318eadb, release build, 5 timed runs each
 
   ok  content validation: 0 errors, 0 warnings
-  ok  catalogue: 140 items, 0 without a resolvable citation
+  ok  catalogue: 104 items, 0 without a resolvable citation
 
  Fixture                        County            Median ms  Max ms  < 50 ms  Same bytes  Warnings  Uncited
- chicago-student-zero-budget-1  Cook, IL                 14      14  yes      yes                2        0
- coos-bay-well-owner-2          Coos, OR                 25      26  yes      yes                2        0
+ chicago-student-zero-budget-1  Cook, IL                 11      12  yes      yes                3        0
+ coos-bay-well-owner-2          Coos, OR                 17      19  yes      yes                2        0
 ...
 Result: OK. Every fixture plans, repeats byte for byte, and cites every number.
 ```

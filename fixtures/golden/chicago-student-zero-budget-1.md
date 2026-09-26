@@ -277,6 +277,7 @@ With no money set aside, the plan is the free steps above, and they still cover 
 ### Things to watch
 
 - **Worth knowing: Your plan uses free steps only.** With no money set aside, the plan lists the free steps that protect you most. Even a few dollars a month buys water and light first.
+- **Worth acting on: No stored water beyond refilled bottles by month 3.** Refilled drink bottles are a good start, but they hold only a little. Water is the one supply you cannot go long without: a few gallons of bottled water or a water jug is the next step, and costs little.
 
 ## Checklists
 
@@ -348,7 +349,7 @@ The household plan above covers school, daycare and work plans and a walking rou
 
 **What helps.** Swap phone numbers with two neighbours. Agree who checks on whom, especially older neighbours and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[96] Host a block party, since strong communities start with prepared neighbours.[100] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[101]
 
-**What to avoid.** Do not wait for a disaster to meet the people next door. A short hello now makes it easier to knock on a door later.
+**What to avoid.** Meet the people next door before you need them. A short hello now makes it easier to knock on a door later.
 
 ## Documents and money
 
@@ -391,7 +392,7 @@ Nobody in the household listed medical or access needs. Keep a written medicine 
 
 **What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[112] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[113] Write a short calm plan: what you might feel, what helps you, and who you will call.[95] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[114]
 
-**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[115] Do not wait until things feel unbearable to reach out. The 988 line supports people in emotional distress as well as in crisis.[112]
+**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[115] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[112]
 
 ## Maintenance calendar
 

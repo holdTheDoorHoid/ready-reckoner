@@ -99,7 +99,7 @@ Of 100 households like yours, about 81 will have someone lose a job in the next 
 
 **What helps.** Build an emergency fund a little at a time. The right amount depends on your situation.[26] Planners often suggest three to six months of living expenses, and more if your income varies.[27] Know how to file for unemployment in your state.[28] Keep copies of your financial, legal and medical papers together, with the names of people to call.[29] Write a bare-bones budget you could switch to, and keep a pantry that can stretch a tight month.
 
-**What to avoid.** Do not wait to file. Contact your state's unemployment program as soon as possible after losing work.[28] Do not keep your emergency fund in investments you would have to sell. A savings account lets you take money out at any time without a penalty.[27]
+**What to avoid.** File soon after losing work: contact your state's unemployment program as soon as you can.[28] Do not keep your emergency fund in investments you would have to sell. A savings account lets you take money out at any time without a penalty.[27]
 
 **What it can do:** lost income. **How bad:** Serious. **How sure:** Mostly data.
 
@@ -339,18 +339,18 @@ Your monthly money starts next month, so this month is the free steps above.
 | --- | --- | --- |
 | 12 (October 2027) | save toward cash in small bills; Battery or rechargeable fan: 2 fans | $64 |
 | 13 (November 2027) | save toward cash in small bills | $30 |
-| 14 (December 2027) | save toward cash in small bills; Cash in small bills: $100 | $130 |
+| 14 (December 2027) | save toward cash in small bills; Cash in small bills: $100, $90 of it from savings | $40 |
 | 15 (January 2028) | Bleeding-control kit (tourniquet and pressure bandage): 1 kit | $71 |
 | 16 (February 2028) | Multipurpose fire extinguisher: 2 extinguishers; Extra pet food in an airtight container: 5 pounds of dry food; Solar motion-sensor outdoor light: 1 light | $98 |
 | 17 (March 2028) | save toward cold-weather sleeping bag for each person (an upgrade on blankets) | $30 |
-| 18 (April 2028) | save toward cold-weather sleeping bag for each person (an upgrade on blankets); Cold-weather sleeping bag for each person (an upgrade on blankets): 1 sleeping bag | $99 |
+| 18 (April 2028) | save toward cold-weather sleeping bag for each person (an upgrade on blankets); Cold-weather sleeping bag for each person (an upgrade on blankets): 1 sleeping bag, $60 of it from savings | $39 |
 | 19 (May 2028) | Extra shelf-stable food you already eat: 16,000 kcal | $76 |
 | 20 (June 2028) | License-free two-way radios (FRS), a pair: 2 pairs | $84 |
 | 21 (July 2028) | save toward extra shelf-stable food you already eat | $30 |
-| 22 (August 2028) | save toward extra shelf-stable food you already eat; Extra shelf-stable food you already eat: 18,000 kcal | $115 |
+| 22 (August 2028) | save toward extra shelf-stable food you already eat; Extra shelf-stable food you already eat: 18,000 kcal, $60 of it from savings | $55 |
 | 23 (September 2028) | Phone power bank (about 20,000 mAh): 3 power banks | $109 |
 | 24 (October 2028) | save toward extra shelf-stable food you already eat | $30 |
-| 25 (November 2028) | save toward extra shelf-stable food you already eat; Extra shelf-stable food you already eat: 24,000 kcal | $143 |
+| 25 (November 2028) | save toward extra shelf-stable food you already eat; Extra shelf-stable food you already eat: 24,000 kcal, $60 of it from savings | $83 |
 
 ### When you are done
 
@@ -484,7 +484,7 @@ The household plan above covers school, daycare and work plans and a walking rou
 
 **What helps.** Swap phone numbers with two neighbours. Agree who checks on whom, especially older neighbours and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[112] Host a block party, since strong communities start with prepared neighbours.[113] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[114]
 
-**What to avoid.** Do not wait for a disaster to meet the people next door. A short hello now makes it easier to knock on a door later.
+**What to avoid.** Meet the people next door before you need them. A short hello now makes it easier to knock on a door later.
 
 ### Pets
 
@@ -553,7 +553,7 @@ Of 100 households like yours, about 15 (6–30) will have an income gap of more 
 
 **What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[124] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[125] Write a short calm plan: what you might feel, what helps you, and who you will call.[102] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[126]
 
-**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[110] Do not wait until things feel unbearable to reach out. The 988 line supports people in emotional distress as well as in crisis.[124]
+**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[110] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[124]
 
 ## Maintenance calendar
 

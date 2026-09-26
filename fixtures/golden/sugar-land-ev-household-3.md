@@ -99,7 +99,7 @@ Of 100 households like yours, about 81 will have someone lose a job in the next 
 
 **What helps.** Build an emergency fund a little at a time. The right amount depends on your situation.[35] Planners often suggest three to six months of living expenses, and more if your income varies.[36] Know how to file for unemployment in your state.[37] Keep copies of your financial, legal and medical papers together, with the names of people to call.[38] Write a bare-bones budget you could switch to, and keep a pantry that can stretch a tight month.
 
-**What to avoid.** Do not wait to file. Contact your state's unemployment program as soon as possible after losing work.[37] Do not keep your emergency fund in investments you would have to sell. A savings account lets you take money out at any time without a penalty.[36]
+**What to avoid.** File soon after losing work: contact your state's unemployment program as soon as you can.[37] Do not keep your emergency fund in investments you would have to sell. A savings account lets you take money out at any time without a penalty.[36]
 
 **What it can do:** lost income. **How bad:** Serious. **How sure:** Mostly data.
 
@@ -468,7 +468,7 @@ The household plan above covers school, daycare and work plans and a walking rou
 
 **What helps.** Swap phone numbers with two neighbours. Agree who checks on whom, especially older neighbours and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[119] Host a block party, since strong communities start with prepared neighbours.[120] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[121]
 
-**What to avoid.** Do not wait for a disaster to meet the people next door. A short hello now makes it easier to knock on a door later.
+**What to avoid.** Meet the people next door before you need them. A short hello now makes it easier to knock on a door later.
 
 ### Pets
 
@@ -536,7 +536,7 @@ Of 100 households like yours, about 15 (7–30) will have an income gap of more 
 
 **What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[137] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[138] Write a short calm plan: what you might feel, what helps you, and who you will call.[112] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[139]
 
-**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[117] Do not wait until things feel unbearable to reach out. The 988 line supports people in emotional distress as well as in crisis.[137]
+**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[117] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[137]
 
 ## Maintenance calendar
 

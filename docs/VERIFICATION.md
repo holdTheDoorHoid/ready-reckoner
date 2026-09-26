@@ -32,14 +32,14 @@ harnesses added on this branch:
 | V-11 | Family guidance shows avalanche, tsunami, volcano, landslide, drought and tornado-only advice where those hazards do not apply | Medium | Fixed `86d550c` |
 | V-12 | Heat and cold waves read "Minor" even for households with a senior, a baby or no cooling/heating | Medium | Fixed `26d7004` |
 | V-13 | A second card of the same family (winter storm after cold wave, tsunami after earthquake) shows a threat with no "What helps" | Medium | Fixed `7ce98e0` |
-| V-15 | The 79 counties without EAGLE-I records (37 in Nebraska, 21 in Alaska) get lower power and thermal targets than their neighbours (Juneau: power ½ day, thermal 0 for a gas-heated home) | Medium | Proposed |
+| V-15 | The 79 counties without EAGLE-I records (37 in Nebraska, 21 in Alaska) get lower power and thermal targets than their neighbours (Juneau: power ½ day, thermal 0 for a gas-heated home) | Medium | Fixed `8be5619` (agent/followups) |
 | V-06 | SSA's "1 in 4" disability chance paraphrased as "more than 1 in 4" | Low | Fixed `688318b` |
 | V-07 | "about 1 times a year" | Low | Fixed `688318b`, `2c11e41` |
 | V-08 | "about fewer than 1 (0–2) of 100" | Low | Fixed `688318b` |
 | V-14 | Engine text "leaving home in a hurry" uses a pressure word the content policy bans | Low | Fixed `7ce98e0` |
-| V-16 | The `no_water_after_month_1` guardrail cannot fire: the free reused-bottles step always gives water in month 0 | Low | Noted (by design) |
-| V-17 | "Do not wait …" appears three times in guidance; the pressure-phrase check only catches "don't wait" | Low | Proposed (content) |
-| V-18 | The packet's "Spend" column adds a sinking-fund deposit and the full price in the purchase month ($130 in a $60 month) | Low | Proposed |
+| V-16 | The `no_water_after_month_1` guardrail cannot fire: the free reused-bottles step always gives water in month 0 | Low | Retargeted `08c44ce` (agent/followups) |
+| V-17 | "Do not wait …" appears three times in guidance; the pressure-phrase check only catches "don't wait" | Low | Fixed `ff049b1` (agent/followups) |
+| V-18 | The packet's "Spend" column adds a sinking-fund deposit and the full price in the purchase month ($130 in a $60 month) | Low | Fixed `42a085a` (agent/followups) |
 | V-19 | localStorage also holds `rr.prefs.v1` (display preferences); the docs name only `rr.plan.v1` | Low | Proposed (docs) |
 | V-20 | The CSP is a `<meta>` tag (no `frame-ancestors`), with `'unsafe-inline'` styles | Low | Noted |
 | V-21 | Citation hygiene: JOLTS cited by its home page, the FEMA survey deck by a third-party mirror, the Hazus manual by a university copy, two price bands by one search-results URL, bottled-water prices from a wholesale case listing | Low | Proposed |
@@ -430,6 +430,25 @@ reproduces it with the real Philadelphia golden (recorded as `it.fails`; flip to
   longer depends on rr-etl, so it no longer builds reqwest, rustls or aws-lc (V-23).
 - `DataStore::attributions` returns the NRI statement first; the reordering in rr-plan, rr-cli and
   rr-wasm is gone (V-24).
+
+## 9. Release follow-ups (agent/followups, 2026-09-26)
+
+Fixed after this pass, each as its own commit on `agent/followups`:
+
+- **V-15** (`8be5619`): a county with no outage record takes its state's pooled series from
+  `core/outages_state.csv` (72 counties in 9 states; American Samoa, Guam and the Northern Mariana
+  Islands have no state row). The Philadelphia household in those counties: power ½–3 days
+  (mostly 2) became 2–5 (mostly 5, Nebraska), heat or cold 0–2 became 2–5 (mostly 3), phones 0–2
+  became 2–5; Juneau power ½ → 3 days, heat or cold 0 → 3, phones ½ → 5. The packet's notes and
+  the power override name the state.
+- **V-16** (`08c44ce`): the guardrail is now `no_stored_water_by_month_3`: it warns when refilled
+  bottles and what the household has leave the stored-water need short and no stored water is
+  owned or bought by month 3. Of the fixtures, only the $0 Chicago student is warned (Phoenix's
+  refilled bottles cover its whole 3-day need).
+- **V-17** (`ff049b1`): "do not wait" joins "don't wait" on the pressure list; the seven guidance
+  sentences that used it were rewritten (three of them reach the fixture packets).
+- **V-18** (`42a085a`): the "Spend" column counts a deposit once and a purchase paid from savings
+  only for the rest (Philadelphia month 14: $130 → $40), and says "$90 of it from savings".
 
 ## Golden changes on this branch
 

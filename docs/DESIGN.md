@@ -593,6 +593,22 @@ guidance beyond safe storage and training pointers.
 
 ## 14. Decision log (append only)
 
+- 2026-09-26 — Release follow-ups (agent/followups; `~/Desktop/ready-reckoner-briefs/brief-release-followups.md`).
+  `BucketAssessment.covered_today` (additive; API 1): coverage from `existing` and the assumed
+  basics before the plan buys anything; `covered` stays the plan's end, and the plan and risks
+  screens show both ("you have now" solid, "your plan covers" striped). Core pack trimmed:
+  `zip_centroids.csv` and the NRI columns `expb`, `ealb`, `alrb` dropped (2.99 → 2.37 MB gzipped;
+  a first visit fetches 1.99 MB of it); `ealp` kept for a health-based heat and cold severity
+  although nothing reads it yet. A household on a well with large animals and a no-water target
+  over 3 days gets a generator as a need for the pump (its fuel as a note line, so fuel is never
+  bought before the generator) and stores 3 days of animal water, with two weeks in stock tanks
+  as the alternative line; 14 stored days remain only where no pump power is planned (Hays: done
+  month 43 → 34, purchases $3,410 → $2,664). Hays' 60-day no-water target is drought (a dry
+  well), which neither a generator nor tanks solve; the line says to haul water in. Counties
+  without outage records use their state's series (V-15); the water guardrail asks for stored
+  water beyond refilled bottles by month 3 (V-16, replacing "no water at all after month one" in
+  §4.7); the packet's "Spend" is the month's money out (V-18); "do not wait" is a pressure phrase
+  (V-17).
 - 2026-09-26 — Verification pass (agent/verify; `docs/VERIFICATION.md`). Model decisions taken to fix
   implausible real-pack numbers: a county outage curve treats the first zero share past its last
   positive one as an upper bound (0.5 %) and never decays more slowly than a log-normal with σ = 2
