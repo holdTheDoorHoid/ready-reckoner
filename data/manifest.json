@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "a5b6c9d722cc",
-  "generated": "2026-09-26T17:34:32Z",
+  "pack_version": "1c2677cdba4a",
+  "generated": "2026-09-26T17:38:48Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -47,9 +47,9 @@
         {
           "path": "core/events.csv",
           "job": "events",
-          "sha256": "ba62a2de742fc0a5bd79a05780b59229db119a9b714d3a1e991a31e16ec45b59",
-          "bytes": 2710481,
-          "rows": 44057,
+          "sha256": "b7525c8a6c44793a04803360d54e0b3b8144b4533841d11900c5a360dbe32064",
+          "bytes": 2733891,
+          "rows": 44397,
           "key": [
             "fips",
             "event_type"
@@ -522,13 +522,13 @@
     },
     "events": {
       "title": "Event rates per county from HURDAT2, SPC severe reports and NOAA Storm Events",
-      "finished": "2026-09-26T03:42:04Z",
+      "finished": "2026-09-26T17:38:48Z",
       "sources": [
         {
           "name": "NOAA NHC HURDAT2 best tracks, Atlantic",
           "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2025-091226.txt",
           "version": "hurdat2-1851-2025-091226.txt",
-          "retrieved": "2026-09-26T03:41:16Z",
+          "retrieved": "2026-09-26T17:36:57Z",
           "sha256": "df63fabce0ad824d20447e241bd27a2a65ae36cb2f9b62aa3caacd9171c34f11",
           "bytes": 7071568,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -537,7 +537,7 @@
           "name": "NOAA NHC HURDAT2 best tracks, eastern and central Pacific",
           "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2025-091426.txt",
           "version": "hurdat2-nepac-1949-2025-091426.txt",
-          "retrieved": "2026-09-26T03:41:17Z",
+          "retrieved": "2026-09-26T17:37:13Z",
           "sha256": "02a8860ecb276a01272b5a57655229689bd42c6c9a647e02176273a6213440bc",
           "bytes": 4084038,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -546,7 +546,7 @@
           "name": "NOAA SPC severe weather database: tornadoes (all segments)",
           "url": "https://www.spc.noaa.gov/wcm/data/1950-2025_all_tornadoes.csv",
           "version": "1950-2025_all_tornadoes.csv; Last-Modified Fri, 24 Apr 2026 19:12:10 GMT",
-          "retrieved": "2026-09-26T03:41:19Z",
+          "retrieved": "2026-09-26T17:37:18Z",
           "sha256": "0ac30e15505a875fd2e6269bba55835701f51f67661169ec25de5bed08698973",
           "bytes": 9219030,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -555,7 +555,7 @@
           "name": "NOAA SPC severe weather database: hail reports",
           "url": "https://www.spc.noaa.gov/wcm/data/1955-2025_hail.csv.zip",
           "version": "1955-2025_hail.csv.zip; Last-Modified Fri, 24 Apr 2026 19:12:09 GMT",
-          "retrieved": "2026-09-26T03:41:22Z",
+          "retrieved": "2026-09-26T17:37:21Z",
           "sha256": "f511540a2c1454c863fc1604cf5b2d33bb3e6bfe531079f3a61d53b5d7fe70f8",
           "bytes": 8266856,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -564,7 +564,7 @@
           "name": "NOAA SPC severe weather database: wind reports",
           "url": "https://www.spc.noaa.gov/wcm/data/1955-2025_wind.csv.zip",
           "version": "1955-2025_wind.csv.zip; Last-Modified Fri, 24 Apr 2026 19:12:13 GMT",
-          "retrieved": "2026-09-26T03:41:29Z",
+          "retrieved": "2026-09-26T17:37:26Z",
           "sha256": "1db782d96d29dbb0ffd488a466f006799681cbe04b0003f245d1a2f3f6b9d87b",
           "bytes": 11875052,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -573,7 +573,7 @@
           "name": "NWS zone-county correlation file",
           "url": "https://www.weather.gov/source/gis/Shapefiles/County/bp16ap26.dbx",
           "version": "bp16ap26.dbx",
-          "retrieved": "2026-09-26T03:41:38Z",
+          "retrieved": "2026-09-26T17:37:43Z",
           "sha256": "69d3472d4d576b8a4924efb7a43108f7c64111f503e15efd650f43dc617a6f12",
           "bytes": 350723,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -582,7 +582,7 @@
           "name": "NWS zone-county correlation file",
           "url": "https://www.weather.gov/source/gis/Shapefiles/County/bp18mr25.dbx",
           "version": "bp18mr25.dbx",
-          "retrieved": "2026-09-26T03:41:38Z",
+          "retrieved": "2026-09-26T17:37:44Z",
           "sha256": "721c00ea7a609d5f06ea16f5c8e588d1ab9a928e58d345be522781c957484f6d",
           "bytes": 345543,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -591,7 +591,7 @@
           "name": "NOAA NCEI Storm Events details 1996",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1996_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1996_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:39Z",
+          "retrieved": "2026-09-26T17:37:49Z",
           "sha256": "518c43aadbffbf7509a2ab20cfa6b54f1d63f196b3d8aedb9ffd7d032968eb45",
           "bytes": 6297309,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -600,7 +600,7 @@
           "name": "NOAA NCEI Storm Events details 1997",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1997_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1997_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:40Z",
+          "retrieved": "2026-09-26T17:37:51Z",
           "sha256": "3fdcaa0a839d8b619161188d7d01b8e24e2688fcfc227ea15a73d7da876b36bc",
           "bytes": 6632990,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -609,7 +609,7 @@
           "name": "NOAA NCEI Storm Events details 1998",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1998_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1998_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:40Z",
+          "retrieved": "2026-09-26T17:37:52Z",
           "sha256": "21e4b8d8a88437a25f441ef453ab2ef96ef98f479f2d0f51d0f72b559176699b",
           "bytes": 10295109,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -618,7 +618,7 @@
           "name": "NOAA NCEI Storm Events details 1999",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1999_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1999_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:41Z",
+          "retrieved": "2026-09-26T17:37:54Z",
           "sha256": "c407d09273bc91d645f0f119bfd7128c153f1acb62c239f34572f483b09aacfb",
           "bytes": 10362659,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -627,7 +627,7 @@
           "name": "NOAA NCEI Storm Events details 2000",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2000_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2000_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:42Z",
+          "retrieved": "2026-09-26T17:37:56Z",
           "sha256": "a4ca5b02ad766bf50db2b192c127b625018f66bb9fb4d9746677d39ba2e392ab",
           "bytes": 7914864,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -636,7 +636,7 @@
           "name": "NOAA NCEI Storm Events details 2001",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2001_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2001_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:42Z",
+          "retrieved": "2026-09-26T17:37:57Z",
           "sha256": "77a84aa66aaa9f7f95a15ecb2d18451bc05be801ea10f606d2e83fb44f737e51",
           "bytes": 6876091,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -645,7 +645,7 @@
           "name": "NOAA NCEI Storm Events details 2002",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2002_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2002_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:43Z",
+          "retrieved": "2026-09-26T17:37:58Z",
           "sha256": "6f941b2ea120245e2e924093032c91c3377e7d1ea2c9163593456facb9ebe185",
           "bytes": 7196867,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -654,7 +654,7 @@
           "name": "NOAA NCEI Storm Events details 2003",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2003_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2003_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:44Z",
+          "retrieved": "2026-09-26T17:37:59Z",
           "sha256": "f6d23ba4043394a517c8c6b0db8346f940a1de3fb8cac76eee773c5797243e3c",
           "bytes": 7213001,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -663,7 +663,7 @@
           "name": "NOAA NCEI Storm Events details 2004",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2004_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2004_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:44Z",
+          "retrieved": "2026-09-26T17:38:01Z",
           "sha256": "b0827cd69b8d0ddc1446d8a322132502a05af19b1193c15eae118f13396844e3",
           "bytes": 7335278,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -672,7 +672,7 @@
           "name": "NOAA NCEI Storm Events details 2005",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2005_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2005_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:45Z",
+          "retrieved": "2026-09-26T17:38:02Z",
           "sha256": "d68e3cbfbe5fb79f720eccea372c53585614bab618f3c2a4433e47767f54e55f",
           "bytes": 7765419,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -681,7 +681,7 @@
           "name": "NOAA NCEI Storm Events details 2006",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2006_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2006_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:46Z",
+          "retrieved": "2026-09-26T17:38:03Z",
           "sha256": "a958ea15688b3346fd69efe53e91b4d57a26f8e6f99e1ddcc3b92c2eb2d57d0b",
           "bytes": 7590951,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -690,7 +690,7 @@
           "name": "NOAA NCEI Storm Events details 2007",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2007_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2007_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:46Z",
+          "retrieved": "2026-09-26T17:38:04Z",
           "sha256": "e8289daa871946230862e2ca0d119195df7108e4a680fe83e3d419f3f21a7524",
           "bytes": 9775676,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -699,7 +699,7 @@
           "name": "NOAA NCEI Storm Events details 2008",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2008_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2008_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:47Z",
+          "retrieved": "2026-09-26T17:38:06Z",
           "sha256": "c97260e82760b17bc571d55e1ca1f5073ccc0558b774313d46dddc3e1ef39b37",
           "bytes": 12276398,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -708,7 +708,7 @@
           "name": "NOAA NCEI Storm Events details 2009",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2009_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2009_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:48Z",
+          "retrieved": "2026-09-26T17:38:08Z",
           "sha256": "c04d6e0173153475440cb614bd019287986c74c311c61864478f9087d7d1b357",
           "bytes": 10335606,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -717,7 +717,7 @@
           "name": "NOAA NCEI Storm Events details 2010",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2010_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2010_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:49Z",
+          "retrieved": "2026-09-26T17:38:10Z",
           "sha256": "d109f8a6ab1a71e70f60fe42d30a0e31f370c904e248a51e5fe85573f904878e",
           "bytes": 11729156,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -726,7 +726,7 @@
           "name": "NOAA NCEI Storm Events details 2011",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2011_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2011_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:50Z",
+          "retrieved": "2026-09-26T17:38:12Z",
           "sha256": "be3b40cd098a879be12c2c3e614700560bd537e6178bba8b1aaf099f665dda40",
           "bytes": 15695066,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -735,7 +735,7 @@
           "name": "NOAA NCEI Storm Events details 2012",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2012_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2012_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:51Z",
+          "retrieved": "2026-09-26T17:38:15Z",
           "sha256": "673db47f6dc9e97e06ffec3b628f5341c128f594d9b247bd07bad2e8397ebac3",
           "bytes": 11820671,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -744,7 +744,7 @@
           "name": "NOAA NCEI Storm Events details 2013",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2013_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2013_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:53Z",
+          "retrieved": "2026-09-26T17:38:17Z",
           "sha256": "4fa4036ed1c7ea9a779d5a5841d18de08596c423920189a9e6173488d1a98260",
           "bytes": 11725909,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -753,7 +753,7 @@
           "name": "NOAA NCEI Storm Events details 2014",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2014_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2014_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:53Z",
+          "retrieved": "2026-09-26T17:38:20Z",
           "sha256": "410b457b1b9628cfd63292848a626482a88714c8bd8c45d56a0469f9de05d078",
           "bytes": 11084754,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -762,7 +762,7 @@
           "name": "NOAA NCEI Storm Events details 2015",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2015_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2015_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:54Z",
+          "retrieved": "2026-09-26T17:38:22Z",
           "sha256": "c4a5a24b8c69ad2b6b867790ce298f5b642a60516c9fce5550a8d2f67cd7bf2e",
           "bytes": 10041550,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -771,7 +771,7 @@
           "name": "NOAA NCEI Storm Events details 2016",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2016_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2016_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:55Z",
+          "retrieved": "2026-09-26T17:38:24Z",
           "sha256": "d8e1389897df3557e74ba36820357f6962a7c0ca922595400fe74d883f7a5036",
           "bytes": 9065715,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -780,7 +780,7 @@
           "name": "NOAA NCEI Storm Events details 2017",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2017_c20260519.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2017_c20260519.csv.gz",
-          "retrieved": "2026-09-26T03:41:56Z",
+          "retrieved": "2026-09-26T17:38:26Z",
           "sha256": "bd3ca72b71544222cba8aa2b29eb3f0efe050d3330a0c408e208befb66881750",
           "bytes": 9340854,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -789,7 +789,7 @@
           "name": "NOAA NCEI Storm Events details 2018",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2018_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2018_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:57Z",
+          "retrieved": "2026-09-26T17:38:28Z",
           "sha256": "19702480f50cd2a8dacce5e57891feba156afb87b1ea5cbb4eaeda69d2b964a4",
           "bytes": 9585982,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -798,7 +798,7 @@
           "name": "NOAA NCEI Storm Events details 2019",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2019_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2019_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:57Z",
+          "retrieved": "2026-09-26T17:38:30Z",
           "sha256": "f5043ecc776818b0feffdf1e0fcbaf63329db0635eab1057c7b8ba00ef332e3b",
           "bytes": 11602648,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -807,7 +807,7 @@
           "name": "NOAA NCEI Storm Events details 2020",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2020_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2020_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:58Z",
+          "retrieved": "2026-09-26T17:38:31Z",
           "sha256": "895c56fd46991c4d9a135d67558dc4b447a02a2314efac0ace645135b98f9c9d",
           "bytes": 10444606,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -816,7 +816,7 @@
           "name": "NOAA NCEI Storm Events details 2021",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2021_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2021_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:59Z",
+          "retrieved": "2026-09-26T17:38:33Z",
           "sha256": "60c1daf96dbe8eafd48c80df5b70df51a0125ab95d467ee7009a646761d57715",
           "bytes": 10563953,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -825,7 +825,7 @@
           "name": "NOAA NCEI Storm Events details 2022",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2022_c20260625.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2022_c20260625.csv.gz",
-          "retrieved": "2026-09-26T03:42:00Z",
+          "retrieved": "2026-09-26T17:38:35Z",
           "sha256": "7d6b79d0049a6edec96b061738289daddba90be26fc9afe7b0a6fd617f21452e",
           "bytes": 11817849,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -834,7 +834,7 @@
           "name": "NOAA NCEI Storm Events details 2023",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2023_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2023_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:42:01Z",
+          "retrieved": "2026-09-26T17:38:38Z",
           "sha256": "713784bed40d9e5a95b1d6240a654f865f3ef97703713105c7b35437270da134",
           "bytes": 12888092,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -843,7 +843,7 @@
           "name": "NOAA NCEI Storm Events details 2024",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2024_c20260728.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2024_c20260728.csv.gz",
-          "retrieved": "2026-09-26T03:42:02Z",
+          "retrieved": "2026-09-26T17:38:41Z",
           "sha256": "2070b83eccab041b36360ab73645b9a249c3eefc5b92b5b3fc0cbba4d9fcc09c",
           "bytes": 12693243,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -852,14 +852,14 @@
           "name": "NOAA NCEI Storm Events details 2025",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2025_c20260819.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2025_c20260819.csv.gz",
-          "retrieved": "2026-09-26T03:42:03Z",
+          "retrieved": "2026-09-26T17:38:44Z",
           "sha256": "d9b46b4c6aae554723cadbb9691f3d5258371c02e530ba815d6fe41e4550149f",
           "bytes": 12585209,
           "license": "US Government work, public domain (17 U.S.C. 105)"
         }
       ],
-      "rows_in": 1460073,
-      "rows_out": 44057,
+      "rows_in": 1461768,
+      "rows_out": 44397,
       "outputs": [
         "core/events.csv"
       ],
@@ -868,7 +868,7 @@
         "Storm passages: a storm counts when its best track passes within 50 nautical miles of the county's internal point with interpolated maximum sustained wind of at least 34 kt (tropical_storm_passage), 64 kt (hurricane_passage) or 96 kt (major_hurricane_passage), whatever its tropical or post-tropical status.",
         "SPC: tornadoes are counted once per county per tornado using the per-state segment records (sn = 1) and their county list (f1-f4); tornado_ef2plus uses the rating (mag >= 2). Hail and wind are counted as days with at least one report in the county (hail 1 in and 2 in or larger by size; all severe-wind reports, and 65 kt or more). share_damaging is the share with a reported property loss above zero; loss units changed in 2016 but only 'above zero' is used.",
         "Storm Events: one observation per county per NOAA episode and type. Zone records apply to every county the NWS zone-county correlation file lists for that zone (newest file first, older files as fallback). Episode length runs from the earliest begin to the latest end of the episode's records in the county (local standard time as recorded). share_damaging counts reported property or crop damage above zero (many records leave damage blank, so it is a lower bound); share_injury counts direct or indirect injuries or deaths.",
-        "Retired forecast zones: 20386 zone records whose code is not in the correlation files were placed in the one county of that state whose name the zone carries (after dropping words like Northern or Coastal); 34015 records (382 distinct zones) could not be placed and were skipped (5.1% of the records used).",
+        "Retired forecast zones: 20452 zone records whose code is not in the correlation files were placed in the one county of that state whose name the zone carries (after dropping words like Northern or Coastal); 34370 records (382 distinct zones) could not be placed and were skipped (5.1% of the records used).",
         "Connecticut: sources that report the retired counties are apportioned to planning regions by land-area share (each region's weight is the share of its land inside the reporting county)."
       ],
       "missing": [

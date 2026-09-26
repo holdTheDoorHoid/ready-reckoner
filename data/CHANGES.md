@@ -170,3 +170,11 @@ Jobs run: facilities.
 ## 2026-09-26T17:34:32Z — pack version a5b6c9d722cc
 
 Jobs run: eviction.
+
+## 2026-09-26T17:38:48Z — pack version 1c2677cdba4a
+
+Jobs run: events.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/events.csv` | 44057 | 44397 | 340 | 0 | 0 | changed |
