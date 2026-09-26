@@ -18,6 +18,9 @@ const CASES: u64 = 250;
 /// Cases for the one-off property (it looks at month 0 only, so it runs more of them).
 const ONE_OFF_CASES: u64 = 600;
 
+/// Cases for the envelope property (enough for plans that stop with money left in a fund).
+const ENVELOPE_CASES: u64 = 800;
+
 fn run(c: &Case, options: BudgetOptions) -> BudgetResult {
     let input = BudgetInput {
         household: &c.household,
@@ -131,10 +134,11 @@ fn fixed_order_more_budget_never_lowers_coverage_in_any_month() {
 
 /// A higher exceedance curve for a bucket never moves that bucket's items later in the buying
 /// order, with one exception the rules create on purpose: a later-tier item that also serves the
-/// bucket can cross the five-times promotion line and be bought earlier, covering the bucket
-/// sooner and making a single-bucket item unnecessary (or pushing it to a later tier). So: an item
-/// that serves only that bucket keeps its place or moves up, unless an item serving the same
-/// bucket was newly promoted ahead of it. Items for other buckets never overtake it.
+/// bucket can cross the five-times promotion line and be bought earlier (or in more chunks),
+/// covering the bucket sooner and making a single-bucket item unnecessary (or pushing it to a
+/// later tier). So: an item that serves only that bucket keeps its place or moves up, unless more
+/// of an item serving the same bucket was promoted ahead of it than before. Items for other
+/// buckets never overtake it otherwise.
 #[test]
 fn higher_curve_never_delays_its_items() {
     let (mut checked, mut substituted) = (0, 0);
@@ -170,19 +174,17 @@ fn higher_curve_never_delays_its_items() {
             };
             let (ob, oa) = (order(&before), order(&after));
             let first = |o: &[(String, bool)], id: &str| o.iter().position(|(x, _)| x == id);
-            // Items serving b that are newly promoted after the rise (not promoted before, or
-            // placed later before), with their new positions.
-            let newly_promoted: Vec<usize> = oa
-                .iter()
-                .enumerate()
-                .filter(|(_, (id, promoted))| *promoted && serves_b(id))
-                .filter(|(i, (id, _))| {
-                    ob.iter()
-                        .position(|(x, promoted)| x == id && *promoted)
-                        .is_none_or(|j| j > *i)
-                })
-                .map(|(i, _)| i)
-                .collect();
+            // Promoted purchases of items serving b made before `id` is first bought (or in the
+            // whole plan if it never is), as quantity per item.
+            let promoted_before = |r: &BudgetResult, id: &str| -> BTreeMap<String, f64> {
+                let mut out: BTreeMap<String, f64> = BTreeMap::new();
+                for p in r.sequence.iter().take_while(|p| p.item_id != id) {
+                    if p.promoted && serves_b(p.item_id.as_str()) {
+                        *out.entry(p.item_id.as_str().to_owned()).or_default() += p.quantity;
+                    }
+                }
+                out
+            };
             for (it, m) in c.items.iter().zip(&c.meta) {
                 let only_b = !m.contributes.is_empty()
                     && m.contributes.iter().all(|x| x.bucket == b)
@@ -197,9 +199,15 @@ fn higher_curve_never_delays_its_items() {
                 if p1.is_some_and(|p1| p1 <= p0) {
                     continue;
                 }
-                let limit = p1.unwrap_or(usize::MAX).min(oa.len());
+                // The exception: more of some item serving b was promoted ahead of it than before
+                // (a newly promoted item, or more chunks of one already promoted).
+                let (was, now) = (
+                    promoted_before(&before, it.id.as_str()),
+                    promoted_before(&after, it.id.as_str()),
+                );
                 assert!(
-                    newly_promoted.iter().any(|&q| q < limit),
+                    now.iter()
+                        .any(|(y, q)| *q > was.get(y).copied().unwrap_or(0.0) + 1e-9),
                     "seed {seed}: {} moved from {p0} to {p1:?} when {b} rose x{k}, and no item \
                      serving {b} was promoted ahead of it",
                     it.id
@@ -335,7 +343,8 @@ fn same_input_same_output() {
 /// ceil(cost / (reserve share x monthly money)) under the split schedule, where "monthly money" is
 /// what reaches that track (90 % for the main plan and 10 % for the allowance with the
 /// rare-catastrophe opt-in). A split fund whose item stops being worth buying pays for the next
-/// purchase instead; that is not a late arrival and is counted separately.
+/// purchase instead, and a fund whose item the plan's last purchase made unnecessary is surplus;
+/// neither is a late arrival, and both are counted separately.
 #[test]
 fn envelopes_resolve_within_ceil_cost_over_budget() {
     let (mut seen, mut split_seen, mut moved) = (0, 0, 0);
@@ -397,6 +406,17 @@ fn envelopes_resolve_within_ceil_cost_over_budget() {
                             "seed {seed} {schedule:?}: {} paid for something else",
                             life.item_id
                         );
+                        moved += 1;
+                    }
+                    // The plan finished because the last purchase covered what the fund's item
+                    // was for: its money is surplus, not late.
+                    (None, _)
+                        if !rare
+                            && r.stopped_month.is_some()
+                            && r.money_by_month
+                                .last()
+                                .is_some_and(|mm| mm.saving_for.is_none()) =>
+                    {
                         moved += 1;
                     }
                     (None, _) => assert!(
@@ -515,11 +535,13 @@ fn one_off_money_goes_to_the_top_life_safety_item() {
 
 /// `Plan.envelopes` holds one entry per item id (ENGINE-API), and each entry adds up every dollar
 /// saved for that item: what its purchases drew from savings, plus what a fund still holds for it
-/// when the plan ends.
+/// when the plan ends. No entry shows $0.00 saved, and a plan that has stopped (nothing left worth
+/// buying) names no saving goal: when the last purchase covered what the fund's item was for, the
+/// money left in the fund is surplus, not an envelope for an item the plan will never buy.
 #[test]
 fn one_envelope_per_item_adding_up_every_draw() {
-    let mut merged = 0;
-    for seed in 0..CASES {
+    let (mut merged, mut surplus) = (0, 0);
+    for seed in 0..ENVELOPE_CASES {
         let c = case(seed);
         for schedule in SCHEDULES {
             let r = run(&c, options(schedule, false));
@@ -531,6 +553,13 @@ fn one_envelope_per_item_adding_up_every_draw() {
                 "seed {seed} {schedule:?}: {envelopes:?}"
             );
             let open = r.money_by_month.last().and_then(|mm| mm.saving_for.clone());
+            if r.stopped_month.is_some() {
+                assert!(
+                    open.is_none(),
+                    "seed {seed} {schedule:?}: stopped, saving for {open:?}"
+                );
+                surplus += usize::from(r.money_by_month.last().unwrap().saved_usd > 0.0);
+            }
             for e in envelopes {
                 let draws: Vec<_> = r
                     .sequence
@@ -552,7 +581,7 @@ fn one_envelope_per_item_adding_up_every_draw() {
                         "seed {seed} {schedule:?}: {e:?} vs ${saved:.2} of ${needed:.2}"
                     );
                 }
-                assert!(s <= n + 0.01, "seed {seed}: {e:?}");
+                assert!(s <= n + 0.01 && s >= 0.01, "seed {seed}: {e:?}");
                 merged += usize::from(draws.len() > 1);
             }
             for p in r.sequence.iter().filter(|p| p.from_savings_usd > 1e-9) {
@@ -560,8 +589,11 @@ fn one_envelope_per_item_adding_up_every_draw() {
             }
         }
     }
-    println!("envelopes: {merged} add up more than one draw");
-    assert!(merged > 0, "no item was saved for twice");
+    println!("envelopes: {merged} add up more than one draw; {surplus} stopped plans kept surplus");
+    assert!(
+        merged > 0 && surplus > 0,
+        "{merged} merged, {surplus} with surplus"
+    );
 }
 
 /// Split schedule: every month in which the free money covers the cheapest item worth buying
@@ -596,7 +628,7 @@ fn split_buys_something_every_month_it_can() {
 
 /// Split schedule: when the plan with the bigger budget finishes (nothing left worth buying), it
 /// covers every bucket at least as far as the plan with the smaller budget does at its end, and
-/// when both finish they cover the same. Coverage counts up to each target, since days beyond it
+/// when both finish (the rare-catastrophe allowance too, with the opt-in) they cover the same. Coverage counts up to each target, since days beyond it
 /// earn nothing (a bigger budget may buy one larger item where a smaller one bought two, and
 /// overshoot a target by less). Plans run for 50 years here so that small budgets finish; when
 /// neither plan finishes, the split schedule makes no promise, because its buying order depends
@@ -623,7 +655,12 @@ fn split_final_coverage_never_lower_with_more_budget() {
             unfinished += 1;
             continue;
         }
-        let both = small.stopped_month.is_some();
+        // Fully finished: nothing left worth buying and, with the opt-in, the rare-catastrophe
+        // allowance done too (the plan ends before the 50-year horizon only then).
+        let finished = |r: &BudgetResult| {
+            r.stopped_month.is_some() && r.plan.months.last().is_some_and(|m| m.index < 600)
+        };
+        let both = finished(&small) && finished(&big);
         let (lo, hi) = (days_at(&small, usize::MAX), days_at(&big, usize::MAX));
         for (b, curve) in &c.risks.curves {
             let cap = curve.target_days;

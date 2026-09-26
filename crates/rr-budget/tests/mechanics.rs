@@ -773,6 +773,52 @@ fn one_off_money_goes_to_the_top_life_safety_item() {
     assert_eq!(month_of(&r, "co_alarm"), Some(1));
 }
 
+/// A divisible item's readiness credit stays within reach after other items fill its bucket:
+/// the jugs (3 days of water for $5, 3.6 per dollar) come before the bottled water (6 for the
+/// first $10 day plus 0.71 for the go-bag, 0.67 per dollar) and cover the water target, but one
+/// step of the bottled water is still bought for the go-bag. (Before, a divisible item with no
+/// room left in its buckets was never a candidate, so its readiness value was lost, and whether
+/// the plan ever got it depended on the budget.)
+#[test]
+fn a_divisible_items_readiness_survives_a_full_bucket() {
+    let mut water_meta = divisible(
+        "water",
+        Contributes::per_household(BucketId::WaterOut, 1.0),
+        1.0,
+    );
+    water_meta.readiness = vec![ReadinessCredit {
+        bucket: BucketId::Evacuate,
+        harm_day_equivalents: 1.0,
+    }];
+    let r = Setup::new("philadelphia-renters-4", 100.0, 0.0)
+        .flat(BucketId::WaterOut, 0.2, 3.0)
+        .readiness(BucketId::Evacuate, 0.3)
+        .add(
+            buy("jugs", BucketId::WaterOut, TierId::H72, 5.0),
+            set("jugs", BucketId::WaterOut, 3.0),
+        )
+        .add(
+            item(
+                "water",
+                "Bottled water",
+                "gallon",
+                &[BucketId::WaterOut, BucketId::Evacuate],
+                TierId::H72,
+                false,
+                false,
+                (10.0, 10.0),
+            ),
+            water_meta,
+        )
+        .run();
+    assert_eq!(order(&r), ["jugs", "water"]);
+    let water = r.sequence.iter().find(|p| p.item_id == "water").unwrap();
+    assert_eq!(water.quantity, 1.0);
+    // Its value is the go-bag's alone: 10 x 2 x (-ln 0.7 / 10) x 1.
+    assert!((water.value - 2.0 * -rr_types::math::ln(0.7)).abs() < 1e-9);
+    assert_eq!(common::readiness_at(&r, usize::MAX)[&BucketId::Evacuate], 1);
+}
+
 /// `Plan.envelopes` holds one entry per item id (ENGINE-API): food bought in chunks that each cost
 /// more than a month's money is saved for, and paid from savings, again and again, and its one
 /// envelope adds up every draw.

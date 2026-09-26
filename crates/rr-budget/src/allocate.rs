@@ -646,6 +646,10 @@ fn run(
         // Main plan.
         while stopped.is_none() {
             let Some((_, picks)) = cache.ordered(&ctx, &state) else {
+                // Nothing is left worth buying, so neither is a fund's item (the last purchase
+                // covered its need): the plan lists no envelope for it, and its money is surplus
+                // like every later month's.
+                main.drop_target();
                 stopped = Some(m);
                 break;
             };
@@ -1226,7 +1230,13 @@ fn evaluate(ctx: &Ctx<'_>, state: &State, i: usize, tier: TierId) -> Option<Cand
             }
             rem
         }
-        Some(_) => chunk_qty(ctx, state, i, horizon)?,
+        Some(step) => match chunk_qty(ctx, state, i, horizon) {
+            Some(q) => q,
+            // Its buckets have no room left (other items covered them), but its readiness credit
+            // has not been counted: one step still buys that.
+            None if !state.readiness_used[i] && !ctx.offers[i].readiness.is_empty() => step,
+            None => return None,
+        },
     };
     let mut c = evaluate_fixed(ctx, state, i, qty, tier, horizon);
     c.value = c.core;
@@ -1479,7 +1489,10 @@ fn buy(
     };
     purse.fund -= from_savings;
     purse.free = (purse.free - (cand.cost - from_savings)).max(0.0);
-    if purse.fund <= EPS {
+    // Deposits are whole cents but prices are not: less than a cent left in the fund goes back to
+    // free money, rather than paying for the next purchase as "savings" of $0.00.
+    if purse.fund < 0.01 - EPS {
+        purse.free += purse.fund.max(0.0);
         purse.fund = 0.0;
     }
     if purse.target.is_some_and(|t| t.offer == cand.offer) || purse.fund == 0.0 {
