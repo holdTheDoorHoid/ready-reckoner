@@ -10,7 +10,7 @@
 
 ## Summary
 
-**Where you are now:** getting started. **What is enough for your risks:** three months of supplies. At your budget, the plan gets there by month 58 (August 2031).
+**Where you are now:** getting started. **What is enough for your risks:** three months of supplies. At your budget, the bare minimum (three days of water, light, warmth and medicine) is in place by month 2 (December 2026), and everything by month 58 (August 2031).
 
 ### The three things that matter most
 
@@ -284,11 +284,11 @@ Your budget is $80 a month. The plan does the free steps first, then buys what p
 - [ ] Set up emergency alerts and know how to reach 911
 - [ ] Make a household plan and a contact card for each person
 - [ ] Fire safety at home: alarms, an escape plan, safe cooking and heating
+- [ ] Tap water in clean reused bottles
 - [ ] Epinephrine: carry two auto-injectors and keep them in date
 - [ ] Keep medicines going: a written list, early refills, an emergency supply
-- [ ] Tap water in clean reused bottles
 - [ ] Water and food know-how: boil water, use your water heater, keep food cold
-- [ ] Get the toilet and hand washing ready: cover material and a wash station
+- [ ] Plan how to stay cool: a cool room and your nearest cooling center
 
 ### Safety rules to learn now
 
@@ -305,55 +305,17 @@ Your monthly money starts next month, so this month is the free steps above.
 
 ### Next month: Month 1 (from November 1, 2026), $80 to spend
 
+- [ ] Plan how you would leave: zone, routes, destination and triggers (free)
+- [ ] Neighbours and skills: swap numbers, check on each other, learn first aid (free)
+- [ ] Get the toilet and hand washing ready: cover material and a wash station (free)
+- [ ] Clean-room plan for smoky, dusty or chemical air (free)
+- [ ] Plan for pregnancy and nursing (free)
 - [ ] Legal readiness: a lawyer's number, a will and powers of attorney (free)
 - [ ] Mental health: save 988 and the distress helpline, and write a calm plan (free)
-- [ ] Plan for pregnancy and nursing (free)
-- [ ] Clean-room plan for smoky, dusty or chemical air (free)
-- [ ] Plan how you would leave: zone, routes, destination and triggers (free)
-- [ ] Documents and insurance: copy key papers, record belongings, check cover (free)
-- [ ] Decide: ID for every person (passport book or card, or a state ID) (free)
-- [ ] Keep your vehicle ready: half a tank, a charged battery, a good spare (free)
-- [ ] **Unscented household bleach (for treating water)**: 1 bottle, about $8 (usually $7–9). Adds 60 days of bleach for treating water for 5 people, which completes the 60-day goal.
-- [ ] **Store-bought bottled water**: 13 gallons, about $13 (usually $11–15). Adds 2.1 days of stored drinking and washing water for 5 people, bringing you to 3.1 of the 60-day goal.
-
-### Month by month
-
-**Month 2 (from December 1, 2026), $80 to spend**
-
 - [ ] Practice: ten-minute drills and the first things to do (free)
 - [ ] When a storm, freeze or heat wave is forecast: the 48-hour list (free)
-- [ ] Pet plan: microchip, records, a photo and a buddy (free)
-- [ ] Plan for horses and livestock (free)
-- [ ] Pack your pets' water in the go-kit (free)
-- [ ] Pack your pets' food in the go-kit (free)
-- [ ] Plan how to stay cool: a cool room and your nearest cooling center (free)
-- [ ] Know and prepare your home: shut-offs, pipes, straps and the outside (free)
-- [ ] **Bleeding-control kit (tourniquet and pressure bandage)**: 1 kit, about $71 (usually $48–95)
-- [ ] **Digital thermometer (and one for a baby, if you have one)**: 1 thermometer, about $8 (usually $7–8)
-- [ ] **Baby wipes**: 2 packs, about $5 (usually $5)
-- [ ] **Extra toilet paper**: 10 rolls, about $8 (usually $5–11)
-- [ ] **Refrigerator and freezer thermometers**: 1 pair, about $8 (usually $5–11)
-- [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17)
-- [ ] **Disposable gloves, a box of 100**: 1 box, about $20 (usually $16–25)
-
-**Month 3 (from January 1, 2027), $80 to spend**
-
-- [ ] Pick a warm room for a winter outage (free)
-- [ ] Neighbours and skills: swap numbers, check on each other, learn first aid (free)
-- [ ] Your trusted circle: agree who helps whom (free)
-- [ ] If you own firearms: safe storage and training (free)
-- [ ] Home and personal security: lock up, protect accounts, spot scams, stay calm (free)
-- [ ] Lockout plan: a spare key and a locksmith you checked (free)
-- [ ] Money: start an emergency fund and a bare-bones budget (free)
+- [ ] Decide: ID for every person (passport book or card, or a state ID) (free)
 - [ ] Decide: flood insurance, even outside a flood zone (free)
-- [ ] **Period products for two cycles**: 2 cycles' supplies, about $12 (usually $9–15)
-- [ ] **Extra pet food in an airtight container**: 13 pounds of dry food, about $16 (usually $10–22)
-- [ ] **N95 respirators for teens and adults**: 15 respirators, about $15 (usually $11–20)
-- [ ] **Personal straw or squeeze filter for a bag**: 1 filter, about $23 (usually $18–29)
-- [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20)
-
-**Month 4 (from February 1, 2027), $80 to spend**
-
 - [ ] Decide: sewer and drain backup cover for a basement (free)
 - [ ] Decide: disability and life insurance for the people who earn (free)
 - [ ] Decide: a stronger roof when you re-roof (FORTIFIED) (free)
@@ -361,49 +323,89 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Decide: a backflow valve and a battery-backup sump pump (free)
 - [ ] Decide: harden the home against embers and wildfire (free)
 - [ ] Going further: food for months (free)
+- [ ] **Unscented household bleach (for treating water)**: 1 bottle, about $8 (usually $7–9). Adds 60 days of bleach for treating water for 5 people, which completes the 60-day goal.
+- [ ] **Store-bought bottled water**: 13 gallons, about $13 (usually $11–15). Adds 2.1 days of stored drinking and washing water for 5 people, bringing you to 3.1 of the 60-day goal.
+
+### Month by month
+
+**Month 2 (from December 1, 2026), $80 to spend**
+
+- [ ] Pet plan: microchip, records, a photo and a buddy (free)
+- [ ] Plan for horses and livestock (free)
+- [ ] Documents and insurance: copy key papers, record belongings, check cover (free)
+- [ ] Keep your vehicle ready: half a tank, a charged battery, a good spare (free)
+- [ ] Pick a warm room for a winter outage (free)
+- [ ] Your trusted circle: agree who helps whom (free)
+- [ ] Home and personal security: lock up, protect accounts, spot scams, stay calm (free)
+- [ ] Know and prepare your home: shut-offs, pipes, straps and the outside (free)
+- [ ] **Bleeding-control kit (tourniquet and pressure bandage)**: 1 kit, about $71 (usually $48–95)
+- [ ] **Headlamp or flashlight for each person**: 1 headlamp, about $12 (usually $3–20)
+- [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20)
+- [ ] **Get-home bag for each commuter: a small bag you stock from home**: 1 bag, about $34 (usually $30–39)
+
+**Month 3 (from January 1, 2027), $80 to spend**
+
+- [ ] Pack your pets' water in the go-kit (free)
+- [ ] Pack your pets' food in the go-kit (free)
+- [ ] Lockout plan: a spare key and a locksmith you checked (free)
+- [ ] If you own firearms: safe storage and training (free)
+- [ ] Money: start an emergency fund and a bare-bones budget (free)
 - [ ] Antibiotics: talk with your own clinician (no stockpile) (free)
-- [ ] **Over-the-counter medicine basics**: 1 set, about $43 (usually $34–52)
-- [ ] **Heavy trash bags for the toilet bucket**: 68 bags, about $7 (usually $7)
+- [ ] **Family first-aid kit**: 2 kits, about $71 (usually $55–88)
+
+**Month 4 (from February 1, 2027), $80 to spend**
+
+- [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $40 (usually $37–43)
+- [ ] **Extra toilet paper**: 10 rolls, about $8 (usually $5–11)
+- [ ] **Refrigerator and freezer thermometers**: 1 pair, about $8 (usually $5–11)
+- [ ] **Period products for two cycles**: 2 cycles' supplies, about $12 (usually $9–15)
+- [ ] **Extra pet food in an airtight container**: 13 pounds of dry food, about $16 (usually $10–22)
 
 **Month 5 (from March 1, 2027), $80 to spend**
 
-- [ ] **Wound-care and splint add-on for the first-aid kit**: 1 kit, about $48 (usually $38–59)
-- [ ] **Plastic sheeting and duct tape to shelter in place**: 1 kit, about $32 (usually $28–36)
+- [ ] **Diapers**: 60 diapers, about $24 (usually $19–28)
+- [ ] **N95 respirators for teens and adults**: 15 respirators, about $15 (usually $11–20)
+- [ ] **Digital thermometer (and one for a baby, if you have one)**: 1 thermometer, about $8 (usually $7–8)
 
 ### Later months
 
 | Month | What | Spend |
 | --- | --- | --- |
-| 6 (April 2027) | Get-home bag for each commuter: a small bag you stock from home: 1 bag; Whistle for each go-bag: 5 whistles | $44 |
-| 7 (May 2027) | Family first-aid kit: 2 kits; Headlamp or flashlight for each person: 4 headlamps; Foil emergency blankets: 5 blankets | $132 |
-| 8 (June 2027) | Gravity water filter (removes bacteria and parasites): 1 filter; Indoor room thermometer: 1 thermometer | $84 |
-| 9 (July 2027) | save toward water carriers for hauling, about 5 gallons each; Fire-resistant, waterproof document pouch: 1 pouch; Shut-off wrench for gas and water: 1 wrench | $85 |
-| 10 (August 2027) | save toward water carriers for hauling, about 5 gallons each; Water carriers for hauling, about 5 gallons each: 4 carriers, $80 of it from savings | $84 |
-| 11 (September 2027) | save toward household kit: paper plates, cups, utensils, trash bags, waterproof matches; NOAA Weather Radio with a tone alert: 1 radio | $80 |
-| 12 (October 2027) | save toward household kit: paper plates, cups, utensils, trash bags, waterproof matches; Household kit: paper plates, cups, utensils, trash bags, waterproof matches: 3 kits, $80 of it from savings | $68 |
-| 13 (November 2027) | save toward car emergency kit; Battery or rechargeable fan: 2 fans | $74 |
-| 14 (December 2027) | save toward car emergency kit; Car emergency kit: 2 kits, $80 of it from savings | $83 |
-| 15 (January 2028) | Bar soap and laundry soap: 5 person-months; Two-bucket emergency toilet kit: 1 kit | $58 |
-| 19 (May 2028) | save toward food-grade tote for hauling water to horses and livestock; Food-grade tote for hauling water to horses and livestock: 1 tote, $160 of it from savings | $169 |
-| 22 (August 2028) | save toward cash in small bills; Cash in small bills: $260, $120 of it from savings | $180 |
-| 23 (September 2028) | Air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter): 1 air cleaner | $92 |
-| 24 (October 2028) | License-free two-way radios (FRS), a pair: 2 pairs | $84 |
-| 26 (December 2028) | save toward pet go-kit: a carrier and a bag you pack from your supplies; Pet go-kit: a carrier and a bag you pack from your supplies: 5 (one per pet), $80 of it from savings; Diapers: 60 diapers | $146 |
-| 27 (January 2029) | save toward portable jump starter for the car; Extra pet food in an airtight container: 13 pounds of dry food; Solar motion-sensor outdoor light: 1 light | $81 |
-| 29 (March 2029) | save toward portable jump starter for the car; Portable jump starter for the car: 2 jump starters, $120 of it from savings; Key safe for a spare house key: 1 key safe | $124 |
-| 31 (May 2029) | save toward cleanup gear for each teen and adult: P100 respirator, goggles, work gloves; Escape ladder for upstairs bedrooms: 1 ladder | $99 |
-| 32 (June 2029) | save toward cleanup gear for each teen and adult: P100 respirator, goggles, work gloves; Cleanup gear for each teen and adult: P100 respirator, goggles, work gloves: 3 sets, $120 of it from savings | $102 |
-| 34 (August 2029) | save toward extra shelf-stable food you already eat; Extra shelf-stable food you already eat: 20,000 kcal, $80 of it from savings; Store-bought bottled water: 67 gallons | $122 |
-| 36 (October 2029) | save toward extra shelf-stable food you already eat; Extra shelf-stable food you already eat: 20,000 kcal, $80 of it from savings | $55 |
-| 37 (November 2029) | Extra shelf-stable food you already eat: 28,000 kcal | $132 |
-| 40 (February 2030) | save toward stock tank to hold water for horses and livestock; Phone power bank (about 20,000 mAh): 3 power banks | $149 |
-| 58 (August 2031) | save toward stock tank to hold water for horses and livestock; Stock tank to hold water for horses and livestock: 1,110 gallons of tank space, $840 of it from savings | $715 |
+| 6 (April 2027) | Indoor room thermometer: 1 thermometer; Battery or rechargeable fan: 2 fans; Gravity water filter (removes bacteria and parasites): 1 filter | $118 |
+| 7 (May 2027) | Wound-care and splint add-on for the first-aid kit: 1 kit; Plastic sheeting and duct tape to shelter in place: 1 kit | $80 |
+| 8 (June 2027) | Two-bucket emergency toilet kit: 1 kit; Heavy trash bags for the toilet bucket: 68 bags; Over-the-counter medicine basics: 1 set | $78 |
+| 9 (July 2027) | Bar soap and laundry soap: 5 person-months; Personal straw or squeeze filter for a bag: 1 filter; Chlorine dioxide water treatment: 1 pack; Disposable gloves, a box of 100: 1 box | $88 |
+| 10 (August 2027) | save toward car emergency kit; Headlamp or flashlight for each person: 3 headlamps | $75 |
+| 11 (September 2027) | save toward car emergency kit; Car emergency kit: 2 kits, $80 of it from savings | $83 |
+| 12 (October 2027) | Baby wipes: 2 packs; Fire-resistant, waterproof document pouch: 1 pouch; Whistle for each go-bag: 5 whistles; Shut-off wrench for gas and water: 1 wrench; Foil emergency blankets: 5 blankets | $73 |
+| 15 (January 2028) | save toward cash in small bills; Household kit: paper plates, cups, utensils, trash bags, waterproof matches: 3 kits | $148 |
+| 17 (March 2028) | save toward cash in small bills; Cash in small bills: $260, $200 of it from savings | $100 |
+| 18 (April 2028) | Store-bought bottled water: 67 gallons | $67 |
+| 19 (May 2028) | Air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter): 1 air cleaner | $92 |
+| 20 (June 2028) | License-free two-way radios (FRS), a pair: 2 pairs | $84 |
+| 22 (August 2028) | save toward pet go-kit: a carrier and a bag you pack from your supplies; Pet go-kit: a carrier and a bag you pack from your supplies: 5 (one per pet), $80 of it from savings; Extra pet food in an airtight container: 13 pounds of dry food | $138 |
+| 23 (September 2028) | save toward stock tank to hold water for horses and livestock; Escape ladder for upstairs bedrooms: 1 ladder | $99 |
+| 24 (October 2028) | save toward stock tank to hold water for horses and livestock; Solar motion-sensor outdoor light: 1 light | $65 |
+| 25 (November 2028) | save toward stock tank to hold water for horses and livestock; Key safe for a spare house key: 1 key safe | $90 |
+| 28 (February 2029) | save toward stock tank to hold water for horses and livestock; Extra shelf-stable food you already eat: 20,000 kcal | $135 |
+| 30 (April 2029) | save toward stock tank to hold water for horses and livestock; Extra shelf-stable food you already eat: 20,000 kcal | $135 |
+| 33 (July 2029) | save toward stock tank to hold water for horses and livestock; Extra shelf-stable food you already eat: 28,000 kcal | $172 |
+| 36 (October 2029) | save toward stock tank to hold water for horses and livestock; Phone power bank (about 20,000 mAh): 3 power banks | $149 |
+| 39 (January 2030) | save toward stock tank to hold water for horses and livestock; Water carriers for hauling, about 5 gallons each: 4 carriers | $164 |
+| 43 (May 2030) | save toward stock tank to hold water for horses and livestock; Portable jump starter for the car: 2 jump starters | $194 |
+| 48 (October 2030) | save toward stock tank to hold water for horses and livestock; Cleanup gear for each teen and adult: P100 respirator, goggles, work gloves: 3 sets | $222 |
+| 54 (April 2031) | save toward stock tank to hold water for horses and livestock; Stock tank to hold water for horses and livestock: 1,110 gallons of tank space, $1,280 of it from savings | $275 |
+| 58 (August 2031) | save toward food-grade tote for hauling water to horses and livestock; Food-grade tote for hauling water to horses and livestock: 1 tote, $160 of it from savings | $169 |
 
 Months that only add to savings are left out.
 
 ### When you are done
 
 By month 58 (August 2031) every need is covered to the step that is enough for your risks. After that, keep up the maintenance calendar and put the same money toward savings.
+
+### Things to watch
+
+- **Worth acting on: At this budget the full plan would take more than three years, so it starts with the bare minimum.** The smallest kit that covers three days of water, light, warmth and medicine comes first and is complete by month 2; everything else follows in the usual order, and the whole plan takes until month 58. Beyond three years at this budget: water carriers for hauling, about 5 gallons each, portable jump starter for the car, cleanup gear for each teen and adult: P100 respirator, goggles, work gloves and stock tank to hold water for horses and livestock and more. A little more each month, or a less cautious setting, brings them closer.
 
 ## Checklists
 
@@ -414,62 +416,59 @@ One list per step, up to the step that is enough for your risks. The free steps 
 - [ ] Unscented household bleach (for treating water): 1 bottle
 - [ ] Store-bought bottled water: 13 gallons
 - [ ] Bleeding-control kit (tourniquet and pressure bandage): 1 kit
-- [ ] Digital thermometer (and one for a baby, if you have one): 1 thermometer
-- [ ] Baby wipes: 2 packs
+- [ ] Headlamp or flashlight for each person: 4 headlamps
+- [ ] Spare batteries for lights and the radio: 1 × 24-pack
+- [ ] Get-home bag for each commuter: a small bag you stock from home: 1 bag
+- [ ] Family first-aid kit: 2 kits
+- [ ] NOAA Weather Radio with a tone alert: 1 radio
 - [ ] Extra toilet paper: 10 rolls
 - [ ] Refrigerator and freezer thermometers: 1 pair
-- [ ] Chlorine dioxide water treatment: 1 pack
-- [ ] Disposable gloves, a box of 100: 1 box
 - [ ] Period products for two cycles: 2 cycles' supplies
 - [ ] Extra pet food in an airtight container: 13 pounds of dry food
+- [ ] Diapers: 60 diapers
 - [ ] N95 respirators for teens and adults: 15 respirators
-- [ ] Personal straw or squeeze filter for a bag: 1 filter
-- [ ] Spare batteries for lights and the radio: 1 × 24-pack
-- [ ] Over-the-counter medicine basics: 1 set
+- [ ] Digital thermometer (and one for a baby, if you have one): 1 thermometer
+- [ ] Indoor room thermometer: 1 thermometer
+- [ ] Battery or rechargeable fan: 2 fans
 - [ ] Wound-care and splint add-on for the first-aid kit: 1 kit
 - [ ] Plastic sheeting and duct tape to shelter in place: 1 kit
-- [ ] Get-home bag for each commuter: a small bag you stock from home: 1 bag
-- [ ] Whistle for each go-bag: 5 whistles
-- [ ] Family first-aid kit: 2 kits
-- [ ] Headlamp or flashlight for each person: 4 headlamps
-- [ ] Foil emergency blankets: 5 blankets
-- [ ] Indoor room thermometer: 1 thermometer
-- [ ] Fire-resistant, waterproof document pouch: 1 pouch
-- [ ] Shut-off wrench for gas and water: 1 wrench
-- [ ] NOAA Weather Radio with a tone alert: 1 radio
-- [ ] Battery or rechargeable fan: 2 fans
+- [ ] Over-the-counter medicine basics: 1 set
+- [ ] Personal straw or squeeze filter for a bag: 1 filter
+- [ ] Chlorine dioxide water treatment: 1 pack
+- [ ] Disposable gloves, a box of 100: 1 box
 - [ ] Car emergency kit: 2 kits
+- [ ] Fire-resistant, waterproof document pouch: 1 pouch
+- [ ] Whistle for each go-bag: 5 whistles
+- [ ] Shut-off wrench for gas and water: 1 wrench
+- [ ] Foil emergency blankets: 5 blankets
 - [ ] Cash in small bills: $260
 - [ ] Pet go-kit: a carrier and a bag you pack from your supplies: 5 (one per pet)
 
 ### Two weeks
 
 - [ ] Bar soap and laundry soap: 5 person-months
+- [ ] Baby wipes: 2 packs
+- [ ] Household kit: paper plates, cups, utensils, trash bags, waterproof matches: 3 kits
 - [ ] Air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter): 1 air cleaner
 - [ ] License-free two-way radios (FRS), a pair: 2 pairs
-- [ ] Diapers: 60 diapers
 - [ ] Extra pet food in an airtight container: 13 pounds of dry food
-- [ ] Solar motion-sensor outdoor light: 1 light
-- [ ] Portable jump starter for the car: 2 jump starters
-- [ ] Key safe for a spare house key: 1 key safe
 - [ ] Escape ladder for upstairs bedrooms: 1 ladder
-- [ ] Cleanup gear for each teen and adult: P100 respirator, goggles, work gloves: 3 sets
+- [ ] Solar motion-sensor outdoor light: 1 light
+- [ ] Key safe for a spare house key: 1 key safe
 - [ ] Extra shelf-stable food you already eat: 68,000 kcal
 - [ ] Phone power bank (about 20,000 mAh): 3 power banks
-
-### One month
-
-- [ ] Household kit: paper plates, cups, utensils, trash bags, waterproof matches: 3 kits
-- [ ] Food-grade tote for hauling water to horses and livestock: 1 tote
+- [ ] Water carriers for hauling, about 5 gallons each: 4 carriers
+- [ ] Portable jump starter for the car: 2 jump starters
+- [ ] Cleanup gear for each teen and adult: P100 respirator, goggles, work gloves: 3 sets
+- [ ] Stock tank to hold water for horses and livestock: 1,110 gallons of tank space
 
 ### Three months
 
-- [ ] Heavy trash bags for the toilet bucket: 68 bags
 - [ ] Gravity water filter (removes bacteria and parasites): 1 filter
-- [ ] Water carriers for hauling, about 5 gallons each: 4 carriers
 - [ ] Two-bucket emergency toilet kit: 1 kit
+- [ ] Heavy trash bags for the toilet bucket: 68 bags
 - [ ] Store-bought bottled water: 67 gallons
-- [ ] Stock tank to hold water for horses and livestock: 1,110 gallons of tank space
+- [ ] Food-grade tote for hauling water to horses and livestock: 1 tote
 
 ### Get-home bag for each person who commutes
 
@@ -572,7 +571,7 @@ Keep paper copies in a waterproof pouch and photos you can reach from any phone.
 
 ### Savings
 
-Of 100 households like yours, about 25 (10–45) will have an income gap of more than 3 months in the next 10 years. The goal is about 6 months of expenses (about $31,200); you have 1 month saved. Your supplies plan is done by month 58. After that, your $80 a month for supplies could go here, reaching the goal in about 27 years. This is a savings goal, kept separate from the supplies budget.
+Of 100 households like yours, about 25 (10–45) will have an income gap of more than 3 months in the next 10 years. The goal is about 6 months of expenses (about $31,200); you have 1 month saved. Your supplies plan is done by month 58. After that, your $80 a month for supplies could go here, reaching the goal in about 27 years. Three months of expenses, about $15,600, in about 16 years. This is a savings goal, kept separate from the supplies budget.
 
 - **Money: start an emergency fund and a bare-bones budget.** Set up an automatic transfer, however small, into a savings account you keep for emergencies; the CFPB says the right amount depends on your situation, and planners often suggest working toward three to six months of expenses (FINRA). Write down your essential monthly costs and what you would cut first, so you know how far savings would stretch. If anyone earns, find your state's unemployment website now, so you could file right away if a job ends (Department of Labor).[11, 14, 15, 16, 177, 178]
 
@@ -625,19 +624,22 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 | Every 2 months | Use and restock: extra pet food in an airtight container; pack your pets' food in the go-kit; pack your pets' water in the go-kit |
 | Every 3 months | Check: air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter); phone power bank (about 20,000 mAh). Test: portable jump starter for the car |
 | April 1, 2027 | Check, then every 6 months: go-bag for each person: a backpack you pack from your supplies; keep medicines going: a written list, early refills, an emergency supply. Use and restock, then every 6 months: tap water in clean reused bottles |
-| May 1, 2027 | Use and restock, then every 6 months: unscented household bleach (for treating water). Check, then every 6 months: store-bought bottled water |
-| June 1, 2027 | Check, then every 6 months: practice: ten-minute drills and the first things to do |
-| October 1, 2027 | Check, then every year: make a household plan and a contact card for each person. Check, then every 6 months: get-home bag for each commuter: a small bag you stock from home. Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
-| November 1, 2027 | Check, then every year: documents and insurance: copy key papers, record belongings, check cover; legal readiness: a lawyer's number, a will and powers of attorney. Check, then every 6 months: family first-aid kit. Test, then every 6 months: headlamp or flashlight for each person |
-| January 1, 2028 | Check, then every year: neighbours and skills: swap numbers, check on each other, learn first aid; your trusted circle: agree who helps whom; spare batteries for lights and the radio; lockout plan: a spare key and a locksmith you checked |
-| February 1, 2028 | Check, then every year: over-the-counter medicine basics |
-| March 1, 2028 | Check, then every 6 months: NOAA Weather Radio with a tone alert. Check, then every year: wound-care and splint add-on for the first-aid kit |
-| June 1, 2028 | Check, then every 6 months: car emergency kit |
-| August 1, 2028 | Check, then every year: water carriers for hauling, about 5 gallons each |
-| April 1, 2029 | Check, then every 6 months: license-free two-way radios (FRS), a pair |
-| June 1, 2029 | Check, then every 6 months: pet go-kit: a carrier and a bag you pack from your supplies |
-| September 1, 2029 | Test, then every 6 months: key safe for a spare house key |
-| August 1, 2030 | Use and restock, then every year: extra shelf-stable food you already eat |
+| May 1, 2027 | Check, then every 6 months: practice: ten-minute drills and the first things to do; store-bought bottled water. Use and restock, then every 6 months: unscented household bleach (for treating water) |
+| June 1, 2027 | Check, then every 6 months: get-home bag for each commuter: a small bag you stock from home. Test, then every 6 months: headlamp or flashlight for each person |
+| July 1, 2027 | Check, then every 6 months: family first-aid kit |
+| August 1, 2027 | Check, then every 6 months: NOAA Weather Radio with a tone alert |
+| October 1, 2027 | Check, then every year: make a household plan and a contact card for each person. Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
+| November 1, 2027 | Check, then every year: neighbours and skills: swap numbers, check on each other, learn first aid; legal readiness: a lawyer's number, a will and powers of attorney |
+| December 1, 2027 | Check, then every year: your trusted circle: agree who helps whom; documents and insurance: copy key papers, record belongings, check cover; spare batteries for lights and the radio |
+| January 1, 2028 | Check, then every year: lockout plan: a spare key and a locksmith you checked |
+| March 1, 2028 | Check, then every 6 months: car emergency kit |
+| May 1, 2028 | Check, then every year: wound-care and splint add-on for the first-aid kit |
+| June 1, 2028 | Check, then every year: over-the-counter medicine basics |
+| December 1, 2028 | Check, then every 6 months: license-free two-way radios (FRS), a pair |
+| February 1, 2029 | Check, then every 6 months: pet go-kit: a carrier and a bag you pack from your supplies |
+| May 1, 2029 | Test, then every 6 months: key safe for a spare house key |
+| February 1, 2030 | Use and restock, then every year: extra shelf-stable food you already eat |
+| January 1, 2031 | Check, then every year: water carriers for hauling, about 5 gallons each |
 
 ## Sources
 

@@ -289,8 +289,8 @@ You have set no money aside, so the plan is free steps. The plan does the free s
 - [ ] Water and food know-how: boil water, use your water heater, keep food cold
 - [ ] Tap water in clean reused bottles
 - [ ] Keep medicines going: a written list, early refills, an emergency supply
-- [ ] Clean-room plan for smoky, dusty or chemical air
-- [ ] Get the toilet and hand washing ready: cover material and a wash station
+- [ ] Plan how you would leave: zone, routes, destination and triggers
+- [ ] No car? Plan your ride out
 
 ### Safety rules to learn now
 
@@ -307,33 +307,30 @@ This month is the free steps above.
 
 ### Next month: Month 1 (from November 1, 2026)
 
-- [ ] Plan how you would leave: zone, routes, destination and triggers (free)
-- [ ] Documents and insurance: copy key papers, record belongings, check cover (free)
-- [ ] Decide: ID for every person (passport book or card, or a state ID) (free)
+- [ ] Neighbours and skills: swap numbers, check on each other, learn first aid (free)
+- [ ] Get the toilet and hand washing ready: cover material and a wash station (free)
+- [ ] Clean-room plan for smoky, dusty or chemical air (free)
 - [ ] Practice: ten-minute drills and the first things to do (free)
-- [ ] No car? Plan your ride out (free)
 - [ ] When a storm, freeze or heat wave is forecast: the 48-hour list (free)
-- [ ] Legal readiness: a lawyer's number, a will and powers of attorney (free)
-- [ ] Mental health: save 988 and the distress helpline, and write a calm plan (free)
+- [ ] Documents and insurance: copy key papers, record belongings, check cover (free)
+- [ ] Plan how to stay cool: a cool room and your nearest cooling center (free)
+- [ ] Your trusted circle: agree who helps whom (free)
+- [ ] Home and personal security: lock up, protect accounts, spot scams, stay calm (free)
+- [ ] Decide: ID for every person (passport book or card, or a state ID) (free)
+- [ ] Decide: homeowners, condo or renters insurance (free)
+- [ ] Decide: flood insurance, even outside a flood zone (free)
 
 ### Month by month
 
 **Month 2 (from December 1, 2026)**
 
 - [ ] Know and prepare your home: shut-offs, pipes, straps and the outside (free)
-- [ ] Neighbours and skills: swap numbers, check on each other, learn first aid (free)
-- [ ] Your trusted circle: agree who helps whom (free)
-- [ ] If you own firearms: safe storage and training (free)
-- [ ] Home and personal security: lock up, protect accounts, spot scams, stay calm (free)
 - [ ] Lockout plan: a spare key and a locksmith you checked (free)
-- [ ] Plan how to stay cool: a cool room and your nearest cooling center (free)
+- [ ] Legal readiness: a lawyer's number, a will and powers of attorney (free)
+- [ ] Mental health: save 988 and the distress helpline, and write a calm plan (free)
 - [ ] Pick a warm room for a winter outage (free)
-
-**Month 3 (from January 1, 2027)**
-
+- [ ] If you own firearms: safe storage and training (free)
 - [ ] Money: start an emergency fund and a bare-bones budget (free)
-- [ ] Decide: homeowners, condo or renters insurance (free)
-- [ ] Decide: flood insurance, even outside a flood zone (free)
 - [ ] Antibiotics: talk with your own clinician (no stockpile) (free)
 
 ### When you are done
@@ -461,8 +458,8 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 | April 1, 2027 | Check, then every 6 months: go-bag for each person: a backpack you pack from your supplies; keep medicines going: a written list, early refills, an emergency supply. Use and restock, then every 6 months: tap water in clean reused bottles |
 | May 1, 2027 | Check, then every 6 months: practice: ten-minute drills and the first things to do |
 | October 1, 2027 | Check, then every year: make a household plan and a contact card for each person. Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
-| November 1, 2027 | Check, then every year: documents and insurance: copy key papers, record belongings, check cover; legal readiness: a lawyer's number, a will and powers of attorney |
-| December 1, 2027 | Check, then every year: neighbours and skills: swap numbers, check on each other, learn first aid; your trusted circle: agree who helps whom; lockout plan: a spare key and a locksmith you checked |
+| November 1, 2027 | Check, then every year: neighbours and skills: swap numbers, check on each other, learn first aid; your trusted circle: agree who helps whom; documents and insurance: copy key papers, record belongings, check cover |
+| December 1, 2027 | Check, then every year: legal readiness: a lawyer's number, a will and powers of attorney; lockout plan: a spare key and a locksmith you checked |
 
 ## Sources
 
