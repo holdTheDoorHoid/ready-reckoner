@@ -44,6 +44,9 @@ on GitHub Pages. No server, no accounts, no analytics.
   must all pass. `.cargo/config.toml` sets `jobs = 3` and turns incremental compilation off; do not
   change either (sccache is the shared cache and is incompatible with incremental; the machine has
   8 cores and 15 GB and runs several agents at once).
+- Debug builds use `debug = "line-tables-only"` (workspace `Cargo.toml`): a target dir is 2–4 GB
+  instead of 7–14. Do not raise it; if you need full debuginfo for one investigation, use
+  `CARGO_PROFILE_DEV_DEBUG=2` for that command only.
 - Web: `cd web && npm ci && npm test -- --maxWorkers=2 && npm run check && npm run build`.
 - Never run the Rust and web test suites at the same time on this machine.
 - The CLI is the oracle: `cargo run -p rr-cli -- plan --household fixtures/households/<name>.json`

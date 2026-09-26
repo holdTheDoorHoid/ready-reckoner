@@ -28,6 +28,12 @@ serde_json = { version = "1", features = ["float_roundtrip"] }
 thiserror = "2"
 toml = "0.9"
 
+# Debug builds carry line tables only: full debuginfo made each worktree's target dir 7–14 GB on a
+# machine several agents share, and tests do not need variable-level debugging. Backtraces keep
+# file and line. (2026-09-26)
+[profile.dev]
+debug = "line-tables-only"
+
 [profile.release]
 opt-level = "s"
 lto = true
