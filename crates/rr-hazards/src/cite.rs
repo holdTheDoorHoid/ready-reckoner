@@ -29,6 +29,9 @@ pub const FEMA_FLOOD_ZONES: &str = "fema_flood_zones";
 pub const CMRA: &str = "cmra_2025";
 /// Fifth National Climate Assessment (2023), chapter 2: stronger tropical cyclones.
 pub const NCA5: &str = "nca5_climate_trends";
+/// Fifth National Climate Assessment Interactive Atlas (CC BY 4.0): county changes at global
+/// warming levels (hot days, cold nights, extreme rain), the source of the data pack's ratios.
+pub const NCA5_ATLAS: &str = "nca5_atlas";
 /// Goldfinger et al. (2012), USGS Professional Paper 1661-F, as reported by Oregon State
 /// University: 40 % chance of a major Cascadia earthquake near Coos Bay in 50 years; 19
 /// full-margin and 22 southern-only ruptures in 10,000 years.
@@ -112,6 +115,7 @@ pub const ALL: &[&str] = &[
     FEMA_FLOOD_ZONES,
     CMRA,
     NCA5,
+    NCA5_ATLAS,
     CASCADIA_2012,
     CASCADIA_PP1661F,
     OREGON_TWO_WEEKS,

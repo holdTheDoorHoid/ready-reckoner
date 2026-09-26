@@ -27,6 +27,18 @@
 //! | `days_over_2in` | days a year with more than 2 in. of rain | inland flooding, ratio, for homes at ground level |
 //! | `icing_days` | days a year that stay below freezing | cold waves and winter storms, ratio, floor ×0.5 |
 //! | `dry_spell_days` | longest run of dry days | drought and wildfire, ratio, ×1 to ×2 |
+//!
+//! Failing those, the ratio variables of the data pack's `climate.csv` (future ÷ present at
+//! about +2 °C; a `<key>_high` column, if added, gives the high scenario):
+//!
+//! | hazard | ratio keys, in order of preference | bounds |
+//! | --- | --- | --- |
+//! | heat wave | `hot_days_95f`, `hot_days_90f_mid45` | ×1 to ×3 |
+//! | inland flooding (ground level) | `extreme_rain_days`, `heavy_rain_days_1in_mid45` | ×0.5 to ×3 |
+//! | cold wave | `very_cold_nights_0f`, `freezing_nights` | ×0.5 to ×1.5 |
+//! | winter weather | `freezing_nights` | ×0.5 to ×1.5 |
+//! | drought | `consecutive_dry_days_mid45`, `dry_days_mid45` | ×1 to ×2 |
+//! | wildfire | `consecutive_dry_days_mid45` | ×1 to ×2 |
 
 use rr_types::{CountyRecord, HazardId};
 
@@ -92,9 +104,13 @@ fn variable(county: &CountyRecord, var: &str) -> Option<(f64, f64, f64)> {
 
 /// A multiplier estimate from central and high values, clamped.
 fn multiplier(mid: f64, high: f64, lo_bound: f64, hi_bound: f64) -> Estimate {
+    multiplier_from(mid, high, lo_bound, hi_bound, cite::CMRA)
+}
+
+fn multiplier_from(mid: f64, high: f64, lo_bound: f64, hi_bound: f64, source: &str) -> Estimate {
     let c = |x: f64| x.clamp(lo_bound, hi_bound);
     let (m, h) = (c(mid), c(high));
-    Estimate::data(m, m.min(h), m.max(h), &[cite::CMRA])
+    Estimate::data(m, m.min(h), m.max(h), &[source])
 }
 
 fn describe(label: &str, m: &Estimate) -> String {
@@ -105,20 +121,45 @@ fn describe(label: &str, m: &Estimate) -> String {
     }
 }
 
-/// A pack-supplied multiplier for `hazard`, if any.
-fn direct(county: &CountyRecord, hazard: HazardId, label: &str) -> Option<Climate> {
-    let mid = get(county, hazard.as_str())?;
-    let high = get(county, &format!("{}_high", hazard.as_str())).unwrap_or(mid);
-    let (lo_bound, hi_bound) = match hazard {
+fn projected(label: &str, m: Estimate) -> Climate {
+    Climate::Projected {
+        what: describe(label, &m),
+        multiplier: m,
+    }
+}
+
+/// Bounds for a hazard's multiplier.
+fn bounds(hazard: HazardId) -> (f64, f64) {
+    match hazard {
         HazardId::HeatWave => (1.0, HEAT_MULTIPLIER_CAP),
         HazardId::ColdWave | HazardId::WinterWeather => (COLD_MULTIPLIER_FLOOR, 1.5),
         HazardId::Drought | HazardId::Wildfire => DRY_SPELL_MULTIPLIER_BOUNDS,
         _ => PRECIP_MULTIPLIER_BOUNDS,
-    };
-    let m = multiplier(mid, high, lo_bound, hi_bound);
-    Some(Climate::Projected {
-        what: describe(label, &m),
-        multiplier: m,
+    }
+}
+
+/// A pack-supplied multiplier for `hazard`, if any.
+fn direct(county: &CountyRecord, hazard: HazardId, label: &str) -> Option<Climate> {
+    let mid = get(county, hazard.as_str())?;
+    let high = get(county, &format!("{}_high", hazard.as_str())).unwrap_or(mid);
+    let (lo, hi) = bounds(hazard);
+    Some(projected(label, multiplier(mid, high, lo, hi)))
+}
+
+/// The first ratio key the county has (future ÷ present; `<key>_high` for the high scenario
+/// when present), clamped to the hazard's bounds. Keys ending `_mid45` come from CMRA, the rest
+/// from the NCA5 Atlas.
+fn ratio(county: &CountyRecord, hazard: HazardId, keys: &[&str], label: &str) -> Option<Climate> {
+    let (lo, hi) = bounds(hazard);
+    keys.iter().find_map(|k| {
+        let mid = get(county, k)?;
+        let high = get(county, &format!("{k}_high")).unwrap_or(mid);
+        let source = if k.ends_with("_mid45") {
+            cite::CMRA
+        } else {
+            cite::NCA5_ATLAS
+        };
+        Some(projected(label, multiplier_from(mid, high, lo, hi, source)))
     })
 }
 
@@ -127,6 +168,10 @@ fn direct(county: &CountyRecord, hazard: HazardId, label: &str) -> Option<Climat
 /// `heat_event_days` is today's heat-wave event-days a year (after the cap in `natural`); it is
 /// the base the additive change in hot days is added to. `ground_level` is false for homes on
 /// the second floor or higher, which do not get the heavy-rain flood multiplier.
+///
+/// Order of preference for each hazard: a pack multiplier keyed by the hazard id; county
+/// counts (`_hist`, `_2050`, `_2050_high`), which allow the research's additive rule for hot
+/// days and show the emissions range; the pack's ratio variables.
 pub(crate) fn treatment(
     county: &CountyRecord,
     hazard: HazardId,
@@ -135,81 +180,99 @@ pub(crate) fn treatment(
 ) -> Climate {
     use HazardId::*;
     match hazard {
-        HeatWave => direct(county, hazard, "heat waves").unwrap_or_else(|| {
-            match variable(county, "days_over_95f") {
-                Some((hist, mid, high)) if heat_event_days > 0.0 => {
-                    let base = heat_event_days.max(MIN_BASELINE_DAYS);
-                    let m = multiplier(
-                        1.0 + (mid - hist).max(0.0) / base,
-                        1.0 + (high - hist).max(0.0) / base,
-                        1.0,
-                        HEAT_MULTIPLIER_CAP,
-                    );
-                    Climate::Projected {
-                        what: describe("heat waves", &m),
-                        multiplier: m,
+        HeatWave => {
+            let label = "heat waves";
+            direct(county, hazard, label)
+                .or_else(|| match variable(county, "days_over_95f") {
+                    Some((hist, mid, high)) if heat_event_days > 0.0 => {
+                        let base = heat_event_days.max(MIN_BASELINE_DAYS);
+                        Some(projected(
+                            label,
+                            multiplier(
+                                1.0 + (mid - hist).max(0.0) / base,
+                                1.0 + (high - hist).max(0.0) / base,
+                                1.0,
+                                HEAT_MULTIPLIER_CAP,
+                            ),
+                        ))
                     }
-                }
-                _ => Climate::NoData,
-            }
-        }),
+                    _ => None,
+                })
+                .or_else(|| {
+                    ratio(
+                        county,
+                        hazard,
+                        &["hot_days_95f", "hot_days_90f_mid45"],
+                        label,
+                    )
+                })
+                .unwrap_or(Climate::NoData)
+        }
         RiverineFlooding => {
             if !ground_level {
                 return Climate::NotExposed;
             }
-            direct(county, hazard, "flooding from heavy rain").unwrap_or_else(|| {
-                match variable(county, "days_over_2in") {
-                    Some((hist, _, _)) if hist < 0.05 => Climate::TooFew,
+            let label = "flooding from heavy rain";
+            direct(county, hazard, label)
+                .or_else(|| match variable(county, "days_over_2in") {
+                    Some((hist, _, _)) if hist < 0.05 => Some(Climate::TooFew),
                     Some((hist, mid, high)) => {
                         let (lo, hi) = PRECIP_MULTIPLIER_BOUNDS;
-                        let m = multiplier(mid / hist, high / hist, lo, hi);
-                        Climate::Projected {
-                            what: describe("flooding from heavy rain", &m),
-                            multiplier: m,
-                        }
+                        Some(projected(
+                            label,
+                            multiplier(mid / hist, high / hist, lo, hi),
+                        ))
                     }
-                    _ => Climate::NoData,
-                }
-            })
+                    None => None,
+                })
+                .or_else(|| {
+                    ratio(
+                        county,
+                        hazard,
+                        &["extreme_rain_days", "heavy_rain_days_1in_mid45"],
+                        label,
+                    )
+                })
+                .unwrap_or(Climate::NoData)
         }
         ColdWave | WinterWeather => {
-            let label = if hazard == ColdWave {
-                "cold waves"
+            let (label, keys): (&str, &[&str]) = if hazard == ColdWave {
+                ("cold waves", &["very_cold_nights_0f", "freezing_nights"])
             } else {
-                "winter storms"
+                ("winter storms", &["freezing_nights"])
             };
-            direct(county, hazard, label).unwrap_or_else(|| match variable(county, "icing_days") {
-                Some((hist, _, _)) if hist < MIN_BASELINE_DAYS => Climate::TooFew,
-                Some((hist, mid, high)) => {
-                    let m = multiplier(mid / hist, high / hist, COLD_MULTIPLIER_FLOOR, 1.5);
-                    Climate::Projected {
-                        what: describe(label, &m),
-                        multiplier: m,
-                    }
-                }
-                _ => Climate::NoData,
-            })
+            direct(county, hazard, label)
+                .or_else(|| match variable(county, "icing_days") {
+                    Some((hist, _, _)) if hist < MIN_BASELINE_DAYS => Some(Climate::TooFew),
+                    Some((hist, mid, high)) => Some(projected(
+                        label,
+                        multiplier(mid / hist, high / hist, COLD_MULTIPLIER_FLOOR, 1.5),
+                    )),
+                    None => None,
+                })
+                .or_else(|| ratio(county, hazard, keys, label))
+                .unwrap_or(Climate::NoData)
         }
         Drought | Wildfire => {
-            let label = if hazard == Drought {
-                "drought"
+            let (label, keys): (&str, &[&str]) = if hazard == Drought {
+                ("drought", &["consecutive_dry_days_mid45", "dry_days_mid45"])
             } else {
-                "wildfire"
+                ("wildfire", &["consecutive_dry_days_mid45"])
             };
-            direct(county, hazard, label).unwrap_or_else(|| {
-                match variable(county, "dry_spell_days") {
-                    Some((hist, _, _)) if hist < 1.0 => Climate::TooFew,
+            direct(county, hazard, label)
+                .or_else(|| match variable(county, "dry_spell_days") {
+                    Some((hist, _, _)) if hist < 1.0 => Some(Climate::TooFew),
                     Some((hist, mid, high)) => {
                         let (lo, hi) = DRY_SPELL_MULTIPLIER_BOUNDS;
-                        let m = multiplier(mid / hist, high / hist, lo, hi);
-                        Climate::Projected {
-                            what: describe(label, &m),
-                            multiplier: m,
-                        }
+                        Some(projected(
+                            label,
+                            multiplier(mid / hist, high / hist, lo, hi),
+                        ))
                     }
-                    _ => Climate::NoData,
-                }
-            })
+                    None => None,
+                })
+                .or_else(|| ratio(county, hazard, keys, label))
+                .unwrap_or(Climate::NoData)
         }
         // Sea-level rise needs its own projection (research §5.3); only a pack-supplied
         // multiplier is used.
@@ -222,7 +285,6 @@ pub(crate) fn treatment(
         Tornado | Hail | IceStorm | StrongWind | Lightning | Landslide | Avalanche => {
             Climate::Unclear
         }
-        Earthquake | Tsunami | VolcanicActivity => Climate::NotApplicable,
         _ => Climate::NotApplicable,
     }
 }

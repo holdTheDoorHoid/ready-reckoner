@@ -11,7 +11,7 @@
 //! | `unemployment_spell_per_worker_year` | per worker-year | job loss |
 //! | `layoff_per_worker_month` | per worker-month (JOLTS) | job loss (upper end of the range) |
 //! | `ed_visits_per_person_year` (or `ed_visits_per_100_persons_year`) | per person-year | medical emergency |
-//! | `accidental_death_per_person_year` | per person-year | death or disability of an earner (cited) |
+//! | `unintentional_injury_death_per_person_year` (or `accidental_death_per_person_year`) | per person-year | death or disability of an earner (cited) |
 
 use rr_types::{BaseRate, CommuteMode, HazardId, HousingKind, WaterSource, math};
 
@@ -200,7 +200,10 @@ fn earner_death_or_disability(ctx: &Ctx<'_>) -> Option<HazardRate> {
             cite::RR_HAZARD_PRIORS,
         ],
     );
-    if let Some(b) = ctx.base_rate(&["accidental_death_per_person_year"]) {
+    if let Some(b) = ctx.base_rate(&[
+        "unintentional_injury_death_per_person_year",
+        "accidental_death_per_person_year",
+    ]) {
         per_earner = per_earner.cite(&[b.source.as_str()]);
     }
     Some(HazardRate::new(

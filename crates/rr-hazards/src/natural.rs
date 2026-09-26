@@ -1,7 +1,8 @@
 //! Natural hazards: r_h = λ_h · a_h · m_h from the county record (DESIGN §4.2, research §3.1).
 //!
 //! - λ_h, the county frequency: the per-county episode rate from the `events` table when the
-//!   pack has one (NOAA Storm Events), otherwise NRI `AFREQ` read with the record's
+//!   pack has one (NOAA Storm Events: `heat`, `extreme_cold`, `winter_storm`, `ice_storm`,
+//!   `high_wind` + SPC `severe_wind_day`), otherwise NRI `AFREQ` read with the record's
 //!   `afreq_kind`. NRI counts heat waves, cold waves and winter weather in event-days, so those
 //!   are divided by a typical episode length. Earthquakes use the USGS shaking chance in
 //!   `county.seismic` in preference to NRI.
@@ -82,15 +83,52 @@ fn cap(mut e: Estimate, max: f64) -> Estimate {
     e
 }
 
+/// Keys in `CountyRecord::events` that count a hazard's episodes (the data pack's event types,
+/// then the hazard id). Windstorms add Storm Events high-wind episodes and SPC severe-wind days.
+/// Hail, tornadoes and landslides use NRI's frequency, because their footprint comes from NRI's
+/// loss ratio per NRI event.
+fn event_keys(hazard: HazardId) -> &'static [&'static str] {
+    use HazardId::*;
+    match hazard {
+        HeatWave => &["heat", "heat_wave"],
+        ColdWave => &["extreme_cold", "cold_wave"],
+        WinterWeather => &["winter_storm", "winter_weather"],
+        IceStorm => &["ice_storm"],
+        StrongWind => &["high_wind", "severe_wind_day", "strong_wind"],
+        _ => &[],
+    }
+}
+
+/// Episodes a year from the events table: the first key present, except windstorms, where the
+/// pack's two wind records (high-wind episodes, severe-wind days) are added.
+fn events_rate(ctx: &Ctx<'_>, hazard: HazardId) -> Option<f64> {
+    let keys = event_keys(hazard);
+    if hazard == HazardId::StrongWind {
+        let pack: f64 = ["high_wind", "severe_wind_day"]
+            .iter()
+            .filter_map(|k| ctx.event(k))
+            .map(|e| f64::from(e.rate_per_year))
+            .sum();
+        if pack > 0.0 {
+            return Some(pack);
+        }
+    }
+    keys.iter()
+        .find_map(|k| ctx.event(k))
+        .map(|e| f64::from(e.rate_per_year))
+}
+
 /// County events a year: the Storm Events episode rate when the pack has one, otherwise NRI.
 fn frequency(ctx: &Ctx<'_>, hazard: HazardId) -> Option<Estimate> {
-    if let Some(e) = ctx.event(hazard.as_str()) {
-        return Some(spread(
-            f64::from(e.rate_per_year),
-            STORM_EVENTS_SPREAD,
-            &[cite::STORM_EVENTS],
-        ));
+    if let Some(r) = events_rate(ctx, hazard) {
+        return Some(spread(r, STORM_EVENTS_SPREAD, &[cite::STORM_EVENTS]));
     }
+    let a = ctx.afreq_rate(hazard)?;
+    Some(spread(a, NRI_FREQUENCY_SPREAD, &[cite::NRI]))
+}
+
+/// NRI frequency only (for hazards whose footprint is NRI's loss ratio per NRI event).
+fn nri_frequency(ctx: &Ctx<'_>, hazard: HazardId) -> Option<Estimate> {
     let a = ctx.afreq_rate(hazard)?;
     Some(spread(a, NRI_FREQUENCY_SPREAD, &[cite::NRI]))
 }
@@ -98,8 +136,7 @@ fn frequency(ctx: &Ctx<'_>, hazard: HazardId) -> Option<Estimate> {
 /// Episodes a year for an event-day hazard: Storm Events episodes, or NRI event-days ÷ a typical
 /// episode length. Also returns the event-days a year.
 fn episodes(ctx: &Ctx<'_>, hazard: HazardId, days: Triple) -> Option<(Estimate, f64)> {
-    if let Some(e) = ctx.event(hazard.as_str()) {
-        let r = f64::from(e.rate_per_year);
+    if let Some(r) = events_rate(ctx, hazard) {
         return Some((
             spread(r, STORM_EVENTS_SPREAD, &[cite::STORM_EVENTS]),
             r * days.0,
@@ -147,8 +184,7 @@ fn flood_floor(ctx: &Ctx<'_>) -> (Estimate, bool) {
 
 fn heat_wave(ctx: &Ctx<'_>, notes: &mut Notes) -> Option<HazardRate> {
     let h = HazardId::HeatWave;
-    let (episodes, event_days) = if let Some(e) = ctx.event(h.as_str()) {
-        let r = f64::from(e.rate_per_year);
+    let (episodes, event_days) = if let Some(r) = events_rate(ctx, h) {
         (
             spread(r, STORM_EVENTS_SPREAD, &[cite::STORM_EVENTS]),
             r * HEAT_EPISODE_DAYS.0,
@@ -242,7 +278,7 @@ fn utility_storm(
 
 fn hail(ctx: &Ctx<'_>) -> Option<HazardRate> {
     let h = HazardId::Hail;
-    let lam = frequency(ctx, h)?;
+    let lam = nri_frequency(ctx, h)?;
     let fp = damage_footprint(ctx, h, HAIL_DAMAGE_RATIO)
         .unwrap_or_else(|| prior(HAIL_FALLBACK_FOOTPRINT, &[cite::RR_HAZARD_PRIORS]));
     Some(
@@ -259,7 +295,7 @@ fn hail(ctx: &Ctx<'_>) -> Option<HazardRate> {
 
 fn tornado(ctx: &Ctx<'_>) -> Option<HazardRate> {
     let h = HazardId::Tornado;
-    let lam = frequency(ctx, h)?;
+    let lam = nri_frequency(ctx, h)?;
     let fp = match damage_footprint(ctx, h, TORNADO_DAMAGE_RATIO) {
         Some(d) => cap(
             d.times(&prior(TORNADO_DISRUPTION, &[cite::RR_HAZARD_PRIORS])),
@@ -282,14 +318,21 @@ fn tornado(ctx: &Ctx<'_>) -> Option<HazardRate> {
 fn hurricane(ctx: &Ctx<'_>) -> Option<(HazardRate, HurricaneSplit)> {
     let h = HazardId::Hurricane;
     let lam = frequency(ctx, h)?;
-    let share = match ctx.event("major_hurricane") {
-        Some(m) if lam.value > 0.0 => {
-            let s = (f64::from(m.rate_per_year) / lam.value).clamp(0.0, 1.0);
+    // The major share: HURDAT2 passages within 50 nautical miles at major-hurricane strength ÷
+    // those at hurricane strength, when the pack has both (DERIVED for this county); otherwise
+    // the national one-third (PRIOR informed by HURDAT2).
+    let passages = |k: &str| ctx.event(k).map(|e| f64::from(e.rate_per_year));
+    let share = match (
+        passages("major_hurricane_passage"),
+        passages("hurricane_passage"),
+    ) {
+        (Some(major), Some(all)) if all > 0.0 => {
+            let s = (major / all).clamp(0.0, 1.0);
             Estimate::data(
                 s,
                 s / STORM_EVENTS_SPREAD,
                 (s * STORM_EVENTS_SPREAD).min(1.0),
-                &[cite::STORM_EVENTS],
+                &[cite::HURDAT2],
             )
         }
         _ => prior(

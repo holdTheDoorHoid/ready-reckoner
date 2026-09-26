@@ -161,7 +161,7 @@ pub fn assess(
         .iter()
         .map(|r| {
             let (today, effective) = register_rate(r, &detected, y2050);
-            (today.value, profile(&ctx, r, &today, &effective))
+            (today.value, profile(&ctx, r, &effective))
         })
         .collect();
     cards.sort_by(|(ta, a), (tb, b)| {
@@ -228,10 +228,10 @@ fn chance(rate: f64) -> f64 {
     }
 }
 
-fn profile(ctx: &Ctx<'_>, r: &HazardRate, today: &Estimate, e: &Estimate) -> HazardProfile {
+fn profile(ctx: &Ctx<'_>, r: &HazardRate, e: &Estimate) -> HazardProfile {
     let y2050 = ctx.y2050();
-    let climate_multiplier = match r.climate {
-        Climate::Projected { .. } if y2050 && today.value > 0.0 => e.value / today.value,
+    let climate_multiplier = match &r.climate {
+        Climate::Projected { multiplier, .. } if y2050 => multiplier.value,
         _ => 1.0,
     };
     let frequency_sentence = match &r.range_sentence {
@@ -303,7 +303,7 @@ fn climate_notes(rates: &[HazardRate], notes: &mut Notes) {
     }
     if !projected.is_empty() {
         notes.add(format!(
-            "Around 2050 (climate projections, from middle to high emissions): {}.",
+            "Around 2050 (climate projections; a range runs from middle to high emissions): {}.",
             projected.join("; ")
         ));
     }
