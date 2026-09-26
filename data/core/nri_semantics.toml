@@ -1,0 +1,213 @@
+# What each hazard's NRI annualised frequency (AFREQ) means, so rr-hazards never guesses.
+# Written by rr-etl (job `nri`) from the NRI Technical Documentation, December 2025 (v1.20),
+# section 5.2 Table 5 and each hazard's "Annualized Frequency" section. fema.gov refuses scripted
+# clients, so the document was read from the Internet Archive snapshot named below.
+#
+# afreq_kind: events_per_year (can exceed 1) or annual_probability (0 to 1).
+# basis: distinct_events (counted events), event_days (counted days; episodes span several days)
+#        or modelled (from a hazard model, not a count).
+# poisson_ok: true when 1 - exp(-afreq) is a sound chance of at least one event in a year.
+
+nri_version = "1.20.0"
+nri_version_date = "December 2025"
+nri_ver_field = "December 2025"
+technical_documentation = "https://www.fema.gov/sites/default/files/documents/fema_national-risk-index_technical-documentation.pdf"
+technical_documentation_archive = "https://web.archive.org/web/20260720090240/https://www.fema.gov/sites/default/files/documents/fema_national-risk-index_technical-documentation.pdf"
+
+[[hazard]]
+id = "avalanche"
+nri_code = "AVLN"
+afreq_kind = "events_per_year"
+basis = "distinct_events"
+unit = "loss-causing avalanche events per year (county)"
+period_of_record = "30 years (1994-2023)"
+poisson_ok = true
+section = "6.5"
+notes = "Counts from SHELDUS, the Colorado Avalanche Information Center and NOAA. Counties in an avalanche susceptibility zone with no recorded loss-causing event get a minimum of 0.01 per year."
+
+[[hazard]]
+id = "coastal_flooding"
+nri_code = "CFLD"
+afreq_kind = "events_per_year"
+basis = "modelled"
+unit = "modelled coastal flood occurrences per year, area-weighted over developed land"
+period_of_record = "not applicable (modelled)"
+poisson_ok = false
+section = "7.4"
+notes = "Sum of sub-type frequencies: 0.01 inside the 1% annual-chance coastal floodplain, 0.002 inside the 0.2% floodplain, plus NOAA high-tide flooding classes (minor, moderate, major) at the midpoints of NOAA's probability classes. High-tide flooding recurs, so values above 1 are common and do not measure the chance of a damaging surge. Use the expected annual loss fields and flood.csv (share of homes in the flood zone) for household risk."
+
+[[hazard]]
+id = "cold_wave"
+nri_code = "CWAV"
+afreq_kind = "events_per_year"
+basis = "event_days"
+unit = "cold-wave days per year (NWS alerts), area-weighted"
+period_of_record = "19.0 years (2005-11-12 to 2024-11-12)"
+poisson_ok = false
+section = "8.5"
+notes = "Table 5 of the documentation calls the measure an 'annualized probability', but the section text and the values (often above 1) are event-days per year. Days cluster into episodes: divide by a typical episode length before treating the result as episodes per year."
+
+[[hazard]]
+id = "drought"
+nri_code = "DRGT"
+afreq_kind = "events_per_year"
+basis = "event_days"
+unit = "drought days per year (US Drought Monitor event-weeks times 7), area-weighted"
+period_of_record = "25.25 years"
+poisson_ok = false
+section = "9.5"
+notes = "Event-days, not events: a single drought can contribute hundreds of days. Divide by a typical drought length before treating it as droughts per year."
+
+[[hazard]]
+id = "earthquake"
+nri_code = "ERQK"
+afreq_kind = "annual_probability"
+basis = "modelled"
+unit = "annual probability of at least minor-damage shaking (USGS probability grid), area-weighted"
+period_of_record = "not applicable (modelled)"
+poisson_ok = false
+section = "10.4"
+notes = "Already a yearly probability; do not transform. seismic.csv carries USGS exceedance probabilities at 0.1 g and 0.2 g at the county centroid for cross-checking."
+
+[[hazard]]
+id = "hail"
+nri_code = "HAIL"
+afreq_kind = "events_per_year"
+basis = "distinct_events"
+unit = "hail events per year (hail 0.75 in or larger; 49-km fishnet, scaled), area-weighted"
+period_of_record = "38.0 years (1986-2023)"
+poisson_ok = true
+section = "11.5"
+notes = "Fishnet counts include hail that fell near, not only inside, the county; a regional frequency rather than the chance hail hits one home."
+
+[[hazard]]
+id = "heat_wave"
+nri_code = "HWAV"
+afreq_kind = "events_per_year"
+basis = "event_days"
+unit = "heat-wave days per year (NWS alerts), area-weighted"
+period_of_record = "19.0 years (2005-11-12 to 2024-11-12)"
+poisson_ok = false
+section = "12.5"
+notes = "Event-days per year. Days cluster into episodes: divide by a typical episode length before treating the result as episodes per year."
+
+[[hazard]]
+id = "hurricane"
+nri_code = "HRCN"
+afreq_kind = "events_per_year"
+basis = "distinct_events"
+unit = "hurricane events per year (buffered HURDAT2 tracks on a 49-km fishnet)"
+period_of_record = "173.86 years for the Atlantic (1851-01-01 to 2024-09-30); 76.0 years for the Pacific (1949-01-01 to 2024-11-30)"
+poisson_ok = true
+section = "13.5"
+notes = "Minimum frequencies are assigned to blocks in hurricane-prone counties with no recorded track. events.csv adds hurricane and tropical-storm passage rates within 50 nautical miles of the county centroid for cross-checking."
+
+[[hazard]]
+id = "ice_storm"
+nri_code = "ISTM"
+afreq_kind = "events_per_year"
+basis = "event_days"
+unit = "ice-storm days per year (49-km fishnet), area-weighted"
+period_of_record = "67.16 years (1946-12-31 to 2014-02-12)"
+poisson_ok = false
+section = "14.5"
+notes = "Event-days per year; the record ends in 2014. events.csv has ice-storm episode rates from NOAA Storm Events 1996-2025."
+
+[[hazard]]
+id = "riverine_flooding"
+nri_code = "IFLD"
+afreq_kind = "events_per_year"
+basis = "event_days"
+unit = "inland flood days per year (NCEI Storm Events flood and flash-flood records, one per county-day)"
+period_of_record = "27 years (1996-2023, as stated)"
+poisson_ok = false
+section = "15.5"
+notes = "New in v1.20: Inland Flooding replaced Riverine Flooding (RFLD) and includes rain-driven (pluvial) flooding. About 100% of a county's building value is treated as exposed, so EALB/EXPB is a county-wide average rather than an in-floodplain rate. Counties crossing the 1% floodplain with no recorded flood day get a minimum of 0.01. Pair with flood.csv (share of homes in the flood zone)."
+
+[[hazard]]
+id = "landslide"
+nri_code = "LNDS"
+afreq_kind = "events_per_year"
+basis = "modelled"
+unit = "landslide events per year (USGS county rate, weighted by the 2024 USGS susceptibility model)"
+period_of_record = "not applicable (modelled rate)"
+poisson_ok = true
+section = "16.5"
+notes = "County value is the USGS estimated events per county per year; tracts inherit it in proportion to susceptibility."
+
+[[hazard]]
+id = "lightning"
+nri_code = "LTNG"
+afreq_kind = "events_per_year"
+basis = "event_days"
+unit = "days per year with a cloud-to-ground lightning strike (SPC daily lightning climatology), area-weighted"
+period_of_record = "29 years in the contiguous US (1995-2023); 12 years elsewhere (2012-2024)"
+poisson_ok = false
+section = "17.5"
+notes = "Table 5 calls the measure an 'annualized probability', but values are days per year (often 20 to 80). No lightning data for Guam, the Northern Mariana Islands, American Samoa or the US Virgin Islands."
+
+[[hazard]]
+id = "strong_wind"
+nri_code = "SWND"
+afreq_kind = "events_per_year"
+basis = "distinct_events"
+unit = "strong-wind events per year (49-km fishnet, scaled), area-weighted"
+period_of_record = "38.0 years (as stated; the documentation's date range reads 1996-2023)"
+poisson_ok = true
+section = "18.5"
+notes = "Fishnet counts include events near, not only inside, the county."
+
+[[hazard]]
+id = "tornado"
+nri_code = "TRND"
+afreq_kind = "events_per_year"
+basis = "distinct_events"
+unit = "tornado events per year (80-km buffered paths on a 49-km fishnet, nationally scaled by EF sub-type)"
+period_of_record = "74.0 years for EF2-EF5 (1950-2023); 38.0 years for EF0-EF1 (1986-2023)"
+poisson_ok = true
+section = "19.5"
+notes = "A frequency of tornadoes in the county's surroundings, not the chance a tornado strikes one home; use EALB/EXPB or HLRB for damage. events.csv adds SPC tornado counts inside the county."
+
+[[hazard]]
+id = "tsunami"
+nri_code = "TSUN"
+afreq_kind = "annual_probability"
+basis = "modelled"
+unit = "surrogate yearly frequency: regional historical runup rate plus P-2426 probabilistic frequency"
+period_of_record = "222.15 years for the historical part"
+poisson_ok = false
+section = "20.3"
+notes = "FEMA states this value is a surrogate 'strictly for reference' and is not used in NRI's own loss calculations. Use it only to flag tsunami exposure (nri_counties.csv tsunami_zone) and use the expected annual loss fields for magnitude."
+
+[[hazard]]
+id = "volcanic_activity"
+nri_code = "VLCN"
+afreq_kind = "annual_probability"
+basis = "modelled"
+unit = "yearly eruption frequency from USGS National Volcanic Threat Assessment recurrence scores (score 4 = 0.0101, 3 = 0.001, 2 = 0.0002)"
+period_of_record = "not applicable (recurrence classes)"
+poisson_ok = false
+section = "21.4"
+notes = "Very small by construction; a per-volcano recurrence class, area-weighted."
+
+[[hazard]]
+id = "wildfire"
+nri_code = "WFIR"
+afreq_kind = "annual_probability"
+basis = "modelled"
+unit = "annual burn probability from a large fire (USFS FSim), area-weighted over developed or agricultural land"
+period_of_record = "not applicable (modelled)"
+poisson_ok = false
+section = "22.4"
+notes = "Already a yearly probability that fire reaches a point; do not transform. Building/population frequency can differ from agriculture frequency."
+
+[[hazard]]
+id = "winter_weather"
+nri_code = "WNTW"
+afreq_kind = "events_per_year"
+basis = "event_days"
+unit = "winter-weather days per year (NWS alerts), area-weighted"
+period_of_record = "19.0 years (2005-11-12 to 2024-11-12)"
+poisson_ok = false
+section = "23.5"
+notes = "Event-days per year. Days cluster into storms: divide by a typical storm length before treating the result as storms per year."

@@ -417,6 +417,22 @@ export interface Owned {
   paid: Map<string, number>;
 }
 
+/**
+ * Items the mock credits as already owned when `assume_basics` is on (everyday basics: blankets,
+ * a bag per person, a few days of ordinary food). Only ids that exist in the mock catalogue are
+ * used; a cooking pot, a can opener and a phone have no matching catalogue item, so they carry no
+ * mock credit (the flag itself is still honoured; nothing else about the mock's behaviour changes).
+ */
+function assumedBasicsCredit(input: PlanInput): [string, number][] {
+  const people = input.people.length;
+  const bagEligible = input.people.filter((p) => p.age_band !== 'infant' && p.age_band !== 'toddler').length;
+  return [
+    ['blankets_warm', people],
+    ['go_bag', bagEligible],
+    ['food_shelf_stable', people * 3],
+  ];
+}
+
 export function ownedFrom(input: PlanInput): Owned {
   const qty = new Map<string, number>();
   const paid = new Map<string, number>();
@@ -424,6 +440,12 @@ export function ownedFrom(input: PlanInput): Owned {
     if (!catalogueItem(o.item_id)) continue;
     qty.set(o.item_id, (qty.get(o.item_id) ?? 0) + o.qty);
     if (o.paid_usd !== undefined) paid.set(o.item_id, (paid.get(o.item_id) ?? 0) + o.paid_usd);
+  }
+  if (input.assume_basics ?? true) {
+    for (const [id, amount] of assumedBasicsCredit(input)) {
+      if (!catalogueItem(id) || amount <= 0) continue;
+      qty.set(id, Math.max(qty.get(id) ?? 0, amount));
+    }
   }
   return { qty, paid };
 }
