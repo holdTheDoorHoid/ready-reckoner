@@ -23,7 +23,8 @@
   const sourceIds = $derived(itemSourceIds(app.catalogue, app.result.output, item.item_id));
   const purchase = $derived(app.purchaseFor(item.item_id, item.tier));
   const fromInventory = $derived(!!item.done && !purchase);
-  const verb = $derived(item.kind === 'free_action' ? 'Done' : item.kind === 'reserve' ? 'Set aside' : 'Bought');
+  /** Money (cash in small bills) is set aside, never bought; so is a deposit toward a bigger item. */
+  const verb = $derived(item.kind === 'free_action' ? 'Done' : item.kind === 'reserve' || item.unit === 'dollar' ? 'Set aside' : 'Bought');
   const perUnit = $derived.by(() => {
     if (!info || item.kind === 'free_action' || item.quantity <= 0) return '';
     const each = item.est_cost_usd / item.quantity;
