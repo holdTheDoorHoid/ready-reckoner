@@ -265,9 +265,14 @@ pub fn render(c: &CountyRecord, loc: Option<&rr_types::LocationResolved>) -> Str
     if let Some(f) = &c.flood {
         s.push_str("\nFlood\n\n");
         let mut t = Table::new(["Field", "Value"]);
+        let basis = match f.sfha_basis.as_deref() {
+            Some("structures") => " (counted from structures)",
+            Some("policies_lower_bound") => " (from insured homes only, so a lower bound)",
+            _ => "",
+        };
         t.row([
             "Homes in the 1%-a-year flood zone".to_owned(),
-            pct(f.sfha_home_share),
+            format!("{}{basis}", pct(f.sfha_home_share)),
         ]);
         t.row([
             "Claims per 1,000 policies a year".to_owned(),

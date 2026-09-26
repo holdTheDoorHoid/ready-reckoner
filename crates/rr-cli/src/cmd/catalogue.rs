@@ -103,5 +103,8 @@ fn flags(it: &Item) -> String {
     if it.rare_catastrophic {
         f.push("rare catastrophe");
     }
+    if it.assumed_basic {
+        f.push("assumed basic");
+    }
     f.join(", ")
 }
