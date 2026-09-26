@@ -444,12 +444,13 @@ recipient and what it learns.
   includes soil). No values for Guam, the Northern Mariana Islands or American Samoa. The
   contiguous-US and Alaska grids are the original 2023 release on a 0.2° (about 20 km) grid; the
   USGS web service now runs a 2026 revision (2023.R2) whose grid is offered only through
-  ScienceBase's new file manager, which has no direct download link. Against the 307 contiguous-US
-  and Alaska counties the service answered before it failed, the grid values differ by a median
-  of 8–9% (87–92% of counties within ±20%, at 0.2 g and 0.1 g), but they are about twice the revised values on the Colorado
-  Plateau (Apache, Navajo and Coconino in Arizona; San Juan in Utah) and 2.5–3 times in Southeast
-  Alaska (Wrangell, Petersburg, Ketchikan, Juneau). Treat shaking chances as order-of-magnitude
-  there, and switch to the revised grid when USGS publishes a direct link.
+  ScienceBase's new file manager, which has no direct download link. Against the 307
+  contiguous-US and Alaska counties the service answered before it failed, the grid values differ
+  by a median of 8–9% (87–92% of counties within ±20%, at 0.2 g and 0.1 g), but they are about
+  twice the revised values on the Colorado Plateau (Apache, Navajo and Coconino in Arizona; San
+  Juan in Utah) and 2.5–3 times in Southeast Alaska (Wrangell, Petersburg, Ketchikan, Juneau).
+  Treat shaking chances as order-of-magnitude there, and switch to the revised grid when USGS
+  publishes a direct link.
 - **NRI is county-scale**; a ZIP in a large county can sit in a very different flood or wildfire
   regime. Copy must say "your county" until tract packs exist.
 
@@ -459,9 +460,8 @@ recipient and what it learns.
   NRI comes through ArcGIS, the documentation and the OpenFEMA terms were read from Internet
   Archive copies.
 - **Census Data API (ACS)** needs a key: skipped for v1 as briefed (households come from SVI).
-- **USGS hazard web service** rate-limited (HTTP 429) and then answered
-  `{"status":"error"}` for every point during a full run on 2026-09-25 (about 3,200 calls from
-  three workers). The contiguous US, Alaska and Hawaii now come from the gridded data releases; the
+- **USGS hazard web service** rate-limited (HTTP 429) and then answered `{"status":"error"}`
+  during a full run on 2026-09-25 (about 3,200 calls from three workers; 330 answered). The contiguous US, Alaska and Hawaii now come from the gridded data releases; the
   service is used only for Puerto Rico and the US Virgin Islands (81 small calls, one at a time).
   It has no Guam or American Samoa model (`guam-2025`, `amsam-2025` return the web app, not a
   service).
