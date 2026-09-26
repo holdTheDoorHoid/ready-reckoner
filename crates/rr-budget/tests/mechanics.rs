@@ -653,6 +653,218 @@ fn cpap_battery_under_each_schedule() {
     assert!(battery_month(&research) > battery_month(&fixed));
 }
 
+/// The one-off money goes to the top life-safety item: the first life-safety item in the buying
+/// order that costs more than a month's money (DESIGN §4.7, polish round). $40 a month, a $300
+/// CPAP battery, and two cheap life-safety items: water ($20) and a carbon monoxide alarm ($35).
+/// - With $200 once, the battery costs more than the one-off: half of it ($100) is kept for the
+///   battery, the other half buys the water and the alarm, cheapest first ($55), and the $45 they
+///   leave joins the fund, which opens at $145. From month 1 half of each month's $40 goes in
+///   (bound: month ceil(($300 - $145) / $20) = 8), and whatever the other half does not spend
+///   counts toward it too: it arrives in month 6.
+/// - With $350 once, the battery is bought first, in month 0.
+/// - With no one-off it arrives in month 11.
+#[test]
+fn one_off_money_goes_to_the_top_life_safety_item() {
+    let setup = |one_off: f32| {
+        let mut battery = buy("cpap_battery", BucketId::Power, TierId::H72, 300.0);
+        battery.life_safety = true;
+        let mut water = buy("water", BucketId::WaterOut, TierId::H72, 20.0);
+        water.life_safety = true;
+        let mut alarm = buy("co_alarm", BucketId::Fire, TierId::H72, 35.0);
+        alarm.life_safety = true;
+        let mut alarm_meta = ItemMeta::new("co_alarm");
+        alarm_meta.readiness = vec![ReadinessCredit {
+            bucket: BucketId::Fire,
+            harm_day_equivalents: 1.0,
+        }];
+        Setup::new("phoenix-apartment-cpap-1", 40.0, one_off)
+            .flat(BucketId::Power, 0.3, 3.0)
+            .flat(BucketId::WaterOut, 0.2, 3.0)
+            .flat(BucketId::Supplies, 0.5, 10.0)
+            .flat(BucketId::Comms, 0.1, 3.0)
+            .readiness(BucketId::Fire, 0.3)
+            .add(battery, set("cpap_battery", BucketId::Power, 3.0))
+            .add(water, set("water", BucketId::WaterOut, 3.0))
+            .add(alarm, alarm_meta)
+            .add(
+                item(
+                    "food",
+                    "Food",
+                    "person-day",
+                    &[BucketId::Supplies],
+                    TierId::H72,
+                    false,
+                    false,
+                    (2.5, 2.5),
+                ),
+                divisible(
+                    "food",
+                    Contributes::per_person(BucketId::Supplies, 1.0),
+                    1.0,
+                ),
+            )
+            .add(
+                buy("radio", BucketId::Comms, TierId::H72, 30.0),
+                set("radio", BucketId::Comms, 3.0),
+            )
+            .run()
+    };
+
+    let r = setup(200.0);
+    let month0: Vec<&str> = r
+        .sequence
+        .iter()
+        .filter(|p| p.month == 0)
+        .map(|p| p.item_id.as_str())
+        .collect();
+    assert_eq!(month0, ["water", "co_alarm"]);
+    let reserve: Vec<_> = r.plan.months[0]
+        .items
+        .iter()
+        .filter(|i| i.kind == PlanItemKind::Reserve)
+        .collect();
+    assert_eq!(reserve.len(), 1);
+    assert_eq!(reserve[0].item_id, "cpap_battery");
+    assert_eq!(reserve[0].est_cost_usd, 145.0);
+    assert!(
+        reserve[0]
+            .why
+            .contains("costs more than your one-off money")
+    );
+    assert_eq!(r.money_by_month[0].saved_usd, 145.0);
+    // The reserve line comes before the purchases it left room for.
+    assert_eq!(r.plan.months[0].items[0].kind, PlanItemKind::Reserve);
+    let with_one_off = month_of(&r, "cpap_battery").expect("the battery arrives");
+    assert_eq!(with_one_off, 6);
+    assert_eq!(month_of(&setup(0.0), "cpap_battery"), Some(11));
+    // One envelope for the battery, holding everything saved for it.
+    assert_eq!(r.plan.envelopes.len(), 1);
+    let battery = r
+        .sequence
+        .iter()
+        .find(|p| p.item_id == "cpap_battery")
+        .unwrap();
+    assert_eq!(
+        f64::from(r.plan.envelopes[0].saved_usd),
+        (battery.from_savings_usd * 100.0).round() / 100.0
+    );
+
+    let r = setup(350.0);
+    assert_eq!(r.sequence[0].item_id, "cpap_battery");
+    assert_eq!(r.sequence[0].month, 0);
+    assert!(
+        r.plan.months[0]
+            .items
+            .iter()
+            .all(|i| i.kind != PlanItemKind::Reserve)
+    );
+    let line = r.plan.months[0]
+        .items
+        .iter()
+        .find(|i| i.item_id == "cpap_battery")
+        .unwrap();
+    assert!(
+        line.why.contains("Your one-off money pays for this first"),
+        "{}",
+        line.why
+    );
+    // The rest follows the usual order: the water fits, the alarm waits for month 1.
+    assert_eq!(month_of(&r, "water"), Some(0));
+    assert_eq!(month_of(&r, "co_alarm"), Some(1));
+}
+
+/// A divisible item's readiness credit stays within reach after other items fill its bucket:
+/// the jugs (3 days of water for $5, 3.6 per dollar) come before the bottled water (6 for the
+/// first $10 day plus 0.71 for the go-bag, 0.67 per dollar) and cover the water target, but one
+/// step of the bottled water is still bought for the go-bag. (Before, a divisible item with no
+/// room left in its buckets was never a candidate, so its readiness value was lost, and whether
+/// the plan ever got it depended on the budget.)
+#[test]
+fn a_divisible_items_readiness_survives_a_full_bucket() {
+    let mut water_meta = divisible(
+        "water",
+        Contributes::per_household(BucketId::WaterOut, 1.0),
+        1.0,
+    );
+    water_meta.readiness = vec![ReadinessCredit {
+        bucket: BucketId::Evacuate,
+        harm_day_equivalents: 1.0,
+    }];
+    let r = Setup::new("philadelphia-renters-4", 100.0, 0.0)
+        .flat(BucketId::WaterOut, 0.2, 3.0)
+        .readiness(BucketId::Evacuate, 0.3)
+        .add(
+            buy("jugs", BucketId::WaterOut, TierId::H72, 5.0),
+            set("jugs", BucketId::WaterOut, 3.0),
+        )
+        .add(
+            item(
+                "water",
+                "Bottled water",
+                "gallon",
+                &[BucketId::WaterOut, BucketId::Evacuate],
+                TierId::H72,
+                false,
+                false,
+                (10.0, 10.0),
+            ),
+            water_meta,
+        )
+        .run();
+    assert_eq!(order(&r), ["jugs", "water"]);
+    let water = r.sequence.iter().find(|p| p.item_id == "water").unwrap();
+    assert_eq!(water.quantity, 1.0);
+    // Its value is the go-bag's alone: 10 x 2 x (-ln 0.7 / 10) x 1.
+    assert!((water.value - 2.0 * -rr_types::math::ln(0.7)).abs() < 1e-9);
+    assert_eq!(common::readiness_at(&r, usize::MAX)[&BucketId::Evacuate], 1);
+}
+
+/// `Plan.envelopes` holds one entry per item id (ENGINE-API): food bought in chunks that each cost
+/// more than a month's money is saved for, and paid from savings, again and again, and its one
+/// envelope adds up every draw.
+#[test]
+fn an_item_saved_for_more_than_once_has_one_envelope() {
+    let r = Setup::new("philadelphia-renters-4", 10.0, 0.0)
+        .flat(BucketId::Supplies, 0.5, 3.0)
+        .add(
+            item(
+                "food",
+                "Food",
+                "person-day",
+                &[BucketId::Supplies],
+                TierId::H72,
+                false,
+                false,
+                (12.0, 12.0),
+            ),
+            divisible(
+                "food",
+                Contributes::per_person(BucketId::Supplies, 1.0),
+                1.0,
+            ),
+        )
+        .run();
+    let draws: Vec<_> = r
+        .sequence
+        .iter()
+        .filter(|p| p.from_savings_usd > 0.0)
+        .collect();
+    assert!(draws.len() >= 3, "{draws:?}");
+    assert_eq!(r.plan.envelopes.len(), 1);
+    let e = &r.plan.envelopes[0];
+    assert_eq!(e.item_id, "food");
+    let saved: f64 = draws.iter().map(|p| p.from_savings_usd).sum();
+    let needed: f64 = draws.iter().map(|p| p.cost_usd).sum();
+    assert!(
+        (f64::from(e.saved_usd) - saved).abs() < 0.01,
+        "{e:?} vs {saved}"
+    );
+    assert!(
+        (f64::from(e.needed_usd) - needed).abs() < 0.01,
+        "{e:?} vs {needed}"
+    );
+}
+
 /// Month 0 lists at most eight free actions (life-safety first, then value); the rest move to
 /// month 1 (and 2), before that month's purchases, and their coverage counts only from then. The
 /// allocator still plans purchases knowing they are coming, so it does not buy water containers

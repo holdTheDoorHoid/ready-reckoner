@@ -83,6 +83,12 @@ pub enum Schedule {
     /// A bigger budget never ends the plan with less coverage in any bucket, but unlike
     /// [`Schedule::FixedOrder`] it can reach a bucket later in some month (the purchase order
     /// depends on the money).
+    ///
+    /// The one-off money (month 0) goes to life-safety items first. The top life-safety item is
+    /// the first one in the buying order that costs more than a month's money: when the one-off
+    /// money covers it, it is bought outright in month 0 (and the next such item is looked at);
+    /// otherwise `reserve_share` of the one-off money opens its fund, the rest buys the cheaper
+    /// life-safety items, cheapest first, and whatever those leave joins the fund.
     Split {
         /// Share of each month's new money set aside, above 0 and at most 1 (default 0.5).
         reserve_share: f64,
@@ -165,7 +171,8 @@ pub struct MonthCoverage {
 pub struct MonthMoney {
     /// The month.
     pub month: u16,
-    /// Money free to spend at the start of the month, after this month's sinking-fund deposit.
+    /// Money free to spend at the start of the month, after this month's sinking-fund deposit (in
+    /// month 0, after what the one-off money bought and set aside for life-safety items).
     pub available_usd: f64,
     /// Money in the main plan's sinking fund at the end of the month.
     pub saved_usd: f64,

@@ -34,7 +34,10 @@
 //!   something), and the expensive item still arrives within ceil(cost / (share × monthly money))
 //!   months of its first deposit. A bigger budget never ends the plan with less coverage in any
 //!   bucket, but month by month it can reach some bucket later, because the purchase order depends
-//!   on the money.
+//!   on the money. The one-off money goes to life-safety items first: the top life-safety item a
+//!   month's money cannot buy (a CPAP battery) is bought in month 0 when the one-off covers it;
+//!   otherwise half the one-off opens its fund, the rest buys the cheaper life-safety items, and
+//!   what they leave joins the fund.
 //! - **FixedOrder.** Buy strictly in priority order and save everything for the next item when it
 //!   costs more than the money on hand. The order never depends on the budget, so more money only
 //!   ever moves purchases earlier and every bucket is covered at least as well in every month. The
