@@ -54,10 +54,10 @@ one is not started.
 - Pages deploy — done; live at the project's GitHub Pages address.
 - Data-refresh Action live — done; runs quarterly, opens a pull request, nothing merges without a
   person reading it.
-- Accessibility audit — **not started.** The interface is built to the WCAG 2.2 AA target set in
-  `docs/UI.md` (keyboard navigation, colour-blind-safe severity colours, reduced motion), but no one
-  has yet run a dedicated audit to confirm it meets that bar the way the numbers and the reading
-  level have been checked.
+- Accessibility audit — **automated part done, manual part not.** An axe-core sweep over 38 pages
+  at desktop and phone widths found 0 violations (twice: after the web shell and after the real
+  engine landed); keyboard use and reduced motion were checked by hand. A screen-reader pass and a
+  review with real users have not been done.
 
 ## Next
 
@@ -66,7 +66,7 @@ Concrete, near-term follow-ups, mostly from the verification pass
 tracked as GitHub issues; the list here is the standing summary. See
 [CHANGELOG.md](../CHANGELOG.md)'s "Known limitations" for how each of these reads to a user today.
 
-- Run the accessibility audit called for above.
+- Do the screen-reader pass and a review with real users.
 - Give the 79 counties without their own outage history a state-level fallback instead of today's
   simpler estimate.
 - Re-check the earthquake and outage numbers for Pacific coast counties reading unexpectedly high
