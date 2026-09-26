@@ -35,9 +35,14 @@ fn run(args: &[String]) -> rr_etl::Result<i32> {
             only,
             optional,
             keep_raw,
+            keep_intermediate,
         } => {
             let http = Http::new(out.join("raw"), keep_raw)?;
-            let ctx = Ctx { data: out, http };
+            let ctx = Ctx {
+                data: out,
+                http,
+                keep_intermediate,
+            };
             let summary = refresh(&ctx, &only, optional)?;
             println!(
                 "refresh finished: {} job(s) ok, {} failed",

@@ -1,0 +1,478 @@
+# FDIC-insured bank failures per year since 1934. Written by rr-etl (job `series`); see docs/DATA_SOURCES.md.
+
+id = "fdic_failures"
+title = "FDIC-insured bank failures per year since 1934"
+publisher = "Federal Deposit Insurance Corporation"
+url = "https://banks.data.fdic.gov/bankfind-suite/failures"
+licence = "US Government work, public domain (17 U.S.C. 105)"
+attribution = ""
+source = "fdic_failed_banks"
+retrieved = "2026-09-26"
+how = "fetched"
+notes = [
+  "4117 failures and assistance transactions, 1934 to the refresh date; assets are total assets at failure in nominal dollars (QBFASSET, thousands, x 1,000).",
+  "Insured deposits (up to $250,000 per depositor per bank) were paid in every failure; for a household the disruption is days without access to an account, not lost savings.",
+]
+
+[[rate]]
+id = "bank_failures_per_year"
+value = 23.32
+unit = "FDIC-insured bank failures per year, United States"
+year = 2025
+period = "2001-2025"
+figure = "583 failures in 2001-2025 (4113 in 1934-2025)"
+derivation = "583 / 25 years"
+note = "Most failures are small banks; the count swings from none to 157 (2010)."
+unverified = false
+
+[[rate]]
+id = "bank_failure_cluster_year_share"
+value = 0.2609
+unit = "share of years with 25 or more bank failures"
+year = 2025
+period = "1934-2025"
+figure = "24 of 92 years"
+derivation = "24 / 92"
+note = "Cluster years mark the banking crises of the 1930s, the late 1980s and early 1990s, and 2009-2012."
+unverified = false
+
+[[row]]
+year = 1934
+failures = 9
+failed_assets_usd = 2661000
+
+[[row]]
+year = 1935
+failures = 25
+failed_assets_usd = 12320000
+
+[[row]]
+year = 1936
+failures = 69
+failed_assets_usd = 12930000
+
+[[row]]
+year = 1937
+failures = 75
+failed_assets_usd = 19280000
+
+[[row]]
+year = 1938
+failures = 74
+failed_assets_usd = 13920000
+
+[[row]]
+year = 1939
+failures = 60
+failed_assets_usd = 43920000
+
+[[row]]
+year = 1940
+failures = 43
+failed_assets_usd = 7959000
+
+[[row]]
+year = 1941
+failures = 15
+failed_assets_usd = 17810000
+
+[[row]]
+year = 1942
+failures = 20
+failed_assets_usd = 1602000
+
+[[row]]
+year = 1943
+failures = 5
+failed_assets_usd = 14060000
+
+[[row]]
+year = 1944
+failures = 2
+failed_assets_usd = 2098000
+
+[[row]]
+year = 1945
+failures = 1
+failed_assets_usd = 6392000
+
+[[row]]
+year = 1946
+failures = 1
+failed_assets_usd = 351000
+
+[[row]]
+year = 1947
+failures = 5
+failed_assets_usd = 6798000
+
+[[row]]
+year = 1948
+failures = 3
+failed_assets_usd = 10360000
+
+[[row]]
+year = 1949
+failures = 4
+failed_assets_usd = 4885000
+
+[[row]]
+year = 1950
+failures = 4
+failed_assets_usd = 4005000
+
+[[row]]
+year = 1951
+failures = 2
+failed_assets_usd = 3050000
+
+[[row]]
+year = 1952
+failures = 3
+failed_assets_usd = 2389000
+
+[[row]]
+year = 1953
+failures = 2
+failed_assets_usd = 18810000
+
+[[row]]
+year = 1954
+failures = 2
+failed_assets_usd = 1138000
+
+[[row]]
+year = 1955
+failures = 5
+failed_assets_usd = 11990000
+
+[[row]]
+year = 1956
+failures = 2
+failed_assets_usd = 12910000
+
+[[row]]
+year = 1957
+failures = 1
+failed_assets_usd = 1253000
+
+[[row]]
+year = 1958
+failures = 4
+failed_assets_usd = 8905000
+
+[[row]]
+year = 1959
+failures = 3
+failed_assets_usd = 2859000
+
+[[row]]
+year = 1960
+failures = 1
+failed_assets_usd = 7506000
+
+[[row]]
+year = 1961
+failures = 5
+failed_assets_usd = 9819000
+
+[[row]]
+year = 1962
+failures = 1
+failed_assets_usd = 0
+
+[[row]]
+year = 1963
+failures = 2
+failed_assets_usd = 26180000
+
+[[row]]
+year = 1964
+failures = 7
+failed_assets_usd = 25850000
+
+[[row]]
+year = 1965
+failures = 5
+failed_assets_usd = 58750000
+
+[[row]]
+year = 1966
+failures = 7
+failed_assets_usd = 120600000
+
+[[row]]
+year = 1967
+failures = 4
+failed_assets_usd = 11990000
+
+[[row]]
+year = 1968
+failures = 3
+failed_assets_usd = 25160000
+
+[[row]]
+year = 1969
+failures = 9
+failed_assets_usd = 43570000
+
+[[row]]
+year = 1970
+failures = 7
+failed_assets_usd = 62150000
+
+[[row]]
+year = 1971
+failures = 7
+failed_assets_usd = 196500000
+
+[[row]]
+year = 1972
+failures = 2
+failed_assets_usd = 1322000000
+
+[[row]]
+year = 1973
+failures = 6
+failed_assets_usd = 1310000000
+
+[[row]]
+year = 1974
+failures = 4
+failed_assets_usd = 3823000000
+
+[[row]]
+year = 1975
+failures = 13
+failed_assets_usd = 420000000
+
+[[row]]
+year = 1976
+failures = 17
+failed_assets_usd = 1039000000
+
+[[row]]
+year = 1977
+failures = 6
+failed_assets_usd = 232600000
+
+[[row]]
+year = 1978
+failures = 7
+failed_assets_usd = 994000000
+
+[[row]]
+year = 1979
+failures = 10
+failed_assets_usd = 133000000
+
+[[row]]
+year = 1980
+failures = 22
+failed_assets_usd = 9541000000
+
+[[row]]
+year = 1981
+failures = 40
+failed_assets_usd = 17590000000
+
+[[row]]
+year = 1982
+failures = 119
+failed_assets_usd = 39840000000
+
+[[row]]
+year = 1983
+failures = 99
+failed_assets_usd = 17300000000
+
+[[row]]
+year = 1984
+failures = 106
+failed_assets_usd = 49000000000
+
+[[row]]
+year = 1985
+failures = 180
+failed_assets_usd = 32680000000
+
+[[row]]
+year = 1986
+failures = 204
+failed_assets_usd = 25270000000
+
+[[row]]
+year = 1987
+failures = 262
+failed_assets_usd = 24450000000
+
+[[row]]
+year = 1988
+failures = 470
+failed_assets_usd = 152000000000
+
+[[row]]
+year = 1989
+failures = 534
+failed_assets_usd = 164100000000
+
+[[row]]
+year = 1990
+failures = 382
+failed_assets_usd = 146600000000
+
+[[row]]
+year = 1991
+failures = 271
+failed_assets_usd = 143500000000
+
+[[row]]
+year = 1992
+failures = 181
+failed_assets_usd = 89590000000
+
+[[row]]
+year = 1993
+failures = 50
+failed_assets_usd = 9977000000
+
+[[row]]
+year = 1994
+failures = 15
+failed_assets_usd = 1601000000
+
+[[row]]
+year = 1995
+failures = 8
+failed_assets_usd = 1226000000
+
+[[row]]
+year = 1996
+failures = 6
+failed_assets_usd = 232600000
+
+[[row]]
+year = 1997
+failures = 1
+failed_assets_usd = 27920000
+
+[[row]]
+year = 1998
+failures = 3
+failed_assets_usd = 290200000
+
+[[row]]
+year = 1999
+failures = 8
+failed_assets_usd = 1592000000
+
+[[row]]
+year = 2000
+failures = 7
+failed_assets_usd = 410200000
+
+[[row]]
+year = 2001
+failures = 4
+failed_assets_usd = 1822000000
+
+[[row]]
+year = 2002
+failures = 11
+failed_assets_usd = 2873000000
+
+[[row]]
+year = 2003
+failures = 3
+failed_assets_usd = 947300000
+
+[[row]]
+year = 2004
+failures = 4
+failed_assets_usd = 170100000
+
+[[row]]
+year = 2007
+failures = 3
+failed_assets_usd = 2615000000
+
+[[row]]
+year = 2008
+failures = 30
+failed_assets_usd = 1678000000000
+
+[[row]]
+year = 2009
+failures = 148
+failed_assets_usd = 2087000000000
+
+[[row]]
+year = 2010
+failures = 157
+failed_assets_usd = 92080000000
+
+[[row]]
+year = 2011
+failures = 92
+failed_assets_usd = 34920000000
+
+[[row]]
+year = 2012
+failures = 51
+failed_assets_usd = 11620000000
+
+[[row]]
+year = 2013
+failures = 24
+failed_assets_usd = 6044000000
+
+[[row]]
+year = 2014
+failures = 18
+failed_assets_usd = 2914000000
+
+[[row]]
+year = 2015
+failures = 8
+failed_assets_usd = 6706000000
+
+[[row]]
+year = 2016
+failures = 5
+failed_assets_usd = 277200000
+
+[[row]]
+year = 2017
+failures = 8
+failed_assets_usd = 5082000000
+
+[[row]]
+year = 2019
+failures = 4
+failed_assets_usd = 208800000
+
+[[row]]
+year = 2020
+failures = 4
+failed_assets_usd = 455000000
+
+[[row]]
+year = 2023
+failures = 5
+failed_assets_usd = 532200000000
+
+[[row]]
+year = 2024
+failures = 2
+failed_assets_usd = 5974000000
+
+[[row]]
+year = 2025
+failures = 2
+failed_assets_usd = 126400000
+
+[[row]]
+year = 2026
+failures = 4
+failed_assets_usd = 643700000
+

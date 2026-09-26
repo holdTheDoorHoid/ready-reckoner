@@ -31,6 +31,8 @@
 //! - [`effect`]: [`Effect`], [`DurationDist`] and [`HouseholdEventRate`].
 //! - [`data`]: data-pack records ([`CountyRecord`], [`BaseRate`]); engine-internal.
 //! - [`exposure`]: data pack v2 exposure records ([`CountyExposure`], [`ZipRecord`]); engine-internal.
+//! - [`calibration`]: data-pack v2 calibration records (outage model, stress event, restoration
+//!   curves, temperature shares, reliability, declarations); engine-internal.
 //! - [`api`]: [`Envelope`], [`EngineError`], and the other function arguments and results.
 //! - [`date`], [`math`], [`rng`], [`fixtures`].
 #![forbid(unsafe_code)]
@@ -40,6 +42,7 @@
 mod macros;
 
 pub mod api;
+pub mod calibration;
 pub mod content;
 pub mod data;
 pub mod date;
@@ -54,6 +57,7 @@ pub mod rng;
 pub mod validate;
 
 pub use api::*;
+pub use calibration::*;
 pub use content::*;
 pub use data::*;
 pub use date::*;

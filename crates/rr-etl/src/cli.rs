@@ -8,7 +8,7 @@ pub const USAGE: &str = "\
 rr-etl — build Ready Reckoner's data packs from public sources
 
 USAGE:
-    rr-etl refresh --out <DIR> [--only <JOB>[,<JOB>...]] [--optional] [--keep-raw]
+    rr-etl refresh --out <DIR> [--only <JOB>[,<JOB>...]] [--optional] [--keep-raw] [--keep-intermediate]
     rr-etl verify --data <DIR>
     rr-etl jobs
 
@@ -27,7 +27,9 @@ OPTIONS:
                           (heavy one-off builds of optional packs) run only when named here
                           or with --optional.
     --optional            With no --only: run every job, the optional ones included.
-    --keep-raw            Keep raw downloads under <DIR>/raw/.
+    --keep-raw            Keep raw downloads under <DIR>/raw/ (implies --keep-intermediate).
+    --keep-intermediate   Keep the files jobs hand to later jobs (<DIR>/raw/intermediate/, a few
+                          tens of MB) so a later `--only` run of a downstream job can use them.
 ";
 
 /// A parsed command.
@@ -43,6 +45,8 @@ pub enum Command {
         optional: bool,
         /// Keep raw downloads.
         keep_raw: bool,
+        /// Keep the intermediate files handed between jobs.
+        keep_intermediate: bool,
     },
     /// `verify`.
     Verify {
@@ -64,6 +68,7 @@ pub fn parse(args: &[String]) -> Result<Command> {
     let mut only = Vec::new();
     let mut keep_raw = false;
     let mut optional = false;
+    let mut keep_intermediate = false;
     let mut i = 1;
     while i < args.len() {
         let a = args[i].as_str();
@@ -90,6 +95,7 @@ pub fn parse(args: &[String]) -> Result<Command> {
             ),
             "--keep-raw" => keep_raw = true,
             "--optional" => optional = true,
+            "--keep-intermediate" => keep_intermediate = true,
             "-h" | "--help" => return Ok(Command::Help),
             other => return Err(data_err(format!("unknown option {other}\n\n{USAGE}"))),
         }
@@ -101,6 +107,7 @@ pub fn parse(args: &[String]) -> Result<Command> {
             only,
             optional,
             keep_raw,
+            keep_intermediate,
         }),
         "verify" => Ok(Command::Verify {
             data: dir.ok_or_else(|| data_err("verify needs --data <DIR>"))?,
@@ -136,7 +143,8 @@ mod tests {
                 out: "data".into(),
                 only: vec!["nri".into(), "geography".into()],
                 optional: false,
-                keep_raw: true
+                keep_raw: true,
+                keep_intermediate: false
             }
         );
         let c = parse(&s(&[
@@ -153,7 +161,8 @@ mod tests {
                 out: "data".into(),
                 only: vec!["nri".into(), "flood".into()],
                 optional: false,
-                keep_raw: false
+                keep_raw: false,
+                keep_intermediate: false
             }
         );
     }

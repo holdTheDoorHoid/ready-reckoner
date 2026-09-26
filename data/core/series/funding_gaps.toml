@@ -1,0 +1,226 @@
+# Federal funding gaps and shutdowns since fiscal year 1977 (CRS RS20348). Written by rr-etl (job `series`); see docs/DATA_SOURCES.md.
+
+id = "funding_gaps"
+title = "Federal funding gaps and shutdowns since fiscal year 1977 (CRS RS20348)"
+publisher = "Congressional Research Service (J. V. Saturno), with the House Historian's shutdown column"
+url = "https://www.congress.gov/crs-product/RS20348"
+licence = "CRS reports are works of the US Government, not subject to copyright"
+attribution = ""
+source = "crs_rs20348_funding_gaps"
+retrieved = "2026-09-26"
+how = "transcribed"
+notes = [
+  "Table 1 of CRS RS20348, version 48 (updated 2026-05-26), read from https://www.everycrsreport.com/files/2026-05-26_RS20348_07052cf62f659c4b684f1ad762c81b435dedb6e4.pdf (congress.gov refuses scripted clients); the furlough column from the House Historian's table (https://history.house.gov/Institution/Shutdown/Government-Shutdowns/). Full days as CRS counts them: days with no budget authority, from the day after authority lapsed to the day before new funding was enacted.",
+  "Before the Attorney General's opinions of 1980 and 1981 (Civiletti), agencies kept working through lapses; rates use fiscal years 1982-2026. The overnight lapse of February 2018 is not in the CRS table.",
+]
+
+[[rate]]
+id = "funding_gap_ge_14d_per_year"
+value = 0.08889
+unit = "chance a fiscal year has a federal funding gap of 14 full days or more"
+low = 0.03036
+high = 0.2034
+year = 2026
+period = "FY1982-FY2026"
+figure = "4 of 45 fiscal years (FY1996, FY2014, FY2019, FY2026)"
+derivation = "4 / 45; range = exact Poisson 90% interval on 4 events"
+note = "Long lapses delay pay for federal workers and contractors and can delay benefits run by the lapsed agencies."
+unverified = false
+
+[[rate]]
+id = "shutdown_with_furloughs_per_year"
+value = 0.1778
+unit = "funding gaps with widespread furloughs per year"
+low = 0.08846
+high = 0.3208
+year = 2026
+period = "FY1982-FY2026"
+figure = "8 gaps with widespread furloughs in 45 fiscal years"
+derivation = "8 / 45; range = exact Poisson 90% interval"
+note = "Limited furloughs (a half day, a weekend of closed parks, one department) are not counted."
+unverified = false
+
+[[row]]
+fiscal_year = 1977
+first_day = "1976-10-01"
+funding_enacted = "1976-10-11"
+full_days = 10
+furloughs = "no"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1978
+first_day = "1977-10-01"
+funding_enacted = "1977-10-13"
+full_days = 12
+furloughs = "no"
+scope = "partial (Labor-HEW)"
+
+[[row]]
+fiscal_year = 1978
+first_day = "1977-11-01"
+funding_enacted = "1977-11-09"
+full_days = 8
+furloughs = "no"
+scope = "partial (Labor-HEW)"
+
+[[row]]
+fiscal_year = 1978
+first_day = "1977-12-01"
+funding_enacted = "1977-12-09"
+full_days = 8
+furloughs = "no"
+scope = "partial (Labor-HEW)"
+
+[[row]]
+fiscal_year = 1979
+first_day = "1978-10-01"
+funding_enacted = "1978-10-18"
+full_days = 17
+furloughs = "no"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1980
+first_day = "1979-10-01"
+funding_enacted = "1979-10-12"
+full_days = 11
+furloughs = "no"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1982
+first_day = "1981-11-21"
+funding_enacted = "1981-11-23"
+full_days = 2
+furloughs = "yes"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1983
+first_day = "1982-10-01"
+funding_enacted = "1982-10-02"
+full_days = 1
+furloughs = "limited"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1983
+first_day = "1982-12-18"
+funding_enacted = "1982-12-21"
+full_days = 3
+furloughs = "no"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1984
+first_day = "1983-11-11"
+funding_enacted = "1983-11-14"
+full_days = 3
+furloughs = "no"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1985
+first_day = "1984-10-01"
+funding_enacted = "1984-10-03"
+full_days = 2
+furloughs = "no"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1985
+first_day = "1984-10-04"
+funding_enacted = "1984-10-05"
+full_days = 1
+furloughs = "limited"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1987
+first_day = "1986-10-17"
+funding_enacted = "1986-10-18"
+full_days = 1
+furloughs = "limited"
+scope = "full"
+
+[[row]]
+fiscal_year = 1988
+first_day = "1987-12-19"
+funding_enacted = "1987-12-20"
+full_days = 1
+furloughs = "no"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1991
+first_day = "1990-10-06"
+funding_enacted = "1990-10-09"
+full_days = 3
+furloughs = "limited"
+scope = "full"
+
+[[row]]
+fiscal_year = 1996
+first_day = "1995-11-14"
+funding_enacted = "1995-11-19"
+full_days = 5
+furloughs = "yes"
+scope = "partial"
+
+[[row]]
+fiscal_year = 1996
+first_day = "1995-12-16"
+funding_enacted = "1996-01-06"
+full_days = 21
+furloughs = "yes"
+scope = "partial"
+
+[[row]]
+fiscal_year = 2014
+first_day = "2013-10-01"
+funding_enacted = "2013-10-17"
+full_days = 16
+furloughs = "yes"
+scope = "full"
+
+[[row]]
+fiscal_year = 2018
+first_day = "2018-01-20"
+funding_enacted = "2018-01-22"
+full_days = 2
+furloughs = "yes"
+scope = "full"
+
+[[row]]
+fiscal_year = 2019
+first_day = "2018-12-22"
+funding_enacted = "2019-01-25"
+full_days = 34
+furloughs = "yes"
+scope = "partial"
+
+[[row]]
+fiscal_year = 2026
+first_day = "2025-10-01"
+funding_enacted = "2025-11-12"
+full_days = 42
+furloughs = "yes"
+scope = "full"
+
+[[row]]
+fiscal_year = 2026
+first_day = "2026-01-31"
+funding_enacted = "2026-02-03"
+full_days = 3
+furloughs = "yes"
+scope = "partial"
+
+[[row]]
+fiscal_year = 2026
+first_day = "2026-02-14"
+funding_enacted = "2026-04-30"
+full_days = 75
+furloughs = "limited"
+scope = "Homeland Security only"
+

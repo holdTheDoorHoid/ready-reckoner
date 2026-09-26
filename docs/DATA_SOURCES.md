@@ -15,7 +15,7 @@ water systems, storm surge, eviction, dust storms, optional packs).
 ## 1. Building and loading
 
 ```
-cargo run -p rr-etl -- refresh --out data [--only <job>[,<job>]] [--optional] [--keep-raw]
+cargo run -p rr-etl -- refresh --out data [--only <job>[,<job>]] [--optional] [--keep-raw] [--keep-intermediate]
 cargo run -p rr-etl -- verify --data data
 cargo run -p rr-etl -- jobs
 ```
@@ -23,16 +23,25 @@ cargo run -p rr-etl -- jobs
 - **Jobs** (run order): `geography`, `nri`, `outages`, `events`, `seismic`, `climate`, `flood`,
   `strategic`, `geomag`, `ground`, `levees`, `water_systems`, `smoke`, `facilities`,
   `surge_proxy`, `eviction`, `surge` (optional), `wildfire_places` (optional), `vulnerability`,
-  `base_rates`. Later jobs read the county list and the Connecticut crosswalk written by
-  `geography`; `facilities` reads `core/strategic_sites.toml` (written by `strategic`) and
-  `surge_proxy` reads the NRI and events packs.
+  `base_rates`, `series`, `outage_model`, `climate_daily`, `reliability`, `displacement`. Later
+  jobs read the county list and the Connecticut crosswalk written by `geography`; `facilities`
+  reads `core/strategic_sites.toml` (written by `strategic`) and `surge_proxy` reads the NRI and
+  events packs.
 - **Optional jobs** (`default: false`) build optional packs under `data/opt/<pack>/` and are left
   out of a plain `refresh` (and so of the quarterly Action): name them with `--only`, or add
   `--optional` to a full run. `surge` downloads 0.25 GB of NHC map archives, one at a time, and
   takes about three minutes; `wildfire_places` builds a pack the core does not need (§13).
+  `outage_model` is a default job: it writes core files and the optional pack `outage_events`.
 - **Owner sign-offs.** `manifest.json` has a `sign_offs` section that refreshes keep as they are.
   A job gated on a key writes its output only when `approved` is true (today: `eviction`, key
   `eviction_lab_odc_by`, §13.10). Only a person flips it.
+- **Intermediate files.** `outages` hands every repaired outage event, each unit's months of data
+  and the outage customer-hours per local day to `outage_model` and `climate_daily`; `events` hands
+  the 2014+ Storm Events county-episodes (UTC) and the HURDAT2 fixes with their times to
+  `outage_model`; `series` hands the OE-417 reports to `outage_model`. They live in
+  `data/raw/intermediate/` (about 20 MB, git-ignored) and are deleted at the end of a refresh unless
+  `--keep-raw` or `--keep-intermediate` is given, so `--only outage_model` works only after a run
+  that kept them.
 - **Raw inputs are not kept.** Small sources are held in memory; the 11.6 GB of EAGLE-I outage
   files are streamed from figshare and parsed on the fly; the three USGS hazard-curve grid ZIPs
   (0.9 GB for the contiguous US) are written to `data/raw/seismic/` only while they are read (a
@@ -145,7 +154,7 @@ yearly chance) and `notes`. The traps it records:
 | Column | Meaning |
 | --- | --- |
 | `events_per_customer_year` | Customer outages in qualifying events, per customer per year of data |
-| `p_ge_1d`, `p_ge_3d`, `p_ge_7d`, `p_ge_14d` | Share of those customer outages lasting at least 1, 3, 7, 14 days |
+| `p_ge_1d`, `p_ge_3d`, `p_ge_7d`, `p_ge_14d`, `p_ge_30d` | Share of those customer outages lasting at least 1, 3, 7, 14, 30 days (`p_ge_30d` since 2026-09-26) |
 | `median_hours`, `p90_hours` | Median and 90th-percentile customer outage length |
 | `years_covered` | First–last year with data, e.g. `2014-2025` |
 | `years_of_data` | Months with at least one EAGLE-I record ÷ 12 (the rate's denominator) |
@@ -303,6 +312,105 @@ id from the content registry (`docs/CITATION_IDS.md`; one id per source): `censu
 `census_popest_vintage_2025` (each `[[publication]]` gives the title, publisher and URL for the
 content layer).
 
+### Data-pack v2 calibration files (job `outage_model`, `climate_daily`, `reliability`, `displacement`, `series`)
+
+Added 2026-09-26 for v0.2.0 (the `data-model` workstream). Every county file is keyed `fips` over
+the canonical counties, lists the counties it lacks under its job's `missing` reasons, and loads
+into `CountyRecord` fields defined in `rr_types::calibration` (`outage_model`, `temperature`,
+`reliability`, `declarations`). Sizes are gzip -9.
+
+| File | Rows | gz | What it holds |
+| --- | --- | --- | --- |
+| `core/outage_pooled.csv` | 3,209 | 78.6 KB | regional pooled outage tail and credibility weights (§5.3) |
+| `core/outage_causes.csv` | 3,153 | 39.5 KB | share of recorded outages by cause (§5.2) |
+| `core/outage_curves.csv` | 102 | 2.8 KB | pooled restoration curves by region and cause, restoration factors (§5.5) |
+| `core/outage_stress.csv` | 3,186 | 30.4 KB | worst outage event in each county's region (§5.5) |
+| `core/temperature.csv` | 3,107 | 83.8 KB | heat and cold days by month; outage hours on hot and cold days |
+| `core/reliability.csv` | 3,174 | 25.8 KB | utility SAIDI and SAIFI (EIA-861 2015–2024) |
+| `core/declarations.csv` | 3,232 | 14.1 KB | major-disaster declarations per county (OpenFEMA) |
+| `core/series/*.toml` (7 files) | 532 entries | 13.2 KB | national series (below) |
+
+These add **288 KB** gzipped to the core pack, which now totals **2.67 MB** gzipped file by file on this branch (budget 5 MB).
+
+**core/outage_pooled.csv** — the regional pooled outage tail (§5.3): `basis` (`blend`,
+`region_only` for counties with no record of their own, `own_only` where no neighbour has one),
+`rate` (customer outages per customer-year in the pool, all lengths), `lam_ge_1d` … `lam_ge_30d`
+(blended rate of customer outages lasting at least 1, 3, 7, 14 and 30 days, per customer-year),
+`z_1d` … `z_30d` (the weight on the county's own record at each length) and `region_counties`
+(neighbours with records inside the 400 km radius). Rates cover the outages the model does not
+carry in rows of its own: those attributed to hurricanes, wildfires, floods, cold-driven grid
+emergencies and other grid failures are left out (their shares are in `outage_causes.csv`).
+Three significant figures for rates, two for weights.
+
+**core/outage_causes.csv** — share of the county's recorded customer outages by cause (§5.2):
+`hurricane_share`, `ice_share`, `winter_share`, `wind_share`, `wildfire_share`, `heat_share`,
+`cold_grid_share`, `flood_share`, `grid_share`, `unattributed_share` (all lengths), and for the five
+causes outside the pool the share of outages lasting a day or more (`hurricane_share_ge_1d` …).
+Shares under half a percent are written as 0.
+
+**core/outage_curves.csv** — pooled restoration curves by `region` (NCA5 region, `puerto_rico`,
+`virgin_islands`, or `mainland` = the contiguous US) and `class` (a cause, `all`, or
+`historic:<id>` for a hand-copied event): `events` (major county events pooled: at least 10% of the
+county's customers and 2,000 customers out at the peak), `customers` (their summed peaks), `s_1d` …
+`s_30d` (peak-weighted mean share of the peak still out that many days after the peak),
+`t50_days`, `t90_days` (peak-weighted median days until half and nine in ten are back) and `factor`
+(t90 over the mainland's for the same cause, bounded 0.5–5: the restoration factor of M-10).
+
+**core/outage_stress.csv** — the worst outage event in each county's region (§5.5): `event` (display
+name), `class`, `cause` (HURDAT2 storm id or Storm Events type), `date` (UTC date the county outage
+began), `recorded_in` (the county whose curve it is), `distance_km`, `peak_share` (share of that
+county's customers out at the peak), `s_1d` … `s_30d` (share of the peak still out), `source`
+(`eaglei`, or `historic:<id>` for a hand-copied event from `crates/rr-etl/data/historic_outages.toml`).
+
+**core/temperature.csv** — NOAA nClimGrid-Daily (public domain), contiguous US: `tmax_ge_90f_MM`,
+`tmax_ge_100f_MM`, `tmin_le_20f_MM`, `tmin_le_0f_MM` for months 01–12 (share of days, 1991–2020,
+whole percentage points), and `outage_hot_share`, `outage_cold_share` (share of the county's EAGLE-I
+event customer-hours 2014–2025 on days with a county-average high of at least 95 °F / a low of at
+most 20 °F) with `region_outage_hot_share`, `region_outage_cold_share` (the same, customer-hour
+weighted over the county and every county within 400 km). nClimGrid's county code is NCEI's
+alphabetical state number followed by the county FIPS (`02001` is Apache County, **Arizona**), so the
+state is taken from the abbreviation in the file's name column. Connecticut's eight old counties
+are converted by land share. Alaska, Hawaii and the territories have no nClimGrid series.
+
+**core/reliability.csv** — EIA-861 (public domain), 2015–2024: `saidi_with_med_min`,
+`saifi_with_med`, `saidi_without_med_min`, `saifi_without_med`, `utility_years`. Per year, a county's
+value is the mean over the utilities EIA lists as serving it, each weighted by its customers divided
+evenly over its counties (EIA publishes no customer split by county); IEEE 1366 values where the
+utility reports them, otherwise its other method; the published value is the mean over the years.
+The 2014 service-territory file is in the old binary Excel format and is not read.
+
+**core/declarations.csv** — OpenFEMA Disaster Declarations Summaries v2: `last_5yr` (major-disaster
+declarations, type DR, that designated the county in the five full years before the build),
+`since_2000`, `with_individual_assistance`, `hurricane_or_flood` (hurricane, tropical storm or
+depression, typhoon, coastal storm, flood). One count per disaster per county; statewide and tribal
+designations are not counted; Connecticut declarations on the old counties count for every planning
+region they overlap. This is `RecoveryInfo.county_declarations_5yr`.
+
+**core/series/*.toml** — national series, one file per source, each with a header (`title`,
+`publisher`, `url`, `licence`, `attribution`, `source` citation id, `retrieved`, `how` = `fetched`
+or `transcribed`, `notes`), `[[rate]]` entries (value, unit, optional `low`/`high`, `year`,
+`period`, the `figure` it comes from, the `derivation`, `note`, and `unverified` for hand-copied
+figures not re-checked) and `[[row]]` entries holding the table behind the rates:
+
+| File | Source (licence) | How | Rates |
+| --- | --- | --- | --- |
+| `drug_shortages.toml` | U.S. Food and Drug Administration (openFDA) (CC0 1.0 (https://open.fda.gov/license/)) | fetched | `drug_shortages_current` |
+| `fbi_arrests.toml` | Federal Bureau of Investigation, Uniform Crime Reporting Program (Crime Data Explorer) (US Government work, public domain (17 U.S.C. 105)) | fetched | `arrests_per_100k_female_10_17`, `arrests_per_100k_female_18_24`, `arrests_per_100k_female_25_34`, `arrests_per_100k_female_35_44`, `arrests_per_100k_female_45_54`, `arrests_per_100k_female_55_64` and 10 more |
+| `fcc_dirs.toml` | Federal Communications Commission, Public Safety and Homeland Security Bureau (US Government work, public domain (17 U.S.C. 105)) | transcribed | `cell_sites_out_peak_area_share_median`, `cell_sites_out_worst_county_share_median`, `cell_sites_days_until_under_5pct_median` |
+| `fdic_failures.toml` | Federal Deposit Insurance Corporation (US Government work, public domain (17 U.S.C. 105)) | fetched | `bank_failures_per_year`, `bank_failure_cluster_year_share` |
+| `funding_gaps.toml` | Congressional Research Service (J. V. Saturno), with the House Historian's shutdown column (CRS reports are works of the US Government, not subject to copyright) | transcribed | `funding_gap_ge_14d_per_year`, `shutdown_with_furloughs_per_year` |
+| `ihp_displacement.toml` | Federal Emergency Management Agency (OpenFEMA) (OpenFEMA Terms and Conditions (public data; citation and statement required)) | fetched | `ihp_rental_assistance_per_approved_usd_earthquake`, `ihp_rental_assistance_per_approved_usd_fire`, `ihp_rental_assistance_per_approved_usd_flood`, `ihp_rental_assistance_per_approved_usd_hurricane`, `ihp_rental_assistance_per_approved_usd_landslide`, `ihp_rental_assistance_per_approved_usd_other` and 3 more |
+| `oe417.toml` | Pacific Northwest National Laboratory (from DOE OE-417 reports and ORNL EAGLE-I) (CC BY 4.0) | fetched | `grid_weather_reports_per_year`, `grid_operations_reports_per_year`, `grid_physical_attack_reports_per_year`, `grid_suspicious_activity_reports_per_year`, `grid_cyber_reports_per_year`, `grid_fuel_supply_reports_per_year` |
+
+**Optional pack `outage_events`** (issue #15; `opt/outage_events/`, loaded only by the expert views
+and the validation page): `county_events.csv` — every county event that left at least 0.25% of the
+county's customers (and at least 5) out for a day or more: `county_fips`, `start` (UTC), `class`,
+`cause` (storm id or Storm Events type), `peak_share`, `s_1d` … `s_30d`, `ge_1d_share` and
+`ge_7d_share` (customer outages of a day / a week or more, per county customer); Puerto Rico's
+island-wide series is filed once under San Juan (72127) and `rr-data` serves it for every municipio.
+`holdout.csv` — the held-out test of §5.4 (split, length, estimator, measure, reliability bin,
+predicted, observed, n). Sizes: `county_events.csv` 29,878 rows, 356 KB gzipped; `holdout.csv` 130 rows, 1.6 KB gzipped.
+
 ### geo/counties.json (3,222 features)
 
 GeoJSON FeatureCollection; feature `id` = FIPS; properties `name`, `state`, `lat`, `lon` (internal
@@ -343,11 +451,14 @@ This is the empirical duration data for the `power` bucket, so the definition is
 **Definition.** An outage event starts when at least **1%** of the county's electricity customers
 (minimum 10) are reported without power in EAGLE-I's 15-minute snapshots, needs at least **one
 hour** at that level, and lasts until fewer than **0.25%** (minimum 5) remain out; dips or missing
-snapshots of up to **2 hours** are bridged. Inside an event, reversals smaller than half of the
-current peak or trough (or smaller than the 1% level) are treated as reporting noise. Customers are
-assumed to be restored **in the order they lost power**, which splits each event's customer-hours
-into individual outage lengths. Rates are customer outages in such events per customer per year of
-data.
+snapshots of up to **2 hours** are bridged, and up to **72 hours** when the event had been at the 1%
+level for six hours, held it for the hour before the gap and holds at least half of that level for
+an hour after it (§5.1). Inside an event the counts are repaired
+before durations are read (§5.1), and reversals smaller than half of the current peak or trough
+(or smaller than the 1% level) are treated as reporting noise. Customers are assumed to be restored
+**in the order they lost power**, which splits each event's customer-hours into individual outage
+lengths, except that customers still out N days after the peak count as out at least N days.
+Rates are customer outages in such events per customer per year of data.
 
 **Why this shape.** The research precedent (Do et al. 2023, *Nature Communications* 14:2470,
 PowerOutage.us data) counts time with at least 0.1% of county customers out. We start higher (1%)
@@ -362,20 +473,209 @@ over eight days; most households were restored within three.
 **Why the noise filter.** Scraped outage counts flicker (a map refresh drops and re-adds thousands
 of customers). Without filtering, each flicker reads as customers restored and new customers out,
 which inflates outage counts and truncates long outages. The filter keeps genuine second waves (a
-second storm) and removes flicker; on the 2023 test year it changed customer-hours by under 2%
-while restoring the multi-day tail (Wayne County: share of outages lasting 3+ days from 3% to
-14%, consistent with the raw curve). Assuming last-out-first-restored instead raises the multi-day shares by up to about a third in
-the hardest-hit counties, so the ordering assumption matters at the margin, not in kind.
+second storm) and removes flicker. Assuming last-out-first-restored instead raises the multi-day
+shares by up to about a third in the hardest-hit counties, so the ordering assumption matters at the
+margin, not in kind.
 
 **Denominators.** Years of data count months with at least one record (EAGLE-I lists only
 snapshots with someone out); state-years in 2018–2022 with under 50% customer coverage (ORNL's
 coverage history) are dropped (Montana 2018, Nebraska 2018–2022, South Dakota 2018). Customers are
 the larger of ORNL's modelled count and the county's households (§10).
 
-**Result, nationally.** Weighting counties by customers, a customer has about 0.05 outages a year
-lasting at least a day and about 0.011 lasting at least three days. The median county records 5.8
-hours of outage per customer per year, close to EIA's national interruption figures with major
-events.
+**Result, nationally.** Weighting counties by customers, a customer has about 0.055 outages a year lasting at least a day and about 0.0135 lasting at least three days (the unrepaired record said 0.05 and 0.011). The median county records 5.8 hours of outage per customer per year, close to EIA's national interruption figures with major events.
+
+### 5.1 Repairing reporting dropouts (model review M-02; 2026-09-26)
+
+EAGLE-I's county count is the sum of the utilities' outage maps, scraped every 15 minutes. During
+the storms that matter most, a utility is often missing from a scrape: the count drops by most of
+the outage for 15 minutes to a few hours, or a map fails for days. Some snapshots count a utility
+twice, and some are stale: a utility's last figure repeated for an hour or a day. In Buncombe County during Helene the count fell from about 115,000 to about 9,700 for a
+quarter of an hour every hour or two and doubled now and then; read as it stands, each drop was
+"everyone restored" and each return "everyone cut off again", so first-out-first-restored turned a
+two-week outage into about 9.7 million "customer outages" among 181,000 customers, none lasting a week, while about 9,300 customers were still out on day 17 (Blue Ridge Public Radio, 14 October 2024). The fix, inside each event:
+
+1. A gap or dip longer than 2 hours is bridged up to 72 hours when the event had been at the 1%
+   level for at least six hours, held it for the hour before the gap, and holds at least half of that
+   level for an hour after it; readings under half of the level inside the gap (the utilities still
+   reporting while the big one is missing) are dropped, so the level carries across. Hurricane
+   Michael's restoration in Jackson County, Florida, has a day of readings of about 9 customers and
+   two days of scattered readings while about 10,000 customers were still out. The six-hour and
+   one-hour conditions keep stale readings from being bridged: in June 2019 Cherokee County,
+   Alabama, read 1 or 2 customers out for days, broken by one-hour plateaus of 510 and 506 at the
+   same hour each morning; an earlier version of this rule, which asked only that the count before
+   the gap reach 1% and the first reading after it reach half, joined them into a six-day outage
+   and added customer-hours in about 1,400 small and mid-sized counties.
+2. Where the 3-hour running median shows a sustained outage, counts more than 1.5 times the median
+   are cut to it (reports counted twice).
+3. Dips narrower than 24 hours are filled to the level around them (a morphological closing, which
+   leaves onsets and restorations unchanged).
+4. The reversal filter and first-out-first-restored then run as before, except that customers
+   still out N days after the peak are counted as out at least N days (the event's own curve is a
+   floor on the per-customer tail): a second wave after the peak otherwise makes first-out-first-
+   restored retire the earliest customers first (Irma in Baker County, Florida: 300 customers out
+   for a week after the peak read as none).
+
+Effect on the committed pack (before → after):
+
+| | Before | After |
+| --- | --- | --- |
+| Buncombe NC (Helene): outages per customer-year; share lasting 3 / 7 / 14 days | 10.06; 0.5% / 0 / 0 | 0.96; 9.0% / 7.4% / 2.5% |
+| Harris TX (Uri, Beryl): outages per customer-year; share lasting 3 / 7 / 14 days | 1.06; 3.1% / 0.2% / 0 | 0.23; 21.1% / 4.6% / 0 |
+| Linn IA (derecho): outages per customer-year; share lasting 3 / 7 / 14 days | 0.55; 11.6% / 4.3% / 0 | 0.34; 19.7% / 10.6% / 0.4% |
+| Jackson FL (Michael): outages per customer-year; share lasting 3 / 7 / 14 days | 0.82; 3.8% / 2.2% / 0 | 0.53; 7.8% / 4.8% / 3.9% |
+| Counties with an event of a week or more but no week-long customer outage | 336 of 761 | 99 of 799 |
+| Counties with an event of two weeks or more but no two-week customer outage | 126 of 272 | 36 of 274 |
+| Counties with more than 3 outages a customer-year and a median of 2 hours or less (flicker) | 128 | 16 |
+
+Across all counties the repair bridged 9,050 gaps in 1,929 counties, and inside events the repaired
+series holds 7% more customer-hours than the recorded snapshots (median county +5%, 90th percentile
++12%; the manifest's `outages` notes). Events of two storms less than a day apart now merge, and a
+genuine restoration followed within three days by a return to half the previous level that holds
+for an hour reads as one outage: both err toward longer outages. Each event is also recorded (optional pack) with its **restoration curve**: the share of
+the peak still out 1, 2, 3, 5, 7, 10, 14, 21, 30, 60 and 90 days after the peak, the running minimum
+of the repaired count, so a customer counted at day N had been out at least N days (the lower bound
+M-02 proposes). `rr-etl verify` checks that every county whose event kept at least 1% of its
+customers out for a week shows week-long customer outages (on the committed pack it passes for
+every county).
+
+### 5.2 Cause attribution (M-10, M-18)
+
+EAGLE-I has no cause field. Each county event is matched, in order, to:
+
+1. a **tropical cyclone** when a HURDAT2 track point of at least 34 kt (fixes interpolated hourly;
+   the ETL used to discard their times) passes within 300 km of the county's internal point between
+   36 hours before the outage began and 24 hours after it reached its peak (capped at two days after
+   the start), so rain ahead of a storm does not hide it (Helene's outage in Buncombe began on
+   25 September 2024 and peaked on the 27th);
+2. otherwise the highest-priority **NOAA Storm Events** episode in the county or its forecast zone
+   (times now converted to UTC from `CZ_TIMEZONE`) overlapping the six hours before the start to two
+   hours after the rise: tropical types, ice, tornado and thunderstorm wind, winter storm, wildfire,
+   high wind, flood, lightning and hail, heat, cold. A winter, ice or cold match that coincides with
+   a DOE OE-417 load-shed, energy-emergency, fuel-supply or system-operations report in the same
+   state (span within a day of the rise) becomes **cold_grid** (the February 2021 Texas blackout);
+3. otherwise an OE-417 report that is not weather (operations, transmission, attack, cyber, fuel) in
+   the same state within a day: **grid**;
+4. otherwise **unattributed** ("power cuts, cause not recorded").
+
+On the committed pack: 571,912 county events read; 7,467 matched to a tropical cyclone track, 88,595
+to Storm Events episodes, 14,025 to an OE-417 grid disturbance, the rest are "cause not recorded".
+Of the 857 events with customers still out a week after the peak, 619 (72%) are attributed. 453,587
+Storm Events county-episodes and 467 tropical cyclones (2014 onward) were available.
+The OE-417 reports come from PNNL's linkage file (CC BY 4.0, credited in §7),
+which links reports to states and times, not places: a large state's report can touch an unrelated
+county's outage.
+
+### 5.3 Regional pooled tails with credibility weights (M-01)
+
+A county's own twelve years rarely hold the storm that sets a one-in-a-hundred target, so its long
+tail is blended with its region's. For each county *c* and length *d* (1, 3, 7, 14, 30 days):
+
+- λ_c(d) = customer outages lasting at least *d* days per customer per year in its own record
+  (first-out-first-restored on the repaired series), leaving out outages attributed to hurricanes,
+  wildfires, floods, cold_grid and grid, which the model carries in rows of their own;
+- λ_R(d) = the same rate over the county **and** every county within R(d) of it — **R = 400 km for
+  1 and 3 days, 800 km for 7, 14 and 30 days** — each weighted by customers × years of data ×
+  (1 − (distance / R)²)² (a biweight); separate island grids (Puerto Rico, the Virgin Islands,
+  Hawaii, Alaska) are never pooled with the mainland;
+- E_c(d) = the number of events reaching *d* days that a county with *c*'s years of data would
+  record at the pooled rate (an event reaches *d* days when at least 0.25% of the county's
+  customers, and at least 5, were out that long);
+- **Z = E / (E + k), k = 5** (the weight the model already gives five hurricane passages when it
+  shrinks a county's major-hurricane share), and **λ̂_c(d) = Z · λ_c(d) + (1 − Z) · λ_R(d)**.
+
+A county's record gets full weight only where it can be expected to hold many events of that
+length, so one extreme storm no longer sets its tail: Linn County, Iowa's record holds the 2020 derecho, about 0.036 customer outages of a week or more per customer-year; its weight at a week is Z = 0.022 and the blended rate 0.0014. Across the seven Iowa counties of M-01 (Linn, Johnson, Scott, Polk, Pottawattamie, Black Hawk, Woodbury) the blended three-day rate ranges 0.0071–0.0146 per customer-year, where their own records range 0.0000–0.0663.
+
+Choices were compared on the held-out test (§5.4, mean Poisson deviance of the blend, lower is
+better; development runs of 2026-09-26 on an earlier version of the repair, so the values differ
+slightly from §5.4):
+
+| Pooling | 2014–19 → 2020–25: 1 d / 3 d / 7 d / 14 d | even → odd years: 1 d / 3 d / 7 d / 14 d |
+| --- | --- | --- |
+| 250 km, same NCA5 region, county left out | 4.96 / 2.67 / 1.38 / 0.467 | 2.17 / 1.31 / 1.97 / 0.241 |
+| 250 km, same region, county included | 4.84 / 2.63 / 1.34 / 0.464 | 1.97 / 1.26 / 1.89 / 0.179 |
+| 250 km, distance only, county included | 4.49 / 2.40 / 1.26 / 0.443 | 1.97 / 1.27 / 1.86 / 0.178 |
+| 400 km, distance only | 4.39 / 1.96 / 1.08 / 0.388 | 2.02 / 1.24 / 1.77 / 0.155 |
+| 800 km, distance only | 4.47 / 1.89 / 0.73 / 0.307 | 2.11 / 1.29 / 1.78 / 0.151 |
+| **400 km (1, 3 d) and 800 km (7 d +)** | **4.39 / 1.96 / 0.73 / 0.307** | **2.02 / 1.24 / 1.78 / 0.151** |
+
+Leaving the county out of its own region (usual for validation, wrong for the estimate) made the
+county a record storm hit look safer than its neighbours. k from 2 to 20 changed little. Each row can
+be rerun with `RR_OUTAGE_POOL=radius_km,k,same_region,include_self[,radius_km_for_7d_and_longer]`
+and `refresh --only outage_model` after a run with `--keep-intermediate`; the manifest note records
+the pooling a build used. Because the
+radius was chosen on these two splits, §5.4's results for the chosen setting are slightly
+optimistic.
+
+### 5.4 Held-out test
+
+Fit on 2014–2019 and predict 2020–2025 (the brief's split), and fit on even years and predict odd
+years (not biased by the lower EAGLE-I coverage before 2018). Estimators: the county's own record,
+the region alone, and the blend. Mean Poisson deviance of each county's count of qualifying events
+(lower is better; a county-only estimate that saw no event of that length predicts none and is
+penalised when one comes), and observed ÷ predicted customer outages summed over all counties:
+
+| Split | Length | Deviance: county only / region only / blend | Observed ÷ predicted: county / region / blend |
+| --- | --- | --- | --- |
+| 2014–2019 → 2020–2025 | 1 d | 22.56 / 4.73 / **3.70** | 1.45 / 1.65 / 1.56 |
+| 2014–2019 → 2020–2025 | 3 d | 15.48 / 2.05 / **1.98** | 1.90 / 2.48 / 2.41 |
+| 2014–2019 → 2020–2025 | 7 d | 3.10 / 0.75 / **0.74** | 5.25 / 5.39 / 5.38 |
+| 2014–2019 → 2020–2025 | 14 d | 0.80 / 0.38 / **0.38** | 3.80 / 3.96 / 3.96 |
+| even years → odd years | 1 d | 7.90 / 3.12 / **1.98** | 1.04 / 1.09 / 1.05 |
+| even years → odd years | 3 d | 8.33 / 1.46 / **1.35** | 1.08 / 1.11 / 1.10 |
+| even years → odd years | 7 d | 3.17 / 1.84 / **1.83** | 1.02 / 1.04 / 1.03 |
+| even years → odd years | 14 d | 0.41 / 0.18 / **0.18** | 1.31 / 1.32 / 1.32 |
+
+Reading it: the blend beats the county's own record everywhere, by a factor of about four to eight
+at one and three days, and edges out the region alone. In the even/odd split, predicted and observed
+customer outages agree within about 10% at one to seven days. The 2014–2019 fit under-predicts
+2020–2025 at every length and for every estimator, by 1.5–1.6 times at one day and 1.9–5.4 times at
+three days and longer: EAGLE-I covered fewer utilities before 2018, and 2020–2025 held the derecho,
+Uri, Ida, Ian, Helene and Beryl.
+The reliability rows in `opt/outage_events/holdout.csv` (predicted yearly chance of a qualifying
+event against the share of county-years that had one) show the same (even → odd years; bins with
+at least 500 county-years):
+
+- 3+ days, predicted 3 to 10 in 100: 0.063 predicted against 0.070 observed (7,940 county-years)
+- 3+ days, predicted 10 to 30 in 100: 0.168 predicted against 0.150 observed (7,615 county-years)
+- 3+ days, predicted 30 in 100 or more: 0.478 predicted against 0.615 observed (865 county-years)
+- 7+ days, predicted under 1 in 100: 0.008 predicted against 0.022 observed (8,229 county-years)
+- 7+ days, predicted 1 to 3 in 100: 0.018 predicted against 0.015 observed (7,876 county-years)
+- 7+ days, predicted 3 to 10 in 100: 0.038 predicted against 0.057 observed (560 county-years)
+
+The smaller bins, all in `holdout.csv` and the manifest notes, are noisier: the 18 county-years
+given the highest week-long chances by the 2014–2019 fit (predicted 0.29–0.34) had one such event
+between them, and the 355 county-years it gave the lowest three-day chance (0.004) had 19 (the
+2014–2019 fit under-predicts, as above).
+
+### 5.5 Restoration curves, the island grids and the stress table
+
+**Pooled curves** (`outage_curves.csv`): on the mainland, hurricane 1,722 events, t50 1.4 and t90 3.8 days, 4.9% of the peak still out at a week; ice 354 events, t50 1.2 and t90 2.9 days, 4.9% of the peak still out at a week; winter 1,705 events, t50 0.7 and t90 1.8 days, 0.4% of the peak still out at a week; wind 7,397 events, t50 0.6 and t90 1.5 days, 0.2% of the peak still out at a week; all 24,602 events, t50 0.6 and t90 1.4 days, 1.3% of the peak still out at a week. Times under a day are not resolved (the curve starts at one day; t50 0.5 and t90 0.9 mean "within a day"). Puerto Rico's own hurricane events in EAGLE-I (3, mainly Fiona 2022): 40% of the peak still out at a week, t90 17.8 days, restoration factor 4.7 against the mainland.
+
+**Puerto Rico and the Virgin Islands.** EAGLE-I's Puerto Rico series starts in 2021 (Fiona 2022,
+the island-wide blackouts of 2024–2025). Each island grid is its own pooling region, and its curves
+carry a restoration factor against the mainland. Hurricane Maria (2017) is hand-copied from DOE's
+60 situation reports, the Government of Puerto Rico's status.pr and PREPA (via NPR):
+all 1.57 million customers out for the first week, 91% still out at two weeks, about 82% at a month (a load figure: PREPA counted no customers from 13 October to 2 January), 36.5% at day 119, 4.2% at day 195, the last customer on day 328. Its curve row is `historic:maria_2017_pr` with the restoration factor at its bound of 5. The Virgin Islands after Irma and Maria are copied the same way (customer counts start on
+day 26; the first week is qualitative, so the event is marked unverified).
+
+**The worst-event stress table** (`outage_stress.csv`, about 30 KB gzipped): for each county, the
+major county event within 250 km in its NCA5 region (or the county itself) with the largest share of
+the peak still out a week after the peak, as recorded where it was worst, with its name (HURDAT2 for
+tropical cyclones; a short list of named events such as the August 2020 derecho and the February
+2021 winter storm in `historic_outages.toml`; otherwise the cause and month) and curve.
+Hand-copied events stand in where they are worse than anything in EAGLE-I (Maria for Puerto Rico,
+Irma and Maria for the Virgin Islands). The backtest counties:
+
+| County | Worst event in the region | Recorded in | Out at peak | Share of the peak still out at 1 / 3 / 7 / 14 / 30 days |
+| --- | --- | --- | --- | --- |
+| Buncombe NC | Hurricane Helene (2024) | Buncombe NC | 100% | 92% / 78% / 69% / 22% / 0% |
+| Linn IA | August 2020 Midwest derecho | Linn IA | 93% | 97% / 78% / 37% / 1% / 0% |
+| Jefferson LA | Hurricane Ida (2021) | Lafourche LA, 35 km | 100% | 100% / 100% / 98% / 42% / 1% |
+| Harris TX | Hurricane Harvey (2017) | Orange TX, 147 km | 98% | 87% / 85% / 25% / 0% / 0% |
+| Travis TX | February 2021 winter storm and Texas blackout (Uri) | Gillespie TX, 120 km | 55% | 74% / 51% / 29% / 4% / 0% |
+| Hinds MS | Hurricane Ida (2021) | St. Helena LA, 162 km | 100% | 94% / 86% / 83% / 56% / 0% |
+| San Juan PR | Hurricane Maria (2017) | (hand-copied) | 100% | 100% / 100% / 100% / 91% / 82% |
 
 ## 6. NRI terms, disclaimer text and where the app shows it
 
@@ -416,6 +716,17 @@ Communities (requested citation). An optional pack's credit line is shown only o
 pack's files is loaded (the manifest's `attribution_packs` names the pack for each such source),
 so a packet never credits data it did not read. The Eviction Lab credit line (ODC-BY 1.0) joins
 them only once the owner approves the source (§13.10).
+
+The v2 calibration files (§2, "Data-pack v2 calibration files") add: the PNNL Event-correlated
+Outage Dataset (**CC BY 4.0: the credit line must be shown**, like EAGLE-I's), NOAA
+nClimGrid-Daily, and OpenFEMA's declarations and housing-assistance datasets (citation +
+statement). The national series cite their sources in their own headers (FBI Crime in the United
+States, CRS RS20348, FCC DIRS reports, openFDA, FDIC); their `source` ids for
+`content/citations.toml` are `pnnl_oe417_linkage`, `openfda_drug_shortages`, `fdic_failed_banks`,
+`crs_rs20348_funding_gaps`, `fcc_dirs_reports`, `fbi_cde_arrests` and
+`openfema_housing_assistance`; the county files use `ornl_eagle_i_outages`, `noaa_hurdat2`,
+`noaa_storm_events` (existing), `noaa_nclimgrid_daily`, `eia_861_reliability` and
+`openfema_declarations` (new ids for the content registry).
 
 ## 8. Privacy: what leaves the device
 
@@ -487,6 +798,41 @@ recipient and what it learns.
   publishes a direct link.
 - **NRI is county-scale**; a ZIP in a large county can sit in a very different flood or wildfire
   regime. Copy must say "your county" until tract packs exist.
+- **EAGLE-I during big storms** (2026-09-26): utilities drop out of the scrape for minutes to days
+  and are sometimes counted twice; §5.1's repair bridges the gaps and cuts doubled counts, erring
+  toward longer outages. Data gaps longer than the 72-hour bridge, gaps in an event's first six
+  hours, and gaps after which the data never hold for an hour still split an event (the continuation
+  then reads as a new event whose curve starts at the reappearance).
+- **Cause attribution** is by time and place only: a thunderstorm near a weakening tropical storm is
+  called a hurricane outage, a wind-driven wildfire safety shutoff with no Storm Events wildfire
+  record is called wind (California shutoff logs are not machine-readable), and OE-417 reports are
+  matched by state. Three in ten week-long events stay "cause not recorded".
+- **The pooled tail** is a regional average with a credibility weight; it cannot see a county's
+  individual vulnerability (a feeder on a ridge, an undergrounded suburb). The held-out test (§5.4)
+  checks calibration on average, not for any one county.
+- **EIA-861 cross-check** (repaired `outages.csv`): over 3,017 counties the rank correlation of
+  EAGLE-I outages per customer-year with the utilities' SAIFI (major event days included) is 0.44,
+  and of EAGLE-I customer-hours with SAIDI 0.58 (3,040 counties). EAGLE-I counts only outages in
+  events that reach 1% of a county's customers, so it should sit below SAIFI: it does in 2,544 of
+  3,017 counties. 29 counties show more than three times their utilities' SAIFI (the M-02 flag for
+  reporting flicker; `rr-etl verify` lists them), among them 06009, 06043, 06051, 06063, 06091,
+  06109, 08019, 08021, 16015 and 22107.
+- **nClimGrid** is a county average on a 5 km grid: it runs cooler than the hottest spot in a county
+  and warmer than the coldest, and covers the contiguous US only.
+- **FBI arrests** count arrests (events), not people, from agencies covering 87–92% of the population;
+  national figures by age and sex are a share-allocation of the FBI's national estimate (§2).
+- **OpenFEMA declarations:** major-disaster (DR) declarations only, one count per disaster per
+  county; 942 statewide or tribal rows are not counted; `last_5yr` = declared in 2021–2025. County
+  codes that cannot be placed on the canonical list include Alaska's old 02201 and codes for American
+  Samoa's outer islands, Micronesia and the Marshall Islands (the manifest note lists the first 20).
+- **OpenFEMA housing assistance:** every damage column of the v2 housing-assistance files (renters'
+  moderate, major and substantial damage, owners' inspected-damage buckets, `totalInspected`) is
+  zero in every row (checked 2026-09-26 by asking the API for rows above zero: none), so the series
+  publishes registrations, approvals and rental assistance only, and no damage share. Months
+  displaced by hazard is not built either: only 99,762 of 3.3 million rental-eligible registrations
+  carry a rental-assistance end date.
+- **Hurricane Maria's curve** mixes customer counts with load for days 30–90 (PREPA reported no
+  customer counts then); load overstates household restoration.
 
 ## 11. Sources not used, or unreachable
 
@@ -514,6 +860,12 @@ recipient and what it learns.
 - **Optional, not built yet:** US Drought Monitor weeks in D2+, NOAA Atlas 14 100-year 24-hour
   depth, volcano threat polygons, tract-level NRI, tract-level wildfire exposure (needs zonal
   statistics over the 30 m rasters).
+- **Considered for the outage model and national series, not used (2026-09-26):** the DOE OE-417
+  annual summaries on `oe.netl.doe.gov` (host refused connections; PNNL's CC BY 4.0 linkage covers
+  2014–2023 instead), FCC NORS filings (confidential under 47 CFR 4.2; the public DIRS reports are
+  used), the ASHP/University of Utah shortage series (proprietary; openFDA is used), the HHS OCR
+  breach portal (counts data breaches, not service outages), CPUC safety-shutoff reports (not
+  machine-readable), and IHP registrations for months displaced (end dates on 3% of records).
 
 ## 12. Refresh
 
@@ -524,8 +876,10 @@ automatically. The optional jobs (`surge`, `wildfire_places`) do not run there; 
 hand with `--only` when their sources change (NHC publishes a new map version every few years;
 Wildfire Risk to Communities about yearly). A failing source keeps its previous pack and is
 named in `data/CHANGES.md`; a file a job stops writing is deleted and listed there as removed. The About screen shows `manifest.pack_version` and `manifest.generated`
-so a stale snapshot is obvious. The full run takes about half an hour (streaming 11.6 GB of EAGLE-I
-files dominates).
+so a stale snapshot is obvious. The full run takes about 45 minutes: streaming 11.6 GB of EAGLE-I
+files dominates (about 17 minutes); the v2 calibration jobs add about 5 (840 monthly nClimGrid files,
+ten EIA-861 years, OpenFEMA paging). That was timed before the §13 exposure jobs joined the run;
+they add their own downloads.
 
 ## 13. Data pack v2: exposure columns
 
