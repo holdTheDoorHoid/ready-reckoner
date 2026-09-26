@@ -40,7 +40,10 @@ The owner's request (2026-09-26): the whole register at a glance, before any car
   range ("about 86 (63–98) of 100"), and how often a year on a second, muted line ("about 4.5 times
   a year", "about once a year", "about 1 in 190 a year"). Rare rows show the range only (as the
   rare box does). *How bad*: the severity swatch and word. *How sure*: the confidence label. On a
-  phone the names and cells wrap; the table never scrolls sideways.
+  phone the names and cells wrap with every word whole, the severity swatch sits above its word,
+  cells are tighter, and at 360 px and below the type is a step smaller; "1 in 2,000" and short
+  ranges like "(63–98)" stay on one line. Checked at 390, 360 and 320 px: the table never scrolls
+  sideways.
 - **Jumping.** Each card has the id `hazard-<id>`. A name in the matrix scrolls to its card and
   moves focus to the card's heading; a card inside the folded "All N risks" list opens it first.
   The address (`#/risks`) never changes. Every card and the rare box end with "Back to the table",
@@ -63,7 +66,9 @@ The owner's request (2026-09-26): the whole register at a glance, before any car
   even when the engine lists other hazards first. For hazards whose main consequence is a readiness
   checklist (a medical emergency, a fire, a break-in, being stranded, having to leave) life-saving
   items come first: the catalogue's `life_safety` flag plus the first-aid kit, the bleeding-control
-  kit and the extinguisher. Names keep a leading acronym ("N95 respirators").
+  kit and the extinguisher. Names keep a leading acronym ("N95 respirators"). Each shows "free",
+  its price, or "have it" / "done" when the household already has it (an assumed basic is never
+  priced).
 - **Evacuate card.** "Notice could be 1 minute to 3 days": the number as shown decides singular or
   plural.
 - **Savings track.** Before the full goal, the next nearer one: "First goal: one month of
