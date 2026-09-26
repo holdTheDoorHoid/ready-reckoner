@@ -233,6 +233,24 @@
    "nearest_nuclear_km": 480.0,
    "tri_facilities": 5,
    "high_hazard_dams": 2
+  },
+  "exposure": {
+   "strategic_class": "E",
+   "uasi_share": 0.0,
+   "geomag_lat": 48.5,
+   "geomag_factor": 0.26,
+   "smoke_days_35": 7.17,
+   "smoke_days_55": 4.69,
+   "smoke_trend": 1.17,
+   "hms_smoke_days": 20.1,
+   "smoke_basis": "imputed",
+   "karst_share": 0.00119,
+   "landslide_susceptible_share": 0.885,
+   "leveed_pop_share": 0.0015,
+   "levee_risk_high_share": 0.0,
+   "dams_high_total": 2,
+   "sdwis_violation_pop_share": 0.0208,
+   "cws_pop_share": 0.746
   }
  },
  "location": {

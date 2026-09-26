@@ -1,6 +1,6 @@
 //! Every citation id rr-hazards can attach to a number resolves: it is defined in
 //! `content/citations.toml` (once the content workstream's registry is merged) or listed in
-//! `docs/CITATION_IDS.md`, where requested ids wait for their entry.
+//! `docs/CITATION_IDS.md`, where requested ids wait for their entry (in bold until written).
 
 use std::path::PathBuf;
 
@@ -16,7 +16,9 @@ fn every_citation_id_is_defined_or_requested() {
     let listed = repo_file("docs/CITATION_IDS.md").expect("docs/CITATION_IDS.md");
     let registry = repo_file("content/citations.toml").unwrap_or_default();
     for id in rr_hazards::CITATION_IDS {
-        let in_list = listed.contains(&format!("`{id}`"));
+        // Registered ids appear in backticks; ids requested and not yet written appear in bold
+        // (the rr-content index test checks every backticked id against the registry).
+        let in_list = listed.contains(&format!("`{id}`")) || listed.contains(&format!("**{id}**"));
         let in_registry = registry.contains(&format!("id = \"{id}\""));
         assert!(
             in_list || in_registry,

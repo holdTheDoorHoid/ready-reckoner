@@ -88,16 +88,80 @@ fn every_profile_and_rate_is_well_formed() {
                 "{}",
                 p.frequency_sentence
             );
+            let known = |s: &rr_types::CitationId| {
+                ids.contains(&s.as_str()) || base_ids.contains(&s.to_string())
+            };
+            for sc in &p.sub_causes {
+                assert!(!sc.sources.is_empty(), "{label}: {} {}", p.id, sc.id);
+                assert!(sc.sources.iter().all(known), "{label}: {} {}", p.id, sc.id);
+                assert!(rr_types::is_well_formed_id(&sc.id), "{label}: {}", sc.id);
+                if let Some([lo, hi]) = sc.rate_range {
+                    assert!(
+                        0.0 <= lo && lo <= hi && hi.is_finite(),
+                        "{label}: {}",
+                        sc.id
+                    );
+                }
+            }
+            if let Some(lf) = &p.location_factor {
+                let [lo, mid, hi] = lf.multiplier;
+                assert!(
+                    0.0 <= lo && lo <= mid && mid <= hi,
+                    "{label}: {} factor",
+                    p.id
+                );
+                assert!(
+                    !lf.label.is_empty() && lf.label.ends_with('.'),
+                    "{label}: {}",
+                    p.id
+                );
+                assert!(
+                    lf.sources.iter().all(known),
+                    "{label}: {} factor sources",
+                    p.id
+                );
+            }
             if p.display == HazardDisplay::RareCatastrophic {
                 rare_started = true;
-                // Research §6.3: never a point estimate.
-                assert!(!p.frequency_sentence.contains("households like yours"));
+                // REVIEW §2.4 and H-02: never a point estimate; a family, words for what it
+                // would mean and what it changes, and one comparison with the household's list.
+                assert!(p.range_only, "{label}: {}", p.id);
+                assert!(
+                    p.frequency_sentence.starts_with("Between 1 in")
+                        || p.frequency_sentence.contains("At most about"),
+                    "{label}: {}",
+                    p.frequency_sentence
+                );
+                assert!(
+                    !p.frequency_sentence.contains("Of 100"),
+                    "{label}: {}",
+                    p.id
+                );
+                assert_eq!(p.family.as_deref(), Some(p.id.as_str()), "{label}");
+                assert!(p.if_it_reaches_you.is_some() && p.what_it_changes.is_some());
+                let anchor = p.anchor_sentence.as_deref().unwrap_or_default();
+                assert!(anchor.starts_with("Less likely than "), "{label}: {}", p.id);
             } else {
                 assert!(!rare_started, "{label}: ranked {} after the rare box", p.id);
+                assert!(p.family.is_none() && p.anchor_sentence.is_none(), "{label}");
             }
         }
-        // Rates: one per profile, HazardId order, each valid.
-        assert_eq!(a.rates.len(), a.profiles.len(), "{label}");
+        // All nine rare families, every time, most likely here first.
+        let rare: Vec<&rr_types::HazardProfile> = a
+            .profiles
+            .iter()
+            .filter(|p| p.display == HazardDisplay::RareCatastrophic)
+            .collect();
+        assert_eq!(rare.len(), H::RARE.len(), "{label}");
+        assert!(
+            rare.windows(2)
+                .all(|w| w[0].rate_per_year >= w[1].rate_per_year),
+            "{label}: the rare box is sorted by how likely it is here"
+        );
+        // Rates: one per ranked profile, HazardId order, each valid; no rare family ever enters
+        // a bucket's Λ (REVIEW §2.3).
+        let ranked = a.profiles.len() - rare.len();
+        assert_eq!(a.rates.len(), ranked, "{label}");
         assert!(
             a.rates.windows(2).all(|w| w[0].hazard < w[1].hazard),
             "{label}"
@@ -105,6 +169,21 @@ fn every_profile_and_rate_is_well_formed() {
         for r in &a.rates {
             assert_eq!(r.validate(), Ok(()), "{label}: {}", r.hazard);
             assert!(seen.contains(&r.hazard));
+            assert!(
+                !r.hazard.is_rare(),
+                "{label}: {} reached rr-consequence",
+                r.hazard
+            );
+        }
+        // "Also checked": under 1 in 100,000 a year, never also on a card.
+        for c in &a.also_checked {
+            assert!(c.rate_per_year < 1.0e-5, "{label}: {}", c.id);
+            assert!(!c.sources.is_empty(), "{label}: {}", c.id);
+            assert!(
+                a.profiles.iter().all(|p| p.id.as_str() != c.id),
+                "{label}: {} is both listed and checked",
+                c.id
+            );
         }
         for s in &a.scenarios {
             assert_eq!(s.household_rate().validate(), Ok(()), "{label}: {}", s.id);
@@ -414,7 +493,10 @@ fn a_county_without_nri_data_still_gets_personal_and_societal_hazards() {
     fixture.county.outages = None;
     fixture.county.climate.clear();
     let a = run(&household("philadelphia-renters-4"), &fixture);
-    assert!(a.profiles.iter().all(|p| p.tier != HazardTier::Natural));
+    // No National Risk Index hazard is left; smoke comes from its own column and the solar storm
+    // and eruption families are always shown.
+    assert!(a.profiles.iter().all(|p| !p.id.is_nri()));
+    assert!(a.profiles.iter().any(|p| p.tier == HazardTier::Natural));
     assert!(has_profile(&a, H::JobLoss) && has_profile(&a, H::Pandemic));
 }
 

@@ -699,6 +699,97 @@ fn drought(ctx: &Ctx<'_>) -> Option<HazardRate> {
     )
 }
 
+/// Wildfire smoke: the county's smoke days at 35.5 µg/m³ or more (NOAA smoke maps with EPA
+/// monitors, 2016–2023) ÷ days per episode. Distant smoke reaches every household in the county,
+/// so the footprint is 1; who it harms most (children, people 65 and over, pregnancy, oxygen) is
+/// a severity floor, not a rate change. `None` when the pack has no smoke column for the county.
+fn wildfire_smoke(ctx: &Ctx<'_>) -> Option<HazardRate> {
+    let h = HazardId::WildfireSmoke;
+    let smoke = ctx.exposure().smoke()?;
+    let sources = [cite::NOAA_HMS, cite::EPA_AQS];
+    let d = smoke.days_35;
+    let days = if d > 0.0 {
+        let k = if smoke.imputed {
+            SMOKE_IMPUTED_SPREAD
+        } else {
+            SMOKE_MONITOR_SPREAD
+        };
+        Estimate::data(d, d / k, d * k, &sources)
+    } else {
+        Estimate::data(0.0, 0.0, 0.0, &sources)
+    };
+    let today = days.times(&per_episode(SMOKE_EPISODE_DAYS));
+    Some(
+        HazardRate::new(
+            h,
+            today,
+            "go through days of unhealthy wildfire smoke",
+            300.0,
+        )
+        .with_climate(Climate::Unclear),
+    )
+}
+
+/// Dust storms: the county's Storm Events "Dust Storm" episodes (by forecast zone) × the share
+/// that reach one household. A county with no row recorded none.
+fn dust_storm(ctx: &Ctx<'_>) -> Option<HazardRate> {
+    let h = HazardId::DustStorm;
+    let lam = match ctx.event("dust_storm") {
+        Some(e) => spread(
+            f64::from(e.rate_per_year),
+            STORM_EVENTS_SPREAD,
+            &[cite::STORM_EVENTS],
+        ),
+        None => Estimate::data(0.0, 0.0, 0.0, &[cite::STORM_EVENTS]),
+    };
+    let today = lam.times(&prior(DUST_FOOTPRINT, &[cite::RR_HAZARD_PRIORS]));
+    Some(
+        HazardRate::new(
+            h,
+            today,
+            "be caught in a dust storm that closes roads or fouls the air at home",
+            200.0,
+        )
+        .with_climate(Climate::Unclear),
+    )
+}
+
+/// Sinkholes: the share of the county on karst (limestone) ground × the yearly chance that a
+/// sinkhole damages a home there (PRIOR). `None` when the pack has no karst column.
+fn sinkhole(ctx: &Ctx<'_>) -> Option<HazardRate> {
+    let h = HazardId::Sinkhole;
+    let karst = ctx.exposure().karst_share()?;
+    let share = Estimate::data(karst, karst, karst, &[cite::USGS_KARST]);
+    let today = share.times(&prior(SINKHOLE_ON_KARST, &[cite::RR_HAZARD_PRIORS]));
+    let mut rate = HazardRate::new(
+        h,
+        today,
+        "have a sinkhole or ground collapse damage their home",
+        30_000.0,
+    );
+    if karst > 0.0 {
+        rate.location_factor = Some(rr_types::LocationFactor {
+            class: if karst >= 0.5 {
+                "karst_most".to_owned()
+            } else if karst >= 0.1 {
+                "karst_some".to_owned()
+            } else {
+                "karst_little".to_owned()
+            },
+            label: format!(
+                "About {} in 100 of {} sits on karst, limestone and similar rock that water can \
+                 dissolve into caves and sinkholes. Not every karst area has sinkholes, so this is \
+                 an upper guide.",
+                crate::sentence::sig2((karst * 100.0).max(0.1)),
+                ctx.county_label()
+            ),
+            multiplier: [karst, karst, karst],
+            sources: vec![cite::USGS_KARST.into()],
+        });
+    }
+    Some(rate)
+}
+
 /// Chance that one household-significant event of a storm hazard cuts the power.
 fn outage_share(hazard: HazardId) -> Option<f64> {
     use HazardId::*;
@@ -789,7 +880,7 @@ fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
 /// Every natural hazard the county has, for this household, today and around 2050.
 pub(crate) fn assess(ctx: &Ctx<'_>, notes: &mut Notes) -> Natural {
     let mut out = Natural::default();
-    for &h in HazardId::ALL {
+    for &h in HazardId::ACTIVE {
         use HazardId::*;
         let rate = match h {
             Avalanche => avalanche(ctx),
@@ -837,6 +928,9 @@ pub(crate) fn assess(ctx: &Ctx<'_>, notes: &mut Notes) -> Natural {
                 r
             }),
             WinterWeather => winter_weather(ctx),
+            WildfireSmoke => wildfire_smoke(ctx),
+            DustStorm => dust_storm(ctx),
+            Sinkhole => sinkhole(ctx),
             _ => None,
         };
         out.rates.extend(rate);
