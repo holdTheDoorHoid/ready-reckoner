@@ -10,6 +10,7 @@ use std::path::PathBuf;
 pub mod base_rates;
 pub mod climate;
 pub mod events;
+pub mod eviction;
 pub mod facilities;
 pub mod flood;
 pub mod geography;
@@ -19,7 +20,9 @@ pub mod levees;
 pub mod nri;
 pub mod outages;
 pub mod seismic;
+pub mod smoke;
 pub mod strategic;
+pub mod surge_proxy;
 pub mod vulnerability;
 pub mod water_systems;
 
@@ -162,9 +165,27 @@ pub const JOBS: &[JobSpec] = &[
         default: true,
     },
     JobSpec {
+        id: "smoke",
+        title: "Wildfire-smoke days per county from NOAA HMS smoke polygons and EPA AQS PM2.5",
+        run: smoke::run,
+        default: true,
+    },
+    JobSpec {
         id: "facilities",
         title: "Nuclear plants, TRI facilities and high-hazard dams by county and ZIP",
         run: facilities::run,
+        default: true,
+    },
+    JobSpec {
+        id: "surge_proxy",
+        title: "County storm-surge proxy from NRI coastal-flood exposure, hurricane passages and evacuation zones",
+        run: surge_proxy::run,
+        default: true,
+    },
+    JobSpec {
+        id: "eviction",
+        title: "Eviction filings per renter household (Eviction Lab; written only with the owner's sign-off)",
+        run: eviction::run,
         default: true,
     },
     JobSpec {
@@ -314,6 +335,15 @@ pub fn refresh(ctx: &Ctx, only: &[String], optional: bool) -> Result<RefreshSumm
     std::fs::create_dir_all(ctx.data.join("geo"))?;
     let mut manifest = Manifest::load_or_default(&ctx.data)?;
     manifest.schema = crate::manifest::SCHEMA;
+    // Decisions a job waits for: present (unapproved) so a person knows where to approve.
+    manifest
+        .sign_offs
+        .entry(eviction::SIGN_OFF.to_string())
+        .or_insert_with(|| crate::manifest::SignOff {
+            approved: false,
+            what: eviction::SIGN_OFF_WHAT.to_string(),
+            by: String::new(),
+        });
     let mut summary = RefreshSummary::default();
     for job in JOBS {
         let selected = if only.is_empty() {

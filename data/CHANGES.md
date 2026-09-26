@@ -130,3 +130,43 @@ Jobs run: water_systems.
 | File | Rows before | Rows after | Added | Removed | Changed | Status |
 |---|---:|---:|---:|---:|---:|---|
 | `core/water_systems.csv` | 3171 | 3171 | 0 | 0 | 243 | changed |
+
+## 2026-09-26T17:23:18Z — pack version 574f5260b3c4
+
+Jobs run: smoke.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/smoke.csv` | 0 | 3225 | 0 | 0 | 0 | new |
+
+## 2026-09-26T17:27:34Z — pack version d94a8c455c64
+
+Jobs run: smoke, surge_proxy.
+Job **facilities failed**: unexpected source data: no Oroville ZIP (95965, 95966) is counted downstream of Oroville Dam
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/smoke.csv` | 3225 | 3225 | 0 | 0 | 84 | changed |
+| `core/surge_proxy.csv` | 0 | 3232 | 0 | 0 | 0 | new |
+
+## 2026-09-26T17:30:02Z — pack version ee75b4a645b3
+
+Jobs run: facilities.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/facilities.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/zip_facilities.csv` | 33791 | 33791 | 0 | 0 | 33791 | changed |
+
+## 2026-09-26T17:32:17Z — pack version a5b6c9d722cc
+
+Jobs run: facilities.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/facilities.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/zip_facilities.csv` | 33791 | 33791 | 0 | 0 | 6173 | changed |
+
+## 2026-09-26T17:34:32Z — pack version a5b6c9d722cc
+
+Jobs run: eviction.

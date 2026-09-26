@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "e620dc2a2dca",
-  "generated": "2026-09-26T17:15:57Z",
+  "pack_version": "a5b6c9d722cc",
+  "generated": "2026-09-26T17:34:32Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -58,8 +58,8 @@
         {
           "path": "core/facilities.csv",
           "job": "facilities",
-          "sha256": "725c4dfb9e20490fd08dd3b2c45d1b7db8096b7309f09b5426c1c555731b9194",
-          "bytes": 96804,
+          "sha256": "9abe0e38d1c2d833e9cd58b1ee0766e053b86a140f5145c9dcb30593236a5f6d",
+          "bytes": 103332,
           "rows": 3232,
           "key": [
             "fips"
@@ -164,6 +164,16 @@
           ]
         },
         {
+          "path": "core/smoke.csv",
+          "job": "smoke",
+          "sha256": "e2eeef315a29df4ba11073b8b73c22cca2106ff757ee895aa1ec81c876e353b1",
+          "bytes": 105225,
+          "rows": 3225,
+          "key": [
+            "fips"
+          ]
+        },
+        {
           "path": "core/states.csv",
           "job": "geography",
           "sha256": "0ba0c48efe7dcf197ef4ba0392d16747f0996cfb81d28fab534596754ffef022",
@@ -189,6 +199,16 @@
           "sha256": "989737d9fd47d0d4bebe54b81a9ee3a511260dce26590f8d9851daf5a7463826",
           "bytes": 61428,
           "rows": 207
+        },
+        {
+          "path": "core/surge_proxy.csv",
+          "job": "surge_proxy",
+          "sha256": "5c43a5bb5dba9e1dc3091973950a66a39adcd648deb0efe158028073815ee678",
+          "bytes": 45238,
+          "rows": 3232,
+          "key": [
+            "fips"
+          ]
         },
         {
           "path": "core/vulnerability.csv",
@@ -224,8 +244,8 @@
         {
           "path": "core/zip_facilities.csv",
           "job": "facilities",
-          "sha256": "347986b822adac3712fc861394d44e0d964b34e97ad1a520ad3ccfacc28a8412",
-          "bytes": 456712,
+          "sha256": "009e2b1235da6e05f5dd61801aba76e39511321646a2dee71b91c7f7dcd3fcc8",
+          "bytes": 726808,
           "rows": 33791,
           "key": [
             "zip"
@@ -865,15 +885,29 @@
         }
       ]
     },
+    "eviction": {
+      "title": "Eviction filings per renter household (Eviction Lab; written only with the owner's sign-off)",
+      "finished": "2026-09-26T17:34:32Z",
+      "sources": [],
+      "rows_in": 0,
+      "rows_out": 0,
+      "outputs": [],
+      "notes": [
+        "Not built: waiting for the owner's sign-off (manifest sign_offs.eviction_lab_odc_by.approved). Eviction Lab data are Open Data Commons Attribution License (ODC-BY 1.0); the repository asks for approval before an attribution licence enters the packs. Nothing was downloaded."
+      ],
+      "definitions": {
+        "attribution_if_approved": "Eviction filing rates derived by Ready Reckoner from: Ashley Gromis, Ian Fellows, James R. Hendrickson, Lavar Edmonds, Lillian Leung, Adam Porton, and Matthew Desmond. Estimating Eviction Prevalence across the United States. Princeton University Eviction Lab. https://data-downloads.evictionlab.org/#estimating-eviction-prevalance-across-us/. Deposited May 13, 2022. This data is shared under the terms of the Open Data Commons Attribution License (ODC-BY 1.0)."
+      }
+    },
     "facilities": {
       "title": "Nuclear plants, TRI facilities and high-hazard dams by county and ZIP",
-      "finished": "2026-09-26T08:24:54Z",
+      "finished": "2026-09-26T17:32:17Z",
       "sources": [
         {
           "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon)",
           "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
           "version": "GENZ2024",
-          "retrieved": "2026-09-26T08:24:01Z",
+          "retrieved": "2026-09-26T17:31:37Z",
           "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
           "bytes": 11626066,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -882,7 +916,7 @@
           "name": "FEMA Operating Nuclear Power Plant Sites",
           "url": "https://gis.fema.gov/arcgis/rest/services/Partner/Operating_Nuclear_Power_Plant_Sites/FeatureServer/0/query (POST where=1=1; fields plant_name,latitude,longitude,update_dat; ordered by plant_name)",
           "version": "FEMA Partner layer Operating_Nuclear_Power_Plant_Sites",
-          "retrieved": "2026-09-26T08:24:03Z",
+          "retrieved": "2026-09-26T17:31:38Z",
           "sha256": "835f768615ab24034afa84a5b3ae4b4ac341965954c7702e2155a5719e8e9e72",
           "bytes": 7111,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -891,7 +925,7 @@
           "name": "EPA Toxics Release Inventory basic data file 2024, US",
           "url": "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/2024_US/csv",
           "version": "TRI reporting year 2024",
-          "retrieved": "2026-09-26T08:24:04Z",
+          "retrieved": "2026-09-26T17:31:39Z",
           "sha256": "06dfa3a67bb4c5bd38d9e9f0f7b8bff10b95254a63169423632d7f6f251e1506",
           "bytes": 60550684,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -900,7 +934,7 @@
           "name": "USACE National Inventory of Dams (nation CSV)",
           "url": "https://nid.sec.usace.army.mil/api/nation/csv",
           "version": "Data Last Updated 2026-9-23",
-          "retrieved": "2026-09-26T08:24:35Z",
+          "retrieved": "2026-09-26T17:32:06Z",
           "sha256": "d2ab9d97237f8ed814761cef953aa82d2761b909c3dfd8b66352f71c5e2ca645",
           "bytes": 67285174,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -909,19 +943,31 @@
           "name": "Census 2024 Gazetteer, ZCTAs",
           "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_zcta_national.zip",
           "version": "2024 Gazetteer; Last-Modified Fri, 30 Aug 2024 18:40:45 GMT",
-          "retrieved": "2026-09-26T08:24:52Z",
+          "retrieved": "2026-09-26T17:32:15Z",
           "sha256": "7b85c04a131672f58b38a950eb82855d5fd4054f0bd9bc3f69aa28897a714e3d",
           "bytes": 1013803,
           "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2020 ZCTA to place relationship file",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_place20_natl.txt",
+          "version": "rel2020 zcta520-place20",
+          "retrieved": "2026-09-26T17:32:15Z",
+          "sha256": "698a5dad71ed419411677d0ffd8ecd9331067f59c472cdd239b92c12f698285d",
+          "bytes": 9811563,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
         }
       ],
-      "rows_in": 203909,
+      "rows_in": 286789,
       "rows_out": 37023,
       "outputs": [
         "core/facilities.csv",
         "core/zip_facilities.csv"
       ],
       "notes": [
+        "dams_high_within_10km_naming_town: High-hazard dams within 10 km of the ZIP's centre whose NID City (the nearest downstream place most likely to be flooded by a failure, as dam owners report it) matches, by normalised name in the same state, a Census 2020 place that holds at least 10% of the ZIP's land or has at least that share of its own land in the ZIP. 12342 High dams name a town; 8535 (69%) match a Census place. 5184 ZIPs have at least one. Inundation maps are not public; the named town is not an inundation boundary.",
+        "dams_high_poor_condition: High-hazard dams whose latest NID condition assessment is Poor or Unsatisfactory (2791 in the counties; condition is not rated for about a fifth of High dams). high_hazard_dams is the county's total of High dams (dams_high_total in the engine's record).",
+        "strategic_km / strategic_bearing / strategic_site: the nearest class A point site or NNSA weapons-complex site (strategic_sites.toml, rule point_30km) within 150 km of the ZIP's centre, its distance (whole km), the compass bearing from the ZIP to it (whole degrees) and its id; empty beyond 150 km (6808 ZIPs have one). Lets a ZIP next to a site in a neighbouring county (Jefferson County, WA across Hood Canal from Bangor) be recognised.",
         "57 nuclear sites. nuclear_within_16km / _80km: any part of the county (1:500k boundary) within 10 / 50 miles of a site. nearest_nuclear_km is measured from the county's internal point; zip_facilities.csv measures from the ZIP centroid (0.1 km).",
         "TRI reporting year 2024: 21482 facilities with coordinates, placed in counties by point-in-polygon (0 without coordinates skipped); tri_within_5km counts facilities within 5 km of the ZIP centroid.",
         "NID (2026-9-23): dams rated High or Significant hazard potential, placed by their coordinates (100 could not be placed). Hazard potential describes what a failure would cause (High: probable loss of life), not how likely a failure is."
@@ -1727,6 +1773,130 @@
         }
       ]
     },
+    "smoke": {
+      "title": "Wildfire-smoke days per county from NOAA HMS smoke polygons and EPA AQS PM2.5",
+      "finished": "2026-09-26T17:26:46Z",
+      "sources": [
+        {
+          "name": "NOAA NESDIS Hazard Mapping System smoke polygons, daily shapefiles 2016-2023",
+          "url": "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/YYYY/MM/hms_smokeYYYYMMDD.zip",
+          "version": "2920 daily files (2 missing); sha256 is of the files' sha256 values in date order",
+          "retrieved": "2026-09-26T17:26:03Z",
+          "sha256": "18398463f69c3a5f563d48b740070cf57a48089b4512a6c5f5880a261636052d",
+          "bytes": 54109642,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon and areas)",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
+          "version": "GENZ2024",
+          "retrieved": "2026-09-26T17:26:03Z",
+          "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
+          "bytes": 11626066,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2016",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2016.zip",
+          "version": "daily_88101_2016.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:04Z",
+          "sha256": "bb70b9a2050de500d5dde412d46045feca5c9699848a2a8111e166c47cd3fd05",
+          "bytes": 4552673,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2017",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2017.zip",
+          "version": "daily_88101_2017.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:08Z",
+          "sha256": "0a09c955d4a84e604acfb3d3bfc864a4bff883eaca9ac1deb208563204256d74",
+          "bytes": 5188737,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2018",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2018.zip",
+          "version": "daily_88101_2018.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:11Z",
+          "sha256": "a82e60b1bd486ebd23adacedd4f1822a41cda0985194b3a21898e135cdf468e5",
+          "bytes": 6325876,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2019",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2019.zip",
+          "version": "daily_88101_2019.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:15Z",
+          "sha256": "88b9b0b1bbd0c7545ffc07959a5ecbd4c6fbe951c67ea648cef70cafe956af53",
+          "bytes": 7315771,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2020",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2020.zip",
+          "version": "daily_88101_2020.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:21Z",
+          "sha256": "18283fe4ffceb53e3091a7fa7de57a2d5b925ce3d56a08d3518021e00212a3ec",
+          "bytes": 7911864,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2021",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2021.zip",
+          "version": "daily_88101_2021.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:26Z",
+          "sha256": "c3f876f8cd898c3bd921db45e1a2dd39c52ed7f5bb48e82a600066a434f6afd4",
+          "bytes": 9003762,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2022",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2022.zip",
+          "version": "daily_88101_2022.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:32Z",
+          "sha256": "82f5035943a447f8edebf1f0b3f774e08b81a250a86295871a8574726d6b2f94",
+          "bytes": 9687295,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA AQS daily PM2.5 (FRM/FEM, parameter 88101), 2023",
+          "url": "https://aqs.epa.gov/aqsweb/airdata/daily_88101_2023.zip",
+          "version": "daily_88101_2023.zip; Last-Modified Mon, 13 Jul 2026 15:47:43 GMT",
+          "retrieved": "2026-09-26T17:26:39Z",
+          "sha256": "4b40502e8147419643a1120c666c4aa952633094f21f65475844172bcc78833b",
+          "bytes": 9919616,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 2947796,
+      "rows_out": 3225,
+      "outputs": [
+        "core/smoke.csv"
+      ],
+      "notes": [
+        "Smoke-covered: the county's internal point inside a Medium or Heavy HMS polygon (2920 daily files 2016-2023, 2 missing: 2016-03-06, 2016-11-12). PM2.5: EPA AQS daily 24-hour averages (sample durations 24 HOUR and 24-HR BLK AVG, 'Excluded' exceptional-event rows left out), the county's highest monitor per day, sites placed by coordinates.",
+        "smoke_days_35 / smoke_days_55: mean days a year 2016-2023 that are smoke-covered with 24-hour PM2.5 of at least 35.5 / 55.5 µg/m³, estimated each year as (observed smoke-covered days over the threshold / observed smoke-covered days) x smoke-covered days, so monitors that run every third or sixth day are not undercounted. smoke_trend: least-squares slope of the yearly smoke_days_35 estimate, days per year per year. hms_smoke_days: mean smoke-covered days a year. Basis: monitor 641 (at least 10 observed smoke-covered days), imputed 2498 (rate of the nearest such county within 150 km in the same NCA5 region, else the region's pooled rate, applied to the county's own smoke-covered days), hms_only 86 (no rate to borrow: counts are 0 where HMS never showed smoke, blank otherwise).",
+        "HMS outlines smoke in the whole air column; the PM2.5 test keeps only days when it reached the ground. Winter inversion pollution (Utah, the San Joaquin Valley) counts only on days HMS also shows smoke. Childs et al. 2022 (CC BY-SA) is not bundled."
+      ],
+      "definitions": {
+        "smoke_days_35": "Days a year (2016-2023 mean) when NOAA HMS shows medium or heavy smoke over the county and the county's 24-hour PM2.5 reaches 35.5 µg/m³ (AQI unhealthy for sensitive groups).",
+        "smoke_days_55": "The same at 55.5 µg/m³ (AQI unhealthy), 2016-2023 mean."
+      },
+      "missing": [
+        {
+          "reason": "Outside the NOAA HMS smoke analysis area (Guam, American Samoa, Northern Mariana Islands)",
+          "fips": [
+            "60010",
+            "60020",
+            "60050",
+            "66010",
+            "69100",
+            "69110",
+            "69120"
+          ]
+        }
+      ]
+    },
     "strategic": {
       "title": "Strategic-site classes (nuclear family) and FEMA UASI shares by county",
       "finished": "2026-09-26T16:29:39Z",
@@ -1794,6 +1964,24 @@
       "definitions": {
         "precedent": "FEMA, Protection in the Nuclear Age (H-20, 1985), p. 12: \"Designating a place as a 'risk' area does not mean that it will be attacked; it does indicate a greater potential for attack.\" NAPB-90 (1987, released 2005) is a method precedent, not a public one.",
         "strategic_class": "A: counterforce and command sites; C1: largest cities, the capital region and weapons plants; B: missile-field fallout corridor; C2: other large cities, ports, refineries and bases; D: downwind of a target; E: remote from targets and fallout paths. Rules and f_S priors in strategic_sites.toml."
+      }
+    },
+    "surge_proxy": {
+      "title": "County storm-surge proxy from NRI coastal-flood exposure, hurricane passages and evacuation zones",
+      "finished": "2026-09-26T17:27:34Z",
+      "sources": [],
+      "rows_in": 3232,
+      "rows_out": 3232,
+      "outputs": [
+        "core/surge_proxy.csv"
+      ],
+      "notes": [
+        "Classes: high 137 counties (9.0% of people), moderate 182 counties (13.3% of people), low 86 counties (6.4% of people), none 2827 counties (71.3% of people). Inputs: NRI v1.20 coastal-flooding people exposed / population, HURDAT2 tropical-storm and hurricane passages within 50 nmi (events.csv; NRI hurricane frequency for Guam, the Northern Mariana Islands and American Samoa), and published evacuation zones (statewide in FL, GA, MD, NC, SC, VA; coastal counties in TX, LA; Baldwin County, AL; Mobile County, AL; Jackson County, MS; Bronx County, NY (NYC Hurricane Evacuation Zone Finder); Kings County, NY; New York County, NY; Queens County, NY; Richmond County, NY). Rules: none if not an NRI coastal-flood county or tropical storms under 0.02 a year; high if at least 10% of residents in coastal-flood areas and at least 0.05 hurricanes a year; moderate if at least 2% and 0.1 tropical storms a year, or evacuation zones and 0.02 hurricanes a year; low otherwise.",
+        "A county proxy: it cannot say that an address is in a surge zone. NRI's coastal-flood areas are the 1% and 0.2% coastal floodplains plus high-tide flooding, smaller than NHC's Category 3 surge extent, so shares understate surge reach. No elevation is used (no national source cheap enough per ZIP); the optional `surge` pack (NOAA/NHC maps by ZIP) is the precise answer. Unconfirmed zone tools in the research (Mississippi statewide, New Jersey, Delaware, Connecticut, Rhode Island) are left out."
+      ],
+      "definitions": {
+        "coastal_flood_pop_share": "People in NRI v1.20 coastal-flood exposure areas / county population.",
+        "surge_proxy_class": "County storm-surge exposure: none, low, moderate or high, from NRI coastal-flood exposure, hurricane passages and official evacuation zones (a proxy; it does not place an address in or out of a zone)."
       }
     },
     "vulnerability": {
@@ -2094,6 +2282,14 @@
       "accessed": "2026-09-26"
     },
     {
+      "source": "NOAA HMS and EPA AQS",
+      "text": "Smoke days from NOAA NESDIS Hazard Mapping System smoke analysis polygons and U.S. EPA Air Quality System daily PM2.5 data.",
+      "license": "US Government works (public domain)",
+      "url": "https://www.ospo.noaa.gov/products/land/hms.html",
+      "version": "2016-2023",
+      "accessed": "2026-09-26"
+    },
+    {
       "source": "ORNL EAGLE-I",
       "text": "Power outage statistics derived by Ready Reckoner from: Brelsford, C., Tennille, S., Myers, A., et al., The Environment for Analysis of Geo-Located Energy Information's Recorded Electricity Outages 2014-2025, Oak Ridge National Laboratory, figshare, doi:10.6084/m9.figshare.24237376 (CC BY 4.0).",
       "license": "CC BY 4.0",
@@ -2107,6 +2303,13 @@
       "license": "OpenFEMA Terms and Conditions",
       "url": "https://www.fema.gov/openfema-data-page/nfip-redacted-claims-v3",
       "version": "Penetration v1, Claims v3",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "Storm-surge proxy",
+      "text": "County storm-surge proxy built by Ready Reckoner from the FEMA National Risk Index (coastal flooding exposure), NOAA NHC HURDAT2 storm tracks and state and local hurricane evacuation-zone tools.",
+      "license": "Derived from US Government works",
+      "url": "https://www.nhc.noaa.gov/nationalsurge/",
       "accessed": "2026-09-26"
     },
     {
@@ -2139,5 +2342,12 @@
       "url": "https://pubs.usgs.gov/of/2014/1156/",
       "accessed": "2026-09-26"
     }
-  ]
+  ],
+  "sign_offs": {
+    "eviction_lab_odc_by": {
+      "approved": false,
+      "what": "Ship Eviction Lab county eviction filing rates (ODC-BY 1.0: attribution required; the credit line below goes on the About screen and in the packet sources). Set approved = true, fill in by, and run `rr-etl refresh --out data --only eviction`.",
+      "by": ""
+    }
+  }
 }

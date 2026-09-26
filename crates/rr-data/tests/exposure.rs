@@ -292,3 +292,87 @@ fn water_system_violations_flag_jackson() {
         }
     }
 }
+
+#[test]
+fn smoke_days_are_low_in_philadelphia_and_high_in_missoula() {
+    if !has("core/smoke.csv") {
+        return;
+    }
+    // The brief's check: Philadelphia almost none (the June 2023 Canadian smoke is most of
+    // what it has), Missoula many.
+    let phl = exposure("42101");
+    let msl = exposure("30063");
+    assert!(
+        phl.smoke_days_35.unwrap() < 1.5,
+        "Philadelphia {:?}",
+        phl.smoke_days_35
+    );
+    assert!(
+        msl.smoke_days_35.unwrap() > 4.0,
+        "Missoula {:?}",
+        msl.smoke_days_35
+    );
+    assert!(msl.smoke_days_35.unwrap() > 4.0 * phl.smoke_days_35.unwrap());
+    assert_eq!(msl.smoke_basis.as_deref(), Some("monitor"));
+    for c in store().counties() {
+        let e = &c.exposure;
+        if let (Some(a), Some(b)) = (e.smoke_days_35, e.smoke_days_55) {
+            assert!(b <= a + 1e-6 && a <= 366.0, "{}: {a} {b}", c.fips);
+        }
+    }
+}
+
+#[test]
+fn surge_proxy_marks_coastal_hurricane_counties() {
+    if !has("core/surge_proxy.csv") {
+        return;
+    }
+    use rr_types::SurgeProxyClass::{High, NoSurge};
+    assert_eq!(
+        exposure("12086").surge_proxy_class,
+        Some(High),
+        "Miami-Dade"
+    );
+    assert_eq!(exposure("48167").surge_proxy_class, Some(High), "Galveston");
+    assert_eq!(
+        exposure("17031").surge_proxy_class,
+        Some(NoSurge),
+        "Cook, IL (Great Lakes)"
+    );
+    assert_eq!(
+        exposure("04013").surge_proxy_class,
+        Some(NoSurge),
+        "Maricopa"
+    );
+}
+
+#[test]
+fn zip_records_carry_dams_and_strategic_distance() {
+    if !has("core/zip_facilities.csv") {
+        return;
+    }
+    let s = store();
+    // Oroville's ZIPs lie downstream of Oroville Dam, which names the town.
+    let oroville = s.zip_record("95965").unwrap();
+    assert!(
+        oroville.dams_high_within_10km_naming_town.unwrap_or(0) >= 1,
+        "{oroville:?}"
+    );
+    // Port Townsend (Jefferson County, WA, class E by county) is near Naval Base Kitsap-Bangor.
+    let pt = s.zip_record("98368").unwrap();
+    assert_eq!(pt.strategic_site.as_deref(), Some("kitsap_bangor"));
+    assert!(pt.strategic_km.unwrap() < 60.0);
+    // Downtown Philadelphia is far from every point site.
+    let phl = s.zip_record("19147").unwrap();
+    assert_eq!(phl.strategic_site, None);
+    assert!(phl.nearest_nuclear_km.is_some());
+    // County dam counts: every county with High dams reports a condition count no larger.
+    for c in s.counties() {
+        if let (Some(t), Some(p)) = (
+            c.exposure.dams_high_total,
+            c.exposure.dams_high_poor_condition,
+        ) {
+            assert!(p <= t, "{}", c.fips);
+        }
+    }
+}
