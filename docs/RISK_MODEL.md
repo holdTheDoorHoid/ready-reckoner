@@ -201,11 +201,11 @@ it (see "Sub-causes and Also checked").
 | Supply chain disruption | store shelves empty of what the household needs | 20 %/yr (10–40 %) | none | PRIOR, research §6.2 |
 | Chemical spill or release | a do-not-drink order or an order to stay inside | 2 %/yr (0.7–5 %) × TRI factor 1 + 0.5·log10((n + 1)/5), bounded ×0.65–×2 | TRI facilities in the county | PRIOR |
 | Nuclear plant accident | an order to shelter or leave | plant within 16 km: 2 in 10,000 a year (0.2 to 5 in 10,000); 16–80 km: 5 in 100,000 (1 to 20 in 100,000); beyond 80 km: not listed | distance | PRIOR (one US accident needing off-site action, Three Mile Island, in several thousand reactor-years) |
-| Dam or levee failure (v2) | told to leave because a dam or levee fails or threatens to | high-hazard dams whose listed downstream town is in the ZIP code × 1 in 10,000 a year per dam (3 in 100,000 – 5 in 10,000; ASDSO: about 2 in 10,000 failures per dam a year, all classes, and incidents such as Oroville 2017) × 0.3 of the ZIP's households (0.1–0.6); without a ZIP, the county's high-hazard dams × 0.01 of its households (0.003–0.03); dams in Poor or Unsatisfactory condition count ×3; plus the share of the county behind levees × 0.2 % a year (0.05–1 %; leveed land is mapped outside the flood zone, so the flood rate misses it), ×2 behind levees USACE rates High or Very High | footprints as stated | PRIOR stacked on the inventories: range only |
+| Dam or levee failure (v2) | told to leave because a dam or levee fails or threatens to | high-hazard dams whose listed downstream town is in the ZIP code × 1 in 10,000 a year per dam (3 in 100,000 – 5 in 10,000; ASDSO: 173 failures reported January 2005 – June 2013, over the NID's more than 90,000 dams about 2 in 10,000 per dam a year, all classes, and incidents such as Oroville 2017) × 0.3 of the ZIP's households (0.1–0.6); without a ZIP, the county's high-hazard dams × 0.01 of its households (0.003–0.03); dams in Poor or Unsatisfactory condition count ×3; plus the share of the county behind levees × 0.2 % a year (0.05–1 %; leveed land is mapped outside the flood zone, so the flood rate misses it), ×2 behind levees USACE rates High or Very High | footprints as stated | PRIOR stacked on the inventories: range only |
 | Phone or internet outage (v2) | phones and internet down for hours, 911 included | 0.3 a year (0.1–1): carrier-wide outages of several hours about once a year (FCC, AT&T 22 February 2024: 92 million calls, 25,000 calls to 911 blocked) × about a third of households on the failing carrier | none | PRIOR |
 | Medicine shortage (v2) | a daily medicine cannot be filled for days to weeks | 5 % a year per person on a daily prescription (2–15 %; ASHP: 323 active shortages at the start of 2024; openFDA: 70 medicines short on 2026-09-26) | ×1.5 (1.2–2) for a medicine that must stay cold (50 of openFDA's 70 are injectables); left out with no daily prescription | PRIOR |
 | Pay or benefits stop (v2) | federal pay or a benefit stops for weeks | federal pay: funding gaps of 14 days or more, 4 in fiscal years 1982–2026 (CRS RS20348): 0.089 a year (exact Poisson 90 %: 0.030–0.203); SNAP or WIC: × 0.25 (0.1–0.6) of those gaps (one of four, November 2025); SSI, SSDI and VA: 0.5 % a year (0.1–2 %), since they were paid through every shutdown; unemployment 1 % (0.2–4 %) | only for households with `finances.benefits`; the largest of their benefits' rates (one lapse stops them all) | DATA (federal pay) + PRIOR |
-| Attack or threat closes your area (v2; replaces the disruption half of terrorism) | a shelter order, closure or transit shutdown for half a day or more | 0.1 metro-wide attacks or threats a year (0.04–0.25; CSIS 1994–2025: Oklahoma City, 11 September, the anthrax letters, Boston) × the metro area's share of FEMA's FY2026 UASI money (New York-White Plains 24.39 %, Chicago 5.30 %, Philadelphia 2.84 %) × 0.3 of its households (0.1–0.8); outside every funded area 3 in a million a year (1 in a million – 3 in 100,000: 5 % of attacks over the 64 million households there, 40,000 households an order) | the metro weight | PRIOR: range only |
+| Attack or threat closes your area (v2; replaces the disruption half of terrorism) | a shelter order, closure or transit shutdown for half a day or more | 0.1 metro-wide attacks or threats a year (0.04–0.25; Oklahoma City, 11 September, the anthrax letters and Boston: three or four in the 30.3 years, January 1994 to April 2024, that CSIS's dataset of 725 attacks and plots covers, 0.10–0.13 a year; the count of closures is ours, not CSIS's) × the metro area's share of FEMA's FY2026 UASI money (New York-White Plains 24.39 %, Chicago 5.30 %, Philadelphia 2.84 %) × 0.3 of its households (0.1–0.8); outside every funded area 3 in a million a year (1 in a million – 3 in 100,000: 5 % of attacks over the 64 million households there, 40,000 households an order) | the metro weight | PRIOR: range only |
 
 The old nuclear-attack row (a worldwide catastrophe forecast shown to every household, H-01) and
 the terrorism row (retired in contract v2, H-02) are replaced by the rare families below.
@@ -254,7 +254,9 @@ r = λ_S·f_S(class) + λ_L·w_L·0.3 + λ_I·s_UASI·0.1, with λ_S = 4 in 10,0
 in 1,000: FRI 2024's catastrophe forecasts × 0.33 reaching US soil; XPT 2023; Rethink Priorities
 2019; Barrett 2013), λ_L = 1 in 10,000 (2 in 100,000 – 5 in 10,000), λ_I = 5 in 100,000 (1 in a
 million – 5 in 10,000), w_L = 0.05 for class A counties and Hawaii and Guam, and s_UASI the metro
-weight. National disruption (λ_S + 0.5·λ_L), use abroad (λ_U = 5 in 1,000, 1–15 in 1,000) and the
+weight. National disruption (λ_S + 0.5·λ_L), use abroad (λ_U = 5 in 1,000, 1–15 in 1,000: the
+middle is XPT 2023's superforecasters, 4 % by the end of 2030 or about 0.48 % a year; its experts'
+5 %, about 0.60 % a year, is inside the range) and the
 EMP of a high-altitude burst (λ_S × 0.5 + λ_L × 0.3; lower 48 states) are sub-causes that never
 enter the local rate. The class is the county's strategic-exposure class from
 `data/core/strategic_sites.toml` (research `strategic-sites.md`):
@@ -277,8 +279,11 @@ fill falls back to plainer words, never a guess. What it changes: one free step,
 spot at home and at work, in classes A–D (FEMA's 72-hour guidance); nothing beyond the basics in
 class E.
 
-**Severe solar storm.** A Carrington-class storm, 3 in 1,000 a year (5 in 10,000 – 1.3 in 100:
-Riley 2012, Love, Riley and Love 2017, Moriña 2019, Lloyd's 2013) × the chance it cuts a
+**Severe solar storm.** A Carrington-class storm, 3 in 1,000 a year (5 in 10,000 – 1.3 in 100: the
+low end is Moriña 2019's lower bound, 0.46 % a decade; the high end is Riley's 2012 estimate of
+about 12 % a decade as Moriña 2019 reports it, beside Love's 1.13 storms a century; the middle is
+the geometric middle of the two, with Lloyd's 2013 return period of about 150 years inside) × the
+chance it cuts a
 household's power for days, 0.09 (0.06–0.12: Lloyd's 20–40 million of about 330 million people) ×
 α ÷ 0.2285, capped at one half. α is NERC TPL-007's factor by geomagnetic latitude (IGRF-14, 0.1 to
 1); 0.2285 is its population-weighted mean over every county (DERIVED from the pack's `geomag.csv`
@@ -299,7 +304,7 @@ military sites, big cities, ports and refineries (classes A, C1, C2); ×0.3 far 
 E): 2.5 in 1,000 (4 in 10,000 – 8 in 1,000) near, 7.5 in 10,000 far.
 
 **Chemical, biological or radiological attack.** 0.03 disruptive attacks a year (0.01–0.1; START
-POICN: 517 CBRN events worldwide 1990–2017, about 76 % chemical) × the metro weight × 0.05
+POICN: 517 CBRN events worldwide 1990–2016, context rather than arithmetic) × the metro weight × 0.05
 (0.01–0.2) of its households under an order (buildings and blocks, as with the anthrax letters);
 outside the funded areas 1.5 in 10 million (1 in 100 million – 2 in a million). Sub-causes:
 chemical, biological, radiological.
@@ -367,9 +372,9 @@ for a scenario that does not apply is ignored with a note.
 | `new_madrid_m7` | 29 counties in AR, IL, KY, MO, TN | 7–10 % in 50 years → 0.18 %/yr (0.15–0.21 %) | — | off (rarer than the yardstick) | — |
 | `local_tsunami` | counties with a tsunami zone | the Cascadia rate (on the Cascadia coast) or 0.1 %/yr (0.03–0.3 %) elsewhere, × residents in the zone (NRI; else 10 %) | the long-run Cascadia rate × the same share | on (knowing the route costs nothing) | — |
 | `major_hurricane_direct_hit` | Gulf and Atlantic states with NRI hurricane frequency ≥ 0.1 a year | the major part of the hurricane rate: frequency × major share × 0.8 | — | on | — |
-| `wasatch_m7` (v2) | 9 Wasatch Front counties (Box Elder, Davis, Morgan, Salt Lake, Summit, Tooele, Utah, Wasatch, Weber) | 43 % chance of magnitude 6.75+ in 50 years (Working Group on Utah Earthquake Probabilities 2016; confirm) → 1.12 %/yr (0.71–1.69 %) | — | on (above half the yardstick) | — |
+| `wasatch_m7` (v2) | 9 Wasatch Front counties (Box Elder, Davis, Morgan, Salt Lake, Summit, Tooele, Utah, Wasatch, Weber) | 43 % chance of magnitude 6.75+ in 50 years in the Wasatch Front region, any fault (Working Group on Utah Earthquake Probabilities 2016; 18 % on the Wasatch fault zone alone) → 1.12 %/yr (0.71–1.69 %) | — | on (above half the yardstick) | — |
 | `san_andreas_south_m78` (v2) | 7 counties of the ShakeOut area (Imperial, Kern, Los Angeles, Orange, Riverside, San Bernardino, Ventura) | 19 % chance of magnitude 6.7+ on the southern San Andreas in 30 years (UCERF3; confirm) → 0.70 %/yr (0.43–1.09 %) | — | on | — |
-| `seattle_fault_m7` (v2) | King, Kitsap, Pierce and Snohomish | about 5 % chance of magnitude 6.5+ in 50 years (USGS and Washington DNR; confirm) → 0.10 %/yr (0.04–0.21 %) | — | on in Washington (Prepare in a Year), though rarer than the yardstick | — |
+| `seattle_fault_m7` (v2) | King, Kitsap, Pierce and Snohomish | 17 % chance of magnitude 6.5+ on a shallow (crustal) fault anywhere in the Puget Sound region in 50 years, the Seattle fault among them (USGS Fact Sheet 2025-3050; no source gives the Seattle fault's own chance) → 0.37 %/yr (0.21–0.71 %) | — | on in Washington (Prepare in a Year), though rarer than the yardstick | — |
 | `heat_blackout` (v2) | counties with 60 or more days a year over 95 °F (CMRA baseline: 44 counties, the desert Southwest, South Texas, southwest Oklahoma; Maricopa 123, Pima 89, Clark 74) | heat episodes × power cuts of a day or more a year (the county's EAGLE-I record × its share over a day, else 2 %/yr, 0.5–6 %) × 3 days ÷ 365 (Stone et al. 2023) | — | on (the most dangerous combination; the answer is a cool place to go) | — |
 
 The earthquake card shows the county rate less the long-run shares of every earthquake scenario
@@ -545,9 +550,11 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   has effects rows (awaiting: consequence). `heat_blackout` overlaps the compound heat-and-outage
   class `rr-consequence` is building; one of the two should own it.
 - **Figures to confirm** (hazard-expansion "UNVERIFIED items"): III's 1 in 67 and $15,400, Eviction
-  Lab's 2.3 in 100 and the 0.4 judgment share, the CSIS count of metro-wide closures, Riley 2012's
-  12 % a decade, the Wasatch 43 %, southern San Andreas 19 % and Seattle fault 5 % figures, and the
-  dust-storm rate in the Maricopa fixture (a test value until the Storm Events dust job lands).
+  Lab's 2.3 in 100 and the 0.4 judgment share, the count of metro-wide closures (CSIS does not
+  count them), the southern San Andreas 19 %, and the dust-storm rate in the Maricopa fixture (a test
+  value until the Storm Events dust job lands). Checked 2026-09-26: Riley 2012's 12 % a decade (as
+  Moriña 2019 reports it) and the Wasatch 43 % (region-wide); the Seattle fault's 5 % has no
+  source and was replaced by USGS's regional 17 %.
 
 ## Consequences and targets
 
