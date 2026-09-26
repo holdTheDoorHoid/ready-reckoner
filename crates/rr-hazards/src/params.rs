@@ -188,6 +188,11 @@ pub(crate) const ICE_CUT_SHARE: &[(&str, f64)] = &[
 /// DERIVED: the same over every region (4,299 matched in 4,010 episodes), capped at 1; the
 /// Northwest, the Southwest and Alaska hold too few ice-storm episodes for a share of their own.
 pub(crate) const ICE_CUT_SHARE_NATIONAL: f64 = 1.0;
+/// Severe-wind days plus high-wind episodes a year (Storm Events) below which a county's wind
+/// record is too thin to have matched its outages to windstorms: fewer than 3 in 30 years. In the
+/// pack that is 77 counties, nearly all where the zone records have gaps (western Washington,
+/// Alaska, Puerto Rico and the territories).
+pub(crate) const WIND_RECORD_MIN: f64 = 0.1;
 
 /// PRIOR. How exposed the household's power lines are, by setting: rural lines are long and
 /// overhead, city lines are shorter and partly underground (research §2.7 "utility

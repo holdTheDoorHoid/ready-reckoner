@@ -959,8 +959,9 @@ const TROPICAL_EVENTS: [&str; 4] = [
 pub(crate) struct FloorCause {
     /// The hazard that takes the top-up.
     pub hazard: HazardId,
-    /// The cause keys whose shares of the recorded outages it must explain.
-    pub keys: Vec<&'static str>,
+    /// The cause keys whose shares of the recorded outages it must explain, each with the part
+    /// of that share it takes (1, or the weather share of the outages matched to no storm).
+    pub keys: Vec<(&'static str, f64)>,
     /// The hazards whose modelled outages count against it.
     pub covered: &'static [HazardId],
     /// The chance that one household event of `hazard` cuts the power.
@@ -978,6 +979,20 @@ fn regional_share(table: &[(&str, f64)], national: f64, region: &str) -> f64 {
         .map_or(national, |(_, s)| *s)
 }
 
+/// Island grids whose outage records stand apart: rr-data pools Puerto Rico and the US Virgin
+/// Islands as grids of their own and serves Puerto Rico's island-wide series (matched against the
+/// whole island's storm record) for every municipio, so a thin wind record for one municipio or
+/// island does not mean the matching missed windstorms.
+const ISLAND_GRIDS: [&str; 5] = ["PR", "VI", "GU", "AS", "MP"];
+
+/// What [`floor_causes`] found about this county's records, for its notes.
+struct FloorGaps {
+    /// Out of reach of tropical storms: outages matched to one came from its remnants.
+    remnants: bool,
+    /// Too few windstorms on record to have matched outages to.
+    thin_wind_record: bool,
+}
+
 /// The outage floor's causes for this county. Winter and ice storms cut the power at the share of
 /// episodes the region's records match an outage to ([`WINTER_CUT_SHARE`], [`ICE_CUT_SHARE`]);
 /// windstorms and hurricanes keep their priors. Each cause is held to its Storm Events episode
@@ -985,40 +1000,50 @@ fn regional_share(table: &[(&str, f64)], national: f64, region: &str) -> f64 {
 /// windstorms, and the larger of the tropical passage and episode rates for hurricanes. A county
 /// out of reach of tropical storms (no hurricane rate from the track record and no tropical row
 /// on record) has no hurricane cause: outages matched to a tropical storm there come from its
-/// remnants and count with windstorms. Also returns whether that is so.
-fn floor_causes(ctx: &Ctx<'_>, rates: &[HazardRate]) -> (Vec<FloorCause>, bool) {
+/// remnants and count with windstorms. A mainland county with almost no windstorm on record
+/// (severe-wind days plus high-wind episodes under [`WIND_RECORD_MIN`] a year: a gap in the
+/// Storm Events zone records, as for western Washington and much of Alaska) could not have its
+/// outages matched to windstorms, so the weather share of its unmatched outages still counts as
+/// windstorms, as the old rule did, with no episode rate to cap it. Island grids
+/// ([`ISLAND_GRIDS`]) keep the new treatment.
+fn floor_causes(ctx: &Ctx<'_>, rates: &[HazardRate]) -> (Vec<FloorCause>, FloorGaps) {
     let episodes = |k: &str| ctx.event(k).map_or(0.0, |e| f64::from(e.rate_per_year));
     let tropical = rates
         .iter()
         .any(|r| r.hazard == HazardId::Hurricane && r.today.value > 0.0)
         || TROPICAL_EVENTS.iter().any(|k| episodes(k) > 0.0);
+    let wind_record = episodes("severe_wind_day") + episodes("high_wind");
+    let thin_wind_record =
+        wind_record < WIND_RECORD_MIN && !ISLAND_GRIDS.contains(&ctx.county.state_abbr.as_str());
     let region = ctx.county.nca_region.as_str();
     let mut out = Vec::new();
     for (h, key, covered, _) in FLOOR_CAUSES {
         let (keys, cut_share, cap) = match h {
             HazardId::StrongWind => {
-                let mut keys = vec![key];
+                let mut keys = vec![(key, 1.0)];
                 if !tropical {
-                    keys.push("hurricane");
+                    keys.push(("hurricane", 1.0));
                 }
-                (
-                    keys,
-                    OUTAGE_SHARE_STRONG_WIND,
-                    episodes("severe_wind_day") + episodes("high_wind"),
-                )
+                let cap = if thin_wind_record {
+                    keys.push(("unattributed", OUTAGE_WEATHER_SHARE.0));
+                    f64::INFINITY
+                } else {
+                    wind_record
+                };
+                (keys, OUTAGE_SHARE_STRONG_WIND, cap)
             }
             HazardId::WinterWeather => (
-                vec![key],
+                vec![(key, 1.0)],
                 regional_share(WINTER_CUT_SHARE, WINTER_CUT_SHARE_NATIONAL, region),
                 episodes("winter_storm"),
             ),
             HazardId::IceStorm => (
-                vec![key],
+                vec![(key, 1.0)],
                 regional_share(ICE_CUT_SHARE, ICE_CUT_SHARE_NATIONAL, region),
                 episodes("ice_storm"),
             ),
             HazardId::Hurricane if tropical => (
-                vec![key],
+                vec![(key, 1.0)],
                 OUTAGE_SHARE_HURRICANE,
                 TROPICAL_EVENTS
                     .iter()
@@ -1035,7 +1060,11 @@ fn floor_causes(ctx: &Ctx<'_>, rates: &[HazardRate]) -> (Vec<FloorCause>, bool) 
             cap,
         });
     }
-    (out, !tropical)
+    let gaps = FloorGaps {
+        remnants: !tropical,
+        thin_wind_record,
+    };
+    (out, gaps)
 }
 
 /// The outage floor by cause (model review M-18, M-10): each storm hazard must explain the
@@ -1075,7 +1104,7 @@ pub(crate) fn shortfall_by_cause(
         if fc.cut_share <= 0.0 || fc.cut_share.is_nan() {
             continue;
         }
-        let needed = recorded * fc.keys.iter().map(|k| share(k)).sum::<f64>();
+        let needed = recorded * fc.keys.iter().map(|(k, w)| w * share(k)).sum::<f64>();
         let have: f64 = fc
             .covered
             .iter()
@@ -1119,11 +1148,19 @@ fn floor_by_cause(
     homes: &str,
     notes: &mut Notes,
 ) {
-    let (floor, remnants) = floor_causes(ctx, rates);
-    if remnants && causes.get("hurricane").is_some_and(|v| *v > 0.0) {
+    let (floor, gaps) = floor_causes(ctx, rates);
+    let has = |k: &str| causes.get(k).is_some_and(|v| *v > 0.0);
+    if gaps.remnants && has("hurricane") {
         notes.add(format!(
             "Some outages in {} were matched to the remnants of tropical storms. It is far from \
              the storm tracks, so they count with windstorms, not as a hurricane.",
+            ctx.county_label()
+        ));
+    }
+    if gaps.thin_wind_record && has("unattributed") {
+        notes.add(format!(
+            "The storm records for {} hold almost no windstorms to match its outages to, so the \
+             weather share of the outages matched to no storm still counts as windstorms.",
             ctx.county_label()
         ));
     }
@@ -1249,6 +1286,7 @@ mod tests {
 
     /// A floor cause with the given cut share and cap, covering what [`FLOOR_CAUSES`] says.
     fn cause(h: HazardId, keys: &[&'static str], cut_share: f64, cap: f64) -> FloorCause {
+        let keys = keys.iter().map(|k| (*k, 1.0)).collect();
         let covered = FLOOR_CAUSES
             .iter()
             .find(|(x, _, _, _)| *x == h)
@@ -1256,7 +1294,7 @@ mod tests {
             .unwrap();
         FloorCause {
             hazard: h,
-            keys: keys.to_vec(),
+            keys,
             covered,
             cut_share,
             cap,

@@ -565,6 +565,17 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   - **Hurricanes only within reach of the tracks.** A county with no hurricane rate from the track
     record and no tropical passage or episode on record has no hurricane cause: outages matched to
     a tropical storm there came from its remnants, count with windstorms, and a note says so.
+  - **Almost no windstorm on record, no matching.** Where the pack's Storm Events record holds
+    fewer than 0.1 severe-wind days plus high-wind episodes a year for a mainland county (fewer than
+    3 in 30 years: a gap in the zone records, as for western Washington's Puget Sound and coast and
+    much of Alaska), its outages could not be matched to windstorms, so the weather share (0.7) of
+    its outages matched to no storm still counts as windstorms, as the old rule did, uncapped, and
+    a note says so. Otherwise those counties would lose the windstorm row they plainly have
+    (Clallam, Washington: 0.67 → 0.0001 a year; Kitsap 0.90 → 0.002). Island grids (Puerto Rico,
+    the US Virgin Islands, Guam, American Samoa, the Northern Mariana Islands) keep the new
+    treatment: rr-data pools them as grids of their own, and Puerto Rico's island-wide record was
+    matched against the whole island's storms. The real fix is the zone-to-county mapping in the
+    events job.
   The `wind` cause counts the modelled outages of windstorms, tornadoes, lightning and hail
   together (data-model files all four under it), and a hurricane top-up also goes into the
   Category 1–2 part, so the major-hurricane card still shows the full rate. The hurricane double

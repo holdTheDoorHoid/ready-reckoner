@@ -1156,3 +1156,52 @@ fn tropical_remnants_far_from_the_tracks_count_with_windstorms() {
             .any(|n| n.contains("remnants of tropical storms"))
     );
 }
+
+#[test]
+fn with_no_windstorm_on_record_unmatched_weather_outages_still_count_as_windstorms() {
+    // Western Washington and much of Alaska have almost no severe-wind day or high-wind episode
+    // in the Storm Events record the pack holds (fewer than 3 in 30 years), so their outages could
+    // not be matched to windstorms. There the weather share (0.7) of the outages matched to no
+    // storm counts as windstorms, as the old rule did, with no episode rate to cap it.
+    let input = household("hays-kansas-farm-5");
+    let mut f = kansas_with_outages(Some(0.05));
+    f.county.events.remove("severe_wind_day");
+    f.county.events.remove("high_wind");
+    f.county.outage_model.as_mut().unwrap().causes = [("unattributed", 0.8f32)]
+        .into_iter()
+        .map(|(k, v)| (k.to_owned(), v))
+        .collect();
+    let a = run(&input, &f);
+    let explained = a
+        .rates
+        .iter()
+        .map(|r| {
+            r.rate_per_year
+                * match r.hazard {
+                    H::StrongWind => 0.9,
+                    H::Tornado | H::Lightning => 0.8,
+                    H::Hail => 0.1,
+                    _ => 0.0,
+                }
+        })
+        .sum::<f64>();
+    // 2 outages a year × 0.8 matched to no storm × 0.7 weather = 1.12 for the wind cause.
+    assert!(close(explained, 2.0 * 0.8 * 0.7, 1e-6), "{explained}");
+    assert!(
+        a.notes
+            .iter()
+            .any(|n| n.contains("hold almost no windstorms to match")),
+        "{:?}",
+        a.notes
+    );
+    // An island grid keeps the new treatment: its unmatched outages stay "cause not recorded".
+    let mut island = f.clone();
+    island.county.state_abbr = "PR".into();
+    let b = run(&input, &island);
+    assert!(rate(&b, H::StrongWind).rate_per_year < rate(&a, H::StrongWind).rate_per_year);
+    assert!(
+        !b.notes
+            .iter()
+            .any(|n| n.contains("hold almost no windstorms to match"))
+    );
+}
