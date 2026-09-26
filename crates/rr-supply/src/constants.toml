@@ -28,7 +28,7 @@ default = 0.8
 low = 0.66
 sources = ["sphere_2018", "who_wedc_tn9"]
 note = "Drinking only. Sphere and WHO give 2.5 to 3 L a day for drinking in the acute phase of an emergency. Denmark advises 3 L; Germany 2 L for drinking plus cooking."
-note_sources = ["sphere_2018", "who_wedc_tn9", "rr_research_supply_standards"]
+note_sources = ["sphere_2018", "who_wedc_tn9", "bbk_vorsorgen_2025", "dema_prepared_for_crises"]
 
 [[constant]]
 key = "water_basic_gal"
@@ -67,7 +67,7 @@ unit = "gallon per person per day"
 default = 0.75
 sources = ["ready_gov_water"]
 note = "Authorities disagree on how much is for drinking: Washington says at least 1 quart, the Church at least 2 quarts, Ready.gov about 3/4 gallon of fluid, Sphere and WHO 2.5 to 3 L, Germany 2 L for drinking and cooking, Denmark 3 L. The plan keeps 1 gallon in total and shows the range."
-note_sources = ["washington_prepare_in_a_year", "church_emergency_prep_manual", "ready_gov_water", "sphere_2018", "who_wedc_tn9", "rr_research_supply_standards"]
+note_sources = ["washington_prepare_in_a_year", "church_emergency_prep_manual", "ready_gov_water", "sphere_2018", "who_wedc_tn9", "bbk_vorsorgen_2025", "dema_prepared_for_crises"]
 
 [[constant]]
 key = "water_heat_drinking_multiplier"
@@ -76,7 +76,7 @@ unit = "times"
 default = 2.0
 sources = ["ready_gov_water", "cdc_water_storage"]
 note = "Ready.gov: in very hot temperatures water needs can double. The plan doubles the drinking share (1.75 gallons a person a day at the basic level); the cautious option doubles everything (2 gallons). NIOSH says not to drink more than 6 cups an hour, and the CDC Yellow Book warns against drinking far past thirst."
-note_sources = ["ready_gov_water", "cdc_niosh_heat_hydration", "rr_research_supply_standards"]
+note_sources = ["ready_gov_water", "cdc_niosh_heat_hydration", "cdc_yellow_book_heat_cold"]
 
 [[constant]]
 key = "hot_climate_days_95f"
@@ -119,24 +119,24 @@ key = "water_dog_oz_per_lb_day"
 label = "Dog drinking water"
 unit = "ounce per pound of body weight per day"
 default = 1.0
-sources = ["rr_research_supply_standards"]
+sources = ["petmd_dog_water"]
 
 [[constant.alternative]]
 label = "Merck maintenance fluids: 132 x body weight in kg to the power 0.75 mL a day (a 30 lb dog about 0.9 L)"
 value = 0.95
-sources = ["rr_research_supply_standards"]
+sources = ["merck_vet_maintenance_fluids"]
 
 [[constant]]
 key = "water_cat_oz_per_lb_day"
 label = "Cat drinking water (about 4 oz per 5 lb)"
 unit = "ounce per pound of body weight per day"
 default = 0.8
-sources = ["rr_research_supply_standards"]
+sources = ["merck_vet_maintenance_fluids"]
 
 [[constant.alternative]]
 label = "Merck maintenance fluids: 80 x body weight in kg to the power 0.75 mL a day"
 value = 0.66
-sources = ["rr_research_supply_standards"]
+sources = ["merck_vet_maintenance_fluids"]
 
 [[constant]]
 key = "dog_weight_lb"
@@ -677,7 +677,7 @@ unit = "gallon per day"
 default = 2.8
 low = 2.8
 high = 7.1
-sources = ["rr_research_supply_standards"]
+sources = ["honda_eu2200i_spec"]
 note = "Its 0.95-gallon tank lasts 8.1 hours at a quarter load and 3.2 hours at full load: about 2.8 and 7.1 gallons a day running nonstop."
 
 [[constant]]
@@ -1935,6 +1935,13 @@ publisher = "ASPCA"
 url = "https://www.aspca.org/pet-care/general-pet-care/disaster-preparedness"
 
 [[source]]
+id = "bbk_vorsorgen_2025"
+short = "BBK"
+title = "Vorsorgen für Krisen und Katastrophen (Preparing for crises and disasters), 2nd edition, November 2025"
+publisher = "Bundesamt für Bevölkerungsschutz und Katastrophenhilfe (BBK), Germany"
+url = "https://www.bbk.bund.de/SharedDocs/Downloads/DE/Mediathek/Publikationen/Buergerinformationen/Ratgeber/ratgeber-notfallvorsorge.pdf?__blob=publicationFile"
+
+[[source]]
 id = "byu_longer_term_storage_2019"
 short = "BYU"
 title = "An Approach to Longer-Term Food Storage (revised September 2019)"
@@ -2054,6 +2061,13 @@ publisher = "Centers for Disease Control and Prevention"
 url = "https://www.cdc.gov/winter-weather/safety/stay-safe-during-after-a-winter-storm-safety.html"
 
 [[source]]
+id = "cdc_yellow_book_heat_cold"
+short = "CDC"
+title = "CDC Yellow Book 2026: Heat and Cold Illness in Travelers"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/yellow-book/hcp/environmental-hazards-risks/heat-and-cold-illness-in-travelers.html"
+
+[[source]]
 id = "cdc_yellow_book_travel_kits"
 short = "CDC"
 title = "CDC Yellow Book 2026: Travel Health Kits"
@@ -2087,6 +2101,13 @@ short = "Church of Jesus Christ"
 title = "Home Storage Center product list and prices (effective January 1, 2026)"
 publisher = "The Church of Jesus Christ of Latter-day Saints"
 url = "https://assets.churchofjesuschrist.org/01/b4/01b41d0ffdbf11ebbb5eeeeeac1e9b2afdc29be5/food_storage_center_products.pdf"
+
+[[source]]
+id = "dema_prepared_for_crises"
+short = "DEMA"
+title = "Prepared for crises"
+publisher = "Danish Emergency Management Agency (Beredskabsstyrelsen)"
+url = "https://www.brs.dk/en/prepared/"
 
 [[source]]
 id = "ecfr_47_1_1102"
@@ -2208,6 +2229,13 @@ publisher = "HHS Administration for Strategic Preparedness and Response"
 url = "https://aspr.hhs.gov/EPAP/Pages/default.aspx"
 
 [[source]]
+id = "honda_eu2200i_spec"
+short = "Generator spec sheet"
+title = "Portable inverter generator (2.2 kW class): manufacturer specification"
+publisher = "Manufacturer specification sheet, archived"
+url = "https://web.archive.org/web/20260914102101/https://powerequipment.honda.com/generators/models/eu2200i"
+
+[[source]]
 id = "iom_dri_water_2005"
 short = "National Academies"
 title = "Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate"
@@ -2220,6 +2248,13 @@ short = "local fire code"
 title = "Home Fuel Storage Limits (International Fire Code and NFPA 58 summary)"
 publisher = "Lehi City Fire Department, Utah"
 url = "https://www.lehi-ut.gov/departments/fire-department/fire-prevention/home-fuel-storage-limits/"
+
+[[source]]
+id = "merck_vet_maintenance_fluids"
+short = "Merck Veterinary Manual"
+title = "Maintenance Fluid Plan in Animals (Merck Veterinary Manual)"
+publisher = "Merck & Co., Inc."
+url = "https://www.merckvetmanual.com/therapeutics/fluid-therapy/maintenance-fluid-plan-in-animals"
 
 [[source]]
 id = "mo_med_2026_antibiotic_kits"
@@ -2262,6 +2297,13 @@ short = "Oregon OEM"
 title = "Be 2 Weeks Ready tool kit"
 publisher = "Oregon Department of Emergency Management"
 url = "https://www.oregon.gov/oem/Documents/B2WR-Complete-Tool-Kit-EN.pdf"
+
+[[source]]
+id = "petmd_dog_water"
+short = "PetMD"
+title = "How Much Water Should a Dog Drink?"
+publisher = "PetMD"
+url = "https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water"
 
 [[source]]
 id = "rdpo_emergency_toilet"
