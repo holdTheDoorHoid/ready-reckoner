@@ -594,6 +594,17 @@ guidance beyond safe storage and training pointers.
 ## 14. Decision log (append only)
 
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
+- 2026-09-26 — First end-to-end plan (rr-plan merged, 217f394) exposed presentation and catalogue
+  problems, not model problems; polish round decided (`~/Desktop/ready-reckoner-briefs/POLISH_ROUND.md`):
+  assumed household basics (`PlanInput.assume_basics`, `Item.assumed_basic`, listed in the packet);
+  free actions grouped to ≤ 30 parents; go-bag, get-home bag and pet kit modelled as containers plus
+  staged household supplies, never additive; bleach capped at one bottle per six months; one
+  extinguisher per floor; sleeping bags only beyond a 3-day cold target or with a vulnerable member;
+  one-off money goes to the top life-safety item; packet ≤ 20 printed pages with hazard blocks only for
+  the top six likely hazards plus named scenarios; price-band sanity pass on the 30 most expensive items.
+  Contract tweaks merged (agent/tweaks 342c39e): `Dials.rare_catastrophic_opt_in`,
+  `IncomeStability::very_stable` (×0.5 job loss), ENGINE-API conventions; goldens regenerated for the
+  citation repoint (source names only).
 - 2026-09-26 — Web shell merged (agent/web-shell f8f1afe). Decisions: interview "Continue anyway"
   on validation problems (warn, don't block); no online-lookup switch in v1 (explanatory text instead);
   month-0 free actions capped at 8 with the rest rolled into months 1–3 (behavioural research; budget
