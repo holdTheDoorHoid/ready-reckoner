@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { defineConfig } from 'vite';
+import { defineConfig, searchForWorkspaceRoot } from 'vite';
 
 import { contentSecurityPolicy, serviceWorker } from './vite-plugins/pwa';
 
@@ -36,6 +36,9 @@ export default defineConfig({
   },
   // Vitest runs components in jsdom, so Svelte must resolve to its browser build.
   resolve: process.env.VITEST ? { conditions: ['browser'] } : undefined,
+  // The Learn articles are the reviewed topic blocks in content/guidance, imported as text; the dev
+  // server and vitest may read that one folder outside web/ (a build reads it anyway).
+  server: { fs: { allow: [searchForWorkspaceRoot(process.cwd()), `${here}../content/guidance`] } },
   build: { target: 'es2022', sourcemap: true },
   test: {
     environment: 'jsdom',
