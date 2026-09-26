@@ -96,15 +96,16 @@ the frozen county records predate the smoke-day column `rr-hazards` reads, so th
 | --- | --- | --- | --- | --- |
 | v0.1.0, as the review scored it | 6 | 5 | 10 | 1 |
 | v0.2 as merged before tier 1 (`3c46b9b`), this rule | 6 | 5 | 10 | 1 |
-| This version, today's data pack (county-only model) | 8 | 4 | 9 | 1 |
+| This version, county-only model (the fallback without the v2 tables) | 8 | 4 | 9 | 1 |
 | This version, with the data pack v2 tables | 5 | 8 | 8 | 1 |
 | This version, with the tables and the v2 answers | 6 | 9 | 6 | 1 |
 | The same, with Buncombe's pre-Helene water record | 6 | 9 | 6 | 1 |
 
-The data pack v2 tables are the regional outage model and restoration curves (`agent/data-model`)
-and the drinking-water violations and smoke days (data-hazard's exposure columns, now merged),
-frozen in `crates/rr-consequence/tests/data/backtest/regional.json` so the verdicts do not move
-with a data refresh. The
+The data pack v2 tables are the regional outage model, the heat and cold shares and the
+restoration curves, and the drinking-water violations and smoke days, extracted from data pack
+`01a46abb2d5d` (the merged v0.2 pack) into `crates/rr-consequence/tests/data/backtest/regional.json`
+so the verdicts do not move with a data refresh. They replaced a hand copy taken from the data
+branches before they merged; every verdict and every number in the table stayed the same. The
 covered count falls with them on purpose: power verdicts that were covered only because the storm
 was in the county's own record (Oklahoma City, Linn) lose that luck when the region's records are
 pooled, and Uri's rolling blackouts in Austin now follow the region's record of such emergencies,
@@ -162,7 +163,8 @@ and the v2 answers; the county-only and pre-event runs are in `target/backtest.m
 - Add each new major event as an out-of-sample test *before* the refresh that includes its year
   (EAGLE-I adds a year every spring), and record its verdict on the old data first.
 - Regenerate the frozen county inputs only with a pack version change, recorded in the commit:
-  `RR_WRITE_BACKTEST=1 cargo test -p rr-consequence --test backtest -- --ignored`.
+  `RR_WRITE_BACKTEST=1 cargo test -p rr-consequence --test backtest -- --ignored` (both files), or
+  `RR_WRITE_BACKTEST=regional ...` for the v2 tables alone, which keeps the county-only baseline.
 
 ## UNVERIFIED
 

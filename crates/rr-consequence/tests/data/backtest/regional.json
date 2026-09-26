@@ -1,4659 +1,5498 @@
 {
- "provenance": [
-  "Frozen inputs for tests/backtest.rs, pending the data-pack v2 merges. Not the data pack.",
-  "outage_models, curves: agent/data-model working tree (rr-etl job outage_model at 56f3fea, files core/outage_pooled.csv, outage_causes.csv, outage_stress.csv, outage_curves.csv generated 2026-09-26 13:03), copied by hand for the backtest and fixture counties; the Puerto Rico and Virgin Islands historic curves follow crates/rr-etl/data/historic_outages.toml at fe4e327 (Maria from DOE situation reports and status.pr), their t50/t90 interpolated linearly between the listed days.",
-  "sdwis_violation_share: agent/data-hazard core/water_systems.csv at 815a585 (EPA ECHO SDWA, share of community-system population served by a system with a health-based violation in the last five years).",
-  "smoke_days_35: agent/data-hazard core/smoke.csv at 310363b (NOAA HMS and EPA AQS, 2016-2023 mean).",
-  "When those branches merge, CountyData::from_record reads the same fields from the pack and this file can go."
- ],
- "outage_models": {
-  "04013": {
-   "basis": "blend",
-   "rate": 0.0619,
-   "lam_ge": [
-    0.00149,
-    7.24e-05,
-    4.65e-05,
-    1.37e-05,
-    3.21e-08
-   ],
-   "z": [
-    0.46,
-    0.029,
-    0.021,
-    0.0094,
-    0.0014
-   ],
-   "region_counties": 22,
-   "stress": {
-    "event": "Wind and thunderstorms, July 2023",
-    "class": "wind",
-    "date": "2023-07-29",
-    "peak_share": 0.1098,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.05551
-     ],
-     [
-      3.0,
-      0.0
-     ],
-     [
-      7.0,
-      0.0
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "tstm_wind:183877",
-    "recorded_in": "04019",
-    "distance_km": 151.0
-   }
+  "provenance": [
+    "The data pack v2 tables for the backtest counties (the regional outage model, heat and cold shares, restoration curves, drinking-water violations and smoke days), extracted from the data pack by tests/backtest.rs (RR_WRITE_BACKTEST=regional). Not the data pack: a frozen copy so the verdicts do not move with each refresh (docs/VALIDATION.md)."
+  ],
+  "pack_version": "01a46abb2d5d",
+  "outage_models": {
+    "06007": {
+      "basis": "blend",
+      "rate": 1.03,
+      "lam_ge": [
+        0.0999,
+        0.0195,
+        0.000532,
+        0.0000289,
+        0.0000016
+      ],
+      "z": [
+        0.75,
+        0.45,
+        0.087,
+        0.017,
+        0.0006
+      ],
+      "region_counties": 59,
+      "causes": {
+        "flood": 0.01,
+        "grid": 0.089,
+        "heat": 0.019,
+        "unattributed": 0.47,
+        "wildfire": 0.2,
+        "wind": 0.051,
+        "winter": 0.16
+      },
+      "causes_ge_1d": {
+        "flood": 0.011,
+        "grid": 0.098,
+        "wildfire": 0.47
+      },
+      "stress": {
+        "event": "November 2018 Camp Fire",
+        "class": "wildfire",
+        "cause": "wildfire:131864",
+        "date": "2018-11-08",
+        "recorded_in": "06007",
+        "distance_km": 0.0,
+        "peak_share": 0.2839,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9604
+          ],
+          [
+            3.0,
+            0.9567
+          ],
+          [
+            7.0,
+            0.8769
+          ],
+          [
+            14.0,
+            0.5459
+          ],
+          [
+            30.0,
+            0.4124
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "13135": {
+      "basis": "blend",
+      "rate": 0.256,
+      "lam_ge": [
+        0.00834,
+        0.00112,
+        0.000242,
+        0.0000155,
+        0.00000275
+      ],
+      "z": [
+        0.58,
+        0.13,
+        0.022,
+        0.0051,
+        0.00083
+      ],
+      "region_counties": 409,
+      "causes": {
+        "hurricane": 0.21,
+        "ice": 0.029,
+        "unattributed": 0.44,
+        "wind": 0.3,
+        "winter": 0.012
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.88
+      },
+      "stress": {
+        "event": "Hurricane Helene",
+        "class": "hurricane",
+        "cause": "AL092024",
+        "date": "2024-09-25",
+        "recorded_in": "37021",
+        "distance_km": 229.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9222
+          ],
+          [
+            3.0,
+            0.7782
+          ],
+          [
+            7.0,
+            0.6938
+          ],
+          [
+            14.0,
+            0.2213
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "15009": {
+      "basis": "blend",
+      "rate": 0.77,
+      "lam_ge": [
+        0.0145,
+        0.00275,
+        0.000891,
+        0.0,
+        0.0
+      ],
+      "z": [
+        0.45,
+        0.15,
+        0.066,
+        0.0,
+        0.0
+      ],
+      "region_counties": 4,
+      "causes": {
+        "flood": 0.045,
+        "unattributed": 0.79,
+        "wildfire": 0.079,
+        "wind": 0.089
+      },
+      "causes_ge_1d": {
+        "flood": 0.11,
+        "wildfire": 0.6
+      },
+      "stress": {
+        "event": "Wildfire or fire-weather shutoff, August 2023",
+        "class": "wildfire",
+        "cause": "wildfire:183072",
+        "date": "2023-08-08",
+        "recorded_in": "15009",
+        "distance_km": 0.0,
+        "peak_share": 0.1918,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.8946
+          ],
+          [
+            3.0,
+            0.3187
+          ],
+          [
+            7.0,
+            0.1484
+          ],
+          [
+            14.0,
+            0.1325
+          ],
+          [
+            30.0,
+            0.05944
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "19113": {
+      "basis": "blend",
+      "rate": 0.332,
+      "lam_ge": [
+        0.0508,
+        0.0146,
+        0.00136,
+        0.000038,
+        0.00000195
+      ],
+      "z": [
+        0.47,
+        0.12,
+        0.022,
+        0.0048,
+        0.0015
+      ],
+      "region_counties": 312,
+      "causes": {
+        "grid": 0.009,
+        "ice": 0.0061,
+        "unattributed": 0.47,
+        "wind": 0.49,
+        "winter": 0.022
+      },
+      "stress": {
+        "event": "August 2020 Midwest derecho",
+        "class": "wind",
+        "cause": "tornado:151777",
+        "date": "2020-08-10",
+        "recorded_in": "19113",
+        "distance_km": 0.0,
+        "peak_share": 0.9255,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9692
+          ],
+          [
+            3.0,
+            0.7774
+          ],
+          [
+            7.0,
+            0.3695
+          ],
+          [
+            14.0,
+            0.01459
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "22051": {
+      "basis": "blend",
+      "rate": 0.476,
+      "lam_ge": [
+        0.0129,
+        0.00191,
+        0.000374,
+        0.000051,
+        0.0000161
+      ],
+      "z": [
+        0.7,
+        0.31,
+        0.076,
+        0.031,
+        0.014
+      ],
+      "region_counties": 114,
+      "causes": {
+        "flood": 0.016,
+        "grid": 0.022,
+        "heat": 0.01,
+        "hurricane": 0.3,
+        "unattributed": 0.56,
+        "wind": 0.094
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.95
+      },
+      "stress": {
+        "event": "Hurricane Ida",
+        "class": "hurricane",
+        "cause": "AL092021",
+        "date": "2021-08-29",
+        "recorded_in": "22057",
+        "distance_km": 35.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            1.0
+          ],
+          [
+            3.0,
+            1.0
+          ],
+          [
+            7.0,
+            0.9781
+          ],
+          [
+            14.0,
+            0.4197
+          ],
+          [
+            30.0,
+            0.01295
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "28049": {
+      "basis": "blend",
+      "rate": 0.665,
+      "lam_ge": [
+        0.0937,
+        0.0141,
+        0.000582,
+        0.0000391,
+        0.0000125
+      ],
+      "z": [
+        0.77,
+        0.39,
+        0.063,
+        0.023,
+        0.01
+      ],
+      "region_counties": 249,
+      "causes": {
+        "flood": 0.023,
+        "grid": 0.011,
+        "hurricane": 0.036,
+        "ice": 0.039,
+        "unattributed": 0.42,
+        "wind": 0.46,
+        "winter": 0.0061
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.052
+      },
+      "stress": {
+        "event": "Hurricane Ida",
+        "class": "hurricane",
+        "cause": "AL092021",
+        "date": "2021-08-29",
+        "recorded_in": "22091",
+        "distance_km": 162.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9372
+          ],
+          [
+            3.0,
+            0.8645
+          ],
+          [
+            7.0,
+            0.832
+          ],
+          [
+            14.0,
+            0.5622
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "36059": {
+      "basis": "blend",
+      "rate": 0.066,
+      "lam_ge": [
+        0.0102,
+        0.00224,
+        0.0000756,
+        2.34e-7,
+        0.0
+      ],
+      "z": [
+        0.73,
+        0.23,
+        0.013,
+        0.00061,
+        0.0
+      ],
+      "region_counties": 191,
+      "causes": {
+        "hurricane": 0.33,
+        "unattributed": 0.13,
+        "wind": 0.49,
+        "winter": 0.05
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.89
+      },
+      "stress": {
+        "event": "Winter storm, March 2018",
+        "class": "winter",
+        "cause": "blizzard:124559",
+        "date": "2018-03-02",
+        "recorded_in": "42103",
+        "distance_km": 138.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9002
+          ],
+          [
+            3.0,
+            0.7167
+          ],
+          [
+            7.0,
+            0.09552
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "36061": {
+      "basis": "blend",
+      "rate": 0.0,
+      "lam_ge": [
+        0.00833,
+        0.00234,
+        0.0000802,
+        2.67e-7,
+        0.0
+      ],
+      "z": [
+        0.71,
+        0.21,
+        0.012,
+        0.00056,
+        0.0
+      ],
+      "region_counties": 205,
+      "stress": {
+        "event": "Winter storm, March 2018",
+        "class": "winter",
+        "cause": "blizzard:124559",
+        "date": "2018-03-02",
+        "recorded_in": "42103",
+        "distance_km": 108.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9002
+          ],
+          [
+            3.0,
+            0.7167
+          ],
+          [
+            7.0,
+            0.09552
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "36081": {
+      "basis": "blend",
+      "rate": 0.00402,
+      "lam_ge": [
+        0.0077,
+        0.00224,
+        0.0000791,
+        2.6e-7,
+        0.0
+      ],
+      "z": [
+        0.74,
+        0.23,
+        0.014,
+        0.00065,
+        0.0
+      ],
+      "region_counties": 201,
+      "causes": {
+        "flood": 0.1,
+        "heat": 0.18,
+        "hurricane": 0.52,
+        "unattributed": 0.1,
+        "wind": 0.093
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.93
+      },
+      "stress": {
+        "event": "Winter storm, March 2018",
+        "class": "winter",
+        "cause": "blizzard:124559",
+        "date": "2018-03-02",
+        "recorded_in": "42103",
+        "distance_km": 125.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9002
+          ],
+          [
+            3.0,
+            0.7167
+          ],
+          [
+            7.0,
+            0.09552
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "36085": {
+      "basis": "blend",
+      "rate": 0.141,
+      "lam_ge": [
+        0.00824,
+        0.00234,
+        0.0000843,
+        3.14e-7,
+        0.0
+      ],
+      "z": [
+        0.7,
+        0.2,
+        0.012,
+        0.00059,
+        0.0
+      ],
+      "region_counties": 215,
+      "causes": {
+        "hurricane": 0.16,
+        "unattributed": 0.73,
+        "wind": 0.11
+      },
+      "causes_ge_1d": {
+        "hurricane": 1.0
+      },
+      "stress": {
+        "event": "Winter storm, March 2018",
+        "class": "winter",
+        "cause": "blizzard:124559",
+        "date": "2018-03-02",
+        "recorded_in": "42103",
+        "distance_km": 113.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9002
+          ],
+          [
+            3.0,
+            0.7167
+          ],
+          [
+            7.0,
+            0.09552
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "37021": {
+      "basis": "blend",
+      "rate": 0.812,
+      "lam_ge": [
+        0.0285,
+        0.00263,
+        0.000312,
+        0.0000146,
+        0.00000244
+      ],
+      "z": [
+        0.72,
+        0.28,
+        0.027,
+        0.0051,
+        0.00055
+      ],
+      "region_counties": 451,
+      "causes": {
+        "cold_grid": 0.011,
+        "flood": 0.02,
+        "hurricane": 0.13,
+        "ice": 0.0055,
+        "unattributed": 0.63,
+        "wind": 0.14,
+        "winter": 0.07
+      },
+      "causes_ge_1d": {
+        "cold_grid": 0.01,
+        "flood": 0.017,
+        "hurricane": 0.77
+      },
+      "stress": {
+        "event": "Hurricane Helene",
+        "class": "hurricane",
+        "cause": "AL092024",
+        "date": "2024-09-25",
+        "recorded_in": "37021",
+        "distance_km": 0.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9222
+          ],
+          [
+            3.0,
+            0.7782
+          ],
+          [
+            7.0,
+            0.6938
+          ],
+          [
+            14.0,
+            0.2213
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "37119": {
+      "basis": "blend",
+      "rate": 0.331,
+      "lam_ge": [
+        0.0272,
+        0.00224,
+        0.000293,
+        0.0000113,
+        0.00000145
+      ],
+      "z": [
+        0.7,
+        0.25,
+        0.027,
+        0.0045,
+        0.00043
+      ],
+      "region_counties": 389,
+      "causes": {
+        "flood": 0.05,
+        "grid": 0.0054,
+        "hurricane": 0.16,
+        "unattributed": 0.34,
+        "wind": 0.41,
+        "winter": 0.032
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.46
+      },
+      "stress": {
+        "event": "Hurricane Helene",
+        "class": "hurricane",
+        "cause": "AL092024",
+        "date": "2024-09-25",
+        "recorded_in": "37021",
+        "distance_km": 159.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9222
+          ],
+          [
+            3.0,
+            0.7782
+          ],
+          [
+            7.0,
+            0.6938
+          ],
+          [
+            14.0,
+            0.2213
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "39029": {
+      "basis": "blend",
+      "rate": 0.606,
+      "lam_ge": [
+        0.0532,
+        0.00788,
+        0.000442,
+        0.0000188,
+        6.65e-7
+      ],
+      "z": [
+        0.79,
+        0.34,
+        0.03,
+        0.0054,
+        0.00036
+      ],
+      "region_counties": 333,
+      "causes": {
+        "unattributed": 0.66,
+        "wind": 0.28,
+        "winter": 0.055
+      },
+      "stress": {
+        "event": "Wind and thunderstorms, June 2022",
+        "class": "wind",
+        "cause": "tstm_wind:169489",
+        "date": "2022-06-14",
+        "recorded_in": "39169",
+        "distance_km": 94.0,
+        "peak_share": 0.1388,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.8175
+          ],
+          [
+            3.0,
+            0.4866
+          ],
+          [
+            7.0,
+            0.04328
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "39035": {
+      "basis": "blend",
+      "rate": 0.296,
+      "lam_ge": [
+        0.0612,
+        0.0145,
+        0.00034,
+        0.0000311,
+        8.74e-7
+      ],
+      "z": [
+        0.76,
+        0.32,
+        0.03,
+        0.007,
+        0.00062
+      ],
+      "region_counties": 281,
+      "causes": {
+        "unattributed": 0.47,
+        "wind": 0.47,
+        "winter": 0.061
+      },
+      "stress": {
+        "event": "Ice storm, February 2023",
+        "class": "ice",
+        "cause": "ice_storm:177465",
+        "date": "2023-02-22",
+        "recorded_in": "26115",
+        "distance_km": 161.0,
+        "peak_share": 0.5108,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.6524
+          ],
+          [
+            3.0,
+            0.4118
+          ],
+          [
+            7.0,
+            0.04568
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "39049": {
+      "basis": "blend",
+      "rate": 0.245,
+      "lam_ge": [
+        0.0141,
+        0.00574,
+        0.000347,
+        0.0000236,
+        0.00000212
+      ],
+      "z": [
+        0.75,
+        0.32,
+        0.031,
+        0.0067,
+        0.00073
+      ],
+      "region_counties": 397,
+      "causes": {
+        "flood": 0.0091,
+        "grid": 0.099,
+        "unattributed": 0.51,
+        "wind": 0.34,
+        "winter": 0.04
+      },
+      "causes_ge_1d": {
+        "grid": 0.81
+      },
+      "stress": {
+        "event": "Winter storm, February 2021",
+        "class": "winter",
+        "cause": "winter_storm:156290",
+        "date": "2021-02-15",
+        "recorded_in": "39087",
+        "distance_km": 158.0,
+        "peak_share": 0.4642,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.8076
+          ],
+          [
+            3.0,
+            0.4985
+          ],
+          [
+            7.0,
+            0.1032
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "40109": {
+      "basis": "blend",
+      "rate": 0.382,
+      "lam_ge": [
+        0.0591,
+        0.0213,
+        0.00254,
+        0.00000598,
+        0.00000121
+      ],
+      "z": [
+        0.57,
+        0.2,
+        0.036,
+        0.0041,
+        0.0011
+      ],
+      "region_counties": 234,
+      "causes": {
+        "cold_grid": 0.039,
+        "flood": 0.011,
+        "heat": 0.026,
+        "ice": 0.12,
+        "unattributed": 0.42,
+        "wildfire": 0.02,
+        "wind": 0.33,
+        "winter": 0.031
+      },
+      "causes_ge_1d": {
+        "wildfire": 0.015
+      },
+      "stress": {
+        "event": "October 2020 Oklahoma ice storm",
+        "class": "ice",
+        "cause": "ice_storm:153454",
+        "date": "2020-10-26",
+        "recorded_in": "40109",
+        "distance_km": 0.0,
+        "peak_share": 0.5521,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9142
+          ],
+          [
+            3.0,
+            0.6393
+          ],
+          [
+            7.0,
+            0.4624
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "42101": {
+      "basis": "blend",
+      "rate": 0.0322,
+      "lam_ge": [
+        0.0102,
+        0.0023,
+        0.000111,
+        7.69e-7,
+        0.0
+      ],
+      "z": [
+        0.7,
+        0.21,
+        0.018,
+        0.0011,
+        0.0
+      ],
+      "region_counties": 260,
+      "causes": {
+        "hurricane": 0.044,
+        "unattributed": 0.27,
+        "wind": 0.58,
+        "winter": 0.11
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.071
+      },
+      "stress": {
+        "event": "Winter storm, March 2018",
+        "class": "winter",
+        "cause": "blizzard:124559",
+        "date": "2018-03-02",
+        "recorded_in": "42103",
+        "distance_km": 147.0,
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9002
+          ],
+          [
+            3.0,
+            0.7167
+          ],
+          [
+            7.0,
+            0.09552
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "48201": {
+      "basis": "blend",
+      "rate": 0.121,
+      "lam_ge": [
+        0.0247,
+        0.0066,
+        0.000279,
+        0.00002,
+        0.00000779
+      ],
+      "z": [
+        0.71,
+        0.26,
+        0.057,
+        0.022,
+        0.012
+      ],
+      "region_counties": 157,
+      "causes": {
+        "cold_grid": 0.083,
+        "flood": 0.0076,
+        "grid": 0.021,
+        "hurricane": 0.37,
+        "unattributed": 0.13,
+        "wind": 0.39
+      },
+      "causes_ge_1d": {
+        "cold_grid": 0.18,
+        "grid": 0.0083,
+        "hurricane": 0.61
+      },
+      "stress": {
+        "event": "Hurricane Harvey",
+        "class": "hurricane",
+        "cause": "AL092017",
+        "date": "2017-08-28",
+        "recorded_in": "48361",
+        "distance_km": 147.0,
+        "peak_share": 0.9767,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.8685
+          ],
+          [
+            3.0,
+            0.8473
+          ],
+          [
+            7.0,
+            0.2505
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "48453": {
+      "basis": "blend",
+      "rate": 0.135,
+      "lam_ge": [
+        0.0261,
+        0.00583,
+        0.000338,
+        0.0000112,
+        0.00000459
+      ],
+      "z": [
+        0.59,
+        0.18,
+        0.043,
+        0.015,
+        0.0086
+      ],
+      "region_counties": 165,
+      "causes": {
+        "cold_grid": 0.22,
+        "flood": 0.026,
+        "grid": 0.025,
+        "heat": 0.026,
+        "hurricane": 0.017,
+        "unattributed": 0.17,
+        "wind": 0.36,
+        "winter": 0.16
+      },
+      "causes_ge_1d": {
+        "cold_grid": 0.57,
+        "hurricane": 0.023
+      },
+      "stress": {
+        "event": "February 2021 winter storm and Texas blackout (Uri)",
+        "class": "cold_grid",
+        "cause": "winter_storm:156281",
+        "date": "2021-02-11",
+        "recorded_in": "48171",
+        "distance_km": 120.0,
+        "peak_share": 0.5485,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.739
+          ],
+          [
+            3.0,
+            0.5087
+          ],
+          [
+            7.0,
+            0.286
+          ],
+          [
+            14.0,
+            0.04285
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "72127": {
+      "basis": "blend",
+      "rate": 3.06,
+      "lam_ge": [
+        0.341,
+        0.02,
+        0.00303,
+        0.0,
+        0.0
+      ],
+      "z": [
+        0.94,
+        0.67,
+        0.29,
+        0.0,
+        0.0
+      ],
+      "region_counties": 77,
+      "causes": {
+        "hurricane": 0.1,
+        "unattributed": 0.9
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.45
+      },
+      "stress": {
+        "event": "Hurricane Maria",
+        "class": "hurricane",
+        "cause": "AL152017",
+        "date": "2017-09-20",
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            1.0
+          ],
+          [
+            3.0,
+            1.0
+          ],
+          [
+            7.0,
+            1.0
+          ],
+          [
+            14.0,
+            0.914
+          ],
+          [
+            30.0,
+            0.815
+          ]
+        ],
+        "source": "historic:maria_2017_pr"
+      }
+    },
+    "72141": {
+      "basis": "blend",
+      "rate": 3.06,
+      "lam_ge": [
+        0.341,
+        0.02,
+        0.00303,
+        0.0,
+        0.0
+      ],
+      "z": [
+        0.94,
+        0.67,
+        0.29,
+        0.0,
+        0.0
+      ],
+      "region_counties": 77,
+      "causes": {
+        "hurricane": 0.1,
+        "unattributed": 0.9
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.45
+      },
+      "stress": {
+        "event": "Hurricane Maria",
+        "class": "hurricane",
+        "cause": "AL152017",
+        "date": "2017-09-20",
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            1.0
+          ],
+          [
+            3.0,
+            1.0
+          ],
+          [
+            7.0,
+            1.0
+          ],
+          [
+            14.0,
+            0.914
+          ],
+          [
+            30.0,
+            0.815
+          ]
+        ],
+        "source": "historic:maria_2017_pr"
+      }
+    }
   },
-  "06007": {
-   "basis": "blend",
-   "rate": 0.927,
-   "lam_ge": [
-    0.111,
-    0.0185,
-    0.000385,
-    1.48e-05,
-    0.0
-   ],
-   "z": [
-    0.78,
-    0.4,
-    0.065,
-    0.0067,
-    0.0
-   ],
-   "region_counties": 59,
-   "causes": {
-    "winter": 0.18,
-    "wind": 0.037,
-    "wildfire": 0.21,
-    "heat": 0.018,
-    "flood": 0.012,
-    "grid": 0.1,
-    "unattributed": 0.44
-   },
-   "causes_ge_1d": {
-    "wildfire": 0.44,
-    "flood": 0.017,
-    "grid": 0.1
-   },
-   "stress": {
-    "event": "November 2018 Camp Fire",
-    "class": "wildfire",
-    "date": "2018-11-08",
-    "peak_share": 0.2839,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.9604
-     ],
-     [
-      3.0,
-      0.9567
-     ],
-     [
-      7.0,
-      0.8769
-     ],
-     [
-      14.0,
-      0.5459
-     ],
-     [
-      30.0,
-      0.4124
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "wildfire:131864",
-    "recorded_in": "06007",
-    "distance_km": 0.0
-   }
+  "temperature": {
+    "06007": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.09,
+        0.35,
+        0.7,
+        0.64,
+        0.4,
+        0.05,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.03,
+        0.09,
+        0.06,
+        0.02,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.063,
+      "outage_cold_share": 0.0,
+      "region_outage_hot_share": 0.0411,
+      "region_outage_cold_share": 0.0174
+    },
+    "13135": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02,
+        0.22,
+        0.42,
+        0.3,
+        0.1,
+        0.01,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.11,
+        0.03,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.03
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.00703,
+      "outage_cold_share": 0.0121,
+      "region_outage_hot_share": 0.0123,
+      "region_outage_cold_share": 0.0144
+    },
+    "19113": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02,
+        0.07,
+        0.14,
+        0.07,
+        0.02,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.69,
+        0.57,
+        0.23,
+        0.02,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.22,
+        0.53
+      ],
+      "tmin_le_0f": [
+        0.25,
+        0.16,
+        0.02,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.1
+      ],
+      "outage_hot_share": 0.00483,
+      "outage_cold_share": 0.00155,
+      "region_outage_hot_share": 0.00548,
+      "region_outage_cold_share": 0.0248
+    },
+    "22051": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.07,
+        0.41,
+        0.63,
+        0.63,
+        0.26,
+        0.02,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0027,
+      "outage_cold_share": 0.0,
+      "region_outage_hot_share": 0.0103,
+      "region_outage_cold_share": 0.00542
+    },
+    "28049": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.09,
+        0.51,
+        0.74,
+        0.71,
+        0.39,
+        0.04,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.03,
+        0.01,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.04,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0474,
+      "outage_cold_share": 0.0112,
+      "region_outage_hot_share": 0.0387,
+      "region_outage_cold_share": 0.017
+    },
+    "36059": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.05,
+        0.17,
+        0.08,
+        0.01,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.27,
+        0.22,
+        0.06,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.08
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.00472,
+      "outage_cold_share": 0.0,
+      "region_outage_hot_share": 0.0138,
+      "region_outage_cold_share": 0.029
+    },
+    "36061": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02,
+        0.09,
+        0.25,
+        0.13,
+        0.02,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.25,
+        0.2,
+        0.05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.07
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "region_outage_hot_share": 0.0149,
+      "region_outage_cold_share": 0.0291
+    },
+    "36081": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.07,
+        0.21,
+        0.11,
+        0.02,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.25,
+        0.19,
+        0.05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.07
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.035,
+      "outage_cold_share": 0.0,
+      "region_outage_hot_share": 0.0151,
+      "region_outage_cold_share": 0.0281
+    },
+    "36085": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02,
+        0.09,
+        0.25,
+        0.14,
+        0.03,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.27,
+        0.2,
+        0.06,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.09
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0969,
+      "outage_cold_share": 0.00149,
+      "region_outage_hot_share": 0.0168,
+      "region_outage_cold_share": 0.0272
+    },
+    "37021": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.27,
+        0.15,
+        0.04,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.04,
+        0.14
+      ],
+      "tmin_le_0f": [
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0,
+      "outage_cold_share": 0.0101,
+      "region_outage_hot_share": 0.00837,
+      "region_outage_cold_share": 0.0267
+    },
+    "37119": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.05,
+        0.3,
+        0.54,
+        0.36,
+        0.13,
+        0.01,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.12,
+        0.03,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.04
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.067,
+      "outage_cold_share": 0.0376,
+      "region_outage_hot_share": 0.0113,
+      "region_outage_cold_share": 0.019
+    },
+    "39029": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02,
+        0.08,
+        0.06,
+        0.01,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.5,
+        0.4,
+        0.18,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.05,
+        0.26
+      ],
+      "tmin_le_0f": [
+        0.06,
+        0.04,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0,
+      "outage_cold_share": 0.0239,
+      "region_outage_hot_share": 0.00472,
+      "region_outage_cold_share": 0.039
+    },
+    "39035": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.04,
+        0.08,
+        0.03,
+        0.02,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.45,
+        0.4,
+        0.17,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02,
+        0.22
+      ],
+      "tmin_le_0f": [
+        0.04,
+        0.04,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0,
+      "outage_cold_share": 0.00858,
+      "region_outage_hot_share": 0.00718,
+      "region_outage_cold_share": 0.0273
+    },
+    "39049": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02,
+        0.11,
+        0.19,
+        0.12,
+        0.05,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.44,
+        0.33,
+        0.11,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.04,
+        0.24
+      ],
+      "tmin_le_0f": [
+        0.06,
+        0.03,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0,
+      "outage_cold_share": 0.0124,
+      "region_outage_hot_share": 0.00551,
+      "region_outage_cold_share": 0.0485
+    },
+    "40109": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.08,
+        0.39,
+        0.77,
+        0.69,
+        0.28,
+        0.02,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02,
+        0.15,
+        0.16,
+        0.03,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.19,
+        0.11,
+        0.03,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.02,
+        0.12
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0663,
+      "outage_cold_share": 0.00583,
+      "region_outage_hot_share": 0.0607,
+      "region_outage_cold_share": 0.0934
+    },
+    "42101": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.04,
+        0.14,
+        0.32,
+        0.18,
+        0.04,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.29,
+        0.22,
+        0.06,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.1
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0,
+      "outage_cold_share": 0.0132,
+      "region_outage_hot_share": 0.0244,
+      "region_outage_cold_share": 0.0258
+    },
+    "48201": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.13,
+        0.65,
+        0.86,
+        0.87,
+        0.53,
+        0.07,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.01,
+        0.05,
+        0.01,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0172,
+      "outage_cold_share": 0.0872,
+      "region_outage_hot_share": 0.0385,
+      "region_outage_cold_share": 0.137
+    },
+    "48453": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.04,
+        0.28,
+        0.74,
+        0.91,
+        0.93,
+        0.58,
+        0.1,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.05,
+        0.16,
+        0.24,
+        0.04,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.01,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0209,
+      "outage_cold_share": 0.418,
+      "region_outage_hot_share": 0.0456,
+      "region_outage_cold_share": 0.275
+    }
   },
-  "12086": {
-   "basis": "blend",
-   "rate": 0.0559,
-   "lam_ge": [
-    0.00181,
-    0.000422,
-    7.56e-05,
-    3.59e-08,
-    0.0
-   ],
-   "z": [
-    0.38,
-    0.015,
-    0.01,
-    0.0005,
-    0.0
-   ],
-   "region_counties": 29,
-   "stress": {
-    "event": "Hurricane Ian",
-    "class": "hurricane",
-    "date": "2022-09-28",
-    "peak_share": 0.9677,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.906
-     ],
-     [
-      3.0,
-      0.7733
-     ],
-     [
-      7.0,
-      0.4529
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "AL092022",
-    "recorded_in": "12015",
-    "distance_km": 207.0
-   }
+  "curves": [
+    {
+      "region": "alaska",
+      "class": "all",
+      "events": 91,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.05691
+        ],
+        [
+          3.0,
+          0.005005
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.6549
+    },
+    {
+      "region": "alaska",
+      "class": "unattributed",
+      "events": 87,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.04869
+        ],
+        [
+          3.0,
+          0.004925
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "alaska",
+      "class": "wind",
+      "events": 2,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1696
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6711,
+      "t90_days": 1.642,
+      "factor": 1.103
+    },
+    {
+      "region": "alaska",
+      "class": "winter",
+      "events": 2,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2643
+        ],
+        [
+          3.0,
+          0.02793
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.8505,
+      "t90_days": 2.586,
+      "factor": 1.458
+    },
+    {
+      "region": "hawaii_pacific",
+      "class": "all",
+      "events": 23,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.04536
+        ],
+        [
+          3.0,
+          0.01034
+        ],
+        [
+          7.0,
+          0.004815
+        ],
+        [
+          14.0,
+          0.004299
+        ],
+        [
+          30.0,
+          0.001929
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.6549
+    },
+    {
+      "region": "hawaii_pacific",
+      "class": "flood",
+      "events": 1,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.9375
+    },
+    {
+      "region": "hawaii_pacific",
+      "class": "hurricane",
+      "events": 1,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1175
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5666,
+      "t90_days": 1.109,
+      "factor": 0.5
+    },
+    {
+      "region": "hawaii_pacific",
+      "class": "unattributed",
+      "events": 16,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.01109
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "hawaii_pacific",
+      "class": "wildfire",
+      "events": 2,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.5476
+        ],
+        [
+          3.0,
+          0.1951
+        ],
+        [
+          7.0,
+          0.09083
+        ],
+        [
+          14.0,
+          0.0811
+        ],
+        [
+          30.0,
+          0.03638
+        ]
+      ],
+      "t50_days": 2.554,
+      "t90_days": 17.49,
+      "factor": 5.0
+    },
+    {
+      "region": "hawaii_pacific",
+      "class": "wind",
+      "events": 2,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0282
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.6047
+    },
+    {
+      "region": "hawaii_pacific",
+      "class": "winter",
+      "events": 1,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.5073
+    },
+    {
+      "region": "mainland",
+      "class": "all",
+      "events": 24602,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2806
+        ],
+        [
+          3.0,
+          0.07993
+        ],
+        [
+          7.0,
+          0.01266
+        ],
+        [
+          14.0,
+          0.001224
+        ],
+        [
+          30.0,
+          0.0001087
+        ]
+      ],
+      "t50_days": 0.5987,
+      "t90_days": 1.374,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "cold_grid",
+      "events": 271,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.5115
+        ],
+        [
+          3.0,
+          0.04685
+        ],
+        [
+          7.0,
+          0.004514
+        ],
+        [
+          14.0,
+          0.00006772
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 1.083,
+      "t90_days": 1.894,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "flood",
+      "events": 330,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1471
+        ],
+        [
+          3.0,
+          0.0197
+        ],
+        [
+          7.0,
+          0.001765
+        ],
+        [
+          14.0,
+          0.0001183
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5333,
+      "t90_days": 0.9599,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "grid",
+      "events": 525,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.08999
+        ],
+        [
+          3.0,
+          0.01189
+        ],
+        [
+          7.0,
+          0.00002591
+        ],
+        [
+          14.0,
+          0.00001976
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "heat",
+      "events": 168,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.02808
+        ],
+        [
+          3.0,
+          0.002818
+        ],
+        [
+          7.0,
+          0.0006617
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "hurricane",
+      "events": 1722,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.5737
+        ],
+        [
+          3.0,
+          0.2475
+        ],
+        [
+          7.0,
+          0.04884
+        ],
+        [
+          14.0,
+          0.005178
+        ],
+        [
+          30.0,
+          0.0002482
+        ]
+      ],
+      "t50_days": 1.409,
+      "t90_days": 3.819,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "ice",
+      "events": 354,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.5327
+        ],
+        [
+          3.0,
+          0.1944
+        ],
+        [
+          7.0,
+          0.04875
+        ],
+        [
+          14.0,
+          0.002133
+        ],
+        [
+          30.0,
+          0.00001016
+        ]
+      ],
+      "t50_days": 1.226,
+      "t90_days": 2.923,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "unattributed",
+      "events": 11947,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.05931
+        ],
+        [
+          3.0,
+          0.009729
+        ],
+        [
+          7.0,
+          0.0006935
+        ],
+        [
+          14.0,
+          0.00004174
+        ],
+        [
+          30.0,
+          0.000006377
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "wildfire",
+      "events": 183,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.3617
+        ],
+        [
+          3.0,
+          0.09094
+        ],
+        [
+          7.0,
+          0.01525
+        ],
+        [
+          14.0,
+          0.007839
+        ],
+        [
+          30.0,
+          0.005656
+        ]
+      ],
+      "t50_days": 0.7089,
+      "t90_days": 1.584,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "wind",
+      "events": 7397,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2607
+        ],
+        [
+          3.0,
+          0.04692
+        ],
+        [
+          7.0,
+          0.002376
+        ],
+        [
+          14.0,
+          0.00002161
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6145,
+      "t90_days": 1.488,
+      "factor": 1.0
+    },
+    {
+      "region": "mainland",
+      "class": "winter",
+      "events": 1705,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.335
+        ],
+        [
+          3.0,
+          0.04666
+        ],
+        [
+          7.0,
+          0.003786
+        ],
+        [
+          14.0,
+          0.00007657
+        ],
+        [
+          30.0,
+          9.135e-7
+        ]
+      ],
+      "t50_days": 0.7201,
+      "t90_days": 1.774,
+      "factor": 1.0
+    },
+    {
+      "region": "midwest",
+      "class": "all",
+      "events": 4917,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2409
+        ],
+        [
+          3.0,
+          0.04627
+        ],
+        [
+          7.0,
+          0.003403
+        ],
+        [
+          14.0,
+          0.0002712
+        ],
+        [
+          30.0,
+          0.000001131
+        ]
+      ],
+      "t50_days": 0.568,
+      "t90_days": 1.163,
+      "factor": 0.846
+    },
+    {
+      "region": "midwest",
+      "class": "cold_grid",
+      "events": 16,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.5
+    },
+    {
+      "region": "midwest",
+      "class": "flood",
+      "events": 66,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1128
+        ],
+        [
+          3.0,
+          0.006893
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.9375
+    },
+    {
+      "region": "midwest",
+      "class": "grid",
+      "events": 46,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.09314
+        ],
+        [
+          3.0,
+          0.002651
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5077,
+      "t90_days": 0.9139,
+      "factor": 1.015
+    },
+    {
+      "region": "midwest",
+      "class": "heat",
+      "events": 8,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.07082
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5776,
+      "t90_days": 1.194,
+      "factor": 1.326
+    },
+    {
+      "region": "midwest",
+      "class": "hurricane",
+      "events": 29,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.34
+        ],
+        [
+          3.0,
+          0.03596
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.7327,
+      "t90_days": 2.393,
+      "factor": 0.6266
+    },
+    {
+      "region": "midwest",
+      "class": "ice",
+      "events": 119,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.575
+        ],
+        [
+          3.0,
+          0.2041
+        ],
+        [
+          7.0,
+          0.02634
+        ],
+        [
+          14.0,
+          0.004418
+        ],
+        [
+          30.0,
+          0.000022
+        ]
+      ],
+      "t50_days": 1.538,
+      "t90_days": 3.725,
+      "factor": 1.274
+    },
+    {
+      "region": "midwest",
+      "class": "unattributed",
+      "events": 2443,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.06435
+        ],
+        [
+          3.0,
+          0.004463
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "midwest",
+      "class": "wind",
+      "events": 1903,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.3137
+        ],
+        [
+          3.0,
+          0.06022
+        ],
+        [
+          7.0,
+          0.003804
+        ],
+        [
+          14.0,
+          0.00008389
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6764,
+      "t90_days": 1.715,
+      "factor": 1.153
+    },
+    {
+      "region": "midwest",
+      "class": "winter",
+      "events": 287,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.317
+        ],
+        [
+          3.0,
+          0.03538
+        ],
+        [
+          7.0,
+          0.0008087
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.7176,
+      "t90_days": 1.739,
+      "factor": 0.9803
+    },
+    {
+      "region": "northeast",
+      "class": "all",
+      "events": 4544,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.26
+        ],
+        [
+          3.0,
+          0.04532
+        ],
+        [
+          7.0,
+          0.001662
+        ],
+        [
+          14.0,
+          0.00001791
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6052,
+      "t90_days": 1.417,
+      "factor": 1.031
+    },
+    {
+      "region": "northeast",
+      "class": "cold_grid",
+      "events": 26,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.5176
+        ],
+        [
+          3.0,
+          0.07439
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 1.178,
+      "t90_days": 2.497,
+      "factor": 1.318
+    },
+    {
+      "region": "northeast",
+      "class": "flood",
+      "events": 61,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1202
+        ],
+        [
+          3.0,
+          0.005202
+        ],
+        [
+          7.0,
+          0.003994
+        ],
+        [
+          14.0,
+          0.000654
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5289,
+      "t90_days": 0.952,
+      "factor": 0.9918
+    },
+    {
+      "region": "northeast",
+      "class": "grid",
+      "events": 54,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.007918
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "northeast",
+      "class": "heat",
+      "events": 7,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1551
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "northeast",
+      "class": "hurricane",
+      "events": 123,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.5305
+        ],
+        [
+          3.0,
+          0.1834
+        ],
+        [
+          7.0,
+          0.004482
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 1.15,
+      "t90_days": 2.988,
+      "factor": 0.7825
+    },
+    {
+      "region": "northeast",
+      "class": "ice",
+      "events": 28,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.4274
+        ],
+        [
+          3.0,
+          0.07862
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.9223,
+      "t90_days": 2.751,
+      "factor": 0.9411
+    },
+    {
+      "region": "northeast",
+      "class": "unattributed",
+      "events": 2314,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.03561
+        ],
+        [
+          3.0,
+          0.002503
+        ],
+        [
+          7.0,
+          0.00005915
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "northeast",
+      "class": "wildfire",
+      "events": 2,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1841
+        ],
+        [
+          3.0,
+          0.1451
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6295,
+      "t90_days": 3.891,
+      "factor": 2.457
+    },
+    {
+      "region": "northeast",
+      "class": "wind",
+      "events": 1401,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2849
+        ],
+        [
+          3.0,
+          0.03826
+        ],
+        [
+          7.0,
+          0.001352
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6506,
+      "t90_days": 1.615,
+      "factor": 1.085
+    },
+    {
+      "region": "northeast",
+      "class": "winter",
+      "events": 528,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.3737
+        ],
+        [
+          3.0,
+          0.03931
+        ],
+        [
+          7.0,
+          0.003066
+        ],
+        [
+          14.0,
+          0.00006439
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.8171,
+      "t90_days": 1.851,
+      "factor": 1.044
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "all",
+      "events": 377,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.131
+        ],
+        [
+          3.0,
+          0.03485
+        ],
+        [
+          7.0,
+          0.0004486
+        ],
+        [
+          14.0,
+          0.000003286
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.6549
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "cold_grid",
+      "events": 3,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.5
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "flood",
+      "events": 11,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.00598
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.9375
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "grid",
+      "events": 7,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "heat",
+      "events": 1,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.08821
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5484,
+      "t90_days": 0.9871,
+      "factor": 1.097
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "ice",
+      "events": 4,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.8755
+        ],
+        [
+          3.0,
+          0.1356
+        ],
+        [
+          7.0,
+          0.0379
+        ],
+        [
+          14.0,
+          0.0004835
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 1.415,
+      "t90_days": 1.886,
+      "factor": 0.6451
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "unattributed",
+      "events": 195,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0002911
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "wildfire",
+      "events": 5,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.5682
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "wind",
+      "events": 109,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2581
+        ],
+        [
+          3.0,
+          0.06951
+        ],
+        [
+          7.0,
+          0.00003615
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.653,
+      "t90_days": 1.772,
+      "factor": 1.19
+    },
+    {
+      "region": "northern_great_plains",
+      "class": "winter",
+      "events": 42,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1703
+        ],
+        [
+          3.0,
+          0.04888
+        ],
+        [
+          7.0,
+          0.001567
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6053,
+      "t90_days": 1.454,
+      "factor": 0.8195
+    },
+    {
+      "region": "northwest",
+      "class": "all",
+      "events": 881,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1788
+        ],
+        [
+          3.0,
+          0.04375
+        ],
+        [
+          7.0,
+          0.005729
+        ],
+        [
+          14.0,
+          0.00005195
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5395,
+      "t90_days": 0.971,
+      "factor": 0.7065
+    },
+    {
+      "region": "northwest",
+      "class": "cold_grid",
+      "events": 1,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1494
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5878,
+      "t90_days": 1.258,
+      "factor": 0.664
+    },
+    {
+      "region": "northwest",
+      "class": "flood",
+      "events": 20,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1809
+        ],
+        [
+          3.0,
+          0.02629
+        ],
+        [
+          7.0,
+          0.000501
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6012,
+      "t90_days": 1.502,
+      "factor": 1.565
+    },
+    {
+      "region": "northwest",
+      "class": "grid",
+      "events": 24,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.02234
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "northwest",
+      "class": "heat",
+      "events": 5,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "northwest",
+      "class": "ice",
+      "events": 3,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1839
+        ],
+        [
+          3.0,
+          0.01807
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5979,
+      "t90_days": 1.31,
+      "factor": 0.5
+    },
+    {
+      "region": "northwest",
+      "class": "unattributed",
+      "events": 633,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1707
+        ],
+        [
+          3.0,
+          0.03996
+        ],
+        [
+          7.0,
+          0.004368
+        ],
+        [
+          14.0,
+          0.00007317
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5214,
+      "t90_days": 0.9385,
+      "factor": 1.043
+    },
+    {
+      "region": "northwest",
+      "class": "wildfire",
+      "events": 25,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.111
+        ],
+        [
+          3.0,
+          0.06181
+        ],
+        [
+          7.0,
+          0.01792
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.5682
+    },
+    {
+      "region": "northwest",
+      "class": "wind",
+      "events": 120,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2381
+        ],
+        [
+          3.0,
+          0.07933
+        ],
+        [
+          7.0,
+          0.01145
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6054,
+      "t90_days": 1.472,
+      "factor": 0.9891
+    },
+    {
+      "region": "northwest",
+      "class": "winter",
+      "events": 50,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.3449
+        ],
+        [
+          3.0,
+          0.07654
+        ],
+        [
+          7.0,
+          0.02131
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 1.148,
+      "t90_days": 3.878,
+      "factor": 2.186
+    },
+    {
+      "region": "puerto_rico",
+      "class": "all",
+      "events": 18,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2613
+        ],
+        [
+          3.0,
+          0.1354
+        ],
+        [
+          7.0,
+          0.1014
+        ],
+        [
+          14.0,
+          0.02585
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.6549
+    },
+    {
+      "region": "puerto_rico",
+      "class": "historic:maria_2017_pr",
+      "events": 1,
+      "share_out_at_days": [
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          1.0
+        ],
+        [
+          7.0,
+          1.0
+        ],
+        [
+          14.0,
+          0.914
+        ],
+        [
+          30.0,
+          0.815
+        ]
+      ],
+      "t50_days": 91.0,
+      "t90_days": 171.5,
+      "factor": 5.0
+    },
+    {
+      "region": "puerto_rico",
+      "class": "hurricane",
+      "events": 3,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.7505
+        ],
+        [
+          3.0,
+          0.5398
+        ],
+        [
+          7.0,
+          0.4043
+        ],
+        [
+          14.0,
+          0.1031
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 8.544,
+      "t90_days": 17.77,
+      "factor": 4.654
+    },
+    {
+      "region": "puerto_rico",
+      "class": "unattributed",
+      "events": 15,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.09755
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southeast",
+      "class": "all",
+      "events": 9358,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.333
+        ],
+        [
+          3.0,
+          0.1229
+        ],
+        [
+          7.0,
+          0.0245
+        ],
+        [
+          14.0,
+          0.002866
+        ],
+        [
+          30.0,
+          0.0001411
+        ]
+      ],
+      "t50_days": 0.6451,
+      "t90_days": 1.615,
+      "factor": 1.175
+    },
+    {
+      "region": "southeast",
+      "class": "cold_grid",
+      "events": 62,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1613
+        ],
+        [
+          3.0,
+          0.0336
+        ],
+        [
+          7.0,
+          0.0005381
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.515,
+      "t90_days": 0.9271,
+      "factor": 0.5
+    },
+    {
+      "region": "southeast",
+      "class": "flood",
+      "events": 105,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1991
+        ],
+        [
+          3.0,
+          0.04732
+        ],
+        [
+          7.0,
+          0.003459
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.9375
+    },
+    {
+      "region": "southeast",
+      "class": "grid",
+      "events": 137,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1222
+        ],
+        [
+          3.0,
+          0.02271
+        ],
+        [
+          7.0,
+          0.00009578
+        ],
+        [
+          14.0,
+          0.00009578
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southeast",
+      "class": "heat",
+      "events": 56,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.01487
+        ],
+        [
+          3.0,
+          0.001641
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southeast",
+      "class": "hurricane",
+      "events": 1479,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.5768
+        ],
+        [
+          3.0,
+          0.247
+        ],
+        [
+          7.0,
+          0.05309
+        ],
+        [
+          14.0,
+          0.006474
+        ],
+        [
+          30.0,
+          0.0003103
+        ]
+      ],
+      "t50_days": 1.37,
+      "t90_days": 3.805,
+      "factor": 0.9964
+    },
+    {
+      "region": "southeast",
+      "class": "ice",
+      "events": 145,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.4415
+        ],
+        [
+          3.0,
+          0.1444
+        ],
+        [
+          7.0,
+          0.03131
+        ],
+        [
+          14.0,
+          0.0001567
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.8422,
+      "t90_days": 2.263,
+      "factor": 0.7741
+    },
+    {
+      "region": "southeast",
+      "class": "unattributed",
+      "events": 4075,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.03262
+        ],
+        [
+          3.0,
+          0.007282
+        ],
+        [
+          7.0,
+          0.0002721
+        ],
+        [
+          14.0,
+          0.00008711
+        ],
+        [
+          30.0,
+          0.00002143
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southeast",
+      "class": "wildfire",
+      "events": 6,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.01935
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.5682
+    },
+    {
+      "region": "southeast",
+      "class": "wind",
+      "events": 2804,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1907
+        ],
+        [
+          3.0,
+          0.031
+        ],
+        [
+          7.0,
+          0.00202
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5576,
+      "t90_days": 1.024,
+      "factor": 0.6883
+    },
+    {
+      "region": "southeast",
+      "class": "winter",
+      "events": 489,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.3244
+        ],
+        [
+          3.0,
+          0.05036
+        ],
+        [
+          7.0,
+          0.00365
+        ],
+        [
+          14.0,
+          0.00009997
+        ],
+        [
+          30.0,
+          0.000003863
+        ]
+      ],
+      "t50_days": 0.7393,
+      "t90_days": 1.773,
+      "factor": 0.9995
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "all",
+      "events": 2887,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.3228
+        ],
+        [
+          3.0,
+          0.09369
+        ],
+        [
+          7.0,
+          0.01461
+        ],
+        [
+          14.0,
+          0.00002279
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6496,
+      "t90_days": 1.615,
+      "factor": 1.175
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "cold_grid",
+      "events": 153,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.5566
+        ],
+        [
+          3.0,
+          0.03842
+        ],
+        [
+          7.0,
+          0.001031
+        ],
+        [
+          14.0,
+          0.00008224
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 1.137,
+      "t90_days": 1.894,
+      "factor": 1.0
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "flood",
+      "events": 43,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1464
+        ],
+        [
+          3.0,
+          0.007178
+        ],
+        [
+          7.0,
+          0.001648
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.9375
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "grid",
+      "events": 196,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1855
+        ],
+        [
+          3.0,
+          0.02605
+        ],
+        [
+          7.0,
+          0.00002422
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "heat",
+      "events": 67,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.01522
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "hurricane",
+      "events": 91,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.619
+        ],
+        [
+          3.0,
+          0.3494
+        ],
+        [
+          7.0,
+          0.0681
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 2.688,
+      "t90_days": 6.123,
+      "factor": 1.604
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "ice",
+      "events": 55,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.62
+        ],
+        [
+          3.0,
+          0.2991
+        ],
+        [
+          7.0,
+          0.1559
+        ],
+        [
+          14.0,
+          0.0002461
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 1.604,
+      "t90_days": 4.456,
+      "factor": 1.524
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "unattributed",
+      "events": 1332,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.03045
+        ],
+        [
+          3.0,
+          0.002386
+        ],
+        [
+          7.0,
+          0.0001246
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "wildfire",
+      "events": 13,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0927
+        ],
+        [
+          3.0,
+          0.01224
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5144,
+      "t90_days": 0.9259,
+      "factor": 0.5846
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "wind",
+      "events": 852,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2579
+        ],
+        [
+          3.0,
+          0.06733
+        ],
+        [
+          7.0,
+          0.0009517
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6152,
+      "t90_days": 1.464,
+      "factor": 0.9839
+    },
+    {
+      "region": "southern_great_plains",
+      "class": "winter",
+      "events": 85,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.4245
+        ],
+        [
+          3.0,
+          0.1033
+        ],
+        [
+          7.0,
+          0.0008253
+        ],
+        [
+          14.0,
+          0.00006348
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.8232,
+      "t90_days": 2.065,
+      "factor": 1.164
+    },
+    {
+      "region": "southwest",
+      "class": "all",
+      "events": 1638,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1818
+        ],
+        [
+          3.0,
+          0.03541
+        ],
+        [
+          7.0,
+          0.004725
+        ],
+        [
+          14.0,
+          0.00097
+        ],
+        [
+          30.0,
+          0.0006659
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.6549
+    },
+    {
+      "region": "southwest",
+      "class": "cold_grid",
+      "events": 10,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.6023
+        ],
+        [
+          3.0,
+          0.4551
+        ],
+        [
+          7.0,
+          0.1976
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 2.594,
+      "t90_days": 9.154,
+      "factor": 4.833
+    },
+    {
+      "region": "southwest",
+      "class": "flood",
+      "events": 24,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.06934
+        ],
+        [
+          3.0,
+          0.0
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5177,
+      "t90_days": 0.9319,
+      "factor": 0.9708
+    },
+    {
+      "region": "southwest",
+      "class": "grid",
+      "events": 61,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.0283
+        ],
+        [
+          3.0,
+          0.001589
+        ],
+        [
+          7.0,
+          0.0
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southwest",
+      "class": "heat",
+      "events": 24,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.03526
+        ],
+        [
+          3.0,
+          0.01016
+        ],
+        [
+          7.0,
+          0.002794
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southwest",
+      "class": "unattributed",
+      "events": 955,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.07215
+        ],
+        [
+          3.0,
+          0.01146
+        ],
+        [
+          7.0,
+          0.0006219
+        ],
+        [
+          14.0,
+          0.00006104
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    },
+    {
+      "region": "southwest",
+      "class": "wildfire",
+      "events": 132,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.4144
+        ],
+        [
+          3.0,
+          0.1013
+        ],
+        [
+          7.0,
+          0.01647
+        ],
+        [
+          14.0,
+          0.009301
+        ],
+        [
+          30.0,
+          0.006711
+        ]
+      ],
+      "t50_days": 0.9234,
+      "t90_days": 1.767,
+      "factor": 1.115
+    },
+    {
+      "region": "southwest",
+      "class": "wind",
+      "events": 208,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2757
+        ],
+        [
+          3.0,
+          0.04198
+        ],
+        [
+          7.0,
+          0.002793
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.6136,
+      "t90_days": 1.655,
+      "factor": 1.112
+    },
+    {
+      "region": "southwest",
+      "class": "winter",
+      "events": 224,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.2261
+        ],
+        [
+          3.0,
+          0.05013
+        ],
+        [
+          7.0,
+          0.007146
+        ],
+        [
+          14.0,
+          0.0001894
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5938,
+      "t90_days": 1.327,
+      "factor": 0.7481
+    },
+    {
+      "region": "virgin_islands",
+      "class": "all",
+      "events": 503,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.04294
+        ],
+        [
+          3.0,
+          0.005905
+        ],
+        [
+          7.0,
+          0.000696
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 0.6549
+    },
+    {
+      "region": "virgin_islands",
+      "class": "historic:irma_maria_2017_vi",
+      "events": 1,
+      "share_out_at_days": [
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          1.0
+        ],
+        [
+          7.0,
+          1.0
+        ],
+        [
+          14.0,
+          0.9702
+        ],
+        [
+          30.0,
+          0.8801
+        ]
+      ],
+      "t50_days": 79.0,
+      "t90_days": 128.5,
+      "factor": 5.0
+    },
+    {
+      "region": "virgin_islands",
+      "class": "hurricane",
+      "events": 28,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.1665
+        ],
+        [
+          3.0,
+          0.03021
+        ],
+        [
+          7.0,
+          0.002692
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5083,
+      "t90_days": 0.915,
+      "factor": 0.5
+    },
+    {
+      "region": "virgin_islands",
+      "class": "unattributed",
+      "events": 475,
+      "share_out_at_days": [
+        [
+          1.0,
+          0.03505
+        ],
+        [
+          3.0,
+          0.004352
+        ],
+        [
+          7.0,
+          0.0005685
+        ],
+        [
+          14.0,
+          0.0
+        ],
+        [
+          30.0,
+          0.0
+        ]
+      ],
+      "t50_days": 0.5,
+      "t90_days": 0.9,
+      "factor": 1.0
+    }
+  ],
+  "sdwis_violation_share": {
+    "06007": 0.05510000139474869,
+    "13135": 0.0,
+    "15009": 0.0,
+    "19113": 0.0009580000187270343,
+    "22051": 0.3370000123977661,
+    "28049": 0.8690000176429749,
+    "36059": 0.3050000071525574,
+    "36061": 1.0,
+    "36081": 1.0,
+    "36085": 1.0,
+    "37021": 0.9399999976158142,
+    "37119": 0.000054299998737405986,
+    "39029": 0.18700000643730164,
+    "39035": 0.0,
+    "39049": 0.009689999744296074,
+    "40109": 0.0714000016450882,
+    "42101": 0.0,
+    "48201": 0.527999997138977,
+    "48453": 0.8320000171661377,
+    "72127": 1.0,
+    "72141": 0.29600000381469727
   },
-  "13135": {
-   "basis": "blend",
-   "rate": 0.256,
-   "lam_ge": [
-    0.00812,
-    0.000798,
-    0.000247,
-    1.11e-05,
-    1.44e-06
-   ],
-   "z": [
-    0.65,
-    0.081,
-    0.019,
-    0.0036,
-    0.00031
-   ],
-   "region_counties": 409,
-   "stress": {
-    "event": "Hurricane Helene",
-    "class": "hurricane",
-    "date": "2024-09-25",
-    "peak_share": 1.0,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.9222
-     ],
-     [
-      3.0,
-      0.7782
-     ],
-     [
-      7.0,
-      0.6938
-     ],
-     [
-      14.0,
-      0.2213
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "AL092024",
-    "recorded_in": "37021",
-    "distance_km": 229.0
-   }
-  },
-  "15009": {
-   "basis": "blend",
-   "rate": 0.764,
-   "lam_ge": [
-    0.0141,
-    0.00128,
-    0.000755,
-    0.0,
-    0.0
-   ],
-   "z": [
-    0.51,
-    0.095,
-    0.041,
-    0.0,
-    0.0
-   ],
-   "region_counties": 4,
-   "causes": {
-    "wind": 0.089,
-    "wildfire": 0.074,
-    "flood": 0.045,
-    "unattributed": 0.79
-   },
-   "causes_ge_1d": {
-    "wildfire": 0.48,
-    "flood": 0.085
-   },
-   "stress": {
-    "event": "Wildfire or fire-weather shutoff, August 2023",
-    "class": "wildfire",
-    "date": "2023-08-08",
-    "peak_share": 0.1918,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.8946
-     ],
-     [
-      3.0,
-      0.3187
-     ],
-     [
-      7.0,
-      0.1484
-     ],
-     [
-      14.0,
-      0.1325
-     ],
-     [
-      30.0,
-      0.05944
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "wildfire:183072",
-    "recorded_in": "15009",
-    "distance_km": 0.0
-   }
-  },
-  "17031": {
-   "basis": "blend",
-   "rate": 0.0481,
-   "lam_ge": [
-    0.0178,
-    0.00316,
-    0.000449,
-    4.37e-05,
-    2.59e-06
-   ],
-   "z": [
-    0.68,
-    0.19,
-    0.021,
-    0.0064,
-    0.0015
-   ],
-   "region_counties": 324,
-   "stress": {
-    "event": "Ice storm, February 2023",
-    "class": "ice",
-    "date": "2023-02-22",
-    "peak_share": 0.5778,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.9456
-     ],
-     [
-      3.0,
-      0.7075
-     ],
-     [
-      7.0,
-      0.04716
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "ice_storm:176942",
-    "recorded_in": "26059",
-    "distance_km": 249.0
-   }
-  },
-  "19013": {
-   "basis": "blend",
-   "rate": 0.275,
-   "lam_ge": [
-    0.0137,
-    0.00744,
-    0.000618,
-    2.83e-05,
-    1.26e-06
-   ],
-   "z": [
-    0.47,
-    0.088,
-    0.021,
-    0.0037,
-    0.001
-   ],
-   "region_counties": 317
-  },
-  "19113": {
-   "basis": "blend",
-   "rate": 0.333,
-   "lam_ge": [
-    0.0541,
-    0.0132,
-    0.00129,
-    3.46e-05,
-    1.84e-06
-   ],
-   "z": [
-    0.51,
-    0.1,
-    0.02,
-    0.0041,
-    0.0013
-   ],
-   "region_counties": 312,
-   "causes": {
-    "ice": 0.0058,
-    "winter": 0.021,
-    "wind": 0.47,
-    "grid": 0.021,
-    "unattributed": 0.48
-   },
-   "stress": {
-    "event": "August 2020 Midwest derecho",
-    "class": "wind",
-    "date": "2020-08-10",
-    "peak_share": 0.9255,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.9692
-     ],
-     [
-      3.0,
-      0.7774
-     ],
-     [
-      7.0,
-      0.3695
-     ],
-     [
-      14.0,
-      0.01459
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "tornado:151777",
-    "recorded_in": "19113",
-    "distance_km": 0.0
-   }
-  },
-  "19193": {
-   "basis": "blend",
-   "rate": 0.37,
-   "lam_ge": [
-    0.0179,
-    0.00719,
-    0.000822,
-    3.06e-05,
-    2.25e-07
-   ],
-   "z": [
-    0.45,
-    0.12,
-    0.025,
-    0.0036,
-    0.00063
-   ],
-   "region_counties": 272
-  },
-  "20051": {
-   "basis": "blend",
-   "rate": 0.636,
-   "lam_ge": [
-    0.0153,
-    0.00152,
-    0.0015,
-    7.87e-06,
-    1.4e-08
-   ],
-   "z": [
-    0.52,
-    0.13,
-    0.026,
-    0.0015,
-    3.1e-05
-   ],
-   "region_counties": 186,
-   "stress": {
-    "event": "Winter storm, April 2017",
-    "class": "winter",
-    "date": "2017-04-30",
-    "peak_share": 1.0,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.1398
-     ],
-     [
-      3.0,
-      0.08918
-     ],
-     [
-      7.0,
-      0.03525
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "blizzard:115357",
-    "recorded_in": "20109",
-    "distance_km": 159.0
-   }
-  },
-  "22051": {
-   "basis": "blend",
-   "rate": 0.475,
-   "lam_ge": [
-    0.0149,
-    0.00179,
-    0.000376,
-    4.34e-05,
-    8.6e-06
-   ],
-   "z": [
-    0.77,
-    0.27,
-    0.07,
-    0.027,
-    0.0086
-   ],
-   "region_counties": 114,
-   "causes": {
-    "hurricane": 0.3,
-    "wind": 0.095,
-    "heat": 0.01,
-    "flood": 0.016,
-    "grid": 0.022,
-    "unattributed": 0.56
-   },
-   "causes_ge_1d": {
-    "hurricane": 0.91,
-    "flood": 0.011
-   },
-   "stress": {
-    "event": "Hurricane Ida",
-    "class": "hurricane",
-    "date": "2021-08-29",
-    "peak_share": 1.0,
-    "share_out_at_days": [
-     [
-      1.0,
-      1.0
-     ],
-     [
-      3.0,
-      1.0
-     ],
-     [
-      7.0,
-      0.9781
-     ],
-     [
-      14.0,
-      0.4197
-     ],
-     [
-      30.0,
-      0.01295
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "AL092021",
-    "recorded_in": "22057",
-    "distance_km": 35.0
-   }
-  },
-  "28049": {
-   "basis": "blend",
-   "rate": 0.659,
-   "lam_ge": [
-    0.1,
-    0.0131,
-    0.000574,
-    3.47e-05,
-    7.51e-06
-   ],
-   "z": [
-    0.81,
-    0.33,
-    0.057,
-    0.02,
-    0.0065
-   ],
-   "region_counties": 249,
-   "causes": {
-    "hurricane": 0.034,
-    "ice": 0.038,
-    "winter": 0.006,
-    "wind": 0.45,
-    "flood": 0.022,
-    "grid": 0.02,
-    "unattributed": 0.43
-   },
-   "causes_ge_1d": {
-    "hurricane": 0.05
-   },
-   "stress": {
-    "event": "Hurricane Ida",
-    "class": "hurricane",
-    "date": "2021-08-29",
-    "peak_share": 1.0,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.9372
-     ],
-     [
-      3.0,
-      0.8645
-     ],
-     [
-      7.0,
-      0.832
-     ],
-     [
-      14.0,
-      0.5622
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "AL092021",
-    "recorded_in": "22091",
-    "distance_km": 162.0
-   }
-  },
-  "36059": {
-   "basis": "blend",
-   "rate": 0.066,
-   "lam_ge": [
-    0.00964,
-    0.00217,
-    0.000102,
-    7.09e-08,
-    0.0
-   ],
-   "z": [
-    0.75,
-    0.19,
-    0.014,
-    0.00013,
-    0.0
-   ],
-   "region_counties": 191,
-   "causes": {
-    "hurricane": 0.33,
-    "winter": 0.05,
-    "wind": 0.49,
-    "unattributed": 0.13
-   },
-   "causes_ge_1d": {
-    "hurricane": 0.89
-   },
-   "stress": {
-    "event": "Wind and thunderstorms, March 2018",
-    "class": "wind",
-    "date": "2018-03-02",
-    "peak_share": 0.469,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.6649
-     ],
-     [
-      3.0,
-      0.3138
-     ],
-     [
-      7.0,
-      0.1223
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "high_wind:122421",
-    "recorded_in": "34019",
-    "distance_km": 113.0
-   }
-  },
-  "36061": {
-   "basis": "blend",
-   "rate": 0.0,
-   "lam_ge": [
-    0.00771,
-    0.00229,
-    0.000106,
-    1.14e-07,
-    0.0
-   ],
-   "z": [
-    0.73,
-    0.17,
-    0.012,
-    0.00017,
-    0.0
-   ],
-   "region_counties": 205,
-   "stress": {
-    "event": "Wind and thunderstorms, March 2018",
-    "class": "wind",
-    "date": "2018-03-02",
-    "peak_share": 0.469,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.6649
-     ],
-     [
-      3.0,
-      0.3138
-     ],
-     [
-      7.0,
-      0.1223
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "high_wind:122421",
-    "recorded_in": "34019",
-    "distance_km": 83.0
-   }
-  },
-  "36081": {
-   "basis": "blend",
-   "rate": 0.00402,
-   "lam_ge": [
-    0.00713,
-    0.0022,
-    0.000105,
-    1.1e-07,
-    0.0
-   ],
-   "z": [
-    0.76,
-    0.2,
-    0.014,
-    0.0002,
-    0.0
-   ],
-   "region_counties": 201,
-   "stress": {
-    "event": "Wind and thunderstorms, March 2018",
-    "class": "wind",
-    "date": "2018-03-02",
-    "peak_share": 0.469,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.6649
-     ],
-     [
-      3.0,
-      0.3138
-     ],
-     [
-      7.0,
-      0.1223
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "high_wind:122421",
-    "recorded_in": "34019",
-    "distance_km": 91.0
-   }
-  },
-  "36085": {
-   "basis": "blend",
-   "rate": 0.141,
-   "lam_ge": [
-    0.00762,
-    0.00231,
-    0.00011,
-    1.77e-07,
-    0.0
-   ],
-   "z": [
-    0.72,
-    0.17,
-    0.013,
-    0.00025,
-    0.0
-   ],
-   "region_counties": 215,
-   "stress": {
-    "event": "Wind and thunderstorms, March 2018",
-    "class": "wind",
-    "date": "2018-03-02",
-    "peak_share": 0.469,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.6649
-     ],
-     [
-      3.0,
-      0.3138
-     ],
-     [
-      7.0,
-      0.1223
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "high_wind:122421",
-    "recorded_in": "34019",
-    "distance_km": 65.0
-   }
-  },
-  "37021": {
-   "basis": "blend",
-   "rate": 0.813,
-   "lam_ge": [
-    0.0304,
-    0.0025,
-    0.000304,
-    1.18e-05,
-    1.38e-06
-   ],
-   "z": [
-    0.76,
-    0.19,
-    0.023,
-    0.0035,
-    0.00017
-   ],
-   "region_counties": 451,
-   "causes": {
-    "hurricane": 0.12,
-    "ice": 0.0054,
-    "winter": 0.068,
-    "wind": 0.13,
-    "cold_grid": 0.011,
-    "flood": 0.019,
-    "unattributed": 0.64
-   },
-   "causes_ge_1d": {
-    "hurricane": 0.75,
-    "flood": 0.016,
-    "cold_grid": 0.0099
-   },
-   "stress": {
-    "event": "Hurricane Helene",
-    "class": "hurricane",
-    "date": "2024-09-25",
-    "peak_share": 1.0,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.9222
-     ],
-     [
-      3.0,
-      0.7782
-     ],
-     [
-      7.0,
-      0.6938
-     ],
-     [
-      14.0,
-      0.2213
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "AL092024",
-    "recorded_in": "37021",
-    "distance_km": 0.0
-   }
-  },
-  "37119": {
-   "basis": "blend",
-   "rate": 0.333,
-   "lam_ge": [
-    0.0284,
-    0.00206,
-    0.000281,
-    9.22e-06,
-    4.29e-07
-   ],
-   "z": [
-    0.74,
-    0.16,
-    0.023,
-    0.0032,
-    4.8e-05
-   ],
-   "region_counties": 389,
-   "stress": {
-    "event": "Hurricane Helene",
-    "class": "hurricane",
-    "date": "2024-09-25",
-    "peak_share": 1.0,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.9222
-     ],
-     [
-      3.0,
-      0.7782
-     ],
-     [
-      7.0,
-      0.6938
-     ],
-     [
-      14.0,
-      0.2213
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "AL092024",
-    "recorded_in": "37021",
-    "distance_km": 159.0
-   }
-  },
-  "39029": {
-   "basis": "blend",
-   "rate": 0.606,
-   "lam_ge": [
-    0.0544,
-    0.00793,
-    0.000431,
-    1.72e-05,
-    6.11e-07
-   ],
-   "z": [
-    0.81,
-    0.25,
-    0.026,
-    0.0037,
-    0.0003
-   ],
-   "region_counties": 333,
-   "stress": {
-    "event": "Wind and thunderstorms, June 2022",
-    "class": "wind",
-    "date": "2022-06-13",
-    "peak_share": 0.1388,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.8175
-     ],
-     [
-      3.0,
-      0.4866
-     ],
-     [
-      7.0,
-      0.04328
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "tstm_wind:169489",
-    "recorded_in": "39169",
-    "distance_km": 94.0
-   }
-  },
-  "39035": {
-   "basis": "blend",
-   "rate": 0.296,
-   "lam_ge": [
-    0.0617,
-    0.0142,
-    0.000345,
-    2.92e-05,
-    8.36e-07
-   ],
-   "z": [
-    0.78,
-    0.27,
-    0.026,
-    0.005,
-    0.00051
-   ],
-   "region_counties": 281,
-   "stress": {
-    "event": "Ice storm, February 2023",
-    "class": "ice",
-    "date": "2023-02-22",
-    "peak_share": 0.5108,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.6524
-     ],
-     [
-      3.0,
-      0.4118
-     ],
-     [
-      7.0,
-      0.04568
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "ice_storm:177465",
-    "recorded_in": "26115",
-    "distance_km": 161.0
-   }
-  },
-  "39049": {
-   "basis": "blend",
-   "rate": 0.245,
-   "lam_ge": [
-    0.0142,
-    0.00625,
-    0.000343,
-    2.11e-05,
-    1.91e-06
-   ],
-   "z": [
-    0.78,
-    0.24,
-    0.027,
-    0.0045,
-    0.00062
-   ],
-   "region_counties": 397,
-   "stress": {
-    "event": "Winter storm, February 2021",
-    "class": "winter",
-    "date": "2021-02-15",
-    "peak_share": 0.4642,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.8076
-     ],
-     [
-      3.0,
-      0.4985
-     ],
-     [
-      7.0,
-      0.1032
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "winter_storm:156290",
-    "recorded_in": "39087",
-    "distance_km": 158.0
-   }
-  },
-  "40109": {
-   "basis": "blend",
-   "rate": 0.383,
-   "lam_ge": [
-    0.0619,
-    0.0206,
-    0.00241,
-    5.65e-06,
-    1.03e-06
-   ],
-   "z": [
-    0.64,
-    0.18,
-    0.032,
-    0.0032,
-    0.00077
-   ],
-   "region_counties": 234,
-   "causes": {
-    "ice": 0.12,
-    "winter": 0.033,
-    "wind": 0.32,
-    "wildfire": 0.019,
-    "heat": 0.024,
-    "cold_grid": 0.038,
-    "flood": 0.011,
-    "unattributed": 0.43
-   },
-   "causes_ge_1d": {
-    "wildfire": 0.014
-   },
-   "stress": {
-    "event": "October 2020 Oklahoma ice storm",
-    "class": "ice",
-    "date": "2020-10-26",
-    "peak_share": 0.5521,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.9142
-     ],
-     [
-      3.0,
-      0.6393
-     ],
-     [
-      7.0,
-      0.4624
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "ice_storm:153454",
-    "recorded_in": "40109",
-    "distance_km": 0.0
-   }
-  },
-  "41011": {
-   "basis": "blend",
-   "rate": 0.526,
-   "lam_ge": [
-    0.0351,
-    0.0116,
-    0.00111,
-    7.85e-05,
-    0.0
-   ],
-   "z": [
-    0.69,
-    0.23,
-    0.052,
-    0.01,
-    0.0
-   ],
-   "region_counties": 40,
-   "stress": {
-    "event": "Power cut, cause not recorded, February 2021",
-    "class": "unattributed",
-    "date": "2021-02-13",
-    "peak_share": 0.1915,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.8323
-     ],
-     [
-      3.0,
-      0.7162
-     ],
-     [
-      7.0,
-      0.2146
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "recorded_in": "41071",
-    "distance_km": 237.0
-   }
-  },
-  "42101": {
-   "basis": "blend",
-   "rate": 0.0322,
-   "lam_ge": [
-    0.00973,
-    0.00236,
-    0.000134,
-    6.18e-07,
-    0.0
-   ],
-   "z": [
-    0.73,
-    0.18,
-    0.017,
-    0.00076,
-    0.0
-   ],
-   "region_counties": 260,
-   "causes": {
-    "hurricane": 0.044,
-    "winter": 0.11,
-    "wind": 0.58,
-    "unattributed": 0.27
-   },
-   "causes_ge_1d": {
-    "hurricane": 0.071
-   },
-   "stress": {
-    "event": "Wind and thunderstorms, March 2018",
-    "class": "wind",
-    "date": "2018-03-02",
-    "peak_share": 0.469,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.6649
-     ],
-     [
-      3.0,
-      0.3138
-     ],
-     [
-      7.0,
-      0.1223
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "high_wind:122421",
-    "recorded_in": "34019",
-    "distance_km": 65.0
-   }
-  },
-  "48157": {
-   "basis": "blend",
-   "rate": 0.0601,
-   "lam_ge": [
-    0.0158,
-    0.00741,
-    0.000218,
-    1.75e-05,
-    5.14e-06
-   ],
-   "z": [
-    0.71,
-    0.17,
-    0.037,
-    0.015,
-    0.0065
-   ],
-   "region_counties": 142,
-   "stress": {
-    "event": "Hurricane Harvey",
-    "class": "hurricane",
-    "date": "2017-08-28",
-    "peak_share": 0.9767,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.8685
-     ],
-     [
-      3.0,
-      0.8473
-     ],
-     [
-      7.0,
-      0.2505
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "AL092017",
-    "recorded_in": "48361",
-    "distance_km": 193.0
-   }
-  },
-  "48201": {
-   "basis": "blend",
-   "rate": 0.111,
-   "lam_ge": [
-    0.0286,
-    0.00905,
-    0.000266,
-    1.94e-05,
-    5.43e-06
-   ],
-   "z": [
-    0.78,
-    0.23,
-    0.051,
-    0.02,
-    0.0083
-   ],
-   "region_counties": 157,
-   "causes": {
-    "hurricane": 0.38,
-    "wind": 0.4,
-    "cold_grid": 0.086,
-    "flood": 0.0078,
-    "grid": 0.021,
-    "unattributed": 0.1
-   },
-   "causes_ge_1d": {
-    "hurricane": 0.58,
-    "cold_grid": 0.17,
-    "grid": 0.008
-   },
-   "stress": {
-    "event": "Hurricane Harvey",
-    "class": "hurricane",
-    "date": "2017-08-28",
-    "peak_share": 0.9767,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.8685
-     ],
-     [
-      3.0,
-      0.8473
-     ],
-     [
-      7.0,
-      0.2505
-     ],
-     [
-      14.0,
-      0.0
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "AL092017",
-    "recorded_in": "48361",
-    "distance_km": 147.0
-   }
-  },
-  "48453": {
-   "basis": "blend",
-   "rate": 0.135,
-   "lam_ge": [
-    0.0277,
-    0.00643,
-    0.000328,
-    1.1e-05,
-    3.83e-06
-   ],
-   "z": [
-    0.69,
-    0.16,
-    0.037,
-    0.013,
-    0.0066
-   ],
-   "region_counties": 165,
-   "causes": {
-    "hurricane": 0.017,
-    "winter": 0.16,
-    "wind": 0.36,
-    "heat": 0.026,
-    "cold_grid": 0.22,
-    "flood": 0.026,
-    "grid": 0.025,
-    "unattributed": 0.17
-   },
-   "causes_ge_1d": {
-    "hurricane": 0.023,
-    "cold_grid": 0.57
-   },
-   "stress": {
-    "event": "February 2021 winter storm and Texas blackout (Uri)",
-    "class": "cold_grid",
-    "date": "2021-02-11",
-    "peak_share": 0.5485,
-    "share_out_at_days": [
-     [
-      1.0,
-      0.739
-     ],
-     [
-      3.0,
-      0.5087
-     ],
-     [
-      7.0,
-      0.286
-     ],
-     [
-      14.0,
-      0.04285
-     ],
-     [
-      30.0,
-      0.0
-     ]
-    ],
-    "source": "eaglei",
-    "cause": "winter_storm:156281",
-    "recorded_in": "48171",
-    "distance_km": 120.0
-   }
-  },
-  "72127": {
-   "basis": "blend",
-   "rate": 3.06,
-   "lam_ge": [
-    0.351,
-    0.02,
-    0.00303,
-    0.0,
-    0.0
-   ],
-   "z": [
-    0.94,
-    0.67,
-    0.29,
-    0.0,
-    0.0
-   ],
-   "region_counties": 77,
-   "causes": {
-    "hurricane": 0.1,
-    "unattributed": 0.9
-   },
-   "causes_ge_1d": {
-    "hurricane": 0.44
-   },
-   "stress": {
-    "event": "Hurricane Maria",
-    "class": "hurricane",
-    "date": "2017-09-20",
-    "peak_share": 1.0,
-    "share_out_at_days": [
-     [
-      1.0,
-      1.0
-     ],
-     [
-      3.0,
-      1.0
-     ],
-     [
-      7.0,
-      1.0
-     ],
-     [
-      14.0,
-      0.914
-     ],
-     [
-      30.0,
-      0.815
-     ]
-    ],
-    "source": "historic:maria_2017_pr",
-    "cause": "AL152017"
-   }
-  },
-  "72141": {
-   "basis": "blend",
-   "rate": 3.06,
-   "lam_ge": [
-    0.351,
-    0.02,
-    0.00303,
-    0.0,
-    0.0
-   ],
-   "z": [
-    0.94,
-    0.67,
-    0.29,
-    0.0,
-    0.0
-   ],
-   "region_counties": 77,
-   "stress": {
-    "event": "Hurricane Maria",
-    "class": "hurricane",
-    "date": "2017-09-20",
-    "peak_share": 1.0,
-    "share_out_at_days": [
-     [
-      1.0,
-      1.0
-     ],
-     [
-      3.0,
-      1.0
-     ],
-     [
-      7.0,
-      1.0
-     ],
-     [
-      14.0,
-      0.914
-     ],
-     [
-      30.0,
-      0.815
-     ]
-    ],
-    "source": "historic:maria_2017_pr",
-    "cause": "AL152017"
-   }
+  "smoke_days_35": {
+    "06007": 8.270000457763672,
+    "13135": 0.25,
+    "15009": 0.0,
+    "19113": 0.75,
+    "22051": 0.0,
+    "28049": 0.0,
+    "36059": 0.8679999709129333,
+    "36061": 0.32600000500679016,
+    "36081": 0.875,
+    "36085": 0.640999972820282,
+    "37021": 0.0,
+    "37119": 0.375,
+    "39029": 1.0299999713897705,
+    "39035": 1.0,
+    "39049": 1.1200000047683716,
+    "40109": 0.375,
+    "42101": 1.1200000047683716,
+    "48201": 0.0,
+    "48453": 0.0,
+    "72127": 0.0,
+    "72141": 0.0
   }
- },
- "curves": [
-  {
-   "region": "alaska",
-   "class": "all",
-   "events": 93,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.05651
-    ],
-    [
-     3.0,
-     0.004928
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.6551
-  },
-  {
-   "region": "alaska",
-   "class": "unattributed",
-   "events": 89,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.0484
-    ],
-    [
-     3.0,
-     0.004844
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "alaska",
-   "class": "wind",
-   "events": 2,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1696
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6711,
-   "t90_days": 1.642,
-   "factor": 1.1
-  },
-  {
-   "region": "alaska",
-   "class": "winter",
-   "events": 2,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2643
-    ],
-    [
-     3.0,
-     0.02793
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.8505,
-   "t90_days": 2.586,
-   "factor": 1.475
-  },
-  {
-   "region": "hawaii_pacific",
-   "class": "all",
-   "events": 25,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.04274
-    ],
-    [
-     3.0,
-     0.009744
-    ],
-    [
-     7.0,
-     0.004537
-    ],
-    [
-     14.0,
-     0.004051
-    ],
-    [
-     30.0,
-     0.001817
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.6551
-  },
-  {
-   "region": "hawaii_pacific",
-   "class": "flood",
-   "events": 1,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.0
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.9345
-  },
-  {
-   "region": "hawaii_pacific",
-   "class": "hurricane",
-   "events": 1,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1175
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5666,
-   "t90_days": 1.109,
-   "factor": 0.5
-  },
-  {
-   "region": "hawaii_pacific",
-   "class": "unattributed",
-   "events": 18,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.01022
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "hawaii_pacific",
-   "class": "wildfire",
-   "events": 2,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.5476
-    ],
-    [
-     3.0,
-     0.1951
-    ],
-    [
-     7.0,
-     0.09083
-    ],
-    [
-     14.0,
-     0.0811
-    ],
-    [
-     30.0,
-     0.03638
-    ]
-   ],
-   "t50_days": 2.554,
-   "t90_days": 17.49,
-   "factor": 5.0
-  },
-  {
-   "region": "hawaii_pacific",
-   "class": "wind",
-   "events": 2,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.0282
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.603
-  },
-  {
-   "region": "hawaii_pacific",
-   "class": "winter",
-   "events": 1,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.0
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.5134
-  },
-  {
-   "region": "mainland",
-   "class": "all",
-   "events": 24882,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2814
-    ],
-    [
-     3.0,
-     0.0814
-    ],
-    [
-     7.0,
-     0.01271
-    ],
-    [
-     14.0,
-     0.001189
-    ],
-    [
-     30.0,
-     0.000109
-    ]
-   ],
-   "t50_days": 0.5991,
-   "t90_days": 1.374,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "cold_grid",
-   "events": 269,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.5128
-    ],
-    [
-     3.0,
-     0.04719
-    ],
-    [
-     7.0,
-     0.004463
-    ],
-    [
-     14.0,
-     6.795e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 1.083,
-   "t90_days": 1.894,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "flood",
-   "events": 332,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1473
-    ],
-    [
-     3.0,
-     0.02022
-    ],
-    [
-     7.0,
-     0.001745
-    ],
-    [
-     14.0,
-     0.000117
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.535,
-   "t90_days": 0.9631,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "grid",
-   "events": 538,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.08965
-    ],
-    [
-     3.0,
-     0.01159
-    ],
-    [
-     7.0,
-     2.575e-05
-    ],
-    [
-     14.0,
-     1.964e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "heat",
-   "events": 169,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.02787
-    ],
-    [
-     3.0,
-     0.0007878
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "hurricane",
-   "events": 1719,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.5748
-    ],
-    [
-     3.0,
-     0.2528
-    ],
-    [
-     7.0,
-     0.04843
-    ],
-    [
-     14.0,
-     0.004959
-    ],
-    [
-     30.0,
-     0.0002483
-    ]
-   ],
-   "t50_days": 1.472,
-   "t90_days": 3.91,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "ice",
-   "events": 355,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.5327
-    ],
-    [
-     3.0,
-     0.1947
-    ],
-    [
-     7.0,
-     0.04871
-    ],
-    [
-     14.0,
-     0.002131
-    ],
-    [
-     30.0,
-     1.015e-05
-    ]
-   ],
-   "t50_days": 1.226,
-   "t90_days": 2.923,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "unattributed",
-   "events": 12211,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.06078
-    ],
-    [
-     3.0,
-     0.008621
-    ],
-    [
-     7.0,
-     0.000865
-    ],
-    [
-     14.0,
-     6.597e-05
-    ],
-    [
-     30.0,
-     6.394e-06
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "wildfire",
-   "events": 183,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.3607
-    ],
-    [
-     3.0,
-     0.09671
-    ],
-    [
-     7.0,
-     0.01626
-    ],
-    [
-     14.0,
-     0.008357
-    ],
-    [
-     30.0,
-     0.006029
-    ]
-   ],
-   "t50_days": 0.6949,
-   "t90_days": 1.584,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "wind",
-   "events": 7390,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2623
-    ],
-    [
-     3.0,
-     0.04743
-    ],
-    [
-     7.0,
-     0.002424
-    ],
-    [
-     14.0,
-     2.166e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6171,
-   "t90_days": 1.492,
-   "factor": 1.0
-  },
-  {
-   "region": "mainland",
-   "class": "winter",
-   "events": 1716,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.3299
-    ],
-    [
-     3.0,
-     0.05132
-    ],
-    [
-     7.0,
-     0.004291
-    ],
-    [
-     14.0,
-     7.748e-05
-    ],
-    [
-     30.0,
-     9.243e-07
-    ]
-   ],
-   "t50_days": 0.7176,
-   "t90_days": 1.753,
-   "factor": 1.0
-  },
-  {
-   "region": "midwest",
-   "class": "all",
-   "events": 4930,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2475
-    ],
-    [
-     3.0,
-     0.04745
-    ],
-    [
-     7.0,
-     0.003421
-    ],
-    [
-     14.0,
-     0.0002735
-    ],
-    [
-     30.0,
-     1.141e-06
-    ]
-   ],
-   "t50_days": 0.5754,
-   "t90_days": 1.194,
-   "factor": 0.8688
-  },
-  {
-   "region": "midwest",
-   "class": "cold_grid",
-   "events": 15,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.0003017
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.5
-  },
-  {
-   "region": "midwest",
-   "class": "flood",
-   "events": 64,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1163
-    ],
-    [
-     3.0,
-     0.006939
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.9345
-  },
-  {
-   "region": "midwest",
-   "class": "grid",
-   "events": 50,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.09278
-    ],
-    [
-     3.0,
-     0.001468
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5292,
-   "t90_days": 0.9526,
-   "factor": 1.058
-  },
-  {
-   "region": "midwest",
-   "class": "heat",
-   "events": 10,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.06338
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "midwest",
-   "class": "hurricane",
-   "events": 29,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.34
-    ],
-    [
-     3.0,
-     0.03596
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.7327,
-   "t90_days": 2.393,
-   "factor": 0.612
-  },
-  {
-   "region": "midwest",
-   "class": "ice",
-   "events": 119,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.576
-    ],
-    [
-     3.0,
-     0.2041
-    ],
-    [
-     7.0,
-     0.02634
-    ],
-    [
-     14.0,
-     0.004419
-    ],
-    [
-     30.0,
-     2.2e-05
-    ]
-   ],
-   "t50_days": 1.538,
-   "t90_days": 3.725,
-   "factor": 1.274
-  },
-  {
-   "region": "midwest",
-   "class": "unattributed",
-   "events": 2457,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.07532
-    ],
-    [
-     3.0,
-     0.005788
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "midwest",
-   "class": "wind",
-   "events": 1896,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.3175
-    ],
-    [
-     3.0,
-     0.06123
-    ],
-    [
-     7.0,
-     0.003798
-    ],
-    [
-     14.0,
-     8.42e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.68,
-   "t90_days": 1.728,
-   "factor": 1.158
-  },
-  {
-   "region": "midwest",
-   "class": "winter",
-   "events": 290,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.3156
-    ],
-    [
-     3.0,
-     0.0352
-    ],
-    [
-     7.0,
-     0.000805
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.7176,
-   "t90_days": 1.738,
-   "factor": 0.9914
-  },
-  {
-   "region": "northeast",
-   "class": "all",
-   "events": 4581,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2564
-    ],
-    [
-     3.0,
-     0.0477
-    ],
-    [
-     7.0,
-     0.001993
-    ],
-    [
-     14.0,
-     1.795e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6019,
-   "t90_days": 1.396,
-   "factor": 1.016
-  },
-  {
-   "region": "northeast",
-   "class": "cold_grid",
-   "events": 26,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.5176
-    ],
-    [
-     3.0,
-     0.07439
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 1.178,
-   "t90_days": 2.497,
-   "factor": 1.318
-  },
-  {
-   "region": "northeast",
-   "class": "flood",
-   "events": 66,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1201
-    ],
-    [
-     3.0,
-     0.004968
-    ],
-    [
-     7.0,
-     0.003814
-    ],
-    [
-     14.0,
-     0.0006245
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5212,
-   "t90_days": 0.9382,
-   "factor": 0.9741
-  },
-  {
-   "region": "northeast",
-   "class": "grid",
-   "events": 56,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.00764
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "northeast",
-   "class": "heat",
-   "events": 7,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1551
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "northeast",
-   "class": "hurricane",
-   "events": 123,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.5305
-    ],
-    [
-     3.0,
-     0.1834
-    ],
-    [
-     7.0,
-     0.004482
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 1.15,
-   "t90_days": 2.988,
-   "factor": 0.7643
-  },
-  {
-   "region": "northeast",
-   "class": "ice",
-   "events": 28,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.4274
-    ],
-    [
-     3.0,
-     0.07862
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.9223,
-   "t90_days": 2.751,
-   "factor": 0.9411
-  },
-  {
-   "region": "northeast",
-   "class": "unattributed",
-   "events": 2342,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.03263
-    ],
-    [
-     3.0,
-     0.001379
-    ],
-    [
-     7.0,
-     2.726e-05
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "northeast",
-   "class": "wildfire",
-   "events": 2,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1841
-    ],
-    [
-     3.0,
-     0.1451
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6295,
-   "t90_days": 3.891,
-   "factor": 2.457
-  },
-  {
-   "region": "northeast",
-   "class": "wind",
-   "events": 1408,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2838
-    ],
-    [
-     3.0,
-     0.03938
-    ],
-    [
-     7.0,
-     0.001574
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.65,
-   "t90_days": 1.614,
-   "factor": 1.081
-  },
-  {
-   "region": "northeast",
-   "class": "winter",
-   "events": 523,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.3694
-    ],
-    [
-     3.0,
-     0.05327
-    ],
-    [
-     7.0,
-     0.004629
-    ],
-    [
-     14.0,
-     6.677e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.7988,
-   "t90_days": 1.892,
-   "factor": 1.079
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "all",
-   "events": 375,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1298
-    ],
-    [
-     3.0,
-     0.03476
-    ],
-    [
-     7.0,
-     0.0004475
-    ],
-    [
-     14.0,
-     3.277e-06
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.6551
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "cold_grid",
-   "events": 3,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.0
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.5
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "flood",
-   "events": 11,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.00598
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.9345
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "grid",
-   "events": 7,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.0
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "heat",
-   "events": 1,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.08821
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5484,
-   "t90_days": 0.9871,
-   "factor": 1.097
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "ice",
-   "events": 4,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.8755
-    ],
-    [
-     3.0,
-     0.1356
-    ],
-    [
-     7.0,
-     0.0379
-    ],
-    [
-     14.0,
-     0.0004835
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 1.415,
-   "t90_days": 1.886,
-   "factor": 0.6451
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "unattributed",
-   "events": 194,
-   "share_out_at_days": [
-    [
-     1.0,
-     5.889e-05
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "wildfire",
-   "events": 5,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.0
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.5682
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "wind",
-   "events": 108,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2597
-    ],
-    [
-     3.0,
-     0.06992
-    ],
-    [
-     7.0,
-     3.637e-05
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6688,
-   "t90_days": 1.772,
-   "factor": 1.187
-  },
-  {
-   "region": "northern_great_plains",
-   "class": "winter",
-   "events": 42,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1627
-    ],
-    [
-     3.0,
-     0.04888
-    ],
-    [
-     7.0,
-     0.001567
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5486,
-   "t90_days": 0.9874,
-   "factor": 0.5633
-  },
-  {
-   "region": "northwest",
-   "class": "all",
-   "events": 887,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1793
-    ],
-    [
-     3.0,
-     0.04407
-    ],
-    [
-     7.0,
-     0.00579
-    ],
-    [
-     14.0,
-     5.25e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5404,
-   "t90_days": 0.9727,
-   "factor": 0.708
-  },
-  {
-   "region": "northwest",
-   "class": "cold_grid",
-   "events": 2,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.09611
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5878,
-   "t90_days": 1.258,
-   "factor": 0.664
-  },
-  {
-   "region": "northwest",
-   "class": "flood",
-   "events": 19,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1826
-    ],
-    [
-     3.0,
-     0.02653
-    ],
-    [
-     7.0,
-     0.0005055
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6012,
-   "t90_days": 1.502,
-   "factor": 1.56
-  },
-  {
-   "region": "northwest",
-   "class": "grid",
-   "events": 22,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.02284
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "northwest",
-   "class": "heat",
-   "events": 5,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.0
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "northwest",
-   "class": "ice",
-   "events": 3,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1839
-    ],
-    [
-     3.0,
-     0.01807
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5979,
-   "t90_days": 1.31,
-   "factor": 0.5
-  },
-  {
-   "region": "northwest",
-   "class": "unattributed",
-   "events": 637,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1712
-    ],
-    [
-     3.0,
-     0.0404
-    ],
-    [
-     7.0,
-     0.004435
-    ],
-    [
-     14.0,
-     7.429e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5316,
-   "t90_days": 0.9568,
-   "factor": 1.063
-  },
-  {
-   "region": "northwest",
-   "class": "wildfire",
-   "events": 27,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.09151
-    ],
-    [
-     3.0,
-     0.05489
-    ],
-    [
-     7.0,
-     0.01591
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.5682
-  },
-  {
-   "region": "northwest",
-   "class": "wind",
-   "events": 119,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2415
-    ],
-    [
-     3.0,
-     0.08001
-    ],
-    [
-     7.0,
-     0.01157
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6054,
-   "t90_days": 1.474,
-   "factor": 0.9873
-  },
-  {
-   "region": "northwest",
-   "class": "winter",
-   "events": 53,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.3406
-    ],
-    [
-     3.0,
-     0.07508
-    ],
-    [
-     7.0,
-     0.0209
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 1.148,
-   "t90_days": 3.878,
-   "factor": 2.212
-  },
-  {
-   "region": "puerto_rico",
-   "class": "all",
-   "events": 18,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2713
-    ],
-    [
-     3.0,
-     0.1354
-    ],
-    [
-     7.0,
-     0.1014
-    ],
-    [
-     14.0,
-     0.02585
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5279,
-   "t90_days": 0.9503,
-   "factor": 0.6916
-  },
-  {
-   "region": "puerto_rico",
-   "class": "historic:maria_2017_pr",
-   "events": 1,
-   "share_out_at_days": [
-    [
-     1.0,
-     1.0
-    ],
-    [
-     3.0,
-     1.0
-    ],
-    [
-     7.0,
-     1.0
-    ],
-    [
-     14.0,
-     0.914
-    ],
-    [
-     30.0,
-     0.815
-    ]
-   ],
-   "t50_days": 90.5,
-   "t90_days": 171.5,
-   "factor": 5.0
-  },
-  {
-   "region": "puerto_rico",
-   "class": "hurricane",
-   "events": 3,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.7505
-    ],
-    [
-     3.0,
-     0.5398
-    ],
-    [
-     7.0,
-     0.4043
-    ],
-    [
-     14.0,
-     0.1031
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 8.544,
-   "t90_days": 17.77,
-   "factor": 4.546
-  },
-  {
-   "region": "puerto_rico",
-   "class": "unattributed",
-   "events": 15,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1109
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southeast",
-   "class": "all",
-   "events": 9509,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.329
-    ],
-    [
-     3.0,
-     0.1241
-    ],
-    [
-     7.0,
-     0.02428
-    ],
-    [
-     14.0,
-     0.002751
-    ],
-    [
-     30.0,
-     0.0001404
-    ]
-   ],
-   "t50_days": 0.64,
-   "t90_days": 1.585,
-   "factor": 1.153
-  },
-  {
-   "region": "southeast",
-   "class": "cold_grid",
-   "events": 61,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1689
-    ],
-    [
-     3.0,
-     0.03513
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5173,
-   "t90_days": 0.9311,
-   "factor": 0.5
-  },
-  {
-   "region": "southeast",
-   "class": "flood",
-   "events": 106,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1945
-    ],
-    [
-     3.0,
-     0.04576
-    ],
-    [
-     7.0,
-     0.003345
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.9345
-  },
-  {
-   "region": "southeast",
-   "class": "grid",
-   "events": 135,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1237
-    ],
-    [
-     3.0,
-     0.02322
-    ],
-    [
-     7.0,
-     9.792e-05
-    ],
-    [
-     14.0,
-     9.792e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southeast",
-   "class": "heat",
-   "events": 55,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.02322
-    ],
-    [
-     3.0,
-     0.003253
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southeast",
-   "class": "hurricane",
-   "events": 1476,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.5781
-    ],
-    [
-     3.0,
-     0.2537
-    ],
-    [
-     7.0,
-     0.05258
-    ],
-    [
-     14.0,
-     0.006201
-    ],
-    [
-     30.0,
-     0.0003105
-    ]
-   ],
-   "t50_days": 1.46,
-   "t90_days": 3.867,
-   "factor": 0.989
-  },
-  {
-   "region": "southeast",
-   "class": "ice",
-   "events": 146,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.4402
-    ],
-    [
-     3.0,
-     0.144
-    ],
-    [
-     7.0,
-     0.03122
-    ],
-    [
-     14.0,
-     0.0001562
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.8422,
-   "t90_days": 2.263,
-   "factor": 0.7741
-  },
-  {
-   "region": "southeast",
-   "class": "unattributed",
-   "events": 4226,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.01916
-    ],
-    [
-     3.0,
-     0.00297
-    ],
-    [
-     7.0,
-     0.0008423
-    ],
-    [
-     14.0,
-     0.0001646
-    ],
-    [
-     30.0,
-     2.1e-05
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southeast",
-   "class": "wildfire",
-   "events": 6,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.01935
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.5682
-  },
-  {
-   "region": "southeast",
-   "class": "wind",
-   "events": 2800,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1904
-    ],
-    [
-     3.0,
-     0.03073
-    ],
-    [
-     7.0,
-     0.002019
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5575,
-   "t90_days": 1.021,
-   "factor": 0.6841
-  },
-  {
-   "region": "southeast",
-   "class": "winter",
-   "events": 498,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.3218
-    ],
-    [
-     3.0,
-     0.04988
-    ],
-    [
-     7.0,
-     0.00362
-    ],
-    [
-     14.0,
-     9.917e-05
-    ],
-    [
-     30.0,
-     3.832e-06
-    ]
-   ],
-   "t50_days": 0.7371,
-   "t90_days": 1.754,
-   "factor": 1.0
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "all",
-   "events": 2955,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.3208
-    ],
-    [
-     3.0,
-     0.09292
-    ],
-    [
-     7.0,
-     0.01449
-    ],
-    [
-     14.0,
-     2.259e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6449,
-   "t90_days": 1.615,
-   "factor": 1.175
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "cold_grid",
-   "events": 152,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.5564
-    ],
-    [
-     3.0,
-     0.03866
-    ],
-    [
-     7.0,
-     0.001031
-    ],
-    [
-     14.0,
-     8.229e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 1.137,
-   "t90_days": 1.894,
-   "factor": 1.0
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "flood",
-   "events": 42,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1497
-    ],
-    [
-     3.0,
-     0.00734
-    ],
-    [
-     7.0,
-     0.001685
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5238,
-   "t90_days": 0.9429,
-   "factor": 0.9791
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "grid",
-   "events": 205,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1839
-    ],
-    [
-     3.0,
-     0.02511
-    ],
-    [
-     7.0,
-     2.367e-05
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "heat",
-   "events": 68,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.01524
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "hurricane",
-   "events": 91,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.62
-    ],
-    [
-     3.0,
-     0.3494
-    ],
-    [
-     7.0,
-     0.0681
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 2.688,
-   "t90_days": 6.123,
-   "factor": 1.566
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "ice",
-   "events": 55,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.62
-    ],
-    [
-     3.0,
-     0.3022
-    ],
-    [
-     7.0,
-     0.1559
-    ],
-    [
-     14.0,
-     0.0002461
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 1.777,
-   "t90_days": 4.486,
-   "factor": 1.534
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "unattributed",
-   "events": 1389,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.03134
-    ],
-    [
-     3.0,
-     0.002133
-    ],
-    [
-     7.0,
-     0.00012
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "wildfire",
-   "events": 14,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.07635
-    ],
-    [
-     3.0,
-     0.01008
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5144,
-   "t90_days": 0.9259,
-   "factor": 0.5846
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "wind",
-   "events": 854,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.259
-    ],
-    [
-     3.0,
-     0.06734
-    ],
-    [
-     7.0,
-     0.0009531
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6152,
-   "t90_days": 1.466,
-   "factor": 0.9825
-  },
-  {
-   "region": "southern_great_plains",
-   "class": "winter",
-   "events": 85,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.4245
-    ],
-    [
-     3.0,
-     0.1029
-    ],
-    [
-     7.0,
-     0.0008231
-    ],
-    [
-     14.0,
-     6.331e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.8221,
-   "t90_days": 2.065,
-   "factor": 1.178
-  },
-  {
-   "region": "southwest",
-   "class": "all",
-   "events": 1645,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.202
-    ],
-    [
-     3.0,
-     0.03653
-    ],
-    [
-     7.0,
-     0.00473
-    ],
-    [
-     14.0,
-     0.001014
-    ],
-    [
-     30.0,
-     0.000696
-    ]
-   ],
-   "t50_days": 0.5113,
-   "t90_days": 0.9204,
-   "factor": 0.6699
-  },
-  {
-   "region": "southwest",
-   "class": "cold_grid",
-   "events": 10,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.5692
-    ],
-    [
-     3.0,
-     0.4301
-    ],
-    [
-     7.0,
-     0.1856
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 2.594,
-   "t90_days": 9.154,
-   "factor": 4.833
-  },
-  {
-   "region": "southwest",
-   "class": "flood",
-   "events": 24,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.06898
-    ],
-    [
-     3.0,
-     0.007279
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5177,
-   "t90_days": 0.9319,
-   "factor": 0.9677
-  },
-  {
-   "region": "southwest",
-   "class": "grid",
-   "events": 63,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.02595
-    ],
-    [
-     3.0,
-     0.0014
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southwest",
-   "class": "heat",
-   "events": 23,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.02577
-    ],
-    [
-     3.0,
-     0.0
-    ],
-    [
-     7.0,
-     0.0
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southwest",
-   "class": "unattributed",
-   "events": 966,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1147
-    ],
-    [
-     3.0,
-     0.01371
-    ],
-    [
-     7.0,
-     0.0006724
-    ],
-    [
-     14.0,
-     6.6e-05
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  },
-  {
-   "region": "southwest",
-   "class": "wildfire",
-   "events": 129,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.4266
-    ],
-    [
-     3.0,
-     0.1113
-    ],
-    [
-     7.0,
-     0.01815
-    ],
-    [
-     14.0,
-     0.01025
-    ],
-    [
-     30.0,
-     0.007392
-    ]
-   ],
-   "t50_days": 1.007,
-   "t90_days": 1.81,
-   "factor": 1.143
-  },
-  {
-   "region": "southwest",
-   "class": "wind",
-   "events": 205,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2869
-    ],
-    [
-     3.0,
-     0.043
-    ],
-    [
-     7.0,
-     0.00277
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.6313,
-   "t90_days": 1.655,
-   "factor": 1.109
-  },
-  {
-   "region": "southwest",
-   "class": "winter",
-   "events": 225,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.2128
-    ],
-    [
-     3.0,
-     0.04148
-    ],
-    [
-     7.0,
-     0.005981
-    ],
-    [
-     14.0,
-     0.000189
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5777,
-   "t90_days": 1.195,
-   "factor": 0.6815
-  },
-  {
-   "region": "virgin_islands",
-   "class": "all",
-   "events": 508,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.04709
-    ],
-    [
-     3.0,
-     0.004927
-    ],
-    [
-     7.0,
-     0.0002476
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 0.6551
-  },
-  {
-   "region": "virgin_islands",
-   "class": "historic:irma_maria_2017_vi",
-   "events": 1,
-   "share_out_at_days": [
-    [
-     1.0,
-     1.0
-    ],
-    [
-     3.0,
-     1.0
-    ],
-    [
-     7.0,
-     1.0
-    ],
-    [
-     14.0,
-     0.97
-    ],
-    [
-     30.0,
-     0.88
-    ]
-   ],
-   "t50_days": 78.6,
-   "t90_days": 128.2,
-   "factor": 5.0
-  },
-  {
-   "region": "virgin_islands",
-   "class": "hurricane",
-   "events": 28,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.1648
-    ],
-    [
-     3.0,
-     0.02999
-    ],
-    [
-     7.0,
-     0.002672
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5083,
-   "t90_days": 0.915,
-   "factor": 0.5
-  },
-  {
-   "region": "virgin_islands",
-   "class": "unattributed",
-   "events": 480,
-   "share_out_at_days": [
-    [
-     1.0,
-     0.03993
-    ],
-    [
-     3.0,
-     0.0034
-    ],
-    [
-     7.0,
-     9.992e-05
-    ],
-    [
-     14.0,
-     0.0
-    ],
-    [
-     30.0,
-     0.0
-    ]
-   ],
-   "t50_days": 0.5,
-   "t90_days": 0.9,
-   "factor": 1.0
-  }
- ],
- "sdwis_violation_share": {
-  "04013": 0.051,
-  "06007": 0.0551,
-  "06067": 0.147,
-  "12086": 2.28e-05,
-  "13135": 0.0,
-  "15009": 0.0,
-  "17031": 0.0451,
-  "19013": 0.0,
-  "19113": 0.000958,
-  "19193": 0.00327,
-  "20051": 0.00376,
-  "22051": 0.337,
-  "28049": 0.869,
-  "30063": 0.0244,
-  "36059": 0.305,
-  "36061": 1.0,
-  "36081": 1.0,
-  "36085": 1.0,
-  "37021": 0.94,
-  "37119": 5.43e-05,
-  "38101": 0.0,
-  "39029": 0.187,
-  "39035": 0.0,
-  "39049": 0.00969,
-  "40109": 0.0714,
-  "41011": 0.0208,
-  "42101": 0.0,
-  "48157": 0.0372,
-  "48167": 0.176,
-  "48201": 0.528,
-  "48453": 0.832,
-  "72127": 1.0,
-  "72141": 0.296
- },
- "smoke_days_35": {
-  "06007": 8.27,
-  "30063": 7.62,
-  "15009": 0.0,
-  "04013": 0.0,
-  "42101": 1.12
- }
 }

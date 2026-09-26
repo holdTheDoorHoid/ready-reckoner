@@ -585,15 +585,15 @@ rr_consequence::assess(
 ) -> ConsequenceAssessment
 ```
 
-`CountyData::from_record` reads the county record. Data pack v2 adds optional fields, each
-absent until its branch merges (the county-only model of v0.1 runs without them and says so):
-`outage_model` (the regional outage model: pooled tails with credibility weights, causes, the
-region's worst event; `agent/data-model`), `temperature` (outage hours on hot and cold days),
+`CountyData::from_record` reads the county record. Data pack v2 adds optional fields (the
+county-only model of v0.1 runs where one is missing, and says so): `outage_model` (the regional
+outage model: pooled tails with credibility weights, causes, the region's worst event) and
+`temperature` (outage hours on hot and cold days), both `rr_types::calibration` records on
+`CountyRecord`; `sdwis_violation_share` and `smoke_days` (from `CountyRecord::exposure`); and
 `curves` (pooled restoration curves by region and cause, handed in with
-`CountyData::with_curves(store.restoration_curves())` because they are not per county),
-`sdwis_violation_share` and `smoke_days` (read from `CountyRecord::exposure`, data-hazard's
-`sdwis_violation_pop_share` and `smoke_days_35`, merged in v0.2). Until agent/data-model merges,
-`crates/rr-consequence/src/pack.rs` mirrors its loader types field for field.
+`CountyData::with_curves(store.restoration_curves())` because they are not per county;
+awaiting: plan, which does not pass them yet, so real plans use the regional restoration factors
+and the island grids' Maria curves only once it does).
 
 `ConsequenceAssessment` carries the 15 `BucketAssessment`s (in `BucketId::ALL` order), the
 `ScenarioInfo`s, cliff `Warning`s, the self-sufficiency statement, and the numbers behind every
@@ -1010,7 +1010,7 @@ big windstorms, grid failure, Cascadia).
   tail: the rates of outages lasting 1, 3, 7, 14 and 30 days per customer-year, each the county's
   own blended with its neighbours' within 400 km (800 km from a week) by a credibility weight
   (λ̂ = Z·λ_county + (1 − Z)·λ_region, Z = E/(E + 5) with E the qualifying events a county like
-  this one would expect in its own record; `agent/data-model`), over the pool's rate of outages of
+  this one would expect in its own record; the data pack's `outage_pooled.csv`), over the pool's rate of outages of
   any length (at least twice the one-day rate, where a county's own record is thin: Manhattan's
   underground grid records none), with the county's own median and 90th-percentile hours for the
   part under a day. The pool leaves out outages attributed to hurricanes, wildfires, floods,
@@ -1021,7 +1021,7 @@ big windstorms, grid failure, Cascadia).
   more, nClimGrid-Daily) replaces the rows' fixed heat shares when the pack has it (M-11). The
   power bucket says whose records these are ("blended with about 450 nearby counties'"). Linn
   County, Iowa, goes from 10 days (the 2020 derecho in its own record) to 5; Oklahoma City from
-  10 to 7.
+  10 to 5.
 - **Fallback, said out loud.** Without the regional model the county's own statistics are used
   as before (or its state's series, V-15), the power bucket says "only your county's own outage
   records", and the range is widened one ladder step at the high end (a structural gap, M-14).
@@ -1149,8 +1149,10 @@ wildfire you could be away for a month or more"). Home loss adds the displacemen
 damage forced the household out, the months by which nine in ten households like it would be home
 (the 90th percentile of the home-loss rows' displacement durations, weighted by how often each
 cause happens), and what living elsewhere that long costs at 30 % of monthly expenses: what
-loss-of-use insurance pays for. The IHP table (months away by incident type) replaces the
-displacement durations when it lands (awaiting: data-model).
+loss-of-use insurance pays for. The durations stay expert estimates: the data pack's FEMA
+housing-assistance series (`ihp_displacement`) gives no months away (only 3 % of rental-eligible
+registrations carry an end date), and its rental assistance per approved household is a floor on
+the cost, not the cost.
 
 ### The worst event on record (v0.2.0)
 
