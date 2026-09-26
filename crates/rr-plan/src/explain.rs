@@ -285,15 +285,24 @@ fn item(a: &Assessment, content: &Content, id: &str) -> Result<Explanation, Engi
             }
             for j in &o.joins {
                 if let Some(l) = a.lines.iter().find(|l| l.line.id == j.line_id) {
-                    math.push(format!(
-                        "Meets {}: needs {} {}; each {} counts as {:.3} {}.",
-                        l.line.id,
-                        text::number(l.quantity),
-                        l.line.unit,
-                        it.unit,
-                        j.units_per_item,
-                        l.line.unit
-                    ));
+                    if j.via_alternative && j.bucket.kind() != rr_types::BucketKind::Duration {
+                        // A staging step: packed in the bag from household supplies.
+                        math.push(format!(
+                            "Counts toward {}: packed in it from household supplies, as part of \
+                             that step rather than instead of it.",
+                            l.line.id
+                        ));
+                    } else {
+                        math.push(format!(
+                            "Meets {}: needs {} {}; each {} counts as {:.3} {}.",
+                            l.line.id,
+                            text::number(l.quantity),
+                            l.line.unit,
+                            it.unit,
+                            j.units_per_item,
+                            l.line.unit
+                        ));
+                    }
                     math.extend(l.math.iter().cloned());
                     ids.extend(l.line.citations.iter().cloned());
                 }

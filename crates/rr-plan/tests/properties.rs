@@ -149,7 +149,8 @@ fn a_zero_budget_gives_free_steps_only_and_a_savings_suggestion() {
     let out = assess(&input);
     let mut free = 0;
     for m in &out.plan.months {
-        for it in &m.items {
+        // What the household has (listed, or an everyday basic the plan assumes) is not bought.
+        for it in m.items.iter().filter(|i| !i.done) {
             assert_eq!(
                 it.kind,
                 PlanItemKind::FreeAction,

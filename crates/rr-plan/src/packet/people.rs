@@ -2,7 +2,9 @@
 //! the go/stay card, pets), documents and money (the Emergency Financial First Aid Kit,
 //! insurance questions, cash, savings), and special needs (medicine, powered devices, babies,
 //! older adults, mobility, pregnancy, animals, stress and mental health). Advice comes from the
-//! catalogue items and guidance blocks, with their sources.
+//! catalogue's free steps (each a parent action with its sub-steps) and four topic blocks:
+//! talking with children, neighbours, drills, and mental health. Where a topic block covers a
+//! step, the step is listed by name only, so the packet does not say the same thing twice.
 
 use rr_types::{AgeBand, BucketId, Mobility, PoweredDevice, Target};
 
@@ -27,14 +29,34 @@ fn advice(cx: &Ctx<'_>, ids: &[&str], out: &mut Vec<String>) -> usize {
     n
 }
 
-/// Requirement lines with these rules, as a list.
-fn lines(cx: &Ctx<'_>, rules: &[&str], out: &mut Vec<String>) -> usize {
+/// Steps offered to this household, by name only: the topic block that follows covers them.
+fn named(cx: &Ctx<'_>, ids: &[&str], out: &mut Vec<String>) -> usize {
     let mut n = 0;
-    for l in
-        cx.a.lines.iter().filter(|l| {
-            rules.contains(&l.line.rule.as_str()) && l.kind == rr_supply::LineKind::Need
-        })
-    {
+    for id in ids {
+        if cx.a.offers.get(id).is_none() {
+            continue;
+        }
+        if let Some(it) = cx.item(id) {
+            out.push(format!("- **{}.**", md(&it.name)));
+            n += 1;
+        }
+    }
+    if n > 0 {
+        out.push(String::new());
+    }
+    n
+}
+
+/// Requirement lines with these rules, as a list: the needs, and with `staged` also the staging
+/// lines (a pet's water and food packed in its go-kit from household stock).
+fn lines_with(cx: &Ctx<'_>, rules: &[&str], staged: bool, out: &mut Vec<String>) -> usize {
+    let mut n = 0;
+    for l in cx.a.lines.iter().filter(|l| {
+        rules.contains(&l.line.rule.as_str())
+            && l.quantity > 0.0
+            && (l.kind == rr_supply::LineKind::Need
+                || (staged && l.kind == rr_supply::LineKind::Alternative))
+    }) {
         out.push(format!(
             "- {}{}",
             md(&l.line.plain),
@@ -46,6 +68,11 @@ fn lines(cx: &Ctx<'_>, rules: &[&str], out: &mut Vec<String>) -> usize {
         out.push(String::new());
     }
     n
+}
+
+/// Requirement lines (needs only) with these rules, as a list.
+fn lines(cx: &Ctx<'_>, rules: &[&str], out: &mut Vec<String>) -> usize {
+    lines_with(cx, rules, false, out)
 }
 
 /// A topic block under its own small heading.
@@ -105,18 +132,7 @@ pub(super) fn family(cx: &Ctx<'_>, out: &mut Vec<String>) {
 
     out.push("### Contacts and meeting places".to_owned());
     out.push(String::new());
-    advice(
-        cx,
-        &[
-            "comms_family_plan",
-            "comms_out_of_area_contact",
-            "comms_contact_card",
-            "comms_wea_alerts_on",
-            "comms_county_alerts",
-            "comms_text_911",
-        ],
-        out,
-    );
+    advice(cx, &["comms_contact_card", "comms_wea_alerts_on"], out);
 
     out.push("### Leaving home: triggers and routes".to_owned());
     out.push(String::new());
@@ -139,67 +155,36 @@ pub(super) fn family(cx: &Ctx<'_>, out: &mut Vec<String>) {
     }
     advice(
         cx,
-        &[
-            "evac_know_zone",
-            "evac_if_then_triggers",
-            "evac_go_stay_card",
-            "evac_ten_minute_drills",
-            "evac_half_tank",
-            "evac_tsunami_high_ground",
-            "evac_flood_turn_around",
-            "evac_tornado_shelter_spot",
-            "evac_quake_drop_cover",
-            "power_ev_storm_charge",
-            "power_ev_range_plan",
-        ],
+        &["evac_know_zone", "evac_ride_plan", "evac_half_tank"],
         out,
     );
-    if input
-        .mobility
-        .vehicles
-        .iter()
-        .any(|v| v.fuel == rr_types::Fuel::Ev)
-    {
-        block(cx, "topic:evs", out);
-    }
+    named(cx, &["evac_ten_minute_drills"], out);
     block(cx, "topic:drills", out);
 
     out.push("### School, work and getting home".to_owned());
     out.push(String::new());
-    let n = advice(
-        cx,
-        &[
-            "gethome_route_plan",
-            "gethome_work_plan",
-            "gethome_school_plan",
-            "gethome_spare_tire_check",
-        ],
-        out,
-    );
-    if n == 0 {
+    let commuters = input.people.iter().filter(|p| p.commute.is_some()).count();
+    if commuters > 0 {
+        out.push(
+            "The household plan above covers school, daycare and work plans and a walking route \
+             home. Each commuter's get-home bag is under Checklists."
+                .to_owned(),
+        );
+    } else {
         out.push(
             "Nobody in the household commutes, so there is no get-home plan to make. If that \
              changes, add the trip on the household screen."
                 .to_owned(),
         );
-        out.push(String::new());
     }
+    out.push(String::new());
     if children {
         block(cx, "topic:talking_with_children", out);
     }
 
     out.push("### Neighbors".to_owned());
     out.push(String::new());
-    advice(
-        cx,
-        &[
-            "community_know_two_neighbours",
-            "community_check_in_agreement",
-            "community_street_list",
-            "community_block_group_cert",
-        ],
-        out,
-    );
+    named(cx, &["community_know_two_neighbours"], out);
     block(cx, "topic:neighbours", out);
 
     if pets {
@@ -232,11 +217,7 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(format!("- [ ] {part}"));
     }
     out.push(String::new());
-    advice(
-        cx,
-        &["docs_effak", "docs_home_inventory", "docs_document_pouch"],
-        out,
-    );
+    advice(cx, &["docs_effak", "docs_document_pouch"], out);
 
     out.push("### Insurance questions".to_owned());
     out.push(String::new());
@@ -249,7 +230,6 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
         ],
         out,
     );
-    advice(cx, &["docs_insurance_check", "docs_renters_insurance"], out);
     if n == 0 {
         out.push(
             "You have the insurance the plan looks for. Check once a year that it still pays for \
@@ -257,9 +237,6 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
                 .to_owned(),
         );
         out.push(String::new());
-    }
-    if a.input.housing.tenure == rr_types::Tenure::Rent {
-        block(cx, "topic:renters", out);
     }
 
     out.push("### Cash".to_owned());
@@ -282,15 +259,7 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
             out.push(String::new());
         }
     }
-    advice(
-        cx,
-        &[
-            "docs_start_emergency_fund",
-            "docs_unemployment_know",
-            "docs_lean_budget",
-        ],
-        out,
-    );
+    advice(cx, &["docs_start_emergency_fund"], out);
 }
 
 pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
@@ -316,11 +285,9 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
         advice(
             cx,
             &[
-                "med_refill_at_seven",
-                "med_emergency_supply_ask",
                 "med_list_written",
                 "med_cooler_refrigerated_rx",
-                "med_telehealth_setup",
+                "med_epinephrine_plan",
             ],
             out,
         );
@@ -328,7 +295,6 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push("### Antibiotics".to_owned());
     out.push(String::new());
     lines(cx, &["antibiotics_none"], out);
-    block(cx, "topic:antibiotics", out);
 
     if people
         .iter()
@@ -384,7 +350,6 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
             out,
         );
         advice(cx, &["special_access_needs_plan"], out);
-        block(cx, "topic:disability_access", out);
     }
     if people.iter().any(|p| p.pregnant_or_nursing) {
         any = true;
@@ -397,7 +362,9 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
         any = true;
         out.push("### Pets and animals".to_owned());
         out.push(String::new());
-        lines(
+        // The go-kit's water and food are staged from household stock, so they are listed with
+        // the carrier they are packed in.
+        lines_with(
             cx,
             &[
                 "pet_food_lb",
@@ -406,9 +373,9 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
                 "pet_go_food",
                 "livestock_water",
             ],
+            true,
             out,
         );
-        block(cx, "topic:pets", out);
     }
     if !any {
         out.push(

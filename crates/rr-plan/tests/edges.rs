@@ -160,11 +160,7 @@ fn assumed_basics_are_credited_listed_and_can_be_switched_off() {
             .map(|i| i.est_cost_usd)
             .sum()
     };
-    if flagged.is_empty() {
-        // The catalogue flags nothing yet: nothing to assume.
-        assert!(!a.warnings.iter().any(|w| w.id == "assumed_basics"));
-        return;
-    }
+    assert!(!flagged.is_empty(), "the catalogue flags everyday basics");
     let note = a
         .warnings
         .iter()
@@ -187,6 +183,57 @@ fn assumed_basics_are_credited_listed_and_can_be_switched_off() {
         spend(&a) <= spend(&b) + 0.01,
         "assuming basics never costs more"
     );
+    // Every flagged item the household is offered is credited, free ones (a phone) included,
+    // and none of them is bought: no layers, blankets or go-bags for Philadelphia.
+    let offered = common::run(&on);
+    for o in offered
+        .offers
+        .offered
+        .iter()
+        .filter(|o| o.item.assumed_basic)
+    {
+        assert!(
+            note.related.contains(&o.item.id.as_str().to_owned()),
+            "{} is assumed",
+            o.item.id
+        );
+    }
+    for id in [
+        "thermal_warm_layers",
+        "thermal_blankets",
+        "evac_go_bag",
+        "comms_phone_basic",
+    ] {
+        assert!(note.related.iter().any(|r| r == id), "{id} is assumed");
+    }
+    let bought: Vec<&str> = a
+        .plan
+        .months
+        .iter()
+        .flat_map(|m| &m.items)
+        .filter(|i| !i.done && flagged.contains(&i.item_id.as_str()))
+        .map(|i| i.item_id.as_str())
+        .collect();
+    assert!(
+        bought.is_empty(),
+        "assumed basics are not bought: {bought:?}"
+    );
+    // Three days of ordinary food per person count toward the food target, in kilocalories.
+    let food = offered
+        .offers
+        .get("food_three_days_basic")
+        .expect("offered");
+    let join = food
+        .joins
+        .iter()
+        .find(|j| j.line_id == "supplies.food_kcal")
+        .expect("meets the food line");
+    let kcal = content
+        .item("food_three_days_basic")
+        .unwrap()
+        .energy_kcal_per_unit;
+    assert_eq!(Some(join.units_per_item as f32), kcal);
+    assert_eq!(food.quantity, on.people.len() as f64, "one unit per person");
     // A household that lists a basic (even as none) keeps its own answer.
     let mut listed = on.clone();
     listed.existing.push(Owned {
@@ -230,4 +277,42 @@ fn the_rare_catastrophe_opt_in_reaches_the_budget() {
         !bought(&assess(&opt_in)).is_empty(),
         "the allowance buys them"
     );
+}
+
+#[test]
+fn staging_steps_count_toward_their_bag_but_are_never_the_bag() {
+    let a = common::run(&household("philadelphia-renters-4"));
+    // The pets' water and food packed in the go-kit meet the carrier line through its staging
+    // alternatives.
+    for id in ["special_pet_go_water", "special_pet_go_food"] {
+        let o = a
+            .offers
+            .get(id)
+            .unwrap_or_else(|| panic!("{id} is offered"));
+        let j = o
+            .joins
+            .iter()
+            .find(|j| j.line_id == "evacuate.pet_carrier")
+            .unwrap_or_else(|| panic!("{id} counts toward the pet carrier"));
+        assert!(j.via_alternative, "{id}");
+    }
+    // No item takes a role (go-bag, device power, cold chain) through an alternative.
+    for (o, m) in a.offers.offered.iter().zip(&a.offers.meta) {
+        if o.joins.iter().all(|j| j.via_alternative) && !o.joins.is_empty() {
+            assert!(m.roles.is_empty(), "{} has {:?}", o.item.id, m.roles);
+        }
+    }
+    let bag = a.offers.get("evac_go_bag").expect("offered");
+    let meta = &a.offers.meta[a
+        .offers
+        .offered
+        .iter()
+        .position(|o| o.item.id == "evac_go_bag")
+        .unwrap()];
+    assert!(
+        bag.joins
+            .iter()
+            .any(|j| j.line_id == "evacuate.go_bag" && !j.via_alternative)
+    );
+    assert!(meta.roles.contains(&rr_budget::ItemRole::GoBag));
 }

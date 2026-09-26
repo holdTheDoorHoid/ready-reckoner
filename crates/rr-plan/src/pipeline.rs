@@ -354,8 +354,11 @@ pub fn run<S: CountySource + ?Sized>(
                 },
                 _,
             ) => {
+                // A go-bag itself, not a staging step packed into one.
                 let bag = offers.offered.iter().any(|o| {
-                    o.joins.iter().any(|j| j.line_id == "evacuate.go_bag")
+                    o.joins
+                        .iter()
+                        .any(|j| j.line_id == "evacuate.go_bag" && !j.via_alternative)
                         && inventory.get(&o.item.id).copied().unwrap_or(0.0) > 0.0
                 });
                 Target::Evacuate {
@@ -485,9 +488,9 @@ pub const ASSUMED_HOW_TO_UNTICK: &str = "Most homes have these, so the plan does
 /// Days of a divisible basic (ordinary food) assumed on hand: the three-day step.
 pub const ASSUMED_DAYS: f64 = 3.0;
 
-/// The basics to credit: offered items the catalogue flags `assumed_basic`, not listed by the
-/// household, at the quantity the household needs (a divisible basic, such as ordinary food, at
-/// three days' worth or its line's days if fewer).
+/// The basics to credit: offered items the catalogue flags `assumed_basic` (free ones too, such
+/// as a charged phone, which then count as done), not listed by the household, at the quantity
+/// the household needs (a divisible basic at three days' worth, or its line's days if fewer).
 fn assumed_basics(input: &PlanInput, offers: &Offers, lines: &[SizedLine]) -> Vec<(ItemId, f64)> {
     if !input.assume_basics {
         return Vec::new();
@@ -495,7 +498,7 @@ fn assumed_basics(input: &PlanInput, offers: &Offers, lines: &[SizedLine]) -> Ve
     offers
         .offered
         .iter()
-        .filter(|o| o.item.assumed_basic && !o.item.free)
+        .filter(|o| o.item.assumed_basic)
         .filter(|o| !input.existing.iter().any(|e| e.item_id == o.item.id))
         .filter_map(|o| {
             let qty = if o.divisible {

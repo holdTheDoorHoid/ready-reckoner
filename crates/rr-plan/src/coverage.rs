@@ -69,6 +69,10 @@ pub enum Units {
     /// The quantity the item's own rule sizes meets the whole line (three power banks for three
     /// phone users meet the phone-power line).
     Fill,
+    /// The item's `energy_kcal_per_unit` kilocalories per item unit, for food sized by a generic
+    /// rule (three days of ordinary food per person). Unlike [`Units::Per`], the item keeps its
+    /// own rule's quantity rather than growing to meet the whole line.
+    Energy,
 }
 
 /// Items sized by a generic rule, and the need lines they meet (`bucket.rule`, matching every
@@ -94,7 +98,8 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
         "comms_contact_card",
         &[("comms.contact_cards", Units::Fill)],
     ),
-    ("comms_paper_map", &[("comms.local_map", Units::Per(1.0))]),
+    // A phone is the household's own; the phone-power line is about keeping it charged.
+    ("comms_phone_basic", &[]),
     // Water and the toilet.
     (
         "water_boil_method",
@@ -118,10 +123,6 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
         &[("thermal.cooling_plan", Units::Fill)],
     ),
     (
-        "thermal_cooling_center",
-        &[("thermal.cooling_plan", Units::Fill)],
-    ),
-    (
         "thermal_sleeping_bag",
         &[("thermal.sleeping_bag_or_blanket", Units::Per(1.0))],
     ),
@@ -132,6 +133,14 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
     // Foil blankets are for go-bags and the car, not a week without heat.
     ("thermal_emergency_blankets", &[]),
     ("thermal_indoor_thermometer", &[]),
+    // Food: three days of what the household normally eats, counted in kilocalories. A cooking pot
+    // meets no line: the boil-water step (which includes a pot with a lid) meets the treatment
+    // line, and the pot is an assumed basic.
+    (
+        "food_three_days_basic",
+        &[("supplies.food_kcal", Units::Energy)],
+    ),
+    ("food_cooking_pot", &[]),
     // Medicine.
     (
         "med_cooler_refrigerated_rx",
@@ -151,6 +160,8 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
         "evac_half_tank",
         &[("evacuate.fuel_half_tank", Units::Fill)],
     ),
+    // The leaving-home plan includes routes marked on a paper map.
+    ("evac_know_zone", &[("comms.local_map", Units::Fill)]),
     (
         "special_access_needs_plan",
         &[("evacuate.evacuation_assistance_plan", Units::Fill)],
@@ -160,20 +171,13 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
         &[("evacuate.pet_carrier", Units::Per(1.0))],
     ),
     ("gethome_bag", &[("get_home.get_home_bag", Units::Per(1.0))]),
-    (
-        "water_personal_filter",
-        &[("get_home.get_home_water", Units::Fill)],
-    ),
     ("gethome_car_kit", &[("get_home.car_kit", Units::Per(1.0))]),
     // Documents, insurance and savings (money buckets: shown in `explain`, not bought).
-    ("docs_effak", &[("home_loss.document_kit", Units::Fill)]),
+    // The documents step includes checking insurance cover (home or renters, flood, earthquake).
     (
-        "docs_renters_insurance",
-        &[("home_loss.insurance_home_or_renters", Units::Fill)],
-    ),
-    (
-        "docs_insurance_check",
+        "docs_effak",
         &[
+            ("home_loss.document_kit", Units::Fill),
             ("home_loss.insurance_home_or_renters", Units::Fill),
             ("home_loss.insurance_flood", Units::Fill),
             ("home_loss.insurance_earthquake", Units::Fill),
@@ -183,9 +187,9 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
         "docs_start_emergency_fund",
         &[("income.emergency_fund_months", Units::Fill)],
     ),
-    // Fire and security.
+    // Fire and security. The fire-safety step includes the escape plan.
     (
-        "fire_escape_plan",
+        "fire_test_alarms",
         &[("fire.fire_escape_plan", Units::Fill)],
     ),
     (
@@ -222,10 +226,10 @@ pub const DIVISIBLE_CLASSES: [&str; 6] = [
     "pet_food",
 ];
 
-/// Rules whose count grows with the target's days without a daily rate (one bottle of bleach per
-/// two weeks, one pack of batteries per week): bought a unit at a time, so a long target does not
-/// arrive as one big purchase.
-pub const DIVISIBLE_RULES: [&str; 2] = ["bleach_bottles", "battery_packs"];
+/// Rules whose count grows with the target's days without a daily rate (one pack of batteries per
+/// week): bought a unit at a time, so a long target does not arrive as one big purchase. (Bleach
+/// is one bottle per household whatever the target, so it is an ordinary set.)
+pub const DIVISIBLE_RULES: [&str; 1] = ["battery_packs"];
 
 /// Classes bought at least a week's worth at a time (a bag of pet food, not a pound).
 const WEEK_STEP_CLASSES: [&str; 1] = ["pet_food"];
@@ -295,6 +299,11 @@ pub struct Join {
     pub bucket: BucketId,
     /// Line units one item unit provides.
     pub units_per_item: f64,
+    /// The item meets the line through one of its alternatives: reused bottles for stored water,
+    /// or a staging step (a pet's water packed in its go-kit) for the bag it is packed in. It
+    /// counts toward that line, but a staging step is never the bag itself, so it takes none of
+    /// the bag's guardrail roles.
+    pub via_alternative: bool,
 }
 
 /// Why a catalogue item is not offered to this household.
@@ -444,12 +453,13 @@ pub fn build(
         let mut joins: Vec<Join> = Vec::new();
         let mut divisible = false;
         let mut step = 1.0_f64;
-        let push = |line: &SizedLine, units: f64, joins: &mut Vec<Join>| {
+        let push = |line: &SizedLine, units: f64, via_alternative: bool, joins: &mut Vec<Join>| {
             if !joins.iter().any(|j| j.line_id == line.line.id) && units > 0.0 {
                 joins.push(Join {
                     line_id: line.line.id.clone(),
                     bucket: line.line.bucket,
                     units_per_item: units,
+                    via_alternative,
                 });
             }
         };
@@ -477,7 +487,7 @@ pub fn build(
                 } else {
                     l.quantity / quantity
                 };
-                push(l, units, &mut joins);
+                push(l, units, false, &mut joins);
             }
             let class_ok = rule_need
                 .iter()
@@ -496,7 +506,7 @@ pub fn build(
         }
         for l in via_alt {
             // An alternative (reused bottles) counts in the need line's unit.
-            push(l, conv, &mut joins);
+            push(l, conv, true, &mut joins);
         }
         // 2. The table.
         let listed = table_lines(item.id.as_str());
@@ -513,8 +523,9 @@ pub fn build(
                         // Per-person lines: one item each; otherwise the sized quantity meets it.
                         Units::Fill if per_person => 1.0,
                         Units::Fill => l.quantity / quantity,
+                        Units::Energy => item.energy_kcal_per_unit.map_or(0.0, f64::from),
                     };
-                    push(l, u, &mut joins);
+                    push(l, u, false, &mut joins);
                 }
             }
         }
@@ -538,7 +549,7 @@ pub fn build(
                     .find(|l| l.line.bucket == BucketId::Thermal && l.line.item_class == class)
                 {
                     let u = l.quantity / quantity;
-                    push(l, u, &mut joins);
+                    push(l, u, false, &mut joins);
                 }
             }
         }
@@ -651,7 +662,12 @@ fn metadata(offered: &[Offered], rule: &PlanCoverage) -> (Vec<ItemMeta>, Vec<Ite
                 });
             }
         }
-        let meets = |key: &str| o.joins.iter().any(|j| line_matches(&j.line_id, key));
+        // Roles come from the lines an item meets itself, never through a staging alternative.
+        let meets = |key: &str| {
+            o.joins
+                .iter()
+                .any(|j| !j.via_alternative && line_matches(&j.line_id, key))
+        };
         if meets("power.medical_device_wh")
             || meets("power.device_battery_units")
             || meets("power.power_station_units")

@@ -109,6 +109,76 @@ fn the_item_table_names_real_items_and_real_lines() {
     assert!(DIVISIBLE_CLASSES.contains(&"water_stored"));
 }
 
+/// Every catalogue-looking id the packet and coverage code name is a real item (or an rr-supply
+/// rule or item class of the same shape), so an item the content merges into a parent is not
+/// skipped silently.
+#[test]
+fn ids_named_in_the_code_are_real_items() {
+    let content = rr_content::content();
+    let classes: std::collections::BTreeSet<String> = common::outputs()
+        .iter()
+        .flat_map(|(_, _, out)| out.requirements.iter().map(|r| r.item_class.clone()))
+        .collect();
+    let prefixes = [
+        "comms_",
+        "community_",
+        "docs_",
+        "evac_",
+        "fire_",
+        "food_",
+        "gethome_",
+        "med_",
+        "power_",
+        "rare_",
+        "san_",
+        "security_",
+        "special_",
+        "thermal_",
+        "water_",
+    ];
+    let files = [
+        ("coverage.rs", include_str!("../src/coverage.rs")),
+        ("pipeline.rs", include_str!("../src/pipeline.rs")),
+        ("packet/people.rs", include_str!("../src/packet/people.rs")),
+        (
+            "packet/summary.rs",
+            include_str!("../src/packet/summary.rs"),
+        ),
+        ("packet/plan.rs", include_str!("../src/packet/plan.rs")),
+        (
+            "packet/checklists.rs",
+            include_str!("../src/packet/checklists.rs"),
+        ),
+        (
+            "packet/targets.rs",
+            include_str!("../src/packet/targets.rs"),
+        ),
+        (
+            "packet/calendar.rs",
+            include_str!("../src/packet/calendar.rs"),
+        ),
+    ];
+    let mut missing = Vec::new();
+    for (file, text) in files {
+        for (i, quoted) in text.split('"').enumerate() {
+            let is_literal = i % 2 == 1;
+            let shaped = quoted
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_');
+            if !is_literal || !shaped || !prefixes.iter().any(|p| quoted.starts_with(p)) {
+                continue;
+            }
+            if content.item(quoted).is_none()
+                && !rr_supply::LINE_RULES.contains(&quoted)
+                && !classes.contains(quoted)
+            {
+                missing.push(format!("{file}: {quoted}"));
+            }
+        }
+    }
+    assert!(missing.is_empty(), "not in the catalogue: {missing:?}");
+}
+
 #[test]
 fn awaiting_ids_are_still_missing_from_the_registry_and_listed_as_requested() {
     let content = rr_content::content();

@@ -471,7 +471,7 @@ export function coverage(owned: Owned, f: Facts, t: Targets): Record<DurationBuc
   let gallons = 0;
   for (const [id, per] of Object.entries(GALLONS)) gallons += q(owned, id) * per;
   if (has(owned, 'water_reused_bottles')) gallons += FREE_BOTTLE_GALLONS;
-  if (has(owned, 'water_heater_reserve')) gallons += heaterGallons(f);
+  if (has(owned, 'water_boil_method')) gallons += heaterGallons(f);
   const waterDays = f.galPerDay > 0 ? gallons / f.galPerDay : 0;
   const filter = has(owned, 'water_filter') ? (f.setting === 'urban' ? 7 : 30) : 0;
 
@@ -554,7 +554,7 @@ function freeActions(ctx: Ctx): string[] {
     'alerts_signup',
     'water_reused_bottles',
   ];
-  if (f.house) ids.push('water_heater_reserve');
+  if (f.house) ids.push('water_boil_method');
   if (f.dailyRx > 0) ids.push('medication_refill_early');
   ids.push('medication_list', 'temperature_plan', 'neighbours_numbers');
   if (f.vulnerable || f.n === 1) ids.push('check_in_agreement');
@@ -1348,7 +1348,7 @@ const FREE_WHY: Record<string, string> = {
   documents_copies: 'After a fire or flood, insurance and aid move faster when you can show papers. Photos cost nothing.',
   alerts_signup: 'Warnings arrive by text first. Minutes of notice change what you can do.',
   water_reused_bottles: 'Free, and about 6 gallons covers the first day or two of water for most households.',
-  water_heater_reserve: 'Your water heater already holds drinkable water. Knowing how to get it out costs nothing.',
+  water_boil_method: 'Your water heater already holds drinkable water, and boiling makes tap water safe. Knowing how costs nothing.',
   medication_refill_early: 'A week of spare medicine at all times covers most short disruptions, at no extra cost.',
   medication_list: 'In an emergency room or a shelter, a written list saves time and avoids mistakes.',
   temperature_plan: 'Heat and cold are most dangerous when the power is out. Knowing where to go is free.',
