@@ -87,7 +87,7 @@ title = "Older Adults"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/older-adults"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Make sure at least one person in your support network has an extra key to your home, knows where you keep your emergency supplies, and knows how to use lifesaving equipment or administer medicine."
 license = "US Government Work (public domain)"
 
@@ -2741,3 +2741,41 @@ year = 2022
 url = "https://www.youtube.com/watch?v=6ihrGNGesfI"
 retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted; cited for principles, never for numbers)"
+
+[[citation]]
+id = "aspr_cmist"
+title = "At-Risk Individuals with Access and Functional Needs (the CMIST Framework)"
+publisher = "HHS Administration for Strategic Preparedness and Response (ASPR)"
+year = 2026
+url = "https://www.aspr.gov/readiness-response/response-operations/risk-individuals/access-functional-needs-cross-cutting-resources/risk-individuals-access-functional-needs"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usfa_fire_safety_disabilities"
+title = "Fire Safety for People with Disabilities"
+publisher = "U.S. Fire Administration"
+year = 2026
+url = "https://www.usfa.fema.gov/prevention/home-fires/at-risk-audiences/people-with-disabilities/index.html"
+retrieved = "2026-09-26"
+quote = "If you are deaf or hard of hearing, use smoke alarms with a vibrating pad, flashing light or strobe light."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_your_language"
+title = "Ready in Your Language"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/ready-your-language"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "aspr_tracie_hha_rule"
+title = "Home Health Agency Requirements: CMS Emergency Preparedness Final Rule (updates effective March 26, 2021)"
+publisher = "HHS ASPR TRACIE"
+year = 2021
+url = "https://files.asprtracie.hhs.gov/documents/aspr-tracie-cms-ep-rule-home-health-agency-requirements.pdf"
+retrieved = "2026-09-26"
+quote = "Individual plans for each patient must be included as part of the comprehensive patient assessment"
+license = "US Government Work (public domain)"

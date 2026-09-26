@@ -128,7 +128,7 @@ fn the_topics_named_in_the_brief_exist() {
         "drills",
         "rotation",
         "renters",
-        "disability_access",
+        "access_needs",
         "pets",
         "evs",
         "mental_health",
