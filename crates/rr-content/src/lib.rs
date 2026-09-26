@@ -16,8 +16,9 @@
 //! - [`validate`](mod@validate): the content validator and its [`Report`].
 //! - [`policy`]: the word lists the validator enforces (brands, firearm words, dosing units) and
 //!   the conditional spans of guidance blocks ([`policy::Condition`], [`policy::HouseholdFacts`]).
-//! - [`ids`]: the guidance kinds ([`GuidanceKind`]) and the ids content may name before engine
-//!   contract v2 reaches `rr-types`.
+//! - [`ids`]: the guidance kinds ([`GuidanceKind`]) and the rules for each, and the ids content may
+//!   name (hazards, buckets, rare families, access needs, benefits), all from engine contract v2 in
+//!   `rr-types`.
 //! - [`tables`]: the state table of zone lookups, registries, alert sign-ups and refill rules.
 //! - [`readability`]: word, sentence and syllable counts and the Flesch-Kincaid grade.
 //! - [`rules`]: the parser for the quantity-rule table in `docs/QUANTITY_RULES.md`.

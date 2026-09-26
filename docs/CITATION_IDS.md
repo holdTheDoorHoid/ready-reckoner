@@ -199,6 +199,182 @@ how to help neighbours; renters 43 and owners 87 insured; 63/22 power outage and
 risk and experience). The DataLumos archive the review suggested (project 218642) holds FEMA's
 2017–2023 survey data, not the 2024 findings deck.
 
+## Added for the v0.2.0 content on 2026-09-26
+
+The v0.2.0 content brief (new blocks, the state table, the Deviant Ollam lessons) added 88 entries
+and re-read 35. Every page below was read on 2026-09-26 and the sentence that cites it was checked
+against it. "Quote" means an exact sentence is stored, matched in the page's own text (the HTML, the
+PDF's extracted text, or the text of the page as a browser shows it). A page read only through a
+summarising fetch stores no quote. How a page was read is stated where it was not a plain download.
+
+### Recovery, the family plan, access needs and clean air
+
+| id | Source | Used in | How it was read and checked |
+| --- | --- | --- | --- |
+| `ready_gov_recovering` | FEMA / Ready.gov, Recovering from Disaster | after_first_30_days | go back only when officials say it is safe; photos before clean-up. Page fetch (ready.gov refuses some scripted clients), paraphrased |
+| `fema_home_inspections` | FEMA, Home Inspections | after_first_30_days | inspectors carry photo ID, never ask for bank details; a FEMA shirt is not ID; keep receipts |
+| `fema_disaster_fraud` | FEMA, Disaster Fraud | after_first_30_days | FEMA never charges to apply or inspect |
+| `fema_ihp` | FEMA, Individuals and Households Program | after_first_30_days | FEMA help does not replace insurance |
+| `disasterassistance_gov` | DHS, DisasterAssistance.gov | after_first_30_days | apply online or at 1-800-621-3362 when a declaration covers the county |
+| `floodsmart_start_claim` | NFIP FloodSmart, Start a Claim | after_first_30_days | quote; the adjuster, the estimate, talk before signing a repair contract |
+| `ftc_scams_after_disasters` | FTC, scams after weather emergencies | after_first_30_days | quote; never sign an insurance check over to a contractor; no cash up front |
+| `healthcare_ready_rx_open` | Healthcare Ready, Rx Open | after_first_30_days | the open-pharmacy map for disaster areas |
+| `usa_gov_replace_ids` | USAGov, replace lost or stolen ID cards | after_first_30_days | quote; start with the birth certificate from the state of birth |
+| `epa_clean_room` | EPA, Create a Clean Room | bucket_clean_air, hazard_wildfire_smoke, plan_shelter | quote; an air cleaner that does not make ozone |
+| `epa_protect_lungs_2026` | EPA fact sheet, Protect Your Lungs From Wildfire Smoke and Ash (June 2026) | bucket_clean_air, hazard_wildfire_smoke | PDF, quote; respirators for children 2 and older, fit caveats |
+| `texasready_hurricanes` | Texas DSHS (TexasReady), Hurricanes | plan_forecast_48h | the 48-hour steps (charge, fuel, cash, refills, fill the tub, coldest fridge setting) |
+| `nws_aly_cold_safety` | NWS Albany, Cold Weather Safety Tips | plan_forecast_48h, hazard_water_damage | PDF, quote; drip faucets, open sink cabinets, heat at 55 °F or higher |
+| `cisa_pace_flyer` | CISA (SAFECOM/NCSWIC), Set Your PACE (2025) | plan_communication | PDF, quote; primary, alternate, contingency, emergency |
+| `fema_back_to_school_2026` | FEMA blog, Back to School, Back to Safety | plan_communication | ask the school about its release and reunification plan |
+| `aspr_cmist` | HHS ASPR, the CMIST framework | topic_access_needs | the five headings; keeping people with their aids and devices |
+| `usfa_fire_safety_disabilities` | USFA, Fire Safety for People with Disabilities | topic_access_needs | quote; vibrating pads and strobe lights for people who are deaf or hard of hearing |
+| `ready_gov_your_language` | FEMA / Ready.gov, Ready in Your Language | topic_access_needs | listo.gov and the other languages |
+| `aspr_tracie_hha_rule` | HHS ASPR TRACIE, CMS emergency preparedness rule for home health agencies | topic_access_needs | PDF, quote; an individual emergency plan for each patient |
+
+### The eleven new ranked hazards
+
+| id | Source | Used in | How it was read and checked |
+| --- | --- | --- | --- |
+| `iii_homeowners_losses`, `iii_water_damage_protect` | Insurance Information Institute | hazard_water_damage | water and freezing claims are filed about six times as often as fire claims (ISO data, 2019–2023); shut-off valve, hoses, what policies cover. The institute is the insurance industry's information body; no agency publishes claim frequency by cause, so it is the source (paraphrased) |
+| `fema_dam_residual_risk_2018` | FEMA fact sheet, Risk Exposure and Residual Risk Related to Dams | hazard_dam_levee | PDF (fema.gov refuses scripted clients, so read through a page fetch and its text extracted), quote |
+| `fema_living_with_levees` | FEMA, Living with Levees | hazard_dam_levee | levees lower the risk from some floods but not all; ask the local government; the levee database |
+| `fema_nfip_levees_2021` | FEMA fact sheet, NFIP and Levees | hazard_dam_levee | PDF as above, quote; accreditation does not guarantee protection |
+| `usace_nld` | USACE, National Levee Database | hazard_dam_levee | the public levee lookup |
+| `mo_sema_dam_failure` | Missouri SEMA, Dam Failures | hazard_dam_levee | ask about a high-hazard dam upstream and its emergency action plan; know the route; get to higher ground |
+| `fcc_network_outage_2024` | FCC PSHSB report on the 2024-02-22 wireless outage | hazard_network_outage | PDF, quote; more than 25,000 failed 911 calls |
+| `fda_drug_shortages`, `fda_drug_shortages_faq`, `fda_besaferx` | FDA | hazard_drug_shortage | quotes on the first two; why shortages happen; try other pharmacies and ask about alternatives; FDA's shortage list; state-licensed online pharmacies |
+| `me_dhhs_snap_2025` | Maine DHHS news release (2025-10-21) | hazard_benefit_interruption | in October 2025 USDA told every state that November SNAP benefits would not be issued; about 42 million people get SNAP |
+| `usda_hunger_hotline` | USDA National Hunger Hotline | hazard_benefit_interruption | the hotline and its hours |
+| `dol_ucfe_furlough_2023` | DOL, Federal Furloughs: UCFE Fact Sheet | hazard_benefit_interruption | PDF; furloughed federal workers may file for UCFE |
+| `cfpb_shutdown_2013`, `cfpb_payday_loans` | CFPB | hazard_benefit_interruption | quotes; call lenders early; the cost of a two-week payday loan |
+| `eviction_lab_national` | Eviction Lab, Princeton University | hazard_eviction | national filing estimates (paraphrased) |
+| `cfpb_rent_help`, `cfpb_facing_eviction` | CFPB | hazard_eviction | rent help; quote: many renters give up before court |
+| `lsc_get_legal_help` | Legal Services Corporation, I Need Legal Help | hazard_eviction, docs_legal_readiness, topic_before_you_need_them | LSC funds civil legal aid for people with low incomes; the office finder. Civil only, so the text says "civil problems" |
+| `fema_hsgp_fy2026` | FEMA, FY2026 Homeland Security Grant Program NOFO | hazard_attack_disruption | PDF; the UASI urban areas and allocations |
+| `nws_dust_storms` | NWS, Dust Storms and Haboobs | hazard_dust_storm | quote; pull off, lights off, parking brake on, foot off the brake pedal; never stop in a lane |
+| `cdc_valley_fever` | CDC, About Valley Fever | hazard_dust_storm | page fetch (cdc.gov refuses scripted clients), paraphrased |
+| `usgs_sinkholes` | USGS Water Science School, Sinkholes | hazard_sinkhole | quote; the states with the most damage |
+| `fl_dep_sinkhole_faq` | Florida Geological Survey, Sinkhole FAQ | hazard_sinkhole | call the insurer; only a licensed geologist or engineer can tell a true sinkhole; mark it off; edges keep slumping for about a day |
+| `fbi_cde_arrests_2024` | FBI UCR, Crime Data Explorer | hazard_arrest_or_detention | the national arrest count for January–December 2024 (about 7.1 million), read from the Crime Data Explorer's own data endpoint (`/LATEST/arrest/national/all`, totals and counts); the web app needs a script-capable browser. The block says it counts arrests, not people |
+| `aclu_stopped_by_police` | ACLU, Know Your Rights: Stopped by Police | hazard_arrest_or_detention, docs_legal_readiness | stay calm, hands visible, say you want to stay silent and want a lawyer; calls from custody may be heard except calls to a lawyer (paraphrased) |
+| `nlg_mass_defense` | National Lawyers Guild, Mass Defense Resources | hazard_arrest_or_detention | chapters run legal hotlines (paraphrased) |
+| `nia_affairs_checklist` | National Institute on Aging, Getting Your Affairs in Order Checklist | arrest block, bucket_medical_emergency, the documents and legal steps, the circle, the Learn article | quote; will, powers of attorney for money and for health care, advance directives, tell someone where the papers are |
+
+### Rare families, strategic sites and the EMP paragraph
+
+| id | Source | Used in | How it was read and checked |
+| --- | --- | --- | --- |
+| `missilesonourland_2023` | Princeton SGS, The Missiles on our Land | family_nuclear, topic_strategic_sites | the Air Force expects the missiles to be targets; fallout depends on the winds; the public map |
+| `dod_mirta_points` | DoD, MIRTA installation points | family_nuclear, topic_strategic_sites | the public list of military sites (ArcGIS feature service) |
+| `census_cbsa_pop_2024` | Census Bureau, metro population estimates 2024 | family_nuclear, topic_strategic_sites | the largest metros and those over a million |
+| `usc_10_2674` | 10 U.S.C. § 2674(f)(2) (Cornell LII) | family_nuclear | the definition of the National Capital Region |
+| `nnsa_locations` | NNSA, Locations | family_nuclear, topic_strategic_sites | the national nuclear labs and plants |
+| `eia_refinery_capacity_2026` | EIA Refinery Capacity Report, Table 3 | family_nuclear | PDF; large refineries by state |
+| `fema_nuclear_72h_2023` | FEMA, Planning for the First 72 Hours (March 2023) | family_nuclear, topic_strategic_sites | PDF, quote; get inside, stay inside at least 24 hours, tune in; fallout is most dangerous in the first hours and travels downwind |
+| `swpc_power_grid` | NOAA SWPC, Electric Power Transmission | family_solar_storm | the March 1989 storm's nine-hour blackout in Quebec |
+| `morina_2019_carrington` | Moriña et al. 2019, Scientific Reports (CC BY 4.0) | family_solar_storm | the range of Carrington-class estimates |
+| `nerc_tpl007_benchmark` | NERC TPL-007 benchmark event | family_solar_storm | the geomagnetic-latitude scaling (stronger toward the poles) |
+| `nasa_tunguska_2019` | NASA, Tunguska Revisited | family_solar_storm | quote; regional-scale impacts every millennia, not centuries |
+| `eia_maria_2017`, `npr_maria_2018` | EIA Today in Energy; NPR | family_long_blackout, topic_validation | quote (EIA): all 1.57 million PREPA customers out; about 11 months to restore every home |
+| `powermag_epri_2019_hemp` | POWER magazine on EPRI's 2019 HEMP report | family_long_blackout | EPRI's own report page returned only its home page to a scripted read, so the finding (little harm to large transformers; no months-long nationwide blackout) is cited through POWER's report of it |
+| `pry_2015_emp_testimony` | Statement for the record, House Oversight, 2015-05-13 | family_long_blackout | the "9 of 10 Americans" figure rests on an assumed nationwide year-long blackout; no published model is cited for it, which is what the block says |
+| `cisa_volt_typhoon_2024` | CISA advisory AA24-038A | family_war_infrastructure | actors working for China's government got into US communications, energy, transport and water systems, to be ready to disrupt them in a conflict |
+| `start_poicn` | START, POICN database | family_cbrn | 517 incidents worldwide in 1990–2016, failed attempts and plots included (the review's "1990–2017" is corrected) |
+| `ready_gov_biohazard` | FEMA / Ready.gov, Biohazard Exposure | family_cbrn | follow doctors and public health officials; avoid crowds (paraphrased) |
+| `duke_2021_pandemics` | Duke Global Health Institute on Marani et al. 2021 | family_severe_pandemic | the study's article on PMC shows a CAPTCHA to scripted clients, so the family block cites Duke's release of the same study; `marani_2021_pandemics` is unchanged |
+| `cam_2022_volcano_risk` | University of Cambridge news (CC BY-NC-SA 4.0) | family_large_eruption | about 1 in 6 for a magnitude-7 eruption somewhere in the next 100 years; 1815 and the year without a summer. Paraphrased only |
+| `usgs_yvo_supervolcano` | USGS Yellowstone Volcano Observatory | family_large_eruption | about 1 in 730,000 a year for a Yellowstone super-eruption |
+| `fdic_deposit_insurance`, `fdic_history_1930s` | FDIC | family_financial_crisis | quotes; $250,000 per depositor per bank; the 1933 bank holiday |
+| `fbi_active_shooter_2024` | FBI 2024 report (via Internet Archive) | family_mass_violence | read from the Internet Archive capture of the FBI's own report page (2026-09-04; an earlier capture of 2026-03-24 agrees); the registry points at the capture. Neutral title, since the report's own title uses a word the validator reserves for the one firearm item |
+
+### Long horizon and the two Learn articles
+
+| id | Source | Used in | How it was read and checked |
+| --- | --- | --- | --- |
+| `pnnl_2015_rainwater` | PNNL-24347 (2015), for DOE | topic_long_horizon | PDF, quote; states set the rules on collecting rain, and they vary widely. Its 2015 state-by-state details are out of date and are not used |
+| `cdc_rainwater_collection` | CDC, Collecting Rainwater and Your Health (2024-07-23) | topic_long_horizon | read in a browser page (cdc.gov refuses scripted clients); quote matched in the page text; rainwater for plants you do not eat |
+| `vdh_storm_wells` | Virginia Department of Health, Before and After the Storm (2024-10-01) | topic_long_horizon | quote; the well pump stops without power; a licensed electrician connects any generator |
+| `wsc_wellcare_help_2025` | Water Systems Council (wellcare), Emergency Preparedness for Homeowners with Water Wells (April 2025) | topic_long_horizon | a trade body's sheet, used because it is the only readable source found that names a hand pump. The Virginia, Ohio and Michigan health pages, NEHA's fact sheet and the EPA-funded PrivateWellClass answer name generators and stored water, not hand pumps. The site rate-limits scripted clients; the PDF was read through a page fetch and its text extracted. Paraphrased |
+| `lehi_fuel_storage` (re-read) | Lehi City Fire Department | topic_long_horizon | International Fire Code limits (25 gallons, 10 in an attached garage, none in a basement), rotation, "consult your local fire department" |
+| `rdpo_emergency_toilet` (re-read) | RDPO, Emergency Toilet project | topic_long_horizon | weeks or months without flushing after a strong earthquake; the twin-bucket system |
+| `cdc_botulism_home_canning` | CDC, Home-Canned Foods (2024-04-25) | topic_long_horizon | browser page, quote matched; low-acid foods need a pressure canner; tested recipes; Extension services help with growing and preserving food |
+| `nchfp_home` | National Center for Home Food Preservation (UGA Extension) | topic_long_horizon | research-based home canning recommendations |
+| `cdc_managing_stress` | CDC, Managing Stress (2026-05-12) | topic_long_horizon | browser page, quote matched; regular sleep times, breaks from the news, talk with people you trust |
+| `rr_design_decision_log_2026` | Ready Reckoner, `docs/DESIGN.md` §14 decision log | topic_validation, topic_strategic_sites | the 22-event backtest (covered 6, partial 5, short 10, not modelled 1) and "a public source per site". Read on the `v0.2` branch (pushed to GitHub); the entry reaches main with the v0.2.0 merge, so the registry points at main and stores no quote |
+
+### The Deviant Ollam lessons
+
+| id | Source | Used in | How it was read and checked |
+| --- | --- | --- | --- |
+| `ollam_2022_lawyer_passport_locksmith_gun` | Deviant Ollam, SAINTCON 2022 keynote (video and slides) | the three free steps, docs_effak, bucket_comms, topic_mental_health, plan_communication, hazard_arrest_or_detention, topic_before_you_need_them | the transcript read from the video's captions in a browser page, and the slide PDF from deviating.net. Principles and checklist steps only, never numbers; paraphrased. The registry title leaves out the talk's own title, which ends with a word the validator reserves for the one firearm item; the id keeps it (footnote ids are not checked as words). **The supply worktree adds the same id with an identical record: keep one when merging** |
+| `state_dept_passport_card` | State Department, Get a Passport Card | docs_effak, topic_before_you_need_them | travel.state.gov refuses scripted clients; read from the Internet Archive capture of the same URL (2026-05-15). Quote: proof of citizenship and identity; TSA accepts it on domestic flights; a certified birth certificate carries the issuing office's seal |
+| `state_dept_child_passport` | State Department, Apply for a Child's Passport Under 16 | docs_effak, topic_before_you_need_them | read from the Internet Archive capture of the same URL (2026-05-23): children may get a book, a card or both, with both parents' approval |
+| `ftc_2008_locksmith` | FTC press release, 2008-05-30 | security_lockout_plan, topic_before_you_need_them | research a locksmith before you need one and save the number; some who advertise are not local or trained. The FTC's consumer article it links to has been withdrawn, so it is not cited |
+| `cisa_data_backup_2012` | US-CERT (now CISA), Data Backup Options | docs_effak, topic_before_you_need_them | PDF, quote; the 3-2-1 rule (three copies, two kinds of media, one away from home) |
+| `ready_gov_cybersecurity` (re-read) | FEMA / Ready.gov, Cybersecurity | docs_effak, topic_before_you_need_them | quote re-matched: use a password manager and two methods of verification; back up to encrypted storage |
+| `dhs_stop_the_bleed` (re-read) | DHS, Stop the Bleed | bucket_medical_emergency, topic_before_you_need_them | ask the health department, hospitals, EMS, fire or police about training. It does not say classes are "free or low-cost", so bucket_medical_emergency no longer does |
+
+No agency page found today says to keep account backup codes on paper or with a trusted person
+(CISA's "Turn On MFA" and the FTC's two-factor article do not mention backup codes), so that step
+cites the talk as a principle.
+
+### The state table
+
+`content/tables/state_registries.toml` (rules: `docs/CONTENT_STANDARDS.md` §10). Each row's
+agency address was opened on 2026-09-26. Where the agency site refused scripted clients, the
+Internet Archive's latest capture of the same address was read: Arizona DEMA (2026-08-31),
+Massachusetts MEMA (2026-08-31), New York DHSES (2026-09-12), Rhode Island EMA (2026-08-31),
+Tennessee TEMA (2026-08-16), Kentucky EM (2026-09-15) and ReadyNH (2026-08-31), plus the Rhode
+Island registry page (2026-05-08) and the NY-Alert sign-up page (2026-08-11). Every other address
+was read directly, as a download or a page fetch.
+
+- **Confirmed state-level tools** (named with their address): zone lookups in Florida, Georgia,
+  North Carolina, South Carolina, Virginia and Maryland, and Hawaii's tsunami evacuation zones;
+  registries in Florida, Texas (STEAR), New Jersey (Register Ready) and Rhode Island; alert
+  sign-ups in New York (NY-Alert), DC (AlertDC), New Hampshire (through ReadyNH), Washington (the
+  state's alert sign-up list) and Michigan (MI Ready). Vendor-run alert portals are linked through
+  the state's own page.
+- **Dropped after checking:** Utah's old special-needs registry domain now hosts an unrelated
+  gambling site; North Dakota's registry page answers 404; Delaware's registry domain no longer
+  resolves. Those rows send the household to its local office.
+- **Refill rules:** Healthcare Ready's review (`healthcare_ready_refill_laws`, re-read) for every
+  row. Florida's Board of Pharmacy page and Healthcare Ready agree once both are read (72 hours day
+  to day; up to 30 days in a declared emergency), as do DC's two sources, so neither says "rules
+  differ". Virginia and North Carolina's sources disagree, so their rows say so and cite both. South
+  Carolina's second source (NACDS) gives a shorter limit, which the row notes. Minnesota's and
+  Missouri's categories were corrected against the review. Puerto Rico has no confirmed registry,
+  alert system or refill rule, and its row says so, pointing to Medicare's disaster drug rule.
+
+### Re-read and re-dated
+
+Read again on 2026-09-26 for sentences written today, with the retrieved date moved: 20 Ready.gov
+pages (`ready_gov_kit`, `_food`, `_power_outages`, `_disability`, `_older_adults`, `_evacuation`,
+`_shelter`, `_heat`, `_plan`, `_family_comm_card`, `_pandemic`, `_alerts`, `_low_cost`,
+`_earthquakes`, `_radiation`, `_public_spaces`, `_tornadoes`, `_hurricanes`, `_chemical`,
+`_cybersecurity`), `cdc_co_basics` and `cdc_potassium_iodide` (quotes re-matched in a browser
+page), `epa_diy_air_cleaners`, `epa_wildfire_indoor_air`, `epa_asheville_boil_notice_2024`,
+`ornl_eagle_i_outages`, `nws_turn_around_dont_drown`, `dhs_stop_the_bleed`,
+`healthcare_ready_refill_laws`, `hcfl_ev_safety`, `florida_dem_medication`, `rdpo_emergency_toilet`,
+`lehi_fuel_storage`, `fri_nuclear_risk_2024` and `rr_research_risk_model`. Every stored quote with
+the new date on an entry this branch added or re-dated was matched again: in the page as
+downloaded, in the extracted PDF text (FEMA, ASPR TRACIE, PNNL, US-CERT), in the page as a browser
+shows it (cdc.gov) or in the Internet Archive capture (travel.state.gov).
+`ready_gov_public_spaces` is retitled "Mass Gathering Incidents (Run. Hide. Fight.)", the page's
+current title.
+
+### Not cited, and why
+
+- **FEMA, *Protection in the Nuclear Age* (1985).** The strategic-sites research found it the
+  closest public precedent for "Why here", but the only copy found is on a private website, so it
+  is not cited; the strategic-sites article rests on current sources instead.
+- **Flex Your Rights.** The brief names it for know-your-rights text; the organisation closed on
+  2023-12-31, so the arrest block cites the ACLU and the National Lawyers Guild.
+- **Pages that could not be read:** EPRI's HEMP report page (cited through POWER magazine instead),
+  the ASHP, NCPC and ABA lawyer-referral pages (blocked), the PNAS article on PMC (a CAPTCHA; Duke's
+  release is cited instead) and travel.state.gov live (read through captures). The NCSL rainwater
+  map answered 404 at the address tried; the supply worktree has since found its current address
+  (ncsl_rainwater), which this branch does not add, to avoid a second id for one source.
+
 ## Registry index for the other workstreams
 
 Every id below is in `content/citations.toml`. Federal entries carry an exact quote where one was
@@ -237,6 +413,17 @@ checked; "prior" marks an expert estimate.
 | Risk communication | `gigerenzer_2007_statistics`, `akl_2011_cochrane_frequencies`, `witte_allen_2000_eppm`, `tannenbaum_2015_fear_appeals` |
 | Mental health | `samhsa_988`, `samhsa_disaster_distress` |
 | Hazmat and planning | `epa_tri_2024`, `cdc_water_advisories`, `fema_cpg201_thira`, `tokyo_bichiku_navi` |
+| Recovery and fraud (v0.2.0) | `ready_gov_recovering`, `fema_home_inspections`, `fema_disaster_fraud`, `fema_ihp`, `disasterassistance_gov`, `floodsmart_start_claim`, `ftc_scams_after_disasters`, `healthcare_ready_rx_open`, `usa_gov_replace_ids` |
+| Family plan and forecasts (v0.2.0) | `cisa_pace_flyer`, `fema_back_to_school_2026`, `texasready_hurricanes`, `nws_aly_cold_safety`, `epa_clean_room` |
+| Access and functional needs (v0.2.0) | `aspr_cmist`, `usfa_fire_safety_disabilities`, `ready_gov_your_language`, `aspr_tracie_hha_rule`, `tdem_stear`, `psegli_critical_care` |
+| Clean air (v0.2.0) | `epa_clean_room`, `epa_protect_lungs_2026`, `epa_diy_air_cleaners`, `epa_wildfire_indoor_air`, `epa_children_wildfire_smoke` |
+| New ranked hazards (v0.2.0) | `iii_homeowners_losses`, `iii_water_damage_protect`, `fema_dam_residual_risk_2018`, `fema_living_with_levees`, `fema_nfip_levees_2021`, `usace_nld`, `mo_sema_dam_failure`, `fcc_network_outage_2024`, `fda_drug_shortages`, `fda_drug_shortages_faq`, `fda_besaferx`, `fema_hsgp_fy2026`, `nws_dust_storms`, `cdc_valley_fever`, `usgs_sinkholes`, `fl_dep_sinkhole_faq` |
+| Benefits, eviction and legal help (v0.2.0) | `me_dhhs_snap_2025`, `usda_hunger_hotline`, `dol_ucfe_furlough_2023`, `cfpb_shutdown_2013`, `cfpb_payday_loans`, `eviction_lab_national`, `cfpb_rent_help`, `cfpb_facing_eviction`, `lsc_get_legal_help`, `aclu_stopped_by_police`, `nlg_mass_defense`, `nia_affairs_checklist`, `fbi_cde_arrests_2024` |
+| Rare families and strategic sites (v0.2.0) | `missilesonourland_2023`, `dod_mirta_points`, `census_cbsa_pop_2024`, `usc_10_2674`, `nnsa_locations`, `eia_refinery_capacity_2026`, `fema_nuclear_72h_2023`, `swpc_power_grid`, `morina_2019_carrington`, `nerc_tpl007_benchmark`, `nasa_tunguska_2019`, `eia_maria_2017`, `npr_maria_2018`, `powermag_epri_2019_hemp`, `pry_2015_emp_testimony`, `cisa_volt_typhoon_2024`, `start_poicn`, `ready_gov_biohazard`, `duke_2021_pandemics`, `cam_2022_volcano_risk`, `usgs_yvo_supervolcano`, `fdic_deposit_insurance`, `fdic_history_1930s`, `fbi_active_shooter_2024` |
+| Long horizon (v0.2.0) | `pnnl_2015_rainwater`, `cdc_rainwater_collection`, `vdh_storm_wells`, `wsc_wellcare_help_2025`, `lehi_fuel_storage`, `rdpo_emergency_toilet`, `cdc_botulism_home_canning`, `nchfp_home`, `cdc_managing_stress` |
+| Documents, identity and accounts (v0.2.0) | `state_dept_passport_card`, `state_dept_child_passport`, `cisa_data_backup_2012`, `ready_gov_cybersecurity`, `ftc_2008_locksmith`, `nia_affairs_checklist`, `ollam_2022_lawyer_passport_locksmith_gun` (principles only) |
+| Emergency refills by state (v0.2.0) | `healthcare_ready_refill_laws`, `nacds_2018_emergency_refills`, `fl_bop_emergency_refills`, `tx_pharmacy_disaster_2024`, `medicare_drugs_disaster` |
+| Our own documents | `rr_design_decision_log_2026` (the backtest and the nuclear-wording decisions) |
 
 ## Requested
 
