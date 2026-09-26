@@ -351,9 +351,8 @@ impl HazardAssessment {
     /// is the yearly rate of power cuts lasting 60 days or more that `rr-consequence` reads off
     /// its exceedance curve for this household, as `(value, low, high)`. `rr-hazards` runs
     /// before `rr-consequence`, so the family first holds only the solar-storm, EMP and war
-    /// parts; the plan pipeline calls this once the curve exists. awaiting: plan — `rr-plan`
-    /// calls it after `rr_consequence::assess_with_parts`; awaiting: consequence — the curve
-    /// value at 60 days.
+    /// parts; the plan pipeline (`rr-plan`) calls this with
+    /// `rr_consequence::ConsequenceAssessment::power_curve_60_days` once the curve exists.
     pub fn add_power_curve(&mut self, per_year: (f64, f64, f64), years: u8) {
         let (v, lo, hi) = per_year;
         if !(v.is_finite() && lo.is_finite() && hi.is_finite()) || v < 0.0 {

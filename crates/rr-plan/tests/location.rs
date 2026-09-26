@@ -170,6 +170,9 @@ impl CountySource for Empty {
     fn base_rates(&self) -> &[BaseRate] {
         &[]
     }
+    fn restoration_curves(&self) -> &[rr_types::RestorationCurve] {
+        &[]
+    }
     fn attributions(&self) -> Vec<Attribution> {
         Vec::new()
     }

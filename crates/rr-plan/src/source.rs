@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 use rr_data::DataStore;
 use rr_types::{
     Attribution, BaseRate, CountyRecord, Date, EngineError, ErrorCode, LocationInput,
-    LocationResolved,
+    LocationResolved, RestorationCurve,
 };
 
 use crate::location;
@@ -29,6 +29,13 @@ pub trait CountySource {
 
     /// National base rates for the societal and personal hazards.
     fn base_rates(&self) -> &[BaseRate];
+
+    /// The pack's pooled power-restoration curves by region and cause (model review M-10: the
+    /// regional restoration stretch and the Puerto Rico and Virgin Islands Maria curves). They
+    /// are not per county, so the pipeline hands them to `rr-consequence` beside the county
+    /// record (`CountyData::with_curves`). Empty for a source without them (the sample
+    /// counties), which leaves the consequence model on each class's own durations.
+    fn restoration_curves(&self) -> &[RestorationCurve];
 
     /// Credit lines and disclaimers the app and the packet must show (the National Risk Index
     /// statement first).
@@ -205,6 +212,11 @@ impl CountySource for FixtureSource {
         &self.base_rates
     }
 
+    /// The sample counties carry no pooled curves.
+    fn restoration_curves(&self) -> &[RestorationCurve] {
+        &[]
+    }
+
     fn attributions(&self) -> Vec<Attribution> {
         fixture_attributions()
     }
@@ -289,6 +301,10 @@ impl CountySource for DataStore {
 
     fn base_rates(&self) -> &[BaseRate] {
         DataStore::base_rates(self)
+    }
+
+    fn restoration_curves(&self) -> &[RestorationCurve] {
+        DataStore::restoration_curves(self)
     }
 
     /// The store puts the National Risk Index statement first.

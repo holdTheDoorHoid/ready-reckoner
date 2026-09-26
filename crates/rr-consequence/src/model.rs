@@ -44,8 +44,8 @@ pub struct CountyData<'a> {
     /// Heat and cold shares during recorded outages (`CountyRecord::temperature`; M-11).
     pub temperature: Option<&'a TemperatureProfile>,
     /// Pooled restoration curves by region and cause (model review M-10), from
-    /// `rr_data::DataStore::restoration_curves()` through [`CountyData::with_curves`].
-    /// awaiting: plan — `rr-plan` passes them.
+    /// `rr_data::DataStore::restoration_curves()` through [`CountyData::with_curves`], as
+    /// `rr-plan` passes them.
     pub curves: &'a [RestorationCurve],
     /// Share of the county's public-water customers served by a system with a health-based
     /// violation in the last five years (EPA SDWIS, `CountyExposure::sdwis_violation_pop_share`).
@@ -82,7 +82,7 @@ impl<'a> CountyData<'a> {
     }
 
     /// The same county with the pack's pooled restoration curves (they are not per county:
-    /// `rr_data::DataStore::restoration_curves()`). awaiting: plan — `rr-plan` passes them.
+    /// `rr_data::DataStore::restoration_curves()`); `rr-plan` passes them.
     pub fn with_curves(mut self, curves: &'a [RestorationCurve]) -> CountyData<'a> {
         self.curves = curves;
         self

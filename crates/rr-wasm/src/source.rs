@@ -28,7 +28,7 @@ use rr_data::DataStore;
 use rr_plan::{CountySource, FixtureSource};
 use rr_types::{
     Attribution, BaseRate, CountyRecord, EngineError, ErrorCode, LocationInput, LocationResolved,
-    PackInfo, Problem, ProblemCode,
+    PackInfo, Problem, ProblemCode, RestorationCurve,
 };
 
 /// The pack the engine needs before it can plan from pack data.
@@ -239,6 +239,15 @@ impl CountySource for WasmSource {
         match self.mode() {
             Mode::Fixtures => self.fixtures.base_rates(),
             Mode::Packs { .. } => self.store.base_rates(),
+        }
+    }
+
+    /// The pack's pooled restoration curves, so the browser plans exactly as the CLI and the
+    /// goldens do (none while the sample counties answer).
+    fn restoration_curves(&self) -> &[RestorationCurve] {
+        match self.mode() {
+            Mode::Fixtures => self.fixtures.restoration_curves(),
+            Mode::Packs { .. } => self.store.restoration_curves(),
         }
     }
 

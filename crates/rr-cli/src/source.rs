@@ -10,7 +10,10 @@ use std::path::{Path, PathBuf};
 
 use rr_data::{DataStore, Manifest};
 use rr_plan::{CountySource, Engine, FixtureSource};
-use rr_types::{Attribution, BaseRate, CountyRecord, EngineError, LocationInput, LocationResolved};
+use rr_types::{
+    Attribution, BaseRate, CountyRecord, EngineError, LocationInput, LocationResolved,
+    RestorationCurve,
+};
 
 use crate::args::DataArgs;
 use crate::error::CliError;
@@ -234,6 +237,13 @@ impl CountySource for Source {
         match self {
             Source::Fixtures(f) => CountySource::base_rates(f),
             Source::Pack { store, .. } => store.base_rates(),
+        }
+    }
+
+    fn restoration_curves(&self) -> &[RestorationCurve] {
+        match self {
+            Source::Fixtures(f) => CountySource::restoration_curves(f),
+            Source::Pack { store, .. } => store.restoration_curves(),
         }
     }
 

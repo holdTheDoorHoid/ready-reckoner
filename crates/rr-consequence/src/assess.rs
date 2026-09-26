@@ -185,7 +185,7 @@ impl ConsequenceAssessment {
 
     /// The household's power cuts lasting 60 days or more a year as `(value, low, high)`: the
     /// argument `rr_hazards::HazardAssessment::add_power_curve` takes for the rare "power out
-    /// for months" row (brief item 7). awaiting: plan — `rr-plan` calls
+    /// for months" row (brief item 7); `rr-plan` calls
     /// `hazards.add_power_curve(consequence.power_curve_60_days(), years)` after assessing.
     pub fn power_curve_60_days(&self) -> (f64, f64, f64) {
         let m = &self.multi_month;
