@@ -465,6 +465,11 @@ fn check_price(item: &Item, loc: &str, r: &mut Report) {
         if band.low != 0.0 || band.high != 0.0 {
             r.error(loc, "a free action must have a $0 price band");
         }
+    } else if is_money_reserve(item) {
+        // Money set aside (cash): one dollar buys one dollar, so there is nothing to observe.
+        if band.note.as_deref().is_none_or(|n| n.trim().is_empty()) {
+            r.error(loc, "a money reserve needs a note saying how the amount is chosen");
+        }
     } else {
         if band.high <= 0.0 {
             r.error(
@@ -494,6 +499,15 @@ fn check_price(item: &Item, loc: &str, r: &mut Report) {
             );
         }
     }
+}
+
+/// An item that is money set aside rather than bought: unit `dollar`, priced at exactly $1 per
+/// dollar. It needs no price observation (`docs/CONTENT_STANDARDS.md` §3).
+pub fn is_money_reserve(item: &Item) -> bool {
+    item.unit == "dollar"
+        && item.price_band_usd.per == "dollar"
+        && item.price_band_usd.low == 1.0
+        && item.price_band_usd.high == 1.0
 }
 
 fn check_tier(item: &Item, loc: &str, r: &mut Report) {

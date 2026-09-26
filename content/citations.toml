@@ -1185,6 +1185,7 @@ publisher = "U.S. Nuclear Regulatory Commission"
 year = 2025
 url = "https://www.nrc.gov/about-nrc/emerg-preparedness/about-emerg-preparedness/potassium-iodide-use.html"
 retrieved = "2026-09-25"
+quote = "The NRC supplies KI tablets, in accordance with FDA dosing guidelines, to States that request it for populations within the 10-mile EPZ of a nuclear power plant."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -1432,6 +1433,15 @@ year = 2026
 url = "https://www.ncpc.org/resources/home-neighborhood-safety/"
 retrieved = "2026-09-25"
 license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "hcfl_ev_safety"
+title = "Staying Safe with Electric Vehicles (hurricane season and flooding)"
+publisher = "Hillsborough County, Florida"
+year = 2025
+url = "https://hcfl.gov/residents/sustainability-and-green/green-hillsborough/staying-safe-with-electric-vehicles"
+retrieved = "2026-09-25"
+license = "Local government publication (paraphrased, not quoted)"
 
 [[citation]]
 id = "listos_california"

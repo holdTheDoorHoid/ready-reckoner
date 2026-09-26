@@ -1,0 +1,234 @@
+# Documents and money: the Emergency Financial First Aid Kit, insurance, cash and savings.
+# Rules: docs/CONTENT_STANDARDS.md §3. Money buckets are funded on the savings track, not the supplies
+# budget (DESIGN §4.7); these items are the free actions and small purchases around them.
+
+[[item]]
+id = "docs_effak"
+name = "Copy and protect your key documents"
+category = "documents_money"
+unit = "action"
+buckets = ["home_loss", "evacuate", "income"]
+tier = "now"
+free = true
+spec = "Use FEMA's Emergency Financial First Aid Kit to gather identification, financial and legal papers, insurance, medical information and contacts. Keep phone photos, paper copies in a waterproof bag, and a copy with someone you trust or in secure online storage."
+look_for = [
+  "IDs, birth certificates, lease or deed, insurance policies and bank details",
+  "Medicine lists, medical records and pet records",
+  "A password-protected digital copy as well as paper",
+]
+avoid = [
+  "Keeping the only copies at home",
+  "Letting the kit go out of date: update it at tax time or on a birthday",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: the FEMA kit and a phone camera." }
+quantity_rule = "once"
+maintenance = { check_months = 12 }
+citations = ["fema_effak", "ready_gov_financial", "ready_gov_kit"]
+hazard_extras = []
+
+[[item]]
+id = "docs_home_inventory"
+name = "Photograph or video your home and belongings"
+category = "documents_money"
+unit = "action"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+spec = "Walk through your home recording each room, the contents of closets and drawers, and serial numbers of costly items, as the first step of FEMA's financial kit. It makes insurance and aid claims faster after a fire or flood."
+look_for = [
+  "Every room, including the garage, basement and closets",
+  "Receipts or model numbers for expensive items",
+  "A copy stored away from the house",
+]
+avoid = [
+  "Storing the only copy on a device in the house",
+  "Waiting until something is damaged",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a phone and twenty minutes." }
+quantity_rule = "once"
+maintenance = { check_months = 12 }
+citations = ["fema_effak"]
+hazard_extras = []
+
+[[item]]
+id = "docs_insurance_check"
+name = "Review your insurance: home or renters, flood, earthquake"
+category = "documents_money"
+unit = "action"
+buckets = ["home_loss", "income"]
+tier = "now"
+free = true
+spec = "Check what your policy covers and decide on the gaps: standard home and renters policies do not cover flood or earthquake damage (Ready.gov), and a new federal flood policy usually takes 30 days to start (FEMA). Renters can buy contents-only flood cover."
+look_for = [
+  "Whether you are in a flood zone, and flood cover if you are near water",
+  "Additional living expenses cover, which pays for a place to stay",
+  "The deductible you could actually pay",
+]
+avoid = [
+  "Waiting for a storm forecast to buy flood insurance",
+  "Assuming your landlord's policy covers your belongings",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to review; premiums are separate decisions on the savings track." }
+quantity_rule = "once"
+maintenance = { check_months = 12 }
+citations = ["ready_gov_financial", "ready_gov_floods", "ready_gov_earthquakes", "fema_nfip_flood_insurance", "floodsmart_buy_policy"]
+hazard_extras = []
+
+[[item]]
+id = "docs_renters_insurance"
+name = "Renters: get a renters-insurance quote"
+category = "documents_money"
+unit = "action"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+spec = "Renters are about half as likely as owners to have insurance (FEMA's 2024 survey), yet a fire or flood can take everything they own and force a move. Get a quote for renters insurance with additional living expenses, then decide."
+look_for = [
+  "Contents cover that matches what your belongings would cost to replace",
+  "Additional living expenses, which pay for a hotel or rent while you are out",
+  "Liability cover included",
+]
+avoid = [
+  "Assuming the landlord's insurance covers you",
+  "Choosing a deductible you could not pay",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to get a quote." }
+quantity_rule = "once_if_renter"
+citations = ["fema_nhs_2024", "ready_gov_financial", "fema_effak"]
+hazard_extras = []
+
+[[item]]
+id = "docs_start_emergency_fund"
+name = "Start an emergency fund, even a small one"
+category = "documents_money"
+unit = "action"
+buckets = ["income"]
+tier = "now"
+free = true
+spec = "Set up an automatic transfer, however small, into a savings account you keep for emergencies. The CFPB says the right amount depends on your situation; planners often suggest working toward three to six months of expenses (FINRA), and the plan shows a target for your household."
+look_for = [
+  "An automatic transfer on payday",
+  "A separate account, so the money is not spent by accident",
+  "Part of any tax refund or windfall",
+]
+avoid = [
+  "Waiting until you can save a lot",
+  "Putting emergency money where it is hard to reach quickly",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to start; the savings goal is shown on its own track, not in the supplies budget." }
+quantity_rule = "once"
+citations = ["cfpb_emergency_fund", "finra_financial_foundations", "stlouisfed_emergency_fund_2025", "fed_shed_2024"]
+hazard_extras = []
+
+[[item]]
+id = "docs_direct_deposit"
+name = "Get federal benefits by direct deposit"
+category = "documents_money"
+unit = "action"
+buckets = ["income"]
+tier = "now"
+free = true
+spec = "If you receive federal benefits such as Social Security, switch to direct deposit or the Direct Express card: the Treasury recommends it, and disasters can hold up mail (Ready.gov)."
+look_for = [
+  "Direct deposit to a checking or savings account",
+  "Or the Direct Express prepaid card",
+]
+avoid = [
+  "Relying on paper checks in the mail",
+  "Keeping only one way to reach your money",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: one phone call or online form." }
+quantity_rule = "once_if_senior"
+citations = ["ready_gov_older_adults"]
+hazard_extras = []
+
+[[item]]
+id = "docs_unemployment_know"
+name = "Know how to file for unemployment in your state"
+category = "documents_money"
+unit = "action"
+buckets = ["income"]
+tier = "now"
+free = true
+spec = "Find your state's unemployment insurance website and what it needs from you, so you can file on the first day if a job ends (Department of Labor). Keep pay stubs and employer details with your documents."
+look_for = [
+  "Your state unemployment office's website, saved",
+  "Recent pay stubs and your employers' addresses",
+  "Your bank details for payments",
+]
+avoid = [
+  "Waiting weeks to file",
+  "Assuming you do not qualify without checking",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a bookmark and a folder." }
+quantity_rule = "once_if_earner"
+citations = ["dol_unemployment_insurance", "bls_work_experience_2024"]
+hazard_extras = []
+
+[[item]]
+id = "docs_lean_budget"
+name = "Write a bare-bones budget you could switch to"
+category = "documents_money"
+unit = "action"
+buckets = ["income"]
+tier = "now"
+free = true
+spec = "List the spending you could cut first if income stopped, and what your essential costs are each month. Knowing that number tells you how far your savings would stretch and sets your emergency-fund goal."
+look_for = [
+  "Rent or mortgage, utilities, food, medicine, insurance and debt minimums",
+  "Subscriptions and extras you would pause",
+]
+avoid = [
+  "Guessing instead of checking bank statements",
+  "Forgetting yearly bills such as insurance",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: an hour with your statements." }
+quantity_rule = "once_if_earner"
+citations = ["cfpb_emergency_fund", "rr_research_risk_model"]
+hazard_extras = ["job_loss"]
+
+[[item]]
+id = "docs_document_pouch"
+name = "Fire-resistant, waterproof document pouch"
+category = "documents_money"
+unit = "pouch"
+buckets = ["home_loss", "evacuate"]
+tier = "h72"
+free = false
+spec = "A fire-resistant, water-resistant pouch or small case for paper copies of key documents, a USB drive and some cash, easy to grab when you leave (FEMA's financial kit suggests fire- and waterproof storage)."
+look_for = [
+  "Fire-resistant and water-resistant labels",
+  "A zipper or latch that closes fully",
+  "Small enough to grab with the go-bag",
+]
+avoid = [
+  "Storing it where you cannot reach it quickly",
+  "Keeping original documents only in the pouch, with no other copies",
+]
+price_band_usd = { low = 21.99, high = 54.99, per = "pouch", note = "Two restaurant-supply listings: a fire-resistant document bag at $21.99 and a small case at $54.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["fema_effak", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "docs_cash_reserve"
+name = "Cash in small bills"
+category = "documents_money"
+unit = "dollar"
+buckets = ["comms", "evacuate", "supplies"]
+tier = "h72"
+free = false
+spec = "Keep some cash in small bills in a safe place at home, because ATMs and card readers may not work during a disaster (Ready.gov). Put some in the go-bag too."
+look_for = [
+  "Small bills and some coins",
+  "A safe place at home, plus a little in each go-bag",
+]
+avoid = [
+  "Keeping all of your cash in one obvious spot",
+  "Spending it on everyday things and not replacing it",
+]
+price_band_usd = { low = 1, high = 1, per = "dollar", note = "Cash is money set aside, not spent. No authority gives an amount: the plan starts at $100 until you enter a few days of your own spending on food, fuel and daily needs." }
+quantity_rule = "cash_reserve_usd"
+citations = ["ready_gov_financial", "fema_effak", "rr_expert_prior"]
+hazard_extras = []
