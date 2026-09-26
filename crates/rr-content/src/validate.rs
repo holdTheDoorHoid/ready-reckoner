@@ -27,7 +27,7 @@ use std::str::FromStr;
 
 use rr_types::{Item, TierId, is_well_formed_id};
 
-use crate::ids::{self, GuidanceKind};
+use crate::ids::{self, GuidanceKind, KindRules};
 use crate::parse::{Content, LoadError};
 use crate::policy::{self, ConditionScope, find_dosing, find_drug_dose, find_phrases, tokens};
 use crate::readability;
@@ -626,7 +626,7 @@ fn resolve_target(
         GuidanceKind::Family if ids::is_rare_family(id) => Ok(()),
         GuidanceKind::Family => Err(format!(
             "`{id}` is not the lead hazard of a rare family (one of {:?})",
-            ids::RARE_FAMILIES
+            ids::rare_families()
         )),
         GuidanceKind::Topic | GuidanceKind::Plan | GuidanceKind::After => {
             if slugs.get(&kind).is_some_and(|s| s.contains(id)) {
@@ -644,8 +644,8 @@ fn resolve_target(
 fn check_guidance(content: &Content, r: &mut Report) {
     let mut slugs: BTreeMap<GuidanceKind, BTreeSet<String>> = BTreeMap::new();
     for g in &content.guidance {
-        if let Some(slug) = g.meta.id.strip_prefix(&g.kind.prefix()) {
-            slugs.entry(g.kind).or_default().insert(slug.to_owned());
+        if let Some(slug) = g.meta.id.strip_prefix(&g.kind().prefix()) {
+            slugs.entry(g.kind()).or_default().insert(slug.to_owned());
         }
     }
     let items: BTreeSet<String> = content
@@ -671,21 +671,19 @@ fn check_guidance(content: &Content, r: &mut Report) {
         if id != stem {
             r.error(&loc, format!("id `{id}` must equal the file name `{stem}`"));
         }
-        let prefix = g.kind.prefix();
+        let kind = g.kind();
+        let prefix = kind.prefix();
         if !id.starts_with(&prefix) {
             r.error(
                 &loc,
-                format!("a `{}` block's id starts with `{prefix}`", g.kind),
+                format!("a `{kind}` block's id starts with `{prefix}`"),
             );
         }
-        let own_kind = format!("{}:", g.kind);
+        let own_kind = format!("{kind}:");
         if !g.meta.applies_to.iter().any(|t| t.starts_with(&own_kind)) {
             r.error(
                 &loc,
-                format!(
-                    "a `{}` block applies to at least one `{own_kind}` target",
-                    g.kind
-                ),
+                format!("a `{kind}` block applies to at least one `{own_kind}` target"),
             );
         }
         if g.meta.title.trim().is_empty() {
@@ -722,7 +720,7 @@ fn check_guidance(content: &Content, r: &mut Report) {
             })
             .collect();
         let scope = ConditionScope {
-            hazards: if g.kind.any_hazard_condition() {
+            hazards: if kind.any_hazard_condition() {
                 None
             } else {
                 Some(&hazards)
@@ -742,7 +740,7 @@ fn check_guidance(content: &Content, r: &mut Report) {
                 format!("{words} words; the limit is {MAX_GUIDANCE_WORDS}"),
             );
         }
-        if g.kind.opens_with_frequency()
+        if kind.opens_with_frequency()
             && !first_paragraph(prose).contains(policy::FREQUENCY_PLACEHOLDER)
         {
             r.error(

@@ -62,12 +62,8 @@ pub struct GlossaryEntry {
 /// A guidance block: its metadata and its Markdown body.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Guidance {
-    /// The front matter.
+    /// The front matter. `meta.kind` is always set: the parser requires the field.
     pub meta: GuidanceMeta,
-    /// What the block is for (the `kind` front-matter field). It lives here rather than in
-    /// [`GuidanceMeta`] because it is not part of the engine contract.
-    // awaiting: rr-types (contract v2 may add `GuidanceMeta.kind`; if it does, read it there).
-    pub kind: GuidanceKind,
     /// The Markdown after the front matter, including the closing `## Sources` section.
     pub body: String,
     /// The file it came from, relative to `content/`.
@@ -95,6 +91,11 @@ impl Guidance {
     ) -> String {
         let body = crate::policy::apply_conditions_for(&self.body, household);
         fill_frequency(&body, frequency)
+    }
+
+    /// What the block is for (the `kind` front-matter field, which the parser requires).
+    pub fn kind(&self) -> GuidanceKind {
+        self.meta.kind.unwrap_or(GuidanceKind::Topic)
     }
 
     /// The prose part of the body: everything before the `## Sources` heading.
@@ -295,11 +296,11 @@ impl Content {
 
     /// Guidance blocks of one kind, in content order.
     pub fn guidance_of_kind(&self, kind: GuidanceKind) -> impl Iterator<Item = &Guidance> + '_ {
-        self.guidance.iter().filter(move |g| g.kind == kind)
+        self.guidance.iter().filter(move |g| g.kind() == kind)
     }
 
     /// The family block for a rare hazard: the block of kind `family` that applies to
-    /// `family:<hazard id>` (the family's lead hazard, [`crate::ids::RARE_FAMILIES`]).
+    /// `family:<hazard id>` (the family's lead hazard, [`rr_types::HazardId::family`]).
     pub fn family_block(&self, hazard: &str) -> Option<&Guidance> {
         let target = format!("family:{hazard}");
         self.guidance_of_kind(GuidanceKind::Family)
@@ -430,7 +431,7 @@ fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
     let title = unquote(&need(title, "title")?);
     let kind = unquote(&need(kind, "kind")?)
         .parse::<GuidanceKind>()
-        .map_err(|e| LoadError::new(path, e))?;
+        .map_err(|e| LoadError::new(path, e.to_string()))?;
     let applies_to = parse_list(path, "applies_to", &need(applies_to, "applies_to")?)?;
     let citations = parse_list(path, "citations", &need(citations, "citations")?)?
         .into_iter()
@@ -442,10 +443,8 @@ fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
             title,
             applies_to,
             citations,
-            // awaiting: content — read `kind` from the front matter (DESIGN-DELTA §1.3).
-            kind: None,
+            kind: Some(kind),
         },
-        kind,
         body,
         file: path.to_owned(),
     })
@@ -500,7 +499,8 @@ license = "US Government Work (public domain)"
         .unwrap();
         let g = c.guidance("bucket_water_out").unwrap();
         assert_eq!(g.meta.title, "No tap water at all");
-        assert_eq!(g.kind, GuidanceKind::Bucket);
+        assert_eq!(g.kind(), GuidanceKind::Bucket);
+        assert_eq!(g.meta.kind, Some(GuidanceKind::Bucket));
         assert_eq!(c.guidance_of_kind(GuidanceKind::Bucket).count(), 1);
         assert_eq!(c.guidance_of_kind(GuidanceKind::Topic).count(), 0);
         assert_eq!(
