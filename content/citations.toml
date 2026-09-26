@@ -167,7 +167,7 @@ title = "Family Communication Plan fillable card"
 publisher = "FEMA / Ready.gov"
 year = 2025
 url = "https://www.ready.gov/sites/default/files/2025-06/family-communication-plan_fillable-card.pdf"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -2713,3 +2713,31 @@ url = "https://www.weather.gov/media/aly/PSAs/ExtremeCold.pdf"
 retrieved = "2026-09-26"
 quote = "Let hot and cold water trickle or drip at night from a faucet."
 license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_pace_flyer"
+title = "Set Your PACE: Prepare Your Critical Communications for Out-of-the-Ordinary Situations"
+publisher = "Cybersecurity and Infrastructure Security Agency (SAFECOM/NCSWIC)"
+year = 2025
+url = "https://www.cisa.gov/sites/default/files/2025-02/Updated_PACE_Flyer_022025.pdf"
+retrieved = "2026-09-26"
+quote = "PACE produces strategies and redundancies that maintain communications despite disrupted communications networks"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_back_to_school_2026"
+title = "Back to School, Back to Safety"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/blog/back-school-back-safety"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ollam_2022_lawyer_passport_locksmith_gun"
+title = "A Talk About Risk & Preparedness (SAINTCON 2022 keynote)"
+publisher = "Deviant Ollam (video and slides)"
+year = 2022
+url = "https://www.youtube.com/watch?v=6ihrGNGesfI"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted; cited for principles, never for numbers)"

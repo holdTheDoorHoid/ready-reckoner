@@ -758,7 +758,9 @@ fn check_guidance(content: &Content, r: &mut Report) {
                 format!("reading level is grade {grade:.1} (Flesch-Kincaid); aim for 8"),
             );
         }
-        let all = format!("{}\n{}", g.meta.title, prose);
+        // Footnote references (`[^id]`) are ids, not text a reader sees: the packet turns them
+        // into numbered markers. Only the words are checked.
+        let all = format!("{}\n{}", g.meta.title, strip_footnote_references(prose));
         check_text(r, &loc, &all, false);
         check_potassium_iodide(r, &loc, &all);
         check_antibiotic_warnings(&plain, &loc, r);
@@ -830,6 +832,24 @@ fn check_states(content: &Content, r: &mut Report) {
             r.error(STATE_REGISTRIES_FILE, format!("no row for `{code}`"));
         }
     }
+}
+
+/// `text` without its footnote references (`[^id]`).
+fn strip_footnote_references(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut rest = text;
+    while let Some(start) = rest.find("[^") {
+        out.push_str(&rest[..start]);
+        match rest[start..].find(']') {
+            Some(end) => rest = &rest[start + end + 1..],
+            None => {
+                rest = &rest[start..];
+                break;
+            }
+        }
+    }
+    out.push_str(rest);
+    out
 }
 
 fn first_paragraph(prose: &str) -> &str {
@@ -1399,6 +1419,20 @@ hazard_extras = []
         assert!(e.iter().any(|m| m.contains("`nowhere`")), "{r}");
         assert!(e.iter().any(|m| m.contains("appears twice")), "{r}");
         assert!(e.iter().any(|m| m.contains("act now")), "{r}");
+    }
+
+    #[test]
+    fn footnote_ids_are_not_checked_as_words() {
+        // A source's id may contain a word the text may not (the talk cited for the free steps
+        // has one in its id); the reader never sees the id.
+        let cites = CITES.replace("ready_gov_water", "talk_about_guns");
+        let body = "---\nid: topic_x\ntitle: A title\nkind: topic\napplies_to: [topic:x]\n\
+                    citations: [talk_about_guns]\n---\nKeep a spare key with a friend.[^talk_about_guns]\n\n\
+                    ## Sources\n\n[^talk_about_guns]: FEMA / Ready.gov, Water (2021).\n";
+        let r = run(&[("citations.toml", &cites), ("guidance/topic_x.md", body)]);
+        assert!(r.is_ok(), "{r}");
+        assert_eq!(strip_footnote_references("a[^b] c[^d]"), "a c");
+        assert_eq!(strip_footnote_references("a [^b"), "a [^b");
     }
 
     #[test]
