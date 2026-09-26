@@ -3687,3 +3687,52 @@ year = 2026
 url = "https://echo.epa.gov/tools/data-downloads/sdwa-download-summary"
 retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
+
+[[citation]]
+id = "noaa_nclimgrid_daily"
+title = "nClimGrid-Daily: daily gridded temperature and precipitation for the contiguous United States since 1951, with county averages (version 1.0.0)"
+publisher = "NOAA National Centers for Environmental Information (Durre et al.)"
+year = 2022
+url = "https://www.ncei.noaa.gov/products/land-based-station/nclimgrid-daily"
+retrieved = "2026-09-26"
+quote = "NCEI’s nClimGrid-Daily product contains gridded fields and area averages of daily maximum, minimum, and average temperatures (Tmax, Tmin, and Tavg) and daily precipitation amount (Prcp) for the Contiguous United States (CONUS) from January 1, 1951–present."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eia_861_reliability"
+title = "Annual Electric Power Industry Report (Form EIA-861) detailed data files: reliability, SAIDI and SAIFI with and without major event days, 2015-2024"
+publisher = "U.S. Energy Information Administration"
+year = 2025
+url = "https://www.eia.gov/electricity/data/eia861/"
+retrieved = "2026-09-26"
+quote = "If collected, utilities report the system average interruption duration index (SAIDI), the system average interruption frequency index (SAIFI), and the conditions under which these metrics are collected."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "openfema_declarations"
+title = "OpenFEMA: Disaster Declarations Summaries (version 2)"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2"
+retrieved = "2026-09-26"
+quote = "Disaster Declarations Summaries is a summarized dataset describing all federally declared disasters."
+license = "US Government Work (public domain), subject to the OpenFEMA Terms and Conditions"
+
+[[citation]]
+id = "openfema_housing_assistance"
+title = "OpenFEMA: Housing Assistance Program Data, Owners and Renters (version 2)"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/openfema-data-page/housing-assistance-program-data-renters-v2"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain), subject to the OpenFEMA Terms and Conditions"
+
+[[citation]]
+id = "fcc_dirs_reports"
+title = "Disaster Information Reporting System (DIRS) and its Communications Status Reports"
+publisher = "Federal Communications Commission, Public Safety and Homeland Security Bureau"
+year = 2026
+url = "https://www.fcc.gov/general/disaster-information-reporting-system-dirs-0"
+retrieved = "2026-09-26"
+quote = "The FCC's Disaster Information Reporting System (DIRS) is a web-based system through which the Commission collects operational status and restoration information from communications providers during major disasters and subsequent recovery efforts."
+license = "US Government Work (public domain)"
