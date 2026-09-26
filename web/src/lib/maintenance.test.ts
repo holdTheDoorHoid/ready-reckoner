@@ -41,7 +41,10 @@ describe('maintenance calendar', () => {
 
   it('marks things the household already had as of unknown age', async () => {
     const cat = await catalogue();
-    const plan = savedFor(FIXTURES['coos-bay-well-owner-2']);
+    // The mock catalogue's own water id: the fixtures name real catalogue items (water_jug_7gal)
+    // since 0100b0c, which the mock does not know.
+    const input = { ...FIXTURES['coos-bay-well-owner-2'], existing: [{ item_id: 'water_stored', qty: 20 }] };
+    const plan = savedFor(input);
     const water = maintenanceTasks(plan, cat).find((t) => t.key === 'rotate:water_stored')!;
     expect(water.from_inventory).toBe(true);
   });
