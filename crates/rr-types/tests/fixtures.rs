@@ -44,6 +44,42 @@ fn every_fixture_file_is_embedded() {
     }
 }
 
+/// Removes from `canon` every field that defaults when absent and that `file` leaves out: the
+/// top-level `assume_basics`, the dials' optional fields, and the contract v2 additions that
+/// default (`housing.below_grade_bedroom`, `finances.benefits`, each person's `access_needs`).
+fn strip_defaults_absent_from(file: &Value, canon: &mut Value) {
+    fn strip(file: &Value, canon: &mut Value, keys: &[&str]) {
+        for key in keys {
+            if file.get(*key).is_none() {
+                canon.as_object_mut().unwrap().remove(*key);
+            }
+        }
+    }
+    strip(file, canon, &["assume_basics"]);
+    strip(
+        &file["dials"],
+        &mut canon["dials"],
+        &[
+            "water_level",
+            "scenario_overrides",
+            "rare_catastrophic_opt_in",
+            "rare_opt_in",
+            "minimum_kit",
+            "long_horizon",
+        ],
+    );
+    strip(
+        &file["housing"],
+        &mut canon["housing"],
+        &["below_grade_bedroom"],
+    );
+    strip(&file["finances"], &mut canon["finances"], &["benefits"]);
+    let people = file["people"].as_array().unwrap();
+    for (i, person) in people.iter().enumerate() {
+        strip(person, &mut canon["people"][i], &["access_needs"]);
+    }
+}
+
 #[test]
 fn every_fixture_parses_round_trips_and_validates() {
     for (name, raw) in fixtures::RAW {
@@ -60,22 +96,11 @@ fn every_fixture_parses_round_trips_and_validates() {
             "{name}"
         );
 
-        // Nothing is lost or invented: the canonical form equals the file, apart from the top-level
-        // and dial fields that default when absent.
+        // Nothing is lost or invented: the canonical form equals the file, apart from the fields
+        // that default when absent (which the engine always writes out).
         let file: Value = serde_json::from_str(raw).unwrap();
         let mut canon: Value = serde_json::from_str(&canonical).unwrap();
-        if file.get("assume_basics").is_none() {
-            canon.as_object_mut().unwrap().remove("assume_basics");
-        }
-        for key in [
-            "water_level",
-            "scenario_overrides",
-            "rare_catastrophic_opt_in",
-        ] {
-            if file["dials"].get(key).is_none() {
-                canon["dials"].as_object_mut().unwrap().remove(key);
-            }
-        }
+        strip_defaults_absent_from(&file, &mut canon);
         assert!(
             same_json(&file, &canon),
             "{name}: canonical form differs\n{canonical}"

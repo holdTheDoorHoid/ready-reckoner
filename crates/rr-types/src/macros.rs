@@ -15,7 +15,9 @@
 /// ```
 ///
 /// The string after the colon names the kind of value in error messages ("unknown setting").
-/// Declaration order is the order of `ALL` and of the derived `Ord`.
+/// Declaration order is the order of `ALL` and of the derived `Ord`. A variant may carry
+/// `#[deprecated]` (a retired id kept so old plans parse): the generated tables name every
+/// variant, so they allow the lint.
 macro_rules! string_enum {
     (
         $(#[$meta:meta])*
@@ -35,6 +37,7 @@ macro_rules! string_enum {
             )+
         }
 
+        #[allow(deprecated)]
         impl $name {
             /// Every value, in declaration order.
             pub const ALL: &'static [Self] = &[$(Self::$variant,)+];
@@ -50,12 +53,14 @@ macro_rules! string_enum {
             }
         }
 
+        #[allow(deprecated)]
         impl ::core::fmt::Display for $name {
             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
                 f.write_str(self.as_str())
             }
         }
 
+        #[allow(deprecated)]
         impl ::core::str::FromStr for $name {
             type Err = $crate::ids::ParseIdError;
 
@@ -67,6 +72,7 @@ macro_rules! string_enum {
             }
         }
 
+        #[allow(deprecated)]
         impl ::serde::Serialize for $name {
             fn serialize<S: ::serde::Serializer>(
                 &self,
@@ -76,6 +82,7 @@ macro_rules! string_enum {
             }
         }
 
+        #[allow(deprecated)]
         impl<'de> ::serde::Deserialize<'de> for $name {
             fn deserialize<D: ::serde::Deserializer<'de>>(
                 deserializer: D,

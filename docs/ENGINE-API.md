@@ -1,6 +1,6 @@
 # Engine API (contract between `rr-wasm` / `rr-cli` and the web app)
 
-`ENGINE_API_VERSION = 1`. Bump it whenever a type, id or function below changes shape; update
+`ENGINE_API_VERSION = 2`. Bump it whenever a type, id or function below changes shape; update
 `crates/rr-types`, `web/src/engine/types.ts` and `web/src/engine/mock.ts` in the same commit.
 `cargo test -p rr-types` fails if `types.ts` drifts from the Rust types (fields, optional markers,
 id lists) or if this file stops naming a function or error code.
