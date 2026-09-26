@@ -151,3 +151,36 @@ fn nuclear_guidance_keeps_potassium_iodide_to_official_instruction() {
     assert!(prose.contains("get inside, stay inside, stay tuned"));
     assert!(prose.contains("potassium iodide unless public health or emergency officials"));
 }
+
+#[test]
+fn the_glossary_covers_the_terms_the_brief_names() {
+    let terms: Vec<String> = content()
+        .glossary
+        .iter()
+        .map(|t| t.term.to_lowercase())
+        .collect();
+    for want in [
+        "return period",
+        "exceedance",
+        "special flood hazard area",
+        "public safety power shutoff",
+        "boil water advisory",
+        "cert",
+        "effak",
+        "kcal",
+        "wh (watt-hour)",
+        "saidi",
+    ] {
+        assert!(
+            terms.iter().any(|t| t.contains(want)),
+            "the glossary has no entry for `{want}`"
+        );
+    }
+    for t in &content().glossary {
+        assert!(
+            !t.plain.eq_ignore_ascii_case(&t.term),
+            "`{}`: the plain phrase comes first and differs from the term",
+            t.term
+        );
+    }
+}
