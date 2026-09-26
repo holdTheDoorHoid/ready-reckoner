@@ -360,6 +360,16 @@ quote = "Severe weather can happen anytime, in any part of the country."
 license = "US Government Work (public domain)"
 
 [[citation]]
+id = "ready_gov_thunderstorms_lightning"
+title = "Thunderstorms and Lightning"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/thunderstorms-lightning"
+retrieved = "2026-09-25"
+quote = "Move from outdoors into a building or car with a roof."
+license = "US Government Work (public domain)"
+
+[[citation]]
 id = "ready_gov_avalanche"
 title = "Avalanche"
 publisher = "FEMA / Ready.gov"
