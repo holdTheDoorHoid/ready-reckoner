@@ -175,8 +175,10 @@ fn words(markdown: &str) -> usize {
         .count()
 }
 
-/// The most the Philadelphia packet may print on: the v0.1.0 packet's 22 US Letter pages.
-const PHILADELPHIA_MAX_PAGES: f64 = 22.2;
+/// The most the Philadelphia packet may print on: the v0.1.0 packet's 22 US Letter pages plus
+/// about one page accepted in v0.1.1 for the safety rules, the wider card rule and the cold-chain
+/// lines (docs/PACKET.md); v0.2.0's packet redesign sets a fresh budget.
+const PHILADELPHIA_MAX_PAGES: f64 = 23.5;
 
 #[test]
 fn philadelphia_stays_within_22_printed_pages() {

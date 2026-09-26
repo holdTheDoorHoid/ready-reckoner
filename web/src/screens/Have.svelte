@@ -111,7 +111,9 @@
     <NumberField
       id="have-{item.id}"
       label={item.name}
-      help="About how many days could your household eat from what is in the cupboards now?"
+      help={item.assumed_basic
+        ? firstSentence(item.spec)
+        : 'About how many days could your household eat from what is in the cupboards now?'}
       value={owned(item.id) !== undefined ? Math.round(((owned(item.id) ?? 0) / eaters) * 10) / 10 : undefined}
       optional
       quiet

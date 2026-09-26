@@ -243,7 +243,7 @@ fn words(markdown: &str) -> usize {
 /// 8,000 words; this cap catches the packet growing back (it was 26,000 words).
 #[test]
 fn the_packet_stays_short() {
-    const MAX_WORDS: usize = 11_500;
+    const MAX_WORDS: usize = 12_500;
     for (name, _, out) in outputs() {
         let p = &out.packet_markdown;
         let n = words(p);

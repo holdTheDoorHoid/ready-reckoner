@@ -50,9 +50,9 @@ research live in the app's Learn and explain views; the packet keeps what to do.
 - compact sources: only the ones the packet's brackets point to, run together ten to a paragraph,
   each with title, publisher, year and the URL once.
 
-On the seven fixtures this gives 8,000 to 11,200 words (down from 16,800 to 24,500 before the
+On the seven fixtures this gives about 8,400 to 11,900 words (v0.1.1; 8,000 to 11,200 in v0.1.0) (down from 16,800 to 24,500 before the
 polish round), a fifth of it the Sources section and data credits. `the_packet_stays_short`
-(`crates/rr-plan/tests/fixtures.rs`) fails above 11,500 words, so the packet cannot grow back
+(`crates/rr-plan/tests/fixtures.rs`) fails above 12,500 words (11,500 in v0.1.0; v0.1.1 accepted about one more printed page for the safety rules, the wider card rule and the cold-chain lines, and the Philadelphia page test allows 23.5 pages), so the packet cannot grow back
 unnoticed.
 
 **Printed pages, the proxy.** Words outside the Sources section count 400 to a printed page and

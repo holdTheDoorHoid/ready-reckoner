@@ -359,20 +359,23 @@ fn a_months_spend_never_exceeds_its_budget_plus_what_earlier_months_left() {
             assert!(s <= lines + 1e-6, "{name} month {}", m.index);
         }
     }
-    // Philadelphia, month 14: the last $30 toward the cash reserve and the $100 it buys ($90
-    // of it saved) are $40 of that month's $60, not $130.
+    // Philadelphia, month 16 (v0.1.1 order): the last deposit toward the cash reserve, the $10 of
+    // the $100 cash not yet saved, the pet food and the fans are $80 of that month's $60 plus what
+    // earlier months left, not $170.
     let a = common::run(&household("philadelphia-renters-4"));
+    // Displayed as $80 (the exact figure carries the price bands' cents).
     assert!(
-        (a.month_spend(14) - 40.0).abs() < 0.01,
+        (a.month_spend(16) - 80.0).abs() < 0.5,
         "{}",
-        a.month_spend(14)
+        a.month_spend(16)
     );
     assert!(a.input.finances.monthly_budget_usd >= 40.0);
     let packet = assess(&household("philadelphia-renters-4")).packet_markdown;
     assert!(
         packet.contains(
-            "| 14 (December 2027) | save toward cash in small bills; Cash in small bills: $100, \
-             $90 of it from savings | $40 |"
+            "| 16 (February 2028) | save toward cash in small bills; Cash in small bills: $100, \
+             $90 of it from savings; Extra pet food in an airtight container: 5 pounds of dry \
+             food; Battery or rechargeable fan: 2 fans | $80 |"
         ),
         "the table row"
     );

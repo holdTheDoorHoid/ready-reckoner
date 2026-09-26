@@ -73,6 +73,14 @@ pub enum Units {
     /// rule (three days of ordinary food per person). Unlike [`Units::Per`], the item keeps its
     /// own rule's quantity rather than growing to meet the whole line.
     Energy,
+    /// This many line units per item unit, and, like [`Units::Energy`], the item keeps its own
+    /// rule's quantity: an insulated bag with cold packs covers about one day of a longer
+    /// cold-storage line, and the plan never buys more bags to fill it.
+    Share(f64),
+    /// The item's quantity meets the whole line except this many units, which another item
+    /// covers: a power station keeps refrigerated medicine cold for the days after the cooler
+    /// bag's one, so neither makes the other redundant.
+    Rest(f64),
 }
 
 /// Items sized by a generic rule, and the need lines they meet (`bucket.rule`, matching every
@@ -82,7 +90,15 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
     // Power.
     ("power_headlamp", &[("power.lights", Units::Per(1.0))]),
     ("power_lantern", &[("power.lights", Units::Per(1.0))]),
-    ("power_station", &[("power.medical_device_wh", Units::Fill)]),
+    // A power station runs a medical device, and keeps refrigerated medicine cold for the rest
+    // of a power cut once the cooler bag's day (rr-supply's `cooler_hold_days`) is used up.
+    (
+        "power_station",
+        &[
+            ("power.medical_device_wh", Units::Fill),
+            ("medication.rx_cold_storage", Units::Rest(1.0)),
+        ],
+    ),
     (
         "power_device_battery",
         &[("power.medical_device_wh", Units::Fill)],
@@ -141,10 +157,11 @@ pub const ITEM_LINES: &[(&str, &[(&str, Units)])] = &[
         &[("supplies.food_kcal", Units::Energy)],
     ),
     ("food_cooking_pot", &[]),
-    // Medicine.
+    // Medicine. An insulated bag with fresh cold packs keeps medicine cool for about a day
+    // (rr-supply's `cooler_hold_days`), whatever the cold-storage line asks for.
     (
         "med_cooler_refrigerated_rx",
-        &[("medication.rx_cold_storage", Units::Fill)],
+        &[("medication.rx_cold_storage", Units::Share(1.0))],
     ),
     // The set includes oral rehydration salts.
     (
@@ -524,6 +541,10 @@ pub fn build(
                         Units::Fill if per_person => 1.0,
                         Units::Fill => l.quantity / quantity,
                         Units::Energy => item.energy_kcal_per_unit.map_or(0.0, f64::from),
+                        Units::Share(u) => *u,
+                        // The line less what another item covers, shared out over the item's
+                        // own quantity (one station fills the rest of the line).
+                        Units::Rest(u) => (l.quantity - u).max(0.0) / quantity,
                     };
                     push(l, u, false, &mut joins);
                 }

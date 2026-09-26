@@ -261,8 +261,9 @@ Because one event feeds several buckets, correlation between buckets is preserve
 this one curve:
 
 1. **Target.** The dial is a return period; the target is the smallest ladder value *d\** with
-   Λ_b(d\*) ≤ Λ\*, where the default `one_in_100` is defined as "90 % sure nothing in the next ten
-   years is worse": Λ\* = −ln(0.9)/10 ≈ 0.01054 per year (about 1-in-95, shown as "about 1-in-100"),
+   Λ_b(d\*) ≤ Λ\*, where the default `one_in_100` is defined, for any one need, as "90 % sure nothing in the
+   next ten years is worse than its target" (across all needs together the chance that at least one
+   runs out is higher, roughly 1 in 3; round-2 model review M-04): Λ\* = −ln(0.9)/10 ≈ 0.01054 per year (about 1-in-95, shown as "about 1-in-100"),
    the same one-percent-a-year yardstick behind FEMA flood maps. The other settings are exactly 0.10,
    0.02 and 0.002. A raw target within 3 % above a ladder step counts as that step (3.003 days is
    "3 days", not "5"). In ordinary counties it reproduces official guidance (Philadelphia: about 3 days of

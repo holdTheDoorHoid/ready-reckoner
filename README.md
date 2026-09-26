@@ -42,7 +42,7 @@ the plan; every dial behind it is there if you want it.
 
 ## Status
 
-**v0.1.0 (September 2026): working end to end on national data.** The engine, the website and the
+**v0.1.1 (September 2026): working end to end on national data, with the round-2 safety fixes.** The engine, the website and the
 printable packet all work together, for every county in the country. See
 [docs/DESIGN.md](docs/DESIGN.md) for the design, [docs/ROADMAP.md](docs/ROADMAP.md) for what's built
 and what's next, [CHANGELOG.md](CHANGELOG.md) for what shipped in this version, and the GitHub

@@ -4,6 +4,81 @@ Ready Reckoner has no accounts and no server, so nothing changes on you without 
 lists what shipped in each version, grouped by area, in plain language. It also lists what we
 already know still needs work.
 
+## v0.1.1 — September 2026
+
+A safety and correctness release, from a review by four independent panels (emergency management,
+practitioner, catastrophe model, hazard data) and a walk through the site. Nothing in the engine
+contract changed; saved plans load as before. The full review is in the project's briefs folder and
+its findings are numbered in `docs/VERIFICATION.md` ("Round 2").
+
+### Fixed: things that could have hurt someone
+- **Refrigerated medicine.** The packet no longer tells anyone to throw away refrigerated medicine
+  after a day without power. Insulin keeps working up to 28 days at 59–86 °F (FDA, CDC): keep it
+  shaded and below 86 °F, never frozen, and never use insulin that froze or looks unusual. A cooler
+  bag now counts for about one day; when the power target is two days or more and there is no
+  backup power, a battery power station becomes a need and the cold-chain warning stays on until it
+  is planned. A diabetes supply list and "ask about a 90-day fill" are added.
+- **Leaving comes first where leaving is likely.** When the chance of having to leave is high, or a
+  major hurricane or local tsunami is in the plan, the summary leads with the decision to leave.
+  Shelter advice fits the home: no basement advice for apartments; high-rises shelter on or below
+  the tenth floor in a hurricane; mobile homes are told to leave.
+- **The hazards that can kill get a card.** Every packet has a house-fire card, plus cards for
+  Severe hazards, fast ones (wildfire, floods, earthquakes) and ones the home is exposed to, up to
+  nine. A new "Safety rules to learn now" section prints in every packet: two ways out, gas, the
+  water heater, food at 40 °F, generator backfeed, CPR.
+- **New safety lines** in every packet: a gas leak, carbon monoxide symptoms, downed power lines,
+  hands-only CPR and defibrillators, private wells after a flood, yearly chimney checks. Heat stroke
+  follows CDC (skin may be dry or damp; cool the person while waiting for help).
+- **Life safety comes first in the plan.** Every plan starts with emergency alerts and 911, the
+  household plan and contact card, and fire safety. The fire extinguisher and smoke alarms are
+  life-safety items; the extinguisher is valued on all home fires, most of them small and unreported
+  (CPSC). Smoke alarms: ask the fire department, the Red Cross or the landlord first; renters with
+  none get a warning instead of a purchase. The bleeding-control kit is a three-day item where help
+  is slow, with a counterfeit-tourniquet caution.
+- **Well pumps.** A generator for a well pump is pump-rated and connected through an
+  electrician-installed interlock or transfer switch (new item), with approved fuel cans (new item)
+  and the CPSC/OSHA backfeed warning. Livestock store 14 days of water until pump power exists. A
+  water filter counts beyond stored water only with a named raw-water source.
+- **Rare-catastrophe gear** (radiation card, shielded bag) is listed only if you opt in.
+
+### Fixed: numbers and sentences
+- Landslide chances are bounded by the county's own loss record and the high-risk flood-zone
+  yardstick (Utuado, Puerto Rico: 90 → 10 in 100 homes damaged over ten years), with roads cut off
+  shown separately.
+- Wildfire evacuations are no longer undercounted (Paradise, California: about 4.5 times more), and
+  Hawaii no longer gets power shutoffs it does not have.
+- Warning times include fast hazards (Lahaina: minutes, not "2 hours").
+- "Mostly back to normal" describes the event behind the target (Asheville power: about 6 days,
+  not half a day).
+- The dial sentence says each target is for one need, and that across all needs the chance that at
+  least one runs out is higher, roughly 1 in 3. The explainer, glossary and design notes agree.
+- The rare-but-severe box shows a range only, and says the nuclear figure is the chance of a
+  catastrophe anywhere in the world, not your household's; a location-aware version is coming.
+- "Notice could be 1 minute", not "1 minutes".
+
+### The site
+- **A risk table at the top of Risks**: every risk, most likely first, with how likely, how bad and
+  how sure. Each name jumps to its card; each card links back.
+- Hazard cards' "What helps" fits the hazard (no warm-room step on the heat card, no fan on the
+  cold card; first-aid and bleeding-control kits first for medical emergencies), keeps "N95" in
+  capitals, and says "have it" for what you own.
+- Plan: "Done so far" counts only steps you have checked off; the everyday basics the plan assumes
+  show as "Already have". Cash is "set aside", not bought. The savings track shows a first goal,
+  with a date, before the full goal.
+- Fridge and freezer thermometers are a need wherever there is a power target, and an indoor
+  thermometer wherever there is a heat target. The shut-off wrench and outdoor motion light appear
+  only for houses. The assumed three days of food has its own help line.
+- Learn shows the reviewed, cited articles; the "Draft text" labels are gone.
+- Start, About and the packet's first page say that Ready Reckoner is an independent planning aid,
+  not official guidance or advice, and that local officials come first.
+- Sources: the FEMA household survey is cited from FEMA's own file (archived); a mis-sourced
+  telehealth sentence is removed; 25 sources added.
+
+### Packet length
+The packet is about one printed page longer than v0.1.0 (Philadelphia: 23 pages). The added page
+is the safety rules, the wider card rule and the cold-chain lines, and it was accepted on purpose;
+v0.2.0 redesigns the packet with a fresh page budget.
+
 ## v0.1.0 — September 2026
 
 The first version that works end to end, for the whole country, on real data. Everything below runs
@@ -91,15 +166,19 @@ plan to smooth out.
 - **A few coastal counties may read too high.** We are re-checking how earthquake risk and outage
   history combine in some Pacific coast counties. Coos Bay, Oregon is one example, where water and
   power targets come out higher than expected.
-- **A couple of hazard cards show advice for the wrong hazard.** A cold-wave card has briefly shown
-  avalanche advice, for instance. This comes from guidance shared across a family of related
-  hazards. A fix is in progress to keep each card's advice specific to itself.
+- **A hazard card can still carry a related hazard's advice** in the packet (a cold-wave card
+  showing avalanche lines, snow advice in a hot county). The site's "What helps" lists are fixed in
+  v0.1.1; the packet's shared guidance blocks are split in v0.2.0.
 - **Heat wave and cold wave can read as less serious than they are** for a household with a baby, an
   older adult, or no cooling or heating. A fix is planned to weigh who is in the household, not just
   typical dollar cost.
-- **Livestock water may be over-sized on a well with a generator.** If a generator is already
-  planned to keep the well pump running, the plan should only need a few days of separate stored
-  water for animals, not the full target. This is under review.
+- **A well-pump generator arrives late.** The pump-rated generator, its interlock and fuel cans
+  are separate lines, so on a small budget the generator can land in year two or three while the
+  animals rely on 14 days of stored water. A "requires" link that keeps a bundle together is planned
+  for v0.2.0.
+- **Life-safety items can push other things later.** Because the extinguisher and bleeding kit now
+  come first, Philadelphia's carbon monoxide alarms moved from month 2 to month 6. A per-item value
+  for readiness items (v0.2.0) will settle the order.
 - **The printed packet's monthly spending can look higher than it is.** In a month where a saved-up
   purchase completes and a regular deposit also lands, both currently show in that month's total. A
   fix is proposed.

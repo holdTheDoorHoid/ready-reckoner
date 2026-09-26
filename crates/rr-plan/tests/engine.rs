@@ -94,7 +94,7 @@ fn the_item_table_names_real_items_and_real_lines() {
                 rules.contains(&rule),
                 "{key}: {rule} is not an rr-supply line rule"
             );
-            if let Units::Per(u) = units {
+            if let Units::Per(u) | Units::Share(u) | Units::Rest(u) = units {
                 assert!(*u > 0.0, "{key}");
             }
         }
@@ -107,6 +107,26 @@ fn the_item_table_names_real_items_and_real_lines() {
         );
     }
     assert!(DIVISIBLE_CLASSES.contains(&"water_stored"));
+}
+
+/// The cooler bag counts rr-supply's `cooler_hold_days` of the cold-storage line, and the power
+/// station the rest (round-2 review S1): the table's numbers follow the constant.
+#[test]
+fn the_cooler_bag_counts_one_day_and_the_station_the_rest() {
+    let hold = rr_supply::constants().value(rr_supply::constants::keys::COOLER_HOLD_DAYS);
+    let find = |item: &str| {
+        ITEM_LINES
+            .iter()
+            .find(|(id, _)| *id == item)
+            .and_then(|(_, lines)| {
+                lines
+                    .iter()
+                    .find(|(key, _)| *key == "medication.rx_cold_storage")
+                    .map(|(_, u)| *u)
+            })
+    };
+    assert_eq!(find("med_cooler_refrigerated_rx"), Some(Units::Share(hold)));
+    assert_eq!(find("power_station"), Some(Units::Rest(hold)));
 }
 
 /// Every catalogue-looking id the packet and coverage code name is a real item (or an rr-supply

@@ -691,8 +691,9 @@ something for the household.
 For every duration bucket, Λ_b(d) = Σ r_h · q_{h,b} · S_{h,b}(d) (thresholds and floors applied).
 
 - **Dial rates** (planner decision, 2026-09-25): `one_in_10` = 0.1, `one_in_50` = 0.02,
-  `one_in_100` = −ln(0.9)/10 = **0.010536051565782628** a year (the research default, "90 % sure
-  nothing in the next ten years is worse", shown as "about 1 in 100"), `one_in_500` = 0.002
+  `one_in_100` = −ln(0.9)/10 = **0.010536051565782628** a year (the research default: for any one need, "90 % sure
+  nothing in the next ten years is worse than its target"; across all needs together the chance
+  that at least one runs out is roughly 1 in 3, M-04; shown as "about 1 in 100"), `one_in_500` = 0.002
   (`rr_consequence::dial_rate`, `ONE_IN_100_RATE`).
 - **Ladder rule** (planner decision): the raw design duration (the smallest d with Λ_b(d) ≤ the dial
   rate) is rounded **up** to the ladder ½, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 180, 365

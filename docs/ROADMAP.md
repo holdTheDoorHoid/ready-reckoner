@@ -59,6 +59,23 @@ one is not started.
   engine landed); keyboard use and reduced motion were checked by hand. A screen-reader pass and a
   review with real users have not been done.
 
+## Round 2 — Review, v0.1.1 and the v0.2.0 programme (2026-09-26)
+
+A walk through the live site and four review panels (emergency management, practitioner,
+catastrophe model with a 22-event backtest, hazard data) produced a merged review (kept in the
+project's briefs folder, `round2/REVIEW.md`, with the panel reports beside it). **v0.1.1** shipped
+the safety and correctness fixes (see [CHANGELOG.md](../CHANGELOG.md)). The owner's decisions for
+**v0.2.0**: the full hazard taxonomy (ten new ranked hazards including burst pipes, wildfire
+smoke, dam and levee failure, benefit interruption, eviction, arrest or detention; a nine-family
+rare-but-severe box with a county strategic-exposure class for nuclear risk, solar storms, CBRN,
+war, severe pandemic, very large eruptions, financial crisis, mass violence; sub-causes on every
+card); a `clean_air` bucket; plan features (family-plan screen and wallet cards, shelter plan,
+48-hour checklist, recovery page, access-and-functional-needs questions, insurance and mitigation
+decisions, trusted circle, legal readiness, lockout plan); the kit and allocator overhaul (22 items,
+28 rule changes, cooking capability, prerequisites, bare-minimum mode); model robustness (regional
+outage pooling, event restoration curves, water-system fragility, compound events) with a public
+validation page; and the long-horizon module. Engine contract v2; hosting stays where it is for now.
+
 ## Next
 
 Concrete, near-term follow-ups, mostly from the verification pass
