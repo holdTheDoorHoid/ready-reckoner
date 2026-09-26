@@ -1,0 +1,1893 @@
+# Ready Reckoner citation registry. CC BY-SA 4.0 (see LICENSE-CONTENT); quotations from US federal
+# sources are public domain. One entry per source document. Rules: docs/CONTENT_STANDARDS.md §2.
+#
+# `quote` is the exact sentence relied on (under 50 words) and is given only where the wording was
+# checked against the source on the retrieval date. Non-federal sources are paraphrased in the app
+# and carry no quote. `prior = true` marks an expert estimate rather than data.
+#
+# Ids used by other crates (hazards, consequence, supply, budget) are listed in docs/CITATION_IDS.md.
+
+# ---------------------------------------------------------------------------------------------
+# FEMA / Ready.gov
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "ready_gov_water"
+title = "Water"
+publisher = "FEMA / Ready.gov"
+year = 2021
+url = "https://www.ready.gov/water"
+retrieved = "2026-09-25"
+quote = "Store at least one gallon of water per person per day for several days, for drinking and sanitation."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_kit"
+title = "Build A Kit"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/kit"
+retrieved = "2026-09-25"
+quote = "Water (one gallon per person per day for several days, for drinking and sanitation)"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_kit_2020"
+title = "Build A Kit (archived January 2020 version, with the 72-hour and work-kit wording)"
+publisher = "FEMA / Ready.gov (via Internet Archive)"
+year = 2020
+url = "https://web.archive.org/web/20200101090440/https://www.ready.gov/kit"
+retrieved = "2026-09-25"
+quote = "Work: Be prepared to shelter at work for at least 24 hours."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_food"
+title = "Food"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/food"
+retrieved = "2026-09-25"
+quote = "The refrigerator will keep food cold for about four hours if it is unopened."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_power_outages"
+title = "Power Outages"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/power-outages"
+retrieved = "2026-09-25"
+quote = "If the power is out for more than a day, discard any medication that should be refrigerated, unless the drug’s label says otherwise."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_pets"
+title = "Pets and Animals"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/pets"
+retrieved = "2026-09-25"
+quote = "If local officials ask you to evacuate, that means your pet should evacuate too."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_disability"
+title = "People with Disabilities"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/disability"
+retrieved = "2026-09-25"
+quote = "Talk to your doctor or pharmacist about how you can create an emergency supply of medicines."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_older_adults"
+title = "Older Adults"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/older-adults"
+retrieved = "2026-09-25"
+quote = "Make sure at least one person in your support network has an extra key to your home, knows where you keep your emergency supplies, and knows how to use lifesaving equipment or administer medicine."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_evacuation"
+title = "Evacuation"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/evacuation"
+retrieved = "2026-09-25"
+quote = "Keep a full tank of gas if an evacuation seems likely. Keep a half tank of gas in it at all times in case of an unexpected need to evacuate."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_shelter"
+title = "Shelter"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/shelter"
+retrieved = "2026-09-25"
+quote = "Seal all windows, doors and air vents with thick plastic sheeting and duct tape."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_heat"
+title = "Extreme Heat"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/heat"
+retrieved = "2026-09-25"
+quote = "Fans create air flow and a false sense of comfort, but do not reduce body temperature or prevent heat-related illnesses."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_winter"
+title = "Winter Weather"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/winter-weather"
+retrieved = "2026-09-25"
+quote = "Create an emergency supply kit for your car. Include jumper cables, sand, a flashlight, warm clothes, blankets, bottled water and non-perishable snacks. Keep a full tank of gas."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_financial"
+title = "Financial Preparedness"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/financial-preparedness"
+retrieved = "2026-09-25"
+quote = "Keep a small amount of cash at home in a safe place. It is important to have small bills on hand because ATMs and credit cards may not work during a disaster when you need to purchase necessary supplies, fuel or food."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_plan"
+title = "Make A Plan"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/plan"
+retrieved = "2026-09-25"
+quote = "Know how you’ll contact one another and reconnect if separated. Establish a family meeting place that’s familiar and easy to find."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_family_comm_card"
+title = "Family Communication Plan fillable card"
+publisher = "FEMA / Ready.gov"
+year = 2025
+url = "https://www.ready.gov/sites/default/files/2025-06/family-communication-plan_fillable-card.pdf"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_pandemic"
+title = "Pandemic"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/pandemic"
+retrieved = "2026-09-25"
+quote = "Buy supplies slowly to ensure that everyone has the opportunity to buy what they need."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_alerts"
+title = "Emergency Alerts"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/alerts"
+retrieved = "2026-09-25"
+quote = "You are not charged for receiving WEAs, and there is no need to subscribe."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_low_cost"
+title = "Low and No Cost Preparedness"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/low-and-no-cost"
+retrieved = "2026-09-25"
+quote = "Make sure you store important phone numbers somewhere besides just your cell phone."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_earthquakes"
+title = "Earthquakes"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/earthquakes"
+retrieved = "2026-09-25"
+quote = "A standard homeowner’s insurance policy does not cover earthquake damage."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_tsunamis"
+title = "Tsunamis"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/tsunamis"
+retrieved = "2026-09-25"
+quote = "Get to high ground as far inland as possible"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_nuclear"
+title = "Nuclear Explosion"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/nuclear-explosion"
+retrieved = "2026-09-25"
+quote = "Get inside. Stay inside. Stay tuned."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_radiation"
+title = "Radiation Emergencies"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/radiation"
+retrieved = "2026-09-25"
+quote = "The best way to stay safe in any radiation emergency is to get inside, stay inside and stay tuned."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_public_spaces"
+title = "Public Spaces (Run. Hide. Fight.)"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/public-spaces"
+retrieved = "2026-09-25"
+quote = "Getting away from the attacker is the top priority."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_cert"
+title = "Community Emergency Response Team"
+publisher = "FEMA / Ready.gov"
+year = 2022
+url = "https://www.ready.gov/cert"
+retrieved = "2026-09-25"
+quote = "The Community Emergency Response Team (CERT) program educates volunteers about disaster preparedness for the hazards that may impact their area and trains them in basic disaster response skills, such as fire safety, light search and rescue, team organization, and disaster medical operations."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_tornadoes"
+title = "Tornadoes"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/tornadoes"
+retrieved = "2026-09-25"
+quote = "The next best protection is a small, interior, windowless room or basement on the lowest level of a sturdy building."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_floods"
+title = "Floods"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/floods"
+retrieved = "2026-09-25"
+quote = "Remember, just six inches of moving water can knock you down, and one foot of moving water can sweep your vehicle away."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_wildfires"
+title = "Wildfires"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/wildfires"
+retrieved = "2026-09-25"
+quote = "Create a fire-resistant zone that is free of leaves, debris or flammable materials for at least 30 feet from your home."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_hurricanes"
+title = "Hurricanes"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/hurricanes"
+retrieved = "2026-09-25"
+quote = "You may have to evacuate quickly due to a hurricane if you live in an evacuation zone."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_chemical"
+title = "Chemicals and Hazardous Materials Incidents"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/chemical"
+retrieved = "2026-09-25"
+quote = "Identify an above-ground shelter room with as few openings as possible."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_home_fires"
+title = "Home Fires"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/home-fires"
+retrieved = "2026-09-25"
+quote = "Find two ways to get out of each room in the event the primary way is blocked by fire or smoke."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_cybersecurity"
+title = "Cybersecurity"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/cybersecurity"
+retrieved = "2026-09-25"
+quote = "Use a password manager and two methods of verification."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_drought"
+title = "Drought"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/drought"
+retrieved = "2026-09-25"
+quote = "The best way to prepare for a drought is to conserve water."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_volcanoes"
+title = "Volcanoes"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/volcanoes"
+retrieved = "2026-09-25"
+quote = "Volcanic ash can travel hundreds of miles and cause severe health problems."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_landslides"
+title = "Landslides and Debris Flow"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/landslides-debris-flow"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_severe_weather"
+title = "Severe Weather"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/severe-weather"
+retrieved = "2026-09-25"
+quote = "Severe weather can happen anytime, in any part of the country."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_avalanche"
+title = "Avalanche"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/avalanche"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_effak"
+title = "Emergency Financial First Aid Kit (FEMA P-1075)"
+publisher = "FEMA and Operation HOPE"
+year = 2019
+url = "https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf"
+retrieved = "2026-09-25"
+license = "All rights reserved, Operation HOPE (paraphrased, not quoted)"
+
+[[citation]]
+id = "fema_nfip_flood_insurance"
+title = "Flood Insurance"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/flood-insurance"
+retrieved = "2026-09-25"
+quote = "there is typically a 30-day waiting period for an NFIP policy to go into effect"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "floodsmart_buy_policy"
+title = "Buy a Policy"
+publisher = "FEMA National Flood Insurance Program (FloodSmart)"
+year = 2026
+url = "https://www.floodsmart.gov/get-insured/buy-a-policy"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_nhs_2024"
+title = "2024 National Household Survey on Disaster Preparedness: Findings"
+publisher = "FEMA (mirror of the published slide deck)"
+year = 2025
+url = "https://survivingcascadia.com/wp-content/uploads/2025/05/2024-national-household-survey-on-disaster-preparedness-findings.pdf"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_nri_v120"
+title = "National Risk Index, version 1.20.0 (December 2025), county data"
+publisher = "FEMA"
+year = 2025
+url = "https://www.fema.gov/about/openfema/data-sets/national-risk-index-data"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain), subject to the National Risk Index Terms and Conditions"
+
+[[citation]]
+id = "fema_nri_disclaimer"
+title = "National Risk Index terms of use: the statement every product that uses its data must show"
+publisher = "FEMA"
+year = 2025
+url = "https://www.arcgis.com/home/item.html?id=39485e8035d446a5bff03259508ae355"
+retrieved = "2026-09-25"
+quote = "This product uses the Federal Emergency Management Agency’s National Risk Index dataset API or downloadable datasets but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s)."
+license = "US Government Work (public domain), subject to the National Risk Index Terms and Conditions"
+
+[[citation]]
+id = "fema_hazus_eq_restoration"
+title = "HAZUS-MH MR4 Earthquake Technical Manual, utility restoration functions (Tables 8.1.a–c)"
+publisher = "FEMA"
+year = 2003
+url = "https://www.fema.gov/flood-maps/products-tools/hazus"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_cpg201_thira"
+title = "Threat and Hazard Identification and Risk Assessment and Stakeholder Preparedness Review Guide (CPG 201), 3rd edition"
+publisher = "FEMA"
+year = 2018
+url = "https://www.fema.gov/sites/default/files/2020-04/CPG201Final20180525.pdf"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usfa_residential_fires"
+title = "Residential fire estimate summaries (2023)"
+publisher = "U.S. Fire Administration"
+year = 2025
+url = "https://www.usfa.fema.gov/statistics/residential-fires/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usfa_smoke_alarms"
+title = "Smoke alarms"
+publisher = "U.S. Fire Administration"
+year = 2026
+url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/smoke-alarms/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usfa_extinguishers"
+title = "Fire extinguishers"
+publisher = "U.S. Fire Administration"
+year = 2026
+url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/fire-extinguishers/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usfa_cooking_fires"
+title = "Cooking fire safety"
+publisher = "U.S. Fire Administration"
+year = 2026
+url = "https://www.usfa.fema.gov/prevention/home-fires/prevent-fires/cooking/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usfa_heating_fires"
+title = "Heating fire safety"
+publisher = "U.S. Fire Administration"
+year = 2026
+url = "https://www.usfa.fema.gov/prevention/home-fires/prevent-fires/heating/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
+# CDC and NIOSH
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "cdc_water_storage"
+title = "How to Create an Emergency Water Supply"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/water-emergency/about/how-to-create-and-store-an-emergency-water-supply.html"
+retrieved = "2026-09-25"
+quote = "If you are filling containers with water to store, replace the water every 6 months."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_water_disinfection"
+title = "How to Make Water Safe in an Emergency"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/water-emergency/about/index.html"
+retrieved = "2026-09-25"
+quote = "Bring clear water to a rolling boil for 1 minute (at elevations above 6,500 feet, boil for 3 minutes)."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_find_clean_water"
+title = "How to Find Clean Water in an Emergency"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/water-emergency/about/how-to-find-clean-water-in-an-emergency.html"
+retrieved = "2026-09-25"
+quote = "Water from your home's tap water heater tank. This refers to the tank that connects to the water that comes out of your faucets and showerheads."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_water_advisories"
+title = "Drinking Water Advisories: An Overview"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/water-emergency/about/drinking-water-advisories-an-overview.html"
+retrieved = "2026-09-25"
+quote = "Boiling water containing harmful chemicals or toxins will not make the water safe to use."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_hygiene_emergency"
+title = "Guidelines for Personal Hygiene During an Emergency"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/water-emergency/safety/guidelines-for-personal-hygiene-during-an-emergency.html"
+retrieved = "2026-09-25"
+quote = "If you do not have soap and water, use an alcohol-based hand sanitizer that contains at least 60% alcohol."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_bleach_disinfecting"
+title = "Cleaning and Disinfecting with Bleach"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/hygiene/about/cleaning-and-disinfecting-with-bleach.html"
+retrieved = "2026-09-25"
+quote = "5 tablespoons (1/3 cup) of bleach per gallon of room temperature water or 4 teaspoons of bleach per quart of room temperature water"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_co_basics"
+title = "Carbon Monoxide Poisoning Basics"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/carbon-monoxide/about/index.html"
+retrieved = "2026-09-25"
+quote = "Never use a generator inside your home or garage, even if doors and windows are open."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_winter_safety"
+title = "Safety Guidelines: During and After a Winter Storm"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/winter-weather/safety/stay-safe-during-after-a-winter-storm-safety.html"
+retrieved = "2026-09-25"
+quote = "Use electric space heaters with automatic shut-off switches and non-glowing elements."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_heat_health"
+title = "About Heat and Your Health"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/heat-health/about/index.html"
+retrieved = "2026-09-25"
+quote = "Use fans, but only if indoor temperatures are less than 90°F. In temperatures above 90°F, a fan can increase body temperature."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_niosh_heat_hydration"
+title = "Heat Stress: Recommendations (hydration)"
+publisher = "CDC National Institute for Occupational Safety and Health"
+year = 2026
+url = "https://www.cdc.gov/niosh/heat-stress/recommendations/index.html"
+retrieved = "2026-09-25"
+quote = "For moderate activities in the heat that last less than 2 hours, drink 1 cup (8 oz.) of water every 15–20 minutes"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_masks"
+title = "Masks and Respiratory Viruses Prevention"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/respiratory-viruses/prevention/masks.html"
+retrieved = "2026-09-25"
+quote = "Cloth masks generally offer lower levels of protection to wearers, surgical/disposable masks usually offer more protection, international filtering facepiece respirators (like KN95 respirators) offer even more, and the most protective respirators are NIOSH Approved® filtering facepiece respirators (like N95® respirators)."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_antibiotic_use"
+title = "Antibiotic Use: Be Antibiotics Aware"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/antibiotic-use/about/index.html"
+retrieved = "2026-09-25"
+quote = "Do not save them for later. Taking the wrong medicine for a future illness may delay correct treatment and can cause severe side effects."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_yellow_book_travel_kits"
+title = "CDC Yellow Book 2026: Travel Health Kits"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_pregnancy_emergency"
+title = "Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/reproductive-health/emergency-preparation-response/safety-messages.html"
+retrieved = "2026-09-25"
+quote = "Have at least a 7- to 10-day supply of your prescription medications. Ask your health care provider if you can obtain a 30-day (or longer) emergency prescription refill."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_infant_feeding_disaster"
+title = "Feeding Your Child Safely During a Disaster"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/breastfeeding/php/guidelines-recommendations/feeding-your-child-safely-during-a-disaster.html"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_infant_checklist"
+title = "Emergency List for Families With Infants and Young Children"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/infant-feeding-emergencies-toolkit/php/checklist.html"
+retrieved = "2026-09-25"
+quote = "check your emergency kit monthly to be sure you have enough formula to meet your baby's current needs for several days."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_period_factsheet"
+title = "Managing Your Period During a Natural Disaster (fact sheet)"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/natural-disasters/media/pdfs/2026/09/FS-Managing-Period-During-Disaster-508.pdf"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_diabetes_emergencies"
+title = "Diabetes Care During Emergencies"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/diabetes/articles/diabetes-care-emergencies.html"
+retrieved = "2026-09-25"
+quote = "Pack enough diabetes supplies to last at least 1 to 2 weeks"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_insulin_emergency"
+title = "Managing Insulin in an Emergency"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/diabetes/articles/managing-insulin-in-emergency.html"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_cholera_treatment"
+title = "Treating Cholera"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/cholera/treatment/index.html"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_evacuation_psa"
+title = "Be Prepared in Case You Need to Evacuate (PSA toolkit)"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/natural-disasters/psa-toolkit/be-prepared-in-case-you-need-to-evacuate.html"
+retrieved = "2026-09-25"
+quote = "Only take what you really need with you: cell phone, chargers, medicines, ID, cash, and car emergency kit."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_potassium_iodide"
+title = "Potassium Iodide (KI)"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html"
+retrieved = "2026-09-25"
+quote = "Do not take KI unless you are instructed by public health or emergency response officials or a healthcare provider."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_wildfire_smoke"
+title = "Wildfire Smoke: Risk Factors and Protection"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/wildfires/risk-factors/index.html"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_nchs_ed_visits"
+title = "FastStats: Emergency Department Visits (NHAMCS 2022)"
+publisher = "CDC National Center for Health Statistics"
+year = 2025
+url = "https://www.cdc.gov/nchs/fastats/emergency-department.htm"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_mmwr_stay_at_home_2020"
+title = "Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020 (MMWR 69(35))"
+publisher = "Centers for Disease Control and Prevention"
+year = 2020
+url = "https://www.cdc.gov/mmwr/volumes/69/wr/mm6935a2.htm"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
+# EPA, DOE, EIA and energy data
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "epa_emergency_disinfection"
+title = "Emergency Disinfection of Drinking Water"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water"
+retrieved = "2026-09-25"
+quote = "Bring water to a rolling boil for at least one minute. At altitudes above 5,000 feet (1,000 meters), boil water for three minutes."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_diy_air_cleaners"
+title = "Research on DIY Air Cleaners to Reduce Wildfire Smoke Indoors"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/air-research/research-diy-air-cleaners-reduce-wildfire-smoke-indoors"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_wildfire_indoor_air"
+title = "Wildfires and Indoor Air Quality"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/indoor-air-quality-iaq/wildfires-and-indoor-air-quality-iaq"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_boil_water_report_2024"
+title = "National Occurrence and Causes of Boil Water Advisories in the United States, Report to Congress (EPA 810-R-24-003)"
+publisher = "U.S. Environmental Protection Agency"
+year = 2024
+url = "https://www.epa.gov/system/files/documents/2025-01/10586_boil-water-advisories_final_rtc_20240603_admin.pdf"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_asheville_boil_notice_2024"
+title = "City of Asheville lifts systemwide boil water notice issued after Hurricane Helene"
+publisher = "U.S. Environmental Protection Agency"
+year = 2024
+url = "https://www.epa.gov/newsreleases/city-asheville-lifts-systemwide-boil-water-notice-issued-after-hurricane-helene"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_energy_star_refrigerators"
+title = "ENERGY STAR Certified Residential Refrigerators and Freezers (datasets p5st-her9 and 8t9c-g3tn)"
+publisher = "U.S. Environmental Protection Agency, ENERGY STAR"
+year = 2026
+url = "https://data.energystar.gov/resource/p5st-her9.json"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "doe_water_heaters"
+title = "Storage Water Heaters"
+publisher = "U.S. Department of Energy, Energy Saver"
+year = 2026
+url = "https://www.energy.gov/energysaver/storage-water-heaters"
+retrieved = "2026-09-25"
+quote = "A single-family storage water heater offers a ready reservoir -- from 20 to 80 gallons -- of hot water."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "doe_appliance_energy"
+title = "Estimating Appliance and Home Electronic Energy Use"
+publisher = "U.S. Department of Energy, Energy Saver"
+year = 2024
+url = "https://www.energy.gov/energysaver/estimating-appliance-and-home-electronic-energy-use"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "doe_afdc_stations"
+title = "Alternative Fueling Station Locator"
+publisher = "U.S. Department of Energy, Alternative Fuels Data Center"
+year = 2026
+url = "https://afdc.energy.gov/stations"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "doe_fueleconomy_ev"
+title = "All-Electric Vehicles"
+publisher = "U.S. Department of Energy and EPA (fueleconomy.gov)"
+year = 2026
+url = "https://www.fueleconomy.gov/feg/evtech.shtml"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eia_btu"
+title = "Units and calculators explained: British thermal units (Btu)"
+publisher = "U.S. Energy Information Administration"
+year = 2025
+url = "https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eia_outage_hours_2024"
+title = "Hurricanes in 2024 led to the most hours without power in the United States in 10 years (Today in Energy)"
+publisher = "U.S. Energy Information Administration"
+year = 2025
+url = "https://www.eia.gov/todayinenergy/detail.php?id=66744"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eia_861_reliability_2024"
+title = "Annual Electric Power Industry Report (EIA-861), 2024 reliability data"
+publisher = "U.S. Energy Information Administration"
+year = 2025
+url = "https://www.eia.gov/electricity/data/eia861/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nlr_pvwatts_v8"
+title = "PVWatts Calculator, version 8 (100 W fixed array outputs for five US cities)"
+publisher = "National Laboratory of the Rockies (formerly NREL), U.S. Department of Energy"
+year = 2026
+url = "https://developer.nlr.gov/docs/solar/pvwatts/v8/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ornl_eagle_i_outages"
+title = "A dataset of recorded electricity outages by United States county 2014–2022 (EAGLE-I), Scientific Data 11:271, data updated through 2025"
+publisher = "Brelsford C. et al., Oak Ridge National Laboratory"
+year = 2024
+url = "https://doi.org/10.1038/s41597-024-03095-5"
+retrieved = "2026-09-25"
+license = "CC BY 4.0"
+
+[[citation]]
+id = "ornl_repowrd_2022"
+title = "RePOWRD: Restoration of Power Outage from Wide-area Severe Weather Disruptions (ORNL/TM-2022/2621)"
+publisher = "Kar B. et al., Oak Ridge National Laboratory"
+year = 2022
+url = "https://info.ornl.gov/sites/publications/Files/Pub183672.pdf"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
+# NOAA / NWS, FCC, eCFR
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "nws_weather_radio"
+title = "NOAA Weather Radio All Hazards"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/nwr/"
+retrieved = "2026-09-25"
+quote = "NWR includes more than 1000 transmitters, covering all 50 states, adjacent coastal waters, Puerto Rico, the U.S. Virgin Islands, and the U.S. Pacific Territories."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nws_tsunami_safety"
+title = "Tsunami Safety: During a Tsunami"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/tsunami-during"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nws_turn_around_dont_drown"
+title = "Turn Around Don't Drown"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/flood-turn-around-dont-drown"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fcc_wea"
+title = "Wireless Emergency Alerts (WEA)"
+publisher = "Federal Communications Commission"
+year = 2025
+url = "https://www.fcc.gov/consumers/guides/wireless-emergency-alerts-wea"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fcc_frs"
+title = "Family Radio Service (FRS)"
+publisher = "Federal Communications Commission"
+year = 2026
+url = "https://www.fcc.gov/wireless/bureau-divisions/mobility-division/family-radio-service-frs"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fcc_gmrs"
+title = "General Mobile Radio Service (GMRS)"
+publisher = "Federal Communications Commission"
+year = 2026
+url = "https://www.fcc.gov/wireless/bureau-divisions/mobility-division/general-mobile-radio-service-gmrs"
+retrieved = "2026-09-25"
+quote = "A GMRS user can expect a communications range of one to twenty-five miles depending on station class, terrain, and repeater use."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fcc_text_911"
+title = "What You Need to Know About Text-to-911"
+publisher = "Federal Communications Commission"
+year = 2026
+url = "https://www.fcc.gov/consumers/guides/what-you-need-know-about-text-911"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ecfr_47_1_1102"
+title = "47 CFR 1.1102, schedule of application fees (wireless licences)"
+publisher = "Electronic Code of Federal Regulations"
+year = 2026
+url = "https://www.ecfr.gov/current/title-47/section-1.1102"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ecfr_49_180_209"
+title = "49 CFR 180.209, requalification of cylinders"
+publisher = "Electronic Code of Federal Regulations"
+year = 2026
+url = "https://www.ecfr.gov/current/title-49/section-180.209"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
+# USDA, FDA, HHS and other federal health sources
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "fsis_shelf_stable"
+title = "Shelf-Stable Food Safety"
+publisher = "USDA Food Safety and Inspection Service"
+year = 2024
+url = "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/shelf-stable-food"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usda_tfp_aug2026"
+title = "Official USDA Thrifty Food Plan: U.S. Average, August 2026"
+publisher = "USDA Food and Nutrition Service"
+year = 2026
+url = "https://www.fns.usda.gov/sites/default/files/resource-files/CostofFoodAug2026Thrifty.pdf"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usda_food_plans_aug2026"
+title = "Official USDA Food Plans: Low-Cost, Moderate-Cost, and Liberal, U.S. Average, August 2026"
+publisher = "USDA Food and Nutrition Service"
+year = 2026
+url = "https://www.fns.usda.gov/sites/default/files/resource-files/CostofFoodAug2026LowModLib.pdf"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usda_dga_2020_2025"
+title = "Dietary Guidelines for Americans, 2020–2025, Appendix 2: Estimated Calorie Needs"
+publisher = "U.S. Department of Agriculture and U.S. Department of Health and Human Services"
+year = 2020
+url = "https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fda_expired_medicines"
+title = "Don't Be Tempted to Use Expired Medicines"
+publisher = "U.S. Food and Drug Administration"
+year = 2021
+url = "https://www.fda.gov/drugs/special-features/dont-be-tempted-use-expired-medicines"
+retrieved = "2026-09-25"
+quote = "sub-potent antibiotics can fail to treat infections, leading to more serious illnesses and antibiotic resistance."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fda_fish_antibiotics_warning_2023"
+title = "Warning letter on unapproved aquarium and bird antibiotic products (Chewy, Inc., November 30, 2023)"
+publisher = "U.S. Food and Drug Administration"
+year = 2023
+url = "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fda_shelf_life_extension"
+title = "Expiration Dating Extension (Shelf-Life Extension Program)"
+publisher = "U.S. Food and Drug Administration"
+year = 2025
+url = "https://www.fda.gov/emergency-preparedness-and-response/mcm-legal-regulatory-and-policy-framework/expiration-dating-extension"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usc_21_353"
+title = "21 U.S.C. 353(b)(1): prescription-only drugs"
+publisher = "Legal Information Institute (text of the United States Code)"
+year = 2026
+url = "https://www.law.cornell.edu/uscode/text/21/353"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "hhs_aspr_epap"
+title = "Emergency Prescription Assistance Program (EPAP)"
+publisher = "HHS Administration for Strategic Preparedness and Response"
+year = 2026
+url = "https://aspr.hhs.gov/EPAP/Pages/default.aspx"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "samhsa_988"
+title = "988 Suicide and Crisis Lifeline"
+publisher = "Substance Abuse and Mental Health Services Administration"
+year = 2026
+url = "https://www.samhsa.gov/find-help/988"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "samhsa_disaster_distress"
+title = "Disaster Distress Helpline"
+publisher = "Substance Abuse and Mental Health Services Administration"
+year = 2026
+url = "https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "dhs_stop_the_bleed"
+title = "Stop the Bleed"
+publisher = "U.S. Department of Homeland Security"
+year = 2026
+url = "https://www.dhs.gov/stopthebleed"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_secure_our_world"
+title = "Secure Our World"
+publisher = "Cybersecurity and Infrastructure Security Agency"
+year = 2026
+url = "https://www.cisa.gov/secure-our-world"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_deescalation"
+title = "Non-Confrontational Techniques (de-escalation and the Power of Hello)"
+publisher = "Cybersecurity and Infrastructure Security Agency"
+year = 2026
+url = "https://www.cisa.gov/topics/physical-security/non-confrontational-techniques"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ftc_disaster_scams"
+title = "Avoiding and Reporting Scams After a Disaster"
+publisher = "Federal Trade Commission"
+year = 2025
+url = "https://consumer.ftc.gov/articles/avoiding-and-reporting-scams-after-disaster"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "dol_unemployment_insurance"
+title = "Unemployment Insurance"
+publisher = "U.S. Department of Labor"
+year = 2026
+url = "https://www.dol.gov/general/topic/unemployment-insurance"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cfpb_emergency_fund"
+title = "An essential guide to building an emergency fund"
+publisher = "Consumer Financial Protection Bureau"
+year = 2025
+url = "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/"
+retrieved = "2026-09-25"
+quote = "The amount you need to have in an emergency savings fund depends on your situation."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fhwa_mutcd_walking_speed"
+title = "Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds"
+publisher = "Federal Highway Administration"
+year = 2009
+url = "https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nhtsa_crashes_2023"
+title = "Traffic Safety Facts: 2023 data overview"
+publisher = "National Highway Traffic Safety Administration"
+year = 2025
+url = "https://crashstats.nhtsa.dot.gov/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nhtsa_tires"
+title = "Tires"
+publisher = "National Highway Traffic Safety Administration"
+year = 2026
+url = "https://www.nhtsa.gov/equipment/tires"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "phmsa_gas_safety"
+title = "Natural Gas Pipeline Safety"
+publisher = "Pipeline and Hazardous Materials Safety Administration"
+year = 2026
+url = "https://www.phmsa.dot.gov/safety-awareness/pipeline/natural-gas-safety"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nrc_potassium_iodide"
+title = "Consideration of Potassium Iodide in Emergency Planning"
+publisher = "U.S. Nuclear Regulatory Commission"
+year = 2025
+url = "https://www.nrc.gov/about-nrc/emerg-preparedness/about-emerg-preparedness/potassium-iodide-use.html"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_pp1661f_cascadia"
+title = "Turbidite Event History: Methods and Implications for Holocene Paleoseismicity of the Cascadia Subduction Zone (USGS Professional Paper 1661-F)"
+publisher = "Goldfinger C. et al., U.S. Geological Survey"
+year = 2012
+url = "https://pubs.usgs.gov/pp/pp1661f/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "osu_cascadia_2012"
+title = "13,500-year Cascadia record suggests a major Northwest earthquake could come sooner than expected (press release on USGS PP 1661-F)"
+publisher = "Oregon State University, via phys.org"
+year = 2012
+url = "https://phys.org/news/2012-08-year-cascadia-northwest-earthquake.html"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+# ---------------------------------------------------------------------------------------------
+# Labor, money and household statistics
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "bls_work_experience_2024"
+title = "Work Experience of the Population, 2024"
+publisher = "U.S. Bureau of Labor Statistics"
+year = 2026
+url = "https://www.bls.gov/news.release/work.nr0.htm"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "bls_displaced_workers_2026"
+title = "Displaced Workers Summary (January 2026 survey)"
+publisher = "U.S. Bureau of Labor Statistics"
+year = 2026
+url = "https://www.bls.gov/news.release/disp.nr0.htm"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "bls_unemployment_duration"
+title = "The Employment Situation, Table A-12: Unemployed persons by duration of unemployment (August 2026)"
+publisher = "U.S. Bureau of Labor Statistics"
+year = 2026
+url = "https://www.bls.gov/news.release/empsit.t12.htm"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "bls_jolts_layoffs"
+title = "Job Openings and Labor Turnover Survey: layoffs and discharges rate (series JTS000000000000000LDR)"
+publisher = "U.S. Bureau of Labor Statistics"
+year = 2026
+url = "https://www.bls.gov/jlt/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "bls_average_prices"
+title = "CPI Average Price Data (series APU000074714, regular gasoline, and food staples)"
+publisher = "U.S. Bureau of Labor Statistics"
+year = 2026
+url = "https://www.bls.gov/cpi/factsheets/average-prices.htm"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "census_households_cps"
+title = "Historical Households Tables, Table HH-1"
+publisher = "U.S. Census Bureau"
+year = 2025
+url = "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fed_shed_2024"
+title = "Economic Well-Being of U.S. Households in 2024"
+publisher = "Board of Governors of the Federal Reserve System"
+year = 2025
+url = "https://www.federalreserve.gov/publications/2025-economic-well-being-of-us-households-in-2024-executive-summary.htm"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "stlouisfed_emergency_fund_2025"
+title = "When the Unexpected Happens, Be Ready with an Emergency Fund (Page One Economics)"
+publisher = "Federal Reserve Bank of St. Louis"
+year = 2025
+url = "https://www.stlouisfed.org/publications/page-one-economics/2025/sep/when-unexpected-happens-be-ready-with-emergency-fund"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "finra_financial_foundations"
+title = "Financial Foundations"
+publisher = "FINRA"
+year = 2026
+url = "https://www.finra.org/investors/investing/investing-basics/financial-foundations"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "aung_2025_displacement"
+title = "Prevalence, Correlates, and Impacts of Displacement Because of Natural Disasters in the United States From 2022 to 2023 (AJPH 115(1):55–65)"
+publisher = "Aung T.W. and Sehgal A.R."
+year = 2025
+url = "https://doi.org/10.2105/AJPH.2024.307854"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "census_pulse_displacement"
+title = "Household Pulse Survey: adults displaced by natural disasters (as reported by NLIHC)"
+publisher = "U.S. Census Bureau data, reported by the National Low Income Housing Coalition"
+year = 2023
+url = "https://nlihc.org/resource/new-data-household-pulse-survey-suggest-disparities-among-households-displaced-disasters"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+# ---------------------------------------------------------------------------------------------
+# Standards bodies and humanitarian guidance
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "sphere_2018"
+title = "The Sphere Handbook: Humanitarian Charter and Minimum Standards in Humanitarian Response, 4th edition"
+publisher = "Sphere Association"
+year = 2018
+url = "https://spherestandards.org/handbook/"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "who_wedc_tn9"
+title = "Technical Note 9: How much water is needed in emergencies"
+publisher = "World Health Organization and WEDC"
+year = 2013
+url = "https://cdn.who.int/media/docs/default-source/wash-documents/who-tn-09-how-much-water-is-needed.pdf"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "iom_dri_water_2005"
+title = "Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate"
+publisher = "Institute of Medicine (National Academies Press)"
+year = 2005
+url = "https://nap.nationalacademies.org/catalog/10925/"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+# ---------------------------------------------------------------------------------------------
+# Non-profit and professional organisations
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "redcross_survival_kit"
+title = "Survival Kit Supplies"
+publisher = "American Red Cross"
+year = 2026
+url = "https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "redcross_first_aid_kit"
+title = "Anatomy of a First Aid Kit"
+publisher = "American Red Cross"
+year = 2025
+url = "https://www.redcross.org/get-help/how-to-prepare-for-emergencies/anatomy-of-a-first-aid-kit.html"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "aspca_disaster_prep"
+title = "Disaster Preparedness"
+publisher = "ASPCA"
+year = 2026
+url = "https://www.aspca.org/pet-care/general-pet-care/disaster-preparedness"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "aap_formula_amounts"
+title = "Amount and Schedule of Baby Formula Feedings"
+publisher = "American Academy of Pediatrics (HealthyChildren.org)"
+year = 2025
+url = "https://www.healthychildren.org/English/ages-stages/baby/formula-feeding/Pages/Amount-and-Schedule-of-Formula-Feedings.aspx"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "sutter_diapers"
+title = "How many diapers a day should your newborn have?"
+publisher = "Sutter Health"
+year = 2025
+url = "https://www.sutterhealth.org/health/how-many-diapers-a-day-your-newborn-should-have"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "healthcare_ready_refill_laws"
+title = "A Review of State Emergency Prescription Protocols"
+publisher = "Healthcare Ready"
+year = 2023
+url = "https://healthcareready.org/a-review-of-state-emergency-prescription-protocols/"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "wms_wound_2014"
+title = "Wilderness Medical Society Practice Guidelines for Basic Wound Management in the Austere Environment: 2014 Update"
+publisher = "Quinn R.H. et al., Wilderness and Environmental Medicine"
+year = 2014
+url = "https://doi.org/10.1016/j.wem.2014.08.015"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "sil_cpap_power"
+title = "CPAP Power Options (user-measured battery use)"
+publisher = "SIL International"
+year = 2024
+url = "https://power.sil.org/cpap-power-options/"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "listos_california"
+title = "Listos California: neighbor and community preparedness"
+publisher = "California Governor's Office of Emergency Services"
+year = 2026
+url = "https://www.listoscalifornia.org/"
+retrieved = "2026-09-25"
+license = "State government publication (paraphrased, not quoted)"
+
+# ---------------------------------------------------------------------------------------------
+# State and local emergency management
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "oregon_2_weeks_ready"
+title = "2 Weeks Ready"
+publisher = "Oregon Department of Emergency Management"
+year = 2026
+url = "https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx"
+retrieved = "2026-09-25"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "oregon_b2wr_toolkit"
+title = "Be 2 Weeks Ready tool kit"
+publisher = "Oregon Department of Emergency Management"
+year = 2023
+url = "https://www.oregon.gov/oem/Documents/B2WR-Complete-Tool-Kit-EN.pdf"
+retrieved = "2026-09-25"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "oregon_resilience_plan_2013"
+title = "The Oregon Resilience Plan"
+publisher = "Oregon Seismic Safety Policy Advisory Commission"
+year = 2013
+url = "https://www.oregon.gov/oem/documents/oregon_resilience_plan_executive_summary.pdf"
+retrieved = "2026-09-25"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "dogami_tsunami_faq"
+title = "Oregon Tsunami Clearinghouse: frequently asked questions"
+publisher = "Oregon Department of Geology and Mineral Industries"
+year = 2026
+url = "https://www.oregon.gov/dogami/tsuclearinghouse/pages/faq-tsunami.aspx"
+retrieved = "2026-09-25"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "washington_prepare_in_a_year"
+title = "Prepare in a Year"
+publisher = "Washington Emergency Management Division"
+year = 2024
+url = "https://mil.wa.gov/prepare-in-a-year"
+retrieved = "2026-09-25"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "florida_dem_medication"
+title = "Medication (personal and family plans)"
+publisher = "Florida Division of Emergency Management"
+year = 2026
+url = "https://www.floridadisaster.org/planprepare/disability/personal-and-family-plans/medication/"
+retrieved = "2026-09-25"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "rdpo_emergency_toilet"
+title = "Emergency Toilet Guidebook (twin-bucket toilet)"
+publisher = "Regional Disaster Preparedness Organization, Portland Metro Region"
+year = 2024
+url = "https://www.rdpo.net/emergency-toilet"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "lehi_fuel_storage"
+title = "Home Fuel Storage Limits (International Fire Code and NFPA 58 summary)"
+publisher = "Lehi City Fire Department, Utah"
+year = 2025
+url = "https://www.lehi-ut.gov/departments/fire-department/fire-prevention/home-fuel-storage-limits/"
+retrieved = "2026-09-25"
+license = "Local government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "tokyo_bichiku_navi"
+title = "Tokyo Bichiku Navi household stockpile calculator (source code)"
+publisher = "Tokyo Metropolitan Government"
+year = 2023
+url = "https://github.com/Tokyo-Metro-Gov/bichiku-navi"
+retrieved = "2026-09-25"
+license = "MIT"
+
+# ---------------------------------------------------------------------------------------------
+# Church of Jesus Christ of Latter-day Saints, BYU and USU (home storage)
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "church_emergency_prep_manual"
+title = "Emergency Preparedness manual: guidelines on emergency water storage and purification"
+publisher = "The Church of Jesus Christ of Latter-day Saints"
+year = 2023
+url = "https://www.churchofjesuschrist.org/study/manual/emergency-preparedness/01-food-and-water-storage/02-guidelines-on-emergency-water-storage-and-purification?lang=eng"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "church_home_storage_2007"
+title = "All Is Safely Gathered In: Family Home Storage"
+publisher = "The Church of Jesus Christ of Latter-day Saints"
+year = 2007
+url = "https://www.churchofjesuschrist.org/bc/content/shared/content/english/pdf/language-materials/04008_eng.pdf"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "church_hsc_order_form_2026"
+title = "Home Storage Center product list and prices (effective January 1, 2026)"
+publisher = "The Church of Jesus Christ of Latter-day Saints"
+year = 2026
+url = "https://assets.churchofjesuschrist.org/01/b4/01b41d0ffdbf11ebbb5eeeeeac1e9b2afdc29be5/food_storage_center_products.pdf"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "byu_longer_term_storage_2019"
+title = "An Approach to Longer-Term Food Storage (revised September 2019)"
+publisher = "Brigham Young University, Department of Nutrition, Dietetics and Food Science"
+year = 2019
+url = "https://brightspotcdn.byu.edu/b1/4d/75fc449e4ce9843daa701f69faa4/an-approach-to-longer-term-food-storage.SEPT2019.pdf"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "usu_food_storage_booklet"
+title = "Food Storage (extension booklet)"
+publisher = "Utah State University Extension"
+year = 2013
+url = "https://extension.usu.edu/preserve-the-harvest/files/Food-Storage-Booklet.pdf"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "ensign_2006_year_supply"
+title = "Food Storage for One Year (Ensign, March 2006)"
+publisher = "The Church of Jesus Christ of Latter-day Saints"
+year = 2006
+url = "https://www.churchofjesuschrist.org/study/ensign/2006/03/random-sampler/food-storage-for-one-year?lang=eng"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+# ---------------------------------------------------------------------------------------------
+# Peer-reviewed research
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "mo_med_2026_antibiotic_kits"
+title = "A Review of Direct-to-Consumer Home Antibiotic Kits: A Threat to Antimicrobial Stewardship and Patient Safety (Missouri Medicine 123(4):344–350)"
+publisher = "Missouri State Medical Association"
+year = 2026
+url = "https://pmc.ncbi.nlm.nih.gov/articles/PMC13585011/"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "bishop_2020_fish_antibiotics"
+title = "Fish antibiotics sold online and the potential for human use (PLoS One 15(9):e0238538)"
+publisher = "Bishop C. et al."
+year = 2020
+url = "https://pmc.ncbi.nlm.nih.gov/articles/PMC7470343/"
+retrieved = "2026-09-25"
+license = "CC BY 4.0"
+
+[[citation]]
+id = "anglemyer_2014_firearm_access"
+title = "The accessibility of firearms and risk for suicide and homicide victimization among household members: a systematic review and meta-analysis (Annals of Internal Medicine 160(2):101–110)"
+publisher = "Anglemyer A., Horvath T. and Rutherford G."
+year = 2014
+url = "https://doi.org/10.7326/M13-1301"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "aldrich_sawada_2015"
+title = "The physical and social determinants of mortality in the 3.11 tsunami (Social Science and Medicine 124:66–75)"
+publisher = "Aldrich D.P. and Sawada Y."
+year = 2015
+url = "https://doi.org/10.1016/j.socscimed.2014.11.025"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "ye_aldrich_2019"
+title = "Substitute or complement? How social capital, age and socioeconomic status interacted to impact mortality in Japan's 3/11 tsunami (SSM Population Health 7:100403)"
+publisher = "Ye M. and Aldrich D.P."
+year = 2019
+url = "https://doi.org/10.1016/j.ssmph.2019.100403"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "semenza_1996_heat_deaths"
+title = "Heat-Related Deaths during the July 1995 Heat Wave in Chicago (New England Journal of Medicine 335:84–90)"
+publisher = "Semenza J.C. et al."
+year = 1996
+url = "https://doi.org/10.1056/NEJM199607113350203"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "clarke_2002_panic"
+title = "Panic: Myth or Reality? (Contexts 1(3):21–26)"
+publisher = "Clarke L."
+year = 2002
+url = "https://doi.org/10.1525/ctx.2002.1.3.21"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "tierney_2006_disaster_myths"
+title = "Metaphors Matter: Disaster Myths, Media Frames, and Their Consequences in Hurricane Katrina (Annals of the AAPSS 604:57–81)"
+publisher = "Tierney K., Bevc C. and Kuligowski E."
+year = 2006
+url = "https://doi.org/10.1177/0002716205285589"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "drury_2009_shared_identity"
+title = "Everyone for themselves? A comparative study of crowd solidarity among emergency survivors (British Journal of Social Psychology 48(3):487–506)"
+publisher = "Drury J., Cocking C. and Reicher S."
+year = 2009
+url = "https://doi.org/10.1348/014466608X357893"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "wood_2018_milling"
+title = "Milling and Public Warnings (Environment and Behavior 50(5):535–566)"
+publisher = "Wood M.M., Mileti D.S., Bean H., Liu B.F. et al."
+year = 2018
+url = "https://doi.org/10.1177/0013916517709561"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "vinnell_2020_shakeout"
+title = "Evaluating the ShakeOut drill in Aotearoa/New Zealand: effects on knowledge, attitudes, and behaviour (International Journal of Disaster Risk Reduction)"
+publisher = "Vinnell L.J., Wallis A., Becker J.S. and Johnston D.M."
+year = 2020
+url = "https://www.sciencedirect.com/science/article/pii/S2212420920306750"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "gargano_2017_wtc_training"
+title = "Previous emergency training and PTSD among World Trade Center evacuees (Journal of Emergency Management 15(5):275–284)"
+publisher = "Gargano L.M. et al."
+year = 2017
+url = "https://doi.org/10.5055/jem.2017.0336"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "gollwitzer_sheeran_2006"
+title = "Implementation Intentions and Goal Achievement: A Meta-analysis of Effects and Processes (Advances in Experimental Social Psychology 38:69–119)"
+publisher = "Gollwitzer P.M. and Sheeran P."
+year = 2006
+url = "https://doi.org/10.1016/S0065-2601(06)38002-1"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "gigerenzer_2007_statistics"
+title = "Helping Doctors and Patients Make Sense of Health Statistics (Psychological Science in the Public Interest 8(2):53–96)"
+publisher = "Gigerenzer G. et al."
+year = 2007
+url = "https://doi.org/10.1111/j.1539-6053.2008.00033.x"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "akl_2011_cochrane_frequencies"
+title = "Using alternative statistical formats for presenting risks and risk reductions (Cochrane Database of Systematic Reviews CD006776)"
+publisher = "Akl E.A. et al."
+year = 2011
+url = "https://doi.org/10.1002/14651858.CD006776.pub2"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "witte_allen_2000_eppm"
+title = "A Meta-Analysis of Fear Appeals: Implications for Effective Public Health Campaigns (Health Education and Behavior 27(5):591–615)"
+publisher = "Witte K. and Allen M."
+year = 2000
+url = "https://doi.org/10.1177/109019810002700506"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "tannenbaum_2015_fear_appeals"
+title = "Appealing to fear: A meta-analysis of fear appeal effectiveness and theories (Psychological Bulletin 141(6):1178–1204)"
+publisher = "Tannenbaum M.B. et al."
+year = 2015
+url = "https://doi.org/10.1037/a0039729"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "lally_2010_habits"
+title = "How are habits formed: Modelling habit formation in the real world (European Journal of Social Psychology 40(6):998–1009)"
+publisher = "Lally P. et al."
+year = 2010
+url = "https://doi.org/10.1002/ejsp.674"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "marani_2021_pandemics"
+title = "Intensity and frequency of extreme novel epidemics (PNAS 118(35):e2105482118)"
+publisher = "Marani M., Katul G.G., Pan W.K. and Parolari A.J."
+year = 2021
+url = "https://pmc.ncbi.nlm.nih.gov/articles/PMC8536331/"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fri_nuclear_risk_2024"
+title = "Can Humanity Achieve a Century of Nuclear Peace?"
+publisher = "Forecasting Research Institute"
+year = 2024
+url = "https://forecastingresearch.org/research/nuclear-risk"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "stone_2023_heat_blackout"
+title = "How Blackouts during Heat Waves Amplify Mortality and Morbidity Risk (Environmental Science and Technology 57(22):8245–8255)"
+publisher = "Stone B. Jr. et al."
+year = 2023
+url = "https://doi.org/10.1021/acs.est.2c09588"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "do_2023_outages"
+title = "Spatiotemporal distribution of power outages with climate events and social vulnerability in the USA (Nature Communications 14:2470)"
+publisher = "Do V. et al."
+year = 2023
+url = "https://doi.org/10.1038/s41467-023-38084-6"
+retrieved = "2026-09-25"
+license = "CC BY 4.0"
+
+[[citation]]
+id = "shaffer_2026_texas_boil_notices"
+title = "Evaluating the Resilience of Drinking Water Systems to Severe Weather Events Using Boil Water Notices and Bottled Water Sales (Environmental Science and Technology 60(31):21648–21660)"
+publisher = "Shaffer M., Awad N., Davenport F. and Fakhreddine S."
+year = 2026
+url = "https://doi.org/10.1021/acs.est.5c18579"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "water_2024_kentucky_advisories"
+title = "Public Water Service Disruptions: A Descriptive Analysis of Boil Water Advisories (Water 16(3):443)"
+publisher = "MDPI Water"
+year = 2024
+url = "https://doi.org/10.3390/w16030443"
+retrieved = "2026-09-25"
+license = "CC BY 4.0"
+
+[[citation]]
+id = "mell_2017_ems_response"
+title = "Emergency Medical Services Response Times in Rural, Suburban, and Urban Areas (JAMA Surgery)"
+publisher = "Mell H.K. et al."
+year = 2017
+url = "https://doi.org/10.1001/jamasurg.2017.2230"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "martell_2020_restoration_data"
+title = "Modeling of Lifeline Infrastructure Restoration Using Empirical Quantitative Data (arXiv:2008.00991)"
+publisher = "Martell M., Miles S. and Choe Y."
+year = 2020
+url = "https://arxiv.org/abs/2008.00991"
+retrieved = "2026-09-25"
+license = "arXiv non-exclusive licence (paraphrased, not quoted)"
+
+# ---------------------------------------------------------------------------------------------
+# Climate
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "cmra_2025"
+title = "Climate Mapping for Resilience and Adaptation: county climate data (2025 version)"
+publisher = "U.S. Global Change Research Program partners (NOAA and others)"
+year = 2025
+url = "https://resilience.climate.gov/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nca5_climate_trends"
+title = "Fifth National Climate Assessment, Chapter 2: Climate Trends"
+publisher = "U.S. Global Change Research Program (unaltered mirror)"
+year = 2023
+url = "https://nca5.climate.us/chapter/2"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nca5_atlas"
+title = "Fifth National Climate Assessment Atlas: county values at global warming levels"
+publisher = "U.S. Global Change Research Program"
+year = 2023
+url = "https://services3.arcgis.com/0Fs3HcaFfvzXvm7w/arcgis/rest/services/NCA_Atlas_GWL_2C/FeatureServer/0"
+retrieved = "2026-09-25"
+license = "CC BY 4.0"
+
+# ---------------------------------------------------------------------------------------------
+# Ready Reckoner's own documents (research compilations, observation log, expert estimates)
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "rr_price_observations_2026_09"
+title = "Retail price observations behind the item catalogue's price bands, September 2026"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md"
+retrieved = "2026-09-25"
+license = "CC BY-SA 4.0"
+
+[[citation]]
+id = "rr_research_supply_standards"
+title = "Supply-sizing evidence base (research report): quantities, shelf lives and costs, with derivations"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/supply-standards.md"
+retrieved = "2026-09-25"
+license = "CC BY-SA 4.0"
+
+[[citation]]
+id = "rr_research_risk_model"
+title = "Quantitative core model specification (research report): hazards, consequence buckets, durations"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/risk-model.md"
+retrieved = "2026-09-25"
+license = "CC BY-SA 4.0"
+
+[[citation]]
+id = "rr_research_prior_art"
+title = "Prior art and behavioural science for a household preparedness planner (research report)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/prior-art-and-psychology.md"
+retrieved = "2026-09-25"
+license = "CC BY-SA 4.0"
+
+[[citation]]
+id = "rr_research_data_sources"
+title = "Public data sources for a client-side preparedness planner (research report)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/data-sources.md"
+retrieved = "2026-09-25"
+license = "CC BY-SA 4.0"
+
+[[citation]]
+id = "rr_expert_prior"
+title = "Ready Reckoner expert estimates for supply sizing and upkeep (each one listed with its reasoning)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md"
+retrieved = "2026-09-25"
+license = "CC BY-SA 4.0"
+prior = true
+
+[[citation]]
+id = "rr_risk_model_priors"
+title = "Ready Reckoner expert estimates for hazard rates and disruption durations (each one listed with its reasoning)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md"
+retrieved = "2026-09-25"
+license = "CC BY-SA 4.0"
+prior = true
