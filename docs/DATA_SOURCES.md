@@ -552,6 +552,25 @@ columns added to an existing file).
 | **core total added** | | | **180 KB** (2.37 → 2.55 MB) |
 | `core/eviction.csv` (`eviction`, gated) | `eviction_filing_rate` | 3,144 | 13.6 KB, not shipped until approved |
 
+Approximate cost of each column on its own (gzip -9 of the key plus that column, minus the key
+alone; a file compresses a little better than the sum of its columns):
+
+| Column | KB | Column | KB |
+| --- | ---: | --- | ---: |
+| `strategic_class` | 1.3 | `smoke_days_35` | 5.3 |
+| `strategic_site_ids` | 2.7 | `smoke_days_55` | 3.9 |
+| `strategic_km` (county) | 2.9 | `smoke_trend` | 5.7 |
+| `strategic_bearing` (county) | 2.0 | `hms_smoke_days` | 4.6 |
+| `uasi_share` | 1.9 | `smoke_basis` | 1.5 |
+| `uasi_area` | 0.4 | `leveed_pop_share` | 3.3 |
+| `geomag_lat` | 4.3 | `levee_risk_high_share` | 0.5 |
+| `geomag_factor` | 2.6 | `sdwis_violation_pop_share` | 5.9 |
+| `karst_share` | 5.4 | `cws_pop_share` | 5.0 |
+| `landslide_susceptible_share` | 7.2 | `surge_proxy_class` | 1.1 |
+| `dams_high_poor_condition` | 1.4 | `coastal_flood_pop_share` | 2.2 |
+| `dams_high_within_10km_naming_town` (ZIP) | 7.2 | `strategic_km` (ZIP) | 14.6 |
+| `strategic_bearing` (ZIP) | 15.9 | `strategic_site` (ZIP) | 9.8 |
+
 ### 13.1 Strategic sites and classes (`strategic`)
 
 The curated list is `crates/rr-etl/data/strategic_sites.toml` (compiled into the ETL; hand-edited,
