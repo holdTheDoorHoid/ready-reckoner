@@ -196,6 +196,15 @@ value = 30.0
 sources = ["rr_expert_prior"]
 
 [[constant]]
+key = "livestock_pump_bridge_days"
+label = "Days of water to store for large animals when a generator can run the well pump"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "Stored water for horses and livestock only has to last until a generator is running the well pump: three days, the three-day step, leaves time to set it up, fix it or refuel it. Without a way to power the pump, the animals' stored water follows people's, up to 14 days (`water_stored_cap_days`). A drought that lowers the well is not a power problem: no amount of stored water or pump power replaces hauling water in."
+
+[[constant]]
 key = "water_rotation_months"
 label = "Replace water you store yourself every"
 unit = "month"

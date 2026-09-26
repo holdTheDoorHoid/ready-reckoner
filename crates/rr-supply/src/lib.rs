@@ -62,6 +62,7 @@ pub const LINE_RULES: &[&str] = &[
     "bleach_bottles",
     "boil_fuel",
     "livestock_water",
+    "livestock_water_stored",
     "food_kcal",
     "food_cost_estimate",
     "food_kit_check",
@@ -366,6 +367,18 @@ pub fn sized_requirements(
     // Duration lines also cite the target's own sources (the hazard and duration data behind the
     // days).
     let cited = |b: BucketId, s: Option<Sizing>| s.map(|s| s.also_cite(t.sources(b)));
+    // A household on a well with horses or livestock keeps the pump running on a generator in a
+    // power cut: the plan makes the generator a need (unless the household owns one), and the
+    // animals' stored water only bridges the first days (`livestock_water`), with two weeks in
+    // stock tanks as the alternative. Only where the no-water target is longer than that bridge.
+    let well_animals = housing.water == WaterSource::Well
+        && pets.large_animals > 0
+        && days_of(BucketId::WaterOut)
+            .is_some_and(|d| d > constants().value(constants::keys::LIVESTOCK_PUMP_BRIDGE_DAYS));
+    let generator_for_pump = well_animals
+        && !h.has_generator()
+        && days_of(BucketId::Power).is_some_and(|d| power::generator_units(d, housing).is_some());
+    let pump_power = well_animals && (h.has_generator() || generator_for_pump);
     let longest = |a: BucketId, b: BucketId| match (days_of(a), days_of(b)) {
         (Some(x), Some(y)) => Some((x.max(y), if x >= y { a } else { b })),
         (Some(x), None) => Some((x, a)),
@@ -406,6 +419,16 @@ pub fn sized_requirements(
                         None,
                         false,
                     );
+                } else if generator_for_pump {
+                    // The fuel to keep for the generator the plan buys for the pump: said, but not
+                    // a need of its own, so the plan never buys fuel before the generator.
+                    out.push(
+                        bucket,
+                        cited(bucket, power::generator_fuel_gallons(days, housing)),
+                        Note,
+                        None,
+                        false,
+                    );
                 }
                 out.push(bucket, power::wheelchair_battery(people), Need, h72, false);
                 if let Some((s, needed)) = power::power_station_units(days, people) {
@@ -418,13 +441,26 @@ pub fn sized_requirements(
                         needed,
                     );
                 }
-                out.push(
-                    bucket,
-                    cited(bucket, power::generator_units(days, housing)),
-                    Optional,
-                    Some(tier_for_days(days)),
-                    false,
-                );
+                if generator_for_pump {
+                    out.push(
+                        bucket,
+                        cited(
+                            bucket,
+                            power::generator_for_well_pump(days, housing, pets.large_animals),
+                        ),
+                        Need,
+                        Some(tier_for_days(days)),
+                        false,
+                    );
+                } else {
+                    out.push(
+                        bucket,
+                        cited(bucket, power::generator_units(days, housing)),
+                        Optional,
+                        Some(tier_for_days(days)),
+                        false,
+                    );
+                }
                 out.push(
                     bucket,
                     cited(bucket, power::solar_panel_units(days, ctx.latitude, people)),
@@ -491,13 +527,32 @@ pub fn sized_requirements(
                 if days_of(BucketId::WaterBoil).is_none() {
                     out.push(bucket, Some(water::bleach_bottles()), Need, h72, false);
                 }
+                let drought = t.driven_by(bucket, &[HazardId::Drought]) == Some(true);
                 out.push(
                     bucket,
-                    cited(bucket, water::livestock_water(days, pets.large_animals)),
+                    cited(
+                        bucket,
+                        water::livestock_water(days, pets.large_animals, pump_power, drought),
+                    ),
                     Need,
                     None,
                     false,
                 );
+                if pump_power {
+                    out.push(
+                        bucket,
+                        cited(
+                            bucket,
+                            water::livestock_water_stored(days, pets.large_animals),
+                        ),
+                        Shape::Alternative {
+                            of: "livestock_water",
+                            variant: "stock_tank",
+                        },
+                        None,
+                        false,
+                    );
+                }
                 out.push(bucket, Some(sanitation::toilet_buckets()), Need, h72, false);
                 out.push(
                     bucket,

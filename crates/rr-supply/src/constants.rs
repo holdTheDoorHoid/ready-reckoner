@@ -558,6 +558,7 @@ keys! {
     WATER_LIVESTOCK_L_DAY = "water_livestock_l_day",
     WATER_REHYDRATION_GAL_PER_PERSON_DAY = "water_rehydration_gal_per_person_day",
     WATER_STORED_CAP_DAYS = "water_stored_cap_days",
+    LIVESTOCK_PUMP_BRIDGE_DAYS = "livestock_pump_bridge_days",
     WATER_ROTATION_MONTHS = "water_rotation_months",
     REUSED_BOTTLES_MAX_GAL = "reused_bottles_max_gal",
     BLEACH_STRENGTH_PCT = "bleach_strength_pct",

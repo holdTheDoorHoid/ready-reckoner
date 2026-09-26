@@ -352,6 +352,108 @@ fn livestock_water_stops_at_the_stored_days() {
     // Under the cap nothing changes: 12 × 25 L × 3 days = 900 L.
     let short = requirements(&input, &[common::days(BucketId::WaterOut, 3.0)]);
     assert_eq!(line(&short, "water_out.livestock_water").quantity, 237.8);
+    // No power target, so no generator is offered and none is planned: no pump power.
+    assert!(!has(&lines, "power.generator_units"));
+    assert!(!has(&lines, "water_out.livestock_water.alt.stock_tank"));
+}
+
+/// A farm on a well with a power target: the generator that runs the pump is a need (with its
+/// fuel), the animals' stored water bridges 3 days until it runs, and two weeks in stock tanks is
+/// the alternative. 14 days stay the need only where no pump power is planned.
+#[test]
+fn livestock_on_a_well_store_three_days_when_a_generator_runs_the_pump() {
+    let input = fixtures::get("hays-kansas-farm-5").unwrap();
+    let targets = || {
+        vec![
+            common::days(BucketId::Power, 3.0),
+            common::driven_by(
+                common::days(BucketId::WaterOut, 60.0),
+                &[(rr_types::HazardId::Drought, 1.0)],
+            ),
+        ]
+    };
+    let lines = requirements(&input, &targets());
+    // 12 × 25 L × 3 days = 900 L = 237.8 gal (it was 14 days, 1,109.5 gal: a $1,515 tank).
+    let l = line(&lines, "water_out.livestock_water");
+    assert_eq!(l.quantity, 237.8);
+    assert!(l.plain.contains("× 3 days = 900 L"), "{}", l.plain);
+    assert!(
+        l.plain.contains("until the generator runs the well pump"),
+        "{}",
+        l.plain
+    );
+    assert!(
+        l.plain.contains("haul water in"),
+        "a drought drives the target: {}",
+        l.plain
+    );
+    assert!(l.citations.iter().any(|c| c == "rr_expert_prior"));
+    let alt = line(&lines, "water_out.livestock_water.alt.stock_tank");
+    assert_eq!(alt.quantity, 1109.5);
+    assert_eq!(alt.rule, "livestock_water_stored");
+    assert!(alt.plain.starts_with("Instead of relying on the generator"));
+    let generator = line(&lines, "power.generator_units");
+    assert_eq!(
+        (generator.quantity, generator.unit.as_str()),
+        (1.0, "generator")
+    );
+    assert!(generator.plain.contains("well pump") && generator.plain.contains("12 large animals"));
+    assert!(!has(&lines, "power.generator_units.optional"));
+    // The fuel to keep for it, 2.8 gal a day × 3 days of power target: a note, so the plan never
+    // buys fuel before the generator.
+    assert_eq!(
+        line(&lines, "power.generator_fuel_gallons.note").quantity,
+        8.4
+    );
+    assert!(!has(&lines, "power.generator_fuel_gallons"));
+    let sized = sized_requirements(&input, &targets(), &SupplyContext::default());
+    let kind = |id: &str| sized.iter().find(|l| l.line.id == id).map(|l| l.kind);
+    assert_eq!(kind("power.generator_units"), Some(LineKind::Need));
+    assert_eq!(
+        kind("power.generator_fuel_gallons.note"),
+        Some(LineKind::Note)
+    );
+    assert_eq!(
+        kind("water_out.livestock_water.alt.stock_tank"),
+        Some(LineKind::Alternative)
+    );
+
+    // A generator the household owns runs the pump too: 3 days, no generator to buy, its fuel.
+    let mut owns = input.clone();
+    owns.housing.backup_power = rr_types::BackupPower::Generator;
+    let lines = requirements(&owns, &targets());
+    assert_eq!(line(&lines, "water_out.livestock_water").quantity, 237.8);
+    assert!(!has(&lines, "power.generator_units"));
+    assert!(has(&lines, "power.generator_units.optional"));
+    assert!(has(&lines, "power.generator_fuel_gallons"));
+    assert!(!has(&lines, "power.generator_fuel_gallons.note"));
+
+    // Town water: no pump to power, so the animals' water stays at 14 stored days.
+    let mut town = input.clone();
+    town.housing.water = rr_types::WaterSource::Municipal;
+    let lines = requirements(&town, &targets());
+    assert_eq!(line(&lines, "water_out.livestock_water").quantity, 1109.5);
+    assert!(!has(&lines, "power.generator_units"));
+    assert!(!has(&lines, "water_out.livestock_water.alt.stock_tank"));
+
+    // No animals: the generator stays optional.
+    let mut none = input.clone();
+    none.pets.large_animals = 0;
+    let lines = requirements(&none, &targets());
+    assert!(has(&lines, "power.generator_units.optional"));
+    assert!(!has(&lines, "power.generator_units"));
+    assert!(!has(&lines, "power.generator_fuel_gallons.note"));
+
+    // A no-water target of 3 days or less is stored whole: no generator needed for it.
+    let short = requirements(
+        &input,
+        &[
+            common::days(BucketId::Power, 3.0),
+            common::days(BucketId::WaterOut, 3.0),
+        ],
+    );
+    assert!(!has(&short, "power.generator_units"));
+    assert_eq!(line(&short, "water_out.livestock_water").quantity, 237.8);
 }
 
 #[test]
