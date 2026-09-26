@@ -489,6 +489,10 @@ fn major_hurricane(ctx: &Ctx<'_>, natural: &Natural) -> Option<Draft> {
     if split.county_rate < MAJOR_HURRICANE_AFREQ_THRESHOLD || !HURRICANE_STATES.contains(&state) {
         return None;
     }
+    // A county whose HURDAT2 record shows no major-hurricane passages has nothing to offer.
+    if split.major_today.value < NEGLIGIBLE_RATE && split.major_future.value < NEGLIGIBLE_RATE {
+        return None;
+    }
     let county = ctx.county_label();
     let state_name = ctx.county.state_name.as_str();
     let years = (1.0 / split.county_rate).round().max(1.0);

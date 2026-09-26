@@ -268,6 +268,10 @@ earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092
   for earthquakes, so with Cascadia on, the part of the county earthquake rate that is Cascadia's
   own long-run share (0.41 %/yr near Coos Bay) is planned both as a typical damaging earthquake
   and inside the scenario. The effect is small beside the scenario's own 1.02 %/yr.
+- **Missing event rows.** The pack writes no row for an event type a county never recorded. A
+  missing `major_hurricane_passage` row is read as "unknown" (the national one-third major
+  share), not "zero", which errs toward preparing; a recorded share near zero drops the
+  major-hurricane scenario.
 - **Income stability.** The v1 input has no "tenured or public" choice, so the research's ×0.5
   step cannot be selected; `stable` means the typical salaried job (×1), as in the Philadelphia
   example.

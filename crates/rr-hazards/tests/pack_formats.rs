@@ -242,3 +242,34 @@ fn base_rate_ids_from_the_pack() {
             .any(|s| s == "nchs_fastats_accidental_injury")
     );
 }
+
+#[test]
+fn no_major_hurricane_passages_means_no_major_hurricane_scenario() {
+    let mut fixture = county("12086");
+    fixture
+        .county
+        .events
+        .insert("hurricane_passage".into(), event(0.20));
+    fixture
+        .county
+        .events
+        .insert("major_hurricane_passage".into(), event(0.0));
+    // An event rate of zero is treated as absent, so the national one-third share applies ...
+    let a = run(&household("miami-condo-retiree-1"), &fixture);
+    assert!(
+        a.scenarios
+            .iter()
+            .any(|s| s.id == "major_hurricane_direct_hit")
+    );
+    // ... but a county whose record gives a major share of exactly zero gets no scenario.
+    fixture
+        .county
+        .events
+        .insert("major_hurricane_passage".into(), event(1.0e-9));
+    let a = run(&household("miami-condo-retiree-1"), &fixture);
+    assert!(
+        a.scenarios
+            .iter()
+            .all(|s| s.id != "major_hurricane_direct_hit")
+    );
+}
