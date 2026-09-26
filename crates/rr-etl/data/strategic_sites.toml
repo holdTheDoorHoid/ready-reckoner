@@ -604,7 +604,7 @@ lon = -84.253
 coord_source = "secondary (Wikipedia/GNIS coordinates, rounded; site centre approximate); verify against an NNSA or DOE site map"
 role = "Uranium components; Oak Ridge."
 counties = ["47001"]   # 47001 Anderson, TN   # 47093 Knox, TN; 47105 Loudon, TN; 47145 Roane, TN
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
 
 [[site]]
@@ -619,7 +619,7 @@ lon = -81.65
 coord_source = "secondary (Wikipedia/GNIS coordinates, rounded; site centre approximate); verify against an NNSA or DOE site map"
 role = "Tritium supply and processing (NNSA)."
 counties = ["45003", "45005", "45011"]   # 45003 Aiken, SC; 45005 Allendale, SC; 45011 Barnwell, SC
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
 
 [[site]]
@@ -634,7 +634,7 @@ lon = -94.55
 coord_source = "secondary (Wikipedia/GNIS coordinates, rounded; site centre approximate); verify against an NNSA or DOE site map"
 role = "Non-nuclear components (formerly the Kansas City Plant)."
 counties = ["29095"]   # 29095 Jackson, MO   # 20091 Johnson, KS; 29037 Cass, MO
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
 
 [[site]]
@@ -649,7 +649,7 @@ lon = -106.3
 coord_source = "secondary (Wikipedia/GNIS coordinates, rounded; site centre approximate); verify against an NNSA or DOE site map"
 role = "Design laboratory; plutonium science and engineering (NNSA)."
 counties = ["35028"]   # 35028 Los Alamos, NM
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
 
 [[site]]
@@ -664,7 +664,7 @@ lon = -106.540306077
 coord_source = "MIRTA Kirtland AFB point"
 role = "Engineering laboratory for weapons (NNSA); on Kirtland AFB, so its county is already A."
 counties = ["35001"]   # 35001 Bernalillo, NM
-support = "primary (NNSA locations page, search summary); coordinates: MIRTA Kirtland AFB point"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates: MIRTA Kirtland AFB point"
 sources = ["nnsa_locations"]
 
 [[site]]
@@ -679,7 +679,7 @@ lon = -121.705
 coord_source = "secondary (Wikipedia/GNIS coordinates, rounded; site centre approximate); verify against an NNSA or DOE site map"
 role = "Sandia California site, next to LLNL."
 counties = ["06001"]   # 06001 Alameda, CA
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
 
 [[site]]
@@ -694,7 +694,7 @@ lon = -121.7058
 coord_source = "secondary (Wikipedia/GNIS coordinates, rounded; site centre approximate); verify against an NNSA or DOE site map"
 role = "Design laboratory (NNSA). Site 300 straddles Alameda and San Joaquin counties."
 counties = ["06001", "06077"]   # 06001 Alameda, CA; 06077 San Joaquin, CA
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
 
 [[site]]
@@ -709,7 +709,7 @@ lon = -116.05
 coord_source = "secondary (Wikipedia/GNIS coordinates, rounded; site centre approximate); verify against an NNSA or DOE site map"
 role = "Test site and device assembly (NNSA)."
 counties = ["32023"]   # 32023 Nye, NV
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
 
 [[site]]

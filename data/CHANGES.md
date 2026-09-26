@@ -223,3 +223,21 @@ Jobs run: wildfire_places.
 |---|---:|---:|---:|---:|---:|---|
 | `opt/wildfire_places/places.csv` | 32038 | 32038 | 0 | 0 | 7701 | changed |
 | `opt/wildfire_places/zip_places.csv` | 35568 | 35568 | 0 | 0 | 17582 | changed |
+
+## 2026-09-26T18:39:12Z — pack version 615b12d602e8
+
+Jobs run: strategic.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/strategic.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/strategic_sites.toml` | 207 | 207 | 0 | 0 | 207 | changed |
+
+## 2026-09-26T18:42:20Z — pack version 0fdc6e19e670
+
+Jobs run: strategic.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/strategic.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/strategic_sites.toml` | 207 | 207 | 0 | 0 | 207 | changed |

@@ -1,5 +1,5 @@
 # Strategic sites for the nuclear family and the terrorism tier (Ready Reckoner data pack).
-# Written by the rr-etl `strategic` job from crates/rr-etl/data/strategic_sites.toml (sha256 cb63fc57d4c86c10baea52f6b78294dc5f34b44b64ab270b07bb316f143e412c); do not edit here.
+# Written by the rr-etl `strategic` job from crates/rr-etl/data/strategic_sites.toml (sha256 7447345cfd13379a0ffd703d1e5d3549227c878abaa2b2515bc4ded1bf85ae12); do not edit here.
 # The f_s factors are expert priors (prior = true): show them only as ranges.
 
 schema = "strategic_sites/1"
@@ -442,7 +442,7 @@ role_plain = "a center that commands or talks to U.S. nuclear forces"
 role = "Department of Defense underground alternate command and communications center near Blue Ridge Summit."
 support = "primary (Army ERDC technical report TR-19-10, search result); coordinates secondary; not in public MIRTA"
 sources = ["erdc_raven_rock"]
-unverified = ["erdc_raven_rock: search_summary", "coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+unverified = ["erdc_raven_rock: search_summary", "coordinates: secondary (not an agency point)"]
 
 [[site]]
 id = "mount_weather"
@@ -458,7 +458,7 @@ role_plain = "a site where the federal government would keep working in a nation
 role = "FEMA continuity-of-government relocation site (civil, not military NC3; grouped here)."
 support = "primary acknowledgement (DHS/FEMA contract notice for the MWEOC facility, search result); coordinates secondary"
 sources = ["mweoc_notice"]
-unverified = ["mweoc_notice: search_summary", "coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+unverified = ["mweoc_notice: search_summary", "coordinates: secondary (not an agency point)"]
 
 [[site]]
 id = "fort_greely"
@@ -588,9 +588,9 @@ rule = "point_30km"
 counties = ["47001"]
 role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
 role = "Uranium components; Oak Ridge."
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
-unverified = ["coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+unverified = ["coordinates: secondary (not an agency point)"]
 
 [[site]]
 id = "savannah_river"
@@ -604,9 +604,9 @@ rule = "point_30km"
 counties = ["45003", "45005", "45011"]
 role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
 role = "Tritium supply and processing (NNSA)."
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
-unverified = ["coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+unverified = ["coordinates: secondary (not an agency point)"]
 
 [[site]]
 id = "kcnsc"
@@ -620,9 +620,9 @@ rule = "point_30km"
 counties = ["29095"]
 role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
 role = "Non-nuclear components (formerly the Kansas City Plant)."
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
-unverified = ["coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+unverified = ["coordinates: secondary (not an agency point)"]
 
 [[site]]
 id = "lanl"
@@ -636,9 +636,9 @@ rule = "point_30km"
 counties = ["35028"]
 role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
 role = "Design laboratory; plutonium science and engineering (NNSA)."
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
-unverified = ["coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+unverified = ["coordinates: secondary (not an agency point)"]
 
 [[site]]
 id = "sandia_nm"
@@ -652,7 +652,7 @@ rule = "point_30km"
 counties = ["35001"]
 role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
 role = "Engineering laboratory for weapons (NNSA); on Kirtland AFB, so its county is already A."
-support = "primary (NNSA locations page, search summary); coordinates: MIRTA Kirtland AFB point"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates: MIRTA Kirtland AFB point"
 sources = ["nnsa_locations"]
 unverified = []
 
@@ -668,9 +668,9 @@ rule = "point_30km"
 counties = ["06001"]
 role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
 role = "Sandia California site, next to LLNL."
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
-unverified = ["coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+unverified = ["coordinates: secondary (not an agency point)"]
 
 [[site]]
 id = "llnl"
@@ -684,9 +684,9 @@ rule = "point_30km"
 counties = ["06001", "06077"]
 role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
 role = "Design laboratory (NNSA). Site 300 straddles Alameda and San Joaquin counties."
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
-unverified = ["coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+unverified = ["coordinates: secondary (not an agency point)"]
 
 [[site]]
 id = "nnss"
@@ -700,9 +700,9 @@ rule = "point_30km"
 counties = ["32023"]
 role_plain = "a plant or laboratory that makes or looks after nuclear weapons"
 role = "Test site and device assembly (NNSA)."
-support = "primary (NNSA locations page, search summary); coordinates secondary"
+support = "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
 sources = ["nnsa_locations"]
-unverified = ["coordinates: secondary (not an agency point)", "role: rests on a secondary source"]
+unverified = ["coordinates: secondary (not an agency point)"]
 
 [[site]]
 id = "dyess_afb"

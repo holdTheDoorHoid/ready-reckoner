@@ -655,6 +655,17 @@ fn q_list(v: &[String]) -> String {
     )
 }
 
+/// Whether a site's `support` note says its role rests (at least partly) on a secondary or
+/// unchecked source. Clauses about coordinates ("coordinates secondary") do not count: those are
+/// flagged from `coord_source`.
+pub fn role_rests_on_secondary(support: &str) -> bool {
+    support
+        .split(';')
+        .map(str::trim)
+        .filter(|c| !c.starts_with("coordinates"))
+        .any(|c| c.contains("secondary") || c.contains("not checked"))
+}
+
 /// Write the engine-facing TOML: classes, templates, the rules as numbers, included sites,
 /// metros, ports, refineries, UASI areas and the sources they cite. Deterministic.
 pub fn pack_toml(f: &SitesFile, sha: &str) -> (String, u64) {
@@ -789,7 +800,7 @@ pub fn pack_toml(f: &SitesFile, sha: &str) -> (String, u64) {
         if site.coord_source.contains("secondary") {
             unverified.push("coordinates: secondary (not an agency point)".to_string());
         }
-        if site.support.contains("secondary") || site.support.contains("not checked") {
+        if role_rests_on_secondary(&site.support) {
             unverified.push("role: rests on a secondary source".to_string());
         }
         s.push_str(&format!("unverified = {}\n", q_list(&unverified)));
@@ -1311,5 +1322,35 @@ mod tests {
             .map(|x| x.as_array().map_or(0, |a| a.len() as u64))
             .sum();
         assert_eq!(counted, rows);
+        // Y-12's role rests on the NNSA page (read in full); only its coordinates are secondary.
+        let y12 = v["site"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|s| s["id"].as_str() == Some("y12"))
+            .unwrap();
+        let flags: Vec<&str> = y12["unverified"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|x| x.as_str().unwrap())
+            .collect();
+        assert_eq!(flags, ["coordinates: secondary (not an agency point)"]);
+    }
+
+    #[test]
+    fn coordinate_clauses_do_not_mark_a_role_secondary() {
+        assert!(!role_rests_on_secondary(
+            "primary (NNSA locations page, read in full 2026-09-26); coordinates secondary"
+        ));
+        assert!(role_rests_on_secondary(
+            "primary (NNSA); storage secondary (FAS 2025); coordinates secondary"
+        ));
+        assert!(role_rests_on_secondary(
+            "primary location (MIRTA); role secondary (FAS 2025)"
+        ));
+        assert!(!role_rests_on_secondary(
+            "primary location (MIRTA); role primary (MDA, search summary)"
+        ));
     }
 }

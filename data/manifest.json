@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "ed4e59dff15a",
-  "generated": "2026-09-26T18:20:10Z",
+  "pack_version": "0fdc6e19e670",
+  "generated": "2026-09-26T18:42:20Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -196,8 +196,8 @@
         {
           "path": "core/strategic_sites.toml",
           "job": "strategic",
-          "sha256": "989737d9fd47d0d4bebe54b81a9ee3a511260dce26590f8d9851daf5a7463826",
-          "bytes": 61428,
+          "sha256": "794bd3213a950b62d9d18d3076aa27b3157d915a88df241e6215a333afc6fbb1",
+          "bytes": 61167,
           "rows": 207
         },
         {
@@ -1940,15 +1940,15 @@
     },
     "strategic": {
       "title": "Strategic-site classes (nuclear family) and FEMA UASI shares by county",
-      "finished": "2026-09-26T16:29:39Z",
+      "finished": "2026-09-26T18:42:20Z",
       "sources": [
         {
           "name": "Ready Reckoner curated strategic sites (sites, class rules, metros, refineries, ports, FY2026 UASI table)",
           "url": "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml",
           "version": "strategic_sites/1 (reviewed), reviewed 2026-09-26",
-          "retrieved": "2026-09-26T16:29:37Z",
-          "sha256": "cb63fc57d4c86c10baea52f6b78294dc5f34b44b64ab270b07bb316f143e412c",
-          "bytes": 91060,
+          "retrieved": "2026-09-26T18:42:18Z",
+          "sha256": "7447345cfd13379a0ffd703d1e5d3549227c878abaa2b2515bc4ded1bf85ae12",
+          "bytes": 91132,
           "license": "Compiled by Ready Reckoner from the public sources listed in the file"
         },
         {
@@ -1973,7 +1973,7 @@
           "name": "Census 2020 centers of population by county",
           "url": "https://www2.census.gov/geo/docs/reference/cenpop2020/county/CenPop2020_Mean_CO.txt",
           "version": "CenPop2020_Mean_CO",
-          "retrieved": "2026-09-26T16:29:37Z",
+          "retrieved": "2026-09-26T18:42:18Z",
           "sha256": "4f754a3bda9714e5820d73bfac44ef1dab2b8c371f6c136305474cda7a752014",
           "bytes": 171276,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -1982,7 +1982,7 @@
           "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon and areas)",
           "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
           "version": "GENZ2024",
-          "retrieved": "2026-09-26T16:29:38Z",
+          "retrieved": "2026-09-26T18:42:19Z",
           "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
           "bytes": 11626066,
           "license": "US Government work, public domain (17 U.S.C. 105)"
