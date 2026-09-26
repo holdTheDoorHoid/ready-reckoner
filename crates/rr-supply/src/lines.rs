@@ -11,7 +11,10 @@ use crate::tiers::tier_for_days;
 pub enum LineKind {
     /// What the household needs for the bucket: `bucket.rule` or `bucket.rule.person_N`.
     Need,
-    /// Another way to meet the need line `bucket.rule`: `bucket.rule.alt.variant`.
+    /// Another way to meet the need line `bucket.rule`, or a household supply staged for it (a
+    /// go-bag's water, drawn from the stored water): `bucket.rule.alt.variant`, or
+    /// `bucket.rule.alt.variant.person_N` for one person's line `bucket.rule.person_N`. Never
+    /// added to anything.
     Alternative,
     /// Worth having for some households, not needed to meet the target: `bucket.rule.optional`.
     Optional,
@@ -31,10 +34,18 @@ impl LineKind {
         }
     }
 
-    /// For an alternative line, the id of the need line it stands in for.
+    /// For an alternative line, the id of the need line it stands in for: `bucket.rule`, or
+    /// `bucket.rule.person_N` when the alternative ends in `.person_N`.
     pub fn alternative_to(id: &str) -> Option<String> {
         let parts: Vec<&str> = id.split('.').collect();
-        (parts.len() >= 4 && parts[2] == "alt").then(|| format!("{}.{}", parts[0], parts[1]))
+        if parts.len() < 4 || parts[2] != "alt" {
+            return None;
+        }
+        let need = format!("{}.{}", parts[0], parts[1]);
+        match parts.get(4) {
+            Some(person) if person.starts_with("person_") => Some(format!("{need}.{person}")),
+            _ => Some(need),
+        }
     }
 }
 
@@ -76,7 +87,16 @@ impl SizedLine {
 pub(crate) enum Shape<'a> {
     Need,
     PerPerson(usize),
-    Alternative { of: &'a str, variant: &'a str },
+    Alternative {
+        of: &'a str,
+        variant: &'a str,
+    },
+    /// An alternative for one person's line `bucket.of.person_N`.
+    PersonAlternative {
+        of: &'a str,
+        variant: &'a str,
+        person: usize,
+    },
     Optional,
     Note,
 }
@@ -94,6 +114,14 @@ pub(crate) fn make(
         Shape::PerPerson(n) => (format!("{bucket}.{}.person_{n}", s.rule), LineKind::Need),
         Shape::Alternative { of, variant } => (
             format!("{bucket}.{of}.alt.{variant}"),
+            LineKind::Alternative,
+        ),
+        Shape::PersonAlternative {
+            of,
+            variant,
+            person,
+        } => (
+            format!("{bucket}.{of}.alt.{variant}.person_{person}"),
             LineKind::Alternative,
         ),
         Shape::Optional => (format!("{bucket}.{}.optional", s.rule), LineKind::Optional),
@@ -145,5 +173,16 @@ mod tests {
             Some("supplies.food_kcal")
         );
         assert_eq!(LineKind::alternative_to("supplies.food_kcal"), None);
+        // A staged supply for one person's line.
+        let staged = "get_home.get_home_bag.alt.staged_water.person_2";
+        assert_eq!(LineKind::of(staged), LineKind::Alternative);
+        assert_eq!(
+            LineKind::alternative_to(staged).as_deref(),
+            Some("get_home.get_home_bag.person_2")
+        );
+        assert_eq!(
+            LineKind::alternative_to("evacuate.go_bag.alt.staged_water").as_deref(),
+            Some("evacuate.go_bag")
+        );
     }
 }

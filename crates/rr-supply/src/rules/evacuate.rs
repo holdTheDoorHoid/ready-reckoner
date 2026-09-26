@@ -1,5 +1,7 @@
-//! Leaving home quickly (research §9.1, §9.4): go-bags sized to the warning time, water and food for
-//! three days, pet carriers and supplies, the half-tank rule, and help for people who need it.
+//! Leaving home quickly (research §9.1, §9.4): go-bags sized to the warning time, pet carriers, the
+//! half-tank rule, and help for people who need it. The go-bags' water and food and the pet
+//! go-kit's are staged from the household's own supplies: `rr-supply` emits them as alternative
+//! lines of the bag they go in, never as something more to buy.
 
 use rr_types::{Per, Person, Pets};
 
@@ -40,8 +42,8 @@ fn notice_band_with(b: &mut Basis, hours: f64) -> NoticeBand {
     }
 }
 
-/// Go-bags: one per person aged 4 and over, packed for the warning the household can expect. Rule
-/// `go_bag`.
+/// Go-bags: one per person aged 4 and over, packed for the warning the household can expect. The
+/// water, food and medicines come from the household's supplies (the staged lines). Rule `go_bag`.
 pub fn go_bag(people_list: &[Person], notice_hours_low: f64, days_away: f64) -> Sizing {
     let mut b = Basis::new();
     let each = b.k(keys::GO_BAGS_PER_PERSON);
@@ -71,7 +73,7 @@ pub fn go_bag(people_list: &[Person], notice_hours_low: f64, days_away: f64) -> 
         String::new()
     };
     let text = format!(
-        "{}{}: water, food, medicines, copies of documents, a phone charger, cash, a flashlight, a whistle, a change of clothes and sturdy shoes. {when}{stay}",
+        "{}{}: a sturdy bag you already own will do. Pack copies of documents, a phone charger, cash, a flashlight, a whistle, a change of clothes and sturdy shoes, and add water, food and medicines from your home supplies rather than buying them twice. {when}{stay}",
         count(q, "go-bag", "go-bags"),
         if babies {
             ", one for each person aged 4 and over (babies' things go in a parent's bag)"
@@ -82,8 +84,9 @@ pub fn go_bag(people_list: &[Person], notice_hours_low: f64, days_away: f64) -> 
     Sizing::new(&b, "go_bag", "go_bag", q, "bag", Per::Person, text)
 }
 
-/// Water for the go-bags: three days at the household's level (the Red Cross evacuation supply).
-/// Rule `go_bag_water`.
+/// Water for the go-bags: three days at the household's level (the Red Cross evacuation supply),
+/// drawn from the water the household stores, so it is an alternative line of `go_bag`, never an
+/// addition. Rule `go_bag_water`.
 pub fn go_bag_water(
     people_list: &[Person],
     level: rr_types::WaterLevel,
@@ -102,7 +105,7 @@ pub fn go_bag_water(
     let per_day = d.people_gal();
     let q = per_day * days;
     let text = format!(
-        "Water for the go-bags, the Red Cross three-day supply for leaving home: about {} a day for the {} × {} = {}. If you leave on foot, carry what you can (about {} L each) and a filter; the rest goes in the car.",
+        "Water for the go-bags comes out of the water you store at home, not on top of it: the Red Cross three-day supply for leaving home, about {} a day for the {} × {} = {}. Keep it with the bags or take it as you leave. If you leave on foot, carry what you can (about {} L each) and a filter; the rest goes in the car.",
         gallons(per_day),
         count(people_list.len() as f64, "person", "people"),
         fmt_days(days),
@@ -121,7 +124,8 @@ pub fn go_bag_water(
     .per_day(days, per_day)
 }
 
-/// Food for the go-bags: three days that need no cooking. Rule `go_bag_food`.
+/// Food for the go-bags: three days that need no cooking, drawn from the household's food (an
+/// alternative line of `go_bag`, never an addition). Rule `go_bag_food`.
 pub fn go_bag_food(people_list: &[Person], days_away: f64) -> Option<Sizing> {
     let mut b = Basis::new();
     let bag_days = b.k(keys::GO_BAG_DAYS);
@@ -137,7 +141,7 @@ pub fn go_bag_food(people_list: &[Person], days_away: f64) -> Option<Sizing> {
     };
     let q = per_day * days;
     let text = format!(
-        "Food for the go-bags: about {} kcal a day × {} = {} kcal of food that needs no cooking or refrigeration.",
+        "Food for the go-bags comes out of your home food supply, not on top of it: about {} kcal a day × {} = {} kcal of food that needs no cooking or refrigeration.",
         num(per_day, 0),
         fmt_days(days),
         num(super::round_quantity("kcal", q), 0)
@@ -156,7 +160,8 @@ pub fn go_bag_food(people_list: &[Person], days_away: f64) -> Option<Sizing> {
     )
 }
 
-/// A carrier for each pet. Rule `pet_carrier`.
+/// A carrier for each pet, with its go-kit packed from the household's supplies. Rule
+/// `pet_carrier`.
 pub fn pet_carrier(pets: &Pets) -> Option<Sizing> {
     let n = u32::from(pets.dogs) + u32::from(pets.cats) + u32::from(pets.small);
     if n == 0 {
@@ -166,8 +171,9 @@ pub fn pet_carrier(pets: &Pets) -> Option<Sizing> {
     b.cite("aspca_disaster_prep");
     b.cite("ready_gov_evacuation");
     let text = format!(
-        "{}, one for each pet. Public shelters may take only service animals, so find pet-friendly places to stay ahead of time.",
-        count(f64::from(n), "pet carrier", "pet carriers")
+        "{}, one for each pet, with a pet go-kit: water and food from your home supplies, any medicine {} takes, records and a photo. Public shelters may take only service animals, so find pet-friendly places to stay ahead of time.",
+        count(f64::from(n), "pet carrier", "pet carriers"),
+        if n == 1 { "it" } else { "each" }
     );
     Some(Sizing::new(
         &b,
@@ -180,7 +186,9 @@ pub fn pet_carrier(pets: &Pets) -> Option<Sizing> {
     ))
 }
 
-/// Water in the pets' go-kit: a week (ASPCA), replaced every two months. Rule `pet_go_water`.
+/// Water in the pets' go-kit: a week (ASPCA), replaced every two months, set aside from the
+/// household's stored water (an alternative line of `pet_carrier`, never an addition). Rule
+/// `pet_go_water`.
 pub fn pet_go_water(pets: &Pets) -> Option<Sizing> {
     if u32::from(pets.dogs) + u32::from(pets.cats) + u32::from(pets.small) == 0 {
         return None;
@@ -192,9 +200,9 @@ pub fn pet_go_water(pets: &Pets) -> Option<Sizing> {
     let per_day = d.pets_gal();
     let q = per_day * days;
     let text = format!(
-        "Water in the pet go-kit for {}: {} = {}. Replace it every {}.",
-        pets_phrase(d.pets),
+        "Water for the pet go-kit, set aside from your stored water rather than bought extra: {} for {} = {}. Replace it every {}.",
         fmt_days(days),
+        pets_phrase(d.pets),
         gallons(super::round_quantity("gallon", q)),
         count(rotate, "month", "months")
     );
@@ -204,7 +212,9 @@ pub fn pet_go_water(pets: &Pets) -> Option<Sizing> {
     )
 }
 
-/// Food in the pets' go-kit: ten days (ASPCA 7–10), replaced every two months. Rule `pet_go_food`.
+/// Food in the pets' go-kit: ten days (ASPCA 7–10), replaced every two months, set aside from the
+/// household's pet food (an alternative line of `pet_carrier`, never an addition). Rule
+/// `pet_go_food`.
 pub fn pet_go_food(pets: &Pets) -> Option<Sizing> {
     let n = u32::from(pets.dogs) + u32::from(pets.cats) + u32::from(pets.small);
     if n == 0 {
@@ -216,13 +226,12 @@ pub fn pet_go_food(pets: &Pets) -> Option<Sizing> {
     let rotate = b.k(keys::PET_KIT_ROTATION_MONTHS);
     let q = f64::from(n) * days;
     let text = format!(
-        "Food in the pet go-kit for {}: {} ({} to {} days) = {} pet-days, with any medicine {} takes, records and a photo. Replace the food every {}.",
-        pets_phrase([pets.dogs, pets.cats, pets.small]),
+        "Food for the pet go-kit, set aside from your pet food rather than bought extra: {} ({} to {} days) for {} = {} pet-days. Replace it every {}.",
         fmt_days(days),
         num(lo, 0),
         num(hi, 0),
+        pets_phrase([pets.dogs, pets.cats, pets.small]),
         num(q, 0),
-        if n == 1 { "it" } else { "each" },
         count(rotate, "month", "months")
     );
     Some(
@@ -337,8 +346,15 @@ mod tests {
         assert!(w.citations.iter().any(|c| c == "redcross_survival_kit"));
         let f = go_bag_food(&p.people, 3.0).unwrap();
         assert_eq!(f.quantity, 24_600.0);
-        assert_eq!(pet_carrier(&p.pets).unwrap().quantity, 1.0);
-        assert_eq!(pet_go_water(&p.pets).unwrap().quantity, 2.2); // 0.3125 × 7
+        assert!(w.plain.contains("not on top of it"), "{}", w.plain);
+        assert!(bags.plain.contains("rather than buying them twice"));
+        assert!(f.plain.contains("not on top of it"));
+        let carrier = pet_carrier(&p.pets).unwrap();
+        assert_eq!(carrier.quantity, 1.0);
+        assert!(carrier.plain.contains("pet go-kit"));
+        let pw = pet_go_water(&p.pets).unwrap();
+        assert_eq!(pw.quantity, 2.2); // 0.3125 × 7
+        assert!(pw.plain.contains("rather than bought extra"));
         assert_eq!(pet_go_food(&p.pets).unwrap().quantity, 10.0);
         assert_eq!(fuel_half_tank(1, 0).unwrap().quantity, 1.0);
         assert!(evacuation_ride_plan(1).is_none());
