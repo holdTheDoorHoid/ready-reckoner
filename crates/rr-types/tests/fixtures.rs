@@ -60,10 +60,13 @@ fn every_fixture_parses_round_trips_and_validates() {
             "{name}"
         );
 
-        // Nothing is lost or invented: the canonical form equals the file, apart from the dial
-        // fields that default when absent.
+        // Nothing is lost or invented: the canonical form equals the file, apart from the top-level
+        // and dial fields that default when absent.
         let file: Value = serde_json::from_str(raw).unwrap();
         let mut canon: Value = serde_json::from_str(&canonical).unwrap();
+        if file.get("assume_basics").is_none() {
+            canon.as_object_mut().unwrap().remove("assume_basics");
+        }
         for key in [
             "water_level",
             "scenario_overrides",

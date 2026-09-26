@@ -63,6 +63,12 @@ pub struct Item {
     /// the user opts in. Optional in content files; defaults to false.
     #[serde(default)]
     pub rare_catastrophic: bool,
+    /// An everyday basic (blankets, a pot and can opener, a phone, a bag, three days of ordinary
+    /// food) that the allocator credits to every household when
+    /// [`crate::PlanInput::assume_basics`] is on, as though already owned. Optional in content
+    /// files; defaults to false.
+    #[serde(default)]
+    pub assumed_basic: bool,
     /// What it is, in a sentence or two.
     pub spec: String,
     /// What to look for when buying.

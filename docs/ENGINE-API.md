@@ -99,7 +99,9 @@ Defined in `crates/rr-types` (Rust, serde) and mirrored by hand in `web/src/engi
 
 ```
 PlanInput { planning_date, location: LocationInput, housing: Housing, people: [Person], pets: Pets,
-            mobility: HouseholdMobility, finances: Finances, existing: [Owned], dials: Dials,
+            mobility: HouseholdMobility, finances: Finances, existing: [Owned],
+            assume_basics?: bool,                                  # defaults to true when absent
+            dials: Dials,
             stage?: not_thought_about|thinking|have_some_things|have_a_plan|maintaining,
             confidence_1to5?: u8 }
 LocationInput { country: "US", zip?, county_fips?, setting: urban|suburban|rural }
@@ -125,7 +127,11 @@ Dials { return_period: one_in_10|one_in_50|one_in_100|one_in_500,
 
 `existing` is the baseline inventory. A free action counts as done when it appears there with `qty`
 1 or more. `paid_usd` is what the household paid for that quantity in total; recorded prices replace
-price-band midpoints. `defaults()` uses `return_period` `one_in_100` and `horizon_years` 10.
+price-band midpoints. `assume_basics` (on by default) credits the household with everyday basics
+that almost every home has — blankets and warm layers, a cooking pot and can opener, a phone, a bag
+per person, three days of ordinary food — unless the Have screen says otherwise; the packet lists
+what was assumed. Those items are the ones with `Item.assumed_basic` set. `defaults()` uses
+`return_period` `one_in_100` and `horizon_years` 10.
 
 ### Outputs
 
@@ -201,7 +207,7 @@ What the numbers mean:
 Citation { id, title, publisher, year?, url, retrieved, quote?, license,
            prior }                                             # defaults to false when absent
 Item { id, name, category, unit, buckets: [BucketId], tier: TierId, free,
-       life_safety, rare_catastrophic,                         # default to false when absent
+       life_safety, rare_catastrophic, assumed_basic,          # default to false when absent
        spec, look_for: [string], avoid: [string],
        price_band_usd: { low, high, per, note? }, retrieved?,  # when the price band was observed
        quantity_rule, maintenance?: { rotate_months?, check_months? }, citations: [CitationId],
@@ -215,7 +221,8 @@ GuidanceMeta { id, title, applies_to: [string], citations: [CitationId] }
   dependent's medication, powered-device backup). `Item.rare_catastrophic`: the allocator gives it
   $0 by default and, when the household turns on `Dials.rare_catastrophic_opt_in`, at most 10% of
   the monthly budget (a radiation meter, potassium iodide only on official instruction, Faraday
-  storage); off by default.
+  storage); off by default. `Item.assumed_basic`: credited to every household as already owned
+  when `PlanInput.assume_basics` is on (see above); off by default.
 - `energy_kcal_per_unit` and `volume_l_per_unit` let the app show cost per 2,000 kcal and per litre or
   gallon.
 
