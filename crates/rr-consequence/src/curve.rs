@@ -63,6 +63,59 @@ impl<'m> Eval<'m> {
         }
     }
 
+    /// Back to central values.
+    pub fn reset(&mut self) {
+        for (k, t) in self.terms.iter().enumerate() {
+            self.w[k] = t.rate * t.q;
+            self.ln_scale[k] = 0.0;
+            self.ln_scale2[k] = 0.0;
+        }
+    }
+
+    /// Sets the weights and duration scales for draw `i` from precomputed multipliers (the fast
+    /// path of [`Eval::set_draw`]; same result).
+    pub fn set_draw_from(&mut self, draws: &crate::ranges::Draws, i: usize) {
+        for (k, t) in self.terms.iter().enumerate() {
+            let mut rate = t.rate;
+            if let Some(p) = t.rate_param {
+                rate *= draws.mult(p, i);
+            }
+            let mut q = t.q;
+            if let Some(p) = t.q_param {
+                q = (q * draws.mult(p, i)).min(1.0);
+            }
+            self.w[k] = rate * q;
+            self.ln_scale[k] = t.dur_param.map_or(0.0, |p| draws.lnm(p, i));
+            self.ln_scale2[k] = t
+                .max_with
+                .as_ref()
+                .and_then(|m| m.dur_param)
+                .map_or(0.0, |p| draws.lnm(p, i));
+        }
+    }
+
+    /// Like [`Eval::target`], searching first between `lo` and `hi` days (a bracket around a known
+    /// answer needs fewer steps); falls back to the full search when the answer is outside.
+    pub fn target_near(&self, rate: f64, lo: f64, hi: f64, iterations: u32) -> f64 {
+        if self.lambda0() <= rate {
+            return 0.0;
+        }
+        let (lo, hi) = (lo.max(MIN_DAYS), hi.min(MAX_DAYS));
+        if lo >= hi || self.lambda(lo) <= rate || self.lambda(hi) > rate {
+            return self.target(rate, iterations + 12);
+        }
+        let (mut a, mut b) = (math::ln(lo), math::ln(hi));
+        for _ in 0..iterations {
+            let mid = 0.5 * (a + b);
+            if self.lambda(math::exp(mid)) > rate {
+                a = mid;
+            } else {
+                b = mid;
+            }
+        }
+        math::exp(b)
+    }
+
     /// Term `i`'s survival at ln d (thresholds, draws and floor applied).
     #[inline]
     fn term_sf(&self, i: usize, ln_d: f64) -> f64 {
@@ -234,6 +287,56 @@ impl<'m> Eval<'m> {
     pub fn natural_frequency(&self, d: f64, years: f64) -> f64 {
         natural_frequency(self.lambda(d), years)
     }
+
+    /// The ladder target for one draw, searching outward from ladder index `start` (the central
+    /// answer, where most draws land) and remembering Λ at each ladder value in `cache` (NaN =
+    /// not computed yet). Same result as [`Eval::ladder_target`].
+    pub fn ladder_target_from(&self, rate: f64, start: usize, cache: &mut [f64; 15]) -> f32 {
+        let ladder = &TARGET_LADDER_DAYS;
+        let n = ladder.len();
+        let at = |k: usize, cache: &mut [f64; 15]| -> f64 {
+            if cache[k].is_nan() {
+                cache[k] = self.lambda(f64::from(ladder[k]));
+            }
+            cache[k]
+        };
+        let mut k = start.min(n - 1);
+        if at(k, cache) <= rate {
+            // Walk down while the next step down still meets the rate.
+            while k > 0 && at(k - 1, cache) <= rate {
+                k -= 1;
+            }
+            if k == 0 && self.lambda0() <= rate {
+                return 0.0;
+            }
+            ladder[k]
+        } else {
+            // Walk up to the first step that meets the rate.
+            while k + 1 < n {
+                k += 1;
+                if at(k, cache) <= rate {
+                    return ladder[k];
+                }
+            }
+            ladder[n - 1]
+        }
+    }
+
+    /// Λ at ladder index `k`, from `cache` when already computed.
+    pub fn lambda_at_ladder(&self, k: usize, cache: &mut [f64; 15]) -> f64 {
+        if cache[k].is_nan() {
+            cache[k] = self.lambda(f64::from(TARGET_LADDER_DAYS[k]));
+        }
+        cache[k]
+    }
+}
+
+/// Index of a ladder value (or of the smallest ladder value at or above `days`).
+pub(crate) fn ladder_index(days: f64) -> usize {
+    TARGET_LADDER_DAYS
+        .iter()
+        .position(|&l| f64::from(l) >= days)
+        .unwrap_or(TARGET_LADDER_DAYS.len() - 1)
 }
 
 /// 100 · (1 − e^(−years · λ)), computed without cancellation.
@@ -308,7 +411,7 @@ impl CurveTerm {
 fn integrate_tail(f: impl Fn(f64) -> f64, x: f64) -> f64 {
     const LO: f64 = 1e-4;
     const HI: f64 = 1e5;
-    const N: usize = 1200; // even
+    const N: usize = 600; // even; ~0.035 per step in ln t
     let start = x.max(LO);
     if start >= HI {
         return 0.0;
@@ -343,7 +446,12 @@ pub struct ExceedanceCurve {
 }
 
 impl ExceedanceCurve {
-    pub(crate) fn from_eval(bucket: BucketId, eval: &Eval<'_>, rate: f64) -> ExceedanceCurve {
+    pub(crate) fn from_eval(
+        bucket: BucketId,
+        eval: &Eval<'_>,
+        target_days: f64,
+        ladder_days: f32,
+    ) -> ExceedanceCurve {
         let terms = eval
             .terms()
             .iter()
@@ -361,8 +469,8 @@ impl ExceedanceCurve {
         ExceedanceCurve {
             bucket,
             terms,
-            target_days: eval.target(rate, 40),
-            ladder_days: eval.ladder_target(rate),
+            target_days,
+            ladder_days,
         }
     }
 

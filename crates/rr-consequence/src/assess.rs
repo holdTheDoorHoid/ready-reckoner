@@ -322,7 +322,7 @@ pub fn assess_with_draws(
     let (hl_assessment, home_loss) = home_loss_bucket(&ctx);
     by_bucket.insert(BucketId::HomeLoss, hl_assessment);
 
-    let scenario_infos = scenario_summaries(&binp, &by_bucket, &states, rate);
+    let scenario_infos = scenario_summaries(&binp, &model, &states, rate);
     let warnings = cliff_warnings(&ctx, &details);
     let statement = statement(
         &ctx, &by_bucket, &details, &income, &evacuate, &get_home, &warnings,
@@ -475,18 +475,12 @@ fn headline_days(bucket: BucketId) -> f64 {
 fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, BucketDetail) {
     let model = ctx.model;
     let mut eval = Eval::central(model, bucket);
-    let target_c = eval.target(ctx.rate, 40);
+    let target_c = eval.target(ctx.rate, 32);
     let ladder = eval.ladder_target(ctx.rate);
     let d1 = headline_days(bucket);
     let d2 = f64::from(ladder).max(1.0);
-    let range = ranges::duration_range(
-        &mut eval,
-        &model.params,
-        ctx.draws,
-        ctx.rate,
-        &[d1, d2],
-        ctx.years,
-    );
+    let range =
+        ranges::duration_range(&mut eval, ctx.draws, ctx.rate, ladder, &[d1, d2], ctx.years);
     let low = range.low.min(ladder);
     let high = range.high.max(ladder);
     let at = if target_c > 0.0 { target_c } else { 0.0 };
@@ -498,7 +492,7 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
     order.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
     let mut candidates: Vec<usize> = Vec::new();
     for (i, s) in &order {
-        if *s < 0.02 || candidates.len() >= 12 {
+        if *s < 0.02 || candidates.len() >= 6 {
             break;
         }
         let t = eval.terms()[*i];
@@ -513,7 +507,7 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
         let rate = ctx.rate;
         let mut target_at = |z: &dyn Fn(usize) -> f64| {
             eval.set_draw(params, z);
-            eval.target(rate, 26)
+            eval.target_near(rate, target_c / 30.0, target_c * 30.0, 12)
         };
         let d = ranges::drivers(&candidates, params, 2, &mut target_at);
         eval.set_draw(params, |_| 0.0);
@@ -528,12 +522,12 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
             let r = dial_rate(rp.years());
             DialPoint {
                 return_period_years: rp.years(),
-                target_days: eval.target(r, 40),
+                target_days: eval.target(r, 26),
                 ladder_days: eval.ladder_target(r),
             }
         })
         .collect();
-    let curve = ExceedanceCurve::from_eval(bucket, &eval, ctx.rate);
+    let curve = ExceedanceCurve::from_eval(bucket, &eval, target_c, ladder);
 
     // Relief for the design event.
     let design = order
@@ -701,7 +695,7 @@ fn readiness_parts(
 ) -> (f64, f64, f64, Vec<Contribution>, Vec<CitationId>) {
     let mut eval = Eval::central(ctx.model, bucket);
     let r = eval.lambda0();
-    let (lo, hi) = ranges::rate_range(&mut eval, &ctx.model.params, ctx.draws);
+    let (lo, hi) = ranges::rate_range(&mut eval, ctx.draws);
     let shares = eval.shares(0.0);
     let owners = owner_shares(&eval, 0.0);
     let sources = bucket_sources(ctx, bucket, eval.terms(), &shares);
@@ -770,7 +764,7 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
     // Typical time away: the median of the time-away mixture, on the ladder.
     let total = eval.lambda0();
     let days_away = if total > 0.0 {
-        let median = eval.target(0.5 * total, 40);
+        let median = eval.target(0.5 * total, 26);
         crate::curve::round_up_to_ladder(median)
     } else {
         0.0
@@ -996,8 +990,7 @@ fn income_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, IncomeDetail) {
     let mut eval = IncomeEval::central(&model.income, rule);
     let target_c = eval.target(ctx.rate, 60);
     let ladder = eval.ladder_target(ctx.rate);
-    let (lo_t, hi_t, lam_lo, lam_hi) =
-        ranges::income_range(&mut eval, &model.params, ctx.draws, ctx.rate, 3.0);
+    let (lo_t, hi_t, lam_lo, lam_hi) = ranges::income_range(&mut eval, ctx.draws, ctx.rate, 3.0);
     let low = lo_t.min(ladder);
     let high = hi_t.max(ladder);
     let shares = eval.shares(target_c);
@@ -1185,13 +1178,14 @@ fn target_words(bucket: BucketId, v: f32) -> String {
     }
 }
 
+/// With/without summaries: the current model is one side of every comparison, so only the other
+/// side is rebuilt.
 fn scenario_summaries(
     binp: &BuildInput<'_>,
-    current: &BTreeMap<BucketId, BucketAssessment>,
+    current: &Model,
     states: &[bool],
     rate: f64,
 ) -> Vec<ScenarioInfo> {
-    let _ = current;
     let earners = f64::from(binp.plan.finances.income.earners.max(1));
     let prm = &binp.table.params;
     let rule = GapRule {
@@ -1204,28 +1198,28 @@ fn scenario_summaries(
         .iter()
         .enumerate()
         .map(|(i, c)| {
-            let mut off = states.to_vec();
-            off[i] = false;
-            let mut on = states.to_vec();
-            on[i] = true;
-            let build = |s: &[bool]| {
-                model::build(&BuildInput {
-                    plan: binp.plan,
-                    rates: binp.rates,
-                    county: binp.county,
-                    scenarios: binp.scenarios,
-                    scenario_on: s,
-                    table: binp.table,
-                })
+            let mut flipped = states.to_vec();
+            flipped[i] = !states[i];
+            let other = model::build(&BuildInput {
+                plan: binp.plan,
+                rates: binp.rates,
+                county: binp.county,
+                scenarios: binp.scenarios,
+                scenario_on: &flipped,
+                table: binp.table,
+            });
+            let (m_off, m_on) = if states[i] {
+                (&other, current)
+            } else {
+                (current, &other)
             };
-            let (m_off, m_on) = (build(&off), build(&on));
-            let without = ladder_targets(&m_off, rate, rule);
-            let with = ladder_targets(&m_on, rate, rule);
+            let without = ladder_targets(m_off, rate, rule);
+            let with = ladder_targets(m_on, rate, rule);
             let need = |m: &Model| {
                 let r = Eval::central(m, BucketId::Evacuate).lambda0();
                 (100.0 * p10(r) + 0.5).floor()
             };
-            let (need_off, need_on) = (need(&m_off), need(&m_on));
+            let (need_off, need_on) = (need(m_off), need(m_on));
             let mut changes = Vec::new();
             for b in DURATION_BUCKETS.iter().chain([BucketId::Income].iter()) {
                 let (a, z) = (without[b], with[b]);

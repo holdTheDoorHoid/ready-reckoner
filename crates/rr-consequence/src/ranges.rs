@@ -25,10 +25,12 @@ use crate::income::IncomeEval;
 use crate::model::UParam;
 use crate::survival::probit;
 
-/// Draws per assessment. Chosen so `assess` stays well under 40 ms in WebAssembly for the
-/// fixtures (see docs/RISK_MODEL.md, "Ranges"); 400 draws put the 10th and 90th percentiles
-/// within about ±1.5 percentile points.
-pub const DRAWS: usize = 400;
+/// Draws per assessment. Measured in WebAssembly (Node 24, release build with the workspace
+/// profile): the heaviest fixture with all 35 hazards active takes about 19 ms at 256 draws, 27 ms
+/// at 400 (docs/RISK_MODEL.md, "Ranges"). With Latin hypercube sampling, 256 draws put the 10th
+/// and 90th percentiles within about ±2 percentile points, finer than the day ladder they are
+/// rounded to.
+pub const DRAWS: usize = 256;
 
 /// Seed for every draw sequence (combined with each parameter's name).
 pub const BASE_SEED: u64 = 0x5EED_2026_0925_0001;
@@ -43,10 +45,17 @@ fn fnv1a(s: &str) -> u64 {
     h
 }
 
-/// Standard-normal scores for every parameter and draw.
+/// Standard-normal scores for every parameter and draw, with the multipliers they imply.
 pub(crate) struct Draws {
     n: usize,
+    /// The scores themselves (kept for the tests; the evaluation uses `lnm` and `mult`).
+    #[cfg(test)]
     z: Vec<f64>,
+    /// ln of each parameter's multiplier in each draw.
+    lnm: Vec<f64>,
+    /// Each rate or share parameter's multiplier in each draw (exp of `lnm`), computed once;
+    /// NaN for duration parameters, which only use `lnm`.
+    mult: Vec<f64>,
 }
 
 impl Draws {
@@ -67,14 +76,49 @@ impl Draws {
                 z[p * n + i] = grid[k];
             }
         }
-        Draws { n, z }
+        let lnm: Vec<f64> = z
+            .iter()
+            .enumerate()
+            .map(|(k, &zi)| params[k / n.max(1)].ln_mult(zi))
+            .collect();
+        // Durations use the logarithm directly; only rates and shares need the multiplier.
+        let mult = lnm
+            .iter()
+            .enumerate()
+            .map(|(k, &l)| {
+                if params[k / n.max(1)].key.starts_with("dur:") {
+                    f64::NAN
+                } else {
+                    rr_types::math::exp(l)
+                }
+            })
+            .collect();
+        Draws {
+            n,
+            #[cfg(test)]
+            z,
+            lnm,
+            mult,
+        }
+    }
+
+    /// ln of parameter `param`'s multiplier in draw `draw`.
+    #[inline]
+    pub fn lnm(&self, param: usize, draw: usize) -> f64 {
+        self.lnm[param * self.n + draw]
+    }
+
+    /// Parameter `param`'s multiplier in draw `draw`.
+    #[inline]
+    pub fn mult(&self, param: usize, draw: usize) -> f64 {
+        self.mult[param * self.n + draw]
     }
 
     pub fn n(&self) -> usize {
         self.n
     }
 
-    #[inline]
+    #[cfg(test)]
     pub fn z(&self, param: usize, draw: usize) -> f64 {
         self.z[param * self.n + draw]
     }
@@ -92,7 +136,7 @@ pub(crate) fn quantile(values: &mut [f64], q: f64) -> f64 {
 }
 
 /// 10th and 90th percentiles of a duration bucket's ladder target, and of its natural frequencies
-/// at `days`.
+/// at `days` (each a ladder value, so the search's cached Λ values are reused).
 pub(crate) struct DurationRange {
     pub low: f32,
     pub high: f32,
@@ -102,23 +146,30 @@ pub(crate) struct DurationRange {
 
 pub(crate) fn duration_range(
     eval: &mut Eval<'_>,
-    params: &[UParam],
     draws: &Draws,
     rate: f64,
+    central: f32,
     days: &[f64],
     years: f64,
 ) -> DurationRange {
     let n = draws.n();
+    let start = crate::curve::ladder_index(f64::from(central));
+    let idx: Vec<usize> = days
+        .iter()
+        .map(|&d| crate::curve::ladder_index(d))
+        .collect();
     let mut targets = Vec::with_capacity(n);
     let mut freqs: Vec<Vec<f64>> = vec![Vec::with_capacity(n); days.len()];
     for i in 0..n {
-        eval.set_draw(params, |p| draws.z(p, i));
-        targets.push(f64::from(eval.ladder_target(rate)));
-        for (j, &d) in days.iter().enumerate() {
-            freqs[j].push(eval.natural_frequency(d, years));
+        eval.set_draw_from(draws, i);
+        let mut cache = [f64::NAN; 15];
+        targets.push(f64::from(eval.ladder_target_from(rate, start, &mut cache)));
+        for (j, &k) in idx.iter().enumerate() {
+            let lam = eval.lambda_at_ladder(k, &mut cache);
+            freqs[j].push(crate::curve::natural_frequency(lam, years));
         }
     }
-    eval.set_draw(params, |_| 0.0);
+    eval.reset();
     let low = quantile(&mut targets, 0.1) as f32;
     let high = quantile(&mut targets, 0.9) as f32;
     let freq = freqs
@@ -129,21 +180,20 @@ pub(crate) fn duration_range(
 }
 
 /// 10th and 90th percentiles of a readiness bucket's yearly need rate.
-pub(crate) fn rate_range(eval: &mut Eval<'_>, params: &[UParam], draws: &Draws) -> (f64, f64) {
+pub(crate) fn rate_range(eval: &mut Eval<'_>, draws: &Draws) -> (f64, f64) {
     let n = draws.n();
     let mut v = Vec::with_capacity(n);
     for i in 0..n {
-        eval.set_draw(params, |p| draws.z(p, i));
+        eval.set_draw_from(draws, i);
         v.push(eval.lambda0());
     }
-    eval.set_draw(params, |_| 0.0);
+    eval.reset();
     (quantile(&mut v, 0.1), quantile(&mut v, 0.9))
 }
 
 /// 10th and 90th percentiles of the income target (months) and of Λ at `months`.
 pub(crate) fn income_range(
     eval: &mut IncomeEval<'_>,
-    params: &[UParam],
     draws: &Draws,
     rate: f64,
     months: f64,
@@ -152,11 +202,11 @@ pub(crate) fn income_range(
     let mut t = Vec::with_capacity(n);
     let mut l = Vec::with_capacity(n);
     for i in 0..n {
-        eval.set_draw(params, |p| draws.z(p, i));
+        eval.set_draw_from(draws, i);
         t.push(f64::from(eval.ladder_target(rate)));
         l.push(eval.lambda(months));
     }
-    eval.set_draw(params, |_| 0.0);
+    eval.reset();
     (
         quantile(&mut t, 0.1) as f32,
         quantile(&mut t, 0.9) as f32,

@@ -93,6 +93,21 @@ impl<'m> IncomeEval<'m> {
         }
     }
 
+    /// Back to central values.
+    pub fn reset(&mut self) {
+        for (k, t) in self.terms.iter().enumerate() {
+            self.rate[k] = t.rate;
+            self.ln_scale[k] = 0.0;
+        }
+    }
+
+    pub fn set_draw_from(&mut self, draws: &crate::ranges::Draws, i: usize) {
+        for (k, t) in self.terms.iter().enumerate() {
+            self.rate[k] = t.rate * t.rate_param.map_or(1.0, |p| draws.mult(p, i));
+            self.ln_scale[k] = t.dur_param.map_or(0.0, |p| draws.lnm(p, i));
+        }
+    }
+
     pub fn terms(&self) -> &[IncomeTerm] {
         self.terms
     }

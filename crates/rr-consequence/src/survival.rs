@@ -20,6 +20,9 @@
 use rr_types::DurationDist;
 use rr_types::math::{self, Z_90};
 
+/// Standard scores beyond which [`Survival::sf_ln`] returns exactly 0 or 1 (Φ̄(8.5) ≈ 9.5 × 10⁻¹⁸).
+const TAIL_Z: f64 = 8.5;
+
 /// Smallest slope (standard deviations per unit of ln d) an empirical segment may have. A flatter
 /// tail would give an effectively infinite expected duration.
 const MIN_SLOPE: f64 = 0.2;
@@ -102,6 +105,10 @@ impl Survival {
     /// P(D > x) given `ln_x = ln(x)` (x > 0) for durations scaled by `exp(ln_scale)`. Same bits as
     /// [`Survival::sf`] for the same x; lets a caller that evaluates many terms at one x take the
     /// logarithm once.
+    ///
+    /// Beyond 8.5 standard deviations (a probability below 10⁻¹⁷) it returns exactly 0 or 1
+    /// without calling `erfc`, which keeps the Monte Carlo fast when most terms sit deep in a
+    /// tail.
     #[inline]
     pub fn sf_ln(&self, ln_x: f64, ln_scale: f64) -> f64 {
         match self {
@@ -110,7 +117,14 @@ impl Survival {
                 if *spread <= 0.0 {
                     return if x >= *mu { 0.0 } else { 1.0 };
                 }
-                math::norm_sf(Z_90 * ((x - mu) / spread))
+                let z = Z_90 * ((x - mu) / spread);
+                if z > TAIL_Z {
+                    0.0
+                } else if z < -TAIL_Z {
+                    1.0
+                } else {
+                    math::norm_sf(z)
+                }
             }
             Survival::Fixed { days } => {
                 if *days <= 0.0 || ln_x - ln_scale >= math::ln(*days) {
