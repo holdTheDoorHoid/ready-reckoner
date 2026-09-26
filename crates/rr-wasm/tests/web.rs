@@ -159,6 +159,63 @@ const CORE: &[(&str, &[u8])] = &[
         "core/zip_facilities.csv",
         include_bytes!("../../../data/core/zip_facilities.csv"),
     ),
+    // Added with the v2 data pack (outage model, temperature, reliability, declarations, series).
+    (
+        "core/declarations.csv",
+        include_bytes!("../../../data/core/declarations.csv"),
+    ),
+    (
+        "core/outage_causes.csv",
+        include_bytes!("../../../data/core/outage_causes.csv"),
+    ),
+    (
+        "core/outage_curves.csv",
+        include_bytes!("../../../data/core/outage_curves.csv"),
+    ),
+    (
+        "core/outage_pooled.csv",
+        include_bytes!("../../../data/core/outage_pooled.csv"),
+    ),
+    (
+        "core/outage_stress.csv",
+        include_bytes!("../../../data/core/outage_stress.csv"),
+    ),
+    (
+        "core/reliability.csv",
+        include_bytes!("../../../data/core/reliability.csv"),
+    ),
+    (
+        "core/temperature.csv",
+        include_bytes!("../../../data/core/temperature.csv"),
+    ),
+    (
+        "core/series/drug_shortages.toml",
+        include_bytes!("../../../data/core/series/drug_shortages.toml"),
+    ),
+    (
+        "core/series/fbi_arrests.toml",
+        include_bytes!("../../../data/core/series/fbi_arrests.toml"),
+    ),
+    (
+        "core/series/fcc_dirs.toml",
+        include_bytes!("../../../data/core/series/fcc_dirs.toml"),
+    ),
+    (
+        "core/series/fdic_failures.toml",
+        include_bytes!("../../../data/core/series/fdic_failures.toml"),
+    ),
+    (
+        "core/series/funding_gaps.toml",
+        include_bytes!("../../../data/core/series/funding_gaps.toml"),
+    ),
+    (
+        "core/series/ihp_displacement.toml",
+        include_bytes!("../../../data/core/series/ihp_displacement.toml"),
+    ),
+    (
+        "core/series/oe417.toml",
+        include_bytes!("../../../data/core/series/oe417.toml"),
+    ),
     (
         "core/counties.csv",
         include_bytes!("../../../data/core/counties.csv"),
