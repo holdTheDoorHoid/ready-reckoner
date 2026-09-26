@@ -278,7 +278,8 @@ Ids are stable snake_case strings. `rr-types` exposes them as enums with `ALL`, 
 
 ## Loading
 
-How the web app gets the engine and its data (`crates/rr-wasm`, `web/src/engine/wasm.ts`).
+How the web app gets the engine and its data (`crates/rr-wasm`, `web/src/engine/wasm.ts`,
+`web/src/engine/loader.ts`).
 
 **Build.** `bash crates/rr-wasm/build-web.sh` compiles `rr-wasm` with wasm-pack (`--target web`,
 the release profile at opt-level `s` unless `CARGO_PROFILE_RELEASE_OPT_LEVEL` says otherwise, then

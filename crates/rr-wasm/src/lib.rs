@@ -2,9 +2,9 @@
 //!
 //! The eight exports below are the `RawEngine` surface of `web/src/engine/index.ts` and
 //! `docs/ENGINE-API.md`: strings (and, for `load_pack`, bytes) in, the JSON of an envelope out.
-//! `web/src/engine/wasm.ts` wraps them as the app's `Engine`, fetches the data packs from the
-//! site's own origin and hands them to [`load_pack`]; the engine itself never touches the network,
-//! the clock or any randomness.
+//! `web/src/engine/wasm.ts` wraps them as the app's `Engine`, and `web/src/engine/loader.ts`
+//! fetches the data packs from the site's own origin and hands them to [`load_pack`]; the engine
+//! itself never touches the network, the clock or any randomness.
 //!
 //! ```text
 //! JavaScript ── JSON string ──► export ─► api::* ─► rr_plan::Engine<WasmSource> ─► envelope JSON

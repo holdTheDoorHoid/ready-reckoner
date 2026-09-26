@@ -59,8 +59,9 @@ const FIXTURES: &[(&str, &str, &str)] = &[
 
 const MANIFEST: &[u8] = include_bytes!("../../../data/manifest.json");
 
-/// The core pack's files in the order `web/src/engine/wasm.ts` hands them over: the county list
-/// last. The test checks this list against the manifest, so a file added to the pack is noticed.
+/// The core pack's files with the county list last, as `web/src/engine/loader.ts` hands them over
+/// (the site loads the ZIP tables later, when a ZIP code is typed; here they come with the rest).
+/// The test checks this list against the manifest, so a file added to the pack is noticed.
 const CORE: &[(&str, &[u8])] = &[
     (
         "core/base_rates.toml",

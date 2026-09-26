@@ -412,7 +412,8 @@ fn the_data_packs_load_file_by_file_and_then_answer_for_every_fixture() {
 }
 
 /// Loads `data/manifest.json`, then every file of the core pack with the county list last, as
-/// `web/src/engine/wasm.ts` does. Returns the manifest's pack version.
+/// `web/src/engine/loader.ts` does (it loads the ZIP tables later; here they come with the rest).
+/// Returns the manifest's pack version.
 fn load_core_packs() -> String {
     let manifest_bytes = read("data/manifest.json");
     let manifest: serde_json::Value = serde_json::from_slice(&manifest_bytes).unwrap();

@@ -203,8 +203,11 @@ export class AppState {
   /** County outlines for the map, loaded once; null when the site has none. */
   countyShapes(): Promise<CountyShapes | null> {
     if (!this.#shapes) {
-      const pending: Promise<CountyShapes | null> = this.#loader
-        ? this.#loader.map().then((json) => (json ? indexShapes(json) : null))
+      const loader = this.#loader;
+      // A map that failed before is fetched again (the loader keeps a failure until told to retry).
+      if (loader?.status.map.phase === 'failed') loader.retry();
+      const pending: Promise<CountyShapes | null> = loader
+        ? loader.map().then((json) => (json ? indexShapes(json) : null))
         : fetchCountyShapes(import.meta.env.BASE_URL);
       this.#shapes = pending;
       // A failed load is tried again next time a map is shown.
