@@ -2,7 +2,7 @@
 //! an escape ladder, and neighbours. Firearms are never sized or listed here (docs/PRINCIPLES.md
 //! §9).
 
-use rr_types::{Housing, HousingKind, Per};
+use rr_types::{Housing, HousingKind, Per, Tenure};
 
 use super::Sizing;
 use crate::basis::Basis;
@@ -69,8 +69,13 @@ pub fn fire_escape_plan(housing: &Housing) -> Sizing {
 }
 
 /// Smoke alarms on every level and in every bedroom when the household has none (bedrooms counted
-/// as one per two people: an estimate). Rule `smoke_alarm_count`.
-pub fn smoke_alarm_count(housing: &Housing, people: usize) -> Option<Sizing> {
+/// as one per two people: an estimate). Free routes come first (round-2 review RR-P16): some fire
+/// departments install alarms at no cost (USFA), the Red Cross installs them free on request
+/// where it runs home visits, and renters ask the landlord first. For renters the line is a note
+/// (the landlord provides alarms; buy them only if every free route fails), so the plan budgets no
+/// purchase; for owners it stays a need, bought only if the free programmes cannot help. Returns
+/// the line and whether it is a need. Rule `smoke_alarm_count`.
+pub fn smoke_alarm_count(housing: &Housing, people: usize) -> Option<(Sizing, bool)> {
     if housing.alarms.smoke {
         return None;
     }
@@ -81,20 +86,30 @@ pub fn smoke_alarm_count(housing: &Housing, people: usize) -> Option<Sizing> {
     let per_room = b.k(keys::PEOPLE_PER_BEDROOM);
     let bedrooms = ceil_count((people.max(1) as f64) / per_room);
     let q = lv + bedrooms;
+    b.cite("redcross_sound_the_alarm");
+    let renter = housing.tenure == Tenure::Rent;
+    let first = if renter {
+        "Ask your landlord first; if that fails, ask your fire department or the Red Cross, which install free smoke alarms in many places, and buy them yourself only if nobody can."
+    } else {
+        "Ask your fire department or the Red Cross first: some fire departments and the Red Cross install free smoke alarms. Buy them only if they cannot."
+    };
     let text = format!(
-        "No smoke alarms yet: put one on every level and in every bedroom, about {} and {} for a home like yours = {} alarms. Test them every month.",
+        "No smoke alarms yet: one on every level and in every bedroom, about {} and {} for a home like yours = {} alarms. {first} Test them every month.",
         count(lv, "level", "levels"),
         count(bedrooms, "bedroom", "bedrooms"),
         num(q, 0)
     );
-    Some(Sizing::new(
-        &b,
-        "smoke_alarm_count",
-        "smoke_alarm",
-        q,
-        "alarm",
-        Per::Household,
-        text,
+    Some((
+        Sizing::new(
+            &b,
+            "smoke_alarm_count",
+            "smoke_alarm",
+            q,
+            "alarm",
+            Per::Household,
+            text,
+        ),
+        !renter,
     ))
 }
 
@@ -136,8 +151,10 @@ pub fn extinguisher_count(housing: &Housing) -> Option<Sizing> {
     b.cite("usfa_extinguishers");
     let floors = levels(&mut b, housing, false);
     let each = b.k(keys::EXTINGUISHERS_PER_FLOOR);
+    let fires = b.k(keys::HOME_FIRES_PER_100_HOUSEHOLDS);
+    let reported = b.k(keys::HOME_FIRES_REPORTED_SHARE);
     let n = floors * each;
-    let text = if floors <= 1.0 {
+    let mut text = if floors <= 1.0 {
         format!(
             "No fire extinguisher yet: {} for a home on one floor, kept near the kitchen. Learn how to use it before you need it.",
             count(
@@ -157,6 +174,11 @@ pub fn extinguisher_count(housing: &Housing) -> Option<Sizing> {
             num(floors, 0)
         )
     };
+    text.push_str(&format!(
+        " Small home fires are common: CPSC estimated about {} a year for every 100 households, most of them cooking fires, and fire departments attend only about {} in 100 of them.",
+        num(fires, 1),
+        num(reported * 100.0, 0)
+    ));
     Some(Sizing::new(
         &b,
         "extinguisher_count",
@@ -252,9 +274,48 @@ mod tests {
         let mut p = fixtures::get("philadelphia-renters-4").unwrap();
         p.housing.alarms.smoke = false;
         // 3 levels (with the basement) + 2 bedrooms for 4 people
-        let s = smoke_alarm_count(&p.housing, 4).unwrap();
+        let (s, need) = smoke_alarm_count(&p.housing, 4).unwrap();
         assert_eq!(s.quantity, 5.0);
         assert!(s.prior && s.citations.iter().any(|c| c == "usfa_smoke_alarms"));
+        // Renters ask the landlord first (round-2 review RR-P16): a note, never a purchase the
+        // plan saves toward for months.
+        assert!(!need);
+        assert!(s.plain.contains("Ask your landlord first"), "{}", s.plain);
+        assert!(s.plain.contains("Red Cross"), "{}", s.plain);
+        assert!(s.citations.iter().any(|c| c == "redcross_sound_the_alarm"));
+        // Owners ask the fire department or the Red Cross first, and buy only if that fails.
+        p.housing.tenure = Tenure::Own;
+        let (o, need) = smoke_alarm_count(&p.housing, 4).unwrap();
+        assert!(need);
+        assert!(
+            o.plain
+                .contains("Ask your fire department or the Red Cross first"),
+            "{}",
+            o.plain
+        );
+        assert!(
+            o.plain.contains("Buy them only if they cannot"),
+            "{}",
+            o.plain
+        );
+    }
+
+    #[test]
+    fn the_extinguisher_line_counts_the_small_fires_nobody_reports() {
+        let p = fixtures::get("philadelphia-renters-4").unwrap();
+        let ext = extinguisher_count(&p.housing).unwrap();
+        assert!(
+            ext.plain
+                .contains("about 6.6 a year for every 100 households"),
+            "{}",
+            ext.plain
+        );
+        assert!(ext.plain.contains("only about 3 in 100"), "{}", ext.plain);
+        assert!(
+            ext.citations
+                .iter()
+                .any(|c| c == "cpsc_unreported_fires_2009")
+        );
     }
 
     #[test]

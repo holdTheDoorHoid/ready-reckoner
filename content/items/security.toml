@@ -72,6 +72,6 @@ avoid = [
 ]
 price_band_usd = { low = 24.49, high = 24.99, per = "light", note = "Two retail listings for solar motion-sensor lights: $24.49 and $24.99." }
 retrieved = "2026-09-25"
-quantity_rule = "once"
+quantity_rule = "once_if_house_ground_floor"
 citations = ["ncpc_home_safety", "rr_price_observations_2026_09"]
 hazard_extras = []

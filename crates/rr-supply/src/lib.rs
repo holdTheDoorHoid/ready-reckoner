@@ -38,8 +38,8 @@ pub mod tiers;
 use std::collections::BTreeSet;
 
 use rr_types::{
-    BucketAssessment, BucketId, CitationId, HazardId, Per, PlanInput, RequirementLine, TierId,
-    WaterSource,
+    BucketAssessment, BucketId, CitationId, HazardId, Per, PlanInput, RequirementLine, Setting,
+    Target, TierId, WaterSource,
 };
 
 pub use constants::{Constant, Constants, constants};
@@ -53,6 +53,13 @@ use targets::Targets;
 
 /// Crate name, used by the CLI's `--version` and by the about screen.
 pub const CRATE: &str = "rr-supply";
+
+/// The catalogue item for an electrician-installed generator inlet with an interlock or transfer
+/// switch. A household that lists it in `existing` and owns a generator has pump power on a well,
+/// so its animals' stored water only bridges the first days (`livestock_water`).
+pub const TRANSFER_INTERLOCK_ITEM: &str = "power_transfer_interlock";
+
+pub use rules::power::COLD_MEDICINE_POWER_CLASS;
 
 /// Rules that emit requirement lines, in the order `docs/QUANTITY_RULES.md` lists them.
 pub const LINE_RULES: &[&str] = &[
@@ -83,8 +90,11 @@ pub const LINE_RULES: &[&str] = &[
     "power_station_units",
     "generator_units",
     "generator_fuel_gallons",
+    "generator_connection_units",
+    "fuel_cans",
     "solar_panel_units",
     "fridge_wh",
+    "fridge_thermometers",
     "well_pump_wh",
     "wheelchair_battery",
     "noaa_radio",
@@ -106,9 +116,11 @@ pub const LINE_RULES: &[&str] = &[
     "n95_masks",
     "thermometer",
     "ors_packets",
+    "bleeding_control_kit",
     "battery_fan",
     "cooling_towel",
     "cooling_plan",
+    "room_thermometer",
     "blankets",
     "sleeping_bag_or_blanket",
     "warm_layers",
@@ -367,18 +379,27 @@ pub fn sized_requirements(
     // Duration lines also cite the target's own sources (the hazard and duration data behind the
     // days).
     let cited = |b: BucketId, s: Option<Sizing>| s.map(|s| s.also_cite(t.sources(b)));
-    // A household on a well with horses or livestock keeps the pump running on a generator in a
-    // power cut: the plan makes the generator a need (unless the household owns one), and the
-    // animals' stored water only bridges the first days (`livestock_water`), with two weeks in
-    // stock tanks as the alternative. Only where the no-water target is longer than that bridge.
-    let well_animals = housing.water == WaterSource::Well
-        && pets.large_animals > 0
-        && days_of(BucketId::WaterOut)
-            .is_some_and(|d| d > constants().value(constants::keys::LIVESTOCK_PUMP_BRIDGE_DAYS));
-    let generator_for_pump = well_animals
+    // Horses or livestock on a well (round-2 review P-02). Their stored water covers the no-water
+    // target up to 14 days, like people's. Pump power exists only when the household owns a
+    // generator and the interlock or transfer switch that connects it to the pump; then the
+    // stored water only bridges the first days (`livestock_water`), with two weeks in stock tanks
+    // as the alternative. A power cut that can outlast the stored water makes a pump-rated
+    // generator a need (unless one is owned), with its connection and fuel cans. A drought that
+    // dries the well is met by hauling water, not by pump power.
+    let well = housing.water == WaterSource::Well;
+    let animals_on_well = well && pets.large_animals > 0 && days_of(BucketId::WaterOut).is_some();
+    let owns_interlock = input
+        .existing
+        .iter()
+        .any(|o| o.item_id == TRANSFER_INTERLOCK_ITEM && o.qty > 0.0);
+    let pump_power = animals_on_well && h.has_generator() && owns_interlock;
+    let stored_cap = constants().value(constants::keys::WATER_STORED_CAP_DAYS);
+    let animals_stored_days = days_of(BucketId::WaterOut).map_or(stored_cap, |d| d.min(stored_cap));
+    let generator_for_pump = animals_on_well
         && !h.has_generator()
-        && days_of(BucketId::Power).is_some_and(|d| power::generator_units(d, housing).is_some());
-    let pump_power = well_animals && (h.has_generator() || generator_for_pump);
+        && days_of(BucketId::Power).is_some_and(|d| {
+            d > animals_stored_days && power::generator_units(d, housing).is_some()
+        });
     let longest = |a: BucketId, b: BucketId| match (days_of(a), days_of(b)) {
         (Some(x), Some(y)) => Some((x.max(y), if x >= y { a } else { b })),
         (Some(x), None) => Some((x, a)),
@@ -411,27 +432,62 @@ pub fn sized_requirements(
                     h72,
                     false,
                 );
+                // The plan's 40 °F rule for food after a power cut needs a fridge thermometer.
+                out.push(bucket, Some(power::fridge_thermometers()), Need, h72, false);
+                let fuel = power::generator_fuel_gallons(days, housing);
+                let fuel_gallons = fuel.as_ref().map_or(0.0, |f| f.quantity);
                 if h.has_generator() {
+                    out.push(bucket, cited(bucket, fuel), Need, None, false);
+                    // Gasoline the plan buys needs approved cans first (CPSC): life-safety, so the
+                    // cans come before the fuel, never after it.
                     out.push(
                         bucket,
-                        cited(bucket, power::generator_fuel_gallons(days, housing)),
+                        cited(
+                            bucket,
+                            power::fuel_cans(fuel_gallons, power::GeneratorFor::Owned),
+                        ),
                         Need,
-                        None,
-                        false,
+                        Some(tier_for_days(days)),
+                        true,
                     );
                 } else if generator_for_pump {
                     // The fuel to keep for the generator the plan buys for the pump: said, but not
-                    // a need of its own, so the plan never buys fuel before the generator.
+                    // a need of its own, so the plan never buys fuel before the generator. The
+                    // cans to keep it in are part of the generator's purchase.
+                    out.push(bucket, cited(bucket, fuel), Note, None, false);
                     out.push(
                         bucket,
-                        cited(bucket, power::generator_fuel_gallons(days, housing)),
-                        Note,
-                        None,
+                        cited(
+                            bucket,
+                            power::fuel_cans(fuel_gallons, power::GeneratorFor::Planned),
+                        ),
+                        Need,
+                        Some(tier_for_days(days)),
                         false,
                     );
                 }
+                // A generator reaches a hardwired well pump only through an electrician-installed
+                // interlock or transfer switch. For a generator the household owns it is
+                // life-safety (the backfeed risk is there now); for the one the plan buys it is
+                // part of that purchase.
+                let generator = if h.has_generator() {
+                    Some(power::GeneratorFor::Owned)
+                } else if generator_for_pump {
+                    Some(power::GeneratorFor::Planned)
+                } else {
+                    None
+                };
+                if let (true, Some(g)) = (well, generator) {
+                    out.push(
+                        bucket,
+                        power::generator_connection_units(housing, g),
+                        Need,
+                        Some(tier_for_days(days)),
+                        g == power::GeneratorFor::Owned,
+                    );
+                }
                 out.push(bucket, power::wheelchair_battery(people), Need, h72, false);
-                if let Some((s, needed)) = power::power_station_units(days, people) {
+                if let Some((s, needed)) = power::power_station_units(days, people, housing) {
                     let shape = if needed { Need } else { Optional };
                     out.push(
                         bucket,
@@ -446,7 +502,12 @@ pub fn sized_requirements(
                         bucket,
                         cited(
                             bucket,
-                            power::generator_for_well_pump(days, housing, pets.large_animals),
+                            power::generator_for_well_pump(
+                                days,
+                                housing,
+                                pets.large_animals,
+                                animals_stored_days,
+                            ),
                         ),
                         Need,
                         Some(tier_for_days(days)),
@@ -504,7 +565,7 @@ pub fn sized_requirements(
                 let Some(days) = days_of(bucket) else {
                     continue;
                 };
-                let (stored, treat) = water::water_storage(days, people, pets, level, hot);
+                let (stored, treat) = water::water_storage(days, people, pets, level, hot, well);
                 out.push(bucket, cited(bucket, Some(stored)), Need, None, true);
                 out.push(
                     bucket,
@@ -698,6 +759,7 @@ pub fn sized_requirements(
                         false,
                     );
                     out.push(bucket, Some(thermal::cooling_plan()), Need, now, false);
+                    out.push(bucket, Some(thermal::room_thermometer()), Need, h72, false);
                 }
                 if cold == Some(true) || neither {
                     // Blankets and warm layers first (most homes have them); a sleeping bag or an
@@ -748,7 +810,15 @@ pub fn sized_requirements(
                     };
                     out.push(
                         bucket,
-                        cited(src, medication::rx_cold_storage(cd, people)),
+                        cited(
+                            src,
+                            medication::rx_cold_storage(
+                                cd,
+                                days_of(BucketId::Power),
+                                people,
+                                housing,
+                            ),
+                        ),
                         Need,
                         None,
                         true,
@@ -953,6 +1023,18 @@ pub fn sized_requirements(
                     h72,
                     false,
                 );
+                // Life-safety where the household is rural or a medical emergency is likely.
+                let p_medical = t
+                    .get(BucketId::MedicalEmergency)
+                    .and_then(|a| match a.target {
+                        Target::Readiness { p_need_10yr, .. } => Some(p_need_10yr),
+                        _ => None,
+                    });
+                let (kit, life_safety) = first_aid::bleeding_control_kit(
+                    input.location.setting == Setting::Rural,
+                    p_medical,
+                );
+                out.push(bucket, Some(kit), Need, h72, life_safety);
             }
             BucketId::Fire => {
                 out.push(
@@ -962,13 +1044,10 @@ pub fn sized_requirements(
                     now,
                     false,
                 );
-                out.push(
-                    bucket,
-                    fire::smoke_alarm_count(housing, people.len()),
-                    Need,
-                    h72,
-                    true,
-                );
+                // Renters ask the landlord first: a note, not a purchase (round-2 review RR-P16).
+                if let Some((s, need)) = fire::smoke_alarm_count(housing, people.len()) {
+                    out.push(bucket, Some(s), if need { Need } else { Note }, h72, need);
+                }
                 out.push(bucket, fire::co_alarm_count(housing), Need, h72, true);
                 out.push(bucket, fire::extinguisher_count(housing), Need, h72, false);
                 out.push(bucket, fire::escape_ladder_count(housing), Need, h72, false);

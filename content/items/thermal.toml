@@ -21,7 +21,7 @@ avoid = [
   "Grills, camp stoves or generators indoors (carbon monoxide)",
 ]
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses what you have." }
-quantity_rule = "once"
+quantity_rule = "warm_room_plan"
 citations = ["cdc_winter_safety", "cdc_co_basics"]
 hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
 
@@ -46,7 +46,7 @@ avoid = [
   "Waiting until someone feels ill to leave a hot home",
 ]
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a plan." }
-quantity_rule = "once"
+quantity_rule = "cooling_plan"
 citations = ["ready_gov_heat", "cdc_heat_health", "semenza_1996_heat_deaths"]
 hazard_extras = ["heat_wave"]
 
@@ -116,7 +116,7 @@ avoid = [
 ]
 price_band_usd = { low = 2.19, high = 15.49, per = "thermometer", note = "Two restaurant-supply listings: a stick-on dial at $2.19 and a wall thermometer with humidity dial at $15.49." }
 retrieved = "2026-09-25"
-quantity_rule = "once"
+quantity_rule = "room_thermometer"
 citations = ["cdc_heat_health", "cdc_winter_safety", "rr_price_observations_2026_09"]
 hazard_extras = ["heat_wave"]
 

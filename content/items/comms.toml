@@ -9,6 +9,7 @@ unit = "action"
 buckets = ["comms", "evacuate", "medical_emergency", "power"]
 tier = "now"
 free = true
+life_safety = true
 spec = "Make sure every phone can get warnings: Wireless Emergency Alerts are free and need no sign-up (Ready.gov), but a phone only gets them when it is on, not in airplane mode, and served by a carrier that takes part (FCC). Add your county's text and email alerts and your power company's outage texts for local news. Call 911 when you can, because texting 911 works only in some places (FCC)."
 look_for = [
   "Emergency and public safety alerts switched on in every phone's settings",
@@ -36,6 +37,7 @@ unit = "action"
 buckets = ["comms", "evacuate", "get_home"]
 tier = "now"
 free = true
+life_safety = true
 spec = "Agree how you will reach each other, where you will meet if you are separated, and who picks up the children (Ready.gov). Pick one out-of-state contact everyone texts to say they are safe, since texts often get through when calls do not, and write key numbers on a card for each wallet or bag (Ready.gov). Add school, daycare and work plans, and go over the plan together once a year."
 look_for = [
   "A meeting place near home and one outside the neighbourhood",

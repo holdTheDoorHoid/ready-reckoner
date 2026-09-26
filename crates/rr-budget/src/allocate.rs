@@ -29,7 +29,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use rr_types::{
     BucketId, BucketKind, CostRange, HazardId, Item, ItemId, Plan, PlanItem, PlanItemKind,
-    PlanMonth, SavingsEnvelope, TARGET_LADDER_DAYS, Target, TierId,
+    PlanMonth, SavingsEnvelope, TARGET_LADDER_DAYS, Target, TierId, WaterSource,
 };
 
 use crate::coverage::{ContributionTable, CoverageRule, ItemMeta, ItemRole, apply_requirements};
@@ -42,7 +42,8 @@ use crate::input::{
 use crate::savings;
 use crate::value::{
     PROMOTION_FACTOR, RARE_CATASTROPHIC_SHARE, READINESS_MIN_P_NEED_10YR, SINKING_FUND_MAX_MONTHS,
-    SINKING_FUND_VALUE_RATIO, annual_rate_from_10yr, duration_value_with, per_100, readiness_value,
+    SINKING_FUND_VALUE_RATIO, VALUE_HORIZON_YEARS, annual_rate_from_10yr, duration_value_with,
+    per_100, readiness_value,
 };
 use crate::weights::harm_weight;
 
@@ -55,6 +56,10 @@ const WALK: [TierId; 6] = [
     TierId::M6,
     TierId::Y1,
 ];
+
+/// The quantity rule of items that make raw water safe (`rr-supply`'s `water_treatment_capacity`:
+/// the gravity filter). In the stored-water chain they fill the days after the stored water.
+const TREATMENT_RULE: &str = "water_treatment_capacity";
 
 /// Money and day comparisons tolerate this much rounding.
 const EPS: f64 = 1e-9;
@@ -71,6 +76,52 @@ pub const FREE_ACTIONS_PER_MONTH: usize = 4;
 
 /// Every free action is scheduled by this month (the first three months are 0, 1 and 2).
 pub const FREE_ACTIONS_BY_MONTH: u16 = 2;
+
+/// The first free steps for every household, in this order (round-2 review N7, RR-P14): being
+/// warned comes before every other protective action (the Protective Action Decision Model in the
+/// research's prior art), then how the household reaches each other and where it meets, then fire
+/// safety at home. Catalogue ids; a household that has done one, or is not offered it, skips it.
+pub const FIRST_FREE_STEPS: [&str; 3] = [
+    "comms_wea_alerts_on",
+    "comms_contact_card",
+    "fire_test_alarms",
+];
+
+/// Free steps that take a month-0 slot only when one is left over: they matter to some
+/// households only (a standby antibiotic prescription is for remote travel or a known recurring
+/// condition), so they never push a step everyone needs out of month 0. Catalogue ids.
+pub const LAST_FREE_STEPS: [&str; 1] = ["med_antibiotics_clinician_card"];
+
+/// Readiness items whose need is not their bucket's own chance: (catalogue id, bucket, events a
+/// year per household, the event in words). The fire extinguisher is for the small fires nobody
+/// reports: about 6.6 a year for every 100 households, of which fire departments attend about
+/// 3.4 % (CPSC's national survey of unreported residential fires, Greene and Andres 2009,
+/// `cpsc_unreported_fires_2009`), not the reported house fires the fire bucket's chance counts
+/// (round-2 review P-06). Its value and its "how often" sentence use this rate.
+pub const READINESS_NEED_OVERRIDES: &[(&str, BucketId, f64, &str)] = &[(
+    "fire_extinguisher",
+    BucketId::Fire,
+    0.066,
+    "have a fire at home, even a small one,",
+)];
+
+/// The ten-year chance of needing readiness bucket `bucket`, for offer `i`: the bucket's own
+/// chance, or the item's override ([`READINESS_NEED_OVERRIDES`]).
+fn readiness_p10(ctx: &Ctx<'_>, i: usize, bucket: BucketId) -> f64 {
+    match readiness_override(ctx, i, bucket) {
+        Some((rate, _)) => -rr_types::math::exp_m1(-VALUE_HORIZON_YEARS * rate),
+        None => ctx.input.risks.p_need_10yr(bucket),
+    }
+}
+
+/// The override for offer `i` in `bucket`, if any: (events a year, the event in words).
+fn readiness_override(ctx: &Ctx<'_>, i: usize, bucket: BucketId) -> Option<(f64, &'static str)> {
+    let id = ctx.offers[i].item.id.as_str();
+    READINESS_NEED_OVERRIDES
+        .iter()
+        .find(|(item, b, _, _)| *item == id && *b == bucket)
+        .map(|(_, _, rate, words)| (*rate, *words))
+}
 
 /// Months for the free actions still to do, in the order given (life-safety first, then value):
 /// up to [`FREE_ACTIONS_MONTH_0`] in month 0, then [`FREE_ACTIONS_PER_MONTH`] a month, raised just
@@ -460,6 +511,22 @@ fn run(
         .copied()
         .filter(|i| !existing.get(i).is_some_and(|(q, _)| *q >= 1.0))
         .collect();
+    // The fixed first steps (alerts, the household plan, fire safety), in their order.
+    for id in FIRST_FREE_STEPS {
+        if let Some(pos) = todo.iter().position(|&i| ctx.offers[i].item.id == id) {
+            let i = todo.remove(pos);
+            let qty = ctx.offers[i].set_quantity.max(1.0);
+            let cand = evaluate_fixed(&ctx, &state, i, qty, TierId::Now, f64::INFINITY);
+            apply(&ctx, &mut state, &cand);
+            free_order.push((cand.offer, cand.qty));
+        }
+    }
+    // Steps that wait for a spare slot go last, in their order.
+    let last: Vec<usize> = LAST_FREE_STEPS
+        .iter()
+        .filter_map(|id| todo.iter().copied().find(|&i| ctx.offers[i].item.id == *id))
+        .collect();
+    todo.retain(|i| !last.contains(i));
     while !todo.is_empty() {
         // Most valuable first (life-safety first), so each action's value is its marginal value.
         let mut best: Option<(usize, Candidate)> = None;
@@ -482,6 +549,12 @@ fn run(
         }
         let (pos, cand) = best.expect("todo is not empty");
         todo.remove(pos);
+        apply(&ctx, &mut state, &cand);
+        free_order.push((cand.offer, cand.qty));
+    }
+    for i in last {
+        let qty = ctx.offers[i].set_quantity.max(1.0);
+        let cand = evaluate_fixed(&ctx, &state, i, qty, TierId::Now, f64::INFINITY);
         apply(&ctx, &mut state, &cand);
         free_order.push((cand.offer, cand.qty));
     }
@@ -1198,7 +1271,7 @@ fn evaluate_fixed(
     let mut ready = Vec::new();
     if !state.readiness_used[i] {
         for &(b, harm) in &o.readiness {
-            let p = ctx.input.risks.p_need_10yr(b);
+            let p = readiness_p10(ctx, i, b);
             let v = readiness_value(ctx.weights[&b], p, harm);
             let low = p < READINESS_MIN_P_NEED_10YR;
             if low {
@@ -2011,6 +2084,25 @@ fn why_parts(ctx: &Ctx<'_>, cand: &Candidate) -> WhyParts {
             };
             let ref_days = ladder_floor_days(from);
             let rate = share * curve(ctx, bucket).lambda_at(ref_days);
+            // A filter fills the stored-water chain's days after the stored water: it makes raw
+            // water safe, so its sentence names that water, not "stored water" (review S6).
+            let item = ctx.offers[cand.offer].item;
+            let part = if bucket == BucketId::WaterOut
+                && part.as_deref() == Some("stored water")
+                && item.quantity_rule == TREATMENT_RULE
+            {
+                let well = ctx.input.household.housing.water == WaterSource::Well;
+                Some(
+                    if well {
+                        explain::WELL_WATER_TREATED
+                    } else {
+                        explain::RAW_WATER_TREATED
+                    }
+                    .to_owned(),
+                )
+            } else {
+                part
+            };
             let text = DurationText {
                 bucket,
                 part,
@@ -2036,9 +2128,10 @@ fn why_parts(ctx: &Ctx<'_>, cand: &Candidate) -> WhyParts {
         .map(|r| ReadinessText {
             bucket: r.0,
             per_100: per_100(
-                annual_rate_from_10yr(ctx.input.risks.p_need_10yr(r.0)),
+                annual_rate_from_10yr(readiness_p10(ctx, cand.offer, r.0)),
                 years,
             ),
+            event: readiness_override(ctx, cand.offer, r.0).map(|(_, words)| words),
         })
         .collect();
     let headline = durations
@@ -2141,7 +2234,7 @@ fn readiness_checklist(ctx: &Ctx<'_>, low_p_ok: &[bool], rare_opt_in: bool) -> V
                 let mut out: Vec<BucketId> = Vec::new();
                 for &(b, _) in &o.readiness {
                     let counts =
-                        ctx.input.risks.p_need_10yr(b) >= READINESS_MIN_P_NEED_10YR || low_p_ok[i];
+                        readiness_p10(ctx, i, b) >= READINESS_MIN_P_NEED_10YR || low_p_ok[i];
                     if counts && !out.contains(&b) {
                         out.push(b);
                     }
@@ -2330,6 +2423,43 @@ fn guardrail_facts(
         } else {
             water_tracks.iter().any(|&t| short(t))
         };
+    // Refrigerated medicine that needs a power source: the cold chain is in hand only once
+    // something covers the power part rr-plan names after rr-supply's `power_for_cold_medicine`
+    // class, as well as the cooler. The first month an offer that covers that part is in hand.
+    let cold_power_tracks: Vec<usize> = (0..ctx.tracks.len())
+        .filter(|&t| ctx.tracks[t].part.as_deref() == Some(guardrails::COLD_MEDICINE_POWER_PART))
+        .collect();
+    let in_hand = |i: usize| -> Option<u16> {
+        if let Some(m) = purchase_months.get(&i) {
+            Some(*m)
+        } else if let Some(m) = free_month_of.get(&i) {
+            Some(*m)
+        } else if state.owned[i] > 0.0 || ctx.offers[i].item.free {
+            Some(0)
+        } else {
+            None
+        }
+    };
+    let cold_chain_month = if cold_power_tracks.is_empty() {
+        first_month(ItemRole::ColdChain)
+    } else {
+        let power_month = (0..ctx.offers.len())
+            .filter(|&i| {
+                let plenty = vec![(
+                    ctx.offers[i].item.id.clone(),
+                    ctx.offers[i].set_quantity.max(1.0) * 1.0e4,
+                )];
+                cold_power_tracks
+                    .iter()
+                    .any(|&t| track_coverage(ctx, t, &plenty) > 1e-9)
+            })
+            .filter_map(in_hand)
+            .min();
+        match (first_month(ItemRole::ColdChain), power_month) {
+            (Some(a), Some(b)) => Some(a.max(b)),
+            _ => None,
+        }
+    };
     let uncovered: Vec<BucketId> = ctx
         .tracks
         .iter()
@@ -2344,7 +2474,7 @@ fn guardrail_facts(
         });
     Facts {
         device_power_month: first_month(ItemRole::DevicePower),
-        cold_chain_month: first_month(ItemRole::ColdChain),
+        cold_chain_month,
         go_bag_month: first_month(ItemRole::GoBag),
         water_needed,
         // Month 0 for stored water the household already has, else the first purchase; never a

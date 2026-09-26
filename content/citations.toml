@@ -2541,3 +2541,35 @@ url = "https://www.epa.gov/children/protect-children-wildfires-smoke-and-volcani
 retrieved = "2026-09-26"
 quote = "Paint, dust, cloth, and surgical masks, even N95 masks, are not made to fit children and will not protect children from breathing wildfire smoke."
 license = "US Government Work (public domain)"
+
+# v0.1.1 (p1-supply): CPSC all-fires rate, OSHA generator backfeed, DHS SAVER trauma kits.
+
+[[citation]]
+id = "cpsc_unreported_fires_2009"
+title = "2004–2005 National Sample Survey of Unreported Residential Fires"
+publisher = "U.S. Consumer Product Safety Commission"
+year = 2009
+url = "https://www.cpsc.gov/s3fs-public/UnreportedResidentialFires.pdf"
+retrieved = "2026-09-26"
+quote = "In the present survey, it was estimated that there were 7.4 million fires in the U. S. (annualized rate for 2004-2005) and a rate of 6.6 residential structure fires per year per 100 households."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "osha_portable_generators"
+title = "Using Portable Generators Safely (fact sheet)"
+publisher = "Occupational Safety and Health Administration"
+year = 2005
+url = "https://www.osha.gov/sites/default/files/publications/OSHA3286.pdf"
+retrieved = "2026-09-26"
+quote = "Never attach a generator directly to the electrical system of a structure (home, office, trailer, etc.) unless a qualified electrician has properly installed the generator with a transfer switch."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "dhs_saver_trauma_kits_2015"
+title = "Individual Officer Trauma Kits (SAVER TechNote)"
+publisher = "U.S. Department of Homeland Security, Science and Technology Directorate"
+year = 2015
+url = "https://www.dhs.gov/sites/default/files/publications/Trauma-Kits-TN_1015-508_0.pdf"
+retrieved = "2026-09-26"
+quote = "the counterfeit tourniquets have been shown to fail before the necessary force to stop bleeding can be applied, possibly leading to catastrophic results."
+license = "US Government Work (public domain)"

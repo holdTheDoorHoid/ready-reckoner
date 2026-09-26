@@ -72,15 +72,17 @@ pub mod value;
 pub mod weights;
 
 pub use allocate::{
-    FREE_ACTIONS_BY_MONTH, FREE_ACTIONS_MONTH_0, FREE_ACTIONS_PER_MONTH, allocate,
-    allocate_with_rule,
+    FIRST_FREE_STEPS, FREE_ACTIONS_BY_MONTH, FREE_ACTIONS_MONTH_0, FREE_ACTIONS_PER_MONTH,
+    LAST_FREE_STEPS, READINESS_NEED_OVERRIDES, allocate, allocate_with_rule,
 };
 pub use coverage::{
     Contributes, ContributionTable, CoverageRule, ItemMeta, ItemRole, MetaError, ReadinessCredit,
     apply_requirements,
 };
 pub use curve::{BucketCurve, CurveError};
-pub use guardrails::{DEVICE_PLAN_BY_MONTH, EVACUATION_HEAVY_P10, GO_BAG_BY_MONTH};
+pub use guardrails::{
+    COLD_MEDICINE_POWER_PART, DEVICE_PLAN_BY_MONTH, EVACUATION_HEAVY_P10, GO_BAG_BY_MONTH,
+};
 pub use input::{
     BudgetError, BudgetInput, BudgetOptions, BudgetResult, Cliff, GuardrailContext, MonthCoverage,
     Purchase, Risks, Schedule,

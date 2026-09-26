@@ -6,6 +6,13 @@
 
 use rr_types::{BucketId, HazardId};
 
+/// The part name a filter's line uses in the stored-water chain when the household is on a well
+/// (the filter makes the well's water safe; it is not stored water).
+pub(crate) const WELL_WATER_TREATED: &str = "well water, treated";
+
+/// The same for a household whose raw-water source is one it picks (a rain barrel, a creek).
+pub(crate) const RAW_WATER_TREATED: &str = "raw water, treated";
+
 /// One bucket (or part) a purchase moves, with the numbers for its sentence.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct DurationText {
@@ -26,6 +33,9 @@ pub(crate) struct ReadinessText {
     pub bucket: BucketId,
     /// Households per 100 needing it over `years`.
     pub per_100: f64,
+    /// The event in words when the item's need is not the bucket's ("have a fire at home, even a
+    /// small one,"); `None` for "need this".
+    pub event: Option<&'static str>,
 }
 
 /// What the sentence is about.
@@ -78,7 +88,12 @@ pub(crate) fn why(lead: Lead, parts: &WhyParts, people: usize, years: u8) -> Str
             "Gets you ready for {}.",
             readiness_phrase(r.bucket)
         ));
-        out.push(frequency_sentence(r.per_100, "need this", None, years));
+        out.push(frequency_sentence(
+            r.per_100,
+            r.event.unwrap_or("need this"),
+            None,
+            years,
+        ));
         mentioned.push(r.bucket);
     }
     if !mentioned.is_empty() {
@@ -260,10 +275,17 @@ fn supply(bucket: BucketId, part: Option<&str>) -> (String, bool) {
             "lights" => ("light during power cuts", false),
             "batteries" => ("spare batteries for lights and a radio", false),
             "medical device power" => ("backup power for a medical device", false),
+            "power for cold medicine" => ("power to keep medicine cold", false),
+            "fridge thermometer" => ("food-safety checks for the fridge", false),
+            "generator" => ("backup power from a generator", false),
+            "generator connection" => ("a safe way to connect the generator", false),
             "generator fuel" => ("generator fuel", false),
             "wheelchair battery" => ("power for a wheelchair", false),
             // Water.
             "stored water" => ("stored drinking and washing water", true),
+            // A filter in the stored-water chain makes raw water safe (rr-supply names the source).
+            WELL_WATER_TREATED => ("filtered and disinfected water from your well", true),
+            RAW_WATER_TREATED => ("filtered and disinfected water from a raw source", true),
             "bleach" => ("bleach for treating water", true),
             "water treatment" => ("safe water during boil notices", true),
             "toilet" => ("emergency toilet supplies", true),
@@ -436,6 +458,7 @@ mod tests {
             readiness: vec![ReadinessText {
                 bucket: BucketId::Evacuate,
                 per_100: 5.1,
+                event: None,
             }],
             ..WhyParts::default()
         };
@@ -443,6 +466,20 @@ mod tests {
             why(Lead::Free, &ready, 4, 10),
             "Free. Gets you ready for leaving home quickly. About 5 of 100 households like \
              yours need this in the next 10 years."
+        );
+        // An item whose need is not the bucket's says what the event is.
+        let fire = WhyParts {
+            readiness: vec![ReadinessText {
+                bucket: BucketId::Fire,
+                per_100: 48.3,
+                event: Some("have a fire at home, even a small one,"),
+            }],
+            ..WhyParts::default()
+        };
+        assert_eq!(
+            why(Lead::Purchase, &fire, 4, 10),
+            "Gets you ready for a fire at home. About 50 of 100 households like yours have a \
+             fire at home, even a small one, in the next 10 years."
         );
     }
 
