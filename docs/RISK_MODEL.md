@@ -77,7 +77,7 @@ and one note names the missing columns.
 | Column | Used for | Without it |
 | --- | --- | --- |
 | `strategic_class`, `strategic_places`, `strategic_km`, `strategic_bearing` | the nuclear family's class and "Why here"; the war row's near/far split | the population-weighted f_S (0.314, range 0.01–0.99); war at ×0.71 (0.3–1) |
-| `uasi_share`, `uasi_area` | the metro weight w_m of the attack, CBRN and nuclear-terrorism terms: the FEMA urban area's own share, looked up by `uasi_area` in the FY2026 table (`params::UASI_FY2026`) | a range from a small town to a 5 % metro |
+| `uasi_area_share`, `uasi_area` | the metro weight w_m of the attack, CBRN and nuclear-terrorism terms: the FEMA urban area's own share of the FY2026 UASI money (the same for every county in the area; 0 outside the funded areas), and the area's name for "Why here" | a share of 0, as outside every funded area, with a note that those rows are too low in a big city |
 | `geomag_factor`, `geomag_lat` | the solar-storm location multiplier α ÷ 0.2285 | the national average (×1) |
 | `smoke_days_35`, `smoke_basis` | wildfire smoke (imputed counties get a ×/÷ 2 spread, monitored ×/÷ 1.3) | wildfire smoke left out |
 | `karst_share` | sinkholes | sinkholes left out |
@@ -509,11 +509,12 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   rates keep quadrature. The class examples reproduce REVIEW §2.3 within rounding and B1.5's ten-year
   ranges word for word (`tests/v2.rs`).
 - **The UASI share is the urban area's, not the county's.** The attack, CBRN and nuclear-terrorism
-  formulas weigh the metro area (λ × w_m × the share of its households under an order). The pack's
-  `uasi_share` is the county's population split of its area's share, so the engine looks the area's
-  own share up by `uasi_area` in the FY2026 table. awaiting: data-hazard — a `uasi_area_share` column
-  would retire that table, and `LocationResolved::exposure.uasi_share` (the contract calls it the
-  metro area's share) should carry the area's share, not the county split.
+  formulas weigh the metro area (λ × w_m × the share of its households under an order), so they read
+  the pack's `uasi_area_share` (source `fema_hsgp_fy2026`), not `uasi_share`, the county's
+  population split of that share. Without the column the three terms fall back to a share of 0 (the
+  rates outside every funded area) and a note says the rows are too low in a big city; the county
+  split is never used in its place. `LocationResolved::exposure.uasi_share` (the contract calls it
+  the metro area's share) still carries the county split and is not read.
 - **The solar-storm location term uses NERC's floor.** α never falls below 0.1, so Miami comes to
   1.2 in 10,000 a year, not the review's 6 in 100,000 (which used α 0.06). The population mean of α
   (0.2285) replaces the review's assumed 0.25. Ground conductivity (β) is not in the pack.
