@@ -136,34 +136,31 @@ describe('mock engine: contract v2 inputs', () => {
     expect(noSource).toBe(false);
   });
 
-  it('accepts the answers it does not model without changing its plan: benefits, insurance extras, dials, tested-on dates', async () => {
+  it('accepts every other new answer: benefits, insurance extras, bare minimum, the long horizon, rare families', async () => {
+    // What the mock's outputs do with them (a benefit row, decisions, the bare-minimum order, the
+    // long-horizon section, what the allowance buys) is the output side's; here they must parse.
     const input = clone(FIXTURES['philadelphia-renters-4']);
-    input.existing = [{ item_id: 'flashlights_headlamps', qty: 4 }];
-    const before = await assess(input);
-    input.finances.benefits = ['federal_pay'];
+    input.finances.benefits = ['federal_pay', 'snap_wic'];
     input.finances.insurance.sewer_backup = false;
     input.finances.insurance.life_or_disability = true;
     input.dials.minimum_kit = true;
     input.dials.long_horizon = true;
-    input.dials.rare_opt_in = ['severe_pandemic'];
+    for (const families of [['severe_pandemic'], ['nuclear_attack', 'mass_violence'], ['all'], []]) {
+      input.dials.rare_opt_in = families;
+      const o = await assess(input);
+      expect(o.buckets).toHaveLength(15);
+    }
+    // No allowance, nothing bought for the rare families.
+    expect((await assess(clone(FIXTURES['philadelphia-renters-4']))).plan.months.flatMap((m) => m.items).some((i) => i.item_id === 'radiation_meter')).toBe(false);
+  });
+
+  it('passes a tested-on date through without changing the plan', async () => {
+    const input = clone(FIXTURES['philadelphia-renters-4']);
+    input.existing = [{ item_id: 'flashlights_headlamps', qty: 4 }];
+    const before = await assess(input);
     input.existing = [{ item_id: 'flashlights_headlamps', qty: 4, tested_on: '2026-09-01' }];
     const after = await assess(input);
     expect(after.plan.months).toEqual(before.plan.months);
     expect(after.buckets).toEqual(before.buckets);
-  });
-
-  it('spends the rare allowance by family: the radiation meter answers the nuclear family only', async () => {
-    const input = clone(FIXTURES['philadelphia-renters-4']);
-    const meter = async () => (await assess(input)).plan.months.flatMap((m) => m.items).some((i) => i.item_id === 'radiation_meter');
-    expect(await meter()).toBe(false);
-    input.dials.rare_opt_in = ['severe_pandemic'];
-    expect(await meter()).toBe(false);
-    input.dials.rare_opt_in = ['nuclear_attack'];
-    expect(await meter()).toBe(true);
-    input.dials.rare_opt_in = ['all'];
-    expect(await meter()).toBe(true);
-    input.dials.rare_opt_in = [];
-    input.dials.rare_catastrophic_opt_in = true;
-    expect(await meter()).toBe(true);
   });
 });

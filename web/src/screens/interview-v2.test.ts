@@ -362,7 +362,8 @@ describe('the settings: rare families, bare minimum and the long horizon', () =>
     nuclear.click();
     flushSync();
     expect(r.app.plan!.input.dials).toMatchObject({ rare_opt_in: ['nuclear_attack'], rare_catastrophic_opt_in: false });
-    await until(() => !!r.app.result.output?.plan.months.some((m) => m.items.some((i) => i.item_id === 'radiation_meter')), 'the allowance to buy the meter');
+    // The engine is asked again with the new allowance (what it buys is the engine's to decide).
+    await until(() => r.app.engineInput?.dials.rare_opt_in?.join() === 'nuclear_attack' && !r.app.pending && !!r.app.result.output, 'a new plan');
     choice(r, 'All of them', panel).click();
     flushSync();
     expect(r.app.plan!.input.dials.rare_opt_in).toEqual(['all']);
