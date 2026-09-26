@@ -1,13 +1,38 @@
 <!--
-  Screen 8, Your packet: the engine's packet (Markdown) rendered safely, ready to print. The print
-  stylesheet starts each section on a new page and keeps it legible in black and white.
+  Screen 8, Your packet: the engine's packet (Markdown) rendered safely, ready to print, with the
+  county map at the start of "Your risks". The print stylesheet keeps it legible in black and
+  white, lets sections follow on from each other, and sets the sources in two small columns.
 -->
 <script lang="ts">
+  import CountyMap from '../components/CountyMap.svelte';
   import Icon from '../components/Icon.svelte';
   import PlanGate from '../components/PlanGate.svelte';
+  import type { PlanOutput } from '../engine/types';
   import { followInPageAnchor } from '../lib/anchors';
-  import { renderMarkdown } from '../lib/markdown';
+  import { countTables, packetSections, renderMarkdown, splitIntro } from '../lib/markdown';
 
+  interface Rendered {
+    slug: string;
+    /** The whole section, or its heading and opening paragraphs when the map follows them. */
+    html: string;
+    /** After the map (the risks section only). */
+    rest?: string;
+  }
+
+  /** The packet rendered section by section; the map goes after the opening of "Your risks". */
+  function render(output: PlanOutput): Rendered[] {
+    let tables = 0;
+    const md = (text: string) => {
+      const html = renderMarkdown(text, { idPrefix: 'pk', headingOffset: 1, tableStart: tables });
+      tables += countTables(html);
+      return html;
+    };
+    return packetSections(output.packet_markdown).map((section) => {
+      if (section.slug !== 'your-risks') return { slug: section.slug, html: md(section.markdown) };
+      const { intro, rest } = splitIntro(section.markdown);
+      return { slug: section.slug, html: md(intro), rest: md(rest) };
+    });
+  }
 </script>
 
 <div class="page packet-page">
@@ -26,7 +51,15 @@
     {#snippet children(output)}
       <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
       <article class="packet card" aria-label="Preparedness packet" onclick={followInPageAnchor}>
-        {@html renderMarkdown(output.packet_markdown, { idPrefix: 'pk', headingOffset: 1 })}
+        {#each render(output) as section (section.slug)}
+          <div class="packet-section packet-section--{section.slug}">
+            {@html section.html}
+            {#if section.rest !== undefined}
+              <div class="packet__map"><CountyMap location={output.location} /></div>
+              {@html section.rest}
+            {/if}
+          </div>
+        {/each}
       </article>
     {/snippet}
   </PlanGate>
@@ -82,6 +115,10 @@
   .packet :global(sup a) {
     text-decoration: none;
     padding: 0 0.15em;
+  }
+  .packet__map {
+    max-width: 20rem;
+    margin: var(--s4) 0 var(--s5);
   }
   @media print {
     .packet {

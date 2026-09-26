@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import type { RawEngine } from './index';
+import type { Engine, RawEngine } from './index';
+import type { Manifest } from './data-files';
 import { FIXTURE_NAMES, FIXTURES } from './fixtures';
+import { PackLoader } from './loader';
 import { createMockEngine, mockDefaults } from './mock';
-import type { Manifest } from './wasm';
-import { adaptRawEngine, coreLoadOrder, loadCorePacks, loadDataFiles } from './wasm';
+import type { Envelope, PlanInput } from './types';
+import { adaptRawEngine, gateEngine } from './wasm';
 
 /**
  * A string-level engine shaped exactly like the rr-wasm exports (JSON in, JSON envelope out),
@@ -60,125 +62,149 @@ describe('the WebAssembly adapter', () => {
 });
 
 // ---------------------------------------------------------------------------------------------
-// Loading the data packs
+// Waiting for data
 // ---------------------------------------------------------------------------------------------
 
 const MANIFEST: Manifest = {
-  pack_version: 'abc123',
+  pack_version: 'v1',
   packs: {
     core: {
       files: [
-        { path: 'core/base_rates.toml', bytes: 10 },
-        { path: 'core/counties.csv', bytes: 200 },
-        { path: 'core/nri_hazards.csv', bytes: 3000 },
+        { path: 'core/counties.csv', bytes: 10 },
+        { path: 'core/zip_county.csv', bytes: 10 },
+        { path: 'core/zip_centroids.csv', bytes: 10 },
+        { path: 'core/zip_facilities.csv', bytes: 10 },
       ],
     },
-    geo: { files: [{ path: 'geo/counties.json', bytes: 40 }] },
   },
 };
 
-/** A site: path (under the base) -> body and status. */
-function site(files: Record<string, { body: string; status?: number; type?: string }>) {
+/** A site whose files arrive only when `release(path)` is called (or at once when `open`). */
+function slowSite(open = false) {
+  const waiting = new Map<string, () => void>();
   const requested: string[] = [];
-  const get = async (url: string): Promise<Response> => {
+  let fail = false;
+  const get = (url: string): Promise<Response> => {
     requested.push(url);
-    const path = url.replace(/^\/base\//, '').replace(/\?.*$/, '');
-    const file = files[path];
-    if (!file) return new Response('not found', { status: 404 });
-    return new Response(file.body, { status: file.status ?? 200, headers: { 'content-type': file.type ?? 'text/plain' } });
+    const path = url.replace(/^\/s\/data\//, '').replace(/\?.*$/, '');
+    if (fail) return Promise.reject(new TypeError('Failed to fetch'));
+    const body = path === 'manifest.json' ? JSON.stringify(MANIFEST) : path;
+    const respond = () => new Response(body, { headers: { 'content-type': path.endsWith('.json') ? 'application/json' : 'text/plain' } });
+    if (open || path === 'manifest.json') return Promise.resolve(respond());
+    return new Promise((resolve) => waiting.set(path, () => resolve(respond())));
   };
-  return { get, requested };
+  return {
+    get,
+    requested,
+    release: (path: string) => waiting.get(path)?.(),
+    releaseAll: () => [...waiting.values()].forEach((r) => r()),
+    breakNetwork: () => (fail = true),
+  };
 }
 
-/** A string-level engine that records every load_pack call and can refuse one file. */
-function recordingEngine(refuse?: string) {
-  const loaded: { name: string; text: string }[] = [];
+/** An engine that answers bad_input for an input with no people, otherwise ok, and records calls. */
+function answeringEngine() {
+  const calls: string[] = [];
+  const envelope = (value: unknown) => JSON.stringify({ ok: true, value });
   const raw: RawEngine = {
-    ...rawEngine(new Map()),
-    load_pack: (name, bytes) => {
-      loaded.push({ name, text: new TextDecoder().decode(bytes) });
-      if (name === refuse) {
-        return JSON.stringify({ ok: false, error: { code: 'pack_corrupt', message: `The data file ${name} does not match its checksum in the manifest.` } });
-      }
-      return JSON.stringify({ ok: true, value: { name, version: 'abc123', rows: 1 } });
+    engine_info: () => envelope({}),
+    load_pack: (name) => {
+      calls.push(`load ${name}`);
+      return envelope({ name, version: 'v1', rows: 1 });
     },
+    county_search: (q) => {
+      calls.push(`search ${q}`);
+      return envelope([]);
+    },
+    resolve_location: (json) => {
+      calls.push(`resolve ${JSON.parse(json).zip ?? JSON.parse(json).county_fips}`);
+      return envelope({});
+    },
+    assess: (json) => {
+      const input = JSON.parse(json) as PlanInput;
+      calls.push(`assess ${input.location.zip ?? input.location.county_fips}`);
+      if (input.people.length === 0) {
+        return JSON.stringify({ ok: false, error: { code: 'bad_input', message: 'Some answers need another look.', details: { problems: [] } } });
+      }
+      return envelope({ plan: true });
+    },
+    explain: () => envelope({}),
+    catalogue: () => envelope({ items: [] }),
+    defaults: () => envelope({}),
   };
-  return { engine: adaptRawEngine(raw), loaded };
+  return { engine: adaptRawEngine(raw), calls };
 }
 
-const fullSite = () =>
-  site({
-    'data/manifest.json': { body: JSON.stringify(MANIFEST), type: 'application/json' },
-    'data/core/base_rates.toml': { body: 'rates' },
-    'data/core/counties.csv': { body: 'counties' },
-    'data/core/nri_hazards.csv': { body: 'nri' },
-    'data/geo/counties.json': { body: 'map' },
+const tick = () => new Promise((r) => setTimeout(r, 0));
+const withPlace = (location: PlanInput['location'], people = FIXTURES['philadelphia-renters-4'].people): PlanInput => ({
+  ...FIXTURES['philadelphia-renters-4'],
+  location,
+  people,
+});
+
+describe('calls that need data wait for it', () => {
+  function setup(open = false) {
+    const s = slowSite(open);
+    const { engine, calls } = answeringEngine();
+    const loader = new PackLoader(engine, '/s/', { fetch: s.get });
+    const gated: Engine = gateEngine(engine, loader);
+    return { s, calls, loader, gated };
+  }
+
+  it('answers a county plan once the county data is in, without fetching the ZIP tables', async () => {
+    const { s, calls, gated, loader } = setup();
+    let answer: Envelope<unknown> | undefined;
+    void gated.assess(withPlace({ country: 'US', county_fips: '42101', setting: 'urban' })).then((r) => (answer = r));
+    await tick();
+    expect(answer).toBeUndefined();
+    s.release('core/counties.csv');
+    await loader.core();
+    await tick();
+    expect(answer).toEqual({ ok: true, value: { plan: true } });
+    expect(s.requested.some((u) => u.includes('zip_'))).toBe(false);
+    // The probe while loading plus the real call once the data was in.
+    expect(calls.filter((c) => c.startsWith('assess')).length).toBe(2);
   });
 
-describe('loading the data packs', () => {
-  it('orders the core pack with the county list last', () => {
-    expect(coreLoadOrder(MANIFEST)).toEqual(['core/base_rates.toml', 'core/nri_hazards.csv', 'core/counties.csv']);
-    expect(coreLoadOrder({ packs: {} })).toEqual([]);
+  it('makes a ZIP code wait for the ZIP tables, and starts fetching them', async () => {
+    const { s, gated, loader } = setup();
+    let answer: Envelope<unknown> | undefined;
+    void gated.resolve_location({ country: 'US', zip: '19147', setting: 'urban' }).then((r) => (answer = r));
+    await tick();
+    s.release('core/counties.csv');
+    await loader.core();
+    await tick();
+    expect(answer).toBeUndefined();
+    expect(s.requested.filter((u) => u.includes('zip_')).length).toBe(3);
+    s.releaseAll();
+    await loader.zip();
+    await tick();
+    expect(answer?.ok).toBe(true);
   });
 
-  it('loads the manifest first, then every core file, from the same origin with the pack version', async () => {
-    const { get, requested } = fullSite();
-    const { engine, loaded } = recordingEngine();
-    const progress: number[] = [];
-    const result = await loadCorePacks(engine, '/base/', { fetch: get, onProgress: (p) => progress.push(p.bytesLoaded) });
-    expect(loaded.map((l) => l.name)).toEqual(['manifest.json', 'core/base_rates.toml', 'core/nri_hazards.csv', 'core/counties.csv']);
-    expect(loaded[0]!.text).toBe(JSON.stringify(MANIFEST));
-    expect(loaded[3]!.text).toBe('counties');
-    expect(requested[0]).toBe('/base/data/manifest.json');
-    expect(requested.slice(1).sort()).toEqual([
-      '/base/data/core/base_rates.toml?v=abc123',
-      '/base/data/core/counties.csv?v=abc123',
-      '/base/data/core/nri_hazards.csv?v=abc123',
-    ]);
-    // The map is not needed to plan.
-    expect(requested.some((u) => u.includes('geo/'))).toBe(false);
-    expect(progress).toEqual([10, 3010, 3210]);
-    expect(result).toEqual({ packVersion: 'abc123', files: ['manifest.json', 'core/base_rates.toml', 'core/nri_hazards.csv', 'core/counties.csv'] });
+  it('never fetches the ZIP tables for the new-plan placeholder ZIP code', async () => {
+    const { s, gated } = setup(true);
+    await gated.assess(withPlace({ country: 'US', zip: '00000', setting: 'urban' }));
+    expect(s.requested.some((u) => u.includes('zip_'))).toBe(false);
   });
 
-  it('leaves the engine on its sample counties when the site has no data', async () => {
-    for (const noData of [site({}), site({ 'data/manifest.json': { body: '<!doctype html><title>app</title>', type: 'text/html' } })]) {
-      const { engine, loaded } = recordingEngine();
-      expect(await loadCorePacks(engine, '/base/', { fetch: noData.get })).toBeNull();
-      expect(loaded).toEqual([]);
-    }
+  it('reports a problem with the answers at once, without waiting for data', async () => {
+    const { gated } = setup();
+    const answer = await gated.assess(withPlace({ country: 'US', zip: '19147', setting: 'urban' }, []));
+    expect(!answer.ok && answer.error.code).toBe('bad_input');
   });
 
-  it('throws, naming the problem, when the manifest or a file cannot be had', async () => {
-    const broken = site({ 'data/manifest.json': { body: 'oops', status: 500 } });
-    await expect(loadCorePacks(recordingEngine().engine, '/base/', { fetch: broken.get })).rejects.toThrow(/manifest did not download \(HTTP 500\)/);
-
-    const notJson = site({ 'data/manifest.json': { body: '{ nope', type: 'application/json' } });
-    await expect(loadCorePacks(recordingEngine().engine, '/base/', { fetch: notJson.get })).rejects.toThrow(/not JSON/);
-
-    const missingFile = site({
-      'data/manifest.json': { body: JSON.stringify(MANIFEST), type: 'application/json' },
-      'data/core/base_rates.toml': { body: 'rates' },
-      'data/core/counties.csv': { body: 'counties' },
-    });
-    await expect(loadCorePacks(recordingEngine().engine, '/base/', { fetch: missingFile.get })).rejects.toThrow(
-      'The data file core/nri_hazards.csv did not download (HTTP 404).',
-    );
+  it('answers pack_missing with the reason when the data cannot be had', async () => {
+    const { s, gated } = setup();
+    s.breakNetwork();
+    const answer = await gated.county_search('phila');
+    expect(answer.ok).toBe(false);
+    expect(!answer.ok && answer.error).toEqual({ code: 'pack_missing', message: 'The county data could not be downloaded. Check your internet connection.' });
   });
 
-  it('throws with the engine’s own message when it refuses a file, and stops there', async () => {
-    const { engine, loaded } = recordingEngine('core/nri_hazards.csv');
-    await expect(loadCorePacks(engine, '/base/', { fetch: fullSite().get })).rejects.toThrow(
-      'The data file core/nri_hazards.csv does not match its checksum in the manifest.',
-    );
-    expect(loaded.map((l) => l.name)).toEqual(['manifest.json', 'core/base_rates.toml', 'core/nri_hazards.csv']);
-  });
-
-  it('loads other packs on demand, such as the map', async () => {
-    const { get, requested } = fullSite();
-    const { engine, loaded } = recordingEngine();
-    await loadDataFiles(engine, '/base/', MANIFEST, ['geo/counties.json'], { fetch: get });
-    expect(loaded.map((l) => l.name)).toEqual(['geo/counties.json']);
-    expect(requested).toEqual(['/base/data/geo/counties.json?v=abc123']);
+  it('passes the catalogue and the defaults straight through', async () => {
+    const { gated, s } = setup();
+    expect(await gated.catalogue()).toEqual({ ok: true, value: { items: [] } });
+    expect(s.requested.filter((u) => !u.includes('manifest')).length).toBe(0);
   });
 });

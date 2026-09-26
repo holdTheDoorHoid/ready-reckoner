@@ -50,6 +50,13 @@
   --mock-ink: #4d3a00;
   --mock-edge: #d8b44a;
 
+  /* County map: land and lines stay quiet; the marked county is striped and outlined in ink. */
+  --map-water: #f1efe9;
+  --map-land: #ffffff;
+  --map-line: #a9a39a;
+  --map-focus-bg: #e1eef0;
+  --map-focus-line: #0e5c69;
+
   --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
@@ -128,6 +135,12 @@
     --mock-ink: #f5dc93;
     --mock-edge: #8a6d1d;
 
+    --map-water: #22272b;
+    --map-land: #1a1e21;
+    --map-line: #59626a;
+    --map-focus-bg: #1b3337;
+    --map-focus-line: #86c9d4;
+
     --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
     --shadow-2: 0 4px 16px rgb(0 0 0 / 0.45);
   }
@@ -178,6 +191,12 @@
   --mock-bg: #3a2f10;
   --mock-ink: #f5dc93;
   --mock-edge: #8a6d1d;
+
+  --map-water: #22272b;
+  --map-land: #1a1e21;
+  --map-line: #59626a;
+  --map-focus-bg: #1b3337;
+  --map-focus-line: #86c9d4;
 
   --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-2: 0 4px 16px rgb(0 0 0 / 0.45);

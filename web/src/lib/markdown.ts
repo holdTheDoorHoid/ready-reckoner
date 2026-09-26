@@ -56,6 +56,8 @@ export interface RenderOptions {
   idPrefix?: string;
   /** Added to every heading level: 1 turns `#` into h2 when the page already has its h1. */
   headingOffset?: number;
+  /** Tables already rendered earlier in the same document, so region names keep counting. */
+  tableStart?: number;
 }
 
 const FOOTNOTE_DEF = /^\[\^([A-Za-z0-9_-]+)\]:[ \t]*(.*)$/gm;
@@ -72,7 +74,7 @@ export function renderMarkdown(source: string, options: RenderOptions = {}): str
   });
   const order: string[] = [];
   const refCount = new Map<string, number>();
-  let tables = 0;
+  let tables = options.tableStart ?? 0;
 
   const base = new Renderer();
   const marked = new Marked({ gfm: true, breaks: false });
@@ -159,4 +161,37 @@ export function renderMarkdown(source: string, options: RenderOptions = {}): str
     ALLOWED_ATTR,
     ALLOW_DATA_ATTR: false,
   });
+}
+
+/** How many tables a rendered document holds (to continue numbering in a later part). */
+export function countTables(html: string): number {
+  return html.split('class="table-wrap"').length - 1;
+}
+
+/** One `##` section of the packet (the part before the first one is the cover). */
+export interface PacketSection {
+  /** From the heading: `summary`, `your-risks`, … `sources`; `cover` for the title block. */
+  slug: string;
+  markdown: string;
+}
+
+/** The packet cut at its `##` headings, so the app can style sections and put the map in one. */
+export function packetSections(markdown: string): PacketSection[] {
+  const out: PacketSection[] = [];
+  const starts = [...markdown.matchAll(/^## (.+)$/gm)];
+  const cover = markdown.slice(0, starts[0]?.index ?? markdown.length);
+  if (cover.trim()) out.push({ slug: 'cover', markdown: cover });
+  starts.forEach((m, i) => {
+    const end = starts[i + 1]?.index ?? markdown.length;
+    const slug = m[1]!.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    out.push({ slug, markdown: markdown.slice(m.index, end) });
+  });
+  return out;
+}
+
+/** A section's heading and opening paragraphs, and the rest (from its first subheading). */
+export function splitIntro(markdown: string): { intro: string; rest: string } {
+  const sub = markdown.slice(1).search(/^#{2,4} /m);
+  if (sub < 0) return { intro: markdown, rest: '' };
+  return { intro: markdown.slice(0, sub + 1), rest: markdown.slice(sub + 1) };
 }

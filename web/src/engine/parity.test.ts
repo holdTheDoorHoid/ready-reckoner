@@ -7,7 +7,7 @@
  *    types.ts) may be missing on either side; array elements are compared as the union of their
  *    shapes.
  * 2. **WebAssembly vs the CLI, numbers.** With the real packs in `data/` loaded through
- *    `loadCorePacks` (the loader the site uses), every fixture's answer equals
+ *    `PackLoader` (the loader the site uses: the core files, then the ZIP tables), every fixture's answer equals
  *    `fixtures/golden/<name>.json` (planned by the native engine from the same packs: `rr golden`,
  *    rr-plan's golden helper) value for value, every number to the last bit.
  *
@@ -29,8 +29,9 @@ import type { Engine } from './index';
 import { FIXTURE_NAMES, FIXTURES } from './fixtures';
 import { createMockEngine } from './mock';
 import type { Envelope, ExplainKind, PlanInput, PlanOutput } from './types';
+import { PackLoader } from './loader';
 import type { WasmModule } from './wasm';
-import { adaptRawEngine, loadCorePacks, loadDataFiles } from './wasm';
+import { adaptRawEngine } from './wasm';
 
 /** The repository root: the nearest directory above the working directory with fixtures/golden and web/. */
 function repoRoot(): string {
@@ -232,15 +233,20 @@ describe.runIf(BUILT)('parity: mock and WebAssembly engines, and the goldens', (
   let packsWasm: Engine;
   let packVersion = '';
   let loadMs = 0;
+  let zipMs = 0;
+  let loader: PackLoader;
 
   beforeAll(async () => {
     fixturesWasm = await wasmInstance('sample-counties');
     packsWasm = await wasmInstance('packs');
+    loader = new PackLoader(packsWasm, '/site/', { fetch: fromDataDir });
     const start = performance.now();
-    const loaded = await loadCorePacks(packsWasm, '/site/', { fetch: fromDataDir });
+    await loader.core();
     loadMs = performance.now() - start;
-    if (!loaded) throw new Error('data/manifest.json is missing');
-    packVersion = loaded.packVersion ?? '';
+    await loader.zip();
+    zipMs = performance.now() - start - loadMs;
+    if (loader.status.core.phase !== 'ready') throw new Error('data/manifest.json is missing');
+    packVersion = loader.status.packVersion ?? '';
   });
 
   it('WebAssembly equals the golden JSON for every fixture, number for number', async () => {
@@ -359,10 +365,10 @@ describe.runIf(BUILT)('parity: mock and WebAssembly engines, and the goldens', (
     expect(loaded.data_pack_version).toBe(packVersion);
     expect(loaded.attributions[0]!.source).toBe('FEMA National Risk Index');
     // The map pack loads on demand through the same loader.
-    const manifest = JSON.parse(readFileSync(`${REPO}data/manifest.json`, 'utf8'));
-    await loadDataFiles(packsWasm, '/site/', manifest, ['geo/counties.json'], { fetch: fromDataDir });
+    const map = (await loader.map()) as { features: unknown[] };
+    expect(map.features.length).toBeGreaterThan(3000);
     expect(value(await packsWasm.engine_info(), 'packs').packs_loaded).toEqual(['core', 'geo']);
-    console.info(`data packs ${packVersion}: loaded through loadCorePacks in ${loadMs.toFixed(0)} ms`);
+    console.info(`data packs ${packVersion}: the county data loaded through PackLoader in ${loadMs.toFixed(0)} ms, the ZIP tables in ${zipMs.toFixed(0)} ms more`);
   });
 });
 

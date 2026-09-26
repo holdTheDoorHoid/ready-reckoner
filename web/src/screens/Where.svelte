@@ -2,10 +2,13 @@
   Screen 1, Where you live: ZIP code (resolved to a county from the list built into the app, with
   a county picker when a ZIP code spans several and a county search as the fallback), the kind of
   area, and the home: type, floor, tenure, water, sewer, heating, cooling and backup power.
+  A small map confirms the county (or numbers the counties a ZIP code spans). The ZIP code list
+  starts loading when someone starts typing one; a county found by name never needs it.
 -->
 <script lang="ts">
   import ChoiceGroup from '../components/ChoiceGroup.svelte';
   import CheckRow from '../components/CheckRow.svelte';
+  import CountyMap from '../components/CountyMap.svelte';
   import Field from '../components/Field.svelte';
   import Icon from '../components/Icon.svelte';
   import InterviewNav from '../components/InterviewNav.svelte';
@@ -22,6 +25,7 @@
     WASTEWATER_KINDS,
     WATER_SOURCES,
   } from '../engine/types';
+  import { PLACEHOLDER_ZIP } from '../engine/data-files';
   import { useApp } from '../lib/app.svelte';
   import { BACKUP, COOLING, HEATING, HOUSING_KIND, SETTING, SEWER, TENURE, WATER } from '../lib/labels';
   import type { FieldProblem } from '../lib/ui-types';
@@ -29,7 +33,6 @@
   const app = useApp();
   const input = $derived(app.plan?.input);
 
-  const PLACEHOLDER_ZIP = '00000';
   let zipText = $state(app.plan?.input.location.zip && app.plan.input.location.zip !== PLACEHOLDER_ZIP ? app.plan.input.location.zip : '');
   let zipTouched = $state(false);
   let resolved = $state<LocationResolved | null>(null);
@@ -38,6 +41,11 @@
   let searchResults = $state<LocationResolved[]>([]);
   let searchDone = $state(false);
   let searchOpen = $state(false);
+  let searching = $state(false);
+  /** A lookup is waiting for its answer (on a first visit, the county data may still be loading). */
+  let looking = $state(false);
+  /** Bumped by "Try again", so the lookup runs again. */
+  let attempt = $state(0);
 
   let ambiguity = $state<{ zip: string; suggestions: LocationResolved[] } | null>(null);
   const suggestions = $derived(ambiguity?.suggestions ?? []);
@@ -52,6 +60,7 @@
   let lookupSeq = 0;
   $effect(() => {
     const loc = input?.location;
+    void attempt;
     if (!loc || !app.engine) return;
     const zip = validZip(loc.zip);
     const county = loc.county_fips;
@@ -61,10 +70,12 @@
       resolved = null;
       lookupError = null;
       ambiguity = null;
+      looking = false;
       return;
     }
     const engine = app.engine;
     const timer = setTimeout(async () => {
+      looking = true;
       let res: LocationResolved | null = null;
       let err: EngineError | null = null;
       let amb: { zip: string; suggestions: LocationResolved[] } | null = null;
@@ -87,12 +98,20 @@
       resolved = res;
       lookupError = err;
       ambiguity = amb;
+      looking = false;
     }, 150);
     return () => clearTimeout(timer);
   });
 
+  function tryAgain() {
+    app.retryData();
+    attempt += 1;
+  }
+
   function setZip(value: string) {
     const digits = value.replace(/\D/g, '').slice(0, 5);
+    // Someone is typing a ZIP code: start fetching the ZIP code list now, not at the fifth digit.
+    if (digits.length > 0) app.prefetchZip();
     zipText = digits;
     if (!app.plan) return;
     const loc = app.plan.input.location;
@@ -115,14 +134,24 @@
   }
 
   let searchSeq = 0;
+  let searchError = $state('');
   async function runSearch() {
     if (!app.engine) return;
     const q = searchText;
     const seq = ++searchSeq;
+    searching = q.trim().length > 0;
     const r = await app.engine.county_search(q);
     if (seq !== searchSeq) return;
+    searching = false;
     searchResults = r.ok ? r.value : [];
+    searchError = r.ok ? '' : r.error.message;
     searchDone = q.trim().length > 0;
+  }
+
+  /** "About 55% of this ZIP code's land area": shares are of land, not of homes. */
+  function sharePhrase(share: number): string {
+    const pct = Math.round(share * 100);
+    return pct < 1 ? "Less than 1% of this ZIP code's land area" : `About ${pct}% of this ZIP code's land area`;
   }
 
   const zipError = $derived.by(() => {
@@ -182,30 +211,57 @@
       </Field>
 
       <div class="lookup" aria-live="polite">
-        {#if resolved}
-          <p class="found"><Icon name="check" /> <span>That's <strong>{resolved.county_name}, {resolved.state_name}</strong>.</span></p>
-          {#if resolved.data_note}<p class="small muted">{resolved.data_note}</p>{/if}
+        {#if looking && !resolved && suggestions.length === 0}
+          <p class="small muted" aria-busy="true">
+            Looking up your county{app.data && app.data.core.phase === 'loading' ? ' (the county data is still loading)' : ''}…
+          </p>
+        {/if}
+        {#if lookupError?.code === 'pack_missing'}
+          <div class="lookup-problem">
+            <p class="small">{lookupError.message}</p>
+            <button type="button" class="button button--small" onclick={tryAgain}>Try again</button>
+          </div>
+        {/if}
+        {#if resolved && suggestions.length === 0}
+          <div class="found-row">
+            <div>
+              <p class="found"><Icon name="check" /> <span>That's <strong>{resolved.county_name}, {resolved.state_name}</strong>.</span></p>
+              {#if resolved.data_note}<p class="small muted">{resolved.data_note}</p>{/if}
+            </div>
+            <CountyMap location={resolved} size="small" caption={false} />
+          </div>
         {/if}
         {#if suggestions.length > 0}
           <fieldset class="pick">
             <legend>That ZIP code covers more than one county. Which one do you live in?</legend>
-            <div class="choices">
-              {#each suggestions as s, i (s.county_fips)}
-                <label class="choice">
-                  <input
-                    id="county-pick-{i}"
-                    type="radio"
-                    name="county-pick"
-                    checked={input.location.county_fips === s.county_fips}
-                    onchange={() => pickCounty(s, true)}
-                  />
-                  <span class="choice__text">
-                    <span>{s.county_name}, {s.state_abbr}</span>
-                    {#if s.zip_county_share !== undefined}<span class="choice__help">About {Math.round(s.zip_county_share * 100)} in 100 addresses in this ZIP code</span>{/if}
-                  </span>
-                </label>
-              {/each}
+            <p class="help">
+              The shares are of land area, not of homes. Not sure which county you are in? It is often printed on a voter registration card or
+              a car registration.
+            </p>
+            <div class="pick__body">
+              <div class="choices">
+                {#each suggestions as s, i (s.county_fips)}
+                  <label class="choice">
+                    <input
+                      id="county-pick-{i}"
+                      type="radio"
+                      name="county-pick"
+                      checked={input.location.county_fips === s.county_fips}
+                      onchange={() => pickCounty(s, true)}
+                    />
+                    <span class="choice__num" aria-hidden="true">{i + 1}</span>
+                    <span class="choice__text">
+                      <span>{s.county_name}, {s.state_abbr}</span>
+                      {#if s.zip_county_share !== undefined}<span class="choice__help">{sharePhrase(s.zip_county_share)}</span>{/if}
+                    </span>
+                  </label>
+                {/each}
+              </div>
+              <CountyMap candidates={suggestions} selected={input.location.county_fips} size="small" />
             </div>
+            {#if resolved && input.location.county_fips}
+              <p class="found"><Icon name="check" /> <span>That's <strong>{resolved.county_name}, {resolved.state_name}</strong>.</span></p>
+            {/if}
           </fieldset>
         {/if}
       </div>
@@ -225,12 +281,16 @@
               oninput={runSearch}
             />
           </div>
-          {#if searchResults.length > 0}
+          {#if searching && searchResults.length === 0}
+            <p class="small muted" aria-busy="true">Searching{app.data && app.data.core.phase === 'loading' ? ' (the county data is still loading)' : ''}…</p>
+          {:else if searchResults.length > 0}
             <ul class="results" aria-label="Matching counties">
               {#each searchResults as c (c.county_fips + (c.zip ?? ''))}
                 <li><button type="button" class="button button--small" onclick={() => pickCounty(c, false)}>{c.county_name}, {c.state_abbr}</button></li>
               {/each}
             </ul>
+          {:else if searchError}
+            <p class="small">{searchError}</p>
           {:else if searchDone}
             <p class="small">No county matches that. Try fewer letters.</p>
           {/if}
@@ -340,8 +400,55 @@
   .found strong {
     color: var(--text);
   }
+  .found-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3) var(--s5);
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .found-row > :global(.county-map) {
+    flex: 0 1 13.5rem;
+  }
+  .lookup-problem {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s3);
+    align-items: center;
+    padding: var(--s2) var(--s3);
+    border-left: 4px solid var(--warn-edge);
+    background: var(--warn-soft);
+    border-radius: var(--r1);
+  }
+  .lookup-problem p {
+    margin: 0;
+  }
   .pick {
     margin-top: var(--s3);
+  }
+  .pick__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3) var(--s5);
+    align-items: flex-start;
+  }
+  .pick__body .choices {
+    flex: 1 1 16rem;
+  }
+  .pick__body > :global(.county-map) {
+    flex: 0 1 13.5rem;
+  }
+  .choice__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--map-focus-line);
+    font-weight: 700;
+    font-size: var(--text-sm);
   }
   .search {
     margin-bottom: var(--s5);

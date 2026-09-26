@@ -15,6 +15,7 @@ import type {
   PlanInput,
   PlanOutput,
 } from './types';
+import type { PackLoader } from './loader';
 
 export * from './types';
 
@@ -67,6 +68,8 @@ export interface EngineSource {
 interface Chosen {
   engine: Engine;
   source: EngineSource;
+  /** Loads the data packs for the WebAssembly engine; null for the mock, which needs none. */
+  loader: PackLoader | null;
 }
 
 let chosen: Promise<Chosen> | undefined;
@@ -75,21 +78,23 @@ async function choose(): Promise<Chosen> {
   if (__RR_ENGINE__ === 'wasm') {
     try {
       const { loadWasmEngine } = await import('./wasm');
-      return { engine: await loadWasmEngine(import.meta.env.BASE_URL), source: { kind: 'wasm' } };
+      const { engine, loader } = await loadWasmEngine(import.meta.env.BASE_URL);
+      return { engine, loader, source: { kind: 'wasm' } };
     } catch (e) {
       console.warn('The WebAssembly engine did not load; using the mock engine instead.', e);
       const { createMockEngine } = await import('./mock');
-      return { engine: createMockEngine(), source: { kind: 'mock', fallback: String(e) } };
+      return { engine: createMockEngine(), loader: null, source: { kind: 'mock', fallback: String(e) } };
     }
   }
   const { createMockEngine } = await import('./mock');
-  return { engine: createMockEngine(), source: { kind: 'mock' } };
+  return { engine: createMockEngine(), loader: null, source: { kind: 'mock' } };
 }
 
 /**
  * The engine the app talks to: the WebAssembly engine when the site is built with it
  * (`VITE_ENGINE=wasm`, or `public/pkg/` present at build time), otherwise the mock. Both implement
- * `Engine`, so callers never need to know which one answered.
+ * `Engine`, so callers never need to know which one answered. The WebAssembly engine resolves as
+ * soon as it runs; calls that need data wait for it (see `gateEngine` in wasm.ts).
  */
 export function getEngine(): Promise<Engine> {
   chosen ??= choose();
@@ -100,4 +105,10 @@ export function getEngine(): Promise<Engine> {
 export function getEngineSource(): Promise<EngineSource> {
   chosen ??= choose();
   return chosen.then((c) => c.source);
+}
+
+/** The data loader behind the WebAssembly engine (progress, the ZIP tables, the map); null for the mock. */
+export function getDataLoader(): Promise<PackLoader | null> {
+  chosen ??= choose();
+  return chosen.then((c) => c.loader);
 }

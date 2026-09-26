@@ -115,8 +115,10 @@ describe('AppState', () => {
     expect(app.plan?.input.planning_date).toBe('2026-11-15');
     expect(app.plan?.input.location.zip).toBe('00000');
     flushSync();
-    await until(() => !!app.result.error, 'the placeholder ZIP code to be rejected');
-    expect(app.result.error?.code).toBe('unknown_zip');
+    // The placeholder ZIP code is not a place: the plan asks for one instead of looking it up.
+    await until(() => !!app.result.error, 'the plan to ask for a place');
+    expect(app.result.error?.code).toBe('bad_input');
+    expect((app.result.error?.details as { problems: { code: string; field: string }[] }).problems[0]).toMatchObject({ code: 'location_missing', field: 'location' });
     app.destroy();
   });
 

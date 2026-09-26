@@ -291,29 +291,44 @@ otherwise to the mock (`VITE_ENGINE=mock` forces it).
 
 **Start.** `getEngine()` imports `pkg/rr_wasm.js` from the site's own origin, instantiates
 `pkg/rr_wasm_bg.wasm`, checks that `engine_info().api_version` equals the app's
-`ENGINE_API_VERSION`, and then loads the data.
+`ENGINE_API_VERSION`, and resolves at once: the catalogue and the defaults are built into the
+engine, so the first screens work while the data loads behind them (a progress line under the
+header says how far it has got). Calls that need data wait for the part they need
+(`gateEngine` in `web/src/engine/wasm.ts`), so no screen ever sees a plan from the built-in
+sample counties while real data is on its way; an answer that never depends on data (`bad_input`)
+comes back at once.
 
 **Data, in this order.** `load_pack(name, bytes)` takes one file per call, named by its path in
-`data/manifest.json`.
+`data/manifest.json` (`web/src/engine/loader.ts`; the file groups are in
+`web/src/engine/data-files.ts`).
 
 1. `manifest.json` first. The engine checks every later file against the sha256 it records (a file
    loaded before the manifest is checked when the manifest arrives).
-2. Every file listed under `packs.core.files`, fetched at once and loaded one by one with
-   `core/counties.csv` last. The engine reassembles the county records after each file, which is
-   only real work once the county list is in, so this order is the fastest; any order gives the
-   same answers.
-3. `geo/counties.json` (county outlines for the map) only when a map is shown; nothing else needs
+2. Every file listed under `packs.core.files` except the three ZIP tables, fetched at once and
+   loaded one by one with `core/counties.csv` last. The engine reassembles the county records
+   after each file, which is only real work once the county list is in, so this order is the
+   fastest; any order gives the same answers.
+3. The ZIP tables (`core/zip_county.csv`, `core/zip_centroids.csv`, `core/zip_facilities.csv`;
+   `ZIP_FILES` in `crates/rr-wasm/src/source.rs`) when a location has a real ZIP code: the app
+   starts fetching them when someone starts typing one, or when a saved plan has one. Only ZIP
+   lookups read them, so a first visit is about 0.65 MB lighter, and someone who finds their
+   county by name never downloads them.
+4. `geo/counties.json` (county outlines for the map) only when a map is shown; nothing else needs
    it.
 
 File URLs carry `?v=<pack_version>`, so a cached manifest is always paired with the files it
-describes; the service worker serves `data/` stale-while-revalidate.
+describes. The service worker precaches `data/manifest.json` with the app (each installed version
+reads the data it was built with; new data arrives with the next version) and the files of step 2
+by their versioned address, in a data cache that survives app updates; the ZIP tables and the map
+are cached the first time they are fetched. After one visit the app works offline.
 
-**Which data answers.** `engine_info()` tells the app which of three states the engine is in:
+**Which data answers.** `engine_info()` tells the app which of four states the engine is in:
 
 | State | `packs_loaded` | `data_pack_version` | `assess`, `resolve_location`, `county_search` |
 | --- | --- | --- | --- |
 | No pack file loaded | `[]` | absent | The seven built-in sample counties, the fixture households' counties; any other place is `unknown_zip` or `unknown_county`. Plans carry `data_pack_version` `fixtures+…`, as the goldens do. The app shows "Sample counties only". |
-| Part-way: the manifest and some core files | the loaded files' paths | the manifest's `pack_version` | `pack_missing`, naming how many core files are in: the engine never plans from part of the core pack |
+| Part-way: the manifest and some core files | the loaded files' paths | the manifest's `pack_version` | `pack_missing`, naming how many of the county files are in: the engine never plans from part of the core pack |
+| The manifest and every core file except the ZIP tables | the loaded files' paths | the manifest's `pack_version` | Counties answer from the national data, exactly as with the whole pack (`county_search`, a location or plan by county code). Any location with a ZIP code answers `pack_missing` ("The list of ZIP codes has not loaded yet") until the ZIP tables are in: a ZIP code decides the county and the facility distances. |
 | The manifest and every core file | `["core"]`, then `["core", "geo"]` | the manifest's `pack_version` | The national data. Attributions come from the manifest, the National Risk Index statement first. |
 
 Once any pack file is loaded the packs decide, and the sample counties no longer answer.
@@ -325,9 +340,13 @@ Once any pack file is loaded the packs decide, and the sample counties no longer
   loaded manifest does not list, or one that cannot be decoded. A refused file changes nothing;
   files loaded before it stay loaded.
 - The loader treats a missing `data/manifest.json` (HTTP 404, or the dev server's HTML page in its
-  place) as a site built without data, and the engine keeps its sample counties. Any other failure
-  (a download that fails, a file the engine refuses, a contract version that does not match) stops
-  loading, and `getEngine()` falls back to the mock engine, with the reason on the About screen.
+  place) as a site built without data, and the engine keeps its sample counties.
+- If the engine itself cannot start (the module fails to load, or its contract version does not
+  match), `getEngine()` falls back to the mock engine, with the reason on the About screen.
+- If data fails once the engine runs (a download that fails, a file the engine refuses), the calls
+  that need that data answer `pack_missing` with the reason, the progress line says what happened
+  and offers "Try again", and nothing else changes. The mock never stands in for the real engine
+  at that point: its placeholder numbers must not replace real ones mid-visit.
 - A panic inside the engine is a bug. The call traps, the adapter turns the trap into `internal`,
   and every later call answers `internal` with the panic message rather than trapping again; the
   page should be reloaded.

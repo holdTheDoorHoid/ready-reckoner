@@ -1,10 +1,11 @@
 <!--
-  The shell: skip link, sample-data banner, header, the current screen, footer, the update banner
-  and a polite live region. On every route change the page title updates and focus moves to the
+  The shell: skip link, sample-data banner, header, the county-data progress line, the current
+  screen, footer, the update banner and a polite live region. On every route change the page title updates and focus moves to the
   new screen's heading, so keyboard and screen-reader users land where the content starts.
 -->
 <script lang="ts">
   import { tick, type Component } from 'svelte';
+  import DataProgress from './components/DataProgress.svelte';
   import MockBanner from './components/MockBanner.svelte';
   import SiteFooter from './components/SiteFooter.svelte';
   import SiteHeader from './components/SiteHeader.svelte';
@@ -90,6 +91,7 @@
   <section class="notice" aria-label="Storage notice"><p>This browser is not keeping your answers (private browsing or blocked storage). Use "Save a copy of your plan" on the Keep it up screen before you close it.</p></section>
 {/if}
 <SiteHeader />
+<DataProgress />
 <main id="main" tabindex="-1">
   {#if app.status}
     <div class="status-banner page page--narrow"><p class="card" role="status"><Icon name="check" /> {app.status}</p></div>
