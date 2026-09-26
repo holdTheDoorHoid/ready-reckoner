@@ -44,15 +44,16 @@ function write(dials: Dials, list: string[]): void {
   dials.rare_opt_in = list;
 }
 
-/** Turn the allowance on or off for one family. */
+/**
+ * Turn the allowance on or off for one family. Ticking every family writes `["all"]`, the same as
+ * "All of them" (web-risks' rare box follows the same rule).
+ */
 export function setRareFamily(dials: Dials, family: RareHazardId, on: boolean): void {
   const chosen = new Set<string>(rareFamilies(dials));
   if (on) chosen.add(family);
   else chosen.delete(family);
-  write(
-    dials,
-    RARE_HAZARD_IDS.filter((f) => chosen.has(f)),
-  );
+  const list = RARE_HAZARD_IDS.filter((f) => chosen.has(f));
+  write(dials, list.length === RARE_HAZARD_IDS.length ? [RARE_ALL] : list);
 }
 
 /** Every family (`["all"]`, which also covers families added later), or none. */

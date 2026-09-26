@@ -63,6 +63,9 @@ describe('changing the allowance', () => {
     expect(d).toMatchObject({ rare_opt_in: ['all'], rare_catastrophic_opt_in: false });
     setRareFamily(d, 'mass_violence', false);
     expect(d.rare_opt_in).toHaveLength(RARE_HAZARD_IDS.length - 1);
+    // Ticking the last one back makes every family ticked again: "all".
+    setRareFamily(d, 'mass_violence', true);
+    expect(d.rare_opt_in).toEqual(['all']);
     setEveryRareFamily(d, false);
     expect(d.rare_opt_in).toEqual([]);
   });

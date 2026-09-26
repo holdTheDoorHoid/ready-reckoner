@@ -30,7 +30,7 @@
 
   const uid = $props.id();
   const chosen = $derived(new Set<string>(rareFamilies(dials)));
-  const every = $derived(allowsEveryRareFamily(dials) || chosen.size === RARE_HAZARD_IDS.length);
+  const every = $derived(allowsEveryRareFamily(dials));
   const some = $derived(!every && chosen.size > 0);
   const listed = $derived<readonly RareHazardId[]>([
     ...(order ?? []).filter((f) => (RARE_HAZARD_IDS as readonly string[]).includes(f)),

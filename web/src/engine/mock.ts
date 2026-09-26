@@ -24,6 +24,7 @@ import type {
   PlanOutput,
 } from './types';
 import { ENGINE_API_VERSION, EXPLAIN_KINDS } from './types';
+import { tidyFamilyPlan } from '../lib/family';
 import { ATTRIBUTIONS, CITATIONS } from './mock/citations';
 import { explainFrom } from './mock/explain';
 import { ITEMS } from './mock/items';
@@ -32,7 +33,6 @@ import { BUCKETS, HAZARDS, TIERS } from './mock/names';
 import type { CountyRow, StateRow } from './mock/places';
 import { COUNTIES, countyByFips, stateByFips, stateForZip, STATES, ZIP_MAJORITY, ZIPS } from './mock/places';
 import { validatePlanInput } from './mock/validate';
-import { tidyFamilyPlan } from '../lib/family';
 
 /** The JSON round trip the WebAssembly boundary imposes: no undefined, no shared references. */
 function wire<T>(value: T): T {
