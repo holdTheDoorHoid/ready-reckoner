@@ -365,15 +365,10 @@ fn attack_disruption(ctx: &Ctx<'_>) -> HazardRate {
     ];
     let lambda = prior(ATTACK_US, &sources);
     let share = prior(ATTACK_METRO_SHARE, &[cite::RR_HAZARD_PRIORS]);
-    let today = match (mw.class, mw.w) {
-        (_, Some(w)) => lambda.scaled(w).times(&share),
-        ("unknown", None) => Estimate::prior(
-            ATTACK_US.0 * 0.01 * ATTACK_METRO_SHARE.0,
-            ATTACK_NON_UASI.1,
-            ATTACK_US.2 * 0.05 * ATTACK_METRO_SHARE.2,
-            &sources,
-        ),
-        _ => prior(ATTACK_NON_UASI, &sources),
+    // Outside every funded urban area, and the fallback of 0 when the pack does not say.
+    let today = match mw.w {
+        Some(w) => lambda.scaled(w).times(&share),
+        None => prior(ATTACK_NON_UASI, &sources),
     };
     let base = ATTACK_US.0 * ATTACK_METRO_SHARE.0;
     let multiplier = match mw.w {

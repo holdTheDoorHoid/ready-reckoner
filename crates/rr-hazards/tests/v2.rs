@@ -35,7 +35,7 @@ fn minot() -> Fixture {
                 place("minot_field", "Minot AFB missile field (91st Missile Wing)", "icbm_field",
                       "a field of underground nuclear missile silos", "ND"),
             ],
-            "uasi_share": 0.0,
+            "uasi_share": 0.0, "uasi_area_share": 0.0,
             "geomag_lat": 56.1, "geomag_factor": 0.63,
             "smoke_days_35": 4.16, "smoke_days_55": 1.47, "smoke_basis": "monitor",
             "karst_share": 0.0, "landslide_susceptible_share": 0.21,
@@ -64,7 +64,7 @@ fn jefferson_tx() -> Fixture {
                        238000 b/cd",
                       "refinery", "", ""),
             ],
-            "uasi_share": 0.0,
+            "uasi_share": 0.0, "uasi_area_share": 0.0,
             "geomag_lat": 38.4, "geomag_factor": 0.1
         }),
     )
@@ -85,7 +85,7 @@ fn saline_mo() -> Fixture {
                       "a plant or laboratory that makes or looks after nuclear weapons", "MO"),
             ],
             "strategic_km": 107.8, "strategic_bearing": 264.0,
-            "uasi_share": 0.0,
+            "uasi_share": 0.0, "uasi_area_share": 0.0,
             "geomag_lat": 47.7, "geomag_factor": 0.24
         }),
     )
@@ -630,6 +630,63 @@ fn attacks_that_close_the_area_follow_the_metro_share() {
 }
 
 #[test]
+fn without_the_area_share_the_metro_weight_falls_back_to_zero_with_a_note() {
+    // Philadelphia's county split (0.7295 %) is still there; only the area's own share is gone.
+    let mut f = county("42101");
+    f.county.exposure.uasi_area_share = None;
+    assert!(f.county.exposure.uasi_share.is_some());
+    let a = run(&household("philadelphia-renters-4"), &f);
+    // The attack row counts the county as outside every funded area: 3 in a million a year, too
+    // rare to rank, so it moves to "Also checked".
+    assert!(!has_profile(&a, H::AttackDisruption));
+    let attack = a
+        .also_checked
+        .iter()
+        .find(|c| c.id == "attack_disruption")
+        .unwrap();
+    assert!(close(attack.rate_per_year, 3.0e-6, 1e-9));
+    // CBRN takes the rate outside the funded areas, and says why.
+    let cbrn = profile(&a, H::CbrnAttack);
+    assert!(close(cbrn.rate_per_year, 1.5e-7, 1e-9));
+    assert_eq!(cbrn.rate_range, [1.0e-8, 2.0e-6]);
+    let lf = cbrn.location_factor.as_ref().unwrap();
+    assert_eq!(lf.class, "unknown");
+    assert!(
+        lf.label.contains("counts it as outside them"),
+        "{}",
+        lf.label
+    );
+    // The crude nuclear device adds nothing: class C1 alone, 4e-4 × 0.6, where the area's share
+    // adds 5e-5 × 2.842 % × 10 %.
+    let with = assess("philadelphia-renters-4", "42101");
+    let nuke = profile(&a, H::NuclearAttack);
+    assert!(close(nuke.rate_per_year, 4.0e-4 * 0.6, 1e-9));
+    assert!(close(
+        profile(&with, H::NuclearAttack).rate_per_year,
+        4.0e-4 * 0.6 + 5.0e-5 * 0.02842 * 0.1,
+        1e-9
+    ));
+    // One note says so; the other columns are all there, so the general note is not shown.
+    let note = a
+        .notes
+        .iter()
+        .find(|n| n.contains("urban-area funding shares are not loaded"))
+        .unwrap();
+    assert!(note.contains("outside the 44 funded urban areas"), "{note}");
+    assert!(
+        !a.notes
+            .iter()
+            .any(|n| n.contains("newer data are not loaded"))
+    );
+    assert!(
+        !with
+            .notes
+            .iter()
+            .any(|n| n.contains("urban-area funding shares"))
+    );
+}
+
+#[test]
 fn arrests_are_summed_over_the_household_by_age() {
     // FBI 2023–2025, per 100,000 a year, men's and women's rates averaged; adults 18–64 weighted
     // by the years each band covers (7, 10, 10, 10, 10).
@@ -803,7 +860,8 @@ fn v2_households() -> Vec<(&'static str, Fixture)> {
                 json!({
                     "strategic_class": "C2",
                     "strategic_places": [place("metro_40900", "Sacramento-Roseville-Folsom, CA", "metro", "", "")],
-                    "uasi_share": 0.004521, "uasi_area": "Sacramento-Roseville-Folsom, CA",
+                    "uasi_share": 0.004521, "uasi_area_share": 0.006837,
+                    "uasi_area": "Sacramento-Roseville-Folsom, CA",
                     "geomag_lat": 44.2, "geomag_factor": 0.16,
                     "smoke_days_35": 6.12, "smoke_basis": "monitor",
                     "karst_share": 0.0, "leveed_pop_share": 0.454, "levee_risk_high_share": 0.944
@@ -819,7 +877,7 @@ fn v2_households() -> Vec<(&'static str, Fixture)> {
                 "MT",
                 "Montana",
                 json!({
-                    "strategic_class": "E", "uasi_share": 0.0,
+                    "strategic_class": "E", "uasi_share": 0.0, "uasi_area_share": 0.0,
                     "geomag_lat": 53.6, "geomag_factor": 0.47,
                     "smoke_days_35": 7.62, "smoke_days_55": 3.12, "smoke_basis": "monitor",
                     "karst_share": 0.114, "leveed_pop_share": 0.0184, "levee_risk_high_share": 0.0
@@ -837,7 +895,8 @@ fn v2_households() -> Vec<(&'static str, Fixture)> {
                 json!({
                     "strategic_class": "C2",
                     "strategic_places": [place("metro_19820", "Detroit-Warren-Dearborn, MI", "metro", "", "")],
-                    "uasi_share": 0.005037, "uasi_area": "Detroit-Warren-Dearborn, MI",
+                    "uasi_share": 0.005037, "uasi_area_share": 0.01233,
+                    "uasi_area": "Detroit-Warren-Dearborn, MI",
                     "geomag_lat": 51.3, "geomag_factor": 0.37,
                     "smoke_days_35": 1.75, "smoke_basis": "monitor",
                     "karst_share": 0.11, "leveed_pop_share": 0.00187, "levee_risk_high_share": 0.0
@@ -855,7 +914,8 @@ fn v2_households() -> Vec<(&'static str, Fixture)> {
                 json!({
                     "strategic_class": "C1",
                     "strategic_places": [place("metro_26420", "Houston-Pasadena-The Woodlands, TX", "metro", "", "")],
-                    "uasi_share": 0.001961, "uasi_area": "Houston-The Woodlands-Sugar Land, TX",
+                    "uasi_share": 0.001961, "uasi_area_share": 0.03996,
+                    "uasi_area": "Houston-The Woodlands-Sugar Land, TX",
                     "geomag_lat": 37.7, "geomag_factor": 0.1,
                     "smoke_days_35": 0.0, "smoke_basis": "monitor",
                     "karst_share": 0.0, "leveed_pop_share": 0.0738, "levee_risk_high_share": 0.0
@@ -873,7 +933,7 @@ fn v2_households() -> Vec<(&'static str, Fixture)> {
                 json!({
                     "strategic_class": "C2",
                     "strategic_places": [place("metro_41980", "San Juan-Bayamón-Caguas, PR", "metro", "", "")],
-                    "uasi_share": 0.0,
+                    "uasi_share": 0.0, "uasi_area_share": 0.0,
                     "geomag_lat": 27.6, "geomag_factor": 0.1,
                     "smoke_days_35": 0.0, "smoke_basis": "hms_only",
                     "karst_share": 0.00781, "leveed_pop_share": 0.0, "levee_risk_high_share": 0.0

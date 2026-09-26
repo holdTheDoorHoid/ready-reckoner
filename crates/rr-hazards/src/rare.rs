@@ -78,7 +78,8 @@ impl Row {
 
 /// The metro weight w_m for the attack rows, and the words for "Why here".
 pub(crate) struct MetroWeight {
-    /// The weight as an estimate (exact when the area is known).
+    /// The urban area's own share of the UASI money; `None` outside every funded area, and when
+    /// the pack does not say (the fallback of 0).
     pub w: Option<f64>,
     /// Class for [`LocationFactor::class`].
     pub class: &'static str,
@@ -86,7 +87,8 @@ pub(crate) struct MetroWeight {
     pub label: String,
 }
 
-/// The metro weight of this county: its FEMA urban area's share of the UASI money.
+/// The metro weight of this county: its FEMA urban area's own share of the UASI money
+/// (`CountyExposure::uasi_area_share`).
 pub(crate) fn metro_weight(ctx: &Ctx<'_>) -> MetroWeight {
     match ctx.exposure().uasi() {
         Uasi::Funded { area, metro_share } => {
@@ -125,12 +127,13 @@ pub(crate) fn metro_weight(ctx: &Ctx<'_>) -> MetroWeight {
                 ctx.county_label()
             ),
         },
-        Uasi::Unknown => MetroWeight {
+        // The fallback of 0: counted as outside every funded area, and the note says so.
+        Uasi::Absent => MetroWeight {
             w: None,
             class: "unknown",
-            label: "The data for where you live does not say whether it is in one of the 44 \
-                    urban areas FEMA funds for terrorism preparedness, so the range runs from a \
-                    small town to a large city."
+            label: "The data for where you live do not say whether it is in one of the 44 urban \
+                    areas FEMA funds for terrorism preparedness, so this estimate counts it as \
+                    outside them. In a big city the chance is higher."
                 .to_owned(),
         },
     }
@@ -191,6 +194,8 @@ fn nuclear(ctx: &Ctx<'_>, notes: &mut Notes) -> Row {
     } else {
         0.0
     };
+    // The crude-device term weighs the urban area's own UASI share: 0 outside every funded area,
+    // and the fallback of 0 when the pack does not say (the missing-data note says so).
     let mw = metro_weight(ctx);
     let s_uasi = mw.w.unwrap_or(0.0);
     let mut local = lambda_s.times_span(&f);
@@ -532,17 +537,11 @@ fn multi_month(gmd: &Estimate, war: &Estimate, lower48: bool) -> Row {
 fn cbrn(ctx: &Ctx<'_>) -> Row {
     let mw = metro_weight(ctx);
     let sources = [cite::START_POICN, cite::FEMA_UASI_FY2026, cite::RR_PRIORS];
-    let est = match (mw.class, mw.w) {
-        (_, Some(w)) => span(CBRN_US, &sources)
+    let est = match mw.w {
+        Some(w) => span(CBRN_US, &sources)
             .scaled(w)
             .times_span(&span(CBRN_METRO_SHARE, &[cite::RR_PRIORS])),
-        ("unknown", None) => Estimate::prior(
-            CBRN_US.0 * 0.01 * CBRN_METRO_SHARE.0,
-            CBRN_NON_UASI.1,
-            CBRN_US.2 * 0.05 * CBRN_METRO_SHARE.2,
-            &sources,
-        ),
-        _ => span(CBRN_NON_UASI, &sources),
+        None => span(CBRN_NON_UASI, &sources),
     };
     let multiplier = match mw.w {
         Some(w) => [w, w, w],

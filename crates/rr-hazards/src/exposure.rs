@@ -5,17 +5,14 @@
 //! `eviction` jobs and assembled by rr-data). ZIP columns, which only a ZIP code can give (the
 //! high-hazard dams whose listed downstream town lies in the ZIP), come from
 //! `LocationResolved::exposure`, the copy the app shows; a county field the record lacks falls
-//! back to that copy too. Absent means unknown, never zero: every hazard that reads a column
-//! says what it does without it.
-//!
-//! awaiting: data-hazard — `CountyRecord::exposure` is data-hazard's type, copied byte for byte
-//! into this branch until that branch merges; the field names here are its column names.
+//! back to that copy too. Absent means unknown, never zero, with one exception: without the
+//! urban area's UASI share the attack, CBRN and crude-device terms count the county as outside
+//! every funded area, and a note says so. Every hazard that reads a column says what it does
+//! without it.
 
 use rr_types::{
     CountyExposure, CountyRecord, LocationResolved, Sourced, StrategicClass, StrategicPlace,
 };
-
-use crate::params::UASI_FY2026;
 
 /// A value, if present and finite.
 fn finite(v: Option<f32>) -> Option<f64> {
@@ -27,6 +24,15 @@ fn share(v: Option<f32>) -> Option<f64> {
     finite(v).filter(|x| (0.0..=1.0).contains(x))
 }
 
+/// A share as the decimal the pack wrote (0.02842, not 0.028419999…), if present and between 0
+/// and 1. The UASI shares are published four-figure numbers, so the metro weight keeps them as
+/// published.
+fn written_share(v: Option<f32>) -> Option<f64> {
+    v.filter(|x| x.is_finite())
+        .map(|x| x.to_string().parse::<f64>().unwrap_or(f64::from(x)))
+        .filter(|x| (0.0..=1.0).contains(x))
+}
+
 /// A share from the app's copy, if present and between 0 and 1.
 fn shown_share(v: &Option<Sourced<f64>>) -> Option<f64> {
     v.as_ref()
@@ -34,20 +40,23 @@ fn shown_share(v: &Option<Sourced<f64>>) -> Option<f64> {
         .filter(|x| x.is_finite() && (0.0..=1.0).contains(x))
 }
 
-/// The metro weight for the attack and CBRN rows.
+/// The metro weight w_m for the attack, CBRN and crude-nuclear-device rows: the county's FEMA
+/// urban area's own share of the national FY2026 UASI money. DHS picks the urban areas and sets
+/// the amounts by relative terrorism risk, so the share weighs the metro area.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum Uasi {
     /// The county lies in a funded urban area: its name and the area's share of the money.
     Funded {
-        /// FEMA's name for the urban area (as in [`UASI_FY2026`]), when known.
+        /// FEMA's name for the urban area, when known.
         area: Option<String>,
-        /// The area's share of the national UASI total, 0 to 1.
+        /// The area's own share of the national UASI total, 0 to 1 (`uasi_area_share`).
         metro_share: f64,
     },
-    /// The county lies outside every funded urban area.
+    /// The county lies outside every funded urban area (`uasi_area_share` is 0).
     NotFunded,
-    /// The pack does not say.
-    Unknown,
+    /// The pack has no `uasi_area_share` for the county. The rows fall back to a share of 0, as
+    /// outside every funded urban area, and a note says so.
+    Absent,
 }
 
 /// Smoke-day counts for the county (2016–2023 means).
@@ -131,37 +140,17 @@ impl<'a> Exposure<'a> {
         Some((km, bearing))
     }
 
-    /// The metro weight: the county's urban area and that area's share of the UASI money.
+    /// The metro weight: the county's urban area and that area's own share of the UASI money
+    /// (`uasi_area_share`, the same for every county in the area). The county's population split
+    /// (`uasi_share`, which the app's copy shows) is not a metro weight and is not read here.
     pub fn uasi(&self) -> Uasi {
-        let by_name = |name: &str| {
-            UASI_FY2026
-                .iter()
-                .find(|(n, _)| *n == name)
-                .map(|(_, s)| *s)
-        };
-        let county_share = share(self.county.uasi_share);
-        if let Some(area) = self.county.uasi_area.as_deref() {
-            if let Some(s) = by_name(area) {
-                return Uasi::Funded {
-                    area: Some(area.to_owned()),
-                    metro_share: s,
-                };
-            }
-        }
-        match (county_share, shown_share(&self.shown.uasi_share)) {
-            (Some(c), _) if c <= 0.0 => Uasi::NotFunded,
-            // The app's copy holds the area's own share (contract v2).
-            (_, Some(s)) if s > 0.0 => Uasi::Funded {
+        match written_share(self.county.uasi_area_share) {
+            Some(s) if s > 0.0 => Uasi::Funded {
                 area: self.county.uasi_area.clone(),
                 metro_share: s,
             },
-            (_, Some(_)) => Uasi::NotFunded,
-            // A county share without its area: a lower bound on the area's share.
-            (Some(c), None) => Uasi::Funded {
-                area: self.county.uasi_area.clone(),
-                metro_share: c,
-            },
-            (None, None) => Uasi::Unknown,
+            Some(_) => Uasi::NotFunded,
+            None => Uasi::Absent,
         }
     }
 
@@ -244,22 +233,34 @@ mod tests {
     }
 
     #[test]
-    fn the_area_name_finds_the_metro_share() {
+    fn the_metro_weight_is_the_area_share_not_the_county_split() {
         let (mut c, l) = record();
-        c.exposure.uasi_area = Some("Philadelphia-Camden-Wilmington, PA-NJ-DE-MD".into());
-        c.exposure.uasi_share = Some(0.007_295);
-        assert_eq!(
-            Exposure::new(&c, &l).uasi(),
-            Uasi::Funded {
-                area: Some("Philadelphia-Camden-Wilmington, PA-NJ-DE-MD".into()),
-                metro_share: 0.02842
+        // Philadelphia County holds 0.7295 % of the national total; its urban area 2.842 %.
+        assert_eq!(c.exposure.uasi_share, Some(0.007_295));
+        match Exposure::new(&c, &l).uasi() {
+            Uasi::Funded { area, metro_share } => {
+                assert_eq!(
+                    area.as_deref(),
+                    Some("Philadelphia-Camden-Wilmington, PA-NJ-DE-MD")
+                );
+                assert_eq!(metro_share, 0.02842);
             }
-        );
+            other => panic!("{other:?}"),
+        }
+        // A share without its area's name still weighs the metro area.
         c.exposure.uasi_area = None;
-        c.exposure.uasi_share = Some(0.0);
+        assert!(matches!(
+            Exposure::new(&c, &l).uasi(),
+            Uasi::Funded { area: None, .. }
+        ));
+        c.exposure.uasi_area_share = Some(0.0);
         assert_eq!(Exposure::new(&c, &l).uasi(), Uasi::NotFunded);
-        c.exposure.uasi_share = None;
-        assert_eq!(Exposure::new(&c, &l).uasi(), Uasi::Unknown);
+        // Without the column the county split is not used in its place.
+        c.exposure.uasi_area_share = None;
+        assert_eq!(Exposure::new(&c, &l).uasi(), Uasi::Absent);
+        // Nor is a value outside 0 to 1.
+        c.exposure.uasi_area_share = Some(1.5);
+        assert_eq!(Exposure::new(&c, &l).uasi(), Uasi::Absent);
     }
 
     #[test]
@@ -269,6 +270,7 @@ mod tests {
         let e = Exposure::new(&c, &l);
         assert!(e.strategic_class().is_none() && e.smoke().is_none() && e.karst_share().is_none());
         assert!(e.levees().is_none() && e.geomag().is_none());
+        assert_eq!(e.uasi(), Uasi::Absent);
         // Dams fall back to the facilities count, which the v1 pack already has.
         assert_eq!(e.dams().county_total, Some(1));
     }

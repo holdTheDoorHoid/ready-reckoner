@@ -215,6 +215,7 @@
    "strategic_km": 381.1,
    "strategic_bearing": 304.0,
    "uasi_share": 0.0,
+   "uasi_area_share": 0.0,
    "geomag_lat": 47.0,
    "geomag_factor": 0.22,
    "smoke_days_35": 0.843,
