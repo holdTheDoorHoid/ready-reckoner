@@ -1,0 +1,235 @@
+{
+ "county": {
+  "fips": "48157",
+  "name": "Fort Bend",
+  "state_abbr": "TX",
+  "state_name": "Texas",
+  "centroid": {
+   "lat": 29.53,
+   "lon": -95.77
+  },
+  "nca_region": "southern_great_plains",
+  "coastal": false,
+  "tsunami_zone": false,
+  "population": 822581,
+  "households": 329032,
+  "building_value_usd": 156000000000.0,
+  "nri_version": "1.20.0",
+  "nri": {
+   "coastal_flooding": {
+    "afreq": 0.012,
+    "afreq_kind": "events_per_year",
+    "alrb": 1.362e-09,
+    "ealb": 212.5,
+    "ealp": 8.164e-07,
+    "ealt": 223.7,
+    "expb": 6201000.0,
+    "expp": 8.993,
+    "hlrb": 0.003426,
+    "risk_score": 19.2
+   },
+   "cold_wave": {
+    "afreq": 0.4738,
+    "afreq_kind": "events_per_year",
+    "alrb": 7.378e-07,
+    "ealb": 115100.0,
+    "ealp": 1.091,
+    "ealt": 15100000.0,
+    "expb": 156000000000.0,
+    "expp": 822600.0,
+    "hlrb": 1.557e-06,
+    "risk_score": 95.45
+   },
+   "drought": {
+    "afreq": 26.2,
+    "afreq_kind": "events_per_year",
+    "ealt": 1477000.0,
+    "risk_score": 84.57
+   },
+   "earthquake": {
+    "afreq": 0.000464,
+    "afreq_kind": "annual_probability",
+    "alrb": 2.735e-06,
+    "ealb": 426700.0,
+    "ealp": 0.01393,
+    "ealt": 617500.0,
+    "expb": 257600000000.0,
+    "expp": 822800.0,
+    "hlrb": 0.00357,
+    "risk_score": 61.77
+   },
+   "hail": {
+    "afreq": 2.106,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.425e-06,
+    "ealb": 378200.0,
+    "ealp": 0.02974,
+    "ealt": 811200.0,
+    "expb": 156000000000.0,
+    "expp": 822600.0,
+    "hlrb": 1.114e-06,
+    "risk_score": 73.85
+   },
+   "heat_wave": {
+    "afreq": 14.32,
+    "afreq_kind": "events_per_year",
+    "alrb": 9.673e-09,
+    "ealb": 1509.0,
+    "ealp": 1.247,
+    "ealt": 17080000.0,
+    "expb": 156000000000.0,
+    "expp": 822600.0,
+    "hlrb": 6.755e-10,
+    "risk_score": 97.85
+   },
+   "hurricane": {
+    "afreq": 0.1752,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0004171,
+    "ealb": 65070000.0,
+    "ealp": 0.3583,
+    "ealt": 70700000.0,
+    "expb": 156000000000.0,
+    "expp": 822500.0,
+    "hlrb": 0.002339,
+    "risk_score": 97.58
+   },
+   "ice_storm": {
+    "afreq": 0.8252,
+    "afreq_kind": "events_per_year",
+    "alrb": 4.959e-07,
+    "ealb": 77350.0,
+    "ealp": 0.1125,
+    "ealt": 1618000.0,
+    "expb": 156000000000.0,
+    "expp": 822300.0,
+    "hlrb": 5.956e-07,
+    "risk_score": 93.34
+   },
+   "landslide": {
+    "afreq": 0.09494,
+    "afreq_kind": "annual_probability",
+    "alrb": 1.346e-08,
+    "ealb": 2100.0,
+    "ealp": 3.301e-07,
+    "ealt": 2104.0,
+    "expb": 405100000.0,
+    "expp": 2078.0,
+    "hlrb": 0.007477,
+    "risk_score": 53.63
+   },
+   "lightning": {
+    "afreq": 74.29,
+    "afreq_kind": "events_per_year",
+    "alrb": 9.05e-07,
+    "ealb": 141200.0,
+    "ealp": 0.4779,
+    "ealt": 6688000.0,
+    "expb": 156000000000.0,
+    "expp": 822600.0,
+    "hlrb": 1.2e-08,
+    "risk_score": 99.36
+   },
+   "riverine_flooding": {
+    "afreq": 1.679,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.001056,
+    "ealb": 164800000.0,
+    "ealp": 0.2914,
+    "ealt": 168800000.0,
+    "expb": 155900000000.0,
+    "expp": 26850.0,
+    "hlrb": 0.0006298,
+    "risk_score": 97.61
+   },
+   "strong_wind": {
+    "afreq": 1.362,
+    "afreq_kind": "events_per_year",
+    "alrb": 3.473e-06,
+    "ealb": 541700.0,
+    "ealp": 0.1981,
+    "ealt": 3336000.0,
+    "expb": 156000000000.0,
+    "expp": 822600.0,
+    "hlrb": 2.443e-06,
+    "risk_score": 94.12
+   },
+   "tornado": {
+    "afreq": 0.7658,
+    "afreq_kind": "events_per_year",
+    "alrb": 5.852e-05,
+    "ealb": 9129000.0,
+    "ealp": 3.668,
+    "ealt": 59380000.0,
+    "expb": 156000000000.0,
+    "expp": 822600.0,
+    "hlrb": 7.642e-05,
+    "risk_score": 99.2
+   },
+   "wildfire": {
+    "afreq": 0.001608,
+    "afreq_kind": "annual_probability",
+    "alrb": 2.643e-06,
+    "ealb": 412200.0,
+    "ealp": 0.006532,
+    "ealt": 502000.0,
+    "expb": 11970000000.0,
+    "expp": 93640.0,
+    "hlrb": 0.1,
+    "risk_score": 80.06
+   },
+   "winter_weather": {
+    "afreq": 1.105,
+    "afreq_kind": "events_per_year",
+    "alrb": 3.142e-07,
+    "ealb": 49010.0,
+    "ealp": 0.001581,
+    "ealt": 70700.0,
+    "expb": 156000000000.0,
+    "expp": 822600.0,
+    "hlrb": 2.843e-07,
+    "risk_score": 46.88
+   }
+  },
+  "climate": {
+   "days_over_2in_2050": 2.675,
+   "days_over_2in_2050_high": 2.847,
+   "days_over_2in_hist": 2.537,
+   "days_over_90f_hist": 82.65,
+   "days_over_95f_2050": 70.12,
+   "days_over_95f_2050_high": 85.07,
+   "days_over_95f_hist": 17.19,
+   "dry_spell_days_2050": 34.03,
+   "dry_spell_days_2050_high": 34.64,
+   "dry_spell_days_hist": 32.06,
+   "icing_days_2050": 0.05304,
+   "icing_days_2050_high": 0.04221,
+   "icing_days_hist": 0.2206
+  },
+  "facilities": {
+   "nearest_nuclear_km": 85.0,
+   "tri_facilities": 50,
+   "high_hazard_dams": 3
+  }
+ },
+ "location": {
+  "country": "US",
+  "county_fips": "48157",
+  "county_name": "Fort Bend",
+  "state_abbr": "TX",
+  "state_name": "Texas",
+  "centroid": {
+   "lat": 29.53,
+   "lon": -95.77
+  },
+  "nca_region": "southern_great_plains",
+  "coastal": false,
+  "tsunami_zone": false,
+  "facility_flags": {
+   "nuclear_plant_within_16km": false,
+   "nuclear_plant_within_80km": false,
+   "hazmat_facilities_within_5km": 0
+  },
+  "zip": "77479"
+ }
+}

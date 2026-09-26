@@ -1,0 +1,223 @@
+{
+ "county": {
+  "fips": "12086",
+  "name": "Miami-Dade",
+  "state_abbr": "FL",
+  "state_name": "Florida",
+  "centroid": {
+   "lat": 25.61,
+   "lon": -80.5
+  },
+  "nca_region": "southeast",
+  "coastal": true,
+  "tsunami_zone": false,
+  "population": 2698679,
+  "households": 1079472,
+  "building_value_usd": 358700000000.0,
+  "nri_version": "1.20.0",
+  "nri": {
+   "coastal_flooding": {
+    "afreq": 2.25,
+    "afreq_kind": "events_per_year",
+    "alrb": 5.085e-05,
+    "ealb": 18240000.0,
+    "ealp": 0.3317,
+    "ealt": 22790000.0,
+    "expb": 181100000000.0,
+    "expp": 1403000.0,
+    "hlrb": 0.003426,
+    "risk_score": 99.6
+   },
+   "cold_wave": {
+    "afreq": 1.284,
+    "afreq_kind": "events_per_year",
+    "alrb": 1.732e-06,
+    "ealb": 621400.0,
+    "ealp": 1.854,
+    "ealt": 41030000.0,
+    "expb": 356700000000.0,
+    "expp": 2689000.0,
+    "hlrb": 1.589e-06,
+    "risk_score": 99.52
+   },
+   "drought": {
+    "afreq": 8.937,
+    "afreq_kind": "events_per_year",
+    "ealt": 662800.0,
+    "risk_score": 79.1
+   },
+   "earthquake": {
+    "afreq": 0.00018,
+    "afreq_kind": "annual_probability",
+    "alrb": 6.569e-07,
+    "ealb": 235600.0,
+    "ealp": 0.01088,
+    "ealt": 384800.0,
+    "expb": 625000000000.0,
+    "expp": 2702000.0,
+    "hlrb": 0.002095,
+    "risk_score": 62.05
+   },
+   "hail": {
+    "afreq": 0.5588,
+    "afreq_kind": "events_per_year",
+    "alrb": 7.078e-06,
+    "ealb": 2539000.0,
+    "ealp": 0.01313,
+    "ealt": 2880000.0,
+    "expb": 358700000000.0,
+    "expp": 2699000.0,
+    "hlrb": 1.173e-05,
+    "risk_score": 96.56
+   },
+   "heat_wave": {
+    "afreq": 6.157,
+    "afreq_kind": "events_per_year",
+    "alrb": 1.149e-09,
+    "ealb": 412.2,
+    "ealp": 2.273,
+    "ealt": 31140000.0,
+    "expb": 356700000000.0,
+    "expp": 2689000.0,
+    "hlrb": 1.895e-10,
+    "risk_score": 99.26
+   },
+   "hurricane": {
+    "afreq": 0.305,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0008069,
+    "ealb": 289500000.0,
+    "ealp": 1.928,
+    "ealt": 330600000.0,
+    "expb": 358700000000.0,
+    "expp": 2699000.0,
+    "hlrb": 0.002783,
+    "risk_score": 99.96
+   },
+   "landslide": {
+    "afreq": 0.1861,
+    "afreq_kind": "annual_probability",
+    "alrb": 2.285e-09,
+    "ealb": 819.7,
+    "ealp": 1.238e-08,
+    "ealt": 819.9,
+    "expb": 92140000.0,
+    "expp": 533.9,
+    "hlrb": 0.07031,
+    "risk_score": 46.37
+   },
+   "lightning": {
+    "afreq": 97.7,
+    "afreq_kind": "events_per_year",
+    "alrb": 1.057e-07,
+    "ealb": 37930.0,
+    "ealp": 0.6039,
+    "ealt": 8311000.0,
+    "expb": 358700000000.0,
+    "expp": 2699000.0,
+    "hlrb": 1.103e-09,
+    "risk_score": 99.94
+   },
+   "riverine_flooding": {
+    "afreq": 4.0,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0007491,
+    "ealb": 268700000.0,
+    "ealp": 1.986,
+    "ealt": 355800000.0,
+    "expb": 358300000000.0,
+    "expp": 1260000.0,
+    "hlrb": 0.0001875,
+    "risk_score": 99.71
+   },
+   "strong_wind": {
+    "afreq": 0.7582,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.48e-07,
+    "ealb": 88950.0,
+    "ealp": 0.07321,
+    "ealt": 1093000.0,
+    "expb": 358700000000.0,
+    "expp": 2699000.0,
+    "hlrb": 3.001e-07,
+    "risk_score": 82.44
+   },
+   "tornado": {
+    "afreq": 1.074,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.124e-05,
+    "ealb": 7620000.0,
+    "ealp": 1.255,
+    "ealt": 24810000.0,
+    "expb": 358700000000.0,
+    "expp": 2699000.0,
+    "hlrb": 1.979e-05,
+    "risk_score": 98.73
+   },
+   "wildfire": {
+    "afreq": 0.006687,
+    "afreq_kind": "annual_probability",
+    "alrb": 1.275e-05,
+    "ealb": 4572000.0,
+    "ealp": 0.04384,
+    "ealt": 5196000.0,
+    "expb": 8796000000.0,
+    "expp": 86260.0,
+    "hlrb": 0.1,
+    "risk_score": 96.85
+   },
+   "winter_weather": {
+    "afreq": 0.0,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0,
+    "ealb": 0.0,
+    "ealp": 0.0,
+    "ealt": 0.0,
+    "expb": 0.0,
+    "expp": 0.0,
+    "hlrb": 7.944e-08,
+    "risk_score": 0.0
+   }
+  },
+  "climate": {
+   "days_over_2in_2050": 2.319,
+   "days_over_2in_2050_high": 2.198,
+   "days_over_2in_hist": 2.085,
+   "days_over_90f_hist": 61.22,
+   "days_over_95f_2050": 24.77,
+   "days_over_95f_2050_high": 45.76,
+   "days_over_95f_hist": 1.401,
+   "dry_spell_days_2050": 31.59,
+   "dry_spell_days_2050_high": 31.61,
+   "dry_spell_days_hist": 33.33,
+   "icing_days_2050": 0.0,
+   "icing_days_2050_high": 0.0,
+   "icing_days_hist": 0.0
+  },
+  "facilities": {
+   "nearest_nuclear_km": 26.0,
+   "tri_facilities": 120,
+   "high_hazard_dams": 0
+  }
+ },
+ "location": {
+  "country": "US",
+  "county_fips": "12086",
+  "county_name": "Miami-Dade",
+  "state_abbr": "FL",
+  "state_name": "Florida",
+  "centroid": {
+   "lat": 25.61,
+   "lon": -80.5
+  },
+  "nca_region": "southeast",
+  "coastal": true,
+  "tsunami_zone": false,
+  "facility_flags": {
+   "nuclear_plant_within_16km": false,
+   "nuclear_plant_within_80km": true,
+   "hazmat_facilities_within_5km": 0
+  },
+  "zip": "33139"
+ }
+}
