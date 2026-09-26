@@ -1,7 +1,7 @@
 <!--
   Screen 4, Money: the monthly budget (slider with a suggested starting point, labelled as an
-  estimate), a one-off amount, months of savings, monthly expenses, how steady income is, and
-  insurance. $0 is a fine answer.
+  estimate), a one-off amount, bare-minimum mode, months of savings, monthly expenses, how steady
+  income is, pay or benefits a shutdown could stop, and insurance. $0 is a fine answer.
 -->
 <script lang="ts">
   import ChoiceGroup from '../components/ChoiceGroup.svelte';
@@ -10,10 +10,12 @@
   import NumberField from '../components/NumberField.svelte';
   import ProgressSteps from '../components/ProgressSteps.svelte';
   import Sources from '../components/Sources.svelte';
-  import { INCOME_STABILITIES } from '../engine/types';
+  import type { Benefit } from '../engine/types';
+  import { BENEFITS, INCOME_STABILITIES } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
+  import { minimumKit, setMinimumKit } from '../lib/dials';
   import { usd } from '../lib/format';
-  import { STABILITY } from '../lib/labels';
+  import { BENEFIT, STABILITY } from '../lib/labels';
   import { href } from '../lib/router.svelte';
 
   const app = useApp();
@@ -29,6 +31,14 @@
 
   const earners = $derived(input?.people.filter((p) => p.earner).length ?? 0);
   const monthly = $derived(input?.finances.monthly_budget_usd ?? 0);
+
+  function setBenefit(b: Benefit, on: boolean) {
+    if (!input) return;
+    const chosen = new Set(input.finances.benefits ?? []);
+    if (on) chosen.add(b);
+    else chosen.delete(b);
+    input.finances.benefits = BENEFITS.filter((x) => chosen.has(x));
+  }
 </script>
 
 <div class="page page--narrow">
@@ -85,6 +95,12 @@
         example="0"
         onchange={(v) => (input.finances.one_off_budget_usd = v ?? 0)}
       />
+      <CheckRow
+        label="Show me the bare minimum first"
+        help="The plan starts with the smallest kit that covers three days of water, light, warmth and medicine, and the rest waits until that is done. Good for a small budget. You can change it later in your settings on the Risks screen."
+        checked={minimumKit(input.dials)}
+        onchange={(on) => setMinimumKit(input.dials, on)}
+      />
     </section>
 
     <section aria-labelledby="savings-title">
@@ -132,12 +148,40 @@
       {/if}
     </section>
 
+    <section aria-labelledby="benefits-title">
+      <h2 id="benefits-title">Pay and benefits</h2>
+      <fieldset>
+        <legend>Does your household rely on any of these?</legend>
+        <p class="help">
+          Optional. Ticking one only adds one risk to your list: these payments can pause during a government shutdown or a funding gap.
+          It stays on this device.
+        </p>
+        {#each BENEFITS as b (b)}
+          <CheckRow label={BENEFIT[b].label} help={BENEFIT[b].help} checked={input.finances.benefits?.includes(b) ?? false} onchange={(on) => setBenefit(b, on)} />
+        {/each}
+      </fieldset>
+    </section>
+
     <section aria-labelledby="insurance-title">
       <h2 id="insurance-title">Insurance</h2>
       <p class="section-intro">Not sure? Leave it unticked. The plan includes checking your policy, which costs nothing.</p>
       <CheckRow label={input.housing.tenure === 'rent' ? 'Renters insurance' : 'Homeowners insurance'} help="Usually pays for repairs or belongings, and often a place to stay." bind:checked={input.finances.insurance.home_or_renters} />
       <CheckRow label="Flood insurance" help="Usually a separate policy." bind:checked={input.finances.insurance.flood} />
       <CheckRow label="Earthquake insurance" help="Usually a separate policy." bind:checked={input.finances.insurance.earthquake} />
+      <CheckRow
+        label="Sewer or water backup cover"
+        help="Pays when drains back up into the home. Usually an add-on to a home or renters policy."
+        checked={input.finances.insurance.sewer_backup ?? false}
+        onchange={(on) => (input.finances.insurance.sewer_backup = on)}
+      />
+      {#if earners > 0}
+        <CheckRow
+          label="Life or disability insurance"
+          help="Pays if an earner dies or can't work for a long time."
+          checked={input.finances.insurance.life_or_disability ?? false}
+          onchange={(on) => (input.finances.insurance.life_or_disability = on)}
+        />
+      {/if}
     </section>
 
     <InterviewNav step="money" />

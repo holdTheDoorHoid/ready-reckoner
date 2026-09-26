@@ -58,6 +58,8 @@ export interface RenderOptions {
   headingOffset?: number;
   /** Tables already rendered earlier in the same document, so region names keep counting. */
   tableStart?: number;
+  /** The notes' name for screen readers (default "Notes"); give each set on one page its own. */
+  notesLabel?: string;
 }
 
 const FOOTNOTE_DEF = /^\[\^([A-Za-z0-9_-]+)\]:[ \t]*(.*)$/gm;
@@ -152,7 +154,7 @@ export function renderMarkdown(source: string, options: RenderOptions = {}): str
         return `<li id="${prefix}-fn-${id}">${text} <a href="#${prefix}-fnref-${id}-1" class="fn-back" aria-label="Back to the text">↩</a></li>`;
       })
       .join('');
-    html += `<section class="footnotes" aria-label="Notes"><ol>${items}</ol></section>`;
+    html += `<section class="footnotes" aria-label="${escapeHtml(options.notesLabel ?? 'Notes')}"><ol>${items}</ol></section>`;
   }
   // DOMPurify's own URL rule stays in force (it checks every attribute value, so a narrower
   // pattern here would also strip type="checkbox"); the hook above then keeps only SAFE_URL links.
@@ -187,6 +189,14 @@ export function packetSections(markdown: string): PacketSection[] {
     out.push({ slug, markdown: markdown.slice(m.index, end) });
   });
   return out;
+}
+
+/**
+ * The section that holds the wallet cards: the one whose heading names them ("Wallet cards"), or
+ * else the family plan they are printed with; undefined when the packet has neither.
+ */
+export function cardsSection(sections: readonly PacketSection[]): string | undefined {
+  return sections.find((s) => s.slug.includes('wallet'))?.slug ?? sections.find((s) => s.slug.includes('family-plan'))?.slug;
 }
 
 /** A section's heading and opening paragraphs, and the rest (from its first subheading). */

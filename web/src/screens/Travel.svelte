@@ -62,7 +62,7 @@
               {/snippet}
             </Field>
             <button type="button" class="button button--quiet button--small" onclick={() => removeVehicle(i)}>
-              <Icon name="trash" /> Remove<span class="visually-hidden"> vehicle {i + 1}</span>
+              <Icon name="trash" /> Remove<span class="visually-hidden">{' '}vehicle {i + 1}</span>
             </button>
           </li>
         {/each}
