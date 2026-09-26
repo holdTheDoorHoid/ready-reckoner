@@ -887,7 +887,9 @@ mod tests {
     fn embedded_table_parses_and_validates() {
         let t = EffectsTable::parse(EFFECTS_TOML).unwrap();
         assert!(t.effects.len() > 150, "{}", t.effects.len());
-        assert_eq!(t.income.len(), 8);
+        // Job loss, pandemic, seven named scenarios (the three v0.2.0 faults among them), the
+        // benefit lapse and an arrest.
+        assert_eq!(t.income.len(), 11);
     }
 
     #[test]

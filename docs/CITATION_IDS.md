@@ -178,21 +178,10 @@ curves, and the two data-pack v2 sources the model reads, with the ids agent/dat
 | `epa_echo_sdwa` | the county's share of public-water customers on a system with a health-based violation in five years (water-system fragility, model review M-03); requested by agent/data-hazard |
 | `epa_aqs_daily_pm25` | the county's smoke days for the clean-air sentence; requested by agent/data-hazard |
 
-Used by the new effects rows and added by agent/content2 (not in this branch's registry; they
-resolve when that branch merges, and rr-plan's registry test waits for it):
-
-| id | What rr-consequence uses it for |
-| --- | --- |
-| `fcc_network_outage_2024` | phone and internet outages last hours (network_outage) |
-| `fda_drug_shortages` | medicine shortages (drug_shortage) |
-| `eviction_lab_national` | evictions (eviction) |
-| `fbi_cde_arrests_2024` | arrests (arrest_or_detention income stream) |
-| `usgs_sinkholes` | sinkholes (sinkhole) |
-| `nws_dust_storms` | dust storms (dust_storm) |
-| `fema_dam_residual_risk_2018` | dam and levee failures (dam_failure) |
-| `iii_water_damage_protect` | burst pipes and leaks (water_damage) |
-| `cfpb_shutdown_2013` | pay or benefits that stop in a funding gap (benefit_interruption income stream) |
-| `me_dhhs_snap_2025` | the November 2025 SNAP lapse (benefit_interruption food row) |
+The new hazards' rows cite the priors (`rr_risk_model_priors`) and, for dust storms, the Storm
+Events record, until agent/content2's topical entries merge (network outages, medicine shortages,
+evictions, arrests, sinkholes, dust storms, dam failure, water damage, funding gaps and the 2025
+SNAP lapse): each row in `effects.toml` names the id to add in an "awaiting: content" comment.
 
 ## Added for the v0.1.1 guidance on 2026-09-26
 

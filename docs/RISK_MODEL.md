@@ -431,9 +431,12 @@ reproduce the research prototype's event classes:
 - **Rare families never enter a curve.** The nine rare hazards (`HazardId::is_rare`) are shown in
   their own box: their rates are skipped when the model is built, and the table rejects rows for
   them (the nuclear-attack row went, and the retired `terrorism` rows with it). Their "what it
-  changes" text is content's; the plan's own power curve at 60 and 90 days
-  (`ConsequenceAssessment::multi_month_blackout`) is the number behind the
-  `multi_month_blackout` row.
+  changes" text is content's; the plan's own power curve at 60 and 90 days, with its 10th and
+  90th percentiles under the same draws as the targets (`ConsequenceAssessment::multi_month`,
+  read with `multi_month_blackout()`), is the number behind the `multi_month_blackout` row:
+  `power_curve_60_days()` returns it as the `(value, low, high)` that
+  `rr_hazards::HazardAssessment::add_power_curve` takes (awaiting: plan, which calls it after
+  assessing). Rare families never enter the curve, so nothing is counted twice.
 - **Hurricanes come in two parts** (v0.2.0): `cat12` and `major`, with fallback shares 0.94 and
   0.06 that reproduce the earlier fixed split; when rr-hazards passes the county's own split (its
   HURDAT2 major share: Utuado about 17 %, Asheville about 2 %) the rows use it
@@ -579,11 +582,11 @@ big windstorms, grid failure, Cascadia).
 | volcanic_activity | clean_air | ash | volcanic ash | 0.5 | 2 d | 7 d | prior |  | ready_gov_volcanoes, rr_risk_model_priors |
 | wildfire_smoke | clean_air | smoke | days of wildfire smoke | 1 | 2 d | 7 d | prior |  | cdc_wildfire_smoke, epa_wildfire_indoor_air, rr_risk_model_priors |
 | wildfire_smoke | supplies | smoke | days of wildfire smoke | 0.2 | 1 d | 4 d | prior |  | cdc_wildfire_smoke, rr_risk_model_priors |
-| dust_storm | clean_air | dust | dust storms | 1 | 3 h | 12 h | prior |  | nws_dust_storms, rr_risk_model_priors |
-| dust_storm | supplies | dust | dust storms | 0.5 | 6 h | 1 d | prior |  | nws_dust_storms, rr_risk_model_priors |
-| dust_storm | get_home | dust | dust storms | 0.3 | — | — | prior | households with a commuter | nws_dust_storms, rr_risk_model_priors |
-| sinkhole | home_loss | collapse | ground collapsing or settling under the home | 0.2 | 30 d | 180 d | prior |  | usgs_sinkholes, census_pulse_displacement, rr_risk_model_priors |
-| sinkhole | evacuate | collapse | ground collapsing or settling under the home | 0.05 | 14 d | 90 d | prior | warning 0–24 h | usgs_sinkholes, rr_risk_model_priors |
+| dust_storm | clean_air | dust | dust storms | 1 | 3 h | 12 h | prior |  | noaa_storm_events, rr_risk_model_priors |
+| dust_storm | supplies | dust | dust storms | 0.5 | 6 h | 1 d | prior |  | noaa_storm_events, rr_risk_model_priors |
+| dust_storm | get_home | dust | dust storms | 0.3 | — | — | prior | households with a commuter | noaa_storm_events, rr_risk_model_priors |
+| sinkhole | home_loss | collapse | ground collapsing or settling under the home | 0.2 | 30 d | 180 d | prior |  | census_pulse_displacement, rr_risk_model_priors |
+| sinkhole | evacuate | collapse | ground collapsing or settling under the home | 0.05 | 14 d | 90 d | prior | warning 0–24 h | rr_risk_model_priors |
 | pandemic | supplies | stay_home | a pandemic that disrupts shopping | 0.9 | 14 d | 45 d | prior |  | cdc_mmwr_stay_at_home_2020, cdc_pandemic_history, rr_risk_model_priors |
 | pandemic | medication | stay_home | a pandemic that disrupts shopping | 0.9 | 7 d | 30 d | prior |  | cdc_pandemic_history, rr_risk_model_priors |
 | grid_failure | power | regional | a regional blackout | 1 | 1 d | 3 d | prior | regional restoration: grid; in heat 0.3; in cold 0.4 | rr_risk_model_priors |
@@ -604,13 +607,13 @@ big windstorms, grid failure, Cascadia).
 | nuclear_plant_incident | supplies | release | a nuclear plant accident | 1 | 1 d | 3 d | prior |  | rr_risk_model_priors |
 | nuclear_plant_incident | home_loss | release | a nuclear plant accident | 0.05 | 90 d | 730 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | hazmat_release | clean_air | release | chemical releases | 0.4 | 6 h | 1 d | prior |  | ready_gov_chemical, rr_risk_model_priors |
-| dam_failure | evacuate | release | a dam or levee failure, or the threat of one | 1 | 3 d | 30 d | prior | warning 0.25–6 h | fema_dam_residual_risk_2018, rr_risk_model_priors |
-| dam_failure | home_loss | release | a dam or levee failure, or the threat of one | 0.3 | 30 d | 180 d | prior |  | fema_dam_residual_risk_2018, census_pulse_displacement, rr_risk_model_priors |
+| dam_failure | evacuate | release | a dam or levee failure, or the threat of one | 1 | 3 d | 30 d | prior | warning 0.25–6 h | rr_risk_model_priors |
+| dam_failure | home_loss | release | a dam or levee failure, or the threat of one | 0.3 | 30 d | 180 d | prior |  | census_pulse_displacement, rr_risk_model_priors |
 | dam_failure | power | release | a dam or levee failure, or the threat of one | 0.3 | 1 d | 7 d | prior |  | rr_risk_model_priors |
 | dam_failure | water_out | release | a dam or levee failure, or the threat of one | 0.2 | 7 d | 30 d | prior | homes on public water; scaled by how easily the water system breaks | rr_risk_model_priors |
-| network_outage | comms | network | phone or internet network outages | 1 | 6 h | 1 d | prior |  | fcc_network_outage_2024, rr_risk_model_priors |
-| drug_shortage | medication | shortage | a shortage of a daily prescription | 1 | 5 d | 21 d | prior |  | fda_drug_shortages, rr_risk_model_priors |
-| benefit_interruption | supplies | lapse | a lapse in food benefits | 1 | 10 d | 30 d | prior | households that rely on SNAP or WIC | me_dhhs_snap_2025, rr_risk_model_priors |
+| network_outage | comms | network | phone or internet network outages | 1 | 6 h | 1 d | prior |  | rr_risk_model_priors |
+| drug_shortage | medication | shortage | a shortage of a daily prescription | 1 | 5 d | 21 d | prior |  | rr_risk_model_priors |
+| benefit_interruption | supplies | lapse | a lapse in food benefits | 1 | 10 d | 30 d | prior | households that rely on SNAP or WIC | rr_risk_model_priors |
 | attack_disruption | supplies | lockdown | an attack or threat that closes your area | 1 | 12 h | 2 d | prior |  | rr_risk_model_priors |
 | attack_disruption | comms | lockdown | an attack or threat that closes your area | 0.3 | 12 h | 2 d | prior |  | rr_risk_model_priors |
 | attack_disruption | get_home | lockdown | an attack or threat that closes your area | 0.5 | — | — | prior | households with a commuter | rr_risk_model_priors |
@@ -630,9 +633,9 @@ big windstorms, grid failure, Cascadia).
 | burglary | security | break_in | break-ins | 1 | — | — | prior |  | rr_risk_model_priors |
 | extended_household_illness | medical_emergency | illness | a long illness at home | 0.5 | — | — | prior |  | rr_risk_model_priors |
 | local_utility_outage | water_boil | system_failure | a major water system failure | 0.0267 | 14 d | 45 d | prior | homes on public water; scaled by how easily the water system breaks | epa_asheville_boil_notice_2024, rr_risk_model_priors |
-| water_damage | water_out | leak | a burst pipe or leak at home | 1 | 6 h | 2 d | prior |  | iii_water_damage_protect, rr_risk_model_priors |
-| water_damage | home_loss | leak | a burst pipe or leak at home | 0.05 | 14 d | 60 d | prior |  | iii_water_damage_protect, census_pulse_displacement, rr_risk_model_priors |
-| eviction | home_loss | eviction | an eviction | 1 | 30 d | 90 d | prior |  | eviction_lab_national, rr_risk_model_priors |
+| water_damage | water_out | leak | a burst pipe or leak at home | 1 | 6 h | 2 d | prior |  | rr_risk_model_priors |
+| water_damage | home_loss | leak | a burst pipe or leak at home | 0.05 | 14 d | 60 d | prior |  | census_pulse_displacement, rr_risk_model_priors |
+| eviction | home_loss | eviction | an eviction | 1 | 30 d | 90 d | prior |  | rr_risk_model_priors |
 | *cascadia_m9* (coast) | power | event | a magnitude 9 Cascadia earthquake | 1 | 90 d | 180 d | prior | in cold 0.4; relief: help 14 d, mostly restored 180 d | oregon_resilience_plan_2013 |
 | *cascadia_m9* (coast) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 365 d | 1095 d | prior | homes on public water; relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013 |
 | *cascadia_m9* (coast) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 90 d | 270 d | prior | homes on a private well; relief: help 14 d, mostly restored 270 d | oregon_resilience_plan_2013, rr_risk_model_priors |
@@ -677,6 +680,36 @@ big windstorms, grid failure, Cascadia).
 | *hayward_m7* | home_loss | event | a magnitude 7 Hayward fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | *hayward_m7* | evacuate | event | a magnitude 7 Hayward fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
 | *hayward_m7* | get_home | event | a magnitude 7 Hayward fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *wasatch_m7* | power | event | a magnitude 7 Wasatch fault earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *wasatch_m7* | water_out | event | a magnitude 7 Wasatch fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *wasatch_m7* | water_out | event | a magnitude 7 Wasatch fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *wasatch_m7* | supplies | event | a magnitude 7 Wasatch fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *wasatch_m7* | medication | event | a magnitude 7 Wasatch fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *wasatch_m7* | comms | event | a magnitude 7 Wasatch fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *wasatch_m7* | home_loss | event | a magnitude 7 Wasatch fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *wasatch_m7* | evacuate | event | a magnitude 7 Wasatch fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *wasatch_m7* | get_home | event | a magnitude 7 Wasatch fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *seattle_fault_m7* | power | event | a magnitude 7 Seattle fault earthquake | 1 | 3 d | 14 d | prior | in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *seattle_fault_m7* | water_out | event | a magnitude 7 Seattle fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *seattle_fault_m7* | water_out | event | a magnitude 7 Seattle fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *seattle_fault_m7* | supplies | event | a magnitude 7 Seattle fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *seattle_fault_m7* | medication | event | a magnitude 7 Seattle fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *seattle_fault_m7* | comms | event | a magnitude 7 Seattle fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *seattle_fault_m7* | home_loss | event | a magnitude 7 Seattle fault earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *seattle_fault_m7* | evacuate | event | a magnitude 7 Seattle fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *seattle_fault_m7* | get_home | event | a magnitude 7 Seattle fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *san_andreas_south_m78* | power | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.3 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *san_andreas_south_m78* | water_out | event | a magnitude 7.8 southern San Andreas earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *san_andreas_south_m78* | water_out | event | a magnitude 7.8 southern San Andreas earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *san_andreas_south_m78* | supplies | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *san_andreas_south_m78* | medication | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *san_andreas_south_m78* | comms | event | a magnitude 7.8 southern San Andreas earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *san_andreas_south_m78* | home_loss | event | a magnitude 7.8 southern San Andreas earthquake | 0.1 | 60 d | 365 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
+| *san_andreas_south_m78* | evacuate | event | a magnitude 7.8 southern San Andreas earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *san_andreas_south_m78* | get_home | event | a magnitude 7.8 southern San Andreas earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *heat_blackout* | power | event | a blackout during a heat wave | 1 | 2 d | 5 d | prior | in heat 1 | stone_2023_heat_blackout, rr_risk_model_priors |
+| *heat_blackout* | thermal | event | a blackout during a heat wave | 1 | 3 d | 7 d | prior | homes without air conditioning; county events: heat_wave, excessive_heat, heat | rr_risk_model_priors |
+| *heat_blackout* | supplies | event | a blackout during a heat wave | 0.5 | 1 d | 3 d | prior |  | rr_risk_model_priors |
 
 | Income stream | Per earner | Spell median | Spell bad case | Unemployment insurance | Evidence | Sources |
 |---|---|---|---|---|---|---|
@@ -686,8 +719,11 @@ big windstorms, grid failure, Cascadia).
 | *major_hurricane_direct_hit*: the local economy after a major hurricane | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *new_madrid_m7*: the regional economy after a New Madrid earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *hayward_m7*: the regional economy after a Hayward fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
-| benefit_interruption: federal pay or benefits that stop | 1 | 2 wk | 6 wk | no | prior | cfpb_shutdown_2013, rr_risk_model_priors |
-| arrest_or_detention: an arrest or detention | 1 | 1 wk | 6 wk | no | prior | fbi_cde_arrests_2024, rr_risk_model_priors |
+| *wasatch_m7*: the regional economy after a Wasatch fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *seattle_fault_m7*: the regional economy after a Seattle fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *san_andreas_south_m78*: the regional economy after a southern San Andreas earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| benefit_interruption: federal pay or benefits that stop | 1 | 2 wk | 6 wk | no | prior | rr_risk_model_priors |
+| arrest_or_detention: an arrest or detention | 1 | 1 wk | 6 wk | no | prior | rr_risk_model_priors |
 
 | Hazard | Part | Events it counts | Share when no split is passed | Why |
 |---|---|---|---|---|
@@ -702,6 +738,10 @@ big windstorms, grid failure, Cascadia).
 | *cascadia_m9* | earthquake | The county earthquake rate includes Cascadia's own shaking (0.41 %/yr near Coos Bay, the long-run recurrence). |
 | *hayward_m7* | earthquake | The Bay Area earthquake rate includes Hayward fault ruptures. |
 | *new_madrid_m7* | earthquake | The county earthquake rate includes New Madrid ruptures. |
+| *wasatch_m7* | earthquake | The Wasatch Front earthquake rate includes Wasatch fault ruptures. |
+| *seattle_fault_m7* | earthquake | The Puget Sound earthquake rate includes Seattle fault ruptures (and Cascadia's, taken out separately). |
+| *san_andreas_south_m78* | earthquake | The southern California earthquake rate includes southern San Andreas ruptures. |
+| *heat_blackout* | heat_wave | The county's heat-wave rate includes the heat waves that come with a blackout of a day or more. |
 
 | Water failure on record (stress line) | Bucket | States | Began | Median | 9 in 10 back | Sources |
 |---|---|---|---|---|---|---|
@@ -837,6 +877,24 @@ whose heat needs power face dangerous cold), a boil notice for 3 in 10 public-wa
 winter median 7 days), no tap water for 1 in 10 (2 d / 10 d), and iced roads for half. The pooled
 tail leaves these outages out, so they are counted once.
 
+### Blackouts during heat waves (v0.2.0)
+
+The heat-plus-outage class of M-11 is rr-hazards' named scenario `heat_blackout` (awaiting:
+hazards, agent/hazards2): a power cut of a day or more that starts during a heat wave, offered
+and on by default in the 44 counties with 60 or more days a year over 95 °F (Maricopa, Pima,
+Clark ...), at the county's heat-wave rate times the chance a day-long outage overlaps a
+three-day episode. Its rows here: power for two days, back over the next three (median 2 d, 90th
+percentile 5 d: the design Stone et al. 2023 studied, PRIOR), every hour of it in dangerous heat,
+so an air-conditioned home's heat need lasts exactly as long as the power cut and wells,
+high-rise pumps, refrigerated medicine and public water follow through the usual links; the heat
+wave itself (3 d / 7 d) for homes without air conditioning; stores dark for half (1 d / 3 d). An
+`[[overlap]]` takes the scenario's share out of the ordinary heat waves, as rr-hazards' heat card
+does, so each heat wave is counted once. The ordinary power cuts on hot days stay in the pooled
+county record, with the county's own share of outage hours on days of 95 °F or more (above);
+there is no second, overlapping class. At about 1 in 1,000 a year the scenario does not move a
+target at the default setting ("Does not change your targets at this setting"); it matters only at
+the more cautious settings.
+
 ### Clean air (v0.2.0)
 
 The 15th bucket, `clean_air` (readiness): the ten-year chance of needing clean air at home, from
@@ -850,8 +908,10 @@ air cleaner or box-fan filter, respirators) is sized by rr-supply.
 
 Model review M-08. The short end of the warning band is the least warning among causes (terms
 summed by hazard, a scenario under its family) whose own ten-year chance is at least 1 in 1,000,
-and the sentence names it; when a fire at home sets it, the fastest cause outside the home gets
-its own sentence ("For dam or levee failures, plan for as little as 15 minutes"). The long end is
+and the sentence names it; when something with no warning sets it (a fire at home, an
+earthquake), the fastest of the hazards that give minutes or hours (wildfire, flash flooding,
+tsunami, a chemical release, a dam or levee failure, a sinkhole) gets its own sentence ("For
+wildfires, plan for as little as 15 minutes of warning"). The long end is
 the most warning among terms with at least 5 % of the rate. "Plan to be away" stays the median
 (the go-bag's horizon), and the likely cause with the longest time away gets a sentence ("after a
 wildfire you could be away for a month or more"). Home loss adds the displacement estimate: if
@@ -980,7 +1040,12 @@ Rows keyed by scenario id (and `coast`/`valley` for Cascadia, from the candidate
 `coastal` flag): `cascadia_m9` (Oregon Resilience Plan restoration times), `major_hurricane_direct_hit`
 (ORNL Michael restoration; Asheville water), `new_madrid_m7` and `hayward_m7` (Hazus- and
 Tohoku-based priors; no regional restoration study was at hand), `local_tsunami` (15–20 minutes'
-warning; rr-hazards' rate already counts only households in the zone). The user's toggle in
+warning; rr-hazards' rate already counts only households in the zone). v0.2.0 adds rows for the
+four scenarios rr-hazards offers on agent/hazards2 (awaiting: hazards): `wasatch_m7`,
+`seattle_fault_m7` and `san_andreas_south_m78` take the New Madrid and Hayward priors for a major
+urban earthquake with their own labels (no restoration study for those faults is registered; the
+ShakeOut magnitude 7.8 would likely run longer), each with an `[[overlap]]` so the county
+earthquake rate gives up its share; `heat_blackout` is described above. The user's toggle in
 `dials.scenario_overrides` wins. `ScenarioInfo.effect_summary` compares the ladder targets with and
 without the scenario (Coos Bay: "Power: 3 days → 14 days; Tap water: 14 days → 60 days …") and, for
 evacuation-only scenarios, the ten-year chance of leaving.

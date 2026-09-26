@@ -11,12 +11,12 @@ mod support {
 use std::collections::BTreeMap;
 
 use rr_consequence::{
-    ConsequenceAssessment, CountyData, OutageModel, RestorationCurve, StressEvent, Survival,
-    assess_with_draws,
+    ConsequenceAssessment, CountyData, OutageModel, RestorationCurve, ScenarioCandidate,
+    StressEvent, Survival, assess_with_draws,
 };
 use rr_types::{
-    Benefit, BucketId, CitationId, Evidence, HazardId, HouseholdEventRate, PlanInput, Target,
-    WaterSource, WaterSystemRecord,
+    Benefit, BucketId, CitationId, Cooling, Evidence, HazardId, HouseholdEventRate, PlanInput,
+    Target, WaterSource, WaterSystemRecord,
 };
 use support::{generic, research};
 
@@ -604,7 +604,8 @@ fn the_warning_names_its_cause_and_the_fastest_one_outside_the_home() {
     );
     assert!(
         s.iter().any(|x| x.contains(
-            "For floods from rivers and heavy rain, plan for as little as a few minutes of warning"
+            "For floods from rivers and heavy rain, plan for as little as a few minutes of \
+             warning; for dam or levee failures, 15 minutes."
         )),
         "{s:?}"
     );
@@ -825,6 +826,164 @@ fn the_dial_sentence_and_the_multi_month_power_curve() {
     assert!((m.rate_60_days - a.curve(BucketId::Power).unwrap().lambda(60.0)).abs() < 1e-15);
     assert!(m.rate_90_days <= m.rate_60_days);
     assert!((0.0..=1.0).contains(&m.p10_60_days));
+}
+
+#[test]
+fn the_hazards_crate_gets_the_power_curve_at_60_days_with_its_range() {
+    let input = research::coos_household();
+    let rates = research::coos_rates();
+    let stats = research::coos_outages();
+    let county = CountyData {
+        outages: Some(&stats),
+        ..CountyData::default()
+    };
+    let scenarios = research::coos_scenarios(true);
+    let a = assess_with_draws(&input, &rates, county, &scenarios, DRAWS);
+    let (v, lo, hi) = a.power_curve_60_days();
+    // Cascadia keeps the coast dark for 3 to 6 months, so the curve reaches two months.
+    assert!(v > 1e-4, "{v}");
+    assert!(lo <= v && v <= hi && lo < hi, "{lo} {v} {hi}");
+    assert!((v - a.power_beyond(60.0)).abs() <= 1e-12 * v.max(1e-300));
+    let m = a.multi_month_blackout();
+    assert!(m.range_90_days[0] <= m.rate_90_days && m.rate_90_days <= m.range_90_days[1]);
+    assert!(m.rate_90_days < m.rate_60_days);
+}
+
+fn scenario(id: &str, name: &str, hazard: HazardId, r: f64) -> ScenarioCandidate {
+    ScenarioCandidate {
+        id: id.into(),
+        name: name.into(),
+        hazard,
+        rate_per_year: r,
+        low: r / 3.0,
+        high: r * 3.0,
+        evidence: Evidence::Prior,
+        on: true,
+        default_on: true,
+        overridden: false,
+        applies_because: "A test county.".into(),
+        variant: None,
+        alternatives: vec![],
+        sources: vec![CitationId::from("rr_risk_model_priors")],
+    }
+}
+
+#[test]
+fn a_blackout_in_a_heat_wave_is_one_event_for_power_heat_and_water() {
+    // rr-hazards' `heat_blackout` (agent/hazards2): about 1 in 1,000 a year in Maricopa.
+    let hb = [scenario(
+        "heat_blackout",
+        "Blackout during a heat wave",
+        HazardId::HeatWave,
+        0.001,
+    )];
+    let rates = vec![
+        rate(HazardId::HeatWave, 2.0),
+        rate(HazardId::StrongWind, 1.0),
+    ];
+    let scenario_terms = |a: &ConsequenceAssessment, b: BucketId| -> f64 {
+        a.curve(b)
+            .map(|c| {
+                c.terms
+                    .iter()
+                    .filter(|t| t.scenario == Some(0))
+                    .map(|t| t.weight)
+                    .sum()
+            })
+            .unwrap_or(0.0)
+    };
+
+    // Air conditioning fails with the power, so the heat need is the power cut itself.
+    let mut cooled = research::philadelphia_household();
+    cooled.housing.cooling = Cooling::Central;
+    let a = run_with(&cooled, &rates, &hb);
+    assert!((scenario_terms(&a, BucketId::Power) - 0.001).abs() < 1e-12);
+    assert!((scenario_terms(&a, BucketId::Thermal) - 0.001).abs() < 1e-12);
+    let thermal = a.curve(BucketId::Thermal).unwrap();
+    let power = a.curve(BucketId::Power).unwrap();
+    let from = |c: &rr_consequence::ExceedanceCurve, d: f64| -> f64 {
+        c.terms
+            .iter()
+            .filter(|t| t.scenario == Some(0))
+            .map(|t| t.weight * t.sf(d))
+            .sum()
+    };
+    for d in [0.5, 2.0, 5.0] {
+        assert!((from(thermal, d) - from(power, d)).abs() < 1e-15, "day {d}");
+    }
+    // Public water past its backup power, scaled by the system (M-03).
+    assert!(scenario_terms(&a, BucketId::WaterOut) > 0.0);
+    assert!(scenario_terms(&a, BucketId::Supplies) > 0.0);
+    // Counted once: the scenario's share leaves the ordinary heat waves.
+    assert!(
+        a.notes
+            .iter()
+            .any(|n| n.contains("taken out of ordinary heat waves")),
+        "{:?}",
+        a.notes
+    );
+    let info = a
+        .scenarios
+        .iter()
+        .find(|s| s.id == "heat_blackout")
+        .unwrap();
+    assert!(info.on && !info.effect_summary.is_empty());
+
+    // Without air conditioning the heat wave itself is the need, from the scenario's own row.
+    let mut open = research::philadelphia_household();
+    open.housing.cooling = Cooling::None;
+    let b = run_with(&open, &rates, &hb);
+    assert!((scenario_terms(&b, BucketId::Thermal) - 0.001).abs() < 1e-12);
+}
+
+#[test]
+fn the_three_new_fault_scenarios_have_rows() {
+    let input = research::philadelphia_household();
+    let rates = vec![rate(HazardId::Earthquake, 0.02)];
+    for (id, name) in [
+        ("wasatch_m7", "A magnitude 7 Wasatch fault earthquake"),
+        ("seattle_fault_m7", "A magnitude 7 Seattle fault earthquake"),
+        (
+            "san_andreas_south_m78",
+            "A magnitude 7.8 southern San Andreas earthquake",
+        ),
+    ] {
+        let s = [scenario(id, name, HazardId::Earthquake, 0.01)];
+        let a = run_with(&input, &rates, &s);
+        for b in [
+            BucketId::Power,
+            BucketId::WaterOut,
+            BucketId::Supplies,
+            BucketId::Medication,
+        ] {
+            let w: f64 = a
+                .curve(b)
+                .map(|c| {
+                    c.terms
+                        .iter()
+                        .filter(|t| t.scenario == Some(0))
+                        .map(|t| t.weight)
+                        .sum()
+                })
+                .unwrap_or(0.0);
+            assert!(w > 0.0, "{id} {b:?}");
+        }
+        assert!(
+            a.notes
+                .iter()
+                .any(|n| n.contains("taken out of ordinary earthquakes")),
+            "{id}: {:?}",
+            a.notes
+        );
+    }
+}
+
+fn run_with(
+    input: &PlanInput,
+    rates: &[HouseholdEventRate],
+    scenarios: &[ScenarioCandidate],
+) -> ConsequenceAssessment {
+    assess_with_draws(input, rates, CountyData::default(), scenarios, DRAWS)
 }
 
 #[test]

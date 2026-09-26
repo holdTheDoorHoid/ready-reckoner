@@ -82,6 +82,10 @@ pub struct ConsequenceAssessment {
     /// For each event that sets a duration target, the other needs the same event brings at once
     /// (DESIGN §4.7's simultaneous-need check; the budget crate compares it with storage).
     pub simultaneous: Vec<SimultaneousNeed>,
+    /// The power curve at two and three months, with its range (brief item 7; read it with
+    /// [`ConsequenceAssessment::multi_month_blackout`] or
+    /// [`ConsequenceAssessment::power_curve_60_days`]).
+    pub multi_month: MultiMonthBlackout,
     /// How easily the household's public water system breaks (model review M-03).
     pub fragility: crate::model::Fragility,
     /// Household coupling rules that fired (one explainable line each).
@@ -168,29 +172,24 @@ impl ConsequenceAssessment {
         )
     }
 
-    /// Yearly rate of power cuts longer than `days` (Λ_power), for the rare
-    /// `multi_month_blackout` row, which the hazards crate shows from this number.
+    /// Yearly rate of power cuts longer than `days` (Λ_power, central values).
     pub fn power_beyond(&self, days: f64) -> f64 {
         self.curve(BucketId::Power).map_or(0.0, |c| c.lambda(days))
     }
 
     /// The power curve at two and three months (DESIGN-DELTA §3: `multi_month_blackout` is
-    /// computed from the plan's own power curve).
+    /// computed from the plan's own power curve), with its range.
     pub fn multi_month_blackout(&self) -> MultiMonthBlackout {
-        let (l60, l90) = (self.power_beyond(60.0), self.power_beyond(90.0));
-        let sources = self
-            .buckets
-            .iter()
-            .find(|b| b.id == BucketId::Power)
-            .map(|b| b.sources.clone())
-            .unwrap_or_default();
-        MultiMonthBlackout {
-            rate_60_days: l60,
-            rate_90_days: l90,
-            p10_60_days: p10(l60),
-            p10_90_days: p10(l90),
-            sources,
-        }
+        self.multi_month.clone()
+    }
+
+    /// The household's power cuts lasting 60 days or more a year as `(value, low, high)`: the
+    /// argument `rr_hazards::HazardAssessment::add_power_curve` takes for the rare "power out
+    /// for months" row (brief item 7). awaiting: plan — `rr-plan` calls
+    /// `hazards.add_power_curve(consequence.power_curve_60_days(), years)` after assessing.
+    pub fn power_curve_60_days(&self) -> (f64, f64, f64) {
+        let m = &self.multi_month;
+        (m.rate_60_days, m.range_60_days[0], m.range_60_days[1])
     }
 }
 
@@ -199,8 +198,12 @@ impl ConsequenceAssessment {
 pub struct MultiMonthBlackout {
     /// Power cuts a year lasting longer than 60 days.
     pub rate_60_days: f64,
+    /// 10th and 90th percentiles of `rate_60_days` under the plan's parameter draws.
+    pub range_60_days: [f64; 2],
     /// Power cuts a year lasting longer than 90 days.
     pub rate_90_days: f64,
+    /// 10th and 90th percentiles of `rate_90_days`.
+    pub range_90_days: [f64; 2],
     /// Chance of at least one longer than 60 days in ten years.
     pub p10_60_days: f64,
     /// Chance of at least one longer than 90 days in ten years.
@@ -338,8 +341,9 @@ pub struct EvacuateDetail {
     pub causes: Vec<(HazardId, String, f64, [f64; 2])>,
     /// The cause behind the short end of the warning band (model review M-08).
     pub fastest_cause: Option<HazardId>,
-    /// The fastest cause that is not a fire at home, with its least warning in hours, when a fire
-    /// at home sets the short end.
+    /// The fastest of the hazards that give minutes or hours of warning ([`FAST_WARNING_HAZARDS`])
+    /// with its least warning in hours, when another cause (a fire at home, an earthquake) sets
+    /// the short end.
     pub fastest_outside: Option<(HazardId, f64)>,
     /// The cause with the longest time away (90th percentile, days) among those with a ten-year
     /// chance of 1 in 100 or more.
@@ -519,6 +523,7 @@ pub fn assess_full(
     let scenario_infos = scenario_summaries(&binp, &model, &states, rate);
     let warnings = cliff_warnings(&ctx, &details);
     let simultaneous = simultaneous_needs(&ctx, &details);
+    let multi_month = multi_month(&ctx, &by_bucket);
     let statement = statement(
         &ctx, &by_bucket, &details, &income, &evacuate, &get_home, &warnings,
     );
@@ -539,6 +544,7 @@ pub fn assess_full(
         home_loss,
         clean_air,
         simultaneous,
+        multi_month,
         fragility: model.fragility,
         couplings: model.couplings.clone(),
         overrides: model.overrides.clone(),
@@ -546,6 +552,32 @@ pub fn assess_full(
         dial_rate: rate,
         horizon_years: years,
         draws: draws.n(),
+    }
+}
+
+/// Power cuts of two and three months or more from the household's own power curve, with the
+/// 10th and 90th percentiles under the same draws as the targets (brief item 7: `rr-hazards`'
+/// rare "power out for months" row adds this to its solar-storm, EMP and war parts). Rare
+/// families never enter the curve, so nothing is counted twice.
+fn multi_month(
+    ctx: &Ctx<'_>,
+    by_bucket: &BTreeMap<BucketId, BucketAssessment>,
+) -> MultiMonthBlackout {
+    let mut eval = Eval::central(ctx.model, BucketId::Power);
+    let (l60, l90) = (eval.lambda(60.0), eval.lambda(90.0));
+    let r = ranges::lambda_range(&mut eval, ctx.draws, &[60.0, 90.0]);
+    let span = |c: f64, (lo, hi): (f64, f64)| [lo.min(c), hi.max(c)];
+    MultiMonthBlackout {
+        rate_60_days: l60,
+        range_60_days: span(l60, r[0]),
+        rate_90_days: l90,
+        range_90_days: span(l90, r[1]),
+        p10_60_days: p10(l60),
+        p10_90_days: p10(l90),
+        sources: by_bucket
+            .get(&BucketId::Power)
+            .map(|b| b.sources.clone())
+            .unwrap_or_default(),
     }
 }
 
@@ -1423,7 +1455,7 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
         }
     }
     let mut fastest: Option<(HazardId, f64)> = None;
-    let mut fastest_outside: Option<(HazardId, f64)> = None;
+    let mut fast: Vec<(HazardId, f64, f64)> = Vec::new();
     for (h, (r, least)) in &by_cause {
         if p10(*r) < WARNING_CAUSE_P10 || !least.is_finite() {
             continue;
@@ -1431,10 +1463,18 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
         if fastest.is_none_or(|(_, n)| *least < n) {
             fastest = Some((*h, *least));
         }
-        if *h != HazardId::HouseFire && fastest_outside.is_none_or(|(_, n)| *least < n) {
-            fastest_outside = Some((*h, *least));
+        if FAST_WARNING_HAZARDS.contains(h) {
+            fast.push((*h, *least, *r));
         }
     }
+    // The hazards that give minutes or hours, fastest first (the more likely first on a tie).
+    fast.sort_by(|a, b| {
+        a.1.total_cmp(&b.1)
+            .then(b.2.total_cmp(&a.2))
+            .then(a.0.cmp(&b.0))
+    });
+    fast.retain(|(h, _, _)| fastest.is_none_or(|(f, _)| f != *h));
+    let fastest_outside = fast.first().map(|(h, n, _)| (*h, *n));
     match fastest {
         Some((_, n)) => notice[0] = n,
         None => {
@@ -1452,8 +1492,7 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
     if notice[1] < notice[0] {
         notice[1] = notice[0];
     }
-    let fastest_outside = fastest_outside
-        .filter(|(h, _)| fastest.is_some_and(|(f, _)| f == HazardId::HouseFire && *h != f));
+
     // The longest time away among likely causes (90th percentile of their time away).
     let mut longest: Option<(HazardId, f64)> = None;
     for (h, (r, _)) in &by_cause {
@@ -1490,12 +1529,23 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
             notice_words(notice[0]),
             notice_words(notice[1])
         ));
-        if let Some((h, n)) = fastest_outside {
-            sentences.push(format!(
+        // When something with no warning (a home fire, an earthquake) sets the short end, the
+        // two fastest hazards that do give minutes or hours still get a line (Lahaina's
+        // wildfire, M-08).
+        match fast.as_slice() {
+            [] => {}
+            [(h, n, _)] => sentences.push(format!(
                 "For {}, plan for as little as {} of warning.",
-                words::hazard_plural(h),
-                notice_words(n)
-            ));
+                words::hazard_plural(*h),
+                notice_words(*n)
+            )),
+            [(h, n, _), (h2, n2, _), ..] => sentences.push(format!(
+                "For {}, plan for as little as {} of warning; for {}, {}.",
+                words::hazard_plural(*h),
+                notice_words(*n),
+                words::hazard_plural(*h2),
+                notice_words(*n2)
+            )),
         }
         sentences.push(format!(
             "Plan to be away for about {}.",
