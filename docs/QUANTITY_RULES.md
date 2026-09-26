@@ -365,12 +365,12 @@ of that harm the item averts on its own, and every item that lists a readiness b
 | medical_emergency | 1.0 | `med_first_aid_kit` |
 | medical_emergency | 0.5 | `med_device_power_plan`, `med_bleeding_control_kit`, `med_epinephrine_plan` |
 | medical_emergency | 0.2–0.3 | `med_list_written`, `med_wound_splint_addon`, `special_pregnancy_plan` (0.3); `med_otc_basics` (0.2) |
-| medical_emergency | 0–0.1 | `med_988_saved`, `med_thermometer` (0.1); `san_nitrile_gloves` (0.05); `med_antibiotics_clinician_card` (0) |
+| medical_emergency | 0–0.1 | `med_988_saved`, `med_thermometer`, `docs_legal_readiness` (0.1); `san_nitrile_gloves` (0.05); `med_antibiotics_clinician_card` (0) |
 | fire | 1.0 | `fire_test_alarms`, `fire_smoke_alarm` |
 | fire | 0.5 | `fire_co_alarm`, `fire_extinguisher`, `fire_escape_ladder` |
 | fire | 0.2–0.3 | `fire_learn_shutoffs` (0.3); `fire_utility_wrench`, `water_heater_strap_kit` (0.2) |
-| security | 1.0, 0.5 | `community_know_two_neighbours`; `security_home_basics` |
-| security | 0.1–0.2 | `security_motion_light`, `security_key_safe` (0.2); `security_firearms_safe_storage` (0.1) |
+| security | 1.0, 0.5 | `community_know_two_neighbours`; `security_home_basics`, `community_trusted_circle` |
+| security | 0.1–0.3 | `security_lockout_plan` (0.3); `security_motion_light`, `security_key_safe` (0.2); `security_firearms_safe_storage` (0.1) |
 | clean_air | 1.0 | `fire_clean_air_room`, `fire_diy_filter_box` |
 | clean_air | 0.5 | `fire_clean_room_plan`, `med_n95_respirators` |
 | clean_air | 0.2–0.3 | `evac_shelter_in_place_kit` (0.3); `med_cleanup_ppe` (0.2) |
