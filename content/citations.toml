@@ -1869,6 +1869,152 @@ retrieved = "2026-09-25"
 license = "CC BY 4.0"
 
 # ---------------------------------------------------------------------------------------------
+# Requested by the hazards workstream (docs/CITATION_IDS.md), added 2026-09-25
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "usgs_nshm_2023"
+title = "2023 National Seismic Hazard Model for the conterminous United States (revised release 2023.R2)"
+publisher = "U.S. Geological Survey"
+year = 2023
+url = "https://doi.org/10.5066/P14VGAV4"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "noaa_storm_events"
+title = "Storm Events Database"
+publisher = "NOAA National Centers for Environmental Information"
+year = 2026
+url = "https://www.ncei.noaa.gov/stormevents/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "openfema_nfip"
+title = "OpenFEMA: NFIP Residential Penetration Rates (v1) and FIMA NFIP Redacted Claims (v3)"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/about/openfema/data-sets"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain), subject to the OpenFEMA Terms and Conditions"
+
+[[citation]]
+id = "openfema_disclaimer"
+title = "OpenFEMA terms and conditions: the statement every product that uses its data must show"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/about/openfema/terms-conditions"
+retrieved = "2026-09-25"
+quote = "This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s)."
+license = "US Government Work (public domain), subject to the OpenFEMA Terms and Conditions"
+
+[[citation]]
+id = "fema_flood_zones"
+title = "Flood Zones (glossary): the Special Flood Hazard Area has a 1-percent chance of flooding in any given year"
+publisher = "FEMA"
+year = 2026
+url = "https://www.fema.gov/about/glossary/flood-zones"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_ucerf3_2015"
+title = "UCERF3: A New Earthquake Forecast for California's Complex Fault System (Fact Sheet 2015–3009)"
+publisher = "Field E.H. and the 2014 Working Group on California Earthquake Probabilities, U.S. Geological Survey"
+year = 2015
+url = "https://pubs.usgs.gov/fs/2015/3009/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_bay_area_outlook_2016"
+title = "Earthquake Outlook for the San Francisco Bay Region 2014–2043 (Fact Sheet 2016–3020, based on UCERF3)"
+publisher = "U.S. Geological Survey"
+year = 2016
+url = "https://pubs.usgs.gov/fs/2016/3020/fs20163020.pdf"
+retrieved = "2026-09-25"
+quote = "In this 30-year period, the probability of an earthquake of magnitude 6.7 or larger occurring is 22 percent along the San Andreas Fault and 33 percent for the Hayward or Rodgers Creek Faults."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_new_madrid"
+title = "New Madrid Seismic Zone"
+publisher = "U.S. Geological Survey, Earthquake Hazards Program"
+year = 2026
+url = "https://www.usgs.gov/programs/earthquake-hazards/new-madrid-seismic-zone"
+retrieved = "2026-09-25"
+quote = "we would estimate a 25-40% chance of a magnitude 6.0 and greater earthquake in the next 50 years and about a 7-10% probability of a repeat of the 1811-1812 earthquakes in the same time period."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "noaa_hurdat2"
+title = "Continental United States Hurricane Impacts/Landfalls 1851–2025 (from HURDAT2; revised September 2026)"
+publisher = "NOAA AOML Hurricane Research Division and National Hurricane Center"
+year = 2026
+url = "https://www.aoml.noaa.gov/hrd/hurdat/All_U.S._Hurricanes.html"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nchs_accidental_injury_2024"
+title = "FastStats: Accidents or Unintentional Injuries (2024 mortality data)"
+publisher = "CDC National Center for Health Statistics"
+year = 2026
+url = "https://www.cdc.gov/nchs/fastats/accidental-injury.htm"
+retrieved = "2026-09-25"
+quote = "Deaths per 100,000 population: 58.1"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ssa_disability_facts"
+title = "Disability Benefits (publication 05-10029)"
+publisher = "Social Security Administration"
+year = 2026
+url = "https://www.ssa.gov/pubs/EN-05-10029.pdf"
+retrieved = "2026-09-25"
+quote = "Studies show that a 20-year-old worker has a 1-in-4 chance of developing a disability before reaching full retirement age."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_pandemic_history"
+title = "1918 Pandemic (H1N1 virus), with CDC's archived pages on the 1957, 1968 and 2009 pandemics"
+publisher = "Centers for Disease Control and Prevention (archive)"
+year = 2019
+url = "https://archive.cdc.gov/www_cdc_gov/flu/pandemic-resources/1918-pandemic-h1n1.html"
+retrieved = "2026-09-25"
+quote = "The number of deaths was estimated to be at least 50 million worldwide with about 675,000 occurring in the United States."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_nuclear_sites"
+title = "Operating Nuclear Power Plant Sites (with 10-mile and 50-mile planning zones)"
+publisher = "FEMA"
+year = 2026
+url = "https://gis.fema.gov/arcgis/rest/services/Partner/Operating_Nuclear_Power_Plant_Sites/FeatureServer/0"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_tri_2024"
+title = "Toxics Release Inventory, 2024 national data"
+publisher = "U.S. Environmental Protection Agency"
+year = 2025
+url = "https://www.epa.gov/toxics-release-inventory-tri-program"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "bjs_criminal_victimization_2023"
+title = "Criminal Victimization, 2023 (National Crime Victimization Survey)"
+publisher = "Bureau of Justice Statistics"
+year = 2024
+url = "https://bjs.ojp.gov/document/cv23.pdf"
+retrieved = "2026-09-25"
+quote = "A lower percentage of households were victims of burglary or trespassing in 2023 (1.01%) than in 2022 (1.12%)."
+license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
 # Ready Reckoner's own documents (research compilations, observation log, expert estimates)
 # ---------------------------------------------------------------------------------------------
 
