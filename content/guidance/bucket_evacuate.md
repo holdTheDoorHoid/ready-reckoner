@@ -4,7 +4,7 @@ title: Having to leave home quickly
 applies_to: [bucket:evacuate]
 citations: [census_pulse_displacement, ready_gov_evacuation, cdc_evacuation_psa, gollwitzer_sheeran_2006, wood_2018_milling, ready_gov_floods]
 ---
-{frequency} Wildfires, floods, hurricanes, chemical spills and house fires can force you to leave. Sometimes you get days of warning, sometimes only minutes. As of December 2022, nearly 1.9 million U.S. households had been forced from home by a disaster in the past year.[^census_pulse_displacement]
+{frequency} Wildfires, floods, hurricanes, chemical spills and house fires can force you to leave. Sometimes you get days of warning, sometimes only minutes. In the year before December 2022, about 16 of every 1,000 U.S. households were forced from home by a disaster.[^census_pulse_displacement]
 
 **What helps.** Plan where you would go and more than one way to get there.[^ready_gov_evacuation] Keep the gas tank at least half full, and full when an evacuation seems likely.[^ready_gov_evacuation] Pack a go-bag for each person. CDC's short list is phone, chargers, medicines, ID, cash and the car emergency kit.[^cdc_evacuation_psa] Plan for pets, because public shelters may take only service animals.[^ready_gov_evacuation] Agree on an if-then rule ahead of time, such as "If our zone gets a warning, we leave within 30 minutes." Plans written this way help people follow through.[^gollwitzer_sheeran_2006] Leave a note saying when you left and where you are going.[^ready_gov_evacuation]
 

@@ -61,6 +61,46 @@ publisher, year and URL and what the number is used for, and mark figures you to
 | `epa_tri_2024` | EPA Toxics Release Inventory | TRI facilities in the county | dataset |
 | `bjs_criminal_victimization_2023` | BJS, Criminal Victimization 2023 | **can replace the burglary prior** | new: 1.01 % of households were victims of burglary or trespassing in 2023 (exact quote stored); burglary alone was 9.0 per 1,000 households. The 1 %-a-year prior in `docs/RISK_MODEL.md` is consistent with it |
 
+## Added for supply on 2026-09-25
+
+Supply cited these through `rr_research_supply_standards` until they had their own entries; its
+constants can now point at them directly. Only the CDC page is federal, so only it stores a quote;
+the others were read on the retrieval date and are paraphrased. A maker's specification sheet is a
+legitimate source: its URL names the maker, but its title and publisher are neutral so the packet's
+source list stays brand-free. Item and guidance text never names a maker either (the validator
+checks citation titles, publishers and quotes for brand names; only URLs are exempt).
+
+| id | Source | Supply number it backs | Check result |
+| --- | --- | --- | --- |
+| `petmd_dog_water` | PetMD, How Much Water Should a Dog Drink? (2020) | dogs: 1 oz of water per lb of body weight a day | confirmed on the page |
+| `merck_vet_maintenance_fluids` | Merck Veterinary Manual, Maintenance Fluid Plan in Animals (updated Nov 2025) | 132 × kg^0.75 mL a day for dogs, 80 × kg^0.75 for cats; the cats' 0.8 oz per lb (a 10 lb cat about 250 mL a day) is derived from it | both formulas confirmed on the page |
+| `bbk_vorsorgen_2025` | Germany, BBK, *Vorsorgen für Krisen und Katastrophen*, 2nd edition (11/2025) | 2 L a person a day, 0.5 L of it for cooking; households able to manage 10 days | both confirmed in the PDF |
+| `dema_prepared_for_crises` | Denmark, Danish Emergency Management Agency, Prepared for crises | 3 L a person a day for drinking and food preparation (9 L for three days); manage for three days | confirmed on the page |
+| `cdc_yellow_book_heat_cold` | CDC Yellow Book 2026, Heat and Cold Illness in Travelers | sweat can reach 1 L an hour (the hot-weather drinking share) | confirmed, exact quote stored. The same chapter says forcing water on someone who is not thirsty raises the risk of hyponatremia, which supports drinking to thirst on the walk home |
+| `honda_eu2200i_spec` | Maker's specification sheet for a 2,200 W inverter generator (archived 2026-09-14) | 0.95 gal tank; 3.2 h at rated load and 8.1 h at a quarter load, so about 2.8 gal a day at a quarter load and 7.1 at full load | confirmed on the archived page |
+
+## Data pack source ids
+
+The data workstream writes source ids into `data/core/base_rates.toml` and the manifest. Use these
+registry ids, so each source has exactly one id:
+
+| Instead of | Use |
+| --- | --- |
+| `usfa_residential_fire_estimates` | `usfa_residential_fires` |
+| `nchs_fastats_emergency_department` | `cdc_nchs_ed_visits` |
+| `nchs_fastats_accidental_injury` | `nchs_accidental_injury_2024` |
+| `census_cps_hh1_households` | `census_households_cps` |
+| an EIA reliability id | `eia_861_reliability_2024` (data) or `eia_outage_hours_2024` (the 11-hour headline) |
+| an EAGLE-I id | `ornl_eagle_i_outages` (CC BY 4.0: credit line required) |
+| an OpenFEMA id | `openfema_nfip` for the data and `openfema_disclaimer` for the required statement |
+| a pandemic base-rate id | `cdc_pandemic_history` (onsets) or `marani_2021_pandemics` (recurrence) |
+
+The two ids the data job added itself, `nhtsa_early_estimate_2025` (1.10 deaths per 100 million
+vehicle miles in 2025, exact quote stored) and `census_popest_vintage_2025` (the Census population
+file used as a denominator), are now registry entries with the same ids. `nhtsa_crashes_2023` now
+points at the 2023 overview itself (DOT HS 813 705) rather than the Crash Stats home page, with the
+6.14 million crashes quoted.
+
 ## Used by consequence
 
 `cargo test -p rr-consequence --test docs` checks that every id `crates/rr-consequence` can emit
@@ -102,44 +142,15 @@ publisher, year and URL and what the number is used for, and mark figures you to
 
 ### Requested by consequence
 
+`inquirer_peco_outages` is now in the registry (checked: PECO's second- and fourth-largest outages
+were the February 2014 and January 1994 ice storms, 713,802 and 520,016 customers).
+`county_boil_water_records` stays a placeholder listed here until the data workstream supplies a
+source; it has no URL yet, so it cannot be a registry entry.
+
 | id | Title | Publisher, year | URL | Used for |
 | --- | --- | --- | --- | --- |
 | `inquirer_peco_outages` | Power outages in Philadelphia history: Peco's biggest storms | The Philadelphia Inquirer, 2025 | https://www.inquirer.com/weather/power-outages-peco-most-history-20250626.html | two of PECO's five largest outages were ice storms (1994, 2014), outside the 2018–2025 records (big ice storm class) |
 | `county_boil_water_records` | a county's boil-water notice records, when a data pack provides them (none does yet; the id is a placeholder for the source the data workstream adds) | — | — | replacing the default boil-water duration with the county's median and 90th percentile |
-
-## Added for supply on 2026-09-25
-
-Supply cited these through `rr_research_supply_standards` until they had their own entries; its
-constants can now point at them directly. Only the CDC page is federal, so only it stores a quote;
-the others were read on the retrieval date and are paraphrased. A maker's specification sheet is a
-legitimate source: its URL names the maker, but its title and publisher are neutral so the packet's
-source list stays brand-free. Item and guidance text never names a maker either (the validator
-checks citation titles, publishers and quotes for brand names; only URLs are exempt).
-
-| id | Source | Supply number it backs | Check result |
-| --- | --- | --- | --- |
-| `petmd_dog_water` | PetMD, How Much Water Should a Dog Drink? (2020) | dogs: 1 oz of water per lb of body weight a day | confirmed on the page |
-| `merck_vet_maintenance_fluids` | Merck Veterinary Manual, Maintenance Fluid Plan in Animals (updated Nov 2025) | 132 × kg^0.75 mL a day for dogs, 80 × kg^0.75 for cats; the cats' 0.8 oz per lb (a 10 lb cat about 250 mL a day) is derived from it | both formulas confirmed on the page |
-| `bbk_vorsorgen_2025` | Germany, BBK, *Vorsorgen für Krisen und Katastrophen*, 2nd edition (11/2025) | 2 L a person a day, 0.5 L of it for cooking; households able to manage 10 days | both confirmed in the PDF |
-| `dema_prepared_for_crises` | Denmark, Danish Emergency Management Agency, Prepared for crises | 3 L a person a day for drinking and food preparation (9 L for three days); manage for three days | confirmed on the page |
-| `cdc_yellow_book_heat_cold` | CDC Yellow Book 2026, Heat and Cold Illness in Travelers | sweat can reach 1 L an hour (the hot-weather drinking share) | confirmed, exact quote stored. The same chapter says forcing water on someone who is not thirsty raises the risk of hyponatremia, which supports drinking to thirst on the walk home |
-| `honda_eu2200i_spec` | Maker's specification sheet for a 2,200 W inverter generator (archived 2026-09-14) | 0.95 gal tank; 3.2 h at rated load and 8.1 h at a quarter load, so about 2.8 gal a day at a quarter load and 7.1 at full load | confirmed on the archived page |
-
-## Data pack source ids
-
-The data workstream writes source ids into `data/core/base_rates.toml` and the manifest. Use these
-registry ids, so each source has exactly one id:
-
-| Instead of | Use |
-| --- | --- |
-| `usfa_residential_fire_estimates` | `usfa_residential_fires` |
-| `nchs_fastats_emergency_department` | `cdc_nchs_ed_visits` |
-| `nchs_fastats_accidental_injury` | `nchs_accidental_injury_2024` |
-| `census_cps_hh1_households` | `census_households_cps` |
-| an EIA reliability id | `eia_861_reliability_2024` (data) or `eia_outage_hours_2024` (the 11-hour headline) |
-| an EAGLE-I id | `ornl_eagle_i_outages` (CC BY 4.0: credit line required) |
-| an OpenFEMA id | `openfema_nfip` for the data and `openfema_disclaimer` for the required statement |
-| a pandemic base-rate id | `cdc_pandemic_history` (onsets) or `marani_2021_pandemics` (recurrence) |
 
 ## Registry index for the other workstreams
 
@@ -181,5 +192,5 @@ checked; "prior" marks an expert estimate.
 
 ## Requested
 
-Two open requests from consequence (`inquirer_peco_outages`, `county_boil_water_records`) are
-listed under "Requested by consequence" above. Add new rows here as described at the top.
+One placeholder is open: `county_boil_water_records` (see "Requested by consequence"), which
+waits for the data workstream to name a source. Add new rows here as described at the top.

@@ -132,6 +132,16 @@ quote = "Create an emergency supply kit for your car. Include jumper cables, san
 license = "US Government Work (public domain)"
 
 [[citation]]
+id = "ready_gov_kids_families"
+title = "Families (Ready Kids)"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/kids/parents"
+retrieved = "2026-09-25"
+quote = "Everyone can be part of helping to prepare for emergencies. Young children and teens alike can be a part of the process."
+license = "US Government Work (public domain)"
+
+[[citation]]
 id = "ready_gov_financial"
 title = "Financial Preparedness"
 publisher = "FEMA / Ready.gov"
@@ -360,6 +370,16 @@ quote = "Severe weather can happen anytime, in any part of the country."
 license = "US Government Work (public domain)"
 
 [[citation]]
+id = "ready_gov_thunderstorms_lightning"
+title = "Thunderstorms and Lightning"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/thunderstorms-lightning"
+retrieved = "2026-09-25"
+quote = "Move from outdoors into a building or car with a roof."
+license = "US Government Work (public domain)"
+
+[[citation]]
 id = "ready_gov_avalanche"
 title = "Avalanche"
 publisher = "FEMA / Ready.gov"
@@ -426,10 +446,10 @@ license = "US Government Work (public domain), subject to the National Risk Inde
 
 [[citation]]
 id = "fema_hazus_eq_restoration"
-title = "HAZUS-MH MR4 Earthquake Technical Manual, utility restoration functions (Tables 8.1.a–c)"
+title = "HAZUS-MH MR4 Earthquake Technical Manual, utility restoration functions (Tables 8.1.a–c; FEMA document, university mirror)"
 publisher = "FEMA"
 year = 2003
-url = "https://www.fema.gov/flood-maps/products-tools/hazus"
+url = "http://www.civil.ist.utl.pt/~mlopes/conteudos/DamageStates/hazus_mr4_earthquake_tech_manual.pdf"
 retrieved = "2026-09-25"
 license = "US Government Work (public domain)"
 
@@ -1157,11 +1177,12 @@ license = "US Government Work (public domain)"
 
 [[citation]]
 id = "nhtsa_crashes_2023"
-title = "Traffic Safety Facts: 2023 data overview"
+title = "Overview of Motor Vehicle Traffic Crashes in 2023 (Research Note, DOT HS 813 705)"
 publisher = "National Highway Traffic Safety Administration"
 year = 2025
-url = "https://crashstats.nhtsa.dot.gov/"
+url = "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813705"
 retrieved = "2026-09-25"
+quote = "The estimated number of police-reported traffic crashes increased from 5.93 million in 2022 to 6.14 million in 2023, a 3.5-percent increase which was not statistically significant."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -2021,6 +2042,43 @@ year = 2024
 url = "https://bjs.ojp.gov/document/cv23.pdf"
 retrieved = "2026-09-25"
 quote = "A lower percentage of households were victims of burglary or trespassing in 2023 (1.01%) than in 2022 (1.12%)."
+license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
+# Requested by the consequence workstream (docs/CITATION_IDS.md), added 2026-09-25
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "inquirer_peco_outages"
+title = "Power outages in Philadelphia history: Peco's biggest storms"
+publisher = "The Philadelphia Inquirer"
+year = 2025
+url = "https://www.inquirer.com/weather/power-outages-peco-most-history-20250626.html"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+# ---------------------------------------------------------------------------------------------
+# Requested by the data workstream (data/core/base_rates.toml), added 2026-09-25, with the
+# same ids the data job already writes.
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "nhtsa_early_estimate_2025"
+title = "Early Estimate of Motor Vehicle Traffic Fatalities and Fatality Rate in 2025 (Crash Stats, DOT HS 813 800)"
+publisher = "National Highway Traffic Safety Administration"
+year = 2026
+url = "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813800"
+retrieved = "2026-09-25"
+quote = "In 2025, the fatality rate dropped to 1.10 fatalities per 100 million VMT, down from the reported rate of 1.19 fatalities per 100 million VMT in 2024"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "census_popest_vintage_2025"
+title = "Annual Estimates of the Resident Population for the United States and States, Vintage 2025 (NST-EST2025-ALLDATA)"
+publisher = "U.S. Census Bureau"
+year = 2025
+url = "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv"
+retrieved = "2026-09-25"
 license = "US Government Work (public domain)"
 
 # ---------------------------------------------------------------------------------------------

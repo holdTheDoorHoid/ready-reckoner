@@ -13,6 +13,8 @@ const NOT_CITATIONS: &[&str] = &[
     "cascadia_m9",
     "new_madrid_m7",
     "hayward_m7",
+    // A placeholder rr-consequence reserves until the data workstream names the source.
+    "county_boil_water_records",
 ];
 
 #[test]
