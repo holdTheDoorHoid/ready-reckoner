@@ -664,10 +664,13 @@ are the 10th and 90th percentiles of the ladder target over the draws, widened t
 central value. The one or two inputs that move the target most (one at a time, each at its 10th
 and 90th percentile) are named in the bucket's last frequency sentence.
 
-Timing (`cargo run -p rr-consequence --example calibrate --release`, and a WebAssembly build with
-the workspace release profile under Node 24, same laptop): the seven fixtures with all 35 hazards
-active take 9–13 ms native and 10–17 ms in WebAssembly; the research inputs 4 ms native and 5–6 ms
-in WebAssembly. 400 draws took up to 27 ms in WebAssembly, hence 256.
+Timing of one `assess` call (`cargo run -p rr-consequence --example calibrate --release` for
+native; a WebAssembly build with the workspace release profile under Node 24 on the same laptop,
+with other builds running): the seven fixture households with rr-hazards' rates and scenarios
+take 9–17 ms in WebAssembly (Miami, with the major-hurricane scenario, is the slowest); with all 35
+hazards active, 9–14 ms native and 12–18 ms in WebAssembly; the research inputs 4–5 ms native and
+5–6 ms in WebAssembly. The budget is about 40 ms; 400 draws took up to 27 ms, hence 256. A slow
+phone may take two to three times as long.
 
 ### The cliff rule
 
