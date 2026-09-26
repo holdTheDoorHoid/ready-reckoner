@@ -1,0 +1,16 @@
+# Determinism: the browser (wasm) and native builds round transcendental functions differently.
+# Engine crates must use rr_types::math (pure-Rust libm) so CLI goldens match browser output.
+disallowed-methods = [
+  { path = "f64::exp", reason = "use rr_types::math::exp (deterministic across wasm and native)" },
+  { path = "f64::ln", reason = "use rr_types::math::ln" },
+  { path = "f64::log", reason = "use rr_types::math::ln" },
+  { path = "f64::log10", reason = "use rr_types::math" },
+  { path = "f64::log2", reason = "use rr_types::math" },
+  { path = "f64::exp2", reason = "use rr_types::math" },
+  { path = "f64::powf", reason = "use rr_types::math::pow" },
+  { path = "f64::powi", reason = "use rr_types::math::pow or repeated multiplication" },
+  { path = "f32::exp", reason = "use rr_types::math::exp" },
+  { path = "f32::ln", reason = "use rr_types::math::ln" },
+  { path = "f32::powf", reason = "use rr_types::math::pow" },
+  { path = "f32::powi", reason = "use rr_types::math::pow or repeated multiplication" },
+]

@@ -6,9 +6,12 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-description = "Ready Reckoner: types"
+description = "Ready Reckoner: the shared contract (ids, input and output types, errors, dates, deterministic math, seeded RNG, fixtures)"
 
 [dependencies]
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+# Pure-Rust libm: exp/ln/erfc give the same bits on native and wasm32. `default-features = false`
+# turns off the architecture-specific paths (which only cover correctly rounded operations anyway).
+libm = { version = "0.2.16", default-features = false }

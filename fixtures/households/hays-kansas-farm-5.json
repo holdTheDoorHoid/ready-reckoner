@@ -22,5 +22,5 @@
     "insurance": { "home_or_renters": true, "flood": false, "earthquake": false }
   },
   "existing": [ { "item_id": "generator_portable", "qty": 0 } ],
-  "dials": { "confidence": "nine_in_ten", "climate": "today", "horizon_years": 10 }
+  "dials": { "return_period": "one_in_100", "climate": "today", "horizon_years": 10 }
 }
