@@ -20,6 +20,7 @@
     error,
     example = '12',
     width = 'short',
+    quiet = false,
   }: {
     id: string;
     label: string;
@@ -36,6 +37,8 @@
     error?: string;
     example?: string;
     width?: 'short' | 'medium';
+    /** Optional, but the screen already says so: don't repeat "(optional)" on the label. */
+    quiet?: boolean;
   } = $props();
 
   let text = $state('');
@@ -67,7 +70,7 @@
   }
 </script>
 
-<Field {id} {label} {help} error={localError ?? error} {optional}>
+<Field {id} {label} {help} error={localError ?? error} optional={optional && !quiet}>
   {#snippet children({ describedBy, invalid })}
     <div class="affix">
       {#if prefix}<span class="affix__text" aria-hidden="true">{prefix}</span>{/if}

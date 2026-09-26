@@ -30,7 +30,9 @@
   <p class="small" id="{uid}-why">{scenario.applies_because}</p>
   <p class="small">{scenario.effect_summary}</p>
   {#if comparison?.length}
-    <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+    <!-- Wide tables scroll sideways on phones; a focusable, labelled region lets keyboard users scroll it. -->
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+    <div class="table-wrap" tabindex="0" role="region" aria-label="With and without this scenario">
       <table>
         <caption class="visually-hidden">Targets with and without: {scenario.name}</caption>
         <thead>

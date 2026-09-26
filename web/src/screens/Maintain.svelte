@@ -142,7 +142,9 @@
       {#if soon.length === 0}
         <p>Nothing yet. As you check items off your plan, their rotation dates appear here.</p>
       {:else}
-        <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+        <!-- Wide tables scroll sideways on phones; a focusable, labelled region lets keyboard users scroll it. -->
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Coming up">
           <table>
             <thead><tr><th scope="col">When</th><th scope="col">What</th><th scope="col">How often</th></tr></thead>
             <tbody>

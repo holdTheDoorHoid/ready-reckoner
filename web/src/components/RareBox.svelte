@@ -21,30 +21,34 @@
       The plan never spends on them by default. Your three-day supplies already cover the first days of sheltering: get inside, stay inside,
       stay tuned.
     </p>
-    <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+    <!-- Wide tables scroll sideways on phones; a focusable, labelled region lets keyboard users scroll it. -->
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Rare but severe hazards">
       <table>
         <caption class="visually-hidden">Rare but severe hazards: how likely and how bad</caption>
         <thead>
           <tr>
             <th scope="col">What</th>
-            <th scope="col">How likely ({years} {years === 1 ? 'year' : 'years'})</th>
+            <th scope="col">How likely <span class="th-note">(households like yours, {years} {years === 1 ? 'year' : 'years'})</span></th>
             <th scope="col">How bad</th>
           </tr>
         </thead>
         <tbody>
           {#each hazards as h (h.id)}
             <tr>
-              <th scope="row">
-                {h.name}
-                <ExplainButton kind="hazard" id={h.id} label="What to do" />
-              </th>
-              <td>{naturalFrequency(chanceWithin(h.rate_per_year, years))} households like yours</td>
+              <th scope="row">{h.name}</th>
+              <td>{naturalFrequency(chanceWithin(h.rate_per_year, years))}</td>
               <td><SeveritySwatch severity={h.severity} /></td>
             </tr>
           {/each}
         </tbody>
       </table>
     </div>
+    <ul class="what-to-do">
+      {#each hazards as h (h.id)}
+        <li><ExplainButton kind="hazard" id={h.id} label="{h.name}: what to do" /></li>
+      {/each}
+    </ul>
     <Sources ids={hazards.flatMap((h) => h.sources)} />
   </section>
 {/if}
@@ -62,5 +66,16 @@
   }
   th[scope='row'] {
     background: transparent;
+  }
+  .th-note {
+    font-weight: 400;
+  }
+  .what-to-do {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--s2);
+  }
+  .what-to-do li + li {
+    margin-top: 0;
   }
 </style>

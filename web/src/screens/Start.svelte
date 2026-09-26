@@ -81,15 +81,6 @@
     the money you have. You get a month-by-month plan and a packet to print.
   </p>
 
-  <section class="card promise" aria-labelledby="promise-title">
-    <h2 id="promise-title"><Icon name="lock" /> Private by design</h2>
-    <ul>
-      <li>Everything you enter stays on this device. There is no account and no tracking.</li>
-      <li>Nothing is sent anywhere. Once loaded, it works without an internet connection.</li>
-      <li>You can save your plan as a file, and delete it from this browser at any time.</li>
-    </ul>
-  </section>
-
   {#if app.plan}
     <section class="card resume" aria-labelledby="resume-title">
       <h2 id="resume-title">Welcome back</h2>
@@ -98,14 +89,36 @@
     </section>
   {/if}
 
-  <section aria-labelledby="new-title">
-    <h2 id="new-title">{app.plan ? 'Start a new plan instead' : 'Start a plan'}</h2>
-    <p>
+  <section class="begin" aria-labelledby="new-title">
+    <h2 id="new-title" class="visually-hidden">{app.plan ? 'Start a new plan or open a file' : 'Start'}</h2>
+    <div class="button-row">
+      {#if app.plan}
+        <button type="button" class="button" onclick={() => (confirmReplace = true)}>Start a new plan</button>
+      {:else}
+        <button type="button" class="button button--primary button--big" onclick={startNew}>Start a plan <Icon name="chevron-right" /></button>
+      {/if}
+      <button type="button" class="button" onclick={() => fileInput?.click()}><Icon name="upload" /> Open a saved plan</button>
+    </div>
+    <p class="small muted">
       About ten minutes, in five short steps: where you live, who lives with you, how you get around, money, and what you already have.
       Stop whenever you like; your answers are saved on this device as you go.
     </p>
-    <details class="optional-questions" open={!app.plan}>
-      <summary>Two optional questions first</summary>
+    <input
+      bind:this={fileInput}
+      class="visually-hidden"
+      type="file"
+      accept="application/json,.json"
+      tabindex="-1"
+      aria-hidden="true"
+      onchange={(e) => {
+        const file = (e.currentTarget as HTMLInputElement).files?.[0];
+        if (file) void readFile(file);
+        (e.currentTarget as HTMLInputElement).value = '';
+      }}
+    />
+    {#if importError}<p class="error-text" role="alert"><Icon name="alert" /><span>{importError}</span></p>{/if}
+    <details class="optional-questions">
+      <summary>Two optional questions before you start</summary>
       <fieldset class="field-block">
         <legend>Where are you with preparing today?</legend>
         <p class="help">This only changes the wording, never the numbers.</p>
@@ -127,36 +140,17 @@
           {/each}
         </div>
       </fieldset>
+      <p class="small muted">Your answers are kept with your plan when you press {app.plan ? '"Start a new plan"' : '"Start a plan"'}.</p>
     </details>
-    <p class="button-row">
-      {#if app.plan}
-        <button type="button" class="button" onclick={() => (confirmReplace = true)}>Start a new plan</button>
-      {:else}
-        <button type="button" class="button button--primary" onclick={startNew}>Start a plan <Icon name="chevron-right" /></button>
-      {/if}
-    </p>
   </section>
 
-  <section aria-labelledby="open-title">
-    <h2 id="open-title">Open a saved plan</h2>
-    <p>If you saved your plan as a file before, open it here. The file is read on this device only.</p>
-    <input
-      bind:this={fileInput}
-      class="visually-hidden"
-      type="file"
-      accept="application/json,.json"
-      tabindex="-1"
-      aria-hidden="true"
-      onchange={(e) => {
-        const file = (e.currentTarget as HTMLInputElement).files?.[0];
-        if (file) void readFile(file);
-        (e.currentTarget as HTMLInputElement).value = '';
-      }}
-    />
-    <p class="button-row">
-      <button type="button" class="button" onclick={() => fileInput?.click()}><Icon name="upload" /> Open a plan file</button>
-    </p>
-    {#if importError}<p class="error-text" role="alert"><Icon name="alert" /><span>{importError}</span></p>{/if}
+  <section class="card promise" aria-labelledby="promise-title">
+    <h2 id="promise-title"><Icon name="lock" /> Private by design</h2>
+    <ul>
+      <li>Everything you enter stays on this device. There is no account and no tracking.</li>
+      <li>Nothing is sent anywhere. Once loaded, it works without an internet connection.</li>
+      <li>You can save your plan as a file, and delete it from this browser at any time.</li>
+    </ul>
   </section>
 
   <section aria-labelledby="get-title">
@@ -198,6 +192,17 @@
   .promise,
   .resume {
     margin: var(--s5) 0;
+  }
+  .begin {
+    margin: var(--s5) 0;
+  }
+  .begin .button-row {
+    margin-bottom: var(--s3);
+  }
+  :global(.button--big) {
+    min-height: 3.25rem;
+    padding: 0.75rem 1.5rem;
+    font-size: var(--text-lg);
   }
   .resume h2 {
     margin-top: 0;

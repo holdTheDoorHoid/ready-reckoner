@@ -26,7 +26,7 @@
 </script>
 
 <div class="field">
-  <label for={id}>{label}{#if optional}<span class="optional"> (optional)</span>{/if}</label>
+  <label for={id}>{label}{#if optional}{' '}<span class="optional">(optional)</span>{/if}</label>
   {#if help}<span class="help" id="{id}-help">{help}</span>{/if}
   {@render children({ id, describedBy, invalid: !!error })}
   {#if error}

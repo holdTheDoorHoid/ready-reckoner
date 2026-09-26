@@ -25,6 +25,7 @@
   .county-map__box {
     position: relative;
     aspect-ratio: 3 / 2;
+    max-height: 11rem;
     border: 2px dashed var(--border-strong);
     border-radius: var(--r2);
     background: var(--surface-2);

@@ -56,9 +56,13 @@
     text-decoration: underline;
   }
 
-  .packet a[href^='http']::after {
+  .packet a[href^='http']:not(.bare-url)::after {
     content: ' (' attr(href) ')';
     font-size: 8.5pt;
+    word-break: break-all;
+  }
+
+  .packet a.bare-url {
     word-break: break-all;
   }
 

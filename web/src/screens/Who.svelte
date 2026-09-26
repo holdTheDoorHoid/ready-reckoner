@@ -127,8 +127,10 @@
           {/if}
 
           {#if medicalOpen === 'yes'}
-            <fieldset class="medical">
-              <legend>Medical needs for person {i + 1}</legend>
+            <details class="medical" open={hasMedical(person)}>
+              <summary>Medical needs for person {i + 1}{hasMedical(person) ? '' : ': none so far'}</summary>
+              <fieldset>
+              <legend class="visually-hidden">Medical needs for person {i + 1}</legend>
               <CheckRow label="Takes a daily prescription medicine" bind:checked={person.medical.daily_rx} />
               <CheckRow label="Has medicine that must stay cold" help="For example insulin." bind:checked={person.medical.refrigerated_rx} />
               <Field id="person-{i}-device" label="Powered medical device" help="A device that needs electricity to work.">
@@ -185,7 +187,8 @@
                 {/snippet}
               </Field>
               <CheckRow label="Carries an epinephrine auto-injector" bind:checked={person.medical.epinephrine} />
-            </fieldset>
+              </fieldset>
+            </details>
           {/if}
         </li>
       {/each}
@@ -240,8 +243,11 @@
     margin: 0;
   }
   .medical {
-    margin-top: var(--s4);
-    padding-top: var(--s4);
+    margin-top: var(--s3);
+    padding-top: var(--s2);
     border-top: 1px solid var(--border);
+  }
+  .medical > fieldset {
+    padding-top: var(--s3);
   }
 </style>

@@ -255,7 +255,9 @@
       {#if app.prefs.expert}
         <section aria-labelledby="req-title">
           <h2 id="req-title">What the targets turn into (expert view)</h2>
-          <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+          <!-- Wide tables scroll sideways on phones; a focusable, labelled region lets keyboard users scroll it. -->
+          <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+          <div class="table-wrap" tabindex="0" role="region" aria-label="What the targets turn into">
             <table>
               <thead><tr><th scope="col">For</th><th scope="col">Amount</th><th scope="col">How it was worked out</th><th scope="col">Rule</th></tr></thead>
               <tbody>

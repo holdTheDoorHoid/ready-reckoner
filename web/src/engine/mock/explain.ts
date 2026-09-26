@@ -40,6 +40,17 @@ export function explainFrom(req: ExplainRequest, r: ModelResult): Explanation | 
       }
       if (p.display === 'rare_catastrophic') {
         plain.push('It is very unlikely, so it sits in its own box and never takes over the budget. The first days of sheltering are covered by the supplies you already plan for.');
+        if (p.id === 'nuclear_attack' || p.id === 'nuclear_plant_incident') {
+          plain.push(
+            'If it happens: get inside, stay inside, stay tuned. Go to the middle of a sturdy building or a basement, stay there for at least 24 hours unless officials say otherwise, and listen for instructions on a radio or phone.',
+          );
+          if (p.id === 'nuclear_plant_incident') {
+            plain.push('Potassium iodide protects only the thyroid, only matters close to a plant, and is taken only when officials say so. They hand it out in the areas that need it.');
+          }
+        }
+        if (p.id === 'terrorism') {
+          plain.push('If you are caught up in an attack: getting away is the top priority. If you cannot, hide and silence your phone. Call 911 when it is safe.');
+        }
       }
       const math = [
         `Events per year for your household: ${h.seed.rate} (area) × ${(h.rate / (h.seed.rate * p.climate_multiplier)).toFixed(2)} (your home) × ${p.climate_multiplier} (climate) = ${p.rate_per_year}`,

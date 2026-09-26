@@ -42,8 +42,13 @@
   const hasPets = $derived((input?.pets.dogs ?? 0) + (input?.pets.cats ?? 0) + (input?.pets.small ?? 0) > 0);
   const hasInfant = $derived(input?.people.some((p) => p.age_band === 'infant') ?? false);
 
+  /** The items this household's plan uses, plus anything already entered; everything else is noise here. */
+  const planIds = $derived(new Set(app.result.output?.plan.months.flatMap((m) => m.items.map((i) => i.item_id)) ?? []));
+
   function relevant(item: Item): boolean {
     if (item.free || item.rare_catastrophic || ASKED_AS_ALARMS.has(item.id)) return false;
+    if (owned(item.id) !== undefined) return true;
+    if (planIds.size > 0) return planIds.has(item.id);
     if (item.id === 'medication_reserve') return needsMedicine;
     if (item.id === 'pet_food_reserve') return hasPets;
     if (item.id === 'infant_formula_reserve') return hasInfant;
@@ -104,18 +109,20 @@
       help="About how many days could your household eat from what is in the cupboards now?"
       value={owned(item.id) !== undefined ? Math.round(((owned(item.id) ?? 0) / eaters) * 10) / 10 : undefined}
       optional
+      quiet
       suffix="days"
       example="3"
       onchange={(v) => setOwned(item.id, v === undefined ? undefined : Math.round(v * eaters * 10) / 10)}
     />
   {:else if item.unit === 'dollar'}
-    <NumberField id="have-{item.id}" label={item.name} value={owned(item.id)} optional prefix="$" example="100" onchange={(v) => setOwned(item.id, v)} />
+    <NumberField id="have-{item.id}" label={item.name} value={owned(item.id)} optional quiet prefix="$" example="100" onchange={(v) => setOwned(item.id, v)} />
   {:else}
     <NumberField
       id="have-{item.id}"
       label={item.name}
       value={owned(item.id)}
       optional
+      quiet
       suffix={plural(item.unit, 2)}
       example="2"
       onchange={(v) => setOwned(item.id, v)}

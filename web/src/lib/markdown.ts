@@ -12,7 +12,7 @@ import { Marked, Renderer, type Tokens } from 'marked';
 
 const ALLOWED_TAGS = [
   'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr', 'strong', 'em', 'del', 'code', 'pre', 'blockquote',
-  'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'a', 'sup', 'section', 'input', 'span', 'div',
+  'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'a', 'sup', 'section', 'input', 'label', 'span', 'div',
 ];
 const ALLOWED_ATTR = ['href', 'id', 'class', 'type', 'checked', 'disabled', 'align', 'start', 'aria-label', 'target', 'rel', 'title', 'tabindex', 'role'];
 const SAFE_URL = /^(?:https?:\/\/|mailto:|#)/i;
@@ -72,6 +72,7 @@ export function renderMarkdown(source: string, options: RenderOptions = {}): str
   });
   const order: string[] = [];
   const refCount = new Map<string, number>();
+  let tables = 0;
 
   const base = new Renderer();
   const marked = new Marked({ gfm: true, breaks: false });
@@ -88,15 +89,31 @@ export function renderMarkdown(source: string, options: RenderOptions = {}): str
         if (!SAFE_URL.test(token.href)) return inner;
         const external = /^https?:/i.test(token.href);
         const hidden = external ? '<span class="visually-hidden"> (opens in a new tab)</span>' : '';
-        return `<a href="${escapeHtml(token.href)}"${token.title ? ` title="${escapeHtml(token.title)}"` : ''}>${inner}${hidden}</a>`;
+        // A bare address shown as its own text: print should not add it again after the link.
+        const bare = token.text === token.href || token.raw.startsWith('<');
+        return `<a href="${escapeHtml(token.href)}"${bare ? ' class="bare-url"' : ''}${token.title ? ` title="${escapeHtml(token.title)}"` : ''}>${inner}${hidden}</a>`;
       },
       heading(this: Renderer, token: Tokens.Heading): string {
         const level = Math.min(6, Math.max(2, token.depth + offset));
         return `<h${level} class="md-h${token.depth}">${this.parser.parseInline(token.tokens)}</h${level}>\n`;
       },
       table(this: Renderer, token: Tokens.Table): string {
-        // Focusable so keyboard users can scroll a wide table sideways on a phone.
-        return `<div class="table-wrap" tabindex="0" role="region" aria-label="Table">${base.table.call(this, token)}</div>\n`;
+        // Focusable so keyboard users can scroll a wide table sideways on a phone; numbered so
+        // each region has its own name.
+        tables += 1;
+        const first = token.header[0]?.text.replace(/[^\p{L}\p{N} ,.'-]/gu, '').trim();
+        const label = `Table ${tables}${first ? `: ${first}` : ''}`;
+        return `<div class="table-wrap" tabindex="0" role="region" aria-label="${escapeHtml(label)}">${base.table.call(this, token)}</div>\n`;
+      },
+      listitem(this: Renderer, item: Tokens.ListItem): string {
+        if (!item.task) return base.listitem.call(this, item);
+        // A checklist line: the tick box is named by its own text.
+        // marked puts a checkbox token first; checkbox() below renders it as nothing.
+        const body = this.parser.parse(item.tokens).trim().replace(/^<p>|<\/p>$/g, '');
+        return `<li class="task-item"><label><input type="checkbox" disabled${item.checked ? ' checked' : ''}> ${body}</label></li>\n`;
+      },
+      checkbox(): string {
+        return '';
       },
     },
     extensions: [
@@ -135,10 +152,11 @@ export function renderMarkdown(source: string, options: RenderOptions = {}): str
       .join('');
     html += `<section class="footnotes" aria-label="Notes"><ol>${items}</ol></section>`;
   }
+  // DOMPurify's own URL rule stays in force (it checks every attribute value, so a narrower
+  // pattern here would also strip type="checkbox"); the hook above then keeps only SAFE_URL links.
   return purify().sanitize(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
     ALLOW_DATA_ATTR: false,
-    ALLOWED_URI_REGEXP: SAFE_URL,
   });
 }

@@ -31,7 +31,9 @@
         {#if app.source.fallback}<p class="small">The full engine was expected but did not load: {app.source.fallback}</p>{/if}
       </div>
     {/if}
-    <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+    <!-- Wide tables scroll sideways on phones; a focusable, labelled region lets keyboard users scroll it. -->
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Versions">
       <table>
         <tbody>
           <tr><th scope="row">This app</th><td>{__RR_APP_VERSION__}</td></tr>

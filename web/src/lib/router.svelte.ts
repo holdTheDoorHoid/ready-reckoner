@@ -66,6 +66,7 @@ export function parseHash(hash: string): Route | null {
     return { id: 'missing' };
   }
   const [head = '', ...rest] = path.replace(/\/+$/, '').split('/');
+  if (head === 'start' && rest.length === 0) return { id: 'start' };
   const id = BY_PATH.get(head);
   if (!id || id === 'missing') return { id: 'missing' };
   const param = rest.join('/');
