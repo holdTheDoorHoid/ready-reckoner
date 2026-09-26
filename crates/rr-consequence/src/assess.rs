@@ -1269,22 +1269,28 @@ fn scenario_summaries(
         .collect()
 }
 
-/// A 25 % change in the dominant event's rate must move the target by at least this factor…
-const CLIFF_RATIO: f64 = 1.5;
-/// …and by at least this many days, for the cliff warning.
+/// The target must grow at least this fast with the return period between adjacent dial settings
+/// (elasticity ln(t₂/t₁) / ln(N₂/N₁); a log-normal tail gives about 1)…
+const CLIFF_ELASTICITY: f64 = 2.0;
+/// …and change by at least this many days, for the cliff warning.
 const CLIFF_MIN_DAYS: f64 = 3.0;
 
 /// The cliff rule (DESIGN §4.4, research §3.3): one hazard or scenario dominates a bucket's design
 /// event (half or more of Λ at the target), its rate for that bucket is within a factor of 3 of
-/// the dial rate, and the target is hypersensitive to it (a 25 % change in its rate moves the
-/// target by half or more, and by 3 days or more). One warning per event, listing the buckets.
+/// the dial rate, and the target jumps between adjacent dial settings (it grows at least as fast
+/// as the square of the return period, and by 3 days or more). One warning per event, listing the
+/// buckets.
 fn cliff_warnings(ctx: &Ctx<'_>, details: &[BucketDetail]) -> Vec<Warning> {
     let mut found: BTreeMap<Owner, Vec<BucketId>> = BTreeMap::new();
+    let here = ReturnPeriod::ALL
+        .iter()
+        .position(|r| *r == ctx.input.dials.return_period)
+        .unwrap_or(2);
     for d in details {
         if d.target_days.is_nan() || d.target_days <= 0.0 {
             continue;
         }
-        let mut eval = Eval::central(ctx.model, d.bucket);
+        let eval = Eval::central(ctx.model, d.bucket);
         let owners = owner_shares(&eval, d.target_days);
         let Some(&(owner, share)) = owners.first() else {
             continue;
@@ -1301,17 +1307,19 @@ fn cliff_warnings(ctx: &Ctx<'_>, details: &[BucketDetail]) -> Vec<Warning> {
         if owner_rate < ctx.rate / 3.0 || owner_rate > ctx.rate * 3.0 {
             continue;
         }
-        let flags: Vec<bool> = eval.terms().iter().map(|t| t.owner() == owner).collect();
-        let params = &ctx.model.params;
-        let mut target_scaled = |factor: f64| {
-            eval.set_draw(params, |_| 0.0);
-            eval.scale_weights(&flags, factor);
-            eval.target(ctx.rate, 30)
-        };
-        let up = target_scaled(1.25);
-        let down = target_scaled(1.0 / 1.25);
-        eval.set_draw(params, |_| 0.0);
-        if (up + 0.05) / (down + 0.05) >= CLIFF_RATIO && up - down >= CLIFF_MIN_DAYS {
+        let t0 = d.target_days;
+        let n0 = f64::from(ReturnPeriod::ALL[here].years());
+        let jumps = [here.checked_sub(1), Some(here + 1)]
+            .into_iter()
+            .flatten()
+            .filter_map(|j| d.dial_table.get(j).map(|p| (j, p)))
+            .any(|(j, p)| {
+                let nj = f64::from(ReturnPeriod::ALL[j].years());
+                let e =
+                    math::ln((p.target_days + 0.05) / (t0 + 0.05)).abs() / math::ln(nj / n0).abs();
+                e >= CLIFF_ELASTICITY && (p.target_days - t0).abs() >= CLIFF_MIN_DAYS
+            });
+        if jumps {
             found.entry(owner).or_default().push(d.bucket);
         }
     }

@@ -115,6 +115,16 @@ pub(crate) enum Origin {
     Coupling(&'static str),
 }
 
+/// A floor under a term's duration: the consequence lasts at least as long as this other
+/// disruption (a well cannot pump while the power is out). Durations are taken as co-monotone, so
+/// P(max(D₁, D₂) > d) = max(S₁(d), S₂(d)).
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) struct MaxWith {
+    pub survival: Survival,
+    pub dur_param: Option<usize>,
+    pub threshold: f64,
+}
+
 /// One way a bucket can be disrupted.
 #[derive(Debug, Clone)]
 pub(crate) struct Term {
@@ -131,6 +141,8 @@ pub(crate) struct Term {
     pub survival: Survival,
     /// The consequence exists only when the underlying outage outlasts this many days.
     pub threshold: f64,
+    /// The consequence lasts at least as long as this (see [`MaxWith`]).
+    pub max_with: Option<MaxWith>,
     pub rate_param: Option<usize>,
     pub q_param: Option<usize>,
     pub dur_param: Option<usize>,
@@ -637,6 +649,7 @@ fn table_term(
         q: row.p_given_event,
         survival,
         threshold: 0.0,
+        max_with: None,
         rate_param: rparam,
         q_param,
         dur_param,
@@ -725,6 +738,7 @@ fn add_pool_terms(
                     q: 1.0,
                     survival: curve.clone(),
                     threshold: 0.0,
+                    max_with: None,
                     rate_param: rp,
                     q_param: None,
                     dur_param: dp,
@@ -792,6 +806,7 @@ fn add_pool_terms(
                     q: (t.q * p.value).min(1.0),
                     survival: Survival::from_dist(&dist),
                     threshold: 0.0,
+                    max_with: None,
                     rate_param: t.rate_param,
                     q_param: qp,
                     dur_param: dp,
@@ -836,6 +851,7 @@ fn derive(source: &Term, bucket: BucketId, q: f64, threshold: f64, rule: &'stati
     t.bucket = bucket;
     t.q = q.clamp(0.0, 1.0);
     t.threshold = threshold;
+    t.max_with = None;
     t.origin = Origin::Coupling(rule);
     t.notice_hours = None;
     t.heat_share = 0.0;
@@ -872,16 +888,63 @@ fn apply_couplings(
         .cloned()
         .collect();
     let mut derived: Vec<Term> = Vec::new();
+    let mut floors: Vec<(usize, MaxWith, Option<usize>)> = Vec::new();
+    let mut fired: Vec<&'static str> = Vec::new();
+    let water_rule = if hh.well {
+        "well_pump"
+    } else {
+        "high_rise_pumps"
+    };
     for t in &power {
-        if hh.well || hh.high_rise_pumped {
-            let q = t.q - already(t, BucketId::WaterOut);
+        // Water (well or high-rise pumps) and refrigerated medicine last at least as long as the
+        // power cut. Table rows of the same event class get the power cut as a floor; the rest of
+        // the power cuts become new terms.
+        for (bucket, active, threshold, rule) in [
+            (
+                BucketId::WaterOut,
+                hh.well || hh.high_rise_pumped,
+                0.0,
+                water_rule,
+            ),
+            (
+                BucketId::Medication,
+                hh.refrigerated_rx,
+                prm.cold_chain_days.value,
+                "refrigerated_medicine",
+            ),
+        ] {
+            if !active {
+                continue;
+            }
+            let overlap: Vec<usize> = terms
+                .iter()
+                .enumerate()
+                .filter(|(_, w)| {
+                    w.bucket == bucket
+                        && w.origin == Origin::Table
+                        && w.owner() == t.owner()
+                        && w.class == t.class
+                })
+                .map(|(i, _)| i)
+                .collect();
+            let q_table: f64 = overlap.iter().map(|&i| terms[i].q).sum();
+            for &i in &overlap {
+                floors.push((
+                    i,
+                    MaxWith {
+                        survival: t.survival.clone(),
+                        dur_param: t.dur_param,
+                        threshold,
+                    },
+                    t.q_param,
+                ));
+            }
+            let q = t.q - q_table;
             if q > 0.0 {
-                let rule = if hh.well {
-                    "well_pump"
-                } else {
-                    "high_rise_pumps"
-                };
-                derived.push(derive(t, BucketId::WaterOut, q, 0.0, rule));
+                derived.push(derive(t, bucket, q, threshold, rule));
+            }
+            if (q > 0.0 || !overlap.is_empty()) && !fired.contains(&rule) {
+                fired.push(rule);
             }
         }
         if hh.heating_needs_power && t.cold_share > 0.0 {
@@ -894,44 +957,36 @@ fn apply_couplings(
                     prm.cold_onset_days.value,
                     "heating_needs_power",
                 ));
+                if !fired.contains(&"heating_needs_power") {
+                    fired.push("heating_needs_power");
+                }
             }
         }
         if hh.air_conditioned && t.heat_share > 0.0 {
             let q = t.q * t.heat_share - already(t, BucketId::Thermal);
             if q > 0.0 {
                 derived.push(derive(t, BucketId::Thermal, q, 0.0, "cooling_needs_power"));
-            }
-        }
-        if hh.refrigerated_rx {
-            let q = t.q - already(t, BucketId::Medication);
-            if q > 0.0 {
-                derived.push(derive(
-                    t,
-                    BucketId::Medication,
-                    q,
-                    prm.cold_chain_days.value,
-                    "refrigerated_medicine",
-                ));
+                if !fired.contains(&"cooling_needs_power") {
+                    fired.push("cooling_needs_power");
+                }
             }
         }
     }
-    let fired = |rule: &str| {
-        derived.iter().any(|t| {
-            t.origin
-                == Origin::Coupling(match rule {
-                    "well_pump" => "well_pump",
-                    "high_rise_pumps" => "high_rise_pumps",
-                    "heating_needs_power" => "heating_needs_power",
-                    "cooling_needs_power" => "cooling_needs_power",
-                    _ => "refrigerated_medicine",
-                })
-        })
-    };
+    for (i, floor, q_param) in floors {
+        let w = &mut terms[i];
+        w.max_with = Some(floor);
+        // The shared part moves with the power cut's share, so the coupled bucket never falls
+        // below power in any draw.
+        if q_param.is_some() {
+            w.q_param = q_param;
+        }
+        w.sources.push(CitationId::from("prior_rr_coupling"));
+    }
     let (f_high_rise, f_heating, f_cooling, f_rx) = (
-        fired("high_rise_pumps"),
-        fired("heating_needs_power"),
-        fired("cooling_needs_power"),
-        fired("refrigerated_medicine"),
+        fired.contains(&"high_rise_pumps"),
+        fired.contains(&"heating_needs_power"),
+        fired.contains(&"cooling_needs_power"),
+        fired.contains(&"refrigerated_medicine"),
     );
     let activated = |class: &str| terms.iter().any(|t| t.class == class);
     let (f_no_cooling, f_no_heating) = (activated("no_cooling"), activated("no_heating"));
@@ -1092,6 +1147,7 @@ fn fixed_rate_term(
         q: 1.0,
         survival: Survival::from_dist(&dist),
         threshold: 0.0,
+        max_with: None,
         rate_param: rp,
         q_param: None,
         dur_param: None,

@@ -613,24 +613,9 @@ mod tests {
     #[test]
     fn bad_rows_are_rejected() {
         let base = EFFECTS_TOML.to_owned();
-        for (from, to, why) in [
-            (
-                "p_given_event = 0.667",
-                "p_given_event = 1.667",
-                "share above 1",
-            ),
-            (
-                "class = \"pressure_loss\"",
-                "class = \"notice\"",
-                "same class in the same bucket twice would be fine, but notice exists only in water_boil; make a real duplicate below",
-            ),
-        ] {
-            let _ = why;
-            let changed = base.replacen(from, to, 1);
-            if from.contains("0.667") {
-                assert!(EffectsTable::parse(&changed).is_err());
-            }
-        }
+        // A share above 1.
+        let over_one = base.replacen("p_given_event = 0.667", "p_given_event = 1.667", 1);
+        assert!(EffectsTable::parse(&over_one).is_err());
         // A duplicate row.
         let dup = format!(
             "{base}\n[[effect]]\nhazard = \"burglary\"\nbucket = \"security\"\nclass = \"break_in\"\nlabel = \"x\"\np_given_event = 0.1\nevidence = \"prior\"\nsources = [\"prior_rr_event_shares\"]\n"

@@ -20,6 +20,17 @@ pub(crate) struct Eval<'m> {
     ln_thr: Vec<f64>,
     w: Vec<f64>,
     ln_scale: Vec<f64>,
+    /// Threshold and scale of each term's floor (see [`crate::model::MaxWith`]).
+    ln_thr2: Vec<f64>,
+    ln_scale2: Vec<f64>,
+}
+
+fn ln_threshold(t: f64) -> f64 {
+    if t > 0.0 {
+        math::ln(t)
+    } else {
+        f64::NEG_INFINITY
+    }
 }
 
 impl<'m> Eval<'m> {
@@ -31,23 +42,68 @@ impl<'m> Eval<'m> {
 
     /// Central values for an explicit set of terms.
     pub fn from_terms(terms: Vec<&'m Term>) -> Eval<'m> {
-        let ln_thr = terms
+        let ln_thr = terms.iter().map(|t| ln_threshold(t.threshold)).collect();
+        let ln_thr2 = terms
             .iter()
             .map(|t| {
-                if t.threshold > 0.0 {
-                    math::ln(t.threshold)
-                } else {
-                    f64::NEG_INFINITY
-                }
+                t.max_with
+                    .as_ref()
+                    .map_or(f64::NEG_INFINITY, |m| ln_threshold(m.threshold))
             })
             .collect();
         let w = terms.iter().map(|t| t.rate * t.q).collect();
-        let ln_scale = vec![0.0; terms.len()];
+        let n = terms.len();
         Eval {
             terms,
             ln_thr,
             w,
-            ln_scale,
+            ln_scale: vec![0.0; n],
+            ln_thr2,
+            ln_scale2: vec![0.0; n],
+        }
+    }
+
+    /// Term `i`'s survival at ln d (thresholds, draws and floor applied).
+    #[inline]
+    fn term_sf(&self, i: usize, ln_d: f64) -> f64 {
+        let t = self.terms[i];
+        let ln_x = if self.ln_thr[i] > ln_d {
+            self.ln_thr[i]
+        } else {
+            ln_d
+        };
+        let s = t.survival.sf_ln(ln_x, self.ln_scale[i]);
+        match &t.max_with {
+            None => s,
+            Some(m) => {
+                let ln_x2 = if self.ln_thr2[i] > ln_d {
+                    self.ln_thr2[i]
+                } else {
+                    ln_d
+                };
+                s.max(m.survival.sf_ln(ln_x2, self.ln_scale2[i]))
+            }
+        }
+    }
+
+    /// Term `i`'s survival as d → 0⁺.
+    fn term_sf0(&self, i: usize) -> f64 {
+        let t = self.terms[i];
+        let s = if self.ln_thr[i] > f64::NEG_INFINITY {
+            t.survival.sf_ln(self.ln_thr[i], self.ln_scale[i])
+        } else {
+            1.0
+        };
+        match &t.max_with {
+            None => s,
+            Some(m) => {
+                let s2 = if self.ln_thr2[i] > f64::NEG_INFINITY {
+                    m.survival.sf_ln(self.ln_thr2[i], self.ln_scale2[i])
+                } else {
+                    1.0
+                };
+                s.max(s2)
+            }
         }
     }
 
@@ -65,15 +121,11 @@ impl<'m> Eval<'m> {
             }
             self.w[i] = rate * q;
             self.ln_scale[i] = t.dur_param.map_or(0.0, |p| params[p].ln_mult(z(p)));
-        }
-    }
-
-    /// Multiplies the current weights of the flagged terms by `factor`.
-    pub fn scale_weights(&mut self, which: &[bool], factor: f64) {
-        for (w, f) in self.w.iter_mut().zip(which) {
-            if *f {
-                *w *= factor;
-            }
+            self.ln_scale2[i] = t
+                .max_with
+                .as_ref()
+                .and_then(|m| m.dur_param)
+                .map_or(0.0, |p| params[p].ln_mult(z(p)));
         }
     }
 
@@ -90,16 +142,9 @@ impl<'m> Eval<'m> {
         let ln_d = math::ln(d);
         let mut total = 0.0;
         for i in 0..self.terms.len() {
-            let w = self.w[i];
-            if w == 0.0 {
-                continue;
+            if self.w[i] != 0.0 {
+                total += self.w[i] * self.term_sf(i, ln_d);
             }
-            let ln_x = if self.ln_thr[i] > ln_d {
-                self.ln_thr[i]
-            } else {
-                ln_d
-            };
-            total += w * self.terms[i].survival.sf_ln(ln_x, self.ln_scale[i]);
         }
         total
     }
@@ -108,17 +153,9 @@ impl<'m> Eval<'m> {
     pub fn lambda0(&self) -> f64 {
         let mut total = 0.0;
         for i in 0..self.terms.len() {
-            let w = self.w[i];
-            if w == 0.0 {
-                continue;
+            if self.w[i] != 0.0 {
+                total += self.w[i] * self.term_sf0(i);
             }
-            total += if self.ln_thr[i] > f64::NEG_INFINITY {
-                w * self.terms[i]
-                    .survival
-                    .sf_ln(self.ln_thr[i], self.ln_scale[i])
-            } else {
-                w
-            };
         }
         total
     }
@@ -128,23 +165,11 @@ impl<'m> Eval<'m> {
         let parts: Vec<f64> = if d > 0.0 {
             let ln_d = math::ln(d);
             (0..self.terms.len())
-                .map(|i| {
-                    let ln_x = self.ln_thr[i].max(ln_d);
-                    self.w[i] * self.terms[i].survival.sf_ln(ln_x, self.ln_scale[i])
-                })
+                .map(|i| self.w[i] * self.term_sf(i, ln_d))
                 .collect()
         } else {
             (0..self.terms.len())
-                .map(|i| {
-                    if self.ln_thr[i] > f64::NEG_INFINITY {
-                        self.w[i]
-                            * self.terms[i]
-                                .survival
-                                .sf_ln(self.ln_thr[i], self.ln_scale[i])
-                    } else {
-                        self.w[i]
-                    }
-                })
+                .map(|i| self.w[i] * self.term_sf0(i))
                 .collect()
         };
         let total: f64 = parts.iter().sum();
@@ -244,8 +269,63 @@ pub struct CurveTerm {
     pub survival: Survival,
     /// The disruption counts only when the underlying event outlasts this many days.
     pub threshold: f64,
+    /// A floor: the disruption lasts at least as long as this other one (survival and threshold),
+    /// for example a well's water outage and the power cut that stops its pump.
+    pub floor: Option<(Survival, f64)>,
     /// The hazard it belongs to.
     pub hazard: HazardId,
+}
+
+impl CurveTerm {
+    /// P(this disruption lasts longer than `d`), thresholds and floor applied.
+    pub fn sf(&self, d: f64) -> f64 {
+        let s = self.survival.sf(d.max(self.threshold), 0.0);
+        match &self.floor {
+            None => s,
+            Some((f, thr)) => s.max(f.sf(d.max(*thr), 0.0)),
+        }
+    }
+
+    /// ∫ₓ^∞ P(duration > t) dt for this term (unweighted).
+    pub fn excess(&self, x: f64) -> f64 {
+        let x = x.max(0.0);
+        match &self.floor {
+            None => {
+                if x >= self.threshold {
+                    self.survival.expected_excess(x, 0.0)
+                } else {
+                    (self.threshold - x) * self.survival.sf(self.threshold, 0.0)
+                        + self.survival.expected_excess(self.threshold, 0.0)
+                }
+            }
+            Some(_) => integrate_tail(|t| self.sf(t), x),
+        }
+    }
+}
+
+/// ∫ₓ^∞ f(t) dt for a non-increasing survival-like f, by Simpson's rule on ln t from max(x, 10⁻⁴)
+/// to 10⁵ days (the part below 10⁻⁴ days is f(x) times its length).
+fn integrate_tail(f: impl Fn(f64) -> f64, x: f64) -> f64 {
+    const LO: f64 = 1e-4;
+    const HI: f64 = 1e5;
+    const N: usize = 1200; // even
+    let start = x.max(LO);
+    if start >= HI {
+        return 0.0;
+    }
+    let (a, b) = (math::ln(start), math::ln(HI));
+    let h = (b - a) / N as f64;
+    let g = |u: f64| {
+        let t = math::exp(u);
+        f(t) * t
+    };
+    let mut sum = g(a) + g(b);
+    for k in 1..N {
+        let u = a + h * k as f64;
+        sum += if k % 2 == 1 { 4.0 } else { 2.0 } * g(u);
+    }
+    let head = if x < LO { (LO - x) * f(x) } else { 0.0 };
+    head + sum * h / 3.0
 }
 
 /// A bucket's exceedance curve at central parameter values, self-contained so the budget and plan
@@ -271,6 +351,10 @@ impl ExceedanceCurve {
                 weight: t.rate * t.q,
                 survival: t.survival.clone(),
                 threshold: t.threshold,
+                floor: t
+                    .max_with
+                    .as_ref()
+                    .map(|m| (m.survival.clone(), m.threshold)),
                 hazard: t.hazard,
             })
             .collect();
@@ -284,30 +368,17 @@ impl ExceedanceCurve {
 
     /// Λ(d): disruptions per year lasting longer than `d` days.
     pub fn lambda(&self, d: f64) -> f64 {
-        self.terms
-            .iter()
-            .map(|t| t.weight * t.survival.sf(d.max(t.threshold), 0.0))
-            .sum()
+        self.terms.iter().map(|t| t.weight * t.sf(d)).sum()
     }
 
     /// Expected days per year of this disruption that last beyond day `x`:
     /// U(x) = ∫ₓ^∞ Λ(t) dt. `unmet_days(0)` is the consumption rate (days per year of
     /// disruption, the Σ r·q·E[D] of DESIGN §4.4).
     pub fn unmet_days(&self, x: f64) -> f64 {
-        let x = x.max(0.0);
         self.terms
             .iter()
-            .map(|t| {
-                if t.weight == 0.0 {
-                    0.0
-                } else if x >= t.threshold {
-                    t.weight * t.survival.expected_excess(x, 0.0)
-                } else {
-                    t.weight
-                        * ((t.threshold - x) * t.survival.sf(t.threshold, 0.0)
-                            + t.survival.expected_excess(t.threshold, 0.0))
-                }
-            })
+            .filter(|t| t.weight != 0.0)
+            .map(|t| t.weight * t.excess(x))
             .sum()
     }
 
@@ -335,17 +406,7 @@ impl ExceedanceCurve {
     /// The design duration for any yearly rate (continuous days): the smallest d with Λ(d) ≤
     /// `rate`; 0 when disruptions of any length are rarer than `rate`.
     pub fn target_at(&self, rate: f64) -> f64 {
-        let total: f64 = self
-            .terms
-            .iter()
-            .map(|t| {
-                if t.threshold > 0.0 {
-                    t.weight * t.survival.sf(t.threshold, 0.0)
-                } else {
-                    t.weight
-                }
-            })
-            .sum();
+        let total: f64 = self.terms.iter().map(|t| t.weight * t.sf(0.0)).sum();
         if total <= rate {
             return 0.0;
         }
