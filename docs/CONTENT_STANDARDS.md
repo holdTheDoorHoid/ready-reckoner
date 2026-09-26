@@ -44,7 +44,11 @@ a price observation), forums, influencer content, product marketing.
   band is the lowest and highest unit price logged for it in `docs/PRICE_OBSERVATIONS.md` (a test
   checks this). Each row there gives the source, listing, price, units and URL.
 - **Ids other crates use** are listed in `docs/CITATION_IDS.md`; a test checks each one resolves.
-  Need a new one? Add it under "Requested" there.
+  Need a new one? Add it under "Requested" there. A placeholder with no source yet may be listed
+  there (and exempted in the test) but never enters the registry, since every entry needs a URL.
+- **Check the claim, not just the quote.** Before a guidance sentence cites a page, read the page
+  and confirm it says that. If the page cannot be read, or says something weaker, drop or soften
+  the sentence. A URL must point at the document itself, not a landing page.
 
 ## 3. Items
 
@@ -97,7 +101,8 @@ consequence is and how common it is (the engine substitutes the household's own 
 where `{frequency}` appears, and drops the placeholder when it has none; bucket and hazard blocks
 must open with it); the second paragraph is what to do; the third is what not to do; end with a
 `## Sources` section of footnotes. Every citation in the front matter is used inline as `[^id]` and
-defined as `[^id]: Publisher, title (year).` One idea per sentence. Eighth-grade reading level (the
+defined as `[^id]: Publisher, title (year).`, copying the registry's publisher and title (a test
+checks that each footnote names its source's title). One idea per sentence. Eighth-grade reading level (the
 validator computes Flesch-Kincaid and warns above 9). No countdowns, no scarcity, no imagery of
 suffering, no "when the SHTF". The validator rejects pressure phrases ("you must", "act now", "don't
 wait", "hurry", "while supplies last", "before it's too late" and similar) and warns on exclamation
