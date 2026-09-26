@@ -39,13 +39,13 @@ pub struct CountyData<'a> {
     /// Fifth National Climate Assessment region id ("" when unknown): the outage-pooling region.
     pub nca_region: &'a str,
     /// The regional outage model: pooled tails with credibility weights, causes and the region's
-    /// worst event (data pack v2; model review M-01, M-02). awaiting: data-model
+    /// worst event (`CountyRecord::outage_model`; model review M-01, M-02).
     pub outage_model: Option<&'a OutageModel>,
-    /// Heat and cold shares during recorded outages (data pack v2; model review M-11).
-    /// awaiting: data-model
+    /// Heat and cold shares during recorded outages (`CountyRecord::temperature`; M-11).
     pub temperature: Option<&'a TemperatureProfile>,
-    /// Pooled restoration curves by region and cause (data pack v2; model review M-10), from
-    /// `rr_data::DataStore::restoration_curves()`. awaiting: data-model, plan
+    /// Pooled restoration curves by region and cause (model review M-10), from
+    /// `rr_data::DataStore::restoration_curves()` through [`CountyData::with_curves`].
+    /// awaiting: plan — `rr-plan` passes them.
     pub curves: &'a [RestorationCurve],
     /// Share of the county's public-water customers served by a system with a health-based
     /// violation in the last five years (EPA SDWIS, `CountyExposure::sdwis_violation_pop_share`).
@@ -65,10 +65,8 @@ impl<'a> CountyData<'a> {
             tsunami_zone: record.tsunami_zone,
             state_abbr: &record.state_abbr,
             nca_region: &record.nca_region,
-            // awaiting: data-model — `outage_model: record.outage_model.as_ref(),` and
-            // `temperature: record.temperature.as_ref(),` once `CountyRecord` carries them.
-            outage_model: None,
-            temperature: None,
+            outage_model: record.outage_model.as_ref(),
+            temperature: record.temperature.as_ref(),
             curves: &[],
             sdwis_violation_share: record
                 .exposure
