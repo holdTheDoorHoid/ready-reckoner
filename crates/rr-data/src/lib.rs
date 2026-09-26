@@ -102,6 +102,15 @@ struct RawOutage {
     years_covered: String,
 }
 
+/// A state's pooled outage figures (`outages_state.csv`, keyed by state abbreviation).
+#[derive(Debug, Clone)]
+struct RawStateOutage {
+    events_per_customer_year: f32,
+    p: [f32; 4],
+    median_hours: f32,
+    p90_hours: f32,
+}
+
 /// Facility data per county.
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct CountyFacilityFlags {
@@ -217,6 +226,7 @@ pub struct DataStore {
     semantics: BTreeMap<HazardId, SemanticsEntry>,
     nri_version: String,
     outages: BTreeMap<String, RawOutage>,
+    outages_state: BTreeMap<String, RawStateOutage>,
     events: BTreeMap<String, BTreeMap<String, EventRate>>,
     seismic: BTreeMap<String, Seismic>,
     climate: BTreeMap<String, BTreeMap<String, f32>>,
@@ -438,8 +448,38 @@ impl DataStore {
                     );
                 }
             }
-            "core/states.csv" | "core/ct_crosswalk.csv" | "core/outages_state.csv" => {
+            "core/states.csv" | "core/ct_crosswalk.csv" => {
                 // Loaded for completeness and checksums; the engine reads county-level values.
+            }
+            "core/outages_state.csv" => {
+                // Each state's pooled series, for the counties with no outage record.
+                let ix = |c: &str| t.col(c);
+                let (i_s, i_e, i_1, i_3, i_7, i_14, i_m, i_9) = (
+                    ix("state_abbr")?,
+                    ix("events_per_customer_year")?,
+                    ix("p_ge_1d")?,
+                    ix("p_ge_3d")?,
+                    ix("p_ge_7d")?,
+                    ix("p_ge_14d")?,
+                    ix("median_hours")?,
+                    ix("p90_hours")?,
+                );
+                self.outages_state.clear();
+                for r in &t.rows {
+                    let g = |i: usize| {
+                        f32c(&r[i])
+                            .ok_or_else(|| corrupt(name, format!("missing value for {}", r[i_s])))
+                    };
+                    self.outages_state.insert(
+                        r[i_s].clone(),
+                        RawStateOutage {
+                            events_per_customer_year: g(i_e)?,
+                            p: [g(i_1)?, g(i_3)?, g(i_7)?, g(i_14)?],
+                            median_hours: g(i_m)?,
+                            p90_hours: g(i_9)?,
+                        },
+                    );
+                }
             }
             "core/zip_county.csv" => {
                 let (i_z, i_c, i_s) = (t.col("zip")?, t.col("county_fips")?, t.col("land_share")?);
@@ -732,6 +772,24 @@ impl DataStore {
             .and_then(|m| m.definition("outages", "event_definition"))
             .unwrap_or("EAGLE-I outage event (definition in data/manifest.json)")
             .to_string();
+        // The years a state's series covers: the span of its counties' own records.
+        let mut state_years: BTreeMap<&str, (String, String)> = BTreeMap::new();
+        for (fips, o) in &self.outages {
+            let (Some(base), Some((from, to))) =
+                (self.base.get(fips), o.years_covered.split_once('-'))
+            else {
+                continue;
+            };
+            let e = state_years
+                .entry(base.state_abbr.as_str())
+                .or_insert_with(|| (from.to_owned(), to.to_owned()));
+            if from < e.0.as_str() {
+                e.0 = from.to_owned();
+            }
+            if to > e.1.as_str() {
+                e.1 = to.to_owned();
+            }
+        }
         let mut out = BTreeMap::new();
         for (fips, base) in &self.base {
             let nc = self.nri_county.get(fips).cloned().unwrap_or_default();
@@ -760,17 +818,41 @@ impl DataStore {
                     ))
                 })
                 .collect();
-            let outages = self.outages.get(fips).map(|o| OutageStats {
-                events_per_customer_year: o.events_per_customer_year,
-                p_ge_1d: o.p[0],
-                p_ge_3d: o.p[1],
-                p_ge_7d: o.p[2],
-                p_ge_14d: o.p[3],
-                median_hours: o.median_hours,
-                p90_hours: o.p90_hours,
-                years_covered: o.years_covered.clone(),
-                event_definition: event_definition.clone(),
-            });
+            // A county with no outage record of its own takes its state's pooled series, marked
+            // as such (verification V-15: without it, a third of short storm outages stood in,
+            // and Juneau got half a day of power).
+            let outages = match self.outages.get(fips) {
+                Some(o) => Some(OutageStats {
+                    events_per_customer_year: o.events_per_customer_year,
+                    p_ge_1d: o.p[0],
+                    p_ge_3d: o.p[1],
+                    p_ge_7d: o.p[2],
+                    p_ge_14d: o.p[3],
+                    median_hours: o.median_hours,
+                    p90_hours: o.p90_hours,
+                    years_covered: o.years_covered.clone(),
+                    event_definition: event_definition.clone(),
+                    state_series: None,
+                }),
+                None => self
+                    .outages_state
+                    .get(&base.state_abbr)
+                    .map(|o| OutageStats {
+                        events_per_customer_year: o.events_per_customer_year,
+                        p_ge_1d: o.p[0],
+                        p_ge_3d: o.p[1],
+                        p_ge_7d: o.p[2],
+                        p_ge_14d: o.p[3],
+                        median_hours: o.median_hours,
+                        p90_hours: o.p90_hours,
+                        years_covered: state_years
+                            .get(base.state_abbr.as_str())
+                            .map(|(a, b)| format!("{a}-{b}"))
+                            .unwrap_or_default(),
+                        event_definition: event_definition.clone(),
+                        state_series: Some(base.state_name.clone()),
+                    }),
+            };
             let (vulnerability, households) = match self.vulnerability.get(fips) {
                 Some((v, h)) => (Some(v.clone()), *h),
                 None => (None, None),

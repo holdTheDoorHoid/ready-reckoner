@@ -345,6 +345,53 @@ fn heating_that_needs_power_turns_winter_outages_into_cold() {
     assert!(b.couplings.iter().any(|c| c.id == "wood_heat"));
 }
 
+/// A county with no outage records of its own carries its state's pooled series (rr-data, V-15):
+/// the model uses it exactly like the county's own, and says whose records they are.
+#[test]
+fn a_states_outage_series_stands_in_and_says_so() {
+    let input = research::philadelphia_household();
+    let rates = research::philadelphia_rates();
+    let own = research::philadelphia_outages();
+    let mut state = own.clone();
+    state.state_series = Some("Pennsylvania".to_owned());
+    let run = |s: &rr_types::OutageStats| {
+        assess_with_draws(
+            &input,
+            &rates,
+            CountyData {
+                outages: Some(s),
+                ..CountyData::default()
+            },
+            &[],
+            TEST_DRAWS,
+        )
+    };
+    let (a, b) = (run(&own), run(&state));
+    assert_eq!(
+        a.bucket(BucketId::Power).target,
+        b.bucket(BucketId::Power).target
+    );
+    let plain = |x: &rr_consequence::ConsequenceAssessment| {
+        x.overrides
+            .iter()
+            .find(|o| o.bucket == BucketId::Power)
+            .map(|o| o.plain.clone())
+            .unwrap()
+    };
+    assert!(
+        plain(&a).contains("this county's outage records"),
+        "{}",
+        plain(&a)
+    );
+    assert!(
+        plain(&b).contains(
+            "Pennsylvania's outage records, because this county has none of its own (2018-2025)"
+        ),
+        "{}",
+        plain(&b)
+    );
+}
+
 #[test]
 fn county_outage_records_replace_the_county_wide_storm_class() {
     let input = research::philadelphia_household();

@@ -143,7 +143,9 @@ yearly chance) and `notes`. The traps it records:
 | `longest_event_hours` | Longest qualifying event |
 
 `outages_state.csv` pools the same statistics by state (customer-weighted), for small-sample
-fallback. Source: ORNL EAGLE-I recorded electricity outages 2014–2025, figshare
+fallback. The engine uses a state's row for every county with no row in `outages.csv` (72 counties
+in 9 states; `rr-data` marks the record `state_series` and gives it the years its state's
+counties cover); American Samoa, Guam and the Northern Mariana Islands have no state row. Source: ORNL EAGLE-I recorded electricity outages 2014–2025, figshare
 doi:10.6084/m9.figshare.24237376 (v4, 2026-02-25), `MCC.csv`, `coverage_history.csv`; CDC SVI 2022
 household counts. **CC BY 4.0: the credit line in §7 must be shown.** Refresh: yearly (a new year
 is added each spring).

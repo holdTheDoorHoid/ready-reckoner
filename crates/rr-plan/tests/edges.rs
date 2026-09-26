@@ -316,3 +316,28 @@ fn staging_steps_count_toward_their_bag_but_are_never_the_bag() {
     );
     assert!(meta.roles.contains(&rr_budget::ItemRole::GoBag));
 }
+
+/// Verification V-15: the 79 counties with no outage records got half a day of power in Juneau
+/// and no heat-or-cold target at all. They now plan with their state's pooled outage series and
+/// the packet says so.
+#[test]
+fn a_county_without_outage_records_plans_with_its_states_series() {
+    let mut input = household("philadelphia-renters-4");
+    input.location.zip = None;
+    input.location.county_fips = Some("02110".into());
+    let out = assess(&input);
+    assert_eq!(out.location.county_name, "Juneau");
+    // It was ½ day of power, no heat or cold target and ½ day of phones.
+    assert!(
+        days(&out, BucketId::Power) >= 2.0,
+        "{}",
+        days(&out, BucketId::Power)
+    );
+    assert!(days(&out, BucketId::Thermal) > 0.0);
+    assert!(days(&out, BucketId::Comms) >= 2.0);
+    assert!(
+        out.packet_markdown
+            .contains("its power-cut figures use Alaska's records (2015-2025) instead"),
+        "the packet's notes name the state series"
+    );
+}

@@ -610,9 +610,13 @@ big windstorms, grid failure, Cascadia).
   event 62 hours, power target 365 days; now 5), and 88 counties were told to prepare for a year
   without power. The rate is
   split between the storm hazards in proportion to their short-outage rates, for the
-  contributions. Without records, county-wide outages are a third of short storm outages at 2 h /
-  20 h (the Philadelphia fit, prior). Recorded in `overrides`; `ornl_eagle_i_outages` joins the
-  power bucket's sources.
+  contributions. A county with no outage records of its own uses its state's pooled series
+  (`outages_state.csv`; `OutageStats.state_series` names the state, and the notes and the override
+  say whose records they are; verification V-15, 2026-09-26: Juneau went from ½ day of power and no
+  heat-or-cold target to 3 days of each). Only where there is no state row either (American Samoa,
+  Guam, the Northern Mariana Islands) are county-wide outages a third of short storm outages at
+  2 h / 20 h (the Philadelphia fit, prior). Recorded in `overrides`; `ornl_eagle_i_outages` joins
+  the power bucket's sources.
 - **County event records.** A `county.events` entry whose key is in a row's `event_keys` and that
   has `median_days` replaces the row's duration (its `p90_days` too, or the row's ratio): snow-ins
   (`winter_storm` …), heat and cold spells for homes without cooling or heating (`heat`,

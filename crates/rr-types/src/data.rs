@@ -140,6 +140,10 @@ pub struct OutageStats {
     pub years_covered: String,
     /// What counted as an outage event.
     pub event_definition: String,
+    /// When the county has no outage record of its own, the state whose pooled figures
+    /// (`core/outages_state.csv`) stand in, by name ("Alaska"). Absent for a county's own record.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub state_series: Option<String>,
 }
 
 /// How often an event type happens in a county, and how long it lasts.

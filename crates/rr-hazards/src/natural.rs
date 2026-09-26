@@ -651,6 +651,24 @@ fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
         ));
         return;
     };
+    // A county with no records of its own carries its state's pooled series (rr-data).
+    let (records, homes) = match &o.state_series {
+        Some(state) => {
+            notes.add(format!(
+                "No power-outage records for {county}: its power-cut figures use {state}'s \
+                 records ({}) instead.",
+                o.years_covered
+            ));
+            (
+                format!("{state}'s power-outage records ({})", o.years_covered),
+                format!("homes across {state}"),
+            )
+        }
+        None => (
+            format!("Power-outage records ({})", o.years_covered),
+            format!("homes in {county}"),
+        ),
+    };
     let recorded = f64::from(o.events_per_customer_year);
     if !(recorded.is_finite() && recorded > 0.0) {
         return;
@@ -672,10 +690,8 @@ fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
     extra.low = ((weather.low - modelled) / c).max(0.0);
     extra.high = (weather.high - modelled) / c;
     notes.add(format!(
-        "Power-outage records ({}) show homes in {county} caught in an outage {}, more often \
-         than the county's storm records explain. The extra outages are counted as windstorms, \
-         the most common cause.",
-        o.years_covered,
+        "{records} show {homes} caught in an outage {}, more often than the county's storm \
+         records explain. The extra outages are counted as windstorms, the most common cause.",
         crate::sentence::about_times_a_year(recorded)
     ));
     match rates.iter_mut().find(|r| r.hazard == HazardId::StrongWind) {
