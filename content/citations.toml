@@ -1459,7 +1459,7 @@ title = "A Review of State Emergency Prescription Protocols"
 publisher = "Healthcare Ready"
 year = 2023
 url = "https://healthcareready.org/a-review-of-state-emergency-prescription-protocols/"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
 [[citation]]
@@ -2573,3 +2573,30 @@ url = "https://www.dhs.gov/sites/default/files/publications/Trauma-Kits-TN_1015-
 retrieved = "2026-09-26"
 quote = "the counterfeit tourniquets have been shown to fail before the necessary force to stop bleeding can be applied, possibly leading to catastrophic results."
 license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nacds_2018_emergency_refills"
+title = "South Carolina, North Carolina, Virginia, Maryland, and District of Columbia Emergency Refill Protocols (laws and protocols as of September 2018)"
+publisher = "National Association of Chain Drug Stores"
+year = 2018
+url = "https://www.nacds.org/ceo/2018/0913/emergency-refill.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fl_bop_emergency_refills"
+title = "Tropical Storm: Early Prescription Refills Permitted Under State of Emergency"
+publisher = "Florida Board of Pharmacy"
+year = 2024
+url = "https://floridaspharmacy.gov/early-prescription-refills-permitted-under-state-of-emergency/"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "tx_pharmacy_disaster_2024"
+title = "Severe Weather Disaster: Emergency Dispensing of Prescription Medications"
+publisher = "Texas State Board of Pharmacy"
+year = 2024
+url = "https://www.pharmacy.texas.gov/files_pdf/2024-severe-weather-disaster-notification.pdf"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"

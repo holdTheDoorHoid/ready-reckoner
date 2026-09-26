@@ -792,7 +792,6 @@ fn check_states(content: &Content, r: &mut Report) {
         for (field, v) in [
             ("name", &row.name),
             ("em_agency", &row.em_agency),
-            ("local_office", &row.local_office),
             ("refill", &row.refill),
         ] {
             if v.trim().is_empty() {

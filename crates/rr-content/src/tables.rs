@@ -54,8 +54,9 @@ pub struct StateRow {
     pub em_agency: String,
     /// Its web address.
     pub em_url: String,
-    /// Who runs local services, in words that fit "ask your …": "county emergency management
-    /// office" unless the state has parishes, boroughs or municipios.
+    /// Who runs local services, in words that fit "your …": "county emergency management
+    /// office" unless the state has parishes, boroughs, towns or municipios. Empty when the state
+    /// agency is itself the local office (the District of Columbia).
     #[serde(default = "default_local_office")]
     pub local_office: String,
     /// A confirmed state-level evacuation-zone lookup.
@@ -121,14 +122,20 @@ impl StateRow {
         let local = |handles: &str, missing: &str| {
             if self.none_found {
                 format!(
-                    "No {missing} was found for all of {}. Ask your {} or {}.",
+                    "No {missing} was found for all of {}. Ask your {} or the agency for all of {}: {}.",
                     self.name,
                     self.local_office,
+                    self.name,
                     self.agency()
+                )
+            } else if self.local_office.is_empty() {
+                format!(
+                    "The {} handles {handles} ({}).",
+                    self.em_agency, self.em_url
                 )
             } else {
                 format!(
-                    "Your {} handles {handles}. Find it through {}.",
+                    "Your {} handles {handles}. Find yours through the state agency: {}.",
                     self.local_office,
                     self.agency()
                 )
@@ -201,10 +208,17 @@ impl StateRow {
             },
             None => StateLine {
                 topic: "Alerts",
-                text: format!(
-                    "Emergency alerts reach phones with no sign-up. Ask your {} about its own text or email alerts.",
-                    self.local_office
-                ),
+                text: if self.local_office.is_empty() {
+                    format!(
+                        "Emergency alerts reach phones with no sign-up. Ask the {} about its own text or email alerts.",
+                        self.em_agency
+                    )
+                } else {
+                    format!(
+                        "Emergency alerts reach phones with no sign-up. Ask your {} about its own text or email alerts.",
+                        self.local_office
+                    )
+                },
                 sources: cite(ALERT_SOURCES),
             },
         });
@@ -280,7 +294,10 @@ mod tests {
                 .text
                 .contains("Your county emergency management office handles evacuation zones")
         );
-        assert!(lines[0].text.contains("https://www.kansastag.gov/kdem"));
+        assert!(lines[0].text.ends_with(
+            "Find yours through the state agency: Kansas Division of Emergency Management \
+             (https://www.kansastag.gov/kdem)."
+        ));
         assert_eq!(lines[0].sources, cite(LOCAL_OFFICE_SOURCES));
         assert!(lines[1].text.starts_with("Emergency alerts reach phones"));
         assert_eq!(lines[2].topic, "Prescription refills");
@@ -321,8 +338,9 @@ mod tests {
         assert_eq!(
             lines[0].text,
             "No evacuation-zone lookup or registry for people who may need help in a disaster \
-             was found for all of Kansas. Ask your municipio's emergency management office or \
-             Kansas Division of Emergency Management (https://www.kansastag.gov/kdem)."
+             was found for all of Kansas. Ask your municipio's emergency management office or the \
+             agency for all of Kansas: Kansas Division of Emergency Management \
+             (https://www.kansastag.gov/kdem)."
         );
         assert!(lines[0].sources.is_empty());
         assert!(
@@ -330,6 +348,20 @@ mod tests {
                 .text
                 .starts_with("No alert sign-up was found for all of Kansas.")
         );
+    }
+
+    #[test]
+    fn an_empty_local_office_means_the_agency_itself() {
+        let r = row("local_office = \"\"\n");
+        let lines = r.lines();
+        assert_eq!(
+            lines[0].text,
+            "The Kansas Division of Emergency Management handles evacuation zones and any \
+             registry for people who may need help in a disaster (https://www.kansastag.gov/kdem)."
+        );
+        assert!(lines[1].text.ends_with(
+            "Ask the Kansas Division of Emergency Management about its own text or email alerts."
+        ));
     }
 
     #[test]
