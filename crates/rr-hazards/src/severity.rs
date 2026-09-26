@@ -63,6 +63,7 @@ pub(crate) fn at_risk_reason(input: &PlanInput, hazard: HazardId) -> Option<&'st
     let heat = match hazard {
         HazardId::HeatWave => true,
         HazardId::ColdWave => false,
+        HazardId::WildfireSmoke | HazardId::DustStorm => return air_risk_reason(input),
         _ => return None,
     };
     let people = &input.people;
@@ -90,8 +91,40 @@ pub(crate) fn at_risk_reason(input: &PlanInput, hazard: HazardId) -> Option<&'st
     None
 }
 
+/// Why smoke or dust is worse for this household than for the average one, if it is: someone 65
+/// or older, a child (EPA: children breathe more air for their size, and N95 masks are not made to
+/// fit them), someone pregnant, or someone on a breathing machine or oxygen. Asthma and COPD are
+/// not asked, so age stands in (hazard brief).
+fn air_risk_reason(input: &PlanInput) -> Option<&'static str> {
+    let people = &input.people;
+    if people.iter().any(|p| matches!(p.age_band, AgeBand::Senior)) {
+        return Some("someone in it is 65 or older");
+    }
+    if people.iter().any(|p| {
+        matches!(
+            p.age_band,
+            AgeBand::Infant | AgeBand::Toddler | AgeBand::Child
+        )
+    }) {
+        return Some("there is a child");
+    }
+    if people.iter().any(|p| p.pregnant_or_nursing) {
+        return Some("someone in it is pregnant or nursing");
+    }
+    if people.iter().any(|p| {
+        matches!(
+            p.medical.powered_device,
+            PoweredDevice::Oxygen | PoweredDevice::Cpap
+        )
+    }) {
+        return Some("someone in it uses a breathing machine or oxygen");
+    }
+    None
+}
+
 /// The severity of one hazard for this household: [`of`], raised to "Serious" for a heat or
-/// cold wave when someone in the household is at higher risk ([`at_risk_reason`]).
+/// cold wave, smoke or dust when someone in the household is at higher risk
+/// ([`at_risk_reason`]).
 pub(crate) fn for_household(rate: &HazardRate, input: &PlanInput) -> f64 {
     let s = of(rate);
     if at_risk_reason(input, rate.hazard).is_some() {

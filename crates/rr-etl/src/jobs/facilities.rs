@@ -7,7 +7,12 @@
 //! - **EPA Toxics Release Inventory 2024** (the latest reporting year): facilities per county
 //!   (by location inside the county boundary) and facilities within 5 km of each ZIP centroid.
 //! - **USACE National Inventory of Dams**: dams with High and Significant hazard potential per
-//!   county (hazard potential rates the consequence of failure, not the chance of it).
+//!   county (hazard potential rates the consequence of failure, not the chance of it), High dams
+//!   whose latest condition assessment is Poor or Unsatisfactory, and per ZIP the High dams within
+//!   10 km whose inventory entry names, as the place a failure would most likely flood (NID
+//!   `City`: "the nearest downstream city, town, or village"), a Census place the ZIP overlaps.
+//! - **Strategic sites** (`core/strategic_sites.toml`, written by the `strategic` job): per ZIP,
+//!   the nearest class A or C1 point site within 150 km, its distance and bearing.
 //!
 //! County boundaries: Census 2024 cartographic 1:500,000 counties. ZIP points: the Census 2024
 //! Gazetteer's ZCTA internal points, rounded to 3 decimals (`geography::zcta_points`).
@@ -37,6 +42,83 @@ const CB500: &str = "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_c
 pub const TRI_YEAR: i32 = 2024;
 /// Radius for "TRI facilities near this ZIP".
 pub const TRI_RADIUS_KM: f64 = 5.0;
+/// Radius for "a High dam naming this ZIP's town is close".
+pub const DAM_RADIUS_KM: f64 = 10.0;
+/// A ZIP counts as overlapping a Census place when at least this share of the ZIP's land is in
+/// the place, or this share of the place's land is in the ZIP (a small town in a large rural
+/// ZIP).
+pub const PLACE_SHARE: f64 = 0.1;
+/// Farthest a strategic point site is reported from a ZIP, km (the class D reach).
+pub const STRATEGIC_KM: f64 = 150.0;
+const ZCTA_PLACE: &str = "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_place20_natl.txt";
+
+/// Normalise a place name for matching NID's downstream town to Census places: lower case,
+/// "City of" and legal suffixes (city, town, village, CDP, borough, ...) dropped, a trailing
+/// ", ST" dropped, "Saint"/"Mount"/"Fort" abbreviated, punctuation removed. "none" and other
+/// fillers give an empty string.
+pub fn norm_place(s: &str) -> String {
+    let lower = s.to_lowercase();
+    let mut t = lower.split(',').next().unwrap_or("").to_string();
+    if let Some(i) = t.find('(') {
+        t.truncate(i);
+    }
+    for prefix in [
+        "city of ",
+        "town of ",
+        "village of ",
+        "borough of ",
+        "township of ",
+    ] {
+        if let Some(rest) = t.trim_start().strip_prefix(prefix) {
+            t = rest.to_string();
+        }
+    }
+    let cleaned: String = t
+        .chars()
+        .map(|c| if c.is_ascii_alphanumeric() { c } else { ' ' })
+        .collect();
+    let mut words: Vec<&str> = cleaned.split_whitespace().collect();
+    const SUFFIX: &[&str] = &[
+        "city",
+        "town",
+        "village",
+        "cdp",
+        "borough",
+        "municipality",
+        "comunidad",
+        "urbana",
+        "zona",
+        "township",
+        "government",
+        "metropolitan",
+        "metro",
+        "consolidated",
+        "unified",
+        "urban",
+        "county",
+    ];
+    while words.len() > 1 && words.last().is_some_and(|w| SUFFIX.contains(w)) {
+        words.pop();
+    }
+    let joined = words
+        .iter()
+        .map(|w| match *w {
+            "saint" => "st",
+            "mount" => "mt",
+            "fort" => "ft",
+            other => other,
+        })
+        .collect::<Vec<_>>()
+        .join(" ");
+    if matches!(
+        joined.as_str(),
+        "none" | "na" | "n a" | "unknown" | "no" | "tbd"
+    ) {
+        String::new()
+    } else {
+        joined
+    }
+}
 
 /// A uniform grid of points for radius queries.
 struct PointGrid {
@@ -261,9 +343,17 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         .iter()
         .position(|x| x.starts_with("Hazard Potential"))
         .ok_or_else(|| data_err("NID: no Hazard Potential column"))?;
+    let (i_cond, i_city, i_state) = (
+        col(&h, "Condition Assessment")?,
+        col(&h, "City")?,
+        col(&h, "State")?,
+    );
     let mut high: BTreeMap<String, u32> = BTreeMap::new();
+    let mut high_poor: BTreeMap<String, u32> = BTreeMap::new();
     let mut significant: BTreeMap<String, u32> = BTreeMap::new();
     let mut nid_unplaced = 0u32;
+    // High dams with coordinates: (lat, lon, state name, downstream town as written).
+    let mut high_dams: Vec<(f64, f64, String, String)> = Vec::new();
     for r in &rows {
         let haz = r[i_haz].as_str();
         if haz != "High" && haz != "Significant" {
@@ -273,6 +363,9 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             nid_unplaced += 1;
             continue;
         };
+        if haz == "High" {
+            high_dams.push((lat, lon, r[i_state].clone(), r[i_city].clone()));
+        }
         match index.locate(lat, lon) {
             Some(c) => {
                 *(if haz == "High" {
@@ -281,7 +374,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                     &mut significant
                 })
                 .entry(c.to_string())
-                .or_default() += 1
+                .or_default() += 1;
+                if haz == "High" && matches!(r[i_cond].as_str(), "Poor" | "Unsatisfactory") {
+                    *high_poor.entry(c.to_string()).or_default() += 1;
+                }
             }
             None => nid_unplaced += 1,
         }
@@ -298,6 +394,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             "nuclear_within_16km",
             "nuclear_within_80km",
             "significant_hazard_dams",
+            "dams_high_poor_condition",
         ],
         1,
     );
@@ -326,6 +423,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             w16.to_string(),
             w80.to_string(),
             significant.get(&c.fips).copied().unwrap_or(0).to_string(),
+            high_poor.get(&c.fips).copied().unwrap_or(0).to_string(),
         ]);
     }
     out.table(ctx, FACILITIES, &mut table)?;
@@ -334,20 +432,181 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let zcta = super::geography::zcta_points(ctx)?;
     out.source(zcta.source);
     out.rows_in += zcta.rows_in;
-    let mut zt = Table::new(&["zip", "nearest_nuclear_km", "tri_within_5km"], 1);
+
+    // Dams whose named downstream town the ZIP overlaps: Census 2020 ZCTA-to-place file.
+    let rel = ctx.http.get(
+        ZCTA_PLACE,
+        Some("facilities/tab20_zcta520_place20_natl.txt"),
+    )?;
+    out.source(super::source_from(
+        "Census 2020 ZCTA to place relationship file",
+        &rel,
+        "rel2020 zcta520-place20",
+        super::PUBLIC_DOMAIN,
+        "",
+    ));
+    let state_fips: BTreeMap<String, String> = crate::jobs::geography::STATE_FACTS
+        .iter()
+        .map(|(f, a, _, _)| (a.to_string(), f.to_string()))
+        .collect();
+    let (gh, grows) = crate::csvout::read_table(&ctx.data, super::geography::COUNTIES)?;
+    let (g_st, g_sn) = (col(&gh, "state_abbr")?, col(&gh, "state_name")?);
+    let name_to_fips: BTreeMap<String, String> = grows
+        .iter()
+        .filter_map(|r| Some((r[g_sn].to_lowercase(), state_fips.get(&r[g_st])?.clone())))
+        .collect();
+    // (state FIPS, normalised place name) -> place GEOIDs; place GEOID -> ZIPs with >= 10% of
+    // their land in it.
+    let (rh, rrows) = parse_delimited(&rel.text(), b'|')?;
+    let (r_z, r_zl, r_p, r_pn, r_pl, r_part) = (
+        col(&rh, "GEOID_ZCTA5_20")?,
+        col(&rh, "AREALAND_ZCTA5_20")?,
+        col(&rh, "GEOID_PLACE_20")?,
+        col(&rh, "NAMELSAD_PLACE_20")?,
+        col(&rh, "AREALAND_PLACE_20")?,
+        col(&rh, "AREALAND_PART")?,
+    );
+    let mut place_by_name: BTreeMap<(String, String), BTreeSet<String>> = BTreeMap::new();
+    let mut zips_of_place: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    for r in &rrows {
+        if r[r_p].len() != 7 {
+            continue;
+        }
+        place_by_name
+            .entry((r[r_p][..2].to_string(), norm_place(&r[r_pn])))
+            .or_default()
+            .insert(r[r_p].clone());
+        let (zl, pl, part) = (
+            r[r_zl].parse::<f64>().unwrap_or(0.0),
+            r[r_pl].parse::<f64>().unwrap_or(0.0),
+            r[r_part].parse::<f64>().unwrap_or(0.0),
+        );
+        let share_of_zip = if zl > 0.0 { part / zl } else { 0.0 };
+        let share_of_place = if pl > 0.0 { part / pl } else { 0.0 };
+        if !r[r_z].is_empty() && (share_of_zip >= PLACE_SHARE || share_of_place >= PLACE_SHARE) {
+            zips_of_place
+                .entry(r[r_p].clone())
+                .or_default()
+                .insert(r[r_z].clone());
+        }
+    }
+    out.rows_in += rrows.len() as u64;
+    let zip_point: BTreeMap<&str, (f64, f64)> = zcta
+        .points
+        .iter()
+        .map(|(z, la, lo)| (z.as_str(), (*la, *lo)))
+        .collect();
+    let mut dams_naming: BTreeMap<String, u32> = BTreeMap::new();
+    let (mut named, mut matched) = (0u32, 0u32);
+    for (lat, lon, state, city) in &high_dams {
+        let key = norm_place(city);
+        if key.is_empty() {
+            continue;
+        }
+        named += 1;
+        let Some(st) = name_to_fips.get(&state.trim().to_lowercase()) else {
+            continue;
+        };
+        let Some(places) = place_by_name.get(&(st.clone(), key)) else {
+            continue;
+        };
+        matched += 1;
+        let zips: BTreeSet<&String> = places
+            .iter()
+            .filter_map(|p| zips_of_place.get(p))
+            .flatten()
+            .collect();
+        for z in zips {
+            if let Some((zl, zo)) = zip_point.get(z.as_str())
+                && haversine_km(*zl, *zo, *lat, *lon) <= DAM_RADIUS_KM
+            {
+                *dams_naming.entry(z.clone()).or_default() += 1;
+            }
+        }
+    }
+    let match_rate = matched as f64 / named.max(1) as f64;
+    if !(0.5..=0.95).contains(&match_rate) {
+        return Err(data_err(format!(
+            "NID downstream towns matched to Census places: {matched} of {named} ({:.0}%); expected 50-90%",
+            100.0 * match_rate
+        )));
+    }
+    if !["95965", "95966"]
+        .iter()
+        .any(|z| dams_naming.contains_key(*z))
+    {
+        return Err(data_err(
+            "no Oroville ZIP (95965, 95966) is counted downstream of Oroville Dam",
+        ));
+    }
+
+    // Nearest strategic point site (class A, or a C1 weapons-complex site) within 150 km.
+    let strategic_points = strategic_points(ctx)?;
+    let mut zt = Table::new(
+        &[
+            "zip",
+            "nearest_nuclear_km",
+            "tri_within_5km",
+            "dams_high_within_10km_naming_town",
+            "strategic_km",
+            "strategic_bearing",
+            "strategic_site",
+        ],
+        1,
+    );
+    let mut strategic_rows = 0usize;
     for (zip, lat, lon) in &zcta.points {
         let (lat, lon) = (*lat, *lon);
         let nearest = sites
             .iter()
             .map(|(a, b)| haversine_km(lat, lon, *a, *b))
             .fold(f64::INFINITY, f64::min);
+        let near_site = strategic_points
+            .iter()
+            .map(|(id, slat, slon)| (haversine_km(lat, lon, *slat, *slon), id, *slat, *slon))
+            .filter(|(d, ..)| *d <= STRATEGIC_KM)
+            .min_by(|a, b| a.0.total_cmp(&b.0).then_with(|| a.1.cmp(b.1)));
+        let (skm, sbear, sid) = match near_site {
+            Some((d, id, slat, slon)) => {
+                strategic_rows += 1;
+                // Whole kilometres and degrees: the rules work at 30 and 150 km.
+                (
+                    format!("{:.0}", d.round()),
+                    format!(
+                        "{:.0}",
+                        crate::geo::bearing_deg(lat, lon, slat, slon)
+                            .round()
+                            .rem_euclid(360.0)
+                    ),
+                    id.clone(),
+                )
+            }
+            None => (String::new(), String::new(), String::new()),
+        };
         zt.push(vec![
             zip.clone(),
             fixed(nearest, 1),
             tri_grid.count_within(lat, lon, TRI_RADIUS_KM).to_string(),
+            dams_naming.get(zip).copied().unwrap_or(0).to_string(),
+            skm,
+            sbear,
+            sid,
         ]);
     }
     out.table(ctx, ZIP_FACILITIES, &mut zt)?;
+    out.notes.push(format!(
+        "dams_high_within_10km_naming_town: High-hazard dams within {DAM_RADIUS_KM} km of the ZIP's centre whose NID City (the nearest downstream place most likely to be flooded by a failure, as dam owners report it) matches, by normalised name in the same state, a Census 2020 place that holds at least {:.0}% of the ZIP's land or has at least that share of its own land in the ZIP. {named} High dams name a town; {matched} ({:.0}%) match a Census place. {} ZIPs have at least one. Inundation maps are not public; the named town is not an inundation boundary.",
+        100.0 * PLACE_SHARE,
+        100.0 * match_rate,
+        dams_naming.len()
+    ));
+    out.notes.push(format!(
+        "dams_high_poor_condition: High-hazard dams whose latest NID condition assessment is Poor or Unsatisfactory ({} in the counties; condition is not rated for about a fifth of High dams). high_hazard_dams is the county's total of High dams (dams_high_total in the engine's record).",
+        high_poor.values().sum::<u32>()
+    ));
+    out.notes.push(format!(
+        "strategic_km / strategic_bearing / strategic_site: the nearest class A point site or NNSA weapons-complex site (strategic_sites.toml, rule point_30km) within {STRATEGIC_KM} km of the ZIP's centre, its distance (whole km), the compass bearing from the ZIP to it (whole degrees) and its id; empty beyond {STRATEGIC_KM} km ({strategic_rows} ZIPs have one). Lets a ZIP next to a site in a neighbouring county (Jefferson County, WA across Hood Canal from Bangor) be recognised.",
+    ));
 
     out.notes.push(format!(
         "{} nuclear sites. nuclear_within_16km / _80km: any part of the county (1:500k boundary) within 10 / 50 miles of a site. nearest_nuclear_km is measured from the county's internal point; zip_facilities.csv measures from the ZIP centroid (0.1 km).",
@@ -371,9 +630,70 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     Ok(out)
 }
 
+/// Point sites from `core/strategic_sites.toml` (written by the `strategic` job): `(id, lat,
+/// lon)` for every site whose rule is `point_30km`.
+fn strategic_points(ctx: &Ctx) -> Result<Vec<(String, f64, f64)>> {
+    let path = ctx.data.join(super::strategic::STRATEGIC_SITES);
+    let text = std::fs::read_to_string(&path).map_err(|e| {
+        data_err(format!(
+            "{} is needed ({e}); run the strategic job first",
+            path.display()
+        ))
+    })?;
+    let v: toml::Table = text
+        .parse()
+        .map_err(|e| data_err(format!("{}: {e}", path.display())))?;
+    let mut out = Vec::new();
+    for s in v
+        .get("site")
+        .and_then(|x| x.as_array())
+        .into_iter()
+        .flatten()
+    {
+        if s.get("rule").and_then(|x| x.as_str()) != Some("point_30km") {
+            continue;
+        }
+        let (Some(id), Some(lat), Some(lon)) = (
+            s.get("id").and_then(|x| x.as_str()),
+            s.get("lat").and_then(|x| x.as_float()),
+            s.get("lon").and_then(|x| x.as_float()),
+        ) else {
+            continue;
+        };
+        out.push((id.to_string(), lat, lon));
+    }
+    if out.len() < 20 {
+        return Err(data_err(format!(
+            "{}: only {} point sites",
+            path.display(),
+            out.len()
+        )));
+    }
+    Ok(out)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn place_names_normalise() {
+        assert_eq!(norm_place("Oroville city"), "oroville");
+        assert_eq!(norm_place("City of St. Louis"), "st louis");
+        assert_eq!(norm_place("Saint Louis city"), "st louis");
+        assert_eq!(norm_place("Horn Lake, Ms"), "horn lake");
+        assert_eq!(norm_place("Mount Vernon town"), "mt vernon");
+        assert_eq!(norm_place("Mt. Vernon"), "mt vernon");
+        assert_eq!(norm_place("Magalia CDP"), "magalia");
+        assert_eq!(
+            norm_place("Nashville-Davidson metropolitan government (balance)"),
+            "nashville davidson"
+        );
+        assert_eq!(norm_place("Junction City"), "junction");
+        assert_eq!(norm_place("Junction City city"), "junction");
+        assert_eq!(norm_place("none"), "");
+        assert_eq!(norm_place("   Bishop     "), "bishop");
+    }
 
     #[test]
     fn point_grid_counts_within_radius() {

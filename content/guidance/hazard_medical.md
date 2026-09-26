@@ -1,6 +1,7 @@
 ---
 id: hazard_medical
 title: Medical emergencies at home
+kind: hazard
 applies_to: [hazard:medical_emergency]
 citations: [nchs_accidental_injury_2024, cdc_nchs_ed_visits, mell_2017_ems_response, dhs_stop_the_bleed, medlineplus_cpr, redcross_first_aid_kit, ready_gov_disability, fcc_text_911, cdc_antibiotic_use, fda_expired_medicines]
 ---

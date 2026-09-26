@@ -1,6 +1,7 @@
 ---
 id: hazard_house_fire
 title: House fires
+kind: hazard
 applies_to: [hazard:house_fire]
 citations: [usfa_residential_fires, ready_gov_home_fires, usfa_smoke_alarms, fema_effak]
 ---

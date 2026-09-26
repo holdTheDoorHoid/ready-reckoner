@@ -1,6 +1,7 @@
 ---
 id: tier_m1
 title: One month
+kind: tier
 applies_to: [tier:m1]
 citations: [rr_research_supply_standards, cdc_pregnancy_emergency, fema_nhs_2024, rr_research_risk_model, fsis_shelf_stable, cfpb_emergency_fund]
 ---

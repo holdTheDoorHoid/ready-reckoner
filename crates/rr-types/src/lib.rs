@@ -30,6 +30,7 @@
 //! - [`content`]: catalogue [`Item`], [`Citation`], [`GuidanceMeta`].
 //! - [`effect`]: [`Effect`], [`DurationDist`] and [`HouseholdEventRate`].
 //! - [`data`]: data-pack records ([`CountyRecord`], [`BaseRate`]); engine-internal.
+//! - [`exposure`]: data pack v2 exposure records ([`CountyExposure`], [`ZipRecord`]); engine-internal.
 //! - [`api`]: [`Envelope`], [`EngineError`], and the other function arguments and results.
 //! - [`date`], [`math`], [`rng`], [`fixtures`].
 #![forbid(unsafe_code)]
@@ -43,6 +44,7 @@ pub mod content;
 pub mod data;
 pub mod date;
 pub mod effect;
+pub mod exposure;
 pub mod fixtures;
 pub mod ids;
 pub mod input;
@@ -56,6 +58,7 @@ pub use content::*;
 pub use data::*;
 pub use date::*;
 pub use effect::*;
+pub use exposure::*;
 pub use ids::*;
 pub use input::*;
 pub use output::*;

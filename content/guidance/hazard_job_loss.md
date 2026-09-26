@@ -1,6 +1,7 @@
 ---
 id: hazard_job_loss
 title: Job loss, illness or the loss of an earner
+kind: hazard
 applies_to: [hazard:job_loss, hazard:earner_death_or_disability, hazard:extended_household_illness]
 citations: [bls_work_experience_2024, bls_displaced_workers_2026, ssa_disability_facts, cfpb_emergency_fund, finra_financial_foundations, dol_unemployment_insurance, fema_effak]
 ---

@@ -1,6 +1,7 @@
 ---
 id: hazard_unrest
 title: Civil unrest and attacks
+kind: hazard
 applies_to: [hazard:civil_unrest, hazard:terrorism]
 citations: [tierney_2006_disaster_myths, drury_2009_shared_identity, rr_research_risk_model, ready_gov_kit, ncpc_home_safety, cisa_deescalation, ready_gov_public_spaces]
 ---
@@ -18,4 +19,4 @@ citations: [tierney_2006_disaster_myths, drury_2009_shared_identity, rr_research
 [^ready_gov_kit]: FEMA / Ready.gov, Build A Kit (2026).
 [^ncpc_home_safety]: National Crime Prevention Council, Home and Neighborhood Safety (2026).
 [^cisa_deescalation]: CISA, Non-Confrontational Techniques (de-escalation and the Power of Hello) (2026).
-[^ready_gov_public_spaces]: FEMA / Ready.gov, Public Spaces (Run. Hide. Fight.) (2026).
+[^ready_gov_public_spaces]: FEMA / Ready.gov, Mass Gathering Incidents (Run. Hide. Fight.) (2026).

@@ -1,6 +1,7 @@
 ---
 id: topic_antibiotics
 title: Antibiotics and emergency antibiotic kits
+kind: topic
 applies_to: [topic:antibiotics]
 citations: [usc_21_353, mo_med_2026_antibiotic_kits, cdc_yellow_book_travel_kits, cdc_antibiotic_use, fda_expired_medicines, fda_fish_antibiotics_warning_2023]
 ---

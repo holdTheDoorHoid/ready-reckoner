@@ -1,6 +1,7 @@
 ---
 id: bucket_evacuate
 title: Having to leave home quickly
+kind: bucket
 applies_to: [bucket:evacuate]
 citations: [census_pulse_displacement, ready_gov_evacuation, cdc_evacuation_psa, gollwitzer_sheeran_2006, wood_2018_milling, ready_gov_floods, nws_hurricane_safety_brochure, ready_gov_hurricanes_2014, noaa_spc_tornado_safety, ready_gov_tornadoes_2014]
 ---

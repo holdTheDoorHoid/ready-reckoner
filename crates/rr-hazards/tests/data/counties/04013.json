@@ -198,6 +198,45 @@
    "nearest_nuclear_km": 35.0,
    "tri_facilities": 350,
    "high_hazard_dams": 20
+  },
+  "exposure": {
+   "strategic_class": "C1",
+   "strategic_site_ids": [
+    "metro_38060"
+   ],
+   "strategic_places": [
+    {
+     "id": "metro_38060",
+     "name": "Phoenix-Mesa-Chandler, AZ",
+     "kind": "metro",
+     "sources": [
+      "census_cbsa_pop_2024",
+      "census_delineation_2023"
+     ]
+    }
+   ],
+   "uasi_share": 0.01798,
+   "uasi_area_share": 0.0197,
+   "uasi_area": "Phoenix-Mesa-Chandler, AZ",
+   "geomag_lat": 40.2,
+   "geomag_factor": 0.1,
+   "smoke_days_35": 0.0,
+   "smoke_days_55": 0.0,
+   "smoke_trend": 0.0,
+   "hms_smoke_days": 6.12,
+   "smoke_basis": "monitor",
+   "karst_share": 0.00276,
+   "landslide_susceptible_share": 0.318,
+   "leveed_pop_share": 0.0626,
+   "levee_risk_high_share": 0.0,
+   "dams_high_total": 20,
+   "sdwis_violation_pop_share": 0.051,
+   "cws_pop_share": 0.991
+  },
+  "events": {
+   "dust_storm": {
+    "rate_per_year": 2.0
+   }
   }
  },
  "location": {

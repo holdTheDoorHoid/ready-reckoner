@@ -1,6 +1,7 @@
 ---
 id: tier_w2
 title: Two weeks
+kind: tier
 applies_to: [tier:w2]
 citations: [redcross_survival_kit, cdc_water_storage, oregon_2_weeks_ready, bbk_vorsorgen_2025, fema_nhs_2024, florida_dem_medication, rdpo_emergency_toilet, ready_gov_disability, washington_prepare_in_a_year]
 ---

@@ -1,6 +1,7 @@
 ---
 id: bucket_water_boil
 title: Tap water must be treated (a boil-water notice)
+kind: bucket
 applies_to: [bucket:water_boil]
 citations: [epa_boil_water_report_2024, shaffer_2026_texas_boil_notices, epa_emergency_disinfection, cdc_co_basics, cdc_water_advisories, cdc_water_disinfection]
 ---

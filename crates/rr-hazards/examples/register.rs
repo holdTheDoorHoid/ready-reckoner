@@ -100,6 +100,57 @@ fn main() {
             s.applies_because
         );
     }
+    println!("\nrare box (range only):");
+    for p in a
+        .profiles
+        .iter()
+        .filter(|p| p.display == rr_types::HazardDisplay::RareCatastrophic)
+    {
+        println!(
+            "  {} [{:.2e}, {:.2e}] family={:?}",
+            p.id,
+            p.rate_range[0],
+            p.rate_range[1],
+            p.family.as_deref().unwrap_or("")
+        );
+        if let Some(a) = &p.anchor_sentence {
+            println!("    anchor: {a}");
+        }
+        if let Some(lf) = &p.location_factor {
+            println!(
+                "    why here [{} x{:.3} ({:.3}-{:.3})]: {}",
+                lf.class, lf.multiplier[1], lf.multiplier[0], lf.multiplier[2], lf.label
+            );
+        }
+        if let Some(i) = &p.if_it_reaches_you {
+            println!("    if it reaches you: {i}");
+        }
+        if let Some(w) = &p.what_it_changes {
+            println!("    what it changes: {w}");
+        }
+        for s in &p.sub_causes {
+            println!("    - {} {:?}", s.name, s.rate_range);
+        }
+    }
+    println!("\nsub-causes on ranked cards:");
+    for p in a
+        .profiles
+        .iter()
+        .filter(|p| p.display == rr_types::HazardDisplay::Ranked && !p.sub_causes.is_empty())
+    {
+        let names: Vec<&str> = p.sub_causes.iter().map(|s| s.name.as_str()).collect();
+        println!("  {}: {}", p.id, names.join("; "));
+        if let Some(lf) = &p.location_factor {
+            println!("    why here [{}]: {}", lf.class, lf.label);
+        }
+    }
+    println!("\nalso checked:");
+    for c in &a.also_checked {
+        println!(
+            "  {:<28} {:.2e} [{:.2e}, {:.2e}] {}",
+            c.id, c.rate_per_year, c.rate_range[0], c.rate_range[1], c.name
+        );
+    }
     println!("\nnotes:");
     for n in &a.notes {
         println!("  - {n}");

@@ -155,6 +155,51 @@ pub fn read_dbf(bytes: &[u8]) -> Result<Dbf> {
     Ok(Dbf { fields, records })
 }
 
+/// Read one field of a dBase III `.dbf` file (by name, case-insensitive) for every record that
+/// is not deleted, without materialising the other fields (the karst layers carry long URL and
+/// comment fields on tens of thousands of records).
+pub fn read_dbf_field(bytes: &[u8], name: &str) -> Result<Vec<String>> {
+    if bytes.len() < 32 {
+        return Err(data_err("DBF truncated"));
+    }
+    let nrec = u32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]) as usize;
+    let header_len = u16::from_le_bytes([bytes[8], bytes[9]]) as usize;
+    let rec_len = u16::from_le_bytes([bytes[10], bytes[11]]) as usize;
+    let mut pos = 32;
+    let mut offset = 1usize;
+    let mut found: Option<(usize, usize)> = None;
+    let mut names = Vec::new();
+    while pos + 32 <= bytes.len() && bytes[pos] != 0x0D {
+        let d = &bytes[pos..pos + 32];
+        let end = d[..11].iter().position(|&c| c == 0).unwrap_or(11);
+        let field = String::from_utf8_lossy(&d[..end]).trim().to_string();
+        let width = d[16] as usize;
+        if field.eq_ignore_ascii_case(name) {
+            found = Some((offset, width));
+        }
+        names.push(field);
+        offset += width;
+        pos += 32;
+    }
+    let (at, width) =
+        found.ok_or_else(|| data_err(format!("DBF has no field {name}; fields are {names:?}")))?;
+    let mut out = Vec::with_capacity(nrec);
+    for i in 0..nrec {
+        let start = header_len + i * rec_len;
+        let rec = bytes
+            .get(start..start + rec_len)
+            .ok_or_else(|| data_err("DBF record truncated"))?;
+        if rec[0] == b'*' {
+            continue;
+        }
+        let cell = rec
+            .get(at..at + width)
+            .ok_or_else(|| data_err("DBF field truncated"))?;
+        out.push(String::from_utf8_lossy(cell).trim().to_string());
+    }
+    Ok(out)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -210,5 +255,7 @@ mod tests {
         let d = read_dbf(&b).unwrap();
         assert_eq!(d.fields, vec!["GEOID"]);
         assert_eq!(d.records[0][d.field("geoid").unwrap()], "42101");
+        assert_eq!(read_dbf_field(&b, "geoid").unwrap(), vec!["42101"]);
+        assert!(read_dbf_field(&b, "NAME").is_err());
     }
 }

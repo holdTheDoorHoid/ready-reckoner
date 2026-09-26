@@ -1,6 +1,7 @@
 ---
 id: hazard_flood
 title: Floods, flash floods and landslides
+kind: hazard
 applies_to: [hazard:riverine_flooding, hazard:coastal_flooding, hazard:landslide]
 citations: [nws_turn_around_dont_drown, fema_flood_zones, ready_gov_floods, floodsmart_buy_policy, ready_gov_landslides]
 ---

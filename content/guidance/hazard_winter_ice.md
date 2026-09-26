@@ -1,6 +1,7 @@
 ---
 id: hazard_winter_ice
 title: Winter storms, ice and extreme cold
+kind: hazard
 applies_to: [hazard:winter_weather, hazard:ice_storm, hazard:cold_wave, hazard:avalanche]
 citations: [ready_gov_winter, shaffer_2026_texas_boil_notices, cdc_winter_safety, ready_gov_stay_safe_warm, ready_gov_avalanche, usfa_heating_fires]
 ---

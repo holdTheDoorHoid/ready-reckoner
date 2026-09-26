@@ -21,9 +21,71 @@ pub fn count_rows(path: &str, bytes: &[u8]) -> Result<u64> {
     rr_data::verify::count_rows(path, bytes).map_err(data_err)
 }
 
-/// Run all checks.
+/// The core pack's size budget, gzip -9 file by file (docs/DATA_SOURCES.md §2).
+pub const CORE_BUDGET_BYTES: u64 = 5_000_000;
+
+/// Run all checks: the shared ones in [`rr_data::verify`], then the core pack's gzipped size
+/// against [`CORE_BUDGET_BYTES`] (each file compressed on its own, as a static host serves it).
 pub fn verify(data_dir: &Path) -> Result<Report> {
-    rr_data::verify::verify(data_dir).map_err(data_err)
+    let mut rep = rr_data::verify::verify(data_dir).map_err(data_err)?;
+    let manifest = crate::manifest::Manifest::load(data_dir)?;
+    let mut total = 0u64;
+    let mut sizes: Vec<(String, u64)> = Vec::new();
+    if let Some(core) = manifest.packs.get("core") {
+        for f in &core.files {
+            let Ok(bytes) = std::fs::read(data_dir.join(&f.path)) else {
+                continue;
+            };
+            let gz = gzip9_len(&bytes);
+            total += gz;
+            sizes.push((f.path.clone(), gz));
+        }
+    }
+    rep.checks += 1;
+    sizes.sort_by_key(|x| std::cmp::Reverse(x.1));
+    rep.lines.push(format!(
+        "core pack: {:.2} MB gzipped file by file (budget {:.1} MB); largest: {}",
+        total as f64 / 1e6,
+        CORE_BUDGET_BYTES as f64 / 1e6,
+        sizes
+            .iter()
+            .take(4)
+            .map(|(p, n)| format!("{p} {:.0} KB", *n as f64 / 1e3))
+            .collect::<Vec<_>>()
+            .join(", ")
+    ));
+    if total > CORE_BUDGET_BYTES {
+        rep.problems.push(format!(
+            "core pack is {:.2} MB gzipped, over the {:.1} MB budget",
+            total as f64 / 1e6,
+            CORE_BUDGET_BYTES as f64 / 1e6
+        ));
+    }
+    for (name, pack) in &manifest.packs {
+        if name == "core" || name == "geo" {
+            continue;
+        }
+        let gz: u64 = pack
+            .files
+            .iter()
+            .filter_map(|f| std::fs::read(data_dir.join(&f.path)).ok())
+            .map(|b| gzip9_len(&b))
+            .sum();
+        rep.lines.push(format!(
+            "optional pack {name}: {} files, {:.2} MB gzipped (not loaded at start)",
+            pack.files.len(),
+            gz as f64 / 1e6
+        ));
+    }
+    Ok(rep)
+}
+
+/// Length of `bytes` after gzip at level 9.
+pub fn gzip9_len(bytes: &[u8]) -> u64 {
+    use std::io::Write;
+    let mut enc = flate2::write::GzEncoder::new(Vec::new(), flate2::Compression::best());
+    let _ = enc.write_all(bytes);
+    enc.finish().map(|v| v.len() as u64).unwrap_or(0)
 }
 
 #[cfg(test)]

@@ -1,6 +1,7 @@
 ---
 id: hazard_vehicle
 title: Stranded in a vehicle
+kind: hazard
 applies_to: [hazard:vehicle_stranding]
 citations: [nhtsa_crashes_2023, ready_gov_winter, ready_gov_evacuation, nhtsa_tires, cdc_winter_safety, hcfl_ev_safety, doe_afdc_stations, nws_turn_around_dont_drown]
 ---

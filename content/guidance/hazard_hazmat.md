@@ -1,6 +1,7 @@
 ---
 id: hazard_hazmat
 title: Chemical spills and releases
+kind: hazard
 applies_to: [hazard:hazmat_release]
 citations: [cdc_water_advisories, ready_gov_chemical, ready_gov_shelter]
 ---

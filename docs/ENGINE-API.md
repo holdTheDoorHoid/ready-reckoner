@@ -59,7 +59,9 @@ Safety equipment defaults to absent, so a skipped question leads to a recommenda
 
 `attributions` lists the credit lines and disclaimers the About screen and the packet must show:
 the FEMA National Risk Index terms require the dataset version, the access date and a statement that
-FEMA does not endorse the app; CC BY sources (EAGLE-I, the NCA5 Atlas) need credit lines.
+FEMA does not endorse the app; CC BY sources (EAGLE-I, the NCA5 Atlas) need credit lines. A
+source that only feeds an optional pack (the surge and wildfire-places packs) is listed only once
+a file of that pack has been loaded.
 
 ## Conventions
 
@@ -383,7 +385,9 @@ leaves out the retired `terrorism`.
 
 `rr-types` also defines the data contract between the engine crates, which never crosses into
 JavaScript: `CountyRecord` (with `NriHazard`, `OutageStats`, `EventRate`, `Seismic`, `FloodPriors`,
-`Facilities`, `Vulnerability`), `BaseRate`, `HouseholdEventRate` (the `rr-hazards` →
+`Facilities`, `Vulnerability`, and the data pack v2 `CountyExposure`), `ZipRecord` (per-ZIP
+extras: dams naming the town, nearest strategic site, the optional surge and wildfire-places
+packs), `BaseRate`, `HouseholdEventRate` (the `rr-hazards` →
 `rr-consequence` interface), and `Effect` with `DurationDist`
 (`{ kind: "log_normal", median_days, p90_days }` or `{ kind: "fixed", days }`;
 σ = ln(p90 / median) / z₀.₉ with z₀.₉ = 1.2815515655446004). `Effect` and `DurationDist` are also

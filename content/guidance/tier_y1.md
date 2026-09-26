@@ -1,6 +1,7 @@
 ---
 id: tier_y1
 title: One year
+kind: tier
 applies_to: [tier:y1]
 citations: [rr_research_risk_model, church_home_storage_2007, ensign_2006_year_supply, usu_food_storage_booklet, cdc_potassium_iodide]
 ---

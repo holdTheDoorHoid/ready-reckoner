@@ -1,6 +1,7 @@
 ---
 id: topic_the_dial
 title: The dial: how rare an event to plan for
+kind: topic
 applies_to: [topic:the_dial]
 citations: [rr_research_risk_model, fema_flood_zones]
 ---

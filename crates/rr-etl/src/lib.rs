@@ -25,9 +25,11 @@ pub mod http;
 pub mod jobs;
 pub mod manifest;
 pub mod num;
+pub mod raster;
 pub mod shp;
 pub mod timefmt;
 pub mod verify;
+pub mod xlsx;
 
 /// Everything that can go wrong in the ETL. Messages are written for the person running the
 /// refresh, so they name the source and what to check.
