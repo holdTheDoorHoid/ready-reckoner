@@ -1,0 +1,257 @@
+# National base rates for societal and personal hazards. Written by rr-etl (job `base_rates`).
+# Every value is computed from the figure quoted with it. `source` is the citation id for
+# content/citations.toml; the [[publication]] entries give the title, publisher and URL.
+# Figures transcribed from publications were read on 2026-09-25; the population and JOLTS
+# figures are fetched on each refresh.
+
+[[rate]]
+id = "us_households_2023"
+value = 131400000
+unit = "households"
+source = "census_households_cps"
+year = 2023
+figure = "131,434 thousand households in 2023"
+derivation = "Table HH-1, 2023 row"
+note = "Denominator for household rates."
+
+[[rate]]
+id = "house_fire_per_household_year"
+value = 0.002622
+unit = "residential building fires per household per year"
+source = "usfa_residential_fires"
+year = 2023
+figure = "344,600 residential building fires in 2023"
+derivation = "344,600 fires / 131,434,000 households"
+note = "About 1 in 381 households a year. Counts fires reported to fire departments."
+
+[[rate]]
+id = "house_fire_death_per_household_year"
+value = 0.00002199
+unit = "residential fire deaths per household per year"
+source = "usfa_residential_fires"
+year = 2023
+figure = "2,890 residential fire deaths in 2023"
+derivation = "2,890 deaths / 131,434,000 households"
+note = ""
+
+[[rate]]
+id = "house_fire_injury_per_household_year"
+value = 0.00007913
+unit = "residential fire injuries per household per year"
+source = "usfa_residential_fires"
+year = 2023
+figure = "10,400 residential fire injuries in 2023"
+derivation = "10,400 injuries / 131,434,000 households"
+note = ""
+
+[[rate]]
+id = "house_fire_mean_loss_usd"
+value = 32700
+unit = "US dollars of direct loss per residential building fire"
+source = "usfa_residential_fires"
+year = 2023
+figure = "$11.27 billion direct loss from 344,600 residential building fires in 2023"
+derivation = "$11,270,000,000 / 344,600 fires"
+note = "A mean; most fires cost far less and a few cost far more."
+
+[[rate]]
+id = "layoff_per_worker_month"
+value = 0.01117
+unit = "layoffs and discharges per worker per month"
+source = "bls_jolts_layoffs"
+year = 2025
+figure = "2025 average of the 12 monthly rates: 1.1167%"
+derivation = "mean of monthly JTS000000000000000LDR values / 100"
+note = "Counts events, not people: some workers are laid off twice, so per-person risk is lower."
+
+[[rate]]
+id = "layoff_upper_bound_per_worker_year"
+value = 0.1261
+unit = "chance of at least one layoff or discharge per worker per year (upper bound)"
+source = "bls_jolts_layoffs"
+year = 2025
+figure = "1.1167% a month"
+derivation = "1 - (1 - monthly rate)^12"
+note = "An upper bound: layoffs cluster in high-turnover jobs, so a typical worker's chance is lower."
+
+[[rate]]
+id = "unemployment_spell_per_worker_year"
+value = 0.083
+unit = "chance a labour-force participant is unemployed at some point in a year"
+source = "bls_work_experience_2024"
+year = 2024
+figure = "work-experience unemployment rate 8.3% in 2024 (14.7 million people unemployed at some time during the year)"
+derivation = "8.3 / 100"
+note = "People unemployed at some point in the year / people who worked or looked for work; includes people who quit or were entering the labour force, so it overstates involuntary job loss."
+
+[[rate]]
+id = "ed_visits_per_person_year"
+value = 0.473
+unit = "emergency department visits per person per year"
+source = "cdc_nchs_ed_visits"
+year = 2022
+figure = "155.4 million visits; 47.3 visits per 100 persons (2022)"
+derivation = "47.3 / 100"
+note = ""
+
+[[rate]]
+id = "ed_visit_admission_share"
+value = 0.115
+unit = "share of emergency department visits that lead to hospital admission"
+source = "cdc_nchs_ed_visits"
+year = 2022
+figure = "11.5% of visits resulted in hospital admission (2022)"
+derivation = "11.5 / 100"
+note = ""
+
+[[rate]]
+id = "injury_ed_visits_per_person_year"
+value = 0.1324
+unit = "injury-related emergency department visits per person per year"
+source = "cdc_nchs_ed_visits"
+year = 2022
+figure = "43.5 million injury-related visits of 155.4 million (2022)"
+derivation = "0.473 x 43.5 / 155.4"
+note = ""
+
+[[rate]]
+id = "unintentional_injury_death_per_person_year"
+value = 0.000581
+unit = "unintentional-injury deaths per person per year"
+source = "nchs_accidental_injury_2024"
+year = 2024
+figure = "197,449 deaths; 58.1 per 100,000 population (2024)"
+derivation = "58.1 / 100,000"
+note = ""
+
+[[rate]]
+id = "traffic_deaths_per_100m_vmt"
+value = 1.1
+unit = "traffic deaths per 100 million vehicle miles traveled"
+source = "nhtsa_early_estimate_2025"
+year = 2025
+figure = "36,640 deaths (early estimate); 1.10 fatalities per 100 million VMT (2025)"
+derivation = "as published"
+note = "All road deaths per mile driven, not only vehicle occupants."
+
+[[rate]]
+id = "traffic_injuries_per_person_year"
+value = 0.007246
+unit = "people injured in traffic crashes per person per year"
+source = "nhtsa_crashes_2023"
+year = 2023
+figure = "2.44 million people injured (2023); U.S. population 336755052 (Census Vintage 2025, July 1, 2023)"
+derivation = "2,440,000 / population 2023"
+note = ""
+
+[[rate]]
+id = "pandemic_onset_per_year"
+value = 0.04524
+unit = "chance a new pandemic begins in a given year"
+low = 0.01808
+high = 0.09276
+source = "cdc_pandemic_history"
+year = 2025
+figure = "5 pandemic onsets in 108 years (1918, 1957, 1968, 2009, 2020; 1918-2025)"
+derivation = "1 - exp(-5/108); range is the exact Poisson 90% interval for 5 events"
+note = "A crude historical rate with wide uncertainty; treat as a planning figure, not a forecast."
+
+[[rate]]
+id = "power_interruption_hours_per_customer_year"
+value = 11
+unit = "hours without power per electricity customer per year (national average)"
+low = 6
+source = "eia_outage_hours_2024"
+year = 2024
+figure = "about 9 hours from major events plus about 2 hours from other events in 2024; major events averaged about 4 hours a year in 2014-2023"
+derivation = "9 + 2; low = 4 + 2 (2014-2023 typical year)"
+note = "National average; use outages.csv for county detail."
+
+[[publication]]
+id = "census_households_cps"
+title = "Table HH-1. Households by Type: 1940 to Present"
+publisher = "U.S. Census Bureau, Current Population Survey"
+url = "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls"
+retrieved = "2026-09-25"
+how = "transcribed"
+
+[[publication]]
+id = "usfa_residential_fires"
+title = "Residential Building Fire Estimates"
+publisher = "U.S. Fire Administration (FEMA)"
+url = "https://www.usfa.fema.gov/statistics/residential-fires/"
+retrieved = "2026-09-25"
+how = "transcribed"
+
+[[publication]]
+id = "bls_jolts_layoffs"
+title = "Job Openings and Labor Turnover Survey: layoffs and discharges rate, total nonfarm (JTS000000000000000LDR)"
+publisher = "U.S. Bureau of Labor Statistics"
+url = "https://data.bls.gov/timeseries/JTS000000000000000LDR"
+retrieved = "each refresh"
+how = "fetched on each refresh"
+
+[[publication]]
+id = "bls_work_experience_2024"
+title = "Work Experience of the Population, 2024"
+publisher = "U.S. Bureau of Labor Statistics"
+url = "https://www.bls.gov/news.release/work.nr0.htm"
+retrieved = "2026-09-25"
+how = "transcribed"
+
+[[publication]]
+id = "cdc_nchs_ed_visits"
+title = "FastStats: Emergency Department Visits (NHAMCS 2022)"
+publisher = "CDC National Center for Health Statistics"
+url = "https://www.cdc.gov/nchs/fastats/emergency-department.htm"
+retrieved = "2026-09-25"
+how = "transcribed"
+
+[[publication]]
+id = "nchs_accidental_injury_2024"
+title = "FastStats: Accidents or Unintentional Injuries"
+publisher = "CDC National Center for Health Statistics"
+url = "https://www.cdc.gov/nchs/fastats/accidental-injury.htm"
+retrieved = "2026-09-25"
+how = "transcribed"
+
+[[publication]]
+id = "nhtsa_early_estimate_2025"
+title = "Early Estimate of Motor Vehicle Traffic Fatalities in 2025 (DOT HS 813 800)"
+publisher = "National Highway Traffic Safety Administration"
+url = "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813800"
+retrieved = "2026-09-25"
+how = "transcribed"
+
+[[publication]]
+id = "nhtsa_crashes_2023"
+title = "Overview of Motor Vehicle Traffic Crashes in 2023 (DOT HS 813 705)"
+publisher = "National Highway Traffic Safety Administration"
+url = "https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813705"
+retrieved = "2026-09-25"
+how = "transcribed"
+
+[[publication]]
+id = "census_popest_vintage_2025"
+title = "Annual Estimates of the Resident Population, Vintage 2025 (NST-EST2025-ALLDATA)"
+publisher = "U.S. Census Bureau"
+url = "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv"
+retrieved = "each refresh"
+how = "fetched on each refresh"
+
+[[publication]]
+id = "cdc_pandemic_history"
+title = "1918 Pandemic (H1N1 virus) and past pandemics"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://archive.cdc.gov/www_cdc_gov/flu/pandemic-resources/1918-pandemic-h1n1.html"
+retrieved = "2026-09-25"
+how = "transcribed"
+
+[[publication]]
+id = "eia_outage_hours_2024"
+title = "Today in Energy: U.S. electricity customers averaged more hours of interruptions in 2024"
+publisher = "U.S. Energy Information Administration"
+url = "https://www.eia.gov/todayinenergy/detail.php?id=66744"
+retrieved = "2026-09-25"
+how = "transcribed"
+

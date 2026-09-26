@@ -1,11 +1,18 @@
 name: Refresh data packs
 
 # Quarterly: re-run the ETL against the federal sources and open a pull request with the new packs
-# and provenance manifest. Nothing merges automatically; a human reads the diff summary.
+# and provenance manifest. Nothing merges automatically; a human reads data/CHANGES.md and the
+# manifest diff. The full run takes about an hour and a half (11.6 GB of EAGLE-I outage data are
+# streamed, never stored; the USGS hazard service is called once per county).
 on:
   schedule:
     - cron: '0 6 1 1,4,7,10 *'
   workflow_dispatch:
+    inputs:
+      only:
+        description: 'Comma-separated job ids to run (empty runs all; see `rr-etl jobs`)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -14,15 +21,30 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Run the ETL
-        run: cargo run --release -p rr-etl -- refresh --out data
+        id: etl
+        # A failing source keeps its previous pack; the rest still refresh. The outcome is
+        # reported in the pull request, and data/CHANGES.md names the failed jobs.
+        continue-on-error: true
+        env:
+          ONLY: ${{ github.event.inputs.only }}
+        run: |
+          if [ -n "$ONLY" ]; then
+            cargo run --release -p rr-etl -- refresh --out data --only "$ONLY"
+          else
+            cargo run --release -p rr-etl -- refresh --out data
+          fi
+      - name: Verify checksums, row counts and county joins
+        run: cargo run --release -p rr-etl -- verify --data data
       - name: Open a pull request if anything changed
         env:
           GH_TOKEN: ${{ github.token }}
+          ETL_OUTCOME: ${{ steps.etl.outcome }}
         run: |
           if git diff --quiet -- data; then
             echo "No data changes."; exit 0
@@ -35,5 +57,5 @@ jobs:
           git commit -m "data: quarterly refresh $(date -u +%Y-%m-%d)"
           git push -u origin "$branch"
           gh pr create --title "Data refresh $(date -u +%Y-%m-%d)" \
-            --body "Automated quarterly ETL run. Review data/manifest.json for source changes and data/CHANGES.md for the summary." \
+            --body "Automated quarterly ETL run (ETL step: ${ETL_OUTCOME}; verify passed). Review data/CHANGES.md for rows changed per pack and data/manifest.json for source versions and dates." \
             --base main --head "$branch"

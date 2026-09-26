@@ -6,9 +6,23 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-description = "Ready Reckoner: etl (native only)"
+description = "Ready Reckoner: build-time ETL that downloads public sources and writes the data packs (native only)"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "rr-etl"
+path = "src/main.rs"
 
 [dependencies]
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+toml.workspace = true
+rr-types = { path = "../rr-types" }
+csv = "1.4"
+flate2 = "1.1"
+sha2 = "0.10"
+zip = { version = "8", default-features = false, features = ["deflate-flate2"] }
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls", "form"] }
