@@ -148,6 +148,9 @@ pub fn quantity(q: f64, unit: &str) -> String {
         "dollar" | "usd" => usd(q),
         "action" | "plan" | "decision" => String::new(),
         "person" | "pet" => format!("{} (one per {unit})", number(q)),
+        // A unit that is itself an amount ("3 days of food for one person") is counted, not
+        // pluralised: "4 × 3 days of food for one person".
+        u if u.starts_with(|c: char| c.is_ascii_digit()) => format!("{} × {u}", number(q)),
         _ => format!("{} {}", number(q), plural(unit, q)),
     }
 }

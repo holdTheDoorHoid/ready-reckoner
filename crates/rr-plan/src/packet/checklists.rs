@@ -1,6 +1,7 @@
-//! Section 5: checklists per step (free steps, three days, two weeks, one month ...), each with
-//! its tier guidance block, the get-home bag per commuter, and hazard-specific extras that sit
-//! outside the budget.
+//! Section 5: checklists per step (free steps, three days, two weeks, one month ...) up to the
+//! step recommended for the household's risks, the get-home bag per commuter, and
+//! hazard-specific extras that sit outside the budget. Why each step matters is the app's Learn
+//! view; the lists here are for ticking off.
 
 use std::collections::BTreeMap;
 
@@ -24,15 +25,16 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push("## Checklists".to_owned());
     out.push(String::new());
     out.push(
-        "Tick these off as you go. Each list is one step, in order. Quantities are what your \
-         household needs for the step."
+        "Tick these off as you go: one list per step, up to the step that is enough for your \
+         risks, with what your household needs. The free steps are under Your plan."
             .to_owned(),
     );
     out.push(String::new());
 
     // Items per tier, merged across months (quantities add up), in plan order.
     let mut by_tier: BTreeMap<TierId, Vec<Entry>> = BTreeMap::new();
-    for (_, i) in cx.steps() {
+    // What the household has (listed or assumed) is in the summary, not on a list to tick.
+    for (_, i) in cx.steps().into_iter().filter(|(_, i)| !i.done) {
         let list = by_tier.entry(i.tier).or_default();
         match list.iter_mut().find(|e| e.id == i.item_id) {
             Some(e) => {
@@ -49,17 +51,15 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             }),
         }
     }
-    for (tier, items) in &by_tier {
-        let title = match tier {
-            TierId::Now => "Free steps".to_owned(),
-            other => other.name().to_owned(),
-        };
-        out.push(format!("### {title}"));
+    // The free steps are the first items of Your plan, each with its own box to tick, so the
+    // lists here start at the first step that costs money.
+    let recommended = rr_supply::tier_recommended(&a.buckets);
+    for (tier, items) in by_tier
+        .iter()
+        .filter(|(t, _)| **t != TierId::Now && **t <= recommended)
+    {
+        out.push(format!("### {}", tier.name()));
         out.push(String::new());
-        if let Some(g) = cx.blocks_for(&format!("tier:{tier}")).first() {
-            out.push(cx.guidance(g, None, None));
-            out.push(String::new());
-        }
         for e in items {
             let tick = if e.done { "x" } else { " " };
             let amount = if e.free {
@@ -89,17 +89,46 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
                 .iter()
                 .filter(|l| l.line.id.ends_with(&format!(".person_{n}")))
                 .collect();
+            let walk = rr_consequence::words::days_phrase(w.walk_hours / 24.0);
+            let walk = if walk.starts_with("about ") {
+                walk
+            } else {
+                format!("about {walk}")
+            };
             out.push(format!(
-                "**Person {n}**: a {} trip, about {} on foot.",
-                rr_consequence::words::distance_adjective(w.distance_km),
-                rr_consequence::words::days_phrase(w.walk_hours / 24.0)
+                "**Person {n}**: a {} trip, {walk} on foot.",
+                rr_consequence::words::distance_adjective(w.distance_km)
             ));
             out.push(String::new());
+            // The bag line, without the trip the heading above already gives; then the water
+            // and snacks for the walk in one line.
+            let mut from_home: Vec<String> = Vec::new();
+            let mut cites: Vec<&rr_types::CitationId> = Vec::new();
             for l in lines {
+                if l.kind == rr_supply::LineKind::Need {
+                    out.push(format!(
+                        "- [ ] {}{}",
+                        md(after_first_sentence(&l.line.plain)),
+                        cite_all(&l.line.citations)
+                    ));
+                } else if l.quantity > 0.0 {
+                    let what = if l.line.unit == "kcal" {
+                        "of snacks"
+                    } else {
+                        "of water"
+                    };
+                    from_home.push(format!(
+                        "{} {what}",
+                        md(&text::quantity(l.quantity, &l.line.unit))
+                    ));
+                    cites.extend(l.line.citations.iter());
+                }
+            }
+            if !from_home.is_empty() {
                 out.push(format!(
-                    "- [ ] {}{}",
-                    md(&l.line.plain),
-                    cite_all(&l.line.citations)
+                    "- [ ] For the walk, from home: {}.{}",
+                    text::join_and(&from_home),
+                    cite_all(cites)
                 ));
             }
             out.push(String::new());
@@ -125,17 +154,24 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(String::new());
         for it in extras {
             out.push(format!(
-                "- **{}** (usually {} per {}): {}{}",
+                "- {} (usually {} per {}){}",
                 md(&it.name),
                 text::band(
                     f64::from(it.price_band_usd.low),
                     f64::from(it.price_band_usd.high)
                 ),
                 md(&it.price_band_usd.per),
-                md(&it.spec),
                 cite_all(&it.citations)
             ));
         }
         out.push(String::new());
+    }
+}
+
+/// Everything after the first sentence, or the whole text when it is one sentence.
+fn after_first_sentence(s: &str) -> &str {
+    match s.find(". ") {
+        Some(i) if i + 2 < s.len() => &s[i + 2..],
+        _ => s,
     }
 }

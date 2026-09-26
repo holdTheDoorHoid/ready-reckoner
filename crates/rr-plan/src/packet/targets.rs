@@ -1,9 +1,11 @@
 //! Section 3: your targets. The dial setting in words, the duration targets with their ranges and
-//! relief rating, then one part per bucket: the bucket's guidance block with the household's own
-//! frequency sentence, the rest of its numbers, and the requirement lines that count toward it;
-//! then named scenarios and any event that drives the answer.
+//! relief rating, then one short part per bucket: what to do, its guidance block's "What helps"
+//! and "What to avoid" paragraphs (the why, the numbers behind the target and the requirement
+//! lines live in the app's Learn and explain views, and the quantities in the checklists). A
+//! bucket whose advice a risk card already gave points to that card; leaving home and getting
+//! home point to the family plan's steps but keep their warnings; a damaged home and lost income
+//! point to Documents and money. Then named scenarios and any event that drives the answer.
 
-use rr_supply::{LineKind, SizedLine};
 use rr_types::{BucketId, BucketKind, Target, TierId};
 
 use super::text::{self, md};
@@ -42,51 +44,6 @@ fn worse_per_100(a: &Assessment) -> String {
     text::per_100(-rr_types::math::exp_m1(-10.0 * rate))
 }
 
-/// The requirement lines of a bucket, split into needs and everything else worth knowing.
-fn lines_of(a: &Assessment, b: BucketId) -> (Vec<&SizedLine>, Vec<&SizedLine>) {
-    let mine: Vec<&SizedLine> = a.lines.iter().filter(|l| l.line.bucket == b).collect();
-    let needs = mine
-        .iter()
-        .copied()
-        .filter(|l| l.kind == LineKind::Need && l.quantity > 0.0)
-        .collect();
-    let other = mine
-        .iter()
-        .copied()
-        .filter(|l| {
-            matches!(
-                l.kind,
-                LineKind::Alternative | LineKind::Optional | LineKind::Note
-            ) || (l.kind == LineKind::Need && l.quantity <= 0.0)
-        })
-        .collect();
-    (needs, other)
-}
-
-fn line_item(l: &SizedLine) -> String {
-    format!("- {}{}", md(&l.line.plain), cite_all(&l.line.citations))
-}
-
-fn write_lines(a: &Assessment, b: BucketId, out: &mut Vec<String>) {
-    let (needs, other) = lines_of(a, b);
-    if !needs.is_empty() {
-        out.push("**What counts toward it:**".to_owned());
-        out.push(String::new());
-        for l in needs {
-            out.push(line_item(l));
-        }
-        out.push(String::new());
-    }
-    if !other.is_empty() {
-        out.push("**Also worth knowing:**".to_owned());
-        out.push(String::new());
-        for l in other {
-            out.push(line_item(l));
-        }
-        out.push(String::new());
-    }
-}
-
 fn relief_cell(days: Option<f32>) -> String {
     match days {
         Some(d) => format!("about {}", text::day_phrase(round_relief(f64::from(d)))),
@@ -110,13 +67,11 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push("## Your targets".to_owned());
     out.push(String::new());
     out.push(format!(
-        "How long to be ready for each kind of disruption, at the setting you chose: {}. At \
-         this setting, something worse than these targets comes in about {} of every 100 \
-         ten-year stretches.{} Water is planned at {}.",
-        super::summary::dial_phrase(cx),
+        "How long to be ready for each kind of disruption at the 1-in-{} setting. Something \
+         worse than these targets comes in about {} of every 100 ten-year stretches.{}",
+        a.input.dials.return_period.years(),
         worse_per_100(a),
-        cite("rr_research_risk_model"),
-        super::summary::water_phrase(a.input.dials.water_level)
+        cite("rr_research_risk_model")
     ));
     out.push(String::new());
     out.push(
@@ -145,24 +100,26 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             .to_owned(),
     );
     out.push(String::new());
-    if a.input.dials.climate == rr_types::ClimateHorizon::Y2050 {
-        if let Some(g) = cx.blocks_for("topic:climate_horizon").first() {
-            out.push(format!("#### {}", md(&g.meta.title)));
-            out.push(String::new());
-            out.push(cx.guidance(g, None, None));
-            out.push(String::new());
-        }
-    }
+    // Blocks a risk card already showed, with the card's name; and cards whose hazard has one
+    // consequence, whose advice is that bucket's (a medical emergency).
+    let cards = super::risks::cards(cx);
+    let shown: Vec<(String, String)> = cards
+        .iter()
+        .filter_map(|(p, g)| g.map(|g| (g.meta.id.clone(), p.name.clone())))
+        .collect();
+    let single: Vec<(BucketId, String)> = cards
+        .iter()
+        .filter(|(p, g)| g.is_some() && p.buckets.len() == 1)
+        .map(|(p, _)| (p.buckets[0], p.name.clone()))
+        .collect();
 
-    for b in &a.buckets {
+    // What to do about these is in the documents-and-money section.
+    let elsewhere = [BucketId::HomeLoss, BucketId::Income];
+    // What helps with these is the family plan's steps; their warnings stay here.
+    let family = [BucketId::Evacuate, BucketId::GetHome];
+    for b in a.buckets.iter().filter(|b| !elsewhere.contains(&b.id)) {
         let target = &b.target;
-        let active = match *target {
-            Target::Days { value, .. } | Target::Months { value, .. } => value > 0.0,
-            Target::Evacuate { p_need_10yr, .. } | Target::Readiness { p_need_10yr, .. } => {
-                p_need_10yr > 0.0
-            }
-        };
-        if !active {
+        if !is_active(target) {
             continue;
         }
         let heading = match b.id.kind() {
@@ -174,49 +131,69 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         };
         out.push(heading);
         out.push(String::new());
-        let mut sentences = b.frequency_sentences.iter();
-        let first = sentences.next();
-        let lead = first.map(|s| format!("{s}{}", cite_all(&b.sources)));
-        let block = cx
+        let target_words = target_phrase(target);
+        if let Some(g) = cx
             .blocks_for(&format!("bucket:{}", b.id))
             .into_iter()
-            .next();
-        let target_words = target_phrase(target);
-        match block {
-            Some(g) => out.push(cx.guidance(g, lead.as_deref(), Some(&target_words))),
-            None => {
-                if let Some(l) = &lead {
-                    out.push(md(l));
+            .next()
+        {
+            let card = shown
+                .iter()
+                .find(|(id, _)| *id == g.meta.id)
+                .map(|(_, name)| name)
+                .or_else(|| single.iter().find(|(x, _)| *x == b.id).map(|(_, n)| n));
+            let advice = super::advice_paragraphs(&cx.guidance(g, None, Some(&target_words)));
+            let avoid = advice.iter().filter(|p| !p.starts_with("**What helps.**"));
+            match card {
+                Some(card) => out.push(format!(
+                    "**What helps.** See \"{}\" under Your risks.",
+                    md(card)
+                )),
+                None if family.contains(&b.id) => {
+                    out.push("**What helps.** See the steps under Family plan.".to_owned());
+                    for para in avoid {
+                        out.push(String::new());
+                        out.push(para.clone());
+                    }
+                }
+                None if advice.is_empty() => {
+                    for para in super::helps_paragraph(&cx.guidance(g, None, Some(&target_words))) {
+                        out.push(para);
+                    }
+                }
+                None => {
+                    // What to do: what helps, and what to avoid (the carbon monoxide, floodwater
+                    // and do-not-drink warnings live here).
+                    for (i, para) in advice.iter().enumerate() {
+                        if i > 0 {
+                            out.push(String::new());
+                        }
+                        out.push(para.clone());
+                    }
                 }
             }
-        }
-        out.push(String::new());
-        let rest: Vec<String> = sentences.map(|s| md(s)).collect();
-        if !rest.is_empty() {
-            out.push(format!(
-                "**Your numbers.** {}{}",
-                rest.join(" "),
-                cite_all(&b.sources)
-            ));
             out.push(String::new());
         }
-        if let Some(r) = &b.relief {
-            out.push(format!(
-                "**When help comes.** For the kind of disruption behind this target, outside \
-                 help plausibly arrives in about {} and service is mostly back in about {}.{}",
-                text::day_phrase(round_relief(f64::from(r.help_arrives_days))),
-                text::day_phrase(round_relief(f64::from(r.mostly_restored_days))),
-                cite_all(&r.sources)
-            ));
-            out.push(String::new());
-        }
-        if b.id == BucketId::Income {
-            if let Some(s) = &a.budget.plan.savings_track {
-                out.push(format!("**Your savings goal.** {}", md(&s.why)));
-                out.push(String::new());
+    }
+
+    let pointed: Vec<String> = a
+        .buckets
+        .iter()
+        .filter(|b| elsewhere.contains(&b.id) && is_active(&b.target))
+        .map(|b| {
+            match b.id {
+                BucketId::HomeLoss => "a damaged home",
+                _ => "lost income",
             }
-        }
-        write_lines(a, b.id, out);
+            .to_owned()
+        })
+        .collect();
+    if !pointed.is_empty() {
+        out.push(format!(
+            "What to do about {} is under Documents and money.",
+            text::join_and(&pointed)
+        ));
+        out.push(String::new());
     }
 
     if !a.consequence.scenarios.is_empty() {
@@ -257,6 +234,16 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             out.push(format!("- **{}** {}", md(&w.message), md(&w.why)));
         }
         out.push(String::new());
+    }
+}
+
+/// Whether a bucket has anything to plan for at this setting.
+fn is_active(t: &Target) -> bool {
+    match *t {
+        Target::Days { value, .. } | Target::Months { value, .. } => value > 0.0,
+        Target::Evacuate { p_need_10yr, .. } | Target::Readiness { p_need_10yr, .. } => {
+            p_need_10yr > 0.0
+        }
     }
 }
 

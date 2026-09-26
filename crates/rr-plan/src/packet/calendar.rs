@@ -7,7 +7,7 @@ use std::collections::BTreeMap;
 use rr_types::Date;
 
 use super::text::{self, md};
-use super::{Ctx, cite, cite_all};
+use super::{Ctx, cite};
 
 /// Intervals up to this many months are listed as repeating rows, not dates.
 const REPEATING_MAX_MONTHS: u16 = 3;
@@ -31,7 +31,6 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     }
     let mut repeating: BTreeMap<u16, Vec<String>> = BTreeMap::new();
     let mut dated: BTreeMap<Date, Vec<String>> = BTreeMap::new();
-    let mut cited: Vec<rr_types::CitationId> = Vec::new();
     for (id, month) in &first {
         let Some(item) = cx.item(id) else {
             continue;
@@ -41,13 +40,12 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         };
         let name = text::lower_first(&item.name);
         for (interval, verb) in [
-            (m.rotate_months, "Replace or use and restock"),
+            (m.rotate_months, "Use and restock"),
             (m.check_months, "Check"),
         ] {
             let Some(every) = interval.filter(|n| *n > 0) else {
                 continue;
             };
-            cited.extend(item.citations.iter().cloned());
             if every <= REPEATING_MAX_MONTHS {
                 repeating
                     .entry(every)
@@ -83,21 +81,6 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(format!("| {} | {} |", text::date(*date), what.join("; ")));
     }
     out.push(String::new());
-    cited.sort();
-    cited.dedup();
-    if !cited.is_empty() {
-        out.push(format!(
-            "The intervals come from each item's sources.{}",
-            cite_all(&cited)
-        ));
-        out.push(String::new());
-    }
-    if let Some(g) = cx.blocks_for("topic:rotation").first() {
-        out.push(format!("#### {}", md(&g.meta.title)));
-        out.push(String::new());
-        out.push(cx.guidance(g, None, None));
-        out.push(String::new());
-    }
 }
 
 fn every_phrase(months: u16) -> String {

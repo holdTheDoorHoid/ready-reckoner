@@ -167,16 +167,188 @@ fn the_packet_has_every_section_in_order_and_nothing_left_over() {
                 "{name}: [{k}] points past the {n} sources"
             );
         }
-        // The sources section lists every citation, numbered.
+        // The sources section lists every citation the brackets point to, numbered in order,
+        // and counts the rest (they stay in the provenance list).
         let sources = &p[p.find("\n## Sources\n").unwrap()..];
+        let body = &p[..p.find("\n## Sources\n").unwrap()];
+        let cited: BTreeSet<usize> = cited_numbers(body).into_iter().collect();
+        let listed = cited.len();
+        assert_eq!(
+            cited.iter().copied().collect::<Vec<_>>(),
+            (1..=listed).collect::<Vec<_>>(),
+            "{name}: the packet's own sources are numbered first, without gaps"
+        );
+        for k in 1..=listed {
+            assert!(
+                sources.contains(&format!("**{k}** ")),
+                "{name}: source {k} not listed"
+            );
+        }
         assert!(
-            sources.contains(&format!("\n{n}. **")),
-            "{name}: source {n} not listed"
+            !sources.contains(&format!("**{}** ", listed + 1)),
+            "{name}: a source the packet does not cite is listed"
+        );
+        if n > listed {
+            assert!(
+                sources.contains(&format!("{} more source", n - listed)),
+                "{name}: the uncited sources are not counted"
+            );
+        }
+        assert!(
+            !sources.contains("(retrieved"),
+            "{name}: sources are compact"
         );
         assert!(
             sources.contains("not endorsed by FEMA"),
             "{name}: NRI statement missing"
         );
+    }
+}
+
+/// Words as a reader counts them: tokens with a letter or digit, citation brackets left out.
+fn words(markdown: &str) -> usize {
+    let mut text = String::with_capacity(markdown.len());
+    let mut rest = markdown;
+    while let Some(start) = rest.find('[') {
+        text.push_str(&rest[..start]);
+        let after = &rest[start + 1..];
+        match after.find(']') {
+            Some(end)
+                if !after[..end].is_empty()
+                    && after[..end].split(", ").all(|n| n.parse::<usize>().is_ok()) =>
+            {
+                text.push(' ');
+                rest = &after[end + 1..];
+            }
+            _ => {
+                text.push('[');
+                rest = after;
+            }
+        }
+    }
+    text.push_str(rest);
+    text.split_whitespace()
+        .filter(|w| w.chars().any(char::is_alphanumeric))
+        .count()
+}
+
+/// The packet is the short version (POLISH_ROUND, docs/PACKET.md): hazard cards only for the
+/// likeliest hazards, one what-to-do part per bucket, checklists up to the recommended step, four
+/// topics, the first year in detail and the rest as a table, compact sources. The goal is about
+/// 8,000 words; this cap catches the packet growing back (it was 26,000 words).
+#[test]
+fn the_packet_stays_short() {
+    const MAX_WORDS: usize = 11_500;
+    for (name, _, out) in outputs() {
+        let p = &out.packet_markdown;
+        let n = words(p);
+        assert!(n <= MAX_WORDS, "{name}: {n} words");
+        // Bucket parts carry what to do, not the why or the requirement lines.
+        for gone in [
+            "**Your numbers.**",
+            "**When help comes.**",
+            "**What counts toward it:**",
+            "**Also worth knowing:**",
+        ] {
+            assert!(!p.contains(gone), "{name}: {gone}");
+        }
+        // Four topics at most, and only these.
+        let topics: Vec<&str> = p
+            .lines()
+            .filter_map(|l| l.strip_prefix("#### "))
+            .filter(|t| !t.starts_with(|c: char| c.is_ascii_digit()))
+            .collect();
+        for t in &topics {
+            assert!(
+                [
+                    "Drills and if-then plans",
+                    "Talking with children about emergencies",
+                    "Neighbours and mutual aid",
+                    "Stress, mental health and the 988 line",
+                ]
+                .contains(t),
+                "{name}: topic {t}"
+            );
+        }
+        // The first twelve months in detail; later months in the table.
+        for m in rr_plan::packet::DETAIL_MONTHS..=120 {
+            assert!(
+                !p.contains(&format!("**Month {m} (from ")),
+                "{name}: month {m} in detail"
+            );
+        }
+        let later = out
+            .plan
+            .months
+            .iter()
+            .any(|m| m.index >= rr_plan::packet::DETAIL_MONTHS && !m.items.is_empty());
+        assert_eq!(
+            p.contains("### After the first year"),
+            later,
+            "{name}: the table of later months"
+        );
+        // Checklists stop at the recommended step.
+        let beyond: Vec<&str> = rr_types::TierId::ALL
+            .iter()
+            .filter(|t| **t > out.tier_recommended)
+            .map(|t| t.name())
+            .collect();
+        let lists = &p[p.find("\n## Checklists\n").unwrap()..p.find("\n## Family plan\n").unwrap()];
+        for t in beyond {
+            assert!(
+                !lists.contains(&format!("\n### {t}\n")),
+                "{name}: {t} checklist"
+            );
+        }
+    }
+}
+
+/// Hazard cards: at most six of the likeliest hazards (each with at least a 10 in 100 chance in
+/// ten years), plus the hazard of a named scenario the plan includes.
+#[test]
+fn hazard_cards_are_the_likeliest_six_and_named_scenarios() {
+    for (name, input, out) in outputs() {
+        let a = common::run(input);
+        let p = &out.packet_markdown;
+        let risks =
+            &p[p.find("\n## Your risks\n").unwrap()..p.find("\n## Your targets\n").unwrap()];
+        let cards: Vec<&str> = risks
+            .lines()
+            .filter_map(|l| l.strip_prefix("#### "))
+            .filter_map(|l| l.split_once(". ").map(|(_, t)| t))
+            .collect();
+        let scenario_hazards: Vec<&str> = a
+            .hazards
+            .scenarios
+            .iter()
+            .filter(|s| s.on)
+            .filter_map(|s| a.hazards.profiles.iter().find(|p| p.id == s.hazard))
+            .map(|p| p.name.as_str())
+            .collect();
+        let ranked = cards
+            .iter()
+            .filter(|c| !scenario_hazards.contains(c))
+            .count();
+        assert!(ranked <= rr_plan::packet::HAZARD_CARDS, "{name}: {cards:?}");
+        for c in &cards {
+            let prof = a
+                .hazards
+                .profiles
+                .iter()
+                .find(|p| p.name == *c)
+                .unwrap_or_else(|| panic!("{name}: card {c}"));
+            let p10 = -rr_types::math::exp_m1(-10.0 * prof.rate_per_year);
+            assert!(
+                p10 >= rr_plan::packet::CARD_MIN_P10 || scenario_hazards.contains(c),
+                "{name}: {c} at {p10}"
+            );
+        }
+        for s in &scenario_hazards {
+            assert!(
+                cards.contains(s),
+                "{name}: the scenario hazard {s} has a card"
+            );
+        }
     }
 }
 

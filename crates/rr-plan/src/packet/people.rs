@@ -53,9 +53,8 @@ fn lines_with(cx: &Ctx<'_>, rules: &[&str], staged: bool, out: &mut Vec<String>)
     let mut n = 0;
     for l in cx.a.lines.iter().filter(|l| {
         rules.contains(&l.line.rule.as_str())
-            && l.quantity > 0.0
             && (l.kind == rr_supply::LineKind::Need
-                || (staged && l.kind == rr_supply::LineKind::Alternative))
+                || (staged && l.kind == rr_supply::LineKind::Alternative && l.quantity > 0.0))
     }) {
         out.push(format!(
             "- {}{}",
@@ -75,13 +74,15 @@ fn lines(cx: &Ctx<'_>, rules: &[&str], out: &mut Vec<String>) -> usize {
     lines_with(cx, rules, false, out)
 }
 
-/// A topic block under its own small heading.
+/// A topic block under its own small heading, without its opening paragraph.
 fn block(cx: &Ctx<'_>, target: &str, out: &mut Vec<String>) {
     if let Some(g) = cx.blocks_for(target).first() {
         out.push(format!("#### {}", md(&g.meta.title)));
         out.push(String::new());
-        out.push(cx.guidance(g, None, None));
-        out.push(String::new());
+        for para in super::headed_paragraphs(&cx.guidance(g, None, None)) {
+            out.push(para);
+            out.push(String::new());
+        }
     }
 }
 

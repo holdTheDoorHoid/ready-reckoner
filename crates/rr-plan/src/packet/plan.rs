@@ -1,11 +1,31 @@
-//! Section 4: your plan. The free steps to do now, this month and next month, then the whole plan
-//! month by month with quantities, prices, price bands and why; savings toward bigger items; when
-//! the plan is done; and the guardrail warnings.
+//! Section 4: your plan. The free steps to do now, this month and next month, then the first
+//! year month by month with quantities, prices, price bands and what each step adds; the months
+//! after the first year as one compact table; savings toward bigger items; when the plan is done;
+//! and the guardrail warnings.
 
 use rr_types::{PlanItem, PlanItemKind, PlanMonth, WarningSeverity};
 
 use super::text::{self, md};
 use super::{Ctx, cite};
+
+/// Months shown in detail (months 0 to 11); later months go in a compact table.
+pub const DETAIL_MONTHS: u16 = 12;
+
+/// What a step adds, in one sentence: the first sentence of its "why", after the "Free." that
+/// opens a free step's.
+pub(crate) fn short_why(why: &str) -> String {
+    let rest = why.trim().strip_prefix("Free.").unwrap_or(why).trim_start();
+    let end = rest
+        .char_indices()
+        .find(|&(i, c)| c == '.' && rest[i + 1..].starts_with(' '))
+        .map_or(rest.len(), |(i, _)| i + 1);
+    rest[..end].trim().to_owned()
+}
+
+/// The item a savings deposit is for: the allocator names it "Save toward: <item>".
+fn saving_for(name: &str) -> &str {
+    name.strip_prefix("Save toward: ").unwrap_or(name)
+}
 
 /// A free step by name only (after the first month the reasons repeat).
 fn short_line(item: &PlanItem) -> String {
@@ -13,35 +33,33 @@ fn short_line(item: &PlanItem) -> String {
     format!("- [{tick}] {} (free)", md(&item.name))
 }
 
-/// One plan line as a checklist entry.
+/// One plan line as a checklist entry, with what it adds.
 pub(crate) fn item_line(item: &PlanItem) -> String {
+    let why = md(&short_why(&item.why));
     match item.kind {
         PlanItemKind::FreeAction => {
             let tick = if item.done { "x" } else { " " };
-            format!("- [{tick}] **{}.** {}", md(&item.name), md(&item.why))
+            format!("- [{tick}] **{}.** {why}", md(&item.name))
         }
         PlanItemKind::Purchase if item.done => format!(
-            "- [x] **{}**: {}. {}",
+            "- [x] **{}**: {}. {why}",
             md(&item.name),
-            md(&text::quantity(f64::from(item.quantity), &item.unit)),
-            md(&item.why)
+            md(&text::quantity(f64::from(item.quantity), &item.unit))
         ),
         PlanItemKind::Purchase => format!(
-            "- [ ] **{}**: {}, about {} (usually {}). {}",
+            "- [ ] **{}**: {}, about {} (usually {}). {why}",
             md(&item.name),
             md(&text::quantity(f64::from(item.quantity), &item.unit)),
             text::usd(f64::from(item.est_cost_usd)),
             text::band(
                 f64::from(item.price_band.low),
                 f64::from(item.price_band.high)
-            ),
-            md(&item.why)
+            )
         ),
         PlanItemKind::Reserve => format!(
-            "- **{}**: {}. {}",
-            md(&item.name),
+            "- Set aside {} toward **{}**.",
             text::usd(f64::from(item.est_cost_usd)),
-            md(&item.why)
+            md(&text::lower_first(saving_for(&item.name)))
         ),
     }
 }
@@ -53,6 +71,60 @@ fn later_line(item: &PlanItem) -> String {
     } else {
         item_line(item)
     }
+}
+
+/// A plan line in months 2 to 11: what, how much and what it costs (this month's and next
+/// month's lines also say what each step adds).
+fn brief_line(item: &PlanItem) -> String {
+    match item.kind {
+        PlanItemKind::FreeAction => short_line(item),
+        PlanItemKind::Purchase => format!(
+            "- [ ] **{}**: {}, about {} (usually {})",
+            md(&item.name),
+            md(&text::quantity(f64::from(item.quantity), &item.unit)),
+            text::usd(f64::from(item.est_cost_usd)),
+            text::band(
+                f64::from(item.price_band.low),
+                f64::from(item.price_band.high)
+            )
+        ),
+        PlanItemKind::Reserve => item_line(item),
+    }
+}
+
+/// One month after the first year as a table row: what to buy or do, and what it costs.
+fn table_row(cx: &Ctx<'_>, m: &PlanMonth) -> String {
+    let start = text::month_start(cx.a.input.planning_date, m.index);
+    let mut what: Vec<String> = Vec::new();
+    let mut spend = 0.0_f64;
+    for i in m.items.iter().filter(|i| !i.done) {
+        match i.kind {
+            PlanItemKind::FreeAction => what.push(format!("{} (free)", md(&i.name))),
+            PlanItemKind::Purchase => {
+                spend += f64::from(i.est_cost_usd);
+                let q = text::quantity(f64::from(i.quantity), &i.unit);
+                what.push(if q.is_empty() {
+                    md(&i.name)
+                } else {
+                    format!("{}: {}", md(&i.name), md(&q))
+                });
+            }
+            PlanItemKind::Reserve => {
+                spend += f64::from(i.est_cost_usd);
+                what.push(format!(
+                    "save toward {}",
+                    md(&text::lower_first(saving_for(&i.name)))
+                ));
+            }
+        }
+    }
+    format!(
+        "| {} ({}) | {} | {} |",
+        m.index,
+        text::month_year(start),
+        what.join("; "),
+        text::usd(spend)
+    )
 }
 
 fn month_heading(cx: &Ctx<'_>, m: &PlanMonth) -> String {
@@ -96,7 +168,7 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         .map(|m| {
             m.items
                 .iter()
-                .filter(|i| i.kind == PlanItemKind::FreeAction)
+                .filter(|i| i.kind == PlanItemKind::FreeAction && !i.done)
                 .collect()
         })
         .unwrap_or_default();
@@ -107,7 +179,7 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         ));
         out.push(String::new());
         for i in free0 {
-            out.push(item_line(i));
+            out.push(format!("- [ ] {}", md(&i.name)));
         }
         out.push(String::new());
     }
@@ -142,10 +214,11 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     if let Some(m) = plan.months.get(1) {
         out.push(format!("### Next month: {}", month_heading(cx, m)));
         out.push(String::new());
-        if m.items.is_empty() {
+        let todo: Vec<&PlanItem> = m.items.iter().filter(|i| !i.done).collect();
+        if todo.is_empty() {
             out.push("Nothing new this month.".to_owned());
         }
-        for i in &m.items {
+        for i in todo {
             out.push(later_line(i));
         }
         out.push(String::new());
@@ -155,7 +228,7 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         .months
         .iter()
         .skip(2)
-        .filter(|m| !m.items.is_empty())
+        .filter(|m| m.index < DETAIL_MONTHS && m.items.iter().any(|i| !i.done))
         .collect();
     if !later.is_empty() {
         out.push("### Month by month".to_owned());
@@ -163,11 +236,26 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         for m in later {
             out.push(format!("**{}**", month_heading(cx, m)));
             out.push(String::new());
-            for i in &m.items {
-                out.push(later_line(i));
+            for i in m.items.iter().filter(|i| !i.done) {
+                out.push(brief_line(i));
             }
             out.push(String::new());
         }
+    }
+    let after: Vec<&PlanMonth> = plan
+        .months
+        .iter()
+        .filter(|m| m.index >= DETAIL_MONTHS && m.items.iter().any(|i| !i.done))
+        .collect();
+    if !after.is_empty() {
+        out.push("### After the first year".to_owned());
+        out.push(String::new());
+        out.push("| Month | What | Spend |".to_owned());
+        out.push("| --- | --- | --- |".to_owned());
+        for m in after {
+            out.push(table_row(cx, m));
+        }
+        out.push(String::new());
     }
 
     // Funds still open when the plan ends (the rest were spent on their item).
@@ -226,34 +314,16 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             );
         }
     }
-    if let Some(s) = &plan.savings_track {
-        out.push(String::new());
-        out.push(format!(
-            "**Savings goal (separate from the supplies budget).** Aim for {} of expenses{}; you \
-             have {}.{}",
-            text::months_phrase(f64::from(s.target_months)),
-            if s.target_usd > 0.0 {
-                format!(" (about {})", text::usd(f64::from(s.target_usd)))
-            } else {
-                String::new()
-            },
-            text::months_phrase(f64::from(s.current_months)),
-            if s.monthly_suggestion_usd > 0.0 {
-                format!(
-                    " Once the supplies plan is done, about {} a month could go here.",
-                    text::usd(f64::from(s.monthly_suggestion_usd))
-                )
-            } else {
-                String::new()
-            }
-        ));
-    }
+    // The savings goal itself is under Documents and money.
     out.push(String::new());
 
+    // The summary already lists the assumed basics, and the targets the cliffs.
     let watch: Vec<&rr_types::Warning> = a
         .warnings
         .iter()
-        .filter(|w| !w.id.starts_with("cliff_") && w.id != "citation_missing")
+        .filter(|w| {
+            !w.id.starts_with("cliff_") && w.id != "citation_missing" && w.id != "assumed_basics"
+        })
         .collect();
     if !watch.is_empty() {
         out.push("### Things to watch".to_owned());

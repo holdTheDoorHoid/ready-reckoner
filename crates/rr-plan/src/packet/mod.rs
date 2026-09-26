@@ -16,6 +16,9 @@ mod summary;
 mod targets;
 pub(crate) mod text;
 
+pub use plan::DETAIL_MONTHS;
+pub use risks::{CARD_MIN_P10, CARDS as HAZARD_CARDS};
+
 use std::collections::BTreeMap;
 
 use rr_content::{Content, Guidance};
@@ -161,6 +164,55 @@ impl<'a> Ctx<'a> {
     }
 }
 
+/// The paragraphs of a rendered guidance block.
+fn paragraphs(rendered: &str) -> Vec<String> {
+    rendered
+        .split("\n\n")
+        .map(str::trim)
+        .filter(|p| !p.is_empty())
+        .map(str::to_owned)
+        .collect()
+}
+
+/// The "what to do" paragraphs of a rendered guidance block: the ones that open with
+/// "**What helps.**" or "**What to avoid.**" (none when the block has neither).
+pub(crate) fn advice_paragraphs(rendered: &str) -> Vec<String> {
+    paragraphs(rendered)
+        .into_iter()
+        .filter(|p| p.starts_with(HELPS) || p.starts_with(AVOID))
+        .collect()
+}
+
+/// The paragraph of a rendered guidance block that says what to do ("**What helps.**"), or its
+/// advice paragraphs, or the whole block when it has neither.
+pub(crate) fn helps_paragraph(rendered: &str) -> Vec<String> {
+    let advice = advice_paragraphs(rendered);
+    if let Some(p) = advice.iter().find(|p| p.starts_with(HELPS)) {
+        return vec![p.clone()];
+    }
+    if advice.is_empty() {
+        paragraphs(rendered)
+    } else {
+        advice
+    }
+}
+
+/// A topic block without its opening paragraph (the why, which the app's Learn view carries):
+/// the paragraphs that open with a bold heading, or the whole block when none does.
+pub(crate) fn headed_paragraphs(rendered: &str) -> Vec<String> {
+    let all = paragraphs(rendered);
+    let headed: Vec<String> = all
+        .iter()
+        .filter(|p| p.starts_with("**"))
+        .cloned()
+        .collect();
+    if headed.is_empty() { all } else { headed }
+}
+
+/// How a guidance block's advice paragraphs open.
+const HELPS: &str = "**What helps.**";
+const AVOID: &str = "**What to avoid.**";
+
 /// Turns `[^id]` footnote references into citation markers.
 fn footnotes_to_markers(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
@@ -250,8 +302,16 @@ pub(crate) fn finish(marked: &str, a: &Assessment, provenance: &[Citation]) -> S
         rest = cursor;
     }
     out.push_str(rest);
+    // The packet lists the sources its brackets point to: they come first in the provenance
+    // order. The others (behind quantities, prices and warnings the packet does not quote) stay
+    // in the plan's provenance list.
+    let cited = cited_ids(marked);
+    let shown = provenance
+        .iter()
+        .take_while(|c| cited.contains(&c.id))
+        .count();
     let mut tail: Vec<String> = Vec::new();
-    sources::write(a, provenance, &mut tail);
+    sources::write(a, &provenance[..shown], provenance.len() - shown, &mut tail);
     out.push('\n');
     out.push_str(&tail.join("\n"));
     // One trailing newline, no trailing spaces except Markdown line breaks.

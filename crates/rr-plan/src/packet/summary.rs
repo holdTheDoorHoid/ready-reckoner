@@ -1,6 +1,6 @@
 //! Section 1: the summary page. Who the plan is for, the date and setting, the step reached and
-//! the step that is enough, the three sentences that matter most, and what the household should
-//! be able to handle.
+//! the step that is enough, the three sentences that matter most, the first free steps, and the
+//! everyday basics the plan assumes. (The targets in full are the next sections' table.)
 
 use rr_types::{
     BackupPower, BucketId, ClimateHorizon, Cooling, Heating, HousingKind, PlanItemKind, TierId,
@@ -196,15 +196,6 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     }
     out.push(String::new());
 
-    if !a.consequence.statement.is_empty() {
-        out.push("### What your household should be able to handle".to_owned());
-        out.push(String::new());
-        for s in &a.consequence.statement {
-            out.push(format!("- {}", md(s)));
-        }
-        out.push(String::new());
-    }
-
     let first: Vec<&str> = a
         .budget
         .plan
@@ -233,11 +224,6 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(String::new());
     }
     assumptions(cx, out);
-    out.push(
-        "Every number in this packet is explained, with its sources, in the sections that follow."
-            .to_owned(),
-    );
-    out.push(String::new());
 }
 
 /// What the plan assumed the household already has (`assume_basics`), and how to undo it.
