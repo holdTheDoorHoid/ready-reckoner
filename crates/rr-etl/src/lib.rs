@@ -22,6 +22,7 @@ pub mod csvout;
 pub mod ct;
 pub mod geo;
 pub mod http;
+pub mod intermediate;
 pub mod jobs;
 pub mod manifest;
 pub mod num;

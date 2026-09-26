@@ -291,6 +291,10 @@ pub fn refresh(ctx: &Ctx, only: &[String]) -> Result<RefreshSummary> {
     finish_manifest(&mut manifest);
     manifest.save(&ctx.data)?;
     crate::changes::append(&ctx.data, &manifest, &summary)?;
+    // Files one job hands to a later one are not packs: drop them unless asked to keep raw data.
+    if !ctx.http.keep_raw {
+        crate::intermediate::clear(&ctx.data)?;
+    }
     Ok(summary)
 }
 

@@ -140,15 +140,129 @@ pub fn parse_coord(s: &str) -> Option<f64> {
     }
 }
 
+/// A HURDAT2 fix time (`20170825`, `1800`, UTC) as seconds since the Unix epoch.
+pub fn hurdat_time(date: &str, hhmm: &str) -> Option<i64> {
+    let d = date.trim();
+    let t = hhmm.trim();
+    if d.len() != 8 || t.is_empty() || t.len() > 4 {
+        return None;
+    }
+    let y: i64 = d[0..4].parse().ok()?;
+    let m: u32 = d[4..6].parse().ok()?;
+    let day: u32 = d[6..8].parse().ok()?;
+    let hm: i64 = t.parse().ok()?;
+    if !(1..=12).contains(&m) || !(1..=31).contains(&day) || hm / 100 > 23 || hm % 100 > 59 {
+        return None;
+    }
+    Some(crate::timefmt::days_from_civil(y, m, day) * 86_400 + (hm / 100) * 3600 + (hm % 100) * 60)
+}
+
+/// UTC offset in seconds of a Storm Events `CZ_TIMEZONE` value. Recent files write the zone and
+/// its offset (`CST-6`, `EST-5`, `AKST-9`, `HST-10`, `GST10`); older ones only the abbreviation
+/// (`CST`, `EDT`). Storm Events records begin and end times in that zone's local time, so
+/// `UTC = local - offset`. `None` when the value is unknown (callers fall back to the county's
+/// longitude).
+pub fn tz_offset_s(tz: &str) -> Option<i64> {
+    let t = tz.trim().to_ascii_uppercase();
+    if t.is_empty() {
+        return None;
+    }
+    // An explicit signed offset after the letters wins.
+    let letters: String = t.chars().take_while(|c| c.is_ascii_alphabetic()).collect();
+    let rest = &t[letters.len()..];
+    if !rest.is_empty()
+        && let Ok(h) = rest.parse::<i64>()
+        && (-12..=14).contains(&h)
+    {
+        return Some(h * 3600);
+    }
+    let h = match letters.as_str() {
+        "EST" => -5,
+        "EDT" => -4,
+        "CST" | "CSC" | "SCT" => -6,
+        "CDT" => -5,
+        "MST" => -7,
+        "MDT" => -6,
+        "PST" => -8,
+        "PDT" => -7,
+        "AKST" | "AKS" => -9,
+        "AKDT" => -8,
+        "HST" => -10,
+        "AST" => -4,
+        "SST" => -11,
+        "GST" | "CHST" => 10,
+        "UTC" | "GMT" => 0,
+        _ => return None,
+    };
+    Some(h * 3600)
+}
+
+/// First year of Storm Events and HURDAT2 records kept for attributing outage events (EAGLE-I
+/// starts in 2014).
+pub const ATTRIBUTION_FIRST_YEAR: i32 = 2014;
+
+/// Storm Events types kept for attributing outage events to a cause, with a short code.
+pub const ATTRIBUTION_TYPES: &[(&str, &str)] = &[
+    ("thunderstorm wind", "tstm_wind"),
+    ("tornado", "tornado"),
+    ("hail", "hail"),
+    ("lightning", "lightning"),
+    ("high wind", "high_wind"),
+    ("strong wind", "strong_wind"),
+    ("ice storm", "ice_storm"),
+    ("sleet", "sleet"),
+    ("freezing fog", "freezing_fog"),
+    ("winter storm", "winter_storm"),
+    ("blizzard", "blizzard"),
+    ("heavy snow", "heavy_snow"),
+    ("lake-effect snow", "lake_snow"),
+    ("winter weather", "winter_weather"),
+    ("extreme cold/wind chill", "extreme_cold"),
+    ("cold/wind chill", "cold"),
+    ("extreme cold", "extreme_cold"),
+    ("heat", "heat"),
+    ("excessive heat", "excessive_heat"),
+    ("wildfire", "wildfire"),
+    ("dense smoke", "dense_smoke"),
+    ("flood", "flood"),
+    ("flash flood", "flash_flood"),
+    ("heavy rain", "heavy_rain"),
+    ("debris flow", "debris_flow"),
+    ("coastal flood", "coastal_flood"),
+    ("storm surge/tide", "storm_surge"),
+    ("lakeshore flood", "lakeshore_flood"),
+    ("tropical storm", "tropical_storm"),
+    ("tropical depression", "tropical_depression"),
+    ("hurricane", "hurricane"),
+    ("hurricane (typhoon)", "hurricane"),
+    ("typhoon", "hurricane"),
+    ("dust storm", "dust_storm"),
+];
+
+/// Short attribution code for a Storm Events `EVENT_TYPE`, if it is one we keep.
+pub fn attribution_type(event_type: &str) -> Option<&'static str> {
+    let t = event_type.trim().to_ascii_lowercase();
+    ATTRIBUTION_TYPES
+        .iter()
+        .find(|(n, _)| *n == t)
+        .map(|(_, c)| *c)
+}
+
 /// A HURDAT2 storm track.
 #[derive(Debug, Clone)]
 pub struct Track {
     /// Storm id, e.g. `AL092017`.
     pub id: String,
+    /// Storm name from the header line (`HARVEY`; `UNNAMED` for storms without one).
+    pub name: String,
     /// Year of genesis.
     pub year: i32,
     /// Fixes: (lat, lon, max wind kt).
     pub fixes: Vec<(f64, f64, f64)>,
+    /// Time of each fix in seconds since the Unix epoch (HURDAT2 times are UTC), parallel to
+    /// `fixes`. Kept so outage events can be matched to the storm by date (until 2026-09-26 the
+    /// times were read and thrown away).
+    pub times: Vec<i64>,
 }
 
 /// Parse a HURDAT2 file.
@@ -164,10 +278,12 @@ pub fn parse_hurdat(text: &str) -> Result<Vec<Track>> {
         let year: i32 = id[4..8]
             .parse()
             .map_err(|_| data_err(format!("HURDAT2: bad storm id {id}")))?;
+        let name = parts[1].to_string();
         let n: usize = parts[2]
             .parse()
             .map_err(|_| data_err(format!("HURDAT2: bad entry count for {id}")))?;
         let mut fixes = Vec::with_capacity(n);
+        let mut times = Vec::with_capacity(n);
         for _ in 0..n {
             let l = lines
                 .next()
@@ -179,10 +295,23 @@ pub fn parse_hurdat(text: &str) -> Result<Vec<Track>> {
             let (Some(lat), Some(lon)) = (parse_coord(f[4]), parse_coord(f[5])) else {
                 continue;
             };
+            let Some(t) = hurdat_time(f[0], f[1]) else {
+                return Err(data_err(format!(
+                    "HURDAT2: bad date or time {} {} in {id}",
+                    f[0], f[1]
+                )));
+            };
             let wind: f64 = f[6].parse().unwrap_or(-999.0);
             fixes.push((lat, lon, wind));
+            times.push(t);
         }
-        out.push(Track { id, year, fixes });
+        out.push(Track {
+            id,
+            name,
+            year,
+            fixes,
+            times,
+        });
     }
     Ok(out)
 }
@@ -386,6 +515,27 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                 .filter(|t| t.year >= HURDAT_FIRST_YEAR && t.year <= last_year),
         );
     }
+    // Fixes since 2014 with their times, for attributing outage events (job `outage_model`).
+    let mut track_rows: Vec<Vec<String>> = Vec::new();
+    for t in tracks.iter().filter(|t| t.year >= ATTRIBUTION_FIRST_YEAR) {
+        for (f, time) in t.fixes.iter().zip(&t.times) {
+            track_rows.push(vec![
+                t.id.clone(),
+                t.name.clone(),
+                time.to_string(),
+                format!("{:.1}", f.0),
+                format!("{:.1}", f.1),
+                format!("{:.0}", f.2),
+            ]);
+        }
+    }
+    track_rows.sort();
+    crate::intermediate::write(
+        &ctx.data,
+        crate::intermediate::HURDAT_TRACKS,
+        &["storm_id", "name", "time", "lat", "lon", "wind_kt"],
+        &track_rows,
+    )?;
     let radius = PASSAGE_RADIUS_NMI * KM_PER_NMI;
     let classes: [(&str, f64); 3] = [
         ("tropical_storm_passage", 34.0),
@@ -661,6 +811,12 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut zone_name_fallbacks = 0u64;
     let mut unmapped_zones: BTreeSet<String> = BTreeSet::new();
     let mut used_records = 0u64;
+    let mut tz_fallbacks = 0u64;
+    let lon_by_fips: HashMap<String, f64> =
+        counties.iter().map(|c| (c.fips.clone(), c.lon)).collect();
+    // County-episodes for outage attribution: (county, episode, type) -> (weight, begin, end, damage, injury).
+    type AttrKey = (String, String, &'static str);
+    let mut attr_eps: BTreeMap<AttrKey, (f64, i64, i64, bool, bool)> = BTreeMap::new();
     for (y, name) in &per_year {
         let url = format!("{STORM_DIR}{name}");
         eprintln!("  Storm Events {y}");
@@ -713,16 +869,25 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                     ix("DEATHS_DIRECT")?,
                     ix("DEATHS_INDIRECT")?,
                 );
+                let i_tz = ix("CZ_TIMEZONE")?;
                 let mut eps: HashMap<Key, Ep> = HashMap::new();
+                let mut attr: HashMap<AttrKey, (f64, i64, i64, bool, bool)> = HashMap::new();
                 let mut unmapped = 0u64;
                 let mut by_zone_name = 0u64;
+                let mut tz_fallback = 0u64;
                 let mut unmapped_names: BTreeSet<String> = BTreeSet::new();
                 let mut used = 0u64;
                 let mut rec = csv::StringRecord::new();
                 while rdr.read_record(&mut rec)? {
-                    let Some(ty) = storm_type(&rec[i_ty]) else {
-                        continue;
+                    let group = storm_type(&rec[i_ty]);
+                    let attr_code = if *y >= ATTRIBUTION_FIRST_YEAR {
+                        attribution_type(&rec[i_ty])
+                    } else {
+                        None
                     };
+                    if group.is_none() && attr_code.is_none() {
+                        continue;
+                    }
                     let stf: u32 = rec[i_stf].trim().parse().unwrap_or(0);
                     let czf: u32 = rec[i_czf].trim().parse().unwrap_or(0);
                     let codes: Vec<String> = match rec[i_czt].trim() {
@@ -750,6 +915,19 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                         }
                         _ => continue,
                     };
+                    // Local time of the record's zone -> UTC (the zone's offset from
+                    // CZ_TIMEZONE; the county's longitude when the value is unknown).
+                    let offset = match tz_offset_s(&rec[i_tz]) {
+                        Some(o) => o,
+                        None => {
+                            tz_fallback += 1;
+                            codes
+                                .first()
+                                .and_then(|c| lon_by_fips.get(c))
+                                .map(|lon| (lon / 15.0).round() as i64 * 3600)
+                                .unwrap_or(-6 * 3600)
+                        }
+                    };
                     let time = |ym: &str, d: &str, hm: &str| -> Option<i64> {
                         let ym: i64 = ym.trim().parse().ok()?;
                         let d: u32 = d.trim().parse().ok()?;
@@ -758,7 +936,8 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                             crate::timefmt::days_from_civil(ym / 100, (ym % 100) as u32, d)
                                 * 86_400
                                 + (hm / 100) * 3600
-                                + (hm % 100) * 60,
+                                + (hm % 100) * 60
+                                - offset,
                         )
                     };
                     let b = time(&rec[i_bym], &rec[i_bd], &rec[i_bt]);
@@ -769,12 +948,24 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                     let inj = [i_ind, i_ini, i_dd, i_di]
                         .iter()
                         .any(|i| rec[*i].trim().parse::<f64>().unwrap_or(0.0) > 0.0);
-                    used += 1;
+                    if group.is_some() {
+                        used += 1;
+                    }
+                    let episode = rec[i_ep].trim().to_string();
                     for code in &codes {
                         for (target, w) in targets(code, &canon, &cw) {
-                            let ep = eps
-                                .entry((target, ty, rec[i_ep].trim().to_string()))
-                                .or_default();
+                            if let (Some(code_a), Some(b), Some(e)) = (attr_code, b, e) {
+                                let a = attr
+                                    .entry((target.clone(), episode.clone(), code_a))
+                                    .or_insert((0.0, b, e, false, false));
+                                a.0 = a.0.max(w);
+                                a.1 = a.1.min(b);
+                                a.2 = a.2.max(e);
+                                a.3 |= dmg;
+                                a.4 |= inj;
+                            }
+                            let Some(ty) = group else { continue };
+                            let ep = eps.entry((target, ty, episode.clone())).or_default();
                             let u = ep.units.entry(code.clone()).or_insert(0.0);
                             *u = u.max(w);
                             if let Some(b) = b {
@@ -788,14 +979,31 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                         }
                     }
                 }
-                Ok((eps, unmapped, unmapped_names, used, by_zone_name))
+                Ok((
+                    eps,
+                    attr,
+                    unmapped,
+                    unmapped_names,
+                    used,
+                    by_zone_name,
+                    tz_fallback,
+                ))
             },
         )?;
-        let (eps, unmapped, names, used, by_name_n) = eps;
+        let (eps, attr, unmapped, names, used, by_name_n, tz_fb) = eps;
         unmapped_zone_records += unmapped;
         zone_name_fallbacks += by_name_n;
+        tz_fallbacks += tz_fb;
         unmapped_zones.extend(names);
         used_records += used;
+        for (k, v) in attr {
+            let a = attr_eps.entry(k).or_insert(v);
+            a.0 = a.0.max(v.0);
+            a.1 = a.1.min(v.1);
+            a.2 = a.2.max(v.2);
+            a.3 |= v.3;
+            a.4 |= v.4;
+        }
         out.source(SourceRecord {
             name: format!("NOAA NCEI Storm Events details {y}"),
             url: streamed.final_url.clone(),
@@ -826,6 +1034,33 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         }
     }
     out.rows_in += used_records;
+    let attr_rows: Vec<Vec<String>> = attr_eps
+        .iter()
+        .map(|((fips, episode, code), (w, b, e, dmg, inj))| {
+            vec![
+                fips.clone(),
+                episode.clone(),
+                code.to_string(),
+                b.to_string(),
+                e.to_string(),
+                sig4(*w),
+                (*dmg as u8).to_string(),
+                (*inj as u8).to_string(),
+            ]
+        })
+        .collect();
+    crate::intermediate::write(
+        &ctx.data,
+        crate::intermediate::STORM_EPISODES,
+        &[
+            "fips", "episode", "type", "begin", "end", "weight", "damage", "injury",
+        ],
+        &attr_rows,
+    )?;
+    eprintln!(
+        "  kept {} county-episodes since {ATTRIBUTION_FIRST_YEAR} for outage attribution",
+        attr_rows.len()
+    );
 
     // --- Output -------------------------------------------------------------------------------
     let mut table = Table::new(
@@ -926,11 +1161,14 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         "Storm passages: a storm counts when its best track passes within {PASSAGE_RADIUS_NMI} nautical miles of the county's internal point with interpolated maximum sustained wind of at least 34 kt (tropical_storm_passage), 64 kt (hurricane_passage) or 96 kt (major_hurricane_passage), whatever its tropical or post-tropical status."
     ));
     out.notes.push("SPC: tornadoes are counted once per county per tornado using the per-state segment records (sn = 1) and their county list (f1-f4); tornado_ef2plus uses the rating (mag >= 2). Hail and wind are counted as days with at least one report in the county (hail 1 in and 2 in or larger by size; all severe-wind reports, and 65 kt or more). share_damaging is the share with a reported property loss above zero; loss units changed in 2016 but only 'above zero' is used.".into());
-    out.notes.push("Storm Events: one observation per county per NOAA episode and type. Zone records apply to every county the NWS zone-county correlation file lists for that zone (newest file first, older files as fallback). Episode length runs from the earliest begin to the latest end of the episode's records in the county (local standard time as recorded). share_damaging counts reported property or crop damage above zero (many records leave damage blank, so it is a lower bound); share_injury counts direct or indirect injuries or deaths.".into());
+    out.notes.push("Storm Events: one observation per county per NOAA episode and type. Zone records apply to every county the NWS zone-county correlation file lists for that zone (newest file first, older files as fallback). Episode length runs from the earliest begin to the latest end of the episode's records in the county, with every time converted to UTC from the record's CZ_TIMEZONE (until 2026-09-26 the zone was ignored, so an episode whose records sat in two time zones was off by an hour). share_damaging counts reported property or crop damage above zero (many records leave damage blank, so it is a lower bound); share_injury counts direct or indirect injuries or deaths.".into());
     out.notes.push(format!(
         "Retired forecast zones: {zone_name_fallbacks} zone records whose code is not in the correlation files were placed in the one county of that state whose name the zone carries (after dropping words like Northern or Coastal); {unmapped_zone_records} records ({} distinct zones) could not be placed and were skipped ({:.1}% of the records used).",
         unmapped_zones.len(),
         100.0 * unmapped_zone_records as f64 / (used_records + unmapped_zone_records).max(1) as f64
+    ));
+    out.notes.push(format!(
+        "Time zones: {tz_fallbacks} Storm Events records had no recognisable CZ_TIMEZONE; their times were converted with the county's longitude (one hour per 15 degrees). The {ATTRIBUTION_FIRST_YEAR}+ county-episodes (UTC begin and end, every outage-relevant type) and the HURDAT2 fixes with their UTC times are handed to the outage_model job; they are not pack files."
     ));
     out.notes.push("Connecticut: sources that report the retired counties are apportioned to planning regions by land-area share (each region's weight is the share of its land inside the reporting county).".into());
     Ok(out)
@@ -986,6 +1224,44 @@ mod tests {
         assert_eq!(norm_name("Harris"), "harris");
         assert_eq!(norm_name("COASTAL ST. JOHNS"), "st johns");
         assert_eq!(norm_name("St. Johns"), "st johns");
+    }
+
+    #[test]
+    fn hurdat_keeps_names_and_fix_times() {
+        let text = "AL092024,             HELENE,     2,\n\
+20240927, 0310, L, HU, 30.0N,  83.9W, 120,  938,\n\
+20240927, 1200,  , TS, 34.4N,  84.0W,  50,  970,\n";
+        let t = parse_hurdat(text).unwrap();
+        assert_eq!(t[0].name, "HELENE");
+        // 2024-09-27 03:10 UTC and 12:00 UTC.
+        assert_eq!(t[0].times[0], 1_727_406_600);
+        assert_eq!(t[0].times[1] - t[0].times[0], 8 * 3600 + 50 * 60);
+        assert!(parse_hurdat("AL012020, X, 1,\n2020060, 1200, , TS, 20.0N, 90.0W, 40,\n").is_err());
+    }
+
+    #[test]
+    fn storm_events_time_zones() {
+        assert_eq!(tz_offset_s("CST-6"), Some(-6 * 3600));
+        assert_eq!(tz_offset_s("EST-5"), Some(-5 * 3600));
+        assert_eq!(tz_offset_s("AKST-9"), Some(-9 * 3600));
+        assert_eq!(tz_offset_s("HST-10"), Some(-10 * 3600));
+        assert_eq!(tz_offset_s("GST10"), Some(10 * 3600));
+        assert_eq!(tz_offset_s("PST"), Some(-8 * 3600));
+        assert_eq!(tz_offset_s("cdt"), Some(-5 * 3600));
+        assert_eq!(tz_offset_s("UNK"), None);
+        assert_eq!(tz_offset_s(""), None);
+        // A derecho report at 12:40 CST in Linn County, Iowa is 18:40 UTC.
+        let local = crate::timefmt::days_from_civil(2020, 8, 10) * 86_400 + 12 * 3600 + 40 * 60;
+        let utc = local - tz_offset_s("CST-6").unwrap();
+        assert_eq!(crate::timefmt::format_unix(utc), "2020-08-10T18:40:00Z");
+    }
+
+    #[test]
+    fn attribution_types_cover_outage_causes() {
+        assert_eq!(attribution_type("Thunderstorm Wind"), Some("tstm_wind"));
+        assert_eq!(attribution_type("Ice Storm"), Some("ice_storm"));
+        assert_eq!(attribution_type("Hurricane (Typhoon)"), Some("hurricane"));
+        assert_eq!(attribution_type("Rip Current"), None);
     }
 
     #[test]
