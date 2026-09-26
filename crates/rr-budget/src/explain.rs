@@ -112,15 +112,13 @@ pub(crate) fn why(lead: Lead, parts: &WhyParts, people: usize, years: u8) -> Str
 
 fn duration_sentence(d: &DurationText, people: usize) -> String {
     let added = (d.to_days - d.from_days).max(0.0);
-    // Water and food scale with the number of people; other cover is for the household.
-    let who = match d.bucket {
-        BucketId::WaterOut | BucketId::WaterBoil | BucketId::Supplies if people == 1 => {
-            " for 1 person".to_owned()
-        }
-        BucketId::WaterOut | BucketId::WaterBoil | BucketId::Supplies => {
-            format!(" for {people} people")
-        }
-        _ => String::new(),
+    let (supply, per_person) = supply(d.bucket, d.part.as_deref());
+    // Water, food and the like scale with the number of people; other cover is for the household
+    // (or for whoever a part names: the baby, the pets, the animals).
+    let who = match (per_person, people) {
+        (false, _) => String::new(),
+        (true, 1) => " for 1 person".to_owned(),
+        (true, n) => format!(" for {n} people"),
     };
     let goal = goal_text(d.target_days);
     let progress = if d.to_days + 1e-9 >= d.target_days {
@@ -128,11 +126,7 @@ fn duration_sentence(d: &DurationText, people: usize) -> String {
     } else {
         format!("bringing you to {} of the {goal}", days_number(d.to_days))
     };
-    format!(
-        "Adds {} of {}{who}, {progress}.",
-        days_text(added),
-        supply_noun(d.bucket, d.part.as_deref())
-    )
+    format!("Adds {} of {supply}{who}, {progress}.", days_text(added))
 }
 
 /// "About 26 of 100 households like yours lose power for a day or more in the next 10 years."
@@ -254,29 +248,65 @@ pub(crate) fn dollars(x: f64) -> String {
     format!("{sign}${grouped}")
 }
 
-fn supply_noun(bucket: BucketId, part: Option<&str>) -> String {
-    let base = match bucket {
+/// What a purchase adds days of, in words, and whether that supply is counted per person.
+///
+/// A part of a bucket (as `rr-plan` names them: "toilet", "pet food", "lights" ...) gets words of
+/// its own rather than the bucket's supply with the part in brackets, which read as "drinking and
+/// washing water (toilet)". A part without words of its own is named as it is.
+fn supply(bucket: BucketId, part: Option<&str>) -> (String, bool) {
+    if let Some(p) = part {
+        let (words, per_person) = match p {
+            // Power.
+            "lights" => ("light during power cuts", false),
+            "batteries" => ("spare batteries for lights and a radio", false),
+            "medical device power" => ("backup power for a medical device", false),
+            "generator fuel" => ("generator fuel", false),
+            "wheelchair battery" => ("power for a wheelchair", false),
+            // Water.
+            "stored water" => ("stored drinking and washing water", true),
+            "bleach" => ("bleach for treating water", true),
+            "water treatment" => ("safe water during boil notices", true),
+            "toilet" => ("emergency toilet supplies", true),
+            "water for animals" => ("water for your animals", false),
+            // Food and supplies.
+            "food" => ("food", true),
+            "toilet paper" => ("toilet paper", true),
+            "soap" => ("soap", true),
+            "pet food" => ("pet food", false),
+            "baby formula" => ("baby formula", false),
+            "nursing supplies" => ("nursing supplies", false),
+            "diapers and wipes" => ("diapers and wipes", false),
+            "period products" => ("period products", false),
+            // Heat and cold.
+            "heat" => ("protection from dangerous heat", false),
+            "cold" => ("protection from dangerous cold", false),
+            // Medicine.
+            "prescriptions" => ("daily medicine", false),
+            "cold storage" => ("cold storage for medicine", false),
+            "epinephrine" => ("epinephrine on hand", false),
+            // Phones and payments.
+            "phone" => ("phone power and news", false),
+            "payments" => ("cash for when card payments are down", false),
+            "two-way radios" => ("two-way radio contact", false),
+            other => (other, false),
+        };
+        return (words.to_owned(), per_person);
+    }
+    let words = match bucket {
         BucketId::Power => "cover for power cuts",
         BucketId::WaterOut => "drinking and washing water",
         BucketId::WaterBoil => "safe water during boil notices",
         BucketId::Supplies => "food and supplies",
-        BucketId::Thermal => match part {
-            Some("heat") => return "protection from dangerous heat".into(),
-            Some("cold") => return "protection from dangerous cold".into(),
-            _ => "protection from dangerous heat or cold",
-        },
+        BucketId::Thermal => "protection from dangerous heat or cold",
         BucketId::Medication => "medicine",
-        BucketId::Comms => match part {
-            Some("phone") => return "phone power and news".into(),
-            Some("payments") => return "cash for when card payments are down".into(),
-            _ => "backup for phones, news and payments",
-        },
+        BucketId::Comms => "backup for phones, news and payments",
         _ => short_name(bucket),
     };
-    match part {
-        Some(p) => format!("{base} ({p})"),
-        None => base.to_owned(),
-    }
+    let per_person = matches!(
+        bucket,
+        BucketId::WaterOut | BucketId::WaterBoil | BucketId::Supplies
+    );
+    (words.to_owned(), per_person)
 }
 
 fn event_phrase(bucket: BucketId, part: Option<&str>) -> String {
@@ -414,5 +444,95 @@ mod tests {
             "Free. Gets you ready for leaving home in a hurry. About 5 of 100 households like \
              yours need this in the next 10 years."
         );
+    }
+
+    fn adds(bucket: BucketId, part: Option<&str>, people: usize) -> String {
+        duration_sentence(
+            &DurationText {
+                bucket,
+                part: part.map(str::to_owned),
+                from_days: 0.0,
+                to_days: 1.7,
+                target_days: 5.0,
+                ref_days: 1.0,
+                per_100: 15.0,
+            },
+            people,
+        )
+    }
+
+    /// A part of a bucket reads as its own supply, never as the bucket's supply with the part in
+    /// brackets, and only supplies counted per person say how many people they are for.
+    #[test]
+    fn parts_read_as_their_own_supply() {
+        assert_eq!(
+            adds(BucketId::WaterOut, Some("toilet"), 1),
+            "Adds 1.7 days of emergency toilet supplies for 1 person, bringing you to 1.7 of the \
+             5-day goal."
+        );
+        assert_eq!(
+            adds(BucketId::WaterOut, Some("stored water"), 4),
+            "Adds 1.7 days of stored drinking and washing water for 4 people, bringing you to 1.7 \
+             of the 5-day goal."
+        );
+        assert_eq!(
+            adds(BucketId::Supplies, Some("pet food"), 2),
+            "Adds 1.7 days of pet food, bringing you to 1.7 of the 5-day goal."
+        );
+        assert_eq!(
+            adds(BucketId::Power, Some("medical device power"), 1),
+            "Adds 1.7 days of backup power for a medical device, bringing you to 1.7 of the 5-day \
+             goal."
+        );
+        assert_eq!(
+            adds(BucketId::Power, Some("lights"), 3),
+            "Adds 1.7 days of light during power cuts, bringing you to 1.7 of the 5-day goal."
+        );
+        // A part with no words of its own is named as it is.
+        assert_eq!(
+            adds(BucketId::Supplies, Some("cooling towels"), 2),
+            "Adds 1.7 days of cooling towels, bringing you to 1.7 of the 5-day goal."
+        );
+        // Without a part, water and food are per person and other cover is for the household.
+        assert_eq!(
+            adds(BucketId::Supplies, None, 2),
+            "Adds 1.7 days of food and supplies for 2 people, bringing you to 1.7 of the 5-day \
+             goal."
+        );
+        assert_eq!(
+            adds(BucketId::Power, None, 2),
+            "Adds 1.7 days of cover for power cuts, bringing you to 1.7 of the 5-day goal."
+        );
+        for part in [
+            "lights",
+            "batteries",
+            "medical device power",
+            "generator fuel",
+            "wheelchair battery",
+            "stored water",
+            "bleach",
+            "water treatment",
+            "toilet",
+            "water for animals",
+            "food",
+            "toilet paper",
+            "soap",
+            "pet food",
+            "baby formula",
+            "nursing supplies",
+            "diapers and wipes",
+            "period products",
+            "heat",
+            "cold",
+            "prescriptions",
+            "cold storage",
+            "epinephrine",
+            "phone",
+            "payments",
+            "two-way radios",
+        ] {
+            let s = adds(BucketId::Supplies, Some(part), 3);
+            assert!(!s.contains('(') && !s.contains("  "), "{part}: {s}");
+        }
     }
 }

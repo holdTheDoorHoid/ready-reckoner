@@ -13,9 +13,13 @@
 //!    five times the tier's best (promotion). Life-safety items come first, then value per dollar.
 //! 3. **When to buy it** ([`Schedule`]). Split (default): when the next item costs more than the
 //!    month's money, put a share of each month's money into a sinking fund for it and spend the
-//!    rest on the best affordable items; otherwise buy in priority order. Fixed order: buy the next
-//!    item when the money is there, otherwise save everything for it. The research shortcuts buy
-//!    the best affordable item instead unless the sinking-fund rule says to wait.
+//!    rest on the best affordable items; otherwise buy in priority order. In month 0 the one-off
+//!    money goes to life-safety items first (`one_off_to_life_safety`): the top life-safety item
+//!    that a month's money cannot buy is bought outright when the one-off covers it; otherwise
+//!    half the one-off opens its fund, the rest buys the cheaper life-safety items, cheapest
+//!    first, and whatever they leave joins the fund. Fixed order: buy the next item when the money
+//!    is there, otherwise save everything for it. The research shortcuts buy the best affordable
+//!    item instead unless the sinking-fund rule says to wait.
 //! 4. **Stop** when no tier has a positive-value candidate; later money goes to the savings track.
 //!
 //! Specialised rare-catastrophe items never enter step 2. On opt-in they are bought, in order of
@@ -248,6 +252,8 @@ enum Event {
         shown: Candidate,
         rare: bool,
         from_savings: f64,
+        /// Bought first with the one-off money (the top life-safety item it covers).
+        one_off_first: bool,
     },
     Reserve {
         offer: usize,
@@ -344,6 +350,9 @@ enum SaveHow {
     AllMoney,
     /// A share of each month's money; the rest buys other items.
     Share(f64),
+    /// Month 0: this share of the one-off money, plus whatever the cheaper life-safety items leave
+    /// of the rest.
+    OneOff(f64),
     /// The rare-catastrophe allowance.
     Rare,
 }
@@ -352,8 +361,38 @@ enum SaveHow {
 #[derive(Debug, Default)]
 struct Ledger {
     sequence: Vec<Purchase>,
-    envelopes: Vec<SavingsEnvelope>,
+    /// Sinking funds per item id, in the order first used: (item, saved, needed).
+    envelopes: Vec<(ItemId, f64, f64)>,
     purchase_months: BTreeMap<usize, u16>,
+}
+
+impl Ledger {
+    /// Records money saved toward `item` (drawn by a purchase, or still in a fund when the plan
+    /// ends). `Plan.envelopes` holds one entry per item id (ENGINE-API): an item saved for more
+    /// than once (the chunks of a divisible item) adds up in one entry, whose `needed` is then the
+    /// cost of all the purchases the savings went to.
+    fn add_envelope(&mut self, item: &ItemId, saved: f64, needed: f64) {
+        match self.envelopes.iter_mut().find(|(id, _, _)| id == item) {
+            Some((_, s, n)) => {
+                *s += saved;
+                *n += needed;
+            }
+            None => self.envelopes.push((item.clone(), saved, needed)),
+        }
+    }
+
+    fn into_envelopes(self) -> (Vec<Purchase>, Vec<SavingsEnvelope>, BTreeMap<usize, u16>) {
+        let envelopes = self
+            .envelopes
+            .into_iter()
+            .map(|(item_id, saved, needed)| SavingsEnvelope {
+                item_id,
+                saved_usd: money(saved),
+                needed_usd: money(needed),
+            })
+            .collect();
+        (self.sequence, envelopes, self.purchase_months)
+    }
 }
 
 fn run(
@@ -543,11 +582,32 @@ fn run(
         let main_monthly = monthly * (1.0 - rare_share);
         let main_new = new - rare_new;
 
+        // Split, month 0: the one-off money goes to life-safety items first.
+        let mut one_off_fund = false;
+        if let (Schedule::Split { reserve_share }, true, None, 0) =
+            (schedule, future_money, stopped, m)
+        {
+            one_off_fund = one_off_to_life_safety(
+                &ctx,
+                &mut Books {
+                    state: &mut state,
+                    credited: &mut credited,
+                    ledger: &mut ledger,
+                    cache: &mut cache,
+                },
+                &mut main,
+                reserve_share,
+                main_monthly,
+                &mut month_events,
+            );
+        }
         // Split: at the start of the month, keep the fund's item while it is still worth buying
         // (or pick the top item if it costs more than this month's money and cannot be bought
-        // now),
-        // then put its share of this month's money into the fund.
-        if let (Schedule::Split { reserve_share }, true, None) = (schedule, future_money, stopped) {
+        // now), then put its share of this month's money into the fund. (A fund the one-off money
+        // has just opened already holds this month's share.)
+        if let (Schedule::Split { reserve_share }, true, None, false) =
+            (schedule, future_money, stopped, one_off_fund)
+        {
             if let Some((_, picks)) = cache.ordered(&ctx, &state) {
                 let kept = main
                     .target
@@ -586,6 +646,10 @@ fn run(
         // Main plan.
         while stopped.is_none() {
             let Some((_, picks)) = cache.ordered(&ctx, &state) else {
+                // Nothing is left worth buying, so neither is a fund's item (the last purchase
+                // covered its need): the plan lists no envelope for it, and its money is surplus
+                // like every later month's.
+                main.drop_target();
                 stopped = Some(m);
                 break;
             };
@@ -681,6 +745,7 @@ fn run(
                         &cand,
                         m,
                         false,
+                        false,
                         &mut month_events,
                     );
                     cache.invalidate(&ctx, pick.offer);
@@ -704,6 +769,7 @@ fn run(
                     &cand,
                     m,
                     true,
+                    false,
                     &mut month_events,
                 );
                 continue;
@@ -722,6 +788,7 @@ fn run(
                         &cand,
                         m,
                         true,
+                        false,
                         &mut month_events,
                     );
                     continue;
@@ -771,18 +838,10 @@ fn run(
     // Funds still open when the plan ends are reported with what they hold.
     for purse in [&main, &rare] {
         if let (Some(t), true) = (purse.target, purse.fund > EPS) {
-            ledger.envelopes.push(SavingsEnvelope {
-                item_id: ctx.offers[t.offer].item.id.clone(),
-                saved_usd: money(purse.fund),
-                needed_usd: money(t.cost),
-            });
+            ledger.add_envelope(&ctx.offers[t.offer].item.id, purse.fund, t.cost);
         }
     }
-    let Ledger {
-        sequence,
-        envelopes,
-        purchase_months,
-    } = ledger;
+    let (sequence, envelopes, purchase_months) = ledger.into_envelopes();
 
     // ---- Assemble the plan. ----
     let mut first = Vec::new();
@@ -1171,7 +1230,13 @@ fn evaluate(ctx: &Ctx<'_>, state: &State, i: usize, tier: TierId) -> Option<Cand
             }
             rem
         }
-        Some(_) => chunk_qty(ctx, state, i, horizon)?,
+        Some(step) => match chunk_qty(ctx, state, i, horizon) {
+            Some(q) => q,
+            // Its buckets have no room left (other items covered them), but its readiness credit
+            // has not been counted: one step still buys that.
+            None if !state.readiness_used[i] && !ctx.offers[i].readiness.is_empty() => step,
+            None => return None,
+        },
     };
     let mut c = evaluate_fixed(ctx, state, i, qty, tier, horizon);
     c.value = c.core;
@@ -1414,6 +1479,7 @@ fn buy(
     cand: &Candidate,
     month: u16,
     rare: bool,
+    one_off_first: bool,
     events: &mut Vec<Event>,
 ) {
     let from_savings = if use_fund {
@@ -1423,7 +1489,10 @@ fn buy(
     };
     purse.fund -= from_savings;
     purse.free = (purse.free - (cand.cost - from_savings)).max(0.0);
-    if purse.fund <= EPS {
+    // Deposits are whole cents but prices are not: less than a cent left in the fund goes back to
+    // free money, rather than paying for the next purchase as "savings" of $0.00.
+    if purse.fund < 0.01 - EPS {
+        purse.free += purse.fund.max(0.0);
         purse.fund = 0.0;
     }
     if purse.target.is_some_and(|t| t.offer == cand.offer) || purse.fund == 0.0 {
@@ -1431,11 +1500,7 @@ fn buy(
         purse.carried_from = None;
     }
     if from_savings > EPS {
-        ledger.envelopes.push(SavingsEnvelope {
-            item_id: ctx.offers[cand.offer].item.id.clone(),
-            saved_usd: money(from_savings),
-            needed_usd: money(cand.cost),
-        });
+        ledger.add_envelope(&ctx.offers[cand.offer].item.id, from_savings, cand.cost);
     }
     // What the purchase does to coverage as the plan reports it (free actions count only from
     // their month), for its explanation.
@@ -1473,6 +1538,7 @@ fn buy(
         shown,
         rare,
         from_savings,
+        one_off_first,
     });
 }
 
@@ -1491,6 +1557,117 @@ fn credit_free_actions(
             apply(ctx, credited, &cand);
             events.push(Event::Free { cand, done: false });
         }
+    }
+}
+
+/// The allocator's running state, borrowed together by helpers that buy.
+struct Books<'s> {
+    state: &'s mut State,
+    credited: &'s mut State,
+    ledger: &'s mut Ledger,
+    cache: &'s mut Cache,
+}
+
+impl Books<'_> {
+    /// Buys `pick` in month 0 with free money from `main`.
+    fn buy_now(
+        &mut self,
+        ctx: &Ctx<'_>,
+        main: &mut Purse,
+        pick: &Pick,
+        one_off_first: bool,
+        events: &mut Vec<Event>,
+    ) {
+        let cand = self.cache.candidate(pick);
+        buy(
+            ctx,
+            self.state,
+            self.credited,
+            main,
+            false,
+            self.ledger,
+            &cand,
+            0,
+            false,
+            one_off_first,
+            events,
+        );
+        self.cache.invalidate(ctx, pick.offer);
+    }
+}
+
+/// Split schedule, month 0: the one-off money goes to life-safety items first (DESIGN §4.7).
+///
+/// The top life-safety item is the first life-safety item in the buying order that costs more
+/// than a month's money (`monthly`). Cheaper ones are bought from monthly money soon enough, and
+/// the very first life-safety item in the order is nearly always one of them (two weeks of
+/// medicine for $12), so the one-off money is for the dear one. If the money left covers it, it is
+/// bought now and the next one is looked at. Otherwise `reserve_share` of the money left (half, by
+/// default) is kept for it, the rest buys the cheaper life-safety items, cheapest first, and
+/// everything those leave goes into its fund. Returns whether a fund was opened; it then stands in
+/// for month 0's usual deposit.
+fn one_off_to_life_safety(
+    ctx: &Ctx<'_>,
+    books: &mut Books<'_>,
+    main: &mut Purse,
+    reserve_share: f64,
+    monthly: f64,
+    events: &mut Vec<Event>,
+) -> bool {
+    let life_safety = |p: &Pick| ctx.offers[p.offer].item.life_safety;
+    loop {
+        let Some((_, picks)) = books.cache.ordered(ctx, books.state) else {
+            return false;
+        };
+        let Some(top) = picks
+            .iter()
+            .copied()
+            .find(|p| life_safety(p) && p.cost > monthly + EPS)
+        else {
+            return false;
+        };
+        if top.cost <= main.free + EPS {
+            books.buy_now(ctx, main, &top, true, events);
+            continue;
+        }
+        if main.free <= EPS {
+            return false;
+        }
+        let keep = reserve_share * main.free;
+        let start = events.len();
+        let still_wanted = loop {
+            let Some((_, picks)) = books.cache.ordered(ctx, books.state) else {
+                break None;
+            };
+            let Some(target) = picks.iter().copied().find(|p| p.offer == top.offer) else {
+                break None;
+            };
+            let spendable = main.free - keep;
+            let cheapest = picks
+                .iter()
+                .copied()
+                .filter(|p| p.offer != top.offer && life_safety(p) && p.cost <= spendable + EPS)
+                .min_by(|a, b| a.cost.total_cmp(&b.cost));
+            match cheapest {
+                Some(p) => books.buy_now(ctx, main, &p, false, events),
+                None => break Some(target),
+            }
+        };
+        // A cheaper item made it unnecessary: look again with the money left.
+        let Some(target) = still_wanted else {
+            continue;
+        };
+        let mut reserve = Vec::new();
+        main.deposit(
+            main.free,
+            FundFor::of(&target),
+            SaveHow::OneOff(reserve_share),
+            &mut reserve,
+        );
+        let opened = !reserve.is_empty();
+        // The deposit is listed before the purchases it left room for, like a month's usual one.
+        events.splice(start..start, reserve);
+        return opened;
     }
 }
 
@@ -1552,6 +1729,7 @@ fn plan_items(ctx: &Ctx<'_>, events: &[Event]) -> Vec<PlanItem> {
             shown,
             rare,
             from_savings,
+            one_off_first,
         } = e
         {
             let found = merged.iter_mut().find_map(|m| match m {
@@ -1560,13 +1738,15 @@ fn plan_items(ctx: &Ctx<'_>, events: &[Event]) -> Vec<PlanItem> {
                     shown: sh,
                     rare: r,
                     from_savings: f,
-                } if c.offer == cand.offer && r == rare => Some((c, sh, f)),
+                    one_off_first: o,
+                } if c.offer == cand.offer && r == rare => Some((c, sh, f, o)),
                 _ => None,
             });
-            if let Some((c, sh, f)) = found {
+            if let Some((c, sh, f, o)) = found {
                 merge_into(c, cand);
                 merge_into(sh, shown);
                 *f += from_savings;
+                *o |= *one_off_first;
                 continue;
             }
         }
@@ -1635,6 +1815,7 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
             shown,
             rare,
             from_savings,
+            one_off_first,
         } => {
             let lead = if *rare {
                 Lead::RareAllowance
@@ -1658,6 +1839,12 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
                     " Paid with {} saved in earlier months.",
                     explain::dollars(*from_savings)
                 ));
+            }
+            if *one_off_first {
+                item.why.push_str(
+                    " Your one-off money pays for this first: it keeps you safe and costs more \
+                     than a month's budget.",
+                );
             }
             item
         }
@@ -1683,18 +1870,19 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
                      more than a month's budget, so the plan saves for it instead of buying \
                      something worth less."
                 ),
-                SaveHow::Share(share) => {
-                    let part = if (share - 0.5).abs() < 1e-9 {
-                        "half".to_owned()
-                    } else {
-                        format!("{:.0}%", share * 100.0)
-                    };
-                    format!(
-                        "Sets aside {deposit_s} toward {name} ({saved_s} of {needed_s} saved). It \
-                         costs more than a month's budget, so the plan puts {part} of each month's \
-                         money toward it and spends the rest on other items."
-                    )
-                }
+                SaveHow::Share(share) => format!(
+                    "Sets aside {deposit_s} toward {name} ({saved_s} of {needed_s} saved). It \
+                     costs more than a month's budget, so the plan puts {} of each month's money \
+                     toward it and spends the rest on other items.",
+                    share_words(*share)
+                ),
+                SaveHow::OneOff(share) => format!(
+                    "Sets aside {deposit_s} toward {name} ({saved_s} of {needed_s} saved). It \
+                     keeps you safe but costs more than your one-off money, so {} of that money \
+                     goes toward it, the rest buys cheaper safety items first, and anything left \
+                     over is saved for it too.",
+                    share_words(*share)
+                ),
                 SaveHow::Rare => format!(
                     "Sets aside {deposit_s} from your rare-emergency allowance toward {name} \
                      ({saved_s} of {needed_s} saved)."
@@ -1726,6 +1914,15 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
                 paid_usd: None,
             }
         }
+    }
+}
+
+/// "half", or a percentage for another reserve share.
+fn share_words(share: f64) -> String {
+    if (share - 0.5).abs() < 1e-9 {
+        "half".to_owned()
+    } else {
+        format!("{:.0}%", share * 100.0)
     }
 }
 
