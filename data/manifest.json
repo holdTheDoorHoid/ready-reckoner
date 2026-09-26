@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "25f3ed156688",
-  "generated": "2026-09-26T08:24:54Z",
+  "pack_version": "2fb3538d5291",
+  "generated": "2026-09-26T19:26:12Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -45,10 +45,20 @@
           ]
         },
         {
+          "path": "core/declarations.csv",
+          "job": "displacement",
+          "sha256": "a3ca223ae65fbf7b9c4865bb64592c69841de84edab911364f5c62dd79d333f2",
+          "bytes": 46914,
+          "rows": 3232,
+          "key": [
+            "fips"
+          ]
+        },
+        {
           "path": "core/events.csv",
           "job": "events",
-          "sha256": "ba62a2de742fc0a5bd79a05780b59229db119a9b714d3a1e991a31e16ec45b59",
-          "bytes": 2710481,
+          "sha256": "842d6c2dae850bdba360575de1c1d407c2739ac68e307deb68d151683a3fc2e3",
+          "bytes": 2710495,
           "rows": 44057,
           "key": [
             "fips",
@@ -104,10 +114,51 @@
           "rows": 18
         },
         {
+          "path": "core/outage_causes.csv",
+          "job": "outage_model",
+          "sha256": "5483becca23ffc33fced39adafc791c8f88ea8dff3a7cd9fc9f5e3b9f8131730",
+          "bytes": 175259,
+          "rows": 3153,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/outage_curves.csv",
+          "job": "outage_model",
+          "sha256": "92d57bb8335c70fe8cb29889971354cac401879fc61c7a8fe8c134dd96616412",
+          "bytes": 7666,
+          "rows": 102,
+          "key": [
+            "region",
+            "class"
+          ]
+        },
+        {
+          "path": "core/outage_pooled.csv",
+          "job": "outage_model",
+          "sha256": "ed330e5c9da0af3bdf6892c7a1d28181c783ccb9334c80f41ab2e58a37d901b3",
+          "bytes": 301145,
+          "rows": 3209,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/outage_stress.csv",
+          "job": "outage_model",
+          "sha256": "9251acb90d21a352ef19b578291f5706aa7a5edb58121cf9b03f75534eece433",
+          "bytes": 367930,
+          "rows": 3186,
+          "key": [
+            "fips"
+          ]
+        },
+        {
           "path": "core/outages.csv",
           "job": "outages",
-          "sha256": "a614873aaf41697a22617fbe0d5b2e3b309fbf700a7163f1aa32aa120998992a",
-          "bytes": 299426,
+          "sha256": "ace3026f77572ad1312ec7fa094d0d7653b65818c50f15846bf1d6a400ecde0a",
+          "bytes": 312683,
           "rows": 3153,
           "key": [
             "fips"
@@ -116,11 +167,21 @@
         {
           "path": "core/outages_state.csv",
           "job": "outages",
-          "sha256": "75c57fc770e8feb0ba396e603223c71b37eb1e5048e14e7b1b2e437fd15940b0",
-          "bytes": 3078,
+          "sha256": "71fdc450e4beca7673649f31257fa5ca92a1b1e331fbe2298b6c7d015a5c178d",
+          "bytes": 3355,
           "rows": 53,
           "key": [
             "state_abbr"
+          ]
+        },
+        {
+          "path": "core/reliability.csv",
+          "job": "reliability",
+          "sha256": "59d2703a496f00fcd78e5f54ff619c4b028c5d1694832d8f5e239e53521259d3",
+          "bytes": 86882,
+          "rows": 3174,
+          "key": [
+            "fips"
           ]
         },
         {
@@ -134,6 +195,55 @@
           ]
         },
         {
+          "path": "core/series/drug_shortages.toml",
+          "job": "series",
+          "sha256": "c1fc7b46b06bd5754f9334942e6c957f808cff009b50c1d2acb06fba169abdb3",
+          "bytes": 2237,
+          "rows": 14
+        },
+        {
+          "path": "core/series/fbi_arrests.toml",
+          "job": "series",
+          "sha256": "3f8bce59679dba76f2aaf0796f854d6e4a2b9a46fdbf599d57192ffc605ac151",
+          "bytes": 16778,
+          "rows": 70
+        },
+        {
+          "path": "core/series/fcc_dirs.toml",
+          "job": "series",
+          "sha256": "f4a98bbe97b9d1070e7e8b1eb62b8c266abec97586e433099f123a1da87caee0",
+          "bytes": 6655,
+          "rows": 19
+        },
+        {
+          "path": "core/series/fdic_failures.toml",
+          "job": "series",
+          "sha256": "56a338c29fa56960dac49b4d83f4177644a8a62b9add9cfdc0f30f16a0ec61ba",
+          "bytes": 7140,
+          "rows": 92
+        },
+        {
+          "path": "core/series/funding_gaps.toml",
+          "job": "series",
+          "sha256": "79fe752a806e8438304b0bbd3cf7d5e71773e7d3af4a122a83e8ea83fad33542",
+          "bytes": 5317,
+          "rows": 27
+        },
+        {
+          "path": "core/series/ihp_displacement.toml",
+          "job": "displacement",
+          "sha256": "a041772ca0054cf7436921d97c51149ae33ac4305805c5dbd5d6ff4a0479143d",
+          "bytes": 8388,
+          "rows": 22
+        },
+        {
+          "path": "core/series/oe417.toml",
+          "job": "series",
+          "sha256": "4c66723a6cbbdd877da93fb42ee7c0bd2d5dde3ce8700a83dd7d44d4c327bee4",
+          "bytes": 23398,
+          "rows": 288
+        },
+        {
           "path": "core/states.csv",
           "job": "geography",
           "sha256": "0ba0c48efe7dcf197ef4ba0392d16747f0996cfb81d28fab534596754ffef022",
@@ -141,6 +251,16 @@
           "rows": 56,
           "key": [
             "state_fips"
+          ]
+        },
+        {
+          "path": "core/temperature.csv",
+          "job": "climate_daily",
+          "sha256": "0460dbf3aa63823cce7e26f162799931c473e0e3037f42120cfd6d155607a260",
+          "bytes": 522589,
+          "rows": 3107,
+          "key": [
+            "fips"
           ]
         },
         {
@@ -185,6 +305,36 @@
           "sha256": "5513188c3fbe4220767cf9308c3727c022c76011ea9c163ac8785d0682adf980",
           "bytes": 1441292,
           "rows": 3222
+        }
+      ]
+    },
+    "outage_events": {
+      "description": "Optional: every county power outage of a day or more since 2014 with its restoration curve and cause, and the held-out test of the outage model. Loaded only by the expert views and the validation page.",
+      "files": [
+        {
+          "path": "opt/outage_events/county_events.csv",
+          "job": "outage_model",
+          "sha256": "91aecfab7328fb18b09663c3d394678ab714945e69daa12a10d9b7a49ea877ac",
+          "bytes": 1938174,
+          "rows": 29878,
+          "key": [
+            "county_fips",
+            "start"
+          ]
+        },
+        {
+          "path": "opt/outage_events/holdout.csv",
+          "job": "outage_model",
+          "sha256": "6eb3e0d0a1fbd3c2f9e11e090d275e444472b4c96876aa6e6a3f3bff4b45d36c",
+          "bytes": 10516,
+          "rows": 130,
+          "key": [
+            "split",
+            "mark_days",
+            "estimator",
+            "measure",
+            "bin"
+          ]
         }
       ]
     }
@@ -443,15 +593,235 @@
         }
       ]
     },
+    "climate_daily": {
+      "title": "Heat and cold days by county and month (NOAA nClimGrid-Daily 1991-2020) and outage hours on hot and cold days",
+      "finished": "2026-09-26T19:26:06Z",
+      "sources": [
+        {
+          "name": "NOAA NCEI nClimGrid-Daily county averages, daily maximum temperature",
+          "url": "https://www.ncei.noaa.gov/data/nclimgrid-daily/access/averages/<year>/tmax-<yyyymm>-cty-scaled.csv (1991-2025, 420 monthly files)",
+          "version": "nClimGrid-Daily v1.0.0 (scaled county averages)",
+          "retrieved": "2026-09-26T19:23:33Z",
+          "sha256": "6449d596e051232b0641569542e4d48874712295b42a5cdae070529fb5f636db",
+          "bytes": 459265800,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "NOAA NCEI nClimGrid-Daily county averages, daily minimum temperature",
+          "url": "https://www.ncei.noaa.gov/data/nclimgrid-daily/access/averages/<year>/tmin-<yyyymm>-cty-scaled.csv (1991-2025, 420 monthly files)",
+          "version": "nClimGrid-Daily v1.0.0 (scaled county averages)",
+          "retrieved": "2026-09-26T19:23:33Z",
+          "sha256": "e95236178c5a9bfa9d897785ce26ae5604f8275d120c8510a96179542c8da977",
+          "bytes": 459265800,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 2609880,
+      "rows_out": 3107,
+      "outputs": [
+        "core/temperature.csv"
+      ],
+      "notes": [
+        "Monthly shares: days in 1991-2020 with a county-average high of at least 90 °F (32.2 °C) or 100 °F (37.8 °C), or a low of at most 20 °F (-6.7 °C) or 0 °F (-17.8 °C), divided by the days with data in that calendar month. County averages run cooler than the hottest spot in a county and warmer than the coldest.",
+        "Outage shares: EAGLE-I event customer-hours (2014-2025, repaired series, from the outages job) by local calendar day (standard time from the county's longitude), on days with a county-average high of at least 95 °F (35 °C) or a low of at most 20 °F; 705047 unit-days joined. Days without temperature data are left out of both parts of the share. The region share weights the county and every county within 400 km by customer-hours and by (1 - (distance/400 km)^2)^2.",
+        "nClimGrid's county code is NCEI's alphabetical state number followed by the county FIPS code (02001 is Apache County, Arizona), so the state comes from the abbreviation in the name column. Connecticut's eight old counties are converted to planning regions by land share."
+      ],
+      "missing": [
+        {
+          "reason": "No nClimGrid-Daily county series",
+          "fips": [
+            "11001",
+            "51678"
+          ]
+        },
+        {
+          "reason": "nClimGrid-Daily covers the contiguous US only",
+          "fips": [
+            "02013",
+            "02016",
+            "02020",
+            "02050",
+            "02060",
+            "02063",
+            "02066",
+            "02068",
+            "02070",
+            "02090",
+            "02100",
+            "02105",
+            "02110",
+            "02122",
+            "02130",
+            "02150",
+            "02158",
+            "02164",
+            "02170",
+            "02180",
+            "02185",
+            "02188",
+            "02195",
+            "02198",
+            "02220",
+            "02230",
+            "02240",
+            "02275",
+            "02282",
+            "02290",
+            "15001",
+            "15003",
+            "15005",
+            "15007",
+            "15009",
+            "60010",
+            "60020",
+            "60050",
+            "66010",
+            "69100",
+            "69110",
+            "69120",
+            "72001",
+            "72003",
+            "72005",
+            "72007",
+            "72009",
+            "72011",
+            "72013",
+            "72015",
+            "72017",
+            "72019",
+            "72021",
+            "72023",
+            "72025",
+            "72027",
+            "72029",
+            "72031",
+            "72033",
+            "72035",
+            "72037",
+            "72039",
+            "72041",
+            "72043",
+            "72045",
+            "72047",
+            "72049",
+            "72051",
+            "72053",
+            "72054",
+            "72055",
+            "72057",
+            "72059",
+            "72061",
+            "72063",
+            "72065",
+            "72067",
+            "72069",
+            "72071",
+            "72073",
+            "72075",
+            "72077",
+            "72079",
+            "72081",
+            "72083",
+            "72085",
+            "72087",
+            "72089",
+            "72091",
+            "72093",
+            "72095",
+            "72097",
+            "72099",
+            "72101",
+            "72103",
+            "72105",
+            "72107",
+            "72109",
+            "72111",
+            "72113",
+            "72115",
+            "72117",
+            "72119",
+            "72121",
+            "72123",
+            "72125",
+            "72127",
+            "72129",
+            "72131",
+            "72133",
+            "72135",
+            "72137",
+            "72139",
+            "72141",
+            "72143",
+            "72145",
+            "72147",
+            "72149",
+            "72151",
+            "72153",
+            "78010",
+            "78020",
+            "78030"
+          ]
+        }
+      ]
+    },
+    "displacement": {
+      "title": "Federal disaster declarations per county and FEMA housing assistance by type of disaster (OpenFEMA)",
+      "finished": "2026-09-26T18:18:26Z",
+      "sources": [
+        {
+          "name": "OpenFEMA DisasterDeclarationsSummaries v2",
+          "url": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$select=disasterNumber,declarationType,declarationDate,incidentType,ihProgramDeclared,iaProgramDeclared,fipsStateCode,fipsCountyCode,placeCode,designatedArea,id (pages of 10000 ordered by id)",
+          "version": "v2; 8 pages",
+          "retrieved": "2026-09-26T18:17:30Z",
+          "sha256": "78d4dd94cd8d374cfcb4e0932c6308dc849ccacc68158f7084d49b224960944e",
+          "bytes": 22217997,
+          "license": "OpenFEMA Terms and Conditions (public data; citation and statement required)",
+          "obligations": "Cite the OpenFEMA dataset page with access date; show: This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s)."
+        },
+        {
+          "name": "OpenFEMA HousingAssistanceRenters v2",
+          "url": "https://www.fema.gov/api/open/v2/HousingAssistanceRenters?$select=disasterNumber,validRegistrations,approvedForFemaAssistance,rentalAmount,id (pages of 10000 ordered by id)",
+          "version": "v2; 15 pages",
+          "retrieved": "2026-09-26T18:17:42Z",
+          "sha256": "ae5db5eb63705076f1d85d84089822873aa8a0fe5731e860114027d12d4068b3",
+          "bytes": 20662900,
+          "license": "OpenFEMA Terms and Conditions (public data; citation and statement required)",
+          "obligations": "Cite the OpenFEMA dataset page with access date; show: This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s)."
+        },
+        {
+          "name": "OpenFEMA HousingAssistanceOwners v2",
+          "url": "https://www.fema.gov/api/open/v2/HousingAssistanceOwners?$select=disasterNumber,validRegistrations,approvedForFemaAssistance,rentalAmount,id (pages of 10000 ordered by id)",
+          "version": "v2; 17 pages",
+          "retrieved": "2026-09-26T18:18:02Z",
+          "sha256": "327b52220de81f70ac4909ef22c8f58cfd10dc5cda6a7a16141b8758ea3f99e3",
+          "bytes": 22452907,
+          "license": "OpenFEMA Terms and Conditions (public data; citation and statement required)",
+          "obligations": "Cite the OpenFEMA dataset page with access date; show: This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s)."
+        }
+      ],
+      "rows_in": 378747,
+      "rows_out": 3254,
+      "outputs": [
+        "core/declarations.csv",
+        "core/series/ihp_displacement.toml"
+      ],
+      "notes": [
+        "Declarations: major-disaster (DR) declarations only; one count per disaster per county; 942 statewide or tribal rows not counted; last_5yr = declared in 2021-2025. Connecticut declarations on the old counties count for every planning region they overlap. hurricane_or_flood = incident type Hurricane, Tropical Storm, Tropical Depression, Typhoon, Coastal Storm, Flood. County codes not placed: 02201, 60030, 60040, 64002, 64005, 64040, 64060, 68010, 68030, 68040, 68070, 68080, 68090, 68110, 68120, 68140, 68150, 68160, 68170, 68180.",
+        "9 disaster groups in the housing-assistance series; values rounded to 4 significant figures."
+      ],
+      "definitions": {
+        "county_declarations_5yr": "Major-disaster declarations (FEMA type DR) that designated the county, declared in 2021-2025 (the five full years before the pack was built); a declaration counts once however many rows it has."
+      }
+    },
     "events": {
       "title": "Event rates per county from HURDAT2, SPC severe reports and NOAA Storm Events",
-      "finished": "2026-09-26T03:42:04Z",
+      "finished": "2026-09-26T19:23:21Z",
       "sources": [
         {
           "name": "NOAA NHC HURDAT2 best tracks, Atlantic",
           "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2025-091226.txt",
           "version": "hurdat2-1851-2025-091226.txt",
-          "retrieved": "2026-09-26T03:41:16Z",
+          "retrieved": "2026-09-26T19:22:39Z",
           "sha256": "df63fabce0ad824d20447e241bd27a2a65ae36cb2f9b62aa3caacd9171c34f11",
           "bytes": 7071568,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -460,7 +830,7 @@
           "name": "NOAA NHC HURDAT2 best tracks, eastern and central Pacific",
           "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2025-091426.txt",
           "version": "hurdat2-nepac-1949-2025-091426.txt",
-          "retrieved": "2026-09-26T03:41:17Z",
+          "retrieved": "2026-09-26T19:22:40Z",
           "sha256": "02a8860ecb276a01272b5a57655229689bd42c6c9a647e02176273a6213440bc",
           "bytes": 4084038,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -469,7 +839,7 @@
           "name": "NOAA SPC severe weather database: tornadoes (all segments)",
           "url": "https://www.spc.noaa.gov/wcm/data/1950-2025_all_tornadoes.csv",
           "version": "1950-2025_all_tornadoes.csv; Last-Modified Fri, 24 Apr 2026 19:12:10 GMT",
-          "retrieved": "2026-09-26T03:41:19Z",
+          "retrieved": "2026-09-26T19:22:43Z",
           "sha256": "0ac30e15505a875fd2e6269bba55835701f51f67661169ec25de5bed08698973",
           "bytes": 9219030,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -478,7 +848,7 @@
           "name": "NOAA SPC severe weather database: hail reports",
           "url": "https://www.spc.noaa.gov/wcm/data/1955-2025_hail.csv.zip",
           "version": "1955-2025_hail.csv.zip; Last-Modified Fri, 24 Apr 2026 19:12:09 GMT",
-          "retrieved": "2026-09-26T03:41:22Z",
+          "retrieved": "2026-09-26T19:22:44Z",
           "sha256": "f511540a2c1454c863fc1604cf5b2d33bb3e6bfe531079f3a61d53b5d7fe70f8",
           "bytes": 8266856,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -487,7 +857,7 @@
           "name": "NOAA SPC severe weather database: wind reports",
           "url": "https://www.spc.noaa.gov/wcm/data/1955-2025_wind.csv.zip",
           "version": "1955-2025_wind.csv.zip; Last-Modified Fri, 24 Apr 2026 19:12:13 GMT",
-          "retrieved": "2026-09-26T03:41:29Z",
+          "retrieved": "2026-09-26T19:22:47Z",
           "sha256": "1db782d96d29dbb0ffd488a466f006799681cbe04b0003f245d1a2f3f6b9d87b",
           "bytes": 11875052,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -496,7 +866,7 @@
           "name": "NWS zone-county correlation file",
           "url": "https://www.weather.gov/source/gis/Shapefiles/County/bp16ap26.dbx",
           "version": "bp16ap26.dbx",
-          "retrieved": "2026-09-26T03:41:38Z",
+          "retrieved": "2026-09-26T19:22:53Z",
           "sha256": "69d3472d4d576b8a4924efb7a43108f7c64111f503e15efd650f43dc617a6f12",
           "bytes": 350723,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -505,7 +875,7 @@
           "name": "NWS zone-county correlation file",
           "url": "https://www.weather.gov/source/gis/Shapefiles/County/bp18mr25.dbx",
           "version": "bp18mr25.dbx",
-          "retrieved": "2026-09-26T03:41:38Z",
+          "retrieved": "2026-09-26T19:22:53Z",
           "sha256": "721c00ea7a609d5f06ea16f5c8e588d1ab9a928e58d345be522781c957484f6d",
           "bytes": 345543,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -514,7 +884,7 @@
           "name": "NOAA NCEI Storm Events details 1996",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1996_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1996_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:39Z",
+          "retrieved": "2026-09-26T19:22:54Z",
           "sha256": "518c43aadbffbf7509a2ab20cfa6b54f1d63f196b3d8aedb9ffd7d032968eb45",
           "bytes": 6297309,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -523,7 +893,7 @@
           "name": "NOAA NCEI Storm Events details 1997",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1997_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1997_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:40Z",
+          "retrieved": "2026-09-26T19:22:55Z",
           "sha256": "3fdcaa0a839d8b619161188d7d01b8e24e2688fcfc227ea15a73d7da876b36bc",
           "bytes": 6632990,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -532,7 +902,7 @@
           "name": "NOAA NCEI Storm Events details 1998",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1998_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1998_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:40Z",
+          "retrieved": "2026-09-26T19:22:56Z",
           "sha256": "21e4b8d8a88437a25f441ef453ab2ef96ef98f479f2d0f51d0f72b559176699b",
           "bytes": 10295109,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -541,7 +911,7 @@
           "name": "NOAA NCEI Storm Events details 1999",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d1999_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d1999_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:41Z",
+          "retrieved": "2026-09-26T19:22:57Z",
           "sha256": "c407d09273bc91d645f0f119bfd7128c153f1acb62c239f34572f483b09aacfb",
           "bytes": 10362659,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -550,7 +920,7 @@
           "name": "NOAA NCEI Storm Events details 2000",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2000_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2000_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:42Z",
+          "retrieved": "2026-09-26T19:22:57Z",
           "sha256": "a4ca5b02ad766bf50db2b192c127b625018f66bb9fb4d9746677d39ba2e392ab",
           "bytes": 7914864,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -559,7 +929,7 @@
           "name": "NOAA NCEI Storm Events details 2001",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2001_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2001_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:42Z",
+          "retrieved": "2026-09-26T19:22:58Z",
           "sha256": "77a84aa66aaa9f7f95a15ecb2d18451bc05be801ea10f606d2e83fb44f737e51",
           "bytes": 6876091,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -568,7 +938,7 @@
           "name": "NOAA NCEI Storm Events details 2002",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2002_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2002_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:43Z",
+          "retrieved": "2026-09-26T19:22:59Z",
           "sha256": "6f941b2ea120245e2e924093032c91c3377e7d1ea2c9163593456facb9ebe185",
           "bytes": 7196867,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -577,7 +947,7 @@
           "name": "NOAA NCEI Storm Events details 2003",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2003_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2003_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:44Z",
+          "retrieved": "2026-09-26T19:22:59Z",
           "sha256": "f6d23ba4043394a517c8c6b0db8346f940a1de3fb8cac76eee773c5797243e3c",
           "bytes": 7213001,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -586,7 +956,7 @@
           "name": "NOAA NCEI Storm Events details 2004",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2004_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2004_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:44Z",
+          "retrieved": "2026-09-26T19:23:00Z",
           "sha256": "b0827cd69b8d0ddc1446d8a322132502a05af19b1193c15eae118f13396844e3",
           "bytes": 7335278,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -595,7 +965,7 @@
           "name": "NOAA NCEI Storm Events details 2005",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2005_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2005_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:45Z",
+          "retrieved": "2026-09-26T19:23:01Z",
           "sha256": "d68e3cbfbe5fb79f720eccea372c53585614bab618f3c2a4433e47767f54e55f",
           "bytes": 7765419,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -604,7 +974,7 @@
           "name": "NOAA NCEI Storm Events details 2006",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2006_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2006_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:46Z",
+          "retrieved": "2026-09-26T19:23:01Z",
           "sha256": "a958ea15688b3346fd69efe53e91b4d57a26f8e6f99e1ddcc3b92c2eb2d57d0b",
           "bytes": 7590951,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -613,7 +983,7 @@
           "name": "NOAA NCEI Storm Events details 2007",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2007_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2007_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:46Z",
+          "retrieved": "2026-09-26T19:23:02Z",
           "sha256": "e8289daa871946230862e2ca0d119195df7108e4a680fe83e3d419f3f21a7524",
           "bytes": 9775676,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -622,7 +992,7 @@
           "name": "NOAA NCEI Storm Events details 2008",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2008_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2008_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:47Z",
+          "retrieved": "2026-09-26T19:23:03Z",
           "sha256": "c97260e82760b17bc571d55e1ca1f5073ccc0558b774313d46dddc3e1ef39b37",
           "bytes": 12276398,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -631,7 +1001,7 @@
           "name": "NOAA NCEI Storm Events details 2009",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2009_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2009_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:48Z",
+          "retrieved": "2026-09-26T19:23:03Z",
           "sha256": "c04d6e0173153475440cb614bd019287986c74c311c61864478f9087d7d1b357",
           "bytes": 10335606,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -640,7 +1010,7 @@
           "name": "NOAA NCEI Storm Events details 2010",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2010_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2010_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:49Z",
+          "retrieved": "2026-09-26T19:23:04Z",
           "sha256": "d109f8a6ab1a71e70f60fe42d30a0e31f370c904e248a51e5fe85573f904878e",
           "bytes": 11729156,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -649,7 +1019,7 @@
           "name": "NOAA NCEI Storm Events details 2011",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2011_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2011_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:50Z",
+          "retrieved": "2026-09-26T19:23:05Z",
           "sha256": "be3b40cd098a879be12c2c3e614700560bd537e6178bba8b1aaf099f665dda40",
           "bytes": 15695066,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -658,7 +1028,7 @@
           "name": "NOAA NCEI Storm Events details 2012",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2012_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2012_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:51Z",
+          "retrieved": "2026-09-26T19:23:06Z",
           "sha256": "673db47f6dc9e97e06ffec3b628f5341c128f594d9b247bd07bad2e8397ebac3",
           "bytes": 11820671,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -667,7 +1037,7 @@
           "name": "NOAA NCEI Storm Events details 2013",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2013_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2013_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:53Z",
+          "retrieved": "2026-09-26T19:23:07Z",
           "sha256": "4fa4036ed1c7ea9a779d5a5841d18de08596c423920189a9e6173488d1a98260",
           "bytes": 11725909,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -676,7 +1046,7 @@
           "name": "NOAA NCEI Storm Events details 2014",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2014_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2014_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:53Z",
+          "retrieved": "2026-09-26T19:23:08Z",
           "sha256": "410b457b1b9628cfd63292848a626482a88714c8bd8c45d56a0469f9de05d078",
           "bytes": 11084754,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -685,7 +1055,7 @@
           "name": "NOAA NCEI Storm Events details 2015",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2015_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2015_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:54Z",
+          "retrieved": "2026-09-26T19:23:09Z",
           "sha256": "c4a5a24b8c69ad2b6b867790ce298f5b642a60516c9fce5550a8d2f67cd7bf2e",
           "bytes": 10041550,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -694,7 +1064,7 @@
           "name": "NOAA NCEI Storm Events details 2016",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2016_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2016_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:55Z",
+          "retrieved": "2026-09-26T19:23:10Z",
           "sha256": "d8e1389897df3557e74ba36820357f6962a7c0ca922595400fe74d883f7a5036",
           "bytes": 9065715,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -703,7 +1073,7 @@
           "name": "NOAA NCEI Storm Events details 2017",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2017_c20260519.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2017_c20260519.csv.gz",
-          "retrieved": "2026-09-26T03:41:56Z",
+          "retrieved": "2026-09-26T19:23:10Z",
           "sha256": "bd3ca72b71544222cba8aa2b29eb3f0efe050d3330a0c408e208befb66881750",
           "bytes": 9340854,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -712,7 +1082,7 @@
           "name": "NOAA NCEI Storm Events details 2018",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2018_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2018_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:57Z",
+          "retrieved": "2026-09-26T19:23:11Z",
           "sha256": "19702480f50cd2a8dacce5e57891feba156afb87b1ea5cbb4eaeda69d2b964a4",
           "bytes": 9585982,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -721,7 +1091,7 @@
           "name": "NOAA NCEI Storm Events details 2019",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2019_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2019_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:57Z",
+          "retrieved": "2026-09-26T19:23:12Z",
           "sha256": "f5043ecc776818b0feffdf1e0fcbaf63329db0635eab1057c7b8ba00ef332e3b",
           "bytes": 11602648,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -730,7 +1100,7 @@
           "name": "NOAA NCEI Storm Events details 2020",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2020_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2020_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:58Z",
+          "retrieved": "2026-09-26T19:23:13Z",
           "sha256": "895c56fd46991c4d9a135d67558dc4b447a02a2314efac0ace645135b98f9c9d",
           "bytes": 10444606,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -739,7 +1109,7 @@
           "name": "NOAA NCEI Storm Events details 2021",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2021_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2021_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:41:59Z",
+          "retrieved": "2026-09-26T19:23:14Z",
           "sha256": "60c1daf96dbe8eafd48c80df5b70df51a0125ab95d467ee7009a646761d57715",
           "bytes": 10563953,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -748,7 +1118,7 @@
           "name": "NOAA NCEI Storm Events details 2022",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2022_c20260625.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2022_c20260625.csv.gz",
-          "retrieved": "2026-09-26T03:42:00Z",
+          "retrieved": "2026-09-26T19:23:15Z",
           "sha256": "7d6b79d0049a6edec96b061738289daddba90be26fc9afe7b0a6fd617f21452e",
           "bytes": 11817849,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -757,7 +1127,7 @@
           "name": "NOAA NCEI Storm Events details 2023",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2023_c20260323.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2023_c20260323.csv.gz",
-          "retrieved": "2026-09-26T03:42:01Z",
+          "retrieved": "2026-09-26T19:23:16Z",
           "sha256": "713784bed40d9e5a95b1d6240a654f865f3ef97703713105c7b35437270da134",
           "bytes": 12888092,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -766,7 +1136,7 @@
           "name": "NOAA NCEI Storm Events details 2024",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2024_c20260728.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2024_c20260728.csv.gz",
-          "retrieved": "2026-09-26T03:42:02Z",
+          "retrieved": "2026-09-26T19:23:17Z",
           "sha256": "2070b83eccab041b36360ab73645b9a249c3eefc5b92b5b3fc0cbba4d9fcc09c",
           "bytes": 12693243,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -775,7 +1145,7 @@
           "name": "NOAA NCEI Storm Events details 2025",
           "url": "https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d2025_c20260819.csv.gz",
           "version": "StormEvents_details-ftp_v1.0_d2025_c20260819.csv.gz",
-          "retrieved": "2026-09-26T03:42:03Z",
+          "retrieved": "2026-09-26T19:23:18Z",
           "sha256": "d9b46b4c6aae554723cadbb9691f3d5258371c02e530ba815d6fe41e4550149f",
           "bytes": 12585209,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -790,8 +1160,9 @@
         "Periods: HURDAT2 1950-2025 (76 years); SPC and Storm Events 1996-2025 (30 years; Storm Events began recording all event types in 1996). A missing row means no recorded event of that type (rate 0), except that HURDAT2 does not cover the western or southern Pacific: typhoon passages for 60010, 60020, 60050, 66010, 69100, 69110, 69120 are not counted (use NRI hurricane fields or tropical_cyclone_impact).",
         "Storm passages: a storm counts when its best track passes within 50 nautical miles of the county's internal point with interpolated maximum sustained wind of at least 34 kt (tropical_storm_passage), 64 kt (hurricane_passage) or 96 kt (major_hurricane_passage), whatever its tropical or post-tropical status.",
         "SPC: tornadoes are counted once per county per tornado using the per-state segment records (sn = 1) and their county list (f1-f4); tornado_ef2plus uses the rating (mag >= 2). Hail and wind are counted as days with at least one report in the county (hail 1 in and 2 in or larger by size; all severe-wind reports, and 65 kt or more). share_damaging is the share with a reported property loss above zero; loss units changed in 2016 but only 'above zero' is used.",
-        "Storm Events: one observation per county per NOAA episode and type. Zone records apply to every county the NWS zone-county correlation file lists for that zone (newest file first, older files as fallback). Episode length runs from the earliest begin to the latest end of the episode's records in the county (local standard time as recorded). share_damaging counts reported property or crop damage above zero (many records leave damage blank, so it is a lower bound); share_injury counts direct or indirect injuries or deaths.",
-        "Retired forecast zones: 20386 zone records whose code is not in the correlation files were placed in the one county of that state whose name the zone carries (after dropping words like Northern or Coastal); 34015 records (382 distinct zones) could not be placed and were skipped (5.1% of the records used).",
+        "Storm Events: one observation per county per NOAA episode and type. Zone records apply to every county the NWS zone-county correlation file lists for that zone (newest file first, older files as fallback). Episode length runs from the earliest begin to the latest end of the episode's records in the county, with every time converted to UTC from the record's CZ_TIMEZONE (until 2026-09-26 the zone was ignored, so an episode whose records sat in two time zones was off by an hour). share_damaging counts reported property or crop damage above zero (many records leave damage blank, so it is a lower bound); share_injury counts direct or indirect injuries or deaths.",
+        "Retired forecast zones: 21455 zone records whose code is not in the correlation files were placed in the one county of that state whose name the zone carries (after dropping words like Northern or Coastal); 35050 records (382 distinct zones) could not be placed and were skipped (5.2% of the records used).",
+        "Time zones: 0 Storm Events records had no recognisable CZ_TIMEZONE; their times were converted with the county's longitude (one hour per 15 degrees). The 2014+ county-episodes (UTC begin and end, every outage-relevant type) and the HURDAT2 fixes with their UTC times are handed to the outage_model job; they are not pack files.",
         "Connecticut: sources that report the retired counties are apportioned to planning regions by land-area share (each region's weight is the share of its land inside the reporting county)."
       ],
       "missing": [
@@ -1152,24 +1523,222 @@
         "tsunami_zone": "A county has a tsunami zone when NRI v1.20 assigns it tsunami building or population exposure (TSUN_EXPB > 0 or TSUN_EXPP > 0)."
       }
     },
+    "outage_model": {
+      "title": "Outage causes, credibility-weighted regional tails, restoration curves and the worst-event stress table (EAGLE-I events)",
+      "finished": "2026-09-26T19:23:33Z",
+      "sources": [
+        {
+          "name": "Hand-copied pre-2014 outage events and event names (crates/rr-etl/data/historic_outages.toml)",
+          "url": "crates/rr-etl/data/historic_outages.toml",
+          "version": "2 events, 5 names",
+          "retrieved": "",
+          "sha256": "f8ef4e285ac341eee849e972b2593bc05c70f54889c41aede64f6acc02f5012a",
+          "bytes": 4709,
+          "license": "figures from the sources listed per event (US Government works)"
+        }
+      ],
+      "rows_in": 571912,
+      "rows_out": 39658,
+      "outputs": [
+        "core/outage_pooled.csv",
+        "core/outage_causes.csv",
+        "core/outage_curves.csv",
+        "core/outage_stress.csv",
+        "opt/outage_events/county_events.csv",
+        "opt/outage_events/holdout.csv"
+      ],
+      "notes": [
+        "Attribution: 571912 county events read; 7467 matched to a tropical cyclone track, 88595 to Storm Events episodes, 14025 to an OE-417 grid disturbance, the rest are 'cause not recorded'. Of the 857 events with customers still out a week after the peak, 619 (72%) are attributed. 453587 Storm Events county-episodes and 467 tropical cyclones (2014 onward) were available.",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 1+ days, blend: predicted 22762463 customer outages, observed 35610687 (observed/predicted 1.56); mean Poisson deviance of qualifying-event counts 3.696 over 2967 counties.",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 1+ days, county only: predicted 24479527 customer outages, observed 35610687 (observed/predicted 1.45); mean Poisson deviance of qualifying-event counts 22.559 over 2967 counties.",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 1+ days, region only: predicted 21620266 customer outages, observed 35610687 (observed/predicted 1.65); mean Poisson deviance of qualifying-event counts 4.730 over 2967 counties.",
+        "Held-out reliability (2014-2019 -> 2020-2025), 1+ days, blend, predicted 3 to 10 in 100: mean predicted yearly chance 0.073, observed share of county-years 0.115 (226 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 1+ days, blend, predicted 10 to 30 in 100: mean predicted yearly chance 0.228, observed share of county-years 0.293 (5683 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 1+ days, blend, predicted 30 in 100 or more: mean predicted yearly chance 0.521, observed share of county-years 0.602 (11474 county-years).",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 3+ days, blend: predicted 2511482 customer outages, observed 6049109 (observed/predicted 2.41); mean Poisson deviance of qualifying-event counts 1.979 over 2967 counties.",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 3+ days, county only: predicted 3185871 customer outages, observed 6049109 (observed/predicted 1.90); mean Poisson deviance of qualifying-event counts 15.476 over 2967 counties.",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 3+ days, region only: predicted 2439351 customer outages, observed 6049109 (observed/predicted 2.48); mean Poisson deviance of qualifying-event counts 2.054 over 2967 counties.",
+        "Held-out reliability (2014-2019 -> 2020-2025), 3+ days, blend, predicted under 1 in 100: mean predicted yearly chance 0.004, observed share of county-years 0.054 (355 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 3+ days, blend, predicted 1 to 3 in 100: mean predicted yearly chance 0.024, observed share of county-years 0.083 (2111 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 3+ days, blend, predicted 3 to 10 in 100: mean predicted yearly chance 0.057, observed share of county-years 0.100 (8911 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 3+ days, blend, predicted 10 to 30 in 100: mean predicted yearly chance 0.160, observed share of county-years 0.215 (5640 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 3+ days, blend, predicted 30 in 100 or more: mean predicted yearly chance 0.357, observed share of county-years 0.549 (366 county-years).",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 7+ days, blend: predicted 103686 customer outages, observed 557387 (observed/predicted 5.38); mean Poisson deviance of qualifying-event counts 0.745 over 2967 counties.",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 7+ days, county only: predicted 106172 customer outages, observed 557387 (observed/predicted 5.25); mean Poisson deviance of qualifying-event counts 3.102 over 2967 counties.",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 7+ days, region only: predicted 103464 customer outages, observed 557387 (observed/predicted 5.39); mean Poisson deviance of qualifying-event counts 0.749 over 2967 counties.",
+        "Held-out reliability (2014-2019 -> 2020-2025), 7+ days, blend, predicted under 1 in 100: mean predicted yearly chance 0.006, observed share of county-years 0.016 (14062 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 7+ days, blend, predicted 1 to 3 in 100: mean predicted yearly chance 0.017, observed share of county-years 0.030 (3069 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 7+ days, blend, predicted 3 to 10 in 100: mean predicted yearly chance 0.034, observed share of county-years 0.073 (234 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 7+ days, blend, predicted 10 to 30 in 100: mean predicted yearly chance 0.287, observed share of county-years 0.000 (12 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 7+ days, blend, predicted 30 in 100 or more: mean predicted yearly chance 0.338, observed share of county-years 0.167 (6 county-years).",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 14+ days, blend: predicted 7769 customer outages, observed 30764 (observed/predicted 3.96); mean Poisson deviance of qualifying-event counts 0.381 over 2967 counties.",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 14+ days, county only: predicted 8086 customer outages, observed 30764 (observed/predicted 3.80); mean Poisson deviance of qualifying-event counts 0.800 over 2967 counties.",
+        "Held-out test (2014-2019 -> 2020-2025), outages of 14+ days, region only: predicted 7763 customer outages, observed 30764 (observed/predicted 3.96); mean Poisson deviance of qualifying-event counts 0.383 over 2967 counties.",
+        "Held-out reliability (2014-2019 -> 2020-2025), 14+ days, blend, predicted under 1 in 100: mean predicted yearly chance 0.002, observed share of county-years 0.004 (16667 county-years).",
+        "Held-out reliability (2014-2019 -> 2020-2025), 14+ days, blend, predicted 1 to 3 in 100: mean predicted yearly chance 0.012, observed share of county-years 0.025 (716 county-years).",
+        "Held-out test (even years -> odd years), outages of 1+ days, blend: predicted 29282061 customer outages, observed 30766732 (observed/predicted 1.05); mean Poisson deviance of qualifying-event counts 1.980 over 3145 counties.",
+        "Held-out test (even years -> odd years), outages of 1+ days, county only: predicted 29445088 customer outages, observed 30766732 (observed/predicted 1.04); mean Poisson deviance of qualifying-event counts 7.902 over 3145 counties.",
+        "Held-out test (even years -> odd years), outages of 1+ days, region only: predicted 28239659 customer outages, observed 30766732 (observed/predicted 1.09); mean Poisson deviance of qualifying-event counts 3.122 over 3145 counties.",
+        "Held-out reliability (even years -> odd years), 1+ days, blend, predicted 3 to 10 in 100: mean predicted yearly chance 0.059, observed share of county-years 0.079 (126 county-years).",
+        "Held-out reliability (even years -> odd years), 1+ days, blend, predicted 10 to 30 in 100: mean predicted yearly chance 0.244, observed share of county-years 0.221 (3346 county-years).",
+        "Held-out reliability (even years -> odd years), 1+ days, blend, predicted 30 in 100 or more: mean predicted yearly chance 0.574, observed share of county-years 0.513 (13197 county-years).",
+        "Held-out test (even years -> odd years), outages of 3+ days, blend: predicted 4164279 customer outages, observed 4561247 (observed/predicted 1.10); mean Poisson deviance of qualifying-event counts 1.349 over 3145 counties.",
+        "Held-out test (even years -> odd years), outages of 3+ days, county only: predicted 4210978 customer outages, observed 4561247 (observed/predicted 1.08); mean Poisson deviance of qualifying-event counts 8.333 over 3145 counties.",
+        "Held-out test (even years -> odd years), outages of 3+ days, region only: predicted 4112926 customer outages, observed 4561247 (observed/predicted 1.11); mean Poisson deviance of qualifying-event counts 1.459 over 3145 counties.",
+        "Held-out reliability (even years -> odd years), 3+ days, blend, predicted under 1 in 100: mean predicted yearly chance 0.006, observed share of county-years 0.015 (66 county-years).",
+        "Held-out reliability (even years -> odd years), 3+ days, blend, predicted 1 to 3 in 100: mean predicted yearly chance 0.023, observed share of county-years 0.044 (183 county-years).",
+        "Held-out reliability (even years -> odd years), 3+ days, blend, predicted 3 to 10 in 100: mean predicted yearly chance 0.063, observed share of county-years 0.070 (7940 county-years).",
+        "Held-out reliability (even years -> odd years), 3+ days, blend, predicted 10 to 30 in 100: mean predicted yearly chance 0.168, observed share of county-years 0.150 (7615 county-years).",
+        "Held-out reliability (even years -> odd years), 3+ days, blend, predicted 30 in 100 or more: mean predicted yearly chance 0.478, observed share of county-years 0.615 (865 county-years).",
+        "Held-out test (even years -> odd years), outages of 7+ days, blend: predicted 343917 customer outages, observed 355907 (observed/predicted 1.03); mean Poisson deviance of qualifying-event counts 1.832 over 3145 counties.",
+        "Held-out test (even years -> odd years), outages of 7+ days, county only: predicted 348704 customer outages, observed 355907 (observed/predicted 1.02); mean Poisson deviance of qualifying-event counts 3.168 over 3145 counties.",
+        "Held-out test (even years -> odd years), outages of 7+ days, region only: predicted 343218 customer outages, observed 355907 (observed/predicted 1.04); mean Poisson deviance of qualifying-event counts 1.845 over 3145 counties.",
+        "Held-out reliability (even years -> odd years), 7+ days, blend, predicted under 1 in 100: mean predicted yearly chance 0.008, observed share of county-years 0.022 (8229 county-years).",
+        "Held-out reliability (even years -> odd years), 7+ days, blend, predicted 1 to 3 in 100: mean predicted yearly chance 0.018, observed share of county-years 0.015 (7876 county-years).",
+        "Held-out reliability (even years -> odd years), 7+ days, blend, predicted 3 to 10 in 100: mean predicted yearly chance 0.038, observed share of county-years 0.057 (560 county-years).",
+        "Held-out reliability (even years -> odd years), 7+ days, blend, predicted 10 to 30 in 100: mean predicted yearly chance 0.119, observed share of county-years 0.250 (4 county-years).",
+        "Held-out test (even years -> odd years), outages of 14+ days, blend: predicted 16730 customer outages, observed 22119 (observed/predicted 1.32); mean Poisson deviance of qualifying-event counts 0.177 over 3145 counties.",
+        "Held-out test (even years -> odd years), outages of 14+ days, county only: predicted 16896 customer outages, observed 22119 (observed/predicted 1.31); mean Poisson deviance of qualifying-event counts 0.412 over 3145 counties.",
+        "Held-out test (even years -> odd years), outages of 14+ days, region only: predicted 16708 customer outages, observed 22119 (observed/predicted 1.32); mean Poisson deviance of qualifying-event counts 0.183 over 3145 counties.",
+        "Held-out reliability (even years -> odd years), 14+ days, blend, predicted under 1 in 100: mean predicted yearly chance 0.002, observed share of county-years 0.003 (16036 county-years).",
+        "Held-out reliability (even years -> odd years), 14+ days, blend, predicted 1 to 3 in 100: mean predicted yearly chance 0.015, observed share of county-years 0.016 (621 county-years).",
+        "Held-out reliability (even years -> odd years), 14+ days, blend, predicted 3 to 10 in 100: mean predicted yearly chance 0.041, observed share of county-years 0.167 (12 county-years).",
+        "Stress table: major events in the county's NCA5 region within 250 km, where Puerto Rico and the US Virgin Islands are regions of their own (separate grids). Pooled tails: by distance across NCA5 regions (the island grids apart), the county included; radius 400/400/800/800/800 km for outages of 1, 3, 7, 14 and 30 days; k = 5. Major county events (restoration curves and stress table): at least 10% of the county's customers and at least 2000 customers out at the peak. Curves are shares of the peak still out N days after the peak, the running minimum of the repaired count (a lower bound on how long customers were out). Restoration factor = the region's median days until 9 in 10 are back / the mainland's for the same cause, bounded 0.5-5.",
+        "Hand-copied event maria_2017_pr (Hurricane Maria, 2017-09-20): share of the peak still out at [1.0, 3.0, 7.0, 9.0, 14.0, 30.0, 104.0, 119.0, 175.0, 182.0, 195.0, 206.0, 239.0, 272.0, 300.0, 322.0, 328.0] days = [1.0, 1.0, 1.0, 0.95, 0.914, 0.815, 0.43, 0.365, 0.0821, 0.066, 0.042, 0.03, 0.0114, 0.003, 0.0004, 2e-5, 0.0]; sources: US DOE Office of Cybersecurity, Energy Security, and Emergency Response, Hurricanes Maria & Irma Event Summaries #40-#98 (2017-09-21 to 2018-04-04), https://www.energy.gov/sites/default/files/2017/09/f37/Hurricanes%20Maria%20Irma%20Harvey%20Event%20Summary%20September%2027.pdf and the reports listed in round2/phase2/research/data-model-series-research.md section 3.5; Government of Puerto Rico, status.pr (archived daily snapshots, Internet Archive); PREPA via NPR, 2018-08-15: https://www.npr.org/2018/08/15/638739819/nearly-a-year-after-maria-puerto-rico-officials-claim-power-totally-restored.",
+        "Hand-copied event irma_maria_2017_vi (Hurricanes Irma and Maria (US Virgin Islands), 2017-09-20): share of the peak still out at [1.0, 3.0, 7.0, 26.0, 33.0, 47.0, 61.0, 77.0, 91.0, 105.0, 119.0, 133.0] days = [1.0, 1.0, 1.0, 0.919, 0.851, 0.7642, 0.6323, 0.5176, 0.3631, 0.2584, 0.1564, 0.0704]; sources: US DOE Hurricanes Maria & Irma Event Summaries (VIWAPA figures), 2017-10-16 to 2018-01-31, round2/phase2/research/data-model-series-research.md section 3.4; UNVERIFIED figures."
+      ],
+      "definitions": {
+        "attribution": "An outage event is attributed, in order, to a tropical cyclone when a HURDAT2 track point of at least 34 kt (fixes interpolated hourly) passes within 300 km of the county's internal point from 36 hours before the outage began to 24 hours after it reached its peak (the peak taken at most 48 hours after the start); else to the highest-priority NOAA Storm Events episode in the county or its forecast zone overlapping the 6 hours before the start to 2 hours after the peak (tropical, ice, tornado and thunderstorm wind, winter, wildfire, high wind, flood, lightning and hail, heat, cold); winter, ice and cold events that coincide (same state, report span within 24 hours of the start and the peak) with a DOE OE-417 load-shed, energy-emergency, public-appeal, voltage-reduction, fuel-supply or system-operations report are cold_grid; else to an OE-417 grid disturbance that is not weather in the same state, within the same window; else 'unattributed' (cause not recorded).",
+        "pooled_tail": "For each county and each length d of 1, 3, 7, 14 and 30 days: lam_ge_Nd = Z x own_ge_Nd + (1 - Z) x region_Nd. region_Nd is the same rate over the county and every county within R(d) of it (400 km for 1 and 3 days, 800 km for 7, 14 and 30 days; any NCA5 region, but Puerto Rico, the US Virgin Islands, Alaska and Hawaii with the Pacific islands pool only among themselves), each weighted by customers x years of data x (1 - (distance/R)^2)^2. Z = E / (E + 5), where E is the number of events reaching d days that a county with this county's years of data would record at the pooled rate (an event reaches d days when at least 0.25% of the county's customers, and at least 5, were out that long). Rates are customer outages lasting at least d days per customer per year, counting only outages the model does not carry in rows of their own: outages attributed to hurricanes, wildfires, floods, cold-driven grid emergencies and other grid failures are left out."
+      },
+      "missing": [
+        {
+          "reason": "No EAGLE-I record for the county or any county near it (island areas outside the EAGLE-I coverage)",
+          "fips": [
+            "02013",
+            "02016",
+            "02050",
+            "02100",
+            "02105",
+            "02110",
+            "02130",
+            "02158",
+            "02180",
+            "02185",
+            "02188",
+            "02195",
+            "02198",
+            "02220",
+            "02230",
+            "02275",
+            "60010",
+            "60020",
+            "60050",
+            "66010",
+            "69100",
+            "69110",
+            "69120"
+          ]
+        },
+        {
+          "reason": "No EAGLE-I record of its own: the pooled tail is its region's, and there are no causes to report",
+          "fips": [
+            "02060",
+            "02070",
+            "02150",
+            "02164",
+            "02282",
+            "08095",
+            "20033",
+            "20187",
+            "20189",
+            "27077",
+            "30069",
+            "31001",
+            "31005",
+            "31007",
+            "31009",
+            "31011",
+            "31029",
+            "31033",
+            "31035",
+            "31039",
+            "31041",
+            "31057",
+            "31061",
+            "31063",
+            "31071",
+            "31073",
+            "31075",
+            "31077",
+            "31085",
+            "31087",
+            "31091",
+            "31099",
+            "31105",
+            "31113",
+            "31115",
+            "31117",
+            "31121",
+            "31125",
+            "31129",
+            "31137",
+            "31141",
+            "31143",
+            "31167",
+            "31171",
+            "31175",
+            "31179",
+            "31181",
+            "31183",
+            "35007",
+            "35021",
+            "41069",
+            "47005",
+            "47039",
+            "47071",
+            "47085",
+            "47135"
+          ]
+        },
+        {
+          "reason": "No major outage event recorded in the county's region",
+          "fips": [
+            "02066",
+            "02290",
+            "31111",
+            "31135",
+            "32011",
+            "32017",
+            "32033",
+            "48141",
+            "49001",
+            "49017",
+            "49021",
+            "49031",
+            "49053"
+          ]
+        }
+      ]
+    },
     "outages": {
       "title": "Power outage frequency and duration per county from ORNL EAGLE-I 2014-2025",
-      "finished": "2026-09-26T03:39:58Z",
+      "finished": "2026-09-26T19:22:39Z",
       "sources": [
         {
           "name": "ORNL EAGLE-I recorded outages: figshare article metadata",
           "url": "https://api.figshare.com/v2/articles/24237376",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:24:54Z",
+          "retrieved": "2026-09-26T19:07:08Z",
           "sha256": "83d46fb6c3e755c0b4ec729f3f741c3d070e589961da9a842b7cc6a5688deb3f",
           "bytes": 12375,
           "license": "CC BY 4.0"
         },
         {
           "name": "ORNL EAGLE-I modelled county customers (MCC.csv)",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547708/MCC.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T032455Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=afb868872c04db5e1f6babb04c936f3aa437aeccacc4c038b154a0eb742859bc",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547708/MCC.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T190709Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=da6fa7d2f5e93e2f5abec758a83de910e4278af39e5bba4688995bdafbd1ce4e",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:24:54Z",
+          "retrieved": "2026-09-26T19:07:09Z",
           "sha256": "d7fbe0d60ea71273f68bd744408059491fbc7f85b6254882d17783d7762bf65e",
           "bytes": 40584,
           "license": "CC BY 4.0",
@@ -1179,7 +1748,7 @@
           "name": "CDC/ATSDR Social Vulnerability Index 2022, counties (households E_HH)",
           "url": "https://svi.cdc.gov/Documents/Data/2022/csv/states_counties/SVI_2022_US_county.csv",
           "version": "SVI 2022",
-          "retrieved": "2026-09-26T03:24:55Z",
+          "retrieved": "2026-09-26T19:07:10Z",
           "sha256": "bc47d244153e359d5c09f621a4bf344a1e593159c16fbd3c28a15461b70a6c0f",
           "bytes": 2301480,
           "license": "US Government work, public domain (17 U.S.C. 105)",
@@ -1187,9 +1756,9 @@
         },
         {
           "name": "ORNL EAGLE-I state coverage history",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547714/coverage_history.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T032456Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=727b9501ad8eeed7ff8180f2bb05220172ac0f4222ca47eb978f15f8ef41c392",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547714/coverage_history.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T190711Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=b5733ce61316798411fecd89420baf9120755d0aa24e376cb4fbeb9ff09d3ddc",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:24:56Z",
+          "retrieved": "2026-09-26T19:07:11Z",
           "sha256": "a5f102ee31d7c8ea5676679ec8a89a1e786bbe482d48f85c9a058a388a593267",
           "bytes": 11965,
           "license": "CC BY 4.0",
@@ -1197,9 +1766,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2014",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547717/eaglei_outages_2014.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T032456Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=36825c7ea742657fc3eacd289258fe96bb68e652578aa7956602277055e3b967",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547717/eaglei_outages_2014.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T190711Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=94d1ffcdef4d10275ca7a2bda4b6073e41b01bfd25203da79d32e69da9a6ba02",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:24:56Z",
+          "retrieved": "2026-09-26T19:07:11Z",
           "sha256": "f292a9f99066ac686df69767c535b218e70b4d4e748840ec620eda3340f914c9",
           "bytes": 78056250,
           "license": "CC BY 4.0",
@@ -1207,9 +1776,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2015",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547822/eaglei_outages_2015.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T032505Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=0b854b6b9c7586a88bbbd54307a74ad0abb67bf4c618e92340eb25dff293751d",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547822/eaglei_outages_2015.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T190718Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=402198bd11f7710c41724f7689e822854c20bc32e0138676c0a1e77a430230fb",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:25:05Z",
+          "retrieved": "2026-09-26T19:07:18Z",
           "sha256": "49de89b3427d564efbd9c80183caf4e9777966f7e319d4b30d682c1c0d064505",
           "bytes": 598963737,
           "license": "CC BY 4.0",
@@ -1217,9 +1786,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2016",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547825/eaglei_outages_2016.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T032549Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=7037f1bb6676f98245eb17edcd9fdd21df3092d6aa4cd6109b3015eff15f3e66",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547825/eaglei_outages_2016.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T190802Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=90b1ec1efb8fc86ef556bfbf2e55269c52fc036e5102461251ba7cb18110290b",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:25:49Z",
+          "retrieved": "2026-09-26T19:08:02Z",
           "sha256": "2c1b364a3b06aee56326174c4644750ea86ba9be4585c5e40eeb7835431bfc9c",
           "bytes": 619779314,
           "license": "CC BY 4.0",
@@ -1227,9 +1796,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2017",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547828/eaglei_outages_2017.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T032635Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=7ba07924de8f21c98a021f82ae97b37823d1a4cb8b6d401706464c01199269b2",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547828/eaglei_outages_2017.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T190855Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=336eb86758cb487ac445740a8cc5b15308cb3827b6e2fb832ddc22dd509cd965",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:26:35Z",
+          "retrieved": "2026-09-26T19:08:55Z",
           "sha256": "47479c4fd645ec69685447f90baa51f08a85e776cedf612279b3e41c13147c8d",
           "bytes": 698796929,
           "license": "CC BY 4.0",
@@ -1237,9 +1806,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2018",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547879/eaglei_outages_2018.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T032730Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=9080ecca15b707ff58096acb2cd550d2d2d9110c6aaa778f39df1c9ec883bde5",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547879/eaglei_outages_2018.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T190947Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=8a47b0a7fb37056e944dc305734e2bd8b5a70c7adddbd2671cc7a0f1eda2d9e1",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:27:30Z",
+          "retrieved": "2026-09-26T19:09:47Z",
           "sha256": "85e0a864aa272e75892e181f1da4754ed78f7bf0bef75a279d8ab381baa7db70",
           "bytes": 999210542,
           "license": "CC BY 4.0",
@@ -1247,9 +1816,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2019",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547885/eaglei_outages_2019.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T032848Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=9d807cc4bce1425c2ff2febf3925d7b89edfbc888d7d2f5d43fa7e00fb7edcfc",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547885/eaglei_outages_2019.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T191103Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=82613a5e498ba09c8bf035c640e7bffc1c67002821c31f0abf81c622cbfc1c0b",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:28:47Z",
+          "retrieved": "2026-09-26T19:11:02Z",
           "sha256": "4cc277a138b326bd0e1f203558539a9422b40dacdf439e3d5b58ee71d7462d27",
           "bytes": 1102778792,
           "license": "CC BY 4.0",
@@ -1257,9 +1826,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2020",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547894/eaglei_outages_2020.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T033013Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=a363886ed9b16a4a8b752f420661d203f97028e32968ac112b99489c47740eb3",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547894/eaglei_outages_2020.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T191225Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=434186196354acaedff2b6c293a8e62868ba5f22c81bdc918089489795dd32fc",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:30:12Z",
+          "retrieved": "2026-09-26T19:12:24Z",
           "sha256": "2a20b62e5245b1b9d4fcedc1bdbaf691bb1e17f75094975c8c6cb854f52e721a",
           "bytes": 1170699724,
           "license": "CC BY 4.0",
@@ -1267,9 +1836,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2021",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547891/eaglei_outages_2021.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T033143Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=751635fdba69e0ff206e0026a28b8c9b620932fdb16ef014fb17d5e3f9f78f9f",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547891/eaglei_outages_2021.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T191356Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=57943ca49f07e17f504a986c44790a2839e5d708177dd810c4a8d215aa472000",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:31:43Z",
+          "retrieved": "2026-09-26T19:13:56Z",
           "sha256": "e3e7ac40a40d92d92488501881ab381b8931833e486941424ac55ea20ffde319",
           "bytes": 1141058232,
           "license": "CC BY 4.0",
@@ -1277,9 +1846,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2022",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547897/eaglei_outages_2022.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T033311Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=fb9c3b0eafe90f652e069e15a8d51c431365b910a25433067d4d0e2383c63747",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/42547897/eaglei_outages_2022.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T191526Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=68e8cc4fd8b02d5ed506deb9d7679ed869762078bc91ad38f3c9a22b39360ab8",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:33:11Z",
+          "retrieved": "2026-09-26T19:15:26Z",
           "sha256": "ff8b58ae30fcbaf290f820bcd4f1420e536994bc9f0a87bb80991130478461b0",
           "bytes": 1187596176,
           "license": "CC BY 4.0",
@@ -1287,9 +1856,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2023",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/44574907/eaglei_outages_2023.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T033447Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=d77f75b0dc40be2f02889d1a39b303b983e03f74e4f302509f3272fb0f3fd28a",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/44574907/eaglei_outages_2023.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T191717Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=13aa6cbbb9006f767a605b528d789ca3aabf58aebbba65c3316fec63d87e5124",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:34:46Z",
+          "retrieved": "2026-09-26T19:17:16Z",
           "sha256": "c028f42dae8522ecfb787ad0b6461cfc809bb04856eef20cb389e486d5657f7e",
           "bytes": 1199752423,
           "license": "CC BY 4.0",
@@ -1297,9 +1866,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2024",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/53581661/eaglei_outages_2024.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T033624Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=47143e5947f90273c50f7cf86b73c056c8603bec3579244f3fb551b0db11b3f4",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/53581661/eaglei_outages_2024.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T191848Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=944fe1fd78959f9d693214012ac78f2152cd3298fd6bf84b6cbb1113eb63fcf0",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:36:23Z",
+          "retrieved": "2026-09-26T19:18:48Z",
           "sha256": "d5d75ea4ef3943446aaf0623e9b451cb4e7796d20cc379de9cf497106ebab2e6",
           "bytes": 1444846424,
           "license": "CC BY 4.0",
@@ -1307,9 +1876,9 @@
         },
         {
           "name": "ORNL EAGLE-I recorded outages 2025",
-          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/62164877/eaglei_outages_2025.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T033814Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=1d1f7e0df127b7abc2560b6d9ad9fba17766949eaf0054d0743b2c2e0ee4b2b3",
+          "url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/62164877/eaglei_outages_2025.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20260926/eu-west-1/s3/aws4_request&X-Amz-Date=20260926T192041Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=7c1028cd752d89710daa8c22c7ecda4411aa35f0f0a71a97bc4a61bc3d17dfae",
           "version": "figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4)",
-          "retrieved": "2026-09-26T03:38:13Z",
+          "retrieved": "2026-09-26T19:20:41Z",
           "sha256": "4148a4a3b26e58024403cef98ccb324d1656f476613d6afff4451e33faf468c9",
           "bytes": 1402347695,
           "license": "CC BY 4.0",
@@ -1324,12 +1893,13 @@
       ],
       "notes": [
         "Customer counts: ORNL's modelled customers (MCC.csv) are below the county's household count in 540 counties, sometimes far below (e.g. 51530: MCC 1 vs 2655 households; 37089: MCC 24 vs 49494 households; 53069: MCC 1 vs 1954 households; 51820: MCC 6 vs 9431 households; 56027: MCC 4 vs 1072 households), which would inflate per-customer rates; the customer count used is the larger of MCC and households (CDC SVI 2022, ACS 2018-2022). Thresholds scale with it.",
-        "Event definition: EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged. Short reversals inside an event (under half of the current peak or trough, or under the 1% level) are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power. Rates are customer outages in such events per customer per year of data. Counties with fewer than 10 events use their state's pooled duration distribution (duration_basis = state; 117 counties); the event rate is always the county's own.",
+        "Event definition: EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged, and up to 72 hours when the event had been at the 1% level for at least 6 hours, held it for the hour before the gap and holds at least half of that level for an hour after it (a utility missing from the data for a while; readings under half of the level inside such a gap are dropped). Inside an event the counts are repaired before durations are read: during a sustained outage, counts more than 1.5 times the 3-hour running median (reports counted twice) are cut to the median, and dips shorter than 24 hours are filled to the level around them (a utility missing from some snapshots, which otherwise reads as everyone restored and cut off again); short reversals under half of the current peak or trough, or under the 1% level, are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power, except that customers still out N days after the peak are counted as out at least N days even when a later wave would have restored them first. Rates are customer outages in such events per customer per year of data. Counties with fewer than 10 events use their state's pooled duration distribution (duration_basis = state; 117 counties); the event rate is always the county's own.",
         "Puerto Rico: EAGLE-I files LUMA's outages by utility region, each under one hub municipio (the hubs' customer counts in the 2024 file sum to the island's 1.49 million). The hubs are summed into one island-wide series (customers = the sum of ORNL's modelled customers for all 78 municipios), and every municipio carries the island's rates, durations and event counts (duration_basis = island); its customers column is its own modelled customer count, so weighting rows by customers counts the island once. Data start in 2021.",
         "Years of data: a month counts when the county has at least one record in it (EAGLE-I lists only snapshots with customers out), so years_of_data is months with data divided by 12. State-years in 2018-2022 where ORNL reports under 50% customer coverage are left out; ORNL publishes no coverage figures for other years, so partial utility coverage there biases rates low.",
         "Customer outages at the start of an event are counted from the event's start (they may have begun below the threshold) and customers still out when the county drops below the threshold are counted as restored then, so durations for the first and last customers in an event are slightly understated.",
         "Excluded for low coverage: MT 2018, NE 2018, NE 2019, NE 2020, NE 2021, NE 2022, SD 2018.",
         "Data checks: 65722 out-of-order rows skipped, 0 duplicate snapshots merged (maximum kept).",
+        "Repair: 9050 gaps in 1929 counties bridged as reporting dropouts; inside events the repaired series holds 7% more customer-hours than the recorded snapshots (median county +5%, 90th percentile +12%).",
         "2014: 1689460 rows, 5695 distinct snapshots, 6 collection gaps longer than 1 hour totalling 8 hours.",
         "2015: 12939157 rows, 34519 distinct snapshots, 11 collection gaps longer than 1 hour totalling 38 hours.",
         "2016: 13306024 rows, 34764 distinct snapshots, 14 collection gaps longer than 1 hour totalling 51 hours.",
@@ -1344,7 +1914,7 @@
         "2025: 30482141 rows, 35149 distinct snapshots, 1 collection gaps longer than 1 hour totalling 3 hours."
       ],
       "definitions": {
-        "event_definition": "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged. Short reversals inside an event (under half of the current peak or trough, or under the 1% level) are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power. Rates are customer outages in such events per customer per year of data."
+        "event_definition": "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged, and up to 72 hours when the event had been at the 1% level for at least 6 hours, held it for the hour before the gap and holds at least half of that level for an hour after it (a utility missing from the data for a while; readings under half of the level inside such a gap are dropped). Inside an event the counts are repaired before durations are read: during a sustained outage, counts more than 1.5 times the 3-hour running median (reports counted twice) are cut to the median, and dips shorter than 24 hours are filled to the level around them (a utility missing from some snapshots, which otherwise reads as everyone restored and cut off again); short reversals under half of the current peak or trough, or under the 1% level, are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power, except that customers still out N days after the peak are counted as out at least N days even when a later wave would have restored them first. Rates are customer outages in such events per customer per year of data."
       },
       "missing": [
         {
@@ -1438,6 +2008,194 @@
         }
       ]
     },
+    "reliability": {
+      "title": "Utility reliability (EIA-861 SAIDI and SAIFI 2015-2024) by county, and the cross-check with EAGLE-I",
+      "finished": "2026-09-26T19:26:12Z",
+      "sources": [
+        {
+          "name": "EIA-861 annual electric power industry report, 2015 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/archive/zip/f8612015.zip",
+          "version": "f8612015.zip",
+          "retrieved": "2026-09-26T19:26:06Z",
+          "sha256": "a8ab1ac504f9d62ed83acf7bcce8000aefb360c0a9d1b66e8c97761557e49ef1",
+          "bytes": 4391160,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EIA-861 annual electric power industry report, 2016 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/archive/zip/f8612016.zip",
+          "version": "f8612016.zip",
+          "retrieved": "2026-09-26T19:26:07Z",
+          "sha256": "8cbcd008780c2861ca10e4dfc3e44fddc4d3db3cb4cbd34f40eccbd673485515",
+          "bytes": 4930673,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EIA-861 annual electric power industry report, 2017 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/archive/zip/f8612017.zip",
+          "version": "f8612017.zip",
+          "retrieved": "2026-09-26T19:26:07Z",
+          "sha256": "474d391ce1814af24334aec2c94a6421295f00d262fb8cfc153a5dea197dcc14",
+          "bytes": 5981558,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EIA-861 annual electric power industry report, 2018 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/archive/zip/f8612018.zip",
+          "version": "f8612018.zip",
+          "retrieved": "2026-09-26T19:26:08Z",
+          "sha256": "90f1d9e34665d91347d476ade7ff88261896a158eda640b7ec7002b8027eb8f8",
+          "bytes": 6030180,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EIA-861 annual electric power industry report, 2019 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/archive/zip/f8612019.zip",
+          "version": "f8612019.zip",
+          "retrieved": "2026-09-26T19:26:08Z",
+          "sha256": "25043e6baa8f6bf28892b22b06877b9efef2a22b19dd32e0f3b0c9b720e222e9",
+          "bytes": 5348318,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EIA-861 annual electric power industry report, 2020 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/archive/zip/f8612020.zip",
+          "version": "f8612020.zip",
+          "retrieved": "2026-09-26T19:26:09Z",
+          "sha256": "abed9f678bd7f7d97dced210205eb9c894d0536ee5ec0041a45e3c329d41e616",
+          "bytes": 4453359,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EIA-861 annual electric power industry report, 2021 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/archive/zip/f8612021.zip",
+          "version": "f8612021.zip",
+          "retrieved": "2026-09-26T19:26:09Z",
+          "sha256": "6008618e91bc0e70d841ebbc19283b96b66d7ac95e20b3ad553bd31a20cd7bd4",
+          "bytes": 4427163,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EIA-861 annual electric power industry report, 2022 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/archive/zip/f8612022.zip",
+          "version": "f8612022.zip",
+          "retrieved": "2026-09-26T19:26:10Z",
+          "sha256": "fe2530295d931c3bc2340918a389745c378e0e6dc960db7c6269b52a616247e0",
+          "bytes": 4387531,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EIA-861 annual electric power industry report, 2023 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/archive/zip/f8612023.zip",
+          "version": "f8612023.zip",
+          "retrieved": "2026-09-26T19:26:10Z",
+          "sha256": "0acd67ab84cdaef09fd47b4449f2c944f8731c2b3c695ec3a97bb6c0690a4d61",
+          "bytes": 4604583,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EIA-861 annual electric power industry report, 2024 (reliability and service territory)",
+          "url": "https://www.eia.gov/electricity/data/eia861/zip/f8612024.zip",
+          "version": "f8612024.zip",
+          "retrieved": "2026-09-26T19:26:11Z",
+          "sha256": "77ce49c60ac5a6bad50c442fc401aad5404a21da875dc5cbaba353af5ede54de",
+          "bytes": 4568208,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 10173,
+      "rows_out": 3174,
+      "outputs": [
+        "core/reliability.csv"
+      ],
+      "notes": [
+        "Cross-check with EAGLE-I (core/outages.csv, repaired series): over 3017 counties, the rank correlation of EAGLE-I outages per customer-year with SAIFI (major event days included) is 0.44, and of EAGLE-I customer-hours with SAIDI 0.58 (3040 counties). EAGLE-I counts only outages in events that reach 1% of a county's customers, so it should sit below SAIFI: it does in 2544 of 3017 counties. 29 counties show more than three times their utilities' SAIFI (the M-02 flag for reporting flicker): 06009, 06043, 06051, 06063, 06091, 06109, 08019, 08021, 16015, 22107, 26001, 30037, 30059, 31165, 36041, 46063, 48109, 48137, 48261, 48267.",
+        "2015: 1011 utility-state reliability rows, 1010 matched to counties through the service-territory list.",
+        "2016: 1048 utility-state reliability rows, 1047 matched to counties through the service-territory list.",
+        "2017: 1068 utility-state reliability rows, 1067 matched to counties through the service-territory list.",
+        "2018: 1104 utility-state reliability rows, 1103 matched to counties through the service-territory list.",
+        "2019: 1166 utility-state reliability rows, 1165 matched to counties through the service-territory list.",
+        "2020: 935 utility-state reliability rows, 935 matched to counties through the service-territory list.",
+        "2021: 950 utility-state reliability rows, 950 matched to counties through the service-territory list.",
+        "2022: 956 utility-state reliability rows, 955 matched to counties through the service-territory list.",
+        "2023: 966 utility-state reliability rows, 965 matched to counties through the service-territory list.",
+        "2024: 969 utility-state reliability rows, 968 matched to counties through the service-territory list.",
+        "Territory county names not placed (3): AS: Rose Island; AS: Swains Island; MP: Northern Islands."
+      ],
+      "definitions": {
+        "reliability_county": "Per year 2015-2024, a county's SAIDI and SAIFI are the mean over the utilities EIA-861 lists as serving it, each weighted by its customers divided evenly over the counties it serves (EIA publishes no customer split by county); IEEE 1366 values where the utility reports them, otherwise its other method. The published value is the mean over the years with data; utility_years counts the utility-year records behind it."
+      },
+      "missing": [
+        {
+          "reason": "EIA-861 does not report this island area's utility by county",
+          "fips": [
+            "78010",
+            "78020",
+            "78030"
+          ]
+        },
+        {
+          "reason": "No utility serving the county reported reliability indices to EIA-861",
+          "fips": [
+            "01033",
+            "01049",
+            "01077",
+            "01083",
+            "02013",
+            "02016",
+            "02050",
+            "02060",
+            "02063",
+            "02066",
+            "02070",
+            "02150",
+            "02158",
+            "02164",
+            "02180",
+            "02185",
+            "02188",
+            "02195",
+            "02220",
+            "02275",
+            "02282",
+            "04012",
+            "08063",
+            "08095",
+            "08115",
+            "13051",
+            "28009",
+            "28057",
+            "28081",
+            "28117",
+            "28139",
+            "28141",
+            "29035",
+            "29091",
+            "29153",
+            "30033",
+            "31005",
+            "31033",
+            "31051",
+            "31061",
+            "31099",
+            "31103",
+            "31105",
+            "32017",
+            "32033",
+            "46017",
+            "46041",
+            "46119",
+            "47005",
+            "47029",
+            "47039",
+            "51590",
+            "51620",
+            "51750",
+            "53069"
+          ]
+        }
+      ]
+    },
     "seismic": {
       "title": "USGS NSHM ground-shaking exceedance at county centroids",
       "finished": "2026-09-26T03:01:31Z",
@@ -1511,6 +2269,113 @@
             "69120"
           ]
         }
+      ]
+    },
+    "series": {
+      "title": "National series: DOE OE-417 grid disturbances (PNNL), FDA drug shortages, FDIC bank failures, federal funding gaps, FCC outage reports, FBI arrests",
+      "finished": "2026-09-26T19:23:29Z",
+      "sources": [
+        {
+          "name": "PNNL Event-correlated Outage Dataset in America (EAGLE-I 2014-2023 x DOE OE-417), OpenEI submission 6458",
+          "url": "https://data.openei.org/files/6458/Outage_Dataset_R1.zip",
+          "version": "Outage_Dataset_R1.zip (release 1)",
+          "retrieved": "2026-09-26T19:23:21Z",
+          "sha256": "44557bae7a5c8e02c611a14f75fe9e123d81d286f700b9fd88ac538edd910fe7",
+          "bytes": 31260449,
+          "license": "CC BY 4.0",
+          "obligations": "Credit PNNL (CC BY 4.0)."
+        },
+        {
+          "name": "openFDA drug shortages (bulk download)",
+          "url": "https://download.open.fda.gov/drug/shortages/drug-shortages-0001-of-0001.json.zip",
+          "version": "last_updated 2026-09-26",
+          "retrieved": "2026-09-26T19:23:26Z",
+          "sha256": "e237316c1a1d47db122964add462693d6aa2b0a41fb70945cf6758acddea2d31",
+          "bytes": 434493,
+          "license": "CC0 1.0 (openFDA content)"
+        },
+        {
+          "name": "FDIC BankFind Suite: failed banks (API, CSV)",
+          "url": "https://api.fdic.gov/banks/failures?limit=10000&fields=FAILDATE,FAILYR,QBFASSET,RESTYPE&format=csv",
+          "version": "all failures since 1934",
+          "retrieved": "2026-09-26T19:23:26Z",
+          "sha256": "cea86de2871d8d24c67c5ff07c8d456f367d6bac829effda35723101440b21b2",
+          "bytes": 174228,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "CRS RS20348, Federal Funding Gaps: A Brief Overview (Table 1)",
+          "url": "https://www.everycrsreport.com/files/2026-05-26_RS20348_07052cf62f659c4b684f1ad762c81b435dedb6e4.pdf",
+          "version": "version 48, updated 2026-05-26; figures transcribed",
+          "retrieved": "2026-09-26T00:00:00Z",
+          "sha256": "",
+          "bytes": 0,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "US House of Representatives, Office of the Historian: Funding Gaps and Shutdowns in the Federal Government",
+          "url": "https://history.house.gov/Institution/Shutdown/Government-Shutdowns/",
+          "version": "shutdown-procedures column transcribed",
+          "retrieved": "2026-09-26T00:00:00Z",
+          "sha256": "",
+          "bytes": 0,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "FCC Communications Status Reports (DIRS), daily, eight hurricanes 2017-2024",
+          "url": "https://docs.fcc.gov/public/attachments/",
+          "version": "DOC ids per event in core/series/fcc_dirs.toml; figures transcribed",
+          "retrieved": "2026-09-26T00:00:00Z",
+          "sha256": "",
+          "bytes": 0,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census Bureau national population by single year of age and sex, Vintage 2025",
+          "url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/national/asrh/nc-est2025-agesex-res.csv",
+          "version": "NC-EST2025-AGESEX-RES",
+          "retrieved": "2026-09-26T19:23:27Z",
+          "sha256": "6436d4f6972d415caf14cb20776807bc031fc9f1bfc9d6ff26055d592a2b0230",
+          "bytes": 18282,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "FBI Crime in the United States 2023: Persons Arrested tables (Tables 29, 39, 40)",
+          "url": "https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=cius/2023/persons-arrested-2023.zip (signed download)",
+          "version": "persons-arrested-2023.zip",
+          "retrieved": "2026-09-26T19:23:27Z",
+          "sha256": "e681a838bff582d3fe8ef9fc36de530095bc97c66782ed1929cbf0466263d813",
+          "bytes": 1228447,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "FBI Crime in the United States 2024: Persons Arrested tables (Tables 29, 39, 40)",
+          "url": "https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=cius/2024/persons-arrested-2024.zip (signed download)",
+          "version": "persons-arrested-2024.zip",
+          "retrieved": "2026-09-26T19:23:29Z",
+          "sha256": "d600df8b38ce4daa641a45a24a06b31c59ce7b607044a855b17d2259486ca301",
+          "bytes": 1260670,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "FBI Crime in the United States 2025: Persons Arrested tables (Tables 29, 39, 40)",
+          "url": "https://cde.ucr.cjis.gov/LATEST/s3/signedurl?key=cius/2025/persons-arrested-2025.zip (signed download)",
+          "version": "persons-arrested-2025.zip",
+          "retrieved": "2026-09-26T19:23:29Z",
+          "sha256": "62173d4c06ed714683fef9f1da7a894f2c6cbac5274d4c10f71c880ae2f14b5d",
+          "bytes": 1281747,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 8643,
+      "rows_out": 510,
+      "outputs": [
+        "core/series/oe417.toml",
+        "core/series/drug_shortages.toml",
+        "core/series/fdic_failures.toml",
+        "core/series/funding_gaps.toml",
+        "core/series/fcc_dirs.toml",
+        "core/series/fbi_arrests.toml"
       ]
     },
     "vulnerability": {
@@ -1691,6 +2556,14 @@
       "accessed": "2026-09-26"
     },
     {
+      "source": "NOAA nClimGrid-Daily",
+      "text": "Daily temperature from NOAA's NClimGrid-Daily county averages (Durre et al., NOAA National Centers for Environmental Information).",
+      "license": "US Government work, public domain (17 U.S.C. 105)",
+      "url": "https://www.ncei.noaa.gov/products/land-based-station/nclimgrid-daily",
+      "version": "v1.0.0",
+      "accessed": "2026-09-26"
+    },
+    {
       "source": "ORNL EAGLE-I",
       "text": "Power outage statistics derived by Ready Reckoner from: Brelsford, C., Tennille, S., Myers, A., et al., The Environment for Analysis of Geo-Located Energy Information's Recorded Electricity Outages 2014-2025, Oak Ridge National Laboratory, figshare, doi:10.6084/m9.figshare.24237376 (CC BY 4.0).",
       "license": "CC BY 4.0",
@@ -1704,6 +2577,22 @@
       "license": "OpenFEMA Terms and Conditions",
       "url": "https://www.fema.gov/openfema-data-page/nfip-redacted-claims-v3",
       "version": "Penetration v1, Claims v3",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "OpenFEMA declarations and housing assistance",
+      "text": "Federal Emergency Management Agency (FEMA), OpenFEMA Datasets: Disaster Declarations Summaries - v2, Housing Assistance Program Data - Owners - v2 and Renters - v2. Retrieved from https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2, https://www.fema.gov/openfema-data-page/housing-assistance-program-data-owners-v2 and https://www.fema.gov/openfema-data-page/housing-assistance-program-data-renters-v2. This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).",
+      "license": "OpenFEMA Terms and Conditions",
+      "url": "https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2",
+      "version": "v2",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "PNNL Event-correlated Outage Dataset",
+      "text": "Grid disturbance counts derived by Ready Reckoner from the Event-correlated Outage Dataset in America, Pacific Northwest National Laboratory, OpenEI submission 6458 (CC BY 4.0), which links U.S. Department of Energy Form OE-417 electric emergency and disturbance reports to ORNL EAGLE-I outages.",
+      "license": "CC BY 4.0",
+      "url": "https://data.openei.org/submissions/6458",
+      "version": "release 1 (Outage_Dataset_R1.zip)",
       "accessed": "2026-09-26"
     },
     {

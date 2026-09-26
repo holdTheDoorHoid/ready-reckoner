@@ -7,7 +7,9 @@
 # is worse, a week in, than anything in the county's region in EAGLE-I.
 #
 # [[name]]: display names for well-known non-tropical events, matched by cause, state and the
-# UTC date the county outage began. Tropical cyclones are named from HURDAT2.
+# UTC date the county outage began. Tropical cyclones are named from HURDAT2. The names, date
+# windows and state lists are from general knowledge; the sources named were not re-read
+# (UNVERIFIED as to the exact windows). They only label rows; no number depends on them.
 
 [[event]]
 id = "maria_2017_pr"

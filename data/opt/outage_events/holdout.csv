@@ -1,0 +1,131 @@
+split,mark_days,estimator,measure,bin,predicted,observed,n
+2014-2019 -> 2020-2025,1,blend,customer_outages,,22760000,35610000,2967
+2014-2019 -> 2020-2025,1,blend,mean_poisson_deviance,,3.696,,2967
+2014-2019 -> 2020-2025,1,blend,reliability,2: 3 to 10 in 100,0.07345,0.115,226
+2014-2019 -> 2020-2025,1,blend,reliability,3: 10 to 30 in 100,0.2276,0.2926,5683
+2014-2019 -> 2020-2025,1,blend,reliability,4: 30 in 100 or more,0.5211,0.6021,11474
+2014-2019 -> 2020-2025,1,county only,customer_outages,,24480000,35610000,2967
+2014-2019 -> 2020-2025,1,county only,mean_poisson_deviance,,22.56,,2967
+2014-2019 -> 2020-2025,1,county only,reliability,0: under 1 in 100,0,0.2846,5084
+2014-2019 -> 2020-2025,1,county only,reliability,3: 10 to 30 in 100,0.1982,0.3925,3101
+2014-2019 -> 2020-2025,1,county only,reliability,4: 30 in 100 or more,0.5802,0.6451,9198
+2014-2019 -> 2020-2025,1,region only,customer_outages,,21620000,35610000,2967
+2014-2019 -> 2020-2025,1,region only,mean_poisson_deviance,,4.73,,2967
+2014-2019 -> 2020-2025,1,region only,reliability,2: 3 to 10 in 100,0.07265,0.1202,208
+2014-2019 -> 2020-2025,1,region only,reliability,3: 10 to 30 in 100,0.237,0.3089,5193
+2014-2019 -> 2020-2025,1,region only,reliability,4: 30 in 100 or more,0.5277,0.5816,11982
+2014-2019 -> 2020-2025,14,blend,customer_outages,,7769,30760,2967
+2014-2019 -> 2020-2025,14,blend,mean_poisson_deviance,,0.3814,,2967
+2014-2019 -> 2020-2025,14,blend,reliability,0: under 1 in 100,0.001971,0.00372,16667
+2014-2019 -> 2020-2025,14,blend,reliability,1: 1 to 3 in 100,0.01212,0.02514,716
+2014-2019 -> 2020-2025,14,county only,customer_outages,,8086,30760,2967
+2014-2019 -> 2020-2025,14,county only,mean_poisson_deviance,,0.8003,,2967
+2014-2019 -> 2020-2025,14,county only,reliability,0: under 1 in 100,0,0.004232,17251
+2014-2019 -> 2020-2025,14,county only,reliability,3: 10 to 30 in 100,0.1796,0.02222,90
+2014-2019 -> 2020-2025,14,county only,reliability,4: 30 in 100 or more,0.4506,0.119,42
+2014-2019 -> 2020-2025,14,region only,customer_outages,,7763,30760,2967
+2014-2019 -> 2020-2025,14,region only,mean_poisson_deviance,,0.3827,,2967
+2014-2019 -> 2020-2025,14,region only,reliability,0: under 1 in 100,0.001971,0.003781,16661
+2014-2019 -> 2020-2025,14,region only,reliability,1: 1 to 3 in 100,0.01196,0.02355,722
+2014-2019 -> 2020-2025,3,blend,customer_outages,,2511000,6049000,2967
+2014-2019 -> 2020-2025,3,blend,mean_poisson_deviance,,1.979,,2967
+2014-2019 -> 2020-2025,3,blend,reliability,0: under 1 in 100,0.003757,0.05352,355
+2014-2019 -> 2020-2025,3,blend,reliability,1: 1 to 3 in 100,0.02431,0.0829,2111
+2014-2019 -> 2020-2025,3,blend,reliability,2: 3 to 10 in 100,0.05721,0.09976,8911
+2014-2019 -> 2020-2025,3,blend,reliability,3: 10 to 30 in 100,0.1598,0.2151,5640
+2014-2019 -> 2020-2025,3,blend,reliability,4: 30 in 100 or more,0.3572,0.5492,366
+2014-2019 -> 2020-2025,3,county only,customer_outages,,3186000,6049000,2967
+2014-2019 -> 2020-2025,3,county only,mean_poisson_deviance,,15.48,,2967
+2014-2019 -> 2020-2025,3,county only,reliability,0: under 1 in 100,0,0.11,12815
+2014-2019 -> 2020-2025,3,county only,reliability,3: 10 to 30 in 100,0.1888,0.1841,2787
+2014-2019 -> 2020-2025,3,county only,reliability,4: 30 in 100 or more,0.4398,0.3223,1781
+2014-2019 -> 2020-2025,3,region only,customer_outages,,2439000,6049000,2967
+2014-2019 -> 2020-2025,3,region only,mean_poisson_deviance,,2.054,,2967
+2014-2019 -> 2020-2025,3,region only,reliability,0: under 1 in 100,0.003773,0.05352,355
+2014-2019 -> 2020-2025,3,region only,reliability,1: 1 to 3 in 100,0.02437,0.08113,2009
+2014-2019 -> 2020-2025,3,region only,reliability,2: 3 to 10 in 100,0.05734,0.1007,8909
+2014-2019 -> 2020-2025,3,region only,reliability,3: 10 to 30 in 100,0.1657,0.2293,6044
+2014-2019 -> 2020-2025,3,region only,reliability,4: 30 in 100 or more,0.3207,0.4848,66
+2014-2019 -> 2020-2025,7,blend,customer_outages,,103700,557400,2967
+2014-2019 -> 2020-2025,7,blend,mean_poisson_deviance,,0.7445,,2967
+2014-2019 -> 2020-2025,7,blend,reliability,0: under 1 in 100,0.005753,0.0155,14062
+2014-2019 -> 2020-2025,7,blend,reliability,1: 1 to 3 in 100,0.01663,0.02965,3069
+2014-2019 -> 2020-2025,7,blend,reliability,2: 3 to 10 in 100,0.03426,0.07265,234
+2014-2019 -> 2020-2025,7,blend,reliability,3: 10 to 30 in 100,0.2867,0,12
+2014-2019 -> 2020-2025,7,blend,reliability,4: 30 in 100 or more,0.3383,0.1667,6
+2014-2019 -> 2020-2025,7,county only,customer_outages,,106200,557400,2967
+2014-2019 -> 2020-2025,7,county only,mean_poisson_deviance,,3.102,,2967
+2014-2019 -> 2020-2025,7,county only,reliability,0: under 1 in 100,0,0.0173,16879
+2014-2019 -> 2020-2025,7,county only,reliability,3: 10 to 30 in 100,0.1826,0.05128,390
+2014-2019 -> 2020-2025,7,county only,reliability,4: 30 in 100 or more,0.4623,0.1316,114
+2014-2019 -> 2020-2025,7,region only,customer_outages,,103500,557400,2967
+2014-2019 -> 2020-2025,7,region only,mean_poisson_deviance,,0.7486,,2967
+2014-2019 -> 2020-2025,7,region only,reliability,0: under 1 in 100,0.005758,0.01572,14056
+2014-2019 -> 2020-2025,7,region only,reliability,1: 1 to 3 in 100,0.01674,0.02899,3105
+2014-2019 -> 2020-2025,7,region only,reliability,2: 3 to 10 in 100,0.03334,0.07353,204
+2014-2019 -> 2020-2025,7,region only,reliability,4: 30 in 100 or more,0.3041,0.05556,18
+even years -> odd years,1,blend,customer_outages,,29280000,30770000,3145
+even years -> odd years,1,blend,mean_poisson_deviance,,1.98,,3145
+even years -> odd years,1,blend,reliability,2: 3 to 10 in 100,0.05933,0.07937,126
+even years -> odd years,1,blend,reliability,3: 10 to 30 in 100,0.2443,0.2215,3346
+even years -> odd years,1,blend,reliability,4: 30 in 100 or more,0.5744,0.5128,13197
+even years -> odd years,1,county only,customer_outages,,29450000,30770000,3145
+even years -> odd years,1,county only,mean_poisson_deviance,,7.902,,3145
+even years -> odd years,1,county only,reliability,0: under 1 in 100,0,0.1892,2955
+even years -> odd years,1,county only,reliability,3: 10 to 30 in 100,0.1925,0.2775,2768
+even years -> odd years,1,county only,reliability,4: 30 in 100 or more,0.6153,0.5657,10946
+even years -> odd years,1,region only,customer_outages,,28240000,30770000,3145
+even years -> odd years,1,region only,mean_poisson_deviance,,3.122,,3145
+even years -> odd years,1,region only,reliability,2: 3 to 10 in 100,0.05936,0.06667,120
+even years -> odd years,1,region only,reliability,3: 10 to 30 in 100,0.2598,0.2434,2802
+even years -> odd years,1,region only,reliability,4: 30 in 100 or more,0.585,0.4968,13747
+even years -> odd years,14,blend,customer_outages,,16730,22120,3145
+even years -> odd years,14,blend,mean_poisson_deviance,,0.1773,,3145
+even years -> odd years,14,blend,reliability,0: under 1 in 100,0.002417,0.003305,16036
+even years -> odd years,14,blend,reliability,1: 1 to 3 in 100,0.01462,0.0161,621
+even years -> odd years,14,blend,reliability,2: 3 to 10 in 100,0.0405,0.1667,12
+even years -> odd years,14,county only,customer_outages,,16900,22120,3145
+even years -> odd years,14,county only,mean_poisson_deviance,,0.4117,,3145
+even years -> odd years,14,county only,reliability,0: under 1 in 100,0,0.002853,16476
+even years -> odd years,14,county only,reliability,3: 10 to 30 in 100,0.1932,0.04054,148
+even years -> odd years,14,county only,reliability,4: 30 in 100 or more,0.3786,0.2667,45
+even years -> odd years,14,region only,customer_outages,,16710,22120,3145
+even years -> odd years,14,region only,mean_poisson_deviance,,0.1829,,3145
+even years -> odd years,14,region only,reliability,0: under 1 in 100,0.002423,0.003802,16044
+even years -> odd years,14,region only,reliability,1: 1 to 3 in 100,0.01482,0.0064,625
+even years -> odd years,3,blend,customer_outages,,4164000,4561000,3145
+even years -> odd years,3,blend,mean_poisson_deviance,,1.349,,3145
+even years -> odd years,3,blend,reliability,0: under 1 in 100,0.005798,0.01515,66
+even years -> odd years,3,blend,reliability,1: 1 to 3 in 100,0.02279,0.04372,183
+even years -> odd years,3,blend,reliability,2: 3 to 10 in 100,0.0631,0.06965,7940
+even years -> odd years,3,blend,reliability,3: 10 to 30 in 100,0.1676,0.1504,7615
+even years -> odd years,3,blend,reliability,4: 30 in 100 or more,0.4782,0.615,865
+even years -> odd years,3,county only,customer_outages,,4211000,4561000,3145
+even years -> odd years,3,county only,mean_poisson_deviance,,8.333,,3145
+even years -> odd years,3,county only,reliability,0: under 1 in 100,0,0.07834,10263
+even years -> odd years,3,county only,reliability,3: 10 to 30 in 100,0.1891,0.1412,3810
+even years -> odd years,3,county only,reliability,4: 30 in 100 or more,0.4552,0.3455,2596
+even years -> odd years,3,region only,customer_outages,,4113000,4561000,3145
+even years -> odd years,3,region only,mean_poisson_deviance,,1.459,,3145
+even years -> odd years,3,region only,reliability,0: under 1 in 100,0.005838,0.01515,66
+even years -> odd years,3,region only,reliability,1: 1 to 3 in 100,0.02168,0.04027,149
+even years -> odd years,3,region only,reliability,2: 3 to 10 in 100,0.06316,0.07179,7814
+even years -> odd years,3,region only,reliability,3: 10 to 30 in 100,0.174,0.1596,8100
+even years -> odd years,3,region only,reliability,4: 30 in 100 or more,0.5222,0.7,540
+even years -> odd years,7,blend,customer_outages,,343900,355900,3145
+even years -> odd years,7,blend,mean_poisson_deviance,,1.832,,3145
+even years -> odd years,7,blend,reliability,0: under 1 in 100,0.007668,0.02175,8229
+even years -> odd years,7,blend,reliability,1: 1 to 3 in 100,0.01761,0.01536,7876
+even years -> odd years,7,blend,reliability,2: 3 to 10 in 100,0.03793,0.05714,560
+even years -> odd years,7,blend,reliability,3: 10 to 30 in 100,0.1185,0.25,4
+even years -> odd years,7,county only,customer_outages,,348700,355900,3145
+even years -> odd years,7,county only,mean_poisson_deviance,,3.168,,3145
+even years -> odd years,7,county only,reliability,0: under 1 in 100,0,0.01753,15801
+even years -> odd years,7,county only,reliability,3: 10 to 30 in 100,0.1878,0.04496,734
+even years -> odd years,7,county only,reliability,4: 30 in 100 or more,0.3978,0.1716,134
+even years -> odd years,7,region only,customer_outages,,343200,355900,3145
+even years -> odd years,7,region only,mean_poisson_deviance,,1.845,,3145
+even years -> odd years,7,region only,reliability,0: under 1 in 100,0.007717,0.02186,8327
+even years -> odd years,7,region only,reliability,1: 1 to 3 in 100,0.0177,0.0166,7770
+even years -> odd years,7,region only,reliability,2: 3 to 10 in 100,0.03567,0.0375,560
+even years -> odd years,7,region only,reliability,3: 10 to 30 in 100,0.1049,0.08333,12

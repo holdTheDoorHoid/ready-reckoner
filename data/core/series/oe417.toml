@@ -1,0 +1,1769 @@
+# DOE OE-417 electric disturbance reports by cause, 2014-2023. Written by rr-etl (job `series`); see docs/DATA_SOURCES.md.
+
+id = "oe417"
+title = "DOE OE-417 electric disturbance reports by cause, 2014-2023"
+publisher = "Pacific Northwest National Laboratory (from DOE OE-417 reports and ORNL EAGLE-I)"
+url = "https://data.openei.org/submissions/6458"
+licence = "CC BY 4.0"
+attribution = "Grid disturbance counts derived by Ready Reckoner from the Event-correlated Outage Dataset in America, Pacific Northwest National Laboratory, OpenEI submission 6458 (CC BY 4.0), which links U.S. Department of Energy Form OE-417 electric emergency and disturbance reports to ORNL EAGLE-I outages."
+source = "pnnl_oe417_linkage"
+retrieved = "2026-09-26"
+how = "fetched"
+notes = [
+  "2922 distinct OE-417 reports in 2014-2023 (the file's ten yearly event files; the 8- and 24-hour lag variants are not used).",
+  "OE-417 reports are filed for large events only (a threshold on load or customers lost, or any physical or cyber attack), the form's type labels changed over the years (grouped here into weather, operations, physical attack or vandalism, suspicious activity, cyber and fuel supply), and reporting grew sharply (32 reports in 2014, 503 in 2020). Rates therefore use 2019-2023 only.",
+  "PNNL links reports to EAGLE-I county outages by state and time window, which over-attributes in large states: the number of linked counties is context, not the size of the event.",
+]
+
+[[rate]]
+id = "grid_weather_reports_per_year"
+value = 174.2
+unit = "OE-417 reports of weather-caused disturbances per year, United States"
+low = 164.5
+high = 184.1
+year = 2023
+period = "2019-2023"
+figure = "871 reports in 2019-2023"
+derivation = "871 / 5 years; range = exact Poisson 90% interval"
+note = "Counts reports, not outages: most reports of attacks and suspicious activity involve no customer outage."
+unverified = false
+
+[[rate]]
+id = "grid_operations_reports_per_year"
+value = 115.4
+unit = "OE-417 reports of system-operations, transmission, distribution or generation disturbances per year, United States"
+low = 107.5
+high = 123.5
+year = 2023
+period = "2019-2023"
+figure = "577 reports in 2019-2023"
+derivation = "577 / 5 years; range = exact Poisson 90% interval"
+note = "Counts reports, not outages: most reports of attacks and suspicious activity involve no customer outage."
+unverified = false
+
+[[rate]]
+id = "grid_physical_attack_reports_per_year"
+value = 78.4
+unit = "OE-417 reports of physical attack, vandalism, sabotage or theft per year, United States"
+low = 71.89
+high = 85.11
+year = 2023
+period = "2019-2023"
+figure = "392 reports in 2019-2023"
+derivation = "392 / 5 years; range = exact Poisson 90% interval"
+note = "Counts reports, not outages: most reports of attacks and suspicious activity involve no customer outage."
+unverified = false
+
+[[rate]]
+id = "grid_suspicious_activity_reports_per_year"
+value = 40
+unit = "OE-417 reports of suspicious activity or a suspected or threatened attack per year, United States"
+low = 35.46
+high = 44.97
+year = 2023
+period = "2019-2023"
+figure = "200 reports in 2019-2023"
+derivation = "200 / 5 years; range = exact Poisson 90% interval"
+note = "Counts reports, not outages: most reports of attacks and suspicious activity involve no customer outage."
+unverified = false
+
+[[rate]]
+id = "grid_cyber_reports_per_year"
+value = 7.4
+unit = "OE-417 reports of a cyber event per year, United States"
+low = 5.519
+high = 9.735
+year = 2023
+period = "2019-2023"
+figure = "37 reports in 2019-2023"
+derivation = "37 / 5 years; range = exact Poisson 90% interval"
+note = "Counts reports, not outages: most reports of attacks and suspicious activity involve no customer outage."
+unverified = false
+
+[[rate]]
+id = "grid_fuel_supply_reports_per_year"
+value = 6
+unit = "OE-417 reports of a fuel supply deficiency or emergency per year, United States"
+low = 4.319
+high = 8.138
+year = 2023
+period = "2019-2023"
+figure = "30 reports in 2019-2023"
+derivation = "30 / 5 years; range = exact Poisson 90% interval"
+note = "Counts reports, not outages: most reports of attacks and suspicious activity involve no customer outage."
+unverified = false
+
+[[row]]
+table = "year"
+year = 2014
+group = "weather"
+reports = 15
+
+[[row]]
+table = "year"
+year = 2014
+group = "operations"
+reports = 2
+
+[[row]]
+table = "year"
+year = 2014
+group = "physical"
+reports = 0
+
+[[row]]
+table = "year"
+year = 2014
+group = "suspicious"
+reports = 7
+
+[[row]]
+table = "year"
+year = 2014
+group = "cyber"
+reports = 5
+
+[[row]]
+table = "year"
+year = 2014
+group = "fuel"
+reports = 3
+
+[[row]]
+table = "year"
+year = 2015
+group = "weather"
+reports = 90
+
+[[row]]
+table = "year"
+year = 2015
+group = "operations"
+reports = 28
+
+[[row]]
+table = "year"
+year = 2015
+group = "physical"
+reports = 30
+
+[[row]]
+table = "year"
+year = 2015
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "year"
+year = 2015
+group = "cyber"
+reports = 0
+
+[[row]]
+table = "year"
+year = 2015
+group = "fuel"
+reports = 0
+
+[[row]]
+table = "year"
+year = 2016
+group = "weather"
+reports = 82
+
+[[row]]
+table = "year"
+year = 2016
+group = "operations"
+reports = 26
+
+[[row]]
+table = "year"
+year = 2016
+group = "physical"
+reports = 41
+
+[[row]]
+table = "year"
+year = 2016
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "year"
+year = 2016
+group = "cyber"
+reports = 4
+
+[[row]]
+table = "year"
+year = 2016
+group = "fuel"
+reports = 7
+
+[[row]]
+table = "year"
+year = 2017
+group = "weather"
+reports = 117
+
+[[row]]
+table = "year"
+year = 2017
+group = "operations"
+reports = 21
+
+[[row]]
+table = "year"
+year = 2017
+group = "physical"
+reports = 32
+
+[[row]]
+table = "year"
+year = 2017
+group = "suspicious"
+reports = 7
+
+[[row]]
+table = "year"
+year = 2017
+group = "cyber"
+reports = 0
+
+[[row]]
+table = "year"
+year = 2017
+group = "fuel"
+reports = 7
+
+[[row]]
+table = "year"
+year = 2018
+group = "weather"
+reports = 159
+
+[[row]]
+table = "year"
+year = 2018
+group = "operations"
+reports = 61
+
+[[row]]
+table = "year"
+year = 2018
+group = "physical"
+reports = 49
+
+[[row]]
+table = "year"
+year = 2018
+group = "suspicious"
+reports = 14
+
+[[row]]
+table = "year"
+year = 2018
+group = "cyber"
+reports = 0
+
+[[row]]
+table = "year"
+year = 2018
+group = "fuel"
+reports = 5
+
+[[row]]
+table = "year"
+year = 2019
+group = "weather"
+reports = 124
+
+[[row]]
+table = "year"
+year = 2019
+group = "operations"
+reports = 100
+
+[[row]]
+table = "year"
+year = 2019
+group = "physical"
+reports = 70
+
+[[row]]
+table = "year"
+year = 2019
+group = "suspicious"
+reports = 17
+
+[[row]]
+table = "year"
+year = 2019
+group = "cyber"
+reports = 0
+
+[[row]]
+table = "year"
+year = 2019
+group = "fuel"
+reports = 7
+
+[[row]]
+table = "year"
+year = 2020
+group = "weather"
+reports = 260
+
+[[row]]
+table = "year"
+year = 2020
+group = "operations"
+reports = 134
+
+[[row]]
+table = "year"
+year = 2020
+group = "physical"
+reports = 59
+
+[[row]]
+table = "year"
+year = 2020
+group = "suspicious"
+reports = 36
+
+[[row]]
+table = "year"
+year = 2020
+group = "cyber"
+reports = 8
+
+[[row]]
+table = "year"
+year = 2020
+group = "fuel"
+reports = 6
+
+[[row]]
+table = "year"
+year = 2021
+group = "weather"
+reports = 201
+
+[[row]]
+table = "year"
+year = 2021
+group = "operations"
+reports = 133
+
+[[row]]
+table = "year"
+year = 2021
+group = "physical"
+reports = 63
+
+[[row]]
+table = "year"
+year = 2021
+group = "suspicious"
+reports = 32
+
+[[row]]
+table = "year"
+year = 2021
+group = "cyber"
+reports = 12
+
+[[row]]
+table = "year"
+year = 2021
+group = "fuel"
+reports = 11
+
+[[row]]
+table = "year"
+year = 2022
+group = "weather"
+reports = 168
+
+[[row]]
+table = "year"
+year = 2022
+group = "operations"
+reports = 130
+
+[[row]]
+table = "year"
+year = 2022
+group = "physical"
+reports = 110
+
+[[row]]
+table = "year"
+year = 2022
+group = "suspicious"
+reports = 56
+
+[[row]]
+table = "year"
+year = 2022
+group = "cyber"
+reports = 14
+
+[[row]]
+table = "year"
+year = 2022
+group = "fuel"
+reports = 5
+
+[[row]]
+table = "year"
+year = 2023
+group = "weather"
+reports = 118
+
+[[row]]
+table = "year"
+year = 2023
+group = "operations"
+reports = 80
+
+[[row]]
+table = "year"
+year = 2023
+group = "physical"
+reports = 90
+
+[[row]]
+table = "year"
+year = 2023
+group = "suspicious"
+reports = 59
+
+[[row]]
+table = "year"
+year = 2023
+group = "cyber"
+reports = 3
+
+[[row]]
+table = "year"
+year = 2023
+group = "fuel"
+reports = 1
+
+[[row]]
+table = "state"
+state = "AL"
+group = "weather"
+reports = 40
+
+[[row]]
+table = "state"
+state = "AL"
+group = "operations"
+reports = 2
+
+[[row]]
+table = "state"
+state = "AL"
+group = "physical"
+reports = 8
+
+[[row]]
+table = "state"
+state = "AL"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "AR"
+group = "weather"
+reports = 35
+
+[[row]]
+table = "state"
+state = "AR"
+group = "operations"
+reports = 10
+
+[[row]]
+table = "state"
+state = "AR"
+group = "physical"
+reports = 8
+
+[[row]]
+table = "state"
+state = "AR"
+group = "suspicious"
+reports = 6
+
+[[row]]
+table = "state"
+state = "AR"
+group = "fuel"
+reports = 1
+
+[[row]]
+table = "state"
+state = "AZ"
+group = "weather"
+reports = 3
+
+[[row]]
+table = "state"
+state = "AZ"
+group = "operations"
+reports = 11
+
+[[row]]
+table = "state"
+state = "AZ"
+group = "physical"
+reports = 3
+
+[[row]]
+table = "state"
+state = "AZ"
+group = "fuel"
+reports = 1
+
+[[row]]
+table = "state"
+state = "CA"
+group = "weather"
+reports = 85
+
+[[row]]
+table = "state"
+state = "CA"
+group = "operations"
+reports = 80
+
+[[row]]
+table = "state"
+state = "CA"
+group = "physical"
+reports = 108
+
+[[row]]
+table = "state"
+state = "CA"
+group = "suspicious"
+reports = 24
+
+[[row]]
+table = "state"
+state = "CA"
+group = "cyber"
+reports = 5
+
+[[row]]
+table = "state"
+state = "CA"
+group = "fuel"
+reports = 26
+
+[[row]]
+table = "state"
+state = "CO"
+group = "weather"
+reports = 2
+
+[[row]]
+table = "state"
+state = "CO"
+group = "operations"
+reports = 19
+
+[[row]]
+table = "state"
+state = "CO"
+group = "physical"
+reports = 10
+
+[[row]]
+table = "state"
+state = "CO"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "CO"
+group = "cyber"
+reports = 1
+
+[[row]]
+table = "state"
+state = "CT"
+group = "weather"
+reports = 50
+
+[[row]]
+table = "state"
+state = "CT"
+group = "operations"
+reports = 4
+
+[[row]]
+table = "state"
+state = "CT"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "CT"
+group = "cyber"
+reports = 1
+
+[[row]]
+table = "state"
+state = "DE"
+group = "weather"
+reports = 3
+
+[[row]]
+table = "state"
+state = "DE"
+group = "operations"
+reports = 2
+
+[[row]]
+table = "state"
+state = "DE"
+group = "physical"
+reports = 6
+
+[[row]]
+table = "state"
+state = "DE"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "DE"
+group = "cyber"
+reports = 2
+
+[[row]]
+table = "state"
+state = "FL"
+group = "weather"
+reports = 35
+
+[[row]]
+table = "state"
+state = "FL"
+group = "operations"
+reports = 22
+
+[[row]]
+table = "state"
+state = "FL"
+group = "physical"
+reports = 14
+
+[[row]]
+table = "state"
+state = "FL"
+group = "suspicious"
+reports = 6
+
+[[row]]
+table = "state"
+state = "FL"
+group = "cyber"
+reports = 3
+
+[[row]]
+table = "state"
+state = "GA"
+group = "weather"
+reports = 42
+
+[[row]]
+table = "state"
+state = "GA"
+group = "operations"
+reports = 2
+
+[[row]]
+table = "state"
+state = "GA"
+group = "physical"
+reports = 9
+
+[[row]]
+table = "state"
+state = "GA"
+group = "suspicious"
+reports = 3
+
+[[row]]
+table = "state"
+state = "GA"
+group = "cyber"
+reports = 1
+
+[[row]]
+table = "state"
+state = "IA"
+group = "weather"
+reports = 7
+
+[[row]]
+table = "state"
+state = "IA"
+group = "operations"
+reports = 8
+
+[[row]]
+table = "state"
+state = "IA"
+group = "physical"
+reports = 2
+
+[[row]]
+table = "state"
+state = "ID"
+group = "weather"
+reports = 5
+
+[[row]]
+table = "state"
+state = "ID"
+group = "operations"
+reports = 4
+
+[[row]]
+table = "state"
+state = "ID"
+group = "physical"
+reports = 18
+
+[[row]]
+table = "state"
+state = "ID"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "ID"
+group = "cyber"
+reports = 1
+
+[[row]]
+table = "state"
+state = "IL"
+group = "weather"
+reports = 17
+
+[[row]]
+table = "state"
+state = "IL"
+group = "operations"
+reports = 12
+
+[[row]]
+table = "state"
+state = "IL"
+group = "suspicious"
+reports = 9
+
+[[row]]
+table = "state"
+state = "IL"
+group = "cyber"
+reports = 3
+
+[[row]]
+table = "state"
+state = "IL"
+group = "fuel"
+reports = 2
+
+[[row]]
+table = "state"
+state = "IN"
+group = "weather"
+reports = 8
+
+[[row]]
+table = "state"
+state = "IN"
+group = "operations"
+reports = 11
+
+[[row]]
+table = "state"
+state = "IN"
+group = "physical"
+reports = 5
+
+[[row]]
+table = "state"
+state = "IN"
+group = "suspicious"
+reports = 4
+
+[[row]]
+table = "state"
+state = "KS"
+group = "weather"
+reports = 17
+
+[[row]]
+table = "state"
+state = "KS"
+group = "operations"
+reports = 4
+
+[[row]]
+table = "state"
+state = "KS"
+group = "physical"
+reports = 2
+
+[[row]]
+table = "state"
+state = "KS"
+group = "fuel"
+reports = 2
+
+[[row]]
+table = "state"
+state = "KY"
+group = "weather"
+reports = 18
+
+[[row]]
+table = "state"
+state = "KY"
+group = "operations"
+reports = 18
+
+[[row]]
+table = "state"
+state = "KY"
+group = "physical"
+reports = 11
+
+[[row]]
+table = "state"
+state = "KY"
+group = "suspicious"
+reports = 6
+
+[[row]]
+table = "state"
+state = "LA"
+group = "weather"
+reports = 49
+
+[[row]]
+table = "state"
+state = "LA"
+group = "operations"
+reports = 30
+
+[[row]]
+table = "state"
+state = "LA"
+group = "physical"
+reports = 8
+
+[[row]]
+table = "state"
+state = "LA"
+group = "suspicious"
+reports = 3
+
+[[row]]
+table = "state"
+state = "LA"
+group = "fuel"
+reports = 3
+
+[[row]]
+table = "state"
+state = "MA"
+group = "weather"
+reports = 56
+
+[[row]]
+table = "state"
+state = "MA"
+group = "operations"
+reports = 11
+
+[[row]]
+table = "state"
+state = "MA"
+group = "physical"
+reports = 5
+
+[[row]]
+table = "state"
+state = "MA"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "MA"
+group = "cyber"
+reports = 2
+
+[[row]]
+table = "state"
+state = "MD"
+group = "weather"
+reports = 8
+
+[[row]]
+table = "state"
+state = "MD"
+group = "operations"
+reports = 12
+
+[[row]]
+table = "state"
+state = "MD"
+group = "physical"
+reports = 2
+
+[[row]]
+table = "state"
+state = "MD"
+group = "suspicious"
+reports = 6
+
+[[row]]
+table = "state"
+state = "MD"
+group = "cyber"
+reports = 2
+
+[[row]]
+table = "state"
+state = "ME"
+group = "weather"
+reports = 51
+
+[[row]]
+table = "state"
+state = "ME"
+group = "operations"
+reports = 30
+
+[[row]]
+table = "state"
+state = "ME"
+group = "physical"
+reports = 2
+
+[[row]]
+table = "state"
+state = "ME"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "ME"
+group = "cyber"
+reports = 1
+
+[[row]]
+table = "state"
+state = "MI"
+group = "weather"
+reports = 68
+
+[[row]]
+table = "state"
+state = "MI"
+group = "operations"
+reports = 24
+
+[[row]]
+table = "state"
+state = "MI"
+group = "physical"
+reports = 7
+
+[[row]]
+table = "state"
+state = "MI"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "MI"
+group = "fuel"
+reports = 1
+
+[[row]]
+table = "state"
+state = "MN"
+group = "weather"
+reports = 11
+
+[[row]]
+table = "state"
+state = "MN"
+group = "operations"
+reports = 19
+
+[[row]]
+table = "state"
+state = "MN"
+group = "physical"
+reports = 8
+
+[[row]]
+table = "state"
+state = "MN"
+group = "suspicious"
+reports = 3
+
+[[row]]
+table = "state"
+state = "MO"
+group = "weather"
+reports = 26
+
+[[row]]
+table = "state"
+state = "MO"
+group = "operations"
+reports = 12
+
+[[row]]
+table = "state"
+state = "MO"
+group = "physical"
+reports = 8
+
+[[row]]
+table = "state"
+state = "MO"
+group = "suspicious"
+reports = 4
+
+[[row]]
+table = "state"
+state = "MS"
+group = "weather"
+reports = 38
+
+[[row]]
+table = "state"
+state = "MS"
+group = "operations"
+reports = 10
+
+[[row]]
+table = "state"
+state = "MS"
+group = "physical"
+reports = 13
+
+[[row]]
+table = "state"
+state = "MS"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "MT"
+group = "weather"
+reports = 1
+
+[[row]]
+table = "state"
+state = "MT"
+group = "operations"
+reports = 6
+
+[[row]]
+table = "state"
+state = "MT"
+group = "physical"
+reports = 2
+
+[[row]]
+table = "state"
+state = "MT"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "MT"
+group = "cyber"
+reports = 1
+
+[[row]]
+table = "state"
+state = "NC"
+group = "weather"
+reports = 55
+
+[[row]]
+table = "state"
+state = "NC"
+group = "operations"
+reports = 8
+
+[[row]]
+table = "state"
+state = "NC"
+group = "physical"
+reports = 7
+
+[[row]]
+table = "state"
+state = "NC"
+group = "suspicious"
+reports = 3
+
+[[row]]
+table = "state"
+state = "ND"
+group = "weather"
+reports = 6
+
+[[row]]
+table = "state"
+state = "ND"
+group = "operations"
+reports = 11
+
+[[row]]
+table = "state"
+state = "ND"
+group = "physical"
+reports = 5
+
+[[row]]
+table = "state"
+state = "ND"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "NE"
+group = "weather"
+reports = 9
+
+[[row]]
+table = "state"
+state = "NE"
+group = "operations"
+reports = 13
+
+[[row]]
+table = "state"
+state = "NE"
+group = "physical"
+reports = 2
+
+[[row]]
+table = "state"
+state = "NE"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "NE"
+group = "fuel"
+reports = 1
+
+[[row]]
+table = "state"
+state = "NH"
+group = "weather"
+reports = 49
+
+[[row]]
+table = "state"
+state = "NH"
+group = "operations"
+reports = 3
+
+[[row]]
+table = "state"
+state = "NH"
+group = "physical"
+reports = 4
+
+[[row]]
+table = "state"
+state = "NH"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "NH"
+group = "cyber"
+reports = 1
+
+[[row]]
+table = "state"
+state = "NJ"
+group = "weather"
+reports = 14
+
+[[row]]
+table = "state"
+state = "NJ"
+group = "operations"
+reports = 6
+
+[[row]]
+table = "state"
+state = "NJ"
+group = "physical"
+reports = 5
+
+[[row]]
+table = "state"
+state = "NJ"
+group = "suspicious"
+reports = 4
+
+[[row]]
+table = "state"
+state = "NJ"
+group = "cyber"
+reports = 3
+
+[[row]]
+table = "state"
+state = "NM"
+group = "weather"
+reports = 1
+
+[[row]]
+table = "state"
+state = "NM"
+group = "operations"
+reports = 14
+
+[[row]]
+table = "state"
+state = "NM"
+group = "physical"
+reports = 6
+
+[[row]]
+table = "state"
+state = "NM"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "NM"
+group = "fuel"
+reports = 1
+
+[[row]]
+table = "state"
+state = "NV"
+group = "weather"
+reports = 5
+
+[[row]]
+table = "state"
+state = "NV"
+group = "operations"
+reports = 13
+
+[[row]]
+table = "state"
+state = "NV"
+group = "physical"
+reports = 32
+
+[[row]]
+table = "state"
+state = "NV"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "NY"
+group = "weather"
+reports = 31
+
+[[row]]
+table = "state"
+state = "NY"
+group = "operations"
+reports = 19
+
+[[row]]
+table = "state"
+state = "NY"
+group = "physical"
+reports = 12
+
+[[row]]
+table = "state"
+state = "NY"
+group = "suspicious"
+reports = 14
+
+[[row]]
+table = "state"
+state = "NY"
+group = "cyber"
+reports = 2
+
+[[row]]
+table = "state"
+state = "NY"
+group = "fuel"
+reports = 7
+
+[[row]]
+table = "state"
+state = "OH"
+group = "weather"
+reports = 29
+
+[[row]]
+table = "state"
+state = "OH"
+group = "operations"
+reports = 23
+
+[[row]]
+table = "state"
+state = "OH"
+group = "physical"
+reports = 7
+
+[[row]]
+table = "state"
+state = "OH"
+group = "suspicious"
+reports = 7
+
+[[row]]
+table = "state"
+state = "OK"
+group = "weather"
+reports = 18
+
+[[row]]
+table = "state"
+state = "OK"
+group = "operations"
+reports = 11
+
+[[row]]
+table = "state"
+state = "OK"
+group = "physical"
+reports = 11
+
+[[row]]
+table = "state"
+state = "OK"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "OK"
+group = "fuel"
+reports = 2
+
+[[row]]
+table = "state"
+state = "OR"
+group = "weather"
+reports = 12
+
+[[row]]
+table = "state"
+state = "OR"
+group = "operations"
+reports = 22
+
+[[row]]
+table = "state"
+state = "OR"
+group = "physical"
+reports = 38
+
+[[row]]
+table = "state"
+state = "OR"
+group = "suspicious"
+reports = 6
+
+[[row]]
+table = "state"
+state = "OR"
+group = "cyber"
+reports = 1
+
+[[row]]
+table = "state"
+state = "PA"
+group = "weather"
+reports = 18
+
+[[row]]
+table = "state"
+state = "PA"
+group = "operations"
+reports = 23
+
+[[row]]
+table = "state"
+state = "PA"
+group = "physical"
+reports = 7
+
+[[row]]
+table = "state"
+state = "PA"
+group = "suspicious"
+reports = 20
+
+[[row]]
+table = "state"
+state = "PA"
+group = "cyber"
+reports = 3
+
+[[row]]
+table = "state"
+state = "RI"
+group = "weather"
+reports = 53
+
+[[row]]
+table = "state"
+state = "RI"
+group = "operations"
+reports = 1
+
+[[row]]
+table = "state"
+state = "RI"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "SC"
+group = "weather"
+reports = 45
+
+[[row]]
+table = "state"
+state = "SC"
+group = "operations"
+reports = 6
+
+[[row]]
+table = "state"
+state = "SC"
+group = "physical"
+reports = 1
+
+[[row]]
+table = "state"
+state = "SC"
+group = "suspicious"
+reports = 7
+
+[[row]]
+table = "state"
+state = "SC"
+group = "fuel"
+reports = 1
+
+[[row]]
+table = "state"
+state = "SD"
+group = "weather"
+reports = 4
+
+[[row]]
+table = "state"
+state = "SD"
+group = "operations"
+reports = 7
+
+[[row]]
+table = "state"
+state = "SD"
+group = "physical"
+reports = 2
+
+[[row]]
+table = "state"
+state = "SD"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "TN"
+group = "weather"
+reports = 22
+
+[[row]]
+table = "state"
+state = "TN"
+group = "operations"
+reports = 9
+
+[[row]]
+table = "state"
+state = "TN"
+group = "physical"
+reports = 9
+
+[[row]]
+table = "state"
+state = "TN"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "TX"
+group = "weather"
+reports = 139
+
+[[row]]
+table = "state"
+state = "TX"
+group = "operations"
+reports = 96
+
+[[row]]
+table = "state"
+state = "TX"
+group = "physical"
+reports = 46
+
+[[row]]
+table = "state"
+state = "TX"
+group = "suspicious"
+reports = 40
+
+[[row]]
+table = "state"
+state = "TX"
+group = "cyber"
+reports = 7
+
+[[row]]
+table = "state"
+state = "TX"
+group = "fuel"
+reports = 3
+
+[[row]]
+table = "state"
+state = "UT"
+group = "weather"
+reports = 1
+
+[[row]]
+table = "state"
+state = "UT"
+group = "operations"
+reports = 5
+
+[[row]]
+table = "state"
+state = "UT"
+group = "physical"
+reports = 22
+
+[[row]]
+table = "state"
+state = "UT"
+group = "suspicious"
+reports = 4
+
+[[row]]
+table = "state"
+state = "VA"
+group = "weather"
+reports = 27
+
+[[row]]
+table = "state"
+state = "VA"
+group = "operations"
+reports = 3
+
+[[row]]
+table = "state"
+state = "VA"
+group = "physical"
+reports = 5
+
+[[row]]
+table = "state"
+state = "VA"
+group = "suspicious"
+reports = 5
+
+[[row]]
+table = "state"
+state = "VT"
+group = "weather"
+reports = 51
+
+[[row]]
+table = "state"
+state = "VT"
+group = "operations"
+reports = 1
+
+[[row]]
+table = "state"
+state = "VT"
+group = "physical"
+reports = 1
+
+[[row]]
+table = "state"
+state = "VT"
+group = "suspicious"
+reports = 1
+
+[[row]]
+table = "state"
+state = "VT"
+group = "cyber"
+reports = 1
+
+[[row]]
+table = "state"
+state = "WA"
+group = "weather"
+reports = 39
+
+[[row]]
+table = "state"
+state = "WA"
+group = "operations"
+reports = 39
+
+[[row]]
+table = "state"
+state = "WA"
+group = "physical"
+reports = 56
+
+[[row]]
+table = "state"
+state = "WA"
+group = "suspicious"
+reports = 12
+
+[[row]]
+table = "state"
+state = "WA"
+group = "cyber"
+reports = 3
+
+[[row]]
+table = "state"
+state = "WI"
+group = "weather"
+reports = 13
+
+[[row]]
+table = "state"
+state = "WI"
+group = "operations"
+reports = 13
+
+[[row]]
+table = "state"
+state = "WI"
+group = "physical"
+reports = 4
+
+[[row]]
+table = "state"
+state = "WI"
+group = "suspicious"
+reports = 2
+
+[[row]]
+table = "state"
+state = "WI"
+group = "cyber"
+reports = 2
+
+[[row]]
+table = "state"
+state = "WI"
+group = "fuel"
+reports = 1
+
+[[row]]
+table = "state"
+state = "WV"
+group = "weather"
+reports = 18
+
+[[row]]
+table = "state"
+state = "WV"
+group = "operations"
+reports = 3
+
+[[row]]
+table = "state"
+state = "WV"
+group = "physical"
+reports = 2
+
+[[row]]
+table = "state"
+state = "WV"
+group = "suspicious"
+reports = 4
+
+[[row]]
+table = "state"
+state = "WY"
+group = "operations"
+reports = 3
+
+[[row]]
+table = "state"
+state = "WY"
+group = "physical"
+reports = 1
+

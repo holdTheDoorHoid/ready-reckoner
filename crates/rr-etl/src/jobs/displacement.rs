@@ -8,9 +8,11 @@
 //!   however many rows it has; statewide and tribal designations are not counted.
 //! - `core/series/ihp_displacement.toml`: FEMA Individuals and Households Program housing
 //!   assistance by incident type (HousingAssistanceRenters and HousingAssistanceOwners, joined to
-//!   the declarations by disaster number): the share of inspected renter households with major or
-//!   substantial damage, the share of inspected owners with more than $30,000 of FEMA-inspected
-//!   damage, and rental assistance paid per approved household.
+//!   the declarations by disaster number): registrations, households approved, and rental
+//!   assistance paid per approved household. The files' damage columns (renters' moderate, major
+//!   and substantial damage; owners' inspected-damage buckets; `totalInspected`) are zero in every
+//!   row of the v2 API (checked 2026-09-26 by filtering each for values above zero), so no damage
+//!   share is published.
 //!
 //! Months displaced by hazard, which the audit proposed from IHP registrations, is not built:
 //! only 99,762 of the 3,309,028 rental-eligible registrations carry a rental-assistance end date,
@@ -253,14 +255,14 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let (renters, src_r) = page_all(
         ctx,
         "HousingAssistanceRenters",
-        "disasterNumber,validRegistrations,totalInspected,totalInspectedWithNoDamage,totalWithModerateDamage,totalWithMajorDamage,totalWithSubstantialDamage,approvedForFemaAssistance,rentalAmount,id",
+        "disasterNumber,validRegistrations,approvedForFemaAssistance,rentalAmount,id",
         "",
     )?;
     out.source(src_r);
     let (owners, src_o) = page_all(
         ctx,
         "HousingAssistanceOwners",
-        "disasterNumber,validRegistrations,noFemaInspectedDamage,femaInspectedDamageBetween1And10000,femaInspectedDamageBetween10001And20000,femaInspectedDamageBetween20001And30000,femaInspectedDamageGreaterThan30000,approvedForFemaAssistance,rentalAmount,id",
+        "disasterNumber,validRegistrations,approvedForFemaAssistance,rentalAmount,id",
         "",
     )?;
     out.source(src_o);
@@ -269,15 +271,9 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     struct Agg {
         disasters: BTreeSet<i64>,
         r_valid: f64,
-        r_inspected: f64,
-        r_major: f64,
-        r_moderate: f64,
         r_approved: f64,
         r_rent: f64,
         o_valid: f64,
-        o_inspected: f64,
-        o_gt30k: f64,
-        o_gt10k: f64,
         o_approved: f64,
         o_rent: f64,
     }
@@ -297,46 +293,25 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     };
     let mut agg: BTreeMap<String, Agg> = BTreeMap::new();
     let mut unmatched = 0u64;
-    for r in &renters {
-        let dn = n(r, "disasterNumber") as i64;
-        let Some(inc) = incident_of.get(&dn) else {
-            unmatched += 1;
-            continue;
-        };
-        let a = agg.entry(group(inc)).or_default();
-        a.disasters.insert(dn);
-        a.r_valid += n(r, "validRegistrations");
-        // `totalInspected` is zero in every row of the v2 files (checked 2026-09-26): the
-        // inspected count is the sum of the damage categories.
-        a.r_inspected += n(r, "totalInspectedWithNoDamage")
-            + n(r, "totalWithModerateDamage")
-            + n(r, "totalWithMajorDamage")
-            + n(r, "totalWithSubstantialDamage");
-        a.r_major += n(r, "totalWithMajorDamage") + n(r, "totalWithSubstantialDamage");
-        a.r_moderate += n(r, "totalWithModerateDamage");
-        a.r_approved += n(r, "approvedForFemaAssistance");
-        a.r_rent += n(r, "rentalAmount");
-    }
-    for r in &owners {
-        let dn = n(r, "disasterNumber") as i64;
-        let Some(inc) = incident_of.get(&dn) else {
-            unmatched += 1;
-            continue;
-        };
-        let a = agg.entry(group(inc)).or_default();
-        a.disasters.insert(dn);
-        a.o_valid += n(r, "validRegistrations");
-        a.o_inspected += n(r, "noFemaInspectedDamage")
-            + n(r, "femaInspectedDamageBetween1And10000")
-            + n(r, "femaInspectedDamageBetween10001And20000")
-            + n(r, "femaInspectedDamageBetween20001And30000")
-            + n(r, "femaInspectedDamageGreaterThan30000");
-        a.o_gt30k += n(r, "femaInspectedDamageGreaterThan30000");
-        a.o_gt10k += n(r, "femaInspectedDamageGreaterThan30000")
-            + n(r, "femaInspectedDamageBetween10001And20000")
-            + n(r, "femaInspectedDamageBetween20001And30000");
-        a.o_approved += n(r, "approvedForFemaAssistance");
-        a.o_rent += n(r, "rentalAmount");
+    for (rows, renter) in [(&renters, true), (&owners, false)] {
+        for r in rows.iter() {
+            let dn = n(r, "disasterNumber") as i64;
+            let Some(inc) = incident_of.get(&dn) else {
+                unmatched += 1;
+                continue;
+            };
+            let a = agg.entry(group(inc)).or_default();
+            a.disasters.insert(dn);
+            if renter {
+                a.r_valid += n(r, "validRegistrations");
+                a.r_approved += n(r, "approvedForFemaAssistance");
+                a.r_rent += n(r, "rentalAmount");
+            } else {
+                a.o_valid += n(r, "validRegistrations");
+                a.o_approved += n(r, "approvedForFemaAssistance");
+                a.o_rent += n(r, "rentalAmount");
+            }
+        }
     }
     let retrieved = crate::timefmt::today_utc();
     let mut doc = SeriesDoc {
@@ -353,37 +328,11 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         ..Default::default()
     };
     doc.notes.push(format!("HousingAssistanceRenters ({} rows) and HousingAssistanceOwners ({} rows) v2, per disaster and ZIP code, joined to DisasterDeclarationsSummaries by disaster number for the incident type; {unmatched} rows had no declaration.", renters.len(), owners.len()));
-    doc.notes.push("OpenFEMA's totalInspected field is zero in every row of both files (checked 2026-09-26); the inspected counts here are the sums of the damage categories.".into());
-    doc.notes.push("Counts registrations with FEMA, not all households hit: people who did not apply, or whose insurance covered them, are not in the data. Damage levels are FEMA's inspection categories for renters (major or substantial = the home is unlivable for a long time); owners are bucketed by FEMA-inspected damage in dollars instead. Rental assistance is what FEMA paid to help people live elsewhere, a floor on the cost of being displaced.".into());
+    doc.notes.push("The damage columns of both v2 files (renters' moderate, major and substantial damage; owners' FEMA-inspected damage buckets; totalInspected) are zero in every row (checked 2026-09-26 by asking the API for rows above zero: none), so no damage share is published; registrations, approvals and rental assistance are filled.".into());
+    doc.notes.push("Counts registrations with FEMA, not all households hit: people who did not apply, or whose insurance covered them, are not in the data. Rental assistance is what FEMA paid to help people live elsewhere, a floor on the cost of being displaced.".into());
     doc.notes.push(format!("See also {OWNERS_PAGE} and {DECL_PAGE}. Months displaced by hazard is not built: only 3% of rental-eligible registrations carry an end date."));
     let year = u16::try_from(build_year - 1).unwrap_or(2025);
     for (g, a) in &agg {
-        if a.r_inspected > 0.0 {
-            doc.rates.push(SRate {
-                id: format!("ihp_renter_major_damage_share_{g}"),
-                value: a.r_major / a.r_inspected,
-                unit: format!("share of inspected renter registrations with major or substantial damage ({g} disasters)"),
-                year,
-                period: "all declarations in the OpenFEMA housing-assistance files".into(),
-                figure: format!("{:.0} of {:.0} inspected renter registrations, {} disasters", a.r_major, a.r_inspected, a.disasters.len()),
-                derivation: "(totalWithMajorDamage + totalWithSubstantialDamage) / (no damage + moderate + major + substantial)".into(),
-                note: String::new(),
-                ..Default::default()
-            });
-        }
-        if a.o_inspected > 0.0 {
-            doc.rates.push(SRate {
-                id: format!("ihp_owner_damage_over_30k_share_{g}"),
-                value: a.o_gt30k / a.o_inspected,
-                unit: format!("share of inspected owner registrations with more than $30,000 of FEMA-inspected damage ({g} disasters)"),
-                year,
-                period: "all declarations in the OpenFEMA housing-assistance files".into(),
-                figure: format!("{:.0} of {:.0} inspected owner registrations", a.o_gt30k, a.o_inspected),
-                derivation: "femaInspectedDamageGreaterThan30000 / (no damage + all four damage buckets)".into(),
-                note: "Nominal dollars across the years; the threshold means more in older disasters.".into(),
-                ..Default::default()
-            });
-        }
         let approved = a.r_approved + a.o_approved;
         if approved > 0.0 {
             doc.rates.push(SRate {
@@ -402,13 +351,9 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             ("incident".into(), Val::S(g.clone())),
             ("disasters".into(), Val::I(a.disasters.len() as i64)),
             ("renter_registrations".into(), Val::N(a.r_valid)),
-            ("renters_inspected".into(), Val::N(a.r_inspected)),
-            ("renters_moderate_damage".into(), Val::N(a.r_moderate)),
-            ("renters_major_or_substantial".into(), Val::N(a.r_major)),
+            ("renters_approved".into(), Val::N(a.r_approved)),
             ("owner_registrations".into(), Val::N(a.o_valid)),
-            ("owners_inspected".into(), Val::N(a.o_inspected)),
-            ("owners_damage_over_10k".into(), Val::N(a.o_gt10k)),
-            ("owners_damage_over_30k".into(), Val::N(a.o_gt30k)),
+            ("owners_approved".into(), Val::N(a.o_approved)),
             ("rental_assistance_usd".into(), Val::N(a.r_rent + a.o_rent)),
         ]);
     }

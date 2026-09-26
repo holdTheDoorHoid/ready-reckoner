@@ -33,8 +33,9 @@ pub enum PoolBasis {
 /// `core/outage_stress.csv`).
 ///
 /// Rates count customer outages lasting at least N days per customer per year, for the outages
-/// the model does not carry in rows of their own: outages attributed to hurricanes, wildfires
-/// and floods are left out (their shares are in `causes`). The blend is
+/// the model does not carry in rows of their own: outages attributed to hurricanes, wildfires,
+/// floods, cold-driven grid emergencies and other grid failures are left out (their shares are in
+/// `causes`). The blend is
 /// `lam_ge = z × own_ge + (1 − z) × region`, so the region's rate is
 /// `(lam_ge − z × own_ge) / (1 − z)` when `z < 1`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
@@ -43,7 +44,8 @@ pub struct OutageModel {
     /// How the pooled tail was formed.
     #[serde(default)]
     pub basis: PoolBasis,
-    /// Years of outage records the county's own rates rest on.
+    /// Years of outage records the county's own rates rest on. Not in the core pack (the
+    /// county's `outages.years_covered` says the same); kept for fixtures.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub years: Option<f32>,
     /// Customer outages per customer per year in the pool, all lengths (the county's own; the
@@ -51,10 +53,12 @@ pub struct OutageModel {
     pub rate: f32,
     /// Blended rate of outages lasting at least 1, 3, 7, 14 and 30 days.
     pub lam_ge: [f32; 5],
-    /// The county's own rates at the same lengths (absent when it has no record).
+    /// The county's own rates at the same lengths. Not in the core pack (it would add 40 KB to
+    /// every first visit); kept for hand-built fixtures and tests.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub own_ge: Option<[f32; 5]>,
-    /// Credibility weight of the county's own record at each length, 0 to 1.
+    /// Credibility weight of the county's own record at each length, 0 to 1:
+    /// `E / (E + 5)`, E = events of that length the county would expect to record.
     pub z: [f32; 5],
     /// Neighbouring counties with records inside the pooling radius.
     #[serde(default)]
@@ -63,8 +67,8 @@ pub struct OutageModel {
     /// `wind`, `wildfire`, `heat`, `cold_grid`, `flood`, `grid`, `unattributed`), all lengths.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub causes: BTreeMap<String, f32>,
-    /// Share of the county's customer outages lasting a day or more that came from hurricanes,
-    /// wildfires and floods (the causes outside the pool).
+    /// Share of the county's customer outages lasting a day or more that came from each cause
+    /// outside the pool (`hurricane`, `wildfire`, `flood`, `cold_grid`, `grid`).
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub causes_ge_1d: BTreeMap<String, f32>,
     /// The worst outage event in the county's region.
@@ -141,7 +145,7 @@ pub struct TemperatureProfile {
     /// Share of the county's outage customer-hours on days with a low of 20 °F or less.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub outage_cold_share: Option<f32>,
-    /// The same two shares over the county's region (customer-hour weighted, within 250 km),
+    /// The same two shares over the county's region (customer-hour weighted, within 400 km),
     /// steadier for small counties.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region_outage_hot_share: Option<f32>,

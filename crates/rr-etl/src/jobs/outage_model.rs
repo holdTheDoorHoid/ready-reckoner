@@ -825,6 +825,62 @@ fn blend(
     Some(b)
 }
 
+/// The manifest definition of the pooled tail, for the pooling actually used.
+fn pooled_tail_definition(cfg: PoolCfg) -> String {
+    format!(
+        "For each county and each length d of 1, 3, 7, 14 and 30 days: lam_ge_Nd = Z x own_ge_Nd + (1 - Z) x region_Nd. region_Nd is the same rate over {} every county within R(d) of it ({:.0} km for 1 and 3 days, {:.0} km for 7, 14 and 30 days; {}), each weighted by customers x years of data x (1 - (distance/R)^2)^2. Z = E / (E + {}), where E is the number of events reaching d days that a county with this county's years of data would record at the pooled rate (an event reaches d days when at least 0.25% of the county's customers, and at least 5, were out that long). Rates are customer outages lasting at least d days per customer per year, counting only outages the model does not carry in rows of their own: outages attributed to hurricanes, wildfires, floods, cold-driven grid emergencies and other grid failures are left out.",
+        if cfg.include_self {
+            "the county and"
+        } else {
+            "(leaving the county out)"
+        },
+        cfg.radius_km[0],
+        cfg.radius_km[2],
+        if cfg.same_region {
+            "only counties in the same NCA5 region"
+        } else {
+            "any NCA5 region, but Puerto Rico, the US Virgin Islands, Alaska and Hawaii with the Pacific islands pool only among themselves"
+        },
+        cfg.k
+    )
+}
+
+/// The manifest definition of cause attribution (the windows `run` applies).
+fn attribution_definition() -> String {
+    format!(
+        "An outage event is attributed, in order, to a tropical cyclone when a HURDAT2 track point of at least 34 kt (fixes interpolated hourly) passes within {TRACK_RADIUS_KM:.0} km of the county's internal point from {} hours before the outage began to {} hours after it reached its peak (the peak taken at most 48 hours after the start); else to the highest-priority NOAA Storm Events episode in the county or its forecast zone overlapping the {} hours before the start to {} hours after the peak (tropical, ice, tornado and thunderstorm wind, winter, wildfire, high wind, flood, lightning and hail, heat, cold); winter, ice and cold events that coincide (same state, report span within {} hours of the start and the peak) with a DOE OE-417 load-shed, energy-emergency, public-appeal, voltage-reduction, fuel-supply or system-operations report are cold_grid; else to an OE-417 grid disturbance that is not weather in the same state, within the same window; else 'unattributed' (cause not recorded).",
+        TRACK_BEFORE_S / 3600,
+        TRACK_AFTER_S / 3600,
+        EPISODE_BEFORE_S / 3600,
+        EPISODE_AFTER_S / 3600,
+        OE417_WINDOW_S / 3600
+    )
+}
+
+/// The manifest note on regions: the stress table's, and the pooling actually used (so a
+/// `RR_OUTAGE_POOL` override is on record).
+fn regions_note(cfg: PoolCfg) -> String {
+    let radius: Vec<String> = cfg.radius_km.iter().map(|r| format!("{r:.0}")).collect();
+    format!(
+        "Stress table: major events in the county's NCA5 region within {REGION_RADIUS_KM:.0} km, where Puerto Rico and the US Virgin Islands are regions of their own (separate grids). Pooled tails: {}, {}; radius {} km for outages of 1, 3, 7, 14 and 30 days; k = {}. Major county events (restoration curves and stress table): at least {:.0}% of the county's customers and at least {MAJOR_MIN:.0} customers out at the peak. Curves are shares of the peak still out N days after the peak, the running minimum of the repaired count (a lower bound on how long customers were out). Restoration factor = the region's median days until 9 in 10 are back / the mainland's for the same cause, bounded {}-{}.",
+        if cfg.same_region {
+            "within the county's NCA5 region"
+        } else {
+            "by distance across NCA5 regions (the island grids apart)"
+        },
+        if cfg.include_self {
+            "the county included"
+        } else {
+            "the county left out"
+        },
+        radius.join("/"),
+        cfg.k,
+        MAJOR_SHARE * 100.0,
+        FACTOR_BOUNDS.0,
+        FACTOR_BOUNDS.1
+    )
+}
+
 /// Run the job.
 pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let mut out = JobOutput::default();
@@ -1625,16 +1681,11 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         license: "figures from the sources listed per event (US Government works)".into(),
         obligations: String::new(),
     });
-    out.definitions.insert(
-        "pooled_tail".into(),
-        format!("For each county and each length d of 1, 3, 7, 14 and 30 days: lam_ge_Nd = Z x own_ge_Nd + (1 - Z) x region_Nd. region_Nd is the same rate over the county and every county within R(d) of it ({} km for 1 and 3 days, {} km for 7, 14 and 30 days; separate island grids are never pooled), each weighted by customers x years of data x (1 - (distance/R)^2)^2. Z = E / (E + {CREDIBILITY_K}), where E is the number of events reaching d days that a county with this county's years of data would record at the pooled rate (an event reaches d days when at least 0.25% of the county's customers, and at least 5, were out that long). Rates are customer outages lasting at least d days per customer per year, counting only outages the model does not carry in rows of their own: outages attributed to hurricanes, wildfires, floods, cold-driven grid emergencies and other grid failures are left out.", POOL_RADIUS_KM[0], POOL_RADIUS_KM[2]),
-    );
-
-    out.definitions.insert(
-        "attribution".into(),
-        format!("An outage event is attributed, in order, to a tropical cyclone when a HURDAT2 track point of at least 34 kt passes within {TRACK_RADIUS_KM:.0} km of the county's internal point from 36 hours before to 24 hours after the outage began; else to the highest-priority NOAA Storm Events episode in the county or its forecast zone overlapping the 6 hours before to 2 hours after the start (tropical, ice, tornado and thunderstorm wind, winter, wildfire, high wind, flood, lightning and hail, heat, cold); winter, ice and cold events that coincide (within 24 hours, same state) with a DOE OE-417 load-shed, energy-emergency or fuel-supply report are cold_grid; else to an OE-417 grid disturbance (not weather) in the same state within 24 hours; else 'unattributed' (cause not recorded)."),
-    );
-    out.notes.push(format!("Regions for pooling and for the stress table: the NCA5 region, except that Puerto Rico and the US Virgin Islands are regions of their own (separate grids). Major county events (restoration curves and stress table): at least {:.0}% of the county's customers and at least {MAJOR_MIN:.0} customers out at the peak. Curves are shares of the peak still out N days after the peak, the running minimum of the repaired count (a lower bound on how long customers were out). Restoration factor = the region's median days until 9 in 10 are back / the mainland's for the same cause, bounded {}-{}.", MAJOR_SHARE * 100.0, FACTOR_BOUNDS.0, FACTOR_BOUNDS.1));
+    out.definitions
+        .insert("pooled_tail".into(), pooled_tail_definition(cfg));
+    out.definitions
+        .insert("attribution".into(), attribution_definition());
+    out.notes.push(regions_note(cfg));
     for h in &historic {
         out.notes.push(format!(
             "Hand-copied event {} ({}, {}): share of the peak still out at {:?} days = {:?}; sources: {}{}.",
@@ -2011,5 +2062,49 @@ mod tests {
         let l1 = blend(1, &stats, &loo, &cust, CREDIBILITY_K).unwrap();
         assert!(l1.lam[2] > l0.lam[2] * 0.5);
         assert_eq!(l0.z[2], 0.0);
+    }
+
+    #[test]
+    fn the_manifest_text_describes_the_pooling_and_windows_in_use() {
+        // The pack's pooling: by distance, the county in its own collective, 400/800 km.
+        let note = regions_note(POOL);
+        assert!(note.contains("by distance across NCA5 regions"), "{note}");
+        assert!(note.contains("the county included"), "{note}");
+        assert!(note.contains("radius 400/400/800/800/800 km"), "{note}");
+        assert!(note.contains("within 250 km"), "{note}");
+        let def = pooled_tail_definition(POOL);
+        assert!(
+            def.contains("over the county and every county within R(d)"),
+            "{def}"
+        );
+        assert!(
+            def.contains("400 km for 1 and 3 days, 800 km for 7, 14 and 30 days"),
+            "{def}"
+        );
+        assert!(def.contains("Z = E / (E + 5)"), "{def}");
+        // An override is on record.
+        let other = PoolCfg {
+            radius_km: [250.0; 5],
+            k: 5.0,
+            same_region: true,
+            include_self: false,
+        };
+        assert!(regions_note(other).contains(
+            "within the county's NCA5 region, the county left out; radius 250/250/250/250/250 km"
+        ));
+        assert!(pooled_tail_definition(other).contains("(leaving the county out)"));
+        // Attribution windows are anchored on the peak, as `run` applies them.
+        let a = attribution_definition();
+        assert!(
+            a.contains(
+                "from 36 hours before the outage began to 24 hours after it reached its peak"
+            ),
+            "{a}"
+        );
+        assert!(
+            a.contains("the 6 hours before the start to 2 hours after the peak"),
+            "{a}"
+        );
+        assert!(a.contains("within 300 km"), "{a}");
     }
 }

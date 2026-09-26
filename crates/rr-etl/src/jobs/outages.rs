@@ -62,8 +62,9 @@ pub const MIN_EVENTS_FOR_COUNTY_DURATIONS: u32 = 10;
 pub const MIN_STATE_COVERAGE: f64 = 0.5;
 
 /// A gap or dip longer than [`BRIDGE_S`] is bridged up to this long when it looks like a
-/// reporting dropout: the count before it was at least the start threshold and the count after
-/// it comes back to at least [`DROPOUT_REBOUND`] of that level. EAGLE-I's county count is the sum
+/// reporting dropout: the count had held at least the start threshold for an hour before it
+/// ([`SUSTAIN_SNAPSHOTS`]) and holds at least [`DROPOUT_REBOUND`] of that level for an hour after
+/// it. EAGLE-I's county count is the sum
 /// of each utility's outage map; a utility missing from a scrape reads as everyone restored at
 /// once and everyone losing power again when it reappears. Utility outage maps fail most often
 /// in the worst storms, for days at a time: Hurricane Michael's restoration in Jackson County,
@@ -72,6 +73,16 @@ pub const MIN_STATE_COVERAGE: f64 = 0.5;
 pub const MAX_DROPOUT_S: i64 = 3 * 86_400;
 /// See [`MAX_DROPOUT_S`].
 pub const DROPOUT_REBOUND: f64 = 0.5;
+/// Consecutive snapshots (one hour) a count must hold on both sides of a gap for the gap to be
+/// bridged as a dropout.
+pub const SUSTAIN_SNAPSHOTS: usize = 4;
+/// Snapshots at or above the start threshold (six hours) an event needs before a gap in it can
+/// be bridged as a dropout. EAGLE-I also carries short stale readings: in June 2019 Cherokee
+/// County, Alabama read 1 or 2 customers out for days, broken by one-hour plateaus of 510 and
+/// 506 customers at the same hour each morning and a lone 290; bridged, they made a six-day
+/// outage that never happened. A storm outage that loses its utility's data has usually been
+/// going for hours.
+pub const MIN_BRIDGE_SNAPSHOTS: u32 = 24;
 /// Half-width, in snapshots, of the running median used to cut doubled counts inside a sustained
 /// outage (12 = three hours each side).
 pub const SPIKE_MEDIAN_HALF: usize = 12;
@@ -116,7 +127,7 @@ pub struct EventRecord {
 pub const PR_ISLAND: u32 = 72000;
 
 /// The event definition, quoted into the manifest and into every `OutageStats`.
-pub const DEFINITION: &str = "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged, and up to 72 hours when the count before the gap was at least 1% and comes back to at least half of it (a utility missing from the data for a while). Inside an event the counts are repaired before durations are read: during a sustained outage, counts more than 1.5 times the 3-hour running median (reports counted twice) are cut to the median, and dips shorter than 24 hours are filled to the level around them (a utility missing from some snapshots, which otherwise reads as everyone restored and cut off again); short reversals under half of the current peak or trough, or under the 1% level, are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power. Rates are customer outages in such events per customer per year of data.";
+pub const DEFINITION: &str = "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged, and up to 72 hours when the event had been at the 1% level for at least 6 hours, held it for the hour before the gap and holds at least half of that level for an hour after it (a utility missing from the data for a while; readings under half of the level inside such a gap are dropped). Inside an event the counts are repaired before durations are read: during a sustained outage, counts more than 1.5 times the 3-hour running median (reports counted twice) are cut to the median, and dips shorter than 24 hours are filled to the level around them (a utility missing from some snapshots, which otherwise reads as everyone restored and cut off again); short reversals under half of the current peak or trough, or under the 1% level, are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power, except that customers still out N days after the peak are counted as out at least N days even when a later wave would have restored them first. Rates are customer outages in such events per customer per year of data.";
 
 #[derive(Debug, Clone, Default)]
 struct OpenEvent {
@@ -128,6 +139,61 @@ struct OpenEvent {
     /// Snapshots at or above the start threshold.
     start_snapshots: u32,
     rows: Vec<(i64, f64)>,
+    /// The latest snapshots at or above the end threshold (at most [`SUSTAIN_SNAPSHOTS`]).
+    recent: Vec<(i64, f64)>,
+    /// A long gap being bridged, until the count has held for an hour after it.
+    probation: Option<Probation>,
+}
+
+/// The state before a long gap, kept until the bridge is confirmed (or restored if it fails).
+#[derive(Debug, Clone, Default)]
+struct Probation {
+    last_active: i64,
+    last_active_level: f64,
+    start_snapshots: u32,
+    recent: Vec<(i64, f64)>,
+    /// The level the count held for the hour before the gap.
+    level: f64,
+    /// Consecutive snapshots (at most one missing between them) holding at least half of
+    /// `level` since the data came back; the bridge is confirmed at [`SUSTAIN_SNAPSHOTS`].
+    held: usize,
+    /// The latest of those snapshots.
+    last_high: i64,
+}
+
+impl OpenEvent {
+    /// Record a snapshot at or above the end threshold.
+    fn note_active(&mut self, t: i64, n: f64) {
+        self.last_active = t;
+        self.last_active_level = n;
+        match self.recent.last_mut() {
+            Some(last) if last.0 == t => last.1 = last.1.max(n),
+            _ => {
+                self.recent.push((t, n));
+                if self.recent.len() > SUSTAIN_SNAPSHOTS {
+                    self.recent.remove(0);
+                }
+            }
+        }
+    }
+
+    /// The level held over the hour before `last_active`: the smallest of the last
+    /// [`SUSTAIN_SNAPSHOTS`] consecutive snapshots, if there are that many.
+    fn sustained_level(&self) -> Option<f64> {
+        if self.recent.len() < SUSTAIN_SNAPSHOTS {
+            return None;
+        }
+        let span = self.recent[self.recent.len() - 1].0 - self.recent[0].0;
+        if span > (SUSTAIN_SNAPSHOTS as i64 - 1) * SLOT_S {
+            return None;
+        }
+        Some(
+            self.recent
+                .iter()
+                .map(|r| r.1)
+                .fold(f64::INFINITY, f64::min),
+        )
+    }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -140,7 +206,8 @@ struct Unit {
     months: BTreeSet<u32>,
     years: BTreeSet<u16>,
     cust_hours_all: f64,
-    cust_hours_events: f64,
+    /// Recorded (unrepaired) customer-hours inside events.
+    cust_hours_events_raw: f64,
     events: u32,
     arrivals: f64,
     /// Customer outage lengths in 15-minute slots -> customers.
@@ -181,13 +248,28 @@ impl Unit {
         }
     }
 
+    /// Close the open event (a bridge still waiting for the count to hold after a gap is not
+    /// confirmed: the event ends before the gap).
     fn close(&mut self) {
+        while self.open.as_ref().is_some_and(|e| e.probation.is_some()) {
+            self.fail_bridge();
+        }
+        self.close_now();
+    }
+
+    fn close_now(&mut self) {
         let Some(ev) = self.open.take() else { return };
         if ev.start_snapshots < MIN_START_SNAPSHOTS {
             return;
         }
         let dur = ev.last_active - ev.start + SLOT_S;
         let slots = ((ev.last_active - ev.start) / SLOT_S + 1) as usize;
+        self.cust_hours_events_raw += ev
+            .rows
+            .iter()
+            .filter(|(t, _)| *t <= ev.last_active)
+            .map(|(_, n)| n * (SLOT_S as f64 / 3600.0))
+            .sum::<f64>();
         // Regular 15-minute series, carrying the last value across missing snapshots.
         let mut v = vec![0.0f64; slots];
         let mut filled = vec![false; slots];
@@ -236,6 +318,9 @@ impl Unit {
         }
         let v = zigzag(&v, self.threshold, REVERSAL_SHARE);
         let (durations, arrivals) = fifo(&v);
+        // Customers still out N days after the peak were out at least N days: first out, first
+        // restored can miss them when a second wave follows the peak (M-02's lower bound).
+        let durations = floor_by_curve(durations, &curve, peak);
         let mut ge = [0.0f64; 5];
         for (k, d) in GE_DAYS.iter().enumerate() {
             ge[k] = durations.range(d * 96..).map(|(_, w)| *w).sum();
@@ -246,7 +331,6 @@ impl Unit {
         let customer_hours = v.iter().sum::<f64>() * hours;
         self.events += 1;
         self.arrivals += arrivals;
-        self.cust_hours_events += customer_hours;
         self.max_event_s = self.max_event_s.max(dur);
         self.records.push(EventRecord {
             start: ev.start,
@@ -267,39 +351,106 @@ impl Unit {
         }
         if t == self.last_t {
             self.duplicates += 1;
+            let end_threshold = self.end_threshold;
             if let Some(ev) = self.open.as_mut()
                 && let Some(last) = ev.rows.last_mut()
                 && last.0 == t
             {
                 last.1 = last.1.max(n);
-                if last.1 >= self.end_threshold {
-                    ev.last_active = t;
-                    ev.last_active_level = last.1;
+                let level = last.1;
+                if level >= end_threshold && ev.probation.is_none() {
+                    ev.note_active(t, level);
                 }
             }
             return;
         }
         self.last_t = t;
         self.cust_hours_all += n * (SLOT_S as f64 / 3600.0);
-        if let Some(ev) = self.open.as_ref() {
-            let gap = t - ev.last_active;
-            if gap > BRIDGE_S {
-                let high_before = ev.last_active_level >= self.threshold;
-                let close = if !high_before || gap > MAX_DROPOUT_S {
-                    true
-                } else if n >= self.end_threshold {
-                    // The data are back: a dropout if the count rebounds to a similar level,
-                    // otherwise the outage ended while the data were missing.
-                    n < DROPOUT_REBOUND * ev.last_active_level
-                } else {
-                    // Still low after a high count: wait (up to MAX_DROPOUT_S) to see whether
-                    // it comes back.
-                    false
-                };
-                if close {
-                    self.close();
-                } else if n >= self.end_threshold {
-                    self.dropouts_bridged += 1;
+        self.feed(t, n);
+    }
+
+    /// The event state machine for one snapshot (also re-run over the snapshots after a gap
+    /// whose bridge failed).
+    fn feed(&mut self, t: i64, n: f64) {
+        enum Next {
+            Append,
+            Close,
+            FailBridge,
+            Probation(f64),
+        }
+        let end_threshold = self.end_threshold;
+        let next = match self.open.as_mut() {
+            None => Next::Append,
+            Some(ev) => match ev.probation.as_mut() {
+                Some(p) if t > p.last_active + MAX_DROPOUT_S => Next::FailBridge,
+                Some(p) if n >= DROPOUT_REBOUND * p.level => {
+                    p.held = if p.held > 0 && t - p.last_high <= 2 * SLOT_S {
+                        p.held + 1
+                    } else {
+                        1
+                    };
+                    p.last_high = t;
+                    if p.held >= SUSTAIN_SNAPSHOTS {
+                        // Confirmed: the count held on both sides, so the utility was missing
+                        // from the data. Readings under half the level inside the gap are the
+                        // utilities still reporting; drop them so the level carries across.
+                        let (from, floor) = (p.last_active, DROPOUT_REBOUND * p.level);
+                        ev.rows.retain(|r| r.0 <= from || r.1 >= floor);
+                        ev.probation = None;
+                        self.dropouts_bridged += 1;
+                    }
+                    Next::Append
+                }
+                // Back at a clearly lower level: the outage ended during the gap.
+                Some(_) if n >= end_threshold => Next::FailBridge,
+                // Still missing (only the utilities with nobody out report): keep waiting.
+                Some(p) => {
+                    p.held = 0;
+                    Next::Append
+                }
+                None => {
+                    let gap = t - ev.last_active;
+                    if gap <= BRIDGE_S {
+                        Next::Append
+                    } else {
+                        // A dropout only in an event that has been at the start level for
+                        // six hours and held it for the last hour, and for at most three days.
+                        let level = ev
+                            .sustained_level()
+                            .filter(|l| *l >= self.threshold)
+                            .filter(|_| ev.start_snapshots >= MIN_BRIDGE_SNAPSHOTS)
+                            .filter(|_| gap <= MAX_DROPOUT_S);
+                        match level {
+                            None => Next::Close,
+                            // The data are back at a similar level: a dropout if it holds.
+                            Some(l) if n >= DROPOUT_REBOUND * l => Next::Probation(l),
+                            // Back, but at a lower level: the outage ended during the gap.
+                            Some(_) if n >= end_threshold => Next::Close,
+                            // Still low after a high count: wait (up to MAX_DROPOUT_S).
+                            Some(_) => Next::Append,
+                        }
+                    }
+                }
+            },
+        };
+        match next {
+            Next::Append => {}
+            Next::Close => self.close_now(),
+            Next::FailBridge => {
+                self.fail_bridge();
+                return self.feed(t, n);
+            }
+            Next::Probation(level) => {
+                if let Some(ev) = self.open.as_mut() {
+                    ev.probation = Some(Probation {
+                        last_active: ev.last_active,
+                        last_active_level: ev.last_active_level,
+                        start_snapshots: ev.start_snapshots,
+                        recent: ev.recent.clone(),
+                        level,
+                        held: 1,
+                        last_high: t,
+                    });
                 }
             }
         }
@@ -312,19 +463,43 @@ impl Unit {
                         last_active_level: n,
                         start_snapshots: 1,
                         rows: vec![(t, n)],
+                        recent: vec![(t, n)],
+                        probation: None,
                     });
                 }
             }
             Some(ev) => {
                 ev.rows.push((t, n));
                 if n >= self.end_threshold {
-                    ev.last_active = t;
-                    ev.last_active_level = n;
+                    ev.note_active(t, n);
                 }
                 if n >= self.threshold {
                     ev.start_snapshots += 1;
                 }
             }
+        }
+    }
+
+    /// A long gap whose count did not hold afterwards: the outage ended during the gap. The event
+    /// is closed as it stood before the gap and the snapshots after it are read again.
+    fn fail_bridge(&mut self) {
+        let Some(mut ev) = self.open.take() else {
+            return;
+        };
+        let Some(p) = ev.probation.take() else {
+            self.open = Some(ev);
+            return;
+        };
+        let at = ev.rows.partition_point(|r| r.0 <= p.last_active);
+        let after = ev.rows.split_off(at);
+        ev.last_active = p.last_active;
+        ev.last_active_level = p.last_active_level;
+        ev.start_snapshots = p.start_snapshots;
+        ev.recent = p.recent;
+        self.open = Some(ev);
+        self.close_now();
+        for (t, n) in after {
+            self.feed(t, n);
         }
     }
 }
@@ -368,6 +543,45 @@ fn fifo(v: &[f64]) -> (BTreeMap<u32, f64>, f64) {
     }
     depart(&mut queue, v[v.len() - 1], v.len(), &mut durations);
     (durations, arrivals)
+}
+
+/// Raise an event's outage-length histogram (15-minute slots -> customers) so that at least
+/// `curve[k] * peak` customers have outages of at least `CURVE_DAYS[k]` days: the customers still
+/// out that long after the peak were out at least that long. Missing customers are moved up from
+/// the longest outages below the mark to exactly the mark, longest mark first. The number of
+/// customer outages is unchanged.
+pub fn floor_by_curve(
+    mut durations: BTreeMap<u32, f64>,
+    curve: &[f64; 11],
+    peak: f64,
+) -> BTreeMap<u32, f64> {
+    for k in (0..CURVE_DAYS.len()).rev() {
+        let mark = CURVE_DAYS[k] * 96;
+        let bound = curve[k] * peak;
+        let have: f64 = durations.range(mark..).map(|(_, w)| *w).sum();
+        let mut need = bound - have;
+        if need <= 1e-9 {
+            continue;
+        }
+        let below: Vec<u32> = durations.range(..mark).rev().map(|(k, _)| *k).collect();
+        for key in below {
+            let w = durations[&key];
+            let m = w.min(need);
+            if m <= 0.0 {
+                continue;
+            }
+            *durations.get_mut(&key).unwrap_or(&mut 0.0) -= m;
+            *durations.entry(mark).or_default() += m;
+            need -= m;
+            if durations.get(&key).is_some_and(|x| *x <= 1e-9) {
+                durations.remove(&key);
+            }
+            if need <= 1e-9 {
+                break;
+            }
+        }
+    }
+    durations
 }
 
 /// Running median over a window of `half` values on each side (truncated at the ends).
@@ -1158,7 +1372,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
                 &mut acc,
                 "share",
                 if u.cust_hours_all > 0.0 {
-                    u.cust_hours_events / u.cust_hours_all
+                    (u.cust_hours_events_raw / u.cust_hours_all).min(1.0)
                 } else {
                     0.0
                 },
@@ -1267,6 +1481,31 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let oo: u64 = state.units.values().map(|u| u.out_of_order).sum();
     let dups: u64 = state.units.values().map(|u| u.duplicates).sum();
     out.notes.push(format!("Data checks: {oo} out-of-order rows skipped, {dups} duplicate snapshots merged (maximum kept)."));
+    // How much the repair adds inside events, against the recorded snapshots.
+    let mut added: Vec<f64> = Vec::new();
+    let (mut rep_all, mut raw_all, mut bridged, mut bridged_units) = (0.0, 0.0, 0u32, 0usize);
+    for u in state.units.values() {
+        let repaired: f64 = u.records.iter().map(|r| r.customer_hours).sum();
+        rep_all += repaired;
+        raw_all += u.cust_hours_events_raw;
+        bridged += u.dropouts_bridged;
+        bridged_units += usize::from(u.dropouts_bridged > 0);
+        if u.cust_hours_events_raw > 0.0 {
+            added.push(repaired / u.cust_hours_events_raw - 1.0);
+        }
+    }
+    added.sort_by(f64::total_cmp);
+    let pct = |q: f64| {
+        added
+            .get(((added.len() as f64 - 1.0) * q).round() as usize)
+            .map_or(0.0, |x| 100.0 * x)
+    };
+    out.notes.push(format!(
+        "Repair: {bridged} gaps in {bridged_units} counties bridged as reporting dropouts; inside events the repaired series holds {:.0}% more customer-hours than the recorded snapshots (median county {:+.0}%, 90th percentile {:+.0}%).",
+        100.0 * (rep_all / raw_all.max(1e-9) - 1.0),
+        pct(0.5),
+        pct(0.9)
+    ));
     for (y, d) in &diags {
         out.notes.push(format!(
             "{y}: {} rows, {} distinct snapshots, {} collection gaps longer than 1 hour totalling {:.0} hours.",
@@ -1368,49 +1607,102 @@ mod tests {
 
     #[test]
     fn reporting_dropouts_are_bridged_up_to_three_days() {
-        // 1,000 customers, 200 out; the data vanish for 6 hours and come back at the same level:
-        // a utility missing from the scrape, not a restoration.
-        let mut u = unit(1000.0);
-        for i in 0..8 {
-            u.row(i * SLOT_S, 200.0);
-        }
-        for i in 32..40 {
-            u.row(i * SLOT_S, 200.0);
-        }
-        u.close();
+        // 1,000 customers, 200 out for six hours; the data vanish for 6 hours and come back at
+        // the same level: a utility missing from the scrape, not a restoration.
+        let run = |before: std::ops::Range<i64>, after: std::ops::Range<i64>, level: f64| {
+            let mut u = unit(1000.0);
+            for i in before {
+                u.row(i * SLOT_S, 200.0);
+            }
+            for i in after {
+                u.row(i * SLOT_S, level);
+            }
+            u.close();
+            u
+        };
+        let u = run(0..24, 48..56, 200.0);
         assert_eq!(u.events, 1);
         assert_eq!(u.dropouts_bridged, 1);
         assert_eq!(u.records[0].arrivals, 200.0);
         // Coming back at under half the level: the outage ended while the data were missing.
-        let mut u = unit(1000.0);
-        for i in 0..8 {
-            u.row(i * SLOT_S, 200.0);
+        assert_eq!(run(0..24, 48..56, 60.0).events, 2);
+        // Two and a half days: still a dropout.
+        assert_eq!(run(0..24, 264..272, 200.0).events, 1);
+        // Longer than three days: two events.
+        assert_eq!(run(0..24, 320..328, 200.0).events, 2);
+        // An event only two hours old when the data vanish: not bridged.
+        assert_eq!(run(0..8, 32..40, 200.0).events, 2);
+    }
+
+    #[test]
+    fn short_stale_plateaus_are_not_bridged() {
+        // Cherokee County, Alabama, June 2019: 1 or 2 customers out, broken by one-hour plateaus
+        // of 510 and 506 a day apart and a lone 290 between them.
+        let mut u = unit(24_530.0);
+        for i in 0..4 {
+            u.row(i * SLOT_S, 510.0);
         }
-        for i in 32..40 {
-            u.row(i * SLOT_S, 60.0);
+        for i in 4..16 {
+            u.row(i * SLOT_S, 1.0);
+        }
+        u.row(72 * SLOT_S, 290.0);
+        u.row(73 * SLOT_S, 2.0);
+        for i in 96..100 {
+            u.row(i * SLOT_S, 506.0);
+        }
+        for i in 100..104 {
+            u.row(i * SLOT_S, 1.0);
         }
         u.close();
         assert_eq!(u.events, 2);
-        // Two and a half days: still a dropout.
+        assert_eq!(u.dropouts_bridged, 0);
+        assert_eq!(u.max_event_s, 3600);
+    }
+
+    #[test]
+    fn a_lone_return_does_not_bridge_a_gap() {
+        // 200 out for 7.5 hours, silence, one reading of 200 twenty hours later, then nothing:
+        // the count never held after the gap, so the outage ended when the data stopped.
         let mut u = unit(1000.0);
-        for i in 0..8 {
+        for i in 0..30 {
             u.row(i * SLOT_S, 200.0);
         }
-        for i in 250..258 {
-            u.row(i * SLOT_S, 200.0);
+        u.row(110 * SLOT_S, 200.0);
+        u.close();
+        assert_eq!(u.events, 1);
+        assert_eq!(u.dropouts_bridged, 0);
+        assert_eq!(u.max_event_s, 30 * SLOT_S);
+    }
+
+    #[test]
+    fn a_dropout_with_sporadic_returns_is_bridged_and_the_residual_readings_dropped() {
+        // Hurricane Michael in Jackson County, Florida (October 2018): about 11,000 out, then a
+        // day of readings of 9 (only a small utility reporting), two readings of about 10,000,
+        // four of 1, and the data back at about 10,000 for days.
+        let mut u = unit(30_000.0);
+        for i in 0..48 {
+            u.row(i * SLOT_S, 11_000.0);
+        }
+        for i in 48..144 {
+            u.row(i * SLOT_S, 9.0);
+        }
+        for i in 144..146 {
+            u.row(i * SLOT_S, 10_000.0);
+        }
+        for i in 146..150 {
+            u.row(i * SLOT_S, 1.0);
+        }
+        for i in 150..300 {
+            u.row(i * SLOT_S, 10_000.0);
         }
         u.close();
         assert_eq!(u.events, 1);
-        // Longer than three days: two events.
-        let mut u = unit(1000.0);
-        for i in 0..8 {
-            u.row(i * SLOT_S, 200.0);
-        }
-        for i in 300..308 {
-            u.row(i * SLOT_S, 200.0);
-        }
-        u.close();
-        assert_eq!(u.events, 2);
+        assert_eq!(u.dropouts_bridged, 1);
+        let r = &u.records[0];
+        // The level carries across the gap: nobody reads as restored during it.
+        assert_eq!(r.curve[0], 1.0);
+        assert!((r.curve[1] - 10.0 / 11.0).abs() < 1e-9, "{:?}", r.curve);
+        assert!((r.arrivals - 11_000.0).abs() < 1e-6, "{}", r.arrivals);
     }
 
     #[test]
@@ -1431,6 +1723,40 @@ mod tests {
             *x = 20.0;
         }
         assert_eq!(closing(&v, DROPOUT_CLOSE_HALF)[175], 20.0);
+    }
+
+    #[test]
+    fn the_event_curve_is_a_floor_on_long_outages() {
+        // 1,000 customers: 500 out at the peak, falling to 50 by day 3, who stay out to day 9; a
+        // second wave of 300 on day 4 is restored on day 5. First out, first restored gives that
+        // restoration to the 50 who had been out since day 0 and keeps the late arrivals, so
+        // nobody reads as out a week, though 50 customers were out for nine days.
+        let mut v = Vec::new();
+        for i in 0..(9 * 96) {
+            let d = i as f64 / 96.0;
+            let first = if d < 1.0 {
+                500.0
+            } else {
+                (500.0 - 225.0 * (d - 1.0)).max(50.0)
+            };
+            let second = if (4.0..5.0).contains(&d) { 300.0 } else { 0.0 };
+            v.push(first + second);
+        }
+        let (d, arrivals) = fifo(&zigzag(&v, 10.0, REVERSAL_SHARE));
+        let long = |d: &BTreeMap<u32, f64>| d.range(7 * 96..).map(|(_, w)| *w).sum::<f64>();
+        assert_eq!(long(&d), 0.0);
+        // The curve: the running minimum from the peak (day 0, 500 out) is 50 from day 3 on.
+        let mut curve = [0.0; 11];
+        for (k, days) in CURVE_DAYS.iter().enumerate() {
+            if (3..=7).contains(days) {
+                curve[k] = 0.1;
+            }
+        }
+        let floored = floor_by_curve(d.clone(), &curve, 500.0);
+        assert!((long(&floored) - 50.0).abs() < 1e-9);
+        let total = |d: &BTreeMap<u32, f64>| d.values().sum::<f64>();
+        assert!((total(&floored) - total(&d)).abs() < 1e-6);
+        assert!((total(&d) - arrivals).abs() < 1e-6);
     }
 
     #[test]

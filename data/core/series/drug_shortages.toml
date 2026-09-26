@@ -1,0 +1,90 @@
+# FDA drug shortages on the day of the refresh (openFDA). Written by rr-etl (job `series`); see docs/DATA_SOURCES.md.
+
+id = "drug_shortages"
+title = "FDA drug shortages on the day of the refresh (openFDA)"
+publisher = "U.S. Food and Drug Administration (openFDA)"
+url = "https://open.fda.gov/apis/drug/drugshortages/"
+licence = "CC0 1.0 (https://open.fda.gov/license/)"
+attribution = ""
+source = "openfda_drug_shortages"
+retrieved = "2026-09-26"
+how = "fetched"
+notes = [
+  "1601 package-level records on 2026-09-26; counts are distinct generic names, so one medicine in short supply in several strengths counts once.",
+  "A snapshot, not a history: the openFDA file lists the shortages FDA currently tracks (and a few recently resolved), so it gives how many medicines are short now, not how often a given medicine runs short. The ASHP/University of Utah series (about 270 active shortages in 2024) counts more broadly and is proprietary; it is not used.",
+]
+
+[[rate]]
+id = "drug_shortages_current"
+value = 70
+unit = "distinct medicines (generic names) FDA lists as currently in shortage"
+year = 2026
+period = "2026-09-26"
+figure = "70 generic names with status Current"
+derivation = "count of distinct generic_name where status = Current"
+note = "Openly licensed snapshot; see notes."
+unverified = false
+
+[[row]]
+table = "status"
+status = "Current"
+medicines = 70
+
+[[row]]
+table = "status"
+status = "Resolved"
+medicines = 4
+
+[[row]]
+table = "status"
+status = "To Be Discontinued"
+medicines = 179
+
+[[row]]
+table = "status_by_form"
+status = "Current"
+form = "injectable"
+medicines = 50
+
+[[row]]
+table = "status_by_form"
+status = "Current"
+form = "oral or liquid"
+medicines = 15
+
+[[row]]
+table = "status_by_form"
+status = "Current"
+form = "other"
+medicines = 5
+
+[[row]]
+table = "status_by_form"
+status = "Resolved"
+form = "injectable"
+medicines = 2
+
+[[row]]
+table = "status_by_form"
+status = "Resolved"
+form = "oral or liquid"
+medicines = 2
+
+[[row]]
+table = "status_by_form"
+status = "To Be Discontinued"
+form = "injectable"
+medicines = 74
+
+[[row]]
+table = "status_by_form"
+status = "To Be Discontinued"
+form = "oral or liquid"
+medicines = 86
+
+[[row]]
+table = "status_by_form"
+status = "To Be Discontinued"
+form = "other"
+medicines = 19
+
