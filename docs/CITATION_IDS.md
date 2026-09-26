@@ -201,9 +201,9 @@ risk and experience). The DataLumos archive the review suggested (project 218642
 
 ## Added for the v0.2.0 content on 2026-09-26
 
-The v0.2.0 content brief (new blocks, the state table, the Deviant Ollam lessons) added 88 entries
-and re-read 35. Every page below was read on 2026-09-26 and the sentence that cites it was checked
-against it. "Quote" means an exact sentence is stored, matched in the page's own text (the HTML, the
+The v0.2.0 content brief (new blocks, the state table, the Deviant Ollam lessons) and the ids the
+hazards and data-hazard workstreams requested added 120 entries, and 35 were re-read. Every page
+below was read on 2026-09-26 and the sentence that cites it was checked against it. "Quote" means an exact sentence is stored, matched in the page's own text (the HTML, the
 PDF's extracted text, or the text of the page as a browser shows it). A page read only through a
 summarising fetch stores no quote. How a page was read is stated where it was not a plain download.
 
@@ -235,13 +235,13 @@ summarising fetch stores no quote. How a page was read is stated where it was no
 
 | id | Source | Used in | How it was read and checked |
 | --- | --- | --- | --- |
-| `iii_homeowners_losses`, `iii_water_damage_protect` | Insurance Information Institute | hazard_water_damage | water and freezing claims are filed about six times as often as fire claims (ISO data, 2019–2023); shut-off valve, hoses, what policies cover. The institute is the insurance industry's information body; no agency publishes claim frequency by cause, so it is the source (paraphrased) |
+| `iii_water_damage`, `iii_water_damage_protect` | Insurance Information Institute | hazard_water_damage | water and freezing claims are filed about six times as often as fire claims (ISO data, 2019–2023); shut-off valve, hoses, what policies cover. The institute is the insurance industry's information body; no agency publishes claim frequency by cause, so it is the source (paraphrased) |
 | `fema_dam_residual_risk_2018` | FEMA fact sheet, Risk Exposure and Residual Risk Related to Dams | hazard_dam_levee | PDF (fema.gov refuses scripted clients, so read through a page fetch and its text extracted), quote |
 | `fema_living_with_levees` | FEMA, Living with Levees | hazard_dam_levee | levees lower the risk from some floods but not all; ask the local government; the levee database |
 | `fema_nfip_levees_2021` | FEMA fact sheet, NFIP and Levees | hazard_dam_levee | PDF as above, quote; accreditation does not guarantee protection |
 | `usace_nld` | USACE, National Levee Database | hazard_dam_levee | the public levee lookup |
 | `mo_sema_dam_failure` | Missouri SEMA, Dam Failures | hazard_dam_levee | ask about a high-hazard dam upstream and its emergency action plan; know the route; get to higher ground |
-| `fcc_network_outage_2024` | FCC PSHSB report on the 2024-02-22 wireless outage | hazard_network_outage | PDF, quote; more than 25,000 failed 911 calls |
+| `fcc_att_outage_2024` | FCC PSHSB report on the 2024-02-22 wireless outage | hazard_network_outage | PDF, quote; more than 25,000 failed 911 calls |
 | `fda_drug_shortages`, `fda_drug_shortages_faq`, `fda_besaferx` | FDA | hazard_drug_shortage | quotes on the first two; why shortages happen; try other pharmacies and ask about alternatives; FDA's shortage list; state-licensed online pharmacies |
 | `me_dhhs_snap_2025` | Maine DHHS news release (2025-10-21) | hazard_benefit_interruption | in October 2025 USDA told every state that November SNAP benefits would not be issued; about 42 million people get SNAP |
 | `usda_hunger_hotline` | USDA National Hunger Hotline | hazard_benefit_interruption | the hotline and its hours |
@@ -255,7 +255,7 @@ summarising fetch stores no quote. How a page was read is stated where it was no
 | `cdc_valley_fever` | CDC, About Valley Fever | hazard_dust_storm | page fetch (cdc.gov refuses scripted clients), paraphrased |
 | `usgs_sinkholes` | USGS Water Science School, Sinkholes | hazard_sinkhole | quote; the states with the most damage |
 | `fl_dep_sinkhole_faq` | Florida Geological Survey, Sinkhole FAQ | hazard_sinkhole | call the insurer; only a licensed geologist or engineer can tell a true sinkhole; mark it off; edges keep slumping for about a day |
-| `fbi_cde_arrests_2024` | FBI UCR, Crime Data Explorer | hazard_arrest_or_detention | the national arrest count for January–December 2024 (about 7.1 million), read from the Crime Data Explorer's own data endpoint (`/LATEST/arrest/national/all`, totals and counts); the web app needs a script-capable browser. The block says it counts arrests, not people |
+| `fbi_cde_arrests` | FBI UCR, Crime in the United States 2024: persons arrested | hazard_arrest_or_detention | Table 29's national estimate, 7,522,824 arrests in 2024 ("about 7.5 million ... about 2 for every 100 people"), and Tables 39 and 40 (arrests by age and sex), read from the files the Crime Data Explorer serves through its download API (the web app needs a script-capable browser). The same tables feed the hazard row (data-model series fbi_arrests), so the block and the row agree. It replaces the earlier entry fbi_cde_arrests_2024, which counted reported arrests (about 7.1 million) |
 | `aclu_stopped_by_police` | ACLU, Know Your Rights: Stopped by Police | hazard_arrest_or_detention, docs_legal_readiness | stay calm, hands visible, say you want to stay silent and want a lawyer; calls from custody may be heard except calls to a lawyer (paraphrased) |
 | `nlg_mass_defense` | National Lawyers Guild, Mass Defense Resources | hazard_arrest_or_detention | chapters run legal hotlines (paraphrased) |
 | `nia_affairs_checklist` | National Institute on Aging, Getting Your Affairs in Order Checklist | arrest block, bucket_medical_emergency, the documents and legal steps, the circle, the Learn article | quote; will, powers of attorney for money and for health care, advance directives, tell someone where the papers are |
@@ -273,7 +273,7 @@ summarising fetch stores no quote. How a page was read is stated where it was no
 | `fema_nuclear_72h_2023` | FEMA, Planning for the First 72 Hours (March 2023) | family_nuclear, topic_strategic_sites | PDF, quote; get inside, stay inside at least 24 hours, tune in; fallout is most dangerous in the first hours and travels downwind |
 | `swpc_power_grid` | NOAA SWPC, Electric Power Transmission | family_solar_storm | the March 1989 storm's nine-hour blackout in Quebec |
 | `morina_2019_carrington` | Moriña et al. 2019, Scientific Reports (CC BY 4.0) | family_solar_storm | the range of Carrington-class estimates |
-| `nerc_tpl007_benchmark` | NERC TPL-007 benchmark event | family_solar_storm | the geomagnetic-latitude scaling (stronger toward the poles) |
+| `nerc_tpl007_gmd` | NERC TPL-007 benchmark event | family_solar_storm | the geomagnetic-latitude scaling (stronger toward the poles) |
 | `nasa_tunguska_2019` | NASA, Tunguska Revisited | family_solar_storm | quote; regional-scale impacts every millennia, not centuries |
 | `eia_maria_2017`, `npr_maria_2018` | EIA Today in Energy; NPR | family_long_blackout, topic_validation | quote (EIA): all 1.57 million PREPA customers out; about 11 months to restore every home |
 | `powermag_epri_2019_hemp` | POWER magazine on EPRI's 2019 HEMP report | family_long_blackout | EPRI's own report page returned only its home page to a scripted read, so the finding (little harm to large transformers; no months-long nationwide blackout) is cited through POWER's report of it |
@@ -282,8 +282,8 @@ summarising fetch stores no quote. How a page was read is stated where it was no
 | `start_poicn` | START, POICN database | family_cbrn | 517 incidents worldwide in 1990–2016, failed attempts and plots included (the review's "1990–2017" is corrected) |
 | `ready_gov_biohazard` | FEMA / Ready.gov, Biohazard Exposure | family_cbrn | follow doctors and public health officials; avoid crowds (paraphrased) |
 | `duke_2021_pandemics` | Duke Global Health Institute on Marani et al. 2021 | family_severe_pandemic | the study's article on PMC shows a CAPTCHA to scripted clients, so the family block cites Duke's release of the same study; `marani_2021_pandemics` is unchanged |
-| `cam_2022_volcano_risk` | University of Cambridge news (CC BY-NC-SA 4.0) | family_large_eruption | about 1 in 6 for a magnitude-7 eruption somewhere in the next 100 years; 1815 and the year without a summer. Paraphrased only |
-| `usgs_yvo_supervolcano` | USGS Yellowstone Volcano Observatory | family_large_eruption | about 1 in 730,000 a year for a Yellowstone super-eruption |
+| `cassidy_mani_2022` | University of Cambridge news (CC BY-NC-SA 4.0) | family_large_eruption | about 1 in 6 for a magnitude-7 eruption somewhere in the next 100 years; 1815 and the year without a summer. Paraphrased only |
+| `usgs_yvo` | USGS Yellowstone Volcano Observatory | family_large_eruption | about 1 in 730,000 a year for a Yellowstone super-eruption |
 | `fdic_deposit_insurance`, `fdic_history_1930s` | FDIC | family_financial_crisis | quotes; $250,000 per depositor per bank; the 1933 bank holiday |
 | `fbi_active_shooter_2024` | FBI 2024 report (via Internet Archive) | family_mass_violence | read from the Internet Archive capture of the FBI's own report page (2026-09-04; an earlier capture of 2026-03-24 agrees); the registry points at the capture. Neutral title, since the report's own title uses a word the validator reserves for the one firearm item |
 
@@ -317,6 +317,74 @@ summarising fetch stores no quote. How a page was read is stated where it was no
 No agency page found today says to keep account backup codes on paper or with a trusted person
 (CISA's "Turn On MFA" and the FTC's two-factor article do not mention backup codes), so that step
 cites the talk as a principle.
+
+### Requested by the hazards and data-hazard workstreams
+
+The hazards workstream asked for 46 ids (its `docs/CITATION_IDS.md`, "Requested by hazards for
+v0.2.0", commit 692942d) and the data-hazard workstream for 10 (`docs/DATA_SOURCES.md` §13.13),
+six of them the same. Each was checked on 2026-09-26, and each figure the requester uses was
+checked against it; where the source says something else, the table says what it does say.
+
+**Already in the registry (8):** `fema_hsgp_fy2026`, `usace_nld`, `fbi_active_shooter_2024`,
+`start_poicn` (the database covers 1990–2016, not 1990–2017), `fema_nuclear_72h_2023`,
+`morina_2019_carrington`, `nasa_tunguska_2019`, `npr_maria_2018`.
+
+**The same source under two names, now one (5):** this branch's entries take the requester's id:
+`nerc_tpl007_gmd` (was nerc_tpl007_benchmark), `usgs_yvo` (was usgs_yvo_supervolcano),
+`fcc_att_outage_2024` (was fcc_network_outage_2024; the title stays brand-free), `iii_water_damage`
+(was iii_homeowners_losses) and `cassidy_mani_2022` (was cam_2022_volcano_risk: the Nature comment
+is paywalled after its opening, so the entry is the University of Cambridge's release of the same
+study, which gives the one-in-six figure).
+
+**Added (33):**
+
+| id | Checked, and what it says |
+| --- | --- |
+| `rr_strategic_sites` | the curated file on the `v0.2` branch (`crates/rr-etl/data/strategic_sites.toml`, 45 site rows, the three missile-field county lists checked against the Sentinel EIS); it reaches main with the v0.2.0 merge, which the URL points at. The data-hazard URL is used (the hazards request named `data/core/strategic_sites.toml`) |
+| `philippe_2023_icbm_fallout` | Scientific American, 2023-12-01: the fallout modelling behind class B |
+| `igrf14_coefficients` | the IGRF-14 coefficient file at NOAA NCEI |
+| `noaa_hms_smoke` | NOAA OSPO's Hazard Mapping System fire and smoke page |
+| `epa_aqs_daily_pm25` | EPA AirData's pre-generated daily files (PM2.5, parameter 88101) |
+| `usgs_karst_2014` | USGS OFR 2014-1156 (Weary and Doctor) |
+| `usace_nid` | the NID site (more than 90,000 dams; read in a browser page, as the site is a script app) |
+| `asdso_dam_failures` | **URL corrected.** The 173 failures and 587 incidents of January 2005 to June 2013 are on ASDSO's "Dam Failures and Incidents" page, which the entry points at. The requested page ("Estimated rates of failure") gives a different figure: 2,694 failures in 5,628,516 dam-years, 0.00048 per dam-year worldwide and historical |
+| `eviction_lab_county_estimates` | the Eviction Lab data downloads (Gromis et al., 2022; ODC-BY 1.0). The national figures the hazards row uses are on the national-estimates table (`eviction_lab_national`): 898,479 evictions from 2,350,042 filings in 2016, 2.34 per 100 renter households |
+| `ashp_shortages` | read in a browser page (the site refuses scripted clients): 227 active shortages now, against the all-time high of 323 in the first quarter of 2024 |
+| `openfda_drug_shortages` | the openFDA endpoint, queried today (data updated 2026-09-26): 70 medicines listed as current, 50 of them injections. CC0 |
+| `crs_rs20348_funding_gaps` | congress.gov read in a browser page: 23 funding gaps since FY1977; 14 days or more in FY1996 (21), FY2014 (16), FY2019 (34) and FY2026, so 4 of the 45 fiscal years 1982–2026 |
+| `snap_lapse_2025` | CNBC, 2025-11-12: 42 million people on SNAP; the first time a shutdown affected SNAP benefits, according to experts |
+| `csis_terrorism_2025` | **Figure differs.** The methodology PDF (October 2024) covers 725 attacks and plots from 1994-01-01 to 2024-04-30, not 750 through July 2025. The "three or four metro-wide closures" is the requester's own reading and is not in the PDF |
+| `fbi_cde_arrests` | see the arrest row above: Tables 29, 39 and 40 for 2024 |
+| `xpt_2023_karger` | **Figure differs.** For nuclear weapons killing 1,000 or more people by 2030 (question 31), the superforecasters' median is 4% (4.5% imputed) and the experts' 5% (6.03% imputed); "experts 4.5 %" mixes the columns |
+| `rp_2019_nuclear` | about 0.38% a year for a US–Russia nuclear war (with the author's caution that the figures are deceptively precise) |
+| `barrett_2013_inadvertent` | Table 1: median annual probability 0.009 (base case); 90% interval 0.0002–0.07 |
+| `love_carrington` | USGS publication record (Geophysical Research Letters, 2015): about 1.13 Carrington-class storms per century, 95% interval 0.42–2.41 |
+| `lloyds_2013_solar` | 20–40 million people at risk, outages of 16 days to 1–2 years, a Carrington-level return period of about 150 years (range 100–250) |
+| `fdic_failed_banks` | the FDIC failures API, queried today: 583 failures and assistance transactions in 2001–2025 |
+| `utah_wguep_2016` | **URL corrected**: the Utah Geological Survey's working-group page (the requested URL answers 404); 43% for one or more M 6.75+ earthquakes in 50 years |
+| `usgs_seattle_fault` | **Figure differs.** USGS (Wirth et al., 2025) gives 17% for an M 6.5+ crustal-fault earthquake anywhere in the Puget Sound region in 50 years (85% deep, 10–15% Cascadia); no readable USGS page gives about 5% for the Seattle fault alone. Seattle's emergency management page says only that recurrence estimates range from 200 to 15,000 years |
+| `pnnl_oe417_linkage` | OpenEI submission 6458 (CC BY 4.0), downloaded today: 37 cyber-event reports in 2019–2023 (7.4 a year) and about 390 reports of physical attack, vandalism, sabotage or theft (the data-model series groups the labels to 392, 78.4 a year) |
+| `cdc_co_quickstats` | read in a browser page; quote: 2,244 deaths in 2010–2015 (about 374 a year) |
+| `ftc_sentinel_2024` | the Data Book's own CSV files: 1,135,291 identity-theft reports in 2024 |
+| `usgs_barry_arm` | USGS news release (2021): the worst case is waves up to 7 feet off Whittier, less than the 2020 estimate |
+| `cdc_h5n1_situation` | **Figure updated.** Read in a browser page: 71 human cases since February 2024 (not 70 since April 2024); quote: no known person-to-person spread |
+| `iv_fluids_helene_2024` | **Figure differs.** The commentary (JPPT 29(6), read on the publisher's page; PMC's page did not render for a scripted browser) says the North Cove plant makes "a sizable portion" of US IV fluids and that some hospitals received 60% of usual supplies; it does not say the plant makes 60% of US IV fluids |
+| `nhc_storm_surge_maps` | NHC's page now serves Version 4; the optional surge pack reads Texas-to-Maine version 2, as DATA_SOURCES §13.8 explains |
+| `rr_surge_proxy` | DATA_SOURCES §13.8 on the `v0.2` branch; reaches main with the merge |
+| `usgs_landslide_2024` | the ScienceBase item behind doi:10.5066/P13KAGU3 |
+| `epa_echo_sdwa` | the ECHO SDWA download summary and data dictionary |
+
+**Not added (4), because no copy could be read that the standards allow:**
+
+- fema_protection_nuclear_age_1985: the only copy found is on a private website that sells
+  potassium iodide; no FEMA or National Archives copy was found. The strategic-sites article
+  rests on current sources instead.
+- fema_napb90: the only copy is the Federation of American Scientists' page; FEMA never published
+  it, and the research itself calls it a method precedent, not a public one. Owner's call.
+- epri_2019_hemp: EPRI's product page is a script app that returned no report text (and redirected
+  a browser to an unrelated site); the finding is cited through `powermag_epri_2019_hemp`.
+- riley_2012_carrington: the publisher's page and PDF are behind a bot check. `morina_2019_carrington`
+  reports Riley's estimate (about 12%) and can carry that sentence.
 
 ### The state table
 
@@ -417,9 +485,9 @@ checked; "prior" marks an expert estimate.
 | Family plan and forecasts (v0.2.0) | `cisa_pace_flyer`, `fema_back_to_school_2026`, `texasready_hurricanes`, `nws_aly_cold_safety`, `epa_clean_room` |
 | Access and functional needs (v0.2.0) | `aspr_cmist`, `usfa_fire_safety_disabilities`, `ready_gov_your_language`, `aspr_tracie_hha_rule`, `tdem_stear`, `psegli_critical_care` |
 | Clean air (v0.2.0) | `epa_clean_room`, `epa_protect_lungs_2026`, `epa_diy_air_cleaners`, `epa_wildfire_indoor_air`, `epa_children_wildfire_smoke` |
-| New ranked hazards (v0.2.0) | `iii_homeowners_losses`, `iii_water_damage_protect`, `fema_dam_residual_risk_2018`, `fema_living_with_levees`, `fema_nfip_levees_2021`, `usace_nld`, `mo_sema_dam_failure`, `fcc_network_outage_2024`, `fda_drug_shortages`, `fda_drug_shortages_faq`, `fda_besaferx`, `fema_hsgp_fy2026`, `nws_dust_storms`, `cdc_valley_fever`, `usgs_sinkholes`, `fl_dep_sinkhole_faq` |
-| Benefits, eviction and legal help (v0.2.0) | `me_dhhs_snap_2025`, `usda_hunger_hotline`, `dol_ucfe_furlough_2023`, `cfpb_shutdown_2013`, `cfpb_payday_loans`, `eviction_lab_national`, `cfpb_rent_help`, `cfpb_facing_eviction`, `lsc_get_legal_help`, `aclu_stopped_by_police`, `nlg_mass_defense`, `nia_affairs_checklist`, `fbi_cde_arrests_2024` |
-| Rare families and strategic sites (v0.2.0) | `missilesonourland_2023`, `dod_mirta_points`, `census_cbsa_pop_2024`, `usc_10_2674`, `nnsa_locations`, `eia_refinery_capacity_2026`, `fema_nuclear_72h_2023`, `swpc_power_grid`, `morina_2019_carrington`, `nerc_tpl007_benchmark`, `nasa_tunguska_2019`, `eia_maria_2017`, `npr_maria_2018`, `powermag_epri_2019_hemp`, `pry_2015_emp_testimony`, `cisa_volt_typhoon_2024`, `start_poicn`, `ready_gov_biohazard`, `duke_2021_pandemics`, `cam_2022_volcano_risk`, `usgs_yvo_supervolcano`, `fdic_deposit_insurance`, `fdic_history_1930s`, `fbi_active_shooter_2024` |
+| New ranked hazards (v0.2.0) | `iii_water_damage`, `iii_water_damage_protect`, `fema_dam_residual_risk_2018`, `fema_living_with_levees`, `fema_nfip_levees_2021`, `usace_nld`, `mo_sema_dam_failure`, `fcc_att_outage_2024`, `fda_drug_shortages`, `fda_drug_shortages_faq`, `fda_besaferx`, `fema_hsgp_fy2026`, `nws_dust_storms`, `cdc_valley_fever`, `usgs_sinkholes`, `fl_dep_sinkhole_faq` |
+| Benefits, eviction and legal help (v0.2.0) | `me_dhhs_snap_2025`, `usda_hunger_hotline`, `dol_ucfe_furlough_2023`, `cfpb_shutdown_2013`, `cfpb_payday_loans`, `eviction_lab_national`, `cfpb_rent_help`, `cfpb_facing_eviction`, `lsc_get_legal_help`, `aclu_stopped_by_police`, `nlg_mass_defense`, `nia_affairs_checklist`, `fbi_cde_arrests` |
+| Rare families and strategic sites (v0.2.0) | `missilesonourland_2023`, `dod_mirta_points`, `census_cbsa_pop_2024`, `usc_10_2674`, `nnsa_locations`, `eia_refinery_capacity_2026`, `fema_nuclear_72h_2023`, `swpc_power_grid`, `morina_2019_carrington`, `nerc_tpl007_gmd`, `nasa_tunguska_2019`, `eia_maria_2017`, `npr_maria_2018`, `powermag_epri_2019_hemp`, `pry_2015_emp_testimony`, `cisa_volt_typhoon_2024`, `start_poicn`, `ready_gov_biohazard`, `duke_2021_pandemics`, `cassidy_mani_2022`, `usgs_yvo`, `fdic_deposit_insurance`, `fdic_history_1930s`, `fbi_active_shooter_2024` |
 | Long horizon (v0.2.0) | `pnnl_2015_rainwater`, `cdc_rainwater_collection`, `vdh_storm_wells`, `wsc_wellcare_help_2025`, `lehi_fuel_storage`, `rdpo_emergency_toilet`, `cdc_botulism_home_canning`, `nchfp_home`, `cdc_managing_stress` |
 | Documents, identity and accounts (v0.2.0) | `state_dept_passport_card`, `state_dept_child_passport`, `cisa_data_backup_2012`, `ready_gov_cybersecurity`, `ftc_2008_locksmith`, `nia_affairs_checklist`, `ollam_2022_lawyer_passport_locksmith_gun` (principles only) |
 | Emergency refills by state (v0.2.0) | `healthcare_ready_refill_laws`, `nacds_2018_emergency_refills`, `fl_bop_emergency_refills`, `tx_pharmacy_disaster_2024`, `medicare_drugs_disaster` |

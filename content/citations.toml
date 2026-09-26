@@ -2791,7 +2791,7 @@ quote = "Children ages 2 years and older can wear respirators; however, NIOSH Ap
 license = "US Government Work (public domain)"
 
 [[citation]]
-id = "iii_homeowners_losses"
+id = "iii_water_damage"
 title = "Facts + Statistics: Homeowners and renters insurance (average losses by cause, 2019–2023)"
 publisher = "Insurance Information Institute (Triple-I), from ISO data"
 year = 2026
@@ -2856,7 +2856,7 @@ retrieved = "2026-09-26"
 license = "State government publication (paraphrased, not quoted)"
 
 [[citation]]
-id = "fcc_network_outage_2024"
+id = "fcc_att_outage_2024"
 title = "February 22, 2024 nationwide wireless network outage: report and findings"
 publisher = "Federal Communications Commission, Public Safety and Homeland Security Bureau"
 year = 2024
@@ -3026,15 +3026,6 @@ retrieved = "2026-09-26"
 license = "State government publication (paraphrased, not quoted)"
 
 [[citation]]
-id = "fbi_cde_arrests_2024"
-title = "Crime Data Explorer: national arrest counts, January to December 2024"
-publisher = "FBI Uniform Crime Reporting Program"
-year = 2026
-url = "https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/explorer/crime/arrest"
-retrieved = "2026-09-26"
-license = "US Government Work (public domain)"
-
-[[citation]]
 id = "aclu_stopped_by_police"
 title = "Know Your Rights: Stopped by Police"
 publisher = "American Civil Liberties Union"
@@ -3136,7 +3127,7 @@ retrieved = "2026-09-26"
 license = "CC BY 4.0 (paraphrased)"
 
 [[citation]]
-id = "nerc_tpl007_benchmark"
+id = "nerc_tpl007_gmd"
 title = "Benchmark Geomagnetic Disturbance Event Description (Project 2013-03, TPL-007)"
 publisher = "North American Electric Reliability Corporation"
 year = 2014
@@ -3237,8 +3228,8 @@ retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
 [[citation]]
-id = "cam_2022_volcano_risk"
-title = "Risk of volcano catastrophe ‘a roll of the dice’, say experts"
+id = "cassidy_mani_2022"
+title = "Risk of volcano catastrophe ‘a roll of the dice’, say experts (on Cassidy and Mani, Nature 608, 2022)"
 publisher = "University of Cambridge"
 year = 2022
 url = "https://www.cam.ac.uk/research/news/risk-of-volcano-catastrophe-a-roll-of-the-dice-say-experts"
@@ -3246,7 +3237,7 @@ retrieved = "2026-09-26"
 license = "CC BY-NC-SA 4.0 (paraphrased, not quoted)"
 
 [[citation]]
-id = "usgs_yvo_supervolcano"
+id = "usgs_yvo"
 title = "Questions About Supervolcanoes (Yellowstone Volcano Observatory)"
 publisher = "U.S. Geological Survey"
 year = 2026
@@ -3397,3 +3388,302 @@ url = "https://www.cisa.gov/sites/default/files/publications/data_backup_options
 retrieved = "2026-09-26"
 quote = "Store 1 copy offsite (e.g., outside your home or business facility)."
 license = "Published by US-CERT, now CISA (paraphrased)"
+
+[[citation]]
+id = "rr_strategic_sites"
+title = "Strategic sites and county strategic-exposure classes (curated list; method in docs/DATA_SOURCES.md section 13.1)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml"
+retrieved = "2026-09-26"
+license = "Compiled by Ready Reckoner from the public sources listed in the file"
+
+[[citation]]
+id = "philippe_2023_icbm_fallout"
+title = "Who Would Take the Brunt of an Attack on U.S. Nuclear Missile Silos?"
+publisher = "Philippe S., Scientific American"
+year = 2023
+url = "https://www.scientificamerican.com/article/who-would-take-the-brunt-of-an-attack-on-u-s-nuclear-missile-silos/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "igrf14_coefficients"
+title = "International Geomagnetic Reference Field, 14th generation (IGRF-14): coefficients"
+publisher = "IAGA (NOAA NCEI copy)"
+year = 2024
+url = "https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt"
+retrieved = "2026-09-26"
+license = "Open coefficients published by IAGA for any use; NOAA NCEI distribution is a US Government work"
+
+[[citation]]
+id = "noaa_hms_smoke"
+title = "Hazard Mapping System Fire and Smoke Product"
+publisher = "NOAA NESDIS Office of Satellite and Product Operations"
+year = 2026
+url = "https://www.ospo.noaa.gov/products/land/hms.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_aqs_daily_pm25"
+title = "AirData pre-generated files: daily PM2.5 by monitor (FRM/FEM, parameter 88101)"
+publisher = "U.S. Environmental Protection Agency, Air Quality System"
+year = 2026
+url = "https://aqs.epa.gov/aqsweb/airdata/download_files.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_karst_2014"
+title = "Karst in the United States: A Digital Map Compilation and Database (Open-File Report 2014-1156)"
+publisher = "Weary D.J. and Doctor D.H., U.S. Geological Survey"
+year = 2014
+url = "https://pubs.usgs.gov/of/2014/1156/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usace_nid"
+title = "National Inventory of Dams"
+publisher = "U.S. Army Corps of Engineers"
+year = 2026
+url = "https://nid.sec.usace.army.mil/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "asdso_dam_failures"
+title = "Dam Failures and Incidents"
+publisher = "Association of State Dam Safety Officials"
+year = 2025
+url = "https://damsafety.org/dam-failures"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "eviction_lab_county_estimates"
+title = "Estimating Eviction Prevalence across the United States (county estimates, 2000-2018)"
+publisher = "Gromis A. et al., Princeton University Eviction Lab"
+year = 2022
+url = "https://data-downloads.evictionlab.org/"
+retrieved = "2026-09-26"
+license = "Open Data Commons Attribution License (ODC-BY 1.0): credit line required; the owner's sign-off on the attribution is pending (data audit section 7)"
+
+[[citation]]
+id = "ashp_shortages"
+title = "Drug Shortages Statistics (national drug shortages, January 2001 to June 2026)"
+publisher = "American Society of Health-System Pharmacists (data from the University of Utah Drug Information Service)"
+year = 2026
+url = "https://www.ashp.org/drug-shortages/shortage-resources/drug-shortages-statistics"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "openfda_drug_shortages"
+title = "openFDA drug shortages endpoint"
+publisher = "U.S. Food and Drug Administration (openFDA)"
+year = 2026
+url = "https://open.fda.gov/apis/drug/drugshortages/"
+retrieved = "2026-09-26"
+license = "CC0 1.0 (openFDA data)"
+
+[[citation]]
+id = "crs_rs20348_funding_gaps"
+title = "Federal Funding Gaps: A Brief Overview (RS20348)"
+publisher = "Congressional Research Service"
+year = 2026
+url = "https://www.congress.gov/crs-product/RS20348"
+retrieved = "2026-09-26"
+license = "CRS reports are works of the US Government, not subject to copyright"
+
+[[citation]]
+id = "snap_lapse_2025"
+title = "Where SNAP benefits stand amid government shutdown negotiations"
+publisher = "CNBC"
+year = 2025
+url = "https://www.cnbc.com/2025/11/12/snap-benefits-government-shutdown-negotiations.html"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "csis_terrorism_2025"
+title = "Methodology and Codebook: The Rising Threat of Anti-Government Domestic Terrorism"
+publisher = "Center for Strategic and International Studies, Warfare, Irregular Threats, and Terrorism Program"
+year = 2024
+url = "https://csis-website-prod.s3.amazonaws.com/s3fs-public/2024-10/241021_McCabe_Domestic_Methodology.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fbi_cde_arrests"
+title = "Crime in the United States, 2024: persons arrested (Table 29, estimated number of arrests; Tables 39 and 40, arrests by age and sex)"
+publisher = "FBI Uniform Crime Reporting Program (Crime Data Explorer)"
+year = 2025
+url = "https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "xpt_2023_karger"
+title = "Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament (FRI Working Paper 1)"
+publisher = "Karger E. et al., Forecasting Research Institute"
+year = 2023
+url = "https://forecastingresearch.org/pdf/existential-risk-persuasion-tournament.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "rp_2019_nuclear"
+title = "How likely is a nuclear exchange between the US and Russia?"
+publisher = "Rodriguez L., Rethink Priorities"
+year = 2019
+url = "https://rethinkpriorities.org/research-area/how-likely-is-a-nuclear-exchange-between-the-us-and-russia/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "barrett_2013_inadvertent"
+title = "Analyzing and Reducing the Risks of Inadvertent Nuclear War Between the United States and Russia (Science & Global Security 21(2))"
+publisher = "Barrett A.M., Baum S.D. and Hostetler K."
+year = 2013
+url = "https://scienceandglobalsecurity.org/archive/sgs21barrett.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "love_carrington"
+title = "On the lognormality of historical magnetic-storm intensity statistics: Implications for extreme-event probabilities (Geophysical Research Letters)"
+publisher = "Love J.J., Rigler E.J., Pulkkinen A. and Riley P. (U.S. Geological Survey publication record)"
+year = 2015
+url = "https://www.usgs.gov/publications/lognormality-historical-magnetic-storm-intensity-statistics-implications-extreme-event"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "lloyds_2013_solar"
+title = "Solar Storm Risk to the North American Electric Grid"
+publisher = "Lloyd's and Atmospheric and Environmental Research"
+year = 2013
+url = "https://assets.lloyds.com/assets/pdf-solar-storm-risk-to-the-north-american-electric-grid/1/pdf-Solar-Storm-Risk-to-the-North-American-Electric-Grid.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fdic_failed_banks"
+title = "Bank Failures and Assistance Transactions (BankFind Suite)"
+publisher = "Federal Deposit Insurance Corporation"
+year = 2026
+url = "https://banks.data.fdic.gov/bankfind-suite/failures"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "utah_wguep_2016"
+title = "Utah Earthquake Probabilities (Working Group on Utah Earthquake Probabilities: the 2016 forecast for the Wasatch Front region)"
+publisher = "Utah Geological Survey"
+year = 2016
+url = "https://geology.utah.gov/hazards/info/workshops/working-groups/earthquake-probabilities/"
+retrieved = "2026-09-26"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "usgs_seattle_fault"
+title = "Earthquake probabilities and hazards in the U.S. Pacific Northwest"
+publisher = "Wirth E.A. et al., U.S. Geological Survey"
+year = 2025
+url = "https://www.usgs.gov/publications/earthquake-probabilities-and-hazards-us-pacific-northwest"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "pnnl_oe417_linkage"
+title = "Event-correlated Outage Dataset in America (OpenEI submission 6458)"
+publisher = "Pacific Northwest National Laboratory (Open Energy Data Initiative)"
+year = 2024
+url = "https://data.openei.org/submissions/6458"
+retrieved = "2026-09-26"
+license = "CC BY 4.0 (credit line required)"
+
+[[citation]]
+id = "cdc_co_quickstats"
+title = "QuickStats: Number of Deaths Resulting from Unintentional Carbon Monoxide Poisoning, by Month and Year, United States, 2010-2015 (MMWR 66(8))"
+publisher = "Centers for Disease Control and Prevention"
+year = 2017
+url = "https://www.cdc.gov/mmwr/volumes/66/wr/mm6608a9.htm"
+retrieved = "2026-09-26"
+quote = "During 2010–2015, a total of 2,244 deaths resulted from unintentional carbon monoxide poisoning, with the highest numbers of deaths each year occurring in winter months."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ftc_sentinel_2024"
+title = "Consumer Sentinel Network Data Book 2024"
+publisher = "Federal Trade Commission"
+year = 2025
+url = "https://www.ftc.gov/reports/consumer-sentinel-network-data-book-2024"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usgs_barry_arm"
+title = "Potential Landslide-Generated Tsunami in Prince William Sound's Barry Arm Likely Less Severe than Previously Thought"
+publisher = "U.S. Geological Survey"
+year = 2021
+url = "https://www.usgs.gov/news/state-news-release/potential-landslide-generated-tsunami-prince-william-sounds-barry-arm"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_h5n1_situation"
+title = "A(H5) Bird Flu: Current Situation"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/bird-flu/situation-summary/index.html"
+retrieved = "2026-09-26"
+quote = "There is no known person-to-person spread at this time"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "iv_fluids_helene_2024"
+title = "Weathering The Storm: Commentary on the Hurricane Helene IV Fluid Shortage (Journal of Pediatric Pharmacology and Therapeutics 29(6):667)"
+publisher = "Journal of Pediatric Pharmacology and Therapeutics"
+year = 2024
+url = "https://doi.org/10.5863/1551-6776-29.6.667"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "nhc_storm_surge_maps"
+title = "National Storm Surge Risk Maps (SLOSH Maximum of Maximums)"
+publisher = "NOAA National Hurricane Center"
+year = 2026
+url = "https://www.nhc.noaa.gov/nationalsurge/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "rr_surge_proxy"
+title = "County storm-surge proxy (method in docs/DATA_SOURCES.md section 13.8)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/DATA_SOURCES.md"
+retrieved = "2026-09-26"
+license = "CC BY-SA 4.0"
+
+[[citation]]
+id = "usgs_landslide_2024"
+title = "Slope-Relief Threshold Landslide Susceptibility Models for the United States and Puerto Rico"
+publisher = "U.S. Geological Survey (ScienceBase)"
+year = 2024
+url = "https://doi.org/10.5066/P13KAGU3"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_echo_sdwa"
+title = "ECHO Safe Drinking Water Act data downloads (download summary and data element dictionary)"
+publisher = "U.S. Environmental Protection Agency, Enforcement and Compliance History Online"
+year = 2026
+url = "https://echo.epa.gov/tools/data-downloads/sdwa-download-summary"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"

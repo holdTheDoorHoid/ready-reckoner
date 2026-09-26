@@ -3,9 +3,9 @@ id: hazard_arrest_or_detention
 title: A household member is arrested or detained
 kind: hazard
 applies_to: [hazard:arrest_or_detention]
-citations: [fbi_cde_arrests_2024, ollam_2022_lawyer_passport_locksmith_gun, nia_affairs_checklist, aclu_stopped_by_police, nlg_mass_defense]
+citations: [fbi_cde_arrests, ollam_2022_lawyer_passport_locksmith_gun, nia_affairs_checklist, aclu_stopped_by_police, nlg_mass_defense]
 ---
-{frequency} Police agencies in the United States reported about 7.1 million arrests in 2024, about 2 for every 100 people. That counts arrests, not people, and says nothing about guilt.[^fbi_cde_arrests_2024] An arrest can mean days away from home and work, bail and legal costs, and children or pets who need care.[^ollam_2022_lawyer_passport_locksmith_gun]
+{frequency} The FBI estimates that police made about 7.5 million arrests in the United States in 2024, about 2 for every 100 people. That counts arrests, not people, and says nothing about guilt.[^fbi_cde_arrests] An arrest can mean days away from home and work, bail and legal costs, and children or pets who need care.[^ollam_2022_lawyer_passport_locksmith_gun]
 
 **What helps.** Keep a lawyer's name and number on paper, not only in a phone, and learn one or two numbers by heart. Name someone who can pick up your children and care for your pets.[^ollam_2022_lawyer_passport_locksmith_gun] Powers of attorney for money and for health care let people you choose act for you if you cannot.[^nia_affairs_checklist] If you are arrested, stay calm, keep your hands where police can see them, and do not run or resist. Say out loud that you want to stay silent and want a lawyer. If you cannot afford one, you have the right to a lawyer the government provides.[^aclu_stopped_by_police] At a protest, carry the number of your area's legal hotline; some National Lawyers Guild chapters run one.[^nlg_mass_defense]
 
@@ -13,7 +13,7 @@ citations: [fbi_cde_arrests_2024, ollam_2022_lawyer_passport_locksmith_gun, nia_
 
 ## Sources
 
-[^fbi_cde_arrests_2024]: FBI Uniform Crime Reporting Program, Crime Data Explorer: national arrest counts, January to December 2024 (2026).
+[^fbi_cde_arrests]: FBI Uniform Crime Reporting Program (Crime Data Explorer), Crime in the United States, 2024: persons arrested (Table 29, estimated number of arrests; Tables 39 and 40, arrests by age and sex) (2025).
 [^ollam_2022_lawyer_passport_locksmith_gun]: Deviant Ollam (video and slides), A Talk About Risk & Preparedness (SAINTCON 2022 keynote) (2022).
 [^nia_affairs_checklist]: National Institute on Aging, Getting Your Affairs in Order Checklist: Documents to Prepare for the Future (2026).
 [^aclu_stopped_by_police]: American Civil Liberties Union, Know Your Rights: Stopped by Police (2026).
