@@ -146,6 +146,11 @@ fn the_packet_has_every_section_in_order_and_nothing_left_over() {
             !p.contains('\u{1}') && !p.contains('\u{2}'),
             "{name}: citation marker left"
         );
+        assert!(
+            !p.contains(rr_content::policy::CONDITION_OPEN)
+                && !p.contains(rr_content::policy::CONDITION_CLOSE),
+            "{name}: conditional marker left"
+        );
         assert!(!p.contains("[^"), "{name}: footnote reference left");
         // Markdown only: nothing that could be an HTML tag.
         let bytes = p.as_bytes();
@@ -469,4 +474,29 @@ fn duration_buckets_the_plan_covers_reach_their_targets() {
             }
         }
     }
+}
+
+#[test]
+fn family_blocks_keep_only_the_hazards_that_apply_here() {
+    let packet = |name: &str| {
+        outputs()
+            .iter()
+            .find(|(n, _, _)| *n == name)
+            .map(|(_, _, o)| o.packet_markdown.clone())
+            .unwrap()
+    };
+    // Philadelphia: avalanches and tsunamis do not reach a rowhouse, so the cold-wave card says
+    // nothing about beacons and no earthquake advice mentions the shore.
+    let phl = packet("philadelphia-renters-4");
+    assert!(
+        !phl.contains("avalanche"),
+        "avalanche advice in Philadelphia"
+    );
+    assert!(!phl.contains("walk to high ground"));
+    // Coos Bay, in a tsunami zone: the earthquake card keeps the tsunami steps.
+    let coos = packet("coos-bay-well-owner-2");
+    assert!(
+        coos.contains("walk to high ground or inland"),
+        "tsunami steps missing"
+    );
 }

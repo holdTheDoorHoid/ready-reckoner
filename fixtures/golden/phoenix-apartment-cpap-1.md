@@ -65,9 +65,9 @@ Of 100 households like yours, about 99 will have someone need emergency care in 
 
 Of 100 households like yours, about 98 (68 to nearly all) will lose power or have damage in a windstorm in the next ten years.[2, 15]
 
-**What helps.** Pick your shelter spot now. A safe room or storm shelter is best. The next best is a small, windowless room or basement on the lowest floor of a sturdy building.[16] Sign up for your community's warnings, and learn what your sirens sound like.[16] Know the signs of a tornado: a rotating funnel cloud, a cloud of debris, or a roar like a freight train. In your shelter, protect your head and neck with your arms, and pile blankets or cushions around you.[16] When thunder roars, go indoors. Get into a building or a car with a roof.[17]
+**What helps.** Pick your shelter spot now. A safe room or storm shelter is best. The next best is a small, windowless room or basement on the lowest floor of a sturdy building.[16] Sign up for your community's warnings, and learn what your sirens sound like.[16] When thunder roars, go indoors. Get into a building or a car with a roof.[17]
 
-**What to avoid.** Stay away from windows, doors and outside walls.[16] There is no safe place in a car during a tornado, only less dangerous ones. If you are caught, stay buckled in and keep your head below the windows.[16] During a thunderstorm, avoid running water and electronics plugged into the wall.[17]
+**What to avoid.** Stay away from windows, doors and outside walls.[16] During a thunderstorm, avoid running water and electronics plugged into the wall.[17]
 
 **What it can do:** no power, no phone, internet or card payments and damage to the home. **How bad:** Minor. **How sure:** Rough data.
 

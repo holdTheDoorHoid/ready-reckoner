@@ -83,8 +83,15 @@ is used as written.
 | `{horizon}` | "the next 10 years" (from `dials.horizon_years`). |
 | `{household}` | "2 adults, 1 older adult and 1 child, with 1 dog". |
 
-A test fails if any of these is left in a packet, or if a citation marker or `[^id]` reference is
-left over, or if a bracketed number points past the Sources list.
+A hazard-family block (one block for several hazards, such as winter storms, ice, cold waves and
+avalanches) marks a span about one of its hazards as `{if:<hazard_id>}…{/if}`. The packet keeps
+the span only when that hazard's ten-year chance for the household is at least 1 in 100 (the cut
+the risk section uses to list it), so a Philadelphia rowhouse is not told to carry an avalanche
+beacon. The hazard must be one the block `applies_to` (the content validator checks this, and
+that spans close, do not nest and stay in one paragraph). Household-free views keep every span.
+
+A test fails if any of these is left in a packet, or if a citation marker, a conditional marker
+or `[^id]` reference is left over, or if a bracketed number points past the Sources list.
 
 ## Where the covered days come from
 

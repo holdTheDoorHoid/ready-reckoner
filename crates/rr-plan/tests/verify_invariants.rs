@@ -396,6 +396,8 @@ fn shape_problems(out: &PlanOutput) -> Vec<String> {
         "NaN",
         "inf days",
         "{frequency}",
+        "{if:",
+        "{/if}",
         "  .",
     ] {
         if out.packet_markdown.contains(bad) {

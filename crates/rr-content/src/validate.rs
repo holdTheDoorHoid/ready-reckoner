@@ -664,6 +664,15 @@ fn check_guidance(content: &Content, r: &mut Report) {
             }
         }
         check_footnotes(g, &cited, &loc, r);
+        let hazards: Vec<&str> = g
+            .meta
+            .applies_to
+            .iter()
+            .filter_map(|t| t.strip_prefix("hazard:"))
+            .collect();
+        for p in policy::condition_problems(&g.body, &hazards) {
+            r.error(&loc, p);
+        }
 
         let prose = g.prose();
         let plain = readability::plain_text(prose);

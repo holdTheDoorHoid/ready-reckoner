@@ -121,7 +121,9 @@ from the text. The file name is the id. Ids are `bucket_<bucket>`, `hazard_<fami
 Body rules: under 300 words (the Sources section is not counted); the first sentence says what the
 consequence is and how common it is (the engine substitutes the household's own frequency sentence
 where `{frequency}` appears, and drops the placeholder when it has none; bucket and hazard blocks
-must open with it); the second paragraph is what to do; the third is what not to do; end with a
+must open with it); in a block for several hazards, a sentence about one of them is wrapped in
+`{if:<hazard_id>}…{/if}` so the packet shows it only where that hazard is likely enough
+(`docs/PACKET.md`); the second paragraph is what to do; the third is what not to do; end with a
 `## Sources` section of footnotes. Every citation in the front matter is used inline as `[^id]` and
 defined as `[^id]: Publisher, title (year).`, copying the registry's publisher and title (a test
 checks that each footnote names its source's title). One idea per sentence. Eighth-grade reading level (the

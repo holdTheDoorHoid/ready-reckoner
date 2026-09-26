@@ -115,11 +115,31 @@ impl<'a> Ctx<'a> {
             .map(String::as_str)
     }
 
+    /// Whether advice about a hazard belongs in this household's packet: its ten-year chance
+    /// (over the dial's horizon) is at least 1 in 100, the same cut the risk section uses to
+    /// list a hazard rather than name it among the faint ones. Unknown ids are kept.
+    pub fn hazard_relevant(&self, id: &str) -> bool {
+        let Ok(h) = id.parse::<rr_types::HazardId>() else {
+            return true;
+        };
+        let rate = self.a.hazard_rate(h);
+        let years = f64::from(self.a.input.dials.horizon_years.max(1));
+        let chance = if rate <= 0.0 {
+            0.0
+        } else {
+            -rr_types::math::exp_m1(-rate * years)
+        };
+        text::per_100(chance) != "fewer than 1"
+    }
+
     /// A guidance block's prose with the placeholders filled and its footnotes turned into
     /// citation markers. `frequency` fills `{frequency}` (the placeholder and the space after it
-    /// are dropped when there is none); `target` fills `{target}`.
+    /// are dropped when there is none); `target` fills `{target}`. A span about one hazard of a
+    /// family block (`{if:avalanche}…{/if}`) stays only when that hazard is relevant here
+    /// ([`Ctx::hazard_relevant`]).
     pub fn guidance(&self, g: &Guidance, frequency: Option<&str>, target: Option<&str>) -> String {
-        let mut body = g.prose().trim().to_owned();
+        let mut body =
+            rr_content::policy::apply_conditions(g.prose().trim(), |h| self.hazard_relevant(h));
         let county = format!(
             "{}, {}",
             self.a.location.county_name, self.a.location.state_name

@@ -8,6 +8,91 @@
 /// The placeholder the engine replaces with the household's own natural-frequency sentence.
 pub const FREQUENCY_PLACEHOLDER: &str = "{frequency}";
 
+/// Opens a span of a hazard-family guidance block that is about one of its hazards only:
+/// `{if:avalanche}In avalanche country, get training ...{/if}`. The packet keeps the span when
+/// that hazard is likely enough for the household (a ten-year chance of at least 1 in 100) and
+/// drops it otherwise; every household-free view keeps it. The hazard must be one the block
+/// `applies_to`. Spans do not nest and stay within one paragraph.
+pub const CONDITION_OPEN: &str = "{if:";
+
+/// Closes a conditional span (see [`CONDITION_OPEN`]).
+pub const CONDITION_CLOSE: &str = "{/if}";
+
+/// `text` with the conditional spans whose hazard id `keep` rejects removed and the markers of
+/// the others dropped. A span removed from between two words takes one of the two spaces around
+/// it; one at the start of a line takes the space after it. Malformed markers are left as they
+/// are (the validator reports them).
+pub fn apply_conditions(text: &str, keep: impl Fn(&str) -> bool) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut rest = text;
+    while let Some(start) = rest.find(CONDITION_OPEN) {
+        let after_open = &rest[start + CONDITION_OPEN.len()..];
+        let (Some(id_end), Some(close)) = (after_open.find('}'), after_open.find(CONDITION_CLOSE))
+        else {
+            break;
+        };
+        if close < id_end {
+            break;
+        }
+        let id = after_open[..id_end].trim();
+        let inner = &after_open[id_end + 1..close];
+        out.push_str(&rest[..start]);
+        let mut tail = &after_open[close + CONDITION_CLOSE.len()..];
+        if keep(id) {
+            out.push_str(inner);
+        } else {
+            let at_line_start = out.is_empty() || out.ends_with('\n');
+            if (at_line_start || out.ends_with(' ')) && tail.starts_with(' ') {
+                tail = &tail[1..];
+            }
+        }
+        rest = tail;
+    }
+    out.push_str(rest);
+    out
+}
+
+/// Problems with the conditional spans of a guidance body: an unclosed or nested span, or a
+/// hazard id that is not one of `allowed` (the block's own `hazard:` targets).
+pub fn condition_problems(body: &str, allowed: &[&str]) -> Vec<String> {
+    let mut problems = Vec::new();
+    let mut rest = body;
+    while let Some(start) = rest.find(CONDITION_OPEN) {
+        let after_open = &rest[start + CONDITION_OPEN.len()..];
+        let Some(id_end) = after_open.find('}') else {
+            problems.push("a `{if:` marker has no closing brace".to_owned());
+            break;
+        };
+        let id = after_open[..id_end].trim();
+        if !allowed.contains(&id) {
+            problems.push(format!(
+                "`{{if:{id}}}` names a hazard this block does not apply to (its applies_to lists {allowed:?})"
+            ));
+        }
+        let inner_and_rest = &after_open[id_end + 1..];
+        let Some(close) = inner_and_rest.find(CONDITION_CLOSE) else {
+            problems.push(format!(
+                "`{{if:{id}}}` is never closed with `{CONDITION_CLOSE}`"
+            ));
+            break;
+        };
+        let inner = &inner_and_rest[..close];
+        if inner.contains(CONDITION_OPEN) {
+            problems.push(format!(
+                "`{{if:{id}}}` contains another `{{if:` (spans do not nest)"
+            ));
+        }
+        if inner.contains("\n\n") {
+            problems.push(format!("`{{if:{id}}}` runs past the end of its paragraph"));
+        }
+        rest = &inner_and_rest[close + CONDITION_CLOSE.len()..];
+    }
+    if rest.contains(CONDITION_CLOSE) {
+        problems.push(format!("a `{CONDITION_CLOSE}` has no opening `{{if:...}}`"));
+    }
+    problems
+}
+
 /// The item categories, one `content/items/<category>.toml` file each.
 pub const CATEGORIES: &[&str] = &[
     "water",
@@ -513,5 +598,52 @@ mod tests {
             vec!["firearm"]
         );
         assert!(find_phrases(&t("troubleshooting the generator"), FIREARM_TOKENS).is_empty());
+    }
+
+    #[test]
+    fn conditional_spans_are_kept_or_dropped_cleanly() {
+        let text = "Warm the core first. {if:avalanche}In avalanche country, carry a beacon.{/if} Check on neighbours.";
+        assert_eq!(
+            apply_conditions(text, |_| true),
+            "Warm the core first. In avalanche country, carry a beacon. Check on neighbours."
+        );
+        assert_eq!(
+            apply_conditions(text, |_| false),
+            "Warm the core first. Check on neighbours."
+        );
+        // At the end of a paragraph, and inside a sentence.
+        let end = "Stay inside. {if:tsunami}Do not go back to the shore.{/if}\n\nNext.";
+        assert_eq!(apply_conditions(end, |_| false), "Stay inside. \n\nNext.");
+        let clause =
+            "Leave if you are told to{if:landslide}, or if you feel unsafe near a slope{/if}.";
+        assert_eq!(
+            apply_conditions(clause, |_| false),
+            "Leave if you are told to."
+        );
+        assert_eq!(
+            apply_conditions(clause, |h| h == "landslide"),
+            "Leave if you are told to, or if you feel unsafe near a slope."
+        );
+        // At the start of a line.
+        assert_eq!(
+            apply_conditions(
+                "{if:drought}In a drought, save water.{/if} Then rest.",
+                |_| false
+            ),
+            "Then rest."
+        );
+    }
+
+    #[test]
+    fn malformed_conditional_spans_are_reported() {
+        assert!(condition_problems("a {if:avalanche}b{/if} c", &["avalanche"]).is_empty());
+        assert!(!condition_problems("a {if:tornado}b{/if}", &["avalanche"]).is_empty());
+        assert!(!condition_problems("a {if:avalanche}b", &["avalanche"]).is_empty());
+        assert!(
+            !condition_problems("a {if:avalanche}b {if:avalanche}c{/if}", &["avalanche"])
+                .is_empty()
+        );
+        assert!(!condition_problems("a b{/if}", &["avalanche"]).is_empty());
+        assert!(!condition_problems("{if:avalanche}a\n\nb{/if}", &["avalanche"]).is_empty());
     }
 }
