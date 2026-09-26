@@ -1229,10 +1229,7 @@ const POOL_CAUSES: [(&str, HazardId); 4] = [
 /// lasting 1, 3, 7, 14 and 30 days over the pool's rate of outages of any length, with the
 /// county's own median and 90th-percentile hours for the short part where they fit below a day.
 /// `None` when fewer than two usable points remain.
-pub(crate) fn pooled_curve(
-    m: &OutageModel,
-    stats: Option<&OutageStats>,
-) -> Option<(Survival, f64)> {
+pub fn pooled_curve(m: &OutageModel, stats: Option<&OutageStats>) -> Option<(Survival, f64)> {
     let lam: Vec<f64> = m.lam_ge.iter().map(|x| f64::from(*x)).collect();
     let mut rate = f64::from(m.rate);
     // The pool's rate is the county's own; where its record is thin (no outages of its own, as in
