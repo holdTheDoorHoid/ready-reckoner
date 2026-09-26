@@ -1,0 +1,223 @@
+{
+ "county": {
+  "fips": "04013",
+  "name": "Maricopa",
+  "state_abbr": "AZ",
+  "state_name": "Arizona",
+  "centroid": {
+   "lat": 33.35,
+   "lon": -112.49
+  },
+  "nca_region": "southwest",
+  "coastal": false,
+  "tsunami_zone": false,
+  "population": 4418836,
+  "households": 1767534,
+  "building_value_usd": 854700000000.0,
+  "nri_version": "1.20.0",
+  "nri": {
+   "avalanche": {
+    "afreq": 0.01,
+    "afreq_kind": "events_per_year",
+    "alrb": 1.705e-12,
+    "ealb": 1.458,
+    "ealp": 1.039e-05,
+    "ealt": 143.9,
+    "expb": 2031000.0,
+    "expp": 0.2965,
+    "hlrb": 7.177e-05,
+    "risk_score": 32.89
+   },
+   "cold_wave": {
+    "afreq": 0.0,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.0,
+    "ealb": 0.0,
+    "ealp": 0.0,
+    "ealt": 0.0,
+    "expb": 0.0,
+    "expp": 0.0,
+    "hlrb": 1.115e-06,
+    "risk_score": 0.0
+   },
+   "drought": {
+    "afreq": 62.54,
+    "afreq_kind": "events_per_year",
+    "ealt": 4593000.0,
+    "risk_score": 97.71
+   },
+   "earthquake": {
+    "afreq": 0.01075,
+    "afreq_kind": "annual_probability",
+    "alrb": 2.629e-05,
+    "ealb": 22470000.0,
+    "ealp": 0.6023,
+    "ealt": 30720000.0,
+    "expb": 1458000000000.0,
+    "expp": 4421000.0,
+    "hlrb": 0.001434,
+    "risk_score": 96.82
+   },
+   "hail": {
+    "afreq": 0.2798,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.825e-05,
+    "ealb": 24140000.0,
+    "ealp": 0.00211,
+    "ealt": 24170000.0,
+    "expb": 854700000000.0,
+    "expp": 4419000.0,
+    "hlrb": 7.675e-05,
+    "risk_score": 99.52
+   },
+   "heat_wave": {
+    "afreq": 19.83,
+    "afreq_kind": "events_per_year",
+    "alrb": 4.467e-08,
+    "ealb": 38180.0,
+    "ealp": 69.85,
+    "ealt": 958000000.0,
+    "expb": 854700000000.0,
+    "expp": 4419000.0,
+    "hlrb": 1.935e-09,
+    "risk_score": 100.0
+   },
+   "hurricane": {
+    "afreq": 0.01154,
+    "afreq_kind": "events_per_year",
+    "alrb": 8.201e-09,
+    "ealb": 7010.0,
+    "ealp": 3.535e-11,
+    "ealt": 11770.0,
+    "expb": 854700000000.0,
+    "expp": 4419000.0,
+    "hlrb": 8.2e-07,
+    "risk_score": 26.57
+   },
+   "landslide": {
+    "afreq": 2.106,
+    "afreq_kind": "annual_probability",
+    "alrb": 3.173e-08,
+    "ealb": 27120.0,
+    "ealp": 7.309e-05,
+    "ealt": 28120.0,
+    "expb": 4374000000.0,
+    "expp": 12340.0,
+    "hlrb": 0.0001461,
+    "risk_score": 83.91
+   },
+   "lightning": {
+    "afreq": 32.26,
+    "afreq_kind": "events_per_year",
+    "alrb": 2.049e-07,
+    "ealb": 175100.0,
+    "ealp": 0.1429,
+    "ealt": 2132000.0,
+    "expb": 854700000000.0,
+    "expp": 4419000.0,
+    "hlrb": 5.943e-09,
+    "risk_score": 95.45
+   },
+   "riverine_flooding": {
+    "afreq": 8.464,
+    "afreq_kind": "events_per_year",
+    "alrb": 0.001294,
+    "ealb": 1106000000.0,
+    "ealp": 0.9469,
+    "ealt": 1120000000.0,
+    "expb": 854700000000.0,
+    "expp": 64120.0,
+    "hlrb": 0.0001529,
+    "risk_score": 99.87
+   },
+   "strong_wind": {
+    "afreq": 1.401,
+    "afreq_kind": "events_per_year",
+    "alrb": 5.876e-06,
+    "ealb": 5022000.0,
+    "ealp": 0.2762,
+    "ealt": 8807000.0,
+    "expb": 854700000000.0,
+    "expp": 4419000.0,
+    "hlrb": 3.161e-06,
+    "risk_score": 99.08
+   },
+   "tornado": {
+    "afreq": 0.5705,
+    "afreq_kind": "events_per_year",
+    "alrb": 3.005e-06,
+    "ealb": 2568000.0,
+    "ealp": 0.2036,
+    "ealt": 5368000.0,
+    "expb": 854700000000.0,
+    "expp": 4419000.0,
+    "hlrb": 5.267e-06,
+    "risk_score": 84.0
+   },
+   "wildfire": {
+    "afreq": 0.001874,
+    "afreq_kind": "annual_probability",
+    "alrb": 4.718e-05,
+    "ealb": 40320000.0,
+    "ealp": 0.1358,
+    "ealt": 42190000.0,
+    "expb": 71660000000.0,
+    "expp": 431500.0,
+    "hlrb": 0.3,
+    "risk_score": 99.62
+   },
+   "winter_weather": {
+    "afreq": 0.5666,
+    "afreq_kind": "events_per_year",
+    "alrb": 1.658e-08,
+    "ealb": 14170.0,
+    "ealp": 0.002397,
+    "ealt": 47010.0,
+    "expb": 852800000000.0,
+    "expp": 4416000.0,
+    "hlrb": 7.944e-08,
+    "risk_score": 38.73
+   }
+  },
+  "climate": {
+   "days_over_2in_2050": 0.1201,
+   "days_over_2in_2050_high": 0.1096,
+   "days_over_2in_hist": 0.09844,
+   "days_over_90f_hist": 156.1,
+   "days_over_95f_2050": 154.0,
+   "days_over_95f_2050_high": 163.4,
+   "days_over_95f_hist": 123.1,
+   "dry_spell_days_2050": 120.0,
+   "dry_spell_days_2050_high": 122.2,
+   "dry_spell_days_hist": 113.2,
+   "icing_days_2050": 0.0005007,
+   "icing_days_2050_high": 0.0005312,
+   "icing_days_hist": 0.005043
+  },
+  "facilities": {
+   "nearest_nuclear_km": 35.0,
+   "tri_facilities": 350,
+   "high_hazard_dams": 20
+  }
+ },
+ "location": {
+  "country": "US",
+  "county_fips": "04013",
+  "county_name": "Maricopa",
+  "state_abbr": "AZ",
+  "state_name": "Arizona",
+  "centroid": {
+   "lat": 33.35,
+   "lon": -112.49
+  },
+  "nca_region": "southwest",
+  "coastal": false,
+  "tsunami_zone": false,
+  "facility_flags": {
+   "nuclear_plant_within_16km": false,
+   "nuclear_plant_within_80km": true,
+   "hazmat_facilities_within_5km": 0
+  },
+  "zip": "85008"
+ }
+}
