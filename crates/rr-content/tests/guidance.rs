@@ -17,7 +17,7 @@ fn block(id: &str) -> &'static rr_content::Guidance {
 
 /// awaiting: content — blocks for the contract v2 bucket and hazards (`bucket_clean_air.md` and the
 /// hazard and family blocks, DESIGN-DELTA §3).
-const AWAITING_BUCKETS: &[BucketId] = &[BucketId::CleanAir];
+const AWAITING_BUCKETS: &[BucketId] = &[];
 const AWAITING_HAZARDS: &[HazardId] = &[
     HazardId::WildfireSmoke,
     HazardId::DustStorm,

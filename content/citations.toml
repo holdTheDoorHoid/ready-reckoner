@@ -788,7 +788,7 @@ title = "Research on DIY Air Cleaners to Reduce Wildfire Smoke Indoors"
 publisher = "U.S. Environmental Protection Agency"
 year = 2026
 url = "https://www.epa.gov/air-research/research-diy-air-cleaners-reduce-wildfire-smoke-indoors"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Do-It-Yourself (DIY) air cleaners, made with a box fan and MERV 13 air filter, are a cost-effective method for reducing smoke concentrations."
 license = "US Government Work (public domain)"
 
@@ -798,7 +798,7 @@ title = "Wildfires and Indoor Air Quality"
 publisher = "U.S. Environmental Protection Agency"
 year = 2026
 url = "https://www.epa.gov/indoor-air-quality-iaq/wildfires-and-indoor-air-quality-iaq"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -2778,4 +2778,14 @@ year = 2021
 url = "https://files.asprtracie.hhs.gov/documents/aspr-tracie-cms-ep-rule-home-health-agency-requirements.pdf"
 retrieved = "2026-09-26"
 quote = "Individual plans for each patient must be included as part of the comprehensive patient assessment"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_protect_lungs_2026"
+title = "Protect Your Lungs From Wildfire Smoke and Ash (fact sheet)"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/system/files/documents/2026-06/protect-your-lungs-factsheet.pdf"
+retrieved = "2026-09-26"
+quote = "Children ages 2 years and older can wear respirators; however, NIOSH Approved respirators do NOT come in sizes suitable for young children."
 license = "US Government Work (public domain)"
