@@ -180,7 +180,8 @@ pub fn load_dir(dir: &Path) -> Result<Source, CliError> {
         let path = dir.join(&p);
         let bytes = std::fs::read(&path).map_err(|e| {
             CliError::failure(format!(
-                "{} is listed in the manifest but cannot be read: {e}",
+                "{} is listed in the manifest but cannot be read: {e}\n  `rr data verify` \
+                 checks every file; --fixtures runs on the seven sample counties meanwhile.",
                 path.display()
             ))
         })?;
@@ -195,7 +196,8 @@ pub fn load_dir(dir: &Path) -> Result<Source, CliError> {
         CliError::engine(
             &e,
             Some(&format!(
-                "(loading the data pack in {}; `rr data verify` checks every file)",
+                "(loading the data pack in {}; `rr data verify` checks every file, and \
+                 --fixtures runs on the seven sample counties meanwhile)",
                 dir.display()
             )),
         )
