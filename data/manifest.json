@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "b5d9ae2bb099",
-  "generated": "2026-09-26T16:50:06Z",
+  "pack_version": "99d062d2414a",
+  "generated": "2026-09-26T16:59:28Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -91,6 +91,16 @@
           "sha256": "f90944f6277b295cdbc59799f1ca31fbb46f35abd64b5e1d01327d2899b8a5fb",
           "bytes": 54145,
           "rows": 3225,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/levees.csv",
+          "job": "levees",
+          "sha256": "61e9ab61784a078e6b2897dfb753608514a384b3e650f74e7751ad1ac7fc33a4",
+          "bytes": 37578,
+          "rows": 3232,
           "key": [
             "fips"
           ]
@@ -1237,6 +1247,61 @@
         }
       ]
     },
+    "levees": {
+      "title": "People behind levees and levee risk ratings by county (USACE National Levee Database)",
+      "finished": "2026-09-26T16:59:28Z",
+      "sources": [
+        {
+          "name": "USACE National Levee Database: levee systems by state (public API)",
+          "url": "https://levees.sec.usace.army.mil/api-local/systems/query?type=sy&sy=*&in=@state:<state name> (56 states)",
+          "version": "6159 systems as served on the retrieval date",
+          "retrieved": "2026-09-26T16:58:47Z",
+          "sha256": "95da2b6ca6b27bfc89427258eb51018b79dab5a31009f0b6a84d6178239a8c24",
+          "bytes": 12851337,
+          "license": "US Government work; NLD: \"available for public use\""
+        },
+        {
+          "name": "USACE National Levee Database: leveed areas (feature layer 16)",
+          "url": "https://geospatial.sec.usace.army.mil/dls/rest/services/NLD/Public/FeatureServer/16/query (POST where=1=1; fields SYSTEM_ID,LEVEED_ID; ordered by OBJECTID; maxAllowableOffset=0.0005; geometryPrecision=5)",
+          "version": "NLD Public FeatureServer layer 16 (Leveed Areas), generalised to 0.0005 degrees",
+          "retrieved": "2026-09-26T16:58:59Z",
+          "sha256": "bc1e3dd549ceb7fa2acc595985788892e6cbb698a6ca994cceab4bb40e3dad25",
+          "bytes": 4833947,
+          "license": "US Government work; NLD: \"available for public use\""
+        },
+        {
+          "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon and areas)",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
+          "version": "GENZ2024",
+          "retrieved": "2026-09-26T16:59:25Z",
+          "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
+          "bytes": 11626066,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2020 centers of population by block group",
+          "url": "https://www2.census.gov/geo/docs/reference/cenpop2020/blkgrp/CenPop2020_Mean_BG.txt",
+          "version": "CenPop2020_Mean_BG",
+          "retrieved": "2026-09-26T16:59:26Z",
+          "sha256": "e4a7ebbf07a8a8d846cea9d2daeb600dea50b1ec2d7703909e40d45c013cd63a",
+          "bytes": 10583505,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 254639,
+      "rows_out": 3232,
+      "outputs": [
+        "core/levees.csv"
+      ],
+      "notes": [
+        "6159 levee systems with 22.3 million people at risk (NLD API). People split among counties: 1129 systems by the Census 2020 block-group population inside their leveed areas, 2418 by leveed-area land (lattice every 0.005 degrees) where no block-group centre falls inside, 805 by the first vertex of an area too small for the lattice, 11 without a leveed-area polygon by the system's point; 0 systems (0 people) could not be placed. After capping each county at its population, 17.2 million people are counted.",
+        "leveed_pop_share = people behind levees in the county / county population (NRI 2020), capped at 1 because nested systems can count people twice (capped: 05017 (1.17), 05035 (1.52), 05041 (1.17), 05093 (1.37), 05095 (1.73), 05111 (1.05), 12011 (3.20), 17003 (1.35), 22007 (1.76), 22009 (2.41), 22025 (1.55), 22029 (2.21), 22035 (1.16), 22041 (1.33), 22047 (1.82), 22051 (1.23), 22057 (1.18), 22065 (1.16), 22071 (1.49), 22075 (1.01), 22077 (2.15), 22079 (2.59), 22083 (1.31), 22087 (2.31), 22089 (1.14), 22093 (1.28), 22101 (1.53), 22107 (1.17), 22121 (2.24), 22123 (1.16), 28011 (1.05), 28027 (1.16), 28053 (1.45), 28055 (1.34), 28119 (2.24), 28125 (1.35), 28133 (1.07), 28143 (1.73), 28151 (1.15), 29069 (1.34), 29143 (1.13), 38017 (1.04)). levee_risk_high_share = of those people, the share behind systems USACE rates Very High or High risk (LSAC); two thirds of systems are not screened, so a 0 there often means 'not rated', not 'low risk'. Counties with no levee system are 0."
+      ],
+      "definitions": {
+        "levee_risk_high_share": "Share of the county's leveed residents behind levee systems with a USACE Levee Screening and Assessment rating of Very High or High.",
+        "leveed_pop_share": "Share of the county's residents living in areas USACE's National Levee Database shows behind a levee (modelled people at risk from the National Structure Inventory, split among counties by where people live inside the leveed areas)."
+      }
+    },
     "nri": {
       "title": "FEMA National Risk Index v1.20, trimmed to the model's county fields",
       "finished": "2026-09-26T08:24:01Z",
@@ -1928,6 +1993,13 @@
       "license": "Compiled from public sources (US Government works are public domain)",
       "url": "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml",
       "version": "reviewed 2026-09-26",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "USACE National Levee Database",
+      "text": "People behind levees and levee risk ratings from the U.S. Army Corps of Engineers National Levee Database.",
+      "license": "US Government work (public domain)",
+      "url": "https://levees.sec.usace.army.mil/",
       "accessed": "2026-09-26"
     },
     {

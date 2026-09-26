@@ -238,3 +238,32 @@ fn karst_and_landslide_shares_match_known_ground() {
         }
     }
 }
+
+#[test]
+fn levee_shares_match_known_places() {
+    if !has("core/levees.csv") {
+        return;
+    }
+    // Sacramento lives largely behind levees (the brief's check); so does St. Charles Parish.
+    assert!(
+        exposure("06067").leveed_pop_share.unwrap() > 0.2,
+        "Sacramento"
+    );
+    assert!(
+        exposure("22089").leveed_pop_share.unwrap() > 0.5,
+        "St. Charles Parish"
+    );
+    assert!(
+        exposure("04001").leveed_pop_share.unwrap() < 0.01,
+        "Apache County, AZ"
+    );
+    // Every county has a value (0 where there is no levee), all shares within [0, 1].
+    for c in store().counties() {
+        let (p, h) = (
+            c.exposure.leveed_pop_share,
+            c.exposure.levee_risk_high_share,
+        );
+        assert!(p.is_some() && h.is_some(), "{}", c.fips);
+        assert!((0.0..=1.0).contains(&p.unwrap()) && (0.0..=1.0).contains(&h.unwrap()));
+    }
+}

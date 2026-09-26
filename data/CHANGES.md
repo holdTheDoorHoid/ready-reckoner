@@ -85,3 +85,24 @@ Jobs run: ground.
 | File | Rows before | Rows after | Added | Removed | Changed | Status |
 |---|---:|---:|---:|---:|---:|---|
 | `core/ground.csv` | 0 | 3225 | 0 | 0 | 0 | new |
+
+## 2026-09-26T16:54:49Z — pack version b5d9ae2bb099
+
+Jobs run: none.
+Job **levees failed**: unexpected source data: leveed_pop_share for Apache County, AZ is 0.000, expected 0-0
+
+## 2026-09-26T16:56:30Z — pack version 8f382775ca36
+
+Jobs run: levees.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/levees.csv` | 0 | 3232 | 0 | 0 | 0 | new |
+
+## 2026-09-26T16:59:28Z — pack version 99d062d2414a
+
+Jobs run: levees.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/levees.csv` | 3232 | 3232 | 0 | 0 | 198 | changed |

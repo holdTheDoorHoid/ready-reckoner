@@ -15,6 +15,7 @@ pub mod flood;
 pub mod geography;
 pub mod geomag;
 pub mod ground;
+pub mod levees;
 pub mod nri;
 pub mod outages;
 pub mod seismic;
@@ -145,6 +146,12 @@ pub const JOBS: &[JobSpec] = &[
         id: "ground",
         title: "Karst (USGS OFR 2014-1156) and landslide-susceptible terrain (USGS 2024) by county",
         run: ground::run,
+        default: true,
+    },
+    JobSpec {
+        id: "levees",
+        title: "People behind levees and levee risk ratings by county (USACE National Levee Database)",
+        run: levees::run,
         default: true,
     },
     JobSpec {
@@ -493,6 +500,38 @@ pub fn arcgis_query(
     license: &str,
     obligations: &str,
 ) -> Result<ArcgisRows> {
+    arcgis_query_ex(
+        ctx,
+        name,
+        layer_url,
+        where_clause,
+        fields,
+        order_by,
+        geometry,
+        &[],
+        version,
+        license,
+        obligations,
+    )
+}
+
+/// [`arcgis_query`] with extra form parameters (for example `maxAllowableOffset` and
+/// `geometryPrecision` to generalise polygons on the server). The extra parameters are recorded
+/// in the source URL.
+#[allow(clippy::too_many_arguments)]
+pub fn arcgis_query_ex(
+    ctx: &Ctx,
+    name: &str,
+    layer_url: &str,
+    where_clause: &str,
+    fields: &[&str],
+    order_by: &str,
+    geometry: bool,
+    extra: &[(&str, String)],
+    version: &str,
+    license: &str,
+    obligations: &str,
+) -> Result<ArcgisRows> {
     let url = format!("{layer_url}/query");
     let mut acc = crate::http::Sha256Acc::new();
     let mut rows = Vec::new();
@@ -512,6 +551,7 @@ pub fn arcgis_query(
         if geometry {
             form.push(("outSR", "4326".to_string()));
         }
+        form.extend(extra.iter().cloned());
         let resp = ctx.http.post_form(&url, &form)?;
         acc.update(&resp.bytes);
         let v: serde_json::Value = serde_json::from_slice(&resp.bytes)?;
@@ -542,8 +582,12 @@ pub fn arcgis_query(
         source: SourceRecord {
             name: name.to_string(),
             url: format!(
-                "{url} (POST where={where_clause}; fields {}; ordered by {order_by})",
-                fields.join(",")
+                "{url} (POST where={where_clause}; fields {}; ordered by {order_by}{})",
+                fields.join(","),
+                extra
+                    .iter()
+                    .map(|(k, v)| format!("; {k}={v}"))
+                    .collect::<String>()
             ),
             version: version.to_string(),
             retrieved,
