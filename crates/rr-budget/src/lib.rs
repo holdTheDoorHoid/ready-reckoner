@@ -20,24 +20,32 @@
 //! [`value`]: `V = 10 · w_b · ∫ₓ^min(x+Δ, target) Λ_b(t) dt` for duration buckets and
 //! `V = 10 · w · r_need · harm` for readiness items, with the harm weights in [`weights`].
 //!
-//! # Timing, and why the default never skips ahead
+//! # Timing
 //!
 //! The allocator decides *what* to buy next without looking at the money (tiers, caps,
-//! life-safety first, value per dollar, promotion), then buys it as soon as the money is there,
-//! saving toward it when it is not ([`Schedule::Strict`]). Because the order never depends on the
-//! budget, more money can only move a purchase earlier, so a bigger budget covers every bucket at
-//! least as well in every month. Buying in order of value per dollar is also the order that
-//! maximises protection over time when money arrives steadily (it is the classic
-//! weighted-completion-time rule).
+//! life-safety first, value per dollar, promotion) and then times purchases by one of three
+//! [`Schedule`]s:
 //!
-//! The research prototype's shortcut ("buy the best affordable item instead, unless the best
-//! costs at most two months of budget and the alternative is worth less than a quarter as much")
-//! is available as [`Schedule::ResearchShortcuts`]. It is not the default because it breaks that
-//! guarantee: with $60 a month a plan buys a $20 item in month 1 while saving for a $100 one, but
-//! with $100 a month it buys the $100 item first, so the $20 item's bucket is *less* covered in
-//! month 1 with more money. The one exception in the strict schedule is a household with no
-//! monthly budget: there is no later month to save for, so leftover one-off money buys the best
-//! remaining item that fits.
+//! - **Split** (the default, `reserve_share` 0.5). When the top-priority item costs more than the
+//!   month's money, half of each month's money goes into a sinking fund for it and the rest buys
+//!   the best affordable items in priority order; the item is bought as soon as the fund (with any
+//!   free money) covers it. Otherwise items are bought in priority order. The household sees
+//!   progress every month (every month whose free money covers the cheapest useful item buys
+//!   something), and the expensive item still arrives within ceil(cost / (share × monthly money))
+//!   months of its first deposit. A bigger budget never ends the plan with less coverage in any
+//!   bucket, but month by month it can reach some bucket later, because the purchase order depends
+//!   on the money.
+//! - **FixedOrder.** Buy strictly in priority order and save everything for the next item when it
+//!   costs more than the money on hand. The order never depends on the budget, so more money only
+//!   ever moves purchases earlier and every bucket is covered at least as well in every month. The
+//!   cost: a small budget facing an expensive top item sees months of saving with nothing bought.
+//! - **ResearchShortcuts.** The research prototype's rule (buy the best affordable item unless
+//!   the best costs at most two months of money and the alternative is worth less than a quarter
+//!   as much per dollar). Its expensive items can wait until nothing cheaper is affordable, and
+//!   more money can lower a bucket's coverage in some month.
+//!
+//! With no monthly budget there is no later month to save for, so every schedule spends leftover
+//! one-off money on the best item that fits.
 //!
 //! Divisible items (water, food, medicine) are bought in chunks that reach the next step of the
 //! day ladder (½, 1, 2, 3, 5, 7, 10, 14 ... days), so the first days come first and each chunk has

@@ -11,8 +11,9 @@ use rr_types::{BucketId, HazardId, Item, Target, TierId};
 use super::{EventClass, assessment, days_target, ev, item, readiness_target, tabulate};
 
 /// The research default dial: 90 % sure nothing in ten years is worse, Λ = −ln(0.9)/10
-/// (research risk-model §3.2). Exactly 1/100 puts the water target at 3.003 days, which rounds up
-/// to 5 on the day ladder; see the report.
+/// (research risk-model §3.2). The planner decided on 2026-09-25 that `one_in_100` maps to this
+/// rate and that ladder rounding tolerates 3 % above a step (exactly 1/100 would put Philadelphia's
+/// water target at 3.003 days).
 pub const DIAL_RATE: f64 = 0.010_536_051_565_782_628;
 
 const H: f64 = 1.0 / 24.0;

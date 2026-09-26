@@ -68,26 +68,45 @@ pub struct GuardrailContext {
     pub cliffs: Vec<Cliff>,
 }
 
+/// Share of each month's money a [`Schedule::Split`] plan puts toward an expensive item by default.
+pub const DEFAULT_RESERVE_SHARE: f64 = 0.5;
+
 /// How the allocator times purchases once it knows what to buy next.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
 pub enum Schedule {
+    /// The default. When the top-priority item costs more than one month's money, put
+    /// `reserve_share` of each month's new money into a sinking fund for it and spend the rest on
+    /// the best affordable items in priority order; buy it as soon as the fund (with any free
+    /// money) covers it. The household sees progress every month, and the expensive item still
+    /// arrives within ceil(cost / (reserve_share × monthly money)) months of its first deposit.
+    /// A bigger budget never ends the plan with less coverage in any bucket, but unlike
+    /// [`Schedule::FixedOrder`] it can reach a bucket later in some month (the purchase order
+    /// depends on the money).
+    Split {
+        /// Share of each month's new money set aside, above 0 and at most 1 (default 0.5).
+        reserve_share: f64,
+    },
     /// Buy in one fixed priority order; when the next item costs more than the money on hand,
-    /// save for it (a sinking fund). The order never depends on the budget, so more money only
-    /// ever moves purchases earlier, and every bucket is covered at least as well in every month
-    /// (the monotonicity property). The default.
-    #[default]
-    Strict,
+    /// save everything for it. The order never depends on the budget, so more money only ever
+    /// moves purchases earlier and every bucket is covered at least as well in every month.
+    FixedOrder,
     /// The research prototype's shortcuts (risk-model §4.2): when the next item is not
     /// affordable, buy the best affordable one instead, unless the next item costs at most twice
     /// the monthly budget and the affordable one is worth less than a quarter as much per dollar.
-    /// Plans can then get worse in some bucket in some month when the budget goes up; see the
-    /// crate docs.
     ResearchShortcuts,
 }
 
+impl Default for Schedule {
+    fn default() -> Self {
+        Schedule::Split {
+            reserve_share: DEFAULT_RESERVE_SHARE,
+        }
+    }
+}
+
 /// Knobs that are not part of `PlanInput`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BudgetOptions {
     /// The longest plan, in months after month 0 (default 120, the ten-year horizon).
@@ -105,7 +124,7 @@ impl Default for BudgetOptions {
         Self {
             max_months: 120,
             rare_catastrophic_opt_in: false,
-            schedule: Schedule::Strict,
+            schedule: Schedule::default(),
         }
     }
 }
@@ -141,6 +160,23 @@ pub struct MonthCoverage {
     pub readiness_done: BTreeMap<BucketId, u32>,
 }
 
+/// Money at one month of the plan, for "this month" screens and the tests.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct MonthMoney {
+    /// The month.
+    pub month: u16,
+    /// Money free to spend at the start of the month, after this month's sinking-fund deposit.
+    pub available_usd: f64,
+    /// Money in the main plan's sinking fund at the end of the month.
+    pub saved_usd: f64,
+    /// What the main plan's sinking fund is saving for at the end of the month, and what that
+    /// costs now (`None` when no fund is running).
+    pub saving_for: Option<(ItemId, f64)>,
+    /// The cheapest item worth buying at the start of the month, other than the one being saved
+    /// for. `None` when nothing is left to buy.
+    pub cheapest_usd: Option<f64>,
+}
+
 /// One purchase in the order the allocator made it (before same-month purchases of one item are
 /// merged into a single plan line).
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -153,6 +189,8 @@ pub struct Purchase {
     pub quantity: f64,
     /// Cost in US dollars.
     pub cost_usd: f64,
+    /// The part of the cost paid from a sinking fund (money set aside in earlier months).
+    pub from_savings_usd: f64,
     /// Value, in expected weighted disruption-days covered per decade (DESIGN §4.7).
     pub value: f64,
     /// The tier whose targets the purchase was valued against.
@@ -175,6 +213,8 @@ pub struct BudgetResult {
     pub covered: BTreeMap<BucketId, Target>,
     /// Coverage at the end of every month of the plan.
     pub coverage_by_month: Vec<MonthCoverage>,
+    /// Money at every month of the plan.
+    pub money_by_month: Vec<MonthMoney>,
     /// Every purchase in the order made.
     pub sequence: Vec<Purchase>,
     /// The highest tier whose targets what the household already has (existing inventory and free
@@ -209,4 +249,7 @@ pub enum BudgetError {
     /// Item metadata is malformed.
     #[error(transparent)]
     Meta(#[from] crate::coverage::MetaError),
+    /// A split schedule's reserve share is not above 0 and at most 1.
+    #[error("reserve_share must be above 0 and at most 1, got {0}")]
+    ReserveShare(f64),
 }

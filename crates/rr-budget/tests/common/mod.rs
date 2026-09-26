@@ -12,8 +12,8 @@ use std::collections::BTreeMap;
 use rr_budget::{BucketCurve, BudgetResult};
 use rr_types::math::{self, Z_90};
 use rr_types::{
-    BucketAssessment, BucketId, CitationId, Contribution, HazardId, Item, ItemId, Plan,
-    PlanItemKind, PriceBand, Target, TierId,
+    BucketAssessment, BucketId, CitationId, Contribution, HazardId, Item, ItemId, PlanItemKind,
+    PriceBand, Target, TierId,
 };
 
 /// One event class of a research-prototype bucket: household rate per year, median and 90th
@@ -181,27 +181,45 @@ pub fn readiness_at(r: &BudgetResult, m: usize) -> &BTreeMap<BucketId, u32> {
     &r.coverage_by_month[m.min(r.coverage_by_month.len() - 1)].readiness_done
 }
 
-/// One envelope as reconstructed from the plan lines.
+/// One sinking fund as reconstructed from the plan: when money first went in, what the deposits
+/// were last labelled for, and the purchase that drew on it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct EnvelopeLife {
+    /// The item the deposits were (last) for.
     pub item_id: ItemId,
     pub opened: u16,
+    /// Month of the purchase that drew on the fund.
     pub bought: Option<u16>,
+    /// The item that purchase was for (normally `item_id`).
+    pub bought_item: Option<ItemId>,
+    /// Cost of that purchase.
     pub needed: f64,
+    /// The deposits changed item along the way (the first item was no longer needed).
+    pub retargeted: bool,
 }
 
-/// Replays the plan's money: every month's budget comes in, purchases go out (less any envelope
-/// they draw on), reserve deposits move money into envelopes. Returns the money left at the end
-/// of each month (never negative if the plan is sound) and each envelope's life.
-pub fn audit(plan: &Plan) -> (Vec<f64>, Vec<EnvelopeLife>) {
-    let mut carry = 0.0_f64;
-    let mut held: BTreeMap<ItemId, f64> = BTreeMap::new();
-    let mut open: BTreeMap<ItemId, (u16, usize)> = BTreeMap::new();
+/// Replays the plan's money. Each month's budget comes in as free money; a reserve line moves free
+/// money into a sinking fund; a purchase takes `from_savings_usd` from the fund and the rest from
+/// free money (read from `BudgetResult::sequence`, which lists every purchase before same-month
+/// lines are merged). Returns the free money left at the end of each month (never negative if the
+/// plan is sound) and each fund's life. `rare` tells which items belong to the rare-catastrophe
+/// allowance, whose fund runs beside the main plan's. Panics if a fund would go negative.
+pub fn audit(r: &BudgetResult, rare: &dyn Fn(&str) -> bool) -> (Vec<f64>, Vec<EnvelopeLife>) {
+    let plan = &r.plan;
+    let mut free = 0.0_f64;
+    let mut fund = 0.0_f64;
+    // Open fund per track: [main, rare].
+    let mut open: [Option<usize>; 2] = [None, None];
     let mut lives: Vec<EnvelopeLife> = Vec::new();
-    let mut used = vec![false; plan.envelopes.len()];
     let mut left = Vec::new();
     for month in &plan.months {
-        carry += f64::from(month.budget_usd);
+        free += f64::from(month.budget_usd);
+        // Purchases of this month, in order, each consumed once.
+        let mut buys: Vec<&rr_budget::Purchase> = r
+            .sequence
+            .iter()
+            .filter(|p| p.month == month.index)
+            .collect();
         for it in &month.items {
             match it.kind {
                 PlanItemKind::FreeAction => {
@@ -209,38 +227,78 @@ pub fn audit(plan: &Plan) -> (Vec<f64>, Vec<EnvelopeLife>) {
                 }
                 PlanItemKind::Purchase if it.done => {}
                 PlanItemKind::Purchase => {
-                    let released = held.remove(&it.item_id).unwrap_or(0.0);
-                    carry -= f64::from(it.est_cost_usd) - released;
-                    if let Some((_, idx)) = open.remove(&it.item_id) {
-                        lives[idx].bought = Some(month.index);
+                    // A merged line stands for every purchase of this item in the month.
+                    let mine: Vec<&rr_budget::Purchase> = buys
+                        .iter()
+                        .copied()
+                        .filter(|p| p.item_id == it.item_id)
+                        .collect();
+                    buys.retain(|p| p.item_id != it.item_id);
+                    let line_cost: f64 = mine.iter().map(|p| p.cost_usd).sum();
+                    assert!(
+                        (line_cost - f64::from(it.est_cost_usd)).abs() < 0.02,
+                        "month {} {}: line ${} vs purchases ${line_cost}",
+                        month.index,
+                        it.item_id,
+                        it.est_cost_usd
+                    );
+                    for p in mine {
+                        fund -= p.from_savings_usd;
+                        free -= p.cost_usd - p.from_savings_usd;
+                        assert!(fund > -0.05, "month {}: fund {fund}", month.index);
+                        if p.from_savings_usd > 1e-9 {
+                            let track = usize::from(p.rare_catastrophic);
+                            if let Some(i) = open[track].take() {
+                                lives[i].bought = Some(month.index);
+                                lives[i].bought_item = Some(p.item_id.clone());
+                                lives[i].needed = p.cost_usd;
+                            }
+                        }
                     }
                 }
                 PlanItemKind::Reserve => {
-                    *held.entry(it.item_id.clone()).or_insert(0.0) += f64::from(it.est_cost_usd);
-                    carry -= f64::from(it.est_cost_usd);
-                    if !open.contains_key(&it.item_id) {
-                        // Envelopes are listed as they close; match by item.
-                        let needed = plan
-                            .envelopes
-                            .iter()
-                            .enumerate()
-                            .find(|(i, e)| !used[*i] && e.item_id == it.item_id)
-                            .map_or(0.0, |(i, e)| {
-                                used[i] = true;
-                                f64::from(e.needed_usd)
+                    let d = f64::from(it.est_cost_usd);
+                    free -= d;
+                    fund += d;
+                    let track = usize::from(rare(it.item_id.as_str()));
+                    match open[track] {
+                        Some(i) if lives[i].item_id != it.item_id => {
+                            lives[i].item_id = it.item_id.clone();
+                            lives[i].retargeted = true;
+                        }
+                        Some(_) => {}
+                        None => {
+                            lives.push(EnvelopeLife {
+                                item_id: it.item_id.clone(),
+                                opened: month.index,
+                                bought: None,
+                                bought_item: None,
+                                needed: 0.0,
+                                retargeted: false,
                             });
-                        lives.push(EnvelopeLife {
-                            item_id: it.item_id.clone(),
-                            opened: month.index,
-                            bought: None,
-                            needed,
-                        });
-                        open.insert(it.item_id.clone(), (month.index, lives.len() - 1));
+                            open[track] = Some(lives.len() - 1);
+                        }
                     }
                 }
             }
         }
-        left.push(carry);
+        assert!(
+            buys.is_empty(),
+            "month {}: purchases without plan lines: {buys:?}",
+            month.index
+        );
+        left.push(free);
+    }
+    // A fund still open at the end is listed last in the plan's envelopes with what it needs.
+    for life in lives.iter_mut().filter(|l| l.bought.is_none()) {
+        if let Some(e) = plan
+            .envelopes
+            .iter()
+            .rev()
+            .find(|e| e.item_id == life.item_id)
+        {
+            life.needed = f64::from(e.needed_usd);
+        }
     }
     (left, lives)
 }

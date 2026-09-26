@@ -503,7 +503,7 @@ fn research_schedule_runs_on_the_fixtures() {
         let (items, meta) = common::philadelphia::catalogue();
         let risks = common::philadelphia::risks();
         let context = GuardrailContext::default();
-        for schedule in [Schedule::Strict, Schedule::ResearchShortcuts] {
+        for schedule in [Schedule::FixedOrder, Schedule::ResearchShortcuts] {
             let input = BudgetInput {
                 household: &household,
                 catalogue: &items,
@@ -519,8 +519,136 @@ fn research_schedule_runs_on_the_fixtures() {
             let a = allocate(&input).unwrap();
             let b = allocate(&input).unwrap();
             assert_eq!(a, b, "{name}");
-            let (left, _) = common::audit(&a.plan);
+            let (left, _) = common::audit(&a, &|id| {
+                items.iter().any(|i| i.id == id && i.rare_catastrophic)
+            });
             assert!(left.iter().all(|&x| x > -0.05), "{name} {schedule:?}");
         }
     }
+}
+
+/// The planner's example: $40 a month, a $300 CPAP battery as the top priority, and cheap items
+/// for other needs. Split: every month buys something while cheap items remain, and the battery
+/// still arrives within ceil($300 / (50 % x $40)) = 15 months. Fixed order: the battery comes
+/// first, in month 8, after seven months of only saving. Research shortcuts: cheap items first;
+/// the battery is saved for only once a month comes when nothing else is affordable, so it
+/// arrives later than under the fixed order.
+#[test]
+fn cpap_battery_under_each_schedule() {
+    let setup = |schedule: Schedule| {
+        let mut battery = buy("cpap_battery", BucketId::Power, TierId::H72, 300.0);
+        battery.life_safety = true;
+        let mut first_aid = ItemMeta::new("first_aid");
+        first_aid.readiness = vec![ReadinessCredit {
+            bucket: BucketId::MedicalEmergency,
+            harm_day_equivalents: 0.5,
+        }];
+        let mut s = Setup::new("phoenix-apartment-cpap-1", 40.0, 0.0)
+            .flat(BucketId::Power, 0.3, 3.0)
+            .flat(BucketId::WaterOut, 0.2, 3.0)
+            .flat(BucketId::Supplies, 0.5, 10.0)
+            .flat(BucketId::Comms, 0.1, 3.0)
+            .flat(BucketId::Thermal, 0.1, 2.0)
+            .readiness(BucketId::MedicalEmergency, 0.9)
+            .add(battery, set("cpap_battery", BucketId::Power, 3.0))
+            .add(
+                buy("water", BucketId::WaterOut, TierId::H72, 20.0),
+                set("water", BucketId::WaterOut, 3.0),
+            )
+            .add(
+                item(
+                    "food",
+                    "Food",
+                    "person-day",
+                    &[BucketId::Supplies],
+                    TierId::H72,
+                    false,
+                    false,
+                    (2.5, 2.5),
+                ),
+                divisible(
+                    "food",
+                    Contributes::per_person(BucketId::Supplies, 1.0),
+                    1.0,
+                ),
+            )
+            .add(
+                buy("first_aid", BucketId::MedicalEmergency, TierId::H72, 25.0),
+                first_aid,
+            )
+            .add(
+                buy("radio", BucketId::Comms, TierId::H72, 30.0),
+                set("radio", BucketId::Comms, 3.0),
+            )
+            .add(
+                buy("fans", BucketId::Thermal, TierId::H72, 30.0),
+                set("fans", BucketId::Thermal, 2.0),
+            );
+        s.options.schedule = schedule;
+        s.run()
+    };
+    let battery_month =
+        |r: &BudgetResult| month_of(r, "cpap_battery").expect("the battery arrives");
+    let others_done_by = |r: &BudgetResult| {
+        r.sequence
+            .iter()
+            .filter(|p| p.item_id != "cpap_battery")
+            .map(|p| p.month)
+            .max()
+            .unwrap()
+    };
+
+    let split = setup(Schedule::default());
+    let b = battery_month(&split);
+    assert!(b <= 15, "battery in month {b}");
+    // Every month whose free money covers the cheapest item still worth buying buys something;
+    // with $20 a month free, that is most months until the cheap items run out.
+    let mut buying_months = 0;
+    for mm in split
+        .money_by_month
+        .iter()
+        .filter(|mm| mm.month >= 1 && mm.month < b)
+    {
+        let bought = split.sequence.iter().any(|p| p.month == mm.month);
+        if mm
+            .cheapest_usd
+            .is_some_and(|c| c <= mm.available_usd + 1e-9)
+        {
+            assert!(
+                bought,
+                "split: month {} could buy something but did not",
+                mm.month
+            );
+        }
+        buying_months += usize::from(bought);
+    }
+    assert!(
+        buying_months >= 5,
+        "only {buying_months} months with a purchase before the battery"
+    );
+    assert!(others_done_by(&split) < b + 3);
+    // Half of each month's $40 went into the battery fund from month 1.
+    let deposits: Vec<f32> = split.plan.months[1..=3]
+        .iter()
+        .flat_map(|m| m.items.iter())
+        .filter(|i| i.kind == PlanItemKind::Reserve)
+        .map(|i| i.est_cost_usd)
+        .collect();
+    assert_eq!(deposits, [20.0, 20.0, 20.0]);
+
+    let fixed = setup(Schedule::FixedOrder);
+    assert_eq!(battery_month(&fixed), 8);
+    for m in 1..8 {
+        assert!(
+            fixed.plan.months[m]
+                .items
+                .iter()
+                .all(|i| i.kind == PlanItemKind::Reserve),
+            "fixed order: month {m} only saves"
+        );
+    }
+
+    let research = setup(Schedule::ResearchShortcuts);
+    assert!(research.sequence.iter().any(|p| p.month == 1));
+    assert!(battery_month(&research) > battery_month(&fixed));
 }

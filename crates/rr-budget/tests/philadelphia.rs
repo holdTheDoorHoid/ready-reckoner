@@ -9,10 +9,14 @@ use std::path::PathBuf;
 
 use common::philadelphia::{self, DIAL_RATE};
 use common::{audit, days_at};
-use rr_budget::{BudgetInput, BudgetOptions, BudgetResult, GuardrailContext, allocate};
+use rr_budget::{BudgetInput, BudgetOptions, BudgetResult, GuardrailContext, Schedule, allocate};
 use rr_types::{BucketId, PlanItemKind, TierId, fixtures};
 
 fn run() -> (rr_types::PlanInput, BudgetResult) {
+    run_with(Schedule::default())
+}
+
+fn run_with(schedule: Schedule) -> (rr_types::PlanInput, BudgetResult) {
     let household = fixtures::get("philadelphia-renters-4").unwrap();
     let (items, meta) = philadelphia::catalogue();
     let risks = philadelphia::risks();
@@ -24,7 +28,10 @@ fn run() -> (rr_types::PlanInput, BudgetResult) {
         requirements: &[],
         risks: &risks,
         context: &context,
-        options: BudgetOptions::default(),
+        options: BudgetOptions {
+            schedule,
+            ..BudgetOptions::default()
+        },
     };
     let result = allocate(&input).expect("allocates");
     (household, result)
@@ -40,6 +47,9 @@ fn money(x: f32) -> String {
 
 /// The first few words of an item name, for the comparison table.
 fn short(name: &str) -> String {
+    if let Some(rest) = name.strip_prefix("Save toward: ") {
+        return format!("Save toward {}", short(rest).to_lowercase());
+    }
     let head = name.split([':', '(', ';']).next().unwrap_or(name).trim();
     head.to_owned()
 }
@@ -59,7 +69,14 @@ fn example_markdown(result: &BudgetResult) -> String {
         "Inputs are stubs until `rr-plan` wires the real crates: curves tabulated from the research \
          prototype's parameters (research risk-model §8, `rm_proto/params.py`) at the research's \
          default dial (Λ ≤ {DIAL_RATE:.4} a year, \"about 1 in 100\"); prices from research §8.6 \
-         (illustrative); hazard shares read off the prototype's event list.\n"
+         (illustrative); hazard shares read off the prototype's event list. `one_in_100` maps to \
+         Λ* = −ln(0.9)/10 ≈ 0.0105 (the planner's decision of 2026-09-25).\n"
+    );
+    let _ = writeln!(
+        md,
+        "Schedule: **split** (the default). When the next item costs more than a month's money, \
+         half of each month's money goes into a sinking fund for it and the rest buys the best \
+         affordable items; otherwise items are bought in priority order.\n"
     );
     let _ = writeln!(md, "## Targets and coverage (days)\n");
     let _ = writeln!(
@@ -156,6 +173,46 @@ fn example_markdown(result: &BudgetResult) -> String {
             "Savings track: {} months of expenses (${:.0}); {} months saved now; suggested ${:.0} a month. {}\n",
             s.target_months, s.target_usd, s.current_months, s.monthly_suggestion_usd, s.why
         );
+    }
+    let _ = writeln!(md, "## Compared with the fixed-order schedule\n");
+    let (_, fixed) = run_with(Schedule::FixedOrder);
+    let line_list = |r: &BudgetResult, m: usize| -> String {
+        r.plan
+            .months
+            .get(m)
+            .map(|month| {
+                month
+                    .items
+                    .iter()
+                    .map(|i| format!("{} {}", short(&i.name), money(i.est_cost_usd)))
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            })
+            .unwrap_or_else(|| "(plan finished)".into())
+    };
+    let months = result.plan.months.len().max(fixed.plan.months.len());
+    let differing: Vec<usize> = (1..months)
+        .filter(|&m| line_list(result, m) != line_list(&fixed, m))
+        .collect();
+    if differing.is_empty() {
+        let _ = writeln!(md, "Identical month by month.\n");
+    } else {
+        let _ = writeln!(
+            md,
+            "The two schedules agree except in the months below (only items costing more than a \
+             month's money are handled differently).\n"
+        );
+        let _ = writeln!(md, "| Month | Split (default) | Fixed order |");
+        let _ = writeln!(md, "| --- | --- | --- |");
+        for m in differing {
+            let _ = writeln!(
+                md,
+                "| {m} | {} | {} |",
+                line_list(result, m),
+                line_list(&fixed, m)
+            );
+        }
+        let _ = writeln!(md);
     }
     let _ = writeln!(md, "## Compared with research risk-model §8.6\n");
     let _ = writeln!(md, "| Month | Research prototype | This crate |");
@@ -258,7 +315,7 @@ fn writes_the_worked_example() {
     assert!((after0[&BucketId::Medication] - 7.0).abs() < 1e-9);
 
     // Money never runs out, and months 1-6 use at most 6 x $60.
-    let (left, lives) = audit(&result.plan);
+    let (left, lives) = audit(&result, &|_| false);
     assert!(
         left.iter().all(|&x| x > -0.05),
         "money never negative: {left:?}"
@@ -304,10 +361,25 @@ fn writes_the_worked_example() {
     assert!(done <= 12, "done in month {done}");
     assert_eq!(result.tier_recommended, TierId::W2);
     assert_eq!(result.tier_at_plan_end, TierId::W2);
-    // The one sinking fund (the $100 cash reserve) resolves within ceil(100 / 60) = 2 months.
+    // The one sinking fund (the $100 cash reserve) gets half of each month's $60 and resolves
+    // within ceil(100 / 30) = 4 months of its first deposit.
     assert_eq!(lives.len(), 1);
     assert_eq!(lives[0].item_id, "cash_reserve");
-    assert!(lives[0].bought.unwrap() - lives[0].opened <= 2);
+    assert!(lives[0].bought.unwrap() - lives[0].opened < 4);
+    // The fixed-order plan buys the same things by the same month: this household's items all
+    // cost less than a month's money except the cash reserve.
+    let (_, fixed) = run_with(Schedule::FixedOrder);
+    assert_eq!(fixed.plan.done_month, result.plan.done_month);
+    let bought = |r: &BudgetResult| -> Vec<(String, u16)> {
+        let mut v: Vec<(String, u16)> = r
+            .sequence
+            .iter()
+            .map(|p| (p.item_id.as_str().to_owned(), p.month))
+            .collect();
+        v.dedup_by(|a, b| a.0 == b.0);
+        v
+    };
+    assert_eq!(bought(&fixed), bought(&result));
     // Income: 4 months of $4,200 on the savings track, fed by the $60 once supplies are done.
     let s = result.plan.savings_track.as_ref().unwrap();
     assert_eq!(
@@ -386,6 +458,7 @@ fn stub_curves_match_research_section_3_8() {
             "{bucket}: {table} vs {exact}"
         );
     }
-    // At exactly one-in-100 the water target is 3.003 days, one hair over the ladder's 3.
+    // At exactly 1/100 the water target is 3.003 days, one hair over the ladder's 3 (why the
+    // planner maps one_in_100 to −ln(0.9)/10 and lets rounding tolerate 3 % above a step).
     assert!(raw_target(&philadelphia::water_out(), 0.01) > 3.0);
 }

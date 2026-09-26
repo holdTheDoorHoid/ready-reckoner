@@ -8,10 +8,11 @@
 //!    a set not yet bought, or the next chunk of a divisible item (water, food, medicine) up to the
 //!    next step on the day ladder. A later-tier item joins when its value per dollar is at least
 //!    five times the tier's best (promotion). Life-safety items come first, then value per dollar.
-//! 3. **When to buy it** ([`Schedule`]). Strict (default): buy the next item when the money is
-//!    there, otherwise save for it, in an envelope when it costs more than a month's budget. The
-//!    research shortcuts buy the best affordable item instead unless the sinking-fund rule says
-//!    to wait.
+//! 3. **When to buy it** ([`Schedule`]). Split (default): when the next item costs more than the
+//!    month's money, put a share of each month's money into a sinking fund for it and spend the
+//!    rest on the best affordable items; otherwise buy in priority order. Fixed order: buy the next
+//!    item when the money is there, otherwise save everything for it. The research shortcuts buy
+//!    the best affordable item instead unless the sinking-fund rule says to wait.
 //! 4. **Stop** when no tier has a positive-value candidate; later money goes to the savings track.
 //!
 //! Specialised rare-catastrophe items never enter step 2. On opt-in they are bought, in order of
@@ -28,7 +29,9 @@ use crate::coverage::{ContributionTable, CoverageRule, ItemMeta, ItemRole, apply
 use crate::curve::Prepared;
 use crate::explain::{self, DurationText, Lead, ReadinessText, WhyParts};
 use crate::guardrails::{self, Facts};
-use crate::input::{BudgetError, BudgetInput, BudgetResult, MonthCoverage, Purchase, Schedule};
+use crate::input::{
+    BudgetError, BudgetInput, BudgetResult, MonthCoverage, MonthMoney, Purchase, Schedule,
+};
 use crate::savings;
 use crate::value::{
     PROMOTION_FACTOR, RARE_CATASTROPHIC_SHARE, READINESS_MIN_P_NEED_10YR, SINKING_FUND_MAX_MONTHS,
@@ -171,7 +174,6 @@ struct Pick {
     offer: usize,
     /// Index into [`WALK`] of the tier the candidate was valued against.
     ti: usize,
-    qty: f64,
     cost: f64,
     /// The value it is ranked and credited with (includes rarely needed readiness value when it
     /// beats the tier's best).
@@ -207,6 +209,7 @@ enum Event {
     Buy {
         cand: Candidate,
         rare: bool,
+        from_savings: f64,
     },
     Reserve {
         offer: usize,
@@ -214,15 +217,105 @@ enum Event {
         deposit: f64,
         saved: f64,
         needed: f64,
+        how: SaveHow,
+        carried_from: Option<usize>,
     },
 }
 
-/// Money set aside for one item.
-#[derive(Debug, Clone)]
-struct Envelope {
+/// What a sinking fund is for.
+#[derive(Debug, Clone, Copy)]
+struct FundFor {
     offer: usize,
-    qty: f64,
-    saved: f64,
+    cost: f64,
+    tier: TierId,
+}
+
+impl FundFor {
+    fn of(p: &Pick) -> Self {
+        FundFor {
+            offer: p.offer,
+            cost: p.cost,
+            tier: WALK[p.ti],
+        }
+    }
+}
+
+/// The money of one track of the plan (the main plan, or the rare-catastrophe allowance).
+#[derive(Debug, Clone, Default)]
+struct Purse {
+    /// Money free to spend.
+    free: f64,
+    /// Money in the sinking fund.
+    fund: f64,
+    /// What the fund is for; `None` when there is no fund, or its item is no longer needed (the
+    /// money then pays for the next top-priority purchase).
+    target: Option<FundFor>,
+    /// The item the fund money was first put aside for, when it has since moved to another item.
+    carried_from: Option<usize>,
+}
+
+impl Purse {
+    /// Moves `amount` of free money into the fund for `target`, recording the deposit.
+    fn deposit(&mut self, amount: f64, target: FundFor, how: SaveHow, events: &mut Vec<Event>) {
+        // Whole cents and never more than is free, so the plan's lines add up exactly.
+        let wanted = amount.min(self.free).max(0.0);
+        let mut amount = (wanted * 100.0).round() / 100.0;
+        if amount > self.free {
+            amount = (self.free * 100.0).floor() / 100.0;
+        }
+        if amount <= EPS && self.fund <= EPS {
+            // A fund opens only when money goes into it.
+            return;
+        }
+        if let Some(old) = self.target {
+            if old.offer != target.offer && self.fund > EPS {
+                self.carried_from = Some(old.offer);
+            }
+        }
+        self.target = Some(target);
+        if amount <= EPS {
+            return;
+        }
+        self.free -= amount;
+        self.fund += amount;
+        events.push(Event::Reserve {
+            offer: target.offer,
+            tier: target.tier,
+            deposit: amount,
+            saved: self.fund,
+            needed: target.cost,
+            how,
+            carried_from: self.carried_from,
+        });
+    }
+
+    /// Forgets the fund's item (it is no longer needed); the money stays in the fund.
+    fn drop_target(&mut self) {
+        if let Some(t) = self.target.take() {
+            if self.fund > EPS {
+                self.carried_from = Some(t.offer);
+            }
+        }
+    }
+}
+
+/// How a sinking-fund deposit came about, for its explanation.
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum SaveHow {
+    /// Everything on hand, because the next item costs more than a month's money.
+    AllMoney,
+    /// A share of each month's money; the rest buys other items.
+    Share(f64),
+    /// The rare-catastrophe allowance.
+    Rare,
+}
+
+/// What every purchase adds to.
+#[derive(Debug, Default)]
+struct Ledger {
+    sequence: Vec<Purchase>,
+    envelopes: Vec<SavingsEnvelope>,
+    purchase_months: BTreeMap<usize, u16>,
 }
 
 fn run(
@@ -230,6 +323,11 @@ fn run(
     meta: &[ItemMeta],
     rule: &dyn CoverageRule,
 ) -> Result<BudgetResult, BudgetError> {
+    if let Schedule::Split { reserve_share } = input.options.schedule {
+        if !(reserve_share.is_finite() && reserve_share > 0.0 && reserve_share <= 1.0) {
+            return Err(BudgetError::ReserveShare(reserve_share));
+        }
+    }
     for (bucket, curve) in &input.risks.curves {
         if bucket.kind() != BucketKind::Duration {
             return Err(BudgetError::CurveBucket(*bucket));
@@ -349,18 +447,21 @@ fn run(
 
     // ---- Month by month. ----
     let mut events: Vec<Vec<Event>> = Vec::new();
-    let mut sequence: Vec<Purchase> = Vec::new();
     let mut coverage_by_month: Vec<MonthCoverage> = Vec::new();
-    let mut envelopes: Vec<SavingsEnvelope> = Vec::new();
-    let mut purchase_months: BTreeMap<usize, u16> = BTreeMap::new();
-    let mut cash = 0.0_f64;
-    let mut rare_cash = 0.0_f64;
-    let mut env: Option<Envelope> = None;
-    let mut rare_env: Option<Envelope> = None;
+    let mut money_by_month: Vec<MonthMoney> = Vec::new();
+    let mut ledger = Ledger::default();
+    let mut main = Purse::default();
+    let mut rare = Purse::default();
     let mut stopped: Option<u16> = None;
     let schedule = input.options.schedule;
     let future_money = monthly > EPS;
     let mut cache = Cache::new(&ctx);
+    cache.screen_rarely_needed(&ctx, &state);
+    let checklist = readiness_checklist(
+        &ctx,
+        &cache.low_p_ok,
+        input.options.rare_catastrophic_opt_in,
+    );
 
     for m in 0..=input.options.max_months {
         if m > 0 && !future_money {
@@ -374,125 +475,206 @@ fn run(
             RARE_CATASTROPHIC_SHARE
         };
         let rare_new = rare_share * new;
-        cash += new - rare_new;
-        rare_cash += rare_new;
-        // What the main plan receives each month (all of it unless the rare allowance takes 10 %).
+        rare.free += rare_new;
+        main.free += new - rare_new;
+        // What the main plan receives each month (all of it unless the rare allowance takes 10 %),
+        // and what it receives this month (month 0 brings the one-off amount instead).
         let main_monthly = monthly * (1.0 - rare_share);
+        let main_new = new - rare_new;
 
-        // Main track.
+        // Split: at the start of the month, keep the fund's item while it is still worth buying
+        // (or pick the top item if it costs more than this month's money and cannot be bought
+        // now),
+        // then put its share of this month's money into the fund.
+        if let (Schedule::Split { reserve_share }, true, None) = (schedule, future_money, stopped) {
+            if let Some((_, picks)) = cache.ordered(&ctx, &state) {
+                let kept = main
+                    .target
+                    .and_then(|t| picks.iter().find(|p| p.offer == t.offer));
+                let target = match kept {
+                    Some(p) => Some(FundFor::of(p)),
+                    None => {
+                        main.drop_target();
+                        let top = picks[0];
+                        let big =
+                            top.cost > main_new + EPS && top.cost > main.free + main.fund + EPS;
+                        big.then(|| FundFor::of(&top))
+                    }
+                };
+                if let Some(t) = target {
+                    let need = (t.cost - main.fund).max(0.0);
+                    let amount = (reserve_share * main_new).min(need);
+                    main.deposit(amount, t, SaveHow::Share(reserve_share), &mut month_events);
+                }
+            }
+        }
+        let available_usd = main.free;
+        let cheapest_usd = if stopped.is_none() {
+            let target = main.target.map(|t| t.offer);
+            cache.ordered(&ctx, &state).and_then(|(_, picks)| {
+                picks
+                    .iter()
+                    .filter(|p| Some(p.offer) != target)
+                    .map(|p| p.cost)
+                    .reduce(f64::min)
+            })
+        } else {
+            None
+        };
+
+        // Main plan.
         while stopped.is_none() {
             let Some((_, picks)) = cache.ordered(&ctx, &state) else {
                 stopped = Some(m);
                 break;
             };
-            let top = picks[0];
-            // A sinking fund, once started, is kept until the item is bought.
-            let saving_for_top = env.as_ref().is_some_and(|e| e.offer == top.offer);
-            let affordable = |p: &&Pick| p.cost <= cash + EPS;
-            let chosen: Option<Pick> = if top.cost <= cash + EPS {
-                Some(top)
-            } else if !future_money {
-                // No later month brings money: saving is pointless, buy the best that fits.
-                picks.iter().find(affordable).copied()
-            } else if schedule == Schedule::ResearchShortcuts && !saving_for_top {
-                picks.iter().find(affordable).copied().filter(|p| {
-                    let wait = top.cost <= SINKING_FUND_MAX_MONTHS * main_monthly + EPS
-                        && p.density() < SINKING_FUND_VALUE_RATIO * top.density();
-                    !wait
-                })
+            let chosen: Option<(Pick, bool)> = if let Schedule::Split { .. } = schedule {
+                // The fund's item, as soon as the fund (with any free money) covers it. While a
+                // fund is running, or the top item costs more than this month's money, the rest of
+                // the money buys the best affordable items in priority order; otherwise the plan
+                // keeps to the priority order, so a cheap item never delays a better one. Savings
+                // pay only for the fund's item, or for the top item when the fund has no item.
+                let kept = main
+                    .target
+                    .and_then(|t| picks.iter().find(|p| p.offer == t.offer));
+                if main.target.is_some() && kept.is_none() {
+                    main.drop_target();
+                }
+                let (free, fund) = (main.free, main.fund);
+                let top = picks[0];
+                let target = kept.map(|p| p.offer);
+                let savings_for = |pos: usize| {
+                    if target.is_none() && pos == 0 {
+                        fund
+                    } else {
+                        0.0
+                    }
+                };
+                match kept {
+                    Some(p) if p.cost <= free + fund + EPS => Some((*p, true)),
+                    // (With no later money coming, the best item that fits is bought too.)
+                    _ if !future_money || target.is_some() || top.cost > main_new + EPS => picks
+                        .iter()
+                        .enumerate()
+                        .find(|(pos, p)| {
+                            Some(p.offer) != target && p.cost <= free + savings_for(*pos) + EPS
+                        })
+                        .map(|(pos, p)| (*p, savings_for(pos) > 0.0)),
+                    _ => (top.cost <= free + savings_for(0) + EPS).then(|| (top, target.is_none())),
+                }
             } else {
-                None
+                let top = picks[0];
+                // In these schedules the fund is always for the top item; if the order changed,
+                // the money pays for whatever is now at the top.
+                if main.target.is_some_and(|t| t.offer != top.offer) {
+                    main.drop_target();
+                }
+                let saving_for_top = main.target.is_some_and(|t| t.offer == top.offer);
+                let (free, fund) = (main.free, main.fund);
+                // Savings pay only for the top item; everything else is paid from free money.
+                let affordable =
+                    |pos: usize, p: &Pick| p.cost <= free + if pos == 0 { fund } else { 0.0 } + EPS;
+                let first_affordable = || {
+                    picks
+                        .iter()
+                        .enumerate()
+                        .find(|(pos, p)| affordable(*pos, p))
+                        .map(|(pos, p)| (*p, pos == 0))
+                };
+                let chosen = if affordable(0, &top) {
+                    Some((top, true))
+                } else if !future_money {
+                    // No later month brings money: saving is pointless, buy the best that fits.
+                    first_affordable()
+                } else if schedule == Schedule::ResearchShortcuts && !saving_for_top {
+                    first_affordable().filter(|(p, _)| {
+                        let wait = top.cost <= SINKING_FUND_MAX_MONTHS * main_monthly + EPS
+                            && p.density() < SINKING_FUND_VALUE_RATIO * top.density();
+                        !wait
+                    })
+                } else {
+                    None
+                };
+                // Nothing bought: everything on hand goes into the fund for the top item when it
+                // costs more than a month's money (otherwise next month's money buys it).
+                if chosen.is_none() && future_money && top.cost > main_monthly + EPS {
+                    main.deposit(
+                        main.free,
+                        FundFor::of(&top),
+                        SaveHow::AllMoney,
+                        &mut month_events,
+                    );
+                }
+                chosen
             };
             match chosen {
-                Some(pick) => {
+                Some((pick, use_fund)) => {
                     let cand = cache.candidate(&pick);
                     buy(
                         &ctx,
                         &mut state,
-                        &mut cash,
-                        &mut env,
-                        &mut envelopes,
+                        &mut main,
+                        use_fund,
+                        &mut ledger,
                         &cand,
                         m,
                         false,
-                        &mut sequence,
-                        &mut purchase_months,
                         &mut month_events,
                     );
                     cache.invalidate(&ctx, pick.offer);
                 }
-                None => {
-                    if future_money && top.cost > main_monthly + EPS {
-                        save_toward(
-                            &mut env,
-                            top.offer,
-                            top.qty,
-                            WALK[top.ti],
-                            top.cost,
-                            cash,
-                            &mut month_events,
-                        );
-                    }
-                    break;
-                }
+                None => break,
             }
         }
 
         // Rare-catastrophe allowance: its own queue, strictly in order.
         while let Some(next) = rare_queue.last() {
-            if next.cost <= rare_cash + EPS {
+            let (free, fund) = (rare.free, rare.fund);
+            if next.cost <= free + fund + EPS {
                 let cand = rare_queue.pop().expect("checked");
                 buy(
                     &ctx,
                     &mut state,
-                    &mut rare_cash,
-                    &mut rare_env,
-                    &mut envelopes,
+                    &mut rare,
+                    true,
+                    &mut ledger,
                     &cand,
                     m,
                     true,
-                    &mut sequence,
-                    &mut purchase_months,
                     &mut month_events,
                 );
                 continue;
             }
             if !future_money {
-                let fits = rare_queue.iter().rposition(|c| c.cost <= rare_cash + EPS);
+                let fits = rare_queue.iter().rposition(|c| c.cost <= free + EPS);
                 if let Some(pos) = fits {
                     let cand = rare_queue.remove(pos);
                     buy(
                         &ctx,
                         &mut state,
-                        &mut rare_cash,
-                        &mut rare_env,
-                        &mut envelopes,
+                        &mut rare,
+                        false,
+                        &mut ledger,
                         &cand,
                         m,
                         true,
-                        &mut sequence,
-                        &mut purchase_months,
                         &mut month_events,
                     );
                     continue;
                 }
             } else if next.cost > RARE_CATASTROPHIC_SHARE * monthly + EPS {
-                let (offer, qty, tier, cost) = (next.offer, next.qty, next.tier, next.cost);
-                save_toward(
-                    &mut rare_env,
-                    offer,
-                    qty,
-                    tier,
-                    cost,
-                    rare_cash,
-                    &mut month_events,
-                );
+                let target = FundFor {
+                    offer: next.offer,
+                    cost: next.cost,
+                    tier: next.tier,
+                };
+                rare.deposit(rare.free, target, SaveHow::Rare, &mut month_events);
             }
             break;
         }
-        if rare_queue.is_empty() && rare_cash > 0.0 {
-            cash += rare_cash;
-            rare_cash = 0.0;
+        if rare_queue.is_empty() && rare.free + rare.fund > 0.0 {
+            main.free += rare.free + rare.fund;
+            rare = Purse::default();
         }
 
         // Coverage only changes when something is bought.
@@ -502,24 +684,39 @@ fn run(
                 month: m,
                 ..prev.clone()
             },
-            _ => snapshot(&ctx, &state, m),
+            _ => snapshot(&ctx, &state, &checklist, m),
         };
         coverage_by_month.push(snap);
+        money_by_month.push(MonthMoney {
+            month: m,
+            available_usd,
+            saved_usd: main.fund,
+            saving_for: main
+                .target
+                .filter(|_| main.fund > EPS)
+                .map(|t| (ctx.offers[t.offer].item.id.clone(), t.cost)),
+            cheapest_usd,
+        });
         events.push(month_events);
         if stopped.is_some() && rare_queue.is_empty() {
             break;
         }
     }
-    // Envelopes still open when the plan ends are reported with what they hold.
-    for e in [env, rare_env].into_iter().flatten() {
-        if e.saved > EPS {
-            envelopes.push(SavingsEnvelope {
-                item_id: ctx.offers[e.offer].item.id.clone(),
-                saved_usd: money(e.saved),
-                needed_usd: money(e.qty * ctx.offers[e.offer].unit_price),
+    // Funds still open when the plan ends are reported with what they hold.
+    for purse in [&main, &rare] {
+        if let (Some(t), true) = (purse.target, purse.fund > EPS) {
+            ledger.envelopes.push(SavingsEnvelope {
+                item_id: ctx.offers[t.offer].item.id.clone(),
+                saved_usd: money(purse.fund),
+                needed_usd: money(t.cost),
             });
         }
     }
+    let Ledger {
+        sequence,
+        envelopes,
+        purchase_months,
+    } = ledger;
 
     // ---- Assemble the plan. ----
     let mut first = Vec::new();
@@ -528,7 +725,14 @@ fn run(
     first.extend(month0_owned);
     if events.is_empty() {
         events.push(Vec::new());
-        coverage_by_month.push(snapshot(&ctx, &state, 0));
+        coverage_by_month.push(snapshot(&ctx, &state, &checklist, 0));
+        money_by_month.push(MonthMoney {
+            month: 0,
+            available_usd: main.free,
+            saved_usd: main.fund,
+            saving_for: None,
+            cheapest_usd: None,
+        });
     }
     let mut month0 = first;
     month0.append(&mut events[0]);
@@ -536,6 +740,7 @@ fn run(
     while events.len() > 1 && events.last().is_some_and(|e| e.is_empty()) {
         events.pop();
         coverage_by_month.pop();
+        money_by_month.pop();
     }
     let months: Vec<PlanMonth> = events
         .iter()
@@ -561,7 +766,7 @@ fn run(
         savings_track,
     };
 
-    let covered = covered_targets(&ctx, &state);
+    let covered = covered_targets(&ctx, &state, &checklist);
     let facts = guardrail_facts(&ctx, &state, &coverage_by_month, &purchase_months, stopped);
     let warnings = guardrails::check(input.household, input.context, input.risks, &facts);
 
@@ -569,6 +774,7 @@ fn run(
         plan,
         covered,
         coverage_by_month,
+        money_by_month,
         sequence,
         tier_reached: tier_met(&ctx, &so_far.track_cov),
         tier_at_plan_end: tier_met(&ctx, &state.track_cov),
@@ -911,6 +1117,10 @@ struct Cache {
     cap_group: Vec<[u8; WALK.len()]>,
     /// The buying order for the current state, until the next purchase.
     ordered: Option<Option<(TierId, Vec<Pick>)>>,
+    /// Per offer: a capability needed less often than the threshold counts in its value
+    /// (screened once, against the household's position before any purchase; see
+    /// [`Cache::screen_rarely_needed`]).
+    low_p_ok: Vec<bool>,
 }
 
 impl Cache {
@@ -949,6 +1159,38 @@ impl Cache {
                 .filter(|&i| !ctx.offers[i].item.free && !ctx.offers[i].item.rare_catastrophic)
                 .collect(),
             ordered: None,
+            low_p_ok: vec![false; ctx.offers.len()],
+        }
+    }
+
+    /// A capability needed less often than the threshold (DESIGN §4.4) is included when its value
+    /// per dollar beats the best item of its tier. That is decided once, against the household's
+    /// position after the free actions, so what the plan finally includes never depends on the
+    /// order it bought things in (and so never on the budget).
+    fn screen_rarely_needed(&mut self, ctx: &Ctx<'_>, state: &State) {
+        let tier_of = |i: usize| ctx.offers[i].item.tier.max(TierId::H72);
+        for i in self.main.clone() {
+            let k = tier_of(i);
+            let ki = WALK.iter().position(|t| *t == k).unwrap_or(0);
+            let Some(c) = self.slot(ctx, state, i, ki).cloned() else {
+                continue;
+            };
+            if c.low_p <= VALUE_EPS {
+                continue;
+            }
+            let mut best: Option<f64> = None;
+            for j in self.main.clone() {
+                if j == i || tier_of(j) > k {
+                    continue;
+                }
+                if let Some(o) = self.slot(ctx, state, j, ki) {
+                    if o.core > VALUE_EPS {
+                        let d = density(o.core, o.cost);
+                        best = Some(best.map_or(d, |b| b.max(d)));
+                    }
+                }
+            }
+            self.low_p_ok[i] = best.is_some_and(|b| density(c.core + c.low_p, c.cost) > b);
         }
     }
 
@@ -998,43 +1240,28 @@ impl Cache {
         let main = std::mem::take(&mut self.main);
         let mut result = None;
         for (ki, &k) in WALK.iter().enumerate() {
-            // (offer, core, low-P readiness value, cost, qty) for tier k.
-            let mut evals: Vec<(usize, f64, f64, f64, f64)> = Vec::new();
+            // Candidates of tier k with their value: duration value plus readiness value, where a
+            // capability needed less often than the threshold counts only if it passed the
+            // screening (DESIGN §4.4).
+            let mut picks: Vec<Pick> = Vec::new();
             for &i in main.iter().filter(|&&i| unlocked(i, k)) {
+                let low_p_ok = self.low_p_ok[i];
                 if let Some(c) = self.slot(ctx, state, i, ki) {
-                    evals.push((i, c.core, c.low_p, c.cost, c.qty));
+                    let value = c.core + if low_p_ok { c.low_p } else { 0.0 };
+                    if value > VALUE_EPS {
+                        picks.push(Pick {
+                            offer: i,
+                            ti: ki,
+                            cost: c.cost,
+                            value,
+                            promoted: false,
+                        });
+                    }
                 }
             }
-            let best = evals
-                .iter()
-                .filter(|e| e.1 > VALUE_EPS)
-                .map(|e| density(e.1, e.3))
-                .fold(None, |acc: Option<f64>, d| {
-                    Some(acc.map_or(d, |a| a.max(d)))
-                });
-            let Some(best) = best else {
+            let Some(best) = picks.iter().map(Pick::density).reduce(f64::max) else {
                 continue;
             };
-            let mut picks: Vec<Pick> = Vec::new();
-            for &(offer, core, low_p, cost, qty) in &evals {
-                // A capability needed less often than the threshold joins only when it beats the
-                // tier's best item on value per dollar (DESIGN §4.4).
-                let value = if low_p > VALUE_EPS && density(core + low_p, cost) > best {
-                    core + low_p
-                } else if core > VALUE_EPS {
-                    core
-                } else {
-                    continue;
-                };
-                picks.push(Pick {
-                    offer,
-                    ti: ki,
-                    qty,
-                    cost,
-                    value,
-                    promoted: false,
-                });
-            }
             // Promotion: a later-tier item at least five times the tier's best per dollar joins,
             // valued at the first later tier where it qualifies. Tiers at which an offer's capped
             // targets do not change give the same valuation, so only one of them is looked at.
@@ -1049,15 +1276,15 @@ impl Cache {
                         continue;
                     }
                     last_group = Some(self.cap_group[i][tj]);
+                    let low_p_ok = self.low_p_ok[i];
                     if let Some(c) = self.slot(ctx, state, i, tj) {
-                        if c.core > VALUE_EPS && density(c.core, c.cost) >= PROMOTION_FACTOR * best
-                        {
+                        let value = c.core + if low_p_ok { c.low_p } else { 0.0 };
+                        if value > VALUE_EPS && density(value, c.cost) >= PROMOTION_FACTOR * best {
                             picks.push(Pick {
                                 offer: i,
                                 ti: tj,
-                                qty: c.qty,
                                 cost: c.cost,
-                                value: c.core,
+                                value,
                                 promoted: true,
                             });
                             break;
@@ -1099,31 +1326,41 @@ fn apply(ctx: &Ctx<'_>, state: &mut State, cand: &Candidate) {
     }
 }
 
+/// Buys `cand` with money from `purse`: from the fund first when `use_fund`, the rest from free
+/// money.
 #[allow(clippy::too_many_arguments)]
 fn buy(
     ctx: &Ctx<'_>,
     state: &mut State,
-    cash: &mut f64,
-    env: &mut Option<Envelope>,
-    envelopes: &mut Vec<SavingsEnvelope>,
+    purse: &mut Purse,
+    use_fund: bool,
+    ledger: &mut Ledger,
     cand: &Candidate,
     month: u16,
     rare: bool,
-    sequence: &mut Vec<Purchase>,
-    purchase_months: &mut BTreeMap<usize, u16>,
     events: &mut Vec<Event>,
 ) {
-    if let Some(e) = env.take() {
-        if e.offer == cand.offer {
-            envelopes.push(SavingsEnvelope {
-                item_id: ctx.offers[e.offer].item.id.clone(),
-                saved_usd: money(e.saved),
-                needed_usd: money(cand.cost),
-            });
-        }
-        // Money in an envelope for another item stays in `cash`; the envelope simply closes.
+    let from_savings = if use_fund {
+        purse.fund.min(cand.cost)
+    } else {
+        0.0
+    };
+    purse.fund -= from_savings;
+    purse.free = (purse.free - (cand.cost - from_savings)).max(0.0);
+    if purse.fund <= EPS {
+        purse.fund = 0.0;
     }
-    *cash = (*cash - cand.cost).max(0.0);
+    if purse.target.is_some_and(|t| t.offer == cand.offer) || purse.fund == 0.0 {
+        purse.target = None;
+        purse.carried_from = None;
+    }
+    if from_savings > EPS {
+        ledger.envelopes.push(SavingsEnvelope {
+            item_id: ctx.offers[cand.offer].item.id.clone(),
+            saved_usd: money(from_savings),
+            needed_usd: money(cand.cost),
+        });
+    }
     if rare {
         // The rare-catastrophe allowance never changes what the main plan sees, so its timing
         // (which depends on the budget) cannot reorder the main plan.
@@ -1131,12 +1368,13 @@ fn buy(
     } else {
         apply(ctx, state, cand);
     }
-    purchase_months.entry(cand.offer).or_insert(month);
-    sequence.push(Purchase {
+    ledger.purchase_months.entry(cand.offer).or_insert(month);
+    ledger.sequence.push(Purchase {
         month,
         item_id: ctx.offers[cand.offer].item.id.clone(),
         quantity: cand.qty,
         cost_usd: cand.cost,
+        from_savings_usd: from_savings,
         value: cand.value,
         tier: cand.tier,
         promoted: cand.promoted,
@@ -1145,45 +1383,16 @@ fn buy(
     events.push(Event::Buy {
         cand: cand.clone(),
         rare,
+        from_savings,
     });
 }
 
-/// Puts everything on hand toward an item (a sinking fund), recording this month's deposit. An
-/// envelope opens only when money goes into it.
-fn save_toward(
-    env: &mut Option<Envelope>,
-    offer: usize,
-    qty: f64,
-    tier: TierId,
-    cost: f64,
-    cash: f64,
-    events: &mut Vec<Event>,
-) {
-    let previous = match env {
-        Some(e) if e.offer == offer => e.saved,
-        _ => 0.0,
-    };
-    let deposit = cash - previous;
-    if cash <= EPS {
-        return;
-    }
-    *env = Some(Envelope {
-        offer,
-        qty,
-        saved: cash,
-    });
-    if deposit > EPS {
-        events.push(Event::Reserve {
-            offer,
-            tier,
-            deposit,
-            saved: cash,
-            needed: cost,
-        });
-    }
-}
-
-fn snapshot(ctx: &Ctx<'_>, state: &State, month: u16) -> MonthCoverage {
+fn snapshot(
+    ctx: &Ctx<'_>,
+    state: &State,
+    checklist: &[Vec<BucketId>],
+    month: u16,
+) -> MonthCoverage {
     let h = ctx.input.household;
     let mut days = BTreeMap::new();
     for b in BucketId::ALL
@@ -1209,11 +1418,8 @@ fn snapshot(ctx: &Ctx<'_>, state: &State, month: u16) -> MonthCoverage {
         .iter()
         .filter(|b| b.kind() != BucketKind::Duration)
     {
-        let n = ctx
-            .offers
-            .iter()
-            .enumerate()
-            .filter(|(i, o)| o.item.buckets.contains(b) && state.owned[*i] > 0.0)
+        let n = (0..ctx.offers.len())
+            .filter(|&i| checklist[i].contains(b) && state.owned[i] > 0.0)
             .count();
         readiness_done.insert(*b, n as u32);
     }
@@ -1234,13 +1440,23 @@ fn plan_items(ctx: &Ctx<'_>, events: &[Event]) -> Vec<PlanItem> {
     // Merge Buy events per (offer, rare) into the first occurrence.
     let mut merged: Vec<Event> = Vec::new();
     for e in events {
-        if let Event::Buy { cand, rare } = e {
+        if let Event::Buy {
+            cand,
+            rare,
+            from_savings,
+        } = e
+        {
             let found = merged.iter_mut().find_map(|m| match m {
-                Event::Buy { cand: c, rare: r } if c.offer == cand.offer && r == rare => Some(c),
+                Event::Buy {
+                    cand: c,
+                    rare: r,
+                    from_savings: f,
+                } if c.offer == cand.offer && r == rare => Some((c, f)),
                 _ => None,
             });
-            if let Some(c) = found {
+            if let Some((c, f)) = found {
                 merge_into(c, cand);
+                *f += from_savings;
                 continue;
             }
         }
@@ -1304,13 +1520,17 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
             }
             item
         }
-        Event::Buy { cand, rare } => {
+        Event::Buy {
+            cand,
+            rare,
+            from_savings,
+        } => {
             let lead = if *rare {
                 Lead::RareAllowance
             } else {
                 Lead::Purchase
             };
-            line(
+            let mut item = line(
                 ctx,
                 cand,
                 PlanItemKind::Purchase,
@@ -1318,7 +1538,14 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
                 lead,
                 false,
                 None,
-            )
+            );
+            if *from_savings > 0.005 {
+                item.why.push_str(&format!(
+                    " Paid with {} saved in earlier months.",
+                    explain::dollars(*from_savings)
+                ));
+            }
+            item
         }
         Event::Reserve {
             offer,
@@ -1326,16 +1553,45 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
             deposit,
             saved,
             needed,
+            how,
+            carried_from,
         } => {
             let item = ctx.offers[*offer].item;
-            let why = format!(
-                "Sets aside {} toward {} ({} of {} saved). It costs more than a month's budget, so \
-                 the plan saves for it instead of buying something worth less.",
+            let (deposit_s, name, saved_s, needed_s) = (
                 explain::dollars(*deposit),
                 lower_first(&item.name),
                 explain::dollars(*saved),
                 explain::dollars(*needed),
             );
+            let mut why = match how {
+                SaveHow::AllMoney => format!(
+                    "Sets aside {deposit_s} toward {name} ({saved_s} of {needed_s} saved). It costs \
+                     more than a month's budget, so the plan saves for it instead of buying \
+                     something worth less."
+                ),
+                SaveHow::Share(share) => {
+                    let part = if (share - 0.5).abs() < 1e-9 {
+                        "half".to_owned()
+                    } else {
+                        format!("{:.0}%", share * 100.0)
+                    };
+                    format!(
+                        "Sets aside {deposit_s} toward {name} ({saved_s} of {needed_s} saved). It \
+                         costs more than a month's budget, so the plan puts {part} of each month's \
+                         money toward it and spends the rest on other items."
+                    )
+                }
+                SaveHow::Rare => format!(
+                    "Sets aside {deposit_s} from your rare-emergency allowance toward {name} \
+                     ({saved_s} of {needed_s} saved)."
+                ),
+            };
+            if let Some(from) = carried_from {
+                why.push_str(&format!(
+                    " This includes money first saved for {}, which the plan no longer needs.",
+                    lower_first(&ctx.offers[*from].item.name)
+                ));
+            }
             PlanItem {
                 item_id: item.id.clone(),
                 name: format!("Save toward: {}", item.name),
@@ -1544,7 +1800,47 @@ fn hazards_for(ctx: &Ctx<'_>, cand: &Candidate) -> Vec<HazardId> {
     list.into_iter().take(3).map(|(h, _)| h).collect()
 }
 
-fn covered_targets(ctx: &Ctx<'_>, state: &State) -> BTreeMap<BucketId, Target> {
+/// The checklist of each readiness (and money) bucket, as buckets per offer: the free actions that
+/// name it, the items whose readiness credit for it counts (needed often enough, or screened in),
+/// and, with the opt-in, the specialised rare-catastrophe items that name it. An item bought for
+/// another need that merely lists the bucket is not a step on its checklist.
+fn readiness_checklist(ctx: &Ctx<'_>, low_p_ok: &[bool], rare_opt_in: bool) -> Vec<Vec<BucketId>> {
+    let named = |o: &Offer<'_>| -> Vec<BucketId> {
+        o.item
+            .buckets
+            .iter()
+            .copied()
+            .filter(|b| b.kind() != BucketKind::Duration)
+            .collect()
+    };
+    ctx.offers
+        .iter()
+        .enumerate()
+        .map(|(i, o)| {
+            if o.item.free || (o.item.rare_catastrophic && rare_opt_in) {
+                named(o)
+            } else if o.item.rare_catastrophic {
+                Vec::new()
+            } else {
+                let mut out: Vec<BucketId> = Vec::new();
+                for &(b, _) in &o.readiness {
+                    let counts =
+                        ctx.input.risks.p_need_10yr(b) >= READINESS_MIN_P_NEED_10YR || low_p_ok[i];
+                    if counts && !out.contains(&b) {
+                        out.push(b);
+                    }
+                }
+                out
+            }
+        })
+        .collect()
+}
+
+fn covered_targets(
+    ctx: &Ctx<'_>,
+    state: &State,
+    checklist: &[Vec<BucketId>],
+) -> BTreeMap<BucketId, Target> {
     let h = ctx.input.household;
     let risks = ctx.input.risks;
     let mut out = BTreeMap::new();
@@ -1578,16 +1874,9 @@ fn covered_targets(ctx: &Ctx<'_>, state: &State) -> BTreeMap<BucketId, Target> {
                 }
             }
             _ => {
-                let of = ctx
-                    .offers
-                    .iter()
-                    .filter(|o| o.item.buckets.contains(b))
-                    .count();
-                let done = ctx
-                    .offers
-                    .iter()
-                    .enumerate()
-                    .filter(|(i, o)| o.item.buckets.contains(b) && state.owned[*i] > 0.0)
+                let of = checklist.iter().filter(|c| c.contains(b)).count();
+                let done = (0..ctx.offers.len())
+                    .filter(|&i| checklist[i].contains(b) && state.owned[i] > 0.0)
                     .count();
                 out.insert(
                     *b,

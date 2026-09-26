@@ -252,10 +252,19 @@ pub fn random_curve(g: &mut Gen) -> BucketCurve {
         lambda.push(l);
         l *= g.range(0.2, 1.0);
     }
-    let target = g.pick(&[
-        0.0, 0.5, 1.0, 2.0, 3.0, 3.0, 5.0, 7.0, 10.0, 14.0, 14.0, 21.0, 30.0, 45.0, 90.0,
-    ]);
-    BucketCurve::new(GRID.to_vec(), lambda, target)
+    // The target is set the way rr-consequence sets it: the smallest day-ladder value whose Λ is at
+    // most the dial's rate (DESIGN §4.4), so Λ is above zero everywhere below the target. One
+    // bucket in ten has no target at all.
+    let mut curve = BucketCurve::new(GRID.to_vec(), lambda, 0.0);
+    if !g.chance(0.1) {
+        let dial = g.pick(&[0.1, 0.02, 0.010_536, 0.002]);
+        curve.target_days = rr_types::TARGET_LADDER_DAYS
+            .iter()
+            .map(|&d| f64::from(d))
+            .find(|&d| curve.lambda_at(d) <= dial)
+            .unwrap_or(365.0);
+    }
+    curve
 }
 
 fn risks(g: &mut Gen) -> Risks {
