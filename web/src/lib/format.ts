@@ -180,6 +180,22 @@ export function rangeOnly(rateLow: number, rateHigh: number, years: number): str
   return a === b ? `about ${a}` : `between ${a} and ${b}`;
 }
 
+/**
+ * A chance cut into pieces for display, so that "1 in 2,000" and a range like "(63–98)" can be kept
+ * on one line: `kind` is 'one_in' or 'range' for those pieces and '' for the rest.
+ */
+export function chancePieces(s: string): { text: string; kind: '' | 'one_in' | 'range' }[] {
+  const out: { text: string; kind: '' | 'one_in' | 'range' }[] = [];
+  let last = 0;
+  for (const m of s.matchAll(/1 in [\d,]+|\(\d[\d,]*–\d[\d,]*\)/g)) {
+    if (m.index > last) out.push({ text: s.slice(last, m.index), kind: '' });
+    out.push({ text: m[0], kind: m[0].startsWith('(') ? 'range' : 'one_in' });
+    last = m.index + m[0].length;
+  }
+  if (last < s.length) out.push({ text: s.slice(last), kind: '' });
+  return out;
+}
+
 /** The expert-view percentage: at most two significant figures. */
 export function percent(p: number): string {
   const v = p * 100;

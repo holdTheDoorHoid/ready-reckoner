@@ -11,6 +11,7 @@
   import { jumpTo } from '../lib/anchors';
   import { chanceShort, chanceWithin, CONFIDENCE_LABELS, perYearWords, rangeOnly } from '../lib/format';
   import { NUCLEAR_NOTE } from '../lib/labels';
+  import Chance from './Chance.svelte';
   import SeveritySwatch from './SeveritySwatch.svelte';
 
   let { ranked, rare, years }: { ranked: HazardProfile[]; rare: HazardProfile[]; years: number } = $props();
@@ -53,7 +54,9 @@
             <a id="matrix-{h.id}" href="#hazard-{h.id}" onclick={(e) => go(e, `hazard-${h.id}`, 'h3')}>{h.name}</a>
           </th>
           <td>
-            {likely(h)}<span class="per-year"><span class="visually-hidden">{'; '}</span>{perYearWords(h.rate_per_year, h.annual_probability)}</span>
+            <Chance text={likely(h)} /><span class="per-year"
+              ><span class="visually-hidden">{'; '}</span><Chance text={perYearWords(h.rate_per_year, h.annual_probability)} /></span
+            >
           </td>
           <td><SeveritySwatch severity={h.severity} /></td>
           <td>{CONFIDENCE_LABELS[h.confidence]}</td>
@@ -68,7 +71,7 @@
         {#each rare as h (h.id)}
           <tr>
             <th scope="row"><a id="matrix-{h.id}" href="#rare-title" onclick={(e) => go(e, 'rare-title')}>{h.name}</a></th>
-            <td>{rangeOnly(h.rate_range[0], h.rate_range[1], years)}</td>
+            <td><Chance text={rangeOnly(h.rate_range[0], h.rate_range[1], years)} /></td>
             <td><SeveritySwatch severity={h.severity} /></td>
             <td>{CONFIDENCE_LABELS[h.confidence]}</td>
           </tr>
@@ -92,9 +95,10 @@
   table {
     table-layout: auto;
   }
+  /* Words wrap whole; a word breaks only if it cannot fit its column at all. */
   th,
   td {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
   thead th {
     white-space: normal;
@@ -128,13 +132,25 @@
   .note {
     margin-top: var(--s2);
   }
+  /* Phones: four columns still, with tighter cells and the severity swatch above its word. */
   @media (max-width: 30rem) {
     th,
     td {
-      padding: 0.4rem 0.3rem;
+      padding: 0.4rem 0.25rem;
     }
     .rank {
       min-width: 1.4em;
+    }
+    td :global(.severity) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2em;
+    }
+  }
+  /* The smallest phones (360 px and less): slightly smaller type keeps every word whole. */
+  @media (max-width: 23rem) {
+    table {
+      font-size: 0.8125rem;
     }
   }
   @media print {

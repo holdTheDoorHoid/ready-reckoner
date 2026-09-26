@@ -10,6 +10,7 @@
   import { jumpTo } from '../lib/anchors';
   import { rangeOnly } from '../lib/format';
   import { NUCLEAR_NOTE } from '../lib/labels';
+  import Chance from './Chance.svelte';
   import ExplainButton from './ExplainButton.svelte';
   import SeveritySwatch from './SeveritySwatch.svelte';
   import Sources from './Sources.svelte';
@@ -41,7 +42,7 @@
           {#each hazards as h (h.id)}
             <tr>
               <th scope="row">{h.name}</th>
-              <td>{rangeOnly(h.rate_range[0], h.rate_range[1], years)}</td>
+              <td><Chance text={rangeOnly(h.rate_range[0], h.rate_range[1], years)} /></td>
               <td><SeveritySwatch severity={h.severity} /></td>
             </tr>
           {/each}

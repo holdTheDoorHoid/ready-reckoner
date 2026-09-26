@@ -30,6 +30,7 @@
     doneMonth?: number;
   } = $props();
 
+  const upperFirst = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
   const pct = $derived(track && track.target_months > 0 ? Math.min(100, (track.current_months / track.target_months) * 100) : 0);
   const milestone = $derived(track ? nextMilestone(track, planningDate, doneMonth) : null);
 </script>
@@ -70,7 +71,7 @@
         >
           <div class="meter__fill" style:width="{pct}%"></div>
         </div>
-        <p class="small"><strong>{monthsPhrase(track.current_months)}</strong> saved so far.</p>
+        <p class="small"><strong>{upperFirst(monthsPhrase(track.current_months))}</strong> saved so far.</p>
         <p class="small">{track.why}</p>
         <footer class="foot">
           <ExplainButton kind="bucket" id="income" />

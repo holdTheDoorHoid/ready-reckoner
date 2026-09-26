@@ -158,6 +158,11 @@ describe('the Risks cards and targets', () => {
     expect(text(r.target)).not.toContain('Something longer reaches');
   });
 
+  it('the savings card starts its sentences with a capital', async () => {
+    const { r } = await screenWith(Risks, 'risks');
+    expect(text(r.target.querySelector('[data-bucket="income"]'))).toContain('Half a month saved so far.');
+  });
+
   it('the evacuate card says "1 minute" (W1)', async () => {
     const { r } = await screenWith(Risks, 'risks');
     expect(text(r.target)).toContain('Notice could be 1 minute to 3 days');
@@ -169,6 +174,8 @@ describe('the Risks cards and targets', () => {
     const helps = (id: string) => text(r.target.querySelector(`#hazard-${id} .helps`));
     expect(helps('heat_wave')).not.toMatch(/warm room/i);
     expect(helps('heat_wave')).toMatch(/cool room/i);
+    // Towels are an assumed everyday basic: the card says the household has them, not a price.
+    expect(helps('heat_wave')).toContain('towels to wet and cool down (have it)');
     expect(helps('cold_wave')).toMatch(/warm room/i);
     expect(helps('cold_wave')).not.toMatch(/fan|cool room/i);
     expect(helps('medical_emergency')).toMatch(/^What helps: family first-aid kit \(\$\d+\), bleeding-control kit/);

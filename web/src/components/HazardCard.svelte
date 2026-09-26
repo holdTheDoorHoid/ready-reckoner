@@ -30,6 +30,12 @@
   /** The hazard's own sources, then those behind the prices in "What helps". */
   const sourceIds = $derived([...hazard.sources, ...helps.slice(0, 3).flatMap((i) => (i.kind === 'free_action' ? [] : itemSourceIds(app.catalogue, app.result.output, i.item_id)))]);
   const TIER_WORDS = { natural: 'Nature', societal: 'Society', personal: 'Household' } as const;
+
+  /** "free", "$34", or, for what the household already has or has done, "have it" / "done" rather than a price. */
+  function helpNote(item: PlanItem): string {
+    if (item.done) return item.kind === 'free_action' ? 'done' : 'have it';
+    return item.kind === 'free_action' ? 'free' : usd(item.est_cost_usd);
+  }
 </script>
 
 <article class="hazard card" class:featured id="hazard-{hazard.id}" aria-labelledby="{uid}-name">
@@ -64,7 +70,7 @@
   {#if helps.length}
     <p class="small helps">
       <strong>What helps:</strong>
-      {#each keyedItems(helps.slice(0, 3)) as { key, item }, i (key)}{i > 0 ? ', ' : ''}{lowerFirst(item.name)} ({item.kind === 'free_action' ? 'free' : usd(item.est_cost_usd)}){/each}.
+      {#each keyedItems(helps.slice(0, 3)) as { key, item }, i (key)}{i > 0 ? ', ' : ''}{lowerFirst(item.name)} ({helpNote(item)}){/each}.
       <a href={href('plan')}>See it in your plan</a>
     </p>
   {/if}

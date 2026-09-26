@@ -4,6 +4,7 @@ import { golden } from '../test/real';
 import {
   addMonths,
   band,
+  chancePieces,
   chanceShort,
   chanceWithin,
   dayPhrase,
@@ -191,6 +192,22 @@ describe('short chances for tables, worded as the engine words them', () => {
     expect(perYearWords(0.2, 1 - Math.exp(-0.2))).toBe('about 1 in 6 a year');
     expect(perYearWords(0.00524, 1 - Math.exp(-0.00524))).toBe('about 1 in 190 a year');
     expect(perYearWords(0.00005, 1 - Math.exp(-0.00005))).toBe('about 1 in 20,000 a year');
+  });
+
+  it('marks "1 in N" and short numeric ranges so a narrow column keeps them on one line', () => {
+    expect(chancePieces('between 1 in 200 and 1 in 41')).toEqual([
+      { text: 'between ', kind: '' },
+      { text: '1 in 200', kind: 'one_in' },
+      { text: ' and ', kind: '' },
+      { text: '1 in 41', kind: 'one_in' },
+    ]);
+    expect(chancePieces('about 86 (63–98) of 100')).toEqual([
+      { text: 'about 86 ', kind: '' },
+      { text: '(63–98)', kind: 'range' },
+      { text: ' of 100', kind: '' },
+    ]);
+    expect(chancePieces('nearly every household')).toEqual([{ text: 'nearly every household', kind: '' }]);
+    expect(chancePieces('about 1 in 20,000 a year').map((p) => p.text).join('')).toBe('about 1 in 20,000 a year');
   });
 
   it('shows a rare catastrophe as a range only, in words when it spans more than 1,000 times (H-02)', () => {
