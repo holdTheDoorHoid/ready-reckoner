@@ -205,18 +205,28 @@ pub fn assess(
     rates.extend(societal::assess(&ctx, &mut notes));
     rates.extend(personal::assess(&ctx, &mut notes));
     rates.sort_by_key(|r| r.hazard);
-    for (h, what) in [
-        (HazardId::HeatWave, "Heat waves"),
-        (HazardId::ColdWave, "Cold waves"),
-    ] {
-        if rates.iter().any(|r| r.hazard == h) {
-            if let Some(why) = severity::at_risk_reason(input, h) {
-                notes.add(format!(
-                    "{what} are marked Serious for this household because {why}; they are most \
-                     dangerous for households like yours."
-                ));
-            }
-        }
+    // Heat and cold waves marked Serious for a household at risk: one note when the reason is the
+    // same for both (someone 65 or older), otherwise one each.
+    let reason = |h: HazardId| {
+        rates
+            .iter()
+            .any(|r| r.hazard == h)
+            .then(|| severity::at_risk_reason(input, h))
+            .flatten()
+    };
+    let (heat, cold) = (reason(HazardId::HeatWave), reason(HazardId::ColdWave));
+    let marked = match (heat, cold) {
+        (Some(h), Some(c)) if h == c => vec![("Heat and cold waves", h)],
+        (h, c) => [("Heat waves", h), ("Cold waves", c)]
+            .into_iter()
+            .filter_map(|(what, why)| why.map(|w| (what, w)))
+            .collect(),
+    };
+    for (what, why) in marked {
+        notes.add(format!(
+            "{what} are marked Serious for this household because {why}; they are most \
+             dangerous for households like yours."
+        ));
     }
 
     // rr-consequence gets each hazard's full rate; a named scenario is an extra event class

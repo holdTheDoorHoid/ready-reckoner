@@ -275,20 +275,21 @@ fn the_packet_stays_short() {
                 "{name}: topic {t}"
             );
         }
-        // The first twelve months in detail; later months in the table.
+        // The first six months in detail; later months with a step in them in the table.
         for m in rr_plan::packet::DETAIL_MONTHS..=120 {
             assert!(
                 !p.contains(&format!("**Month {m} (from ")),
                 "{name}: month {m} in detail"
             );
         }
-        let later = out
-            .plan
-            .months
-            .iter()
-            .any(|m| m.index >= rr_plan::packet::DETAIL_MONTHS && !m.items.is_empty());
+        let later = out.plan.months.iter().any(|m| {
+            m.index >= rr_plan::packet::DETAIL_MONTHS
+                && m.items
+                    .iter()
+                    .any(|i| !i.done && i.kind != rr_types::PlanItemKind::Reserve)
+        });
         assert_eq!(
-            p.contains("### After the first year"),
+            p.contains("### Later months"),
             later,
             "{name}: the table of later months"
         );
@@ -308,51 +309,80 @@ fn the_packet_stays_short() {
     }
 }
 
-/// Hazard cards: at most six of the likeliest hazards (each with at least a 10 in 100 chance in
-/// ten years), plus the hazard of a named scenario the plan includes.
+/// Hazard cards (review S3): the likeliest hazards, house fire always, every hazard that can kill
+/// (Severe or worse, fast, or meeting this home) from a 1 in 100 chance in ten years, and the
+/// hazard of a named scenario the plan includes; at most nine, most likely first.
 #[test]
-fn hazard_cards_are_the_likeliest_six_and_named_scenarios() {
+fn hazard_cards_follow_the_life_safety_rule() {
+    use rr_plan::packet::{
+        CARD_MIN_P10, FREQUENT_CARDS, HAZARD_CARDS, LIFE_SAFETY_MIN_P10, SEVERE,
+    };
     for (name, input, out) in outputs() {
         let a = common::run(input);
         let p = &out.packet_markdown;
         let risks =
             &p[p.find("\n## Your risks\n").unwrap()..p.find("\n## Your targets\n").unwrap()];
-        let cards: Vec<&str> = risks
+        let cards: Vec<&rr_types::HazardProfile> = risks
             .lines()
             .filter_map(|l| l.strip_prefix("#### "))
             .filter_map(|l| l.split_once(". ").map(|(_, t)| t))
+            .map(|c| {
+                a.hazards
+                    .profiles
+                    .iter()
+                    .find(|p| p.name == c)
+                    .unwrap_or_else(|| panic!("{name}: card {c}"))
+            })
             .collect();
-        let scenario_hazards: Vec<&str> = a
+        let p10 = |p: &rr_types::HazardProfile| -rr_types::math::exp_m1(-10.0 * p.rate_per_year);
+        let scenario: Vec<rr_types::HazardId> = a
             .hazards
             .scenarios
             .iter()
             .filter(|s| s.on)
-            .filter_map(|s| a.hazards.profiles.iter().find(|p| p.id == s.hazard))
-            .map(|p| p.name.as_str())
+            .map(|s| s.hazard)
             .collect();
-        let ranked = cards
-            .iter()
-            .filter(|c| !scenario_hazards.contains(c))
-            .count();
-        assert!(ranked <= rr_plan::packet::HAZARD_CARDS, "{name}: {cards:?}");
-        for c in &cards {
-            let prof = a
+        let protected = |p: &rr_types::HazardProfile| {
+            p.id == rr_types::HazardId::HouseFire
+                || scenario.contains(&p.id)
+                || (p10(p) >= LIFE_SAFETY_MIN_P10 && p.severity >= SEVERE)
+        };
+        assert!(cards.len() <= HAZARD_CARDS, "{name}: {} cards", cards.len());
+        // Every card has a reason; house fire, Severe hazards and scenario hazards always do.
+        let ranked: Vec<&rr_types::HazardProfile> = {
+            let mut v: Vec<&rr_types::HazardProfile> = a
                 .hazards
                 .profiles
                 .iter()
-                .find(|p| p.name == *c)
-                .unwrap_or_else(|| panic!("{name}: card {c}"));
-            let p10 = -rr_types::math::exp_m1(-10.0 * prof.rate_per_year);
+                .filter(|p| p.display == rr_types::HazardDisplay::Ranked)
+                .collect();
+            v.sort_by(|x, y| y.rate_per_year.total_cmp(&x.rate_per_year));
+            v
+        };
+        let frequent: Vec<rr_types::HazardId> = ranked
+            .iter()
+            .filter(|p| p10(p) >= CARD_MIN_P10)
+            .take(FREQUENT_CARDS)
+            .map(|p| p.id)
+            .collect();
+        for c in &cards {
             assert!(
-                p10 >= rr_plan::packet::CARD_MIN_P10 || scenario_hazards.contains(c),
-                "{name}: {c} at {p10}"
+                protected(c) || frequent.contains(&c.id) || (p10(c) >= LIFE_SAFETY_MIN_P10),
+                "{name}: {} has no reason for a card",
+                c.name
             );
         }
-        for s in &scenario_hazards {
+        for p in ranked.iter().filter(|p| protected(p)) {
             assert!(
-                cards.contains(s),
-                "{name}: the scenario hazard {s} has a card"
+                cards.iter().any(|c| c.id == p.id),
+                "{name}: {} ({}) has no card",
+                p.name,
+                p.severity
             );
+        }
+        // Most likely first.
+        for w in cards.windows(2) {
+            assert!(w[0].rate_per_year >= w[1].rate_per_year, "{name}: order");
         }
     }
 }

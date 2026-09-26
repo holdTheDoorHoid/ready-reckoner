@@ -1,48 +1,83 @@
-//! Section 2: your risks. Cards for the hazards most likely to reach the household (at most six,
-//! by household rate, among those with at least a 10 in 100 chance in ten years) plus the hazard
-//! of any named scenario the plan includes, each with its guidance block; every other hazard as
-//! one row of a table (those under 1 in 100 share one line); the rare-and-catastrophic box with
-//! likelihood and severity as separate columns; and the plain caveats behind the numbers.
+//! Section 2: your risks. Cards for the hazards a household most needs to know about, each with
+//! its guidance block: the likeliest ones, and the ones that kill (house fire always; any hazard
+//! rated Severe or worse, or one that strikes with minutes of warning, or one this home is
+//! exposed to, from a 1 in 100 chance in ten years; the hazard of any named scenario the plan
+//! includes). Every other hazard is one row of a table (those under 1 in 100 share one line);
+//! then the rare-and-catastrophic box with likelihood and severity as separate columns, and the
+//! plain caveats behind the numbers.
 
 use rr_content::Guidance;
-use rr_types::{BucketId, HazardDisplay, HazardProfile};
+use rr_types::{HazardDisplay, HazardId, HazardProfile, HousingKind, Mobility};
 
 use super::text::{self, md};
 use super::{Ctx, cite_all};
 
-/// At most this many hazards get a card (named scenarios come on top).
-pub const CARDS: usize = 6;
+/// At most this many hazards get a card in all; the least severe of the likeliest ones make room
+/// first, and house fire, Severe hazards and named scenarios' hazards are never dropped.
+pub const CARDS: usize = 9;
 
-/// A hazard gets a card only with at least this chance of reaching the household in ten years.
+/// The likeliest hazards: at most this many, each with at least [`CARD_MIN_P10`].
+pub const FREQUENT_CARDS: usize = 6;
+
+/// A hazard is one of the likeliest only with at least this chance of reaching the household in
+/// ten years.
 pub const CARD_MIN_P10: f64 = 0.10;
 
-/// What a consequence bucket means for a household, mid-sentence.
-pub(crate) fn bucket_effect(b: BucketId) -> &'static str {
-    match b {
-        BucketId::Power => "no power",
-        BucketId::WaterBoil => "boil-water notices",
-        BucketId::WaterOut => "no tap water",
-        BucketId::Supplies => "no way to get to a store",
-        BucketId::Thermal => "dangerous heat or cold at home",
-        BucketId::Medication => "gaps in medicine",
-        BucketId::Comms => "no phone, internet or card payments",
-        BucketId::Evacuate => "having to leave home",
-        BucketId::GetHome => "being stranded away from home",
-        BucketId::MedicalEmergency => "a medical emergency",
-        BucketId::Fire => "a fire at home",
-        BucketId::Security => "a break-in or trouble nearby",
-        BucketId::Income => "lost income",
-        BucketId::HomeLoss => "damage to the home",
-    }
+/// A hazard that kills gets a card from this chance in ten years up (review S3, RR-P03, M-07).
+pub const LIFE_SAFETY_MIN_P10: f64 = 0.01;
+
+/// "Severe" on the severity scale the packet prints ([`text::severity`]).
+pub const SEVERE: f64 = 0.6;
+
+/// Hazards that can strike with minutes of warning or none, where knowing what to do in the
+/// moment saves lives (model review M-07): a card from [`LIFE_SAFETY_MIN_P10`] up.
+pub const FAST_HAZARDS: [HazardId; 8] = [
+    HazardId::Wildfire,
+    HazardId::RiverineFlooding,
+    HazardId::CoastalFlooding,
+    HazardId::Tsunami,
+    HazardId::Tornado,
+    HazardId::Earthquake,
+    HazardId::Landslide,
+    HazardId::Avalanche,
+];
+
+/// Why a hazard has a card. Every reason but [`Why::Frequent`] protects the card from the cap.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum Why {
+    /// One of the likeliest hazards.
+    Frequent,
+    /// It strikes fast, or this home is exposed to it (a basement flat and floods, a mobile home
+    /// and wind, someone slow to leave and wildfire or floods).
+    Exposed,
+    /// Rated Severe or worse.
+    Severe,
+    /// A named scenario the plan includes hangs on it.
+    Scenario,
+    /// House fire, always.
+    HouseFire,
 }
 
-fn effects(p: &HazardProfile) -> String {
-    let parts: Vec<String> = p
-        .buckets
+/// Whether this household's home or members make a hazard more dangerous for it (model review
+/// M-07): a home below street level or with a basement and floods; a mobile home and wind or
+/// hurricanes; someone who needs help to move and wildfire or floods.
+fn household_exposed(cx: &Ctx<'_>, h: HazardId) -> bool {
+    let input = &cx.a.input;
+    let housing = &input.housing;
+    let slow = input
+        .people
         .iter()
-        .map(|b| bucket_effect(*b).to_owned())
-        .collect();
-    text::join_and(&parts)
+        .any(|p| p.medical.mobility != Mobility::None);
+    match h {
+        HazardId::RiverineFlooding | HazardId::CoastalFlooding => {
+            housing.floor <= 0 || housing.basement || slow
+        }
+        HazardId::Tornado | HazardId::StrongWind | HazardId::Hurricane => {
+            housing.kind == HousingKind::MobileHome
+        }
+        HazardId::Wildfire => slow,
+        _ => false,
+    }
 }
 
 /// The chance of at least one event in `years` at a yearly rate.
@@ -67,29 +102,91 @@ fn ranked<'a>(cx: &Ctx<'a>) -> Vec<&'a HazardProfile> {
     v
 }
 
-/// The hazards shown as cards, in order, each with the guidance block its card shows. The
-/// targets section uses this to point to a card instead of repeating the same block.
-pub(crate) fn cards<'a>(cx: &Ctx<'a>) -> Vec<(&'a HazardProfile, Option<&'a Guidance>)> {
+/// Why each ranked hazard has a card (life-safety reasons first), before the cap.
+fn card_reasons<'a>(cx: &Ctx<'a>) -> Vec<(&'a HazardProfile, Why)> {
     let all = ranked(cx);
-    let mut chosen: Vec<&HazardProfile> = all
+    let p10 = |p: &HazardProfile| chance(p.rate_per_year, 10);
+    let frequent: Vec<HazardId> = all
         .iter()
-        .copied()
-        .filter(|p| chance(p.rate_per_year, 10) >= CARD_MIN_P10)
-        .take(CARDS)
+        .filter(|p| p10(p) >= CARD_MIN_P10)
+        .take(FREQUENT_CARDS)
+        .map(|p| p.id)
         .collect();
-    // The hazard behind each named scenario the plan includes, if it is not already a card.
-    for s in cx.a.hazards.scenarios.iter().filter(|s| s.on) {
-        if chosen.iter().any(|p| p.id == s.hazard) {
-            continue;
-        }
-        if let Some(p) = cx.a.hazards.profiles.iter().find(|p| p.id == s.hazard) {
-            chosen.push(p);
+    let scenario: Vec<HazardId> =
+        cx.a.hazards
+            .scenarios
+            .iter()
+            .filter(|s| s.on)
+            .map(|s| s.hazard)
+            .collect();
+    let mut out: Vec<(&HazardProfile, Why)> = Vec::new();
+    for p in
+        cx.a.hazards
+            .profiles
+            .iter()
+            .filter(|p| p.display == HazardDisplay::Ranked)
+    {
+        let likely_enough = p10(p) >= LIFE_SAFETY_MIN_P10;
+        let why = if p.id == HazardId::HouseFire {
+            Some(Why::HouseFire)
+        } else if scenario.contains(&p.id) {
+            Some(Why::Scenario)
+        } else if likely_enough && p.severity >= SEVERE {
+            Some(Why::Severe)
+        } else if likely_enough && (FAST_HAZARDS.contains(&p.id) || household_exposed(cx, p.id)) {
+            Some(Why::Exposed)
+        } else if frequent.contains(&p.id) {
+            Some(Why::Frequent)
+        } else {
+            None
+        };
+        if let Some(w) = why {
+            out.push((p, w));
         }
     }
+    out
+}
+
+/// The hazards shown as cards, most likely first, each with the guidance block its card shows.
+/// The targets section uses this to point to a card instead of repeating the same block.
+///
+/// The rule (review S3): the likeliest hazards ([`FREQUENT_CARDS`] with at least
+/// [`CARD_MIN_P10`]), plus house fire always, plus any hazard with at least
+/// [`LIFE_SAFETY_MIN_P10`] that is rated Severe or worse, strikes fast ([`FAST_HAZARDS`]) or
+/// meets this home ([`household_exposed`]), plus the hazard of any named scenario the plan
+/// includes. Above [`CARDS`], the least severe of the likeliest make room first, then the least
+/// likely fast or exposed ones; house fire, Severe hazards and scenario hazards always stay.
+pub(crate) fn cards<'a>(cx: &Ctx<'a>) -> Vec<(&'a HazardProfile, Option<&'a Guidance>)> {
+    let mut chosen = card_reasons(cx);
+    while chosen.len() > CARDS {
+        // The weakest reason first; among equals the least severe, then the least likely.
+        let drop = chosen
+            .iter()
+            .enumerate()
+            .filter(|(_, (_, w))| matches!(w, Why::Frequent | Why::Exposed))
+            .min_by(|(_, (a, wa)), (_, (b, wb))| {
+                wa.cmp(wb)
+                    .then(if *wa == Why::Frequent {
+                        a.severity.total_cmp(&b.severity)
+                    } else {
+                        core::cmp::Ordering::Equal
+                    })
+                    .then(a.rate_per_year.total_cmp(&b.rate_per_year))
+            })
+            .map(|(i, _)| i);
+        match drop {
+            Some(i) => {
+                chosen.remove(i);
+            }
+            None => break,
+        }
+    }
+    // Most likely first; equal rates keep the register's order.
+    chosen.sort_by(|(x, _), (y, _)| y.rate_per_year.total_cmp(&x.rate_per_year));
     let mut used: Vec<&str> = Vec::new();
     chosen
         .into_iter()
-        .map(|p| {
+        .map(|(p, _)| {
             let block = cx
                 .blocks_for(&format!("hazard:{}", p.id))
                 .into_iter()
@@ -109,16 +206,16 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push("## Your risks".to_owned());
     out.push(String::new());
     out.push(format!(
-        "The events most likely to reach a household like yours in {}, over {horizon}, most \
-         likely first. A lost job or a week-long outage is far more likely than a disaster from \
-         the movies, and the plan is ordered the same way.",
+        "What could reach a household like yours in {} over {horizon}: the likeliest events, and \
+         the rarer ones that can kill, most likely first. A lost job or a week-long outage is far \
+         more likely than a disaster from the movies, and the plan is ordered the same way.",
         md(&super::summary::place(cx))
     ));
     out.push(String::new());
 
     let cards = cards(cx);
     if !cards.is_empty() {
-        out.push("### The ones most likely to reach you".to_owned());
+        out.push("### What to know and do".to_owned());
         out.push(String::new());
     }
     // Which card showed each family block, so a later card of the same family can point to it.
@@ -159,9 +256,10 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             out.push(para);
             out.push(String::new());
         }
+        // How bad and how sure; what it does to the household is its sentence above, and each
+        // consequence has its own part under Your targets.
         out.push(format!(
-            "**What it can do:** {}. **How bad:** {}. **How sure:** {}.",
-            md(&effects(p)),
+            "**How bad:** {}. **How sure:** {}.",
             text::severity(p.severity),
             text::confidence(p.confidence)
         ));
@@ -217,8 +315,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push("### Rare but severe".to_owned());
         out.push(String::new());
         out.push(
-            "Shown apart, because a tiny chance times a huge loss would otherwise crowd out \
-             everything else. The plan never lets them take over the budget."
+            "Shown apart, so that a tiny chance of a huge loss cannot crowd out everything else or \
+             take over the budget."
                 .to_owned(),
         );
         out.push(String::new());
@@ -235,7 +333,12 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         }
         out.push(String::new());
         // What to do: the first rare hazard's block, its advice paragraphs only (the table says
-        // how likely), unless a card already showed it.
+        // how likely), unless a card already showed it. Outside a nuclear plant's 10-mile zone
+        // only the shelter guidance prints: the "What helps" paragraph to its second source
+        // (get inside, stay inside, stay tuned; where, and for how long). The rest, potassium
+        // iodide included, matters inside the zone (review RR-P03: the space pays for the fire
+        // card every packet now carries).
+        let near_plant = a.supply_context.nuclear_plant_within_16km == Some(true);
         if let Some(g) = rare.iter().find_map(|p| {
             cx.blocks_for(&format!("hazard:{}", p.id))
                 .into_iter()
@@ -246,6 +349,13 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
                 .any(|(_, b)| b.is_some_and(|b| b.meta.id == g.meta.id))
             {
                 for para in super::advice_paragraphs(&cx.guidance(g, None, None)) {
+                    let para = if near_plant {
+                        para
+                    } else if para.starts_with("**What helps.**") {
+                        super::up_to_citation_runs(&para, 2)
+                    } else {
+                        continue;
+                    };
                     out.push(para);
                     out.push(String::new());
                 }

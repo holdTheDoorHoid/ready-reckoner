@@ -118,15 +118,16 @@ fn nuclear_plant_incident(ctx: &Ctx<'_>, notes: &mut Notes) -> Option<HazardRate
     } else {
         NUCLEAR_PLANT_INGESTION
     };
-    let zone = if epz {
-        "within 10 miles (16 km), the zone where people may be told to shelter or leave"
+    notes.add(if epz {
+        "A nuclear power plant is within 10 miles (16 km), the zone where people may be told to \
+         shelter or leave; potassium iodide matters only inside this zone and is handed out by \
+         the authorities."
+            .to_owned()
     } else {
-        "within 50 miles (80 km), the zone where food and water may be checked"
-    };
-    notes.add(format!(
-        "A nuclear power plant is {zone}; potassium iodide matters only inside the 10-mile zone \
-         and is handed out by the authorities."
-    ));
+        "A nuclear power plant is within 50 miles (80 km), the zone where food and water may be \
+         checked; potassium iodide is only for the 10-mile zone."
+            .to_owned()
+    });
     Some(HazardRate::new(
         HazardId::NuclearPlantIncident,
         prior(t, &[cite::FEMA_NUCLEAR_SITES, cite::RR_HAZARD_PRIORS]),

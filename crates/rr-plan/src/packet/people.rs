@@ -79,7 +79,7 @@ fn block(cx: &Ctx<'_>, target: &str, out: &mut Vec<String>) {
     if let Some(g) = cx.blocks_for(target).first() {
         out.push(format!("#### {}", md(&g.meta.title)));
         out.push(String::new());
-        for para in super::headed_paragraphs(&cx.guidance(g, None, None)) {
+        for para in super::topic_paragraphs(&cx.guidance(g, None, None)) {
             out.push(para);
             out.push(String::new());
         }
@@ -133,7 +133,14 @@ pub(super) fn family(cx: &Ctx<'_>, out: &mut Vec<String>) {
 
     out.push("### Contacts and meeting places".to_owned());
     out.push(String::new());
-    advice(cx, &["comms_contact_card", "comms_wea_alerts_on"], out);
+    advice(cx, &["comms_contact_card"], out);
+    // How to set up alerts is the phone-and-internet part of Your targets when that part prints
+    // (alerts on every phone, a weather radio, when text-to-911 works); here it is named.
+    if a.target_days(BucketId::Comms) > 0.0 {
+        named(cx, &["comms_wea_alerts_on"], out);
+    } else {
+        advice(cx, &["comms_wea_alerts_on"], out);
+    }
 
     out.push("### Leaving home: triggers and routes".to_owned());
     out.push(String::new());
@@ -162,24 +169,11 @@ pub(super) fn family(cx: &Ctx<'_>, out: &mut Vec<String>) {
     named(cx, &["evac_ten_minute_drills"], out);
     block(cx, "topic:drills", out);
 
-    out.push("### School, work and getting home".to_owned());
-    out.push(String::new());
-    let commuters = input.people.iter().filter(|p| p.commute.is_some()).count();
-    if commuters > 0 {
-        out.push(
-            "The household plan above covers school, daycare and work plans and a walking route \
-             home. Each commuter's get-home bag is under Checklists."
-                .to_owned(),
-        );
-    } else {
-        out.push(
-            "Nobody in the household commutes, so there is no get-home plan to make. If that \
-             changes, add the trip on the household screen."
-                .to_owned(),
-        );
-    }
-    out.push(String::new());
+    // School and work plans are rows of the table above, and each commuter's get-home bag is
+    // under Checklists; what is left here is talking with children.
     if children {
+        out.push("### Children".to_owned());
+        out.push(String::new());
         block(cx, "topic:talking_with_children", out);
     }
 

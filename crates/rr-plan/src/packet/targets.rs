@@ -6,11 +6,10 @@
 //! home point to the family plan's steps but keep their warnings; a damaged home and lost income
 //! point to Documents and money. Then named scenarios and any event that drives the answer.
 
-use rr_types::{BucketId, BucketKind, Target, TierId};
+use rr_types::{BucketId, BucketKind, ReturnPeriod, Target, TierId};
 
 use super::text::{self, md};
-use super::{Ctx, cite, cite_all};
-use crate::pipeline::Assessment;
+use super::{Ctx, cite_all};
 
 /// A target in words: "about 5 days (up to 10 days)", "about 4 months (2–7)".
 pub(crate) fn target_phrase(t: &Target) -> String {
@@ -38,10 +37,25 @@ pub(crate) fn target_phrase(t: &Target) -> String {
     }
 }
 
-/// Out of 100, how many ten-year stretches bring something worse than the targets at this dial.
-fn worse_per_100(a: &Assessment) -> String {
-    let rate = rr_consequence::dial_rate(a.input.dials.return_period);
-    text::per_100(-rr_types::math::exp_m1(-10.0 * rate))
+/// What the dial means (model review M-04): each target holds for its own need, so the chance
+/// that at least one need runs past its target is higher. At the default 1-in-100 setting these
+/// are the canonical words the web app also shows; at other settings the per-need share is that
+/// setting's and the joint one is only said to be higher.
+pub fn dial_sentence(rp: ReturnPeriod) -> String {
+    if rp == ReturnPeriod::OneIn100 {
+        return "For any one need, something worse than its target comes in about 1 of every 10 \
+                ten-year stretches. Across all your needs together, the chance that at least one \
+                runs out is higher, roughly 1 in 3. That is why the plan also gives you ways to \
+                cope when a target runs out."
+            .to_owned();
+    }
+    let rate = rr_consequence::dial_rate(rp);
+    format!(
+        "For any one need, something worse than its target comes in about {} of every 100 \
+         ten-year stretches. Across all your needs together, the chance that at least one runs \
+         out is higher. That is why the plan also gives you ways to cope when a target runs out.",
+        text::per_100(-rr_types::math::exp_m1(-10.0 * rate))
+    )
 }
 
 fn relief_cell(days: Option<f32>) -> String {
@@ -67,11 +81,13 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push("## Your targets".to_owned());
     out.push(String::new());
     out.push(format!(
-        "How long to be ready for each kind of disruption at the 1-in-{} setting. Something \
-         worse than these targets comes in about {} of every 100 ten-year stretches.{}",
+        "How long to be ready for each kind of disruption at the 1-in-{} setting. {}{}",
         a.input.dials.return_period.years(),
-        worse_per_100(a),
-        cite("rr_research_risk_model")
+        dial_sentence(a.input.dials.return_period),
+        cite_all([
+            &rr_types::CitationId::from("rr_research_risk_model"),
+            &rr_types::CitationId::from("rr_risk_model_priors"),
+        ])
     ));
     out.push(String::new());
     out.push(
@@ -95,8 +111,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     }
     out.push(String::new());
     out.push(
-        "The range in brackets shows where the target could sit when the inputs behind it are \
-         uncertain. \"Not known\" means no restoration records exist for that kind of disruption."
+        "The range in brackets shows how uncertain each target is. \"Not known\": there are no \
+         restoration records for the event behind that target."
             .to_owned(),
     );
     out.push(String::new());
@@ -107,11 +123,26 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         .iter()
         .filter_map(|(p, g)| g.map(|g| (g.meta.id.clone(), p.name.clone())))
         .collect();
-    let single: Vec<(BucketId, String)> = cards
+    let mut single: Vec<(BucketId, String)> = cards
         .iter()
         .filter(|(p, g)| g.is_some() && p.buckets.len() == 1)
         .map(|(p, _)| (p.buckets[0], p.name.clone()))
         .collect();
+    // Dangerous heat or cold at home: when the heat-wave and cold-wave cards are both shown, their
+    // advice (cooling places, a warm room, fans above 90°F, no oven or grill for heat) is this
+    // bucket's, so it points to them.
+    let card_name = |h: rr_types::HazardId| {
+        cards
+            .iter()
+            .find(|(p, g)| p.id == h && g.is_some())
+            .map(|(p, _)| p.name.clone())
+    };
+    if let (Some(heat), Some(cold)) = (
+        card_name(rr_types::HazardId::HeatWave),
+        card_name(rr_types::HazardId::ColdWave),
+    ) {
+        single.push((BucketId::Thermal, format!("{heat}\" and \"{cold}")));
+    }
 
     // What to do about these is in the documents-and-money section.
     let elsewhere = [BucketId::HomeLoss, BucketId::Income];

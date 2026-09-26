@@ -212,11 +212,12 @@ pub fn notice_range(low_hours: f64, high_hours: f64) -> String {
     let one = |h: f64| -> String {
         if h <= 0.0 {
             "no warning".to_owned()
-        } else if h < 1.0 {
+        } else if h < 1.0 && (h * 60.0).round() < 60.0 {
+            // Singular and plural ("1 minute", review W1); 59.5 minutes and up read "1 hour".
             let m = (h * 60.0).round().max(1.0);
             format!("{} minute{}", m as i64, if m == 1.0 { "" } else { "s" })
         } else if h < 48.0 {
-            let r = (h * 10.0).round() / 10.0;
+            let r = ((h * 10.0).round() / 10.0).max(1.0);
             format!(
                 "{} hour{}",
                 n_text(r),
@@ -517,6 +518,8 @@ mod tests {
         assert_eq!(households(0.004), "fewer than 1 of 100");
         assert_eq!(households(0.99), "almost all");
         assert_eq!(notice_range(0.25, 12.0), "15 minutes to 12 hours");
+        assert_eq!(notice_range(0.02, 72.0), "1 minute to 3 days");
+        assert_eq!(notice_range(0.995, 24.0), "1 hour to 24 hours");
         assert_eq!(lower_first("NOAA radio"), "NOAA radio");
         assert_eq!(
             dial_phrase(ReturnPeriod::OneIn100),

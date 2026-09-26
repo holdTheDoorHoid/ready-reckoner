@@ -25,8 +25,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push("## Checklists".to_owned());
     out.push(String::new());
     out.push(
-        "Tick these off as you go: one list per step, up to the step that is enough for your \
-         risks, with what your household needs. The free steps are under Your plan."
+        "One list per step, up to the step that is enough for your risks. The free steps are \
+         under Your plan."
             .to_owned(),
     );
     out.push(String::new());
@@ -135,13 +135,17 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         }
     }
 
-    // Hazard-specific extras the budget does not measure.
+    // Hazard-specific extras the budget does not measure. Gear for rare catastrophes (a radiation
+    // meter, a shielded bag) prints only when the household opted in to that group
+    // (`dials.rare_catastrophic_opt_in`, CONTENT_STANDARDS §3; review S4, RR-P11).
+    let opted_in = a.input.dials.rare_catastrophic_opt_in;
     let extras: Vec<&rr_types::Item> = a
         .offers
         .extras
         .iter()
         .filter(|id| !cx.in_plan(id.as_str()))
         .filter_map(|id| cx.item(id.as_str()))
+        .filter(|it| opted_in || !it.rare_catastrophic)
         .collect();
     if !extras.is_empty() {
         out.push("### Extras for the hazards you face".to_owned());

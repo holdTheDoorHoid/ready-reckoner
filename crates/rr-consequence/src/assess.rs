@@ -982,7 +982,8 @@ fn get_home_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, GetHomeDetail) {
 
 fn hours_on_foot(h: f64) -> String {
     if h < 0.75 {
-        return format!("{} minutes", words::round_nice(h * 60.0));
+        let m = words::round_nice(h * 60.0);
+        return format!("{m} minute{}", if m == "1" { "" } else { "s" });
     }
     let halves = (h * 2.0 + 0.5).floor() as i64; // nearest half hour
     match halves {
@@ -1623,5 +1624,12 @@ mod tests {
         }
         assert!(capability_advice(BucketId::Comms).contains("radio"));
         assert!(capability_advice(BucketId::Medication).contains("prescriber"));
+    }
+
+    #[test]
+    fn walking_times_are_singular_when_they_should_be() {
+        assert_eq!(hours_on_foot(1.0 / 60.0), "1 minute");
+        assert_eq!(hours_on_foot(0.5), "30 minutes");
+        assert_eq!(hours_on_foot(1.0), "an hour");
     }
 }
