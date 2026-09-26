@@ -1,0 +1,281 @@
+# Food: planned in calories, never "servings". Rules: docs/CONTENT_STANDARDS.md §3.
+# Price bands come from docs/PRICE_OBSERVATIONS.md (observed 2026-09-25). One unit of a food item is
+# 2,000 kcal, about one adult-day, so the app can show cost per 2,000 kcal.
+
+[[item]]
+id = "food_outage_food_safety"
+name = "Know how long the fridge and freezer keep food cold"
+category = "food"
+unit = "action"
+buckets = ["power", "supplies"]
+tier = "now"
+free = true
+spec = "Keep the fridge and freezer closed in an outage: a closed fridge keeps food cold for about four hours and a full freezer for about 48 hours (Ready.gov). Throw out perishable food that has been above 40°F for two hours or more."
+look_for = [
+  "A thermometer in the fridge and the freezer",
+  "Where you could get ice or dry ice nearby",
+  "A cooler for the food you need first",
+]
+avoid = [
+  "Opening the doors to check again and again",
+  "Tasting food to decide if it is safe",
+  "Eating from cans that are swollen, dented or rusted (Ready.gov)",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: knowledge and habits." }
+quantity_rule = "once"
+citations = ["ready_gov_food", "ready_gov_power_outages"]
+hazard_extras = []
+
+[[item]]
+id = "food_buy_slowly"
+name = "Build food supplies a little at a time"
+category = "food"
+unit = "action"
+buckets = ["supplies"]
+tier = "now"
+free = true
+spec = "Add a few extra cans or boxes of what you already eat on each shopping trip, and put the new ones at the back. Ready.gov asks people to buy supplies slowly so everyone can get what they need."
+look_for = [
+  "A shelf or bin where the extra food lives",
+  "Oldest food at the front, newest at the back",
+  "A short list of what your household eats in a week",
+]
+avoid = [
+  "Buying a lot at once when a storm is in the news",
+  "Foods nobody in the house will eat",
+  "Letting the extra food expire unused",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: the food itself is priced in the pantry item." }
+quantity_rule = "once"
+citations = ["ready_gov_pandemic", "ready_gov_food"]
+hazard_extras = []
+
+[[item]]
+id = "food_pantry_rotation"
+name = "Extra shelf-stable food you already eat"
+category = "food"
+unit = "2,000 kcal"
+buckets = ["supplies"]
+tier = "h72"
+free = false
+spec = "Canned and dry foods your household already eats that need little or no cooking: canned meat, fish, beans, fruit and vegetables, peanut butter, cereal and crackers. Plan in calories (about 1,800 to 2,800 a day for an adult, less for children) and eat and replace them in normal shopping."
+look_for = [
+  "Foods your household already eats and likes",
+  "Ready to eat or quick to heat",
+  "Pull-tab lids or a manual can opener",
+  "Special diets, baby food and comfort foods covered",
+]
+avoid = [
+  "Swollen, leaking, rusted or badly dented cans (USDA)",
+  "Storing food above 85°F: cooler places keep it longer (USDA)",
+  "Counting 'servings' instead of calories",
+]
+price_band_usd = { low = 8.44, high = 10.46, per = "2,000 kcal", note = "USDA's August 2026 food plans: $8.44 per person-day on the Thrifty plan for a family of four and $10.46 on the Low-Cost plan for a man aged 19–50, for a full everyday diet of about 2,000 kcal." }
+retrieved = "2026-09-25"
+quantity_rule = "food_kcal"
+energy_kcal_per_unit = 2000
+maintenance = { rotate_months = 12 }
+citations = ["ready_gov_food", "fsis_shelf_stable", "usda_dga_2020_2025", "usda_tfp_aug2026", "usda_food_plans_aug2026", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_bulk_staples"
+name = "Dry staples for long storage (rice, beans, oats, wheat)"
+category = "food"
+unit = "2,000 kcal"
+buckets = ["supplies"]
+tier = "m3"
+free = false
+spec = "White rice, dried beans, rolled oats and wheat sealed against air and moisture, for plans that run to three months or more. Packed this way and kept below 75°F they last about 20 to 30 years, but they need water, fuel and time to cook."
+look_for = [
+  "Food-safe buckets, #10 cans or sealed bags with oxygen absorbers",
+  "White rice rather than brown, which goes rancid",
+  "A plan for the cooking fuel and extra water they need",
+]
+avoid = [
+  "A hot garage or attic: wheat kept about 25 years cool but only about 5 years hot (Utah State University)",
+  "Putting moist foods in oxygen-free packs (botulism risk)",
+  "Living on staples alone for months: add oil, vegetables and a vitamin source",
+]
+price_band_usd = { low = 1.34, high = 2.16, per = "2,000 kcal", note = "Four observations, August 2026: white rice and dried beans at US average prices ($1.34 and $2.07 per 2,000 kcal) and canned wheat and pinto beans from a home-storage center ($1.72 and $2.16)." }
+retrieved = "2026-09-25"
+quantity_rule = "food_kcal"
+energy_kcal_per_unit = 2000
+maintenance = { check_months = 12 }
+citations = ["church_home_storage_2007", "church_hsc_order_form_2026", "byu_longer_term_storage_2019", "usu_food_storage_booklet", "bls_average_prices", "usda_fooddata_central", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_freeze_dried"
+name = "Freeze-dried or dehydrated meal kits (check the calories)"
+category = "food"
+unit = "2,000 kcal"
+buckets = ["supplies"]
+tier = "m1"
+free = false
+spec = "Pouched or canned meals that keep for years, useful when space is short or for a go-bag. Kits sold as '30 days' often supply only 1,290 to 1,730 calories a day, and dried meals need about 0.6 gallon of extra water per person-day."
+look_for = [
+  "The kit's total calories, so you can divide by about 2,000 a day",
+  "Meals your household will actually eat",
+  "The extra water and a way to heat it",
+]
+avoid = [
+  "Counting 'days' or 'servings' on the box instead of calories",
+  "Buying a big kit before you have water, medicine and a pantry",
+  "Kits that give no calorie total",
+]
+price_band_usd = { low = 9.93, high = 36.43, per = "2,000 kcal", note = "Two retail kits worked out to $9.93 and $36.43 per 2,000 kcal once their stated calories were divided out; kits vary widely." }
+retrieved = "2026-09-25"
+quantity_rule = "food_kcal"
+energy_kcal_per_unit = 2000
+maintenance = { check_months = 12 }
+citations = ["rr_research_supply_standards", "rr_research_prior_art", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_manual_can_opener"
+name = "Manual can opener"
+category = "food"
+unit = "opener"
+buckets = ["supplies"]
+tier = "h72"
+free = false
+spec = "A hand-crank can opener kept with the stored food, because electric openers stop in an outage (Ready.gov lists one in every kit)."
+look_for = [
+  "A sturdy crank and a comfortable grip",
+  "A spare kept in the go-bag if your food there is canned",
+]
+avoid = [
+  "Relying on an electric opener",
+  "Flimsy openers that slip on the rim",
+]
+price_band_usd = { low = 6.69, high = 11.49, per = "opener", note = "Two retail listings: $6.69 and $11.49." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["ready_gov_kit", "ready_gov_food", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_camp_stove"
+name = "One-burner camp stove (outdoor use only)"
+category = "food"
+unit = "stove"
+buckets = ["water_boil", "supplies"]
+tier = "h72"
+free = false
+spec = "A butane or propane camp stove for boiling water and heating food outdoors when the power or gas is off. CDC says never use a portable gas camp stove indoors, because of carbon monoxide."
+look_for = [
+  "A stable base that holds a pot big enough for boiling water",
+  "Fuel canisters that match the stove",
+  "A lighter or matches in a waterproof bag",
+]
+avoid = [
+  "Using it indoors, in a garage or on a closed porch",
+  "Keeping fuel near heat or in a hot car",
+  "Leaving it burning unattended",
+]
+price_band_usd = { low = 39.99, high = 49.99, per = "stove", note = "Two retail listings for one-burner stoves: butane $39.99, propane $49.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["cdc_co_basics", "cdc_infant_checklist", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_cooking_fuel"
+name = "Fuel canisters for the camp stove"
+category = "food"
+unit = "8-ounce canister"
+buckets = ["water_boil", "supplies"]
+tier = "h72"
+free = false
+spec = "Enough canisters to boil drinking water and heat one meal a day for your household. Store them cool and dry, away from flames, and use the oldest first."
+look_for = [
+  "The fuel type your stove takes",
+  "Undented canisters with intact caps",
+  "A cool, ventilated storage spot outside the living space if you keep many",
+]
+avoid = [
+  "Storing them in a hot car or next to a heater",
+  "Refilling small canisters yourself",
+  "Using damaged or rusted canisters",
+]
+price_band_usd = { low = 1.46, high = 2.71, per = "8-ounce canister", note = "Two restaurant-supply listings for 8-ounce butane canisters sold in packs: $1.46 and $2.71 each." }
+retrieved = "2026-09-25"
+quantity_rule = "cooking_fuel_canisters"
+maintenance = { check_months = 12 }
+citations = ["eia_btu", "rr_research_supply_standards", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_infant_formula"
+name = "Infant formula (ready-to-feed first, then powder)"
+category = "food"
+unit = "ounce of powder"
+buckets = ["supplies", "water_boil"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "Breastfeeding remains best; if your baby takes formula, keep ready-to-feed formula for the first days, because it needs no water (CDC). Keep powder for longer, mixed only with bottled water or water boiled for 1 minute and cooled."
+look_for = [
+  "The formula your baby already takes",
+  "Ready-to-feed bottles for the first days, then powder",
+  "Use-by dates past your next check: formula dates are about safety, not just quality",
+]
+avoid = [
+  "Mixing powder with tap water during a boil notice",
+  "Watering down formula to make it last",
+  "Homemade formula",
+]
+price_band_usd = { low = 1.21, high = 1.60, per = "ounce of powder", note = "Two online listings for 28.2-ounce cans: $33.99 and $44.99. Prices vary widely by brand and store." }
+retrieved = "2026-09-25"
+quantity_rule = "infant_formula_oz"
+maintenance = { check_months = 1 }
+citations = ["cdc_infant_feeding_disaster", "cdc_infant_checklist", "ready_gov_food", "aap_formula_amounts", "fsis_shelf_stable", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_fridge_thermometers"
+name = "Refrigerator and freezer thermometers"
+category = "food"
+unit = "pair"
+buckets = ["power", "supplies"]
+tier = "h72"
+free = false
+spec = "One thermometer in the fridge and one in the freezer, so after an outage you know whether food stayed at 40°F or below (Ready.gov)."
+look_for = [
+  "A clear dial or digital display",
+  "A range that reads below freezing",
+]
+avoid = [
+  "Guessing by touch or smell",
+  "Hiding the thermometer behind food at the back",
+]
+price_band_usd = { low = 4.78, high = 10.58, per = "pair", note = "Two restaurant-supply listings: dial thermometers at $2.39 and digital at $5.29 each, doubled for a pair." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["ready_gov_food", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_cooler"
+name = "Hard-sided cooler"
+category = "food"
+unit = "cooler"
+buckets = ["power", "supplies", "medication"]
+tier = "h72"
+free = false
+spec = "A 25 to 50 quart cooler to hold the food and medicine you need first when the fridge is off, with ice or frozen water jugs. Ready.gov suggests coolers with ice when the power is out."
+look_for = [
+  "A tight lid and thick walls",
+  "A size that fits your fridge's most important food",
+  "Frozen water jugs as ice that you can drink later",
+]
+avoid = [
+  "Putting medicine directly on ice (it can freeze)",
+  "Leaving the cooler in the sun",
+]
+price_band_usd = { low = 30.99, high = 49.99, per = "cooler", note = "Two retail listings for 30-quart coolers: $30.99 and $49.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["ready_gov_power_outages", "cdc_insulin_emergency", "rr_price_observations_2026_09"]
+hazard_extras = []

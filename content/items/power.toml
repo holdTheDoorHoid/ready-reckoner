@@ -1,0 +1,320 @@
+# Power: light, charging, backup power and the rules that keep it safe. Rules:
+# docs/CONTENT_STANDARDS.md §3. Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
+
+[[item]]
+id = "power_utility_outage_report"
+name = "Know how to report an outage and get your utility's alerts"
+category = "power"
+unit = "action"
+buckets = ["power", "comms"]
+tier = "now"
+free = true
+spec = "Save your power company's outage number and sign up for its outage texts, so you can report a problem and hear when repairs are expected. Keep the number on paper too, since your phone may be low."
+look_for = [
+  "The outage phone number and website on your contact card",
+  "Text or app alerts turned on",
+  "The account number from a recent bill",
+]
+avoid = [
+  "Assuming the utility already knows your street is out",
+  "Going near downed power lines: stay away and report them",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a sign-up and a phone number." }
+quantity_rule = "once"
+citations = ["ready_gov_power_outages", "rr_research_risk_model"]
+hazard_extras = []
+
+[[item]]
+id = "power_car_charging"
+name = "Charge phones from the car, outdoors only"
+category = "power"
+unit = "action"
+buckets = ["power", "comms"]
+tier = "now"
+free = true
+spec = "A car's USB port or 12-volt socket can recharge phones and power banks in an outage. Run the engine only outdoors: CDC says never run a car inside a garage attached to a house, even with the door open."
+look_for = [
+  "A car charging cable kept in the glove box",
+  "The car parked outdoors, away from windows, when the engine runs",
+]
+avoid = [
+  "Running the engine in any garage",
+  "Draining the car battery so it will not start",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses the car and cables you have." }
+quantity_rule = "once_if_vehicle"
+citations = ["cdc_co_basics"]
+hazard_extras = []
+
+[[item]]
+id = "power_ev_storm_charge"
+name = "Charge the electric car to full when a storm or evacuation is possible"
+category = "power"
+unit = "action"
+buckets = ["evacuate", "power"]
+tier = "now"
+free = true
+spec = "If you might leave in an electric car, keep it fully charged through storm season and charge it to 100% when a storm is forecast, because chargers may have long lines or no power (Hillsborough County, Florida). If you leave it behind in a flood-prone area, park it on high ground about 50 feet from buildings, unplugged."
+look_for = [
+  "A full charge before any warning, not after",
+  "Where you would park the car above flood level",
+  "The car's real range with the air conditioning or heat on",
+]
+avoid = [
+  "Driving an electric car through floodwater: water can damage the battery and start a fire",
+  "Charging or driving a car that sat in floodwater, especially salt water",
+  "Leaving it plugged in or in the garage when you evacuate",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits." }
+quantity_rule = "once_if_ev"
+citations = ["hcfl_ev_safety", "ready_gov_evacuation"]
+hazard_extras = ["hurricane", "coastal_flooding", "riverine_flooding"]
+
+[[item]]
+id = "power_ev_range_plan"
+name = "Plan evacuation routes that fit your electric car's range"
+category = "power"
+unit = "action"
+buckets = ["evacuate", "get_home"]
+tier = "now"
+free = true
+spec = "Check how far your electric car goes on a full charge in heat or cold, and pick evacuation destinations inside that range. Plan to arrive without public chargers, which may be crowded or without power (Hillsborough County, Florida), and note chargers along the way on the Department of Energy's station map."
+look_for = [
+  "Destinations within about two-thirds of your full range, to leave room for traffic",
+  "Chargers along two routes, from the federal station locator",
+  "A charging cable kept in the car",
+]
+avoid = [
+  "Planning a trip that needs a charger halfway",
+  "Waiting for the evacuation order to charge",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: planning." }
+quantity_rule = "once_if_ev"
+citations = ["hcfl_ev_safety", "doe_afdc_stations", "doe_fueleconomy_ev", "rr_expert_prior"]
+hazard_extras = []
+
+[[item]]
+id = "power_headlamp"
+name = "Headlamp or flashlight for each person"
+category = "power"
+unit = "headlamp"
+buckets = ["power", "evacuate"]
+tier = "h72"
+free = false
+spec = "An LED headlamp or flashlight for each person, which leaves both hands free and is far safer than candles. Rechargeable ones can top up from a power bank or the car."
+look_for = [
+  "LED with a low setting that runs for many hours",
+  "Rechargeable by USB, or using the same battery size as your other gear",
+  "One by each bed and one in each go-bag",
+]
+avoid = [
+  "Candles for light",
+  "Lights that use odd battery sizes you do not stock",
+]
+price_band_usd = { low = 14.99, high = 22.99, per = "headlamp", note = "Two retail listings for rechargeable LED headlamps: $14.99 and $22.99." }
+retrieved = "2026-09-25"
+quantity_rule = "per_person"
+citations = ["ready_gov_kit", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_lantern"
+name = "Rechargeable LED lantern for a room"
+category = "power"
+unit = "lantern"
+buckets = ["power"]
+tier = "h72"
+free = false
+spec = "A battery, USB or solar LED lantern that lights a whole room, so the household can cook, read and move around safely during an outage."
+look_for = [
+  "Solar or USB charging, or common batteries",
+  "A low setting that runs through the night",
+]
+avoid = [
+  "Fuel lanterns indoors",
+  "Lanterns left uncharged in a drawer",
+]
+price_band_usd = { low = 29.00, high = 29.95, per = "lantern", note = "Two retail listings for rechargeable LED lanterns: $29.00 and $29.95." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+maintenance = { check_months = 6 }
+citations = ["ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_batteries"
+name = "Spare batteries for lights and the radio"
+category = "power"
+unit = "24-pack"
+buckets = ["power", "comms"]
+tier = "h72"
+free = false
+spec = "A pack of the battery size your lights and radio use, kept in its package away from heat. Ready.gov lists extra batteries in its basic kit."
+look_for = [
+  "The sizes your gear actually takes",
+  "An expiry date several years out",
+]
+avoid = [
+  "Loose batteries rattling together in a drawer",
+  "Mixing old and new batteries in one device",
+]
+price_band_usd = { low = 10.49, high = 19.99, per = "24-pack", note = "Two listings for 24-packs of AA alkaline batteries: $10.49 and $19.99." }
+retrieved = "2026-09-25"
+quantity_rule = "battery_packs"
+maintenance = { check_months = 12 }
+citations = ["ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_bank"
+name = "Phone power bank (about 20,000 mAh)"
+category = "power"
+unit = "power bank"
+buckets = ["power", "comms"]
+tier = "h72"
+free = false
+spec = "A charged battery pack of about 20,000 mAh (roughly 74 watt-hours) for each person who carries a phone, so alerts and calls keep working in an outage. Ready.gov lists a phone with chargers and a backup battery in its kit."
+look_for = [
+  "About 20,000 mAh capacity",
+  "The right cable for each phone",
+  "A way to recharge it: wall, car or solar",
+]
+avoid = [
+  "Leaving it uncharged for months",
+  "Very cheap packs with no safety marks",
+]
+price_band_usd = { low = 41.39, high = 59.99, per = "power bank", note = "Two retail listings for 20,000 mAh power banks: $41.39 and $59.99." }
+retrieved = "2026-09-25"
+quantity_rule = "per_person_13_plus"
+maintenance = { check_months = 3 }
+citations = ["ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_station"
+name = "Portable battery power station (about 1,000 watt-hours)"
+category = "power"
+unit = "power station"
+buckets = ["power", "medication", "comms"]
+tier = "w2"
+free = false
+spec = "A rechargeable battery of about 1,000 watt-hours with outlets, safe to use indoors because it burns no fuel. On a full charge it runs a CPAP for about five nights with the humidifier on, or a top-freezer fridge for most of a day."
+look_for = [
+  "About 1,000 Wh of capacity and at least 1,000 W of output",
+  "Lithium iron phosphate (LiFePO4) cells, which last thousands of cycles",
+  "A way to recharge it: solar panel, car or wall",
+]
+avoid = [
+  "Expecting it to run a whole house or central air",
+  "Leaving it at zero charge for months",
+]
+price_band_usd = { low = 499.00, high = 559.00, per = "power station", note = "Two retail listings for units of about 1,000 Wh: $499 and $559." }
+retrieved = "2026-09-25"
+quantity_rule = "power_station_units"
+maintenance = { check_months = 3 }
+citations = ["rr_research_supply_standards", "sil_cpap_power", "epa_energy_star_refrigerators", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_generator"
+name = "Inverter generator (outdoors only, 20 feet from the house)"
+category = "power"
+unit = "generator"
+buckets = ["power", "thermal", "water_out"]
+tier = "w2"
+free = false
+spec = "A 2,000 to 3,000 watt gasoline inverter generator for homes with a safe spot outdoors, 20 feet or more from windows, doors and vents (CDC). It uses about 2.8 gallons of fuel a day at light load and up to 7 at full load."
+look_for = [
+  "A built-in carbon monoxide sensor that shuts it off",
+  "Heavy-duty extension cords to plug appliances into it directly (Ready.gov)",
+  "A carbon monoxide alarm inside the house",
+]
+avoid = [
+  "Running it in a garage, porch or near any opening, even with doors open (CDC)",
+  "Connecting it to the house wiring instead of plugging appliances into it with cords",
+  "Buying one if you live in an apartment or cannot keep it 20 feet from the building",
+  "Assuming a small unit can start a well pump: check the pump's starting watts",
+]
+price_band_usd = { low = 499.00, high = 1199.00, per = "generator", note = "Three listings for 2,200–2,800 W inverter generators: $499, $549 and a $1,199 list price." }
+retrieved = "2026-09-25"
+quantity_rule = "generator_units"
+maintenance = { check_months = 3 }
+citations = ["cdc_co_basics", "ready_gov_power_outages", "rr_research_supply_standards", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_generator_fuel"
+name = "Gasoline for the generator, in approved cans"
+category = "power"
+unit = "gallon"
+buckets = ["power"]
+tier = "w2"
+free = false
+spec = "Fuel for the generator's run time, in approved cans, used within about six months as many appliance makers advise. Fire codes typically allow no more than 25 gallons at home, 10 in an attached garage and none in living space (IFC as summarized by Lehi, Utah)."
+look_for = [
+  "Approved gasoline cans with tight caps",
+  "A detached shed or garage for storage",
+  "A date on each can, and fuel stabilizer if you store it",
+]
+avoid = [
+  "Storing gasoline inside the home",
+  "Refueling a hot generator: let it cool first (Ready.gov)",
+  "Storing more than your local fire code allows",
+]
+price_band_usd = { low = 4.09, high = 4.20, per = "gallon", note = "US average price of regular gasoline, July and August 2026: $4.09 and $4.20 a gallon. Approved 5-gallon cans cost extra." }
+retrieved = "2026-09-25"
+quantity_rule = "generator_fuel_gallons"
+volume_l_per_unit = 3.785
+maintenance = { rotate_months = 6 }
+citations = ["lehi_fuel_storage", "ready_gov_power_outages", "bls_average_prices", "rr_research_supply_standards", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_solar_panel"
+name = "Portable solar panel (about 100 watts)"
+category = "power"
+unit = "panel"
+buckets = ["power", "comms"]
+tier = "m1"
+free = false
+spec = "A folding panel of about 100 watts to recharge a power station or power banks during a long outage. In December one gives about 120 watt-hours a day in Seattle and about 420 in Phoenix: enough for phones, lights, a radio and a CPAP, but not a full-size fridge in a northern winter."
+look_for = [
+  "Output that matches your power station's solar input",
+  "A kickstand to angle it toward the sun",
+  "The right cable and connector",
+]
+avoid = [
+  "Expecting it to run a refrigerator in winter",
+  "Laying it flat or in partial shade, which cuts output",
+]
+price_band_usd = { low = 199.00, high = 249.00, per = "panel", note = "Three retail listings for 100 W portable panels: $199, $247 and $249." }
+retrieved = "2026-09-25"
+quantity_rule = "solar_panel_units"
+citations = ["nlr_pvwatts_v8", "rr_research_supply_standards", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_device_battery"
+name = "Backup battery for a powered medical device"
+category = "power"
+unit = "battery"
+buckets = ["power", "medication"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "A battery of about 200 to 300 watt-hours sized to the device. A CPAP uses about 100 watt-hours a night without its humidifier and 170 with it, so a small unit covers a night or two; an oxygen concentrator uses far more, so ask the supplier."
+look_for = [
+  "The device's own watts, from its label, to size the battery",
+  "The right adapter or cable for the device",
+  "A way to recharge it during a long outage",
+]
+avoid = [
+  "Guessing the size: check the label or ask the supplier",
+  "Running the humidifier on battery when power is short",
+]
+price_band_usd = { low = 169.00, high = 299.00, per = "battery", note = "Two retail listings for small portable power stations (183 and 286 Wh): $169 and $299." }
+retrieved = "2026-09-25"
+quantity_rule = "device_battery_units"
+maintenance = { check_months = 3 }
+citations = ["sil_cpap_power", "ready_gov_disability", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []

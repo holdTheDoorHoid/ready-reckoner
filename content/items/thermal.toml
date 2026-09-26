@@ -1,0 +1,188 @@
+# Dangerous heat or cold indoors: warm and cool rooms, safe heat, hydration. Rules:
+# docs/CONTENT_STANDARDS.md §3. Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
+
+[[item]]
+id = "thermal_warm_room_plan"
+name = "Pick a warm room for a winter outage"
+category = "thermal"
+unit = "action"
+buckets = ["thermal"]
+tier = "now"
+free = true
+spec = "If the heat goes off in winter, gather everyone in one small room: close off unneeded rooms, stuff towels in the cracks under doors, and cover windows with blankets at night (CDC). Wear layers and hats, and use sleeping bags."
+look_for = [
+  "A small interior room with few windows",
+  "Blankets and towels you can use to seal gaps",
+  "A way to check on older relatives and neighbours",
+]
+avoid = [
+  "Heating with a gas oven or stovetop (CDC)",
+  "Letting an infant sleep in a cold room (CDC)",
+  "Grills, camp stoves or generators indoors (carbon monoxide)",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses what you have." }
+quantity_rule = "once"
+citations = ["cdc_winter_safety", "cdc_co_basics"]
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+
+[[item]]
+id = "thermal_cool_room_plan"
+name = "Pick a cool room for a heat wave"
+category = "thermal"
+unit = "action"
+buckets = ["thermal"]
+tier = "now"
+free = true
+spec = "In a heat wave, use the coolest, lowest room, cover sunny windows with drapes or shades, take cool showers or baths, and use the oven less (Ready.gov). If the room goes above 90°F, a fan stops helping, so go somewhere cooler (CDC)."
+look_for = [
+  "A shaded, low room (heat rises)",
+  "Drapes, shades or window reflectors for sunny windows",
+  "Light, loose clothing and water within reach",
+]
+avoid = [
+  "Relying on a fan when the room is above 90°F (CDC)",
+  "Leaving people or pets in a closed car (Ready.gov)",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses what you have." }
+quantity_rule = "once"
+citations = ["ready_gov_heat", "cdc_heat_health"]
+hazard_extras = ["heat_wave"]
+
+[[item]]
+id = "thermal_cooling_center"
+name = "Know your nearest cooling center"
+category = "thermal"
+unit = "action"
+buckets = ["thermal"]
+tier = "now"
+free = true
+spec = "Find out where your nearest cooling center or other air-conditioned public place is, and how you would get there without power: CDC suggests dialing 2-1-1 or calling your health department. Plan who checks on older neighbours and relatives in a heat wave."
+look_for = [
+  "The address and hours of the nearest cooling center or library",
+  "A ride plan for anyone who does not drive",
+  "A daily check-in with older or ill relatives and neighbours in heat",
+]
+avoid = [
+  "Leaving people or pets in a closed car on a warm day (Ready.gov)",
+  "Waiting until someone feels ill to leave a hot home",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a phone call or a search." }
+quantity_rule = "once"
+citations = ["cdc_heat_health", "ready_gov_heat", "semenza_1996_heat_deaths"]
+hazard_extras = ["heat_wave"]
+
+[[item]]
+id = "thermal_pipe_freeze"
+name = "Learn how to keep pipes from freezing"
+category = "thermal"
+unit = "action"
+buckets = ["water_out", "thermal"]
+tier = "now"
+free = true
+spec = "Ready.gov advises learning how to keep pipes from freezing before winter: know which pipes run along outside walls or crawl spaces, how to keep them warm, and where the main water shut-off is if one bursts."
+look_for = [
+  "Pipes in unheated spaces that need insulation",
+  "The main water shut-off, and a tool to turn it",
+  "Insulation, caulking and weather stripping where cold gets in",
+]
+avoid = [
+  "Thawing pipes with an open flame",
+  "Leaving a house unheated in a hard freeze",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to learn; pipe insulation costs a few dollars." }
+quantity_rule = "once"
+citations = ["ready_gov_winter"]
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+
+[[item]]
+id = "thermal_sleeping_bag"
+name = "Warm sleeping bag or heavy wool blanket for each person"
+category = "thermal"
+unit = "person"
+buckets = ["thermal"]
+tier = "h72"
+free = false
+spec = "A sleeping bag rated for your coldest nights, or a heavy wool blanket, for each person, as Ready.gov lists in its basic kit. With a warm room plan this covers a winter outage when the heating needs electricity."
+look_for = [
+  "A temperature rating near your area's coldest nights",
+  "Wool or synthetic fill that stays warm if damp",
+  "Warm hats and layers for everyone too",
+]
+avoid = [
+  "Thin blankets alone in a cold climate",
+  "Storing it where mice or damp can reach it",
+]
+price_band_usd = { low = 25.00, high = 55.99, per = "person", note = "Two retail listings: a heavy wool blanket at $25.00 and a 0°F sleeping bag at $55.99." }
+retrieved = "2026-09-25"
+quantity_rule = "per_person"
+citations = ["ready_gov_kit", "cdc_winter_safety", "rr_price_observations_2026_09"]
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+
+[[item]]
+id = "thermal_battery_fan"
+name = "Battery or rechargeable fan"
+category = "thermal"
+unit = "fan"
+buckets = ["thermal", "power"]
+tier = "h72"
+free = false
+spec = "A small battery or USB fan for moving air when the power is out in hot weather. CDC says fans help only while indoor temperatures are below 90°F; above that, go somewhere cooler."
+look_for = [
+  "Rechargeable from a power bank or USB",
+  "Several hours of run time on one charge",
+]
+avoid = [
+  "Relying on a fan above 90°F indoors (CDC)",
+  "Counting on a fan to prevent heat illness (Ready.gov)",
+]
+price_band_usd = { low = 10.99, high = 22.99, per = "fan", note = "Two retail listings for rechargeable fans: $10.99 and $22.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["cdc_heat_health", "ready_gov_heat", "rr_price_observations_2026_09"]
+hazard_extras = ["heat_wave"]
+
+[[item]]
+id = "thermal_indoor_thermometer"
+name = "Indoor room thermometer"
+category = "thermal"
+unit = "thermometer"
+buckets = ["thermal"]
+tier = "h72"
+free = false
+spec = "A simple room thermometer, so you know when it is too hot for a fan to help (90°F) or too cold for an infant to sleep, and when to leave for a cooling center or warming shelter (CDC)."
+look_for = [
+  "A clear dial or digital display you can read at a glance",
+  "One in the room where the most vulnerable person sleeps",
+]
+avoid = [
+  "Guessing the temperature by feel",
+  "Placing it in direct sun or next to a heater",
+]
+price_band_usd = { low = 2.19, high = 15.49, per = "thermometer", note = "Two restaurant-supply listings: a stick-on dial at $2.19 and a wall thermometer with humidity dial at $15.49." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["cdc_heat_health", "cdc_winter_safety", "rr_price_observations_2026_09"]
+hazard_extras = ["heat_wave"]
+
+[[item]]
+id = "thermal_emergency_blankets"
+name = "Foil emergency blankets"
+category = "thermal"
+unit = "blanket"
+buckets = ["thermal", "evacuate", "get_home"]
+tier = "h72"
+free = false
+spec = "Light, folded foil blankets that reflect body heat, for each go-bag and the car. They are part of the Red Cross first-aid kit list."
+look_for = [
+  "Folded small enough to fit every bag",
+  "A second one for the car kit",
+]
+avoid = [
+  "Using them in place of a real blanket at home",
+  "Reusing torn ones",
+]
+price_band_usd = { low = 0.50, high = 4.95, per = "blanket", note = "Two retail listings: $0.50 and $4.95 a blanket." }
+retrieved = "2026-09-25"
+quantity_rule = "per_person"
+citations = ["redcross_first_aid_kit", "rr_price_observations_2026_09"]
+hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]

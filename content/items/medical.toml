@@ -1,0 +1,394 @@
+# Medical: medicine continuity, first aid and mental health. Rules: docs/CONTENT_STANDARDS.md §3, §5.
+# The validator rejects dosing patterns in this file and allows aquarium, fish or veterinary
+# antibiotics to be named only in `avoid`, as a warning. No drug names with doses, anywhere.
+
+[[item]]
+id = "med_list_written"
+name = "Written medicine list for each person"
+category = "medical"
+unit = "action"
+buckets = ["medication", "medical_emergency"]
+tier = "now"
+free = true
+spec = "A paper list of each person's medicines with the dose their prescriber set, what each one is for, allergies, and the prescriber's and pharmacy's phone numbers. Keep one copy in the go-bag and one with your documents (Ready.gov)."
+look_for = [
+  "Every medicine, including over-the-counter ones and supplements",
+  "Allergies and medical conditions",
+  "Prescriber, pharmacy and insurance phone numbers",
+]
+avoid = [
+  "Keeping the only copy on your phone",
+  "Letting it fall out of date when a medicine changes",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: paper and a pen." }
+quantity_rule = "once"
+maintenance = { check_months = 6 }
+citations = ["ready_gov_disability", "fema_effak"]
+hazard_extras = []
+
+[[item]]
+id = "med_refill_at_seven"
+name = "Refill when 7 days of medicine remain"
+category = "medical"
+unit = "action"
+buckets = ["medication"]
+tier = "now"
+free = true
+life_safety = true
+spec = "Order each refill when a week of medicine is left, so you always hold at least 7 days on hand; CDC and the Red Cross both advise a week or more for emergencies. Ask whether your plan allows 90-day fills."
+look_for = [
+  "Pharmacy refill reminders or automatic refills",
+  "A calendar note for each medicine's refill date",
+  "A 90-day supply where your plan and prescriber allow it",
+]
+avoid = [
+  "Waiting for the last pill",
+  "Mixing old and new bottles without checking dates: use the oldest first",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it changes when you refill, not what you pay." }
+quantity_rule = "once_if_daily_rx"
+citations = ["cdc_pregnancy_emergency", "redcross_survival_kit", "fda_expired_medicines"]
+hazard_extras = []
+
+[[item]]
+id = "med_emergency_supply_ask"
+name = "Ask your prescriber and pharmacist about an emergency supply"
+category = "medical"
+unit = "action"
+buckets = ["medication"]
+tier = "now"
+free = true
+spec = "Ask how to build an emergency supply of your medicines and what your state allows: in a declared emergency some states let pharmacists give up to a 30-day refill. If you have no insurance, the federal Emergency Prescription Assistance Program can help when it is activated after a disaster."
+look_for = [
+  "Your state's emergency refill rule (your pharmacist will know it)",
+  "Whether your plan waives 'refill too soon' limits in a disaster",
+  "A second pharmacy you could use if yours closes",
+]
+avoid = [
+  "Assuming you can refill during a storm",
+  "Changing or stretching a medicine on your own: call your prescriber or pharmacist",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: two phone calls." }
+quantity_rule = "once_if_daily_rx"
+citations = ["ready_gov_disability", "healthcare_ready_refill_laws", "hhs_aspr_epap", "cdc_pregnancy_emergency"]
+hazard_extras = []
+
+[[item]]
+id = "med_reserve_supply"
+name = "Extra supply of daily prescription medicine (toward 14 days)"
+category = "medical"
+unit = "day of one person's medicine"
+buckets = ["medication"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "Build a cushion of each daily prescription toward 14 days on hand, between CDC's 7 to 10 days and Florida's two weeks. Keep medicines in their labeled bottles in a cool, dry place and use the oldest first."
+look_for = [
+  "Pharmacy labels on every bottle",
+  "Expiry dates past your next refill",
+  "The supplies that go with a medicine, such as test strips or syringes",
+]
+avoid = [
+  "Expired medicine, which may not work (FDA)",
+  "A hot car or a steamy bathroom (FDA)",
+  "Pill organizers as the only storage: they hide names and dates",
+]
+price_band_usd = { low = 0.40, high = 1.33, per = "day of one person's medicine", note = "Average 2025 employer-plan copays of $12 for a generic and $40 for a preferred brand-name drug per 30-day fill, or $0.40–1.33 a day. Your own copay replaces this." }
+retrieved = "2026-09-25"
+quantity_rule = "medication_days"
+maintenance = { rotate_months = 1 }
+citations = ["cdc_pregnancy_emergency", "redcross_survival_kit", "florida_dem_medication", "cdc_diabetes_emergencies", "fda_expired_medicines", "kff_ehbs_2025", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "med_antibiotics_clinician_card"
+name = "Antibiotics: talk with your own clinician (no stockpile)"
+category = "medical"
+unit = "action"
+buckets = ["medication", "medical_emergency"]
+tier = "now"
+free = true
+spec = "The plan never sets an antibiotic quantity: antibiotics are prescription-only, and CDC advises against saving them for later. If a specific, foreseeable situation worries you, such as remote travel or a known recurring condition, ask your own clinician whether a standby prescription with written instructions makes sense."
+look_for = [
+  "A clinician who knows your history, in person or by telehealth",
+  "Written instructions for any standby prescription: when to start it and when to call",
+  "Storage as the label says, and a note of the expiry date",
+]
+avoid = [
+  "Aquarium, fish or veterinary antibiotics: the FDA calls these unapproved and unsafe for people",
+  "Sharing antibiotics, or taking someone else's (CDC)",
+  "Expired antibiotics, which can fail to treat an infection (FDA)",
+  "Starting antibiotics on your own when medical care can be reached",
+  "Mail-order kits prescribed without a diagnosis ($300–400): infection specialists warn they fuel resistance",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a conversation with your clinician. The plan buys no antibiotics." }
+quantity_rule = "once"
+citations = ["cdc_antibiotic_use", "usc_21_353", "cdc_yellow_book_travel_kits", "fda_fish_antibiotics_warning_2023", "bishop_2020_fish_antibiotics", "fda_expired_medicines", "mo_med_2026_antibiotic_kits", "wms_wound_2014"]
+hazard_extras = []
+
+[[item]]
+id = "med_device_power_plan"
+name = "Power plan for a medical device"
+category = "medical"
+unit = "action"
+buckets = ["power", "medication", "medical_emergency"]
+tier = "now"
+free = true
+life_safety = true
+spec = "Ask your doctor or supplier how to keep the device running in an outage and how long its battery lasts, and ask your power company to put you on its list for priority restoration (Ready.gov). Keep batteries charged and know where you would go if the power stays off."
+look_for = [
+  "The device's power use in watts, from its label or manual",
+  "Spare batteries or a backup battery sized for your nights",
+  "Your utility's medical-priority registration",
+]
+avoid = [
+  "Assuming priority restoration means the power comes back quickly",
+  "Running any device from a generator indoors (carbon monoxide)",
+  "Backup batteries left uncharged",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: calls to your supplier and utility." }
+quantity_rule = "once_if_powered_device"
+citations = ["ready_gov_disability", "ready_gov_power_outages", "cdc_co_basics"]
+hazard_extras = []
+
+[[item]]
+id = "med_first_aid_training"
+name = "Learn bleeding control, first aid and hands-only CPR"
+category = "medical"
+unit = "action"
+buckets = ["medical_emergency"]
+tier = "now"
+free = true
+spec = "Take a free Stop the Bleed class, which teaches how to stop serious bleeding until help arrives, and learn basic first aid and hands-only CPR. People trained before an emergency act faster and cope better afterwards."
+look_for = [
+  "A free Stop the Bleed class near you",
+  "A first-aid and CPR class from a hospital, fire department or the Red Cross",
+  "A refresher when your certificate runs out",
+]
+avoid = [
+  "Waiting until the day you need the skill",
+  "Keeping supplies you do not know how to use",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Stop the Bleed classes are usually free; other classes may charge." }
+quantity_rule = "once"
+citations = ["dhs_stop_the_bleed", "gargano_2017_wtc_training", "redcross_first_aid_kit"]
+hazard_extras = []
+
+[[item]]
+id = "med_988_saved"
+name = "Save 988 and the Disaster Distress Helpline"
+category = "medical"
+unit = "action"
+buckets = ["medical_emergency"]
+tier = "now"
+free = true
+spec = "Save 988, the Suicide and Crisis Lifeline, and the Disaster Distress Helpline (call or text 1-800-985-5990) in every phone and on the paper contact card. Both are free and answer day and night, for anyone having a hard time, before or after a disaster."
+look_for = [
+  "Both numbers saved in every phone",
+  "Both numbers on the paper contact card",
+  "Children and teens told they can call or text too",
+]
+avoid = [
+  "Waiting until things feel unbearable to reach out",
+  "Thinking these lines are only for a crisis: they help with any distress",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: both lines cost nothing to call or text." }
+quantity_rule = "once"
+citations = ["samhsa_988", "samhsa_disaster_distress"]
+hazard_extras = []
+
+[[item]]
+id = "med_calm_plan"
+name = "Write a short calm plan"
+category = "medical"
+unit = "action"
+buckets = ["medical_emergency"]
+tier = "now"
+free = true
+spec = "Write down what each person might feel after a disaster, what helps each of you settle, and who you will call. Stress, worry and poor sleep are common after a disaster, and a plan made on a calm day makes it easier to ask for help."
+look_for = [
+  "One or two things that help each person settle, such as a walk, music, prayer or a routine",
+  "Who each person can talk to",
+  "The 988 and Disaster Distress Helpline numbers",
+]
+avoid = [
+  "Expecting everyone to feel fine right away",
+  "Shutting down children's questions",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: paper and ten minutes." }
+quantity_rule = "once"
+citations = ["samhsa_disaster_distress", "rr_research_prior_art"]
+hazard_extras = []
+
+[[item]]
+id = "med_telehealth_setup"
+name = "Set up telehealth and pharmacy accounts now"
+category = "medical"
+unit = "action"
+buckets = ["medication", "medical_emergency"]
+tier = "now"
+free = true
+spec = "Create your logins for your insurer's or clinic's telehealth service and your pharmacy's app or website while it is easy. In an emergency you can then reach your own clinician and move a prescription without traveling."
+look_for = [
+  "Your insurance member number saved with the logins",
+  "A second pharmacy you could move prescriptions to",
+  "Login details kept somewhere besides your phone",
+]
+avoid = [
+  "Setting it up during the emergency, when phones and websites are busy",
+  "Services that prescribe without asking about your history",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to set up; visits cost what your plan charges." }
+quantity_rule = "once"
+citations = ["mo_med_2026_antibiotic_kits", "rr_research_supply_standards"]
+hazard_extras = []
+
+[[item]]
+id = "med_spare_glasses"
+name = "Put a spare pair of glasses in the go-bag"
+category = "medical"
+unit = "action"
+buckets = ["medical_emergency", "evacuate"]
+tier = "now"
+free = true
+spec = "Keep your last pair of prescription glasses, and contact lens solution if you wear contacts, in the go-bag. Ready.gov lists both in its emergency kit."
+look_for = [
+  "An old pair that still works well enough",
+  "A hard case",
+  "A small bottle of lens solution and a lens case",
+]
+avoid = [
+  "Relying on contact lenses alone when clean water is short",
+  "Leaving the spare pair in a drawer at home",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses an old pair." }
+quantity_rule = "once"
+citations = ["ready_gov_kit"]
+hazard_extras = []
+
+[[item]]
+id = "med_first_aid_kit"
+name = "Family first-aid kit"
+category = "medical"
+unit = "kit"
+buckets = ["medical_emergency"]
+tier = "h72"
+free = false
+spec = "A kit close to the Red Cross list for a family of four: dressings, adhesive bandages, tape, gauze pads and roller bandages, antiseptic wipes, gloves, a breathing barrier, a cold pack, tweezers, a non-glass thermometer, an emergency blanket and a first-aid guide. Add each person's medicines and emergency phone numbers."
+look_for = [
+  "Gloves that are not latex",
+  "A thermometer that is not glass or mercury",
+  "A contents list so you can restock",
+]
+avoid = [
+  "Kits padded with dozens of tiny bandages and little else",
+  "Used or expired items left in the kit",
+]
+price_band_usd = { low = 34.95, high = 49.95, per = "kit", note = "Two listings from a non-profit's store: a 299-piece kit at $34.95 and a 115-piece family kit at $49.95." }
+retrieved = "2026-09-25"
+quantity_rule = "first_aid_kit"
+maintenance = { check_months = 6 }
+citations = ["redcross_first_aid_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "med_otc_basics"
+name = "Over-the-counter medicine basics"
+category = "medical"
+unit = "set"
+buckets = ["medical_emergency", "medication"]
+tier = "h72"
+free = false
+spec = "A small stock of the non-prescription medicines Ready.gov lists: a pain and fever reliever, anti-diarrhea medicine, an antacid, and allergy medicine, plus oral rehydration salts. Choose kinds your household already uses, and children's forms for children."
+look_for = [
+  "Medicines your household already takes without problems",
+  "Children's versions for children, chosen with a pharmacist",
+  "Oral rehydration salt packets, mixed with safe water (CDC)",
+]
+avoid = [
+  "Expired medicines (FDA)",
+  "A hot car or a steamy bathroom",
+  "Giving adult medicine to children",
+]
+price_band_usd = { low = 33.96, high = 51.66, per = "set", note = "Four boxed medicines from a restaurant-supply store (pain reliever, anti-diarrhea, upset stomach, allergy): $33.96 with a store-brand pain reliever and $51.66 with a name brand." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+maintenance = { check_months = 12 }
+citations = ["ready_gov_kit", "cdc_yellow_book_travel_kits", "cdc_cholera_treatment", "fda_expired_medicines", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "med_n95_respirators"
+name = "N95 respirators"
+category = "medical"
+unit = "respirator"
+buckets = ["medical_emergency", "supplies"]
+tier = "h72"
+free = false
+spec = "NIOSH-approved N95 respirators, the most protective kind CDC describes, for wildfire smoke, volcanic ash and illness. They work only when they seal around the nose and mouth."
+look_for = [
+  "NIOSH approval printed on the respirator",
+  "Sizes that fit each adult and teen",
+  "A box of 10 or 20",
+]
+avoid = [
+  "Cloth masks, which protect least (CDC)",
+  "Gaps at the edges or a beard under the seal",
+  "Masks on children under 2",
+]
+price_band_usd = { low = 0.72, high = 1.30, per = "respirator", note = "Two restaurant-supply listings for 20-packs: $0.72 and $1.30 each." }
+retrieved = "2026-09-25"
+quantity_rule = "n95_masks"
+citations = ["cdc_masks", "ready_gov_wildfires", "ready_gov_volcanoes", "rr_price_observations_2026_09"]
+hazard_extras = ["wildfire", "pandemic", "volcanic_activity"]
+
+[[item]]
+id = "med_cooler_refrigerated_rx"
+name = "Insulated bag and cold packs for refrigerated medicine"
+category = "medical"
+unit = "set"
+buckets = ["medication", "power"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "An insulated bag with cold packs to keep medicine such as insulin cool, but never frozen, when the power is out or you have to leave. Ready.gov advises throwing out refrigerated medicine after a day without power unless its label says otherwise, so ask your pharmacist how long yours lasts."
+look_for = [
+  "A bag that fits your medicine and two cold packs",
+  "A small thermometer or temperature strip",
+  "Your pharmacist's answer on how long it lasts out of the fridge",
+]
+avoid = [
+  "Medicine pressed directly against ice or frozen packs",
+  "A hot car",
+  "Using insulin that froze or overheated before asking a pharmacist (CDC)",
+]
+price_band_usd = { low = 14.74, high = 36.73, per = "set", note = "Two combinations of retail listings: a small insulated bag ($12.99) or a soft cooler ($34.99), each with two gel packs at $0.87." }
+retrieved = "2026-09-25"
+quantity_rule = "once_if_refrigerated_rx"
+citations = ["ready_gov_power_outages", "cdc_insulin_emergency", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "med_bleeding_control_kit"
+name = "Bleeding-control kit (tourniquet and pressure bandage)"
+category = "medical"
+unit = "kit"
+buckets = ["medical_emergency"]
+tier = "w2"
+free = false
+spec = "A tourniquet, a pressure bandage and gloves for serious bleeding when help is far away or delayed, as taught in Stop the Bleed classes. It matters most where ambulances take longer to arrive, such as rural areas."
+look_for = [
+  "A tourniquet with a windlass, a rod you turn to tighten it",
+  "A pressure bandage or trauma dressing",
+  "A Stop the Bleed class so you know how to use it",
+]
+avoid = [
+  "Tourniquets sold without instructions",
+  "Buying it without learning how to use it",
+  "Storing it where you cannot find it fast",
+]
+price_band_usd = { low = 47.90, high = 94.95, per = "kit", note = "A tourniquet ($37.95) and a pressure bandage ($9.95) bought separately, or a packaged bleeding-control kit at $94.95." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["dhs_stop_the_bleed", "wms_wound_2014", "mell_2017_ems_response", "rr_price_observations_2026_09"]
+hazard_extras = []
