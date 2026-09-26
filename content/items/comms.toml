@@ -1,0 +1,214 @@
+# Communications and information: alerts, contacts, radios. Rules: docs/CONTENT_STANDARDS.md §3.
+# Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
+
+[[item]]
+id = "comms_wea_alerts_on"
+name = "Turn on emergency alerts on every phone"
+category = "comms"
+unit = "action"
+buckets = ["comms", "evacuate"]
+tier = "now"
+free = true
+spec = "Check that Wireless Emergency Alerts are switched on in each phone's settings. They are free and need no sign-up (Ready.gov), but a phone only gets them when it is on, not in airplane mode, and served by a carrier that takes part (FCC)."
+look_for = [
+  "Emergency and public safety alerts switched on in phone settings",
+  "Phones kept charged and switched on at night during storms",
+]
+avoid = [
+  "Turning alerts off because a test was annoying",
+  "Relying only on alerts: add a weather radio and county alerts",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a phone setting." }
+quantity_rule = "once"
+citations = ["ready_gov_alerts", "fcc_wea"]
+hazard_extras = []
+
+[[item]]
+id = "comms_county_alerts"
+name = "Sign up for your county's emergency alerts"
+category = "comms"
+unit = "action"
+buckets = ["comms", "evacuate"]
+tier = "now"
+free = true
+spec = "Sign up for your county or city's emergency text and email alerts, which carry local warnings such as evacuation orders and boil-water notices. Ready.gov's planning questions start with how you will receive alerts and warnings."
+look_for = [
+  "Your county emergency management office's alert sign-up",
+  "Every adult's phone number registered",
+  "Alerts for your home and for work or school addresses",
+]
+avoid = [
+  "Assuming national alerts cover local notices",
+  "Signing up once and never updating your number",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a sign-up." }
+quantity_rule = "once"
+citations = ["ready_gov_alerts", "ready_gov_plan"]
+hazard_extras = []
+
+[[item]]
+id = "comms_contact_card"
+name = "Written contact card for each person"
+category = "comms"
+unit = "action"
+buckets = ["comms", "evacuate", "get_home"]
+tier = "now"
+free = true
+spec = "Write key phone numbers on a card for each person's wallet or bag: family, the out-of-area contact, work, school, doctor and 988. Ready.gov advises storing important numbers somewhere besides your phone, and offers a fillable card."
+look_for = [
+  "Ready.gov's free fillable family communication card",
+  "A card in every wallet, backpack and the go-bag",
+  "The out-of-area contact's number on every card",
+]
+avoid = [
+  "Relying on a phone's contact list that dies with the battery",
+  "Letting cards go out of date",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: paper and a pen, or the fillable card." }
+quantity_rule = "once"
+maintenance = { check_months = 12 }
+citations = ["ready_gov_low_cost", "ready_gov_family_comm_card", "fema_effak"]
+hazard_extras = []
+
+[[item]]
+id = "comms_out_of_area_contact"
+name = "Choose an out-of-area contact everyone can text"
+category = "comms"
+unit = "action"
+buckets = ["comms", "evacuate"]
+tier = "now"
+free = true
+spec = "Pick one relative or friend in another state whom everyone in the household will text to say they are safe (Ready.gov). Texts often get through when calls do not, and they use less battery."
+look_for = [
+  "Someone likely to answer, outside your region",
+  "Their number on every contact card",
+  "Everyone knowing to text first",
+]
+avoid = [
+  "Tying up local phone lines with calls",
+  "Choosing someone who lives nearby and faces the same disaster",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: one conversation." }
+quantity_rule = "once"
+citations = ["ready_gov_earthquakes", "ready_gov_plan"]
+hazard_extras = []
+
+[[item]]
+id = "comms_family_plan"
+name = "Make a family emergency plan"
+category = "comms"
+unit = "action"
+buckets = ["comms", "evacuate", "get_home"]
+tier = "now"
+free = true
+spec = "Agree how you will reach each other, where you will meet if you are separated, and who picks up the children (Ready.gov). Include each person's medical needs, pets and school or work plans, then practice it."
+look_for = [
+  "A meeting place near home and one outside the neighbourhood",
+  "Who collects each child, with a backup",
+  "Ready.gov's fillable family emergency plan",
+]
+avoid = [
+  "A plan only one person knows",
+  "Never practicing it",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: an hour with your household." }
+quantity_rule = "once"
+maintenance = { check_months = 12 }
+citations = ["ready_gov_plan", "ready_gov_family_comm_card"]
+hazard_extras = []
+
+[[item]]
+id = "comms_text_911"
+name = "Know how to reach 911 by call or text"
+category = "comms"
+unit = "action"
+buckets = ["comms", "medical_emergency"]
+tier = "now"
+free = true
+spec = "Always call 911 when you can, because a voice call gives the call center more information; text-to-911 works only in some places (FCC). Find out whether your county accepts texts, which helps when speaking is unsafe or impossible."
+look_for = [
+  "Whether your county accepts texts to 911",
+  "Children who know how to call 911",
+  "Your address written by the phone for visitors and sitters",
+]
+avoid = [
+  "Texting when you could call",
+  "Assuming a text went through without a reply",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: knowledge." }
+quantity_rule = "once"
+citations = ["fcc_text_911"]
+hazard_extras = []
+
+[[item]]
+id = "comms_paper_map"
+name = "Keep a paper map of your area"
+category = "comms"
+unit = "action"
+buckets = ["evacuate", "get_home", "comms"]
+tier = "now"
+free = true
+spec = "Keep a printed or paper road map of your area in the car and the go-bag, with your evacuation routes and meeting places marked (Ready.gov lists local maps in its kit). Phone maps fail when the network or battery does."
+look_for = [
+  "A free state road map or a printed county map",
+  "Two routes marked from home and from work",
+  "Meeting places and shelters marked",
+]
+avoid = [
+  "Relying only on phone navigation",
+  "An old map that misses new roads",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: printed maps and many state road maps cost nothing." }
+quantity_rule = "once"
+citations = ["ready_gov_kit", "ready_gov_evacuation"]
+hazard_extras = []
+
+[[item]]
+id = "comms_noaa_radio"
+name = "NOAA Weather Radio with a tone alert"
+category = "comms"
+unit = "radio"
+buckets = ["comms", "power", "evacuate"]
+tier = "h72"
+free = false
+spec = "A radio that receives NOAA Weather Radio, which broadcasts warnings day and night from more than 1,000 transmitters, and sounds an alarm when a warning is issued. Pick one that runs on batteries, a hand crank or solar as well as the wall."
+look_for = [
+  "NOAA Weather Radio with a tone or alert feature",
+  "Battery, crank or solar power",
+  "SAME county coding, so it alarms only for your area",
+]
+avoid = [
+  "Radios without the weather band",
+  "A radio stored with dead batteries",
+]
+price_band_usd = { low = 54.99, high = 64.99, per = "radio", note = "Two retail listings: a desktop alert radio at $54.99 and a hand-crank model at $64.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+maintenance = { check_months = 6 }
+citations = ["nws_weather_radio", "ready_gov_kit", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "comms_frs_radios"
+name = "License-free two-way radios (FRS), a pair"
+category = "comms"
+unit = "pair"
+buckets = ["comms"]
+tier = "w2"
+free = false
+spec = "A pair of Family Radio Service handhelds for talking within a neighbourhood when phones are down; the FCC lets anyone use them without a license. Expect about half a mile on the low-power channels and more on the others, depending on buildings and hills."
+look_for = [
+  "FRS radios (no license needed)",
+  "Rechargeable batteries plus a spare set of regular batteries",
+  "A channel your household and neighbours agree on",
+]
+avoid = [
+  "Buying GMRS-only radios without the $35 FCC license",
+  "Believing the long ranges printed on the box",
+]
+price_band_usd = { low = 74.99, high = 89.99, per = "pair", note = "Two retail listings for pairs of FRS radios: $74.99 and $89.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+maintenance = { check_months = 6 }
+citations = ["fcc_frs", "fcc_gmrs", "ecfr_47_1_1102", "rr_price_observations_2026_09"]
+hazard_extras = []

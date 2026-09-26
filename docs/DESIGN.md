@@ -550,6 +550,13 @@ control clears storage. The content security policy forbids inline scripts and e
 except for the optional, consented lookups. The repo publishes a threat model note in
 `docs/PRIVACY.md` (Phase 3).
 
+**Open decision (raised 2026-09-26 by the web workstream): the hosting origin.** Browser storage
+belongs to the whole origin, and `holdthedoorhoid.github.io` is shared by every project the owner
+publishes there, so any of those pages could read a household's saved plan. Before real use the site
+should live on its own origin: a dedicated GitHub organisation (free; `<org>.github.io`) or a custom
+domain. Until then the site carries the "sample numbers" banner and the About screen states the
+limitation.
+
 ## 11. Determinism and testing
 
 - Fixture households in `fixtures/households/*.json` cover: a renting family of four in
@@ -587,6 +594,11 @@ guidance beyond safe storage and training pointers.
 ## 14. Decision log (append only)
 
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
+- 2026-09-26 — Web shell merged (agent/web-shell f8f1afe). Decisions: interview "Continue anyway"
+  on validation problems (warn, don't block); no online-lookup switch in v1 (explanatory text instead);
+  month-0 free actions capped at 8 with the rest rolled into months 1–3 (behavioural research; budget
+  follow-up); `existing` holds one entry per item id (check-offs merge); `covered` may be 0; envelopes
+  are one per item id; done items may appear in month 0. Open decision: hosting origin (§10).
 - 2026-09-26 — Budget allocator decisions (agent/budget): default schedule is Split (reserve half toward
   an item costing more than a month's money, spend the rest); any person's daily prescription has harm
   weight 3; guardrail thresholds: evacuation-heavy = 10 % ten-year chance, go-bag expected by month 6,

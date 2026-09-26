@@ -4,10 +4,24 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0e5c69" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#16191c" media="(prefers-color-scheme: dark)" />
+    <meta name="referrer" content="no-referrer" />
     <title>Ready Reckoner</title>
     <meta name="description" content="Work out what is likely to happen where you live, what it would do to your household, and what to prepare first with the money you have. Nothing leaves your browser." />
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icons/icon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script src="/theme-init.js"></script>
   </head>
   <body>
+    <noscript>
+      <p style="max-width: 40rem; margin: 2rem auto; font: 1.1rem/1.5 system-ui, sans-serif">
+        Ready Reckoner needs JavaScript to work out your plan. It runs entirely in your browser and
+        sends nothing anywhere.
+      </p>
+    </noscript>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -1,0 +1,263 @@
+# Water: storage, treatment and free sources. Rules: docs/CONTENT_STANDARDS.md §3.
+# Price bands come from docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
+
+[[item]]
+id = "water_reused_bottles"
+name = "Tap water in clean reused bottles"
+category = "water"
+unit = "gallon"
+buckets = ["water_out", "water_boil"]
+tier = "now"
+free = true
+life_safety = true
+spec = "Wash drink bottles with soap, sanitize them with 1 teaspoon of unscented bleach in a quart of water, and fill them with tap water. Label each one 'drinking water' with the date and keep it cool and dark."
+look_for = [
+  "Bottles that held water or soda, with screw caps that seal",
+  "A cool, dark spot away from gasoline and pesticides",
+  "A date on every bottle so you know when to refill it",
+]
+avoid = [
+  "Milk and juice jugs (they seal poorly and turn brittle)",
+  "Anything that held chemicals, fuel or cleaners",
+  "Glass that can break",
+]
+price_band_usd = { low = 0, high = 0, per = "gallon", note = "Uses bottles you already have." }
+quantity_rule = "water_reused_bottles"
+volume_l_per_unit = 3.785
+maintenance = { rotate_months = 6 }
+citations = ["cdc_water_storage", "ready_gov_water", "church_emergency_prep_manual", "washington_prepare_in_a_year"]
+hazard_extras = []
+
+[[item]]
+id = "water_heater_reserve"
+name = "Know how to use the water in your water heater"
+category = "water"
+unit = "action"
+buckets = ["water_out"]
+tier = "now"
+free = true
+life_safety = true
+spec = "A tank water heater holds 20 to 80 gallons of clean tap water, and CDC lists it as a safe source when the taps are off. Learn where its drain valve and your home's main water shut-off are, so you can keep unsafe water out and drain the tank when you need it."
+look_for = [
+  "The tank size printed on the heater's label",
+  "The drain valve at the bottom of the tank, and a hose or pan that fits under it",
+  "Your home's main water shut-off valve",
+]
+avoid = [
+  "Water from a boiler or radiator system: CDC says use the tap water heater, not the heating tank",
+  "Draining the tank while its power or gas is still on",
+  "Letting unsafe city water flow in: officials may tell you to shut the main valve",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it uses water you already have." }
+quantity_rule = "once"
+citations = ["doe_water_heaters", "cdc_find_clean_water"]
+hazard_extras = []
+
+[[item]]
+id = "water_boil_method"
+name = "Know how to boil water safely"
+category = "water"
+unit = "action"
+buckets = ["water_boil"]
+tier = "now"
+free = true
+spec = "Bring clear water to a rolling boil for 1 minute, or 3 minutes above 5,000 feet, then let it cool before storing it (EPA, CDC). Let cloudy water settle or strain it through a clean cloth first."
+look_for = [
+  "A pot with a lid that you keep for boiling",
+  "A safe indoor heat source: an electric stove when power is on, or a gas stove you know how to light with a match",
+  "Clean containers with lids for the cooled water",
+]
+avoid = [
+  "Camp stoves, grills or generators indoors (carbon monoxide)",
+  "Boiling water that smells of fuel or chemicals: boiling does not make it safe (CDC)",
+  "Pitcher or fridge filters during a boil notice: boil filtered tap water too (CDC)",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it uses a pot and stove you already have." }
+quantity_rule = "once"
+citations = ["epa_emergency_disinfection", "cdc_water_disinfection", "cdc_water_advisories", "cdc_co_basics"]
+hazard_extras = []
+
+[[item]]
+id = "water_stored_bottled"
+name = "Store-bought bottled water"
+category = "water"
+unit = "gallon"
+buckets = ["water_out", "water_boil"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "Sealed, commercially bottled water in gallon jugs or cases, kept cool and out of the sun. The plan counts one gallon per person per day, for drinking and for keeping clean (Ready.gov, CDC)."
+look_for = [
+  "A best-by date printed on the pack",
+  "Gallon jugs or cases that fit the shelf where they will live",
+  "Enough for your household's target number of days",
+]
+avoid = [
+  "Keeping it in a hot garage, attic or car trunk",
+  "Packs with broken seals or no date",
+  "Buying it all during a storm warning; build it up a little at a time",
+]
+price_band_usd = { low = 0.88, high = 1.13, per = "gallon", note = "Two retail listings: a 24-bottle case of half-liter bottles and six 1-gallon jugs worked out to $0.88–1.13 a gallon." }
+retrieved = "2026-09-25"
+quantity_rule = "water_gallons"
+volume_l_per_unit = 3.785
+maintenance = { check_months = 6 }
+citations = ["ready_gov_water", "cdc_water_storage", "ready_gov_pandemic", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "water_jug_7gal"
+name = "Water storage jug, about 7 gallons"
+category = "water"
+unit = "jug"
+buckets = ["water_out", "water_boil"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "A food-grade plastic jug of 5 to 7 gallons with a tight cap and a spigot. Clean it, sanitize it with 1 teaspoon of unscented bleach in a quart of water, fill it with tap water, and replace the water every six months (CDC)."
+look_for = [
+  "Marked food-grade or safe for drinking water",
+  "A spigot or pour spout and a cap that seals",
+  "A size you can move: a full 7-gallon jug weighs about 58 pounds",
+]
+avoid = [
+  "Containers that ever held chemicals or fuel",
+  "Milk jugs or thin plastic that cracks",
+  "Storing it in direct sun",
+]
+price_band_usd = { low = 20.99, high = 23.99, per = "jug", note = "Two retail listings for 7-gallon rigid jugs, $20.99 and $23.99: about $3.00–3.43 per gallon of storage." }
+retrieved = "2026-09-25"
+quantity_rule = "water_gallons"
+volume_l_per_unit = 26.5
+maintenance = { rotate_months = 6 }
+citations = ["cdc_water_storage", "ready_gov_water", "oregon_b2wr_toolkit", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "water_drum_55gal"
+name = "55-gallon water drum with pump"
+category = "water"
+unit = "drum"
+buckets = ["water_out"]
+tier = "w2"
+free = false
+spec = "A food-grade drum that holds 55 gallons, with a bung wrench and a hand pump or siphon, for homes that need two weeks or more of stored water. Full, it weighs about 460 pounds, so fill it where it will stay."
+look_for = [
+  "Food-grade plastic made for drinking water, usually blue",
+  "A bung wrench and a pump or siphon in the kit",
+  "A ground-floor spot that can hold about 460 pounds",
+]
+avoid = [
+  "Used drums that held syrup, juice or chemicals",
+  "Upper floors or decks that may not take the weight",
+  "A spot where you cannot reach the pump",
+]
+price_band_usd = { low = 129.99, high = 199.99, per = "drum", note = "Two retail listings, both on sale: $129.99 and $199.99 (list prices $250–310), or about $2.36–3.64 per gallon of storage." }
+retrieved = "2026-09-25"
+quantity_rule = "water_gallons"
+volume_l_per_unit = 208.2
+maintenance = { rotate_months = 6 }
+citations = ["cdc_water_storage", "oregon_b2wr_toolkit", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "water_bleach_unscented"
+name = "Unscented household bleach (for treating water)"
+category = "water"
+unit = "bottle"
+buckets = ["water_boil", "water_out"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "Plain unscented bleach whose label says 5 to 9 percent sodium hypochlorite. For clear water, add 8 drops of 6% bleach or 6 drops of 8.25% bleach per gallon, double it for cloudy or very cold water, stir, and wait 30 minutes (EPA)."
+look_for = [
+  "Sodium hypochlorite between 5% and 9% on the label",
+  "Plain, unscented bleach",
+  "A clean medicine dropper and measuring spoons kept with it",
+]
+avoid = [
+  "Scented or color-safe bleach, or bleach with added cleaners (EPA)",
+  "Mixing bleach with other cleaners",
+  "Bottles stored more than a year: bleach slowly loses strength (EPA)",
+]
+price_band_usd = { low = 6.58, high = 8.75, per = "bottle", note = "Two janitorial-supply listings sold by the case: a 128-ounce bottle at $6.58 and an 81-ounce concentrated bottle at $8.75. One bottle treats thousands of gallons." }
+retrieved = "2026-09-25"
+quantity_rule = "bleach_bottles"
+maintenance = { rotate_months = 12 }
+citations = ["epa_emergency_disinfection", "cdc_water_storage", "cdc_water_disinfection", "cdc_bleach_disinfecting", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "water_filter_gravity"
+name = "Gravity water filter (removes bacteria and parasites)"
+category = "water"
+unit = "filter"
+buckets = ["water_out", "water_boil"]
+tier = "w2"
+free = false
+spec = "A bag or bucket system that cleans raw water by gravity, with an absolute pore size of 0.3 micron or smaller (CDC). It does not remove viruses, so add a disinfectant such as bleach or chlorine dioxide after filtering."
+look_for = [
+  "An absolute pore size of 0.3 micron or smaller on the package",
+  "A rated capacity in gallons, with replacement filters sold",
+  "A clean-water container kept apart from the dirty side",
+]
+avoid = [
+  "Counting on it to remove viruses or chemicals (CDC)",
+  "Water that smells of fuel or chemicals",
+  "Filters that give no pore size",
+]
+price_band_usd = { low = 54.95, high = 95.95, per = "filter", note = "Two retail listings for family gravity filters, $54.95 and $95.95; models that also remove viruses cost about $190." }
+retrieved = "2026-09-25"
+quantity_rule = "water_treatment_capacity"
+citations = ["cdc_water_disinfection", "rr_research_risk_model", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "water_personal_filter"
+name = "Personal straw or squeeze filter for a bag"
+category = "water"
+unit = "filter"
+buckets = ["get_home"]
+tier = "h72"
+free = false
+spec = "A small filter you drink through or squeeze water through, with the same 0.3-micron rating as a larger filter (CDC). Walking in heat takes about 24 to 32 ounces of water an hour, so a filter saves carrying it all (NIOSH)."
+look_for = [
+  "An absolute pore size of 0.3 micron or smaller",
+  "Light enough to live in the bag",
+  "A bottle or pouch it fits",
+]
+avoid = [
+  "Counting on it to remove viruses or chemicals (CDC)",
+  "Drinking water that smells of fuel",
+  "Leaving it out of the bag after you use it",
+]
+price_band_usd = { low = 17.95, high = 29.00, per = "filter", note = "Three retail listings: $17.95, $24.95 and $29.00." }
+retrieved = "2026-09-25"
+quantity_rule = "per_commuter"
+citations = ["cdc_water_disinfection", "cdc_niosh_heat_hydration", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "water_chlorine_dioxide"
+name = "Chlorine dioxide water treatment"
+category = "water"
+unit = "pack"
+buckets = ["water_boil", "get_home", "evacuate"]
+tier = "h72"
+free = false
+spec = "Drops or tablets of chlorine dioxide, which kill the parasite Cryptosporidium when used as directed; iodine and plain chlorine tablets do not (CDC). Use them after a filter, or on their own for clear water, and wait as long as the label says."
+look_for = [
+  "Chlorine dioxide on the label, not iodine",
+  "An expiry date well in the future",
+  "Clear directions for how much water each pack treats",
+]
+avoid = [
+  "Iodine tablets if anyone is pregnant or has thyroid problems (CDC)",
+  "Treating water that smells of fuel or chemicals",
+  "Expired packs",
+]
+price_band_usd = { low = 9.99, high = 16.99, per = "pack", note = "Two retail listings for two-part drop kits: $9.99 and $16.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["cdc_water_disinfection", "rr_price_observations_2026_09"]
+hazard_extras = []

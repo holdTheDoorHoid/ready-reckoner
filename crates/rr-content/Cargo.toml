@@ -6,9 +6,14 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-description = "Ready Reckoner: content"
+description = "Ready Reckoner: the item catalogue, citations, guidance blocks and glossary, embedded at build time and validated against the content policy"
+build = "build.rs"
 
 [dependencies]
+rr-types = { path = "../rr-types" }
 serde.workspace = true
-serde_json.workspace = true
+toml.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

@@ -1,0 +1,2517 @@
+# rr-supply constants registry (CC BY-SA 4.0, like everything under docs/ and content/).
+#
+# Every number the quantity rules use lives here, with the sources it comes from. The rules read
+# values only through this file; `rr_supply::constants()` exposes it for the expert view.
+#
+# [[constant]]  key        stable snake_case id (the Rust `keys` module names each one)
+#               label      what it is, in plain words
+#               unit       the unit of `default`, `low`, `high`
+#               default    the value the engine uses
+#               low, high  optional plausible range (published spread, or the range of an estimate)
+#               prior      true when the value is a planning estimate, not a published figure
+#               sources    citation ids for the default (they resolve to content/citations.toml)
+#               note       optional; where authorities disagree (docs/research/supply-standards.md §13)
+#               note_sources  citation ids for numbers in the note
+#               [[constant.alternative]]  other published values: label, value, sources
+#
+# Numbers and wording come from docs/research/supply-standards.md (retrieved 2026-09-25).
+
+# ---------------------------------------------------------------------------------------------
+# Water (research §1)
+# ---------------------------------------------------------------------------------------------
+
+[[constant]]
+key = "water_survival_gal"
+label = "Water per person per day at the survival level (drinking only, about 3 L)"
+unit = "gallon per person per day"
+default = 0.8
+low = 0.66
+sources = ["sphere_2018", "who_wedc_tn9"]
+note = "Drinking only. Sphere and WHO give 2.5 to 3 L a day for drinking in the acute phase of an emergency. Denmark advises 3 L; Germany 2 L for drinking plus cooking."
+note_sources = ["sphere_2018", "who_wedc_tn9", "rr_research_supply_standards"]
+
+[[constant]]
+key = "water_basic_gal"
+label = "Water per person per day at the basic level (drinking and basic hygiene)"
+unit = "gallon per person per day"
+default = 1.0
+sources = ["ready_gov_water", "cdc_water_storage"]
+note = "The US figure assumes a short outage and waterless hygiene (wipes, hand sanitizer). Sphere's 15 L and WHO's 20 L are amounts for long emergencies or for good health, not a US household rule."
+note_sources = ["sphere_2018", "who_wedc_tn9"]
+
+[[constant.alternative]]
+label = "Sphere household minimum (15 L)"
+value = 3.96
+sources = ["sphere_2018"]
+
+[[constant.alternative]]
+label = "WHO minimum for health and hygiene (20 L)"
+value = 5.28
+sources = ["who_wedc_tn9"]
+
+[[constant]]
+key = "water_comfortable_gal"
+label = "Water per person per day at the comfortable level (Sphere's 15 L: drinking, cooking and washing)"
+unit = "gallon per person per day"
+default = 4.0
+low = 2.0
+high = 5.3
+sources = ["sphere_2018"]
+note = "Sphere treats 15 L as a floor, not a ceiling; 7.5 L may do for a short time in a drought. WHO puts the minimum for health and hygiene near 20 L."
+note_sources = ["sphere_2018", "who_wedc_tn9"]
+
+[[constant]]
+key = "water_drinking_share_basic_gal"
+label = "Drinking share of the basic allowance"
+unit = "gallon per person per day"
+default = 0.75
+sources = ["ready_gov_water"]
+note = "Authorities disagree on how much is for drinking: Washington says at least 1 quart, the Church at least 2 quarts, Ready.gov about 3/4 gallon of fluid, Sphere and WHO 2.5 to 3 L, Germany 2 L for drinking and cooking, Denmark 3 L. The plan keeps 1 gallon in total and shows the range."
+note_sources = ["washington_prepare_in_a_year", "church_emergency_prep_manual", "ready_gov_water", "sphere_2018", "who_wedc_tn9", "rr_research_supply_standards"]
+
+[[constant]]
+key = "water_heat_drinking_multiplier"
+label = "Multiplier on drinking water in a hot climate"
+unit = "times"
+default = 2.0
+sources = ["ready_gov_water", "cdc_water_storage"]
+note = "Ready.gov: in very hot temperatures water needs can double. The plan doubles the drinking share (1.75 gallons a person a day at the basic level); the cautious option doubles everything (2 gallons). NIOSH says not to drink more than 6 cups an hour, and the CDC Yellow Book warns against drinking far past thirst."
+note_sources = ["ready_gov_water", "cdc_niosh_heat_hydration", "rr_research_supply_standards"]
+
+[[constant]]
+key = "hot_climate_days_95f"
+label = "Days a year at or above 95 °F that make a county count as hot for water storage"
+unit = "days per year"
+default = 30.0
+low = 10.0
+high = 60.0
+prior = true
+sources = ["rr_expert_prior", "nca5_atlas"]
+note = "No agency defines a hot climate for water storage; CDC says to store more if you live in one. The plan uses the hot-weather amount where the county sees about a month or more of 95 °F days a year under the chosen climate dial (Philadelphia today: about 3)."
+note_sources = ["cdc_water_storage", "nca5_atlas"]
+
+[[constant]]
+key = "water_nursing_add_gal"
+label = "Extra water per pregnant or breastfeeding person per day"
+unit = "gallon per person per day"
+default = 0.29
+sources = ["iom_dri_water_2005"]
+note = "From the National Academies' total water intakes: 3.8 L a day breastfeeding and 3.0 L pregnant, against 2.7 L for other women (+1.1 L and +0.3 L). The household form has one box for pregnant or nursing, so the plan uses the larger breastfeeding figure."
+note_sources = ["iom_dri_water_2005"]
+
+[[constant]]
+key = "water_pregnancy_add_gal"
+label = "Extra water per pregnant person per day (used if pregnancy is known and nursing is not)"
+unit = "gallon per person per day"
+default = 0.08
+sources = ["iom_dri_water_2005"]
+
+[[constant]]
+key = "water_formula_infant_gal"
+label = "Safe water to mix powdered formula, per formula-fed baby per day"
+unit = "gallon per infant per day"
+default = 0.25
+sources = ["aap_formula_amounts", "cdc_infant_feeding_disaster"]
+note = "About 1 quart (0.95 L) makes the most formula a baby usually drinks in a day (32 oz, AAP). CDC: use ready-to-feed formula if you can; otherwise bottled water, or water boiled for 1 minute and cooled."
+
+[[constant]]
+key = "water_dog_oz_per_lb_day"
+label = "Dog drinking water"
+unit = "ounce per pound of body weight per day"
+default = 1.0
+sources = ["rr_research_supply_standards"]
+
+[[constant.alternative]]
+label = "Merck maintenance fluids: 132 x body weight in kg to the power 0.75 mL a day (a 30 lb dog about 0.9 L)"
+value = 0.95
+sources = ["rr_research_supply_standards"]
+
+[[constant]]
+key = "water_cat_oz_per_lb_day"
+label = "Cat drinking water (about 4 oz per 5 lb)"
+unit = "ounce per pound of body weight per day"
+default = 0.8
+sources = ["rr_research_supply_standards"]
+
+[[constant.alternative]]
+label = "Merck maintenance fluids: 80 x body weight in kg to the power 0.75 mL a day"
+value = 0.66
+sources = ["rr_research_supply_standards"]
+
+[[constant]]
+key = "dog_weight_lb"
+label = "Weight assumed for a dog (the household form does not ask)"
+unit = "pound"
+default = 40.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "cat_weight_lb"
+label = "Weight assumed for a cat"
+unit = "pound"
+default = 10.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "water_small_pet_oz_day"
+label = "Drinking water for a small pet (bird, rabbit, reptile)"
+unit = "ounce per pet per day"
+default = 8.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_pets"]
+note = "No published figure; a cup a day covers a rabbit, and birds and reptiles need less. Ready.gov: store a water bowl and several days of water for pets."
+
+[[constant]]
+key = "water_livestock_l_day"
+label = "Water per large animal (horse, cow) per day"
+unit = "litre per animal per day"
+default = 25.0
+low = 20.0
+high = 30.0
+sources = ["sphere_2018"]
+note = "Sphere: 20 to 30 L per large or medium animal, 5 L per small animal. Horses and cattle often need more in heat; no figure was found."
+
+[[constant]]
+key = "water_rehydration_gal_per_person_day"
+label = "Extra water to rehydrate freeze-dried or dehydrated food"
+unit = "gallon per person-day of such food"
+default = 0.6
+prior = true
+sources = ["rr_expert_prior"]
+note = "Worked out from one retail kit's label: about 120 cups of water for 12 person-days of food. Only needed when the food plan uses dehydrated meals."
+
+[[constant]]
+key = "water_stored_cap_days"
+label = "Days of water to store before a filter and a water source take over"
+unit = "day"
+default = 14.0
+sources = ["byu_longer_term_storage_2019", "ensign_2006_year_supply", "oregon_b2wr_toolkit", "washington_prepare_in_a_year"]
+note = "The Church and BYU pair a year of food with two weeks of stored water (14 gallons a person) plus a means of purification. Oregon and Washington ask for two weeks. Beyond that, a filter plus rain, a stream or a pond beats stacking more jugs."
+
+[[constant.alternative]]
+label = "Store 2 to 4 weeks (the research example for a well household)"
+value = 30.0
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "water_rotation_months"
+label = "Replace water you store yourself every"
+unit = "month"
+default = 6.0
+sources = ["cdc_water_storage", "ready_gov_water"]
+note = "CDC, Ready.gov, the Church and Washington say every 6 months; the ASPCA says every 2 months for bottled water in a pet kit."
+note_sources = ["cdc_water_storage", "ready_gov_water", "church_emergency_prep_manual", "washington_prepare_in_a_year", "aspca_disaster_prep"]
+
+
+[[constant]]
+key = "reused_bottles_max_gal"
+label = "Most water a household can bottle in clean reused drink bottles"
+unit = "gallon"
+default = 6.0
+prior = true
+sources = ["rr_expert_prior", "rr_research_risk_model"]
+note = "The clean drink bottles a household can collect in about a month; milk jugs leak and are not used. The research example fills about 6 gallons this way in month 0."
+
+[[constant]]
+key = "bleach_strength_pct"
+label = "Strength of household bleach to use for water (sodium hypochlorite)"
+unit = "percent"
+default = 6.0
+low = 5.0
+high = 9.0
+sources = ["cdc_water_storage", "epa_emergency_disinfection"]
+note = "CDC: the label should say it contains between 5 % and 9 % sodium hypochlorite; use unscented bleach, not the splashless kind."
+note_sources = ["cdc_water_storage", "cdc_bleach_disinfecting"]
+
+[[constant]]
+key = "bleach_drops_per_gal_6pct"
+label = "Drops of 6 % unscented bleach per gallon of clear water"
+unit = "drop per gallon"
+default = 8.0
+sources = ["epa_emergency_disinfection"]
+
+[[constant]]
+key = "bleach_drops_per_gal_8pct"
+label = "Drops of 8.25 % unscented bleach per gallon of clear water"
+unit = "drop per gallon"
+default = 6.0
+sources = ["epa_emergency_disinfection"]
+note = "Ready.gov's older page says 1/8 teaspoon a gallon for 5.25 to 6 % bleach, which is out of date now that 8.25 % bleach is common. CDC says 8 drops for any 5 to 9 % bleach. The plan uses the EPA table by strength, doubled for cloudy water (CDC)."
+note_sources = ["ready_gov_water", "cdc_water_disinfection", "epa_emergency_disinfection"]
+
+[[constant]]
+key = "bleach_cloudy_multiplier"
+label = "Bleach multiplier for cloudy, coloured or very cold water"
+unit = "times"
+default = 2.0
+sources = ["cdc_water_disinfection"]
+
+[[constant]]
+key = "disinfect_wait_minutes"
+label = "Wait after adding bleach"
+unit = "minute"
+default = 30.0
+sources = ["epa_emergency_disinfection", "cdc_water_disinfection"]
+
+
+[[constant]]
+key = "bleach_bottle_days"
+label = "Days one bottle of unscented bleach covers water treatment and cleaning"
+unit = "day"
+default = 14.0
+prior = true
+sources = ["cdc_bleach_disinfecting", "rr_research_supply_standards", "rr_expert_prior"]
+note = "One 64 to 121 oz bottle covers a household's water treatment and surface cleaning for about two weeks (an assumption). Bleach loses strength over time."
+
+[[constant]]
+key = "boil_minutes"
+label = "Rolling boil"
+unit = "minute"
+default = 1.0
+sources = ["cdc_water_disinfection", "epa_emergency_disinfection"]
+
+[[constant]]
+key = "boil_minutes_high_altitude"
+label = "Rolling boil at high altitude"
+unit = "minute"
+default = 3.0
+sources = ["epa_emergency_disinfection"]
+
+[[constant]]
+key = "boil_altitude_ft"
+label = "Altitude above which to boil for 3 minutes"
+unit = "foot"
+default = 5000.0
+sources = ["epa_emergency_disinfection"]
+note = "CDC, EPA and Ready.gov say 1 minute; the Church says 3 to 5. EPA switches to 3 minutes above 5,000 feet and CDC above 6,500 feet; the plan uses the stricter 5,000."
+note_sources = ["cdc_water_disinfection", "epa_emergency_disinfection", "church_emergency_prep_manual"]
+
+[[constant.alternative]]
+label = "CDC threshold"
+value = 6500.0
+sources = ["cdc_water_disinfection"]
+
+[[constant]]
+key = "propane_l_boiled_per_lb"
+label = "Litres of water one pound of propane brings to a boil on a camp stove"
+unit = "litre per pound"
+default = 27.5
+low = 25.0
+high = 30.0
+prior = true
+sources = ["rr_expert_prior", "eia_btu"]
+note = "Physics plus two assumptions (a 40 % efficient stove and 4.2 lb per gallon of propane): about 800 Btu per litre boiled. Check the stove's own figures."
+
+# ---------------------------------------------------------------------------------------------
+# Food (research §2)
+# ---------------------------------------------------------------------------------------------
+
+
+[[constant]]
+key = "cooking_fuel_lb_per_person_day"
+label = "Camp-stove fuel per person per day to boil drinking water and heat one meal"
+unit = "pound per person per day"
+default = 0.2
+prior = true
+sources = ["rr_expert_prior", "rr_research_supply_standards", "eia_btu"]
+note = "About 5 L boiled a day at 25 to 30 L per pound of propane or butane."
+
+[[constant]]
+key = "fuel_canister_lb"
+label = "Fuel in one 8-ounce stove canister"
+unit = "pound"
+default = 0.5
+prior = true
+sources = ["rr_expert_prior", "rr_price_observations_2026_09"]
+
+[[constant]]
+key = "cooking_fuel_min_canisters"
+label = "Fewest stove canisters worth keeping"
+unit = "canister"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "kcal_pregnant_or_nursing_add"
+label = "Extra food energy per pregnant or breastfeeding person per day"
+unit = "kcal per person per day"
+default = 400.0
+low = 0.0
+high = 452.0
+sources = ["usda_dga_2020_2025"]
+note = "DGA Table A2-3: +0 in the first trimester, +340 in the second, +452 in the third; +330 while breastfeeding months 0 to 6, +400 months 7 to 12. The form does not say which, so the plan uses 400."
+
+[[constant]]
+key = "kcal_pregnancy_t2_add"
+label = "Extra food energy, second trimester"
+unit = "kcal per day"
+default = 340.0
+sources = ["usda_dga_2020_2025"]
+
+[[constant]]
+key = "kcal_pregnancy_t3_add"
+label = "Extra food energy, third trimester"
+unit = "kcal per day"
+default = 452.0
+sources = ["usda_dga_2020_2025"]
+
+[[constant]]
+key = "kcal_lactation_0_6_add"
+label = "Extra food energy while breastfeeding, months 0 to 6"
+unit = "kcal per day"
+default = 330.0
+sources = ["usda_dga_2020_2025"]
+
+[[constant]]
+key = "kcal_lactation_7_12_add"
+label = "Extra food energy while breastfeeding, months 7 to 12"
+unit = "kcal per day"
+default = 400.0
+sources = ["usda_dga_2020_2025"]
+
+[[constant]]
+key = "sphere_kcal_average"
+label = "Sphere planning figure: average across all ages (a check, not an individual need)"
+unit = "kcal per person per day"
+default = 2100.0
+sources = ["sphere_2018"]
+
+[[constant]]
+key = "food_cost_pantry_usd_per_person_day"
+label = "Everyday groceries: USDA Thrifty Food Plan, August 2026"
+unit = "US dollar per person per day"
+default = 8.44
+sources = ["usda_tfp_aug2026"]
+note = "$236.30 a week for the reference family of four. By person it runs from about $3.77 a day for a 1-year-old to $10.51 for a man aged 20 to 50. Shelf-stable pantry food costs about the same (an assumption)."
+
+[[constant]]
+key = "food_cost_staples_usd_per_person_day"
+label = "Bulk staples (wheat, rice, beans, milk powder) at Home Storage Center prices"
+unit = "US dollar per person per day"
+default = 2.5
+low = 2.15
+high = 2.85
+sources = ["church_hsc_order_form_2026", "ensign_2006_year_supply", "byu_longer_term_storage_2019"]
+note = "The 2006 year's-supply basics cost about $2.15 a day at 2026 prices; the broader 2019 BYU list about $2.85 a day before oils and peanut butter."
+
+[[constant]]
+key = "food_cost_freeze_dried_usd_per_2000kcal"
+label = "Freeze-dried and dehydrated meals, per 2,000 kcal"
+unit = "US dollar per 2,000 kcal"
+default = 24.0
+low = 9.0
+high = 39.0
+sources = ["rr_price_observations_2026_09"]
+
+[[constant]]
+key = "retail_kit_kcal_per_day"
+label = "Food energy a retail \"30-day\" kit really supplies per day"
+unit = "kcal per day"
+default = 1290.0
+low = 1290.0
+high = 1730.0
+sources = ["rr_price_observations_2026_09"]
+note = "Kits are sold by servings or days. Measured in kcal, many \"30-day\" kits supply 1,290 to 1,730 kcal a day: 60 to 80 % of what an adult needs. Sphere plans on 2,100."
+note_sources = ["rr_price_observations_2026_09", "sphere_2018"]
+
+[[constant]]
+key = "retail_kit_label_days"
+label = "Days on a \"30-day\" kit's label"
+unit = "day"
+default = 30.0
+sources = ["rr_price_observations_2026_09"]
+
+[[constant]]
+key = "staples_after_days"
+label = "Days of everyday pantry food before bulk staples are the cheaper way to add more"
+unit = "day"
+default = 30.0
+prior = true
+sources = ["church_emergency_prep_manual", "rr_expert_prior"]
+note = "The Church manual builds a short-term supply a day, a week, then a month and beyond, and a separate longer-term supply of staples; no authority sets the switch point."
+
+[[constant]]
+key = "infant_formula_oz_day"
+label = "Prepared formula per formula-fed baby per day (planning maximum)"
+unit = "fluid ounce per day"
+default = 32.0
+sources = ["aap_formula_amounts"]
+note = "AAP: about 2 1/2 oz per pound of body weight a day, usually no more than 32 oz. The plan uses 32 oz so the supply still fits as the baby grows. CDC: ready-to-feed formula is safest in an emergency."
+note_sources = ["aap_formula_amounts", "cdc_infant_feeding_disaster"]
+
+
+[[constant]]
+key = "formula_powder_oz_per_day"
+label = "Powdered formula to make a day's 32 oz of prepared formula"
+unit = "ounce of powder per day"
+default = 5.0
+prior = true
+sources = ["rr_expert_prior", "aap_formula_amounts"]
+note = "Labels differ; check yours."
+
+[[constant]]
+key = "baby_supply_min_days"
+label = "Fewest days of formula and diapers to keep"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["cdc_infant_checklist", "rr_expert_prior"]
+note = "CDC: check the kit monthly so there is enough formula for several days."
+
+[[constant]]
+key = "nursing_pad_boxes"
+label = "Boxes of disposable nursing pads per breastfed baby"
+unit = "box"
+default = 2.0
+low = 1.0
+high = 2.0
+sources = ["cdc_infant_checklist"]
+
+[[constant]]
+key = "manual_pumps_per_nursing_infant"
+label = "Manual breast pump per breastfed baby"
+unit = "pump"
+default = 1.0
+sources = ["cdc_infant_checklist"]
+
+# ---------------------------------------------------------------------------------------------
+# Medication (research §3.2–3.4)
+# ---------------------------------------------------------------------------------------------
+
+
+[[constant]]
+key = "pet_food_min_days"
+label = "Fewest days of pet food to keep at home"
+unit = "day"
+default = 7.0
+low = 7.0
+high = 10.0
+sources = ["aspca_disaster_prep"]
+note = "ASPCA: 7 to 10 days of pet food; Ready.gov: several days."
+note_sources = ["aspca_disaster_prep", "ready_gov_pets"]
+
+[[constant]]
+key = "dog_food_lb_per_day"
+label = "Dry food a 40 lb dog eats a day"
+unit = "pound per day"
+default = 0.7
+prior = true
+sources = ["rr_expert_prior", "aspca_disaster_prep"]
+note = "Feed what the label says for your pet; this is a planning amount for the dog size the water rule assumes."
+
+[[constant]]
+key = "cat_food_lb_per_day"
+label = "Dry food a 10 lb cat eats a day"
+unit = "pound per day"
+default = 0.15
+prior = true
+sources = ["rr_expert_prior", "aspca_disaster_prep"]
+
+[[constant]]
+key = "small_pet_food_lb_per_day"
+label = "Food a small pet eats a day"
+unit = "pound per day"
+default = 0.05
+prior = true
+sources = ["rr_expert_prior", "ready_gov_pets"]
+
+[[constant]]
+key = "rx_days_on_hand"
+label = "Days of prescription medicine to keep on hand"
+unit = "day"
+default = 14.0
+low = 7.0
+high = 30.0
+sources = ["florida_dem_medication", "cdc_diabetes_emergencies", "cdc_pregnancy_emergency", "redcross_survival_kit"]
+note = "Red Cross 7 days; CDC 7 to 10 days (pregnancy page) and 1 to 2 weeks of diabetes supplies; Florida 2 weeks. State emergency-refill laws range from 72 hours to 30 days (90 in North Carolina). The plan keeps the household's medication target within 7 to 30 days (14 when there is no target)."
+note_sources = ["redcross_survival_kit", "cdc_pregnancy_emergency", "cdc_diabetes_emergencies", "florida_dem_medication", "healthcare_ready_refill_laws"]
+
+[[constant]]
+key = "rx_emergency_refill_days"
+label = "Longest emergency refill most state disaster rules allow"
+unit = "day"
+default = 30.0
+sources = ["healthcare_ready_refill_laws", "cdc_pregnancy_emergency"]
+note = "Ten states allow up to 30 days after a governor's emergency declaration; North Carolina allows 90; 16 jurisdictions have no emergency-refill law. HHS's EPAP helps uninsured people replace prescriptions where it has been switched on after a disaster."
+note_sources = ["healthcare_ready_refill_laws", "hhs_aspr_epap"]
+
+[[constant]]
+key = "refrigerated_rx_hold_days"
+label = "Days refrigerated medicine lasts without power (unless the label says otherwise)"
+unit = "day"
+default = 1.0
+sources = ["ready_gov_power_outages"]
+
+[[constant]]
+key = "antibiotic_quantity"
+label = "Antibiotics sized by the plan"
+unit = "course"
+default = 0.0
+sources = ["cdc_antibiotic_use", "fda_fish_antibiotics_warning_2023", "fda_expired_medicines", "cdc_yellow_book_travel_kits"]
+note = "CDC: don't save antibiotics for later. The Yellow Book allows prescribed standby antibiotics for some remote travel; the Wilderness Medical Society limits routine use to open fractures and some bites; direct-to-consumer kits cost about $300 to $400 and are criticised for stewardship. The plan sizes none and routes to the household's clinician."
+note_sources = ["cdc_antibiotic_use", "cdc_yellow_book_travel_kits", "wms_wound_2014", "mo_med_2026_antibiotic_kits"]
+
+# ---------------------------------------------------------------------------------------------
+# Power (research §6)
+# ---------------------------------------------------------------------------------------------
+
+[[constant]]
+key = "cpap_wh_per_night"
+label = "CPAP energy per night, humidifier on"
+unit = "watt-hour per night"
+default = 170.0
+low = 96.0
+high = 170.0
+sources = ["sil_cpap_power"]
+note = "One user's measurements. Battery makers suggest turning the humidifier off on battery, which brings it under 100 Wh; a travel machine uses 33 to 99 Wh."
+
+[[constant.alternative]]
+label = "Humidifier off"
+value = 96.0
+sources = ["sil_cpap_power"]
+
+[[constant]]
+key = "cpap_wh_per_night_dry"
+label = "CPAP energy per night, humidifier off"
+unit = "watt-hour per night"
+default = 96.0
+sources = ["sil_cpap_power"]
+
+[[constant]]
+key = "oxygen_concentrator_w"
+label = "Power drawn by a home oxygen concentrator"
+unit = "watt"
+default = 300.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_disability"]
+note = "No manufacturer figure was checked; use the watts on the device label. Ready.gov: keep a backup supply of oxygen and ask your utility about a priority restoration list."
+
+[[constant]]
+key = "device_hours_per_day"
+label = "Hours a day a powered medical device runs, when not known"
+unit = "hour per day"
+default = 24.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "fridge_wh_per_day"
+label = "Refrigerator energy per day (ENERGY STAR median, top freezer)"
+unit = "watt-hour per day"
+default = 995.0
+low = 537.0
+high = 1753.0
+sources = ["epa_energy_star_refrigerators"]
+
+[[constant.alternative]]
+label = "Bottom-freezer refrigerator"
+value = 1523.0
+sources = ["epa_energy_star_refrigerators"]
+
+[[constant.alternative]]
+label = "Side-by-side refrigerator"
+value = 1753.0
+sources = ["epa_energy_star_refrigerators"]
+
+[[constant.alternative]]
+label = "Chest freezer"
+value = 597.0
+sources = ["epa_energy_star_refrigerators"]
+
+[[constant]]
+key = "fridge_cold_hours"
+label = "Hours a closed refrigerator keeps food cold"
+unit = "hour"
+default = 4.0
+sources = ["ready_gov_food"]
+
+[[constant]]
+key = "freezer_cold_hours"
+label = "Hours a full freezer holds its temperature"
+unit = "hour"
+default = 48.0
+sources = ["ready_gov_power_outages"]
+
+[[constant]]
+key = "phone_wh_per_day"
+label = "Energy to charge one phone a day"
+unit = "watt-hour per phone per day"
+default = 15.0
+low = 10.0
+high = 20.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "A full charge of a typical phone battery is about 10 to 20 Wh; no manufacturer figure was captured."
+
+[[constant]]
+key = "lights_per_person"
+label = "Battery lights (headlamp or lantern) per person aged 4 and over"
+unit = "light per person"
+default = 1.0
+prior = true
+sources = ["ready_gov_kit", "rr_expert_prior"]
+
+[[constant]]
+key = "power_station_wh"
+label = "Capacity of a common portable power station"
+unit = "watt-hour"
+default = 1070.0
+sources = ["rr_price_observations_2026_09"]
+note = "A 1,070 Wh, 1,500 W unit observed on 2026-09-25 at about $559 ($0.52 per Wh)."
+
+[[constant]]
+key = "power_station_usable_share"
+label = "Share of a power station's capacity you can use after inverter losses"
+unit = "fraction"
+default = 0.85
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "generator_gal_per_day"
+label = "Fuel a 2,200 W inverter generator burns running all day"
+unit = "gallon per day"
+default = 2.8
+low = 2.8
+high = 7.1
+sources = ["rr_research_supply_standards"]
+note = "Its 0.95-gallon tank lasts 8.1 hours at a quarter load and 3.2 hours at full load: about 2.8 and 7.1 gallons a day running nonstop."
+
+[[constant]]
+key = "fuel_storage_max_gal"
+label = "Most gasoline a home may store"
+unit = "gallon"
+default = 25.0
+sources = ["lehi_fuel_storage"]
+note = "Local codes vary. This is the International Fire Code limit as one fire department states it: 25 gallons in approved cans, best in a detached shed, 10 in an attached garage, none in the living space."
+
+[[constant]]
+key = "fuel_storage_attached_garage_gal"
+label = "Most gasoline in an attached garage"
+unit = "gallon"
+default = 10.0
+sources = ["lehi_fuel_storage"]
+
+[[constant]]
+key = "fuel_storage_indoor_gal"
+label = "Gasoline allowed in the living space"
+unit = "gallon"
+default = 0.0
+sources = ["lehi_fuel_storage"]
+
+[[constant]]
+key = "propane_small_cylinders_indoor_max"
+label = "Most 1-lb propane cylinders inside the home or attached garage"
+unit = "cylinder"
+default = 2.0
+sources = ["lehi_fuel_storage"]
+
+[[constant]]
+key = "fuel_rotation_months"
+label = "Use stored fuel within"
+unit = "month"
+default = 6.0
+sources = ["lehi_fuel_storage"]
+
+[[constant]]
+key = "generator_clearance_ft"
+label = "Distance a generator must run from windows, doors and vents"
+unit = "foot"
+default = 20.0
+sources = ["cdc_co_basics", "ready_gov_power_outages"]
+
+[[constant]]
+key = "well_pump_w"
+label = "Running power of a 1/2 hp submersible well pump"
+unit = "watt"
+default = 1250.0
+low = 1000.0
+high = 1500.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "From secondary sources only; check the pump's nameplate."
+
+[[constant]]
+key = "well_pump_start_multiplier"
+label = "Starting power of a well pump, as a multiple of its running power"
+unit = "times"
+default = 2.5
+low = 2.0
+high = 3.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "well_pump_hours_per_day"
+label = "Hours a day the well pump runs for essential water"
+unit = "hour per day"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "wheelchair_spare_batteries"
+label = "Spare batteries per power wheelchair"
+unit = "battery"
+default = 1.0
+sources = ["ready_gov_disability"]
+
+# ---------------------------------------------------------------------------------------------
+# Communications and cash (research §7, §8.1)
+# ---------------------------------------------------------------------------------------------
+
+
+[[constant]]
+key = "battery_pack_days"
+label = "Days one pack of AA or AAA batteries runs a household's lights and radio"
+unit = "day"
+default = 7.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_kit"]
+
+[[constant]]
+key = "power_station_max_units"
+label = "Most power stations the plan suggests for a medical device"
+unit = "power station"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "power_station_upgrade_days"
+label = "Outage target from which a power station is offered as an upgrade"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "generator_min_days"
+label = "Outage target from which a generator is offered for a house"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior", "rr_research_supply_standards"]
+
+[[constant]]
+key = "generator_min_days_well"
+label = "Outage target from which a generator is offered for a house on a well"
+unit = "day"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior", "rr_research_supply_standards"]
+
+[[constant]]
+key = "solar_panel_min_days"
+label = "Outage target from which a solar panel is offered"
+unit = "day"
+default = 7.0
+prior = true
+sources = ["rr_expert_prior", "nlr_pvwatts_v8"]
+
+[[constant]]
+key = "noaa_radios_per_household"
+label = "Battery or hand-crank radio with NOAA Weather Radio"
+unit = "radio per household"
+default = 1.0
+sources = ["ready_gov_kit", "nws_weather_radio"]
+
+[[constant]]
+key = "gmrs_license_usd"
+label = "FCC GMRS licence fee"
+unit = "US dollar"
+default = 35.0
+sources = ["ecfr_47_1_1102", "fcc_gmrs"]
+
+[[constant]]
+key = "gmrs_license_years"
+label = "GMRS licence term (covers the whole family)"
+unit = "year"
+default = 10.0
+sources = ["fcc_gmrs"]
+
+[[constant]]
+key = "two_way_radio_min_people"
+label = "People aged 13 and over before two-way radios are worth having"
+unit = "person"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "contact_cards_per_person"
+label = "Written contact card per person aged 4 and over"
+unit = "card per person"
+default = 1.0
+sources = ["ready_gov_plan", "ready_gov_low_cost"]
+
+[[constant]]
+key = "local_maps_per_household"
+label = "Paper map of the area"
+unit = "map per household"
+default = 1.0
+sources = ["ready_gov_kit"]
+
+[[constant]]
+key = "cash_days_min"
+label = "Fewest days of cash for basics"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["ready_gov_financial", "rr_expert_prior"]
+note = "Ready.gov: keep a small amount of cash in small bills, because ATMs and cards may not work. No agency gives a dollar figure; the household chooses its daily amount."
+
+[[constant]]
+key = "cash_days_max"
+label = "Most days of cash for basics"
+unit = "day"
+default = 14.0
+prior = true
+sources = ["fema_effak", "rr_expert_prior"]
+
+# ---------------------------------------------------------------------------------------------
+# Sanitation and hygiene (research §4)
+# ---------------------------------------------------------------------------------------------
+
+
+[[constant]]
+key = "cash_default_usd"
+label = "Cash to keep at home until the household sets its own amount"
+unit = "US dollar"
+default = 100.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_financial"]
+note = "No agency gives a dollar figure; the research example keeps $100."
+note_sources = ["ready_gov_financial", "rr_research_risk_model"]
+
+[[constant]]
+key = "toilet_buckets_per_household"
+label = "Buckets for a two-bucket emergency toilet (pee and poo)"
+unit = "bucket"
+default = 2.0
+sources = ["rdpo_emergency_toilet", "oregon_b2wr_toolkit"]
+
+[[constant]]
+key = "toilet_bags_per_person_day"
+label = "Heavy garbage bags (13-gallon, 0.9 mil or thicker) per person per day, counting both bags of a double-bagged load"
+unit = "bag per person per day"
+default = 0.45
+low = 0.3
+high = 0.6
+prior = true
+sources = ["rdpo_emergency_toilet", "oregon_b2wr_toolkit", "rr_expert_prior"]
+note = "Worked out from Oregon's 5 gallons of waste a person a week and RDPO's fill-halfway, double-bag rule; most urine goes to the pee bucket, so real use is lower than the upper bound."
+
+[[constant]]
+key = "toilet_cover_cups_per_person_day"
+label = "Dry cover material (sawdust, shredded paper, dry leaves) per person per day"
+unit = "cup per person per day"
+default = 1.0
+low = 0.5
+high = 1.5
+prior = true
+sources = ["rdpo_emergency_toilet", "rr_expert_prior"]
+note = "RDPO: about a handful per poo. A handful is taken as 1/2 to 1 cup, at 1 to 1 1/2 a day."
+
+
+[[constant]]
+key = "toilet_paper_person_days_per_roll"
+label = "Person-days one roll of toilet paper lasts"
+unit = "person-day per roll"
+default = 5.0
+prior = true
+sources = ["rr_expert_prior", "oregon_b2wr_toolkit"]
+note = "Oregon: measure your household's weekly use and double it for two weeks."
+
+[[constant]]
+key = "soap_bath_g_per_person_month"
+label = "Bathing soap"
+unit = "gram per person per month"
+default = 250.0
+sources = ["sphere_2018"]
+
+[[constant]]
+key = "soap_laundry_g_per_person_month"
+label = "Laundry soap"
+unit = "gram per person per month"
+default = 200.0
+sources = ["sphere_2018"]
+
+[[constant]]
+key = "menstrual_cycles_kit"
+label = "Cycles of period products to keep"
+unit = "cycle"
+default = 2.0
+sources = ["cdc_period_factsheet"]
+
+[[constant]]
+key = "menstrual_products_per_cycle"
+label = "Period products per cycle"
+unit = "product per cycle"
+default = 20.0
+low = 15.0
+high = 30.0
+prior = true
+sources = ["sphere_2018", "cdc_period_factsheet", "rr_expert_prior"]
+note = "Sphere plans 15 disposable pads a month; changing a tampon every 4 to 8 hours (CDC) over about 5 days is 15 to 30. RDPO puts used pads and tampons in the poo bucket, Oregon in a separate bag; the plan follows Oregon and notes RDPO."
+note_sources = ["sphere_2018", "cdc_period_factsheet", "rdpo_emergency_toilet", "oregon_b2wr_toolkit"]
+
+[[constant]]
+key = "menstrual_cycle_days"
+label = "Days per cycle, for plans longer than a month"
+unit = "day"
+default = 28.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "menstruating_share"
+label = "Share of adults and teens assumed to menstruate (the form does not ask sex)"
+unit = "fraction"
+default = 0.5
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "diapers_per_day_infant"
+label = "Diapers per baby per day"
+unit = "diaper per day"
+default = 8.0
+low = 6.0
+high = 12.0
+prior = true
+sources = ["sutter_diapers", "cdc_infant_checklist", "rr_expert_prior"]
+note = "Newborns use 8 to 12 a day, 9- to 12-month-olds 6 to 8 (a manufacturer's guide); after the first week a baby should have more than six wet diapers a day (Sutter Health)."
+
+[[constant]]
+key = "diapers_per_day_toddler"
+label = "Diapers per toddler per day, if still in diapers"
+unit = "diaper per day"
+default = 6.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "wipes_packs_per_child_2wk"
+label = "Packs of baby wipes per child in diapers, per two weeks"
+unit = "pack"
+default = 2.0
+sources = ["cdc_infant_checklist"]
+
+# ---------------------------------------------------------------------------------------------
+# First aid (research §3.1, §3.5–3.8)
+# ---------------------------------------------------------------------------------------------
+
+[[constant]]
+key = "first_aid_people_per_kit"
+label = "People one family first-aid kit (the Red Cross list) is sized for"
+unit = "person"
+default = 4.0
+sources = ["redcross_first_aid_kit"]
+
+[[constant]]
+key = "otc_kinds"
+label = "Kinds of non-prescription medicine (pain reliever, anti-diarrhea, antacid, laxative)"
+unit = "kind"
+default = 4.0
+sources = ["ready_gov_kit"]
+
+[[constant]]
+key = "otc_days_per_package"
+label = "Days one package of each kind lasts a household of four"
+unit = "day"
+default = 14.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "n95_per_person_day"
+label = "N95 masks per person per day of smoke or outbreak"
+unit = "mask per person per day"
+default = 1.0
+prior = true
+sources = ["cdc_masks", "rr_expert_prior"]
+
+[[constant]]
+key = "n95_days"
+label = "Days of smoke or outbreak to have masks for"
+unit = "day"
+default = 5.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "ors_packets_per_person_2wk"
+label = "Oral rehydration salt packets per person per two weeks"
+unit = "packet"
+default = 3.0
+prior = true
+sources = ["cdc_cholera_treatment", "rr_expert_prior"]
+
+[[constant]]
+key = "ors_l_per_packet"
+label = "Safe water per oral rehydration packet"
+unit = "litre"
+default = 1.0
+sources = ["cdc_yellow_book_travel_kits"]
+
+[[constant]]
+key = "thermometers_per_household"
+label = "Oral thermometer (non-mercury, non-glass)"
+unit = "thermometer"
+default = 1.0
+sources = ["redcross_first_aid_kit"]
+
+# ---------------------------------------------------------------------------------------------
+# Heat and cold (research §5)
+# ---------------------------------------------------------------------------------------------
+
+[[constant]]
+key = "fan_max_indoor_f"
+label = "Indoor temperature above which a fan stops helping"
+unit = "degree Fahrenheit"
+default = 90.0
+sources = ["cdc_heat_health"]
+note = "CDC: use fans only below 90 °F indoors. Ready.gov: fans give a false sense of comfort and do not lower body temperature. The plan warns above 90 °F and points to cooling centres."
+note_sources = ["cdc_heat_health", "ready_gov_heat"]
+
+[[constant]]
+key = "battery_fans_base"
+label = "Battery fans per household"
+unit = "fan"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "battery_fans_per_vulnerable"
+label = "Extra battery fans per person aged 65 and over, baby, or pregnant person"
+unit = "fan per person"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior", "cdc_heat_health"]
+
+[[constant]]
+key = "cooling_towels_per_person"
+label = "Cooling towels per person"
+unit = "towel per person"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "sleeping_bags_per_person"
+label = "Sleeping bag or warm blanket per person"
+unit = "item per person"
+default = 1.0
+sources = ["ready_gov_kit", "sphere_2018"]
+
+[[constant]]
+key = "warm_layer_sets_per_person"
+label = "Sets of warm layers (coat, hat, gloves) per person"
+unit = "set per person"
+default = 1.0
+sources = ["ready_gov_kit", "cdc_winter_safety"]
+
+[[constant]]
+key = "hypothermia_f"
+label = "Body temperature that needs medical help at once"
+unit = "degree Fahrenheit"
+default = 95.0
+sources = ["cdc_winter_safety"]
+
+# ---------------------------------------------------------------------------------------------
+# Fire and security
+# ---------------------------------------------------------------------------------------------
+
+[[constant]]
+key = "alarm_levels_apartment"
+label = "Levels assumed for an apartment or mobile home"
+unit = "level"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "alarm_levels_house"
+label = "Levels assumed for a rowhouse or house (the form does not ask)"
+unit = "level"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "alarm_levels_basement"
+label = "Extra level for a basement"
+unit = "level"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior"]
+
+
+[[constant]]
+key = "people_per_bedroom"
+label = "People per bedroom, for counting smoke alarms in sleeping rooms (the form does not ask)"
+unit = "person per bedroom"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior", "usfa_smoke_alarms"]
+
+[[constant]]
+key = "escape_ladder_lowest_floor"
+label = "Lowest apartment floor that needs an escape ladder"
+unit = "floor"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_home_fires"]
+
+[[constant]]
+key = "escape_ladder_highest_floor"
+label = "Highest apartment floor an escape ladder reaches"
+unit = "floor"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_home_fires"]
+
+[[constant]]
+key = "co_alarm_replace_years"
+label = "Replace a carbon monoxide alarm every (or as the maker says)"
+unit = "year"
+default = 5.0
+sources = ["cdc_co_basics"]
+
+[[constant]]
+key = "extinguishers_per_household"
+label = "Fire extinguishers per household"
+unit = "extinguisher"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "neighbour_contacts"
+label = "Neighbours to swap numbers with"
+unit = "contact"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior"]
+
+# ---------------------------------------------------------------------------------------------
+# Documents, insurance and savings (research §8)
+# ---------------------------------------------------------------------------------------------
+
+[[constant]]
+key = "effak_parts"
+label = "Parts of the Emergency Financial First Aid Kit"
+unit = "part"
+default = 4.0
+sources = ["fema_effak"]
+
+[[constant]]
+key = "nfip_wait_days"
+label = "Usual wait before a new flood insurance policy starts"
+unit = "day"
+default = 30.0
+sources = ["fema_nfip_flood_insurance"]
+
+[[constant]]
+key = "nfip_building_limit_usd"
+label = "Most NFIP flood insurance pays for a home's structure"
+unit = "US dollar"
+default = 250000.0
+sources = ["floodsmart_buy_policy"]
+
+[[constant]]
+key = "nfip_contents_limit_usd"
+label = "Most NFIP flood insurance pays for belongings"
+unit = "US dollar"
+default = 100000.0
+sources = ["floodsmart_buy_policy"]
+
+[[constant]]
+key = "emergency_fund_months"
+label = "Months of expenses in an emergency fund"
+unit = "month"
+default = 3.0
+low = 3.0
+high = 6.0
+sources = ["finra_financial_foundations", "stlouisfed_emergency_fund_2025"]
+note = "Planners often suggest 3 to 6 months (FINRA, St. Louis Fed); people with variable income may need more. The CFPB gives no number: it depends on your situation. The plan uses the household's own income target when there is one."
+note_sources = ["finra_financial_foundations", "stlouisfed_emergency_fund_2025", "cfpb_emergency_fund"]
+
+# ---------------------------------------------------------------------------------------------
+# Getting home and leaving home (research §9)
+# ---------------------------------------------------------------------------------------------
+
+[[constant]]
+key = "walk_mph"
+label = "Walking speed for getting home on foot"
+unit = "mile per hour"
+default = 3.0
+low = 2.0
+high = 3.0
+prior = true
+sources = ["rr_expert_prior", "fhwa_mutcd_walking_speed"]
+note = "Traffic engineers plan crossings for people walking 2.0 to 2.4 mph; with a load or at night, expect that pace."
+note_sources = ["fhwa_mutcd_walking_speed"]
+
+[[constant]]
+key = "walk_water_l_per_hour"
+label = "Water to carry per hour of walking"
+unit = "litre per hour"
+default = 0.5
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "walk_water_l_per_hour_hot"
+label = "Water per hour of walking in heat"
+unit = "litre per hour"
+default = 0.71
+low = 0.71
+high = 0.95
+sources = ["cdc_niosh_heat_hydration"]
+note = "NIOSH: 1 cup every 15 to 20 minutes for moderate work in the heat (24 to 32 oz an hour), and no more than 6 cups an hour."
+
+[[constant]]
+key = "walk_water_carry_max_l"
+label = "Water worth carrying before a filter or tablets make more sense"
+unit = "litre"
+default = 2.5
+low = 2.0
+high = 3.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "walk_kcal_per_12h"
+label = "Food energy for 12 hours of walking"
+unit = "kcal"
+default = 1250.0
+low = 1000.0
+high = 1500.0
+prior = true
+sources = ["rr_expert_prior", "usda_dga_2020_2025"]
+
+[[constant]]
+key = "work_shelter_hours"
+label = "Hours to be ready to shelter at work"
+unit = "hour"
+default = 24.0
+sources = ["ready_gov_kit_2020"]
+
+[[constant]]
+key = "car_kits_per_vehicle"
+label = "Emergency kit per vehicle"
+unit = "kit per vehicle"
+default = 1.0
+sources = ["ready_gov_winter"]
+
+[[constant]]
+key = "go_bag_days"
+label = "Days of water and food in a go-bag"
+unit = "day"
+default = 3.0
+low = 2.0
+high = 3.0
+sources = ["redcross_survival_kit", "washington_prepare_in_a_year"]
+
+[[constant]]
+key = "go_bags_per_person"
+label = "Go-bags per person aged 4 and over"
+unit = "bag per person"
+default = 1.0
+sources = ["washington_prepare_in_a_year"]
+
+[[constant]]
+key = "pet_evac_food_days"
+label = "Days of pet food in the pet's go-kit"
+unit = "day"
+default = 10.0
+low = 7.0
+high = 10.0
+sources = ["aspca_disaster_prep"]
+
+[[constant]]
+key = "pet_evac_water_days"
+label = "Days of pet water in the pet's go-kit"
+unit = "day"
+default = 7.0
+sources = ["aspca_disaster_prep"]
+
+[[constant]]
+key = "pet_kit_rotation_months"
+label = "Replace pet go-kit food and water every"
+unit = "month"
+default = 2.0
+sources = ["aspca_disaster_prep"]
+
+[[constant]]
+key = "gas_tank_min_share"
+label = "Least fuel to keep in the tank at all times"
+unit = "fraction of a tank"
+default = 0.5
+sources = ["ready_gov_evacuation"]
+
+[[constant]]
+key = "notice_minutes_band_hours"
+label = "Warning shorter than this counts as minutes (bag by the door)"
+unit = "hour"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "notice_hours_band_hours"
+label = "Warning shorter than this counts as hours; longer counts as days"
+unit = "hour"
+default = 24.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "readiness_p_need_threshold"
+label = "Ten-year chance of need above which a readiness capability enters the plan"
+unit = "probability"
+default = 0.02
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "evacuation_plans_per_person"
+label = "Transport plan per person who needs help to leave"
+unit = "plan per person"
+default = 1.0
+sources = ["ready_gov_older_adults", "ready_gov_disability"]
+
+# ---------------------------------------------------------------------------------------------
+# Tables
+# ---------------------------------------------------------------------------------------------
+
+# Dietary Guidelines for Americans 2020-2025, Appendix 2, Table A2-2: estimated calorie needs per
+# day (kcal) by age, sex and activity. Each triple is [sedentary, moderately active, active].
+[dga]
+sources = ["usda_dga_2020_2025"]
+activity = "moderate"
+note = "The plan uses the moderately active column (walking 1.5 to 3 miles a day), because hauling water and cleaning up are work. The form does not ask sex, so each age band averages the men's and women's rows, year by year over the band's ages (65 and over: 65 to 75; the 76+ row equals the 66-75 row)."
+
+[[dga.row]]
+ages = [2, 2]
+male = [1000, 1000, 1000]
+female = [1000, 1000, 1000]
+
+[[dga.row]]
+ages = [3, 3]
+male = [1000, 1400, 1400]
+female = [1000, 1200, 1400]
+
+[[dga.row]]
+ages = [4, 4]
+male = [1200, 1400, 1600]
+female = [1200, 1400, 1400]
+
+[[dga.row]]
+ages = [5, 5]
+male = [1200, 1400, 1600]
+female = [1200, 1400, 1600]
+
+[[dga.row]]
+ages = [6, 6]
+male = [1400, 1600, 1800]
+female = [1200, 1400, 1600]
+
+[[dga.row]]
+ages = [7, 7]
+male = [1400, 1600, 1800]
+female = [1200, 1600, 1800]
+
+[[dga.row]]
+ages = [8, 8]
+male = [1400, 1600, 2000]
+female = [1400, 1600, 1800]
+
+[[dga.row]]
+ages = [9, 9]
+male = [1600, 1800, 2000]
+female = [1400, 1600, 1800]
+
+[[dga.row]]
+ages = [10, 10]
+male = [1600, 1800, 2200]
+female = [1400, 1800, 2000]
+
+[[dga.row]]
+ages = [11, 11]
+male = [1800, 2000, 2200]
+female = [1600, 1800, 2000]
+
+[[dga.row]]
+ages = [12, 12]
+male = [1800, 2200, 2400]
+female = [1600, 2000, 2200]
+
+[[dga.row]]
+ages = [13, 13]
+male = [2000, 2200, 2600]
+female = [1600, 2000, 2200]
+
+[[dga.row]]
+ages = [14, 14]
+male = [2000, 2400, 2800]
+female = [1800, 2000, 2400]
+
+[[dga.row]]
+ages = [15, 15]
+male = [2200, 2600, 3000]
+female = [1800, 2000, 2400]
+
+[[dga.row]]
+ages = [16, 18]
+male = [2400, 2800, 3200]
+female = [1800, 2000, 2400]
+
+[[dga.row]]
+ages = [19, 20]
+male = [2600, 2800, 3000]
+female = [2000, 2200, 2400]
+
+[[dga.row]]
+ages = [21, 25]
+male = [2400, 2800, 3000]
+female = [2000, 2200, 2400]
+
+[[dga.row]]
+ages = [26, 30]
+male = [2400, 2600, 3000]
+female = [1800, 2000, 2400]
+
+[[dga.row]]
+ages = [31, 35]
+male = [2400, 2600, 3000]
+female = [1800, 2000, 2200]
+
+[[dga.row]]
+ages = [36, 40]
+male = [2400, 2600, 2800]
+female = [1800, 2000, 2200]
+
+[[dga.row]]
+ages = [41, 45]
+male = [2200, 2600, 2800]
+female = [1800, 2000, 2200]
+
+[[dga.row]]
+ages = [46, 50]
+male = [2200, 2400, 2800]
+female = [1800, 2000, 2200]
+
+[[dga.row]]
+ages = [51, 55]
+male = [2200, 2400, 2800]
+female = [1600, 1800, 2200]
+
+[[dga.row]]
+ages = [56, 60]
+male = [2200, 2400, 2600]
+female = [1600, 1800, 2200]
+
+[[dga.row]]
+ages = [61, 65]
+male = [2000, 2400, 2600]
+female = [1600, 1800, 2000]
+
+[[dga.row]]
+ages = [66, 75]
+male = [2000, 2200, 2600]
+female = [1600, 1800, 2000]
+
+[[dga.row]]
+ages = [76, 120]
+male = [2000, 2200, 2400]
+female = [1600, 1800, 2000]
+
+# Table A2-1: toddlers 12 to 23 months (one activity column).
+[[dga.month_row]]
+months = [12, 14]
+male = 800
+female = 800
+
+[[dga.month_row]]
+months = [15, 17]
+male = 900
+female = 800
+
+[[dga.month_row]]
+months = [18, 20]
+male = 1000
+female = 900
+
+[[dga.month_row]]
+months = [21, 23]
+male = 1000
+female = 1000
+
+# The ages (in whole years) each household age band covers, for averaging the DGA table.
+[[dga.band]]
+band = "toddler"
+ages = [1, 3]
+
+[[dga.band]]
+band = "child"
+ages = [4, 12]
+
+[[dga.band]]
+band = "teen"
+ages = [13, 17]
+
+[[dga.band]]
+band = "adult"
+ages = [18, 64]
+
+[[dga.band]]
+band = "senior"
+ages = [65, 75]
+
+# USDA Thrifty Food Plan household-size adjustment (the cost per person rises in small households).
+[tfp_size]
+sources = ["usda_tfp_aug2026"]
+
+[[tfp_size.row]]
+people = [1, 1]
+factor = 1.20
+
+[[tfp_size.row]]
+people = [2, 2]
+factor = 1.10
+
+[[tfp_size.row]]
+people = [3, 3]
+factor = 1.05
+
+[[tfp_size.row]]
+people = [4, 4]
+factor = 1.00
+
+[[tfp_size.row]]
+people = [5, 6]
+factor = 0.95
+
+[[tfp_size.row]]
+people = [7, 255]
+factor = 0.90
+
+# Long-term staples per adult per year. `byu_2019` is the default list (BYU, linked from the Church's
+# current manual); `ensign_2006` is the older, cheaper "basics" list.
+[staples]
+sources = ["byu_longer_term_storage_2019"]
+default_list = "byu_2019"
+note = "The 2019 BYU list gives enough calories and protein for one adult for a year; the 2006 basics cost less but lack variety. Either may fall short on calcium and vitamins A, C, B12 and E (USU), so the BYU list adds vitamin C. Moist foods must never go into oxygen-free packaging (botulism)."
+note_sources = ["byu_longer_term_storage_2019", "ensign_2006_year_supply", "usu_food_storage_booklet", "church_emergency_prep_manual"]
+
+[[staples.row]]
+key = "wheat"
+label = "wheat"
+group = "grains"
+list = "byu_2019"
+per_adult_year = 132.0
+unit = "lb"
+
+[[staples.row]]
+key = "white_rice"
+label = "white rice"
+group = "grains"
+list = "byu_2019"
+per_adult_year = 65.0
+unit = "lb"
+
+[[staples.row]]
+key = "rolled_oats"
+label = "rolled oats"
+group = "grains"
+list = "byu_2019"
+per_adult_year = 29.0
+unit = "lb"
+
+[[staples.row]]
+key = "pasta"
+label = "pasta"
+group = "grains"
+list = "byu_2019"
+per_adult_year = 21.0
+unit = "lb"
+
+[[staples.row]]
+key = "legumes"
+label = "dry beans, peas and lentils"
+group = "legumes"
+list = "byu_2019"
+per_adult_year = 62.0
+unit = "lb"
+
+[[staples.row]]
+key = "nonfat_dry_milk"
+label = "nonfat dry milk"
+group = "dry_milk"
+list = "byu_2019"
+per_adult_year = 49.0
+unit = "lb"
+
+[[staples.row]]
+key = "sugar"
+label = "sugar or other sweeteners"
+group = "sugar"
+list = "byu_2019"
+per_adult_year = 70.0
+unit = "lb"
+
+[[staples.row]]
+key = "dried_apple"
+label = "dried apple slices"
+group = "fruit_veg"
+list = "byu_2019"
+per_adult_year = 6.0
+unit = "lb"
+
+[[staples.row]]
+key = "potato_flakes"
+label = "potato flakes"
+group = "fruit_veg"
+list = "byu_2019"
+per_adult_year = 22.0
+unit = "lb"
+
+[[staples.row]]
+key = "dried_carrots"
+label = "dried carrots"
+group = "fruit_veg"
+list = "byu_2019"
+per_adult_year = 8.0
+unit = "lb"
+
+[[staples.row]]
+key = "dried_onions"
+label = "dried onions"
+group = "fruit_veg"
+list = "byu_2019"
+per_adult_year = 2.0
+unit = "lb"
+
+[[staples.row]]
+key = "salt"
+label = "iodized salt"
+group = "salt_leavening"
+list = "byu_2019"
+per_adult_year = 8.0
+unit = "lb"
+
+[[staples.row]]
+key = "leavening"
+label = "baking soda and baking powder"
+group = "salt_leavening"
+list = "byu_2019"
+per_adult_year = 5.0
+unit = "lb"
+
+[[staples.row]]
+key = "cooking_oil"
+label = "cooking oil"
+group = "oil"
+list = "byu_2019"
+per_adult_year = 2.0
+unit = "gallon"
+
+[[staples.row]]
+key = "vitamin_c"
+label = "vitamin C tablets (90 mg)"
+group = "vitamin"
+list = "byu_2019"
+per_adult_year = 365.0
+unit = "tablet"
+
+[[staples.row]]
+key = "grains_basic"
+label = "grains (wheat, flour, rice, corn, oats, pasta)"
+group = "grains"
+list = "ensign_2006"
+per_adult_year = 400.0
+unit = "lb"
+
+[[staples.row]]
+key = "legumes_basic"
+label = "dry beans, split peas and lentils"
+group = "legumes"
+list = "ensign_2006"
+per_adult_year = 60.0
+unit = "lb"
+
+[[staples.row]]
+key = "dry_milk_basic"
+label = "powdered milk"
+group = "dry_milk"
+list = "ensign_2006"
+per_adult_year = 16.0
+unit = "lb"
+
+[[staples.row]]
+key = "oil_basic"
+label = "cooking oil (10 quarts)"
+group = "oil"
+list = "ensign_2006"
+per_adult_year = 2.5
+unit = "gallon"
+
+[[staples.row]]
+key = "sugar_basic"
+label = "sugar or honey"
+group = "sugar"
+list = "ensign_2006"
+per_adult_year = 60.0
+unit = "lb"
+
+[[staples.row]]
+key = "salt_basic"
+label = "salt"
+group = "salt_leavening"
+list = "ensign_2006"
+per_adult_year = 8.0
+unit = "lb"
+
+# Child portions of the adult staples amount (Ensign 2006). Add one year to each child's age,
+# because children are still growing; nursing babies share their mother's portion.
+[child_share]
+sources = ["ensign_2006_year_supply"]
+age_offset_years = 1
+
+[[child_share.row]]
+ages = [0, 3]
+share = 0.5
+
+[[child_share.row]]
+ages = [4, 6]
+share = 0.7
+
+[[child_share.row]]
+ages = [7, 10]
+share = 0.9
+
+[[child_share.row]]
+ages = [11, 120]
+share = 1.0
+
+# Storage life of staples packed dry, low-oxygen, below 75 °F (Home Storage Center order form; the
+# shorter of the Church's figures, as research §13 recommends). Hot storage cuts grains to about 5
+# years (USU, citing BYU).
+[shelf_life]
+sources = ["church_hsc_order_form_2026", "usu_food_storage_booklet"]
+note = "The Church web page gives longer lives for some items (dry milk 20, beans and oats 30 years); the plan uses the shorter order-form values. Grains kept in a hot garage or attic keep about 5 years instead of 25 to 30."
+note_sources = ["church_hsc_order_form_2026", "usu_food_storage_booklet", "church_emergency_prep_manual"]
+
+[[shelf_life.row]]
+key = "wheat"
+years = 30.0
+
+[[shelf_life.row]]
+key = "white_rice"
+years = 30.0
+
+[[shelf_life.row]]
+key = "sugar"
+years = 30.0
+
+[[shelf_life.row]]
+key = "legumes"
+years = 25.0
+
+[[shelf_life.row]]
+key = "pasta"
+years = 25.0
+
+[[shelf_life.row]]
+key = "rolled_oats"
+years = 20.0
+
+[[shelf_life.row]]
+key = "potato_flakes"
+years = 20.0
+
+[[shelf_life.row]]
+key = "nonfat_dry_milk"
+years = 15.0
+
+[[shelf_life.row]]
+key = "grains_hot_storage"
+years = 5.0
+
+[[shelf_life.row]]
+key = "canned_low_acid"
+years = 2.0
+
+[[shelf_life.row]]
+key = "canned_high_acid"
+years = 1.0
+
+# December solar output for a 100 W panel (NREL PVWatts v8: fixed, 30 degree tilt, facing south, 14 %
+# losses), used as a latitude-band proxy for the household's county. Each band takes the lowest
+# measured value at or south of it, so the estimate errs low; inland sites north of 46 degrees do better
+# than cloudy Seattle.
+[solar]
+sources = ["nlr_pvwatts_v8", "rr_expert_prior"]
+prior = true
+note = "PVWatts assumes ideal aim and no shade; a portable panel laid flat or partly shaded makes less. A 100 to 200 W portable panel keeps phones, lights, a radio and a CPAP going almost everywhere, but not a full-size fridge in a northern winter."
+
+[[solar.row]]
+lat = [-90.0, 36.0]
+dec_wh_per_100w = 382.0
+city = "Miami, FL (Phoenix, AZ makes 424)"
+
+[[solar.row]]
+lat = [36.0, 42.0]
+dec_wh_per_100w = 261.0
+city = "Philadelphia, PA"
+
+[[solar.row]]
+lat = [42.0, 46.0]
+dec_wh_per_100w = 219.0
+city = "Minneapolis, MN"
+
+[[solar.row]]
+lat = [46.0, 90.0]
+dec_wh_per_100w = 121.0
+city = "Seattle, WA"
+
+# Where authorities disagree on something that is not a single number the rules use
+# (research §13). Numeric disagreements are notes on the constants above.
+[[disagreement]]
+topic = "How long to prepare for"
+positions = "Ready.gov: several days (72 hours until about 2021). CDC: 3 days, try 2 weeks. Red Cross: 3 days to leave, 2 weeks at home. Oregon and Washington: 2 weeks. Sweden 1 week, Germany 10 days, the EU and Denmark 72 hours, the Church 3 months plus a longer-term supply."
+handling = "The plan sizes each bucket from the household's own risk and says which tier is enough; two weeks is the usual home tier. No authority sets a one-month amount; the one-month tier is an interpolation and the plan says so once."
+sources = ["ready_gov_kit", "cdc_water_storage", "redcross_survival_kit", "oregon_2_weeks_ready", "washington_prepare_in_a_year", "church_home_storage_2007"]
+
+[[disagreement]]
+topic = "Kerosene heaters"
+positions = "CDC lists kerosene heaters as backup heat where local law allows. The International Fire Code, as one fire department states it, bans unvented portable kerosene heaters in living spaces."
+handling = "Not suggested by default; shown only as 'if legal where you live, and vented or ventilated'."
+sources = ["cdc_winter_safety", "lehi_fuel_storage"]
+
+[[disagreement]]
+topic = "Used period products in a bucket toilet"
+positions = "RDPO: into the poo bucket. Oregon OEM: a separate garbage bag."
+handling = "Follow the local authority; the plan defaults to a separate bag (Oregon) and notes RDPO."
+sources = ["rdpo_emergency_toilet", "oregon_b2wr_toolkit"]
+
+[[disagreement]]
+topic = "Carbon monoxide deaths"
+positions = "CDC's basics page: more than 400 non-fire deaths a year. A CDC PSA page: more than 500."
+handling = "Cite more than 400 non-fire deaths a year (CDC)."
+sources = ["cdc_co_basics"]
+
+[[disagreement]]
+topic = "Church food quantities"
+positions = "The 2006 Ensign basics (400 lb grain, 60 lb legumes, 16 lb milk, 10 qt oil, 60 lb sugar, 8 lb salt per adult-year); the 2019 BYU list (about 247 lb of grains plus more variety); official policy since 2007 gives no quantities."
+handling = "The BYU 2019 list is the default; the 2006 list is the cheaper option."
+sources = ["ensign_2006_year_supply", "byu_longer_term_storage_2019", "church_home_storage_2007"]
+
+# ---------------------------------------------------------------------------------------------
+# Sources rr-supply cites: the entries of content/citations.toml the supply lines use (title,
+# publisher and URL copied from there), with the short name used in the plain-language lines
+# ("(Ready.gov, CDC)"). A test checks every id against content/citations.toml when it is present.
+# ---------------------------------------------------------------------------------------------
+
+[[source]]
+id = "aap_formula_amounts"
+short = "AAP"
+title = "Amount and Schedule of Baby Formula Feedings"
+publisher = "American Academy of Pediatrics (HealthyChildren.org)"
+url = "https://www.healthychildren.org/English/ages-stages/baby/formula-feeding/Pages/Amount-and-Schedule-of-Formula-Feedings.aspx"
+
+[[source]]
+id = "aspca_disaster_prep"
+short = "ASPCA"
+title = "Disaster Preparedness"
+publisher = "ASPCA"
+url = "https://www.aspca.org/pet-care/general-pet-care/disaster-preparedness"
+
+[[source]]
+id = "byu_longer_term_storage_2019"
+short = "BYU"
+title = "An Approach to Longer-Term Food Storage (revised September 2019)"
+publisher = "Brigham Young University, Department of Nutrition, Dietetics and Food Science"
+url = "https://brightspotcdn.byu.edu/b1/4d/75fc449e4ce9843daa701f69faa4/an-approach-to-longer-term-food-storage.SEPT2019.pdf"
+
+[[source]]
+id = "cdc_antibiotic_use"
+short = "CDC"
+title = "Antibiotic Use: Be Antibiotics Aware"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/antibiotic-use/about/index.html"
+
+[[source]]
+id = "cdc_cholera_treatment"
+short = "CDC"
+title = "Treating Cholera"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/cholera/treatment/index.html"
+
+[[source]]
+id = "cdc_co_basics"
+short = "CDC"
+title = "Carbon Monoxide Poisoning Basics"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/carbon-monoxide/about/index.html"
+
+[[source]]
+id = "cdc_diabetes_emergencies"
+short = "CDC"
+title = "Diabetes Care During Emergencies"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/diabetes/articles/diabetes-care-emergencies.html"
+
+[[source]]
+id = "cdc_evacuation_psa"
+short = "CDC"
+title = "Be Prepared in Case You Need to Evacuate (PSA toolkit)"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/natural-disasters/psa-toolkit/be-prepared-in-case-you-need-to-evacuate.html"
+
+[[source]]
+id = "cdc_heat_health"
+short = "CDC"
+title = "About Heat and Your Health"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/heat-health/about/index.html"
+
+[[source]]
+id = "cdc_infant_checklist"
+short = "CDC"
+title = "Emergency List for Families With Infants and Young Children"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/infant-feeding-emergencies-toolkit/php/checklist.html"
+
+[[source]]
+id = "cdc_infant_feeding_disaster"
+short = "CDC"
+title = "Feeding Your Child Safely During a Disaster"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/breastfeeding/php/guidelines-recommendations/feeding-your-child-safely-during-a-disaster.html"
+
+[[source]]
+id = "cdc_insulin_emergency"
+short = "CDC"
+title = "Managing Insulin in an Emergency"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/diabetes/articles/managing-insulin-in-emergency.html"
+
+[[source]]
+id = "cdc_masks"
+short = "CDC"
+title = "Masks and Respiratory Viruses Prevention"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/respiratory-viruses/prevention/masks.html"
+
+[[source]]
+id = "cdc_niosh_heat_hydration"
+short = "NIOSH"
+title = "Heat Stress: Recommendations (hydration)"
+publisher = "CDC National Institute for Occupational Safety and Health"
+url = "https://www.cdc.gov/niosh/heat-stress/recommendations/index.html"
+
+[[source]]
+id = "cdc_period_factsheet"
+short = "CDC"
+title = "Managing Your Period During a Natural Disaster (fact sheet)"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/natural-disasters/media/pdfs/2026/09/FS-Managing-Period-During-Disaster-508.pdf"
+
+[[source]]
+id = "cdc_pregnancy_emergency"
+short = "CDC"
+title = "Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/reproductive-health/emergency-preparation-response/safety-messages.html"
+
+[[source]]
+id = "cdc_water_disinfection"
+short = "CDC"
+title = "How to Make Water Safe in an Emergency"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/water-emergency/about/index.html"
+
+[[source]]
+id = "cdc_water_storage"
+short = "CDC"
+title = "How to Create an Emergency Water Supply"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/water-emergency/about/how-to-create-and-store-an-emergency-water-supply.html"
+
+[[source]]
+id = "cdc_winter_safety"
+short = "CDC"
+title = "Safety Guidelines: During and After a Winter Storm"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/winter-weather/safety/stay-safe-during-after-a-winter-storm-safety.html"
+
+[[source]]
+id = "cdc_yellow_book_travel_kits"
+short = "CDC"
+title = "CDC Yellow Book 2026: Travel Health Kits"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html"
+
+[[source]]
+id = "cfpb_emergency_fund"
+short = "CFPB"
+title = "An essential guide to building an emergency fund"
+publisher = "Consumer Financial Protection Bureau"
+url = "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/"
+
+[[source]]
+id = "church_emergency_prep_manual"
+short = "Church of Jesus Christ"
+title = "Emergency Preparedness manual: guidelines on emergency water storage and purification"
+publisher = "The Church of Jesus Christ of Latter-day Saints"
+url = "https://www.churchofjesuschrist.org/study/manual/emergency-preparedness/01-food-and-water-storage/02-guidelines-on-emergency-water-storage-and-purification?lang=eng"
+
+[[source]]
+id = "church_home_storage_2007"
+short = "Church of Jesus Christ"
+title = "All Is Safely Gathered In: Family Home Storage"
+publisher = "The Church of Jesus Christ of Latter-day Saints"
+url = "https://www.churchofjesuschrist.org/bc/content/shared/content/english/pdf/language-materials/04008_eng.pdf"
+
+[[source]]
+id = "church_hsc_order_form_2026"
+short = "Church of Jesus Christ"
+title = "Home Storage Center product list and prices (effective January 1, 2026)"
+publisher = "The Church of Jesus Christ of Latter-day Saints"
+url = "https://assets.churchofjesuschrist.org/01/b4/01b41d0ffdbf11ebbb5eeeeeac1e9b2afdc29be5/food_storage_center_products.pdf"
+
+[[source]]
+id = "ecfr_47_1_1102"
+short = "FCC"
+title = "47 CFR 1.1102, schedule of application fees (wireless licences)"
+publisher = "Electronic Code of Federal Regulations"
+url = "https://www.ecfr.gov/current/title-47/section-1.1102"
+
+[[source]]
+id = "eia_btu"
+short = "EIA"
+title = "Units and calculators explained: British thermal units (Btu)"
+publisher = "U.S. Energy Information Administration"
+url = "https://www.eia.gov/energyexplained/units-and-calculators/british-thermal-units.php"
+
+[[source]]
+id = "ensign_2006_year_supply"
+short = "Church of Jesus Christ"
+title = "Food Storage for One Year (Ensign, March 2006)"
+publisher = "The Church of Jesus Christ of Latter-day Saints"
+url = "https://www.churchofjesuschrist.org/study/ensign/2006/03/random-sampler/food-storage-for-one-year?lang=eng"
+
+[[source]]
+id = "epa_emergency_disinfection"
+short = "EPA"
+title = "Emergency Disinfection of Drinking Water"
+publisher = "U.S. Environmental Protection Agency"
+url = "https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water"
+
+[[source]]
+id = "epa_energy_star_refrigerators"
+short = "ENERGY STAR"
+title = "ENERGY STAR Certified Residential Refrigerators and Freezers (datasets p5st-her9 and 8t9c-g3tn)"
+publisher = "U.S. Environmental Protection Agency, ENERGY STAR"
+url = "https://data.energystar.gov/resource/p5st-her9.json"
+
+[[source]]
+id = "fcc_frs"
+short = "FCC"
+title = "Family Radio Service (FRS)"
+publisher = "Federal Communications Commission"
+url = "https://www.fcc.gov/wireless/bureau-divisions/mobility-division/family-radio-service-frs"
+
+[[source]]
+id = "fcc_gmrs"
+short = "FCC"
+title = "General Mobile Radio Service (GMRS)"
+publisher = "Federal Communications Commission"
+url = "https://www.fcc.gov/wireless/bureau-divisions/mobility-division/general-mobile-radio-service-gmrs"
+
+[[source]]
+id = "fda_expired_medicines"
+short = "FDA"
+title = "Don't Be Tempted to Use Expired Medicines"
+publisher = "U.S. Food and Drug Administration"
+url = "https://www.fda.gov/drugs/special-features/dont-be-tempted-use-expired-medicines"
+
+[[source]]
+id = "fda_fish_antibiotics_warning_2023"
+short = "FDA"
+title = "Warning letter on unapproved aquarium and bird antibiotic products (Chewy, Inc., November 30, 2023)"
+publisher = "U.S. Food and Drug Administration"
+url = "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023"
+
+[[source]]
+id = "fema_effak"
+short = "FEMA"
+title = "Emergency Financial First Aid Kit (FEMA P-1075)"
+publisher = "FEMA and Operation HOPE"
+url = "https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf"
+
+[[source]]
+id = "fema_nfip_flood_insurance"
+short = "FEMA"
+title = "Flood Insurance"
+publisher = "FEMA"
+url = "https://www.fema.gov/flood-insurance"
+
+[[source]]
+id = "fhwa_mutcd_walking_speed"
+short = "FHWA"
+title = "Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds"
+publisher = "Federal Highway Administration"
+url = "https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm"
+
+[[source]]
+id = "finra_financial_foundations"
+short = "FINRA"
+title = "Financial Foundations"
+publisher = "FINRA"
+url = "https://www.finra.org/investors/investing/investing-basics/financial-foundations"
+
+[[source]]
+id = "floodsmart_buy_policy"
+short = "FloodSmart"
+title = "Buy a Policy"
+publisher = "FEMA National Flood Insurance Program (FloodSmart)"
+url = "https://www.floodsmart.gov/get-insured/buy-a-policy"
+
+[[source]]
+id = "florida_dem_medication"
+short = "Florida DEM"
+title = "Medication (personal and family plans)"
+publisher = "Florida Division of Emergency Management"
+url = "https://www.floridadisaster.org/planprepare/disability/personal-and-family-plans/medication/"
+
+[[source]]
+id = "healthcare_ready_refill_laws"
+short = "Healthcare Ready"
+title = "A Review of State Emergency Prescription Protocols"
+publisher = "Healthcare Ready"
+url = "https://healthcareready.org/a-review-of-state-emergency-prescription-protocols/"
+
+[[source]]
+id = "hhs_aspr_epap"
+short = "HHS"
+title = "Emergency Prescription Assistance Program (EPAP)"
+publisher = "HHS Administration for Strategic Preparedness and Response"
+url = "https://aspr.hhs.gov/EPAP/Pages/default.aspx"
+
+[[source]]
+id = "iom_dri_water_2005"
+short = "National Academies"
+title = "Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate"
+publisher = "Institute of Medicine (National Academies Press)"
+url = "https://nap.nationalacademies.org/catalog/10925/"
+
+[[source]]
+id = "lehi_fuel_storage"
+short = "local fire code"
+title = "Home Fuel Storage Limits (International Fire Code and NFPA 58 summary)"
+publisher = "Lehi City Fire Department, Utah"
+url = "https://www.lehi-ut.gov/departments/fire-department/fire-prevention/home-fuel-storage-limits/"
+
+[[source]]
+id = "mo_med_2026_antibiotic_kits"
+short = "Missouri Medicine"
+title = "A Review of Direct-to-Consumer Home Antibiotic Kits: A Threat to Antimicrobial Stewardship and Patient Safety (Missouri Medicine 123(4):344–350)"
+publisher = "Missouri State Medical Association"
+url = "https://pmc.ncbi.nlm.nih.gov/articles/PMC13585011/"
+
+[[source]]
+id = "nca5_atlas"
+short = "NCA5 Atlas"
+title = "Fifth National Climate Assessment Atlas: county values at global warming levels"
+publisher = "U.S. Global Change Research Program"
+url = "https://services3.arcgis.com/0Fs3HcaFfvzXvm7w/arcgis/rest/services/NCA_Atlas_GWL_2C/FeatureServer/0"
+
+[[source]]
+id = "nlr_pvwatts_v8"
+short = "NREL PVWatts"
+title = "PVWatts Calculator, version 8 (100 W fixed array outputs for five US cities)"
+publisher = "National Laboratory of the Rockies (formerly NREL), U.S. Department of Energy"
+url = "https://developer.nlr.gov/docs/solar/pvwatts/v8/"
+
+[[source]]
+id = "nws_weather_radio"
+short = "NOAA"
+title = "NOAA Weather Radio All Hazards"
+publisher = "NOAA National Weather Service"
+url = "https://www.weather.gov/nwr/"
+
+[[source]]
+id = "oregon_2_weeks_ready"
+short = "Oregon OEM"
+title = "2 Weeks Ready"
+publisher = "Oregon Department of Emergency Management"
+url = "https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx"
+
+[[source]]
+id = "oregon_b2wr_toolkit"
+short = "Oregon OEM"
+title = "Be 2 Weeks Ready tool kit"
+publisher = "Oregon Department of Emergency Management"
+url = "https://www.oregon.gov/oem/Documents/B2WR-Complete-Tool-Kit-EN.pdf"
+
+[[source]]
+id = "rdpo_emergency_toilet"
+short = "RDPO"
+title = "Emergency Toilet Guidebook (twin-bucket toilet)"
+publisher = "Regional Disaster Preparedness Organization, Portland Metro Region"
+url = "https://www.rdpo.net/emergency-toilet"
+
+[[source]]
+id = "ready_gov_disability"
+short = "Ready.gov"
+title = "People with Disabilities"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/disability"
+
+[[source]]
+id = "ready_gov_earthquakes"
+short = "Ready.gov"
+title = "Earthquakes"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/earthquakes"
+
+[[source]]
+id = "ready_gov_evacuation"
+short = "Ready.gov"
+title = "Evacuation"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/evacuation"
+
+[[source]]
+id = "ready_gov_financial"
+short = "Ready.gov"
+title = "Financial Preparedness"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/financial-preparedness"
+
+[[source]]
+id = "ready_gov_food"
+short = "Ready.gov"
+title = "Food"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/food"
+
+[[source]]
+id = "ready_gov_heat"
+short = "Ready.gov"
+title = "Extreme Heat"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/heat"
+
+[[source]]
+id = "ready_gov_home_fires"
+short = "Ready.gov"
+title = "Home Fires"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/home-fires"
+
+[[source]]
+id = "ready_gov_kit"
+short = "Ready.gov"
+title = "Build A Kit"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/kit"
+
+[[source]]
+id = "ready_gov_kit_2020"
+short = "Ready.gov"
+title = "Build A Kit (archived January 2020 version, with the 72-hour and work-kit wording)"
+publisher = "FEMA / Ready.gov (via Internet Archive)"
+url = "https://web.archive.org/web/20200101090440/https://www.ready.gov/kit"
+
+[[source]]
+id = "ready_gov_low_cost"
+short = "Ready.gov"
+title = "Low and No Cost Preparedness"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/low-and-no-cost"
+
+[[source]]
+id = "ready_gov_older_adults"
+short = "Ready.gov"
+title = "Older Adults"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/older-adults"
+
+[[source]]
+id = "ready_gov_pets"
+short = "Ready.gov"
+title = "Pets and Animals"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/pets"
+
+[[source]]
+id = "ready_gov_plan"
+short = "Ready.gov"
+title = "Make A Plan"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/plan"
+
+[[source]]
+id = "ready_gov_power_outages"
+short = "Ready.gov"
+title = "Power Outages"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/power-outages"
+
+[[source]]
+id = "ready_gov_water"
+short = "Ready.gov"
+title = "Water"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/water"
+
+[[source]]
+id = "ready_gov_winter"
+short = "Ready.gov"
+title = "Winter Weather"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/winter-weather"
+
+[[source]]
+id = "redcross_first_aid_kit"
+short = "Red Cross"
+title = "Anatomy of a First Aid Kit"
+publisher = "American Red Cross"
+url = "https://www.redcross.org/get-help/how-to-prepare-for-emergencies/anatomy-of-a-first-aid-kit.html"
+
+[[source]]
+id = "redcross_survival_kit"
+short = "Red Cross"
+title = "Survival Kit Supplies"
+publisher = "American Red Cross"
+url = "https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html"
+
+[[source]]
+id = "rr_expert_prior"
+short = "estimate"
+title = "Ready Reckoner expert estimates for supply sizing and upkeep (each one listed with its reasoning)"
+publisher = "Ready Reckoner contributors"
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md"
+prior = true
+
+[[source]]
+id = "rr_price_observations_2026_09"
+short = "retail prices"
+title = "Retail price observations behind the item catalogue's price bands, September 2026"
+publisher = "Ready Reckoner contributors"
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md"
+
+[[source]]
+id = "rr_research_supply_standards"
+short = "Ready Reckoner research"
+title = "Supply-sizing evidence base (research report): quantities, shelf lives and costs, with derivations"
+publisher = "Ready Reckoner contributors"
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/supply-standards.md"
+
+[[source]]
+id = "sil_cpap_power"
+short = "SIL"
+title = "CPAP Power Options (user-measured battery use)"
+publisher = "SIL International"
+url = "https://power.sil.org/cpap-power-options/"
+
+[[source]]
+id = "sphere_2018"
+short = "Sphere"
+title = "The Sphere Handbook: Humanitarian Charter and Minimum Standards in Humanitarian Response, 4th edition"
+publisher = "Sphere Association"
+url = "https://spherestandards.org/handbook/"
+
+[[source]]
+id = "stlouisfed_emergency_fund_2025"
+short = "St. Louis Fed"
+title = "When the Unexpected Happens, Be Ready with an Emergency Fund (Page One Economics)"
+publisher = "Federal Reserve Bank of St. Louis"
+url = "https://www.stlouisfed.org/publications/page-one-economics/2025/sep/when-unexpected-happens-be-ready-with-emergency-fund"
+
+[[source]]
+id = "sutter_diapers"
+short = "Sutter Health"
+title = "How many diapers a day should your newborn have?"
+publisher = "Sutter Health"
+url = "https://www.sutterhealth.org/health/how-many-diapers-a-day-your-newborn-should-have"
+
+[[source]]
+id = "usda_dga_2020_2025"
+short = "Dietary Guidelines"
+title = "Dietary Guidelines for Americans, 2020–2025, Appendix 2: Estimated Calorie Needs"
+publisher = "U.S. Department of Agriculture and U.S. Department of Health and Human Services"
+url = "https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf"
+
+[[source]]
+id = "usda_tfp_aug2026"
+short = "USDA"
+title = "Official USDA Thrifty Food Plan: U.S. Average, August 2026"
+publisher = "USDA Food and Nutrition Service"
+url = "https://www.fns.usda.gov/sites/default/files/resource-files/CostofFoodAug2026Thrifty.pdf"
+
+[[source]]
+id = "usu_food_storage_booklet"
+short = "USU Extension"
+title = "Food Storage (extension booklet)"
+publisher = "Utah State University Extension"
+url = "https://extension.usu.edu/preserve-the-harvest/files/Food-Storage-Booklet.pdf"
+
+[[source]]
+id = "washington_prepare_in_a_year"
+short = "Washington EMD"
+title = "Prepare in a Year"
+publisher = "Washington Emergency Management Division"
+url = "https://mil.wa.gov/prepare-in-a-year"
+
+[[source]]
+id = "who_wedc_tn9"
+short = "WHO"
+title = "Technical Note 9: How much water is needed in emergencies"
+publisher = "World Health Organization and WEDC"
+url = "https://cdn.who.int/media/docs/default-source/wash-documents/who-tn-09-how-much-water-is-needed.pdf"
+
+[[source]]
+id = "wms_wound_2014"
+short = "Wilderness Medical Society"
+title = "Wilderness Medical Society Practice Guidelines for Basic Wound Management in the Austere Environment: 2014 Update"
+publisher = "Quinn R.H. et al., Wilderness and Environmental Medicine"
+url = "https://doi.org/10.1016/j.wem.2014.08.015"
+
+[[source]]
+id = "cdc_bleach_disinfecting"
+short = "CDC"
+title = "Cleaning and Disinfecting with Bleach"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/hygiene/about/cleaning-and-disinfecting-with-bleach.html"
+
+[[source]]
+id = "rr_research_risk_model"
+short = "Ready Reckoner research"
+title = "Quantitative core model specification (research report): hazards, consequence buckets, durations"
+publisher = "Ready Reckoner contributors"
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/risk-model.md"
+
+[[source]]
+id = "usfa_smoke_alarms"
+short = "USFA"
+title = "Smoke alarms"
+publisher = "U.S. Fire Administration"
+url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/smoke-alarms/"
+
+[[source]]
+id = "usfa_extinguishers"
+short = "USFA"
+title = "Fire extinguishers"
+publisher = "U.S. Fire Administration"
+url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/fire-extinguishers/"

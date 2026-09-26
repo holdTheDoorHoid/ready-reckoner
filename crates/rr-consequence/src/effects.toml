@@ -1,0 +1,2274 @@
+# Ready Reckoner — effects table: what each hazard does to each consequence bucket, and for how long.
+#
+# Licence: CC BY-SA 4.0 (a derived table, like everything under content/ and docs/).
+# Source of the numbers: docs/research/risk-model.md §2.4 (hazard-to-bucket map), §2.5 (empirical
+# durations), §6.2 (societal priors) and §7.5 (the EAGLE-I backtest that revised the power priors),
+# plus the research prototype's event classes for Philadelphia and Coos Bay (§8, §9).
+#
+# How to read a row
+#   hazard / scenario  which hazard (or named scenario) the event belongs to
+#   class              the event class within the hazard ("local" storm outage, "major" windstorm,
+#                      "cat3plus" hurricane). Rows with the same class are the SAME event hitting
+#                      several buckets, which is how correlation between buckets is kept.
+#   p_given_event      chance that a household-significant event of this hazard is of this class
+#                      AND causes this bucket's consequence at the home (0 to 1). Rows of one
+#                      (hazard, bucket) are different event classes, so their shares add up to 1 at
+#                      most.
+#   duration           how long the consequence lasts (median and 90th percentile, in days). For
+#                      `evacuate` it is the time away from home; for readiness buckets it is unused.
+#   evidence           "empirical" only when both the share and the duration rest on measured
+#                      records (or the share is 1 by definition); otherwise "prior" (an expert
+#                      estimate, shown to the user as such).
+#   duration_evidence  what the duration alone rests on, when it differs from `evidence` (a
+#                      measured restoration curve with an expert-estimated share, say).
+#   requires           the row applies only to some households: municipal (public water), well,
+#                      commuter, no_cooling, no_heating, mobile_home, coastal.
+#   pool               a short storm outage: when the county has outage statistics (EAGLE-I), the
+#                      county-scale part of these outages comes from them (see the Rust docs).
+#   event_keys         county event records (county.events) whose median/p90 days replace the
+#                      duration when present.
+#   heat_share         share of these power cuts that happen during dangerous heat (air-conditioned
+#                      homes then face dangerous heat indoors).
+#   cold_share         share that happen when heating is needed (homes whose heating needs power
+#                      then face dangerous cold).
+#   replaced_by        the row is dropped when this named scenario is offered, because the
+#                      scenario carries the same event at its own rate.
+#   notice_hours       evacuate rows: least and most warning, in hours.
+#   relief             when outside help plausibly arrives and when service is mostly restored for
+#                      this event (Oregon Resilience Plan two-tier rating).
+#   duration_factor /  uncertainty: the 90th-percentile multiplier on the duration or the share
+#   p_factor           (defaults come from [params]).
+#
+# Hazard rates (how often each hazard reaches the household) are NOT in this file: rr-hazards
+# supplies them as HouseholdEventRate. See docs/RISK_MODEL.md, "Consequences and targets".
+
+version = "2026-09-25"
+
+# ---------------------------------------------------------------------------------------------
+# Parameters used by the coupling rules, the money buckets and the ranges.
+# ---------------------------------------------------------------------------------------------
+
+[params.well_pump_failure]
+value = 0.07
+low = 0.03
+high = 0.15
+unit = "failures per year"
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A private well's electric pump or pressure tank fails about once in 14 years; repair takes days."
+
+[params.wood_heat_shortfall]
+value = 0.01
+low = 0.003
+high = 0.03
+unit = "events per year"
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A long winter outage can outrun a wood stove (wet wood, not enough wood cut, nobody able to tend it)."
+
+[params.booster_pump_floor]
+value = 7.0
+unit = "floor"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Street water pressure usually reaches about six floors; higher floors rely on electric booster pumps (a general rule; check your building)."
+
+[params.cold_onset_days]
+value = 0.5
+unit = "days"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A house takes some hours to become dangerously cold after the heating stops."
+
+[params.cold_chain_days]
+value = 1.0
+unit = "days"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Refrigerated medicine is at risk once the power has been off for about a day, unless there is a cooler plan."
+
+[params.walk_speed_mph]
+value = 3.0
+unit = "miles per hour"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "An adult walks home at about 3 miles per hour."
+
+[params.walk_water_l_per_hour]
+value = 0.5
+unit = "litres per hour of walking in heat"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "About half a litre of water per hour of walking in hot weather."
+
+[params.share_hours_away]
+value = 0.27
+unit = "share of the week"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A full-time worker spends about 27 percent of the week's hours at work, away from home."
+
+[params.storm_pool_fallback_ratio]
+value = 0.33
+low = 0.15
+high = 0.6
+unit = "county-scale outages per short storm outage"
+duration = { kind = "log_normal", median_days = 0.0833, p90_days = 0.833 }
+evidence = "prior"
+sources = ["ornl_eagle_i_outages", "eia_861_reliability_2024", "rr_risk_model_priors"]
+note = "Without county outage records, county-scale storm outages are taken as a third of short storm outages, lasting a median of 2 hours with a bad case of 20 hours (the Philadelphia EAGLE-I fit, 0.065 a year against 0.2 short storm outages)."
+
+[params.relief_standard_days]
+value = 3.0
+unit = "days"
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013"]
+note = "The standard recommendation is to be self-sufficient for 72 hours before major relief arrives."
+
+[params.readiness_threshold]
+value = 0.02
+unit = "chance in 10 years"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A readiness capability is worth having once the 10-year chance of needing it reaches 2 in 100."
+
+[params.ui_replacement]
+value = 0.5
+low = 0.4
+high = 0.6
+unit = "share of wages"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Unemployment insurance replaces about half of wages (state rules vary)."
+
+[params.ui_weeks]
+value = 26.0
+unit = "weeks"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Unemployment insurance usually lasts up to 26 weeks (state rules vary)."
+
+[params.job_spell_weeks]
+value = 10.0
+unit = "weeks (median; p90 in the duration)"
+duration = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
+evidence = "prior"
+sources = ["bls_work_experience_2024", "bls_unemployment_duration", "rr_risk_model_priors"]
+note = "A completed unemployment spell lasts a median of about 10 weeks, with a bad case of 36 weeks (consistent with 21.5 percent of people with unemployment looking 27 weeks or more). Duration units here are weeks."
+
+[params.weeks_per_month]
+value = 4.345
+unit = "weeks"
+evidence = "empirical"
+sources = ["rr_risk_model_priors"]
+note = "52.14 weeks divided by 12 months."
+
+[params.job_loss_base_rate]
+value = 0.083
+low = 0.06
+high = 0.11
+unit = "spells per earner per year"
+evidence = "empirical"
+sources = ["bls_work_experience_2024"]
+note = "8.3 percent of people who worked or looked for work in 2024 were unemployed at some point. Used only when rr-hazards gives no job-loss rate."
+
+[params.stability_stable]
+value = 1.0
+low = 0.5
+high = 1.0
+unit = "times the base job-loss rate"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Regular salary: the typical rate (tenured or public jobs are about half)."
+
+[params.stability_variable]
+value = 1.5
+low = 1.25
+high = 2.0
+unit = "times the base job-loss rate"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Commission or variable pay."
+
+[params.stability_seasonal]
+value = 1.75
+low = 1.5
+high = 2.0
+unit = "times the base job-loss rate"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Seasonal work."
+
+[params.stability_gig]
+value = 1.75
+low = 1.5
+high = 2.0
+unit = "times the base job-loss rate"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Gig or app-based work."
+
+[params.displaced_back_within_week]
+value = 0.35
+unit = "share of displaced households"
+evidence = "empirical"
+sources = ["census_pulse_displacement", "aung_2025_displacement"]
+note = "More than a third of people displaced by a disaster were back within a week."
+
+[params.displaced_over_six_months]
+value = 0.12
+unit = "share of displaced households"
+evidence = "empirical"
+sources = ["census_pulse_displacement"]
+note = "12 percent were out for more than six months (not counting those who never returned)."
+
+[params.never_return_renter]
+value = 0.25
+unit = "share of displaced renters"
+evidence = "empirical"
+sources = ["census_pulse_displacement"]
+note = "About 1 in 4 displaced renters never returned home."
+
+[params.never_return_owner]
+value = 0.10
+unit = "share of displaced owners"
+evidence = "empirical"
+sources = ["census_pulse_displacement"]
+note = "About 1 in 10 displaced homeowners never returned home."
+
+[params.duration_factor_empirical]
+value = 1.3
+unit = "90th-percentile multiplier"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Durations measured in records are uncertain by about a factor of 1.3 either way (10th to 90th percentile)."
+
+[params.duration_factor_prior]
+value = 2.0
+unit = "90th-percentile multiplier"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Expert-estimated durations are uncertain by about a factor of 2 either way."
+
+[params.p_factor_empirical]
+value = 1.2
+unit = "90th-percentile multiplier"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Measured shares are uncertain by about a factor of 1.2."
+
+[params.p_factor_prior]
+value = 1.5
+unit = "90th-percentile multiplier"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Expert-estimated shares are uncertain by about a factor of 1.5."
+
+[params.outage_stats_rate_factor]
+value = 1.3
+unit = "90th-percentile multiplier"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "County outage rates from 2014-2025 records are uncertain by about a factor of 1.3."
+
+# ---------------------------------------------------------------------------------------------
+# Natural hazards
+# ---------------------------------------------------------------------------------------------
+
+[[effect]]
+hazard = "avalanche"
+bucket = "supplies"
+class = "slide"
+label = "avalanches closing roads"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 4.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Avalanches close mountain roads for a day or more; clearing can take days."
+
+[[effect]]
+hazard = "avalanche"
+bucket = "get_home"
+class = "slide"
+label = "avalanches closing roads"
+p_given_event = 0.3
+evidence = "prior"
+requires = "commuter"
+sources = ["rr_risk_model_priors"]
+note = "A road closure can leave a commuter unable to get home."
+
+[[effect]]
+hazard = "avalanche"
+bucket = "evacuate"
+class = "slide"
+label = "avalanches closing roads"
+p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+notice_hours = [0.5, 12.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Homes in a slide path are sometimes told to leave."
+
+[[effect]]
+hazard = "avalanche"
+bucket = "home_loss"
+class = "slide"
+label = "avalanches closing roads"
+p_given_event = 0.01
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "coastal_flooding"
+bucket = "evacuate"
+class = "surge"
+label = "flooding from the sea"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [12.0, 72.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Storm surge is forecast hours to days ahead; many homes in the flood zone are told to leave."
+
+[[effect]]
+hazard = "coastal_flooding"
+bucket = "home_loss"
+class = "surge"
+label = "flooding from the sea"
+p_given_event = 0.2
+evidence = "prior"
+sources = ["fema_nri_v120", "rr_risk_model_priors"]
+note = "Share of flooded homes left unlivable for a while (the National Risk Index loss ratio is used only to check this is material)."
+
+[[effect]]
+hazard = "coastal_flooding"
+bucket = "water_boil"
+class = "surge"
+label = "flooding from the sea"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 10.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["epa_boil_water_report_2024", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "coastal_flooding"
+bucket = "power"
+class = "surge"
+label = "flooding from the sea"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
+heat_share = 0.2
+cold_share = 0.3
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "coastal_flooding"
+bucket = "supplies"
+class = "surge"
+label = "flooding from the sea"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "coastal_flooding"
+bucket = "medication"
+class = "surge"
+label = "flooding from the sea"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Leaving home in a hurry can cut you off from your pharmacy and refills."
+
+[[effect]]
+hazard = "cold_wave"
+bucket = "power"
+class = "extreme_cold"
+label = "extreme cold straining the grid"
+p_given_event = 0.005
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+cold_share = 1.0
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "rr-hazards counts every cold wave in the county; about 1 in 200 overloads the grid (Texas, February 2021; the Southeast, December 2022)."
+
+[[effect]]
+hazard = "cold_wave"
+bucket = "water_boil"
+class = "extreme_cold"
+label = "extreme cold straining the grid"
+p_given_event = 0.003
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["shaffer_2026_texas_boil_notices", "rr_risk_model_priors"]
+note = "About 1 in 300 county cold waves breaks mains widely enough for a boil-water notice (winter notices in Texas lasted a median of 7 days)."
+
+[[effect]]
+hazard = "cold_wave"
+bucket = "water_out"
+class = "extreme_cold"
+label = "extreme cold straining the grid"
+p_given_event = 0.005
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Frozen or burst pipes can leave a home with no water."
+
+[[effect]]
+hazard = "cold_wave"
+bucket = "thermal"
+class = "no_heating"
+label = "cold waves in a home with no heating"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 5.0 }
+requires = "no_heating"
+event_keys = ["cold_wave", "extreme_cold", "extreme_cold_wind_chill", "cold_wind_chill"]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A home with no heating system faces dangerous cold for as long as the cold wave lasts."
+
+[[effect]]
+hazard = "cold_wave"
+bucket = "supplies"
+class = "extreme_cold"
+label = "extreme cold straining the grid"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 2.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "drought"
+bucket = "water_out"
+class = "low_yield"
+label = "drought lowering a well"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 90.0 }
+requires = "well"
+event_keys = ["drought"]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A drought can lower a private well's yield for weeks to months."
+
+[[effect]]
+hazard = "earthquake"
+bucket = "power"
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 0.5, p90_days = 3.0 }
+heat_share = 0.1
+cold_share = 0.4
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "rr-hazards counts shaking of 0.1 g (intensity VI, things knocked off shelves); damaging shaking is about a third of that. Outages last hours to days (after Tohoku, Japan restored over 90 percent of power in 10 days)."
+
+[[effect]]
+hazard = "earthquake"
+bucket = "water_out"
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "rr_risk_model_priors"]
+note = "Broken mains after typical shaking take days to weeks to repair (Hazus restoration curves, 1985 expert opinion)."
+
+[[effect]]
+hazard = "earthquake"
+bucket = "water_out"
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.07
+duration = { kind = "log_normal", median_days = 8.0, p90_days = 20.0 }
+requires = "well"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "rr_risk_model_priors"]
+note = "Hazus puts an extensively damaged well out for 10.5 days on average (standard deviation 7.5)."
+
+[[effect]]
+hazard = "earthquake"
+bucket = "supplies"
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+bucket = "medication"
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.07
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+bucket = "comms"
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 0.5, p90_days = 3.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+bucket = "evacuate"
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.02
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [0.0, 0.05]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Earthquakes give no warning; a damaged home may have to be left at once."
+
+[[effect]]
+hazard = "earthquake"
+bucket = "home_loss"
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.02
+evidence = "prior"
+sources = ["fema_nri_v120", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+bucket = "get_home"
+class = "shaking"
+label = "earthquake shaking that knocks things off shelves"
+p_given_event = 0.1
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "About 27 percent of a worker's week is spent at work, away from home."
+
+[[effect]]
+hazard = "hail"
+bucket = "power"
+class = "local"
+label = "short storm outages"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.417 }
+pool = true
+heat_share = 0.3
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hail"
+bucket = "home_loss"
+class = "local"
+label = "short storm outages"
+p_given_event = 0.002
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "heat_wave"
+bucket = "power"
+class = "heat_outage"
+label = "heat waves straining the grid"
+p_given_event = 0.02
+duration = { kind = "log_normal", median_days = 0.167, p90_days = 0.833 }
+pool = true
+heat_share = 1.0
+evidence = "prior"
+sources = ["stone_2023_heat_blackout", "rr_risk_model_priors"]
+note = "Heat waves strain the grid; a blackout during a heat wave is the most dangerous combination for health."
+
+[[effect]]
+hazard = "heat_wave"
+bucket = "thermal"
+class = "no_cooling"
+label = "heat waves in a home without air conditioning"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 7.0 }
+requires = "no_cooling"
+event_keys = ["heat_wave", "excessive_heat", "heat"]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Without air conditioning, dangerous heat indoors lasts as long as the heat wave."
+
+[[effect]]
+hazard = "hurricane"
+bucket = "power"
+class = "cat12"
+label = "hurricanes and tropical storms"
+p_given_event = 0.45
+duration = { kind = "log_normal", median_days = 1.5, p90_days = 5.0 }
+heat_share = 0.5
+duration_evidence = "empirical"
+evidence = "prior"
+sources = ["ornl_repowrd_2022", "rr_risk_model_priors"]
+note = "Duration from ORNL restoration records (Irma: restoration rate 0.02 per hour, so half restored in 35 hours and 90 percent in 115 hours); the share is an expert estimate."
+
+[[effect]]
+hazard = "hurricane"
+bucket = "power"
+class = "cat3plus"
+label = "major hurricanes (category 3 or a direct hit)"
+p_given_event = 0.06
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 16.0 }
+heat_share = 0.5
+replaced_by = "major_hurricane_direct_hit"
+duration_evidence = "empirical"
+evidence = "prior"
+sources = ["ornl_repowrd_2022", "rr_risk_model_priors"]
+note = "Duration from ORNL restoration records (Michael: rate 0.006 per hour, half restored in 116 hours and 90 percent in 384 hours)."
+
+[[effect]]
+hazard = "hurricane"
+bucket = "water_boil"
+class = "cat12"
+label = "hurricanes and tropical storms"
+p_given_event = 0.15
+duration = { kind = "log_normal", median_days = 6.0, p90_days = 18.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["shaffer_2026_texas_boil_notices", "rr_risk_model_priors"]
+note = "Hurricane boil-water notices in Texas lasted a median of 6 days."
+
+[[effect]]
+hazard = "hurricane"
+bucket = "supplies"
+class = "cat12"
+label = "hurricanes and tropical storms"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 5.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+bucket = "supplies"
+class = "cat3plus"
+label = "major hurricanes (category 3 or a direct hit)"
+p_given_event = 0.06
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 14.0 }
+replaced_by = "major_hurricane_direct_hit"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+bucket = "medication"
+class = "cat3plus"
+label = "major hurricanes (category 3 or a direct hit)"
+p_given_event = 0.06
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+replaced_by = "major_hurricane_direct_hit"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+bucket = "comms"
+class = "cat12"
+label = "hurricanes and tropical storms"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 0.5, p90_days = 2.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+bucket = "comms"
+class = "cat3plus"
+label = "major hurricanes (category 3 or a direct hit)"
+p_given_event = 0.06
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 10.0 }
+replaced_by = "major_hurricane_direct_hit"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+bucket = "evacuate"
+class = "cat12"
+label = "hurricanes and tropical storms"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+notice_hours = [24.0, 72.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Hurricanes give one to three days of warning; evacuation orders cover surge zones and mobile homes, not most homes."
+
+[[effect]]
+hazard = "hurricane"
+bucket = "evacuate"
+class = "mobile_home"
+label = "wind warnings for mobile homes"
+p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+notice_hours = [24.0, 72.0]
+requires = "mobile_home"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Mobile homes are told to leave for hurricane-force winds that most houses ride out."
+
+[[effect]]
+hazard = "hurricane"
+bucket = "home_loss"
+class = "cat12"
+label = "hurricanes and tropical storms"
+p_given_event = 0.01
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+bucket = "home_loss"
+class = "cat3plus"
+label = "major hurricanes (category 3 or a direct hit)"
+p_given_event = 0.02
+replaced_by = "major_hurricane_direct_hit"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "ice_storm"
+bucket = "power"
+class = "local"
+label = "short storm outages"
+p_given_event = 0.65
+duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.417 }
+pool = true
+cold_share = 1.0
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "ice_storm"
+bucket = "power"
+class = "major"
+label = "big ice storms"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 1.5, p90_days = 5.0 }
+cold_share = 1.0
+evidence = "prior"
+sources = ["inquirer_peco_outages", "rr_risk_model_priors"]
+note = "Ice storms caused two of the Philadelphia utility's five largest outages (1994, 2014); they sit outside the 2018-2025 outage records, so this class is an expert estimate."
+
+[[effect]]
+hazard = "ice_storm"
+bucket = "power"
+class = "record"
+label = "an ice storm of record"
+p_given_event = 0.017
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 14.0 }
+cold_share = 1.0
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "ice_storm"
+bucket = "supplies"
+class = "icy_roads"
+label = "icy roads"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Icy roads keep people home for one to three days."
+
+[[effect]]
+hazard = "ice_storm"
+bucket = "supplies"
+class = "record"
+label = "an ice storm of record"
+p_given_event = 0.017
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 14.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "ice_storm"
+bucket = "medication"
+class = "record"
+label = "an ice storm of record"
+p_given_event = 0.017
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "ice_storm"
+bucket = "comms"
+class = "record"
+label = "an ice storm of record"
+p_given_event = 0.017
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 10.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "ice_storm"
+bucket = "get_home"
+class = "icy_roads"
+label = "icy roads"
+p_given_event = 0.05
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "landslide"
+bucket = "supplies"
+class = "slide"
+label = "landslides closing roads"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "landslide"
+bucket = "power"
+class = "slide"
+label = "landslides closing roads"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 0.5, p90_days = 2.0 }
+cold_share = 0.5
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "landslide"
+bucket = "evacuate"
+class = "slide"
+label = "landslides closing roads"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 60.0 }
+notice_hours = [0.0, 2.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "landslide"
+bucket = "home_loss"
+class = "slide"
+label = "landslides closing roads"
+p_given_event = 0.1
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "landslide"
+bucket = "get_home"
+class = "slide"
+label = "landslides closing roads"
+p_given_event = 0.1
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "lightning"
+bucket = "power"
+class = "local"
+label = "short storm outages"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.417 }
+pool = true
+heat_share = 0.3
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "evacuate"
+class = "flood"
+label = "floods at or near the home"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [1.0, 12.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Flash floods give hours of warning, sometimes less."
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "home_loss"
+class = "flood"
+label = "floods at or near the home"
+p_given_event = 0.15
+evidence = "prior"
+sources = ["fema_nri_v120", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "water_boil"
+class = "flood"
+label = "floods at or near the home"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 10.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["epa_boil_water_report_2024", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "power"
+class = "flood"
+label = "floods at or near the home"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 0.5, p90_days = 3.0 }
+heat_share = 0.2
+cold_share = 0.3
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "supplies"
+class = "flood"
+label = "floods at or near the home"
+p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 4.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "medication"
+class = "flood"
+label = "floods at or near the home"
+p_given_event = 0.15
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "riverine_flooding"
+bucket = "get_home"
+class = "flood"
+label = "floods at or near the home"
+p_given_event = 0.05
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "strong_wind"
+bucket = "power"
+class = "local"
+label = "short storm outages"
+p_given_event = 0.85
+duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.417 }
+pool = true
+heat_share = 0.15
+cold_share = 0.4
+evidence = "prior"
+sources = ["eia_861_reliability_2024", "rr_risk_model_priors"]
+note = "rr-hazards counts windstorms that cut the power or damage the home; most outages are short and local (split of the utility major-event frequency)."
+
+[[effect]]
+hazard = "strong_wind"
+bucket = "power"
+class = "major"
+label = "a windstorm bigger than any in the recent records"
+p_given_event = 0.03
+duration = { kind = "log_normal", median_days = 1.5, p90_days = 5.0 }
+cold_share = 0.8
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Big windstorms are rarer than the 2018-2025 outage records can show: Coos Bay's big-windstorm class (research §9, 0.03 a year) over its windstorm rate."
+
+[[effect]]
+hazard = "strong_wind"
+bucket = "comms"
+class = "local"
+label = "short storm outages"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 0.4, p90_days = 1.75 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Storms knock out cell and internet service for hours to a day or two."
+
+[[effect]]
+hazard = "tornado"
+bucket = "power"
+class = "path"
+label = "tornadoes"
+p_given_event = 0.8
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
+heat_share = 0.2
+cold_share = 0.1
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "tornado"
+bucket = "supplies"
+class = "path"
+label = "tornadoes"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "tornado"
+bucket = "comms"
+class = "path"
+label = "tornadoes"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 0.5, p90_days = 2.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "tornado"
+bucket = "medication"
+class = "path"
+label = "tornadoes"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "tornado"
+bucket = "home_loss"
+class = "path"
+label = "tornadoes"
+p_given_event = 0.3
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "tornado"
+bucket = "evacuate"
+class = "mobile_home"
+label = "wind warnings for mobile homes"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 7.0 }
+notice_hours = [0.1, 0.5]
+requires = "mobile_home"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "People in mobile homes are told to go to a sturdy shelter when a tornado warning is issued."
+
+[[effect]]
+hazard = "tsunami"
+bucket = "evacuate"
+class = "distant"
+label = "tsunamis from distant earthquakes"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 7.0 }
+notice_hours = [2.0, 12.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A tsunami from a distant earthquake gives hours of warning."
+
+[[effect]]
+hazard = "tsunami"
+bucket = "home_loss"
+class = "distant"
+label = "tsunamis from distant earthquakes"
+p_given_event = 0.1
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "volcanic_activity"
+bucket = "supplies"
+class = "ash"
+label = "volcanic ash"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "volcanic_activity"
+bucket = "evacuate"
+class = "ash"
+label = "volcanic ash"
+p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 30.0 }
+notice_hours = [1.0, 48.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "volcanic_activity"
+bucket = "power"
+class = "ash"
+label = "volcanic ash"
+p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
+cold_share = 0.4
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "volcanic_activity"
+bucket = "water_boil"
+class = "ash"
+label = "volcanic ash"
+p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "volcanic_activity"
+bucket = "comms"
+class = "ash"
+label = "volcanic ash"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "volcanic_activity"
+bucket = "home_loss"
+class = "ash"
+label = "volcanic ash"
+p_given_event = 0.02
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "wildfire"
+bucket = "evacuate"
+class = "threat"
+label = "wildfires"
+p_given_event = 0.15
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [0.25, 12.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "rr-hazards counts warnings to leave and safety shutoffs; in the West most events are shutoffs. Wildfires give minutes to hours of warning."
+
+[[effect]]
+hazard = "wildfire"
+bucket = "power"
+class = "shutoff"
+label = "wildfire safety power shutoffs"
+p_given_event = 0.85
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+heat_share = 0.3
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Utilities cut power for one to three days when fire danger is extreme."
+
+[[effect]]
+hazard = "wildfire"
+bucket = "supplies"
+class = "smoke"
+label = "wildfire smoke"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Heavy smoke keeps people indoors for days."
+
+[[effect]]
+hazard = "wildfire"
+bucket = "home_loss"
+class = "threat"
+label = "wildfires"
+p_given_event = 0.02
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "winter_weather"
+bucket = "supplies"
+class = "snowed_in"
+label = "snow and ice storms"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 2.0 }
+event_keys = ["winter_weather", "winter_storm", "blizzard", "heavy_snow"]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A household-significant winter storm keeps you home for about a day, two in a bad case."
+
+[[effect]]
+hazard = "winter_weather"
+bucket = "power"
+class = "local"
+label = "short storm outages"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.417 }
+pool = true
+cold_share = 1.0
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "winter_weather"
+bucket = "comms"
+class = "local"
+label = "short storm outages"
+p_given_event = 0.02
+duration = { kind = "log_normal", median_days = 0.4, p90_days = 1.75 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "winter_weather"
+bucket = "get_home"
+class = "snowed_in"
+label = "snow and ice storms"
+p_given_event = 0.05
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A storm can catch a commuter away from home with roads closed."
+
+# ---------------------------------------------------------------------------------------------
+# Societal hazards
+# ---------------------------------------------------------------------------------------------
+
+[[effect]]
+hazard = "pandemic"
+bucket = "supplies"
+class = "stay_home"
+label = "a pandemic that disrupts shopping"
+p_given_event = 0.9
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 45.0 }
+evidence = "prior"
+sources = ["cdc_mmwr_stay_at_home_2020", "cdc_pandemic_history", "rr_risk_model_priors"]
+note = "rr-hazards counts pandemics that change daily life (as in 1918 and 2020). Stay-home orders in 2020 lasted a median of 45 days, but stores stayed open, so the stockpile need was about two weeks."
+
+[[effect]]
+hazard = "pandemic"
+bucket = "medication"
+class = "stay_home"
+label = "a pandemic that disrupts shopping"
+p_given_event = 0.9
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["cdc_pandemic_history", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "grid_failure"
+bucket = "power"
+class = "regional"
+label = "a regional blackout"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+heat_share = 0.3
+cold_share = 0.4
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "The 2003 Northeast blackout lasted up to 4 days where it hit."
+
+[[effect]]
+hazard = "grid_failure"
+bucket = "water_out"
+class = "regional"
+label = "a regional blackout"
+p_given_event = 0.4
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Water systems without backup power lose pressure in a long blackout."
+
+[[effect]]
+hazard = "grid_failure"
+bucket = "comms"
+class = "regional"
+label = "a regional blackout"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Cell towers run on batteries for hours, not days."
+
+[[effect]]
+hazard = "grid_failure"
+bucket = "get_home"
+class = "regional"
+label = "a regional blackout"
+p_given_event = 0.27
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Transit and traffic lights stop; a commuter at work may have to walk home."
+
+[[effect]]
+hazard = "cyber_outage"
+bucket = "medication"
+class = "pharmacy_it"
+label = "pharmacy or insurer computer outages"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Pharmacy and insurer computer outages can hold up prescriptions for days to weeks."
+
+[[effect]]
+hazard = "cyber_outage"
+bucket = "comms"
+class = "payments"
+label = "card-payment outages"
+p_given_event = 0.25
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Card and ATM networks go down for one to three days."
+
+[[effect]]
+hazard = "civil_unrest"
+bucket = "supplies"
+class = "curfew"
+label = "curfews"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 5.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "civil_unrest"
+bucket = "security"
+class = "curfew"
+label = "curfews"
+p_given_event = 1.0
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "civil_unrest"
+bucket = "get_home"
+class = "curfew"
+label = "curfews"
+p_given_event = 0.1
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "supply_chain_disruption"
+bucket = "supplies"
+class = "shortage"
+label = "store shortages and runs on stores"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 5.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "supply_chain_disruption"
+bucket = "medication"
+class = "pharmacy_access"
+label = "pharmacy closures and refill delays"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 1.5, p90_days = 4.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hazmat_release"
+bucket = "water_out"
+class = "release"
+label = "chemical releases"
+p_given_event = 0.6
+duration = { kind = "log_normal", median_days = 1.5, p90_days = 7.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "rr-hazards counts releases that bring a do-not-drink order or an order to stay inside; about 6 in 10 are do-not-drink notices (research §6.2: 2 %/yr), lasting days."
+
+[[effect]]
+hazard = "hazmat_release"
+bucket = "supplies"
+class = "release"
+label = "chemical releases"
+p_given_event = 0.4
+duration = { kind = "log_normal", median_days = 0.25, p90_days = 1.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "An air release means sheltering in place for hours."
+
+[[effect]]
+hazard = "hazmat_release"
+bucket = "evacuate"
+class = "release"
+label = "chemical releases"
+p_given_event = 0.1
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+notice_hours = [0.1, 2.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "nuclear_plant_incident"
+bucket = "evacuate"
+class = "release"
+label = "a nuclear plant accident"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 60.0 }
+notice_hours = [1.0, 12.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "nuclear_plant_incident"
+bucket = "supplies"
+class = "release"
+label = "a nuclear plant accident"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Sheltering in place comes first."
+
+[[effect]]
+hazard = "nuclear_plant_incident"
+bucket = "home_loss"
+class = "release"
+label = "a nuclear plant accident"
+p_given_event = 0.05
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "nuclear_attack"
+bucket = "supplies"
+class = "shelter"
+label = "a nuclear attack"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+evidence = "prior"
+sources = ["ready_gov_nuclear", "rr_risk_model_priors"]
+note = "Official advice is to get inside, stay inside for at least 24 hours, and stay tuned; what happens after that is unknown."
+
+[[effect]]
+hazard = "terrorism"
+bucket = "supplies"
+class = "lockdown"
+label = "a terrorist attack"
+p_given_event = 0.3
+duration = { kind = "log_normal", median_days = 0.5, p90_days = 2.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "terrorism"
+bucket = "comms"
+class = "lockdown"
+label = "a terrorist attack"
+p_given_event = 0.2
+duration = { kind = "log_normal", median_days = 0.5, p90_days = 2.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "terrorism"
+bucket = "evacuate"
+class = "lockdown"
+label = "a terrorist attack"
+p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
+notice_hours = [0.0, 1.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "terrorism"
+bucket = "security"
+class = "lockdown"
+label = "a terrorist attack"
+p_given_event = 0.5
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+# ---------------------------------------------------------------------------------------------
+# Personal hazards (job loss feeds the income model in [[income]])
+# ---------------------------------------------------------------------------------------------
+
+[[effect]]
+hazard = "house_fire"
+bucket = "evacuate"
+class = "fire"
+label = "a fire at home or next door"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 60.0 }
+notice_hours = [0.02, 0.1]
+evidence = "prior"
+sources = ["usfa_residential_fires", "rr_risk_model_priors"]
+note = "A home fire gives minutes to get out; time away runs from days to months."
+
+[[effect]]
+hazard = "house_fire"
+bucket = "fire"
+class = "fire"
+label = "a fire at home or next door"
+p_given_event = 1.0
+evidence = "empirical"
+sources = ["usfa_residential_fires"]
+
+[[effect]]
+hazard = "house_fire"
+bucket = "home_loss"
+class = "fire"
+label = "a fire at home or next door"
+p_given_event = 0.5
+evidence = "prior"
+sources = ["usfa_residential_fires", "census_pulse_displacement", "rr_risk_model_priors"]
+note = "Long displacement is most common after fires."
+
+[[effect]]
+hazard = "house_fire"
+bucket = "medication"
+class = "fire"
+label = "a fire at home or next door"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "Medicine left behind in a fire has to be replaced from wherever you are staying."
+
+[[effect]]
+hazard = "medical_emergency"
+bucket = "medical_emergency"
+class = "emergency"
+label = "medical emergencies"
+p_given_event = 1.0
+evidence = "empirical"
+sources = ["cdc_nchs_ed_visits"]
+
+[[effect]]
+hazard = "vehicle_stranding"
+bucket = "get_home"
+class = "stranded"
+label = "being stranded by a breakdown or closed roads"
+p_given_event = 1.0
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "local_utility_outage"
+bucket = "water_out"
+class = "pressure_loss"
+label = "water main breaks"
+p_given_event = 0.667
+duration = { kind = "log_normal", median_days = 0.25, p90_days = 1.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["epa_boil_water_report_2024", "rr_risk_model_priors"]
+note = "Most local water problems are main breaks and pressure loss (80 percent of the boil-water advisories EPA found for 2021), fixed within hours to a day."
+
+[[effect]]
+hazard = "local_utility_outage"
+bucket = "water_boil"
+class = "notice"
+label = "local water problems"
+p_given_event = 0.333
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 6.0 }
+requires = "municipal"
+event_keys = ["boil_water_notice", "boil_water"]
+evidence = "prior"
+sources = ["shaffer_2026_texas_boil_notices", "water_2024_kentucky_advisories", "rr_risk_model_priors"]
+note = "Texas notices (2010-2022) most often lasted 3 to 4 days; Kentucky advisories averaged 5 days."
+
+[[effect]]
+hazard = "local_utility_outage"
+bucket = "water_out"
+class = "system_failure"
+label = "a major water system failure"
+p_given_event = 0.0267
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
+note = "Rare system-wide failures (Jackson 2022, Asheville 2024) left cities without safe tap water for weeks."
+
+[[effect]]
+hazard = "local_utility_outage"
+bucket = "evacuate"
+class = "gas_leak"
+label = "gas leaks and building emergencies"
+p_given_event = 0.02
+duration = { kind = "log_normal", median_days = 1.0, p90_days = 5.0 }
+notice_hours = [0.1, 1.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "local_utility_outage"
+bucket = "medication"
+class = "gas_leak"
+label = "gas leaks and building emergencies"
+p_given_event = 0.02
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "burglary"
+bucket = "security"
+class = "break_in"
+label = "break-ins"
+p_given_event = 1.0
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "extended_household_illness"
+bucket = "medical_emergency"
+class = "illness"
+label = "a long illness at home"
+p_given_event = 0.5
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+note = "A long illness at home often brings urgent care visits."
+
+# ---------------------------------------------------------------------------------------------
+# Named scenarios (rates come from rr-hazards' scenario candidates)
+# ---------------------------------------------------------------------------------------------
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "coast"
+bucket = "power"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 90.0, p90_days = 180.0 }
+cold_share = 0.4
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013"]
+relief = { help_arrives_days = 14.0, mostly_restored_days = 180.0, sources = ["oregon_resilience_plan_2013"] }
+note = "Oregon Resilience Plan, present conditions: electricity on the coast takes 3 to 6 months to restore; major relief takes 1 to 2 weeks to arrive."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "coast"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 365.0, p90_days = 1095.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013"]
+relief = { help_arrives_days = 14.0, mostly_restored_days = 1095.0, sources = ["oregon_resilience_plan_2013"] }
+note = "Oregon Resilience Plan: coastal drinking water and sewer take 1 to 3 years to restore."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "coast"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 90.0, p90_days = 270.0 }
+requires = "well"
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+relief = { help_arrives_days = 14.0, mostly_restored_days = 270.0, sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"] }
+note = "A well needs power for its pump (3 to 6 months on the coast) and may be damaged."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "coast"
+bucket = "supplies"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 21.0, p90_days = 60.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+relief = { help_arrives_days = 14.0, mostly_restored_days = 1095.0, sources = ["oregon_resilience_plan_2013"] }
+note = "Expert estimate anchored on the Oregon Resilience Plan: relief reaches the coast in 1 to 2 weeks, roads and services take 3 years or more to reach 90 percent."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "coast"
+bucket = "medication"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 90.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+relief = { help_arrives_days = 14.0, mostly_restored_days = 1095.0, sources = ["oregon_resilience_plan_2013"] }
+note = "Expert estimate anchored on the Oregon Resilience Plan: coastal healthcare facilities take 3 years to restore."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "coast"
+bucket = "comms"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "coast"
+bucket = "home_loss"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 0.1
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "Some homes outside the tsunami zone will be too damaged to live in."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "coast"
+bucket = "get_home"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 0.27
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "valley"
+bucket = "power"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 90.0 }
+cold_share = 0.4
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013"]
+relief = { help_arrives_days = 3.0, mostly_restored_days = 90.0, sources = ["oregon_resilience_plan_2013"] }
+note = "Oregon Resilience Plan: valley electricity takes 1 to 3 months to restore; relief arrives in about 72 hours."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "valley"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 365.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013"]
+relief = { help_arrives_days = 3.0, mostly_restored_days = 365.0, sources = ["oregon_resilience_plan_2013"] }
+note = "Oregon Resilience Plan: valley drinking water and sewer take 1 month to 1 year to restore."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "valley"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 30.0, p90_days = 90.0 }
+requires = "well"
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+relief = { help_arrives_days = 3.0, mostly_restored_days = 90.0, sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"] }
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "valley"
+bucket = "supplies"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+relief = { help_arrives_days = 3.0, mostly_restored_days = 365.0, sources = ["oregon_resilience_plan_2013"] }
+note = "Top-priority valley highways take 6 to 12 months for partial restoration."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "valley"
+bucket = "medication"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+relief = { help_arrives_days = 3.0, mostly_restored_days = 540.0, sources = ["oregon_resilience_plan_2013"] }
+note = "Valley healthcare facilities take about 18 months to restore."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "valley"
+bucket = "comms"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "valley"
+bucket = "home_loss"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 0.05
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+variant = "valley"
+bucket = "get_home"
+class = "event"
+label = "a magnitude 9 Cascadia earthquake"
+p_given_event = 0.27
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "tsunami"
+scenario = "local_tsunami"
+bucket = "evacuate"
+class = "event"
+label = "a tsunami from a nearby earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 90.0 }
+notice_hours = [0.25, 0.33]
+evidence = "prior"
+sources = ["dogami_tsunami_faq", "rr_risk_model_priors"]
+note = "A local tsunami arrives in 15 to 20 minutes. rr-hazards' rate already counts only households in the inundation zone, so every event means leaving at once."
+
+[[effect]]
+hazard = "tsunami"
+scenario = "local_tsunami"
+bucket = "home_loss"
+class = "event"
+label = "a tsunami from a nearby earthquake"
+p_given_event = 0.5
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+scenario = "major_hurricane_direct_hit"
+bucket = "power"
+class = "event"
+label = "a direct hit by a major hurricane"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 16.0 }
+heat_share = 0.5
+evidence = "empirical"
+sources = ["ornl_repowrd_2022"]
+note = "Michael (2018): restoration rate 0.006 per hour, half restored in 116 hours, 90 percent in 384 hours."
+
+[[effect]]
+hazard = "hurricane"
+scenario = "major_hurricane_direct_hit"
+bucket = "water_out"
+class = "event"
+label = "a direct hit by a major hurricane"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 49.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+scenario = "major_hurricane_direct_hit"
+bucket = "water_boil"
+class = "event"
+label = "a direct hit by a major hurricane"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 6.0, p90_days = 18.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["shaffer_2026_texas_boil_notices", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+scenario = "major_hurricane_direct_hit"
+bucket = "supplies"
+class = "event"
+label = "a direct hit by a major hurricane"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 14.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+scenario = "major_hurricane_direct_hit"
+bucket = "medication"
+class = "event"
+label = "a direct hit by a major hurricane"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+scenario = "major_hurricane_direct_hit"
+bucket = "comms"
+class = "event"
+label = "a direct hit by a major hurricane"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 2.0, p90_days = 7.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+scenario = "major_hurricane_direct_hit"
+bucket = "evacuate"
+class = "event"
+label = "a direct hit by a major hurricane"
+p_given_event = 0.8
+duration = { kind = "log_normal", median_days = 5.0, p90_days = 30.0 }
+notice_hours = [24.0, 72.0]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "hurricane"
+scenario = "major_hurricane_direct_hit"
+bucket = "home_loss"
+class = "event"
+label = "a direct hit by a major hurricane"
+p_given_event = 0.3
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+bucket = "power"
+class = "event"
+label = "a magnitude 7 New Madrid earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+cold_share = 0.4
+heat_share = 0.1
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "No regional restoration study was available; expert estimate for a major urban earthquake (Tohoku restored over 90 percent of power in 10 days)."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7 New Madrid earthquake"
+p_given_event = 0.7
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "rr_risk_model_priors"]
+note = "Hazus: an extensively damaged treatment plant is out for 32 days on average, storage tanks 93."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7 New Madrid earthquake"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 8.0, p90_days = 20.0 }
+requires = "well"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+bucket = "supplies"
+class = "event"
+label = "a magnitude 7 New Madrid earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+bucket = "medication"
+class = "event"
+label = "a magnitude 7 New Madrid earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+bucket = "comms"
+class = "event"
+label = "a magnitude 7 New Madrid earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "After Tohoku, 90 percent of phone lines were back in two weeks."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+bucket = "home_loss"
+class = "event"
+label = "a magnitude 7 New Madrid earthquake"
+p_given_event = 0.1
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+bucket = "evacuate"
+class = "event"
+label = "a magnitude 7 New Madrid earthquake"
+p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [0.0, 0.05]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+bucket = "get_home"
+class = "event"
+label = "a magnitude 7 New Madrid earthquake"
+p_given_event = 0.27
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+bucket = "power"
+class = "event"
+label = "a magnitude 7 Hayward fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+cold_share = 0.3
+heat_share = 0.1
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "No regional restoration study was available; expert estimate for a major urban earthquake (Tohoku restored over 90 percent of power in 10 days)."
+
+[[effect]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7 Hayward fault earthquake"
+p_given_event = 0.7
+duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
+requires = "municipal"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+bucket = "water_out"
+class = "event"
+label = "a magnitude 7 Hayward fault earthquake"
+p_given_event = 0.5
+duration = { kind = "log_normal", median_days = 8.0, p90_days = 20.0 }
+requires = "well"
+evidence = "prior"
+sources = ["fema_hazus_eq_restoration"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+bucket = "supplies"
+class = "event"
+label = "a magnitude 7 Hayward fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 21.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+bucket = "medication"
+class = "event"
+label = "a magnitude 7 Hayward fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 7.0, p90_days = 30.0 }
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+bucket = "comms"
+class = "event"
+label = "a magnitude 7 Hayward fault earthquake"
+p_given_event = 1.0
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 14.0 }
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+bucket = "home_loss"
+class = "event"
+label = "a magnitude 7 Hayward fault earthquake"
+p_given_event = 0.1
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+bucket = "evacuate"
+class = "event"
+label = "a magnitude 7 Hayward fault earthquake"
+p_given_event = 0.05
+duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
+notice_hours = [0.0, 0.05]
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[effect]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+bucket = "get_home"
+class = "event"
+label = "a magnitude 7 Hayward fault earthquake"
+p_given_event = 0.27
+requires = "commuter"
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+# ---------------------------------------------------------------------------------------------
+# Scenario overlaps. rr-hazards passes each hazard's full rate, which already contains the named
+# scenario's long-run share (a Cascadia rupture shakes the county too). When the scenario is
+# offered (on or off), that share leaves the parent's typical rows: the parent's rate is scaled by
+# 1 − share / rate, never below a quarter (the same floor as the hazard card). The share is the
+# scenario's lowest published rate: its long-run alternative when rr-hazards gives one, else its
+# rate. Major hurricanes use `replaced_by` rows instead (a class, not a share). The local tsunami
+# has no overlap: the county tsunami rows are distant-source tsunamis (NRI's historical record;
+# the last Cascadia tsunami was in 1700), and rr-hazards' tsunami card adds the two.
+# ---------------------------------------------------------------------------------------------
+
+[[overlap]]
+scenario = "cascadia_m9"
+hazard = "earthquake"
+note = "The county earthquake rate includes Cascadia's own shaking (0.41 %/yr near Coos Bay, the long-run recurrence)."
+
+[[overlap]]
+scenario = "hayward_m7"
+hazard = "earthquake"
+note = "The Bay Area earthquake rate includes Hayward fault ruptures."
+
+[[overlap]]
+scenario = "new_madrid_m7"
+hazard = "earthquake"
+note = "The county earthquake rate includes New Madrid ruptures."
+
+# ---------------------------------------------------------------------------------------------
+# Income streams (money bucket `income`, research §3.5). Spell lengths are in WEEKS.
+# rate: job_loss uses the household rate from rr-hazards (split evenly between earners); every
+# other stream is r_h x per_earner x earners.
+# ---------------------------------------------------------------------------------------------
+
+[[income]]
+hazard = "job_loss"
+label = "losing a job"
+per_earner = 1.0
+spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
+unemployment_insurance = true
+evidence = "prior"
+sources = ["bls_work_experience_2024", "bls_unemployment_duration", "rr_risk_model_priors"]
+note = "Spell median 10 weeks, bad case 36 weeks; completed spells are shorter than the 11.4-week median of current spells."
+
+[[income]]
+hazard = "pandemic"
+label = "job losses in a pandemic"
+per_earner = 0.11
+spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
+unemployment_insurance = true
+evidence = "prior"
+sources = ["cdc_pandemic_history", "rr_risk_model_priors"]
+note = "In a pandemic that changes daily life, about 1 in 9 workers lost their jobs (spring 2020)."
+
+[[income]]
+hazard = "earthquake"
+scenario = "cascadia_m9"
+label = "the regional economy after a Cascadia earthquake"
+per_earner = 0.3
+spell_weeks = { kind = "log_normal", median_days = 26.0, p90_days = 78.0 }
+unemployment_insurance = true
+evidence = "prior"
+sources = ["oregon_resilience_plan_2013", "rr_risk_model_priors"]
+note = "The Oregon Resilience Plan warns that disruptions of a month or more force many businesses to close or leave."
+
+[[income]]
+hazard = "hurricane"
+scenario = "major_hurricane_direct_hit"
+label = "the local economy after a major hurricane"
+per_earner = 0.1
+spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
+unemployment_insurance = true
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[income]]
+hazard = "earthquake"
+scenario = "new_madrid_m7"
+label = "the regional economy after a New Madrid earthquake"
+per_earner = 0.1
+spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
+unemployment_insurance = true
+evidence = "prior"
+sources = ["rr_risk_model_priors"]
+
+[[income]]
+hazard = "earthquake"
+scenario = "hayward_m7"
+label = "the regional economy after a Hayward fault earthquake"
+per_earner = 0.1
+spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
+unemployment_insurance = true
+evidence = "prior"
+sources = ["rr_risk_model_priors"]

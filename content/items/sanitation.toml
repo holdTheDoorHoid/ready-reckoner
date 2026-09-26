@@ -1,0 +1,214 @@
+# Sanitation and hygiene: the twin-bucket toilet, hand washing, period and baby supplies.
+# Rules: docs/CONTENT_STANDARDS.md §3. Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
+
+[[item]]
+id = "san_handwash_station"
+name = "Set up a hand-washing station from a water jug"
+category = "sanitation"
+unit = "action"
+buckets = ["water_out", "water_boil"]
+tier = "now"
+free = true
+spec = "Use a water jug with a spigot, a bucket to catch the water, and soap to make a hand-washing station, as CDC suggests. When there is no soap and water, use hand sanitizer with at least 60% alcohol."
+look_for = [
+  "A jug with a spigot, raised so the water runs freely",
+  "Soap and a towel kept beside it",
+  "A bucket underneath for the used water",
+]
+avoid = [
+  "Dipping hands into the stored water",
+  "Skipping hand washing after using the toilet or before handling food",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it uses the water jug and soap already in the plan." }
+quantity_rule = "once"
+citations = ["cdc_hygiene_emergency"]
+hazard_extras = []
+
+[[item]]
+id = "san_cover_material"
+name = "Collect cover material for the toilet"
+category = "sanitation"
+unit = "action"
+buckets = ["water_out"]
+tier = "now"
+free = true
+spec = "Keep a bag of dry, carbon-rich cover material for the toilet bucket, such as sawdust, shredded paper, dry leaves or pet bedding. A handful after each use controls smell and helps waste dry out (RDPO)."
+look_for = [
+  "Shredded paper or cardboard from your own recycling",
+  "Sawdust or pet bedding (not cedar)",
+  "A dry, covered bin to keep it in",
+]
+avoid = [
+  "Wet material, which does not control smell",
+  "Cedar chips",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free if you use shredded paper or leaves; pet bedding costs a few dollars a bag." }
+quantity_rule = "once"
+citations = ["rdpo_emergency_toilet"]
+hazard_extras = []
+
+[[item]]
+id = "san_twin_bucket_toilet"
+name = "Two-bucket emergency toilet kit"
+category = "sanitation"
+unit = "kit"
+buckets = ["water_out"]
+tier = "h72"
+free = false
+spec = "Two sturdy 5-gallon buckets, one for pee and one for poo, with a toilet seat, for when toilets cannot be flushed. This method, developed after the 2011 Christchurch earthquakes, keeps waste drier and safer to store (RDPO)."
+look_for = [
+  "Two sturdy buckets that can hold an adult's weight",
+  "A seat made for the bucket",
+  "Labels: PEE on one, POO on the other",
+]
+avoid = [
+  "Burying bagged waste or putting it in the curbside trash unless officials say so",
+  "An airtight lid on the poo bucket: waste should be able to dry",
+  "Pool noodles as a seat (they cannot be cleaned)",
+]
+price_band_usd = { low = 39.98, high = 52.99, per = "kit", note = "A bucket toilet with seat ($25.99) plus a second bucket ($13.99), or a complete bucket-toilet set at $52.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["rdpo_emergency_toilet", "oregon_b2wr_toolkit", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "san_toilet_bags"
+name = "Heavy trash bags for the toilet bucket"
+category = "sanitation"
+unit = "bag"
+buckets = ["water_out"]
+tier = "h72"
+free = false
+spec = "13-gallon trash bags that are 0.9 mil thick or more, to line the poo bucket. Fill a bag no more than halfway, tie it, double-bag it, and store it away from food, water, children and pets until officials say how to dispose of it (RDPO)."
+look_for = [
+  "13-gallon size, 0.9 mil or thicker",
+  "Ties or drawstrings",
+  "Enough for twice the bags, because each one is double-bagged",
+]
+avoid = [
+  "Thin bags that tear",
+  "Overfilling a bag",
+]
+price_band_usd = { low = 0.11, high = 0.11, per = "bag", note = "Two janitorial listings for 13-gallon, 0.9-mil bags in cases of 200: about $0.11 a bag." }
+retrieved = "2026-09-25"
+quantity_rule = "toilet_bags"
+citations = ["rdpo_emergency_toilet", "oregon_b2wr_toolkit", "ready_gov_kit", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "san_toilet_paper"
+name = "Extra toilet paper"
+category = "sanitation"
+unit = "roll"
+buckets = ["supplies", "water_out"]
+tier = "h72"
+free = false
+spec = "Enough rolls to last your target days. Oregon advises measuring how much your household uses in a week and storing double that for two weeks."
+look_for = [
+  "Rolls stored dry, in their plastic",
+  "Your household's own weekly use as the guide",
+]
+avoid = [
+  "Buying a year's worth during a shortage",
+  "Storing it where water could reach it",
+]
+price_band_usd = { low = 0.49, high = 1.12, per = "roll", note = "Two janitorial listings for standard 2-ply rolls: $0.49 and $1.12 a roll." }
+retrieved = "2026-09-25"
+quantity_rule = "toilet_paper_rolls"
+citations = ["oregon_b2wr_toolkit", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "san_hand_sanitizer"
+name = "Hand sanitizer with at least 60% alcohol"
+category = "sanitation"
+unit = "12-ounce bottle"
+buckets = ["water_out", "water_boil", "supplies"]
+tier = "h72"
+free = false
+spec = "Alcohol-based hand sanitizer for when soap and water are short; CDC says it should contain at least 60% alcohol. Moist towelettes help with cleaning but do not replace it."
+look_for = [
+  "At least 60% alcohol on the label",
+  "A pump bottle for home and a small bottle for each bag",
+]
+avoid = [
+  "Alcohol-free sanitizers",
+  "Sanitizer instead of soap when hands are visibly dirty",
+]
+price_band_usd = { low = 2.11, high = 6.67, per = "12-ounce bottle", note = "Two janitorial listings: gallon jugs of alcohol gel at $2.11 per 12 ounces, and name-brand 12-ounce bottles at $6.67." }
+retrieved = "2026-09-25"
+quantity_rule = "per_person"
+citations = ["cdc_hygiene_emergency", "ready_gov_kit", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "san_soap"
+name = "Bar soap and laundry soap"
+category = "sanitation"
+unit = "person-month"
+buckets = ["supplies"]
+tier = "w2"
+free = false
+spec = "About 250 grams of bathing soap and 200 grams of laundry soap per person each month, the humanitarian standard (Sphere). Plain bar soap stores for years."
+look_for = [
+  "Bar soap your household already uses",
+  "Powdered laundry soap that works in a bucket as well as a machine",
+]
+avoid = [
+  "Storing soap next to food, where it can taint the taste",
+  "Liquid soap in thin bottles that can split",
+]
+price_band_usd = { low = 2.09, high = 10.08, per = "person-month", note = "Two combinations of listings for one person-month: wrapped bath bars plus bulk laundry powder ($2.09), or a castile bar plus a smaller box of powder ($10.08)." }
+retrieved = "2026-09-25"
+quantity_rule = "soap_person_months"
+citations = ["sphere_2018", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "san_menstrual_products"
+name = "Period products for two cycles"
+category = "sanitation"
+unit = "cycle's supply"
+buckets = ["supplies"]
+tier = "h72"
+free = false
+spec = "Enough of each person's usual pads, tampons or cup supplies for two cycles, as CDC advises for an emergency kit. Change tampons at least every 8 hours, even when supplies are short (CDC)."
+look_for = [
+  "The products each person already uses",
+  "Clean underwear, soap or hand sanitizer, and pain relief kept with them",
+  "Small bags for used products",
+]
+avoid = [
+  "Wearing one tampon longer than 8 hours to make supplies last",
+  "Putting used products in the toilet bucket if local guidance says to bag them separately",
+]
+price_band_usd = { low = 4.32, high = 7.41, per = "cycle's supply", note = "Two janitorial listings, counted at 20 products a cycle: pads $4.32 and tampons $7.41 per cycle." }
+retrieved = "2026-09-25"
+quantity_rule = "menstrual_cycles"
+citations = ["cdc_period_factsheet", "sphere_2018", "oregon_b2wr_toolkit", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "san_diapers"
+name = "Diapers and baby wipes"
+category = "sanitation"
+unit = "diaper"
+buckets = ["supplies"]
+tier = "h72"
+free = false
+spec = "Diapers in the size your baby wears now, plus wipes, rash cream and gallon zip-top bags for dirty diapers, as CDC's family checklist lists. After the first week, a newborn has more than six wet diapers a day (Sutter Health)."
+look_for = [
+  "The current size, plus a pack of the next size up",
+  "At least two packs of wipes (CDC)",
+  "Zip-top bags for used diapers and dirty clothes",
+]
+avoid = [
+  "Putting diapers in the toilet bucket: they go in regular trash (RDPO)",
+  "Storing only one size for a growing baby",
+]
+price_band_usd = { low = 0.32, high = 0.47, per = "diaper", note = "Two listings for cases of diapers: $0.32 and $0.47 a diaper." }
+retrieved = "2026-09-25"
+quantity_rule = "diapers"
+citations = ["cdc_infant_checklist", "sutter_diapers", "rdpo_emergency_toilet", "rr_price_observations_2026_09"]
+hazard_extras = []
