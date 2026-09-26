@@ -41,10 +41,26 @@ pub const GENERIC_RULES: &[&str] = &[
     "once_if_house_ground_floor",
     "once_if_near_nuclear_plant",
     "once_if_generator",
+    "once_if_homeowner",
+    "once_if_owned_house",
+    "once_if_owned_detached",
+    "once_if_owned_basement",
 ];
 
 fn switch(on: bool) -> (f64, Per) {
     (if on { 1.0 } else { 0.0 }, Per::Household)
+}
+
+/// A house of the household's own (detached, rowhouse, mobile home or rural property), not an
+/// apartment.
+fn is_house(kind: HousingKind) -> bool {
+    matches!(
+        kind,
+        HousingKind::Detached
+            | HousingKind::Rowhouse
+            | HousingKind::MobileHome
+            | HousingKind::RuralProperty
+    )
 }
 
 /// The quantity for a generic rule, or `None` if `rule` is not generic.
@@ -113,6 +129,26 @@ pub(crate) fn quantity(rule: &str, input: &PlanInput, ctx: &SupplyContext) -> Op
         ),
         "once_if_near_nuclear_plant" => switch(ctx.nuclear_plant_within_16km == Some(true)),
         "once_if_generator" => switch(input.housing.backup_power == BackupPower::Generator),
+        // Home decisions the owner makes (round-2 review RR-P10): insurance forms, retrofits, a
+        // safe room, a roof, a backflow valve. Renters ask the landlord, so they get none.
+        "once_if_homeowner" => switch(input.housing.tenure == Tenure::Own),
+        "once_if_owned_house" => {
+            switch(input.housing.tenure == Tenure::Own && is_house(input.housing.kind))
+        }
+        // A house that stands on its own foundation (a detached house or one on rural land), where
+        // bolting it down and bracing a crawl space apply; not a rowhouse or a mobile home.
+        "once_if_owned_detached" => switch(
+            input.housing.tenure == Tenure::Own
+                && matches!(
+                    input.housing.kind,
+                    HousingKind::Detached | HousingKind::RuralProperty
+                ),
+        ),
+        "once_if_owned_basement" => switch(
+            input.housing.tenure == Tenure::Own
+                && is_house(input.housing.kind)
+                && input.housing.basement,
+        ),
         _ => return None,
     })
 }
@@ -172,6 +208,16 @@ mod tests {
         );
         assert_eq!(q(miami, "once_if_earner"), 0.0);
         assert_eq!(q("hays-kansas-farm-5", "once_if_large_animals"), 1.0);
+        // Owner decisions: Hays owns a house with a basement on rural land; Philadelphia rents;
+        // the Miami condo is owned but no house; Sugar Land owns a detached house, no basement.
+        assert_eq!(q("hays-kansas-farm-5", "once_if_owned_basement"), 1.0);
+        assert_eq!(q("hays-kansas-farm-5", "once_if_owned_detached"), 1.0);
+        assert_eq!(q(p, "once_if_homeowner"), 0.0);
+        assert_eq!(q(p, "once_if_owned_house"), 0.0);
+        assert_eq!(q(miami, "once_if_homeowner"), 1.0);
+        assert_eq!(q(miami, "once_if_owned_house"), 0.0);
+        assert_eq!(q(sl, "once_if_owned_house"), 1.0);
+        assert_eq!(q(sl, "once_if_owned_basement"), 0.0);
         assert_eq!(q("hays-kansas-farm-5", "once_if_pregnant_or_nursing"), 1.0);
         let input = fixtures::get(p).unwrap();
         let near = SupplyContext {

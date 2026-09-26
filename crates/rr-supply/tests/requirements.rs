@@ -61,7 +61,8 @@ fn philadelphia_matches_the_research() {
     assert_eq!(line(&lines, "medication.medication_days").quantity, 14.0);
     assert_eq!(line(&lines, "medication.antibiotics_none").quantity, 0.0);
     assert_eq!(line(&lines, "comms.phone_power_wh").quantity, 140.0);
-    assert_eq!(line(&lines, "comms.cash_reserve_usd").quantity, 100.0);
+    // Half of 3 days of $4,200 a month is $210, rounded down to $200 (round-2 review P-18).
+    assert_eq!(line(&lines, "comms.cash_reserve_usd").quantity, 200.0);
     assert_eq!(line(&lines, "fire.co_alarm_count").quantity, 2.0);
     assert!(
         !has(&lines, "fire.smoke_alarm_count"),
@@ -114,9 +115,10 @@ fn philadelphia_matches_the_research() {
     // Reused bottles cite the cap and the rotation, not the dog's water.
     let reused = line(&lines, "water_out.water_gallons.alt.reused_bottles");
     assert!(!reused.citations.iter().any(|c| c == "petmd_dog_water"));
-    // One extinguisher per floor of a two-floor rowhouse; no ladder at street level.
+    // One extinguisher per floor of a two-floor rowhouse; a two-storey ladder, since a rowhouse
+    // is assumed to sleep upstairs (round-2 review P-06).
     assert_eq!(line(&lines, "fire.extinguisher_count").quantity, 2.0);
-    assert!(!has(&lines, "fire.escape_ladder_count"));
+    assert_eq!(line(&lines, "fire.escape_ladder_count").quantity, 1.0);
     // Thermal is driven by both heat and cold. Blankets and layers for everyone; a sleeping bag
     // for the senior only (1.7 days of cold).
     assert!(has(&lines, "thermal.battery_fan") && has(&lines, "thermal.blankets"));
@@ -148,7 +150,7 @@ fn coos_bay_prefers_a_filter_and_a_source_to_a_hundred_gallons() {
     let treat = line(&lines, "water_out.water_treatment_capacity");
     assert_eq!(treat.per, Per::Household);
     assert_eq!(treat.quantity, 96.8); // 36 days × 2.6875 gal
-    assert!(treat.plain.contains("filter") && treat.plain.contains("source"));
+    assert!(treat.plain.contains("filter") && treat.plain.contains("your well"));
 
     assert_eq!(line(&lines, "power.generator_fuel_gallons").quantity, 25.0);
     assert!(has(&lines, "power.well_pump_wh.optional"));
@@ -167,17 +169,18 @@ fn coos_bay_prefers_a_filter_and_a_source_to_a_hundred_gallons() {
         !bleach.citations.iter().any(|c| c == common::TARGET_SOURCE),
         "the target's days do not size it"
     );
-    // The household has an extinguisher; a detached house at street level gets no ladder.
+    // The household has an extinguisher; a detached house gets the two-storey ladder.
     assert!(!has(&lines, "fire.extinguisher_count"));
-    assert!(!has(&lines, "fire.escape_ladder_count"));
+    assert_eq!(line(&lines, "fire.escape_ladder_count").quantity, 1.0);
 
-    // 17 days of food is the first line in the one-month tier: the note is said there, once.
+    // The toilet bags, now counted for 30 of the 50 days (round-2 review P-16), are the first
+    // line in the one-month tier: the note is said there, once.
     let noted: Vec<&RequirementLine> = lines
         .iter()
         .filter(|l| l.plain.contains(ONE_MONTH_NOTE))
         .collect();
     assert_eq!(noted.len(), 1);
-    assert_eq!(noted[0].id, "supplies.food_kcal");
+    assert_eq!(noted[0].id, "water_out.toilet_bags");
     assert!(
         noted[0]
             .citations
@@ -245,6 +248,18 @@ fn every_line_is_cited_and_well_formed() {
         "pair",
         "installed kit",
         "can",
+        "cylinder",
+        "charger",
+        "fridge",
+        "barrel",
+        "carrier",
+        "tote",
+        "pump",
+        "air cleaner",
+        "filter box",
+        "filter",
+        "fl oz",
+        "stove",
     ];
     for (name, input, targets) in common::all() {
         for ctx in [
@@ -335,8 +350,6 @@ fn every_duration_and_readiness_bucket_gets_lines() {
             let expect = match (name, b) {
                 // Coos Bay: the wood stove covers cold and a well has no boil-water notices.
                 ("coos-bay-well-owner-2", BucketId::Thermal | BucketId::WaterBoil) => false,
-                // awaiting: supply — the clean-air lines (contract v2).
-                (_, BucketId::CleanAir) => false,
                 _ => true,
             };
             assert_eq!(lines.iter().any(|l| l.bucket == *b), expect, "{name}: {b}");
@@ -861,7 +874,7 @@ fn items_are_sized_by_their_rule() {
     assert_eq!(q("get_home_bag").unwrap().0, 2.0);
     assert_eq!(q("bleach_bottles").unwrap().0, 1.0);
     assert_eq!(q("extinguisher_count").unwrap().0, 2.0);
-    assert_eq!(q("escape_ladder_count").unwrap().0, 0.0);
+    assert_eq!(q("escape_ladder_count").unwrap().0, 1.0);
     assert_eq!(q("blankets").unwrap().0, 4.0);
     assert_eq!(q("sleeping_bag_or_blanket").unwrap().0, 1.0);
     // No filter for a short no-water target on city water; no line means 0.

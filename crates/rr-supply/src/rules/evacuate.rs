@@ -73,7 +73,7 @@ pub fn go_bag(people_list: &[Person], notice_hours_low: f64, days_away: f64) -> 
         String::new()
     };
     let text = format!(
-        "{}{}: a sturdy bag you already own will do. Pack copies of documents, a phone charger, cash, a flashlight, a whistle, a change of clothes and sturdy shoes, and add water, food and medicines from your home supplies rather than buying them twice. {when}{stay}",
+        "{}{}: a sturdy bag you already own will do. Pack copies of documents on paper and on a flash drive, a phone charger, cash, a flashlight, a whistle, an old pair of prescription glasses, a change of clothes and sturdy shoes, and add water, food and medicines from your home supplies rather than buying them twice. {when}{stay}",
         count(q, "go-bag", "go-bags"),
         if babies {
             ", one for each person aged 4 and over (babies' things go in a parent's bag)"

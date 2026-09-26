@@ -6,7 +6,7 @@ use rr_types::{Housing, HousingKind, Mobility, Per, Person, PoweredDevice, Tenur
 
 use super::Sizing;
 use crate::basis::Basis;
-use crate::constants::keys;
+use crate::constants::{constants, keys};
 use crate::format::{ceil_count, count, day_adjective, days as fmt_days, gallons, num, round_dp};
 use crate::household::{is_4_plus, is_13_plus};
 
@@ -165,26 +165,121 @@ pub fn lights(people_list: &[Person]) -> Sizing {
     Sizing::new(&b, "lights", "light", q, "light", Per::Person, text)
 }
 
-/// Packs of AA or AAA batteries for lights and the radio: one pack a week (an estimate). Rule
-/// `battery_packs`.
+/// Packs of AA or AAA batteries for lights and the radio: one pack a week (an estimate), for at most
+/// the two weeks a household stores (`battery_pack_cap_days`, an estimate); past that, a way to
+/// recharge ([`recharge_capability`]) beats a pile of batteries (round-2 review P-04: 26 packs for a
+/// 180-day target). Rule `battery_packs`.
 pub fn battery_packs(days: f64) -> Option<Sizing> {
     if days <= 0.0 {
         return None;
     }
     let mut b = Basis::new();
     let per = b.k(keys::BATTERY_PACK_DAYS);
-    let q = ceil_count((days / per).max(1.0));
-    let text = format!(
+    let capped = days > constants().value(keys::BATTERY_PACK_CAP_DAYS);
+    let stored = if capped {
+        b.k(keys::BATTERY_PACK_CAP_DAYS)
+    } else {
+        days
+    };
+    let q = ceil_count((stored / per).max(1.0));
+    let mut text = format!(
         "{} of AA or AAA batteries for the lights and the radio: one pack lasts a household about {}. Check which sizes your lights use.",
         count(q, "pack", "packs"),
         fmt_days(per)
     );
+    if capped {
+        text.push_str(&format!(
+            " Your power target is {}; batteries are counted for the first {}, and after that a way to recharge (see that line) and rechargeable lights do more than a pile of batteries.",
+            fmt_days(days),
+            fmt_days(stored)
+        ));
+    }
+    Some(
+        Sizing::new(
+            &b,
+            "battery_packs",
+            "battery_pack",
+            q,
+            "pack",
+            Per::Household,
+            text,
+        )
+        .math(vec![format!(
+            "max(1, ceil(min({} days, {} days) ÷ {} days)) = {} packs",
+            num(days, 2),
+            num(constants().value(keys::BATTERY_PACK_CAP_DAYS), 0),
+            num(per, 0),
+            num(q, 0)
+        )]),
+    )
+}
+
+/// The item class of the recharge line (a car charger, or a solar panel for a household with no
+/// vehicle): its own part of the power bucket, so rr-plan values a way to recharge once, whichever
+/// item meets it.
+pub const RECHARGE_CLASS: &str = "recharge";
+
+/// Whether the household needs a way to recharge: the power target is longer than the two weeks of
+/// batteries and phone power the plan stores (`battery_pack_cap_days`), or someone uses a powered
+/// medical device whose battery must be topped up, and the household has no generator or solar
+/// battery of its own (either can recharge). A power station alone does not count: it needs
+/// recharging itself.
+pub fn recharge_needed(days: f64, people_list: &[Person], housing: &Housing) -> bool {
+    let own = matches!(
+        housing.backup_power,
+        rr_types::BackupPower::Generator | rr_types::BackupPower::SolarBattery
+    );
+    let device = people_list
+        .iter()
+        .any(|p| p.medical.powered_device != PoweredDevice::None);
+    let long = days > constants().value(keys::BATTERY_PACK_CAP_DAYS);
+    days > 0.0 && !own && (long || device)
+}
+
+/// A way to recharge from the car: a 12-volt charger or a small inverter that tops up phones,
+/// power banks, rechargeable lights, a power station and a medical device's battery. A need when
+/// [`recharge_needed`] and the household has a vehicle (round-2 review P-04, P-09; item N-14). A
+/// household with no vehicle gets a solar panel as its way to recharge instead
+/// ([`solar_panel_units`] with `as_recharge`). Rule `recharge_capability`.
+pub fn recharge_capability(
+    days: f64,
+    people_list: &[Person],
+    housing: &Housing,
+    vehicles: usize,
+) -> Option<Sizing> {
+    if vehicles == 0 || !recharge_needed(days, people_list, housing) {
+        return None;
+    }
+    let mut b = Basis::new();
+    let cap = b.k(keys::BATTERY_PACK_CAP_DAYS);
+    b.cite("cdc_co_basics");
+    let device = people_list
+        .iter()
+        .any(|p| p.medical.powered_device != PoweredDevice::None);
+    let why = if days > cap {
+        format!(
+            "your power target of {} is longer than the {} of batteries and phone power the plan stores",
+            fmt_days(days),
+            fmt_days(cap)
+        )
+    } else {
+        "a medical device's battery needs topping up every day the power is out".to_owned()
+    };
+    let mut text = format!(
+        "A way to recharge from the car, because {why}: a 12-volt charger, or a small inverter (about 150 W) for chargers that plug into the wall. It tops up phones, power banks, rechargeable lights and a power station. Run the engine only outdoors, never in a garage, even with the door open (CDC)."
+    );
+    if device {
+        b.cite("sil_cpap_power");
+        text.push_str(
+            " Check that the inverter's watts cover the medical device's charger (see its label).",
+        );
+    }
     Some(Sizing::new(
         &b,
-        "battery_packs",
-        "battery_pack",
-        q,
-        "pack",
+        "recharge_capability",
+        RECHARGE_CLASS,
+        1.0,
+        "charger",
         Per::Household,
         text,
     ))
@@ -233,6 +328,23 @@ pub fn generator_fuel_gallons(days: f64, housing: &Housing) -> Option<Sizing> {
             indoors
         ));
     }
+    // What the fuel really runs (round-2 review P-04): hours at light and full load, and days when
+    // the running is rationed to a few hours a day. The line's days are the days the fuel lasts at
+    // light load, never the target, so a gallon is never read as a week of cover.
+    let rationed = b.k(keys::GENERATOR_RATIONED_HOURS_PER_DAY);
+    let hours_light = q * 24.0 / per_day;
+    let hours_full = q * 24.0 / full;
+    let fuel_days = hours_light / 24.0;
+    text.push_str(&format!(
+        " {} runs it about {} hours at light load ({} at full load): about {} nonstop, or {} to {} at {} a day.",
+        capitalise_first(&gallons(q)),
+        num(hours_light, 0),
+        num(hours_full, 0),
+        fmt_days(round_dp(fuel_days, 1)),
+        num(hours_full / rationed, 0),
+        fmt_days(round_dp(hours_light / rationed, 0)),
+        count(rationed, "hour", "hours")
+    ));
     text.push_str(&format!(
         " Use stored fuel within {}. Run the generator outdoors only, at least {} feet from windows, doors and vents.",
         count(rotate, "month", "months"),
@@ -254,15 +366,35 @@ pub fn generator_fuel_gallons(days: f64, housing: &Housing) -> Option<Sizing> {
             Per::Household,
             text,
         )
-        .per_day(days, per_day)
-        .math(vec![format!(
-            "min({} gal/day × {} days, {} gal) = {} gal",
-            num(per_day, 2),
-            num(days, 2),
-            num(max, 0),
-            num(q, 2)
-        )]),
+        .per_day(fuel_days, per_day)
+        .math(vec![
+            format!(
+                "min({} gal/day × {} days, {} gal) = {} gal",
+                num(per_day, 2),
+                num(days, 2),
+                num(max, 0),
+                num(q, 2)
+            ),
+            format!(
+                "{} gal × 24 h ÷ {} gal/day = {} h at light load ({} days); ÷ {} h a day = {} days",
+                num(q, 2),
+                num(per_day, 2),
+                num(hours_light, 1),
+                num(fuel_days, 2),
+                num(rationed, 0),
+                num(hours_light / rationed, 1)
+            ),
+        ]),
     )
+}
+
+/// "25 gallons" → "25 gallons"; first letter upper-cased for the start of a sentence.
+fn capitalise_first(s: &str) -> String {
+    let mut c = s.chars();
+    match c.next() {
+        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+        None => String::new(),
+    }
 }
 
 /// The item class of the power station line when it keeps refrigerated medicine cold (a need, see
@@ -442,10 +574,11 @@ pub fn solar_panel_units(
     days: f64,
     latitude: Option<f64>,
     people_list: &[Person],
+    as_recharge: bool,
 ) -> Option<Sizing> {
     let mut b = Basis::new();
     let from = b.k(keys::SOLAR_PANEL_MIN_DAYS);
-    if days < from {
+    if days < from && !as_recharge {
         return None;
     }
     let (_, essential) = essential_wh_per_day(&mut b, people_list);
@@ -458,10 +591,26 @@ pub fn solar_panel_units(
             .find(|r| lat >= r.lat[0] && lat < r.lat[1])
             .or(table.rows.last())
     });
-    let mut text = format!(
-        "Optional for a {} outage: a portable solar panel with a battery.",
-        day_adjective(days)
-    );
+    let mut text = if as_recharge {
+        let cap = b.k(keys::BATTERY_PACK_CAP_DAYS);
+        let why = if days > cap {
+            format!(
+                "your power target of {} is longer than the {} of batteries and phone power the plan stores",
+                fmt_days(days),
+                fmt_days(cap)
+            )
+        } else {
+            "a medical device's battery needs topping up every day the power is out".to_owned()
+        };
+        format!(
+            "A way to recharge without a car, because {why}: a portable solar panel that charges a power station, power banks and rechargeable lights."
+        )
+    } else {
+        format!(
+            "Optional for a {} outage: a portable solar panel with a battery.",
+            day_adjective(days)
+        )
+    };
     let mut math = Vec::new();
     match row {
         Some(r) => {
@@ -485,11 +634,16 @@ pub fn solar_panel_units(
         }
         None => text.push_str(" Winter sun is weak: a 100 to 200 W panel keeps phones, lights, a radio and a CPAP going, but not a full-size fridge in a northern winter."),
     }
+    let class = if as_recharge {
+        RECHARGE_CLASS
+    } else {
+        "solar_panel"
+    };
     Some(
         Sizing::new(
             &b,
             "solar_panel_units",
-            "solar_panel",
+            class,
             1.0,
             "panel",
             Per::Household,
@@ -829,6 +983,27 @@ mod tests {
         assert_eq!(s.quantity, 25.0);
         assert!(s.plain.contains("36.4 gallons"), "{}", s.plain);
         assert!(s.plain.contains("20 feet"));
+        // Round-2 review P-04: fuel in run-hours, never the target's days. 25 gal × 24 h ÷ 2.8 =
+        // 214 h at light load (85 at full load): 8.9 days nonstop, 21 to 54 days at 4 hours a day.
+        assert!(
+            s.plain
+                .contains("25 gallons runs it about 214 hours at light load (85 at full load)"),
+            "{}",
+            s.plain
+        );
+        assert!(s.plain.contains("8.9 days nonstop"), "{}", s.plain);
+        assert!(
+            s.plain.contains("21 to 54 days at 4 hours a day"),
+            "{}",
+            s.plain
+        );
+        let fuel_days = s.days.unwrap();
+        assert!((fuel_days - 25.0 / 2.8).abs() < 1e-9, "{fuel_days}");
+        let long = generator_fuel_gallons(180.0, &p.housing).unwrap();
+        assert_eq!(
+            long.days, s.days,
+            "a 180-day target does not stretch 25 gallons"
+        );
         assert_eq!(
             generator_fuel_gallons(3.0, &p.housing).unwrap().quantity,
             8.4
@@ -861,18 +1036,27 @@ mod tests {
         let miami = fixtures::get("miami-condo-retiree-1").unwrap();
         assert!(generator_units(30.0, &miami.housing).is_none());
         // Solar from 7 days.
-        assert!(solar_panel_units(5.0, Some(40.0), &philly.people).is_none());
-        let s = solar_panel_units(13.0, Some(39.95), &philly.people).unwrap();
+        assert!(solar_panel_units(5.0, Some(40.0), &philly.people, false).is_none());
+        let s = solar_panel_units(13.0, Some(39.95), &philly.people, false).unwrap();
         assert!(
             s.plain.contains("261 Wh") && s.plain.contains("380 W"),
             "{}",
             s.plain
         );
         assert!(s.prior);
-        let seattle = solar_panel_units(13.0, Some(47.6), &philly.people).unwrap();
+        let seattle = solar_panel_units(13.0, Some(47.6), &philly.people, false).unwrap();
         assert!(seattle.plain.contains("121 Wh"));
-        let unknown = solar_panel_units(13.0, None, &philly.people).unwrap();
+        let unknown = solar_panel_units(13.0, None, &philly.people, false).unwrap();
         assert!(unknown.plain.contains("northern winter"));
+        // As the way to recharge for a household with no car: offered even under 7 days (a medical
+        // device), in the recharge part.
+        let r = solar_panel_units(3.0, Some(40.0), &philly.people, true).unwrap();
+        assert_eq!(r.item_class, RECHARGE_CLASS);
+        assert!(
+            r.plain.starts_with("A way to recharge without a car"),
+            "{}",
+            r.plain
+        );
     }
 
     #[test]
@@ -889,6 +1073,36 @@ mod tests {
         assert!(wheelchair_battery(&philly.people).is_none());
         assert_eq!(battery_packs(3.0).unwrap().quantity, 1.0);
         assert_eq!(battery_packs(13.0).unwrap().quantity, 2.0);
+        // Round-2 review P-04: 180 days was 26 packs; now 2 (14 days), and the line points to a
+        // way to recharge.
+        let long = battery_packs(180.0).unwrap();
+        assert_eq!(long.quantity, 2.0);
+        assert!(long.plain.contains("way to recharge"), "{}", long.plain);
+        assert!(long.prior);
+    }
+
+    /// Round-2 review P-04, P-09: past two weeks of batteries, or for a medical device's battery, a
+    /// way to recharge: a car charger for a household with a vehicle.
+    #[test]
+    fn a_way_to_recharge_past_two_weeks_or_for_a_device() {
+        let coos = fixtures::get("coos-bay-well-owner-2").unwrap();
+        // Coos Bay owns a generator: it can recharge already.
+        assert!(!recharge_needed(180.0, &coos.people, &coos.housing));
+        let philly = fixtures::get("philadelphia-renters-4").unwrap();
+        assert!(!recharge_needed(14.0, &philly.people, &philly.housing));
+        assert!(recharge_needed(15.0, &philly.people, &philly.housing));
+        let r = recharge_capability(30.0, &philly.people, &philly.housing, 1).unwrap();
+        assert_eq!(
+            (r.quantity, r.unit, r.item_class.as_str()),
+            (1.0, "charger", RECHARGE_CLASS)
+        );
+        assert!(r.plain.contains("never in a garage"), "{}", r.plain);
+        assert!(r.citations.iter().any(|c| c == "cdc_co_basics"));
+        assert!(recharge_capability(30.0, &philly.people, &philly.housing, 0).is_none());
+        // A CPAP user with a car: a need even for a 3-day power target.
+        let phoenix = fixtures::get("phoenix-apartment-cpap-1").unwrap();
+        let r = recharge_capability(3.0, &phoenix.people, &phoenix.housing, 1).unwrap();
+        assert!(r.plain.contains("medical device"), "{}", r.plain);
     }
 
     #[test]

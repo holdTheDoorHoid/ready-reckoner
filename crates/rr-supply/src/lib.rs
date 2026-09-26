@@ -31,7 +31,9 @@ mod format;
 pub mod generic;
 mod household;
 pub mod lines;
+pub mod minimum;
 pub mod rules;
+pub mod storage;
 mod targets;
 pub mod tiers;
 
@@ -44,7 +46,9 @@ use rr_types::{
 
 pub use constants::{Constant, Constants, constants};
 pub use lines::{LineKind, SizedLine};
+pub use minimum::{MINIMUM_KIT_DAYS, minimum_kit};
 pub use rules::Sizing;
+pub use storage::{StorageEstimate, StoragePart, storage_by_tier};
 pub use tiers::{ONE_MONTH_NOTE, tier_enough, tier_for_days, tier_recommended};
 
 use household::Household;
@@ -68,25 +72,36 @@ pub const LINE_RULES: &[&str] = &[
     "water_treatment_capacity",
     "bleach_bottles",
     "boil_fuel",
+    "rain_catchment_units",
+    "water_carriers",
+    "well_hand_pump",
     "livestock_water",
     "livestock_water_stored",
+    "livestock_haul_tank",
     "food_kcal",
     "food_cost_estimate",
     "food_kit_check",
     "long_term_staples",
+    "cooking_capability",
     "cooking_fuel_canisters",
+    "propane_cylinders",
+    "grill_propane_tank",
+    "infant_formula_rtf",
     "infant_formula_oz",
     "nursing_supplies",
     "pet_food_lb",
     "pet_food_days",
     "medication_days",
+    "medication_fills",
     "rx_cold_storage",
+    "rx_fridge_units",
     "antibiotics_none",
     "epinephrine_check",
     "medical_device_wh",
     "device_battery_units",
     "lights",
     "battery_packs",
+    "recharge_capability",
     "power_station_units",
     "generator_units",
     "generator_fuel_gallons",
@@ -107,6 +122,7 @@ pub const LINE_RULES: &[&str] = &[
     "toilet_bags",
     "toilet_cover_material",
     "toilet_paper_rolls",
+    "household_ops_kits",
     "soap_person_months",
     "menstrual_cycles",
     "diapers",
@@ -117,6 +133,10 @@ pub const LINE_RULES: &[&str] = &[
     "thermometer",
     "ors_packets",
     "bleeding_control_kit",
+    "wound_care_addon",
+    "air_cleaner_units",
+    "diy_filter_box",
+    "clean_room_plan",
     "battery_fan",
     "cooling_towel",
     "cooling_plan",
@@ -135,10 +155,15 @@ pub const LINE_RULES: &[&str] = &[
     "insurance_home_or_renters",
     "insurance_flood",
     "insurance_earthquake",
+    "insurance_wind_deductible",
+    "insurance_sewer_backup",
+    "insurance_condo_unit",
+    "insurance_life_disability",
     "emergency_fund_months",
     "get_home_bag",
     "get_home_water",
     "get_home_food",
+    "get_home_filter",
     "car_kit",
     "go_bag",
     "go_bag_water",
@@ -180,6 +205,16 @@ pub struct SupplyContext {
     /// A nuclear power plant within 16 km (`LocationResolved.facility_flags`), for
     /// `once_if_near_nuclear_plant`.
     pub nuclear_plant_within_16km: Option<bool>,
+    /// Days a year with wildfire smoke at or above 35.5 µg/m³ of fine particles, county mean
+    /// (`LocationResolved.exposure.smoke_days_35`): how many days of respirators the clean-air
+    /// lines count. Absent: five days (an estimate).
+    pub smoke_days: Option<f64>,
+    /// The county's two-digit state FIPS code (the first two digits of `county_fips`): the state's
+    /// rain-barrel rule and its driest months' rain. Absent: no state figure or rule is read.
+    pub state_fips: Option<u8>,
+    /// Share of the county's homes in the high-risk flood zone (the core pack's
+    /// `flood.sfha_home_share`), for the flood-insurance decision's wording.
+    pub sfha_home_share: Option<f64>,
 }
 
 impl SupplyContext {
@@ -188,6 +223,11 @@ impl SupplyContext {
         let threshold = constants().value(constants::keys::HOT_CLIMATE_DAYS_95F);
         self.days_at_or_above_95f
             .is_some_and(|d| d.is_finite() && d >= threshold)
+    }
+
+    /// The state FIPS code from a five-digit county FIPS code, for [`SupplyContext::state_fips`].
+    pub fn state_of(county_fips: &str) -> Option<u8> {
+        county_fips.get(..2).and_then(|s| s.parse().ok())
     }
 }
 
@@ -272,10 +312,17 @@ impl<'a> ItemSizer<'a> {
             return None;
         }
         if rule == "water_treatment_capacity" {
+            // A filter counts only with water to put through it (round-2 review P-03): the well,
+            // a raw-water source the household named, or the rain barrels the plan makes a need.
             let cap = constants().value(constants::keys::WATER_STORED_CAP_DAYS);
             let long = self.water_out_days.is_some_and(|d| d > cap);
             let well = self.input.housing.water == WaterSource::Well;
-            let quantity = if long || well { 1.0 } else { 0.0 };
+            let barrel = self
+                .lines
+                .iter()
+                .any(|l| l.line.rule == "rain_catchment_units" && l.kind == LineKind::Need);
+            let source = rules::water::RawSource::of(&self.input.housing, barrel).exists();
+            let quantity = if well || (long && source) { 1.0 } else { 0.0 };
             return Some(ItemQuantity {
                 quantity,
                 per: Per::Household,
@@ -349,8 +396,9 @@ impl Out {
 }
 
 /// The requirement lines with everything the plan and budget crates need: kind, tier, days,
-/// per-day rate, formula, estimate tag and life-safety flag. Buckets missing from `buckets` get
-/// no lines; lines come in [`BucketId::ALL`] order, and within a bucket in a fixed order.
+/// per-day rate, formula, estimate tag, life-safety flag and the bare-minimum share
+/// ([`SizedLine::minimum`]). Buckets missing from `buckets` get no lines; lines come in
+/// [`BucketId::ALL`] order, and within a bucket in a fixed order.
 pub fn sized_requirements(
     input: &PlanInput,
     buckets: &[BucketAssessment],
@@ -358,8 +406,8 @@ pub fn sized_requirements(
 ) -> Vec<SizedLine> {
     use Shape::{Need, Note, Optional};
     use rules::{
-        comms, evacuate, fire, first_aid, food, get_home, medication, money, power, sanitation,
-        thermal, water,
+        clean_air, comms, evacuate, fire, first_aid, food, get_home, medication, money, power,
+        sanitation, thermal, water,
     };
 
     let h = Household::new(input);
@@ -371,6 +419,7 @@ pub fn sized_requirements(
     let housing = &input.housing;
     let now = Some(TierId::Now);
     let h72 = Some(TierId::H72);
+    let w2 = Some(TierId::W2);
     let mut out = Out {
         lines: Vec::new(),
         noted: false,
@@ -406,6 +455,9 @@ pub fn sized_requirements(
         (None, Some(y)) => Some((y, b)),
         (None, None) => None,
     };
+    // Winter can come here unless the heat-or-cold bucket names heat only: the camp stove burns
+    // propane, which works far below freezing, not butane (round-2 review P-07).
+    let cold = t.driven_by(BucketId::Thermal, COLD) != Some(false);
 
     for &bucket in BucketId::ALL {
         if t.get(bucket).is_none() {
@@ -432,7 +484,27 @@ pub fn sized_requirements(
                     h72,
                     false,
                 );
-                // The plan's 40 °F rule for food after a power cut needs a fridge thermometer.
+                // Past two weeks of batteries (or for a medical device's battery), a way to
+                // recharge: a car charger, or a solar panel for a household with no vehicle
+                // (round-2 review P-04, P-09).
+                let recharge = power::recharge_needed(days, people, housing);
+                let recharge_tier =
+                    if days > constants().value(constants::keys::BATTERY_PACK_CAP_DAYS) {
+                        Some(tier_for_days(days))
+                    } else {
+                        h72
+                    };
+                out.push(
+                    bucket,
+                    cited(
+                        bucket,
+                        power::recharge_capability(days, people, housing, h.vehicles()),
+                    ),
+                    Need,
+                    recharge_tier,
+                    false,
+                );
+                // The plan's own 40 °F rule for food after a power cut needs a fridge thermometer.
                 out.push(bucket, Some(power::fridge_thermometers()), Need, h72, false);
                 let fuel = power::generator_fuel_gallons(days, housing);
                 let fuel_gallons = fuel.as_ref().map_or(0.0, |f| f.quantity);
@@ -522,11 +594,21 @@ pub fn sized_requirements(
                         false,
                     );
                 }
+                // A household with no vehicle recharges from the sun: the panel is then its way to
+                // recharge, a need; otherwise the panel stays an option.
+                let solar_needed = recharge && h.vehicles() == 0;
                 out.push(
                     bucket,
-                    cited(bucket, power::solar_panel_units(days, ctx.latitude, people)),
-                    Optional,
-                    Some(tier_for_days(days)),
+                    cited(
+                        bucket,
+                        power::solar_panel_units(days, ctx.latitude, people, solar_needed),
+                    ),
+                    if solar_needed { Need } else { Optional },
+                    if solar_needed {
+                        recharge_tier
+                    } else {
+                        Some(tier_for_days(days))
+                    },
                     false,
                 );
                 out.push(
@@ -565,11 +647,26 @@ pub fn sized_requirements(
                 let Some(days) = days_of(bucket) else {
                     continue;
                 };
-                let (stored, treat) = water::water_storage(days, people, pets, level, hot, well);
+                let drought = t.driven_by(bucket, &[HazardId::Drought]) == Some(true);
+                let earthquake = t.driven_by(bucket, &[HazardId::Earthquake]) == Some(true);
+                // The raw-water source beyond the stored days: the well, a source the household
+                // named, or rain barrels where the state lets them be drunk (round-2 review P-03).
+                let per_day = water::daily_total_gal(people, pets, level, hot);
+                let rain =
+                    water::rain_catchment_units(days, per_day, housing, drought, ctx.state_fips);
+                let planned_barrel = matches!(rain, Some((_, water::RainKind::Need)));
+                let source = water::RawSource::of(housing, planned_barrel);
+                let (stored, treat) = water::water_storage(days, people, pets, level, hot, source);
                 out.push(bucket, cited(bucket, Some(stored)), Need, None, true);
                 out.push(
                     bucket,
-                    Some(water::water_reused_bottles(people, pets, level, hot)),
+                    Some(water::water_reused_bottles(
+                        days.min(stored_cap),
+                        people,
+                        pets,
+                        level,
+                        hot,
+                    )),
                     Shape::Alternative {
                         of: "water_gallons",
                         variant: "reused_bottles",
@@ -584,11 +681,27 @@ pub fn sized_requirements(
                     Some(tier_for_days(days)),
                     false,
                 );
+                if let Some((s, kind)) = rain {
+                    let shape = match kind {
+                        water::RainKind::Need => Need,
+                        water::RainKind::Optional => Optional,
+                        water::RainKind::Note => Note,
+                    };
+                    out.push(bucket, Some(s), shape, Some(TierId::M1), false);
+                }
+                if let Some((s, needed)) = water::water_carriers(days, people.len(), housing) {
+                    out.push(
+                        bucket,
+                        Some(s),
+                        if needed { Need } else { Optional },
+                        w2,
+                        false,
+                    );
+                }
                 // Bleach goes with the boil-water lines when there are any, otherwise here.
                 if days_of(BucketId::WaterBoil).is_none() {
                     out.push(bucket, Some(water::bleach_bottles()), Need, h72, false);
                 }
-                let drought = t.driven_by(bucket, &[HazardId::Drought]) == Some(true);
                 out.push(
                     bucket,
                     cited(
@@ -614,19 +727,43 @@ pub fn sized_requirements(
                         false,
                     );
                 }
+                out.push(
+                    bucket,
+                    water::livestock_haul_tank(days, pets.large_animals, drought),
+                    Need,
+                    w2,
+                    false,
+                );
+                out.push(
+                    bucket,
+                    water::well_hand_pump(days, housing),
+                    Optional,
+                    Some(TierId::M3),
+                    false,
+                );
                 out.push(bucket, Some(sanitation::toilet_buckets()), Need, h72, false);
                 out.push(
                     bucket,
-                    cited(bucket, sanitation::toilet_bags(days, people)),
+                    cited(bucket, sanitation::toilet_bags(days, people, earthquake)),
                     Need,
                     None,
                     false,
                 );
                 out.push(
                     bucket,
-                    cited(bucket, sanitation::toilet_cover_material(days, people)),
+                    cited(
+                        bucket,
+                        sanitation::toilet_cover_material(days, people, earthquake),
+                    ),
                     Need,
                     None,
+                    false,
+                );
+                out.push(
+                    bucket,
+                    cited(bucket, sanitation::household_ops_kits(days)),
+                    Need,
+                    w2,
                     false,
                 );
             }
@@ -669,6 +806,9 @@ pub fn sized_requirements(
                     );
                 }
                 out.push(bucket, food::food_kit_check(people), Note, tier, false);
+                // Ready-to-feed formula for the first three days, then powder (round-2 review
+                // P-17): a baby's only food, so both are life-safety.
+                out.push(bucket, food::infant_formula_rtf(people), Need, h72, true);
                 out.push(
                     bucket,
                     cited(bucket, food::infant_formula_oz(days, people)),
@@ -694,24 +834,55 @@ pub fn sized_requirements(
                     None,
                     false,
                 );
+                // A way to cook without power, and fuel for it (round-2 review P-07).
+                let boil_days = days_of(BucketId::WaterBoil);
+                let cooking =
+                    food::cooking_capability(Some(days), boil_days, people, housing, cold);
+                let formula_first = boil_days.is_some()
+                    && people.iter().any(household::is_formula_fed)
+                    && days < constants().value(constants::keys::COOKING_CAPABILITY_MIN_DAYS);
+                let cooking_tier = if formula_first { h72 } else { w2 };
+                let must_buy = matches!(cooking, Some((_, food::Cooking::Need)));
+                if let Some((s, kind)) = cooking {
+                    let s = s.also_cite(t.sources(bucket));
+                    match kind {
+                        food::Cooking::Need => out.push(bucket, Some(s), Need, cooking_tier, false),
+                        food::Cooking::Covered => {
+                            out.push(bucket, Some(s), Note, cooking_tier, false)
+                        }
+                    }
+                }
                 if let Some((fuel_days, src)) = longest(BucketId::Supplies, BucketId::WaterBoil) {
+                    let staples = food::staples_kcal(days, people);
+                    let fuel = if cold {
+                        food::propane_cylinders(fuel_days, people, staples)
+                    } else {
+                        food::cooking_fuel_canisters(fuel_days, people, staples)
+                    };
                     out.push(
                         bucket,
-                        cited(src, food::cooking_fuel_canisters(fuel_days, people)),
-                        Optional,
-                        tier,
+                        cited(src, fuel),
+                        if must_buy { Need } else { Optional },
+                        if must_buy { cooking_tier } else { tier },
                         false,
                     );
                 }
-                if let Some((tp_days, src)) = longest(BucketId::Supplies, BucketId::WaterOut) {
-                    out.push(
-                        bucket,
-                        cited(src, sanitation::toilet_paper_rolls(tp_days, people)),
-                        Need,
-                        Some(tier_for_days(tp_days)),
-                        false,
-                    );
-                }
+                out.push(
+                    bucket,
+                    food::grill_propane_tank(housing),
+                    Optional,
+                    w2,
+                    false,
+                );
+                // Toilet paper follows the store target only: how much you use has nothing to do
+                // with whether the tap runs (round-2 review P-04).
+                out.push(
+                    bucket,
+                    cited(bucket, sanitation::toilet_paper_rolls(days, people)),
+                    Need,
+                    tier,
+                    false,
+                );
                 out.push(
                     bucket,
                     cited(bucket, sanitation::soap_person_months(days, people)),
@@ -750,15 +921,33 @@ pub fn sized_requirements(
                 // With no heat or cold hazard named (or no contributions at all), cover both.
                 let neither = heat != Some(true) && cold != Some(true);
                 if heat == Some(true) || neither {
-                    out.push(bucket, Some(thermal::battery_fan(people)), Need, h72, false);
+                    // In a hot county a home without power soon passes 90 °F, where fans stop
+                    // helping: fans and towels are optional comforts, and the heat plan's place
+                    // to go is the cover, life-safety when a power cut is part of the plan
+                    // (round-2 review P-09).
+                    let comfort = if hot { Optional } else { Need };
                     out.push(
                         bucket,
-                        Some(thermal::cooling_towel(people)),
-                        Need,
+                        Some(thermal::battery_fan(people, hot)),
+                        comfort,
                         h72,
                         false,
                     );
-                    out.push(bucket, Some(thermal::cooling_plan()), Need, now, false);
+                    out.push(
+                        bucket,
+                        Some(thermal::cooling_towel(people, hot)),
+                        comfort,
+                        h72,
+                        false,
+                    );
+                    let blackout = days_of(BucketId::Power).is_some_and(|d| d >= 1.0);
+                    out.push(
+                        bucket,
+                        Some(thermal::cooling_plan(hot)),
+                        Need,
+                        now,
+                        hot && blackout,
+                    );
                     out.push(bucket, Some(thermal::room_thermometer()), Need, h72, false);
                 }
                 if cold == Some(true) || neither {
@@ -801,6 +990,15 @@ pub fn sized_requirements(
                     None,
                     true,
                 );
+                // The rest of a long target: 60- to 90-day fills, not a bigger stockpile (round-2
+                // review P-04).
+                out.push(
+                    bucket,
+                    cited(bucket, medication::medication_fills(days, people)),
+                    Need,
+                    days.map(tier_for_days),
+                    false,
+                );
                 let cold_days = days_of(BucketId::Power).or(days);
                 if let Some(cd) = cold_days {
                     let src = if days_of(BucketId::Power).is_some() {
@@ -821,6 +1019,18 @@ pub fn sized_requirements(
                         ),
                         Need,
                         None,
+                        true,
+                    );
+                }
+                if let Some(power_days) = days_of(BucketId::Power) {
+                    out.push(
+                        bucket,
+                        cited(
+                            BucketId::Power,
+                            medication::rx_fridge_units(Some(power_days), people, housing, hot),
+                        ),
+                        Need,
+                        Some(tier_for_days(power_days)),
                         true,
                     );
                 }
@@ -860,9 +1070,9 @@ pub fn sized_requirements(
                 out.push(bucket, Some(comms::local_map()), Need, now, false);
                 out.push(
                     bucket,
-                    cited(bucket, Some(comms::cash_reserve_usd(days))),
+                    cited(bucket, Some(comms::cash_reserve_usd(days, &input.finances))),
                     Need,
-                    None,
+                    h72,
                     false,
                 );
             }
@@ -948,7 +1158,8 @@ pub fn sized_requirements(
             }
             BucketId::GetHome => {
                 // Each commuter's bag, with its water and snacks staged from home: alternative
-                // lines of that person's bag, never additions.
+                // lines of that person's bag, never additions; a filter only for a long walk
+                // outside hot counties (round-2 review P-15).
                 for (index, commute) in h.commuters() {
                     out.push(
                         bucket,
@@ -976,6 +1187,13 @@ pub fn sized_requirements(
                             variant: "staged_food",
                             person: index,
                         },
+                        h72,
+                        false,
+                    );
+                    out.push(
+                        bucket,
+                        get_home::get_home_filter(index, commute, hot),
+                        Shape::PerPerson(index),
                         h72,
                         false,
                     );
@@ -1008,7 +1226,6 @@ pub fn sized_requirements(
                     h72,
                     false,
                 );
-                out.push(bucket, first_aid::n95_masks(people), Need, h72, false);
                 out.push(
                     bucket,
                     Some(first_aid::thermometer(people)),
@@ -1024,17 +1241,29 @@ pub fn sized_requirements(
                     false,
                 );
                 // Life-safety where the household is rural or a medical emergency is likely.
+                let rural = input.location.setting == Setting::Rural;
                 let p_medical = t
                     .get(BucketId::MedicalEmergency)
                     .and_then(|a| match a.target {
                         Target::Readiness { p_need_10yr, .. } => Some(p_need_10yr),
                         _ => None,
                     });
-                let (kit, life_safety) = first_aid::bleeding_control_kit(
-                    input.location.setting == Setting::Rural,
-                    p_medical,
-                );
+                let (kit, life_safety) = first_aid::bleeding_control_kit(rural, p_medical);
                 out.push(bucket, Some(kit), Need, h72, life_safety);
+                if let Some((s, three_day)) = first_aid::wound_care_addon(rural, supplies) {
+                    let s = if supplies.is_some() && !rural {
+                        s.also_cite(t.sources(BucketId::Supplies))
+                    } else {
+                        s
+                    };
+                    out.push(
+                        bucket,
+                        Some(s),
+                        Need,
+                        if three_day { h72 } else { w2 },
+                        false,
+                    );
+                }
             }
             BucketId::Fire => {
                 out.push(
@@ -1050,14 +1279,47 @@ pub fn sized_requirements(
                 }
                 out.push(bucket, fire::co_alarm_count(housing), Need, h72, true);
                 out.push(bucket, fire::extinguisher_count(housing), Need, h72, false);
-                out.push(bucket, fire::escape_ladder_count(housing), Need, h72, false);
+                out.push(bucket, fire::escape_ladder_count(housing), Need, w2, false);
             }
             BucketId::Security => {
                 out.push(bucket, Some(fire::neighbour_contacts()), Need, now, false);
             }
-            // awaiting: supply — the clean-air lines (respirators, an air cleaner or a DIY filter
-            // box, a sealed-room plan; DESIGN-DELTA §3).
-            BucketId::CleanAir => {}
+            BucketId::CleanAir => {
+                // Unhealthy air indoors (contract v2): respirators for teens and adults sized by
+                // the county's smoke days, an air cleaner for the clean room or the cheaper box
+                // fan with a MERV 13 filter, and the clean-room plan.
+                out.push(
+                    bucket,
+                    cited(bucket, clean_air::n95_masks(people, ctx.smoke_days)),
+                    Need,
+                    h72,
+                    false,
+                );
+                out.push(
+                    bucket,
+                    Some(clean_air::air_cleaner_units()),
+                    Need,
+                    w2,
+                    false,
+                );
+                out.push(
+                    bucket,
+                    Some(clean_air::diy_filter_box()),
+                    Shape::Alternative {
+                        of: "air_cleaner_units",
+                        variant: "diy_filter_box",
+                    },
+                    w2,
+                    false,
+                );
+                out.push(
+                    bucket,
+                    Some(clean_air::clean_room_plan(people)),
+                    Need,
+                    now,
+                    false,
+                );
+            }
             BucketId::Income => {
                 let months = t.months(bucket);
                 let s = money::emergency_fund_months(months, &input.finances);
@@ -1067,6 +1329,13 @@ pub fn sized_requirements(
                     s
                 };
                 out.push(bucket, Some(s), Need, Some(TierId::M3), false);
+                out.push(
+                    bucket,
+                    money::insurance_life_disability(people, &input.finances),
+                    Need,
+                    now,
+                    false,
+                );
             }
             BucketId::HomeLoss => {
                 out.push(bucket, Some(money::document_kit()), Need, now, false);
@@ -1079,7 +1348,7 @@ pub fn sized_requirements(
                 );
                 out.push(
                     bucket,
-                    money::insurance_flood(&input.finances, housing),
+                    money::insurance_flood(&input.finances, housing, ctx.sfha_home_share),
                     Need,
                     now,
                     false,
@@ -1093,8 +1362,32 @@ pub fn sized_requirements(
                         false,
                     );
                 }
+                if t.driven_by(bucket, &[HazardId::Hurricane]) == Some(true) {
+                    out.push(
+                        bucket,
+                        money::insurance_wind_deductible(&input.finances),
+                        Need,
+                        now,
+                        false,
+                    );
+                }
+                out.push(
+                    bucket,
+                    money::insurance_sewer_backup(&input.finances, housing),
+                    Need,
+                    now,
+                    false,
+                );
+                out.push(
+                    bucket,
+                    money::insurance_condo_unit(&input.finances, housing),
+                    Need,
+                    now,
+                    false,
+                );
             }
         }
     }
+    minimum::mark(&mut out.lines);
     out.lines
 }

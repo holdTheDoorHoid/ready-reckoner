@@ -15,6 +15,9 @@ pub(crate) const CUPS_PER_GAL: f64 = 16.0;
 pub(crate) const DAYS_PER_YEAR: f64 = 365.0;
 /// Days in a month, for per-month amounts.
 pub(crate) const DAYS_PER_MONTH: f64 = 30.0;
+/// Gallons of rain an inch deep over one square foot: 144 cubic inches ÷ 231 cubic inches a gallon
+/// (a definition, not a sourced quantity).
+pub(crate) const GAL_PER_SQFT_INCH: f64 = 144.0 / 231.0;
 
 const POW10: [f64; 4] = [1.0, 10.0, 100.0, 1000.0];
 

@@ -1,12 +1,12 @@
 //! Food: calories by age, cost by approach, long-term staples, infant formula and pet food
 //! (research §2).
 
-use rr_types::{AgeBand, Per, Person, Pets};
+use rr_types::{AgeBand, CookingFuel, Heating, Housing, HousingKind, Per, Person, Pets};
 
 use super::Sizing;
 use crate::basis::Basis;
-use crate::constants::{ChildShareTable, DgaTable, keys};
-use crate::format::{DAYS_PER_YEAR, count, days as fmt_days, num, people, usd};
+use crate::constants::{ChildShareTable, DgaTable, constants, keys};
+use crate::format::{DAYS_PER_YEAR, ceil_count, count, days as fmt_days, num, people, usd};
 use crate::household::is_formula_fed;
 use crate::rules::water::pets_phrase;
 
@@ -455,22 +455,59 @@ pub fn long_term_staples(days: f64, people_list: &[Person]) -> Vec<Sizing> {
     out
 }
 
-/// Powdered formula for formula-fed babies: 32 oz of prepared formula a day at most (AAP), about
-/// 5 oz of powder (labels differ), for at least three days. Rule `infant_formula_oz`.
+/// Ready-to-feed formula for the first days (round-2 review P-17; item N-11): it needs no water, so
+/// it is the safest choice in an emergency (CDC). Up to 32 oz of prepared formula a day (the AAP's
+/// most) × `baby_supply_min_days` (3) for each formula-fed baby. Rule `infant_formula_rtf`.
+pub fn infant_formula_rtf(people_list: &[Person]) -> Option<Sizing> {
+    let n = people_list.iter().filter(|p| is_formula_fed(p)).count() as f64;
+    if n == 0.0 {
+        return None;
+    }
+    let mut b = Basis::new();
+    let per_day = b.k(keys::INFANT_FORMULA_OZ_DAY);
+    let days = b.k(keys::BABY_SUPPLY_MIN_DAYS);
+    b.cite("cdc_infant_feeding_disaster");
+    let q = n * per_day * days;
+    let text = format!(
+        "Ready-to-feed formula for the first {}: up to {} oz a day for each baby on formula × {} = {} fluid ounces. It needs no water, so it is the safest formula in an emergency; keep the kind your baby already takes, and check the dates every month.",
+        fmt_days(days),
+        num(per_day, 0),
+        count(n, "baby", "babies"),
+        num(q, 0)
+    );
+    Some(
+        Sizing::new(
+            &b,
+            "infant_formula_rtf",
+            "infant_formula",
+            q,
+            "fl oz",
+            Per::Person,
+            text,
+        )
+        .per_day(days, n * per_day),
+    )
+}
+
+/// Powdered formula for the days after the ready-to-feed formula's first three: 32 oz of prepared
+/// formula a day at most (AAP), about 5 oz of powder (labels differ), for each formula-fed baby. No
+/// line when the target is three days or less. Rule `infant_formula_oz`.
 pub fn infant_formula_oz(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let n = people_list.iter().filter(|p| is_formula_fed(p)).count() as f64;
-    if n == 0.0 || days <= 0.0 {
+    let rtf_days = constants().value(keys::BABY_SUPPLY_MIN_DAYS);
+    if n == 0.0 || !(days > rtf_days) {
         return None;
     }
     let mut b = Basis::new();
     let prepared = b.k(keys::INFANT_FORMULA_OZ_DAY);
     let powder = b.k(keys::FORMULA_POWDER_OZ_PER_DAY);
-    let min_days = b.k(keys::BABY_SUPPLY_MIN_DAYS);
+    let first = b.k(keys::BABY_SUPPLY_MIN_DAYS);
     b.cite("cdc_infant_feeding_disaster");
-    let d = days.max(min_days);
+    let d = days - first;
     let q = n * powder * d;
     let text = format!(
-        "{}: up to {} oz of prepared formula a day, about {} oz of powder (labels differ), × {} = {} oz of powder. Ready-to-feed formula is safest in an emergency; powder needs safe water (counted in the water line). Check the amount every month as the baby grows.",
+        "Powdered formula for the days after the ready-to-feed formula's first {}: {}: up to {} oz of prepared formula a day, about {} oz of powder (labels differ), × {} = {} oz of powder. Powder needs safe water (counted in the water line). Check the amount every month as the baby grows.",
+        fmt_days(first),
         count(n, "baby on formula", "babies on formula"),
         num(prepared, 0),
         num(powder, 0),
@@ -591,50 +628,287 @@ pub fn pet_food_lb(days: f64, pets: &Pets) -> Option<Sizing> {
     Some(Sizing::new(&b, "pet_food_lb", "pet_food", q, "lb", Per::Pet, text).per_day(d, per_day))
 }
 
-/// Fuel canisters for a camp stove: about 0.2 lb a person a day to boil drinking water and heat one
-/// meal, in 8-ounce canisters, at least two (estimates). Optional line (rule
-/// `cooking_fuel_canisters`).
-pub fn cooking_fuel_canisters(days: f64, people_list: &[Person]) -> Option<Sizing> {
+/// The item class of the cooking lines (a way to cook without power, and its fuel): one part of
+/// the supplies bucket, so the stove and its fuel are valued together.
+pub const COOKING_CLASS: &str = "cooking";
+
+/// What the cooking line is for this household.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Cooking {
+    /// A way to cook without power is needed and must be bought: a camp stove and fuel.
+    Need,
+    /// The home can already cook without power (a wood stove, or a gas range while the gas flows):
+    /// a note, nothing to buy.
+    Covered,
+}
+
+/// A way to cook and boil water without power (round-2 review P-07, REVIEW K1): needed when the
+/// can't-get-to-a-store target is at least `cooking_capability_min_days` (14, an estimate; Oregon's
+/// 2 Weeks Ready asks households to know how to prepare two weeks of food without electricity or
+/// gas), or when a formula-fed baby's powder must be mixed during a boil-water target. A wood stove
+/// or a gas range already covers it (a note); otherwise a one-burner camp stove, burning propane where
+/// a cold hazard drives the heat-or-cold bucket (butane stops turning to gas near 32 °F; NIST),
+/// outdoors only (CDC). Rule `cooking_capability`.
+pub fn cooking_capability(
+    supplies_days: Option<f64>,
+    boil_days: Option<f64>,
+    people_list: &[Person],
+    housing: &Housing,
+    cold: bool,
+) -> Option<(Sizing, Cooking)> {
+    let min = constants().value(keys::COOKING_CAPABILITY_MIN_DAYS);
+    let long = supplies_days.is_some_and(|d| d >= min);
+    let formula = people_list.iter().any(is_formula_fed) && boil_days.is_some_and(|d| d > 0.0);
+    if !long && !formula {
+        return None;
+    }
+    let mut b = Basis::new();
+    if long {
+        b.k(keys::COOKING_CAPABILITY_MIN_DAYS);
+    }
+    if formula {
+        b.cite("cdc_infant_feeding_disaster");
+    }
+    let why = match (long, formula) {
+        (true, true) => format!(
+            "your plan runs {} without a store, and a baby's powdered formula needs boiled water during a boil-water notice",
+            fmt_days(supplies_days.unwrap_or(min))
+        ),
+        (true, false) => format!(
+            "your plan runs {} without a store, longer than food that needs no cooking comfortably covers",
+            fmt_days(supplies_days.unwrap_or(min))
+        ),
+        _ => "a baby's powdered formula needs boiled water during a boil-water notice".to_owned(),
+    };
+    if housing.heating == Heating::Wood {
+        b.cite("oregon_2_weeks_ready");
+        let text = format!(
+            "A way to cook without power, because {why}: your wood stove can boil water and cook when the power is out. Keep dry wood and a pot that fits on it."
+        );
+        let s = Sizing::new(
+            &b,
+            "cooking_capability",
+            COOKING_CLASS,
+            1.0,
+            "stove",
+            Per::Household,
+            text,
+        );
+        return Some((s, Cooking::Covered));
+    }
+    if housing.cooking == Some(CookingFuel::Gas) {
+        b.cite("cdc_co_basics");
+        b.cite("ready_gov_winter");
+        let text = format!(
+            "A way to cook without power, because {why}: your gas range can boil water and cook while the gas still flows. If its igniter needs power, light a burner with a long match (check the manual first). Never use the oven or burners to heat the home."
+        );
+        let s = Sizing::new(
+            &b,
+            "cooking_capability",
+            COOKING_CLASS,
+            1.0,
+            "stove",
+            Per::Household,
+            text,
+        );
+        return Some((s, Cooking::Covered));
+    }
+    b.cite("cdc_co_basics");
+    let fuel_words = if cold {
+        let butane = b.k(keys::BUTANE_BOIL_F);
+        let propane = b.k(keys::PROPANE_BOIL_F);
+        format!(
+            "one that burns propane, because winter outages come where you live: butane stops turning to gas near {} °F, propane not until about {} °F",
+            num(butane, 0),
+            num(propane, 0)
+        )
+    } else {
+        "a propane or butane one-burner stove".to_owned()
+    };
+    let text = format!(
+        "A way to cook and boil water without power, because {why}: a camp stove, {fuel_words}. Use it outdoors only, never indoors or in a garage (carbon monoxide), and keep a lighter or waterproof matches with it."
+    );
+    let s = Sizing::new(
+        &b,
+        "cooking_capability",
+        COOKING_CLASS,
+        1.0,
+        "stove",
+        Per::Household,
+        text,
+    );
+    Some((s, Cooking::Need))
+}
+
+/// Fuel for a camp stove, in pounds: about 0.2 lb a person a day to boil drinking water and heat
+/// one meal for the longer of the store and boil-water targets, plus about 0.3 lb per 2,000 kcal of
+/// dry staples the plan counts beyond the first month (estimates; round-2 review P-07). Returns the
+/// pounds and the staples' share.
+fn fuel_lb(b: &mut Basis, fuel_days: f64, people_list: &[Person], staples_kcal: f64) -> (f64, f64) {
     let n = people_list.len() as f64;
-    if n == 0.0 || days <= 0.0 {
+    let per_person_day = b.k(keys::COOKING_FUEL_LB_PER_PERSON_DAY);
+    let base = n * fuel_days * per_person_day;
+    let staples = if staples_kcal > 0.0 {
+        staples_kcal / 2000.0 * b.k(keys::STAPLES_FUEL_LB_PER_2000KCAL)
+    } else {
+        0.0
+    };
+    (base + staples, staples)
+}
+
+/// "about 0.2 lb of fuel a person a day × 4 people × 10 days = 8 lb, plus 1.2 lb to cook the dry
+/// staples".
+fn fuel_words(people_list: &[Person], fuel_days: f64, total: f64, staples: f64) -> String {
+    let n = people_list.len() as f64;
+    let per_person_day = constants().value(keys::COOKING_FUEL_LB_PER_PERSON_DAY);
+    let base = total - staples;
+    let mut s = format!(
+        "about {} lb of fuel a person a day × {} × {} = {} lb",
+        num(per_person_day, 1),
+        count(n, "person", "people"),
+        fmt_days(fuel_days),
+        num(base, 1)
+    );
+    if staples > 0.0 {
+        s.push_str(&format!(
+            ", plus {} lb to cook the dry staples, {} lb in all",
+            num(staples, 1),
+            num(total, 1)
+        ));
+    }
+    s
+}
+
+/// Butane canisters for a camp stove where no cold hazard drives the heat-or-cold bucket: the
+/// pounds [`fuel_lb`] gives in 8-ounce canisters, at least two (estimates). A need when the household
+/// must buy a way to cook ([`Cooking::Need`]), else optional. Rule `cooking_fuel_canisters`.
+pub fn cooking_fuel_canisters(
+    fuel_days: f64,
+    people_list: &[Person],
+    staples_kcal: f64,
+) -> Option<Sizing> {
+    if people_list.is_empty() || fuel_days <= 0.0 {
         return None;
     }
     let mut b = Basis::new();
     b.cite("cdc_co_basics");
-    let lb = b.k(keys::COOKING_FUEL_LB_PER_PERSON_DAY);
+    let (lb, staples) = fuel_lb(&mut b, fuel_days, people_list, staples_kcal);
     let per_canister = b.k(keys::FUEL_CANISTER_LB);
     let min = b.k(keys::COOKING_FUEL_MIN_CANISTERS);
-    let fuel = n * days * lb;
-    let q = crate::format::ceil_count(fuel / per_canister).max(min);
+    let q = ceil_count(lb / per_canister).max(min);
     let text = format!(
-        "If you cook or boil water on a camp stove: about {} lb of fuel a person a day × {} × {} = {} lb, or {} of {} lb each. Use it outdoors only, never indoors (carbon monoxide).",
-        num(lb, 1),
-        count(n, "person", "people"),
-        fmt_days(days),
-        num(fuel, 1),
-        count(q, "canister", "canisters"),
+        "Fuel for a camp stove: {}, or {} of {} lb each. Use it outdoors only, never indoors (carbon monoxide), and store it cool, away from heat.",
+        fuel_words(people_list, fuel_days, lb, staples),
+        count(q, "butane canister", "butane canisters"),
         num(per_canister, 1)
     );
     Some(
         Sizing::new(
             &b,
             "cooking_fuel_canisters",
-            "stove_fuel",
+            COOKING_CLASS,
             q,
             "canister",
             Per::Household,
             text,
         )
         .math(vec![format!(
-            "max({}, ceil({} × {} days × {} lb ÷ {} lb)) = {}",
+            "max({}, ceil({} lb ÷ {} lb)) = {}",
             num(min, 0),
-            num(n, 0),
-            num(days, 2),
             num(lb, 2),
             num(per_canister, 2),
             num(q, 0)
         )]),
     )
+}
+
+/// One-pound propane cylinders for a camp stove where a cold hazard drives the heat-or-cold bucket
+/// (propane works far below freezing; butane does not, NIST): the pounds [`fuel_lb`] gives, in 1 lb
+/// cylinders, at least two; no more than two kept inside (the fire-code limit as Lehi states it).
+/// A need when the household must buy a way to cook, else optional (round-2 review P-07; item N-08).
+/// Rule `propane_cylinders`.
+pub fn propane_cylinders(
+    fuel_days: f64,
+    people_list: &[Person],
+    staples_kcal: f64,
+) -> Option<Sizing> {
+    if people_list.is_empty() || fuel_days <= 0.0 {
+        return None;
+    }
+    let mut b = Basis::new();
+    b.cite("cdc_co_basics");
+    let (lb, staples) = fuel_lb(&mut b, fuel_days, people_list, staples_kcal);
+    let per_cylinder = b.k(keys::PROPANE_CYLINDER_LB);
+    let min = b.k(keys::COOKING_FUEL_MIN_CANISTERS);
+    let inside = b.k(keys::PROPANE_SMALL_CYLINDERS_INDOOR_MAX);
+    let q = ceil_count(lb / per_cylinder).max(min);
+    let text = format!(
+        "Fuel for a propane camp stove: {}, or {}. Use the stove outdoors only (carbon monoxide), and store the cylinders outside the living space, with no more than {} inside the home or an attached garage.",
+        fuel_words(people_list, fuel_days, lb, staples),
+        count(
+            q,
+            "one-pound propane cylinder",
+            "one-pound propane cylinders"
+        ),
+        num(inside, 0)
+    );
+    Some(
+        Sizing::new(
+            &b,
+            "propane_cylinders",
+            COOKING_CLASS,
+            q,
+            "cylinder",
+            Per::Household,
+            text,
+        )
+        .math(vec![format!(
+            "max({}, ceil({} lb ÷ {} lb)) = {}",
+            num(min, 0),
+            num(lb, 2),
+            num(per_cylinder, 2),
+            num(q, 0)
+        )]),
+    )
+}
+
+/// A spare filled 20-lb cylinder for an outdoor gas grill (round-2 review P-07; item N-09): the
+/// cheapest boiling and cooking fuel for a house that has a grill. The interview does not ask about
+/// a grill, so it stays optional. Rule `grill_propane_tank`.
+pub fn grill_propane_tank(housing: &Housing) -> Option<Sizing> {
+    let house = matches!(
+        housing.kind,
+        HousingKind::Detached
+            | HousingKind::Rowhouse
+            | HousingKind::MobileHome
+            | HousingKind::RuralProperty
+    );
+    if !house {
+        return None;
+    }
+    let mut b = Basis::new();
+    b.cite("lehi_fuel_storage");
+    b.cite("cdc_co_basics");
+    let text = "Optional, if you have an outdoor gas grill: a spare filled 20-pound cylinder is the cheapest way to boil water and cook in a long outage. Use the grill outdoors only, away from the house, and keep the cylinder outside, never indoors or in the garage.".to_owned();
+    Some(Sizing::new(
+        &b,
+        "grill_propane_tank",
+        COOKING_CLASS,
+        1.0,
+        "cylinder",
+        Per::Household,
+        text,
+    ))
+}
+
+/// The dry staples' food energy the plan counts for a store target: the days beyond the first month
+/// (`staples_after_days`, as [`long_term_staples`] counts them) × the household's kcal a day.
+pub fn staples_kcal(days: f64, people_list: &[Person]) -> f64 {
+    let after = constants().value(keys::STAPLES_AFTER_DAYS);
+    if days <= after {
+        return 0.0;
+    }
+    household_kcal(&mut Basis::new(), people_list) * (days - after)
 }
 
 #[cfg(test)]
@@ -746,17 +1020,83 @@ mod tests {
         assert_eq!(band_share(dga, cs, AgeBand::Infant), 0.0);
     }
 
+    /// Round-2 review P-17: three days of ready-to-feed formula, then powder for the rest.
     #[test]
     fn formula_and_nursing() {
         let p = fixtures::get("sugar-land-ev-household-3").unwrap();
+        let rtf = infant_formula_rtf(&p.people).unwrap();
+        assert_eq!((rtf.quantity, rtf.unit), (96.0, "fl oz")); // 32 fl oz × 3 days
+        assert!(rtf.plain.contains("needs no water"), "{}", rtf.plain);
+        assert!(rtf.citations.iter().any(|c| c == "aap_formula_amounts"));
         let f = infant_formula_oz(7.0, &p.people).unwrap();
-        assert_eq!(f.quantity, 35.0); // 5 oz of powder × 7 days
-        assert_eq!(infant_formula_oz(1.0, &p.people).unwrap().quantity, 15.0); // at least 3 days
+        assert_eq!(f.quantity, 20.0); // 5 oz of powder × (7 − 3) days
+        assert!(
+            infant_formula_oz(3.0, &p.people).is_none(),
+            "3 days are ready-to-feed"
+        );
+        assert!(infant_formula_oz(1.0, &p.people).is_none());
         assert!(nursing_supplies(&p.people).is_none());
         let mut breastfed = p.people.clone();
         breastfed[2].medical.dietary.clear();
         assert!(infant_formula_oz(7.0, &breastfed).is_none());
+        assert!(infant_formula_rtf(&breastfed).is_none());
         assert_eq!(nursing_supplies(&breastfed).unwrap().quantity, 1.0);
+    }
+
+    /// Round-2 review P-07: no household could cook or boil without power. A long store target (or
+    /// formula under a boil notice) needs a way to cook; a wood stove or gas range already is one;
+    /// propane where winter comes; staples need fuel to cook.
+    #[test]
+    fn a_way_to_cook_without_power() {
+        let philly = fixtures::get("philadelphia-renters-4").unwrap();
+        // 10 days, no baby: not needed.
+        assert!(
+            cooking_capability(Some(10.0), Some(4.0), &philly.people, &philly.housing, true)
+                .is_none()
+        );
+        // 14 days, no gas range recorded: a propane stove in a cold county.
+        let (s, kind) =
+            cooking_capability(Some(14.0), None, &philly.people, &philly.housing, true).unwrap();
+        assert_eq!(kind, Cooking::Need);
+        assert!(
+            s.plain.contains("propane") && s.plain.contains("32 °F"),
+            "{}",
+            s.plain
+        );
+        assert!(s.citations.iter().any(|c| c == "nist_butane"));
+        assert_eq!(s.item_class, COOKING_CLASS);
+        // A gas range or a wood stove already covers it.
+        let mut gas = philly.housing.clone();
+        gas.cooking = Some(CookingFuel::Gas);
+        let (s, kind) = cooking_capability(Some(14.0), None, &philly.people, &gas, true).unwrap();
+        assert_eq!(kind, Cooking::Covered);
+        assert!(s.plain.contains("gas range"), "{}", s.plain);
+        let coos = fixtures::get("coos-bay-well-owner-2").unwrap();
+        let (s, kind) =
+            cooking_capability(Some(60.0), None, &coos.people, &coos.housing, false).unwrap();
+        assert_eq!(kind, Cooking::Covered);
+        assert!(s.plain.contains("wood stove"));
+        // A formula-fed baby under a boil-water target, even for a short store target.
+        let sl = fixtures::get("sugar-land-ev-household-3").unwrap();
+        let (s, _) =
+            cooking_capability(Some(7.0), Some(3.0), &sl.people, &sl.housing, false).unwrap();
+        assert!(s.plain.contains("formula"), "{}", s.plain);
+        // Fuel: 2 people × 60 days × 0.2 lb = 24 lb, plus 30 days of staples (4,524 kcal a day ×
+        // 30 = 135,700 kcal ÷ 2,000 × 0.3 = 20.4 lb): 45 one-pound cylinders.
+        let staples = staples_kcal(60.0, &coos.people);
+        assert!((staples - 30.0 * 106_300.0 / 47.0 * 2.0).abs() < 1e-6);
+        let p = propane_cylinders(60.0, &coos.people, staples).unwrap();
+        assert_eq!(p.quantity, 45.0);
+        assert!(p.plain.contains("dry staples"), "{}", p.plain);
+        assert!(p.prior);
+        assert_eq!(staples_kcal(30.0, &coos.people), 0.0);
+        let one = fixtures::get("chicago-student-zero-budget-1").unwrap();
+        assert_eq!(
+            propane_cylinders(1.0, &one.people, 0.0).unwrap().quantity,
+            2.0
+        );
+        assert!(grill_propane_tank(&philly.housing).is_some());
+        assert!(grill_propane_tank(&one.housing).is_none());
     }
 
     #[test]
@@ -793,12 +1133,14 @@ mod tests {
     fn camp_stove_canisters() {
         let p = fixtures::get("philadelphia-renters-4").unwrap();
         // 4 × 10 days × 0.2 lb = 8 lb ÷ 0.5 lb = 16 canisters
-        let s = cooking_fuel_canisters(10.0, &p.people).unwrap();
+        let s = cooking_fuel_canisters(10.0, &p.people, 0.0).unwrap();
         assert_eq!(s.quantity, 16.0);
         assert!(s.prior && s.plain.contains("never indoors"));
         let one = fixtures::get("chicago-student-zero-budget-1").unwrap();
         assert_eq!(
-            cooking_fuel_canisters(1.0, &one.people).unwrap().quantity,
+            cooking_fuel_canisters(1.0, &one.people, 0.0)
+                .unwrap()
+                .quantity,
             2.0,
             "at least 2"
         );

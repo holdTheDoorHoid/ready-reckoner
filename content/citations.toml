@@ -2573,3 +2573,195 @@ url = "https://www.dhs.gov/sites/default/files/publications/Trauma-Kits-TN_1015-
 retrieved = "2026-09-26"
 quote = "the counterfeit tourniquets have been shown to fail before the necessary force to stop bleeding can be applied, possibly leading to catastrophic results."
 license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
+# v0.2.0 (supply2): rain barrels, stoves and fuel, clean air, insurance and home decisions, the
+# 48-hour list, key safes and passports. Checks and how each page was read: docs/CITATION_IDS.md.
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "noaa_nclimdiv"
+title = "nClimDiv statewide monthly precipitation (climdiv-pcpnst-v1.0.0-20260904)"
+publisher = "NOAA National Centers for Environmental Information"
+year = 2026
+url = "https://www.ncei.noaa.gov/pub/data/cirs/climdiv/"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ncsl_rainwater"
+title = "Map Monday: Is Catching Rainwater Legal in Your State? (updated September 8, 2025)"
+publisher = "National Conference of State Legislatures"
+year = 2025
+url = "https://www.ncsl.org/resources/map-monday-is-catching-rainwater-legal-in-your-state"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "nist_butane"
+title = "Butane: phase change data (NIST Chemistry WebBook, SRD 69)"
+publisher = "National Institute of Standards and Technology"
+year = 2025
+url = "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106978&Mask=4"
+retrieved = "2026-09-26"
+license = "NIST Standard Reference Data (figure cited, not copied)"
+
+[[citation]]
+id = "nist_propane"
+title = "Propane: phase change data (NIST Chemistry WebBook, SRD 69)"
+publisher = "National Institute of Standards and Technology"
+year = 2025
+url = "https://webbook.nist.gov/cgi/cbook.cgi?ID=C74986&Mask=4"
+retrieved = "2026-09-26"
+license = "NIST Standard Reference Data (figure cited, not copied)"
+
+[[citation]]
+id = "epa_air_cleaner_guide"
+title = "Guide to Air Cleaners in the Home"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home"
+retrieved = "2026-09-26"
+quote = "choose a portable air cleaner that has a clean air delivery rate (CADR) that is large enough for the size of the room or area in which you will use it"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "floodsmart_flood_risk"
+title = "What Is My Flood Risk?"
+publisher = "FEMA National Flood Insurance Program (FloodSmart)"
+year = 2026
+url = "https://www.floodsmart.gov/flood-zones-and-maps/what-is-my-flood-risk"
+retrieved = "2026-09-26"
+quote = "Over the past 10 years (2014 - 2024), nearly one-third of NFIP flood insurance claims (29%) came from areas located outside of current high-risk flood areas"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "naic_home_insurance_guide"
+title = "A Consumer's Guide to Home Insurance"
+publisher = "National Association of Insurance Commissioners"
+year = 2022
+url = "https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "naic_life_insurance_guide"
+title = "Life Insurance Buyer's Guide"
+publisher = "National Association of Insurance Commissioners"
+year = 2019
+url = "https://content.naic.org/sites/default/files/publication-lig-lp-consumer-life.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cdc_hurricane_prepare"
+title = "Preparing for Hurricanes or Other Tropical Storms"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/hurricanes/safety/index.html"
+retrieved = "2026-09-26"
+quote = "You can also fill up your sinks and bathtubs with water for washing."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_mosquitoes_after_flood"
+title = "What to Do After a Hurricane or Flood (mosquitoes)"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/mosquitoes/response/index.html"
+retrieved = "2026-09-26"
+quote = "An increase in nuisance or floodwater mosquito populations is expected in the weeks after flooding."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "redcross_hurricane_checklist"
+title = "Hurricane Safety Checklist"
+publisher = "American Red Cross"
+year = 2024
+url = "https://www.redcross.org/content/dam/redcross/get-help/pdfs/hurricane/EN_Hurricane-Safety-Checklist.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "fema_b526_eq_checklist"
+title = "Earthquake Safety Checklist (FEMA B-526, October 2023)"
+publisher = "FEMA"
+year = 2023
+url = "https://www.fema.gov/sites/default/files/documents/fema_b-526-eq-safety-checklist.pdf"
+retrieved = "2026-09-26"
+quote = "Water heaters that could be pulled away from pipes and rupture."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_sill_plate_bolting"
+title = "Bolt Sill Plates to Foundation (Protecting Your Property from Earthquakes fact sheet, April 2008)"
+publisher = "FEMA"
+year = 2008
+url = "https://www.fema.gov/sites/default/files/2020-07/how2013_sill_plates.pdf"
+retrieved = "2026-09-26"
+quote = "Modifications to the foundation must be done by a licensed contractor, who will ensure that the work is done correctly and according to all applicable codes."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_p320_safe_room"
+title = "Taking Shelter from the Storm: Building or Installing a Safe Room for Your Home (FEMA P-320, sixth edition, April 2025)"
+publisher = "FEMA"
+year = 2025
+url = "https://www.fema.gov/sites/default/files/documents/fema_rsl_fema-p-320-taking-shelter-from-the-storm_042025.pdf"
+retrieved = "2026-09-26"
+quote = "FEMA safe rooms provide near-absolute protection from the deadly winds and wind-borne debris associated with extreme-wind events."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_safe_room_funding"
+title = "Safe Room Funding"
+publisher = "FEMA"
+year = 2025
+url = "https://www.fema.gov/emergency-managers/risk-management/building-science/safe-rooms/funding"
+retrieved = "2026-09-26"
+quote = "Individual homeowners do not apply directly to FEMA for safe room funding."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_flood_smart_protect"
+title = "Fact Sheet: Be Flood Smart. Protect Your Property"
+publisher = "FEMA"
+url = "https://www.fema.gov/press-release/20230425/fact-sheet-be-flood-smart-protect-your-property"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ibhs_fortified_incentives"
+title = "FORTIFIED Home: Financial Incentives"
+publisher = "Insurance Institute for Business & Home Safety"
+year = 2026
+url = "https://fortifiedhome.org/incentives/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "state_dept_passport_fees"
+title = "Passport Fees"
+publisher = "U.S. Department of State"
+year = 2026
+url = "https://travel.state.gov/content/travel/en/passports/how-apply/fees.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "sold_secure_testing"
+title = "Why Do We Test? Independent attack testing and ratings for security products, key safes included"
+publisher = "Sold Secure (Master Locksmiths Association test house, UK)"
+year = 2026
+url = "https://soldsecure.com/why-do-we-test"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "ollam_2022_lawyer_passport_locksmith_gun"
+title = "A Talk About Risk & Preparedness (SAINTCON 2022 keynote)"
+publisher = "Deviant Ollam (video and slides)"
+year = 2022
+url = "https://www.youtube.com/watch?v=6ihrGNGesfI"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted; cited for principles, never for numbers)"

@@ -109,5 +109,7 @@ fn write_the_fixture_report() {
     assert!(out.contains("`fire.extinguisher_count` | need | h72 | 2 | extinguisher"));
     assert!(out.contains("`thermal.sleeping_bag_or_blanket` | need | h72 | 1 | item"));
     assert!(out.contains("`evacuate.go_bag.alt.staged_water` | alternative | h72 | 12 | gallon"));
-    assert!(!out.contains("`fire.escape_ladder_count`"));
+    // Round 2, v0.2.0 (review P-06): a rowhouse is assumed to sleep upstairs, so it gets a
+    // two-storey ladder; Coos Bay's detached house too.
+    assert!(out.contains("`fire.escape_ladder_count` | need | w2 | 1 | ladder"));
 }

@@ -42,8 +42,8 @@ fn levels(b: &mut Basis, housing: &Housing, with_basement: bool) -> f64 {
 }
 
 /// A fire escape plan: two ways out of every room and a meeting spot outside. Every household
-/// gets it, alarms or not. A house at street level is not assumed to sleep upstairs, so its plan
-/// asks for a second way out of any upstairs bedroom instead of sizing a ladder. Rule
+/// gets it, alarms or not. A house is assumed to have bedrooms upstairs (the ladder line sizes the
+/// second way out), and a bedroom below ground needs its own second way out too. Rule
 /// `fire_escape_plan`.
 pub fn fire_escape_plan(housing: &Housing) -> Sizing {
     let mut b = Basis::new();
@@ -52,7 +52,10 @@ pub fn fire_escape_plan(housing: &Housing) -> Sizing {
     if is_apartment(housing) {
         text.push_str(" In a building, know both stairways and never use the elevator in a fire.");
     } else if is_house(housing) && housing.floor <= 1 {
-        text.push_str(" If anyone sleeps upstairs, check that each bedroom has a second way out, such as a window onto a porch roof or an escape ladder.");
+        text.push_str(" Upstairs bedrooms need a second way out, such as a window onto a porch roof or an escape ladder (see the ladder line).");
+    }
+    if housing.below_grade_bedroom {
+        text.push_str(" A bedroom below ground needs its own second way out too, usually a window big enough to climb through.");
     }
     if housing.alarms.smoke {
         text.push_str(" Test your smoke alarms every month.");
@@ -190,11 +193,12 @@ pub fn extinguisher_count(housing: &Housing) -> Option<Sizing> {
     ))
 }
 
-/// An escape ladder only where people sleep above the ground with no second way out assumed: a home
-/// (any kind but a mobile home) whose floor is 2 or 3 (an estimate; a ladder does not reach higher,
-/// where the stairs are the way out). The form's floor is where the household lives, so a house at
-/// street level gets the upstairs-bedroom advice in its escape plan instead. Rule
-/// `escape_ladder_count`.
+/// An escape ladder where people sleep above the ground floor (round-2 review P-06): a house
+/// (rowhouse, detached or on rural land) is assumed to have bedrooms upstairs, as the form does not
+/// ask and most two-storey homes do (an estimate from the two levels a house is counted with), so it
+/// gets a two-storey ladder unless every bedroom is on the ground floor; a home whose household lives
+/// on floor 2 or 3 gets one sized to that floor. Never for a mobile home (one storey) or above
+/// floor 3 (a ladder reaches no higher; the stairs are the way out). Rule `escape_ladder_count`.
 pub fn escape_ladder_count(housing: &Housing) -> Option<Sizing> {
     if housing.kind == HousingKind::MobileHome {
         return None;
@@ -203,14 +207,21 @@ pub fn escape_ladder_count(housing: &Housing) -> Option<Sizing> {
     let lo = b.k(keys::ESCAPE_LADDER_LOWEST_FLOOR);
     let hi = b.k(keys::ESCAPE_LADDER_HIGHEST_FLOOR);
     let floor = f64::from(housing.floor);
-    if !(lo..=hi).contains(&floor) {
+    let text = if (lo..=hi).contains(&floor) {
+        format!(
+            "You live on floor {}, above the ground: 1 escape ladder for a bedroom window, in case fire or smoke blocks the way out, unless every bedroom already has a second way out such as a fire escape. Keep it by the window and practise with it.",
+            num(floor, 0)
+        )
+    } else if is_house(housing) && floor <= 1.0 {
+        let levels = b.k(keys::ALARM_LEVELS_HOUSE);
+        format!(
+            "A house like yours usually has bedrooms upstairs ({} levels): 1 two-storey escape ladder for an upstairs bedroom window, in case fire or smoke blocks the stairs. Skip it if every bedroom is on the ground floor or already has a second way out, such as a porch roof. Keep it by the window and practise with it.",
+            num(levels, 0)
+        )
+    } else {
         return None;
-    }
+    };
     b.cite("ready_gov_home_fires");
-    let text = format!(
-        "You live on floor {}, above the ground: 1 escape ladder for a bedroom window, in case fire or smoke blocks the way out, unless every bedroom already has a second way out such as a fire escape. Keep it by the window and practise with it.",
-        num(floor, 0)
-    );
     Some(Sizing::new(
         &b,
         "escape_ladder_count",
@@ -260,13 +271,21 @@ mod tests {
         assert_eq!(ext.quantity, 2.0);
         assert!(ext.plain.contains("near the kitchen") && ext.plain.contains("A-B-C"));
         assert!(ext.prior && ext.citations.iter().any(|c| c == "usfa_extinguishers"));
-        // Street level: no ladder; the escape plan asks about upstairs bedrooms instead.
-        assert!(escape_ladder_count(&p.housing).is_none());
+        // A rowhouse at street level is assumed to sleep upstairs (round-2 review P-06): one
+        // two-storey ladder, an estimate, and the escape plan points to it.
+        let ladder = escape_ladder_count(&p.housing).unwrap();
+        assert_eq!(ladder.quantity, 1.0);
+        assert!(ladder.plain.contains("two-storey"), "{}", ladder.plain);
+        assert!(ladder.prior);
         let plan = fire_escape_plan(&p.housing);
         assert_eq!(plan.quantity, 1.0);
         assert!(plan.plain.contains("two ways out") && plan.plain.contains("every month"));
-        assert!(plan.plain.contains("sleeps upstairs"));
+        assert!(plan.plain.contains("Upstairs bedrooms"), "{}", plan.plain);
         assert!(!plan.prior);
+        // A bedroom below ground gets its own sentence.
+        let mut basement = p.housing.clone();
+        basement.below_grade_bedroom = true;
+        assert!(fire_escape_plan(&basement).plain.contains("below ground"));
     }
 
     #[test]
@@ -345,6 +364,12 @@ mod tests {
         let coos = fixtures::get("coos-bay-well-owner-2").unwrap();
         assert!(co_alarm_count(&coos.housing).is_none());
         assert!(extinguisher_count(&coos.housing).is_none());
+        // A detached house at street level gets the two-storey ladder too; a high floor never.
+        assert_eq!(escape_ladder_count(&coos.housing).unwrap().quantity, 1.0);
+        let mut high = coos.housing.clone();
+        high.kind = HousingKind::ApartmentLowRise;
+        high.floor = 5;
+        assert!(escape_ladder_count(&high).is_none());
         assert_eq!(neighbour_contacts().quantity, 2.0);
     }
 }
