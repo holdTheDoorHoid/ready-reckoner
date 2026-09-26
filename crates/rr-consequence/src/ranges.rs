@@ -174,6 +174,23 @@ pub(crate) fn duration_range(
     DurationRange { low, high, freq }
 }
 
+/// 10th and 90th percentiles of Λ at each of `days`: the bucket's yearly rate of disruptions
+/// longer than that many days, under the same draws as its target.
+pub(crate) fn lambda_range(eval: &mut Eval<'_>, draws: &Draws, days: &[f64]) -> Vec<(f64, f64)> {
+    let n = draws.n();
+    let mut v: Vec<Vec<f64>> = vec![Vec::with_capacity(n); days.len()];
+    for i in 0..n {
+        eval.set_draw_from(draws, i);
+        for (j, &d) in days.iter().enumerate() {
+            v[j].push(eval.lambda(d));
+        }
+    }
+    eval.reset();
+    v.iter_mut()
+        .map(|x| (quantile(x, 0.1), quantile(x, 0.9)))
+        .collect()
+}
+
 /// 10th and 90th percentiles of a readiness bucket's yearly need rate.
 pub(crate) fn rate_range(eval: &mut Eval<'_>, draws: &Draws) -> (f64, f64) {
     let n = draws.n();

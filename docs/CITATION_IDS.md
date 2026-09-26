@@ -158,6 +158,33 @@ source; it has no URL yet, so it cannot be a registry entry.
 | `inquirer_peco_outages` | Power outages in Philadelphia history: Peco's biggest storms | The Philadelphia Inquirer, 2025 | https://www.inquirer.com/weather/power-outages-peco-most-history-20250626.html | two of PECO's five largest outages were ice storms (1994, 2014), outside the 2018–2025 records (big ice storm class) |
 | `county_boil_water_records` | a county's boil-water notice records, when a data pack provides them (none does yet; the id is a placeholder for the source the data workstream adds) | — | — | replacing the default boil-water duration with the county's median and 90th percentile |
 
+### Added for v0.2.0 (agent/consequence2)
+
+In `content/citations.toml` (the water failures behind the water buckets' stress line and the
+backtest in `docs/VALIDATION.md`, and the reports behind the historic restoration curves; the
+two data-pack v2 sources the model reads are content's entries):
+
+| id | What rr-consequence uses it for |
+| --- | --- |
+| `avl_watchdog_water_2024` | Asheville after Helene: 75 to 80 % of customers had water on 16 October 2024 (day 19); water began returning to the 80 % who lost it that week |
+| `nchn_asheville_water_2024` | Asheville after Helene: 90 to 95 % had water on 18 October 2024 (day 21) |
+| `npr_jackson_boil_2022` | Jackson's boil notice lifted after nearly 7 weeks (15 September 2022) |
+| `npr_jackson_water_restored_2022` | Jackson: running water restored by 7 September 2022 after several days without service |
+| `cbs_long_beach_water_2012` | Long Beach NY after Sandy: water safe and sewers back 13 days after landfall |
+| `kut_austin_boil_2021` | Austin's citywide boil notice, 17 to 23 February 2021 |
+| `kishore_2018_maria` | Puerto Rico after Maria: households averaged 68 days without water (read from a summary, UNVERIFIED) |
+| `cleveland19_blackout_2003` | Cleveland's three-day boil advisories after the August 2003 blackout |
+| `doe_maria_situation_reports` | the data pack's historic restoration curves for Puerto Rico (Maria) and the US Virgin Islands (Irma and Maria), used for the island grids' major-hurricane rows and stress line |
+| `epa_echo_sdwa` | the county's share of public-water customers on a system with a health-based violation in five years (water-system fragility, model review M-03) |
+| `epa_aqs_daily_pm25` | the county's smoke days for the clean-air sentence |
+
+The new hazards' rows cite content's topical entries beside the priors (`rr_risk_model_priors`):
+`fcc_att_outage_2024` (phone and internet outages), `fda_drug_shortages` (medicine shortages),
+`me_dhhs_snap_2025` (the 2025 SNAP lapse), `eviction_lab_national` (evictions), `fbi_cde_arrests`
+(arrests), `usgs_sinkholes` (sinkholes), `nws_dust_storms` with `noaa_storm_events` (dust storms),
+`fema_dam_residual_risk_2018` (dam and levee failures), `iii_water_damage_protect` (burst pipes
+and leaks) and `cfpb_shutdown_2013` (pay or benefits that stop in a funding gap).
+
 ## Added for the v0.1.1 guidance on 2026-09-26
 
 Life-safety sentences from the round-2 review (S1, S7, RR-P04, RR-P07, RR-P16, RR-P17, P-22). Each
@@ -554,6 +581,20 @@ chlorine dioxide is only somewhat effective against Cryptosporidium comes from C
 page; the item cites CDC's emergency page, which says chlorine dioxide kills it when the directions
 are followed, and adds that boiling works better against parasites.
 
+## Requested by data-model (2026-09-26)
+
+The data-model workstream's loaders emit these five ids (its `docs/DATA_SOURCES.md` §2, "Data-pack
+v2 calibration files", and `data/manifest.json`, branch agent/data-model). Each page was read on 2026-09-26; quotes were
+matched in the page's own text.
+
+| id | Source | What the data pack uses it for | How it was read and checked |
+| --- | --- | --- | --- |
+| `noaa_nclimgrid_daily` | NOAA NCEI, nClimGrid-Daily v1.0.0 (Durre et al., 2022) | `core/temperature.csv`: the share of days per month at or above 90 °F and 100 °F and at or below 20 °F and 0 °F (1991–2020), and the hot and cold shares of outage hours | product page downloaded; quote (daily Tmax, Tmin, Tavg and precipitation, gridded and area averages, contiguous US since 1951). The county-average files the loader reads (`access/averages/<year>/tmax-<yyyymm>-cty-scaled.csv`) are listed in NCEI's directory. Alaska, Hawaii and the territories have no series |
+| `eia_861_reliability` | EIA, Form EIA-861 detailed data files, reliability, 2015–2024 | `core/reliability.csv`: SAIDI and SAIFI with and without major event days, by county | page downloaded; quote (utilities report SAIDI and SAIFI and how they were collected). The 2024 reliability workbook was opened: it has "All Events (With Major Event Days)" and "Without Major Event Days" columns. `eia_861_reliability_2024` (the same page, for the 2024 figures rr-consequence cites) stays as it is; the two could be merged later |
+| `openfema_declarations` | FEMA, OpenFEMA Disaster Declarations Summaries v2 | `core/declarations.csv`: major-disaster declarations (type DR) by county, the last five years and since 2000 | fema.gov refuses scripted clients, so the page was read in a browser (last data refresh 2026-09-26); quote. The OpenFEMA API's own dataset metadata says the same |
+| `openfema_housing_assistance` | FEMA, OpenFEMA Housing Assistance Program Data, Owners and Renters v2 | `core/series/ihp_displacement.toml`: FEMA rental assistance per approved household, by type of disaster | the landing pages showed FEMA's "technical difficulties" page in a browser today, so both datasets were read through the OpenFEMA API's own metadata (OpenFemaDataSets, refreshed 2026-09-26): aggregated, non-PII Individual Assistance data by state, county and ZIP code from declaration DR1439 (2002). No quote stored |
+| `fcc_dirs_reports` | FCC PSHSB, Disaster Information Reporting System (DIRS) and its Communications Status Reports | `core/series/fcc_dirs.toml`: the share of cell sites out by county during eight hurricanes, 2017–2024 | fcc.gov refuses scripted clients, so the DIRS page was read in a browser; quote. One of the status reports the series cites (DOC-346368A1, Hurricane Harvey, 2017-08-26) was downloaded: it builds on DIRS outage data and has the per-county table of cell sites served, out and percent out. The series file's own URL (DOC-353805A1) is the FCC's 2018 report on the 2017 hurricane season, which confirms 48 of 78 Puerto Rico municipios had every cell site out after Maria |
+
 ## Registry index for the other workstreams
 
 Every id below is in `content/citations.toml`. Federal entries carry an exact quote where one was
@@ -603,6 +644,7 @@ checked; "prior" marks an expert estimate.
 | Documents, identity and accounts (v0.2.0) | `state_dept_passport_card`, `state_dept_child_passport`, `cisa_data_backup_2012`, `ready_gov_cybersecurity`, `ftc_2008_locksmith`, `nia_affairs_checklist`, `ollam_2022_lawyer_passport_locksmith_gun` (principles only) |
 | Emergency refills by state (v0.2.0) | `healthcare_ready_refill_laws`, `nacds_2018_emergency_refills`, `fl_bop_emergency_refills`, `tx_pharmacy_disaster_2024`, `medicare_drugs_disaster` |
 | Our own documents | `rr_design_decision_log_2026` (the backtest and the nuclear-wording decisions) |
+| Data pack v2 county and national files (data-model) | `noaa_nclimgrid_daily`, `eia_861_reliability`, `openfema_declarations`, `openfema_housing_assistance`, `fcc_dirs_reports`, `pnnl_oe417_linkage`, `openfda_drug_shortages`, `fdic_failed_banks`, `crs_rs20348_funding_gaps`, `fbi_cde_arrests` |
 
 ## Requested
 

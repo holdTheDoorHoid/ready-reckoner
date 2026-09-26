@@ -16,7 +16,7 @@
 
 1. Of 100 households like yours, about 15 (10–30) will have to leave home quickly at least once in the next 10 years. Know your evacuation zone and where you would go; leave when told.[2, 3] On the coast, strong shaking is the warning: walk to high ground as soon as it stops.[4]
 2. Of 100 households like yours, about 50 (40–90) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 6 months at home with no power, and about 1 year with no tap water.
-3. Of 100 households like yours, about 55 (35–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 months of food you normally eat, and 3 months of daily medicine on hand.
+3. Of 100 households like yours, about 80 (60–100) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 months of food you normally eat, and 3 months of daily medicine on hand.
 
 ### Start here
 
@@ -197,7 +197,7 @@ How long to be ready for each kind of disruption at the 1-in-500 setting. For an
 | No tap water at all | about 1 year (6 months to 1 year) | about 2 weeks | about 1 year | one year |
 | Can't get to a store | about 2 months (1½–6) | about 2 weeks | about 1 year | three months |
 | Dangerous heat or cold indoors | about 2 weeks (10 days to 2 weeks) | about 3 days | about 5 days | two weeks |
-| Medication and medical-supply continuity | about 3 months (1½–6) | about 2 weeks | about 1 year | three months |
+| Medication and medical-supply continuity | about 3 months (2–6) | about 2 weeks | about 1 year | three months |
 | No phone, internet or card payments | about 1½ months (3 weeks to 3 months) | not known | not known | three months |
 
 The range in brackets shows how uncertain each target is. "Not known": there are no restoration records for the event behind that target.
@@ -226,7 +226,7 @@ The range in brackets shows how uncertain each target is. "Not known": there are
 
 **What to avoid.** Fans move air but do not lower body temperature.[16] Above 90°F indoors, a fan can make you hotter.[15] Never heat your home with a gas oven, and never use a grill or camp stove indoors.[84] Headache, dizziness, nausea or confusion can mean carbon monoxide poisoning: get outside, then call 911.[85] Keep space heaters 3 feet from anything that can burn.[104] Never leave people or pets in a closed car on a warm day.[16]
 
-### Medication and medical-supply continuity: about 3 months (1½–6)
+### Medication and medical-supply continuity: about 3 months (2–6)
 
 **What helps.** Refill early, while you still have a week left. The Red Cross suggests keeping a 7-day supply, and Florida advises at least two weeks.[105, 106] Ask your doctor, pharmacist and drug plan how to build an emergency supply, such as a 90-day fill.[10, 107] Keep a written list of each person's medicines, doses and allergies.[10] Many states let pharmacists give an emergency refill, but the rules differ.[108] After a declared disaster, a federal program can help people without insurance replace prescriptions.[109] People with diabetes should pack supplies for at least 1 to 2 weeks: syringes or pen needles, a glucose meter with test strips and spare batteries, and glucose tablets.[110, 111] Insulin in its original vial or pen, opened or not, keeps working for up to 28 days at 59°F to 86°F. In an outage, keep it below 86°F in the shade or a cooler, never frozen.[112, 113] For other medicines that need a fridge, ask your pharmacist now how long each keeps out of it, and write the answer on your medicine list.[81]
 
@@ -266,18 +266,24 @@ The range in brackets shows how uncertain each target is. "Not known": there are
 
 **What to avoid.** After a disaster, be careful with people who show up offering fast repairs or help for a fee. Report scams at ReportFraud.ftc.gov.[133] Do not hide a spare key under the doormat or a planter. Leave it with a trusted neighbour.[129]
 
+### Unhealthy air indoors
+
+**What helps.** Pick a clean room big enough for everyone, such as a bedroom with its own bathroom. Close its windows and doors, and run a portable air cleaner sized for the room.[134] If you cannot get one, a box fan with a MERV 13 filter attached is a low-cost stand-in.[23, 134] If your heating and cooling system pulls in outside air, close the intake or set it to recirculate.[24] Keep N95 or P100 respirators with two straps for anyone who has to go outside. They work only when they seal over the nose and under the chin.[135] Respirators do not come in sizes for young children, so for them the clean room is the protection.[22, 135] Check the air quality on AirNow or your local news.[24]
+
+**What to avoid.** Do not use an air cleaner that makes ozone.[134] While the air is bad, avoid frying, candles, smoking and vacuuming without a HEPA filter, and skip hard exercise.[24] Masks with ear loops or one strap do not seal, so they will not protect your lungs.[135] If you have heart or lung disease or are pregnant, ask your doctor before wearing a respirator.[135]
+
 What to do about lost income and a damaged home is under Documents and money.
 
 ### Named scenarios
 
 A named scenario is one rare, severe event that would change your targets a lot. The plan includes it or leaves it out as shown; you can change either on the risks screen.
 
-- **Magnitude 9 Cascadia earthquake** (included in your plan). Coos County is on the Cascadia coast, next to the fault. Scientists put the chance of a major Cascadia earthquake near Coos Bay at about 40 in 100 over the next 50 years. Oregon asks every household to be ready for at least two weeks, so the plan includes it. Planning for it changes: Power: 10 days → 180 days; Tap water: 90 days → 365 days; Food and supplies: 30 days → 60 days; Medicine: 45 days → 90 days; Phone and payments: 10 days → 45 days.[20, 35, 134, 135, 136]
-- **Tsunami from a nearby earthquake** (included in your plan). Part of Coos County is in the tsunami zone: about 17 in 100 residents live there. After a nearby earthquake the first waves arrive in 15 to 20 minutes, so anyone who lives, works or goes to school in the zone should walk to high ground as soon as the shaking stops. Knowing the route costs nothing, so the plan includes it. Planning for it changes: households like yours that have to leave home quickly within 10 years: 16 → 17 in 100.[4, 19, 20, 35]
+- **Magnitude 9 Cascadia earthquake** (included in your plan). Coos County is on the Cascadia coast, next to the fault. Scientists put the chance of a major Cascadia earthquake near Coos Bay at about 40 in 100 over the next 50 years. Oregon asks every household to be ready for at least two weeks, so the plan includes it. Planning for it changes: Power: 10 days → 180 days; Tap water: 90 days → 365 days; Food and supplies: 45 days → 60 days; Medicine: 60 days → 90 days; Phone and payments: 10 days → 45 days.[20, 35, 136, 137, 138, 139]
+- **Tsunami from a nearby earthquake** (included in your plan). Part of Coos County is in the tsunami zone: about 17 in 100 residents live there. After a nearby earthquake the first waves arrive in 15 to 20 minutes, so anyone who lives, works or goes to school in the zone should walk to high ground as soon as the shaking stops. Knowing the route costs nothing, so the plan includes it. Planning for it changes: households like yours that have to leave home quickly within 10 years: 16 → 17 in 100.[4, 19, 20, 35, 136]
 
 ## Your plan
 
-Your budget is $150 a month, plus $500 once at the start. The plan does the free steps first, then buys what protects you most for each dollar until each need reaches the step that is enough for it. Water, medicine and safety come first within each step.[137]
+Your budget is $150 a month, plus $500 once at the start. The plan does the free steps first, then buys what protects you most for each dollar until each need reaches the step that is enough for it. Water, medicine and safety come first within each step.[140]
 
 ### Start now: free steps (from October 1, 2026)
 
@@ -292,30 +298,30 @@ Your budget is $150 a month, plus $500 once at the start. The plan does the free
 
 ### Safety rules to learn now
 
-- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[45, 138]
-- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[139]
-- **Water heater:** Turn off its power or gas before you drain it for water.[139]
+- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[45, 141]
+- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[142]
+- **Water heater:** Turn off its power or gas before you drain it for water.[142]
 - **Food:** In a power cut, throw out food that has been at 40°F or warmer for 2 hours.[81]
-- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[81, 140]
+- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[81, 143]
 - **CPR:** Take a first-aid and CPR class.[128]
 
 ### This month
 
 - [ ] **Approved 5-gallon gasoline cans, with fuel stabilizer**: 5 cans, about $169 (usually $136–202). Adds 90 days of generator fuel, bringing you to 90 of the 180-day goal.
-- [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 20 days of one person's medicine, about $17 (usually $8–27). Adds 60 days of medicine, bringing you to 60 of the 90-day goal.
+- [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 30 days of one person's medicine, about $26 (usually $12–40). Adds 90 days of medicine, which completes the 90-day goal.
 - [ ] **Unscented household bleach (for treating water)**: 1 bottle, about $8 (usually $7–9). Adds 365 days of bleach for treating water for 2 people, which completes the 365-day goal.
 - [ ] **Bleeding-control kit (tourniquet and pressure bandage)**: 1 kit, about $71 (usually $48–95). Gets you ready for a medical emergency before help arrives.
-- [ ] **Whistle for each go-bag**: 2 whistles, about $4 (usually $2–5). Gets you ready for leaving home quickly.
 - [ ] **Extra pet food in an airtight container**: 11 pounds of dry food, about $14 (usually $8–19). Adds 7.1 days of pet food, bringing you to 7.1 of the 60-day goal.
+- [ ] **Whistle for each go-bag**: 2 whistles, about $4 (usually $2–5). Gets you ready for leaving home quickly.
 - [ ] **Foil emergency blankets**: 2 blankets, about $5 (usually $1–10). Gets you ready for leaving home quickly.
 - [ ] **Thermometers: one for the family, and one for a baby**: 1 thermometer, about $8 (usually $7–8). Gets you ready for a medical emergency before help arrives.
 - [ ] **Refrigerator and freezer thermometers**: 1 pair, about $8 (usually $5–11). Adds 180 days of food-safety checks for the fridge, which completes the 180-day goal.
 - [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17). Gets you ready for getting home if you are stranded.
+- [ ] **Period products for two cycles**: 4 cycles' supplies, about $23 (usually $17–30). Adds 60 days of period products, which completes the 60-day goal.
 - [ ] **N95 respirators**: 10 respirators, about $10 (usually $7–13). Gets you ready for a medical emergency before help arrives.
 - [ ] **Headlamp or flashlight for each person**: 2 headlamps, about $23 (usually $7–40). Adds 180 days of light during power cuts, which completes the 180-day goal.
 - [ ] **Personal straw or squeeze filter for a bag**: 1 filter, about $23 (usually $18–29). Gets you ready for getting home if you are stranded.
 - [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20). Adds 6.9 days of spare batteries for lights and a radio, bringing you to 6.9 of the 180-day goal.
-- [ ] **Period products for two cycles**: 4 cycles' supplies, about $23 (usually $17–30). Adds 60 days of period products, which completes the 60-day goal.
 - [ ] **Gravity water filter (removes bacteria and parasites)**: 1 filter, about $75 (usually $55–96). Adds 351 days of filtered and disinfected water from your well for 2 people, bringing you to 361 of the 365-day goal.
 
 ### Next month: Month 1 (from November 1, 2026), $150 to spend
@@ -329,7 +335,7 @@ Your budget is $150 a month, plus $500 once at the start. The plan does the free
 - [ ] Pack your pets' water in the go-kit (free)
 - [ ] Pack your pets' food in the go-kit (free)
 - [ ] **Get-home bag for each commuter: a small bag you stock from home**: 1 bag, about $34 (usually $30–39). Gets you ready for getting home if you are stranded.
-- [ ] **Extra supply of daily prescription medicine (toward 14 days)**: 10 days of one person's medicine, about $9 (usually $4–13). Adds 30 days of medicine, which completes the 90-day goal.
+- [ ] **Bar soap and laundry soap**: 4 person-months, about $24 (usually $8–40). Adds 60 days of soap for 2 people, which completes the 60-day goal.
 - [ ] **Family first-aid kit**: 1 kit, about $36 (usually $27–44). Gets you ready for a medical emergency before help arrives.
 - [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $28 (usually $23–33). Gets you ready for leaving home quickly.
 - [ ] **Two-bucket emergency toilet kit**: 1 kit, about $28 (usually $26–30). Adds 122 days of emergency toilet supplies for 2 people, bringing you to 243 of the 365-day goal.
@@ -347,38 +353,41 @@ Your budget is $150 a month, plus $500 once at the start. The plan does the free
 - [ ] Lockout plan: a spare key and a locksmith you checked (free)
 - [ ] Pick a warm room for a winter outage (free)
 - [ ] **Over-the-counter medicine basics**: 1 set, about $43 (usually $34–52)
-- [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $40 (usually $37–43)
-- [ ] **Bar soap and laundry soap**: 4 person-months, about $24 (usually $8–40)
 
 **Month 3 (from January 1, 2027), $150 to spend**
 
 - [ ] Money: start an emergency fund and a bare-bones budget (free)
 - [ ] Antibiotics: talk with your own clinician (no stockpile) (free)
+- [ ] **Extra toilet paper**: 146 rolls, about $118 (usually $72–164)
 - [ ] **Cash in small bills**: $100, about $100 (usually $100)
+- [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $40 (usually $37–43)
 
 **Month 4 (from February 1, 2027), $150 to spend**
 
 - [ ] **Car emergency kit**: 2 kits, about $123 (usually $70–176)
-- [ ] **Extra toilet paper**: 146 rolls, about $118 (usually $72–164)
-- [ ] **Shut-off wrench for gas and water**: 1 wrench, about $17 (usually $12–22)
 
 **Month 5 (from March 1, 2027), $150 to spend**
 
+- [ ] **License-free two-way radios (FRS), a pair**: 1 pair, about $42 (usually $39–45)
+- [ ] **Shut-off wrench for gas and water**: 1 wrench, about $17 (usually $12–22)
 - [ ] **Pet go-kit: a carrier and a bag you pack from your supplies**: 3 (one per pet), about $97 (usually $90–105)
-- [ ] **Heavy trash bags for the toilet bucket**: 329 bags, about $36 (usually $36)
+- [ ] **Extra shelf-stable food you already eat**: 2,000 kcal, about $9 (usually $8–10)
+- [ ] **Extra pet food in an airtight container**: 11 pounds of dry food, about $14 (usually $8–19)
 
 ### Later months
 
 | Month | What | Spend |
 | --- | --- | --- |
-| 6 (April 2027) | License-free two-way radios (FRS), a pair: 1 pair; Extra shelf-stable food you already eat: 12,000 kcal; Extra pet food in an airtight container: 11 pounds of dry food; Indoor room thermometer: 1 thermometer; Spare batteries for lights and the radio: 1 × 24-pack; Solar motion-sensor outdoor light: 1 light; Battery or rechargeable fan: 1 fan | $178 |
-| 7 (May 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Extra shelf-stable food you already eat: 8,000 kcal; Spare batteries for lights and the radio: 1 × 24-pack | $128 |
+| 6 (April 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Indoor room thermometer: 1 thermometer; Spare batteries for lights and the radio: 1 × 24-pack; Extra shelf-stable food you already eat: 10,000 kcal | $146 |
+| 7 (May 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Extra shelf-stable food you already eat: 8,000 kcal; Solar motion-sensor outdoor light: 1 light; Spare batteries for lights and the radio: 1 × 24-pack | $153 |
 | 8 (June 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Extra shelf-stable food you already eat: 14,000 kcal | $141 |
-| 9 (July 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Extra shelf-stable food you already eat: 18,000 kcal | $160 |
-| 11 (September 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Clean-air room for wildfire smoke: 1 air cleaner; Extra pet food in an airtight container: 11 pounds of dry food; Spare batteries for lights and the radio: 2 × 24-pack | $244 |
-| 12 (October 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Spare batteries for lights and the radio: 4 × 24-pack | $136 |
-| 15 (January 2028) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Generator inlet and interlock or transfer switch, installed by an electrician: 1 installed kit, $675 of it from savings | $300 |
-| 16 (February 2028) | Extra pet food in an airtight container: 22 pounds of dry food; Spare batteries for lights and the radio: 4 × 24-pack | $88 |
+| 9 (July 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Battery or rechargeable fan: 1 fan | $92 |
+| 10 (August 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Clean-air room for wildfire smoke: 1 air cleaner; Extra pet food in an airtight container: 11 pounds of dry food | $213 |
+| 11 (September 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Heavy trash bags for the toilet bucket: 329 bags; Spare batteries for lights and the radio: 2 × 24-pack | $142 |
+| 12 (October 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Extra shelf-stable food you already eat: 18,000 kcal | $160 |
+| 13 (November 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Spare batteries for lights and the radio: 4 × 24-pack | $136 |
+| 14 (December 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Extra pet food in an airtight container: 22 pounds of dry food | $102 |
+| 16 (February 2028) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Generator inlet and interlock or transfer switch, installed by an electrician: 1 installed kit, $825 of it from savings; Spare batteries for lights and the radio: 4 × 24-pack | $211 |
 | 17 (March 2028) | Extra shelf-stable food you already eat: 32,000 kcal | $151 |
 | 18 (April 2028) | Gasoline for the generator, in approved cans: 25 gallons; Extra pet food in an airtight container: 22 pounds of dry food | $131 |
 | 19 (May 2028) | Extra shelf-stable food you already eat: 40,000 kcal | $189 |
@@ -405,35 +414,37 @@ One list per step, up to the step that is enough for your risks. The free steps 
 - [ ] Approved 5-gallon gasoline cans, with fuel stabilizer: 5 cans
 - [ ] Unscented household bleach (for treating water): 1 bottle
 - [ ] Bleeding-control kit (tourniquet and pressure bandage): 1 kit
-- [ ] Whistle for each go-bag: 2 whistles
 - [ ] Extra pet food in an airtight container: 11 pounds of dry food
+- [ ] Whistle for each go-bag: 2 whistles
 - [ ] Foil emergency blankets: 2 blankets
 - [ ] Thermometers: one for the family, and one for a baby: 1 thermometer
 - [ ] Refrigerator and freezer thermometers: 1 pair
 - [ ] Chlorine dioxide water treatment: 1 pack
+- [ ] Period products for two cycles: 4 cycles' supplies
 - [ ] N95 respirators: 10 respirators
 - [ ] Headlamp or flashlight for each person: 2 headlamps
 - [ ] Personal straw or squeeze filter for a bag: 1 filter
 - [ ] Spare batteries for lights and the radio: 1 × 24-pack
-- [ ] Period products for two cycles: 4 cycles' supplies
 - [ ] Get-home bag for each commuter: a small bag you stock from home: 1 bag
 - [ ] Family first-aid kit: 1 kit
 - [ ] Fire-resistant, waterproof document pouch: 1 pouch
 - [ ] Over-the-counter medicine basics: 1 set
-- [ ] NOAA Weather Radio with a tone alert: 1 radio
-- [ ] Cash in small bills: $100
-- [ ] Car emergency kit: 2 kits
 - [ ] Extra toilet paper: 146 rolls
+- [ ] Cash in small bills: $100
+- [ ] NOAA Weather Radio with a tone alert: 1 radio
+- [ ] Car emergency kit: 2 kits
 - [ ] Shut-off wrench for gas and water: 1 wrench
 - [ ] Pet go-kit: a carrier and a bag you pack from your supplies: 3 (one per pet)
+- [ ] Extra shelf-stable food you already eat: 2,000 kcal
 
 ### Two weeks
 
+- [ ] Bar soap and laundry soap: 4 person-months
 - [ ] License-free two-way radios (FRS), a pair: 1 pair
-- [ ] Extra shelf-stable food you already eat: 52,000 kcal
 - [ ] Extra pet food in an airtight container: 11 pounds of dry food
 - [ ] Indoor room thermometer: 1 thermometer
 - [ ] Spare batteries for lights and the radio: 2 × 24-pack
+- [ ] Extra shelf-stable food you already eat: 50,000 kcal
 - [ ] Solar motion-sensor outdoor light: 1 light
 - [ ] Battery or rechargeable fan: 1 fan
 - [ ] Clean-air room for wildfire smoke: 1 air cleaner
@@ -441,15 +452,14 @@ One list per step, up to the step that is enough for your risks. The free steps 
 
 ### One month
 
-- [ ] Bar soap and laundry soap: 4 person-months
-- [ ] Extra pet food in an airtight container: 33 pounds of dry food
+- [ ] Extra pet food in an airtight container: 11 pounds of dry food
 - [ ] Extra shelf-stable food you already eat: 72,000 kcal
 
 ### Three months
 
 - [ ] Extra supply of daily prescription medicine (toward 14 days): 30 days of one person's medicine
 - [ ] Spare batteries for lights and the radio: 10 × 24-pack
-- [ ] Extra pet food in an airtight container: 44 pounds of dry food
+- [ ] Extra pet food in an airtight container: 66 pounds of dry food
 - [ ] Dry staples for long storage (rice, beans, oats, wheat): 136,000 kcal
 - [ ] Phone power bank (about 20,000 mAh): 2 power banks
 
@@ -469,18 +479,18 @@ One list per step, up to the step that is enough for your risks. The free steps 
 
 **Person 1**: a 7-mile (12 km) trip, about 2 hours on foot.
 
-- [ ] Keep a get-home bag in the car: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (FHWA, Ready.gov; some amounts are estimates)[82, 141, 142, 143]
-- [ ] For the walk, from home: 1.2 litres of water and 300 kcal of snacks.[100, 141, 142]
+- [ ] Keep a get-home bag in the car: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (FHWA, Ready.gov; some amounts are estimates)[82, 144, 145, 146]
+- [ ] For the walk, from home: 1.2 litres of water and 300 kcal of snacks.[100, 144, 145]
 
 ### Extras for the hazards you face
 
 These help with one hazard rather than a whole need, so they sit outside the budget. Consider them once the steps above are done.
 
-- Plastic sheeting and duct tape to shelter in place (usually $28–36 per kit)[82, 144, 145, 146]
+- Plastic sheeting and duct tape to shelter in place (usually $28–36 per kit)[82, 147, 148, 149]
 
 ## Family plan
 
-Fill this in together, and keep a copy in each go-bag and one on the fridge. Write the numbers down: phones die.[147]
+Fill this in together, and keep a copy in each go-bag and one on the fridge. Write the numbers down: phones die.[150]
 
 | Plan | Your answer |
 | --- | --- |
@@ -495,7 +505,7 @@ Fill this in together, and keep a copy in each go-bag and one on the fridge. Wri
 
 ### Contacts and meeting places
 
-- **Make a household plan and a contact card for each person.** Agree how you will reach each other, where you will meet if you are separated, and who picks up the children (Ready.gov). Pick one out-of-state contact everyone texts to say they are safe, since texts often get through when calls do not, and write key numbers on a card for each wallet or bag (Ready.gov). Add school, daycare and work plans, and go over the plan together once a year.[30, 36, 117, 143, 147, 148]
+- **Make a household plan and a contact card for each person.** Agree how you will reach each other, where you will meet if you are separated, and who picks up the children (Ready.gov). Pick one out-of-state contact everyone texts to say they are safe, since texts often get through when calls do not, and write key numbers on a card for each wallet or bag (Ready.gov). Add school, daycare and work plans, and go over the plan together once a year.[30, 36, 117, 146, 150, 151]
 
 - **Set up emergency alerts and know how to reach 911.**
 
@@ -503,16 +513,16 @@ Fill this in together, and keep a copy in each go-bag and one on the fridge. Wri
 
 About 15 of 100 households like yours have to leave home quickly at least once in 10 years. Warning can be 1 minute to 12 hours ahead. Plan to be away for about 2 days.[4, 19, 20, 35, 38, 43, 55, 58]
 
-- **Plan how you would leave: zone, routes, destination and triggers.** Look up your evacuation zone and routes on your state and county emergency management websites, mark two routes on a paper map, and pick where you would go, pet-friendly if you have pets (Ready.gov). For each likely hazard, write a go-or-stay card and an if-then trigger, such as 'If our zone gets an evacuation warning, we leave within 30 minutes.' Plans written in if-then form make people more likely to follow through.[2, 3, 82, 120, 149, 150, 151, 152]
-- **Keep your vehicle ready: half a tank, a charged battery, a good spare.** Keep at least half a tank of gas at all times and a full tank when an evacuation looks likely (Ready.gov); if you drive an electric car, keep it charged through storm season and pick destinations within its range (Hillsborough County, Florida). Check the spare tire with the others each month, and keep a phone charging cable in the car (NHTSA). Run the engine only outdoors, never in a garage (CDC).[2, 84, 141, 153, 154, 155, 156, 157]
+- **Plan how you would leave: zone, routes, destination and triggers.** Look up your evacuation zone and routes on your state and county emergency management websites, mark two routes on a paper map, and pick where you would go, pet-friendly if you have pets (Ready.gov). For each likely hazard, write a go-or-stay card and an if-then trigger, such as 'If our zone gets an evacuation warning, we leave within 30 minutes.' Plans written in if-then form make people more likely to follow through.[2, 3, 82, 120, 152, 153, 154, 155]
+- **Keep your vehicle ready: half a tank, a charged battery, a good spare.** Keep at least half a tank of gas at all times and a full tank when an evacuation looks likely (Ready.gov); if you drive an electric car, keep it charged through storm season and pick destinations within its range (Hillsborough County, Florida). Check the spare tire with the others each month, and keep a phone charging cable in the car (NHTSA). Run the engine only outdoors, never in a garage (CDC).[2, 84, 144, 156, 157, 158, 159, 160]
 
 - **Practice: ten-minute drills and the first things to do.**
 
 #### Drills and if-then plans
 
-**If-then plans.** An if-then plan links a trigger to an action: "If the county issues an evacuation warning for our zone, we leave within 30 minutes." Plans written this way help people follow through.[151] When a warning comes, people often wait to confirm it with others before they act.[120] A trigger you agreed on earlier leaves less to decide in the moment. Write one for each likely hazard, and add who picks up the children and where you will meet.[147]
+**If-then plans.** An if-then plan links a trigger to an action: "If the county issues an evacuation warning for our zone, we leave within 30 minutes." Plans written this way help people follow through.[154] When a warning comes, people often wait to confirm it with others before they act.[120] A trigger you agreed on earlier leaves less to decide in the moment. Write one for each likely hazard, and add who picks up the children and where you will meet.[150]
 
-**Drills.** In New Zealand, people who took part in earthquake drills knew the right actions better, used them more during real shaking, and did more to prepare.[158] Among people who got out of the World Trade Center on 9/11, those with earlier emergency training were less likely to develop PTSD.[159] Practice your fire escape plan twice a year.[45] Other ten-minute drills: Drop, Cover and Hold On, a night without power, grabbing the go-bag against a timer, and sealing a room to shelter in place.[152]
+**Drills.** In New Zealand, people who took part in earthquake drills knew the right actions better, used them more during real shaking, and did more to prepare.[161] Among people who got out of the World Trade Center on 9/11, those with earlier emergency training were less likely to develop PTSD.[162] Practice your fire escape plan twice a year.[45] Other ten-minute drills: Drop, Cover and Hold On, a night without power, grabbing the go-bag against a timer, and sealing a room to shelter in place.[155]
 
 **What to avoid.** Do not skip drills because they feel silly. Each one you finish counts toward your plan.
 
@@ -522,13 +532,13 @@ About 15 of 100 households like yours have to leave home quickly at least once i
 
 #### Neighbours and mutual aid
 
-**What helps.** Swap phone numbers with two neighbours. Agree who checks on whom, especially older neighbours and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[160] Host a block party, since strong communities start with prepared neighbours.[161] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[162]
+**What helps.** Swap phone numbers with two neighbours. Agree who checks on whom, especially older neighbours and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[163] Host a block party, since strong communities start with prepared neighbours.[164] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[165]
 
 **What to avoid.** Meet the people next door before you need them. A short hello now makes it easier to knock on a door later.
 
 ### Pets
 
-- **Pet plan: microchip, records, a photo and a buddy.** Keep your pet's ID tag and microchip details current, put vaccination records and a recent photo with your documents, and arrange a buddy who can care for or evacuate your pets if you cannot (Ready.gov). If officials ask you to evacuate, your pets should go too.[149, 150]
+- **Pet plan: microchip, records, a photo and a buddy.** Keep your pet's ID tag and microchip details current, put vaccination records and a recent photo with your documents, and arrange a buddy who can care for or evacuate your pets if you cannot (Ready.gov). If officials ask you to evacuate, your pets should go too.[152, 153]
 
 ## Documents and money
 
@@ -539,50 +549,50 @@ Keep paper copies in a waterproof pouch and photos you can reach from any phone.
 - [ ] **Medical papers:** insurance cards, the written medicine list, prescriptions, and vaccination records.
 - [ ] **Contacts:** family, doctors, the insurance agent, the landlord or lender, and employers.
 
-- **Documents and insurance: copy key papers, record belongings, check cover.** Use FEMA's Emergency Financial First Aid Kit to gather IDs, financial and legal papers, insurance, medical information and contacts, and photograph or video every room and valuable item. Keep paper copies in a waterproof bag and another copy with someone you trust or in secure online storage (FEMA). Check what your insurance covers: standard home and renters policies do not cover flood or earthquake damage, a new flood policy usually takes 30 days to start, and renters can buy their own policy and contents-only flood cover (Ready.gov, FEMA).[30, 36, 39, 40, 82, 118, 130, 163, 164, 165, 166, 167, 168, 169]
-- **Fire-resistant, waterproof document pouch.** A fire-resistant, water-resistant pouch or small case for paper copies of key documents, a USB drive and some cash, easy to grab when you leave (FEMA's financial kit suggests fire- and waterproof storage).[30, 146]
+- **Documents and insurance: copy key papers, record belongings, check cover.** Use FEMA's Emergency Financial First Aid Kit to gather IDs, financial and legal papers, insurance, medical information and contacts, and photograph or video every room and valuable item. Keep paper copies in a waterproof bag and another copy with someone you trust or in secure online storage (FEMA). Check what your insurance covers: standard home and renters policies do not cover flood or earthquake damage, a new flood policy usually takes 30 days to start, and renters can buy their own policy and contents-only flood cover (Ready.gov, FEMA).[30, 36, 39, 40, 82, 118, 130, 166, 167, 168, 169, 170, 171, 172]
+- **Fire-resistant, waterproof document pouch.** A fire-resistant, water-resistant pouch or small case for paper copies of key documents, a USB drive and some cash, easy to grab when you leave (FEMA's financial kit suggests fire- and waterproof storage).[30, 149]
 
 ### Insurance questions
 
-- Home and renters policies usually don't cover floods. Decide on flood insurance before you need it: a new policy usually starts 30 days after you buy it. It pays up to $250,000 for the building and $100,000 for belongings. (FEMA, FloodSmart, Ready.gov)[40, 118, 163]
+- Home and renters policies usually don't cover floods. Decide on flood insurance before you need it: a new policy usually starts 30 days after you buy it. It pays up to $250,000 for the building and $100,000 for belongings. (FEMA, FloodSmart, Ready.gov)[40, 118, 166]
 - A standard home policy does not cover earthquake damage. Decide whether earthquake insurance is worth its deductible where you live. (Ready.gov)[36]
 
 ### Cash
 
-- Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about $100 to start, or enough for about 14 days of basics (food, fuel, medicine) at your own daily spending. No agency gives a dollar amount. (Ready.gov, FEMA; some amounts are estimates)[20, 30, 35, 118, 134, 135, 136, 141]
+- Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about $100 to start, or enough for about 14 days of basics (food, fuel, medicine) at your own daily spending. No agency gives a dollar amount. (Ready.gov, FEMA; some amounts are estimates)[20, 30, 35, 118, 137, 138, 139, 144]
 
 ### Savings
 
-Of 100 households like yours, about 20 (9–40) will have an income gap of more than 3 months in the next 10 years. The goal is about 12 months of expenses (about $45,600); you have 3 months saved. Your supplies plan is done by month 22. After that, your $150 a month for supplies could go here, reaching the goal in about 19 years. This is a savings goal, kept separate from the supplies budget.
+Of 100 households like yours, about 20 (10–40) will have an income gap of more than 3 months in the next 10 years. The goal is about 12 months of expenses (about $45,600); you have 3 months saved. Your supplies plan is done by month 22. After that, your $150 a month for supplies could go here, reaching the goal in about 19 years. This is a savings goal, kept separate from the supplies budget.
 
-- **Money: start an emergency fund and a bare-bones budget.** Set up an automatic transfer, however small, into a savings account you keep for emergencies; the CFPB says the right amount depends on your situation, and planners often suggest working toward three to six months of expenses (FINRA). Write down your essential monthly costs and what you would cut first, so you know how far savings would stretch. If anyone earns, find your state's unemployment website now, so you could file right away if a job ends (Department of Labor).[27, 28, 29, 50, 170, 171]
+- **Money: start an emergency fund and a bare-bones budget.** Set up an automatic transfer, however small, into a savings account you keep for emergencies; the CFPB says the right amount depends on your situation, and planners often suggest working toward three to six months of expenses (FINRA). Write down your essential monthly costs and what you would cut first, so you know how far savings would stretch. If anyone earns, find your state's unemployment website now, so you could file right away if a job ends (Department of Labor).[27, 28, 29, 50, 173, 174]
 
 ## Special needs
 
 ### Medicine
 
-- 1 person takes prescription medicine every day: keep 30 days of it on hand. Your target is 90 days; beyond 30 days, ask your prescriber or insurer about a longer fill. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. No agency sets a one-month amount: this step sits between the two-week advice (Red Cross, Oregon, Washington) and the Church's three-month pantry. (Florida DEM, CDC, Red Cross, Healthcare Ready)[20, 35, 43, 56, 57, 105, 106, 108, 110, 134, 135, 136, 172, 173, 174]
+- 1 person takes prescription medicine every day: keep 30 days of it on hand. Your target is 90 days; beyond 30 days, ask your prescriber or insurer about a longer fill. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. No agency sets a one-month amount: this step sits between the two-week advice (Red Cross, Oregon, Washington) and the Church's three-month pantry. (Florida DEM, CDC, Red Cross, Healthcare Ready)[20, 35, 43, 53, 54, 56, 57, 105, 106, 108, 110, 137, 138, 139, 175, 176, 177, 178]
 
-- **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[10, 13, 30, 82, 105, 108, 109, 172, 175]
+- **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[10, 13, 30, 82, 105, 108, 109, 175, 179]
 
 ### Antibiotics
 
-- No antibiotics are included in this plan. If you have a specific, foreseeable need, such as remote travel, talk to your own clinician about a standby prescription with written instructions. Never use fish or pet antibiotics, never share prescriptions, and don't use expired ones. (CDC, FDA)[12, 13, 176, 177]
+- No antibiotics are included in this plan. If you have a specific, foreseeable need, such as remote travel, talk to your own clinician about a standby prescription with written instructions. Never use fish or pet antibiotics, never share prescriptions, and don't use expired ones. (CDC, FDA)[12, 13, 180, 181]
 
 ### Pets and animals
 
-- Dry food for the 2 dogs and the cat for 60 days (at least a week): about 0.7 lb a day for each dog and 0.15 lb a day for each cat = 93 lb. Feed what the label says for yours, and keep it in an airtight, waterproof container. (ASPCA, Ready.gov; some amounts are estimates)[14, 20, 35, 56, 57, 134, 135, 136, 141, 149, 150, 178]
-- 3 pet carriers, one for each pet, with a pet go-kit: water and food from your home supplies, any medicine each takes, records and a photo. Public shelters may take only service animals, so find pet-friendly places to stay ahead of time. (ASPCA, Ready.gov)[2, 150]
-- Water for the pet go-kit, set aside from your stored water rather than bought extra: 7 days for the 2 dogs and the cat = 4.8 gallons. Replace it every 2 months. (ASPCA, PetMD, Merck Veterinary Manual; some amounts are estimates)[141, 150, 179, 180]
-- Food for the pet go-kit, set aside from your pet food rather than bought extra: 10 days (7 to 10 days) for the 2 dogs and the cat = 30 pet-days. Replace it every 2 months. (ASPCA)[150]
+- Dry food for the 2 dogs and the cat for 60 days (at least a week): about 0.7 lb a day for each dog and 0.15 lb a day for each cat = 93 lb. Feed what the label says for yours, and keep it in an airtight, waterproof container. (ASPCA, Ready.gov; some amounts are estimates)[14, 20, 35, 46, 47, 56, 57, 137, 138, 139, 144, 152, 153, 182, 183]
+- 3 pet carriers, one for each pet, with a pet go-kit: water and food from your home supplies, any medicine each takes, records and a photo. Public shelters may take only service animals, so find pet-friendly places to stay ahead of time. (ASPCA, Ready.gov)[2, 153]
+- Water for the pet go-kit, set aside from your stored water rather than bought extra: 7 days for the 2 dogs and the cat = 4.8 gallons. Replace it every 2 months. (ASPCA, PetMD, Merck Veterinary Manual; some amounts are estimates)[144, 153, 184, 185]
+- Food for the pet go-kit, set aside from your pet food rather than bought extra: 10 days (7 to 10 days) for the 2 dogs and the cat = 30 pet-days. Replace it every 2 months. (ASPCA)[153]
 
 ### Stress and mental health
 
 #### Stress, mental health and the 988 line
 
-**What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[181] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[182] Write a short calm plan: what you might feel, what helps you, and who you will call.[152] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[134]
+**What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[186] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[187] Write a short calm plan: what you might feel, what helps you, and who you will call.[155] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[137]
 
-**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[183] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[181]
+**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[188] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[186]
 
 ## Maintenance calendar
 
@@ -595,16 +605,15 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 | Every 3 months | Check: phone power bank (about 20,000 mAh) |
 | April 1, 2027 | Check, then every 6 months: go-bag for each person: a backpack you pack from your supplies; keep medicines going: a written list, early refills, an emergency supply. Use and restock, then every 6 months: approved 5-gallon gasoline cans, with fuel stabilizer; water storage jug, about 7 gallons; tap water in clean reused bottles |
 | May 1, 2027 | Check, then every 6 months: practice: ten-minute drills and the first things to do; get-home bag for each commuter: a small bag you stock from home; family first-aid kit |
-| June 1, 2027 | Check, then every 6 months: NOAA Weather Radio with a tone alert |
+| July 1, 2027 | Check, then every 6 months: NOAA Weather Radio with a tone alert |
 | August 1, 2027 | Check, then every 6 months: car emergency kit |
-| September 1, 2027 | Check, then every 6 months: pet go-kit: a carrier and a bag you pack from your supplies |
-| October 1, 2027 | Check, then every year: make a household plan and a contact card for each person; legal readiness: a lawyer's number, a will and powers of attorney; spare batteries for lights and the radio. Check, then every 6 months: license-free two-way radios (FRS), a pair. Use and restock, then every year: unscented household bleach (for treating water). Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
+| September 1, 2027 | Check, then every 6 months: license-free two-way radios (FRS), a pair; pet go-kit: a carrier and a bag you pack from your supplies |
+| October 1, 2027 | Check, then every year: make a household plan and a contact card for each person; legal readiness: a lawyer's number, a will and powers of attorney; spare batteries for lights and the radio. Use and restock, then every year: unscented household bleach (for treating water). Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
 | November 1, 2027 | Check, then every year: documents and insurance: copy key papers, record belongings, check cover |
 | December 1, 2027 | Check, then every year: neighbours and skills: swap numbers, check on each other, learn first aid; your trusted circle: agree who helps whom; over-the-counter medicine basics; lockout plan: a spare key and a locksmith you checked |
-| April 1, 2028 | Use and restock, then every year: extra shelf-stable food you already eat |
+| March 1, 2028 | Use and restock, then every year: extra shelf-stable food you already eat |
 | October 1, 2028 | Use and restock, then every 6 months: gasoline for the generator, in approved cans |
-| January 1, 2029 | Check, then every year: generator inlet and interlock or transfer switch, installed by an electrician |
-| February 1, 2029 | Check, then every 6 months: store-bought bottled water |
+| February 1, 2029 | Check, then every year: generator inlet and interlock or transfer switch, installed by an electrician. Check, then every 6 months: store-bought bottled water |
 | June 1, 2029 | Check, then every year: dry staples for long storage (rice, beans, oats, wheat) |
 
 ## Sources
@@ -637,19 +646,19 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **121** CDC Yellow Book 2026: Heat and Cold Illness in Travelers. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/environmental-hazards-risks/heat-and-cold-illness-in-travelers.html **122** Heat Stress: Recommendations. CDC National Institute for Occupational Safety and Health, 2026. https://www.cdc.gov/niosh/heat-stress/recommendations/index.html **123** Sound the Alarm: free smoke alarm installation. American Red Cross, 2026. https://www.redcross.org/sound-the-alarm.html **124** Pictograph: Where to put home smoke alarms. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/gallery/pictographs/pictograph02.html **125** Cooking fire safety. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prevent-fires/cooking/ **126** Fire extinguishers. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/fire-extinguishers/ **127** Gas Emergencies. Pennsylvania Public Utility Commission, 2026. https://www.puc.pa.gov/pipeline-safety/gas-emergencies/ **128** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills **129** Home and Neighborhood Safety. National Crime Prevention Council, 2026. https://www.ncpc.org/resources/home-neighborhood-safety/ **130** Cybersecurity. FEMA / Ready.gov, 2026. https://www.ready.gov/cybersecurity
 
-**131** Non-Confrontational Techniques. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/topics/physical-security/non-confrontational-techniques **132** Mass Gathering Incidents. FEMA / Ready.gov, 2026. https://www.ready.gov/public-spaces **133** Dealing with Weather Emergencies. Federal Trade Commission, 2026. https://consumer.ftc.gov/features/dealing-weather-emergencies **134** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx **135** The Oregon Resilience Plan. Oregon Seismic Safety Policy Advisory Commission, 2013. https://www.oregon.gov/oem/documents/oregon_resilience_plan_executive_summary.pdf **136** Turbidite Event History: Methods and Implications for Holocene Paleoseismicity of the Cascadia Subduction Zone. Goldfinger C. et al., U.S. Geological Survey, 2012. https://pubs.usgs.gov/pp/pp1661f/ **137** Harm weights used by the allocator. Ready Reckoner, 2026. Same page as 20. Expert estimate. **138** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **139** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **140** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf
+**131** Non-Confrontational Techniques. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/topics/physical-security/non-confrontational-techniques **132** Mass Gathering Incidents. FEMA / Ready.gov, 2026. https://www.ready.gov/public-spaces **133** Dealing with Weather Emergencies. Federal Trade Commission, 2026. https://consumer.ftc.gov/features/dealing-weather-emergencies **134** Create a Clean Room to Protect Indoor Air Quality During a Wildfire. U.S. Environmental Protection Agency, 2026. https://www.epa.gov/emergencies-iaq/create-clean-room-protect-indoor-air-quality-during-wildfire **135** Protect Your Lungs From Wildfire Smoke and Ash. U.S. Environmental Protection Agency, 2026. https://www.epa.gov/system/files/documents/2026-06/protect-your-lungs-factsheet.pdf **136** Household Pulse Survey: adults displaced by natural disasters. U.S. Census Bureau data, reported by the National Low Income Housing Coalition, 2023. https://nlihc.org/resource/new-data-household-pulse-survey-suggest-disparities-among-households-displaced-disasters **137** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx **138** The Oregon Resilience Plan. Oregon Seismic Safety Policy Advisory Commission, 2013. https://www.oregon.gov/oem/documents/oregon_resilience_plan_executive_summary.pdf **139** Turbidite Event History: Methods and Implications for Holocene Paleoseismicity of the Cascadia Subduction Zone. Goldfinger C. et al., U.S. Geological Survey, 2012. https://pubs.usgs.gov/pp/pp1661f/ **140** Harm weights used by the allocator. Ready Reckoner, 2026. Same page as 20. Expert estimate.
 
-**141** Ready Reckoner expert estimates for supply sizing and upkeep. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md Expert estimate. **142** Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds. Federal Highway Administration, 2009. https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm **143** Build A Kit. FEMA / Ready.gov (via Internet Archive), 2020. https://web.archive.org/web/20200101090440/https://www.ready.gov/kit **144** Shelter. FEMA / Ready.gov, 2026. https://www.ready.gov/shelter **145** Chemicals and Hazardous Materials Incidents. FEMA / Ready.gov, 2026. https://www.ready.gov/chemical **146** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **147** Make A Plan. FEMA / Ready.gov, 2026. https://www.ready.gov/plan **148** Family Communication Plan fillable card. FEMA / Ready.gov, 2025. https://www.ready.gov/sites/default/files/2025-06/family-communication-plan_fillable-card.pdf **149** Pets and Animals. FEMA / Ready.gov, 2026. https://www.ready.gov/pets **150** Disaster Preparedness. ASPCA, 2026. https://www.aspca.org/pet-care/general-pet-care/disaster-preparedness
+**141** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **142** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **143** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf **144** Ready Reckoner expert estimates for supply sizing and upkeep. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md Expert estimate. **145** Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds. Federal Highway Administration, 2009. https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm **146** Build A Kit. FEMA / Ready.gov (via Internet Archive), 2020. https://web.archive.org/web/20200101090440/https://www.ready.gov/kit **147** Shelter. FEMA / Ready.gov, 2026. https://www.ready.gov/shelter **148** Chemicals and Hazardous Materials Incidents. FEMA / Ready.gov, 2026. https://www.ready.gov/chemical **149** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **150** Make A Plan. FEMA / Ready.gov, 2026. https://www.ready.gov/plan
 
-**151** Implementation Intentions and Goal Achievement: A Meta-analysis of Effects and Processes. Gollwitzer P.M. and Sheeran P., 2006. https://doi.org/10.1016/S0065-2601(06)38002-1 **152** Prior art and behavioural science for a household preparedness planner. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/prior-art-and-psychology.md **153** Winter Weather. FEMA / Ready.gov, 2026. https://www.ready.gov/winter-weather **154** Staying Safe with Electric Vehicles. Hillsborough County, Florida, 2025. https://hcfl.gov/residents/sustainability-and-green/green-hillsborough/staying-safe-with-electric-vehicles **155** Alternative Fueling Station Locator. U.S. Department of Energy, Alternative Fuels Data Center, 2026. https://afdc.energy.gov/stations **156** All-Electric Vehicles. U.S. Department of Energy and EPA (fueleconomy.gov), 2026. https://www.fueleconomy.gov/feg/evtech.shtml **157** Tires. National Highway Traffic Safety Administration, 2026. https://www.nhtsa.gov/equipment/tires **158** Evaluating the ShakeOut drill in Aotearoa/New Zealand: effects on knowledge, attitudes, and behaviour. Vinnell L.J., Wallis A., Becker J.S. and Johnston D.M., 2020. https://www.sciencedirect.com/science/article/pii/S2212420920306750 **159** Previous emergency training and PTSD among World Trade Center evacuees. Gargano L.M. et al., 2017. https://doi.org/10.5055/jem.2017.0336 **160** Older Adults. FEMA / Ready.gov, 2026. https://www.ready.gov/older-adults
+**151** Family Communication Plan fillable card. FEMA / Ready.gov, 2025. https://www.ready.gov/sites/default/files/2025-06/family-communication-plan_fillable-card.pdf **152** Pets and Animals. FEMA / Ready.gov, 2026. https://www.ready.gov/pets **153** Disaster Preparedness. ASPCA, 2026. https://www.aspca.org/pet-care/general-pet-care/disaster-preparedness **154** Implementation Intentions and Goal Achievement: A Meta-analysis of Effects and Processes. Gollwitzer P.M. and Sheeran P., 2006. https://doi.org/10.1016/S0065-2601(06)38002-1 **155** Prior art and behavioural science for a household preparedness planner. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/prior-art-and-psychology.md **156** Winter Weather. FEMA / Ready.gov, 2026. https://www.ready.gov/winter-weather **157** Staying Safe with Electric Vehicles. Hillsborough County, Florida, 2025. https://hcfl.gov/residents/sustainability-and-green/green-hillsborough/staying-safe-with-electric-vehicles **158** Alternative Fueling Station Locator. U.S. Department of Energy, Alternative Fuels Data Center, 2026. https://afdc.energy.gov/stations **159** All-Electric Vehicles. U.S. Department of Energy and EPA (fueleconomy.gov), 2026. https://www.fueleconomy.gov/feg/evtech.shtml **160** Tires. National Highway Traffic Safety Administration, 2026. https://www.nhtsa.gov/equipment/tires
 
-**161** Listos California: neighbor and community preparedness. California Governor's Office of Emergency Services, 2026. https://www.listoscalifornia.org/ **162** Community Emergency Response Team. FEMA / Ready.gov, 2022. https://www.ready.gov/cert **163** Flood Insurance. FEMA, 2026. https://www.fema.gov/flood-insurance **164** 2024 National Household Survey on Disaster Preparedness: Findings. FEMA (via Internet Archive), 2025. https://web.archive.org/web/20250507154704/https://www.fema.gov/sites/default/files/documents/fema_icpd_2024-national-household-survey-on-disaster-preparedness-findings_05072025.pdf **165** Get a Passport Card. U.S. Department of State (via Internet Archive), 2026. https://travel.state.gov/content/travel/en/passports/need-passport/card.html **166** Apply for a Child's Passport Under 16. U.S. Department of State (via Internet Archive), 2026. https://travel.state.gov/content/travel/en/passports/need-passport/under-16.html **167** Getting Your Affairs in Order Checklist: Documents to Prepare for the Future. National Institute on Aging, 2026. https://www.nia.nih.gov/health/advance-care-planning/getting-your-affairs-order-checklist-documents-prepare-future **168** Data Backup Options. Ruggiero P. and Heckathorn M.A., US-CERT (now CISA), 2012. https://www.cisa.gov/sites/default/files/publications/data_backup_options.pdf **169** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **170** When the Unexpected Happens, Be Ready with an Emergency Fund. Federal Reserve Bank of St. Louis, 2025. https://www.stlouisfed.org/publications/page-one-economics/2025/sep/when-unexpected-happens-be-ready-with-emergency-fund
+**161** Evaluating the ShakeOut drill in Aotearoa/New Zealand: effects on knowledge, attitudes, and behaviour. Vinnell L.J., Wallis A., Becker J.S. and Johnston D.M., 2020. https://www.sciencedirect.com/science/article/pii/S2212420920306750 **162** Previous emergency training and PTSD among World Trade Center evacuees. Gargano L.M. et al., 2017. https://doi.org/10.5055/jem.2017.0336 **163** Older Adults. FEMA / Ready.gov, 2026. https://www.ready.gov/older-adults **164** Listos California: neighbor and community preparedness. California Governor's Office of Emergency Services, 2026. https://www.listoscalifornia.org/ **165** Community Emergency Response Team. FEMA / Ready.gov, 2022. https://www.ready.gov/cert **166** Flood Insurance. FEMA, 2026. https://www.fema.gov/flood-insurance **167** 2024 National Household Survey on Disaster Preparedness: Findings. FEMA (via Internet Archive), 2025. https://web.archive.org/web/20250507154704/https://www.fema.gov/sites/default/files/documents/fema_icpd_2024-national-household-survey-on-disaster-preparedness-findings_05072025.pdf **168** Get a Passport Card. U.S. Department of State (via Internet Archive), 2026. https://travel.state.gov/content/travel/en/passports/need-passport/card.html **169** Apply for a Child's Passport Under 16. U.S. Department of State (via Internet Archive), 2026. https://travel.state.gov/content/travel/en/passports/need-passport/under-16.html **170** Getting Your Affairs in Order Checklist: Documents to Prepare for the Future. National Institute on Aging, 2026. https://www.nia.nih.gov/health/advance-care-planning/getting-your-affairs-order-checklist-documents-prepare-future
 
-**171** Economic Well-Being of U.S. Households in 2024. Board of Governors of the Federal Reserve System, 2025. https://www.federalreserve.gov/publications/2025-economic-well-being-of-us-households-in-2024-executive-summary.htm **172** Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/reproductive-health/emergency-preparation-response/safety-messages.html **173** Prepare in a Year. Washington Emergency Management Division, 2024. https://mil.wa.gov/prepare-in-a-year **174** All Is Safely Gathered In: Family Home Storage. The Church of Jesus Christ of Latter-day Saints, 2007. https://www.churchofjesuschrist.org/bc/content/shared/content/english/pdf/language-materials/04008_eng.pdf **175** A Review of Direct-to-Consumer Home Antibiotic Kits: A Threat to Antimicrobial Stewardship and Patient Safety. Missouri State Medical Association, 2026. https://pmc.ncbi.nlm.nih.gov/articles/PMC13585011/ **176** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023 **177** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **178** Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020. Centers for Disease Control and Prevention, 2020. https://www.cdc.gov/mmwr/volumes/69/wr/mm6935a2.htm **179** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water **180** Maintenance Fluid Plan in Animals. Merck & Co., Inc., 2025. https://www.merckvetmanual.com/therapeutics/fluid-therapy/maintenance-fluid-plan-in-animals
+**171** Data Backup Options. Ruggiero P. and Heckathorn M.A., US-CERT (now CISA), 2012. https://www.cisa.gov/sites/default/files/publications/data_backup_options.pdf **172** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **173** When the Unexpected Happens, Be Ready with an Emergency Fund. Federal Reserve Bank of St. Louis, 2025. https://www.stlouisfed.org/publications/page-one-economics/2025/sep/when-unexpected-happens-be-ready-with-emergency-fund **174** Economic Well-Being of U.S. Households in 2024. Board of Governors of the Federal Reserve System, 2025. https://www.federalreserve.gov/publications/2025-economic-well-being-of-us-households-in-2024-executive-summary.htm **175** Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/reproductive-health/emergency-preparation-response/safety-messages.html **176** Drug Shortages. U.S. Food and Drug Administration, 2026. https://www.fda.gov/drugs/drug-safety-and-availability/drug-shortages **177** Prepare in a Year. Washington Emergency Management Division, 2024. https://mil.wa.gov/prepare-in-a-year **178** All Is Safely Gathered In: Family Home Storage. The Church of Jesus Christ of Latter-day Saints, 2007. https://www.churchofjesuschrist.org/bc/content/shared/content/english/pdf/language-materials/04008_eng.pdf **179** A Review of Direct-to-Consumer Home Antibiotic Kits: A Threat to Antimicrobial Stewardship and Patient Safety. Missouri State Medical Association, 2026. https://pmc.ncbi.nlm.nih.gov/articles/PMC13585011/ **180** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023
 
-**181** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **182** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **183** Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
+**181** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **182** Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020. Centers for Disease Control and Prevention, 2020. https://www.cdc.gov/mmwr/volumes/69/wr/mm6935a2.htm **183** Wildfire Smoke: Risk Factors and Protection. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/wildfires/risk-factors/index.html **184** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water **185** Maintenance Fluid Plan in Animals. Merck & Co., Inc., 2025. https://www.merckvetmanual.com/therapeutics/fluid-therapy/maintenance-fluid-plan-in-animals **186** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **187** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **188** Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
 
-48 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+47 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

@@ -82,9 +82,12 @@ impl<'m> Eval<'m> {
             }
             let mut q = t.q;
             if let Some(p) = t.q_param {
-                q = (q * draws.mult(p, i)).min(1.0);
+                q *= draws.mult(p, i);
             }
-            self.w[k] = rate * q;
+            if let Some(p) = t.frag_param {
+                q *= draws.mult(p, i);
+            }
+            self.w[k] = rate * q.min(1.0);
             self.ln_scale[k] = t.dur_param.map_or(0.0, |p| draws.lnm(p, i));
             self.ln_scale2[k] = t
                 .max_with
@@ -170,9 +173,12 @@ impl<'m> Eval<'m> {
             }
             let mut q = t.q;
             if let Some(p) = t.q_param {
-                q = (q * math::exp(params[p].ln_mult(z(p)))).min(1.0);
+                q *= math::exp(params[p].ln_mult(z(p)));
             }
-            self.w[i] = rate * q;
+            if let Some(p) = t.frag_param {
+                q *= math::exp(params[p].ln_mult(z(p)));
+            }
+            self.w[i] = rate * q.min(1.0);
             self.ln_scale[i] = t.dur_param.map_or(0.0, |p| params[p].ln_mult(z(p)));
             self.ln_scale2[i] = t
                 .max_with
@@ -605,6 +611,10 @@ pub struct DialPoint {
     pub target_days: f64,
     /// On the day ladder.
     pub ladder_days: f32,
+    /// The target jumps here from the setting before it by the engine's cliff rule (one event
+    /// near this setting dominates, elasticity of at least 2 and 3 days or more): the only
+    /// settings the sweep should mark (model review M-15).
+    pub cliff: bool,
 }
 
 #[cfg(test)]
