@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { golden } from '../test/real';
 import {
   addMonths,
   band,
+  chanceShort,
+  chanceWithin,
   dayPhrase,
   frequencySentence,
   monthsBetween,
@@ -10,8 +13,12 @@ import {
   noticeRange,
   per100,
   percent,
+  perYearWords,
   quantity,
+  rangeOnly,
+  roundSig2,
   severityBand,
+  sig2,
   targetDays,
   targetMonths,
   usd,
@@ -82,6 +89,20 @@ describe('days and months', () => {
     expect(noticeRange(0.25, 12)).toBe('15 minutes to 12 hours');
     expect(noticeRange(24, 72)).toBe('24 hours to 3 days');
   });
+
+  it('says "1 minute", "1 hour" and "1 day" in the singular, after rounding (W1)', () => {
+    // Every fixture's evacuate target starts at 0.02 hours (1.2 minutes): "1 minutes" before v0.1.1.
+    expect(noticeRange(0.02, 72)).toBe('1 minute to 3 days');
+    expect(noticeRange(0.02, 2)).toBe('1 minute to 2 hours');
+    expect(noticeRange(0.999, 30)).toBe('1 hour to 30 hours');
+    expect(noticeRange(1.04, 1.04)).toBe('1 hour');
+    expect(noticeRange(1, 1.02)).toBe('1 hour');
+    expect(noticeRange(1.5, 24)).toBe('1½ hours to 24 hours');
+    expect(noticeRange(0.5, 60)).toBe('30 minutes to 3 days');
+    expect(noticeRange(20, 36)).toBe('20 hours to 36 hours');
+    expect(noticeRange(48, 48)).toBe('2 days');
+    expect(noticeRange(0, 0.02)).toBe('1 minute');
+  });
 });
 
 describe('money and quantities', () => {
@@ -116,5 +137,69 @@ describe('calendar dates', () => {
     expect(monthsBetween('2026-10-01', '2026-11-01')).toBe(1);
     expect(monthsBetween('2026-10-15', '2027-01-14')).toBe(2);
     expect(monthsBetween('2026-10-01', '2026-09-25')).toBe(-1);
+  });
+});
+
+describe('short chances for tables, worded as the engine words them', () => {
+  it('rounds to two significant figures like rr-hazards', () => {
+    expect(roundSig2(86.37)).toBe(86);
+    expect(roundSig2(1234)).toBe(1200);
+    expect(roundSig2(200.5)).toBe(200);
+    expect(roundSig2(40.5)).toBe(41);
+    expect(roundSig2(1000)).toBe(1000);
+    expect(roundSig2(0)).toBe(0);
+    expect(sig2(4.47)).toBe('4.5');
+    expect(sig2(1.89)).toBe('1.9');
+    expect(sig2(12_500)).toBe('13,000');
+  });
+
+  it('gives the same number, and the same range, as the card sentence for every ranked hazard in every golden packet', () => {
+    const names = ['philadelphia-renters-4', 'miami-condo-retiree-1', 'coos-bay-well-owner-2', 'hays-kansas-farm-5', 'chicago-student-zero-budget-1', 'phoenix-apartment-cpap-1', 'sugar-land-ev-household-3'];
+    let checked = 0;
+    for (const name of names) {
+      for (const h of golden(name).register.filter((x) => x.display === 'ranked')) {
+        const s = h.frequency_sentence;
+        const p = chanceWithin(h.rate_per_year, 10);
+        const lo = chanceWithin(h.rate_range[0], 10);
+        const hi = chanceWithin(h.rate_range[1], 10);
+        let want: string | undefined;
+        let range: string | undefined;
+        let m: RegExpExecArray | null;
+        if (s.startsWith('Nearly every household')) want = 'nearly every household';
+        else if ((m = /^Of 100 households like yours, about (\S+?|fewer than 1|nearly all)(?: \((.+?)\))? will/.exec(s))) {
+          range = m[2];
+          want = `about ${m[1]}${range ? ` (${range})` : ''} of 100`;
+        } else if ((m = /^About (\S+?|fewer than 1)(?: \((.+?)\))? in 1,000 households/.exec(s))) {
+          range = m[2];
+          want = `about ${m[1]}${range ? ` (${range})` : ''} in 1,000`;
+        } else if ((m = /^About (1 in [\d,]+)(?: \((.+?)\))? households/.exec(s))) {
+          range = m[2];
+          want = `about ${m[1]}${range ? ` (${range})` : ''}`;
+        }
+        if (!want) continue; // a hand-written sentence (none among ranked hazards today)
+        const got = range ? chanceShort(p, lo, hi) : chanceShort(p);
+        expect(got, `${name} ${h.id}: ${s}`).toBe(want);
+        checked += 1;
+      }
+    }
+    expect(checked).toBeGreaterThan(150);
+  });
+
+  it('says how often a year: times a year, once a year, or the chance in any one year', () => {
+    expect(perYearWords(4.47, 1 - Math.exp(-4.47))).toBe('about 4.5 times a year');
+    expect(perYearWords(1.03, 1 - Math.exp(-1.03))).toBe('about once a year');
+    expect(perYearWords(0.2, 1 - Math.exp(-0.2))).toBe('about 1 in 6 a year');
+    expect(perYearWords(0.00524, 1 - Math.exp(-0.00524))).toBe('about 1 in 190 a year');
+    expect(perYearWords(0.00005, 1 - Math.exp(-0.00005))).toBe('about 1 in 20,000 a year');
+  });
+
+  it('shows a rare catastrophe as a range only, in words when it spans more than 1,000 times (H-02)', () => {
+    // Philadelphia's two rare rows (golden packet), over ten years and over one.
+    expect(rangeOnly(0.0005, 0.0025, 10)).toBe('between 1 in 200 and 1 in 41');
+    expect(rangeOnly(0.0001, 0.001, 10)).toBe('between 1 in 1,000 and 1 in 100');
+    expect(rangeOnly(0.0005, 0.0025, 1)).toBe('between 1 in 2,000 and 1 in 400');
+    expect(rangeOnly(1e-7, 1e-3, 10)).toBe('very unlikely: less than 1 in 100');
+    expect(rangeOnly(0.001, 0.001, 10)).toBe('about 1 in 100');
+    expect(rangeOnly(0.0005, 0.0025, 10)).not.toMatch(/of 100/);
   });
 });
