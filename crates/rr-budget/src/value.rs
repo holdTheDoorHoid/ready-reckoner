@@ -53,11 +53,23 @@ pub fn duration_value(
     x1: f64,
     cap: f64,
 ) -> f64 {
+    duration_value_with(weight, share, x0, x1, cap, |a, b| curve.integral(a, b))
+}
+
+/// [`duration_value`] with the integral supplied (the allocator passes a prepared curve).
+pub(crate) fn duration_value_with(
+    weight: f64,
+    share: f64,
+    x0: f64,
+    x1: f64,
+    cap: f64,
+    integral: impl Fn(f64, f64) -> f64,
+) -> f64 {
     let top = x1.min(cap);
     if top <= x0 {
         return 0.0;
     }
-    VALUE_HORIZON_YEARS * weight * share * curve.integral(x0, top)
+    VALUE_HORIZON_YEARS * weight * share * integral(x0, top)
 }
 
 /// The annual rate r behind a ten-year probability P: P = 1 − e^(−10 r).

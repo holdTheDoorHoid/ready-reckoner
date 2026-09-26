@@ -123,6 +123,10 @@ impl BucketCurve {
 
     /// Λ(d): events per year that last longer than `d` days.
     pub fn lambda_at(&self, d: f64) -> f64 {
+        self.lambda_with(d, &|i| self.segment(i), self.tail_segment())
+    }
+
+    fn lambda_with(&self, d: f64, seg: &dyn Fn(usize) -> Segment, tail: Segment) -> f64 {
         let n = self.days.len();
         if n == 0 {
             return 0.0;
@@ -130,21 +134,24 @@ impl BucketCurve {
         if d <= self.days[0] {
             return self.lambda[0];
         }
-        match self.days.iter().position(|&x| x >= d) {
-            Some(i) => {
-                if d == self.days[i] {
-                    self.lambda[i]
-                } else {
-                    self.segment(i).value(d)
-                }
-            }
-            None => self.tail().value(d),
+        // First index with days[i] >= d (binary search; days strictly increase).
+        let i = self.days.partition_point(|&x| x < d);
+        if i == n {
+            tail.value(d)
+        } else if d == self.days[i] {
+            self.lambda[i]
+        } else {
+            seg(i).value(d)
         }
     }
 
     /// ∫ₐᵇ Λ(t) dt: expected disruption-days per year that fall between day `a` and day `b` of an
     /// event (DESIGN §4.4, point 3). Zero when `b <= a`; `a` below zero is treated as zero.
     pub fn integral(&self, a: f64, b: f64) -> f64 {
+        self.integral_with(a, b, &|i| self.segment(i), self.tail_segment())
+    }
+
+    fn integral_with(&self, a: f64, b: f64, seg: &dyn Fn(usize) -> Segment, tail: Segment) -> f64 {
         let a = a.max(0.0);
         let n = self.days.len();
         if n == 0 || b <= a {
@@ -156,20 +163,47 @@ impl BucketCurve {
         if a < first {
             total += self.lambda[0] * (b.min(first) - a);
         }
-        // Tabulated segments.
-        for i in 1..n {
+        // Tabulated segments that overlap [a, b]: segment i runs from days[i - 1] to days[i].
+        let first_seg = self.days.partition_point(|&x| x <= a).max(1);
+        for i in first_seg..n {
+            if self.days[i - 1] >= b {
+                break;
+            }
             let lo = a.max(self.days[i - 1]);
             let hi = b.min(self.days[i]);
             if lo < hi {
-                total += self.segment(i).integral(lo, hi);
+                total += seg(i).integral(lo, hi);
             }
         }
         // Beyond the last tabulated duration.
         let last = self.days[n - 1];
         if b > last {
-            total += self.tail().integral(a.max(last), b);
+            total += tail.integral(a.max(last), b);
         }
         total
+    }
+
+    /// The curve with its segment slopes worked out once, for repeated evaluation. Gives exactly
+    /// the same numbers as [`BucketCurve::integral`] and [`BucketCurve::lambda_at`].
+    pub(crate) fn prepared(&self) -> Prepared<'_> {
+        let segs = (0..self.days.len())
+            .map(|i| {
+                if i == 0 {
+                    Segment::Power {
+                        d0: 1.0,
+                        l0: 0.0,
+                        alpha: 0.0,
+                    }
+                } else {
+                    self.segment(i)
+                }
+            })
+            .collect();
+        Prepared {
+            curve: self,
+            segs,
+            tail: self.tail_segment(),
+        }
     }
 
     /// The segment between table points `i - 1` and `i` (`i >= 1`).
@@ -184,7 +218,7 @@ impl BucketCurve {
 
     /// The extrapolation beyond the last point: the last segment's power law, or flat for a
     /// one-point table.
-    fn tail(&self) -> Segment {
+    fn tail_segment(&self) -> Segment {
         let n = self.days.len();
         let (d, l) = (self.days[n - 1], self.lambda[n - 1]);
         if n == 1 || l <= 0.0 {
@@ -207,6 +241,26 @@ impl BucketCurve {
                 alpha: 0.0,
             },
         }
+    }
+}
+
+/// A [`BucketCurve`] with its segments precomputed (see [`BucketCurve::prepared`]).
+pub(crate) struct Prepared<'a> {
+    curve: &'a BucketCurve,
+    /// `segs[i]` is the segment ending at table point `i` (`segs[0]` is unused).
+    segs: Vec<Segment>,
+    tail: Segment,
+}
+
+impl Prepared<'_> {
+    /// Same as [`BucketCurve::integral`].
+    pub(crate) fn integral(&self, a: f64, b: f64) -> f64 {
+        self.curve.integral_with(a, b, &|i| self.segs[i], self.tail)
+    }
+
+    /// Same as [`BucketCurve::lambda_at`].
+    pub(crate) fn lambda_at(&self, d: f64) -> f64 {
+        self.curve.lambda_with(d, &|i| self.segs[i], self.tail)
     }
 }
 
@@ -361,6 +415,29 @@ mod tests {
         assert!(close(curve.integral(a, b), numeric, 1e-6));
         let split = curve.integral(a, 2.2) + curve.integral(2.2, 17.0) + curve.integral(17.0, b);
         assert!(close(curve.integral(a, b), split, 1e-12));
+    }
+
+    #[test]
+    fn prepared_curves_give_the_same_bits() {
+        let curve = BucketCurve::new(
+            vec![0.04, 0.25, 1.0, 3.0, 7.0, 14.0],
+            vec![0.97, 0.3, 0.03, 0.0098, 0.0, 0.0],
+            3.0,
+        );
+        curve.validate().unwrap();
+        let p = curve.prepared();
+        for &(a, b) in &[
+            (0.0, 0.5),
+            (0.1, 2.9),
+            (2.0, 13.0),
+            (6.0, 40.0),
+            (0.0, 400.0),
+        ] {
+            assert_eq!(p.integral(a, b).to_bits(), curve.integral(a, b).to_bits());
+        }
+        for &d in &[0.0, 0.2, 1.0, 2.5, 7.0, 9.0, 100.0] {
+            assert_eq!(p.lambda_at(d).to_bits(), curve.lambda_at(d).to_bits());
+        }
     }
 
     #[test]

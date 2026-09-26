@@ -25,14 +25,14 @@ use rr_types::{
 };
 
 use crate::coverage::{ContributionTable, CoverageRule, ItemMeta, ItemRole, apply_requirements};
-use crate::curve::BucketCurve;
+use crate::curve::Prepared;
 use crate::explain::{self, DurationText, Lead, ReadinessText, WhyParts};
 use crate::guardrails::{self, Facts};
 use crate::input::{BudgetError, BudgetInput, BudgetResult, MonthCoverage, Purchase, Schedule};
 use crate::savings;
 use crate::value::{
     PROMOTION_FACTOR, RARE_CATASTROPHIC_SHARE, READINESS_MIN_P_NEED_10YR, SINKING_FUND_MAX_MONTHS,
-    SINKING_FUND_VALUE_RATIO, annual_rate_from_10yr, duration_value, per_100, readiness_value,
+    SINKING_FUND_VALUE_RATIO, annual_rate_from_10yr, duration_value_with, per_100, readiness_value,
 };
 use crate::weights::harm_weight;
 
@@ -113,6 +113,8 @@ struct Offer<'a> {
 struct Ctx<'a> {
     input: &'a BudgetInput<'a>,
     rule: &'a dyn CoverageRule,
+    /// Each duration bucket's curve, with its segments worked out once.
+    curves: BTreeMap<BucketId, Prepared<'a>>,
     offers: Vec<Offer<'a>>,
     tracks: Vec<Track>,
     weights: BTreeMap<BucketId, f64>,
@@ -158,6 +160,26 @@ struct Candidate {
 }
 
 impl Candidate {
+    fn density(&self) -> f64 {
+        density(self.value, self.cost)
+    }
+}
+
+/// A candidate in the buying order: a pointer into the valuation cache plus what ranking needs.
+#[derive(Debug, Clone, Copy)]
+struct Pick {
+    offer: usize,
+    /// Index into [`WALK`] of the tier the candidate was valued against.
+    ti: usize,
+    qty: f64,
+    cost: f64,
+    /// The value it is ranked and credited with (includes rarely needed readiness value when it
+    /// beats the tier's best).
+    value: f64,
+    promoted: bool,
+}
+
+impl Pick {
     fn density(&self) -> f64 {
         density(self.value, self.cost)
     }
@@ -338,6 +360,7 @@ fn run(
     let mut stopped: Option<u16> = None;
     let schedule = input.options.schedule;
     let future_money = monthly > EPS;
+    let mut cache = Cache::new(&ctx);
 
     for m in 0..=input.options.max_months {
         if m > 0 && !future_money {
@@ -355,62 +378,61 @@ fn run(
 
         // Main track.
         while stopped.is_none() {
-            let Some((_, cands)) = ordered_candidates(&ctx, &state) else {
+            let Some((_, picks)) = cache.ordered(&ctx, &state) else {
                 stopped = Some(m);
                 break;
             };
-            let top = &cands[0];
-            if top.cost <= cash + EPS {
-                let cand = top.clone();
-                buy(
-                    &ctx,
-                    &mut state,
-                    &mut cash,
-                    &mut env,
-                    &mut envelopes,
-                    &cand,
-                    m,
-                    false,
-                    &mut sequence,
-                    &mut purchase_months,
-                    &mut month_events,
-                );
-                continue;
-            }
+            let top = picks[0];
             // A sinking fund, once started, is kept until the item is bought.
             let saving_for_top = env.as_ref().is_some_and(|e| e.offer == top.offer);
-            let pick: Option<Candidate> = if !future_money {
+            let affordable = |p: &&Pick| p.cost <= cash + EPS;
+            let chosen: Option<Pick> = if top.cost <= cash + EPS {
+                Some(top)
+            } else if !future_money {
                 // No later month brings money: saving is pointless, buy the best that fits.
-                cands.iter().find(|c| c.cost <= cash + EPS).cloned()
+                picks.iter().find(affordable).copied()
             } else if schedule == Schedule::ResearchShortcuts && !saving_for_top {
-                cands.iter().find(|c| c.cost <= cash + EPS).and_then(|p| {
+                picks.iter().find(affordable).copied().filter(|p| {
                     let wait = top.cost <= SINKING_FUND_MAX_MONTHS * monthly + EPS
                         && p.density() < SINKING_FUND_VALUE_RATIO * top.density();
-                    (!wait).then(|| p.clone())
+                    !wait
                 })
             } else {
                 None
             };
-            if let Some(cand) = pick {
-                buy(
-                    &ctx,
-                    &mut state,
-                    &mut cash,
-                    &mut env,
-                    &mut envelopes,
-                    &cand,
-                    m,
-                    false,
-                    &mut sequence,
-                    &mut purchase_months,
-                    &mut month_events,
-                );
-                continue;
+            match chosen {
+                Some(pick) => {
+                    let cand = cache.candidate(&pick);
+                    buy(
+                        &ctx,
+                        &mut state,
+                        &mut cash,
+                        &mut env,
+                        &mut envelopes,
+                        &cand,
+                        m,
+                        false,
+                        &mut sequence,
+                        &mut purchase_months,
+                        &mut month_events,
+                    );
+                    cache.invalidate(&ctx, pick.offer);
+                }
+                None => {
+                    if future_money && top.cost > monthly + EPS {
+                        save_toward(
+                            &mut env,
+                            top.offer,
+                            top.qty,
+                            WALK[top.ti],
+                            top.cost,
+                            cash,
+                            &mut month_events,
+                        );
+                    }
+                    break;
+                }
             }
-            if future_money && top.cost > monthly + EPS {
-                save_toward(&mut env, top, cash, &mut month_events);
-            }
-            break;
         }
 
         // Rare-catastrophe allowance: its own queue, strictly in order.
@@ -452,8 +474,16 @@ fn run(
                     continue;
                 }
             } else if next.cost > RARE_CATASTROPHIC_SHARE * monthly + EPS {
-                let next = next.clone();
-                save_toward(&mut rare_env, &next, rare_cash, &mut month_events);
+                let (offer, qty, tier, cost) = (next.offer, next.qty, next.tier, next.cost);
+                save_toward(
+                    &mut rare_env,
+                    offer,
+                    qty,
+                    tier,
+                    cost,
+                    rare_cash,
+                    &mut month_events,
+                );
             }
             break;
         }
@@ -462,7 +492,16 @@ fn run(
             rare_cash = 0.0;
         }
 
-        coverage_by_month.push(snapshot(&ctx, &state, m));
+        // Coverage only changes when something is bought.
+        let bought = month_events.iter().any(|e| matches!(e, Event::Buy { .. }));
+        let snap = match coverage_by_month.last() {
+            Some(prev) if !bought && m > 0 => MonthCoverage {
+                month: m,
+                ..prev.clone()
+            },
+            _ => snapshot(&ctx, &state, m),
+        };
+        coverage_by_month.push(snap);
         events.push(month_events);
         if stopped.is_some() && rare_queue.is_empty() {
             break;
@@ -641,6 +680,12 @@ fn build_ctx<'a>(
     Ctx {
         input,
         rule,
+        curves: input
+            .risks
+            .curves
+            .iter()
+            .map(|(b, c)| (*b, c.prepared()))
+            .collect(),
         offers,
         tracks,
         weights,
@@ -695,8 +740,8 @@ fn track_coverage(ctx: &Ctx<'_>, t: usize, inventory: &[(ItemId, f64)]) -> f64 {
     }
 }
 
-fn curve<'a>(ctx: &Ctx<'a>, bucket: BucketId) -> &'a BucketCurve {
-    &ctx.input.risks.curves[&bucket]
+fn curve<'c>(ctx: &'c Ctx<'_>, bucket: BucketId) -> &'c Prepared<'c> {
+    &ctx.curves[&bucket]
 }
 
 fn remaining_set_qty(ctx: &Ctx<'_>, state: &State, i: usize) -> f64 {
@@ -788,7 +833,10 @@ fn evaluate_fixed(
         }
         let x0 = state.track_cov[t];
         let cap = tr.target.min(horizon);
-        let value = duration_value(tr.weight, tr.share, curve(ctx, tr.bucket), x0, x0 + dx, cap);
+        let prepared = curve(ctx, tr.bucket);
+        let value = duration_value_with(tr.weight, tr.share, x0, x0 + dx, cap, |a, b| {
+            prepared.integral(a, b)
+        });
         duration += value;
         gains.push(Gain {
             track: t,
@@ -846,68 +894,190 @@ fn evaluate(ctx: &Ctx<'_>, state: &State, i: usize, tier: TierId) -> Option<Cand
     Some(c)
 }
 
-/// The current tier and its candidates in buying order, or `None` when nothing is worth buying.
-fn ordered_candidates(ctx: &Ctx<'_>, state: &State) -> Option<(TierId, Vec<Candidate>)> {
-    let main: Vec<usize> = (0..ctx.offers.len())
-        .filter(|&i| !ctx.offers[i].item.free && !ctx.offers[i].item.rare_catastrophic)
-        .collect();
-    let unlocked = |i: usize, k: TierId| ctx.offers[i].item.tier.max(TierId::H72) <= k;
-    for (ki, &k) in WALK.iter().enumerate() {
-        let evals: Vec<Candidate> = main
-            .iter()
-            .filter(|&&i| unlocked(i, k))
-            .filter_map(|&i| evaluate(ctx, state, i, k))
-            .collect();
-        let best = evals
-            .iter()
-            .filter(|c| c.core > VALUE_EPS)
-            .map(|c| density(c.core, c.cost))
-            .fold(None, |acc: Option<f64>, d| {
-                Some(acc.map_or(d, |a| a.max(d)))
-            });
-        let Some(best) = best else {
-            continue;
-        };
-        let mut cands: Vec<Candidate> = Vec::new();
-        for mut c in evals {
-            // A capability needed less often than the threshold joins only when it beats the
-            // tier's best item on value per dollar (DESIGN §4.4).
-            if c.low_p > VALUE_EPS && density(c.core + c.low_p, c.cost) > best {
-                c.value = c.core + c.low_p;
-                cands.push(c);
-            } else if c.core > VALUE_EPS {
-                c.value = c.core;
-                cands.push(c);
+/// Valuations per offer and tier, kept until a purchase changes something they depend on: the
+/// offer's own purchase, or a purchase touching one of the offer's tracks. (This is why a
+/// [`CoverageRule`]'s answer for a bucket may depend only on items that serve that bucket.)
+struct Cache {
+    slots: Vec<[Option<Option<Candidate>>; WALK.len()]>,
+    /// Offers touching each track.
+    by_track: Vec<Vec<usize>>,
+    /// Offers the main plan can buy (not free, not rare-catastrophe).
+    main: Vec<usize>,
+    /// Per offer and tier, a number that changes only where the offer's capped targets change: an
+    /// offer valued at two tiers with the same number has the same valuation at both.
+    cap_group: Vec<[u8; WALK.len()]>,
+    /// The buying order for the current state, until the next purchase.
+    ordered: Option<Option<(TierId, Vec<Pick>)>>,
+}
+
+impl Cache {
+    fn new(ctx: &Ctx<'_>) -> Self {
+        let mut by_track = vec![Vec::new(); ctx.tracks.len()];
+        for (i, o) in ctx.offers.iter().enumerate() {
+            for &t in &o.tracks {
+                by_track[t].push(i);
             }
         }
-        let mut taken: BTreeSet<usize> = cands.iter().map(|c| c.offer).collect();
-        for &j in &WALK[ki + 1..] {
+        let cap_group = ctx
+            .offers
+            .iter()
+            .map(|o| {
+                let caps = |ti: usize| -> Vec<f64> {
+                    let h = f64::from(WALK[ti].days());
+                    o.tracks
+                        .iter()
+                        .map(|&t| ctx.tracks[t].target.min(h))
+                        .collect()
+                };
+                let mut groups = [0u8; WALK.len()];
+                for ti in 1..WALK.len() {
+                    groups[ti] = groups[ti - 1] + u8::from(caps(ti) != caps(ti - 1));
+                }
+                groups
+            })
+            .collect();
+        Cache {
+            slots: (0..ctx.offers.len())
+                .map(|_| std::array::from_fn(|_| None))
+                .collect(),
+            by_track,
+            cap_group,
+            main: (0..ctx.offers.len())
+                .filter(|&i| !ctx.offers[i].item.free && !ctx.offers[i].item.rare_catastrophic)
+                .collect(),
+            ordered: None,
+        }
+    }
+
+    /// The valuation of offer `i` against tier `WALK[ti]`, computed on first use.
+    fn slot(&mut self, ctx: &Ctx<'_>, state: &State, i: usize, ti: usize) -> Option<&Candidate> {
+        if self.slots[i][ti].is_none() {
+            self.slots[i][ti] = Some(evaluate(ctx, state, i, WALK[ti]));
+        }
+        self.slots[i][ti].as_ref().and_then(|c| c.as_ref())
+    }
+
+    /// The full candidate behind a pick, as ranked.
+    fn candidate(&self, p: &Pick) -> Candidate {
+        let mut c = self.slots[p.offer][p.ti]
+            .as_ref()
+            .and_then(|c| c.as_ref())
+            .expect("a pick points at a computed valuation")
+            .clone();
+        c.value = p.value;
+        c.promoted = p.promoted;
+        c
+    }
+
+    /// Forgets what a purchase of offer `i` may have changed.
+    fn invalidate(&mut self, ctx: &Ctx<'_>, i: usize) {
+        self.ordered = None;
+        self.slots[i] = std::array::from_fn(|_| None);
+        for &t in &ctx.offers[i].tracks {
+            for &o in &self.by_track[t] {
+                self.slots[o] = std::array::from_fn(|_| None);
+            }
+        }
+    }
+
+    /// The current tier and its candidates in buying order (`None` when nothing is worth
+    /// buying), computed once per state.
+    fn ordered(&mut self, ctx: &Ctx<'_>, state: &State) -> Option<&(TierId, Vec<Pick>)> {
+        if self.ordered.is_none() {
+            let o = self.compute_order(ctx, state);
+            self.ordered = Some(o);
+        }
+        self.ordered.as_ref().and_then(|o| o.as_ref())
+    }
+
+    fn compute_order(&mut self, ctx: &Ctx<'_>, state: &State) -> Option<(TierId, Vec<Pick>)> {
+        let unlocked = |i: usize, k: TierId| ctx.offers[i].item.tier.max(TierId::H72) <= k;
+        let main = std::mem::take(&mut self.main);
+        let mut result = None;
+        for (ki, &k) in WALK.iter().enumerate() {
+            // (offer, core, low-P readiness value, cost, qty) for tier k.
+            let mut evals: Vec<(usize, f64, f64, f64, f64)> = Vec::new();
+            for &i in main.iter().filter(|&&i| unlocked(i, k)) {
+                if let Some(c) = self.slot(ctx, state, i, ki) {
+                    evals.push((i, c.core, c.low_p, c.cost, c.qty));
+                }
+            }
+            let best = evals
+                .iter()
+                .filter(|e| e.1 > VALUE_EPS)
+                .map(|e| density(e.1, e.3))
+                .fold(None, |acc: Option<f64>, d| {
+                    Some(acc.map_or(d, |a| a.max(d)))
+                });
+            let Some(best) = best else {
+                continue;
+            };
+            let mut picks: Vec<Pick> = Vec::new();
+            for &(offer, core, low_p, cost, qty) in &evals {
+                // A capability needed less often than the threshold joins only when it beats the
+                // tier's best item on value per dollar (DESIGN §4.4).
+                let value = if low_p > VALUE_EPS && density(core + low_p, cost) > best {
+                    core + low_p
+                } else if core > VALUE_EPS {
+                    core
+                } else {
+                    continue;
+                };
+                picks.push(Pick {
+                    offer,
+                    ti: ki,
+                    qty,
+                    cost,
+                    value,
+                    promoted: false,
+                });
+            }
+            // Promotion: a later-tier item at least five times the tier's best per dollar joins,
+            // valued at the first later tier where it qualifies. Tiers at which an offer's capped
+            // targets do not change give the same valuation, so only one of them is looked at.
+            let taken: BTreeSet<usize> = picks.iter().map(|p| p.offer).collect();
             for &i in &main {
-                if taken.contains(&i) || !unlocked(i, j) {
+                if taken.contains(&i) {
                     continue;
                 }
-                if let Some(mut c) = evaluate(ctx, state, i, j) {
-                    if c.core > VALUE_EPS && density(c.core, c.cost) >= PROMOTION_FACTOR * best {
-                        c.promoted = true;
-                        taken.insert(i);
-                        cands.push(c);
+                let mut last_group: Option<u8> = None;
+                for (tj, &j) in WALK.iter().enumerate().skip(ki + 1) {
+                    if !unlocked(i, j) || last_group == Some(self.cap_group[i][tj]) {
+                        continue;
+                    }
+                    last_group = Some(self.cap_group[i][tj]);
+                    if let Some(c) = self.slot(ctx, state, i, tj) {
+                        if c.core > VALUE_EPS && density(c.core, c.cost) >= PROMOTION_FACTOR * best
+                        {
+                            picks.push(Pick {
+                                offer: i,
+                                ti: tj,
+                                qty: c.qty,
+                                cost: c.cost,
+                                value: c.core,
+                                promoted: true,
+                            });
+                            break;
+                        }
                     }
                 }
             }
+            picks.sort_by(|a, b| {
+                let (la, lb) = (
+                    ctx.offers[a.offer].item.life_safety,
+                    ctx.offers[b.offer].item.life_safety,
+                );
+                lb.cmp(&la)
+                    .then(b.density().total_cmp(&a.density()))
+                    .then(a.ti.cmp(&b.ti))
+                    .then(a.offer.cmp(&b.offer))
+            });
+            result = Some((k, picks));
+            break;
         }
-        cands.sort_by(|a, b| {
-            let (la, lb) = (
-                ctx.offers[a.offer].item.life_safety,
-                ctx.offers[b.offer].item.life_safety,
-            );
-            lb.cmp(&la)
-                .then(b.density().total_cmp(&a.density()))
-                .then(a.tier.cmp(&b.tier))
-                .then(a.offer.cmp(&b.offer))
-        });
-        return Some((k, cands));
+        self.main = main;
+        result
     }
-    None
 }
 
 fn apply(ctx: &Ctx<'_>, state: &mut State, cand: &Candidate) {
@@ -975,11 +1145,19 @@ fn buy(
     });
 }
 
-/// Puts everything on hand toward `top` (a sinking fund), recording this month's deposit. An
+/// Puts everything on hand toward an item (a sinking fund), recording this month's deposit. An
 /// envelope opens only when money goes into it.
-fn save_toward(env: &mut Option<Envelope>, top: &Candidate, cash: f64, events: &mut Vec<Event>) {
+fn save_toward(
+    env: &mut Option<Envelope>,
+    offer: usize,
+    qty: f64,
+    tier: TierId,
+    cost: f64,
+    cash: f64,
+    events: &mut Vec<Event>,
+) {
     let previous = match env {
-        Some(e) if e.offer == top.offer => e.saved,
+        Some(e) if e.offer == offer => e.saved,
         _ => 0.0,
     };
     let deposit = cash - previous;
@@ -987,17 +1165,17 @@ fn save_toward(env: &mut Option<Envelope>, top: &Candidate, cash: f64, events: &
         return;
     }
     *env = Some(Envelope {
-        offer: top.offer,
-        qty: top.qty,
+        offer,
+        qty,
         saved: cash,
     });
     if deposit > EPS {
         events.push(Event::Reserve {
-            offer: top.offer,
-            tier: top.tier,
+            offer,
+            tier,
             deposit,
             saved: cash,
-            needed: top.cost,
+            needed: cost,
         });
     }
 }
@@ -1009,7 +1187,19 @@ fn snapshot(ctx: &Ctx<'_>, state: &State, month: u16) -> MonthCoverage {
         .iter()
         .filter(|b| b.kind() == BucketKind::Duration)
     {
-        days.insert(*b, ctx.rule.coverage(*b, &state.inventory, h));
+        // A tracked bucket's coverage is its weakest track's (the rule's contract for parts), which
+        // the allocator already keeps up to date; only untracked buckets ask the rule.
+        let tracked = ctx
+            .tracks
+            .iter()
+            .enumerate()
+            .filter(|(_, t)| t.bucket == *b)
+            .map(|(i, _)| state.track_cov[i])
+            .fold(None, |acc: Option<f64>, x| {
+                Some(acc.map_or(x, |a| a.min(x)))
+            });
+        let v = tracked.unwrap_or_else(|| ctx.rule.coverage(*b, &state.inventory, h));
+        days.insert(*b, v);
     }
     let mut readiness_done = BTreeMap::new();
     for b in BucketId::ALL
