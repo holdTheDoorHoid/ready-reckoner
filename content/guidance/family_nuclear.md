@@ -10,13 +10,13 @@ citations: [fri_nuclear_risk_2024, missilesonourland_2023, dod_mirta_points, cen
 **Why here.** Where you live changes how badly a war could reach you, not how likely one is. The plan puts each county in one of six groups:
 
 1. Next to a nuclear missile field or another key military site.[^missilesonourland_2023][^dod_mirta_points]
-2. Downwind of the missile fields in five Great Plains states, where fallout could drift, depending on the winds.[^missilesonourland_2023]
-3. In one of the largest metro areas or the capital region, or near one of the national nuclear labs and plants.[^census_cbsa_pop_2024][^usc_10_2674][^nnsa_locations]
+2. Downwind of the missile fields in five Great Plains states, where fallout could drift.[^missilesonourland_2023]
+3. In one of the largest metro areas or the capital region, or near a national nuclear lab or plant.[^census_cbsa_pop_2024][^usc_10_2674][^nnsa_locations]
 4. In another metro area of a million people or more, or near a large refinery or a major base.[^census_cbsa_pop_2024][^eia_refinery_capacity_2026][^dod_mirta_points]
 5. Downwind of a place in group 1 or 3, where fallout can travel.[^fema_nuclear_72h_2023]
 6. Far from all of these.
 
-A higher group means more danger if a war happened. It does not mean an attack is likely.[^fri_nuclear_risk_2024]
+A higher group does not mean an attack is likely.[^fri_nuclear_risk_2024]
 
 **If it reaches you.** Get inside the nearest sturdy building, stay inside, and tune in. Plan to stay at least 24 hours unless officials say otherwise.[^fema_nuclear_72h_2023] Take potassium iodide only if officials tell you to.[^cdc_potassium_iodide]
 

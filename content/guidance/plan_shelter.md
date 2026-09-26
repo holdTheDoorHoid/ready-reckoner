@@ -5,9 +5,9 @@ kind: plan
 applies_to: [plan:shelter]
 citations: [fema_nhs_2024, ready_gov_plan, ready_gov_tornadoes, noaa_spc_tornado_safety, ready_gov_hurricanes, fema_hurricane_safety_tips_2012, nws_hurricane_safety_brochure, ready_gov_earthquakes, ready_gov_chemical, epa_clean_room, ready_gov_nuclear]
 ---
-In FEMA's 2024 survey, where to shelter safely was the information people most wanted.[^fema_nhs_2024] Pick a spot for each danger below, at home and at work, and practice going there with your household.[^ready_gov_plan]
+In FEMA's 2024 survey, where to shelter safely was the information people most wanted.[^fema_nhs_2024] Pick a spot for each danger below, at home and at work, and practice going there.[^ready_gov_plan]
 
-{if:tornado}**Tornado.** The best place is a safe room or storm shelter. Next best is a small inside room with no windows, or a basement, on the lowest floor of a sturdy building.[^ready_gov_tornadoes] Most tornadoes can destroy even a tied-down mobile home, so a mobile home needs a sturdy building nearby to go to.[^noaa_spc_tornado_safety]{/if}
+{if:tornado}**Tornado.** The best place is a safe room or storm shelter. Next best is a small inside room with no windows, or a basement, on the lowest floor of a sturdy building.[^ready_gov_tornadoes] Most tornadoes can destroy even a tied-down mobile home, so plan to go to a sturdy building nearby.[^noaa_spc_tornado_safety]{/if}
 
 {if:hurricane}**Hurricane.** If you live in an evacuation zone and officials tell you to leave, go right away. If you stay, use an inside room away from windows.[^ready_gov_hurricanes]{/if} {if:home:apartment_high_rise}In a tall building, take shelter on or below the 10th floor when hurricane winds come, and do not count on the elevators.[^fema_hurricane_safety_tips_2012][^nws_hurricane_safety_brochure]{/if}
 
