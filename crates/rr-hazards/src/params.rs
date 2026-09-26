@@ -504,59 +504,6 @@ pub(crate) const ATTACK_NON_UASI: Triple = (3.0e-6, 1.0e-6, 3.0e-5);
 /// 0.3, "a few days' disruption" (hazard-expansion H-10).
 pub(crate) const ATTACK_LOSS_USD: f64 = 800.0;
 
-/// FEMA FY2026 Urban Area Security Initiative allocations (FY2026 HSGP notice of funding
-/// opportunity, Appendix I.B, read in full by the strategic-sites research): each urban area's
-/// share of the $584,250,000. DHS picks the areas and sets the amounts by relative terrorism risk,
-/// so the share is the metro weight w_m of the attack and CBRN rows. The pack records a county's
-/// population split of its area's share and the area's name; the name finds the area's own share
-/// here. awaiting: data-hazard — a `uasi_area_share` column would make this table unnecessary.
-pub(crate) const UASI_FY2026: &[(&str, f64)] = &[
-    ("New York-White Plains, NY", 0.2439),
-    ("Los Angeles-Long Beach-Glendale, CA", 0.05813),
-    ("Washington-Arlington-Alexandria, DC-VA-MD-WV", 0.05506),
-    ("Newark-Jersey City-New Brunswick, NJ-PA", 0.05499),
-    ("Chicago-Naperville-Elgin, IL-IN-WI", 0.05304),
-    ("San Francisco-San Jose-Oakland, CA", 0.04918),
-    ("Houston-The Woodlands-Sugar Land, TX", 0.03996),
-    ("Philadelphia-Camden-Wilmington, PA-NJ-DE-MD", 0.02842),
-    ("San Diego-Chula Vista-Carlsbad, CA", 0.02784),
-    ("Dallas-Fort Worth-Arlington, TX", 0.02646),
-    ("Boston-Cambridge-Newton, MA-NH", 0.02552),
-    ("Miami-Fort Lauderdale-Pompano Beach, FL", 0.02345),
-    ("Atlanta-Sandy Springs-Alpharetta, GA", 0.02254),
-    ("Phoenix-Mesa-Chandler, AZ", 0.01970),
-    ("Seattle-Tacoma-Bellevue, WA", 0.01919),
-    ("Minneapolis-St. Paul-Bloomington, MN-WI", 0.01428),
-    ("Virginia Beach-Norfolk-Newport News, VA-NC", 0.01335),
-    ("Anaheim-Santa Ana-Irvine, CA", 0.01316),
-    ("Las Vegas-Henderson-Paradise, NV", 0.01313),
-    ("Detroit-Warren-Dearborn, MI", 0.01233),
-    ("Baltimore-Columbia-Towson, MD", 0.01180),
-    ("Tampa-St. Petersburg-Clearwater, FL", 0.01135),
-    ("Riverside-San Bernardino-Ontario, CA", 0.01118),
-    ("San Antonio-New Braunfels, TX", 0.01077),
-    ("Orlando-Kissimmee-Sanford, FL", 0.01035),
-    ("Denver-Aurora-Lakewood, CO", 0.00991),
-    ("Honolulu, HI", 0.00975),
-    ("Portland-Vancouver-Hillsboro, OR-WA", 0.00948),
-    ("St. Louis, MO-IL", 0.00948),
-    ("Jacksonville, FL", 0.00724),
-    ("Pittsburgh, PA", 0.00716),
-    ("New Orleans-Metairie, LA", 0.00698),
-    ("Sacramento-Roseville-Folsom, CA", 0.00684),
-    ("Charlotte-Concord-Gastonia, NC-SC", 0.00661),
-    ("Cleveland-Elyria, OH", 0.00657),
-    ("Nashville-Davidson--Murfreesboro--Franklin, TN", 0.00648),
-    ("Kansas City, MO-KS", 0.00635),
-    ("Cincinnati, OH-KY-IN", 0.00627),
-    ("Columbus, OH", 0.00627),
-    ("Austin-Round Rock-Georgetown, TX", 0.00570),
-    ("Richmond, VA", 0.00531),
-    ("Indianapolis-Carmel-Anderson, IN", 0.00522),
-    ("Colorado Springs, CO", 0.00472),
-    ("Milwaukee-Waukesha, WI", 0.00459),
-];
-
 /// DATA (FBI Crime in the United States 2023–2025, Tables 29, 39 and 40, via the data-model
 /// series `fbi_arrests`): arrests per 100,000 people a year by age band, as `(band, first age,
 /// last age, male (value, low, high), female (value, low, high))`. The value is the mean of the
@@ -873,18 +820,6 @@ mod tests {
         assert_eq!(NUCLEAR_USE_WORLD, (5.0e-3, 1.0e-3, 1.5e-2));
         // The unknown-class factor lies between the classes it averages.
         assert!(STRATEGIC_FACTOR_UNKNOWN.0 > 0.03 && STRATEGIC_FACTOR_UNKNOWN.0 < 0.9);
-    }
-
-    #[test]
-    fn uasi_shares_add_up_to_the_national_total() {
-        // FY2026: $584,250,000 over 44 urban areas; the shares are rounded to four figures.
-        assert_eq!(UASI_FY2026.len(), 44);
-        let sum: f64 = UASI_FY2026.iter().map(|(_, s)| s).sum();
-        assert!((sum - 1.0).abs() < 1e-3, "{sum}");
-        let mut names: Vec<&str> = UASI_FY2026.iter().map(|(n, _)| *n).collect();
-        names.sort_unstable();
-        names.dedup();
-        assert_eq!(names.len(), 44);
     }
 
     #[test]

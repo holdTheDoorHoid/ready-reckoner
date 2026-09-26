@@ -1,6 +1,7 @@
 ---
 id: tier_m3
 title: Three months
+kind: tier
 applies_to: [tier:m3]
 citations: [bls_unemployment_duration, rr_research_risk_model, finra_financial_foundations, cfpb_emergency_fund, church_home_storage_2007, fema_nhs_2024]
 ---

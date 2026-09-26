@@ -1,6 +1,7 @@
 ---
 id: bucket_fire
 title: A fire at home
+kind: bucket
 applies_to: [bucket:fire]
 citations: [usfa_residential_fires, usfa_cooking_fires, usfa_smoke_alarms, redcross_sound_the_alarm, usfa_smoke_alarm_renters, ready_gov_home_fires, usfa_heating_fires, usfa_extinguishers, pa_puc_gas_emergencies, ready_gov_safety_skills]
 ---

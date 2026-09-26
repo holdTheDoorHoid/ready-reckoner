@@ -1,6 +1,7 @@
 ---
 id: bucket_home_loss
 title: Home damaged or unlivable
+kind: bucket
 applies_to: [bucket:home_loss]
 citations: [census_pulse_displacement, fema_nhs_2024, ready_gov_earthquakes, ready_gov_financial, fema_nfip_flood_insurance, floodsmart_buy_policy, fema_effak, ftc_disaster_scams]
 ---

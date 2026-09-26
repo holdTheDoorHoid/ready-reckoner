@@ -1,6 +1,7 @@
 ---
 id: hazard_grid_cyber
 title: Regional blackouts, cyberattacks and local utility outages
+kind: hazard
 applies_to: [hazard:grid_failure, hazard:cyber_outage, hazard:local_utility_outage]
 citations: [rr_research_risk_model, epa_boil_water_report_2024, ready_gov_kit, ready_gov_financial, ready_gov_low_cost, ready_gov_disability, ready_gov_cybersecurity, cisa_secure_our_world, cdc_water_advisories]
 ---

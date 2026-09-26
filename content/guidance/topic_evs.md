@@ -1,6 +1,7 @@
 ---
 id: topic_evs
 title: Electric vehicles in an emergency
+kind: topic
 applies_to: [topic:evs]
 citations: [doe_fueleconomy_ev, hcfl_ev_safety, doe_afdc_stations]
 ---

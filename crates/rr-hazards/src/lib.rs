@@ -414,7 +414,8 @@ fn anchor_for(high: f64, ranked: &[(HazardId, f64)], years: u8) -> Option<String
 }
 
 /// One note naming the v2 data columns the pack does not have for this county, so a reader knows
-/// which rows rest on national averages or are left out.
+/// which rows rest on national averages or are left out, and one when the urban area's UASI share
+/// is missing (the attack, CBRN and crude-device terms then fall back to a share of 0).
 fn missing_data_note(ctx: &Ctx<'_>, notes: &mut Notes) {
     let e = ctx.exposure();
     let mut missing = Vec::new();
@@ -430,15 +431,22 @@ fn missing_data_note(ctx: &Ctx<'_>, notes: &mut Notes) {
     if e.geomag().is_none() {
         missing.push("geomagnetic latitude");
     }
-    if matches!(e.uasi(), exposure::Uasi::Unknown) {
-        missing.push("FEMA's urban-area funding");
-    }
     if !missing.is_empty() {
         notes.add(format!(
             "Some of the newer data are not loaded for {}: {}. The rows that need them use \
              national averages or are left out.",
             ctx.county_label(),
             join_plain(&missing.iter().map(|s| (*s).to_owned()).collect::<Vec<_>>())
+        ));
+    }
+    // The metro weight falls back to 0 rather than to an average, so it has a note of its own.
+    if matches!(e.uasi(), exposure::Uasi::Absent) {
+        notes.add(format!(
+            "FEMA's urban-area funding shares are not loaded for {}, so the estimates for an \
+             attack that closes your area, a chemical, biological or radiological attack, and a \
+             crude nuclear device count it as outside the 44 funded urban areas. In a big city \
+             those estimates are too low.",
+            ctx.county_label()
         ));
     }
 }

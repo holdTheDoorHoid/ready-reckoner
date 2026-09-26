@@ -1,6 +1,7 @@
 ---
 id: hazard_earthquake
 title: Earthquakes, tsunamis and volcanoes
+kind: hazard
 applies_to: [hazard:earthquake, hazard:tsunami, hazard:volcanic_activity]
 citations: [ready_gov_earthquakes, dogami_tsunami_faq, ready_gov_tsunamis, ready_gov_volcanoes]
 ---

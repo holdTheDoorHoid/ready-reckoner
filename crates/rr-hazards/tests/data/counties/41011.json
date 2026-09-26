@@ -237,6 +237,7 @@
   "exposure": {
    "strategic_class": "E",
    "uasi_share": 0.0,
+   "uasi_area_share": 0.0,
    "geomag_lat": 48.5,
    "geomag_factor": 0.26,
    "smoke_days_35": 7.17,

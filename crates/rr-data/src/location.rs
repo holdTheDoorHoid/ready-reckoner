@@ -121,7 +121,10 @@ impl DataStore {
             ),
             water_system_flag: num(e.sdwis_violation_pop_share, "water_system_flag"),
             geomag_factor: num(e.geomag_factor, "geomag_factor"),
-            uasi_share: num(e.uasi_share, "uasi_share"),
+            // The app-facing field is the urban area's share (what rr-hazards weights the attack,
+            // CBRN and crude-device terms by), not the county split, so the number a user sees
+            // is the number the engine used.
+            uasi_share: num(e.uasi_area_share, "uasi_share"),
             eviction_rate: num(e.eviction_filing_rate, "eviction_rate"),
         }
     }

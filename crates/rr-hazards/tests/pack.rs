@@ -76,6 +76,7 @@ fn every_county_in_the_pack() {
     let input = rr_types::fixtures::get("philadelphia-renters-4").unwrap();
     let mut n = 0;
     let mut classes_unknown = 0;
+    let mut uasi_absent = Vec::new();
     for county in s.counties() {
         let Some(location) = s.location(&county.fips, None) else {
             continue;
@@ -90,8 +91,22 @@ fn every_county_in_the_pack() {
         if nuke.location_factor.as_ref().unwrap().class == "unknown" {
             classes_unknown += 1;
         }
+        if a.notes
+            .iter()
+            .any(|note| note.contains("urban-area funding shares are not loaded"))
+        {
+            uasi_absent.push(county.fips.clone());
+        }
         n += 1;
     }
+    // The pack carries the urban area's own UASI share for every county (0 outside the funded
+    // areas), so no county falls back to a share of 0 for want of the column.
+    assert!(
+        uasi_absent.is_empty(),
+        "{} counties without uasi_area_share: {:?}",
+        uasi_absent.len(),
+        &uasi_absent[..uasi_absent.len().min(10)]
+    );
     assert!(n > 3000, "only {n} counties");
     // The strategic classes cover every county or none (a pack before or after the v2 exposure
     // files); awaiting: data-hazard — once they merge, none is unknown.

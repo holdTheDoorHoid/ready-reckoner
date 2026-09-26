@@ -1,6 +1,7 @@
 ---
 id: tier_m6
 title: Six months
+kind: tier
 applies_to: [tier:m6]
 citations: [oregon_resilience_plan_2013, rr_research_risk_model, usu_food_storage_booklet, finra_financial_foundations, aldrich_sawada_2015]
 ---

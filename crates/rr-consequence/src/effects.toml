@@ -1586,7 +1586,6 @@ evidence = "prior"
 sources = ["cdc_wildfire_smoke", "rr_risk_model_priors"]
 note = "Heavy smoke keeps people, above all those with heart or lung disease, older adults and children, inside for days."
 
-# awaiting: content — add nws_dust_storms to sources once agent/content2 merges
 [[effect]]
 hazard = "dust_storm"
 bucket = "clean_air"
@@ -1595,10 +1594,9 @@ label = "dust storms"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 0.125, p90_days = 0.5 }
 evidence = "prior"
-sources = ["noaa_storm_events", "rr_risk_model_priors"]
+sources = ["nws_dust_storms", "noaa_storm_events", "rr_risk_model_priors"]
 note = "rr-hazards counts dust-storm episodes that reach the household; the dust fouls indoor air for hours."
 
-# awaiting: content — add nws_dust_storms to sources once agent/content2 merges
 [[effect]]
 hazard = "dust_storm"
 bucket = "supplies"
@@ -1607,10 +1605,9 @@ label = "dust storms"
 p_given_event = 0.5
 duration = { kind = "log_normal", median_days = 0.25, p90_days = 1.0 }
 evidence = "prior"
-sources = ["noaa_storm_events", "rr_risk_model_priors"]
+sources = ["nws_dust_storms", "noaa_storm_events", "rr_risk_model_priors"]
 note = "Near-zero visibility keeps people off the roads for hours."
 
-# awaiting: content — add nws_dust_storms to sources once agent/content2 merges
 [[effect]]
 hazard = "dust_storm"
 bucket = "get_home"
@@ -1619,10 +1616,9 @@ label = "dust storms"
 p_given_event = 0.3
 requires = "commuter"
 evidence = "prior"
-sources = ["noaa_storm_events", "rr_risk_model_priors"]
+sources = ["nws_dust_storms", "noaa_storm_events", "rr_risk_model_priors"]
 note = "A commuter caught on the highway must pull off and wait it out."
 
-# awaiting: content — add usgs_sinkholes to sources once agent/content2 merges
 [[effect]]
 hazard = "sinkhole"
 bucket = "home_loss"
@@ -1631,10 +1627,9 @@ label = "ground collapsing or settling under the home"
 p_given_event = 0.2
 duration = { kind = "log_normal", median_days = 30.0, p90_days = 180.0 }
 evidence = "prior"
-sources = ["census_pulse_displacement", "rr_risk_model_priors"]
+sources = ["usgs_sinkholes", "census_pulse_displacement", "rr_risk_model_priors"]
 note = "rr-hazards counts ground collapse or settling that damages or threatens a home in limestone country; about 1 in 5 makes it unlivable for a while."
 
-# awaiting: content — add usgs_sinkholes to sources once agent/content2 merges
 [[effect]]
 hazard = "sinkhole"
 bucket = "evacuate"
@@ -1644,7 +1639,7 @@ p_given_event = 0.05
 duration = { kind = "log_normal", median_days = 14.0, p90_days = 90.0 }
 notice_hours = [0.0, 24.0]
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["usgs_sinkholes", "rr_risk_model_priors"]
 note = "A sinkhole can open with no warning, or cracks can show for days first."
 
 # ---------------------------------------------------------------------------------------------
@@ -1871,7 +1866,6 @@ evidence = "prior"
 sources = ["ready_gov_chemical", "rr_risk_model_priors"]
 note = "An air release means sheltering in place with windows shut and the air system off: the sealed-room plan."
 
-# awaiting: content — add fema_dam_residual_risk_2018 to sources once agent/content2 merges
 [[effect]]
 hazard = "dam_failure"
 bucket = "evacuate"
@@ -1881,10 +1875,9 @@ p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
 notice_hours = [0.25, 6.0]
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["fema_dam_residual_risk_2018", "rr_risk_model_priors"]
 note = "rr-hazards counts failures or spillway emergencies that order households downstream or behind a levee to leave; warning can be minutes to hours."
 
-# awaiting: content — add fema_dam_residual_risk_2018 to sources once agent/content2 merges
 [[effect]]
 hazard = "dam_failure"
 bucket = "home_loss"
@@ -1893,7 +1886,7 @@ label = "a dam or levee failure, or the threat of one"
 p_given_event = 0.3
 duration = { kind = "log_normal", median_days = 30.0, p90_days = 180.0 }
 evidence = "prior"
-sources = ["census_pulse_displacement", "rr_risk_model_priors"]
+sources = ["fema_dam_residual_risk_2018", "census_pulse_displacement", "rr_risk_model_priors"]
 
 [[effect]]
 hazard = "dam_failure"
@@ -1918,7 +1911,6 @@ evidence = "prior"
 sources = ["rr_risk_model_priors"]
 note = "Where the reservoir is the town's supply, or the flood reaches the plant."
 
-# awaiting: content — add fcc_network_outage_2024 to sources once agent/content2 merges
 [[effect]]
 hazard = "network_outage"
 bucket = "comms"
@@ -1927,10 +1919,9 @@ label = "phone or internet network outages"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 0.25, p90_days = 1.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["fcc_att_outage_2024", "rr_risk_model_priors"]
 note = "A carrier or internet outage cuts calls and texts, 911 included, for hours (AT&T, February 2024: about 12 hours)."
 
-# awaiting: content — add fda_drug_shortages to sources once agent/content2 merges
 [[effect]]
 hazard = "drug_shortage"
 bucket = "medication"
@@ -1939,10 +1930,9 @@ label = "a shortage of a daily prescription"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 5.0, p90_days = 21.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["fda_drug_shortages", "rr_risk_model_priors"]
 note = "rr-hazards counts, for each person on a daily prescription, a year's chance that it cannot be filled. A national shortage can last months, but a patient usually gets another strength, maker or pharmacy within days (median 5 days), weeks at worst (21 days; the hazard table's 7 d / 30 d describes the shortage, not the gap). Refill rules keep practical buffers near a month, so the rest is the prescriber conversation."
 
-# awaiting: content — add me_dhhs_snap_2025 to sources once agent/content2 merges
 [[effect]]
 hazard = "benefit_interruption"
 bucket = "supplies"
@@ -1952,7 +1942,7 @@ p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 10.0, p90_days = 30.0 }
 requires = "food_benefit"
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["me_dhhs_snap_2025", "rr_risk_model_priors"]
 note = "Model review M-12: November 2025 SNAP allotments were suspended from 1 November, with partial and then full payments after 12 November; food money runs short for one to four weeks."
 
 [[effect]]
@@ -2167,7 +2157,6 @@ evidence = "prior"
 sources = ["epa_asheville_boil_notice_2024", "rr_risk_model_priors"]
 note = "When a failed system comes back, the water must be boiled for weeks while it is flushed and tested (Asheville about 7 weeks after Helene; Jackson nearly 7 weeks in 2022)."
 
-# awaiting: content — add iii_water_damage_protect to sources once agent/content2 merges
 [[effect]]
 hazard = "water_damage"
 bucket = "water_out"
@@ -2176,10 +2165,9 @@ label = "a burst pipe or leak at home"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 0.25, p90_days = 2.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["iii_water_damage_protect", "rr_risk_model_priors"]
 note = "The water is shut off at the main until the pipe is fixed: hours, sometimes a day or two."
 
-# awaiting: content — add iii_water_damage_protect to sources once agent/content2 merges
 [[effect]]
 hazard = "water_damage"
 bucket = "home_loss"
@@ -2188,10 +2176,9 @@ label = "a burst pipe or leak at home"
 p_given_event = 0.05
 duration = { kind = "log_normal", median_days = 14.0, p90_days = 60.0 }
 evidence = "prior"
-sources = ["census_pulse_displacement", "rr_risk_model_priors"]
+sources = ["iii_water_damage_protect", "census_pulse_displacement", "rr_risk_model_priors"]
 note = "About 1 in 20 floods rooms badly enough to move out while they dry and are repaired."
 
-# awaiting: content — add eviction_lab_national to sources once agent/content2 merges
 [[effect]]
 hazard = "eviction"
 bucket = "home_loss"
@@ -2200,7 +2187,7 @@ label = "an eviction"
 p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 30.0, p90_days = 90.0 }
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["eviction_lab_national", "rr_risk_model_priors"]
 note = "rr-hazards counts eviction filings that end with the household having to leave (renters only); finding a new home takes weeks to months."
 
 # ---------------------------------------------------------------------------------------------
@@ -3277,7 +3264,6 @@ unemployment_insurance = true
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
-# awaiting: content — add cfpb_shutdown_2013 to sources once agent/content2 merges
 [[income]]
 hazard = "benefit_interruption"
 label = "federal pay or benefits that stop"
@@ -3287,10 +3273,9 @@ unemployment_insurance = false
 household_rate = true
 requires = "income_benefit"
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["cfpb_shutdown_2013", "rr_risk_model_priors"]
 note = "Funding gaps lasted 16 days (2013), 34 days (2018-19) and 42 days (2025); pay or benefits usually come back afterwards, but the gap has to be bridged."
 
-# awaiting: content — add fbi_cde_arrests_2024 to sources once agent/content2 merges
 [[income]]
 hazard = "arrest_or_detention"
 label = "an arrest or detention"
@@ -3299,7 +3284,7 @@ spell_weeks = { kind = "log_normal", median_days = 1.0, p90_days = 6.0 }
 unemployment_insurance = false
 household_rate = true
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
+sources = ["fbi_cde_arrests", "rr_risk_model_priors"]
 note = "rr-hazards counts arrests of household members (events, never guilt). Most people are released within days; some are held for weeks, and pay stops meanwhile."
 
 # ---------------------------------------------------------------------------------------------

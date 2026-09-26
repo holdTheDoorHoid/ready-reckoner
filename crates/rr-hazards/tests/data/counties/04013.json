@@ -216,6 +216,7 @@
     }
    ],
    "uasi_share": 0.01798,
+   "uasi_area_share": 0.0197,
    "uasi_area": "Phoenix-Mesa-Chandler, AZ",
    "geomag_lat": 40.2,
    "geomag_factor": 0.1,

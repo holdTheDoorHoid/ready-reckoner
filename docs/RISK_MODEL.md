@@ -77,7 +77,7 @@ and one note names the missing columns.
 | Column | Used for | Without it |
 | --- | --- | --- |
 | `strategic_class`, `strategic_places`, `strategic_km`, `strategic_bearing` | the nuclear family's class and "Why here"; the war row's near/far split | the population-weighted f_S (0.314, range 0.01–0.99); war at ×0.71 (0.3–1) |
-| `uasi_share`, `uasi_area` | the metro weight w_m of the attack, CBRN and nuclear-terrorism terms: the FEMA urban area's own share, looked up by `uasi_area` in the FY2026 table (`params::UASI_FY2026`) | a range from a small town to a 5 % metro |
+| `uasi_area_share`, `uasi_area` | the metro weight w_m of the attack, CBRN and nuclear-terrorism terms: the FEMA urban area's own share of the FY2026 UASI money (the same for every county in the area; 0 outside the funded areas), and the area's name for "Why here" | a share of 0, as outside every funded area, with a note that those rows are too low in a big city |
 | `geomag_factor`, `geomag_lat` | the solar-storm location multiplier α ÷ 0.2285 | the national average (×1) |
 | `smoke_days_35`, `smoke_basis` | wildfire smoke (imputed counties get a ×/÷ 2 spread, monitored ×/÷ 1.3) | wildfire smoke left out |
 | `karst_share` | sinkholes | sinkholes left out |
@@ -509,11 +509,12 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   rates keep quadrature. The class examples reproduce REVIEW §2.3 within rounding and B1.5's ten-year
   ranges word for word (`tests/v2.rs`).
 - **The UASI share is the urban area's, not the county's.** The attack, CBRN and nuclear-terrorism
-  formulas weigh the metro area (λ × w_m × the share of its households under an order). The pack's
-  `uasi_share` is the county's population split of its area's share, so the engine looks the area's
-  own share up by `uasi_area` in the FY2026 table. awaiting: data-hazard — a `uasi_area_share` column
-  would retire that table, and `LocationResolved::exposure.uasi_share` (the contract calls it the
-  metro area's share) should carry the area's share, not the county split.
+  formulas weigh the metro area (λ × w_m × the share of its households under an order), so they read
+  the pack's `uasi_area_share` (source `fema_hsgp_fy2026`), not `uasi_share`, the county's
+  population split of that share. Without the column the three terms fall back to a share of 0 (the
+  rates outside every funded area) and a note says the rows are too low in a big city; the county
+  split is never used in its place. `LocationResolved::exposure.uasi_share` (the contract calls it
+  the metro area's share) still carries the county split and is not read.
 - **The solar-storm location term uses NERC's floor.** α never falls below 0.1, so Miami comes to
   1.2 in 10,000 a year, not the review's 6 in 100,000 (which used α 0.06). The population mean of α
   (0.2285) replaces the review's assumed 0.25. Ground conductivity (β) is not in the pack.
@@ -804,11 +805,11 @@ big windstorms, grid failure, Cascadia).
 | volcanic_activity | clean_air | ash | volcanic ash | 0.5 | 2 d | 7 d | prior |  | ready_gov_volcanoes, rr_risk_model_priors |
 | wildfire_smoke | clean_air | smoke | days of wildfire smoke | 1 | 2 d | 7 d | prior |  | cdc_wildfire_smoke, epa_wildfire_indoor_air, rr_risk_model_priors |
 | wildfire_smoke | supplies | smoke | days of wildfire smoke | 0.2 | 1 d | 4 d | prior |  | cdc_wildfire_smoke, rr_risk_model_priors |
-| dust_storm | clean_air | dust | dust storms | 1 | 3 h | 12 h | prior |  | noaa_storm_events, rr_risk_model_priors |
-| dust_storm | supplies | dust | dust storms | 0.5 | 6 h | 1 d | prior |  | noaa_storm_events, rr_risk_model_priors |
-| dust_storm | get_home | dust | dust storms | 0.3 | — | — | prior | households with a commuter | noaa_storm_events, rr_risk_model_priors |
-| sinkhole | home_loss | collapse | ground collapsing or settling under the home | 0.2 | 30 d | 180 d | prior |  | census_pulse_displacement, rr_risk_model_priors |
-| sinkhole | evacuate | collapse | ground collapsing or settling under the home | 0.05 | 14 d | 90 d | prior | warning 0–24 h | rr_risk_model_priors |
+| dust_storm | clean_air | dust | dust storms | 1 | 3 h | 12 h | prior |  | nws_dust_storms, noaa_storm_events, rr_risk_model_priors |
+| dust_storm | supplies | dust | dust storms | 0.5 | 6 h | 1 d | prior |  | nws_dust_storms, noaa_storm_events, rr_risk_model_priors |
+| dust_storm | get_home | dust | dust storms | 0.3 | — | — | prior | households with a commuter | nws_dust_storms, noaa_storm_events, rr_risk_model_priors |
+| sinkhole | home_loss | collapse | ground collapsing or settling under the home | 0.2 | 30 d | 180 d | prior |  | usgs_sinkholes, census_pulse_displacement, rr_risk_model_priors |
+| sinkhole | evacuate | collapse | ground collapsing or settling under the home | 0.05 | 14 d | 90 d | prior | warning 0–24 h | usgs_sinkholes, rr_risk_model_priors |
 | pandemic | supplies | stay_home | a pandemic that disrupts shopping | 0.9 | 14 d | 45 d | prior |  | cdc_mmwr_stay_at_home_2020, cdc_pandemic_history, rr_risk_model_priors |
 | pandemic | medication | stay_home | a pandemic that disrupts shopping | 0.9 | 7 d | 30 d | prior |  | cdc_pandemic_history, rr_risk_model_priors |
 | grid_failure | power | regional | a regional blackout | 1 | 1 d | 3 d | prior | regional restoration: grid; in heat 0.3; in cold 0.4 | rr_risk_model_priors |
@@ -829,13 +830,13 @@ big windstorms, grid failure, Cascadia).
 | nuclear_plant_incident | supplies | release | a nuclear plant accident | 1 | 1 d | 3 d | prior |  | rr_risk_model_priors |
 | nuclear_plant_incident | home_loss | release | a nuclear plant accident | 0.05 | 90 d | 730 d | prior |  | rr_risk_model_priors, census_pulse_displacement |
 | hazmat_release | clean_air | release | chemical releases | 0.4 | 6 h | 1 d | prior |  | ready_gov_chemical, rr_risk_model_priors |
-| dam_failure | evacuate | release | a dam or levee failure, or the threat of one | 1 | 3 d | 30 d | prior | warning 0.25–6 h | rr_risk_model_priors |
-| dam_failure | home_loss | release | a dam or levee failure, or the threat of one | 0.3 | 30 d | 180 d | prior |  | census_pulse_displacement, rr_risk_model_priors |
+| dam_failure | evacuate | release | a dam or levee failure, or the threat of one | 1 | 3 d | 30 d | prior | warning 0.25–6 h | fema_dam_residual_risk_2018, rr_risk_model_priors |
+| dam_failure | home_loss | release | a dam or levee failure, or the threat of one | 0.3 | 30 d | 180 d | prior |  | fema_dam_residual_risk_2018, census_pulse_displacement, rr_risk_model_priors |
 | dam_failure | power | release | a dam or levee failure, or the threat of one | 0.3 | 1 d | 7 d | prior |  | rr_risk_model_priors |
 | dam_failure | water_out | release | a dam or levee failure, or the threat of one | 0.2 | 7 d | 30 d | prior | homes on public water; scaled by how easily the water system breaks | rr_risk_model_priors |
-| network_outage | comms | network | phone or internet network outages | 1 | 6 h | 1 d | prior |  | rr_risk_model_priors |
-| drug_shortage | medication | shortage | a shortage of a daily prescription | 1 | 5 d | 21 d | prior |  | rr_risk_model_priors |
-| benefit_interruption | supplies | lapse | a lapse in food benefits | 1 | 10 d | 30 d | prior | households that rely on SNAP or WIC | rr_risk_model_priors |
+| network_outage | comms | network | phone or internet network outages | 1 | 6 h | 1 d | prior |  | fcc_att_outage_2024, rr_risk_model_priors |
+| drug_shortage | medication | shortage | a shortage of a daily prescription | 1 | 5 d | 21 d | prior |  | fda_drug_shortages, rr_risk_model_priors |
+| benefit_interruption | supplies | lapse | a lapse in food benefits | 1 | 10 d | 30 d | prior | households that rely on SNAP or WIC | me_dhhs_snap_2025, rr_risk_model_priors |
 | attack_disruption | supplies | lockdown | an attack or threat that closes your area | 1 | 12 h | 2 d | prior |  | rr_risk_model_priors |
 | attack_disruption | comms | lockdown | an attack or threat that closes your area | 0.3 | 12 h | 2 d | prior |  | rr_risk_model_priors |
 | attack_disruption | get_home | lockdown | an attack or threat that closes your area | 0.5 | — | — | prior | households with a commuter | rr_risk_model_priors |
@@ -855,9 +856,9 @@ big windstorms, grid failure, Cascadia).
 | burglary | security | break_in | break-ins | 1 | — | — | prior |  | rr_risk_model_priors |
 | extended_household_illness | medical_emergency | illness | a long illness at home | 0.5 | — | — | prior |  | rr_risk_model_priors |
 | local_utility_outage | water_boil | system_failure | a major water system failure | 0.0267 | 14 d | 45 d | prior | homes on public water; scaled by how easily the water system breaks | epa_asheville_boil_notice_2024, rr_risk_model_priors |
-| water_damage | water_out | leak | a burst pipe or leak at home | 1 | 6 h | 2 d | prior |  | rr_risk_model_priors |
-| water_damage | home_loss | leak | a burst pipe or leak at home | 0.05 | 14 d | 60 d | prior |  | census_pulse_displacement, rr_risk_model_priors |
-| eviction | home_loss | eviction | an eviction | 1 | 30 d | 90 d | prior |  | rr_risk_model_priors |
+| water_damage | water_out | leak | a burst pipe or leak at home | 1 | 6 h | 2 d | prior |  | iii_water_damage_protect, rr_risk_model_priors |
+| water_damage | home_loss | leak | a burst pipe or leak at home | 0.05 | 14 d | 60 d | prior |  | iii_water_damage_protect, census_pulse_displacement, rr_risk_model_priors |
+| eviction | home_loss | eviction | an eviction | 1 | 30 d | 90 d | prior |  | eviction_lab_national, rr_risk_model_priors |
 | *cascadia_m9* (coast) | power | event | a magnitude 9 Cascadia earthquake | 1 | 90 d | 180 d | prior | in cold 0.4; relief: help 14 d, mostly restored 180 d | oregon_resilience_plan_2013 |
 | *cascadia_m9* (coast) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 365 d | 1095 d | prior | homes on public water; relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013 |
 | *cascadia_m9* (coast) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 90 d | 270 d | prior | homes on a private well; relief: help 14 d, mostly restored 270 d | oregon_resilience_plan_2013, rr_risk_model_priors |
@@ -944,8 +945,8 @@ big windstorms, grid failure, Cascadia).
 | *wasatch_m7*: the regional economy after a Wasatch fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *seattle_fault_m7*: the regional economy after a Seattle fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *san_andreas_south_m78*: the regional economy after a southern San Andreas earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
-| benefit_interruption: federal pay or benefits that stop | 1 | 2 wk | 6 wk | no | prior | rr_risk_model_priors |
-| arrest_or_detention: an arrest or detention | 1 | 1 wk | 6 wk | no | prior | rr_risk_model_priors |
+| benefit_interruption: federal pay or benefits that stop | 1 | 2 wk | 6 wk | no | prior | cfpb_shutdown_2013, rr_risk_model_priors |
+| arrest_or_detention: an arrest or detention | 1 | 1 wk | 6 wk | no | prior | fbi_cde_arrests, rr_risk_model_priors |
 
 | Hazard | Part | Events it counts | Share when no split is passed | Why |
 |---|---|---|---|---|

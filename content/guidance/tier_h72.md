@@ -1,6 +1,7 @@
 ---
 id: tier_h72
 title: Three days
+kind: tier
 applies_to: [tier:h72]
 citations: [ready_gov_kit, ready_gov_kit_2020, dema_prepared_for_crises, cdc_water_storage, ready_gov_food, ready_gov_disability, ready_gov_evacuation, fema_nhs_2024]
 ---
