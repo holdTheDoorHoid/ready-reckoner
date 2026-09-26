@@ -1,13 +1,15 @@
 <!--
   The money buckets, kept visibly apart from the supplies budget: the emergency-savings goal for
   lost income, and the home-loss checklist (insurance and papers). A long goal gets a nearer one
-  first (one month of expenses, or three once one is saved), dated from the same money the engine
-  suggests (the supplies budget, once the supplies plan is done); the full goal stays beside it.
+  first: the engine's first savings step when it sends one (contract v2 `Plan.first_milestone`:
+  one month of expenses or $500, whichever is smaller, and the month it is reached); otherwise one
+  month of expenses, or three once one is saved, dated from the same money the engine suggests
+  (the supplies budget, once the supplies plan is done). The full goal stays beside it.
 -->
 <script lang="ts">
-  import type { BucketAssessment, IsoDate, PlanItem, SavingsTrack } from '../engine/types';
+  import type { BucketAssessment, IsoDate, PlanItem, SavingsMilestone, SavingsTrack } from '../engine/types';
   import { nextMilestone } from '../lib/savings';
-  import { formatMonth, monthsPhrase, targetMonths, usd } from '../lib/format';
+  import { addMonths, formatMonth, monthsPhrase, targetMonths, usd } from '../lib/format';
   import ExplainButton from './ExplainButton.svelte';
   import ReadinessCard from './ReadinessCard.svelte';
   import Sources from './Sources.svelte';
@@ -19,6 +21,7 @@
     homeItems,
     planningDate = undefined,
     doneMonth = undefined,
+    firstMilestone = undefined,
   }: {
     income: BucketAssessment | undefined;
     track: SavingsTrack | undefined;
@@ -28,11 +31,19 @@
     planningDate?: IsoDate;
     /** The month the supplies plan is done (`Plan.done_month`), when the saving can start. */
     doneMonth?: number;
+    /** The engine's first savings step (contract v2), which replaces the one worked out here. */
+    firstMilestone?: SavingsMilestone;
   } = $props();
 
   const upperFirst = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
   const pct = $derived(track && track.target_months > 0 ? Math.min(100, (track.current_months / track.target_months) * 100) : 0);
-  const milestone = $derived(track ? nextMilestone(track, planningDate, doneMonth) : null);
+  const milestone = $derived(track && !firstMilestone ? nextMilestone(track, planningDate, doneMonth) : null);
+  /** "one month of expenses, about $4,200" or "$500 in savings". */
+  const firstWords = $derived.by(() => {
+    if (!firstMilestone) return '';
+    const what = firstMilestone.months >= 0.995 ? `one month of expenses, about ${usd(firstMilestone.usd)}` : `${usd(firstMilestone.usd)} in savings`;
+    return planningDate ? `${what}, by ${formatMonth(addMonths(planningDate, firstMilestone.by_month))}` : what;
+  });
 </script>
 
 <section class="savings" aria-labelledby="savings-title">
@@ -48,7 +59,9 @@
     {#if income && income.target.kind === 'months' && track}
       <article class="card" aria-labelledby="income-title" data-bucket={income.id} data-target={JSON.stringify(income.target)}>
         <h3 id="income-title">{income.name}</h3>
-        {#if milestone}
+        {#if firstMilestone}
+          <p class="milestone"><strong>First goal:</strong> {firstWords}.</p>
+        {:else if milestone}
           <p class="milestone">
             <strong>{milestone.first ? 'First goal' : 'Next goal'}:</strong>
             {milestone.months === 1 ? 'one month' : 'three months'} of expenses{milestone.usd !== undefined ? `, about ${usd(milestone.usd)}` : ''}{milestone.by
@@ -57,7 +70,7 @@
           </p>
         {/if}
         <p>
-          {#if milestone}<strong>Full goal:</strong>{/if}
+          {#if milestone || firstMilestone}<strong>Full goal:</strong>{/if}
           <span class="big">{targetMonths(income.target.value, income.target.low, income.target.high)}</span> of expenses{track.target_usd > 0 ? `, about ${usd(track.target_usd)}` : ''}.
         </p>
         <div

@@ -86,7 +86,9 @@ describe('mock engine: shape of every fixture', () => {
       expect(firstRare).toBeGreaterThan(0);
       expect(o.register.slice(firstRare).every((h) => h.display === 'rare_catastrophic')).toBe(true);
       for (const h of o.register) {
-        expect(h.frequency_sentence).toMatch(/of 100 households like yours|Almost all households|Fewer than 1 in 100/);
+        // Range-only rows (the rare families, stacked expert estimates) never state a point.
+        if (h.range_only) expect(h.frequency_sentence, h.id).toMatch(/^(Between 1 in [\d,]+ and 1 in [\d,]+|At most about 1 in [\d,]+|Expert estimates for this span) .*households like yours would /);
+        else expect(h.frequency_sentence).toMatch(/of 100 households like yours|Almost all households|Fewer than 1 in 100/);
         expect(h.probability_range[0]).toBeLessThanOrEqual(h.annual_probability);
         expect(h.probability_range[1]).toBeGreaterThanOrEqual(h.annual_probability);
       }
@@ -240,7 +242,9 @@ describe('mock engine: invariants', () => {
       let previous: PlanOutput | undefined;
       for (const monthly of budgets) {
         const o = await assess(withBudget(FIXTURES[name], monthly, 0));
-        if (previous) {
+        // Bare-minimum mode (a plan that would run past three years) reorders on purpose: the
+        // three-day kit first. Compare plans only in the same mode.
+        if (previous && !!previous.plan.minimum_kit === !!o.plan.minimum_kit) {
           const before = purchaseMonths(previous);
           const after = purchaseMonths(o);
           for (const [key, month] of before) {

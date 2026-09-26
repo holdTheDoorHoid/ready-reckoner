@@ -1,12 +1,14 @@
 <!--
   One plan item: what it is and how much, the cost and price band, why it is here (which
-  consequences, which hazards), what to look for and avoid, a check-off, and what was paid.
+  consequences, which hazards), what to look for and avoid, a check-off, and what was paid. A
+  decision (contract v2 `PlanItem.decision`: insurance, ID papers) shows no price and is checked
+  off as "Decided"; an item that needs another first (`requires`) says "With: …".
 -->
 <script lang="ts">
   import type { PlanItem } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { band, formatDate, quantity, usd } from '../lib/format';
-  import { bucketName, catalogueItem, hazardName, itemSourceIds, requirementsFor } from '../lib/lookup';
+  import { bucketName, catalogueItem, hazardName, itemSourceIds, lowerFirst, requirementsFor } from '../lib/lookup';
   import { intervalLabel } from '../lib/maintenance';
   import ExplainButton from './ExplainButton.svelte';
   import FamilyPlanLink from './FamilyPlanLink.svelte';
@@ -24,8 +26,12 @@
   const sourceIds = $derived(itemSourceIds(app.catalogue, app.result.output, item.item_id));
   const purchase = $derived(app.purchaseFor(item.item_id, item.tier));
   const fromInventory = $derived(!!item.done && !purchase);
-  /** Money (cash in small bills) is set aside, never bought; so is a deposit toward a bigger item. */
-  const verb = $derived(item.kind === 'free_action' ? 'Done' : item.kind === 'reserve' || item.unit === 'dollar' ? 'Set aside' : 'Bought');
+  /** Money (cash in small bills) is set aside, never bought; so is a deposit toward a bigger item. A decision is decided. */
+  const verb = $derived(
+    item.decision ? 'Decided' : item.kind === 'free_action' ? 'Done' : item.kind === 'reserve' || item.unit === 'dollar' ? 'Set aside' : 'Bought',
+  );
+  /** What it needs first, by name ("With: flashlights or headlamps"). */
+  const withNames = $derived((item.requires ?? []).map((id) => catalogueItem(app.catalogue, id)?.name ?? id));
   const perUnit = $derived.by(() => {
     if (!info || item.kind === 'free_action' || item.quantity <= 0) return '';
     const each = item.est_cost_usd / item.quantity;
@@ -55,7 +61,9 @@
   <div class="item__body">
     <h4 id="{uid}-name" class="item__name">{item.name}</h4>
     <p class="item__qty" id="{uid}-qty">
-      {#if item.kind === 'free_action'}
+      {#if item.decision}
+        <span class="chip">Decision</span>
+      {:else if item.kind === 'free_action'}
         {#if !compact}<span class="chip chip--accent">Free</span>{/if}
       {:else}
         <strong>{quantity(item.quantity, item.unit)}</strong>
@@ -63,9 +71,10 @@
         <span class="muted">({band(item.price_band.low, item.price_band.high)})</span>
       {/if}
       {#if item.done}
-        <span class="done-mark"><Icon name="check" /> {item.kind === 'free_action' ? 'Done' : 'Have it'}</span>
+        <span class="done-mark"><Icon name="check" /> {item.decision ? 'Decided' : item.kind === 'free_action' ? 'Done' : 'Have it'}</span>
       {/if}
     </p>
+    {#if withNames.length}<p class="item__with small"><strong>With:</strong> {withNames.map((n, i) => (i === 0 ? n : lowerFirst(n))).join(', ')}</p>{/if}
     <p class="item__why">{item.why}</p>
     <FamilyPlanLink itemId={item.item_id} />
     {#if fromInventory}
@@ -102,6 +111,7 @@
             Typical price: {band(info.price_band_usd.low, info.price_band_usd.high)} per {info.price_band_usd.per}{info.price_band_usd.note ? `; ${info.price_band_usd.note}` : ''}.
             {#if perUnit}That is {perUnit}.{/if}
             {#if info.retrieved}Prices as of {formatDate(info.retrieved)}.{/if}
+            {#if item.decision}It is a decision, so it is never paid from your supplies budget.{/if}
           </p>
         {/if}
         {#if info.maintenance?.rotate_months}<p class="small">Use and replace: {intervalLabel(info.maintenance.rotate_months).toLowerCase()}.</p>{/if}
@@ -174,6 +184,9 @@
   }
   .item__why {
     margin-bottom: var(--s2);
+  }
+  .item__with {
+    margin: 0 0 var(--s1);
   }
   .item__paid {
     max-width: 22rem;

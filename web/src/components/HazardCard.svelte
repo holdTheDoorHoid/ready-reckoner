@@ -1,6 +1,9 @@
 <!--
   One hazard: how often it reaches households like this one (natural frequency, with range), how
-  bad and how sure, what it does, and what in the plan answers it. Threat and action together.
+  bad and how sure, what it does, the named causes it includes (contract v2 `sub_causes`, folded
+  away), and what in the plan answers it. Threat and action together. A hazard whose chance rests
+  on stacked expert estimates (`range_only`) never shows one number: no picture of 100 households,
+  and the expert view gives the range only.
   The card's id is `hazard-<id>`, the target of its row in the risk matrix; with `backToTable` it
   links back to that row.
 -->
@@ -8,7 +11,7 @@
   import type { HazardProfile, PlanItem } from '../engine/types';
   import { jumpTo } from '../lib/anchors';
   import { useApp } from '../lib/app.svelte';
-  import { chanceWithin, CONFIDENCE_LABELS, percent, usd } from '../lib/format';
+  import { chanceWithin, CONFIDENCE_LABELS, percent, rangeOnly, usd } from '../lib/format';
   import { bucketName, itemSourceIds, keyedItems, lowerFirst } from '../lib/lookup';
   import { href } from '../lib/router.svelte';
   import ExplainButton from './ExplainButton.svelte';
@@ -45,7 +48,7 @@
   </header>
   <p class="hazard__freq">{hazard.frequency_sentence}</p>
   <div class="hazard__main">
-    {#if featured}
+    {#if featured && !hazard.range_only}
       <IconArray probability={chance} label="{hazard.frequency_sentence} Each square is one household." />
     {/if}
     <dl class="facts" class:facts--stacked={featured}>
@@ -61,11 +64,28 @@
   </div>
   {#if app.prefs.expert}
     <p class="expert small">
-      Expert view: {percent(chance)} in {years} {years === 1 ? 'year' : 'years'}; {hazard.rate_per_year} events a year ({hazard.rate_range[0]}–{hazard.rate_range[1]}){#if hazard.eal_per_household_usd !== undefined}; expected loss about {usd(hazard.eal_per_household_usd)} a year{/if}.
+      {#if hazard.range_only}
+        Expert view: a range only, {rangeOnly(hazard.rate_range[0], hazard.rate_range[1], years)} in {years} {years === 1 ? 'year' : 'years'}; {hazard.rate_range[0]}–{hazard.rate_range[1]} events a year.
+      {:else}
+        Expert view: {percent(chance)} in {years} {years === 1 ? 'year' : 'years'}; {hazard.rate_per_year} events a year ({hazard.rate_range[0]}–{hazard.rate_range[1]}){#if hazard.eal_per_household_usd !== undefined}; expected loss about {usd(hazard.eal_per_household_usd)} a year{/if}.
+      {/if}
     </p>
   {/if}
   {#if hazard.buckets.length}
     <p class="small"><strong>What it can do:</strong> {hazard.buckets.map((b) => lowerFirst(bucketName(app.catalogue, b))).join('; ')}.</p>
+  {/if}
+  {#if hazard.sub_causes?.length}
+    <details class="includes small">
+      <summary>What it includes ({hazard.sub_causes.length})</summary>
+      <ul>
+        {#each hazard.sub_causes as c (c.id)}
+          <li>
+            <strong>{c.name}</strong>{#if c.rate_range}<span class="muted"> ({rangeOnly(c.rate_range[0], c.rate_range[1], 1)} a year)</span>{/if}. {c.note}
+            <Sources ids={c.sources} variant="inline" what={c.name} />
+          </li>
+        {/each}
+      </ul>
+    </details>
   {/if}
   {#if helps.length}
     <p class="small helps">
@@ -83,7 +103,7 @@
         href="#matrix-{hazard.id}"
         onclick={(e) => {
           if (jumpTo(`matrix-${hazard.id}`, { block: 'center' })) e.preventDefault();
-        }}>Back to the table<span class="visually-hidden"> of risks</span></a
+        }}>Back to the table<span class="visually-hidden">{' '}of risks</span></a
       >
     {/if}
   </footer>
@@ -141,6 +161,17 @@
   .facts dd {
     margin: 0;
     font-weight: 600;
+  }
+  .includes summary {
+    color: var(--accent);
+    min-height: 36px;
+  }
+  .includes ul {
+    margin: var(--s1) 0 var(--s2);
+    padding-left: 1.2em;
+  }
+  .includes li + li {
+    margin-top: var(--s1);
   }
   .helps {
     background: var(--good-soft);

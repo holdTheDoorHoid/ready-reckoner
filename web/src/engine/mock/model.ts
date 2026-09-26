@@ -38,7 +38,6 @@ import type {
   Warning,
 } from '../types';
 import { BUCKET_IDS, ENGINE_API_VERSION, RETURN_PERIODS, TARGET_LADDER_DAYS, TIER_IDS } from '../types';
-import { allowsRare } from '../../lib/dials';
 import { chanceWithin, dayPhrase, frequencySentence, monthsPhrase } from '../../lib/format';
 import { citation } from './citations';
 import { catalogueItem } from './items';
@@ -46,6 +45,8 @@ import { BUCKETS, hazardName, hazardTier as tierOf } from './names';
 import { buildPacket } from './packet';
 import type { ByDial, DurationBucket, EvacuateSeed, HazardSeed, RegionProfile, ScenarioSeed } from './regions';
 import { DURATION_BUCKETS, PROFILES, tierForDays } from './regions';
+import { firstMilestone, RANGE_ONLY_RANKED, rangeSentence, rareFamilies, stressTestFor, subCausesFor, v2Seeds } from './v2';
+import { DECISION_WHY, LONG_HORIZON_ITEMS, MINIMUM_KIT, rareItemsFor } from './items-v2';
 
 export const MOCK_ENGINE_VERSION = 'mock-0.1.0';
 export const MOCK_CONTENT_VERSION = 'mock-content-2026-09-25';
@@ -248,10 +249,7 @@ function commonSeeds(f: Facts, loc: LocationResolved): HazardSeed[] {
     { id: 'local_utility_outage', rate: f.well ? 0.2 : 0.12, spread: 1.8, severity: 0.25, confidence: 'medium', sources: ['mock_boil_notices'], buckets: ['water_boil', 'water_out'], what: f.well ? 'have the well pump fail or the water go bad' : 'have a boil-water notice or a water main break' },
     { id: 'burglary', rate: urban ? 0.02 : f.setting === 'suburban' ? 0.012 : 0.008, spread: 1.5, severity: 0.2, confidence: 'high', sources: ['mock_burglary'], buckets: ['security'], what: 'have a burglary' },
     { id: 'extended_household_illness', rate: 0.015 * f.n, spread: 2, severity: 0.4, confidence: 'prior', sources: ['mock_societal_prior'], buckets: ['income', 'supplies', 'medication'], what: 'have someone ill for weeks' },
-    { id: 'nuclear_attack', rate: 0.0003, spread: 5, severity: 1, confidence: 'prior', sources: ['mock_rare_prior', 'mock_nuclear_guidance'], buckets: ['supplies', 'power', 'water_out', 'comms'], what: 'be affected by a nuclear attack or EMP', rare: true },
-    // Contract v2 retired `terrorism`; its personal-safety half is the rare `mass_violence` family
-    // (awaiting: web-risks — the mock's rare families).
-    { id: 'mass_violence', rate: urban ? 0.0005 : 0.0001, spread: 5, severity: 0.6, confidence: 'prior', sources: ['mock_rare_prior'], buckets: ['security', 'medical_emergency'], what: 'be caught up in a mass shooting or bombing', rare: true },
+    // The nine rare families (nuclear attack, mass violence and the rest) come from v2.ts.
   ];
   if (f.earners > 0) {
     seeds.push(
@@ -264,7 +262,7 @@ function commonSeeds(f: Facts, loc: LocationResolved): HazardSeed[] {
     seeds.push({ id: 'hazmat_release', rate: 0.002 * Math.sqrt(hazmat), spread: 3, severity: 0.35, confidence: 'low', sources: ['mock_societal_prior'], buckets: ['evacuate', 'supplies'], what: 'be told to shelter indoors or leave because of a chemical release', evac: 0.5 });
   }
   if (loc.facility_flags.nuclear_plant_within_80km) {
-    seeds.push({ id: 'nuclear_plant_incident', rate: loc.facility_flags.nuclear_plant_within_16km ? 0.0002 : 0.00005, spread: 5, severity: 0.8, confidence: 'prior', sources: ['mock_rare_prior', 'mock_nuclear_guidance'], buckets: ['evacuate', 'supplies'], what: 'be affected by a nuclear plant accident', rare: true, evac: 1 });
+    seeds.push({ id: 'nuclear_plant_incident', rate: loc.facility_flags.nuclear_plant_within_16km ? 0.0002 : 0.00005, spread: 5, severity: 0.8, confidence: 'prior', sources: ['mock_rare_prior', 'mock_nuclear_guidance'], buckets: ['evacuate', 'supplies'], what: 'be affected by a nuclear plant accident', evac: 1 });
   }
   return seeds;
 }
@@ -290,7 +288,9 @@ export interface RankedHazard {
 function buildRegister(input: PlanInput, f: Facts, profile: RegionProfile, loc: LocationResolved): RankedHazard[] {
   const years = input.dials.horizon_years;
   const out: RankedHazard[] = [];
-  for (const seed of [...profile.hazards, ...commonSeeds(f, loc)]) {
+  const adults = input.people.filter((p) => p.age_band === 'adult' || p.age_band === 'senior').length;
+  const v2 = v2Seeds(input, { n: f.n, dailyRx: f.dailyRx, owner: f.owner, basement: f.basement, setting: f.setting, adults }, loc);
+  for (const seed of [...profile.hazards, ...commonSeeds(f, loc), ...v2]) {
     const climate = input.dials.climate === 'y2050' ? (seed.y2050 ?? 1) : 1;
     const rate = seed.rate * householdModifier(seed, f) * climate;
     if (!(rate > 0)) continue;
@@ -309,10 +309,15 @@ function buildRegister(input: PlanInput, f: Facts, profile: RegionProfile, loc: 
       climate_multiplier: climate,
       confidence: seed.confidence,
       sources: seed.sources,
-      frequency_sentence: frequencySentence(chanceWithin(rate, years), seed.what, years, chanceWithin(lo, years), chanceWithin(hi, years)),
+      frequency_sentence: RANGE_ONLY_RANKED.has(seed.id)
+        ? rangeSentence(seed.what, lo, hi, years)
+        : frequencySentence(chanceWithin(rate, years), seed.what, years, chanceWithin(lo, years), chanceWithin(hi, years)),
       buckets: seed.buckets,
     };
     if (seed.eal !== undefined) hp.eal_per_household_usd = seed.eal;
+    const subCauses = subCausesFor(seed.id);
+    if (subCauses) hp.sub_causes = subCauses;
+    if (RANGE_ONLY_RANKED.has(seed.id)) hp.range_only = true;
     out.push({ profile: hp, seed, rate });
   }
   // Ten-year chance times severity squared: likely things lead, and a rare event that hits
@@ -321,10 +326,8 @@ function buildRegister(input: PlanInput, f: Facts, profile: RegionProfile, loc: 
   const ranked = out
     .filter((h) => !h.seed.rare)
     .sort((a, b) => importance(b) - importance(a) || a.seed.id.localeCompare(b.seed.id));
-  const rare = out
-    .filter((h) => h.seed.rare)
-    .sort((a, b) => b.profile.severity - a.profile.severity || a.seed.id.localeCompare(b.seed.id));
-  return [...ranked, ...rare];
+  // The nine rare families: most likely here first, never by expected loss (contract v2).
+  return [...ranked, ...rareFamilies(input, loc, ranked, f.n)];
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -577,6 +580,14 @@ function freeActions(ctx: Ctx): string[] {
   if (f.pets > 0) ids.push('pet_plan');
   if (f.large > 0) ids.push('livestock_water_plan');
   ids.push('insurance_check', 'utility_shutoffs', 'community_group', 'firearm_safe_storage');
+  // Decisions (contract v2 `Item.decision`): no purchase, never paid from the supplies budget.
+  const insurance = ctx.input.finances.insurance;
+  if (!f.owner && !insurance.home_or_renters) ids.push('decision_renters_insurance');
+  if (f.owner && !insurance.flood && rateOf(ctx, 'riverine_flooding') + rateOf(ctx, 'coastal_flooding') + rateOf(ctx, 'hurricane') >= 0.05) {
+    ids.push('decision_flood_insurance');
+  }
+  if (f.basement && insurance.sewer_backup !== true) ids.push('decision_sewer_backup');
+  ids.push('id_for_every_person');
   return ids;
 }
 
@@ -787,10 +798,9 @@ function buildChunks(ctx: Ctx): Chunk[] {
 
   // Rare catastrophes: $0 by default; opted in, a single item in a late month (real allocator
   // caps this at 10% of the monthly budget). The allowance is by family since contract v2
-  // (`Dials.rare_opt_in`, the v1 switch meaning all): the meter answers the nuclear family.
-  if (allowsRare(ctx.input.dials, 'nuclear_attack')) {
-    out.push(chunk(ctx, 'radiation_meter', 'm3', 1));
-  }
+  // (`Dials.rare_opt_in`, the v1 switch meaning all), and only for a family whose local
+  // ten-year chance is at least 1 in 1,000 (REVIEW §2.4): the meter answers the nuclear family.
+  for (const r of rareItemsFor(ctx.input.dials, ctx.register)) out.push(chunk(ctx, r.id, r.tier, r.qty));
   return out;
 }
 
@@ -1049,6 +1059,13 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
       sources,
     };
     if (relief) out.relief = relief;
+    if (target.kind === 'days') {
+      const st = stressTestFor(profile.key, location.state_abbr, id, target.value, facts.well);
+      if (st) {
+        out.stress_test = st;
+        out.sources = unique([...out.sources, ...st.sources]);
+      }
+    }
     return out;
   });
 
@@ -1058,7 +1075,7 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
   // Plan
   const chunks = buildChunks(ctx);
   markDone(ctx, chunks);
-  const { plan, schedule, unscheduled } = schedulePlan(ctx, chunks, buckets);
+  const { plan, schedule, unscheduled, tooLong } = schedulePlan(ctx, chunks, buckets);
   planEndCoverage(ctx, chunks, unscheduled, buckets);
 
   // Tiers reached and recommended
@@ -1075,7 +1092,7 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
   }
 
   const scenarios = buildScenarios(input, facts, profile, states, targets);
-  const warnings = buildWarnings(ctx, buckets, chunks, schedule, unscheduled, states);
+  const warnings = buildWarnings(ctx, buckets, chunks, schedule, unscheduled, states, plan, tooLong);
 
   const provenanceIds = unique([
     ...register.flatMap((h) => h.seed.sources),
@@ -1085,6 +1102,12 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
     ...freeActions(ctx).flatMap((id) => catalogueItem(id)!.citations),
     ...scenarios.flatMap((s) => s.sources),
     'mock_savings_track',
+    ...register.flatMap((h) => [
+      ...(h.profile.sub_causes ?? []).flatMap((c) => c.sources),
+      ...(h.profile.location_factor?.sources ?? []),
+    ]),
+    ...buckets.flatMap((b) => b.stress_test?.sources ?? []),
+    ...(plan.long_horizon ?? []).flatMap((i) => catalogueItem(i.item_id)?.citations ?? []),
   ]).sort();
   const provenance: Citation[] = provenanceIds.map((id) => citation(id)).filter((c): c is Citation => c !== undefined);
 
@@ -1414,6 +1437,7 @@ const FREE_WHY: Record<string, string> = {
 
 function whyFor(ctx: Ctx, buckets: BucketAssessment[], c: Chunk): string {
   const id = c.item.id;
+  if (c.item.decision && DECISION_WHY[id]) return DECISION_WHY[id];
   if (c.item.free) return FREE_WHY[id] ?? `Costs nothing and helps with: ${c.item.buckets.map(bucketName).join(', ').toLowerCase()}.`;
   const level = c.level;
   switch (id) {
@@ -1463,7 +1487,9 @@ function whyFor(ctx: Ctx, buckets: BucketAssessment[], c: Chunk): string {
 }
 
 function toPlanItem(ctx: Ctx, buckets: BucketAssessment[], c: Chunk): PlanItem {
-  const kind: PlanItemKind = c.item.free
+  // A decision (insurance, ID papers) is a free step: it never takes money from the supplies budget.
+  const decision = !!c.item.decision;
+  const kind: PlanItemKind = c.item.free || decision
     ? 'free_action'
     : c.item.id === 'cash_small_bills' || c.item.id === 'medication_reserve'
       ? 'reserve'
@@ -1475,8 +1501,8 @@ function toPlanItem(ctx: Ctx, buckets: BucketAssessment[], c: Chunk): PlanItem {
     kind,
     quantity: c.qty,
     unit: c.item.unit,
-    est_cost_usd: c.item.free ? 0 : est,
-    price_band: { low: cents(c.bandLow * c.qty), high: cents(c.bandHigh * c.qty) },
+    est_cost_usd: c.item.free || decision ? 0 : est,
+    price_band: decision ? { low: 0, high: 0 } : { low: cents(c.bandLow * c.qty), high: cents(c.bandHigh * c.qty) },
     buckets: c.item.buckets,
     hazards: hazardsFor(ctx, c.item),
     why: whyFor(ctx, buckets, c),
@@ -1485,6 +1511,8 @@ function toPlanItem(ctx: Ctx, buckets: BucketAssessment[], c: Chunk): PlanItem {
   };
   if (c.done) out.done = true;
   if (c.done && c.paid !== undefined) out.paid_usd = c.paid;
+  if (c.item.requires?.length) out.requires = c.item.requires;
+  if (decision) out.decision = true;
   return out;
 }
 
@@ -1510,28 +1538,39 @@ function schedulePlan(ctx: Ctx, chunks: Chunk[], buckets: BucketAssessment[]) {
   for (const c of chunks.filter((x) => x.done)) push(0, toPlanItem(ctx, buckets, c));
 
   // Purchases: tier order, life safety first, then value for money; bought as the money allows.
-  const todo = chunks
-    .filter((c) => !c.done && c.qty > 0)
-    .map((c) => ({ c, cost: cents(c.unitCost * c.qty) }))
-    .sort(
+  // In bare-minimum mode (contract v2 `Dials.minimum_kit`, or a plan that would run past 36
+  // months) the smallest three-day kit comes first and everything else follows in the usual order.
+  const todo = chunks.filter((c) => !c.done && c.qty > 0).map((c) => ({ c, cost: cents(c.unitCost * c.qty) }));
+  const order = (minimumFirst: boolean) =>
+    [...todo].sort(
       (a, b) =>
+        (minimumFirst ? Number(MINIMUM_KIT.has(b.c.item.id)) - Number(MINIMUM_KIT.has(a.c.item.id)) : 0) ||
         TIER_IDS.indexOf(a.c.promotedTo ?? a.c.tier) - TIER_IDS.indexOf(b.c.promotedTo ?? b.c.tier) ||
         Number(b.c.item.life_safety) - Number(a.c.item.life_safety) ||
         (b.c.priority * 10) / Math.sqrt(b.cost + 4) - (a.c.priority * 10) / Math.sqrt(a.cost + 4) ||
         a.c.item.id.localeCompare(b.c.item.id),
     );
-  let cumulative = 0;
-  const unscheduled: Chunk[] = [];
-  const envelopes: SavingsEnvelope[] = [];
-  for (const { c, cost } of todo) {
-    cumulative = cents(cumulative + cost);
-    let k: number | undefined;
-    if (cumulative <= oneOff + monthly + 1e-6) k = 0;
-    else if (monthly > 0) k = Math.ceil((cumulative - oneOff) / monthly - 1e-9) - 1;
-    if (k === undefined || k >= MAX_MONTHS) {
-      unscheduled.push(c);
-      continue;
+  const place = (list: { c: Chunk; cost: number }[]) => {
+    let cumulative = 0;
+    const at: { c: Chunk; cost: number; k: number }[] = [];
+    const later: Chunk[] = [];
+    for (const { c, cost } of list) {
+      cumulative = cents(cumulative + cost);
+      let k: number | undefined;
+      if (cumulative <= oneOff + monthly + 1e-6) k = 0;
+      else if (monthly > 0) k = Math.ceil((cumulative - oneOff) / monthly - 1e-9) - 1;
+      if (k === undefined || k >= MAX_MONTHS) later.push(c);
+      else at.push({ c, cost, k });
     }
+    return { at, later };
+  };
+  let placed = place(order(false));
+  const tooLong = placed.later.length > 0 && monthly > 0;
+  const minimumKit = !!ctx.input.dials.minimum_kit || tooLong;
+  if (minimumKit) placed = place(order(true));
+  const unscheduled: Chunk[] = placed.later;
+  const envelopes: SavingsEnvelope[] = [];
+  for (const { c, cost, k } of placed.at) {
     schedule.set(`${c.item.id}:${c.tier}`, k);
     push(k, toPlanItem(ctx, buckets, c));
     if (monthly > 0 && cost > monthly && k > 0) envelopes.push({ item_id: c.item.id, saved_usd: 0, needed_usd: cost });
@@ -1547,7 +1586,27 @@ function schedulePlan(ctx: Ctx, chunks: Chunk[], buckets: BucketAssessment[]) {
   const plan: PlanOutput['plan'] = { months: planMonths, envelopes };
   if (unscheduled.length === 0) plan.done_month = lastScheduled;
   plan.savings_track = savingsTrack(ctx, buckets);
-  return { plan, schedule, unscheduled };
+  const milestone = firstMilestone(plan.savings_track, ctx.input.finances.monthly_expenses_usd ?? 3000, plan.done_month);
+  if (milestone) plan.first_milestone = milestone;
+  if (minimumKit) plan.minimum_kit = true;
+  const longHorizon = longHorizonItems(ctx, buckets);
+  if (longHorizon.length) plan.long_horizon = longHorizon;
+  return { plan, schedule, unscheduled, tooLong };
+}
+
+/**
+ * The long-horizon section (contract v2 `Plan.long_horizon`): shown when any duration target is a
+ * month or more, or the household asks for it (`Dials.long_horizon`). Pointers and the few things
+ * that keep working for months, never a stockpile.
+ */
+function longHorizonItems(ctx: Ctx, buckets: BucketAssessment[]): PlanItem[] {
+  const longest = Math.max(...Object.values(ctx.targets.days).map((t) => t.value));
+  if (longest < 30 && !ctx.input.dials.long_horizon) return [];
+  return LONG_HORIZON_ITEMS.filter((l) => !l.well || ctx.f.well).map((l) => {
+    const c = chunk(ctx, l.id, l.tier, l.qty(ctx.f.n));
+    c.done = has(ctx.owned, l.id, c.qty);
+    return toPlanItem(ctx, buckets, c);
+  });
 }
 
 function savingsTrack(ctx: Ctx, buckets: BucketAssessment[]): SavingsTrack {
@@ -1617,6 +1676,8 @@ function buildWarnings(
   schedule: Map<string, number>,
   unscheduled: Chunk[],
   states: ScenarioState[],
+  plan: PlanOutput['plan'],
+  tooLong: boolean,
 ): Warning[] {
   const { input, f, targets } = ctx;
   const out: Warning[] = [];
@@ -1741,13 +1802,17 @@ function buildWarnings(
       related: ['home_loss', 'insurance_check'],
     });
   }
-  if (unscheduled.length > 0 && monthly > 0) {
+  // Contract v2 `plan_too_long`: the full plan would run past three years, so bare-minimum mode
+  // takes over. `related` names what falls beyond three years even so (the Plan screen's
+  // deferred list).
+  if ((tooLong || (plan.minimum_kit && unscheduled.length > 0)) && monthly > 0) {
+    const deferred = unique(unscheduled.map((c) => c.item.id));
     out.push({
-      id: 'plan_longer_than_three_years',
-      severity: 'note',
-      message: `At this budget, ${unscheduled.length} ${unscheduled.length === 1 ? 'item falls' : 'items fall'} beyond three years.`,
-      why: 'The plan covers the most likely disruptions first, so the early months do the most good. A less cautious setting, or a little more each month, brings the rest closer.',
-      related: [],
+      id: 'plan_too_long',
+      severity: 'warn',
+      message: 'At this budget the full plan would take more than three years, so it starts with the bare minimum.',
+      why: `The smallest kit that covers three days of water, light, warmth and medicine comes first; the rest follows in the usual order. ${deferred.length} ${deferred.length === 1 ? 'step falls' : 'steps fall'} beyond three years. A little more each month, or a less cautious setting, brings them closer.`,
+      related: deferred,
     });
   }
   return out;

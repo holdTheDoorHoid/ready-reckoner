@@ -4,7 +4,8 @@ import { FIXTURES } from '../engine/fixtures';
 import { createMockEngine } from '../engine/mock';
 import type { Catalogue } from '../engine/types';
 import { savedFor } from '../test/helpers';
-import { calendarFile, drillItems, maintenanceTasks } from './maintenance';
+import { calendarFile, drillItems, maintenanceTasks, nextSeasonStart, seasonalAnchors } from './maintenance';
+import { setTestedOn, testedOn } from './persistence';
 
 async function catalogue(): Promise<Catalogue> {
   const r = await createMockEngine().catalogue();
@@ -84,5 +85,74 @@ describe('calendar file', () => {
     );
     expect(ics).toContain(String.raw`SUMMARY:Check: a\, b\; c`);
     expect(ics).toMatch(/\r\n [a-z]/);
+  });
+});
+
+describe('tests and seasons (contract v2)', () => {
+  it('dates a test from the last time the item was tried, and says "Test:"', async () => {
+    const cat = await catalogue();
+    // The radio needs trying every 6 months (mock catalogue); bought on 5 Oct, tried on 1 Dec.
+    const plan = savedFor(FIXTURES['philadelphia-renters-4'], {
+      purchases: [{ item_id: 'radio_crank', tier: 'h72', qty: 1, date: '2026-10-05' }],
+    });
+    const before = maintenanceTasks(plan, cat).find((t) => t.key === 'test:radio_crank')!;
+    expect(before).toMatchObject({ kind: 'test', title: 'Test: battery or hand-crank weather radio', interval_months: 6, due: '2027-04-05' });
+    expect(before.last).toBeUndefined();
+    expect(setTestedOn(plan, 'radio_crank', '2026-12-01')).toBe(true);
+    expect(testedOn(plan, 'radio_crank')).toBe('2026-12-01');
+    const after = maintenanceTasks(plan, cat).find((t) => t.key === 'test:radio_crank')!;
+    expect(after).toMatchObject({ last: '2026-12-01', due: '2027-06-01' });
+    // Something never owned cannot be marked tested.
+    expect(setTestedOn(plan, 'generator_portable', '2026-12-01')).toBe(false);
+  });
+
+  it('keeps one tested-on date (persistence, as the Have screen): on what the household had before the plan when it has the item there', async () => {
+    const input = { ...FIXTURES['coos-bay-well-owner-2'], existing: [{ item_id: 'radio_crank', qty: 1, tested_on: '2026-01-10' }] };
+    const plan = savedFor(input, { purchases: [{ item_id: 'radio_crank', tier: 'h72', qty: 1, date: '2026-10-05', tested_on: '2026-10-05' }] });
+    expect(testedOn(plan, 'radio_crank')).toBe('2026-10-05');
+    setTestedOn(plan, 'radio_crank', '2026-11-11');
+    expect(plan.input.existing[0]!.tested_on).toBe('2026-11-11');
+    expect(plan.purchases[0]!.tested_on).toBeUndefined();
+  });
+
+  it('anchors seasonal items to the first day of their season, from the planning date', async () => {
+    expect(nextSeasonStart('summer', '2026-10-01')).toBe('2027-06-01');
+    expect(nextSeasonStart('winter', '2026-10-01')).toBe('2026-12-01');
+    expect(nextSeasonStart('fall', '2026-09-01')).toBe('2026-09-01');
+    expect(nextSeasonStart('fall', '2026-09-01', true)).toBe('2027-09-01');
+    const cat = await catalogue();
+    const plan = savedFor(FIXTURES['philadelphia-renters-4'], {
+      purchases: [{ item_id: 'fans_cooling', tier: 'h72', qty: 2, date: '2026-10-05' }],
+    });
+    const fans = maintenanceTasks(plan, cat).find((t) => t.key === 'season:fans_cooling')!;
+    expect(fans).toMatchObject({ kind: 'season', title: 'Before summer: check battery fans and cooling towels', interval_months: 12, due: '2027-06-01' });
+    plan.done_dates['season:fans_cooling'] = '2027-06-02';
+    expect(maintenanceTasks(plan, cat).find((t) => t.key === 'season:fans_cooling')!.due).toBe('2028-06-01');
+  });
+
+  it('groups the seasonal anchors of what the household has or plans, season by season', async () => {
+    const cat = await catalogue();
+    const anchors = seasonalAnchors(cat, new Set(['fans_cooling', 'blankets_warm', 'alarms_test', 'water_stored']));
+    expect(anchors.map((a) => [a.season, a.items.map((i) => i.id)])).toEqual([
+      ['summer', ['fans_cooling']],
+      ['fall', ['alarms_test']],
+      ['winter', ['blankets_warm']],
+    ]);
+  });
+
+  it('puts tests and seasonal checks in the calendar file', async () => {
+    const cat = await catalogue();
+    const plan = savedFor(FIXTURES['philadelphia-renters-4'], {
+      purchases: [
+        { item_id: 'radio_crank', tier: 'h72', qty: 1, date: '2026-10-05' },
+        { item_id: 'fans_cooling', tier: 'h72', qty: 2, date: '2026-10-05' },
+      ],
+    });
+    const ics = calendarFile(maintenanceTasks(plan, cat), '2026-10-06');
+    expect(ics).toContain('SUMMARY:Test: battery or hand-crank weather radio');
+    expect(ics).toContain('UID:test-radio_crank@ready-reckoner.local');
+    expect(ics).toContain('SUMMARY:Before summer: check battery fans and cooling towels');
+    expect(ics).toContain('DTSTART;VALUE=DATE:20270601');
+    expect(ics).toContain('RRULE:FREQ=MONTHLY;INTERVAL=12');
   });
 });

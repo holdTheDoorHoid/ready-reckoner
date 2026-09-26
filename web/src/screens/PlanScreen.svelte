@@ -4,6 +4,11 @@
   warnings (never blocks), money being saved toward bigger items, and the whole schedule. Steps
   count only what the household does from here: what it already had (its own list, and the everyday
   basics the plan assumes) is shown apart as "Already have".
+
+  Contract v2: in bare-minimum mode (`Plan.minimum_kit`) a banner says the smallest three-day kit
+  comes first and lists what falls beyond three years (the `plan_too_long` warning's `related`
+  items); decisions show as decisions; the long-horizon section (`Plan.long_horizon`) follows the
+  whole plan.
 -->
 <script lang="ts">
   import BucketGauge from '../components/BucketGauge.svelte';
@@ -81,6 +86,17 @@
   function restart() {
     if (app.plan) app.plan.input.planning_date = app.today();
   }
+
+  /** What falls beyond three years in bare-minimum mode: the items the `plan_too_long` warning names. */
+  function deferredNames(output: PlanOutput): string[] {
+    const related = output.warnings.find((w) => w.id === 'plan_too_long')?.related ?? [];
+    return related.map((id) => catalogueItem(app.catalogue, id)?.name).filter((n): n is string => !!n);
+  }
+
+  /** Any duration target of a month or more (the long-horizon section then appears by itself). */
+  function hasLongTarget(output: PlanOutput): boolean {
+    return output.buckets.some((b) => b.target.kind === 'days' && b.target.value >= 30);
+  }
 </script>
 
 <div class="page">
@@ -131,9 +147,31 @@
         </li>
       </ul>
 
-      {#if output.warnings.length}
+      {#if output.plan.minimum_kit}
+        {@const deferred = deferredNames(output)}
+        <section class="minimum card" aria-labelledby="minimum-title">
+          <h2 id="minimum-title">Bare minimum first</h2>
+          <p>
+            {app.plan?.input.dials.minimum_kit ? 'You asked for the bare minimum first.' : 'At your budget the full plan would take more than three years, so it starts with the bare minimum.'}
+            The first things to get are the smallest kit that covers three days of water, light, warmth and medicine. Everything else comes after
+            it, in the usual order.
+          </p>
+          {#if deferred.length}
+            <details class="deferred">
+              <summary>Beyond three years at this budget: {deferred.length} {deferred.length === 1 ? 'step' : 'steps'}</summary>
+              <ul>
+                {#each deferred as name, i (i)}<li>{name}</li>{/each}
+              </ul>
+              <p class="small muted">A little more each month, or a less cautious setting on the risks screen, brings them closer.</p>
+            </details>
+          {/if}
+        </section>
+      {/if}
+
+      {@const shownWarnings = output.plan.minimum_kit ? output.warnings.filter((w) => w.id !== 'plan_too_long') : output.warnings}
+      {#if shownWarnings.length}
         <section aria-label="Things to look at">
-          {#each output.warnings as w (w.id)}<Warning warning={w} />{/each}
+          {#each shownWarnings as w (w.id)}<Warning warning={w} />{/each}
         </section>
       {/if}
 
@@ -246,6 +284,27 @@
         {/if}
       </section>
 
+      {#if output.plan.long_horizon?.length}
+        {@const having = output.plan.long_horizon.filter((i) => i.kind !== 'free_action')}
+        {@const learning = output.plan.long_horizon.filter((i) => i.kind === 'free_action')}
+        <section aria-labelledby="long-title">
+          <h2 id="long-title">If it lasts for months</h2>
+          <p class="section-intro">
+            {hasLongTarget(output) ? 'One of your targets is a month or more.' : 'You asked to see this part of the plan.'} Nobody can stockpile for
+            months, and you do not need to. These keep working when an outage lasts: a few things worth having, and pointers to learn from.
+            They are not part of the monthly schedule.
+          </p>
+          {#if having.length}
+            <h3>Worth having</h3>
+            {#each keyedItems(having) as { key, item } (key)}<ItemCard {item} />{/each}
+          {/if}
+          {#if learning.length}
+            <h3>Worth learning</h3>
+            {#each keyedItems(learning) as { key, item } (key)}<ItemCard {item} compact />{/each}
+          {/if}
+        </section>
+      {/if}
+
       {#if done.length}
         <section aria-labelledby="done-title">
           <h2 id="done-title">Done <span class="muted h-note">{done.length}</span></h2>
@@ -277,6 +336,7 @@
         homeItems={[]}
         {planningDate}
         doneMonth={output.plan.done_month}
+        firstMilestone={output.plan.first_milestone}
       />
 
       {#if app.plan}
@@ -444,5 +504,18 @@
   }
   .schedule {
     margin-top: var(--s6);
+  }
+  .minimum {
+    margin: 0 0 var(--s5);
+    border-left: 6px solid var(--accent);
+  }
+  .minimum h2 {
+    margin-top: 0;
+    font-size: var(--text-lg);
+  }
+  .deferred summary {
+    color: var(--accent);
+    min-height: 36px;
+    font-weight: 600;
   }
 </style>
