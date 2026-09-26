@@ -120,7 +120,6 @@ fn the_practitioner_items_exist_with_their_rules() {
 fn clean_air_items_sit_in_the_clean_air_bucket() {
     for id in [
         "fire_clean_air_room",
-        "fire_diy_filter_box",
         "fire_clean_room_plan",
         "med_n95_respirators",
     ] {
@@ -139,14 +138,19 @@ fn clean_air_items_sit_in_the_clean_air_bucket() {
         item("fire_clean_air_room").quantity_rule,
         "air_cleaner_units"
     );
-    assert_eq!(item("fire_diy_filter_box").quantity_rule, "diy_filter_box");
-    assert!(cites(item("fire_diy_filter_box"), "epa_diy_air_cleaners"));
-    // EPA: CADR at least two-thirds of the floor area, about 130 for 200 square feet.
-    assert!(item("fire_clean_air_room").spec.contains("about 130"));
-    // The filter box is the cheaper line.
+    // One item for the clean room's air, so the plan never buys both: a HEPA air cleaner sized
+    // by EPA's table (CADR at least two-thirds of the floor area, about 130 for 200 square feet),
+    // or the cheaper box fan with a MERV 13 filter (EPA: cost-effective), whose price is the low
+    // end of the band. Readiness credit is per item, so two items would both be bought.
+    let air = item("fire_clean_air_room");
+    assert!(air.spec.contains("about 130") && air.spec.contains("MERV 13"));
+    assert!(cites(air, "epa_diy_air_cleaners") && cites(air, "epa_air_cleaner_guide"));
+    assert!((f64::from(air.price_band_usd.low) - 34.97).abs() < 0.006);
     assert!(
-        item("fire_diy_filter_box").price_band_usd.high
-            < item("fire_clean_air_room").price_band_usd.high
+        content()
+            .items
+            .iter()
+            .all(|i| i.quantity_rule != "diy_filter_box")
     );
     let plan = item("fire_clean_room_plan");
     assert!(plan.free && plan.quantity_rule == "clean_room_plan");

@@ -197,54 +197,29 @@ readiness_share = 0.2
 
 [[item]]
 id = "fire_clean_air_room"
-name = "Portable air cleaner with a HEPA filter for a clean room"
+name = "Air cleaner for the clean room: a HEPA air cleaner, or a box fan with a MERV 13 filter"
 category = "fire"
 unit = "air cleaner"
 buckets = ["clean_air"]
 tier = "w2"
 free = false
-spec = "A portable air cleaner with a HEPA filter for one room you can close off, with a clean air delivery rate (CADR) big enough for the room: about 130 for a 200-square-foot bedroom (EPA). A box fan with a MERV 13 filter attached is a cost-effective alternative (EPA), on its own line."
+spec = "A portable air cleaner with a HEPA filter for one room you can close off, with a clean air delivery rate (CADR) big enough for the room: about 130 for a 200-square-foot bedroom (EPA). A 20-inch box fan with a MERV 13 filter taped over the side that pulls air in does the job for less, which EPA calls cost-effective; use a newer fan with safety features, and do not leave it running while no one is home (EPA)."
 look_for = [
-  "A smoke CADR of at least two-thirds of the room's floor area in square feet (EPA)",
-  "A true HEPA filter, with spare filters sold",
+  "An air cleaner with a smoke CADR of at least two-thirds of the room's floor area in square feet, and a true HEPA filter (EPA)",
+  "Or a 20-inch box fan made in 2012 or later with a safety listing mark, and a matching MERV 13 filter with its airflow arrow toward the fan",
+  "Spare filters, and tape to seal a filter box's edges",
   "Quiet enough to run all night in a bedroom",
 ]
 avoid = [
   "Air cleaners that make ozone (EPA)",
+  "Old fans with frayed cords or no safety listing",
   "Leaving windows open or running a whole-house fan in smoke",
 ]
-price_band_usd = { low = 99.99, high = 149, per = "air cleaner", note = "Two home-center listings for room air cleaners with HEPA filters: $99.99 and $149. A box fan with a MERV 13 filter costs less (EPA)." }
+price_band_usd = { low = 34.97, high = 149, per = "air cleaner", note = "Four home-center listings: a box fan with one MERV 13 filter at $34.97 or $60.95, the cheaper line EPA calls cost-effective, or a room air cleaner with a HEPA filter at $99.99 or $149." }
 retrieved = "2026-09-26"
 quantity_rule = "air_cleaner_units"
-citations = ["epa_diy_air_cleaners", "epa_wildfire_indoor_air", "ready_gov_wildfires", "epa_air_cleaner_guide", "rr_price_observations_2026_09"]
-hazard_extras = []
-maintenance = { check_months = 12 }
-readiness_share = 1.0
-season = "summer"
-
-[[item]]
-id = "fire_diy_filter_box"
-name = "Box fan with a MERV 13 filter (a cheaper air cleaner)"
-category = "fire"
-unit = "filter box"
-buckets = ["clean_air"]
-tier = "w2"
-free = false
-spec = "A 20-inch box fan with a 20 by 20 inch MERV 13 filter taped over the side that pulls air in, which EPA calls a cost-effective way to cut smoke indoors. Use a newer fan with safety features, and do not leave it running while no one is home (EPA)."
-look_for = [
-  "A MERV 13 filter that matches the fan's size, with its airflow arrow pointing toward the fan",
-  "A fan made in 2012 or later, with a safety listing mark",
-  "Tape to seal the filter's edges, and a spare filter",
-]
-avoid = [
-  "Old fans with frayed cords or no safety listing",
-  "Running it while no one is home",
-]
-price_band_usd = { low = 34.97, high = 60.95, per = "filter box", note = "Two home-center sets: a 20-inch box fan ($24.98) with one MERV 13 filter from a four-pack ($9.99), or a heavier fan ($36.98) with a single MERV 13 filter ($23.97)." }
-retrieved = "2026-09-26"
-quantity_rule = "diy_filter_box"
 maintenance = { check_months = 3 }
-citations = ["epa_diy_air_cleaners", "epa_wildfire_indoor_air", "rr_price_observations_2026_09"]
+citations = ["epa_air_cleaner_guide", "epa_wildfire_indoor_air", "epa_diy_air_cleaners", "ready_gov_wildfires", "rr_price_observations_2026_09"]
 hazard_extras = []
 readiness_share = 1.0
 season = "summer"

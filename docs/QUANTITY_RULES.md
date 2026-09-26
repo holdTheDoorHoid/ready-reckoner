@@ -206,7 +206,7 @@ days gets none either.
 | `bleeding_control_kit` | first aid | medical_emergency | bleeding_control_kit | location.setting, target(medical_emergency) | 1 kit (a tourniquet and a pressure bandage) with a Stop the Bleed class, for every household. Life-safety where the setting is rural (ambulances take longer, Mell 2017) or the medical-emergency ten-year chance is at least 0.5 (`bleeding_kit_life_safety_p10`, *Prior*, standing in for "the medical-emergency card ranks in the top three": the rules do not see the register). The threshold orders the plan and is not cited on the line | kit | household | dhs_stop_the_bleed (rural: also mell_2017_ems_response) | implemented (round 2, v0.1.1, review P-11) |
 | `wound_care_addon` | first aid | medical_emergency | wound_care | location.setting, target(supplies) | 1 wound-care and splint add-on (irrigation syringe, closure strips, elastic wrap, padded splint, shears, blister dressings, packing gauze; Wilderness Medical Society) for a rural home (three-day tier; ambulances take longer, Mell 2017) or a store target of at least 14 days (`wound_addon_min_days`, *Prior*; two-week tier) | kit | household | wms_wound_2014, redcross_first_aid_kit (rural: also mell_2017_ems_response; otherwise also rr_expert_prior) | implemented (Round 2, v0.2.0, review P-11, item N-12) |
 | `air_cleaner_units` | clean air | clean_air | air_cleaner | — | 1 portable air cleaner with a HEPA filter for the clean room, with a clean air delivery rate of at least 0.65 cfm per square foot (EPA's sizing table, 8-foot ceiling) × a 200 sq ft bedroom (`clean_room_sqft`, *Prior*) = 130 | air cleaner | household | epa_air_cleaner_guide, epa_wildfire_indoor_air, rr_expert_prior | implemented (Round 2, v0.2.0, the clean-air bucket) |
-| `diy_filter_box` | clean air | clean_air (alternative of `air_cleaner_units`) | air_cleaner | — | 1 box fan with a MERV 13 filter taped to it, which EPA calls a cost-effective way to cut smoke indoors: the cheaper way to meet the air-cleaner line, never an addition | filter box | household | epa_diy_air_cleaners | implemented (Round 2, v0.2.0, the clean-air bucket) |
+| `diy_filter_box` | clean air | clean_air (alternative of `air_cleaner_units`) | air_cleaner | — | 1 box fan with a MERV 13 filter taped to it, which EPA calls a cost-effective way to cut smoke indoors: the cheaper way to meet the air-cleaner line, never an addition | filter box | household | epa_diy_air_cleaners | implemented (Round 2, v0.2.0, the clean-air bucket); the catalogue prices it inside the one clean-room air cleaner item (`fire_clean_air_room`), so the plan never buys both |
 | `clean_room_plan` | clean air | clean_air | clean_room_plan | people | 1 plan: one room with few windows and doors, kept closed, the heating or cooling set to recirculate, the air cleaner running, no frying, candles or vacuuming on smoky days; children stay in it | plan | household | epa_wildfire_indoor_air, cdc_wildfire_smoke | implemented (Round 2, v0.2.0, the clean-air bucket) |
 | `battery_fan` | thermal | thermal (heat; `.optional` in a hot county) | thermal_heat | people, hot | 1 per household + 1 per person 65+, baby or pregnant (*Prior*); fans help only below 90 °F indoors. In a hot county (30+ days a year at 95 °F) a home without power soon passes 90 °F, so the fans are an optional comfort there and do not count as heat cover | fan | household | cdc_heat_health, rr_expert_prior (hot: also nca5_atlas, stone_2023_heat_blackout) | rr-supply. Round 2, v0.2.0 (review P-09): optional in hot counties |
 | `cooling_towel` | thermal | thermal (heat; `.optional` in a hot county) | thermal_heat | people, hot | 1 per person (*Prior*); optional in a hot county, like the fans | towel | person | rr_expert_prior | rr-supply. Round 2, v0.2.0 (review P-09): optional in hot counties |
@@ -336,8 +336,9 @@ of that harm the item averts on its own, and every item that lists a readiness b
 - **1.0, the capability itself:** the thing that makes the household ready, with nothing else on the
   checklist doing its job: the go-bag, the get-home bag, the first-aid kit, working smoke alarms and
   the escape plan, emergency alerts, the evacuation plan, a ride out for a household with no car,
-  the evacuation assistance plan, knowing two neighbours, and an air cleaner or filter box for the
-  clean room (the two are alternatives: the allocator buys the cheaper).
+  the evacuation assistance plan, knowing two neighbours, and the clean room's air cleaner (one item:
+  a HEPA unit or the cheaper box fan with a MERV 13 filter, since readiness credit is per item and
+  two items would both be bought).
 - **0.5, a second core piece:** needed for the capability to work in a common case, or the core for
   part of the household: the contact card, drills, the 48-hour list, pet and infant plans and the
   pet go-kit, the older-adult and livestock plans, the car kit, the bleeding-control kit, the device
@@ -371,7 +372,7 @@ of that harm the item averts on its own, and every item that lists a readiness b
 | fire | 0.2–0.3 | `fire_learn_shutoffs` (0.3); `fire_utility_wrench`, `water_heater_strap_kit` (0.2) |
 | security | 1.0, 0.5 | `community_know_two_neighbours`; `security_home_basics`, `community_trusted_circle` |
 | security | 0.1–0.3 | `security_lockout_plan` (0.3); `security_motion_light`, `security_key_safe` (0.2); `security_firearms_safe_storage` (0.1) |
-| clean_air | 1.0 | `fire_clean_air_room`, `fire_diy_filter_box` |
+| clean_air | 1.0 | `fire_clean_air_room` (a HEPA air cleaner or the cheaper filter box) |
 | clean_air | 0.5 | `fire_clean_room_plan`, `med_n95_respirators` |
 | clean_air | 0.2–0.3 | `evac_shelter_in_place_kit` (0.3); `med_cleanup_ppe` (0.2) |
 

@@ -199,7 +199,7 @@ the lowest to the highest. The fuel-can rows add each can's share of a bottle of
 
 ## Round 2, v0.2.0 (observed 2026-09-26)
 
-Rows for the items the round-2 practitioner review proposed (N-03 to N-20), the clean-air filter box,
+Rows for the items the round-2 practitioner review proposed (N-03 to N-20), the clean-air filter box (two more rows for the clean-room air cleaner, the cheaper way to fill it),
 the key safe and jump starter from the Deviant Ollam lessons, and a camp stove that burns propane,
 which replaces the two butane stove rows above (the stove must work where winters freeze; review
 P-07). Home-center and supermarket prices were read from the stores' search pages in an ordinary
@@ -250,7 +250,7 @@ Composite rows add up the listed parts. The hand pump has one fixed-price listin
 | `security_key_safe` | homedepot.com (browser) | Resettable push-button lock box (model 5423DHC) | 62.57 | 1 | 62.57 | key safe | https://www.homedepot.com/s/wall%20mount%20key%20lock%20box%20push%20button |
 | `special_kids_activity_kit` | kroger.com (browser) | Composite: memory card game ($4.99) + 24 washable crayons ($3.99) + giant drawing pad ($5.99) | 14.97 | 1 | 14.97 | kit | https://www.kroger.com/search?query=coloring%20book%20crayons |
 | `special_kids_activity_kit` | kroger.com (browser) | Composite: memory card game ($4.99) + 24 colored pencils ($4.99) + 16 washable markers ($6.99) + giant drawing pad ($5.99) | 22.96 | 1 | 22.96 | kit | https://www.kroger.com/search?query=coloring%20book%20crayons |
-| `fire_diy_filter_box` | homedepot.com (browser) | Composite: 20-inch three-speed box fan (model B20201, $24.98) + one 20 x 20 x 1 MERV 13 filter from a four-pack ($39.97, $9.99 each) | 34.97 | 1 | 34.97 | filter box | https://www.homedepot.com/s/20%20in%20box%20fan |
-| `fire_diy_filter_box` | homedepot.com (browser) | Composite: 20-inch box fan with weather-shield design (model B20540, $36.98) + single 20 x 20 x 1 MERV 13 pleated filter (model 61201.012020, $23.97) | 60.95 | 1 | 60.95 | filter box | https://www.homedepot.com/s/20x20x1%20merv%2013 |
+| `fire_clean_air_room` | homedepot.com (browser) | Composite: 20-inch three-speed box fan (model B20201, $24.98) + one 20 x 20 x 1 MERV 13 filter from a four-pack ($39.97, $9.99 each) | 34.97 | 1 | 34.97 | air cleaner | https://www.homedepot.com/s/20%20in%20box%20fan |
+| `fire_clean_air_room` | homedepot.com (browser) | Composite: 20-inch box fan with weather-shield design (model B20540, $36.98) + single 20 x 20 x 1 MERV 13 pleated filter (model 61201.012020, $23.97) | 60.95 | 1 | 60.95 | air cleaner | https://www.homedepot.com/s/20x20x1%20merv%2013 |
 | `fire_home_tarp_kit` | homedepot.com (browser) | Composite: 10 x 12 ft heavy-duty tarp (model SPT010012, $25.95) + 3/8 in x 100 ft braided rope (model 14156, $6.58) + 60-yard duct tape (model 242760, $6.98) | 39.51 | 1 | 39.51 | kit | https://www.homedepot.com/s/heavy%20duty%20tarp%2010%20ft%20x%2012%20ft |
 | `fire_home_tarp_kit` | homedepot.com (browser) | Composite: 10 x 12 ft 14-mil heavy-duty tarp (model TS-101-10x12, $38.48) + 1/2 in x 100 ft braided rope (model 72465, $19.26) + 30-yard heavy duct tape (model 106718, $9.94) | 67.68 | 1 | 67.68 | kit | https://www.homedepot.com/s/rope%20100%20ft |
