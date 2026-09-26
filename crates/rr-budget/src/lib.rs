@@ -111,7 +111,9 @@ pub use input::{
     Purchase, Risks, Schedule, SimultaneousNeed,
 };
 pub use savings::{
-    FIRST_MILESTONE_USD, LEGAL_BAIL_MEDIAN_USD, LEGAL_COST_CITATION, THREE_MONTH_POINT,
+    FIRST_MILESTONE_USD, LEGAL_BAIL_50K_OR_MORE_PER_100, LEGAL_BAIL_MEDIAN_USD,
+    LEGAL_BAIL_UNDER_5K_PER_100, LEGAL_BAIL_YEAR, LEGAL_BOND_FEE_SHARE, LEGAL_COST_CITATION,
+    THREE_MONTH_POINT,
 };
 
 /// Crate name, used by the CLI's `--version` and by the about screen.

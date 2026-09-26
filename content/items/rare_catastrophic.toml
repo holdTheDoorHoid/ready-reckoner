@@ -73,4 +73,6 @@ price_band_usd = { low = 37.95, high = 97.95, per = "bag", note = "Two retail li
 retrieved = "2026-09-25"
 quantity_rule = "once"
 citations = ["rr_research_risk_model", "fri_nuclear_risk_2024", "rr_price_observations_2026_09"]
-hazard_extras = ["nuclear_attack"]
+# The months-long blackout family, not the nuclear one: an electromagnetic pulse reaches far beyond
+# any blast or fallout zone, and that family's block carries the EMP paragraph (planner, 2026-09-26).
+hazard_extras = ["multi_month_blackout"]

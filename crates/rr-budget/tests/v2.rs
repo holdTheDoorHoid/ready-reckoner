@@ -316,7 +316,7 @@ fn the_rare_allowance_buys_only_for_ticked_families_likely_enough_here() {
         let mut water = buy("water", BucketId::WaterOut, TierId::H72, 150.0);
         water.life_safety = true;
         let (m, mm) = rare("meter", Some(HazardId::NuclearAttack), 25.0);
-        let (f, fm) = rare("faraday", Some(HazardId::NuclearAttack), 68.0);
+        let (f, fm) = rare("nuclear_extra", Some(HazardId::NuclearAttack), 68.0);
         let (sol, sm) = rare("solar_shield", Some(HazardId::GeomagneticStorm), 30.0);
         let (k, km) = rare("kitless", None, 10.0);
         let mut s = Setup::new(PHL, 100.0, 0.0)
@@ -341,13 +341,13 @@ fn the_rare_allowance_buys_only_for_ticked_families_likely_enough_here() {
         .map(|i| i.as_str())
         .collect();
     assert!(skipped.contains(&"solar_shield") && skipped.contains(&"kitless"));
-    let (water, meter, faraday) = (
+    let (water, meter, extra) = (
         month_of(&r, "water").unwrap(),
         month_of(&r, "meter").unwrap(),
-        month_of(&r, "faraday").unwrap(),
+        month_of(&r, "nuclear_extra").unwrap(),
     );
     assert!(meter > water, "nothing before the three-day basics");
-    assert!(faraday > meter, "best value per dollar first");
+    assert!(extra > meter, "best value per dollar first");
     assert!(r.sequence.iter().filter(|p| p.rare_catastrophic).count() == 2);
     // No allowance money moves before the basics are in hand.
     let first_rare_deposit = lines(&r)
@@ -376,15 +376,16 @@ fn the_rare_allowance_buys_only_for_ticked_families_likely_enough_here() {
     let mut v1 = setup(&[]);
     v1.options.rare_catastrophic_opt_in = true;
     assert!(month_of(&v1.run(), "meter").is_some());
-    // Half the allowance over ten months is $50: the $25 meter fits, the $68 bag would not.
+    // Half the allowance over ten months is $50: the $25 meter fits, the $68 second nuclear item
+    // would not.
     let mut short = setup(&["nuclear_attack"]);
     short.options.max_months = 10;
     let r = short.run();
     assert!(month_of(&r, "meter").is_some());
-    assert_eq!(month_of(&r, "faraday"), None);
+    assert_eq!(month_of(&r, "nuclear_extra"), None);
     assert!(
         r.rare_catastrophic_skipped
-            .contains(&ItemId::from("faraday"))
+            .contains(&ItemId::from("nuclear_extra"))
     );
 }
 
@@ -671,6 +672,8 @@ fn the_legal_line_needs_the_opt_in_and_the_arrest_row() {
     let why = &r.plan.savings_track.as_ref().unwrap().why;
     assert!(why.contains("Apart from these months"), "{why}");
     assert!(why.contains("$10,000"), "{why}");
+    assert!(why.contains("about $1,000 on a $10,000 bail"), "{why}");
+    assert!(why.contains("about 28 in 100 were under $5,000"), "{why}");
     assert_eq!(
         r.citations,
         [rr_types::CitationId::from(LEGAL_COST_CITATION)]

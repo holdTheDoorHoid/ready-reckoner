@@ -209,10 +209,14 @@ fn fans_arrive_before_summer_where_the_cost_order_allows() {
     }
 }
 
-/// REVIEW §2.4: the allowance buys only for ticked families likely enough here. Minot (a missile
-/// field, class A) ticked the nuclear family: the dosimeter card comes after the three-day
-/// life-safety purchases and says what it is for. Coos Bay (class E) ticking every family buys
-/// nothing. Philadelphia (class C1) with the v1 switch buys the card and the Faraday bag.
+/// REVIEW §2.4: the allowance buys only for ticked families likely enough here. The dosimeter card
+/// goes with the nuclear family; Faraday storage with the months-long blackout family (an
+/// electromagnetic pulse reaches far beyond any blast zone; planner, 2026-09-26). Minot (a missile
+/// field, class A) ticked the nuclear and solar-storm families: the card comes after the three-day
+/// life-safety purchases and says what it is for, and there is no Faraday storage (the blackout
+/// family is not ticked). Coos Bay ticking every family buys nothing (the nuclear family about 1.2
+/// and the blackout family about 6.9 in 10,000 over ten years). Philadelphia ticking every family
+/// buys both (the blackout family about 1.07 in 1,000).
 #[test]
 fn the_rare_allowance_by_family_on_the_fixtures() {
     let (_, _, a, minot) = every_household()
@@ -266,12 +270,33 @@ fn the_rare_allowance_by_family_on_the_fixtures() {
         "class E: the nuclear family is under 1 in 1,000 over ten years"
     );
 
+    assert_eq!(first_month(minot, "rare_faraday_storage"), None);
+
     let mut phl = household("philadelphia-renters-4");
-    phl.dials.rare_catastrophic_opt_in = true;
+    phl.dials.rare_opt_in = vec!["all".into()];
     let out = assess(&phl);
     for id in ["rare_radiation_meter", "rare_faraday_storage"] {
         assert!(first_month(&out, id).is_some(), "Philadelphia: {id}");
     }
+    let bag = out
+        .plan
+        .months
+        .iter()
+        .flat_map(|m| &m.items)
+        .find(|i| i.item_id == "rare_faraday_storage" && i.kind == PlanItemKind::Purchase)
+        .unwrap();
+    assert_eq!(bag.hazards, [rr_types::HazardId::MultiMonthBlackout]);
+    assert!(
+        bag.why.contains("power out for months row you ticked"),
+        "{}",
+        bag.why
+    );
+    // Ticking the nuclear family alone no longer buys it.
+    let mut nuclear_only = household("philadelphia-renters-4");
+    nuclear_only.dials.rare_opt_in = vec!["nuclear_attack".into()];
+    let out = assess(&nuclear_only);
+    assert!(first_month(&out, "rare_radiation_meter").is_some());
+    assert_eq!(first_month(&out, "rare_faraday_storage"), None);
 }
 
 /// The long-horizon section lists the flagged items when a target reaches 30 days or the
