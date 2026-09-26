@@ -672,11 +672,11 @@ fn outage_floor(ctx: &Ctx<'_>, rates: &mut Vec<HazardRate>, notes: &mut Notes) {
     extra.low = ((weather.low - modelled) / c).max(0.0);
     extra.high = (weather.high - modelled) / c;
     notes.add(format!(
-        "Power-outage records ({}) show homes in {county} caught in an outage about {} times a \
-         year, more often than the county's storm records explain. The extra outages are \
-         counted as windstorms, the most common cause.",
+        "Power-outage records ({}) show homes in {county} caught in an outage {}, more often \
+         than the county's storm records explain. The extra outages are counted as windstorms, \
+         the most common cause.",
         o.years_covered,
-        crate::sentence::sig2(recorded)
+        crate::sentence::about_times_a_year(recorded)
     ));
     match rates.iter_mut().find(|r| r.hazard == HazardId::StrongWind) {
         Some(wind) => {

@@ -139,7 +139,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 ### Notes on these numbers
 
 - These chances are for Miami-Dade County as a whole. A home near a river, the coast or a steep slope can face more; the county's average is what the plan uses.
-- Power-outage records (2014-2025) show homes in Miami-Dade County caught in an outage about 0.47 times a year, more often than the county's storm records explain. The extra outages are counted as windstorms, the most common cause.
+- Power-outage records (2014-2025) show homes in Miami-Dade County caught in an outage about once every 2 years, more often than the county's storm records explain. The extra outages are counted as windstorms, the most common cause.
 - Around 2050 (climate projections; where there is a range, it runs from middle to high emissions): heat waves 3 times as often; a larger share of hurricanes reaching major strength, 10 to 30 % more (how often hurricanes come does not change).
 - No increase is projected here by 2050 for droughts and wildfires.
 - Heavier rain by 2050 is not added to floods from rivers or heavy rain because your home is above the ground floor.

@@ -154,7 +154,7 @@ Shown apart, because a tiny chance times a huge loss would otherwise crowd out e
 ### Notes on these numbers
 
 - These chances are for Fort Bend County as a whole. A home near a river, the coast or a steep slope can face more; the county's average is what the plan uses.
-- Power-outage records (2014-2025) show homes in Fort Bend County caught in an outage about 0.45 times a year, more often than the county's storm records explain. The extra outages are counted as windstorms, the most common cause.
+- Power-outage records (2014-2025) show homes in Fort Bend County caught in an outage about once every 2 years, more often than the county's storm records explain. The extra outages are counted as windstorms, the most common cause.
 - Also checked, and too rare here to list (under 1 in 100,000 a year): coastal floods.
 - Around 2050 (climate projections; where there is a range, it runs from middle to high emissions): drought 6 to 8 % more often; heat waves 3 times as often; a larger share of hurricanes reaching major strength, 10 to 30 % more (how often hurricanes come does not change); flooding from heavy rain 5 to 12 % more often; wildfire 6 to 8 % more often.
 - This county has too few freezing days to project a change for cold waves and winter storms, so they are left as today.

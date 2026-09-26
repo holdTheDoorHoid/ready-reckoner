@@ -206,17 +206,28 @@ pub(crate) fn natural_frequency(f: Frequency, verb: &str) -> String {
         format!("Fewer than 1 in 100,000 households like yours will {verb} {when}.")
     };
     if f.rate >= 1.0 {
-        // "Nearly every household" hides how often; say it ("about once a year", never
-        // "about 1 times a year").
+        // "Nearly every household" hides how often; say it.
         s.pop();
-        let times = sig2(f.rate);
-        if times == "1" {
-            s.push_str(" (about once a year).");
-        } else {
-            s.push_str(&format!(" (about {times} times a year)."));
-        }
+        s.push_str(&format!(" ({}).", about_times_a_year(f.rate)));
     }
     s
+}
+
+/// A yearly rate in words: "about 2.4 times a year", "about once a year" (never "about 1 times
+/// a year"), "about once every 3 years".
+pub(crate) fn about_times_a_year(rate: f64) -> String {
+    if rate >= 1.05 {
+        format!("about {} times a year", sig2(rate))
+    } else if rate >= 0.75 {
+        "about once a year".to_owned()
+    } else if rate > 0.0 {
+        format!(
+            "about once every {} years",
+            thousands((1.0 / rate).round().max(2.0) as u64)
+        )
+    } else {
+        "never".to_owned()
+    }
 }
 
 /// A range-only sentence for a rare catastrophe (research §6.3): never a point estimate.
@@ -314,6 +325,10 @@ mod tests {
         let s = natural_frequency(freq(1.03, 0.8, 1.3, false), "go through a cold wave");
         assert!(s.ends_with("(about once a year)."), "{s}");
         assert!(!s.contains("1 times"), "{s}");
+        assert_eq!(about_times_a_year(2.44), "about 2.4 times a year");
+        assert_eq!(about_times_a_year(1.0), "about once a year");
+        assert_eq!(about_times_a_year(0.83), "about once a year");
+        assert_eq!(about_times_a_year(0.3), "about once every 3 years");
     }
 
     #[test]
