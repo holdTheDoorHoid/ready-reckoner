@@ -600,10 +600,10 @@ pub fn cooking_fuel_canisters(days: f64, people_list: &[Person]) -> Option<Sizin
         return None;
     }
     let mut b = Basis::new();
+    b.cite("cdc_co_basics");
     let lb = b.k(keys::COOKING_FUEL_LB_PER_PERSON_DAY);
     let per_canister = b.k(keys::FUEL_CANISTER_LB);
     let min = b.k(keys::COOKING_FUEL_MIN_CANISTERS);
-    b.cite("cdc_co_basics");
     let fuel = n * days * lb;
     let q = crate::format::ceil_count(fuel / per_canister).max(min);
     let text = format!(

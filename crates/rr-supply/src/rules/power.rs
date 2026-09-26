@@ -349,6 +349,8 @@ pub fn generator_units(days: f64, housing: &Housing) -> Option<Sizing> {
         return None;
     }
     let mut b = Basis::new();
+    b.cite("cdc_co_basics");
+    b.cite("ready_gov_power_outages");
     let well = housing.water == WaterSource::Well;
     let from = if well {
         b.k(keys::GENERATOR_MIN_DAYS_WELL)
@@ -359,11 +361,13 @@ pub fn generator_units(days: f64, housing: &Housing) -> Option<Sizing> {
         return None;
     }
     let clearance = b.k(keys::GENERATOR_CLEARANCE_FT);
-    b.cite("cdc_co_basics");
-    b.cite("ready_gov_power_outages");
     let mut text = format!(
-        "Optional: a portable generator can run the fridge, lights{} through a {} outage. It must run outdoors, at least {} feet from windows, doors and vents, never in a garage, and it needs fuel (see the fuel line).",
-        if well { " and the well pump" } else { "" },
+        "Optional: a portable generator can run {} through a {} outage. It must run outdoors, at least {} feet from windows, doors and vents, never in a garage, and it needs fuel (see the fuel line).",
+        if well {
+            "the fridge, lights and the well pump"
+        } else {
+            "the fridge and lights"
+        },
         day_adjective(days),
         num(clearance, 0)
     );

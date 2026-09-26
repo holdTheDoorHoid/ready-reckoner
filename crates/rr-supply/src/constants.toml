@@ -262,7 +262,7 @@ label = "Days one bottle of unscented bleach covers water treatment and cleaning
 unit = "day"
 default = 14.0
 prior = true
-sources = ["rr_expert_prior", "rr_research_supply_standards", "cdc_bleach_disinfecting"]
+sources = ["cdc_bleach_disinfecting", "rr_research_supply_standards", "rr_expert_prior"]
 note = "One 64 to 121 oz bottle covers a household's water treatment and surface cleaning for about two weeks (an assumption). Bleach loses strength over time."
 
 [[constant]]
