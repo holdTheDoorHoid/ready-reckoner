@@ -77,10 +77,10 @@ pub use survival::{Survival, probit};
 pub const CODE_CITATIONS: [&str; 6] = [
     "census_pulse_displacement",
     "county_boil_water_records",
-    "eagle_i_outages",
-    "mell_2017_ems",
+    "mell_2017_ems_response",
     "noaa_storm_events",
-    "prior_rr_coupling",
+    "ornl_eagle_i_outages",
+    "rr_risk_model_priors",
 ];
 
 /// Every citation id this crate can put in an output, sorted: the effects table's and

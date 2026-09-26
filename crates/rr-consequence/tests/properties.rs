@@ -371,7 +371,7 @@ fn county_outage_records_replace_the_county_wide_storm_class() {
         with.bucket(BucketId::Power)
             .sources
             .iter()
-            .any(|s| s == "eagle_i_outages")
+            .any(|s| s == "ornl_eagle_i_outages")
     );
     assert!(without.overrides.is_empty());
     // The county-wide class runs at the records' rate…
@@ -724,7 +724,7 @@ fn a_scenario_with_no_consequence_rows_is_reported_but_changes_nothing() {
         on: true,
         applies_because: "Test.".into(),
         variant: None,
-        sources: vec!["prior_rr_event_shares".into()],
+        sources: vec!["rr_risk_model_priors".into()],
     };
     let a = assess_with_draws(
         &input,

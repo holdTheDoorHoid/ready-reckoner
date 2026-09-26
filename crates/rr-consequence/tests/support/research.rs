@@ -30,7 +30,7 @@ fn rate(h: HazardId, r: f64, factor: f64, evidence: Evidence, src: &str) -> Hous
 }
 
 fn prior(h: HazardId, r: f64) -> HouseholdEventRate {
-    rate(h, r, 2.0, Evidence::Prior, "prior_rr_event_shares")
+    rate(h, r, 2.0, Evidence::Prior, "rr_risk_model_priors")
 }
 
 /// County outage statistics whose duration shares follow a log-normal with this median and 90th
@@ -90,7 +90,7 @@ pub fn philadelphia_rates() -> Vec<HouseholdEventRate> {
             0.0052,
             1.3,
             Evidence::Empirical,
-            "usfa_residential_fires_2023",
+            "usfa_residential_fires",
         ),
         // Two earners at 0.083 spells a year (regular salary).
         rate(
@@ -106,7 +106,7 @@ pub fn philadelphia_rates() -> Vec<HouseholdEventRate> {
             1.892,
             1.2,
             Evidence::Empirical,
-            "cdc_ed_visits_2022",
+            "cdc_nchs_ed_visits",
         ),
         prior(VehicleStranding, 0.1),
         prior(Burglary, 0.015),
@@ -158,7 +158,7 @@ pub fn coos_rates() -> Vec<HouseholdEventRate> {
             0.0026,
             1.3,
             Evidence::Empirical,
-            "usfa_residential_fires_2023",
+            "usfa_residential_fires",
         ),
         rate(
             JobLoss,
@@ -172,7 +172,7 @@ pub fn coos_rates() -> Vec<HouseholdEventRate> {
             0.946,
             1.2,
             Evidence::Empirical,
-            "cdc_ed_visits_2022",
+            "cdc_nchs_ed_visits",
         ),
         prior(VehicleStranding, 0.1),
         prior(Burglary, 0.01),
@@ -201,7 +201,7 @@ pub fn coos_scenarios(cascadia_on: bool) -> Vec<ScenarioCandidate> {
             applies_because: "Coos County is on the Oregon coast above the Cascadia fault; Oregon asks households to be ready for at least two weeks.".into(),
             variant: Some("coast".into()),
             sources: vec![
-                CitationId::from("goldfinger_2012_cascadia"),
+                CitationId::from("osu_cascadia_2012"),
                 CitationId::from("oregon_resilience_plan_2013"),
             ],
         },
@@ -216,7 +216,7 @@ pub fn coos_scenarios(cascadia_on: bool) -> Vec<ScenarioCandidate> {
             applies_because: "Coos County has a tsunami inundation zone.".into(),
             variant: None,
             sources: vec![
-                CitationId::from("goldfinger_2012_cascadia"),
+                CitationId::from("osu_cascadia_2012"),
                 CitationId::from("dogami_tsunami_faq"),
             ],
         },

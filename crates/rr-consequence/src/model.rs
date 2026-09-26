@@ -712,7 +712,7 @@ fn add_pool_terms(
                 "how long county-wide storm outages last here".to_owned(),
                 Evidence::Empirical,
             );
-            let source = CitationId::from("eagle_i_outages");
+            let source = CitationId::from("ornl_eagle_i_outages");
             // Attribution: by short-outage rate; with no storm rates at all, to strong wind.
             let shares: Vec<(HazardId, f64, f64, f64)> = if total > 0.0 {
                 pool_rows
@@ -861,7 +861,7 @@ fn derive(source: &Term, bucket: BucketId, q: f64, threshold: f64, rule: &'stati
     } else {
         None
     };
-    t.sources.push(CitationId::from("prior_rr_coupling"));
+    t.sources.push(CitationId::from("rr_risk_model_priors"));
     t
 }
 
@@ -875,7 +875,7 @@ fn apply_couplings(
 ) {
     let table = inp.table;
     let prm = &table.params;
-    let coupling_src = vec![CitationId::from("prior_rr_coupling")];
+    let coupling_src = vec![CitationId::from("rr_risk_model_priors")];
     let already = |t: &Term, b: BucketId| -> f64 {
         table_share
             .get(&(t.owner(), t.class.clone(), b))
@@ -980,7 +980,7 @@ fn apply_couplings(
         if q_param.is_some() {
             w.q_param = q_param;
         }
-        w.sources.push(CitationId::from("prior_rr_coupling"));
+        w.sources.push(CitationId::from("rr_risk_model_priors"));
     }
     let (f_high_rise, f_heating, f_cooling, f_rx) = (
         fired.contains(&"high_rise_pumps"),
@@ -1165,7 +1165,7 @@ fn fixed_rate_term(
 /// Coupling rules applied by other crates, recorded so the household sees one explainable table.
 fn household_notes(input: &PlanInput, hh: &Household, couplings: &mut Vec<CouplingApplied>) {
     use rr_types::{AgeBand, PoweredDevice, Setting, Tenure};
-    let prior = [CitationId::from("prior_rr_coupling")];
+    let prior = [CitationId::from("rr_risk_model_priors")];
     if input.people.iter().any(|p| p.age_band == AgeBand::Infant) {
         coupling_note(
             couplings,
@@ -1273,7 +1273,7 @@ fn household_notes(input: &PlanInput, hh: &Household, couplings: &mut Vec<Coupli
                 .to_owned(),
             &[BucketId::MedicalEmergency],
             "rr-consequence",
-            &[CitationId::from("mell_2017_ems")],
+            &[CitationId::from("mell_2017_ems_response")],
         );
     }
     if input.pets.dogs + input.pets.cats + input.pets.small + input.pets.large_animals > 0 {

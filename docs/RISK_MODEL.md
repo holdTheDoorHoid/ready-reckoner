@@ -279,8 +279,6 @@ earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092
   the Hayward fault, USGS's 7–10 % for New Madrid, the SSA "more than 1 in 4" disability figure,
   the one-third major share of landfalling hurricanes, and the 1 % burglary prior.
 
-## Consequences and targets` (rr-consequence), and later `## Supply sizing` (rr-supply).
-
 ## Consequences and targets
 
 Owner: `crates/rr-consequence`. Everything below is implemented and tested; the numbers are in
@@ -374,183 +372,183 @@ ordinary storms and kept explicit priors only for classes the 2018–2025 record
 <!-- effects-table:start (generated from crates/rr-consequence/src/effects.toml) -->
 | Hazard or *scenario* | Bucket | Class | Event class in words | Share | Median | Bad case (p90) | Evidence | Applies / notes | Sources |
 |---|---|---|---|---|---|---|---|---|---|
-| avalanche | supplies | slide | avalanches closing roads | 1 | 1 d | 4 d | prior |  | prior_rr_durations |
-| avalanche | get_home | slide | avalanches closing roads | 0.3 | — | — | prior | households with a commuter | prior_rr_event_shares |
-| avalanche | evacuate | slide | avalanches closing roads | 0.05 | 2 d | 7 d | prior | warning 0.5–12 h | prior_rr_event_shares, prior_rr_durations |
-| avalanche | home_loss | slide | avalanches closing roads | 0.01 | — | — | prior |  | prior_rr_event_shares |
-| coastal_flooding | evacuate | surge | flooding from the sea | 0.5 | 3 d | 30 d | prior | warning 12–72 h | prior_rr_event_shares, prior_rr_durations |
-| coastal_flooding | home_loss | surge | flooding from the sea | 0.2 | — | — | prior |  | fema_nri_v120, prior_rr_event_shares |
-| coastal_flooding | water_boil | surge | flooding from the sea | 0.1 | 3 d | 10 d | prior | homes on public water | epa_bwa_report_2024, prior_rr_durations |
-| coastal_flooding | power | surge | flooding from the sea | 0.3 | 1 d | 5 d | prior | in heat 0.2; in cold 0.3 | prior_rr_event_shares, prior_rr_durations |
-| coastal_flooding | supplies | surge | flooding from the sea | 0.3 | 1 d | 5 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| coastal_flooding | medication | surge | flooding from the sea | 0.1 | 5 d | 30 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| cold_wave | power | extreme_cold | extreme cold straining the grid | 0.03 | 1 d | 3 d | prior | in cold 1 | prior_rr_event_shares, prior_rr_durations |
-| cold_wave | water_boil | extreme_cold | extreme cold straining the grid | 0.05 | 7 d | 21 d | prior | homes on public water | shaffer_2026_texas_bwn, prior_rr_event_shares |
-| cold_wave | water_out | extreme_cold | extreme cold straining the grid | 0.02 | 1 d | 5 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| cold_wave | thermal | no_heating | cold waves in a home with no heating | 1 | 2 d | 5 d | prior | homes without heating; county events: cold_wave, extreme_cold, extreme_cold_wind_chill, cold_wind_chill | prior_rr_coupling, prior_rr_durations |
-| cold_wave | supplies | extreme_cold | extreme cold straining the grid | 0.1 | 1 d | 2 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| drought | water_out | low_yield | drought lowering a well | 1 | 30 d | 90 d | prior | homes on a private well; county events: drought | prior_rr_coupling, prior_rr_durations |
-| earthquake | power | damaging | damaging earthquakes | 0.5 | 12 h | 3 d | prior | in heat 0.1; in cold 0.4 | hazus_mr4_restoration, oregon_resilience_plan_2013, prior_rr_event_shares |
-| earthquake | water_out | damaging | damaging earthquakes | 0.3 | 3 d | 14 d | prior | homes on public water | hazus_mr4_restoration, prior_rr_event_shares |
-| earthquake | water_out | damaging | damaging earthquakes | 0.2 | 8 d | 20 d | prior | homes on a private well | hazus_mr4_restoration, prior_rr_event_shares |
-| earthquake | supplies | damaging | damaging earthquakes | 0.3 | 1 d | 5 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| earthquake | medication | damaging | damaging earthquakes | 0.2 | 2 d | 7 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| earthquake | comms | damaging | damaging earthquakes | 0.5 | 12 h | 3 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| earthquake | evacuate | damaging | damaging earthquakes | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | prior_rr_event_shares, prior_rr_durations |
-| earthquake | home_loss | damaging | damaging earthquakes | 0.05 | — | — | prior |  | fema_nri_v120, prior_rr_event_shares |
-| earthquake | get_home | damaging | damaging earthquakes | 0.27 | — | — | prior | households with a commuter | prior_rr_coupling |
-| hail | power | local | short storm outages | 0.1 | 3 h | 10 h | prior | county outage records replace the county-wide part; in heat 0.3 | prior_rr_event_shares, prior_rr_durations |
-| hail | home_loss | local | short storm outages | 0.002 | — | — | prior |  | prior_rr_event_shares |
-| heat_wave | power | heat_outage | heat waves straining the grid | 0.02 | 4 h | 20 h | prior | county outage records replace the county-wide part; in heat 1 | stone_2023_heat_blackout, prior_rr_event_shares, prior_rr_durations |
-| heat_wave | thermal | no_cooling | heat waves in a home without air conditioning | 1 | 3 d | 7 d | prior | homes without air conditioning; county events: heat_wave, excessive_heat, heat | prior_rr_coupling, prior_rr_durations |
-| hurricane | power | cat12 | hurricanes and tropical storms | 0.45 | 1.5 d | 5 d | duration data, share prior | in heat 0.5 | ornl_repowrd_2022, prior_rr_event_shares |
-| hurricane | power | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 5 d | 16 d | duration data, share prior | in heat 0.5; dropped when *major_hurricane_direct_hit* is offered | ornl_repowrd_2022, prior_rr_event_shares |
-| hurricane | water_boil | cat12 | hurricanes and tropical storms | 0.15 | 6 d | 18 d | prior | homes on public water | shaffer_2026_texas_bwn, prior_rr_event_shares |
-| hurricane | supplies | cat12 | hurricanes and tropical storms | 0.1 | 2 d | 5 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| hurricane | supplies | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 5 d | 14 d | prior | dropped when *major_hurricane_direct_hit* is offered | prior_rr_event_shares, prior_rr_durations |
-| hurricane | medication | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 7 d | 21 d | prior | dropped when *major_hurricane_direct_hit* is offered | prior_rr_event_shares, prior_rr_durations |
-| hurricane | comms | cat12 | hurricanes and tropical storms | 0.1 | 12 h | 2 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| hurricane | comms | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 3 d | 10 d | prior | dropped when *major_hurricane_direct_hit* is offered | prior_rr_event_shares, prior_rr_durations |
-| hurricane | evacuate | cat12 | hurricanes and tropical storms | 0.1 | 3 d | 14 d | prior | warning 24–72 h | prior_rr_event_shares, prior_rr_durations |
-| hurricane | evacuate | mobile_home | wind warnings for mobile homes | 0.2 | 2 d | 7 d | prior | mobile homes; warning 24–72 h | prior_rr_coupling |
-| hurricane | home_loss | cat12 | hurricanes and tropical storms | 0.01 | — | — | prior |  | prior_rr_event_shares |
-| hurricane | home_loss | cat3plus | major hurricanes (category 3 or a direct hit) | 0.02 | — | — | prior | dropped when *major_hurricane_direct_hit* is offered | prior_rr_event_shares |
-| ice_storm | power | local | short storm outages | 0.3 | 3 h | 10 h | prior | county outage records replace the county-wide part; in cold 1 | prior_rr_event_shares, prior_rr_durations |
-| ice_storm | power | major | big ice storms | 0.1 | 1.5 d | 5 d | prior | in cold 1 | inquirer_peco_outages, prior_rr_durations, prior_rr_event_shares |
-| ice_storm | power | record | an ice storm of record | 0.017 | 5 d | 14 d | prior | in cold 1 | prior_rr_durations, prior_rr_event_shares |
-| ice_storm | supplies | icy_roads | icy roads | 0.5 | 1 d | 3 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| ice_storm | supplies | record | an ice storm of record | 0.017 | 5 d | 14 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| ice_storm | medication | record | an ice storm of record | 0.017 | 7 d | 21 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| ice_storm | comms | record | an ice storm of record | 0.017 | 3 d | 10 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| ice_storm | get_home | icy_roads | icy roads | 0.05 | — | — | prior | households with a commuter | prior_rr_event_shares |
-| landslide | supplies | slide | landslides closing roads | 0.2 | 1 d | 5 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| landslide | power | slide | landslides closing roads | 0.1 | 12 h | 2 d | prior | in cold 0.5 | prior_rr_event_shares, prior_rr_durations |
-| landslide | evacuate | slide | landslides closing roads | 0.1 | 5 d | 60 d | prior | warning 0–2 h | prior_rr_event_shares, prior_rr_durations |
-| landslide | home_loss | slide | landslides closing roads | 0.05 | — | — | prior |  | prior_rr_event_shares |
-| landslide | get_home | slide | landslides closing roads | 0.1 | — | — | prior | households with a commuter | prior_rr_event_shares |
-| lightning | power | local | short storm outages | 0.1 | 3 h | 10 h | prior | county outage records replace the county-wide part; in heat 0.3 | prior_rr_event_shares, prior_rr_durations |
-| riverine_flooding | evacuate | flood | floods at or near the home | 0.3 | 3 d | 30 d | prior | warning 1–12 h | prior_rr_event_shares, prior_rr_durations |
-| riverine_flooding | home_loss | flood | floods at or near the home | 0.15 | — | — | prior |  | fema_nri_v120, prior_rr_event_shares |
-| riverine_flooding | water_boil | flood | floods at or near the home | 0.1 | 3 d | 10 d | prior | homes on public water | epa_bwa_report_2024, prior_rr_durations |
-| riverine_flooding | power | flood | floods at or near the home | 0.1 | 12 h | 3 d | prior | in heat 0.2; in cold 0.3 | prior_rr_event_shares, prior_rr_durations |
-| riverine_flooding | supplies | flood | floods at or near the home | 0.2 | 1 d | 4 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| riverine_flooding | medication | flood | floods at or near the home | 0.15 | 5 d | 30 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| riverine_flooding | get_home | flood | floods at or near the home | 0.05 | — | — | prior | households with a commuter | prior_rr_event_shares |
-| strong_wind | power | local | short storm outages | 0.5 | 3 h | 10 h | prior | county outage records replace the county-wide part; in heat 0.15; in cold 0.4 | eia_861_2024, prior_rr_durations, prior_rr_event_shares |
-| strong_wind | power | major | a windstorm bigger than any in the recent records | 0.012 | 1.5 d | 5 d | prior | in cold 0.8 | prior_rr_durations, prior_rr_event_shares |
-| strong_wind | comms | local | short storm outages | 0.14 | 10 h | 1.8 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| tornado | power | path | tornadoes | 0.8 | 1 d | 5 d | prior | in heat 0.2; in cold 0.1 | prior_rr_event_shares, prior_rr_durations |
-| tornado | supplies | path | tornadoes | 0.3 | 1 d | 3 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| tornado | comms | path | tornadoes | 0.3 | 12 h | 2 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| tornado | medication | path | tornadoes | 0.1 | 2 d | 7 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| tornado | home_loss | path | tornadoes | 0.3 | — | — | prior |  | prior_rr_event_shares |
-| tornado | evacuate | mobile_home | wind warnings for mobile homes | 0.5 | 1 d | 7 d | prior | mobile homes; warning 0.1–0.5 h | prior_rr_coupling |
-| tsunami | evacuate | distant | tsunamis from distant earthquakes | 1 | 1 d | 7 d | prior | warning 2–12 h | prior_rr_durations |
-| tsunami | home_loss | distant | tsunamis from distant earthquakes | 0.1 | — | — | prior |  | prior_rr_event_shares |
-| volcanic_activity | supplies | ash | volcanic ash | 0.5 | 2 d | 7 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| volcanic_activity | evacuate | ash | volcanic ash | 0.2 | 5 d | 30 d | prior | warning 1–48 h | prior_rr_event_shares, prior_rr_durations |
-| volcanic_activity | power | ash | volcanic ash | 0.2 | 1 d | 5 d | prior | in cold 0.4 | prior_rr_event_shares, prior_rr_durations |
-| volcanic_activity | water_boil | ash | volcanic ash | 0.2 | 2 d | 7 d | prior | homes on public water | prior_rr_event_shares, prior_rr_durations |
-| volcanic_activity | comms | ash | volcanic ash | 0.1 | 1 d | 3 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| volcanic_activity | home_loss | ash | volcanic ash | 0.02 | — | — | prior |  | prior_rr_event_shares |
-| wildfire | evacuate | threat | wildfires | 0.075 | 3 d | 30 d | prior | warning 0.25–12 h | prior_rr_event_shares, prior_rr_durations |
-| wildfire | power | shutoff | wildfire safety power shutoffs | 0.5 | 1 d | 3 d | prior | in heat 0.3 | prior_rr_event_shares, prior_rr_durations |
-| wildfire | supplies | smoke | wildfire smoke | 0.3 | 2 d | 7 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| wildfire | home_loss | threat | wildfires | 0.02 | — | — | prior |  | prior_rr_event_shares |
-| winter_weather | supplies | snowed_in | snow and ice storms | 1 | 1 d | 2 d | prior | county events: winter_weather, winter_storm, blizzard, heavy_snow | prior_rr_durations |
-| winter_weather | power | local | short storm outages | 0.05 | 3 h | 10 h | prior | county outage records replace the county-wide part; in cold 1 | prior_rr_event_shares, prior_rr_durations |
-| winter_weather | comms | local | short storm outages | 0.02 | 10 h | 1.8 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| winter_weather | get_home | snowed_in | snow and ice storms | 0.05 | — | — | prior | households with a commuter | prior_rr_event_shares |
-| pandemic | supplies | stay_home | a pandemic that disrupts shopping | 0.2 | 14 d | 45 d | prior |  | moreland_2020_stay_home, cdc_pandemic_history, prior_rr_durations |
-| pandemic | medication | stay_home | a pandemic that disrupts shopping | 0.2 | 7 d | 30 d | prior |  | cdc_pandemic_history, prior_rr_durations |
-| grid_failure | power | regional | a regional blackout | 1 | 1 d | 3 d | prior | in heat 0.3; in cold 0.4 | prior_rr_durations |
-| grid_failure | water_out | regional | a regional blackout | 0.4 | 1 d | 3 d | prior | homes on public water | prior_rr_event_shares, prior_rr_durations |
-| grid_failure | comms | regional | a regional blackout | 0.5 | 1 d | 3 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| grid_failure | get_home | regional | a regional blackout | 0.27 | — | — | prior | households with a commuter | prior_rr_coupling |
-| cyber_outage | medication | pharmacy_it | pharmacy or insurer computer outages | 1 | 5 d | 21 d | prior |  | prior_rr_durations |
-| cyber_outage | comms | payments | card-payment outages | 0.25 | 1 d | 3 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| civil_unrest | supplies | curfew | curfews | 1 | 2 d | 5 d | prior |  | prior_rr_durations |
-| civil_unrest | security | curfew | curfews | 1 | — | — | prior |  | prior_rr_event_shares |
-| civil_unrest | get_home | curfew | curfews | 0.1 | — | — | prior | households with a commuter | prior_rr_event_shares |
-| supply_chain_disruption | supplies | shortage | store shortages and runs on stores | 1 | 2 d | 5 d | prior |  | prior_rr_durations |
-| supply_chain_disruption | medication | pharmacy_access | pharmacy closures and refill delays | 0.5 | 1.5 d | 4 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| hazmat_release | water_out | release | chemical releases | 1 | 1.5 d | 7 d | prior | homes on public water | prior_rr_durations |
-| hazmat_release | supplies | release | chemical releases | 0.3 | 6 h | 1 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| hazmat_release | evacuate | release | chemical releases | 0.1 | 1 d | 3 d | prior | warning 0.1–2 h | prior_rr_event_shares, prior_rr_durations |
-| nuclear_plant_incident | evacuate | release | a nuclear plant accident | 1 | 7 d | 60 d | prior | warning 1–12 h | prior_rr_durations |
-| nuclear_plant_incident | supplies | release | a nuclear plant accident | 1 | 1 d | 3 d | prior |  | prior_rr_durations |
-| nuclear_plant_incident | home_loss | release | a nuclear plant accident | 0.05 | — | — | prior |  | prior_rr_event_shares |
-| nuclear_attack | supplies | shelter | a nuclear attack | 1 | 1 d | 3 d | prior |  | ready_gov_nuclear, prior_rr_durations |
-| terrorism | supplies | lockdown | a terrorist attack | 0.3 | 12 h | 2 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| terrorism | comms | lockdown | a terrorist attack | 0.2 | 12 h | 2 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| terrorism | evacuate | lockdown | a terrorist attack | 0.05 | 1 d | 3 d | prior | warning 0–1 h | prior_rr_event_shares, prior_rr_durations |
-| terrorism | security | lockdown | a terrorist attack | 0.5 | — | — | prior |  | prior_rr_event_shares |
-| house_fire | evacuate | fire | a fire at home or next door | 1 | 3 d | 60 d | prior | warning 0.02–0.1 h | usfa_residential_fires_2023, prior_rr_durations |
-| house_fire | fire | fire | a fire at home or next door | 1 | — | — | data |  | usfa_residential_fires_2023 |
-| house_fire | home_loss | fire | a fire at home or next door | 0.5 | — | — | prior |  | usfa_residential_fires_2023, census_pulse_displacement, prior_rr_event_shares |
-| house_fire | medication | fire | a fire at home or next door | 1 | 5 d | 30 d | prior |  | prior_rr_durations |
-| medical_emergency | medical_emergency | emergency | medical emergencies | 1 | — | — | data |  | cdc_ed_visits_2022 |
-| vehicle_stranding | get_home | stranded | being stranded by a breakdown or closed roads | 1 | — | — | prior |  | prior_rr_event_shares |
-| local_utility_outage | water_out | pressure_loss | water main breaks | 0.667 | 6 h | 1 d | prior | homes on public water | epa_bwa_report_2024, prior_rr_durations |
-| local_utility_outage | water_boil | notice | local water problems | 0.333 | 2 d | 6 d | prior | homes on public water; county events: boil_water_notice, boil_water | shaffer_2026_texas_bwn, kentucky_bwa_2024, prior_rr_durations |
-| local_utility_outage | water_out | system_failure | a major water system failure | 0.0267 | 7 d | 30 d | prior | homes on public water | epa_asheville_bwn_2024, prior_rr_durations, prior_rr_event_shares |
-| local_utility_outage | evacuate | gas_leak | gas leaks and building emergencies | 0.02 | 1 d | 5 d | prior | warning 0.1–1 h | prior_rr_event_shares, prior_rr_durations |
-| local_utility_outage | medication | gas_leak | gas leaks and building emergencies | 0.02 | 5 d | 30 d | prior |  | prior_rr_event_shares, prior_rr_durations |
-| burglary | security | break_in | break-ins | 1 | — | — | prior |  | prior_rr_event_shares |
-| extended_household_illness | medical_emergency | illness | a long illness at home | 0.5 | — | — | prior |  | prior_rr_event_shares |
+| avalanche | supplies | slide | avalanches closing roads | 1 | 1 d | 4 d | prior |  | rr_risk_model_priors |
+| avalanche | get_home | slide | avalanches closing roads | 0.3 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| avalanche | evacuate | slide | avalanches closing roads | 0.05 | 2 d | 7 d | prior | warning 0.5–12 h | rr_risk_model_priors |
+| avalanche | home_loss | slide | avalanches closing roads | 0.01 | — | — | prior |  | rr_risk_model_priors |
+| coastal_flooding | evacuate | surge | flooding from the sea | 0.5 | 3 d | 30 d | prior | warning 12–72 h | rr_risk_model_priors |
+| coastal_flooding | home_loss | surge | flooding from the sea | 0.2 | — | — | prior |  | fema_nri_v120, rr_risk_model_priors |
+| coastal_flooding | water_boil | surge | flooding from the sea | 0.1 | 3 d | 10 d | prior | homes on public water | epa_boil_water_report_2024, rr_risk_model_priors |
+| coastal_flooding | power | surge | flooding from the sea | 0.3 | 1 d | 5 d | prior | in heat 0.2; in cold 0.3 | rr_risk_model_priors |
+| coastal_flooding | supplies | surge | flooding from the sea | 0.3 | 1 d | 5 d | prior |  | rr_risk_model_priors |
+| coastal_flooding | medication | surge | flooding from the sea | 0.1 | 5 d | 30 d | prior |  | rr_risk_model_priors |
+| cold_wave | power | extreme_cold | extreme cold straining the grid | 0.03 | 1 d | 3 d | prior | in cold 1 | rr_risk_model_priors |
+| cold_wave | water_boil | extreme_cold | extreme cold straining the grid | 0.05 | 7 d | 21 d | prior | homes on public water | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
+| cold_wave | water_out | extreme_cold | extreme cold straining the grid | 0.02 | 1 d | 5 d | prior |  | rr_risk_model_priors |
+| cold_wave | thermal | no_heating | cold waves in a home with no heating | 1 | 2 d | 5 d | prior | homes without heating; county events: cold_wave, extreme_cold, extreme_cold_wind_chill, cold_wind_chill | rr_risk_model_priors |
+| cold_wave | supplies | extreme_cold | extreme cold straining the grid | 0.1 | 1 d | 2 d | prior |  | rr_risk_model_priors |
+| drought | water_out | low_yield | drought lowering a well | 1 | 30 d | 90 d | prior | homes on a private well; county events: drought | rr_risk_model_priors |
+| earthquake | power | damaging | damaging earthquakes | 0.5 | 12 h | 3 d | prior | in heat 0.1; in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| earthquake | water_out | damaging | damaging earthquakes | 0.3 | 3 d | 14 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| earthquake | water_out | damaging | damaging earthquakes | 0.2 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration, rr_risk_model_priors |
+| earthquake | supplies | damaging | damaging earthquakes | 0.3 | 1 d | 5 d | prior |  | rr_risk_model_priors |
+| earthquake | medication | damaging | damaging earthquakes | 0.2 | 2 d | 7 d | prior |  | rr_risk_model_priors |
+| earthquake | comms | damaging | damaging earthquakes | 0.5 | 12 h | 3 d | prior |  | rr_risk_model_priors |
+| earthquake | evacuate | damaging | damaging earthquakes | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| earthquake | home_loss | damaging | damaging earthquakes | 0.05 | — | — | prior |  | fema_nri_v120, rr_risk_model_priors |
+| earthquake | get_home | damaging | damaging earthquakes | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| hail | power | local | short storm outages | 0.1 | 3 h | 10 h | prior | county outage records replace the county-wide part; in heat 0.3 | rr_risk_model_priors |
+| hail | home_loss | local | short storm outages | 0.002 | — | — | prior |  | rr_risk_model_priors |
+| heat_wave | power | heat_outage | heat waves straining the grid | 0.02 | 4 h | 20 h | prior | county outage records replace the county-wide part; in heat 1 | stone_2023_heat_blackout, rr_risk_model_priors |
+| heat_wave | thermal | no_cooling | heat waves in a home without air conditioning | 1 | 3 d | 7 d | prior | homes without air conditioning; county events: heat_wave, excessive_heat, heat | rr_risk_model_priors |
+| hurricane | power | cat12 | hurricanes and tropical storms | 0.45 | 1.5 d | 5 d | duration data, share prior | in heat 0.5 | ornl_repowrd_2022, rr_risk_model_priors |
+| hurricane | power | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 5 d | 16 d | duration data, share prior | in heat 0.5; dropped when *major_hurricane_direct_hit* is offered | ornl_repowrd_2022, rr_risk_model_priors |
+| hurricane | water_boil | cat12 | hurricanes and tropical storms | 0.15 | 6 d | 18 d | prior | homes on public water | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
+| hurricane | supplies | cat12 | hurricanes and tropical storms | 0.1 | 2 d | 5 d | prior |  | rr_risk_model_priors |
+| hurricane | supplies | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 5 d | 14 d | prior | dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
+| hurricane | medication | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 7 d | 21 d | prior | dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
+| hurricane | comms | cat12 | hurricanes and tropical storms | 0.1 | 12 h | 2 d | prior |  | rr_risk_model_priors |
+| hurricane | comms | cat3plus | major hurricanes (category 3 or a direct hit) | 0.06 | 3 d | 10 d | prior | dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
+| hurricane | evacuate | cat12 | hurricanes and tropical storms | 0.1 | 3 d | 14 d | prior | warning 24–72 h | rr_risk_model_priors |
+| hurricane | evacuate | mobile_home | wind warnings for mobile homes | 0.2 | 2 d | 7 d | prior | mobile homes; warning 24–72 h | rr_risk_model_priors |
+| hurricane | home_loss | cat12 | hurricanes and tropical storms | 0.01 | — | — | prior |  | rr_risk_model_priors |
+| hurricane | home_loss | cat3plus | major hurricanes (category 3 or a direct hit) | 0.02 | — | — | prior | dropped when *major_hurricane_direct_hit* is offered | rr_risk_model_priors |
+| ice_storm | power | local | short storm outages | 0.3 | 3 h | 10 h | prior | county outage records replace the county-wide part; in cold 1 | rr_risk_model_priors |
+| ice_storm | power | major | big ice storms | 0.1 | 1.5 d | 5 d | prior | in cold 1 | inquirer_peco_outages, rr_risk_model_priors |
+| ice_storm | power | record | an ice storm of record | 0.017 | 5 d | 14 d | prior | in cold 1 | rr_risk_model_priors |
+| ice_storm | supplies | icy_roads | icy roads | 0.5 | 1 d | 3 d | prior |  | rr_risk_model_priors |
+| ice_storm | supplies | record | an ice storm of record | 0.017 | 5 d | 14 d | prior |  | rr_risk_model_priors |
+| ice_storm | medication | record | an ice storm of record | 0.017 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| ice_storm | comms | record | an ice storm of record | 0.017 | 3 d | 10 d | prior |  | rr_risk_model_priors |
+| ice_storm | get_home | icy_roads | icy roads | 0.05 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| landslide | supplies | slide | landslides closing roads | 0.2 | 1 d | 5 d | prior |  | rr_risk_model_priors |
+| landslide | power | slide | landslides closing roads | 0.1 | 12 h | 2 d | prior | in cold 0.5 | rr_risk_model_priors |
+| landslide | evacuate | slide | landslides closing roads | 0.1 | 5 d | 60 d | prior | warning 0–2 h | rr_risk_model_priors |
+| landslide | home_loss | slide | landslides closing roads | 0.05 | — | — | prior |  | rr_risk_model_priors |
+| landslide | get_home | slide | landslides closing roads | 0.1 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| lightning | power | local | short storm outages | 0.1 | 3 h | 10 h | prior | county outage records replace the county-wide part; in heat 0.3 | rr_risk_model_priors |
+| riverine_flooding | evacuate | flood | floods at or near the home | 0.3 | 3 d | 30 d | prior | warning 1–12 h | rr_risk_model_priors |
+| riverine_flooding | home_loss | flood | floods at or near the home | 0.15 | — | — | prior |  | fema_nri_v120, rr_risk_model_priors |
+| riverine_flooding | water_boil | flood | floods at or near the home | 0.1 | 3 d | 10 d | prior | homes on public water | epa_boil_water_report_2024, rr_risk_model_priors |
+| riverine_flooding | power | flood | floods at or near the home | 0.1 | 12 h | 3 d | prior | in heat 0.2; in cold 0.3 | rr_risk_model_priors |
+| riverine_flooding | supplies | flood | floods at or near the home | 0.2 | 1 d | 4 d | prior |  | rr_risk_model_priors |
+| riverine_flooding | medication | flood | floods at or near the home | 0.15 | 5 d | 30 d | prior |  | rr_risk_model_priors |
+| riverine_flooding | get_home | flood | floods at or near the home | 0.05 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| strong_wind | power | local | short storm outages | 0.5 | 3 h | 10 h | prior | county outage records replace the county-wide part; in heat 0.15; in cold 0.4 | eia_861_reliability_2024, rr_risk_model_priors |
+| strong_wind | power | major | a windstorm bigger than any in the recent records | 0.012 | 1.5 d | 5 d | prior | in cold 0.8 | rr_risk_model_priors |
+| strong_wind | comms | local | short storm outages | 0.14 | 10 h | 1.8 d | prior |  | rr_risk_model_priors |
+| tornado | power | path | tornadoes | 0.8 | 1 d | 5 d | prior | in heat 0.2; in cold 0.1 | rr_risk_model_priors |
+| tornado | supplies | path | tornadoes | 0.3 | 1 d | 3 d | prior |  | rr_risk_model_priors |
+| tornado | comms | path | tornadoes | 0.3 | 12 h | 2 d | prior |  | rr_risk_model_priors |
+| tornado | medication | path | tornadoes | 0.1 | 2 d | 7 d | prior |  | rr_risk_model_priors |
+| tornado | home_loss | path | tornadoes | 0.3 | — | — | prior |  | rr_risk_model_priors |
+| tornado | evacuate | mobile_home | wind warnings for mobile homes | 0.5 | 1 d | 7 d | prior | mobile homes; warning 0.1–0.5 h | rr_risk_model_priors |
+| tsunami | evacuate | distant | tsunamis from distant earthquakes | 1 | 1 d | 7 d | prior | warning 2–12 h | rr_risk_model_priors |
+| tsunami | home_loss | distant | tsunamis from distant earthquakes | 0.1 | — | — | prior |  | rr_risk_model_priors |
+| volcanic_activity | supplies | ash | volcanic ash | 0.5 | 2 d | 7 d | prior |  | rr_risk_model_priors |
+| volcanic_activity | evacuate | ash | volcanic ash | 0.2 | 5 d | 30 d | prior | warning 1–48 h | rr_risk_model_priors |
+| volcanic_activity | power | ash | volcanic ash | 0.2 | 1 d | 5 d | prior | in cold 0.4 | rr_risk_model_priors |
+| volcanic_activity | water_boil | ash | volcanic ash | 0.2 | 2 d | 7 d | prior | homes on public water | rr_risk_model_priors |
+| volcanic_activity | comms | ash | volcanic ash | 0.1 | 1 d | 3 d | prior |  | rr_risk_model_priors |
+| volcanic_activity | home_loss | ash | volcanic ash | 0.02 | — | — | prior |  | rr_risk_model_priors |
+| wildfire | evacuate | threat | wildfires | 0.075 | 3 d | 30 d | prior | warning 0.25–12 h | rr_risk_model_priors |
+| wildfire | power | shutoff | wildfire safety power shutoffs | 0.5 | 1 d | 3 d | prior | in heat 0.3 | rr_risk_model_priors |
+| wildfire | supplies | smoke | wildfire smoke | 0.3 | 2 d | 7 d | prior |  | rr_risk_model_priors |
+| wildfire | home_loss | threat | wildfires | 0.02 | — | — | prior |  | rr_risk_model_priors |
+| winter_weather | supplies | snowed_in | snow and ice storms | 1 | 1 d | 2 d | prior | county events: winter_weather, winter_storm, blizzard, heavy_snow | rr_risk_model_priors |
+| winter_weather | power | local | short storm outages | 0.05 | 3 h | 10 h | prior | county outage records replace the county-wide part; in cold 1 | rr_risk_model_priors |
+| winter_weather | comms | local | short storm outages | 0.02 | 10 h | 1.8 d | prior |  | rr_risk_model_priors |
+| winter_weather | get_home | snowed_in | snow and ice storms | 0.05 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| pandemic | supplies | stay_home | a pandemic that disrupts shopping | 0.2 | 14 d | 45 d | prior |  | cdc_mmwr_stay_at_home_2020, cdc_pandemic_history, rr_risk_model_priors |
+| pandemic | medication | stay_home | a pandemic that disrupts shopping | 0.2 | 7 d | 30 d | prior |  | cdc_pandemic_history, rr_risk_model_priors |
+| grid_failure | power | regional | a regional blackout | 1 | 1 d | 3 d | prior | in heat 0.3; in cold 0.4 | rr_risk_model_priors |
+| grid_failure | water_out | regional | a regional blackout | 0.4 | 1 d | 3 d | prior | homes on public water | rr_risk_model_priors |
+| grid_failure | comms | regional | a regional blackout | 0.5 | 1 d | 3 d | prior |  | rr_risk_model_priors |
+| grid_failure | get_home | regional | a regional blackout | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| cyber_outage | medication | pharmacy_it | pharmacy or insurer computer outages | 1 | 5 d | 21 d | prior |  | rr_risk_model_priors |
+| cyber_outage | comms | payments | card-payment outages | 0.25 | 1 d | 3 d | prior |  | rr_risk_model_priors |
+| civil_unrest | supplies | curfew | curfews | 1 | 2 d | 5 d | prior |  | rr_risk_model_priors |
+| civil_unrest | security | curfew | curfews | 1 | — | — | prior |  | rr_risk_model_priors |
+| civil_unrest | get_home | curfew | curfews | 0.1 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| supply_chain_disruption | supplies | shortage | store shortages and runs on stores | 1 | 2 d | 5 d | prior |  | rr_risk_model_priors |
+| supply_chain_disruption | medication | pharmacy_access | pharmacy closures and refill delays | 0.5 | 1.5 d | 4 d | prior |  | rr_risk_model_priors |
+| hazmat_release | water_out | release | chemical releases | 1 | 1.5 d | 7 d | prior | homes on public water | rr_risk_model_priors |
+| hazmat_release | supplies | release | chemical releases | 0.3 | 6 h | 1 d | prior |  | rr_risk_model_priors |
+| hazmat_release | evacuate | release | chemical releases | 0.1 | 1 d | 3 d | prior | warning 0.1–2 h | rr_risk_model_priors |
+| nuclear_plant_incident | evacuate | release | a nuclear plant accident | 1 | 7 d | 60 d | prior | warning 1–12 h | rr_risk_model_priors |
+| nuclear_plant_incident | supplies | release | a nuclear plant accident | 1 | 1 d | 3 d | prior |  | rr_risk_model_priors |
+| nuclear_plant_incident | home_loss | release | a nuclear plant accident | 0.05 | — | — | prior |  | rr_risk_model_priors |
+| nuclear_attack | supplies | shelter | a nuclear attack | 1 | 1 d | 3 d | prior |  | ready_gov_nuclear, rr_risk_model_priors |
+| terrorism | supplies | lockdown | a terrorist attack | 0.3 | 12 h | 2 d | prior |  | rr_risk_model_priors |
+| terrorism | comms | lockdown | a terrorist attack | 0.2 | 12 h | 2 d | prior |  | rr_risk_model_priors |
+| terrorism | evacuate | lockdown | a terrorist attack | 0.05 | 1 d | 3 d | prior | warning 0–1 h | rr_risk_model_priors |
+| terrorism | security | lockdown | a terrorist attack | 0.5 | — | — | prior |  | rr_risk_model_priors |
+| house_fire | evacuate | fire | a fire at home or next door | 1 | 3 d | 60 d | prior | warning 0.02–0.1 h | usfa_residential_fires, rr_risk_model_priors |
+| house_fire | fire | fire | a fire at home or next door | 1 | — | — | data |  | usfa_residential_fires |
+| house_fire | home_loss | fire | a fire at home or next door | 0.5 | — | — | prior |  | usfa_residential_fires, census_pulse_displacement, rr_risk_model_priors |
+| house_fire | medication | fire | a fire at home or next door | 1 | 5 d | 30 d | prior |  | rr_risk_model_priors |
+| medical_emergency | medical_emergency | emergency | medical emergencies | 1 | — | — | data |  | cdc_nchs_ed_visits |
+| vehicle_stranding | get_home | stranded | being stranded by a breakdown or closed roads | 1 | — | — | prior |  | rr_risk_model_priors |
+| local_utility_outage | water_out | pressure_loss | water main breaks | 0.667 | 6 h | 1 d | prior | homes on public water | epa_boil_water_report_2024, rr_risk_model_priors |
+| local_utility_outage | water_boil | notice | local water problems | 0.333 | 2 d | 6 d | prior | homes on public water; county events: boil_water_notice, boil_water | shaffer_2026_texas_boil_notices, water_2024_kentucky_advisories, rr_risk_model_priors |
+| local_utility_outage | water_out | system_failure | a major water system failure | 0.0267 | 7 d | 30 d | prior | homes on public water | epa_asheville_boil_notice_2024, rr_risk_model_priors |
+| local_utility_outage | evacuate | gas_leak | gas leaks and building emergencies | 0.02 | 1 d | 5 d | prior | warning 0.1–1 h | rr_risk_model_priors |
+| local_utility_outage | medication | gas_leak | gas leaks and building emergencies | 0.02 | 5 d | 30 d | prior |  | rr_risk_model_priors |
+| burglary | security | break_in | break-ins | 1 | — | — | prior |  | rr_risk_model_priors |
+| extended_household_illness | medical_emergency | illness | a long illness at home | 0.5 | — | — | prior |  | rr_risk_model_priors |
 | *cascadia_m9* (coast) | power | event | a magnitude 9 Cascadia earthquake | 1 | 90 d | 180 d | prior | in cold 0.4; relief: help 14 d, mostly restored 180 d | oregon_resilience_plan_2013 |
 | *cascadia_m9* (coast) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 365 d | 1095 d | prior | homes on public water; relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013 |
-| *cascadia_m9* (coast) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 90 d | 270 d | prior | homes on a private well; relief: help 14 d, mostly restored 270 d | oregon_resilience_plan_2013, prior_rr_coupling |
-| *cascadia_m9* (coast) | supplies | event | a magnitude 9 Cascadia earthquake | 1 | 21 d | 60 d | prior | relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013, prior_rr_durations |
-| *cascadia_m9* (coast) | medication | event | a magnitude 9 Cascadia earthquake | 1 | 30 d | 90 d | prior | relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013, prior_rr_durations |
-| *cascadia_m9* (coast) | comms | event | a magnitude 9 Cascadia earthquake | 1 | 14 d | 60 d | prior |  | oregon_resilience_plan_2013, prior_rr_durations |
-| *cascadia_m9* (coast) | home_loss | event | a magnitude 9 Cascadia earthquake | 0.1 | — | — | prior |  | oregon_resilience_plan_2013, prior_rr_event_shares |
-| *cascadia_m9* (coast) | get_home | event | a magnitude 9 Cascadia earthquake | 0.27 | — | — | prior | households with a commuter | prior_rr_coupling |
+| *cascadia_m9* (coast) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 90 d | 270 d | prior | homes on a private well; relief: help 14 d, mostly restored 270 d | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (coast) | supplies | event | a magnitude 9 Cascadia earthquake | 1 | 21 d | 60 d | prior | relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (coast) | medication | event | a magnitude 9 Cascadia earthquake | 1 | 30 d | 90 d | prior | relief: help 14 d, mostly restored 1095 d | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (coast) | comms | event | a magnitude 9 Cascadia earthquake | 1 | 14 d | 60 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (coast) | home_loss | event | a magnitude 9 Cascadia earthquake | 0.1 | — | — | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (coast) | get_home | event | a magnitude 9 Cascadia earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | *cascadia_m9* (valley) | power | event | a magnitude 9 Cascadia earthquake | 1 | 30 d | 90 d | prior | in cold 0.4; relief: help 3 d, mostly restored 90 d | oregon_resilience_plan_2013 |
 | *cascadia_m9* (valley) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 30 d | 365 d | prior | homes on public water; relief: help 3 d, mostly restored 365 d | oregon_resilience_plan_2013 |
-| *cascadia_m9* (valley) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 30 d | 90 d | prior | homes on a private well; relief: help 3 d, mostly restored 90 d | oregon_resilience_plan_2013, prior_rr_coupling |
-| *cascadia_m9* (valley) | supplies | event | a magnitude 9 Cascadia earthquake | 1 | 7 d | 21 d | prior | relief: help 3 d, mostly restored 365 d | oregon_resilience_plan_2013, prior_rr_durations |
-| *cascadia_m9* (valley) | medication | event | a magnitude 9 Cascadia earthquake | 1 | 14 d | 60 d | prior | relief: help 3 d, mostly restored 540 d | oregon_resilience_plan_2013, prior_rr_durations |
-| *cascadia_m9* (valley) | comms | event | a magnitude 9 Cascadia earthquake | 1 | 7 d | 30 d | prior |  | oregon_resilience_plan_2013, prior_rr_durations |
-| *cascadia_m9* (valley) | home_loss | event | a magnitude 9 Cascadia earthquake | 0.05 | — | — | prior |  | oregon_resilience_plan_2013, prior_rr_event_shares |
-| *cascadia_m9* (valley) | get_home | event | a magnitude 9 Cascadia earthquake | 0.27 | — | — | prior | households with a commuter | prior_rr_coupling |
-| *local_tsunami* | evacuate | event | a tsunami from a nearby earthquake | 0.27 | 3 d | 90 d | prior | warning 0.25–0.33 h | dogami_tsunami_faq, prior_rr_coupling |
-| *local_tsunami* | home_loss | event | a tsunami from a nearby earthquake | 0.1 | — | — | prior |  | prior_rr_event_shares |
+| *cascadia_m9* (valley) | water_out | event | a magnitude 9 Cascadia earthquake | 1 | 30 d | 90 d | prior | homes on a private well; relief: help 3 d, mostly restored 90 d | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (valley) | supplies | event | a magnitude 9 Cascadia earthquake | 1 | 7 d | 21 d | prior | relief: help 3 d, mostly restored 365 d | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (valley) | medication | event | a magnitude 9 Cascadia earthquake | 1 | 14 d | 60 d | prior | relief: help 3 d, mostly restored 540 d | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (valley) | comms | event | a magnitude 9 Cascadia earthquake | 1 | 7 d | 30 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (valley) | home_loss | event | a magnitude 9 Cascadia earthquake | 0.05 | — | — | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *cascadia_m9* (valley) | get_home | event | a magnitude 9 Cascadia earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *local_tsunami* | evacuate | event | a tsunami from a nearby earthquake | 0.27 | 3 d | 90 d | prior | warning 0.25–0.33 h | dogami_tsunami_faq, rr_risk_model_priors |
+| *local_tsunami* | home_loss | event | a tsunami from a nearby earthquake | 0.1 | — | — | prior |  | rr_risk_model_priors |
 | *major_hurricane_direct_hit* | power | event | a direct hit by a major hurricane | 1 | 5 d | 16 d | data | in heat 0.5 | ornl_repowrd_2022 |
-| *major_hurricane_direct_hit* | water_out | event | a direct hit by a major hurricane | 0.5 | 7 d | 49 d | prior | homes on public water | epa_asheville_bwn_2024, prior_rr_event_shares |
-| *major_hurricane_direct_hit* | water_boil | event | a direct hit by a major hurricane | 0.5 | 6 d | 18 d | prior | homes on public water | shaffer_2026_texas_bwn, prior_rr_event_shares |
-| *major_hurricane_direct_hit* | supplies | event | a direct hit by a major hurricane | 1 | 5 d | 14 d | prior |  | prior_rr_durations |
-| *major_hurricane_direct_hit* | medication | event | a direct hit by a major hurricane | 1 | 7 d | 21 d | prior |  | prior_rr_durations |
-| *major_hurricane_direct_hit* | comms | event | a direct hit by a major hurricane | 1 | 2 d | 7 d | prior |  | prior_rr_durations |
-| *major_hurricane_direct_hit* | evacuate | event | a direct hit by a major hurricane | 0.8 | 5 d | 30 d | prior | warning 24–72 h | prior_rr_event_shares, prior_rr_durations |
-| *major_hurricane_direct_hit* | home_loss | event | a direct hit by a major hurricane | 0.3 | — | — | prior |  | prior_rr_event_shares |
-| *new_madrid_m7* | power | event | a magnitude 7 New Madrid earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.4 | hazus_mr4_restoration, oregon_resilience_plan_2013, prior_rr_durations |
-| *new_madrid_m7* | water_out | event | a magnitude 7 New Madrid earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | hazus_mr4_restoration, prior_rr_durations |
-| *new_madrid_m7* | water_out | event | a magnitude 7 New Madrid earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | hazus_mr4_restoration |
-| *new_madrid_m7* | supplies | event | a magnitude 7 New Madrid earthquake | 1 | 7 d | 21 d | prior |  | prior_rr_durations |
-| *new_madrid_m7* | medication | event | a magnitude 7 New Madrid earthquake | 1 | 7 d | 30 d | prior |  | prior_rr_durations |
-| *new_madrid_m7* | comms | event | a magnitude 7 New Madrid earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, prior_rr_durations |
-| *new_madrid_m7* | home_loss | event | a magnitude 7 New Madrid earthquake | 0.1 | — | — | prior |  | prior_rr_event_shares |
-| *new_madrid_m7* | evacuate | event | a magnitude 7 New Madrid earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | prior_rr_event_shares, prior_rr_durations |
-| *new_madrid_m7* | get_home | event | a magnitude 7 New Madrid earthquake | 0.27 | — | — | prior | households with a commuter | prior_rr_coupling |
-| *hayward_m7* | power | event | a magnitude 7 Hayward fault earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.3 | hazus_mr4_restoration, oregon_resilience_plan_2013, prior_rr_durations |
-| *hayward_m7* | water_out | event | a magnitude 7 Hayward fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | hazus_mr4_restoration, prior_rr_durations |
-| *hayward_m7* | water_out | event | a magnitude 7 Hayward fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | hazus_mr4_restoration |
-| *hayward_m7* | supplies | event | a magnitude 7 Hayward fault earthquake | 1 | 7 d | 21 d | prior |  | prior_rr_durations |
-| *hayward_m7* | medication | event | a magnitude 7 Hayward fault earthquake | 1 | 7 d | 30 d | prior |  | prior_rr_durations |
-| *hayward_m7* | comms | event | a magnitude 7 Hayward fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, prior_rr_durations |
-| *hayward_m7* | home_loss | event | a magnitude 7 Hayward fault earthquake | 0.1 | — | — | prior |  | prior_rr_event_shares |
-| *hayward_m7* | evacuate | event | a magnitude 7 Hayward fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | prior_rr_event_shares, prior_rr_durations |
-| *hayward_m7* | get_home | event | a magnitude 7 Hayward fault earthquake | 0.27 | — | — | prior | households with a commuter | prior_rr_coupling |
+| *major_hurricane_direct_hit* | water_out | event | a direct hit by a major hurricane | 0.5 | 7 d | 49 d | prior | homes on public water | epa_asheville_boil_notice_2024, rr_risk_model_priors |
+| *major_hurricane_direct_hit* | water_boil | event | a direct hit by a major hurricane | 0.5 | 6 d | 18 d | prior | homes on public water | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
+| *major_hurricane_direct_hit* | supplies | event | a direct hit by a major hurricane | 1 | 5 d | 14 d | prior |  | rr_risk_model_priors |
+| *major_hurricane_direct_hit* | medication | event | a direct hit by a major hurricane | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *major_hurricane_direct_hit* | comms | event | a direct hit by a major hurricane | 1 | 2 d | 7 d | prior |  | rr_risk_model_priors |
+| *major_hurricane_direct_hit* | evacuate | event | a direct hit by a major hurricane | 0.8 | 5 d | 30 d | prior | warning 24–72 h | rr_risk_model_priors |
+| *major_hurricane_direct_hit* | home_loss | event | a direct hit by a major hurricane | 0.3 | — | — | prior |  | rr_risk_model_priors |
+| *new_madrid_m7* | power | event | a magnitude 7 New Madrid earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.4 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *new_madrid_m7* | water_out | event | a magnitude 7 New Madrid earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *new_madrid_m7* | water_out | event | a magnitude 7 New Madrid earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *new_madrid_m7* | supplies | event | a magnitude 7 New Madrid earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *new_madrid_m7* | medication | event | a magnitude 7 New Madrid earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *new_madrid_m7* | comms | event | a magnitude 7 New Madrid earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *new_madrid_m7* | home_loss | event | a magnitude 7 New Madrid earthquake | 0.1 | — | — | prior |  | rr_risk_model_priors |
+| *new_madrid_m7* | evacuate | event | a magnitude 7 New Madrid earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *new_madrid_m7* | get_home | event | a magnitude 7 New Madrid earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
+| *hayward_m7* | power | event | a magnitude 7 Hayward fault earthquake | 1 | 3 d | 14 d | prior | in heat 0.1; in cold 0.3 | fema_hazus_eq_restoration, oregon_resilience_plan_2013, rr_risk_model_priors |
+| *hayward_m7* | water_out | event | a magnitude 7 Hayward fault earthquake | 0.7 | 14 d | 60 d | prior | homes on public water | fema_hazus_eq_restoration, rr_risk_model_priors |
+| *hayward_m7* | water_out | event | a magnitude 7 Hayward fault earthquake | 0.5 | 8 d | 20 d | prior | homes on a private well | fema_hazus_eq_restoration |
+| *hayward_m7* | supplies | event | a magnitude 7 Hayward fault earthquake | 1 | 7 d | 21 d | prior |  | rr_risk_model_priors |
+| *hayward_m7* | medication | event | a magnitude 7 Hayward fault earthquake | 1 | 7 d | 30 d | prior |  | rr_risk_model_priors |
+| *hayward_m7* | comms | event | a magnitude 7 Hayward fault earthquake | 1 | 3 d | 14 d | prior |  | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *hayward_m7* | home_loss | event | a magnitude 7 Hayward fault earthquake | 0.1 | — | — | prior |  | rr_risk_model_priors |
+| *hayward_m7* | evacuate | event | a magnitude 7 Hayward fault earthquake | 0.05 | 3 d | 30 d | prior | warning 0–0.05 h | rr_risk_model_priors |
+| *hayward_m7* | get_home | event | a magnitude 7 Hayward fault earthquake | 0.27 | — | — | prior | households with a commuter | rr_risk_model_priors |
 
 | Income stream | Per earner | Spell median | Spell bad case | Unemployment insurance | Evidence | Sources |
 |---|---|---|---|---|---|---|
-| job_loss: losing a job | 1 | 10 wk | 36 wk | yes | prior | bls_work_experience_2024, bls_unemployment_duration_2026, prior_rr_income |
-| pandemic: job losses in a pandemic | 0.02 | 10 wk | 36 wk | yes | prior | cdc_pandemic_history, prior_rr_income |
-| *cascadia_m9*: the regional economy after a Cascadia earthquake | 0.3 | 26 wk | 78 wk | yes | prior | oregon_resilience_plan_2013, prior_rr_income |
-| *major_hurricane_direct_hit*: the local economy after a major hurricane | 0.1 | 10 wk | 36 wk | yes | prior | prior_rr_income |
-| *new_madrid_m7*: the regional economy after a New Madrid earthquake | 0.1 | 10 wk | 36 wk | yes | prior | prior_rr_income |
-| *hayward_m7*: the regional economy after a Hayward fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | prior_rr_income |
+| job_loss: losing a job | 1 | 10 wk | 36 wk | yes | prior | bls_work_experience_2024, bls_unemployment_duration, rr_risk_model_priors |
+| pandemic: job losses in a pandemic | 0.02 | 10 wk | 36 wk | yes | prior | cdc_pandemic_history, rr_risk_model_priors |
+| *cascadia_m9*: the regional economy after a Cascadia earthquake | 0.3 | 26 wk | 78 wk | yes | prior | oregon_resilience_plan_2013, rr_risk_model_priors |
+| *major_hurricane_direct_hit*: the local economy after a major hurricane | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *new_madrid_m7*: the regional economy after a New Madrid earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
+| *hayward_m7*: the regional economy after a Hayward fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 <!-- effects-table:end -->
 
 ### County overrides
@@ -736,40 +734,8 @@ coupling now holds the water outage at least as long as the power cut (the resea
    home or workplace is in the inundation zone.
 6. **Gas stove** coverage waits for a catalogue id (`gas_stove` assumed). // awaiting: rr-content
 
-### Citation ids used by rr-consequence
+### Citations
 
-For `content/citations.toml` (research source numbers from `docs/research/risk-model.md` §12).
-Ids starting `prior_rr_` are expert judgements (`prior = true`), all from the research report.
-
-| Id | Source |
-|---|---|
-| `aung_2025_displacement` | S16 Aung & Sehgal (2025), displacement because of natural disasters, AJPH |
-| `bls_unemployment_duration_2026` | S23 BLS Employment Situation Table A-12, unemployed by duration (Aug 2026) |
-| `bls_work_experience_2024` | S25 BLS Work Experience of the Population, 2024 |
-| `cdc_ed_visits_2022` | S26 CDC NCHS FastStats, emergency department visits (NHAMCS 2022) |
-| `cdc_pandemic_history` | data-sources research §8: influenza pandemics 1918, 1957, 1968, 2009 and COVID-19 (CDC archive) |
-| `census_pulse_displacement` | S17 Census Household Pulse Survey displacement results |
-| `county_boil_water_records` | a county boil-water record in the data pack (when rr-data ships one) |
-| `dogami_tsunami_faq` | S32 DOGAMI Oregon Tsunami Clearinghouse FAQ (15–20 minutes) |
-| `eagle_i_outages` | S10 Brelsford et al. (2024), EAGLE-I county outage records 2014–2025 |
-| `eia_861_2024` | S9 EIA-861 2024 reliability data (SAIDI/SAIFI) |
-| `epa_asheville_bwn_2024` | S37 EPA, Asheville lifts systemwide boil water notice after Helene |
-| `epa_bwa_report_2024` | S13 EPA (2024), boil water advisories, Report to Congress |
-| `fema_nri_v120` | S1 FEMA National Risk Index v1.20 county data (loss ratios, used for screening) |
-| `hazus_mr4_restoration` | Hazus MR4 earthquake restoration functions (Tables 8.1.a–c; 1985 expert opinion) |
-| `inquirer_peco_outages` | S36 Philadelphia Inquirer, PECO's biggest outages |
-| `kentucky_bwa_2024` | S15 Kentucky boil water advisories 2004–2020, *Water* 16(3):443 |
-| `mell_2017_ems` | S39 Mell et al. (2017), EMS response times, JAMA Surgery |
-| `moreland_2020_stay_home` | S18 Moreland et al. (2020), state stay-at-home orders, MMWR |
-| `noaa_storm_events` | NOAA Storm Events (county event records in the data pack) |
-| `oregon_resilience_plan_2013` | S30 Oregon Resilience Plan (2013), executive summary and coastal chapter |
-| `ornl_repowrd_2022` | S12 Kar et al. (2022), RePOWRD hurricane restoration, ORNL |
-| `prior_rr_coupling` | research §2.7 household coupling rules (expert judgement) |
-| `prior_rr_durations` | research §2.4, §6.2 durations where no records exist (expert judgement) |
-| `prior_rr_event_shares` | research §2.4, §3.1, §6.2 shares and footprints (expert judgement) |
-| `prior_rr_income` | research §3.5 unemployment insurance, spell lengths, earner shares (expert judgement) |
-| `prior_rr_ranges` | research §3.6 uncertainty factors for the ranges (expert judgement) |
-| `ready_gov_nuclear` | S22 Ready.gov, Nuclear Explosion ("get inside, stay inside, stay tuned") |
-| `shaffer_2026_texas_bwn` | S14 Shaffer et al. (2026), Texas boil water notices 2010–2022, ES&T |
-| `stone_2023_heat_blackout` | S35 Stone et al. (2023), blackouts during heat waves, ES&T |
-| `usfa_residential_fires_2023` | S27 US Fire Administration, residential fire statistics (2023) |
+Every id this section's numbers carry is listed under "Used by consequence" in
+`docs/CITATION_IDS.md` (ids already in `content/citations.toml`, and two new requests). Expert
+estimates cite `rr_risk_model_priors`.

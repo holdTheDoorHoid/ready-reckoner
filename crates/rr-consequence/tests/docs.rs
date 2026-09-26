@@ -164,17 +164,28 @@ fn risk_model_doc_carries_the_generated_effects_table() {
 }
 
 #[test]
-fn risk_model_doc_lists_every_citation_id() {
-    let doc = std::fs::read_to_string(DOC).expect("docs/RISK_MODEL.md exists");
-    let section = doc
-        .split("### Citation ids used by rr-consequence")
+fn every_citation_id_is_registered_or_requested() {
+    let registry = std::fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../content/citations.toml"
+    ))
+    .unwrap_or_default();
+    let ids_doc = std::fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../docs/CITATION_IDS.md"
+    ))
+    .expect("docs/CITATION_IDS.md exists");
+    let section = ids_doc
+        .split("## Used by consequence")
         .nth(1)
-        .expect("citation id section");
+        .expect("a 'Used by consequence' section");
     for id in rr_consequence::citation_ids() {
         assert!(id.is_well_formed(), "{id}");
+        let in_registry = registry.contains(&format!("id = \"{id}\""));
+        let listed = section.contains(&format!("`{id}`"));
         assert!(
-            section.contains(&format!("`{id}`")),
-            "{id} is not listed under 'Citation ids used by rr-consequence'"
+            in_registry || listed,
+            "{id} is neither in content/citations.toml nor listed under 'Used by consequence' in docs/CITATION_IDS.md"
         );
     }
 }

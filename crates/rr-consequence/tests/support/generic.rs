@@ -12,7 +12,7 @@ fn r(h: HazardId, rate: f64) -> HouseholdEventRate {
         low: rate / 2.0,
         high: rate * 2.0,
         evidence: Evidence::Prior,
-        sources: vec![CitationId::from("prior_rr_event_shares")],
+        sources: vec![CitationId::from("rr_risk_model_priors")],
     }
 }
 

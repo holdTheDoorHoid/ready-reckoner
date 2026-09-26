@@ -580,15 +580,15 @@ mod tests {
             // Expert estimates must cite a prior so the app can show them as such.
             if row.evidence == Evidence::Prior {
                 assert!(
-                    row.sources.iter().any(|s| s.as_str().starts_with("prior_"))
+                    row.sources.iter().any(|s| s == "rr_risk_model_priors")
                         || row
                             .sources
                             .iter()
                             .any(|s| s == "oregon_resilience_plan_2013"
-                                || s == "hazus_mr4_restoration"
+                                || s == "fema_hazus_eq_restoration"
                                 || s == "ornl_repowrd_2022"
-                                || s == "epa_asheville_bwn_2024"
-                                || s == "shaffer_2026_texas_bwn"),
+                                || s == "epa_asheville_boil_notice_2024"
+                                || s == "shaffer_2026_texas_boil_notices"),
                     "{} is a prior without a prior or published-estimate source",
                     row.key()
                 );
@@ -618,7 +618,7 @@ mod tests {
         assert!(EffectsTable::parse(&over_one).is_err());
         // A duplicate row.
         let dup = format!(
-            "{base}\n[[effect]]\nhazard = \"burglary\"\nbucket = \"security\"\nclass = \"break_in\"\nlabel = \"x\"\np_given_event = 0.1\nevidence = \"prior\"\nsources = [\"prior_rr_event_shares\"]\n"
+            "{base}\n[[effect]]\nhazard = \"burglary\"\nbucket = \"security\"\nclass = \"break_in\"\nlabel = \"x\"\np_given_event = 0.1\nevidence = \"prior\"\nsources = [\"rr_risk_model_priors\"]\n"
         );
         assert!(matches!(
             EffectsTable::parse(&dup),
@@ -626,7 +626,7 @@ mod tests {
         ));
         // A duration bucket without a duration.
         let nodur = format!(
-            "{base}\n[[effect]]\nhazard = \"burglary\"\nbucket = \"power\"\nclass = \"odd\"\nlabel = \"x\"\np_given_event = 0.1\nevidence = \"prior\"\nsources = [\"prior_rr_event_shares\"]\n"
+            "{base}\n[[effect]]\nhazard = \"burglary\"\nbucket = \"power\"\nclass = \"odd\"\nlabel = \"x\"\np_given_event = 0.1\nevidence = \"prior\"\nsources = [\"rr_risk_model_priors\"]\n"
         );
         assert!(EffectsTable::parse(&nodur).is_err());
         // No sources.
@@ -636,7 +636,7 @@ mod tests {
         assert!(EffectsTable::parse(&nosrc).is_err());
         // Shares of one group above 1.
         let over = format!(
-            "{base}\n[[effect]]\nhazard = \"burglary\"\nbucket = \"security\"\nclass = \"other\"\nlabel = \"x\"\np_given_event = 0.5\nevidence = \"prior\"\nsources = [\"prior_rr_event_shares\"]\n"
+            "{base}\n[[effect]]\nhazard = \"burglary\"\nbucket = \"security\"\nclass = \"other\"\nlabel = \"x\"\np_given_event = 0.5\nevidence = \"prior\"\nsources = [\"rr_risk_model_priors\"]\n"
         );
         assert!(EffectsTable::parse(&over).is_err());
         // An unknown field.
@@ -647,7 +647,7 @@ mod tests {
     #[test]
     fn citation_ids_are_well_formed() {
         let ids = table().citation_ids();
-        assert!(ids.len() >= 25, "{}", ids.len());
+        assert!(ids.len() >= 20, "{}", ids.len());
         for id in ids {
             assert!(id.is_well_formed(), "{id}");
         }
