@@ -9,6 +9,8 @@ use std::path::PathBuf;
 
 pub mod base_rates;
 pub mod climate;
+pub mod climate_daily;
+pub mod displacement;
 pub mod events;
 pub mod facilities;
 pub mod flood;
@@ -16,8 +18,11 @@ pub mod geography;
 pub mod nri;
 pub mod outage_model;
 pub mod outages;
+pub mod reliability;
 pub mod seismic;
 pub mod series;
+pub mod series_arrests;
+pub mod series_transcribed;
 pub mod vulnerability;
 
 /// Shared state for a refresh.
@@ -144,6 +149,21 @@ pub const JOBS: &[JobSpec] = &[
         id: "outage_model",
         title: "Outage causes, credibility-weighted regional tails, restoration curves and the worst-event stress table (EAGLE-I events)",
         run: outage_model::run,
+    },
+    JobSpec {
+        id: "climate_daily",
+        title: "Heat and cold days by county and month (NOAA nClimGrid-Daily 1991-2020) and outage hours on hot and cold days",
+        run: climate_daily::run,
+    },
+    JobSpec {
+        id: "reliability",
+        title: "Utility reliability (EIA-861 SAIDI and SAIFI 2014-2024) by county, and the cross-check with EAGLE-I",
+        run: reliability::run,
+    },
+    JobSpec {
+        id: "displacement",
+        title: "Federal disaster declarations per county and FEMA housing assistance by type of disaster (OpenFEMA)",
+        run: displacement::run,
     },
 ];
 

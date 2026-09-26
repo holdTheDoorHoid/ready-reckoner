@@ -13,7 +13,8 @@
 //! - `drug_shortages.toml`: openFDA drug shortages (CC0), counts by status and dosage form on
 //!   the day of the refresh.
 //! - `fdic_failures.toml`: FDIC failed banks since 1934, failures and failed assets per year.
-//! - `funding_gaps.toml`, `fcc_dirs.toml`, `fbi_arrests.toml`: see their builders.
+//! - `funding_gaps.toml`, `fcc_dirs.toml`: hand-copied (see [`super::series_transcribed`]).
+//! - `fbi_arrests.toml`: FBI arrests per 100,000 by sex and age (see [`super::series_arrests`]).
 
 use super::{Ctx, JobOutput};
 use crate::intermediate as im;
@@ -769,6 +770,8 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     oe417(ctx, &mut out)?;
     drug_shortages(ctx, &mut out)?;
     fdic(ctx, &mut out)?;
+    super::series_transcribed::build(ctx, &mut out)?;
+    super::series_arrests::build(ctx, &mut out)?;
     Ok(out)
 }
 

@@ -1220,7 +1220,13 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         }
         let mut row = vec![places[i].fips.clone()];
         // Two significant figures, and shares under half a percent written as 0.
-        let share = |x: f64| if x < 0.005 { "0".to_string() } else { sig(x, 2) };
+        let share = |x: f64| {
+            if x < 0.005 {
+                "0".to_string()
+            } else {
+                sig(x, 2)
+            }
+        };
         row.extend(s.by_class.iter().map(|x| share(*x)));
         for c in OUTSIDE_POOL {
             row.push(share(s.by_class_1d[class_index(c)]));
@@ -1532,20 +1538,40 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         ],
         2,
     );
-    for e in events.iter().filter(|e| e.at(1) > 0.0 || e.ge[0] > 0.0) {
+    // Events that left a real share of the county out for a day or more (the qualifying test);
+    // Puerto Rico's island-wide series is written once, under San Juan (rr-data serves it for
+    // every municipio). Two significant figures.
+    let pr_code = format!("{:05}", super::outages::PR_ISLAND);
+    for e in events.iter().filter(|e| e.ge[0] >= units[e.unit].qualify()) {
         let cust = units[e.unit].customers;
         let start = crate::timefmt::format_unix(e.start)[..16].replace('T', " ");
-        for (ci, _) in &targets[e.unit] {
+        let places_of: Vec<usize> = if units[e.unit].code == pr_code {
+            index.get("72127").copied().into_iter().collect()
+        } else {
+            targets[e.unit].iter().map(|(ci, _)| *ci).collect()
+        };
+        for ci in places_of {
+            // The cause without its episode number (the storm id stays): the id adds entropy
+            // the web does not use.
+            let cause = e
+                .cause
+                .split(';')
+                .next()
+                .unwrap_or("")
+                .split(':')
+                .next()
+                .unwrap_or("")
+                .to_string();
             let mut row = vec![
-                places[*ci].fips.clone(),
+                places[ci].fips.clone(),
                 start.clone(),
                 CLASSES[e.class].to_string(),
-                e.cause.split(';').next().unwrap_or("").to_string(),
-                sig4((e.peak / cust).min(1.0)),
+                cause,
+                sig((e.peak / cust).min(1.0), 2),
             ];
-            row.extend([1u32, 3, 7, 14, 30].iter().map(|d| sig4(e.at(*d))));
-            row.push(sig4(e.ge[0] / cust));
-            row.push(sig4(e.ge[2] / cust));
+            row.extend([1u32, 3, 7, 14, 30].iter().map(|d| sig(e.at(*d), 2)));
+            row.push(sig(e.ge[0] / cust, 2));
+            row.push(sig(e.ge[2] / cust, 2));
             opt.push(row);
         }
     }

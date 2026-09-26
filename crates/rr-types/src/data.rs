@@ -10,7 +10,9 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{CitationId, HazardId, LatLon};
+use crate::{
+    CitationId, Declarations, HazardId, LatLon, OutageModel, Reliability, TemperatureProfile,
+};
 
 /// Everything the core pack knows about one county.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -67,6 +69,19 @@ pub struct CountyRecord {
     /// Social vulnerability measures.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub vulnerability: Option<Vulnerability>,
+    /// Regional outage model: pooled tail, credibility weights, causes, worst event in the
+    /// region (data pack v2, `crate::calibration`). awaiting: types2
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub outage_model: Option<OutageModel>,
+    /// Heat and cold day shares by month and during recorded outages (data pack v2).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub temperature: Option<TemperatureProfile>,
+    /// Reliability indices of the utilities serving the county (EIA-861; data pack v2).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reliability: Option<Reliability>,
+    /// Federal disaster declarations covering the county (OpenFEMA; data pack v2).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub declarations: Option<Declarations>,
 }
 
 string_enum! {

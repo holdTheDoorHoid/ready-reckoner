@@ -359,6 +359,11 @@ mod tests {
             flood: None,
             facilities: None,
             vulnerability: None,
+            // awaiting: data-model (pack v2 calibration records; no behaviour here)
+            outage_model: None,
+            temperature: None,
+            reliability: None,
+            declarations: None,
         }
     }
 
