@@ -18,6 +18,7 @@
   import ReadinessCard from '../components/ReadinessCard.svelte';
   import SavingsTrack from '../components/SavingsTrack.svelte';
   import ScenarioToggle from '../components/ScenarioToggle.svelte';
+  import Sources from '../components/Sources.svelte';
   import Warning from '../components/Warning.svelte';
   import type { ClimateHorizon, Dials, PlanItem, PlanOutput, ReturnPeriod, WaterLevel } from '../engine/types';
   import { CLIMATE_HORIZONS, WATER_LEVELS } from '../engine/types';
@@ -270,6 +271,22 @@
         homeItems={bucketItems(output, 'home_loss')}
       />
 
+      <section class="support card" aria-labelledby="support-title">
+        <h2 id="support-title">If this feels like a lot</h2>
+        <p>Reading about risks can be stressful, and that is normal. You can talk to someone at any hour:</p>
+        <ul class="support__lines">
+          <li>
+            <strong>988 Suicide and Crisis Lifeline:</strong> call, text or chat 988. Support 24/7 for mental health, substance use and more.
+            <Sources ids={['samhsa_988']} variant="inline" what="the 988 Lifeline" />
+          </li>
+          <li>
+            <strong>Disaster Distress Helpline:</strong> call or text 1-800-985-5990. Toll-free, in many languages, 24/7, for anyone in the U.S.
+            and its territories feeling distress after a natural or human-caused disaster.
+            <Sources ids={['samhsa_disaster_distress']} variant="inline" what="the Disaster Distress Helpline" />
+          </li>
+        </ul>
+      </section>
+
       <p class="next button-row">
         <a class="button button--primary" href={href('plan')}>See your plan <Icon name="chevron-right" /></a>
         <span class="small muted">Free steps first, then what to buy each month.</span>
@@ -349,5 +366,16 @@
   }
   .next {
     margin-top: var(--s6);
+  }
+  .support {
+    margin-top: var(--s6);
+    max-width: 48rem;
+  }
+  .support h2 {
+    margin-top: 0;
+    font-size: var(--text-lg);
+  }
+  .support__lines li + li {
+    margin-top: var(--s2);
   }
 </style>

@@ -6,7 +6,7 @@
   import type { HazardProfile, PlanItem } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { chanceWithin, CONFIDENCE_LABELS, percent, usd } from '../lib/format';
-  import { bucketName, lowerFirst } from '../lib/lookup';
+  import { bucketName, itemSourceIds, lowerFirst } from '../lib/lookup';
   import { href } from '../lib/router.svelte';
   import ExplainButton from './ExplainButton.svelte';
   import IconArray from './IconArray.svelte';
@@ -23,6 +23,8 @@
   const uid = $props.id();
 
   const chance = $derived(chanceWithin(hazard.rate_per_year, years));
+  /** The hazard's own sources, then those behind the prices in "What helps". */
+  const sourceIds = $derived([...hazard.sources, ...helps.slice(0, 3).flatMap((i) => (i.kind === 'free_action' ? [] : itemSourceIds(app.catalogue, app.result.output, i.item_id)))]);
   const TIER_WORDS = { natural: 'Nature', societal: 'Society', personal: 'Household' } as const;
 </script>
 
@@ -64,7 +66,7 @@
   {/if}
   <footer class="hazard__foot">
     <ExplainButton kind="hazard" id={hazard.id} />
-    <Sources ids={hazard.sources} />
+    <Sources ids={sourceIds} what={hazard.name} />
   </footer>
 </article>
 

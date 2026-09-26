@@ -1,18 +1,89 @@
 <!--
   Screen 11, About and method: which engine and data versions are running, the credit lines and
-  disclaimers the data sources require (shown exactly as the engine gives them), every source,
+  disclaimers the data sources require (shown exactly as the engine gives them, the National Risk
+  Index statement first), what data is on this device and where it comes from, every source,
   the licences, what is stored and where, and how to report a wrong number.
 -->
 <script lang="ts">
+  import Icon from '../components/Icon.svelte';
+  import { MAP_FILE, ZIP_FILES } from '../engine/data-files';
+  import type { Phase } from '../engine/loader';
   import { useApp } from '../lib/app.svelte';
   import { formatDate } from '../lib/format';
   import { href } from '../lib/router.svelte';
 
   const app = useApp();
   const info = $derived(app.info);
+  const manifest = $derived(app.manifest);
   const citations = $derived([...(app.catalogue?.citations ?? [])].sort((a, b) => a.title.localeCompare(b.title)));
-  /** The real engine is answering without the national data packs (engine_info lists none). */
-  const sampleCounties = $derived(app.source?.kind === 'wasm' && info !== null && info.packs_loaded.length === 0);
+  /** The real engine is answering without the national data packs: the site has none. */
+  const sampleCounties = $derived(
+    app.source?.kind === 'wasm' && (app.data ? app.data.core.phase === 'none' : info !== null && info.packs_loaded.length === 0),
+  );
+
+  const REPORT_URL = 'https://github.com/holdTheDoorHoid/ready-reckoner/issues/new?template=wrong-number.md';
+
+  function megabytes(bytes: number): string {
+    return `${(bytes / 1_000_000).toFixed(1)} MB`;
+  }
+
+  function phaseWords(phase: Phase | undefined, lazy: string): string {
+    if (phase === 'ready') return 'On this device';
+    if (phase === 'loading') return 'Loading now';
+    if (phase === 'failed') return 'Did not load (try again from the line at the top)';
+    return lazy;
+  }
+
+  /** One row per part of the data, from the manifest. */
+  const parts = $derived.by(() => {
+    if (!manifest) return [];
+    const core = manifest.packs.core?.files ?? [];
+    const size = (files: { bytes?: number }[]) => files.reduce((sum, f) => sum + (f.bytes ?? 0), 0);
+    const zips = core.filter((f) => ZIP_FILES.includes(f.path));
+    const counties = core.filter((f) => !ZIP_FILES.includes(f.path));
+    const map = (manifest.packs.geo?.files ?? []).filter((f) => f.path === MAP_FILE);
+    return [
+      { name: 'County data', what: manifest.packs.core?.description ?? 'Hazards, outages and more for every county.', files: counties.length, bytes: size(counties), status: phaseWords(app.data?.core.phase, 'Loads when the app opens') },
+      { name: 'ZIP code list', what: 'Which county each ZIP code is in, and how far it is from nuclear plants and chemical sites.', files: zips.length, bytes: size(zips), status: phaseWords(app.data?.zip.phase, 'Loads when you type a ZIP code') },
+      { name: 'County map', what: manifest.packs.geo?.description ?? 'County outlines for the map.', files: map.length, bytes: size(map), status: phaseWords(app.data?.map.phase, 'Loads when a map is shown') },
+    ].filter((p) => p.files > 0);
+  });
+
+  interface JobSource {
+    name: string;
+    url?: string;
+  }
+  /** Where each part of the data comes from (the manifest's jobs), newest refresh first. */
+  const jobs = $derived.by(() => {
+    const raw = (manifest as { jobs?: Record<string, { title?: string; finished?: string; sources?: JobSource[] }> } | null)?.jobs ?? {};
+    return Object.entries(raw)
+      .map(([id, j]) => ({
+        id,
+        title: j.title ?? id,
+        finished: j.finished?.slice(0, 10) ?? '',
+        sources: (j.sources ?? []).map((src) => ({ name: src.name, url: src.url && /^https?:\/\/\S+$/.test(src.url) ? src.url : undefined })),
+      }))
+      .sort((a, b) => a.title.localeCompare(b.title));
+  });
+
+  /** Licences of the data sources, from the manifest (the engine's credit lines omit them). */
+  const dataLicences = $derived(
+    ((manifest?.attributions ?? []) as { source?: string; license?: string }[]).filter((a) => a.source && a.license).sort((a, b) => a.source!.localeCompare(b.source!)),
+  );
+
+  /** The versions a report needs; nothing about the household. */
+  const versionLine = $derived(
+    `App ${__RR_APP_VERSION__}; engine ${info?.engine_version ?? '?'} (contract ${info?.api_version ?? '?'}); data ${info?.data_pack_version ?? 'none'}; content ${info?.content_version ?? '?'}`,
+  );
+  let copied = $state('');
+  async function copyVersions() {
+    try {
+      await navigator.clipboard.writeText(versionLine);
+      copied = 'Copied. Paste it into the report.';
+    } catch {
+      copied = 'Your browser would not copy it; select the line above and copy it instead.';
+    }
+  }
 </script>
 
 <div class="page page--narrow">
@@ -49,12 +120,68 @@
           <tr><th scope="row">This app</th><td>{__RR_APP_VERSION__}</td></tr>
           <tr><th scope="row">Planning engine</th><td>{info?.engine_version ?? 'loading'}{app.source ? ` (${app.source.kind === 'mock' ? 'stand-in' : 'WebAssembly'})` : ''}</td></tr>
           <tr><th scope="row">Engine contract</th><td>version {info?.api_version ?? '?'}</td></tr>
-          <tr><th scope="row">Data packs</th><td>{info?.data_pack_version ?? 'none loaded'}{info?.packs_loaded.length ? ` (${info.packs_loaded.join(', ')})` : ''}</td></tr>
+          <tr>
+            <th scope="row">Data</th>
+            <td>
+              {#if info?.data_pack_version}
+                version {info.data_pack_version}{manifest?.generated ? `, built ${formatDate(manifest.generated.slice(0, 10))}` : ''}
+              {:else if app.data?.core.phase === 'loading'}
+                loading
+              {:else}
+                none loaded
+              {/if}
+            </td>
+          </tr>
           <tr><th scope="row">Content</th><td>{info?.content_version ?? 'loading'}</td></tr>
         </tbody>
       </table>
     </div>
   </section>
+
+  {#if parts.length}
+    <section aria-labelledby="data-title">
+      <h2 id="data-title">The data on this device</h2>
+      <p>
+        The app downloads its data once, from this site only, and keeps it in this browser so it also works offline. The ZIP code list and the
+        map come only when they are needed. Sizes are as stored; the download is smaller.
+      </p>
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <div class="table-wrap" tabindex="0" role="region" aria-label="The data on this device">
+        <table>
+          <thead><tr><th scope="col">Part</th><th scope="col">What it holds</th><th scope="col">Size</th><th scope="col">Status</th></tr></thead>
+          <tbody>
+            {#each parts as p (p.name)}
+              <tr>
+                <th scope="row">{p.name}</th>
+                <td>{p.what}</td>
+                <td class="num">{megabytes(p.bytes)} <span class="muted">({p.files} {p.files === 1 ? 'file' : 'files'})</span></td>
+                <td>{p.status}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+      {#if jobs.length}
+        <details class="jobs">
+          <summary>Where the data comes from ({jobs.length} parts{jobs.some((j) => j.finished) ? `, last refreshed ${formatDate(jobs.map((j) => j.finished).sort().at(-1)!)}` : ''})</summary>
+          <ul>
+            {#each jobs as job (job.id)}
+              <li>
+                <strong>{job.title}</strong>{#if job.finished}<span class="muted">, refreshed {formatDate(job.finished)}</span>{/if}
+                <ul class="job-sources">
+                  {#each job.sources as src, i (i)}
+                    <li>
+                      {#if src.url}<a href={src.url} target="_blank" rel="noopener noreferrer">{src.name}<span class="visually-hidden"> (opens in a new tab)</span></a>{:else}{src.name}{/if}
+                    </li>
+                  {/each}
+                </ul>
+              </li>
+            {/each}
+          </ul>
+        </details>
+      {/if}
+    </section>
+  {/if}
 
   <section aria-labelledby="method-title">
     <h2 id="method-title">How it works</h2>
@@ -101,6 +228,12 @@
       <li>Guidance text and tables are under Creative Commons Attribution-ShareAlike 4.0.</li>
       <li>Data packs are built from public federal sources; each one's terms are recorded with the data.</li>
     </ul>
+    {#if dataLicences.length}
+      <p class="small">The data's own terms:</p>
+      <ul class="small">
+        {#each dataLicences as a (a.source)}<li><strong>{a.source}:</strong> {a.license}</li>{/each}
+      </ul>
+    {/if}
   </section>
 
   <section aria-labelledby="privacy-title">
@@ -116,11 +249,23 @@
 
   <section aria-labelledby="report-title">
     <h2 id="report-title">Found a wrong number?</h2>
-    <p>Please tell us. Say which number, on which screen, what you expected, and your source if you have one.</p>
     <p>
-      <a class="button" href="https://github.com/holdTheDoorHoid/ready-reckoner/issues/new" target="_blank" rel="noopener noreferrer">Report it on GitHub<span class="visually-hidden"> (opens in a new tab)</span></a>
+      Please tell us. The report form asks what the app showed, what you believe is right, and your source. Say which screen, and which
+      setting you had on.
     </p>
-    <p class="small muted">Please don't include your address or details about your household.</p>
+    <p>
+      <a class="button" href={REPORT_URL} target="_blank" rel="noopener noreferrer"><Icon name="alert" /> Report a wrong number on GitHub<span class="visually-hidden"> (opens in a new tab)</span></a>
+    </p>
+    <p class="small">Add this line so we can see exactly what was running (it says nothing about you):</p>
+    <p class="version-line"><code>{versionLine}</code></p>
+    <p class="button-row">
+      <button type="button" class="button button--small" onclick={copyVersions}>Copy this line</button>
+      <span class="small" role="status">{copied}</span>
+    </p>
+    <p class="small muted">
+      GitHub reports are public. Please don't include your address. A saved plan file holds your household's details, so attach one only if you
+      are happy for anyone to read it; a made-up household that shows the same number works just as well.
+    </p>
   </section>
 </div>
 
@@ -152,5 +297,30 @@
   }
   th[scope='row'] {
     width: 11rem;
+  }
+  .jobs {
+    margin-top: var(--s4);
+    font-size: var(--text-sm);
+  }
+  .jobs summary {
+    color: var(--accent);
+    min-height: 36px;
+  }
+  .jobs > ul > li + li {
+    margin-top: var(--s3);
+  }
+  .job-sources {
+    margin: var(--s1) 0 0;
+  }
+  .job-sources a {
+    word-break: break-word;
+  }
+  .version-line code {
+    display: block;
+    padding: var(--s2) var(--s3);
+    background: var(--surface-2);
+    border-radius: var(--r1);
+    font-size: 0.8125rem;
+    overflow-wrap: anywhere;
   }
 </style>

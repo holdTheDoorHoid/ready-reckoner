@@ -57,6 +57,9 @@
       {#if done}<Icon name="check" />{/if}
       <span>{coveredText}</span>
     </p>
+    {#if compact}
+      <Sources ids={[...bucket.sources, ...(bucket.relief?.sources ?? [])]} variant="inline" what="{bucket.name}: be ready for {targetText}" />
+    {/if}
     {#if !compact}
       {#if bucket.relief}
         <p class="gauge__relief small">
@@ -69,7 +72,7 @@
       {/if}
       <footer class="gauge__foot">
         <ExplainButton kind="bucket" id={bucket.id} />
-        <Sources ids={[...bucket.sources, ...(bucket.relief?.sources ?? [])]} />
+        <Sources ids={[...bucket.sources, ...(bucket.relief?.sources ?? [])]} what={bucket.name} />
       </footer>
     {/if}
   </article>
@@ -145,4 +148,5 @@
     padding: var(--s2) 0;
     border-bottom: 1px solid var(--border);
   }
+
 </style>

@@ -10,12 +10,13 @@
   import ItemCard from '../components/ItemCard.svelte';
   import PlanGate from '../components/PlanGate.svelte';
   import SavingsTrack from '../components/SavingsTrack.svelte';
+  import Sources from '../components/Sources.svelte';
   import Warning from '../components/Warning.svelte';
   import type { PlanItem, PlanOutput } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { addMonths, formatDate, formatMonth, monthsBetween, quantity, usd } from '../lib/format';
   import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, stageLine } from '../lib/labels';
-  import { allPlanItems, bucketName, catalogueItem, tierName } from '../lib/lookup';
+  import { allPlanItems, bucketName, catalogueItem, itemSourceIds, tierName } from '../lib/lookup';
   import { href } from '../lib/router.svelte';
 
   const app = useApp();
@@ -56,6 +57,11 @@
   function counts(output: PlanOutput) {
     const all = allPlanItems(output).map((x) => x.item);
     return { done: all.filter((i) => i.done).length, total: all.length };
+  }
+
+  /** Sources behind one item's quantity and price, for the short lists. */
+  function sourcesOf(output: PlanOutput, item: PlanItem): string[] {
+    return item.kind === 'free_action' ? [] : itemSourceIds(app.catalogue, output, item.item_id);
   }
 
   function restart() {
@@ -141,7 +147,10 @@
           <h2 id="next-title">{monthLabel(nextMonth.index)} <span class="muted h-note">from {formatDate(addMonths(planningDate, nextMonth.index))}</span></h2>
           <ul class="preview">
             {#each nextMonth.items.filter((i) => !i.done) as item (item.item_id + item.tier)}
-              <li>{item.name}: {item.kind === 'free_action' ? 'free' : `${quantity(item.quantity, item.unit)}, about ${usd(item.est_cost_usd)}`}</li>
+              <li>
+                {item.name}: {item.kind === 'free_action' ? 'free' : `${quantity(item.quantity, item.unit)}, about ${usd(item.est_cost_usd)}`}
+                <Sources ids={sourcesOf(output, item)} variant="inline" what={item.name} />
+              </li>
             {/each}
           </ul>
         </section>
@@ -169,6 +178,7 @@
               <li class="card">
                 <strong>{catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id}</strong>: about {usd(e.needed_usd)}
                 {#if month}; ready to buy around {formatMonth(addMonths(planningDate, month.index))}{/if}.
+                <Sources ids={itemSourceIds(app.catalogue, output, e.item_id)} variant="inline" what={catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id} />
               </li>
             {/each}
           </ul>
@@ -191,6 +201,7 @@
                     <span>{item.name}</span>
                     <span class="muted">{item.kind === 'free_action' ? 'free' : `${quantity(item.quantity, item.unit)}, about ${usd(item.est_cost_usd)}`}</span>
                     <span class="chip">{bucketName(app.catalogue, item.buckets[0] ?? '')}</span>
+                    <Sources ids={sourcesOf(output, item)} variant="inline" what={item.name} />
                   </li>
                 {/each}
               </ul>
@@ -259,10 +270,16 @@
           <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
           <div class="table-wrap" tabindex="0" role="region" aria-label="What the targets turn into">
             <table>
-              <thead><tr><th scope="col">For</th><th scope="col">Amount</th><th scope="col">How it was worked out</th><th scope="col">Rule</th></tr></thead>
+              <thead><tr><th scope="col">For</th><th scope="col">Amount</th><th scope="col">How it was worked out</th><th scope="col">Rule</th><th scope="col">Sources</th></tr></thead>
               <tbody>
                 {#each output.requirements as r (r.id)}
-                  <tr><td>{bucketName(app.catalogue, r.bucket)}</td><td class="num">{quantity(r.quantity, r.unit)}</td><td>{r.plain}</td><td><code>{r.rule}</code></td></tr>
+                  <tr>
+                    <td>{bucketName(app.catalogue, r.bucket)}</td>
+                    <td class="num">{quantity(r.quantity, r.unit)}</td>
+                    <td>{r.plain}</td>
+                    <td><code>{r.rule}</code></td>
+                    <td><Sources ids={r.citations} variant="inline" what={quantity(r.quantity, r.unit)} /></td>
+                  </tr>
                 {/each}
               </tbody>
             </table>

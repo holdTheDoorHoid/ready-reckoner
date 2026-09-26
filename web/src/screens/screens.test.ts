@@ -307,7 +307,7 @@ describe('what the screens show', () => {
     current.cleanup();
     current = await render(About, { plan, route: 'about', engine: realEngine(['core']) });
     expect(current.text()).not.toContain('The national data is not loaded');
-    expect(current.text()).toContain('e8b8cd6861e6 (core)');
+    expect(current.text()).toContain('version e8b8cd6861e6');
   });
 
   it('start: starting a plan takes the person to the first step with a dated plan', async () => {

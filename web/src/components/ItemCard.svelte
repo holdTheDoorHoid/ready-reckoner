@@ -6,7 +6,7 @@
   import type { PlanItem } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { band, formatDate, quantity, usd } from '../lib/format';
-  import { bucketName, catalogueItem, hazardName } from '../lib/lookup';
+  import { bucketName, catalogueItem, hazardName, itemSourceIds, requirementsFor } from '../lib/lookup';
   import { intervalLabel } from '../lib/maintenance';
   import ExplainButton from './ExplainButton.svelte';
   import Icon from './Icon.svelte';
@@ -18,6 +18,9 @@
   const uid = $props.id();
 
   const info = $derived(catalogueItem(app.catalogue, item.item_id));
+  /** How the quantity was worked out (the requirement lines behind it), and every source behind the numbers. */
+  const workings = $derived(item.kind === 'free_action' ? [] : requirementsFor(app.catalogue, app.result.output, item.item_id));
+  const sourceIds = $derived(itemSourceIds(app.catalogue, app.result.output, item.item_id));
   const purchase = $derived(app.purchaseFor(item.item_id, item.tier));
   const fromInventory = $derived(!!item.done && !purchase);
   const verb = $derived(item.kind === 'free_action' ? 'Done' : item.kind === 'reserve' ? 'Set aside' : 'Bought');
@@ -105,7 +108,11 @@
       {#if item.hazards.length}
         <p class="small"><span class="sub-inline">Hazards it answers:</span> {item.hazards.slice(0, 4).map((h) => hazardName(app.catalogue, h)).join('; ')}.</p>
       {/if}
-      {#if info}<Sources ids={info.citations} />{/if}
+      {#if workings.length}
+        <p class="sub">How the amount is worked out</p>
+        <ul>{#each workings as r (r.id)}<li>{r.plain}</li>{/each}</ul>
+      {/if}
+      <Sources ids={sourceIds} label="Sources for the amount and the price" what={item.name} />
       <ExplainButton kind="item" id={item.item_id} label="How the plan chose this" />
     </details>
   </div>

@@ -1,6 +1,7 @@
 <!--
-  Screen 4, Money: the monthly budget (slider with a "typical" marker), a one-off amount, months of
-  savings, monthly expenses, how steady income is, and insurance. $0 is a fine answer.
+  Screen 4, Money: the monthly budget (slider with a suggested starting point, labelled as an
+  estimate), a one-off amount, months of savings, monthly expenses, how steady income is, and
+  insurance. $0 is a fine answer.
 -->
 <script lang="ts">
   import ChoiceGroup from '../components/ChoiceGroup.svelte';
@@ -18,10 +19,12 @@
   const app = useApp();
   const input = $derived(app.plan?.input);
 
-  // awaiting: content — a sourced figure for a typical monthly preparedness budget. The mock cites
-  // a placeholder expert estimate; the marker is shown as an estimate, not a recommendation.
-  const TYPICAL_BUDGET = 50;
-  const TYPICAL_SOURCE = 'mock_typical_budget';
+  // A suggested starting point, not a survey figure: no survey measures what households spend on
+  // preparing (FEMA's 2024 National Household Survey has no spending question), so the marker is
+  // labelled an estimate and never presented as what most people do. The one relevant survey
+  // finding, that about a quarter name cost as their main barrier, is cited beneath it.
+  const STARTING_POINT = 50;
+  const COST_BARRIER_SOURCE = 'fema_nhs_2024';
   const SLIDER_MAX = 300;
 
   const earners = $derived(input?.people.filter((p) => p.earner).length ?? 0);
@@ -60,14 +63,19 @@
         />
         <div class="slider__scale" aria-hidden="true">
           <span>$0</span>
-          <span class="slider__typical" style:left="{(TYPICAL_BUDGET / SLIDER_MAX) * 100}%">typical</span>
+          <span class="slider__typical" style:left="{(STARTING_POINT / SLIDER_MAX) * 100}%">{usd(STARTING_POINT)} (estimate)</span>
           <span>{usd(SLIDER_MAX)}+</span>
         </div>
       </div>
       <p class="small muted typical-note">
-        Many households start at about {usd(TYPICAL_BUDGET)} a month (an estimate). Any amount works; the plan just takes longer.
+        The {usd(STARTING_POINT)} mark is a starting point we suggest. It is an estimate, not a survey figure. Any amount works; a smaller one
+        just takes longer.
       </p>
-      <Sources ids={[TYPICAL_SOURCE]} label="Where the typical amount comes from" />
+      <p class="small typical-note">
+        Cost is a real barrier: in FEMA's 2024 National Household Survey, about 1 in 4 people (26%) said cost was the main thing stopping them
+        from preparing. That is why $0 still gets you a plan.
+      </p>
+      <Sources ids={[COST_BARRIER_SOURCE]} label="Where the survey finding comes from" />
       <NumberField
         id="one-off"
         label="A one-off amount at the start"

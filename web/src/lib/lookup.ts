@@ -1,5 +1,5 @@
 /** Plain names and catalogue entries by id, from `catalogue()`; falls back to the id itself. */
-import type { BucketId, Catalogue, HazardId, Item, PlanItem, PlanOutput, TierId } from '../engine/types';
+import type { BucketId, Catalogue, HazardId, Item, PlanItem, PlanOutput, RequirementLine, TierId } from '../engine/types';
 
 export function bucketName(cat: Catalogue | null, id: BucketId | string): string {
   return cat?.buckets.find((b) => b.id === id)?.name ?? id;
@@ -25,4 +25,24 @@ export function allPlanItems(output: PlanOutput): { item: PlanItem; month: numbe
 /** Lower-case the first letter, for names used inside a sentence. */
 export function lowerFirst(s: string): string {
   return s.charAt(0).toLowerCase() + s.slice(1);
+}
+
+/**
+ * The requirement lines behind an item's quantity: the lines worked out by the item's quantity
+ * rule (`Item.quantity_rule` = `RequirementLine.rule`). Empty for items without one (free actions).
+ */
+export function requirementsFor(cat: Catalogue | null, output: PlanOutput | undefined, itemId: string): RequirementLine[] {
+  const rule = catalogueItem(cat, itemId)?.quantity_rule;
+  if (!rule || !output) return [];
+  return output.requirements.filter((r) => r.rule === rule);
+}
+
+/**
+ * Every source behind the numbers shown for a plan item: the quantity (its requirement lines)
+ * first, then the item itself (what to look for, the price band).
+ */
+export function itemSourceIds(cat: Catalogue | null, output: PlanOutput | undefined, itemId: string): string[] {
+  const quantity = requirementsFor(cat, output, itemId).flatMap((r) => r.citations);
+  const item = catalogueItem(cat, itemId)?.citations ?? [];
+  return [...new Set([...quantity, ...item])];
 }

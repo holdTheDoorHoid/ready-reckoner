@@ -14,6 +14,7 @@ import { getContext, setContext, untrack } from 'svelte';
 import { hasPlace } from '../engine/data-files';
 import type { Engine, EngineSource } from '../engine/index';
 import { getDataLoader, getEngine, getEngineSource } from '../engine/index';
+import type { Manifest } from '../engine/data-files';
 import type { LoaderStatus, PackLoader } from '../engine/loader';
 import type { Catalogue, EngineError, EngineInfo, IsoDate, PlanInput, PlanItem, PlanOutput, TierId } from '../engine/types';
 import { localToday } from './format';
@@ -55,6 +56,8 @@ export class AppState {
   source = $state.raw<EngineSource | null>(null);
   /** The data packs as they load (null for the mock engine, which needs none). */
   data = $state.raw<LoaderStatus | null>(null);
+  /** The data manifest (versions, files, sources), once loaded; null without data. */
+  manifest = $state.raw<Manifest | null>(null);
   result = $state.raw<AssessResult>({});
   pending = $state(false);
   /** The engine and catalogue are loaded. */
@@ -114,14 +117,21 @@ export class AppState {
       ? { kind: info.ok && info.value.engine_version.startsWith('mock') ? 'mock' : 'wasm' }
       : await getEngineSource();
     if (this.#loader) {
+      const loader = this.#loader;
       let last = '';
-      this.#unsubscribe = this.#loader.subscribe((status) => {
+      this.#unsubscribe = loader.subscribe((status) => {
         this.data = status;
         // Versions, loaded packs and credit lines change as packs arrive.
         const key = `${status.core.phase}|${status.zip.phase}|${status.map.phase}`;
         if (key !== last) {
           last = key;
           void this.refreshInfo();
+          if (!this.manifest) {
+            void loader
+              .manifest()
+              .then((m) => (this.manifest = m))
+              .catch(() => undefined);
+          }
         }
       });
     }

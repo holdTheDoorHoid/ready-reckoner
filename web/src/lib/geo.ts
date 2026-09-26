@@ -193,8 +193,8 @@ export function areaView(shapes: CountyShapes, fipsList: readonly string[], sele
   const chosen = fipsList.map((f) => shapes.byFips.get(f)).filter((c): c is CountyShape => !!c);
   if (chosen.length === 0) return null;
   const [w, s, e, n] = union(chosen.map((c) => c.bbox));
-  const padX = Math.max((e - w) * 0.35, 0.15);
-  const padY = Math.max((n - s) * 0.35, 0.12);
+  const padX = Math.max((e - w) * 0.2, 0.12);
+  const padY = Math.max((n - s) * 0.2, 0.1);
   const frame: [number, number, number, number] = [w - padX, s - padY, e + padX, n + padY];
   const project = projector(frame);
   const ids = new Set(chosen.map((c) => c.fips));
