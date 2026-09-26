@@ -111,7 +111,8 @@ string_enum! {
         Landslide = "landslide",
         /// Lightning strike.
         Lightning = "lightning",
-        /// Flooding from rivers and streams (the National Risk Index calls it riverine flooding).
+        /// Flooding from rivers, streams and heavy rain (National Risk Index v1.20 "inland
+        /// flooding", `IFLD`; the id keeps the older name).
         RiverineFlooding = "riverine_flooding",
         /// Damaging wind that is not a tornado or hurricane.
         StrongWind = "strong_wind",
@@ -129,11 +130,13 @@ string_enum! {
         Pandemic = "pandemic",
         /// A regional, multi-day failure of the power grid that is not caused by weather.
         GridFailure = "grid_failure",
-        /// A cyberattack or software failure that takes down utilities, payments or phones.
+        /// A cyberattack or computer failure that takes down utilities, payments, or pharmacy and
+        /// insurer systems.
         CyberOutage = "cyber_outage",
         /// Riots or widespread unrest.
         CivilUnrest = "civil_unrest",
-        /// Shortages from port, rail, trucking or fuel disruption.
+        /// Store shortages: port, rail, trucking or fuel disruption, or runs on stores before a
+        /// storm.
         SupplyChainDisruption = "supply_chain_disruption",
         /// A chemical spill or release from a plant, rail car or truck.
         HazmatRelease = "hazmat_release",
@@ -207,7 +210,7 @@ impl HazardId {
             IceStorm => "Ice storm",
             Landslide => "Landslide",
             Lightning => "Lightning",
-            RiverineFlooding => "River flooding",
+            RiverineFlooding => "Flooding from rivers or heavy rain",
             StrongWind => "Strong wind",
             Tornado => "Tornado",
             Tsunami => "Tsunami",
@@ -240,11 +243,12 @@ string_enum! {
     pub enum TargetKind: "target kind" {
         /// A number of days, with a low–high range (duration buckets).
         Days = "days",
-        /// A number of months, with a low–high range (money buckets).
+        /// A number of months, with a low–high range (`income`).
         Months = "months",
         /// The chance of having to leave, the warning to expect and the days away (`evacuate`).
         Evacuate = "evacuate",
-        /// The chance of needing it and a checklist of steps (the other readiness buckets).
+        /// The chance of needing it and a checklist of steps (the other readiness buckets and
+        /// `home_loss`).
         Readiness = "readiness",
     }
 }
@@ -331,16 +335,19 @@ impl BucketId {
         }
     }
 
-    /// How this bucket's [`crate::Target`] is expressed: days for duration buckets, months for
-    /// money buckets, `evacuate` for `evacuate`, and readiness for the other readiness buckets.
+    /// How this bucket's [`crate::Target`] is expressed: days for the duration buckets, months
+    /// for `income` (the savings goal), `evacuate` for `evacuate`, and a readiness checklist for
+    /// the other readiness buckets and for `home_loss`, which is an insurance-and-documents
+    /// decision with no stockpile target (DESIGN §4.4).
     pub const fn target_kind(self) -> TargetKind {
-        match self.kind() {
-            BucketKind::Duration => TargetKind::Days,
-            BucketKind::Money => TargetKind::Months,
-            BucketKind::Readiness => match self {
-                BucketId::Evacuate => TargetKind::Evacuate,
-                _ => TargetKind::Readiness,
-            },
+        use BucketId::*;
+        match self {
+            Power | WaterBoil | WaterOut | Supplies | Thermal | Medication | Comms => {
+                TargetKind::Days
+            }
+            Income => TargetKind::Months,
+            Evacuate => TargetKind::Evacuate,
+            GetHome | MedicalEmergency | Fire | Security | HomeLoss => TargetKind::Readiness,
         }
     }
 }
@@ -529,13 +536,16 @@ mod tests {
         for b in BucketId::ALL {
             let want = match (b.kind(), b) {
                 (BucketKind::Duration, _) => TargetKind::Days,
-                (BucketKind::Money, _) => TargetKind::Months,
+                (BucketKind::Money, BucketId::Income) => TargetKind::Months,
+                // An insurance-and-documents decision, no stockpile target (DESIGN §4.4).
+                (BucketKind::Money, _) => TargetKind::Readiness,
                 (BucketKind::Readiness, BucketId::Evacuate) => TargetKind::Evacuate,
                 (BucketKind::Readiness, _) => TargetKind::Readiness,
             };
             assert_eq!(b.target_kind(), want, "{b}");
         }
         assert_eq!(BucketId::Income.target_kind(), TargetKind::Months);
+        assert_eq!(BucketId::HomeLoss.target_kind(), TargetKind::Readiness);
         assert_eq!(BucketId::Evacuate.target_kind(), TargetKind::Evacuate);
         assert_eq!(BucketId::GetHome.target_kind(), TargetKind::Readiness);
         assert_eq!(BucketId::WaterOut.target_kind(), TargetKind::Days);

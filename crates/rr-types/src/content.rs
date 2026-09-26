@@ -53,6 +53,16 @@ pub struct Item {
     pub tier: TierId,
     /// Costs nothing (a free action).
     pub free: bool,
+    /// Life-safety item: the allocator orders it first within its tier (smoke and carbon
+    /// monoxide alarms, water, a dependent's medication, backup power for a medical device).
+    /// Optional in content files; defaults to false.
+    #[serde(default)]
+    pub life_safety: bool,
+    /// Specialised item for rare catastrophes (a radiation meter, potassium iodide, Faraday
+    /// storage): the allocator gives it $0 by default and at most 10% of the monthly budget when
+    /// the user opts in. Optional in content files; defaults to false.
+    #[serde(default)]
+    pub rare_catastrophic: bool,
     /// What it is, in a sentence or two.
     pub spec: String,
     /// What to look for when buying.
@@ -61,6 +71,9 @@ pub struct Item {
     pub avoid: Vec<String>,
     /// Typical price.
     pub price_band_usd: PriceBand,
+    /// When the price band was observed ("prices as of ...").
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub retrieved: Option<Date>,
     /// Name of the quantity rule in `rr-supply` that sizes it.
     pub quantity_rule: String,
     /// Rotation and check intervals, if it needs any.

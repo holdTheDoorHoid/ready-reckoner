@@ -619,6 +619,9 @@ mod tests {
         assert_eq!(b[12].id, BucketId::Income);
         assert_eq!(b[12].kind, BucketKind::Money);
         assert_eq!(b[12].target_kind, TargetKind::Months);
+        assert_eq!(b[13].id, BucketId::HomeLoss);
+        assert_eq!(b[13].kind, BucketKind::Money);
+        assert_eq!(b[13].target_kind, TargetKind::Readiness);
         let t = TierInfo::all();
         assert_eq!(t.len(), 7);
         let json = serde_json::to_value(&t).unwrap();

@@ -101,16 +101,16 @@ pub struct HazardProfile {
     pub tier: HazardTier,
     /// Ranked list or the rare-catastrophe box.
     pub display: HazardDisplay,
-    /// Chance of at least one household-significant event in a year, 0 to 1 (climate multiplier
+    /// Expected household-significant events per year, r_h (can exceed 1; climate multiplier
     /// already applied).
-    pub annual_probability: f64,
-    /// A plausible low and high for `annual_probability`, as `[low, high]`.
-    pub probability_range: [f64; 2],
-    /// Expected household-significant events per year, r_h (can exceed 1). For rare events it is
-    /// close to `annual_probability`, which is 1 − e^(−r_h).
     pub rate_per_year: f64,
     /// A plausible low and high for `rate_per_year`, as `[low, high]`.
     pub rate_range: [f64; 2],
+    /// Chance of at least one household-significant event in a year, 0 to 1: 1 − e^(−r_h), close
+    /// to `rate_per_year` for rare events.
+    pub annual_probability: f64,
+    /// A plausible low and high for `annual_probability`, as `[low, high]`.
+    pub probability_range: [f64; 2],
     /// Relative severity, 0 to 1, for ranking and copy.
     pub severity: f64,
     /// Expected annual loss per household in US dollars, where the National Risk Index gives it.
@@ -135,7 +135,8 @@ pub const TARGET_LADDER_DAYS: [f32; 15] = [
 ];
 
 /// A bucket's target or coverage (the JSON `kind` tag says which shape). The kind matches
-/// [`BucketId::target_kind`].
+/// [`BucketId::target_kind`]: days for duration buckets, months for `income`, `evacuate` for
+/// `evacuate`, readiness for the other readiness buckets and `home_loss`.
 ///
 /// `low` and `high` are the 10th and 90th percentiles of the target under uncertainty in the
 /// model's parameters. In [`BucketAssessment::covered`] there is no uncertainty, so `low` and
@@ -152,7 +153,7 @@ pub enum Target {
         /// 90th percentile, in days.
         high: f32,
     },
-    /// A number of months (money buckets).
+    /// A number of months (`income`: months of income gap to have saved).
     Months {
         /// Months.
         value: f32,
@@ -172,7 +173,7 @@ pub enum Target {
         /// Days away from home to plan for.
         days_away: f32,
     },
-    /// A checklist (the other readiness buckets).
+    /// A checklist (the other readiness buckets, and `home_loss`: insurance and documents).
     Readiness {
         /// Chance of needing it at least once in the next ten years, 0 to 1.
         p_need_10yr: f64,
@@ -347,9 +348,10 @@ pub struct PlanItem {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlanMonth {
-    /// Month number, starting at 1 for the month that begins on the planning date.
+    /// Month number, counted from 0: month 0 begins on the planning date and holds the free
+    /// actions first.
     pub index: u16,
-    /// Money available this month in US dollars (the one-off amount lands in month 1).
+    /// Money available this month in US dollars (the one-off amount lands in month 0).
     pub budget_usd: f32,
     /// Steps for this month, in the order to do them.
     pub items: Vec<PlanItem>,
@@ -388,7 +390,7 @@ pub struct SavingsTrack {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Plan {
-    /// Months in order, starting at month 1.
+    /// Months in order, starting at month 0.
     pub months: Vec<PlanMonth>,
     /// The month by which every bucket is covered to its target, if the plan gets there.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -461,10 +463,10 @@ pub struct PlanOutput {
     pub location: LocationResolved,
     /// Every hazard: the `ranked` ones most important first, then the `rare_catastrophic` ones.
     pub register: Vec<HazardProfile>,
-    /// Named scenarios considered for this location.
-    pub scenarios: Vec<ScenarioInfo>,
     /// Every bucket, in [`BucketId::ALL`] order.
     pub buckets: Vec<BucketAssessment>,
+    /// Named scenarios that apply to this location, each on or off.
+    pub scenarios: Vec<ScenarioInfo>,
     /// The highest tier the plan covers so far.
     pub tier_reached: TierId,
     /// The tier that is enough for this household's risk.
