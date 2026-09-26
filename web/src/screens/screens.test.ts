@@ -62,6 +62,9 @@ function slips(text: string): string[] {
   for (const bad of ['undefined', 'NaN', '[object Object]', 'null', 'Infinity']) if (text.includes(bad)) found.push(bad);
   const ids = text.match(/\b(?:one_in_\d+|water_out|water_boil|medical_emergency|home_loss|get_home|free_action)\b/g);
   if (ids) found.push(...ids);
+  // Singular after "1" (W1: "Notice could be 1 minutes").
+  const plurals = text.match(/(?<![\d.,½])1 (?:minutes|hours|days|weeks|months|years|steps)\b/g);
+  if (plurals) found.push(...plurals);
   return found;
 }
 

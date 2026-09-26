@@ -1,7 +1,9 @@
 <!--
   Screen 7, Your plan: phased purchases and actions by month, this month first and free steps
   first. Each item can be checked off with what was paid. Progress per consequence, guardrail
-  warnings (never blocks), money being saved toward bigger items, and the whole schedule.
+  warnings (never blocks), money being saved toward bigger items, and the whole schedule. Steps
+  count only what the household does from here: what it already had (its own list, and the everyday
+  basics the plan assumes) is shown apart as "Already have".
 -->
 <script lang="ts">
   import BucketGauge from '../components/BucketGauge.svelte';
@@ -54,9 +56,21 @@
     return items.filter((i) => !i.done).reduce((s, i) => s + i.est_cost_usd, 0);
   }
 
+  /** Done without being checked off here: on the "What you already have" list, or an assumed everyday basic. */
+  function alreadyHad(item: PlanItem): boolean {
+    return !!item.done && !app.purchaseFor(item.item_id, item.tier);
+  }
+
+  /** Steps done and to do, leaving out what the household already had. */
   function counts(output: PlanOutput) {
     const all = allPlanItems(output).map((x) => x.item);
-    return { done: all.filter((i) => i.done).length, total: all.length };
+    const had = all.filter(alreadyHad).length;
+    return { done: all.filter((i) => i.done).length - had, had, total: all.length - had };
+  }
+
+  /** Money (cash in small bills) is set aside, not bought. */
+  function isMoney(itemId: string): boolean {
+    return catalogueItem(app.catalogue, itemId)?.unit === 'dollar';
   }
 
   /** Sources behind one item's quantity and price, for the short lists. */
@@ -78,7 +92,8 @@
       {@const thisMonth = months.find((m) => m.index === currentMonth)}
       {@const thisItems = (thisMonth?.items ?? []).filter((i) => !i.done)}
       {@const nextMonth = months.find((m) => m.index > currentMonth)}
-      {@const done = allPlanItems(output).filter((x) => x.item.done).map((x) => x.item)}
+      {@const done = allPlanItems(output).filter((x) => x.item.done && !alreadyHad(x.item)).map((x) => x.item)}
+      {@const had = allPlanItems(output).filter((x) => alreadyHad(x.item)).map((x) => x.item)}
       {@const c = counts(output)}
       {@const monthly = app.plan?.input.finances.monthly_budget_usd ?? 0}
       <p class="lead">{stageLine(app.plan?.input.stage)} Month by month: free steps first, then the cheapest protection for your risks, within your budget.</p>
@@ -99,7 +114,8 @@
         </li>
         <li class="card">
           <span class="stat__label">Done so far</span>
-          <span class="stat__value">{c.done} of {c.total} steps</span>
+          <span class="stat__value">{c.done} of {c.total} {c.total === 1 ? 'step' : 'steps'}</span>
+          {#if c.had > 0}<span class="small muted">Already have: {c.had}</span>{/if}
         </li>
         <li class="card">
           <span class="stat__label">Every target covered</span>
@@ -188,7 +204,9 @@
             {#each output.plan.envelopes as e, i (i)}
               {@const month = months.find((m) => m.items.some((x) => x.item_id === e.item_id && !x.done && Math.abs(x.est_cost_usd - e.needed_usd) < 0.01))}
               <li class="card">
-                <strong>{catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id}</strong>: about {usd(e.needed_usd)}{#if month}; ready to buy
+                <strong>{catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id}</strong>: about {usd(e.needed_usd)}{#if month}; {isMoney(e.item_id)
+                    ? 'all set aside'
+                    : 'ready to buy'}
                   around {formatMonth(addMonths(planningDate, month.index))}{/if}.
                 <Sources ids={itemSourceIds(app.catalogue, output, e.item_id)} variant="inline" what={catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id} />
               </li>
@@ -238,11 +256,27 @@
         </section>
       {/if}
 
+      {#if had.length}
+        <section aria-labelledby="had-title">
+          <h2 id="had-title">Already have <span class="muted h-note">{had.length}</span></h2>
+          <p class="section-intro">
+            What the plan counts as already in your home: what you listed, and the everyday basics most homes have. Change them on
+            <a href={href('have')}>What you already have</a>.
+          </p>
+          <details>
+            <summary>Show what you already have</summary>
+            {#each keyedItems(had) as { key, item } (key)}<ItemCard {item} />{/each}
+          </details>
+        </section>
+      {/if}
+
       <SavingsTrack
         income={output.buckets.find((b) => b.id === 'income')}
         track={output.plan.savings_track}
         homeLoss={undefined}
         homeItems={[]}
+        {planningDate}
+        doneMonth={output.plan.done_month}
       />
 
       {#if app.plan}

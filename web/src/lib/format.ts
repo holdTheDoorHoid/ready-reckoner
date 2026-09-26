@@ -73,6 +73,129 @@ export function naturalFrequency(p: number): string {
   return `about ${v.n} of 100`;
 }
 
+// ---------------------------------------------------------------------------------------------
+// Short chances for tables, worded exactly as the engine's sentences word them
+// (crates/rr-hazards/src/sentence.rs), so a table and the card beside it never disagree: two
+// significant figures, whole numbers from 1 to 10, "in 1,000" below 1 in 100, "1 in N" below 1 in
+// 1,000, "nearly every household" from 99.5 in 100.
+// ---------------------------------------------------------------------------------------------
+
+/** `x > 0` to two significant figures (0 for anything else). */
+export function roundSig2(x: number): number {
+  if (!(Number.isFinite(x) && x > 0)) return 0;
+  let e = Math.floor(Math.log10(x));
+  // Guard against log10 rounding just across a power of ten.
+  if (10 ** e > x) e -= 1;
+  else if (10 ** (e + 1) <= x) e += 1;
+  const scale = 10 ** (e - 1);
+  return Math.round(x / scale) * scale;
+}
+
+/** A whole number with thousands separators: 12500 -> "12,500". */
+export function thousands(n: number): string {
+  return usd0.format(Math.round(n));
+}
+
+/** At most two significant figures without trailing zeros: "4.5", "81", "2,500". */
+export function sig2(x: number): string {
+  const r = roundSig2(x);
+  if (r >= 10) return thousands(r);
+  return String(Number(r.toPrecision(2)));
+}
+
+function per100Word(n: number): string {
+  if (n >= 99.5) return 'nearly all';
+  if (n < 0.5) return 'fewer than 1';
+  if (n < 10) return String(Math.round(n));
+  return thousands(roundSig2(n));
+}
+
+function per1000Word(n: number): string {
+  if (n < 0.5) return 'fewer than 1';
+  if (n < 10) return String(Math.round(n));
+  return thousands(roundSig2(n));
+}
+
+/** "1 in 2,500" for a small chance `p` (below 1 in 10 or so). */
+export function oneIn(p: number): string {
+  if (p < 1e-6) return 'fewer than 1 in 1,000,000';
+  const n = 1 / p;
+  return `1 in ${n < 10 ? Math.max(2, Math.round(n)) : thousands(roundSig2(n))}`;
+}
+
+/** The engine's bracketed range: "(63–98)" when both ends are numbers, "(44 to nearly all)" otherwise. */
+function bracket(lo: string, hi: string): string {
+  if (lo === hi) return '';
+  const numeric = (s: string) => /^[\d,]+$/.test(s);
+  return numeric(lo) && numeric(hi) ? ` (${lo}–${hi})` : ` (${lo} to ${hi})`;
+}
+
+/**
+ * A chance over the whole horizon for a table cell: "about 86 of 100", "about 9 in 1,000",
+ * "about 1 in 2,000", "nearly every household". With `lo` and `hi` (expert estimates) the range
+ * follows the number the way the engine's sentences put it: "about 86 (63–98) of 100".
+ */
+export function chanceShort(p: number, lo?: number, hi?: number): string {
+  const withRange = lo !== undefined && hi !== undefined;
+  if (p * 100 >= 99.5) return 'nearly every household';
+  if (p * 100 >= 0.95) {
+    const r = withRange ? bracket(per100Word(lo * 100), per100Word(hi * 100)) : '';
+    return `about ${per100Word(p * 100)}${r} of 100`;
+  }
+  if (p * 1000 >= 0.95) {
+    const r = withRange ? bracket(per1000Word(lo * 1000), per1000Word(hi * 1000)) : '';
+    return `about ${per1000Word(p * 1000)}${r} in 1,000`;
+  }
+  if (p >= 1e-5) {
+    const r = withRange ? bracket(oneIn(lo), oneIn(hi)) : '';
+    return `about ${oneIn(p)}${r}`;
+  }
+  return 'fewer than 1 in 100,000';
+}
+
+/**
+ * How often in a year, for the second line under a chance: "about 4.5 times a year", "about once a
+ * year" (never "about 1 times a year"), otherwise the chance in any one year, "about 1 in 190 a
+ * year", the way the dial's "1-in-100" is read.
+ */
+export function perYearWords(ratePerYear: number, annualProbability: number): string {
+  if (ratePerYear >= 1.05) return `about ${sig2(ratePerYear)} times a year`;
+  if (ratePerYear >= 0.75) return 'about once a year';
+  if (!(annualProbability > 0)) return 'no known chance a year';
+  return `about ${oneIn(annualProbability)} a year`;
+}
+
+/**
+ * A rare catastrophe's chance as a range only, never a point (CONTENT_STANDARDS §6: expert numbers
+ * show as ranges): "between 1 in 200 and 1 in 41" over `years`, or, when the range spans more than
+ * 1,000 times, "very unlikely: less than 1 in 100".
+ */
+export function rangeOnly(rateLow: number, rateHigh: number, years: number): string {
+  const lo = chanceWithin(Math.max(0, rateLow), years);
+  const hi = chanceWithin(Math.max(0, rateHigh), years);
+  if (!(hi > 0)) return 'no known chance';
+  if (!(rateLow > 0) || rateHigh / rateLow > 1000 || lo < 1e-6) return `very unlikely: less than ${oneIn(hi)}`;
+  const a = oneIn(lo);
+  const b = oneIn(hi);
+  return a === b ? `about ${a}` : `between ${a} and ${b}`;
+}
+
+/**
+ * A chance cut into pieces for display, so that "1 in 2,000" and a range like "(63–98)" can be kept
+ * on one line: `kind` is 'one_in' or 'range' for those pieces and '' for the rest.
+ */
+export function chancePieces(s: string): { text: string; kind: '' | 'one_in' | 'range' }[] {
+  const out: { text: string; kind: '' | 'one_in' | 'range' }[] = [];
+  let last = 0;
+  for (const m of s.matchAll(/1 in [\d,]+|\(\d[\d,]*–\d[\d,]*\)/g)) {
+    if (m.index > last) out.push({ text: s.slice(last, m.index), kind: '' });
+    out.push({ text: m[0], kind: m[0].startsWith('(') ? 'range' : 'one_in' });
+    last = m.index + m[0].length;
+  }
+  if (last < s.length) out.push({ text: s.slice(last), kind: '' });
+  return out;
+}
+
 /** The expert-view percentage: at most two significant figures. */
 export function percent(p: number): string {
   const v = p * 100;
@@ -142,15 +265,24 @@ export function monthsPhrase(v: number): string {
   return `${nText(v)} month${v === 1 ? '' : 's'}`;
 }
 
-/** Notice time: "15 minutes to 12 hours", "1 to 3 days". */
+/**
+ * Notice time: "15 minutes to 12 hours", "1 minute to 3 days". Singular or plural follows the
+ * number as shown, after rounding (0.02 hours is "1 minute", 1.04 hours is "1 hour").
+ */
 export function noticeRange(lowHours: number, highHours: number): string {
   const one = (h: number): string => {
-    if (h < 1) return `${Math.round(h * 60)} minutes`;
-    if (h < 48) return `${nText(Math.round(h * 10) / 10)} hour${h === 1 ? '' : 's'}`;
+    const m = Math.max(1, Math.round(h * 60));
+    if (m < 60) return `${m} minute${m === 1 ? '' : 's'}`;
+    if (h < 48) {
+      const r = Math.round(h * 10) / 10;
+      return `${nText(r)} hour${r === 1 ? '' : 's'}`;
+    }
     const d = Math.round(h / 24);
     return `${d} day${d === 1 ? '' : 's'}`;
   };
-  return lowHours === highHours ? one(lowHours) : `${one(lowHours)} to ${one(highHours)}`;
+  const low = one(lowHours);
+  const high = one(highHours);
+  return low === high ? low : `${low} to ${high}`;
 }
 
 // ---------------------------------------------------------------------------------------------

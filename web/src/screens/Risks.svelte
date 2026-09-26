@@ -1,9 +1,10 @@
 <!--
   Screen 6, Your risks: the register and what it means for this household. Settings (the dials)
-  sit in a drawer at the top and re-run the assessment as they change. Named scenarios appear only
-  when the engine offers them. Duration buckets are gauges, readiness buckets are have/not-yet
-  cards, money buckets are on a separate savings track, and rare catastrophic hazards have their
-  own box. Every hazard is shown with what in the plan answers it.
+  sit in a drawer at the top and re-run the assessment as they change. Directly under them, the
+  risk matrix lists every hazard in one table, most likely first, each name a jump to its card.
+  Named scenarios appear only when the engine offers them. Duration buckets are gauges, readiness
+  buckets are have/not-yet cards, money buckets are on a separate savings track, and rare
+  catastrophic hazards have their own box. Every hazard is shown with what in the plan answers it.
 -->
 <script lang="ts">
   import BucketGauge from '../components/BucketGauge.svelte';
@@ -16,6 +17,7 @@
   import PlanGate from '../components/PlanGate.svelte';
   import RareBox from '../components/RareBox.svelte';
   import ReadinessCard from '../components/ReadinessCard.svelte';
+  import RiskMatrix from '../components/RiskMatrix.svelte';
   import SavingsTrack from '../components/SavingsTrack.svelte';
   import ScenarioToggle from '../components/ScenarioToggle.svelte';
   import Sources from '../components/Sources.svelte';
@@ -24,8 +26,9 @@
   import { CLIMATE_HORIZONS, WATER_LEVELS } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { dayPhrase, targetDays } from '../lib/format';
-  import { CLIMATE, HORIZONS, RETURN_PERIOD, stageLine, WATER_LEVEL } from '../lib/labels';
-  import { allPlanItems, catalogueItem } from '../lib/lookup';
+  import { helpsFor } from '../lib/helps';
+  import { CLIMATE, dialSentence, HORIZONS, RETURN_PERIOD, stageLine, WATER_LEVEL } from '../lib/labels';
+  import { allPlanItems } from '../lib/lookup';
   import { href } from '../lib/router.svelte';
   import type { ComparisonRow } from '../lib/ui-types';
 
@@ -55,27 +58,6 @@
     if (!app.plan) return;
     app.plan.input.dials.rare_catastrophic_opt_in = on;
     announcement = on ? 'Rare-catastrophe budget allowed.' : 'Rare-catastrophe budget switched off.';
-  }
-
-  /**
-   * Items in the plan that answer a hazard, most direct first: items made for the hazard, then items
-   * whose main job is the hazard's main consequence, then any overlap; free and cheap first on ties.
-   */
-  function helpsFor(output: PlanOutput, hazardId: string): PlanItem[] {
-    const hazard = output.register.find((h) => h.id === hazardId);
-    if (!hazard) return [];
-    const main = hazard.buckets[0];
-    const score = (i: PlanItem) => {
-      const extra = catalogueItem(app.catalogue, i.item_id)?.hazard_extras.includes(hazard.id) ? 4 : 0;
-      const primary = i.buckets[0] === main ? 3 : i.buckets[0] && hazard.buckets.includes(i.buckets[0]) ? 1 : 0;
-      return extra + primary + i.buckets.filter((b) => hazard.buckets.includes(b)).length * 0.5;
-    };
-    const seen = new Set<string>();
-    return allPlanItems(output)
-      .map((x) => x.item)
-      .filter((i) => i.hazards.includes(hazard.id) && score(i) >= 1)
-      .filter((i) => (seen.has(i.item_id) ? false : (seen.add(i.item_id), true)))
-      .sort((a, b) => Number(!!a.done) - Number(!!b.done) || score(b) - score(a) || a.est_cost_usd - b.est_cost_usd);
   }
 
   function bucketItems(output: PlanOutput, bucketId: string): PlanItem[] {
@@ -201,6 +183,7 @@
               </div>
             </section>
           {/if}
+          <RiskMatrix {ranked} {rare} {years} />
         </div>
         <CountyMap location={output.location} />
       </div>
@@ -229,7 +212,7 @@
         <p class="section-intro">Ranked by how likely and how serious. Chances are for households like yours in your county.</p>
         <div class="featured">
           {#each ranked.slice(0, 3) as h (h.id)}
-            <HazardCard hazard={h} featured helps={helpsFor(output, h.id)} {years} />
+            <HazardCard hazard={h} featured helps={helpsFor(output, app.catalogue, h.id)} {years} backToTable />
           {/each}
         </div>
         {#if ranked.length > 3}
@@ -237,7 +220,7 @@
             <summary>All {ranked.length} risks, ranked</summary>
             <div class="grid">
               {#each ranked.slice(3) as h (h.id)}
-                <HazardCard hazard={h} helps={helpsFor(output, h.id)} {years} />
+                <HazardCard hazard={h} helps={helpsFor(output, app.catalogue, h.id)} {years} backToTable />
               {/each}
             </div>
           </details>
@@ -250,6 +233,7 @@
           The days your household should be able to manage for each kind of disruption, at your settings. The solid bar is what you have
           now; the striped bar is how much of it your plan covers once every step in it is done.
         </p>
+        {#if dials}<p class="section-intro dial-sentence">{dialSentence(dials.return_period)}</p>{/if}
         <div class="grid">
           {#each duration as b (b.id)}<BucketGauge bucket={b} />{/each}
         </div>
@@ -263,13 +247,15 @@
         </div>
       </section>
 
-      <RareBox hazards={rare} {years} />
+      <RareBox hazards={rare} {years} backToTable />
 
       <SavingsTrack
         income={output.buckets.find((b) => b.id === 'income')}
         track={output.plan.savings_track}
         homeLoss={output.buckets.find((b) => b.id === 'home_loss')}
         homeItems={bucketItems(output, 'home_loss')}
+        planningDate={app.plan?.input.planning_date}
+        doneMonth={output.plan.done_month}
       />
 
       <section class="support card" aria-labelledby="support-title">

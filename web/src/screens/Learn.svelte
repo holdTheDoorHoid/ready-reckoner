@@ -1,11 +1,17 @@
-<!-- Screen 10, Learn: short articles; one at a time at #/learn/<slug>. -->
+<!--
+  Screen 10, Learn: short articles (the reviewed topic blocks in content/guidance); one at a time at
+  #/learn/<slug>, each note linked to its source. The blocks' own headings start at "##", which
+  follows the page's h1 as h2.
+-->
 <script lang="ts">
   import Icon from '../components/Icon.svelte';
-  import { ARTICLES, article } from '../learn/articles';
+  import { ARTICLES, article, withSourceLinks } from '../learn/articles';
   import { followInPageAnchor } from '../lib/anchors';
+  import { useApp } from '../lib/app.svelte';
   import { renderMarkdown } from '../lib/markdown';
   import { href, useRouter } from '../lib/router.svelte';
 
+  const app = useApp();
   const router = useRouter();
   const current = $derived(router.current.param ? article(router.current.param) : undefined);
 </script>
@@ -16,7 +22,9 @@
     <h1 id="page-title" tabindex="-1">{current.title}</h1>
     {#if current.draft}<p class="chip draft">Draft text, still being reviewed</p>{/if}
     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
-    <article class="prose" onclick={followInPageAnchor}>{@html renderMarkdown(current.body, { idPrefix: `learn-${current.slug}`, headingOffset: 1 })}</article>
+    <article class="prose" onclick={followInPageAnchor}>
+      {@html renderMarkdown(withSourceLinks(current.body, app.catalogue?.citations), { idPrefix: `learn-${current.slug}`, headingOffset: 0 })}
+    </article>
   {:else}
     <h1 id="page-title" tabindex="-1">Learn</h1>
     {#if router.current.param}<p class="card">That article could not be found. Here are the others.</p>{/if}

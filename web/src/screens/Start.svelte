@@ -8,7 +8,7 @@
   import type { Problem, Stage } from '../engine/types';
   import { STAGES } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
-  import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, STAGE } from '../lib/labels';
+  import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, STAGE, STATUS_LINE } from '../lib/labels';
   import { engineInput, parseImport, STEP_IDS, type SavedPlan } from '../lib/persistence';
   import { parseHash, useRouter } from '../lib/router.svelte';
 
@@ -152,6 +152,7 @@
       <li>You can save your plan as a file, and delete it from this browser at any time.</li>
     </ul>
   </section>
+  <p class="status-line">{STATUS_LINE}</p>
 
   <section aria-labelledby="get-title">
     <h2 id="get-title">What you get</h2>
@@ -192,6 +193,13 @@
   .promise,
   .resume {
     margin: var(--s5) 0;
+  }
+  .promise {
+    margin-bottom: var(--s3);
+  }
+  .status-line {
+    margin: 0 0 var(--s5);
+    font-size: var(--text-sm);
   }
   .begin {
     margin: var(--s5) 0;

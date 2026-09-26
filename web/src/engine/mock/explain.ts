@@ -4,6 +4,7 @@
  */
 import type { Citation, Explanation, ExplainRequest } from '../types';
 import { chanceWithin, dayPhrase, naturalFrequency, percent, targetDays, targetMonths, usd } from '../../lib/format';
+import { returnPeriodHelp } from '../../lib/labels';
 import { citation } from './citations';
 import { catalogueItem } from './items';
 import type { ModelResult } from './model';
@@ -66,7 +67,7 @@ export function explainFrom(req: ExplainRequest, r: ModelResult): Explanation | 
       const math: string[] = [];
       const t = b.target;
       if (t.kind === 'days') {
-        plain.push(`You chose ${dial.label}. That means planning for disruptions so long that about ${naturalFrequency(1 - Math.exp(-10 / dial.n)).replace('about ', '')} households like yours would see a longer one in ten years.`);
+        plain.push(`You chose ${dial.label}. ${returnPeriodHelp(req.input.dials.return_period)}`);
         plain.push(`For "${b.name.toLowerCase()}" that comes to ${targetDays(t.value, t.low, t.high)}. The range shows how unsure the underlying numbers are.`);
         math.push(`Target: the smallest ladder value d where the yearly rate of disruptions longer than d is at most 1/${dial.n} = ${1 / dial.n}`);
         math.push('Ladder: ½, 1, 2, 3, 5, 7, 10, 14, 21, 30, 45, 60, 90, 180, 365 days');

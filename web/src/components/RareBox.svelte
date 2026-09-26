@@ -1,16 +1,21 @@
 <!--
   Rare catastrophic hazards in their own box, with how likely and how bad as two separate columns,
   never ranked by expected loss, and with the calm, concrete fact that ordinary supplies cover the
-  first days of sheltering.
+  first days of sheltering. How likely is a range only (H-02): these are expert estimates, and a
+  single number would claim a precision nobody has. The nuclear row is a worldwide figure, and the
+  note under the table says so.
 -->
 <script lang="ts">
   import type { HazardProfile } from '../engine/types';
-  import { chanceWithin, naturalFrequency } from '../lib/format';
+  import { jumpTo } from '../lib/anchors';
+  import { rangeOnly } from '../lib/format';
+  import { NUCLEAR_NOTE } from '../lib/labels';
+  import Chance from './Chance.svelte';
   import ExplainButton from './ExplainButton.svelte';
   import SeveritySwatch from './SeveritySwatch.svelte';
   import Sources from './Sources.svelte';
 
-  let { hazards, years }: { hazards: HazardProfile[]; years: number } = $props();
+  let { hazards, years, backToTable = false }: { hazards: HazardProfile[]; years: number; backToTable?: boolean } = $props();
 </script>
 
 {#if hazards.length}
@@ -29,7 +34,7 @@
         <thead>
           <tr>
             <th scope="col">What</th>
-            <th scope="col">How likely <span class="th-note">(households like yours, {years} {years === 1 ? 'year' : 'years'})</span></th>
+            <th scope="col">How likely <span class="th-note">(in the next {years === 1 ? 'year' : `${years} years`})</span></th>
             <th scope="col">How bad</th>
           </tr>
         </thead>
@@ -37,19 +42,33 @@
           {#each hazards as h (h.id)}
             <tr>
               <th scope="row">{h.name}</th>
-              <td>{naturalFrequency(chanceWithin(h.rate_per_year, years))}</td>
+              <td><Chance text={rangeOnly(h.rate_range[0], h.rate_range[1], years)} /></td>
               <td><SeveritySwatch severity={h.severity} /></td>
             </tr>
           {/each}
         </tbody>
       </table>
     </div>
+    {#if hazards.some((h) => h.id === 'nuclear_attack')}
+      <p class="small note">{NUCLEAR_NOTE}</p>
+    {/if}
     <ul class="what-to-do">
       {#each hazards as h (h.id)}
         <li><ExplainButton kind="hazard" id={h.id} label="{h.name}: what to do" /></li>
       {/each}
     </ul>
-    <Sources ids={hazards.flatMap((h) => h.sources)} />
+    <div class="foot">
+      <Sources ids={hazards.flatMap((h) => h.sources)} />
+      {#if backToTable}
+        <a
+          class="back no-print"
+          href="#matrix-{hazards[0]!.id}"
+          onclick={(e) => {
+            if (jumpTo(`matrix-${hazards[0]!.id}`, { block: 'center' })) e.preventDefault();
+          }}>Back to the table<span class="visually-hidden"> of risks</span></a
+        >
+      {/if}
+    </div>
   </section>
 {/if}
 
@@ -77,5 +96,20 @@
   }
   .what-to-do li + li {
     margin-top: 0;
+  }
+  .note {
+    margin: 0 0 var(--s3);
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s1) var(--s4);
+    align-items: flex-start;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-size: var(--text-sm);
   }
 </style>
