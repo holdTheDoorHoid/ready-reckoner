@@ -65,6 +65,12 @@ FEMA does not endorse the app; CC BY sources (EAGLE-I, the NCA5 Atlas) need cred
 - Every struct rejects unknown fields, so a typo in the app, a fixture, an imported plan or a content
   file is an error rather than a silently ignored value. Fields marked "defaults when absent" below
   may be left out of input and are always present in the engine's output.
+- `PlanInput.existing` holds at most one entry per item id: the UI merges check-offs into the one
+  entry rather than appending a new one. In `BucketAssessment.covered`, `Target::days.value` (and
+  the other target kinds' `value`) may be 0, meaning the household is not on the ladder for that
+  bucket at all, not that the target itself is 0. `Plan.envelopes` holds one `SavingsEnvelope` per
+  item id. `Plan.months[0]` may list items that are already done (`PlanItem.kind = "free_action"`,
+  `done: true`), not only ones still to do.
 - Deterministic: same input, same output, byte for byte, on every target. Engine crates compute
   exp, ln, pow and the normal distribution with `rr_types::math` (pure-Rust libm), because the
   platform maths library differs between native builds and WebAssembly in the last bit.
