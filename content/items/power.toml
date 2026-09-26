@@ -236,7 +236,6 @@ unit = "installed kit"
 buckets = ["power", "water_out"]
 tier = "h72"
 free = false
-life_safety = true
 spec = "An inlet on the outside wall with an interlock kit on the main panel, or a transfer switch, installed by a licensed electrician, so a portable generator can run the well pump and other chosen circuits. It is the only safe way to connect a generator to house wiring: OSHA says to attach one only through a transfer switch a qualified electrician installed, and CPSC warns that plugging a generator into a wall outlet can electrocute utility workers and neighbours."
 look_for = [
   "A licensed electrician, and a permit where your town requires one",

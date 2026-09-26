@@ -467,8 +467,9 @@ pub fn sized_requirements(
                     );
                 }
                 // A generator reaches a hardwired well pump only through an electrician-installed
-                // interlock or transfer switch: life-safety (backfeeding electrocutes line
-                // workers), so it never comes after the generator.
+                // interlock or transfer switch. For a generator the household owns it is
+                // life-safety (the backfeed risk is there now); for the one the plan buys it is
+                // part of that purchase.
                 let generator = if h.has_generator() {
                     Some(power::GeneratorFor::Owned)
                 } else if generator_for_pump {
@@ -482,7 +483,7 @@ pub fn sized_requirements(
                         power::generator_connection_units(housing, g),
                         Need,
                         Some(tier_for_days(days)),
-                        true,
+                        g == power::GeneratorFor::Owned,
                     );
                 }
                 out.push(bucket, power::wheelchair_battery(people), Need, h72, false);

@@ -420,7 +420,9 @@ fn livestock_on_a_well_store_two_weeks_until_pump_power_exists() {
     );
     let connection = get("power.generator_connection_units");
     assert_eq!(connection.kind, LineKind::Need);
-    assert!(connection.life_safety);
+    // Part of the generator's purchase until there is a generator to connect.
+    assert!(!connection.life_safety);
+    assert_eq!(connection.line.item_class, "generator");
     assert_eq!(connection.line.unit, "installed kit");
     assert!(
         connection
@@ -445,10 +447,11 @@ fn livestock_on_a_well_store_two_weeks_until_pump_power_exists() {
     let get = |id: &str| sized.iter().find(|l| l.line.id == id);
     assert_eq!(get("water_out.livestock_water").unwrap().quantity, 1109.5);
     assert!(get("power.generator_units").is_none());
-    assert_eq!(
-        get("power.generator_connection_units").map(|l| l.kind),
-        Some(LineKind::Need)
-    );
+    let connection = get("power.generator_connection_units").unwrap();
+    assert_eq!(connection.kind, LineKind::Need);
+    // The generator is already there: its connection is life-safety.
+    assert!(connection.life_safety);
+    assert!(get("power.fuel_cans").unwrap().life_safety);
     assert_eq!(
         get("power.generator_fuel_gallons").map(|l| l.kind),
         Some(LineKind::Need)
@@ -912,4 +915,70 @@ fn directional_cover_has_its_own_item_class() {
             }
         }
     }
+}
+
+/// The staged round-2 fixture (`fixtures/households/pending/`): insulin on a rural well with
+/// livestock and a long power target. It exercises every round-2 supply rule at once, so the
+/// planner's goldens cover them once it is wired into `rr_types::fixtures`.
+#[test]
+fn the_pending_cold_chain_and_well_fixture_exercises_the_round_two_rules() {
+    let input: rr_types::PlanInput = serde_json::from_str(include_str!(
+        "../../../fixtures/households/pending/cameron-insulin-well-farm-2.json"
+    ))
+    .unwrap();
+    assert!(input.validate().is_empty(), "{:?}", input.validate());
+    let targets = vec![
+        common::days(BucketId::Power, 45.0),
+        common::days(BucketId::WaterOut, 45.0),
+        common::days(BucketId::Supplies, 14.0),
+        common::driven_by(
+            common::days(BucketId::Thermal, 3.0),
+            &[(rr_types::HazardId::HeatWave, 1.0)],
+        ),
+        common::days(BucketId::Medication, 45.0),
+        common::readiness(BucketId::MedicalEmergency, 0.9),
+        common::readiness(BucketId::Fire, 0.05),
+    ];
+    let sized = sized_requirements(&input, &targets, &SupplyContext::default());
+    let get = |id: &str| {
+        sized
+            .iter()
+            .find(|l| l.line.id == id)
+            .unwrap_or_else(|| panic!("no {id}"))
+    };
+    // Cold chain: the whole 45-day power target, with a power station as a need.
+    assert_eq!(get("medication.rx_cold_storage").quantity, 45.0);
+    let station = get("power.power_station_units");
+    assert_eq!(
+        (station.kind, station.line.item_class.as_str()),
+        (LineKind::Need, rr_supply::COLD_MEDICINE_POWER_CLASS)
+    );
+    // The well: 14 days of animal water until pump power exists, then a pump-rated generator
+    // with its connection and fuel cans, valued as one purchase.
+    assert_eq!(get("water_out.livestock_water").quantity, 369.8);
+    for id in [
+        "power.generator_units",
+        "power.generator_connection_units",
+        "power.fuel_cans",
+    ] {
+        let l = get(id);
+        assert_eq!(
+            (l.kind, l.line.item_class.as_str()),
+            (LineKind::Need, "generator"),
+            "{id}"
+        );
+    }
+    assert!(
+        get("water_out.water_treatment_capacity")
+            .line
+            .plain
+            .contains("water from your well")
+    );
+    // No smoke alarms and the household owns its home: a need, free routes first.
+    assert!(get("fire.smoke_alarm_count").life_safety);
+    // Rural: the bleeding-control kit is life-safety.
+    assert!(get("medical_emergency.bleeding_control_kit").life_safety);
+    // Thermometers for the fridge and the room.
+    assert_eq!(get("power.fridge_thermometers").kind, LineKind::Need);
+    assert_eq!(get("thermal.room_thermometer").kind, LineKind::Need);
 }

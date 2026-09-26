@@ -632,10 +632,19 @@ pub fn generator_connection_units(housing: &Housing, generator: GeneratorFor) ->
     let text = format!(
         "{whose} can run the well pump, which is wired into the house, only through an inlet with an interlock or transfer switch that a licensed electrician installs: 1 installed kit, with the pump's circuit on it. Never plug a generator into a wall outlet or connect it to the house wiring any other way: backfeeding can electrocute utility workers and neighbours, and OSHA says to connect a generator to a building only through a transfer switch a qualified electrician installed."
     );
+    // For a generator the household owns, the connection is its own part of the power bucket (a
+    // life-safety need: the backfeed risk is there now). For the generator the plan buys, it
+    // shares the generator's part with the generator and its fuel cans, so the three are valued
+    // as one purchase and the connection never outranks the rest of the plan before there is a
+    // generator to connect.
+    let class = match generator {
+        GeneratorFor::Owned => "generator_connection",
+        GeneratorFor::Planned => "generator",
+    };
     Some(Sizing::new(
         &b,
         "generator_connection_units",
-        "generator_connection",
+        class,
         1.0,
         "installed kit",
         Per::Household,
@@ -963,7 +972,10 @@ mod tests {
         // The connection: owners of a house on a well, with a generator owned or planned.
         let c = generator_connection_units(&hays.housing, GeneratorFor::Planned).unwrap();
         assert_eq!((c.quantity, c.unit), (1.0, "installed kit"));
-        assert_eq!(c.item_class, "generator_connection");
+        assert_eq!(
+            c.item_class, "generator",
+            "valued with the generator it connects"
+        );
         assert!(
             c.plain.starts_with("The generator for the well pump"),
             "{}",
@@ -973,6 +985,7 @@ mod tests {
         let coos = fixtures::get("coos-bay-well-owner-2").unwrap();
         let c = generator_connection_units(&coos.housing, GeneratorFor::Owned).unwrap();
         assert!(c.plain.starts_with("Your generator"), "{}", c.plain);
+        assert_eq!(c.item_class, "generator_connection");
         let mut renter = coos.clone();
         renter.housing.tenure = Tenure::Rent;
         assert!(generator_connection_units(&renter.housing, GeneratorFor::Owned).is_none());
