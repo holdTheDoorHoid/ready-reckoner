@@ -1,0 +1,112 @@
+{
+ "planning_date": "2026-10-01",
+ "location": {
+  "country": "US",
+  "county_fips": "39029",
+  "setting": "suburban"
+ },
+ "housing": {
+  "kind": "detached",
+  "tenure": "own",
+  "floor": 1,
+  "basement": false,
+  "water": "municipal",
+  "sewer": "sewer",
+  "heating": "gas",
+  "cooling": "central",
+  "backup_power": "none",
+  "alarms": {
+   "smoke": true,
+   "co": true,
+   "extinguisher": false
+  }
+ },
+ "people": [
+  {
+   "age_band": "adult",
+   "pregnant_or_nursing": false,
+   "medical": {
+    "daily_rx": false,
+    "refrigerated_rx": false,
+    "powered_device": "none",
+    "mobility": "none",
+    "dietary": [],
+    "epinephrine": false
+   },
+   "earner": true,
+   "commute": {
+    "distance_km": 16,
+    "mode": "car",
+    "remote_possible": false
+   }
+  },
+  {
+   "age_band": "adult",
+   "pregnant_or_nursing": false,
+   "medical": {
+    "daily_rx": false,
+    "refrigerated_rx": false,
+    "powered_device": "none",
+    "mobility": "none",
+    "dietary": [],
+    "epinephrine": false
+   },
+   "earner": true,
+   "commute": {
+    "distance_km": 8,
+    "mode": "car",
+    "remote_possible": true
+   }
+  },
+  {
+   "age_band": "child",
+   "pregnant_or_nursing": false,
+   "medical": {
+    "daily_rx": false,
+    "refrigerated_rx": false,
+    "powered_device": "none",
+    "mobility": "none",
+    "dietary": [],
+    "epinephrine": false
+   },
+   "earner": false
+  }
+ ],
+ "pets": {
+  "dogs": 1,
+  "cats": 0,
+  "small": 0,
+  "large_animals": 0
+ },
+ "mobility": {
+  "vehicles": [
+   {
+    "fuel": "gas"
+   },
+   {
+    "fuel": "gas"
+   }
+  ]
+ },
+ "finances": {
+  "monthly_budget_usd": 100,
+  "one_off_budget_usd": 0,
+  "emergency_fund_months": 1,
+  "monthly_expenses_usd": 5000,
+  "income": {
+   "earners": 2,
+   "stability": "stable"
+  },
+  "insurance": {
+   "home_or_renters": true,
+   "flood": false,
+   "earthquake": false
+  }
+ },
+ "existing": [],
+ "dials": {
+  "return_period": "one_in_100",
+  "climate": "today",
+  "horizon_years": 10
+ }
+}
