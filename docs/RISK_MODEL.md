@@ -783,3 +783,71 @@ months of water from the well-drought prior. Each household's rates are listed i
 Every id this section's numbers carry is listed under "Used by consequence" in
 `docs/CITATION_IDS.md` (ids already in `content/citations.toml`, two shared with hazards, two new
 requests). Expert estimates cite `rr_risk_model_priors`.
+
+## Supply sizing
+
+Owned by `crates/rr-supply`. Entry points: `rr_supply::requirements(input, buckets)` (and
+`requirements_with` with a `SupplyContext`: days a year at or above 95 °F, the county latitude,
+the nuclear-plant flag) returns the `RequirementLine`s; `sized_requirements` adds each line's
+kind, tier, days, per-day rate, formula, estimate tag and life-safety flag;
+`ItemSizer::new(input, buckets, ctx).quantity(rule)` sizes any catalogue item by its
+`quantity_rule`; `constants()` is the registry the expert view shows. Every rule, formula and unit
+is in `docs/QUANTITY_RULES.md`.
+
+### What the numbers are
+
+Each bucket's design target (days, or the evacuation and readiness shapes) becomes quantities.
+Every number comes from `crates/rr-supply/src/constants.toml` (about 150 values with sources, ranges,
+alternatives and the research §13 disagreement notes), and each line cites exactly the sources of
+the numbers it used plus the bucket target's own sources. Estimates cite `rr_expert_prior` and the
+line says "some amounts are estimates".
+
+| Need | Rule | Evidence |
+| --- | --- | --- |
+| Water, basic | 1 gal a person a day (survival 0.8, comfortable 4.0); drinking share doubled in a hot county (basic becomes 1.75); +0.29 pregnant or nursing, +0.25 formula baby; pets by weight | DATA (Ready.gov, CDC, Sphere, DRI); DERIVED heat split; PRIOR pet weights and the 30-day hot threshold |
+| Water, long outages | Store up to 14 days; beyond that, treat water from a source (filter, bleach, boiling) | DATA (BYU/Church 14 gal plus purification, Oregon, Washington) |
+| Boil-water notice | Make the drinking share safe; boil 1 minute (3 above 5,000 ft), bleach by strength (EPA) | DATA |
+| Food | kcal by age band, DGA Table A2-2 moderately active, men and women averaged; +400 pregnancy or nursing; costs three ways (USDA Thrifty $8.44, bulk staples $2.15–2.85, freeze-dried $9–39 per 2,000 kcal); bulk staples for days beyond 30 (BYU 2019 list, Ensign child shares) | DATA; DERIVED band averages |
+| Medication | Target clamped to 7–30 days (14 when there is none) for daily or refrigerated prescriptions; cold storage for the power target; antibiotics always 0 with the clinician card | DATA (Red Cross, CDC, Florida) |
+| Power | CPAP 170 Wh a night; oxygen 300 W and other devices by watts; phones 15 Wh a day; generator 2.8 gal a day capped at the 25-gallon storage limit; December solar by latitude band | DATA (SIL, ENERGY STAR, fire code, PVWatts); PRIOR oxygen watts, phone Wh, band proxy |
+| Sanitation | Twin-bucket toilet: 0.45 bags and 1 cup of cover a person-day; soap by person-month (Sphere); 2 cycles of period products for half the adults and teens (sex not asked) | DATA (RDPO, Oregon, Sphere, CDC); PRIOR bag and cover rates |
+| Readiness | Go-bags per person 4+ with 3 days of water and food (Red Cross); get-home bags sized to the walk (3 mph, 0.5 L an hour; 0.71 in heat, NIOSH); first-aid kit per 4 people; alarms per level when missing | DATA; PRIOR walking pace and hourly water |
+
+### Tiers
+
+`tier_for_days(d)`: 0 is `now`; up to 3 days `h72`, 14 `w2`, 30 `m1`, 90 `m3`, 180 `m6`, then `y1`.
+`tier_enough` gives that tier for duration buckets, `m3` for income (the savings track), `now` for
+home loss, and `h72` for the other readiness buckets once the ten-year chance of need reaches 2 %
+(PRIOR). `tier_recommended` is the highest over duration and readiness buckets, never below `h72`.
+The first line that reaches the one-month tier says once that no agency sets a one-month amount.
+
+### The reference households
+
+At the research targets (Philadelphia: power 3 days, water 3 without and 4 to boil, food 10,
+medication 14; Coos Bay: power 13, no-water 50, food 17, medication 21):
+
+| Need | Philadelphia renters (4 people, a dog) | Coos Bay well owners (2 people, 2 dogs, a cat) |
+| --- | --- | --- |
+| Stored water | 12.9 gal (3 days) | 37.6 gal (the first 14 of 50 days) |
+| Water to make safe | 13.3 gal over a 4-day boil notice | 96.8 gal over days 15–50, one filter and a source |
+| Food | 82,000 kcal ($338 as groceries) | 76,900 kcal ($316) |
+| Medication on hand | 14 person-days | 21 person-days |
+| Generator fuel | none (no generator) | 25 gal stored (13 days needs 36.4) |
+| Phone power | 140 Wh | 390 Wh |
+| Toilet bags / cover | 6 bags, 12 cups | 45 bags, 100 cups |
+| Tier recommended | two weeks | three months |
+
+### Decisions and known gaps
+
+- **Pregnant or nursing** is one box, so water uses the larger breastfeeding figure (+0.29 gal)
+  and food +400 kcal.
+- **Hot climate** needs the county's days at or above 95 °F from the plan crate; without it the
+  household is sized as temperate (Philadelphia's 3.3 days a year is temperate).
+- **Formula** is detected from the word "formula" in a baby's dietary notes.
+- **Rule names** follow the content workstream's requests; where a formula differs (water from the
+  no-water target only, insulin counts as a prescription, masks from age 4, two cycles up to a
+  month) `docs/QUANTITY_RULES.md` says why.
+- **Heat and cold are separate cover** (`thermal_heat` and `thermal_cold` item classes), as are
+  stored water and treatment (`water_stored`, `water_treatment_capacity`).
+- **Readiness lines are emitted whatever the chance of need**; the allocator decides with value
+  per dollar, and `tier_enough` applies the 2 % threshold.
