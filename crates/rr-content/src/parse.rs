@@ -69,9 +69,9 @@ impl Guidance {
     /// The body with the household's frequency sentence in place of `{frequency}`. With `None`
     /// the placeholder is removed (for the generic, household-free view).
     ///
-    /// Conditional spans (`{if:<hazard>}…{/if}`, [`crate::policy::CONDITION_OPEN`]) are all kept
-    /// here, without their markers; the packet keeps only those about hazards likely enough for
-    /// the household.
+    /// Conditional spans (`{if:<hazard>}…{/if}`, `{if:home:<kind>}…{/if}`,
+    /// [`crate::policy::CONDITION_OPEN`]) are all kept here, without their markers; the packet
+    /// keeps only those about hazards likely enough for the household and about its kind of home.
     pub fn render(&self, frequency: Option<&str>) -> String {
         let body = crate::policy::apply_conditions(&self.body, |_| true);
         match frequency {

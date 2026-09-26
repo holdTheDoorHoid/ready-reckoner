@@ -132,14 +132,27 @@ impl<'a> Ctx<'a> {
         text::per_100(chance) != "fewer than 1"
     }
 
+    /// Whether a conditional span belongs in this household's packet: a span about one hazard of
+    /// a family block (`{if:avalanche}…{/if}`) when that hazard is relevant here
+    /// ([`Ctx::hazard_relevant`]); a span about a kind of home (`{if:home:apartment_high_rise}`,
+    /// `{if:not_home:…}`) when the household's home is (or is not) of that kind.
+    pub fn condition_holds(&self, id: &str) -> bool {
+        use rr_content::policy::Condition;
+        match Condition::parse(id) {
+            Ok(Condition::Hazard(h)) => self.hazard_relevant(&h),
+            Ok(c) => c.for_home(self.a.input.housing.kind).unwrap_or(true),
+            // Malformed conditions never pass the content validator; keep the text.
+            Err(_) => true,
+        }
+    }
+
     /// A guidance block's prose with the placeholders filled and its footnotes turned into
     /// citation markers. `frequency` fills `{frequency}` (the placeholder and the space after it
-    /// are dropped when there is none); `target` fills `{target}`. A span about one hazard of a
-    /// family block (`{if:avalanche}…{/if}`) stays only when that hazard is relevant here
-    /// ([`Ctx::hazard_relevant`]).
+    /// are dropped when there is none); `target` fills `{target}`. Conditional spans stay only
+    /// when their condition holds for this household ([`Ctx::condition_holds`]).
     pub fn guidance(&self, g: &Guidance, frequency: Option<&str>, target: Option<&str>) -> String {
         let mut body =
-            rr_content::policy::apply_conditions(g.prose().trim(), |h| self.hazard_relevant(h));
+            rr_content::policy::apply_conditions(g.prose().trim(), |id| self.condition_holds(id));
         let county = format!(
             "{}, {}",
             self.a.location.county_name, self.a.location.state_name
