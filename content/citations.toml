@@ -816,7 +816,7 @@ title = "City of Asheville lifts systemwide boil water notice issued after Hurri
 publisher = "U.S. Environmental Protection Agency"
 year = 2024
 url = "https://www.epa.gov/newsreleases/city-asheville-lifts-systemwide-boil-water-notice-issued-after-hurricane-helene"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -907,7 +907,7 @@ title = "A dataset of recorded electricity outages by United States county 2014â
 publisher = "Brelsford C. et al., Oak Ridge National Laboratory"
 year = 2024
 url = "https://doi.org/10.1038/s41597-024-03095-5"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "CC BY 4.0"
 
 [[citation]]
@@ -1571,7 +1571,7 @@ title = "Emergency Toilet Guidebook (twin-bucket toilet)"
 publisher = "Regional Disaster Preparedness Organization, Portland Metro Region"
 year = 2024
 url = "https://www.rdpo.net/emergency-toilet"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
 [[citation]]
@@ -1580,7 +1580,7 @@ title = "Home Fuel Storage Limits (International Fire Code and NFPA 58 summary)"
 publisher = "Lehi City Fire Department, Utah"
 year = 2025
 url = "https://www.lehi-ut.gov/departments/fire-department/fire-prevention/home-fuel-storage-limits/"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "Local government publication (paraphrased, not quoted)"
 
 [[citation]]
@@ -3282,3 +3282,82 @@ year = 2025
 url = "https://web.archive.org/web/20260904170718/https://www.fbi.gov/file-repository/reports-and-publications/2024-active-shooter-report/view"
 retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
+
+[[citation]]
+id = "pnnl_2015_rainwater"
+title = "Rainwater Harvesting: State Regulations and Technical Resources (PNNL-24347)"
+publisher = "Loper S.A., Pacific Northwest National Laboratory (for the U.S. Department of Energy)"
+year = 2015
+url = "https://www.pnnl.gov/main/publications/external/technical_reports/PNNL-24347.pdf"
+retrieved = "2026-09-26"
+quote = "rainwater harvesting is not regulated by the federal government but rather it is up to individual states to regulate the collection and use of rainwater"
+license = "Report prepared for the U.S. Department of Energy (paraphrased; general finding only, the 2015 state-by-state details are not used)"
+
+[[citation]]
+id = "cdc_rainwater_collection"
+title = "Collecting Rainwater and Your Health: An Overview"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/drinking-water/about/collecting-rainwater-and-your-health-an-overview.html"
+retrieved = "2026-09-26"
+quote = "Rainwater is not necessarily safe to drink without first removing germs and chemicals from it."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "vdh_storm_wells"
+title = "Before and After the Storm: Private Wells and Onsite Sewage Systems"
+publisher = "Virginia Department of Health"
+year = 2024
+url = "https://www.vdh.virginia.gov/environmental-health/onsite-sewage-water-services-updated/before-and-after-the-storm-private-wells-and-onsite-sewage-systems/"
+retrieved = "2026-09-26"
+quote = "If your home is served by a well, the well pump will not work when the power goes out."
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "wsc_wellcare_help_2025"
+title = "Emergency Preparedness for Homeowners with Water Wells (Homeowner Emergency Localized Plan)"
+publisher = "Water Systems Council (wellcare program)"
+year = 2025
+url = "https://wellcarehotline.org/wp-content/uploads/2025/04/HELP-for-Well-Owners.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cdc_botulism_home_canning"
+title = "Home-Canned Foods (botulism prevention)"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/botulism/prevention/home-canned-foods.html"
+retrieved = "2026-09-26"
+quote = "Pressure canning is the only recommended method for canning low-acid foods."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nchfp_home"
+title = "National Center for Home Food Preservation (research-based home canning recommendations)"
+publisher = "University of Georgia Cooperative Extension (founded with USDA funding)"
+year = 2026
+url = "https://nchfp.uga.edu/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cdc_managing_stress"
+title = "Managing Stress"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/mental-health/living-with/index.html"
+retrieved = "2026-09-26"
+quote = "Take breaks from news and social media."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "rr_design_decision_log_2026"
+title = "Design document, section 14 decision log: the round-2 review and the v0.2.0 decisions (entry of 2026-09-26)"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/DESIGN.md"
+retrieved = "2026-09-26"
+quote = "a 22-event backtest: covered 6, partial 5, short 10, not modelled 1"
+license = "CC BY-SA 4.0"
+
