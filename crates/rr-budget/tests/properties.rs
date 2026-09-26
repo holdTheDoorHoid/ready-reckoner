@@ -87,11 +87,16 @@ fn spend_never_exceeds_budget() {
 /// money on the best item that fits, so it is compared from the smallest positive budget up. (The
 /// split schedule does not promise this month by month, only at the end of the plan: see
 /// `split_final_coverage_never_lower_with_more_budget`.)
+///
+/// The rare allowance is off here: it starts once the three-day life-safety items are in hand,
+/// which comes sooner with more money, and the main plan then receives 90 % instead of all of it
+/// (see `Schedule::FixedOrder`).
 #[test]
 fn fixed_order_more_budget_never_lowers_coverage_in_any_month() {
     for seed in 0..CASES {
         let mut c = case(seed);
-        let rare = seed % 2 == 0;
+        let rare = false;
+        c.household.dials.rare_opt_in.clear();
         if c.household.finances.monthly_budget_usd <= 0.0 {
             c.household.finances.monthly_budget_usd = 1.0;
         }
@@ -143,7 +148,12 @@ fn fixed_order_more_budget_never_lowers_coverage_in_any_month() {
 fn higher_curve_never_delays_its_items() {
     let (mut checked, mut substituted) = (0, 0);
     for seed in 0..CASES {
-        let c = case(seed);
+        // Without prerequisites: an accessory for another bucket rightly moves up with its
+        // device when the device serves the bucket whose curve rose.
+        let mut c = case(seed);
+        for it in &mut c.items {
+            it.requires.clear();
+        }
         let buckets: Vec<BucketId> = c.risks.curves.keys().copied().collect();
         for (n, &b) in buckets
             .iter()
@@ -280,13 +290,19 @@ fn free_items_precede_purchases_at_most_eight_a_month_all_by_month_2() {
                     "seed {seed}: month {}: a free action after a purchase",
                     month.index
                 );
+                // Decisions sit outside the monthly count and come by month 1.
                 let to_do = items
                     .iter()
-                    .filter(|i| i.kind == PlanItemKind::FreeAction && !i.done)
+                    .filter(|i| i.kind == PlanItemKind::FreeAction && !i.done && !i.decision)
                     .count();
                 assert!(
                     to_do <= 8,
                     "seed {seed}: month {} has {to_do} free actions to do",
+                    month.index
+                );
+                assert!(
+                    month.index <= rr_budget::EXEMPT_BY_MONTH || items.iter().all(|i| !i.decision),
+                    "seed {seed}: a decision in month {}",
                     month.index
                 );
                 seen += first_other;
@@ -709,12 +725,24 @@ fn buys_only_what_is_worth_buying_and_stops_when_covered() {
         let c = case(seed);
         for schedule in SCHEDULES {
             let r = run(&c, options(schedule, false));
+            // The rare allowance buys only for a family the household ticked whose local
+            // ten-year chance is at least 1 in 1,000.
+            let ticked: Vec<&'static str> = c.household.dials.rare_families();
             for p in &r.sequence {
                 assert!(p.value > 0.0, "seed {seed}: {p:?}");
-                assert!(
-                    !p.rare_catastrophic,
-                    "seed {seed}: rare items need the opt-in"
-                );
+                if p.rare_catastrophic {
+                    let it = c.items.iter().find(|i| i.id == p.item_id).unwrap();
+                    assert!(
+                        it.hazard_extras.iter().any(|h| {
+                            h.family().is_some_and(|f| ticked.contains(&f))
+                                && rr_budget::rare::p10_from_rate(
+                                    c.risks.register.get(h).copied().unwrap_or(0.0),
+                                ) >= rr_budget::rare::RARE_MIN_P10
+                        }),
+                        "seed {seed}: {} bought for no ticked, likely-enough family",
+                        p.item_id
+                    );
+                }
             }
             if r.plan.done_month.is_some() {
                 let end = days_at(&r, usize::MAX);
@@ -785,6 +813,7 @@ fn two_item_case(monthly: f32) -> Case {
         risks: Risks {
             curves,
             assessments: BTreeMap::new(),
+            ..Risks::default()
         },
         context: GuardrailContext::default(),
     }
@@ -864,4 +893,122 @@ fn research_shortcuts_keep_a_sinking_fund_for_a_much_better_item() {
     c.household.finances.monthly_budget_usd = 40.0;
     let r = run(&c, options(Schedule::ResearchShortcuts, false));
     assert_eq!(month_bought(&r, "small"), Some(1));
+}
+
+// ---- Contract v2 invariants (the generator adds prerequisites, shares, groups, seasons,
+// long-horizon items, decisions, kit shares and rare families to every case). ----
+
+/// An accessory is never bought before one of its devices is in hand: owned (month 0), or bought
+/// earlier, or earlier in the same month.
+#[test]
+fn accessories_never_come_before_their_devices() {
+    let mut checked = 0;
+    for seed in 0..CASES {
+        let c = case(seed);
+        for schedule in SCHEDULES {
+            let r = run(&c, options(schedule, seed % 2 == 0));
+            for (pos, p) in r.sequence.iter().enumerate() {
+                let it = c.items.iter().find(|i| i.id == p.item_id).unwrap();
+                if it.requires.is_empty() {
+                    continue;
+                }
+                checked += 1;
+                let owned = c
+                    .household
+                    .existing
+                    .iter()
+                    .any(|o| o.qty > 0.0 && it.requires.contains(&o.item_id));
+                let bought_before = r.sequence[..pos]
+                    .iter()
+                    .any(|q| it.requires.contains(&q.item_id));
+                assert!(
+                    owned || bought_before,
+                    "seed {seed} {schedule:?}: {} in month {} before any of {:?}",
+                    p.item_id,
+                    p.month,
+                    it.requires
+                );
+            }
+        }
+    }
+    assert!(checked > 50, "only {checked} accessory purchases checked");
+}
+
+/// Every plan reports its two done months in order: the kit is never complete after
+/// everything is, and bare-minimum mode is on exactly when the household asked or (split
+/// schedule) the normal plan would run past three years.
+#[test]
+fn the_two_done_months_are_in_order_and_the_mode_follows_its_rule() {
+    let mut both = 0;
+    for seed in 0..CASES {
+        let c = case(seed);
+        for schedule in SCHEDULES {
+            let r = run(&c, options(schedule, seed % 2 == 0));
+            if let (Some(k), Some(d)) = (r.plan.minimum_done_month, r.plan.done_month) {
+                assert!(k <= d, "seed {seed}: kit in month {k}, everything in {d}");
+                both += 1;
+            }
+            let long = matches!(schedule, Schedule::Split { .. })
+                && c.household.finances.monthly_budget_usd > 0.0
+                && r.full_plan_stopped_month
+                    .is_none_or(|m| m > rr_budget::PLAN_TOO_LONG_MONTHS);
+            assert_eq!(
+                r.plan.minimum_kit,
+                c.household.dials.minimum_kit || long,
+                "seed {seed} {schedule:?}"
+            );
+            assert_eq!(
+                r.warnings.iter().any(|w| w.id == "plan_too_long"),
+                long,
+                "seed {seed} {schedule:?}"
+            );
+        }
+    }
+    assert!(both > 20, "only {both} plans with both months");
+}
+
+/// The rare allowance never buys before the last three-day life-safety purchase, and no family
+/// takes more than half of it over the plan horizon.
+#[test]
+fn the_rare_allowance_waits_for_the_basics_and_no_family_takes_half() {
+    let mut rare_buys = 0;
+    for seed in 0..CASES {
+        let c = case(seed);
+        for schedule in SCHEDULES {
+            let o = options(schedule, seed % 2 == 0);
+            let r = run(&c, o);
+            let basics = r
+                .sequence
+                .iter()
+                .filter(|p| !p.rare_catastrophic && p.tier == TierId::H72)
+                .filter(|p| c.items.iter().any(|i| i.id == p.item_id && i.life_safety))
+                .map(|p| p.month)
+                .max();
+            let f = &c.household.finances;
+            let total = rr_budget::value::RARE_CATASTROPHIC_SHARE
+                * (f64::from(f.one_off_budget_usd)
+                    + f64::from(f.monthly_budget_usd) * f64::from(o.max_months));
+            let mut spent: BTreeMap<rr_types::HazardId, f64> = BTreeMap::new();
+            for p in r.sequence.iter().filter(|p| p.rare_catastrophic) {
+                rare_buys += 1;
+                assert!(
+                    basics.is_none_or(|b| p.month > b),
+                    "seed {seed} {schedule:?}: {} in month {} before the basics (month {basics:?})",
+                    p.item_id,
+                    p.month
+                );
+                let it = c.items.iter().find(|i| i.id == p.item_id).unwrap();
+                for h in &it.hazard_extras {
+                    *spent.entry(*h).or_default() += p.cost_usd;
+                }
+            }
+            for (h, usd) in spent {
+                assert!(
+                    usd <= rr_budget::rare::RARE_FAMILY_MAX_SHARE * total + 1e-6,
+                    "seed {seed} {schedule:?}: {h} took ${usd} of ${total}"
+                );
+            }
+        }
+    }
+    assert!(rare_buys > 10, "only {rare_buys} rare purchases");
 }

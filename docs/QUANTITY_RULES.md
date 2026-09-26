@@ -390,7 +390,11 @@ and wildfire hardening; **summer** for fans, cooling towels, the room thermomete
 and filter box (wildfire season), insect repellent and the tarp kit (hurricane season); **fall** for
 the generator and its upkeep, the carbon monoxide alarm (heating season), sleeping bags, blankets
 and warm layers, the camp stove and propane, the car kit and the jump starter (cold weakens
-batteries). The budget crate uses the anchors to buy a fan before summer when the cost order allows.
+batteries). The budget crate uses the anchors to buy a fan before summer when the cost order allows:
+in the default schedule an item is due while its season is under way or starts within two months,
+and a due item one month's money can buy moves ahead of the ordinary items of the current tier. It
+never moves an item into an earlier tier, ahead of a life-safety item or capability, or into a
+sinking fund (`docs/RISK_MODEL.md`, "Budget allocation").
 
 `Item.test_interval_months` says how often to try the thing the way it would be used, because a
 backup nobody has tried may not work (the Deviant Ollam lessons). The maintenance calendar prints
@@ -419,7 +423,9 @@ medicine continuity first. rr-supply marks each line's share of that kit in `Siz
 | A baby's food | `supplies.infant_formula_rtf` | the three days of ready-to-feed formula (water and food at once) |
 
 Smoke and carbon monoxide alarms are not in it: they are life-safety lines, which the allocator
-orders first anyway.
+orders first anyway. The budget crate buys the kit (with the three-day life-safety items) before the
+tiers in bare-minimum mode, in just the amount each line needs (one headlamp of four), and reports
+the month it is complete for every plan (`Plan.minimum_done_month`).
 
 ## Storage space and weight
 

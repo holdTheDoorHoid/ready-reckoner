@@ -15,6 +15,9 @@ const NOT_CITATIONS: &[&str] = &[
     "hayward_m7",
     // A placeholder rr-consequence reserves until the data workstream names the source.
     "county_boil_water_records",
+    // Requested by rr-budget for the savings track's legal-emergency line (docs/CITATION_IDS.md,
+    // "Requested by budget"); in rr_plan::provenance::AWAITING_CONTENT until content adds it.
+    "bjs_felony_defendants_2009",
     // Requested by rr-hazards for v0.2.0 and not in the registry: no copy could be read that
     // docs/CONTENT_STANDARDS.md §2 allows (docs/CITATION_IDS.md, "Not added"). They stay in
     // rr_plan::provenance::AWAITING_CONTENT until a readable source is found or the rows drop them.

@@ -5,7 +5,8 @@
 use std::collections::BTreeMap;
 
 use rr_budget::{
-    BucketCurve, BudgetInput, BudgetOptions, BudgetResult, Cliff, GuardrailContext, Risks, Schedule,
+    BucketCurve, BudgetInput, BudgetOptions, BudgetResult, Cliff, GuardrailContext, Risks,
+    Schedule, SimultaneousNeed,
 };
 use rr_consequence::{ConsequenceAssessment, CountyData};
 use rr_content::Content;
@@ -305,6 +306,23 @@ pub fn run<S: CountySource + ?Sized>(
     let risks = Risks {
         curves,
         assessments: buckets.iter().map(|b| (b.id, b.clone())).collect(),
+        // rr-budget v0.2.0: the rare allowance reads each family's local rate and the savings
+        // track whether the arrest row applies; the simultaneous-need check is the consequence
+        // crate's.
+        register: register.clone(),
+        simultaneous: consequence
+            .simultaneous
+            .iter()
+            .map(|n| SimultaneousNeed {
+                event: n.event.clone(),
+                hazard: n.hazard,
+                needs: n
+                    .needs
+                    .iter()
+                    .map(|&(b, days, chance)| (b, f64::from(days), chance))
+                    .collect(),
+            })
+            .collect(),
     };
     let prone = |ids: &[HazardId]| {
         ids.iter()
@@ -326,6 +344,14 @@ pub fn run<S: CountySource + ?Sized>(
                 })
             })
             .collect(),
+        // The surge-zone guardrail: the ZIP code's surge share where the optional pack gives it,
+        // else the county's core-pack proxy class.
+        surge_zip_share: location.exposure.surge_cat3_share.as_ref().map(|s| s.value),
+        surge_county_class: location
+            .exposure
+            .surge_proxy_class
+            .as_ref()
+            .map(|s| s.value.clone()),
     };
     let items = offers.items();
     let budget_input = BudgetInput {

@@ -221,6 +221,7 @@ pub fn risks() -> Risks {
     Risks {
         curves,
         assessments,
+        ..Risks::default()
     }
 }
 

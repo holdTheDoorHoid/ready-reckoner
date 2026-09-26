@@ -577,6 +577,12 @@ pub struct Plan {
     /// The month by which every bucket is covered to its target, if the plan gets there.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub done_month: Option<u16>,
+    /// The month the bare-minimum kit (three days of water, light, warmth and medicine, as
+    /// `rr-supply` marks it) is complete: the plan's first "done" month, reported for every plan,
+    /// in bare-minimum mode or not; `done_month` is the month everything is. Absent when the
+    /// plan never completes the kit (contract v2; REVIEW R6, model review M-12).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub minimum_done_month: Option<u16>,
     /// Savings toward items that cost more than one month's budget.
     pub envelopes: Vec<SavingsEnvelope>,
     /// The emergency-fund goal, when the household has income to protect.

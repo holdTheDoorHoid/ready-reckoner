@@ -145,7 +145,9 @@ pub fn references(
     for c in rr_supply::citations_used() {
         add(c.as_str(), "rr-supply");
     }
-    add(rr_budget::weights::HARM_WEIGHT_CITATION, "rr-budget");
+    for c in rr_budget::CITATION_IDS {
+        add(c, "rr-budget");
+    }
     for c in rr_plan::coverage::COVERAGE_CITATIONS {
         add(c, "rr-plan");
     }

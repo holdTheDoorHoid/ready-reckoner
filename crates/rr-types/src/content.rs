@@ -107,6 +107,12 @@ pub struct Item {
     /// shared as before.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub readiness_share: Option<f32>,
+    /// Items with the same group do the same readiness job (a HEPA air cleaner and a box fan
+    /// with a filter): once the household owns or schedules one, the others earn no readiness
+    /// value, so the plan never buys two ways to do one thing for that reason alone (contract v2;
+    /// REVIEW K3). Absent when the item has no alternative.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub alternative_group: Option<String>,
     /// A decision rather than a purchase (an insurance policy or a home repair to weigh), never
     /// paid from the supplies budget (contract v2; REVIEW N4, N5). Optional in content files;
     /// defaults to false.

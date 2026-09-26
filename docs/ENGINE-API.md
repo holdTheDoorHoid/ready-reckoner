@@ -155,7 +155,8 @@ Dials { return_period: one_in_10|one_in_50|one_in_100|one_in_500,
         rare_catastrophic_opt_in: bool,                        # defaults to false when absent
         rare_opt_in: [string],                                 # v2; family ids or ["all"]; defaults to []
         minimum_kit: bool,                                     # v2; defaults to false
-        long_horizon: bool }                                   # v2; defaults to false
+        long_horizon: bool,                                    # v2; defaults to false
+        legal_opt_in?: bool }                                  # v2; absent = false
 FamilyPlan { meeting_place_near?, meeting_place_far?, out_of_area_contact?: Contact,
              school_pickup?, work_plans?, shelter_spot_home?, shelter_spot_work?,
              where_we_would_go?, routes?: [string], neighbours_who_check?, who_takes_animals?,
@@ -193,6 +194,9 @@ v2 inputs, in plain terms:
   and means `["all"]`; engine crates read both through `Dials::rare_families()`. `minimum_kit`
   turns on bare-minimum mode (the engine also switches it on, and warns, when a plan would run past
   36 months). `long_horizon` shows the long-horizon section even when no target passes 30 days.
+  `legal_opt_in` (turned on from the arrest row of the register) adds a legal-emergency amount
+  (bail and a lawyer, cited, with its range) to the savings track, shown apart from the months of
+  income the goal protects; it is left out of the JSON when false.
 - `family_plan` is the household's own plan from a device-only screen: echoed into the packet and
   the wallet cards, stored in the saved plan file (it is the household's own file), never used for
   computation, and never sent anywhere.
@@ -249,6 +253,7 @@ PlanOutput { engine_version, api_version, data_pack_version, content_version,
              recovery?: RecoveryInfo }                                           # v2
 RecoveryInfo { county_declarations_5yr?: u16, sources: [CitationId] }            # v2
 Plan { months: [{ index, budget_usd, items: [PlanItem] }], done_month?,
+       minimum_done_month?,                                                      # v2
        envelopes: [{ item_id, saved_usd, needed_usd }],
        savings_track?: { target_months, target_usd, current_months, monthly_suggestion_usd, why },
        first_milestone?: { months, usd, by_month },                              # v2
@@ -299,12 +304,21 @@ What the numbers mean:
   if there is one, otherwise the middle of the band. `done` is omitted when false.
 - `Plan.months` are counted from 0: month 0 begins on the planning date, holds the free actions
   first, and receives the one-off budget. `done_month` is the month by which every bucket is covered.
+  `minimum_done_month` (v2) is the month the bare-minimum kit (three days of water, light, warmth
+  and medicine, as `rr-supply` marks it) is complete, for every plan: the plan's two done months are
+  that one and `done_month`, and the packet's summary line uses the first.
   `envelopes` are sinking funds for items that cost more than a month's budget. `savings_track` is the
   emergency-fund goal for `income`, never funded from the supplies budget.
 - `first_milestone` (v2): the first savings step, one month of expenses or $500, whichever is
-  smaller, and the plan month it is reached. `minimum_kit` (v2): the plan is in bare-minimum mode.
+  smaller, and the plan month the supplies budget reaches it once the supplies plan is done; left
+  out when it is already saved or the plan never frees the budget. `minimum_kit` (v2): the plan is
+  in bare-minimum mode (the kit, with the three-day life-safety items, comes before the tiers).
   `long_horizon` (v2): the long-horizon section (rain catchment, fuel storage, sanitation for months),
-  present when a target passes 30 days or `dials.long_horizon` is on.
+  present when a target reaches 30 days or `dials.long_horizon` is on; its items stay in the months
+  too (the section only groups them, one line per item with its quantities added up).
+- Free steps: at most eight ordinary free steps a month (month 0 lists the first eight whatever
+  their kind). Decisions (`PlanItem.decision`), the long-horizon pointer, the clean-room plan and
+  the 90-day-fills step sit outside that count and are all scheduled by month 1.
 - `PlanItem.requires` (v2): items it needs first; the allocator never schedules it before them.
   `PlanItem.decision` (v2): an insurance or home-repair decision, not a purchase.
 - `recovery` (v2): facts for the "After a disaster: the first 30 days" page, such as how many federal
@@ -323,7 +337,8 @@ Item { id, name, category, unit, buckets: [BucketId], tier: TierId, free,
        quantity_rule, maintenance?: { rotate_months?, check_months? }, citations: [CitationId],
        hazard_extras: [HazardId], energy_kcal_per_unit?, volume_l_per_unit?,
        requires: [ItemId], decision, long_horizon,             # v2; default to [] / false when absent
-       readiness_share?: f32, season?: spring|summer|fall|winter,
+       readiness_share?: f32, alternative_group?: string,      # v2
+       season?: spring|summer|fall|winter,
        test_interval_months?: u16 }                            # v2
 GuidanceMeta { id, title, applies_to: [string], citations: [CitationId],
                kind?: after|plan|hazard|bucket|tier|topic|family }   # v2
@@ -448,7 +463,7 @@ Ids are stable snake_case strings. `rr-types` exposes them as enums with `ALL`, 
 ## Warnings
 
 `Warning.id` is a stable string; the app can react to an id, never to the message. v2 adds the six
-marked below (`rr_types::Warning::V2_IDS`).
+marked below (`rr_types::Warning::V2_IDS`) and the `simultaneous_need` note.
 
 | Id | Emitted by | When |
 | --- | --- | --- |
@@ -466,9 +481,10 @@ marked below (`rr_types::Warning::V2_IDS`).
 | `surge_zone_stay_home` (v2) | rr-budget | a surge zone or a likely evacuation, and a plan that never says to leave (REVIEW S2) |
 | `cold_chain_power` (v2) | rr-budget | refrigerated medicine that needs a power source for a power target of 2 days or more, and none planned (S1) |
 | `benefit_lapse` (v2) | rr-budget | a household relying on federal pay or a benefit with no food buffer by month 3 (H7) |
-| `plan_too_long` (v2) | rr-budget | the full plan would run past 36 months; bare-minimum mode takes over (R6) |
+| `plan_too_long` (v2) | rr-budget | the full plan would run past 36 months; bare-minimum mode takes over (R6). `related` lists the items that fall beyond three years even so (the plan screen's deferred list) |
 | `no_raw_water_source` (v2) | rr-budget | a water filter in the plan and no raw water source named (S6) |
 | `no_cooking_capability` (v2) | rr-budget | no way to cook or boil water without power (K1) |
+| `simultaneous_need` (v2) | rr-budget | a note: the plan is done, but one event that sets a target would need more stored water, food or power at once than the plan holds (DESIGN §4.7's simultaneous-need check, from rr-consequence) |
 
 ## Loading
 
@@ -581,6 +597,7 @@ recomputes outputs on load and ignores ids it does not know in a stored output.
 | `Dials.rare_opt_in` | `[string]`: family ids, or `["all"]` | `[]` | rare allowance by family (§1.1; H8, REVIEW §2.4). `rare_catastrophic_opt_in` stays and maps to `["all"]` (`Dials::rare_families()`) |
 | `Dials.minimum_kit` | bool | `false` | bare-minimum mode (§1.1; R6); the engine also warns past 36 months |
 | `Dials.long_horizon` | bool | `false` | show the long-horizon section below 30-day targets (§1.1) |
+| `Dials.legal_opt_in` | bool, left out when false | `false` | a legal-emergency amount (bail and a lawyer) beside the savings goal, turned on from the arrest row of the register (owner decision 2026-09-26; budget2) |
 | `PlanInput.family_plan` | `FamilyPlan` (with `Contact`, `TrustedPerson`, `Holds`) | absent | the device-only family-plan screen, printed in the packet and on wallet cards; never computed with; trimmed and length-capped, never required (§1.1; N1; trusted circle, lawyer, roadside number and numbers by heart from §4a) |
 
 ### Ids
@@ -615,6 +632,7 @@ when they build output and `HazardId::RARE` for the families.
 | `BucketAssessment.stress_test` | `StressTest { event, date, region, share_out_at_days, covered_by_target, sources }` | left out | the worst event in the region's record (§1.3; R10) |
 | `Plan.first_milestone` | `SavingsMilestone { months, usd, by_month }` | left out | a first savings step within reach (§1.3; N4) |
 | `Plan.minimum_kit` | bool | left out when false | bare-minimum mode is on (§1.3; R6) |
+| `Plan.minimum_done_month` | u16 | left out | the month the bare-minimum kit is complete, for every plan; the first of the two done months (R6, M-12; budget2) |
 | `Plan.long_horizon` | `[PlanItem]` | left out | the long-horizon section (§1.3) |
 | `PlanItem.requires` | `[ItemId]` | left out | accessories never before their device (§1.3; K4) |
 | `PlanItem.decision` | bool | left out when false | insurance and mitigation decisions, no purchase (§1.3; N4, N5) |
@@ -628,6 +646,7 @@ when they build output and `HazardId::RARE` for the families.
 | --- | --- | --- | --- |
 | `Item.requires` | `[ItemId]` | `[]` | §1.3; K4 |
 | `Item.readiness_share` | f32, 0 to 1 | absent | per-item readiness value (§1.3; K3) |
+| `Item.alternative_group` | string | absent | items that do the same readiness job share one credit: once one is owned or planned, the others earn no readiness value (K3; budget2) |
 | `Item.decision` | bool | `false` | decision items (§1.3; N4, N5) |
 | `Item.long_horizon` | bool | `false` | long-horizon section (§1.3) |
 | `Item.season` | `spring` \| `summer` \| `fall` \| `winter` | absent | seasonal maintenance anchors and season-aware ordering (§1.3; N8) |

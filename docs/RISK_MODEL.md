@@ -1534,3 +1534,110 @@ medication 14; Coos Bay: power 13, no-water 50, food 17, medication 21):
     reused-bottles line at its cap no longer carries the pet-water sources, the boil-water line
     cites the drinking share alone, and lines the target's days do not size do not cite the
     target.
+
+## Budget allocation (v0.2.0)
+
+Owned by `crates/rr-budget` (DESIGN §4.7; DESIGN-DELTA §3; the budget2 brief). The value of a
+purchase is unchanged (`V = 10 · w_b · ∫ Λ_b` for duration buckets, `10 · w · r_need · harm` for
+readiness items); what v0.2.0 adds is how items are ordered, what waits for what, and a mode for
+plans that would take too long. Every number below is an estimate of the allocator's (cited as
+`prior_harm_weights`, the allocator's priors) unless it names another source; none reaches the user
+as a number except where the text says so.
+
+### Readiness value per item
+
+An item's readiness value is its bucket's value times its `readiness_share` (rr-supply's table in
+`docs/QUANTITY_RULES.md`, "Readiness share"): a whistle (0.05) carries a twentieth of what the go-bag
+(1.0) does. Items with the same `alternative_group` do the same readiness job: once one is owned or
+scheduled, the others earn no readiness value, and a checklist counts the group as one step.
+
+### The order
+
+- **Free steps:** the fixed first three (alerts, the household plan, fire safety), then life-safety
+  steps, then (bare-minimum mode) the kit's free steps, then capabilities (share 1), then the rest by
+  value; at most eight ordinary steps a month. Decisions, the long-horizon pointer, the clean-room
+  plan and the 90-day-fills step are outside that count: month 0 if they rank among its first eight,
+  otherwise month 1 (the supply workstream's counting rules). A household with many decisions (an
+  owner in hurricane, flood and wildfire country) can therefore see up to 13 of them beside eight
+  ordinary steps in month 1.
+- **Purchases, within the current tier:** life-safety items, then capabilities (share 1 and
+  readiness value that counts), then seasonal items that are due, then the rest by value per dollar,
+  and long-horizon items last.
+- **Prerequisites (`requires`, any one of):** an accessory is a candidate only once one of its
+  devices is owned or bought (the same month is fine, after the device). A device the catalogue does
+  not offer at all counts as the household's own (Coos Bay's fuel cans need no generator in the
+  plan: the household has one). When a worthwhile accessory's devices can never earn a place on
+  their own (what they do is covered already), the cheapest available device, walking up a chain
+  such as fuel, cans, generator, joins the buying order at a token value, so the device still comes
+  first; that token is never a tier's best for promotion. The rare allowance honours prerequisites
+  too.
+
+### Season-aware ordering
+
+With the planning date and an item's season anchor (`Item.season`), an item is due while its season
+is under way or starts within two months (`rr_budget::season::SEASON_LEAD_MONTHS`). In the default
+split schedule, a due item that one month's money can buy moves ahead of the ordinary items of the
+current tier, after life-safety items and capabilities. With a 1 October planning date a fan
+(summer) is due from April and the fall checks (generator upkeep, the carbon monoxide alarm, the
+camp stove, blankets) are due at once. **Limits:** the rule only reorders the current tier, never
+moves an item into an earlier tier or ahead of a life-safety item or capability, never opens a
+sinking fund for a seasonal item, and does not apply to the fixed-order schedule, whose order never
+depends on the calendar. So a two-week-tier fan can still arrive after summer starts when the
+three-day basics take the whole spring.
+
+### Bare-minimum mode and the two done months
+
+When `Dials::minimum_kit` is on, or when the plan in the normal order would run past 36 months
+(split schedule; REVIEW R6, model review M-12), the allocator buys the bare-minimum kit rr-supply
+marks (`SizedLine::minimum`: three days of water, one light and one pack of batteries, warmth,
+three days of medicine and device power, the cooler's day, a baby's ready-to-feed formula) before
+the tiers, together with the three-day life-safety items (rr-supply leaves the alarms out of the kit
+because life-safety comes first anyway). Kit items are bought in just the amount that closes the gap
+(one headlamp of a set of four; the rest of the set comes later in the usual order); a kit item that
+adds no value at the three-day caps (a gas-range household's bleach) is still bought, last. The
+automatic switch warns `plan_too_long`, naming what falls beyond three years. Every plan reports
+`Plan.minimum_done_month` (the kit complete) beside `Plan.done_month` (everything).
+
+### The rare allowance by family
+
+REVIEW §2.4 and the hazard-expansion report's C.2: specialised items are bought only for a family
+the household ticked (`Dials::rare_opt_in`, or the v1 switch for all) whose local ten-year chance, the
+register's central estimate, is at least **1 in 1,000**; value = the family's chance × harm-days
+avoided ÷ cost; **no family takes more than half** of the allowance over the plan horizon (a tenth of
+the one-off plus a tenth of every month's money up to 120 months); and the allowance receives
+nothing until the three-day life-safety items are in hand. Harm-days avoided (priors, on the scale of
+rr-plan's readiness harm estimates):
+
+| Item | Harm-days | Why |
+| --- | --- | --- |
+| `rare_radiation_meter` (dosimeter card) | 2 | tells a sheltering household when it is safe to go outside, the main decision after fallout (like the go-bag's 2) |
+| `rare_faraday_storage` | 0.5 | keeps a spare radio or phone working after an electromagnetic pulse, a supporting item (like the get-home bag's 0.5) |
+| any other specialised item | 0.5 | a supporting item |
+
+Potassium iodide is free and keeps rr-supply's planning-zone rule (a free step near a plant, not an
+allowance purchase). Each allowance purchase says which ticked family it is for and that the chance
+here passes 1 in 1,000 (no point estimate: rare rows show ranges only). Rare items are on no
+readiness checklist. Fixtures: Minot (class A, nuclear ticked) buys the dosimeter card in month 4
+and Faraday storage in month 12; Philadelphia (C1) with the v1 switch buys both; Coos Bay (class E)
+buys nothing (about 1.2 in 10,000 over ten years).
+
+### Savings
+
+The first step (`Plan.first_milestone`) is one month of expenses or $500, whichever is smaller
+(professional review RR-P09), reached from the supplies budget once the supplies plan is done; it is
+left out when already saved (most fixtures hold more than $500) or when the plan never frees the
+budget. The savings sentence adds the three-month point when the goal is longer. Households that
+turn on `Dials::legal_opt_in` (from the arrest row) see a separate legal-emergency line: bail in
+felony cases in large counties has a middle value of about $10,000 (`bjs_felony_defendants_2009`,
+requested with the figure to confirm; amounts vary widely and many people are released without
+bail).
+
+### Guardrail thresholds
+
+| Warning | Threshold | Basis |
+| --- | --- | --- |
+| `surge_zone_stay_home` | ZIP share in the Category 1–3 surge zone ≥ 0.5, else the county proxy class `high`; or a ten-year chance of leaving ≥ 0.25 | prior; fires only when no step in the plan is about leaving |
+| `benefit_lapse` | less than 10 days of food (or the food target, if shorter) at the end of month 3 | the benefit-interruption row's median lapse (10 days, `me_dhhs_snap_2025`, prior) |
+| `simultaneous_need` | an event brings the need at least half the time and the plan holds half a day less than it | prior; stored water, food and power only; only once the plan is done |
+| `cold_chain_power` | refrigerated medicine needs a power source and nothing in the plan ever covers it | rr-supply's `power_for_cold_medicine` line |
+| `no_raw_water_source`, `no_cooking_capability` | a filter with no well, named source or planned rain barrel; a camp stove offered and never bought | rr-supply's rules |

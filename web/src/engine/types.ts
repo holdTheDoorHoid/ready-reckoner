@@ -459,6 +459,11 @@ export interface Dials {
   minimum_kit?: boolean;
   /** Show the long-horizon section even when no target passes 30 days. Defaults to false. */
   long_horizon?: boolean;
+  /**
+   * Show a legal-emergency amount (bail and a lawyer) beside the savings goal, apart from its months
+   * of income; turned on from the arrest row of the risk register. Absent means false.
+   */
+  legal_opt_in?: boolean;
 }
 
 export interface ScenarioToggle {
@@ -855,6 +860,8 @@ export interface Plan {
   months: PlanMonth[];
   /** The month by which every bucket is covered, if the plan gets there. */
   done_month?: number;
+  /** The month the bare-minimum kit (three days of water, light, warmth and medicine) is complete; absent if never. */
+  minimum_done_month?: number;
   envelopes: SavingsEnvelope[];
   savings_track?: SavingsTrack;
   /** One month of expenses or $500, whichever is smaller, and the month it is reached. */
@@ -979,6 +986,8 @@ export interface Item {
   requires?: ItemId[];
   /** Share of its readiness bucket's value, 0 to 1. */
   readiness_share?: number;
+  /** Items with the same group do the same readiness job; once one is owned or planned the others earn no readiness value. */
+  alternative_group?: string;
   /** A decision, not a purchase; never paid from the supplies budget. The engine always sends it. */
   decision?: boolean;
   /** Belongs to the long-horizon section. The engine always sends it. */

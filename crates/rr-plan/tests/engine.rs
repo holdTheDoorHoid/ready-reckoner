@@ -237,7 +237,7 @@ fn every_citation_id_the_engine_crates_can_emit_resolves_or_is_awaited() {
             .iter()
             .map(|s| (*s).to_owned()),
     );
-    ids.push(rr_budget::weights::HARM_WEIGHT_CITATION.to_owned());
+    ids.extend(rr_budget::CITATION_IDS.iter().map(|s| (*s).to_owned()));
     for item in &content.items {
         ids.extend(item.citations.iter().map(|c| c.as_str().to_owned()));
     }

@@ -4,17 +4,27 @@
 //! | --- | --- | --- |
 //! | `zero_budget` | note | no monthly and no one-off money |
 //! | `device_power_plan` | warn | a powered medical device, no backup power at home, and no device-power item by month 3 |
-//! | `cold_chain_plan` | warn | refrigerated medicine, and by month 3 no cooler for it or, where it needs a power source (a power target of 2 days or more and no backup power: rr-supply's `power_for_cold_medicine` line), nothing that covers that power (the design gives no month; this reuses the device rule's) |
+//! | `cold_chain_plan` | warn | refrigerated medicine, and by month 3 no cooler for it, or, where it needs a power source (a power target of 2 days or more and no backup power: rr-supply's `power_for_cold_medicine` line), that power arrives after month 3 (the design gives no month; this reuses the device rule's) |
+//! | `cold_chain_power` | warn | refrigerated medicine that needs a power source, and nothing in the plan ever covers that power (contract v2; REVIEW S1) |
 //! | `no_stored_water_by_month_3` | warn | free steps (refilled drink bottles) leave the stored-water need short, and no stored water is owned or bought by month 3 |
 //! | `smoke_alarms_landlord` | warn | renters with no working smoke alarms: the plan buys none, because the landlord comes first (round-2 review RR-P16), so it says so |
 //! | `evacuation_no_go_bag` | warn | a ten-year chance of having to leave of 10 % or more (`Prior`) and no go-bag by month 6 (`Prior`) |
 //! | `insurance_flood` / `insurance_quake` | warn | an owner in a flood- or quake-prone area without that policy |
 //! | `cliff_<bucket>` | note | `rr-consequence` found one rare event driving the bucket's target |
 //! | `uncovered_<bucket>` | note | the plan ran out of things to buy but the bucket is still short of its goal (a catalogue gap) |
+//! | `surge_zone_stay_home` | warn | a storm-surge zone ([`is_surge_zone`]) or a ten-year chance of having to leave of at least [`LEAVING_LIKELY_P10`] (`Prior`), and no step in the plan is about leaving (contract v2; REVIEW S2) |
+//! | `benefit_lapse` | warn | the household relies on federal pay or a benefit (`Finances::benefits`) and has less than [`BENEFIT_BUFFER_DAYS`] of food (or its food target, if shorter) at the end of month [`BENEFIT_BUFFER_BY_MONTH`] (contract v2; REVIEW H7) |
+//! | `plan_too_long` | warn | the plan in the normal buying order would run past 36 months: bare-minimum mode takes over, and `related` lists what falls beyond three years even so (contract v2; REVIEW R6) |
+//! | `no_raw_water_source` | warn | a water filter is in the plan, the home is not on a well, no raw water source is named, and no rain barrel is planned (contract v2; REVIEW S6) |
+//! | `no_cooking_capability` | warn | the household needs a way to cook without power (rr-supply offers the camp stove: no gas range or wood stove covers it) and the plan never gets one (contract v2; REVIEW K1) |
+//! | `simultaneous_need` | note | the plan ran out of things to buy, but one event that sets a target would need more stored water, food or power at once than the plan holds (DESIGN §4.7's simultaneous-need check, from `rr-consequence`) |
 
-use rr_types::{BackupPower, BucketId, PlanInput, Tenure, Warning, WarningSeverity};
+use rr_types::{
+    BackupPower, BucketId, HazardId, ItemId, PlanInput, RawWaterSource, Tenure, Warning,
+    WarningSeverity, WaterSource,
+};
 
-use crate::explain::{households_phrase, short_name};
+use crate::explain::{days_text, households_phrase, short_name};
 use crate::input::{GuardrailContext, Risks};
 use crate::value::{annual_rate_from_10yr, per_100};
 
@@ -38,14 +48,59 @@ pub const GO_BAG_BY_MONTH: u16 = 6;
 /// step of refilling drink bottles (PRINCIPLES §11: "no water at all after month three").
 pub const STORED_WATER_BY_MONTH: u16 = 3;
 
+/// A ZIP code with at least this share inside the Category 1–3 storm-surge zone is a surge zone
+/// for `surge_zone_stay_home` (`Prior`: most of the area floods in a category 3 storm).
+pub const SURGE_ZIP_SHARE: f64 = 0.5;
+
+/// A ten-year chance of having to leave home at or above this makes leaving likely for
+/// `surge_zone_stay_home` (`Prior`, a quarter; the go-bag guardrail's evacuation-heavy line is
+/// 10 %).
+pub const LEAVING_LIKELY_P10: f64 = 0.25;
+
+/// Days of food a household that relies on pay or benefits a lapse can stop should have by
+/// [`BENEFIT_BUFFER_BY_MONTH`]: the typical length of a lapse in food benefits in the consequence
+/// model (`rr-consequence`'s benefit-interruption row: median 10 days, `Prior`, from the November
+/// 2025 SNAP suspension, `me_dhhs_snap_2025`), or the household's food target if shorter.
+pub const BENEFIT_BUFFER_DAYS: f64 = 10.0;
+
+/// The month by which a benefit household should have its food buffer (the same month-3 line as
+/// the stored-water and device guardrails).
+pub const BENEFIT_BUFFER_BY_MONTH: u16 = 3;
+
+/// The stored supplies the simultaneous-need check compares with an event's needs: water, food
+/// and power ("the budget crate compares the stored water, food and fuel with it", RISK_MODEL).
+pub const SIMULTANEOUS_BUCKETS: [BucketId; 3] =
+    [BucketId::WaterOut, BucketId::Supplies, BucketId::Power];
+
+/// A need counts in the simultaneous-need check when the event brings it at least this often
+/// (`Prior`: more often than not).
+pub const SIMULTANEOUS_MIN_CHANCE: f64 = 0.5;
+
+/// A need counts as short when the plan holds less than it by more than this many days (half a
+/// day: the day ladder's first step).
+pub const SIMULTANEOUS_SLACK_DAYS: f64 = 0.5;
+
+/// Whether the home is in a storm-surge zone: the ZIP code's surge share when the optional surge
+/// pack gives it, otherwise the county's core-pack proxy class `high`. The packet's
+/// evacuate-first rule can call this too, so the two never disagree.
+pub fn is_surge_zone(zip_share: Option<f64>, county_class: Option<&str>) -> bool {
+    match zip_share {
+        Some(s) if s.is_finite() => s >= SURGE_ZIP_SHARE,
+        _ => county_class == Some("high"),
+    }
+}
+
 /// What the allocator found, for the checks.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Facts {
     /// First month a device-power item is in hand (owned, free, or bought), if ever.
     pub device_power_month: Option<u16>,
-    /// First month the cold chain is in hand: a cold-chain item and, where refrigerated medicine
-    /// needs a power source ([`COLD_MEDICINE_POWER_PART`]), something that covers that power.
-    pub cold_chain_month: Option<u16>,
+    /// First month a cold-chain item (a cooler for refrigerated medicine) is in hand.
+    pub cooler_month: Option<u16>,
+    /// Refrigerated medicine needs a power source here ([`COLD_MEDICINE_POWER_PART`] exists).
+    pub cold_power_needed: bool,
+    /// First month something that covers that power is in hand, if ever.
+    pub cold_power_month: Option<u16>,
     /// First month a go-bag is in hand.
     pub go_bag_month: Option<u16>,
     /// The household has a no-water target that free steps and what it has leave short.
@@ -54,6 +109,47 @@ pub(crate) struct Facts {
     pub stored_water_month: Option<u16>,
     /// Buckets still short of their goal when the plan ran out of things to buy.
     pub uncovered_when_stopped: Vec<BucketId>,
+    /// Some step in the plan (owned, done, free or bought) is about leaving home.
+    pub leaving_in_plan: bool,
+    /// Days of food at the end of month [`BENEFIT_BUFFER_BY_MONTH`] (the plan's own timeline).
+    pub food_at_month_3: Option<f64>,
+    /// The food (supplies) target in days, when there is one.
+    pub food_target: Option<f64>,
+    /// A water filter is in the plan (owned or bought).
+    pub filter_in_plan: bool,
+    /// A rain barrel (a raw water source) is in the plan.
+    pub rain_in_plan: bool,
+    /// The household needs a way to cook without power (the catalogue offers one).
+    pub cooking_needed: bool,
+    /// The plan gets one (owned or bought).
+    pub cooking_in_plan: bool,
+    /// Events that would need more stored water, food or power at once than the plan holds.
+    pub shortfalls: Vec<Shortfall>,
+    /// The normal plan runs past three years (bare-minimum mode).
+    pub too_long: Option<TooLong>,
+}
+
+/// One event the simultaneous-need check finds short.
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) struct Shortfall {
+    /// The event in words.
+    pub event: String,
+    /// Its hazard.
+    pub hazard: HazardId,
+    /// (bucket, days the event needs at once, days the plan holds).
+    pub short: Vec<(BucketId, f64, f64)>,
+}
+
+/// What `plan_too_long` says.
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) struct TooLong {
+    /// When the plan in the normal buying order runs out of things to buy (`None`: not within the
+    /// plan horizon).
+    pub full_plan_month: Option<u16>,
+    /// When the bare-minimum kit is complete in the plan shown.
+    pub minimum_month: Option<u16>,
+    /// What falls beyond three years even so: (item, name in lower case).
+    pub deferred: Vec<(ItemId, String)>,
 }
 
 fn warning(
@@ -113,7 +209,11 @@ pub(crate) fn check(
     }
 
     let cold = household.people.iter().any(|p| p.medical.refrigerated_rx);
-    if cold && late(facts.cold_chain_month, DEVICE_PLAN_BY_MONTH) {
+    let power_late = facts.cold_power_needed
+        && facts
+            .cold_power_month
+            .is_some_and(|m| m > DEVICE_PLAN_BY_MONTH);
+    if cold && (late(facts.cooler_month, DEVICE_PLAN_BY_MONTH) || power_late) {
         out.push(warning(
             "cold_chain_plan",
             WarningSeverity::Warn,
@@ -123,6 +223,18 @@ pub(crate) fn check(
              fridge. A cooler bag with cold packs helps only for a short time; a battery power \
              station can keep a small cooler or the fridge running. Ask your pharmacist how long \
              yours can stay out of the fridge.",
+            &["medication", "power"],
+        ));
+    }
+    if cold && facts.cold_power_needed && facts.cold_power_month.is_none() {
+        out.push(warning(
+            Warning::COLD_CHAIN_POWER,
+            WarningSeverity::Warn,
+            "Refrigerated medicine needs a power source in a long power cut, and the plan has none."
+                .into(),
+            "A cooler bag keeps medicine cool only for a short time. For a longer power cut, a \
+             battery power station keeps a small cooler or the fridge running, and a 12-volt fridge \
+             can run from the car. Ask your pharmacist how long yours can stay out of the fridge.",
             &["medication", "power"],
         ));
     }
@@ -192,6 +304,166 @@ pub(crate) fn check(
         ));
     }
 
+    // Surge zone or a likely evacuation, and nothing in the plan about leaving.
+    let surge = is_surge_zone(
+        context.surge_zip_share,
+        context.surge_county_class.as_deref(),
+    );
+    let leaving_likely = p_leave >= LEAVING_LIKELY_P10;
+    if (surge || leaving_likely) && !facts.leaving_in_plan {
+        let message = if surge {
+            "Your home is in a storm-surge zone, and the plan never says when to leave."
+        } else {
+            "Leaving home is likely where you live, and the plan never says when to leave."
+        };
+        out.push(warning(
+            Warning::SURGE_ZONE_STAY_HOME,
+            WarningSeverity::Warn,
+            message.into(),
+            "Water pushed ashore by a hurricane can flood a whole neighbourhood in minutes, and \
+             supplies at home do not make it safe to stay. When officials say to leave, go. Look \
+             up your evacuation zone and pick where you would go.",
+            &["evacuate"],
+        ));
+    }
+
+    // Pay or benefits that can stop, and no food buffer by month 3.
+    if !f.benefits.is_empty() {
+        let need = facts
+            .food_target
+            .map_or(BENEFIT_BUFFER_DAYS, |t| t.min(BENEFIT_BUFFER_DAYS));
+        let have = facts.food_at_month_3.unwrap_or(0.0);
+        if facts.food_target.is_some() && need > 0.0 && have + 1e-6 < need {
+            out.push(warning(
+                Warning::BENEFIT_LAPSE,
+                WarningSeverity::Warn,
+                "Not enough food stored by month 3 in case pay or benefits stop.".into(),
+                "Government pay and food benefits have stopped before, for days to weeks at a \
+                 time, during shutdowns and funding lapses. A small store of food built early \
+                 bridges the gap; a food bank or 211 can help too.",
+                &["supplies", "benefit_interruption"],
+            ));
+        }
+    }
+
+    // A filter with nothing to filter.
+    let source_named = household.housing.water == WaterSource::Well
+        || household
+            .housing
+            .raw_water_source
+            .is_some_and(|s| s != RawWaterSource::None)
+        || facts.rain_in_plan;
+    if facts.filter_in_plan && !source_named {
+        out.push(warning(
+            Warning::NO_RAW_WATER_SOURCE,
+            WarningSeverity::Warn,
+            "A water filter is in the plan, but no water source to filter is named.".into(),
+            "A filter makes raw water safe only if you have some: a well, a creek or pond nearby, \
+             a rain barrel or a neighbour's well. Name one in your home details, or store more \
+             water instead.",
+            &["water_out"],
+        ));
+    }
+
+    // No way to cook or boil water without power.
+    if facts.cooking_needed && !facts.cooking_in_plan {
+        out.push(warning(
+            Warning::NO_COOKING_CAPABILITY,
+            WarningSeverity::Warn,
+            "No way to cook or boil water without power.".into(),
+            "An electric stove stops in a power cut. A camp stove, used outdoors and never \
+             inside, cooks stored food and boils water; unscented bleach makes water safe without \
+             heat.",
+            &["supplies", "water_boil"],
+        ));
+    }
+
+    // The full plan would take more than three years: bare-minimum mode.
+    if let Some(t) = &facts.too_long {
+        let mut why = String::from(
+            "The smallest kit that covers three days of water, light, warmth and medicine comes \
+             first",
+        );
+        match t.minimum_month {
+            Some(0) => why.push_str(" and is complete this month"),
+            Some(m) => why.push_str(&format!(" and is complete by month {m}")),
+            None => {}
+        }
+        why.push_str("; everything else follows in the usual order");
+        match t.full_plan_month {
+            Some(m) => why.push_str(&format!(", and the whole plan takes until month {m}.")),
+            None => why.push_str(", and the whole plan runs past ten years."),
+        }
+        if !t.deferred.is_empty() {
+            let names: Vec<&str> = t.deferred.iter().take(4).map(|(_, n)| n.as_str()).collect();
+            let more = if t.deferred.len() > names.len() {
+                " and more"
+            } else {
+                ""
+            };
+            why.push_str(&format!(
+                " Beyond three years at this budget: {}{more}.",
+                join_list(&names)
+            ));
+        }
+        why.push_str(" A little more each month, or a less cautious setting, brings them closer.");
+        out.push(Warning {
+            id: Warning::PLAN_TOO_LONG.to_owned(),
+            severity: WarningSeverity::Warn,
+            message: "At this budget the full plan would take more than three years, so it starts \
+                      with the bare minimum."
+                .into(),
+            why,
+            related: t
+                .deferred
+                .iter()
+                .map(|(id, _)| id.as_str().to_owned())
+                .collect(),
+        });
+    }
+
+    // One event that needs more stored water, food or power at once than the plan holds.
+    if let Some(s) = facts.shortfalls.iter().max_by(|a, b| {
+        a.short
+            .len()
+            .cmp(&b.short.len())
+            .then(b.event.cmp(&a.event))
+    }) {
+        let parts: Vec<String> = s
+            .short
+            .iter()
+            .map(|(b, need, have)| {
+                format!(
+                    "about {} {} (the plan holds {})",
+                    days_text(*need),
+                    simultaneous_words(*b),
+                    days_text(*have)
+                )
+            })
+            .collect();
+        let mut related: Vec<String> = s
+            .short
+            .iter()
+            .map(|(b, _, _)| b.as_str().to_owned())
+            .collect();
+        related.push(s.hazard.as_str().to_owned());
+        out.push(warning(
+            "simultaneous_need",
+            WarningSeverity::Note,
+            format!(
+                "One event could need more at once than the plan stores: {}.",
+                s.event
+            ),
+            &format!(
+                "At the severity that sets one of your targets, it would also mean {}. Storing a \
+                 little more, or a way to make more (a water filter, a camp stove, a way to \
+                 recharge), closes the gap; it is about storage space as much as money.",
+                join_list(&parts.iter().map(String::as_str).collect::<Vec<_>>())
+            ),
+            &related.iter().map(String::as_str).collect::<Vec<_>>(),
+        ));
+    }
+
     for cliff in &context.cliffs {
         let why = match cliff.bucket {
             BucketId::WaterOut | BucketId::WaterBoil => {
@@ -231,4 +503,23 @@ pub(crate) fn check(
         ));
     }
     out
+}
+
+/// What an event's need is, in a few words after "about N days".
+fn simultaneous_words(b: BucketId) -> &'static str {
+    match b {
+        BucketId::WaterOut => "without tap water",
+        BucketId::Supplies => "without reaching a store",
+        BucketId::Power => "without power",
+        _ => short_name(b),
+    }
+}
+
+/// "a", "a and b", "a, b and c".
+fn join_list(names: &[&str]) -> String {
+    match names {
+        [] => String::new(),
+        [one] => (*one).to_owned(),
+        [init @ .., last] => format!("{} and {last}", init.join(", ")),
+    }
 }

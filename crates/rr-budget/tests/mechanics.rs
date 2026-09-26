@@ -339,11 +339,14 @@ fn requirement_lines_size_purchases() {
 
 /// Rare-catastrophe items get $0 unless the household opts in, then at most 10 % of each month's
 /// money: a $50 radiation meter on a $100 budget is saved for at $10 a month and bought in month
-/// 5, and the main plan's $900 item takes a month longer than without the allowance.
+/// 5, and the main plan's $900 item takes a month longer than without the allowance. (The meter
+/// names the nuclear family, whose local ten-year chance here, about 2.4 in 1,000, passes the 1 in
+/// 1,000 the allowance needs.)
 #[test]
 fn rare_catastrophic_items_are_capped() {
     let mut meter = buy("radiation_meter", BucketId::Security, TierId::Y1, 50.0);
     meter.rare_catastrophic = true;
+    meter.hazard_extras = vec![rr_types::HazardId::NuclearAttack];
     let mut s = Setup::new("philadelphia-renters-4", 100.0, 0.0)
         .flat(BucketId::Power, 0.5, 14.0)
         .add(
@@ -351,6 +354,9 @@ fn rare_catastrophic_items_are_capped() {
             set("generator", BucketId::Power, 14.0),
         )
         .add(meter, ItemMeta::new("radiation_meter"));
+    s.risks
+        .register
+        .insert(rr_types::HazardId::NuclearAttack, 2.4e-4);
     let off = s.run();
     assert_eq!(
         off.rare_catastrophic_skipped,

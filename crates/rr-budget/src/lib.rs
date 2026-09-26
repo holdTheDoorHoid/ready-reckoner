@@ -2,10 +2,28 @@
 //! guardrails (DESIGN §4.7–§4.8, research risk-model §3.2, §4, §6.3).
 //!
 //! Given a household, its budget, the items on offer and each bucket's exceedance curve, it
-//! produces the month-by-month [`rr_types::Plan`]: free actions first (at most eight to do in any
-//! month, all within the first three months), then purchases in the order that buys the most risk
-//! reduction per dollar, a sinking fund for anything that costs more than a month's money, a stop
-//! when nothing more is worth buying, and the income savings goal on its own track.
+//! produces the month-by-month [`rr_types::Plan`]: free actions first (at most eight ordinary ones
+//! to do in any month; decisions and three planning steps outside that count, by month 1), then
+//! purchases in the order that buys the most risk reduction per dollar within each tier
+//! (life-safety first, then capabilities, then seasonal items that are due, long-horizon items
+//! last, and never an accessory before its device), a sinking fund for anything that costs more
+//! than a month's money, a stop when nothing more is worth buying, and the income savings goal on
+//! its own track with its first step.
+//!
+//! # Contract v2 (v0.2.0)
+//!
+//! - Readiness value per item (`Item::readiness_share`) and one credit per alternative group
+//!   (`Item::alternative_group`); prerequisites (`Item::requires`, any one of).
+//! - Bare-minimum mode (`Dials::minimum_kit`, or a plan past [`PLAN_TOO_LONG_MONTHS`] months):
+//!   the kit `rr-supply` marks, with the three-day life-safety items, before the tiers; every plan
+//!   reports `Plan::minimum_done_month` beside `Plan::done_month`.
+//! - Season-aware ordering ([`season`]) and the long-horizon section (`Plan::long_horizon`).
+//! - The rare allowance by family ([`rare`]): ticked families likely enough here, value from the
+//!   family's chance, half the allowance per family at most, nothing before the three-day basics.
+//! - Savings: `Plan::first_milestone`, the three-month point and the legal-emergency line
+//!   (`Dials::legal_opt_in`).
+//! - Guardrails `surge_zone_stay_home`, `cold_chain_power`, `benefit_lapse`, `plan_too_long`,
+//!   `no_raw_water_source`, `no_cooking_capability` and the `simultaneous_need` note.
 //!
 //! # Inputs
 //!
@@ -67,26 +85,42 @@ pub mod curve;
 mod explain;
 mod guardrails;
 pub mod input;
+pub mod rare;
 mod savings;
+pub mod season;
 pub mod value;
 pub mod weights;
 
 pub use allocate::{
-    FIRST_FREE_STEPS, FREE_ACTIONS_BY_MONTH, FREE_ACTIONS_MONTH_0, FREE_ACTIONS_PER_MONTH,
-    LAST_FREE_STEPS, READINESS_NEED_OVERRIDES, allocate, allocate_with_rule,
+    EXEMPT_BY_MONTH, EXEMPT_FREE_STEPS, FIRST_FREE_STEPS, FREE_ACTIONS_BY_MONTH,
+    FREE_ACTIONS_MONTH_0, FREE_ACTIONS_PER_MONTH, LAST_FREE_STEPS, LONG_HORIZON_MIN_DAYS,
+    PLAN_TOO_LONG_MONTHS, READINESS_NEED_OVERRIDES, allocate, allocate_with_rule,
 };
 pub use coverage::{
-    Contributes, ContributionTable, CoverageRule, ItemMeta, ItemRole, MetaError, ReadinessCredit,
-    apply_requirements,
+    Contributes, ContributionTable, CoverageRule, ItemMeta, ItemRole, MetaError, MinimumShare,
+    ReadinessCredit, apply_requirements,
 };
 pub use curve::{BucketCurve, CurveError};
 pub use guardrails::{
-    COLD_MEDICINE_POWER_PART, DEVICE_PLAN_BY_MONTH, EVACUATION_HEAVY_P10, GO_BAG_BY_MONTH,
+    BENEFIT_BUFFER_BY_MONTH, BENEFIT_BUFFER_DAYS, COLD_MEDICINE_POWER_PART, DEVICE_PLAN_BY_MONTH,
+    EVACUATION_HEAVY_P10, GO_BAG_BY_MONTH, LEAVING_LIKELY_P10, SIMULTANEOUS_BUCKETS,
+    SIMULTANEOUS_MIN_CHANCE, SIMULTANEOUS_SLACK_DAYS, SURGE_ZIP_SHARE, is_surge_zone,
 };
 pub use input::{
     BudgetError, BudgetInput, BudgetOptions, BudgetResult, Cliff, GuardrailContext, MonthCoverage,
-    Purchase, Risks, Schedule,
+    Purchase, Risks, Schedule, SimultaneousNeed,
+};
+pub use savings::{
+    FIRST_MILESTONE_USD, LEGAL_BAIL_MEDIAN_USD, LEGAL_COST_CITATION, THREE_MONTH_POINT,
 };
 
 /// Crate name, used by the CLI's `--version` and by the about screen.
 pub const CRATE: &str = "rr-budget";
+
+/// Every citation id this crate can emit: the harm weights (also the rare allowance's harm-days
+/// priors) and the savings track's legal-emergency figure. `rr citations --missing` checks them.
+pub const CITATION_IDS: [&str; 3] = [
+    weights::HARM_WEIGHT_CITATION,
+    rare::RARE_HARM_CITATION,
+    savings::LEGAL_COST_CITATION,
+];

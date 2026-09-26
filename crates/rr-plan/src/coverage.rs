@@ -49,7 +49,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use rr_budget::{CoverageRule, ItemMeta, ItemRole, ReadinessCredit};
+use rr_budget::{CoverageRule, ItemMeta, ItemRole, MinimumShare, ReadinessCredit};
 use rr_content::Content;
 use rr_supply::{ItemSizer, LineKind, SizedLine};
 use rr_types::{BucketId, BucketKind, HazardId, Item, ItemId, PlanInput, Target};
@@ -631,7 +631,7 @@ pub fn build(
     }
 
     let rule = PlanCoverage::new(lines, &offered, targets);
-    let (meta, extras) = metadata(&offered, &rule);
+    let (meta, extras) = metadata(&offered, &rule, lines);
     Offers {
         offered,
         meta,
@@ -641,8 +641,14 @@ pub fn build(
     }
 }
 
-/// The allocator's metadata: sets and steps, readiness credits, guardrail roles.
-fn metadata(offered: &[Offered], rule: &PlanCoverage) -> (Vec<ItemMeta>, Vec<ItemId>) {
+/// The allocator's metadata: sets and steps, readiness credits, guardrail roles, and each item's
+/// part in the bare-minimum kit (the share of each line it meets that `rr-supply` marks
+/// `SizedLine::minimum`; contract v2 `Dials::minimum_kit`).
+fn metadata(
+    offered: &[Offered],
+    rule: &PlanCoverage,
+    lines: &[SizedLine],
+) -> (Vec<ItemMeta>, Vec<ItemId>) {
     let harm_share = |b: BucketId| -> f64 {
         READINESS_HARM
             .iter()
@@ -708,6 +714,21 @@ fn metadata(offered: &[Offered], rule: &PlanCoverage) -> (Vec<ItemMeta>, Vec<Ite
         // Stored water itself, not the free step of refilling bottles (an alternative).
         if meets("water_out.water_gallons") && !o.item.free {
             m.roles.push(ItemRole::StoredWater);
+        }
+        // The bare-minimum kit: every line the item meets that has a share in the kit (refilled
+        // bottles count toward the kit's water through their alternative line).
+        for j in &o.joins {
+            let need = lines
+                .iter()
+                .find(|l| l.line.id == j.line_id)
+                .and_then(|l| l.minimum);
+            if let Some(need) = need.filter(|n| *n > 0.0) {
+                m.minimum.push(MinimumShare {
+                    line: j.line_id.clone(),
+                    units_per_item: j.units_per_item,
+                    need,
+                });
+            }
         }
         let measured = !m.readiness.is_empty() || o.joins.iter().any(|j| rule.covers(j));
         if !measured && !o.item.hazard_extras.is_empty() && !o.item.free {

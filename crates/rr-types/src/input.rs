@@ -632,6 +632,12 @@ pub struct Dials {
     /// false when absent.
     #[serde(default)]
     pub long_horizon: bool,
+    /// Show a legal-emergency amount (bail and a lawyer) beside the savings goal, apart from the
+    /// months of income it protects. The household turns it on from the arrest row of the risk
+    /// register; off by default, because the copy assumes nothing about the household (contract
+    /// v2; owner decision 2026-09-26). Left out of the JSON when false.
+    #[serde(default, skip_serializing_if = "core::ops::Not::not")]
+    pub legal_opt_in: bool,
 }
 
 impl Dials {
@@ -1043,6 +1049,7 @@ impl PlanInput {
                 rare_opt_in: Vec::new(),
                 minimum_kit: false,
                 long_horizon: false,
+                legal_opt_in: false,
             },
             stage: None,
             confidence_1to5: None,

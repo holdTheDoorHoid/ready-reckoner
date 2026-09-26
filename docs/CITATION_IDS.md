@@ -684,3 +684,9 @@ checked; "prior" marks an expert estimate.
 
 One placeholder is open: `county_boil_water_records` (see "Requested by consequence"), which
 waits for the data workstream to name a source. Add new rows here as described at the top.
+
+### Requested by budget (v0.2.0, 2026-09-26)
+
+| id | Title, publisher, year, URL | Used for |
+| --- | --- | --- |
+| `bjs_felony_defendants_2009` | *Felony Defendants in Large Urban Counties, 2009 — Statistical Tables* (NCJ 243777), Bureau of Justice Statistics (Brian A. Reaves), 2013, <https://bjs.ojp.gov/library/publications/felony-defendants-large-urban-counties-2009-statistical-tables> | The savings track's legal-emergency line (`Dials::legal_opt_in`, shown only to households that turn it on from the arrest row): "in the largest counties the middle amount set in felony cases is about $10,000" (`rr_budget::LEGAL_BAIL_MEDIAN_USD`). **Confirm** the median ($10,000, from memory) in the bail-amount table; if the table gives the spread (for example the share under $5,000 and over $50,000), say so here and the line can print the range as numbers instead of "amounts vary widely". Listed in `rr_plan::provenance::AWAITING_CONTENT` until the entry exists (US Government Work, public domain). |

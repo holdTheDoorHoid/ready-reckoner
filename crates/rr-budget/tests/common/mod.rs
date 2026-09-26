@@ -174,6 +174,7 @@ pub fn item(
         volume_l_per_unit: None,
         requires: Vec::new(),
         readiness_share: None,
+        alternative_group: None,
         decision: false,
         long_horizon: false,
         season: None,

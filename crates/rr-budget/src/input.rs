@@ -7,14 +7,14 @@
 //! | [`BudgetInput::household`] | the user (`PlanInput`: people, finances, `existing`, dials) |
 //! | [`BudgetInput::catalogue`] | `rr-content` (the items offered to this household) |
 //! | [`BudgetInput::meta`], [`BudgetInput::requirements`] | `rr-supply` (rates and quantities; see [`crate::coverage::apply_requirements`]) |
-//! | [`Risks`] | `rr-consequence` (Λ curves, targets, hazard shares, ten-year need) |
-//! | [`GuardrailContext`] | `rr-hazards` / `rr-consequence` (flood and quake exposure, cliffs) |
+//! | [`Risks`] | `rr-consequence` (Λ curves, targets, hazard shares, ten-year need, the simultaneous-need check) and `rr-hazards` (the register's yearly rates) |
+//! | [`GuardrailContext`] | `rr-hazards` / `rr-consequence` / `rr-data` (flood and quake exposure, cliffs, storm surge) |
 
 use std::collections::BTreeMap;
 
 use rr_types::{
-    BucketAssessment, BucketId, Item, ItemId, Plan, PlanInput, RequirementLine, Target, TierId,
-    Warning,
+    BucketAssessment, BucketId, HazardId, Item, ItemId, Plan, PlanInput, RequirementLine, Target,
+    TierId, Warning,
 };
 use serde::{Deserialize, Serialize};
 
@@ -31,6 +31,29 @@ pub struct Risks {
     /// the "why" text), the readiness targets' `p_need_10yr`, the income target in months, and
     /// the income bucket's `frequency_sentences`.
     pub assessments: BTreeMap<BucketId, BucketAssessment>,
+    /// Every hazard's yearly household rate from the register (`rr-hazards`'s
+    /// `HazardProfile::rate_per_year`, the central estimate). The allocator reads the rare
+    /// families' rates (a family's local ten-year chance decides whether the rare allowance may
+    /// buy for it) and whether the arrest row applies (the savings track's legal line). Empty:
+    /// no rare family qualifies.
+    pub register: BTreeMap<HazardId, f64>,
+    /// DESIGN §4.7's simultaneous-need check from `rr-consequence`
+    /// (`ConsequenceAssessment::simultaneous`): for each event that sets a duration target, the
+    /// other needs the same event brings at once. May be empty.
+    pub simultaneous: Vec<SimultaneousNeed>,
+}
+
+/// The needs one design event brings at the same time (`rr-consequence`'s `SimultaneousNeed`,
+/// copied as plain data).
+#[derive(Debug, Clone, PartialEq)]
+pub struct SimultaneousNeed {
+    /// The event in words ("major hurricanes (category 3 or a direct hit)").
+    pub event: String,
+    /// Its hazard.
+    pub hazard: HazardId,
+    /// Every duration need the event brings: (bucket, days at the design event's severity, the
+    /// chance the event brings that need at all, 0 to 1).
+    pub needs: Vec<(BucketId, f64, f64)>,
 }
 
 impl Risks {
@@ -56,7 +79,7 @@ pub struct Cliff {
 }
 
 /// Facts the guardrails need that the allocator cannot work out itself.
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct GuardrailContext {
     /// The home is in a flood-prone area (flood zone share or flood rate above the hazards
@@ -66,6 +89,14 @@ pub struct GuardrailContext {
     pub quake_zone: bool,
     /// Buckets whose target rests on one rare event.
     pub cliffs: Vec<Cliff>,
+    /// Share of the ZIP code inside the Category 1–3 storm-surge zone (NOAA/NHC, the optional
+    /// surge pack), 0 to 1, when known (`LocationResolved::exposure.surge_cat3_share`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub surge_zip_share: Option<f64>,
+    /// The county's storm-surge proxy class from the core pack (`none`, `low`, `moderate`,
+    /// `high`), when known (`LocationResolved::exposure.surge_proxy_class`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub surge_county_class: Option<String>,
 }
 
 /// Share of each month's money a [`Schedule::Split`] plan puts toward an expensive item by default.
@@ -95,7 +126,12 @@ pub enum Schedule {
     },
     /// Buy in one fixed priority order; when the next item costs more than the money on hand,
     /// save everything for it. The order never depends on the budget, so more money only ever
-    /// moves purchases earlier and every bucket is covered at least as well in every month.
+    /// moves purchases earlier and every bucket is covered at least as well in every month. Two
+    /// v2 rules keep this: the season rule and the automatic bare-minimum switch (a plan past
+    /// three years) apply to the split schedule only. The one exception is the rare allowance: it
+    /// starts once the three-day life-safety items are in hand, which comes sooner with more
+    /// money, and from then on the main plan receives 90 % of each month's money instead of all
+    /// of it, so with the allowance on the promise holds for the order, not month by month.
     FixedOrder,
     /// The research prototype's shortcuts (risk-model §4.2): when the next item is not
     /// affordable, buy the best affordable one instead, unless the next item costs at most twice
@@ -117,9 +153,11 @@ impl Default for Schedule {
 pub struct BudgetOptions {
     /// The longest plan, in months after month 0 (default 120, the ten-year horizon).
     pub max_months: u16,
-    /// The household opted in to specialised items for rare catastrophes (radiation meter,
-    /// potassium iodide, Faraday storage). They then get at most 10 % of each month's money;
-    /// otherwise $0. `PlanInput` has no field for this yet; see the report.
+    /// Opts in to every rare family, like the v1 switch `Dials::rare_catastrophic_opt_in`. The
+    /// allocator also reads the families the household ticked (`Dials::rare_families()`); with
+    /// neither, specialised rare-catastrophe items get $0. With an opt-in, an item is bought
+    /// from an allowance of at most 10 % of each month's money, and only where one of its
+    /// families is likely enough here (see `crate::rare`).
     pub rare_catastrophic_opt_in: bool,
     /// How purchases are timed.
     pub schedule: Schedule,
@@ -207,6 +245,8 @@ pub struct Purchase {
     pub promoted: bool,
     /// Bought from the capped rare-catastrophe allowance.
     pub rare_catastrophic: bool,
+    /// Bought for the bare-minimum kit, before the tiers (bare-minimum mode).
+    pub minimum: bool,
 }
 
 /// What the allocator returns. `rr-plan` copies `plan` and `warnings` into `PlanOutput`, fills
@@ -238,10 +278,21 @@ pub struct BudgetResult {
     pub tier_recommended: TierId,
     /// Guardrail warnings. Never errors: the user may know something the model does not.
     pub warnings: Vec<Warning>,
-    /// Specialised rare-catastrophe items left out because the household did not opt in.
+    /// Specialised rare-catastrophe items the allowance does not buy: the household did not tick
+    /// their family, the family's local ten-year chance is under 1 in 1,000, the item names no
+    /// rare family, or it would take its family past half the allowance.
     pub rare_catastrophic_skipped: Vec<ItemId>,
     /// The month the allocator ran out of anything worth buying, if the plan got there.
     pub stopped_month: Option<u16>,
+    /// The month the bare-minimum kit is complete (also in `plan.minimum_done_month`).
+    pub minimum_done_month: Option<u16>,
+    /// When the plan in the normal buying order (before any bare-minimum reordering) runs out of
+    /// things to buy: `None` when it never does within `max_months` (or has no monthly money).
+    pub full_plan_stopped_month: Option<u16>,
+    /// Citation ids behind numbers the plan's own sentences print that no bucket, item or line
+    /// carries (the savings track's legal-emergency figure); `rr-plan` adds them to the
+    /// provenance.
+    pub citations: Vec<rr_types::CitationId>,
 }
 
 /// Why the allocator could not run. These are bugs in the caller, never user errors.
