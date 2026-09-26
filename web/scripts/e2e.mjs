@@ -241,12 +241,22 @@ try {
   await page.screenshot({ path: join(shots, 'plan--philadelphia--desktop.png'), fullPage: true });
   await page.goto(`${site.url}#/packet`);
   await page.waitForSelector('[data-screen-ready] .packet .county-map__svg', { timeout: 30000 });
-  await page.emulateMediaType('print');
+  // Media type and colour scheme are set together: puppeteer's separate setters each reset the other.
+  const media = await page.createCDPSession();
+  const emulate = (type, scheme) => media.send('Emulation.setEmulatedMedia', { media: type, features: [{ name: 'prefers-color-scheme', value: scheme }] });
+  await emulate('print', 'light');
   await page.screenshot({ path: join(shots, 'packet-print-view--philadelphia.png'), fullPage: true });
   await page.pdf({ path: join(shots, 'packet--philadelphia--letter.pdf'), format: 'Letter', printBackground: false });
-  await page.emulateMediaType(null);
-  await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
-  check('the packet shows the county map in its print view', true);
+  check('the packet shows the county map in its print view', !!(await page.$('.packet .county-map__svg')));
+  // A device in dark mode still prints dark ink on white paper.
+  await emulate('print', 'dark');
+  const ink = await page.evaluate(() => {
+    const p = document.querySelector('.packet p');
+    const land = document.querySelector('.packet .county--context');
+    return { text: p ? getComputedStyle(p).color : '', land: land ? getComputedStyle(land).fill : '' };
+  });
+  check('printing from a dark-mode device gives dark text and a white map', ink.text === 'rgb(0, 0, 0)' && ink.land === 'rgb(255, 255, 255)', JSON.stringify(ink));
+  await emulate('', 'light');
 
   // About: versions and every credit line, the NRI statement first.
   await page.goto(`${site.url}#/about`);
