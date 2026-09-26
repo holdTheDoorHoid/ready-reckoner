@@ -453,7 +453,6 @@ fn research_shortcuts_keep_a_sinking_fund_for_a_much_better_item() {
     assert_eq!(r.plan.months[1].items[0].kind, PlanItemKind::Reserve);
     // With $40 a month the big item costs more than two months of budget, so the small one is
     // bought first even though it is worth much less.
-    let mut c = c;
     c.household.finances.monthly_budget_usd = 40.0;
     let r = run(&c, options(Schedule::ResearchShortcuts, false));
     assert_eq!(month_bought(&r, "small"), Some(1));
