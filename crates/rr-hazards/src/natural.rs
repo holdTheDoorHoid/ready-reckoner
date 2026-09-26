@@ -848,7 +848,9 @@ fn outage_floor(
         return;
     }
     if let Some(causes) = outage_causes(ctx) {
-        floor_by_cause(recorded, causes, rates, hurricane, &records, &homes, notes);
+        floor_by_cause(
+            ctx, recorded, causes, rates, hurricane, &records, &homes, notes,
+        );
         return;
     }
     let weather = spread(recorded, OUTAGE_RATE_SPREAD, &[cite::EAGLE_I]).times(&prior(
@@ -942,19 +944,117 @@ const FLOOR_CAUSES: [(HazardId, &str, &[HazardId], &str); 4] = [
     ),
 ];
 
+/// Storm Events rows that show a county within reach of tropical storms: HURDAT2 passages within
+/// the pack's 50-nautical-mile radius, and tropical storm or hurricane episodes in its forecast
+/// zone.
+const TROPICAL_EVENTS: [&str; 4] = [
+    "tropical_storm_passage",
+    "hurricane_passage",
+    "major_hurricane_passage",
+    "tropical_cyclone_impact",
+];
+
+/// One storm cause of the outage floor, as a county's records set it.
+#[derive(Debug, Clone)]
+pub(crate) struct FloorCause {
+    /// The hazard that takes the top-up.
+    pub hazard: HazardId,
+    /// The cause keys whose shares of the recorded outages it must explain.
+    pub keys: Vec<&'static str>,
+    /// The hazards whose modelled outages count against it.
+    pub covered: &'static [HazardId],
+    /// The chance that one household event of `hazard` cuts the power.
+    pub cut_share: f64,
+    /// The highest rate the floor may take `hazard` to: its Storm Events episode rate, since a
+    /// storm that cuts the power is a storm on record.
+    pub cap: f64,
+}
+
+/// The share of a region's storm episodes that cut the power: its row of `table`, else `national`.
+fn regional_share(table: &[(&str, f64)], national: f64, region: &str) -> f64 {
+    table
+        .iter()
+        .find(|(r, _)| *r == region)
+        .map_or(national, |(_, s)| *s)
+}
+
+/// The outage floor's causes for this county. Winter and ice storms cut the power at the share of
+/// episodes the region's records match an outage to ([`WINTER_CUT_SHARE`], [`ICE_CUT_SHARE`]);
+/// windstorms and hurricanes keep their priors. Each cause is held to its Storm Events episode
+/// rate: winter-storm and ice-storm episodes, severe-wind days plus high-wind episodes for
+/// windstorms, and the larger of the tropical passage and episode rates for hurricanes. A county
+/// out of reach of tropical storms (no hurricane rate from the track record and no tropical row
+/// on record) has no hurricane cause: outages matched to a tropical storm there come from its
+/// remnants and count with windstorms. Also returns whether that is so.
+fn floor_causes(ctx: &Ctx<'_>, rates: &[HazardRate]) -> (Vec<FloorCause>, bool) {
+    let episodes = |k: &str| ctx.event(k).map_or(0.0, |e| f64::from(e.rate_per_year));
+    let tropical = rates
+        .iter()
+        .any(|r| r.hazard == HazardId::Hurricane && r.today.value > 0.0)
+        || TROPICAL_EVENTS.iter().any(|k| episodes(k) > 0.0);
+    let region = ctx.county.nca_region.as_str();
+    let mut out = Vec::new();
+    for (h, key, covered, _) in FLOOR_CAUSES {
+        let (keys, cut_share, cap) = match h {
+            HazardId::StrongWind => {
+                let mut keys = vec![key];
+                if !tropical {
+                    keys.push("hurricane");
+                }
+                (
+                    keys,
+                    OUTAGE_SHARE_STRONG_WIND,
+                    episodes("severe_wind_day") + episodes("high_wind"),
+                )
+            }
+            HazardId::WinterWeather => (
+                vec![key],
+                regional_share(WINTER_CUT_SHARE, WINTER_CUT_SHARE_NATIONAL, region),
+                episodes("winter_storm"),
+            ),
+            HazardId::IceStorm => (
+                vec![key],
+                regional_share(ICE_CUT_SHARE, ICE_CUT_SHARE_NATIONAL, region),
+                episodes("ice_storm"),
+            ),
+            HazardId::Hurricane if tropical => (
+                vec![key],
+                OUTAGE_SHARE_HURRICANE,
+                TROPICAL_EVENTS
+                    .iter()
+                    .map(|k| episodes(k))
+                    .fold(0.0, f64::max),
+            ),
+            _ => continue,
+        };
+        out.push(FloorCause {
+            hazard: h,
+            keys,
+            covered,
+            cut_share,
+            cap,
+        });
+    }
+    (out, !tropical)
+}
+
 /// The outage floor by cause (model review M-18, M-10): each storm hazard must explain the
-/// outages matched to it by date, its own share of the county's recorded outages. A shortfall is
-/// that hazard's, not the windstorms'. Outages no storm was matched to are not put on any storm,
-/// as M-18 proposes ("power cuts, cause not recorded"): `rr-consequence` counts them in the power
-/// bucket from the county's outage record, and spreading them over the storms that happen to have
-/// a dated share put 84 % of one county's outages on its 3.6 % winter share. `modelled` holds each
-/// hazard's rate × its chance of cutting the power. Returns the extra household events a year for
-/// each storm hazard that falls short.
+/// outages matched to it by date, its own share of the county's recorded outages, turned into
+/// household events at the chance one of its events cuts the power ([`FloorCause::cut_share`]),
+/// and never beyond its episode rate on record ([`FloorCause::cap`]); the floor never lowers a
+/// rate. A shortfall is that hazard's, not the windstorms'. Outages no storm was matched to, and
+/// those matched to wildfires, heat, floods or grid trouble, are put on no storm, as M-18 proposes
+/// ("power cuts, cause not recorded"): `rr-consequence` counts them in the power bucket from the
+/// county's outage record, and spreading them over the storms that happen to have a dated share
+/// put 84 % of one county's outages on its 3.6 % winter share. `rates` holds each hazard's rate a
+/// year. Returns, for each storm hazard that falls short, the extra household events a year and
+/// the headroom its cap left; and whether a cap held any cause back.
 pub(crate) fn shortfall_by_cause(
     recorded: f64,
     causes: &BTreeMap<String, f32>,
-    modelled: &[(HazardId, f64)],
-) -> Vec<(HazardId, f64)> {
+    floor: &[FloorCause],
+    rates: &[(HazardId, f64)],
+) -> (Vec<(HazardId, f64, f64)>, bool) {
     let share = |k: &str| {
         causes
             .get(k)
@@ -962,27 +1062,55 @@ pub(crate) fn shortfall_by_cause(
             .filter(|v| v.is_finite() && *v > 0.0)
             .unwrap_or(0.0)
     };
-    let mut out = Vec::new();
-    for (h, key, covered, _) in FLOOR_CAUSES {
-        let needed = recorded * share(key);
-        let have = modelled
+    let rate = |h: HazardId| {
+        rates
             .iter()
-            .filter(|(m, _)| covered.contains(m))
+            .filter(|(x, _)| *x == h)
             .map(|(_, r)| *r)
-            .sum::<f64>();
-        let c = outage_share(h).unwrap_or(1.0);
-        if needed > have && c > 0.0 {
-            out.push((h, (needed - have) / c));
+            .sum::<f64>()
+    };
+    let mut out = Vec::new();
+    let mut capped = false;
+    for fc in floor {
+        if fc.cut_share <= 0.0 || fc.cut_share.is_nan() {
+            continue;
+        }
+        let needed = recorded * fc.keys.iter().map(|k| share(k)).sum::<f64>();
+        let have: f64 = fc
+            .covered
+            .iter()
+            .map(|&h| {
+                let c = if h == fc.hazard {
+                    fc.cut_share
+                } else {
+                    outage_share(h).unwrap_or(0.0)
+                };
+                rate(h) * c
+            })
+            .sum();
+        if needed <= have {
+            continue;
+        }
+        let want = (needed - have) / fc.cut_share;
+        let headroom = (fc.cap - rate(fc.hazard)).max(0.0);
+        if want > headroom {
+            capped = true;
+        }
+        let extra = want.min(headroom);
+        if extra > 0.0 {
+            out.push((fc.hazard, extra, headroom));
         }
     }
-    out
+    (out, capped)
 }
 
 /// Applies [`shortfall_by_cause`] to the rates, with a note. A hurricane top-up also goes into the
 /// Category 1–2 part of the hurricane split: the major-hurricane scenario's register card shows
 /// that part plus the major part, and must still show the full rate. The majors are HURDAT2's own
 /// passages; the outages the model misses come from the more frequent weaker storms.
+#[allow(clippy::too_many_arguments)]
 fn floor_by_cause(
+    ctx: &Ctx<'_>,
     recorded: f64,
     causes: &BTreeMap<String, f32>,
     rates: &mut Vec<HazardRate>,
@@ -991,19 +1119,26 @@ fn floor_by_cause(
     homes: &str,
     notes: &mut Notes,
 ) {
-    let modelled: Vec<(HazardId, f64)> = rates
-        .iter()
-        .filter_map(|r| outage_share(r.hazard).map(|c| (r.hazard, r.today.value * c)))
-        .collect();
-    let extras = shortfall_by_cause(recorded, causes, &modelled);
+    let (floor, remnants) = floor_causes(ctx, rates);
+    if remnants && causes.get("hurricane").is_some_and(|v| *v > 0.0) {
+        notes.add(format!(
+            "Some outages in {} were matched to the remnants of tropical storms. It is far from \
+             the storm tracks, so they count with windstorms, not as a hurricane.",
+            ctx.county_label()
+        ));
+    }
+    let now: Vec<(HazardId, f64)> = rates.iter().map(|r| (r.hazard, r.today.value)).collect();
+    let (extras, capped) = shortfall_by_cause(recorded, causes, &floor, &now);
     if extras.is_empty() {
         return;
     }
     let mut named = Vec::new();
-    for (h, extra) in extras {
-        let e = spread(
+    for (h, extra, headroom) in extras {
+        // The range never reaches past the storm's episode rate on record either.
+        let e = Estimate::data(
             extra,
-            OUTAGE_RATE_SPREAD,
+            extra / OUTAGE_RATE_SPREAD,
+            (extra * OUTAGE_RATE_SPREAD).min(headroom.max(extra)),
             &[cite::EAGLE_I, cite::HURDAT2, cite::STORM_EVENTS],
         );
         let verb = FLOOR_CAUSES
@@ -1029,10 +1164,15 @@ fn floor_by_cause(
     notes.add(format!(
         "{records} show {homes} caught in an outage {}. Matched by date to the storms behind \
          them, some outages come from {} more often than the county's storm records explain, so \
-         the difference is counted under each cause. Outages no storm could be matched to are \
-         not counted under any storm; the power-cut estimates count them.",
+         the difference is counted under each cause{}. Outages from other causes, or matched to \
+         no storm, are counted in the power-cut estimates, not under a storm.",
         crate::sentence::about_times_a_year(recorded),
-        crate::join_lower(&named)
+        crate::join_lower(&named),
+        if capped {
+            ", never more often than the storm records show that storm"
+        } else {
+            ""
+        }
     ));
 }
 
@@ -1103,61 +1243,218 @@ pub(crate) fn assess(ctx: &Ctx<'_>, notes: &mut Notes) -> Natural {
 mod tests {
     use super::*;
 
+    fn causes(pairs: &[(&str, f32)]) -> BTreeMap<String, f32> {
+        pairs.iter().map(|(k, v)| ((*k).to_owned(), *v)).collect()
+    }
+
+    /// A floor cause with the given cut share and cap, covering what [`FLOOR_CAUSES`] says.
+    fn cause(h: HazardId, keys: &[&'static str], cut_share: f64, cap: f64) -> FloorCause {
+        let covered = FLOOR_CAUSES
+            .iter()
+            .find(|(x, _, _, _)| *x == h)
+            .map(|(_, _, c, _)| *c)
+            .unwrap();
+        FloorCause {
+            hazard: h,
+            keys: keys.to_vec(),
+            covered,
+            cut_share,
+            cap,
+        }
+    }
+
+    fn get(got: &[(HazardId, f64, f64)], h: HazardId) -> Option<f64> {
+        got.iter().find(|(x, _, _)| *x == h).map(|(_, v, _)| *v)
+    }
+
     #[test]
     fn outages_are_topped_up_under_the_cause_the_dates_give() {
         // Recorded: 1 outage a customer a year; half windstorms, a fifth hurricanes, a tenth winter
         // storms, a fifth matched to no storm (put on none of them). Modelled: windstorms explain
-        // 0.2 outages, winter storms 0.09, hurricanes none.
-        let causes: BTreeMap<String, f32> = [
-            ("wind", 0.5f32),
+        // 0.2 outages, winter storms 0.09, hurricanes none. No caps.
+        let c = causes(&[
+            ("wind", 0.5),
             ("hurricane", 0.2),
             ("winter", 0.1),
             ("unattributed", 0.2),
-        ]
-        .into_iter()
-        .map(|(k, v)| (k.to_owned(), v))
-        .collect();
-        let modelled = [(HazardId::StrongWind, 0.2), (HazardId::WinterWeather, 0.09)];
-        let got = shortfall_by_cause(1.0, &causes, &modelled);
-        let get = |h: HazardId| got.iter().find(|(x, _)| *x == h).map(|(_, v)| *v);
-        let want_wind = (0.5 - 0.2) / 0.9;
-        let want_hurricane = 0.2 / 0.9;
-        let want_winter = (0.1 - 0.09) / 0.3;
-        assert!((get(HazardId::StrongWind).unwrap() - want_wind).abs() < 1e-6);
-        assert!((get(HazardId::Hurricane).unwrap() - want_hurricane).abs() < 1e-6);
-        assert!((get(HazardId::WinterWeather).unwrap() - want_winter).abs() < 1e-6);
+        ]);
+        let inf = f64::INFINITY;
+        let floor = [
+            cause(HazardId::StrongWind, &["wind"], 0.9, inf),
+            cause(HazardId::WinterWeather, &["winter"], 0.3, inf),
+            cause(HazardId::IceStorm, &["ice"], 0.8, inf),
+            cause(HazardId::Hurricane, &["hurricane"], 0.9, inf),
+        ];
+        let rates = [
+            (HazardId::StrongWind, 0.2 / 0.9),
+            (HazardId::WinterWeather, 0.09 / 0.3),
+        ];
+        let (got, capped) = shortfall_by_cause(1.0, &c, &floor, &rates);
+        assert!(!capped);
+        // Cause shares are f32 in the pack, hence the tolerance.
+        let near = |a: Option<f64>, b: f64| (a.unwrap() - b).abs() < 1e-6;
+        assert!(near(get(&got, HazardId::StrongWind), (0.5 - 0.2) / 0.9));
+        assert!(near(get(&got, HazardId::Hurricane), 0.2 / 0.9));
+        assert!(near(get(&got, HazardId::WinterWeather), (0.1 - 0.09) / 0.3));
         assert!(
-            get(HazardId::IceStorm).is_none(),
+            get(&got, HazardId::IceStorm).is_none(),
             "no ice-storm outages recorded"
         );
         // Windstorms that explain their dated share get no top-up.
-        let explained = shortfall_by_cause(0.1, &causes, &[(HazardId::StrongWind, 1.0)]);
-        assert!(explained.iter().all(|(h, _)| *h != HazardId::StrongWind));
-        // A county whose outages are mostly matched to no storm: the small dated winter share is
-        // all winter storms must explain (Schleicher County, Texas: 3.6 % winter, 84 % unmatched).
-        let schleicher: BTreeMap<String, f32> = [("winter", 0.036f32), ("unattributed", 0.84)]
-            .into_iter()
-            .map(|(k, v)| (k.to_owned(), v))
-            .collect();
-        let got = shortfall_by_cause(4.351, &schleicher, &[(HazardId::WinterWeather, 0.005)]);
-        assert_eq!(got.len(), 1);
-        assert!((got[0].1 - (4.351 * 0.036 - 0.005) / 0.3).abs() < 1e-6);
+        let (explained, _) =
+            shortfall_by_cause(0.1, &c, &floor, &[(HazardId::StrongWind, 1.0 / 0.9)]);
+        assert!(get(&explained, HazardId::StrongWind).is_none());
     }
 
     #[test]
     fn tornado_lightning_and_hail_outages_count_against_the_wind_class() {
         // data-model files tornadoes, lightning and hail under `wind`, so their modelled outages
         // count against it: windstorms take only what is left, (1.0 - 0.55) / 0.9.
-        let causes: BTreeMap<String, f32> = [("wind".to_owned(), 1.0f32)].into_iter().collect();
-        let modelled = [
-            (HazardId::StrongWind, 0.3),
-            (HazardId::Tornado, 0.1),
-            (HazardId::Lightning, 0.1),
-            (HazardId::Hail, 0.05),
+        let c = causes(&[("wind", 1.0)]);
+        let floor = [cause(HazardId::StrongWind, &["wind"], 0.9, f64::INFINITY)];
+        let rates = [
+            (HazardId::StrongWind, 0.3 / 0.9),
+            (HazardId::Tornado, 0.1 / 0.8),
+            (HazardId::Lightning, 0.1 / 0.8),
+            (HazardId::Hail, 0.05 / 0.1),
         ];
-        let got = shortfall_by_cause(1.0, &causes, &modelled);
+        let (got, _) = shortfall_by_cause(1.0, &c, &floor, &rates);
         assert_eq!(got.len(), 1);
-        assert_eq!(got[0].0, HazardId::StrongWind);
-        assert!((got[0].1 - 0.45 / 0.9).abs() < 1e-9);
+        assert!((get(&got, HazardId::StrongWind).unwrap() - 0.45 / 0.9).abs() < 1e-9);
+    }
+
+    #[test]
+    fn winter_storms_use_the_regional_share_and_stop_at_the_episode_rate() {
+        // Schleicher County, Texas: 4.351 outages a customer a year, 3.6 % matched to winter
+        // storms, 84 % to no storm; 0.3333 winter-storm episodes a year on record; winter storms
+        // modelled at 0.0167 a year. The Southern Great Plains share, 0.474, turns the dated winter
+        // outages into 0.31 extra winter storms a year, inside the episode rate.
+        let share = regional_share(
+            WINTER_CUT_SHARE,
+            WINTER_CUT_SHARE_NATIONAL,
+            "southern_great_plains",
+        );
+        assert!((share - 0.474).abs() < 1e-12);
+        let c = causes(&[("winter", 0.036), ("unattributed", 0.84)]);
+        let floor = [cause(HazardId::WinterWeather, &["winter"], share, 0.3333)];
+        let rates = [(HazardId::WinterWeather, 0.0167)];
+        let (got, capped) = shortfall_by_cause(4.351, &c, &floor, &rates);
+        let want = (4.351 * 0.036 - 0.0167 * share) / share;
+        assert!(!capped);
+        assert!((get(&got, HazardId::WinterWeather).unwrap() - want).abs() < 1e-6);
+        assert!(0.0167 + want <= 0.3333);
+        // Many more winter outages than episodes can explain: the rate stops at the episode rate
+        // (a storm that cuts the power is a storm on record), and never falls below where it was.
+        let c = causes(&[("winter", 0.5)]);
+        let floor = [cause(HazardId::WinterWeather, &["winter"], 0.284, 1.0)];
+        let (got, capped) = shortfall_by_cause(2.0, &c, &floor, &rates);
+        assert!(capped);
+        assert!((0.0167 + get(&got, HazardId::WinterWeather).unwrap() - 1.0).abs() < 1e-12);
+        let (got, _) = shortfall_by_cause(2.0, &c, &floor, &[(HazardId::WinterWeather, 1.5)]);
+        assert!(
+            got.is_empty(),
+            "a rate above the episode rate is left alone"
+        );
+        // A region without a share of its own takes the national one.
+        let alaska = regional_share(WINTER_CUT_SHARE, WINTER_CUT_SHARE_NATIONAL, "alaska");
+        assert_eq!(alaska, WINTER_CUT_SHARE_NATIONAL);
+    }
+
+    /// The regional cut shares are what the data pack gives: matched outages (`outages.csv`
+    /// `events` × `outage_causes.csv` share) over Storm Events episodes in the record's years,
+    /// pooled by NCA5 region; 100 episodes or more for a share of its own; capped at 1. Skipped
+    /// when `data/core` is not there.
+    #[test]
+    fn cut_shares_match_the_data_pack() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../data/core");
+        let read = |f: &str| std::fs::read_to_string(dir.join(f)).ok();
+        let (Some(counties), Some(outages), Some(causes), Some(events)) = (
+            read("counties.csv"),
+            read("outages.csv"),
+            read("outage_causes.csv"),
+            read("events.csv"),
+        ) else {
+            eprintln!("data/core not found: skipped");
+            return;
+        };
+        type Rows = BTreeMap<String, BTreeMap<String, String>>;
+        // Keyed by the first column (fips); `events.csv` also by its second (event type).
+        let parse = |text: &str, two_keys: bool| -> Rows {
+            let mut lines = text.lines();
+            let header: Vec<&str> = lines.next().unwrap().split(',').collect();
+            let mut out = Rows::new();
+            for line in lines.filter(|l| !l.is_empty()) {
+                let cells: Vec<&str> = line.split(',').collect();
+                let key = if two_keys {
+                    format!("{}|{}", cells[0], cells[1])
+                } else {
+                    cells[0].to_owned()
+                };
+                let row = header
+                    .iter()
+                    .zip(&cells)
+                    .map(|(h, c)| ((*h).to_owned(), (*c).to_owned()))
+                    .collect();
+                out.insert(key, row);
+            }
+            out
+        };
+        let counties = parse(&counties, false);
+        let outages = parse(&outages, false);
+        let causes = parse(&causes, false);
+        let events = parse(&events, true);
+        let num = |row: &BTreeMap<String, String>, col: &str| -> f64 {
+            row.get(col).and_then(|v| v.parse().ok()).unwrap_or(0.0)
+        };
+        let check = |cause: &str, event: &str, table: &[(&str, f64)], national: f64| {
+            let mut by_region: BTreeMap<String, (f64, f64)> = BTreeMap::new();
+            for (fips, o) in &outages {
+                let Some(c) = causes.get(fips) else { continue };
+                let rate = events
+                    .get(&format!("{fips}|{event}"))
+                    .map_or(0.0, |e| num(e, "rate_per_year"));
+                let episodes = rate * num(o, "years_of_data");
+                if episodes <= 0.0 {
+                    continue;
+                }
+                let region = counties
+                    .get(fips)
+                    .and_then(|r| r.get("nca_region").cloned())
+                    .unwrap_or_default();
+                let a = by_region.entry(region).or_insert((0.0, 0.0));
+                a.0 += num(o, "events") * num(c, &format!("{cause}_share"));
+                a.1 += episodes;
+            }
+            let matched: f64 = by_region.values().map(|a| a.0).sum();
+            let all: f64 = by_region.values().map(|a| a.1).sum();
+            let derived_national = (matched / all).min(1.0);
+            assert!(
+                (derived_national - national).abs() < 5e-4,
+                "{cause}: national {derived_national} against {national}"
+            );
+            for (region, (m, n)) in &by_region {
+                let own = table.iter().find(|(r, _)| r == region).map(|(_, s)| *s);
+                if *n >= 100.0 {
+                    let derived = (m / n).min(1.0);
+                    let used = own.unwrap_or(national);
+                    assert!(
+                        (derived - used).abs() < 5e-4,
+                        "{cause} {region}: {derived} against {used}"
+                    );
+                } else {
+                    assert!(
+                        own.is_none(),
+                        "{cause} {region}: too few episodes for a row"
+                    );
+                }
+            }
+        };
+        check(
+            "winter",
+            "winter_storm",
+            WINTER_CUT_SHARE,
+            WINTER_CUT_SHARE_NATIONAL,
+        );
+        check("ice", "ice_storm", ICE_CUT_SHARE, ICE_CUT_SHARE_NATIONAL);
     }
 }

@@ -138,7 +138,9 @@ pub(crate) const OUTAGE_RATE_SPREAD: f64 = 1.3;
 pub(crate) const HEAT_DAYS_CAP_FLOOR: f64 = 0.2;
 
 /// PRIOR. Chance that one household-significant event of each storm type cuts the power, used
-/// only to compare the storm rates with recorded outages (the outage floor).
+/// only to compare the storm rates with recorded outages (the outage floor). Where the county
+/// record matches its outages to storms by date, winter and ice storms use the shares the records
+/// show instead ([`WINTER_CUT_SHARE`], [`ICE_CUT_SHARE`]).
 pub(crate) const OUTAGE_SHARE_STRONG_WIND: f64 = 0.9;
 /// See [`OUTAGE_SHARE_STRONG_WIND`].
 pub(crate) const OUTAGE_SHARE_WINTER: f64 = 0.3;
@@ -152,6 +154,40 @@ pub(crate) const OUTAGE_SHARE_TORNADO: f64 = 0.8;
 pub(crate) const OUTAGE_SHARE_LIGHTNING: f64 = 0.8;
 /// See [`OUTAGE_SHARE_STRONG_WIND`].
 pub(crate) const OUTAGE_SHARE_HAIL: f64 = 0.1;
+
+/// DERIVED (the core data pack, re-derived by a unit test in `natural.rs`): the share of Storm
+/// Events winter-storm episodes (`events.csv` `winter_storm`: winter storm, blizzard, heavy snow and
+/// lake-effect snow) that the county outage records match an outage to (`outages.csv` `events` ×
+/// `outage_causes.csv` `winter_share`), pooled over the counties of each NCA5 region with a record
+/// of their own: Σ matched outages ÷ Σ (episodes a year × the record's years). In the outage floor
+/// it replaces [`OUTAGE_SHARE_WINTER`] as the chance that a winter storm cuts the power. Regions
+/// whose records hold fewer than 100 episodes (Alaska, Hawaii and the Pacific) and counties
+/// outside every region take [`WINTER_CUT_SHARE_NATIONAL`]. The matched
+/// count weighs events by customers out, so large outages count a little more than once.
+pub(crate) const WINTER_CUT_SHARE: &[(&str, f64)] = &[
+    ("midwest", 0.284),
+    ("northeast", 0.583),
+    ("northern_great_plains", 0.185),
+    ("northwest", 0.331),
+    ("southeast", 0.806),
+    ("southern_great_plains", 0.474),
+    ("southwest", 0.344),
+];
+/// DERIVED: the same over every region, 22,758 matched outages in 53,296 episodes.
+pub(crate) const WINTER_CUT_SHARE_NATIONAL: f64 = 0.427;
+/// DERIVED, as [`WINTER_CUT_SHARE`], for ice storms (`events.csv` `ice_storm`, outage cause `ice`),
+/// capped at 1: the ice cause also holds sleet and freezing fog, so matched outages can outnumber
+/// ice-storm episodes. Replaces [`OUTAGE_SHARE_ICE`] in the outage floor.
+pub(crate) const ICE_CUT_SHARE: &[(&str, f64)] = &[
+    ("midwest", 0.967),
+    ("northeast", 0.46),
+    ("northern_great_plains", 1.0),
+    ("southeast", 1.0),
+    ("southern_great_plains", 1.0),
+];
+/// DERIVED: the same over every region (4,299 matched in 4,010 episodes), capped at 1; the
+/// Northwest, the Southwest and Alaska hold too few ice-storm episodes for a share of their own.
+pub(crate) const ICE_CUT_SHARE_NATIONAL: f64 = 1.0;
 
 /// PRIOR. How exposed the household's power lines are, by setting: rural lines are long and
 /// overhead, city lines are shorter and partly underground (research §2.7 "utility
