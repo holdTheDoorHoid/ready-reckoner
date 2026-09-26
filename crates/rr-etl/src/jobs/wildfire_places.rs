@@ -15,7 +15,7 @@
 use super::{Ctx, JobOutput};
 use crate::csvout::{Table, col, parse_delimited};
 use crate::manifest::Attribution;
-use crate::num::sig;
+use crate::num::fixed;
 use crate::{Result, data_err};
 use std::collections::BTreeMap;
 
@@ -133,9 +133,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         table.push(vec![
             p.geoid.clone(),
             p.name.clone(),
-            p.direct.map(|v| sig(v, 3)).unwrap_or_default(),
-            p.indirect.map(|v| sig(v, 3)).unwrap_or_default(),
-            p.risk_rank.map(|v| sig(v, 3)).unwrap_or_default(),
+            // Three decimals: shares and percentile ranks, not measurements.
+            p.direct.map(|v| fixed(v, 3)).unwrap_or_default(),
+            p.indirect.map(|v| fixed(v, 3)).unwrap_or_default(),
+            p.risk_rank.map(|v| fixed(v, 3)).unwrap_or_default(),
         ]);
     }
     out.table(ctx, PLACES, &mut table)?;
@@ -174,7 +175,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         zt.push(vec![
             r[i_z].clone(),
             r[i_p].clone(),
-            sig((part / zl).min(1.0), 3),
+            fixed((part / zl).min(1.0), 3),
         ]);
         pairs += 1;
     }

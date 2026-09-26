@@ -178,3 +178,48 @@ Jobs run: events.
 | File | Rows before | Rows after | Added | Removed | Changed | Status |
 |---|---:|---:|---:|---:|---:|---|
 | `core/events.csv` | 44057 | 44397 | 340 | 0 | 0 | changed |
+
+## 2026-09-26T17:53:48Z — pack version 9ade1a0dc473
+
+Jobs run: wildfire_places.
+Job **surge failed**: unexpected source data: GeoTIFF chunk 1498578: unsupported error: compression method Unknown(34887) is unsupported
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `opt/wildfire_places/places.csv` | 0 | 32038 | 0 | 0 | 0 | new |
+| `opt/wildfire_places/zip_places.csv` | 0 | 35568 | 0 | 0 | 0 | new |
+
+## 2026-09-26T18:01:12Z — pack version 9ade1a0dc473
+
+Jobs run: none.
+Job **surge failed**: unexpected source data: Category 3 surge share for Miami Beach, FL (33139) is 0.402, expected more than 0.8
+
+## 2026-09-26T18:08:20Z — pack version 9ade1a0dc473
+
+Jobs run: none.
+Job **surge failed**: unexpected source data: Category 3 surge share for Miami Beach, FL (33139) is 0.793, expected more than 0.8
+
+## 2026-09-26T18:14:10Z — pack version 16841a150ad0
+
+Jobs run: surge.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `opt/surge/zip_surge.csv` | 0 | 26452 | 0 | 0 | 0 | new |
+
+## 2026-09-26T18:19:44Z — pack version db145d8577c3
+
+Jobs run: surge.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `opt/surge/zip_surge.csv` | 26452 | 26459 | 7 | 0 | 0 | changed |
+
+## 2026-09-26T18:20:10Z — pack version ed4e59dff15a
+
+Jobs run: wildfire_places.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `opt/wildfire_places/places.csv` | 32038 | 32038 | 0 | 0 | 7701 | changed |
+| `opt/wildfire_places/zip_places.csv` | 35568 | 35568 | 0 | 0 | 17582 | changed |

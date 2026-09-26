@@ -419,3 +419,40 @@ fn resolved_locations_carry_sourced_exposure() {
         assert!(ids.contains(id), "{id}");
     }
 }
+
+#[test]
+fn optional_packs_feed_the_zip_record() {
+    let s = store();
+    if has("opt/wildfire_places/places.csv") {
+        // Paradise, CA (ZIP 95969): most of its buildings are directly exposed to wildfire.
+        let z = s.zip_record("95969").unwrap();
+        let paradise = z
+            .wildfire_places
+            .iter()
+            .find(|p| p.place == "0655520")
+            .expect("Paradise listed for 95969");
+        assert!(paradise.buildings_direct.unwrap() > 0.5, "{paradise:?}");
+        assert!(
+            z.wildfire_places
+                .windows(2)
+                .all(|w| w[0].zip_land_share >= w[1].zip_land_share)
+        );
+    }
+    if has("opt/surge/zip_surge.csv") {
+        // Miami Beach sits almost entirely inside the Category 3 surge area; Denver has no row.
+        let mb = s.zip_record("33139").unwrap();
+        assert!(mb.surge_cat3_share.unwrap() >= 0.7, "{mb:?}");
+        assert!(mb.surge_cat1_share.unwrap() <= mb.surge_cat3_share.unwrap());
+        assert_eq!(s.zip_record("80202").unwrap().surge_cat3_share, None);
+        let loc = s.location("12086", Some("33139")).unwrap();
+        assert_eq!(
+            loc.exposure
+                .surge_cat3_share
+                .as_ref()
+                .unwrap()
+                .source
+                .as_str(),
+            "nhc_storm_surge_maps"
+        );
+    }
+}

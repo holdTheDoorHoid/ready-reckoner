@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "1c2677cdba4a",
-  "generated": "2026-09-26T17:38:48Z",
+  "pack_version": "ed4e59dff15a",
+  "generated": "2026-09-26T18:20:10Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -262,6 +262,47 @@
           "sha256": "5513188c3fbe4220767cf9308c3727c022c76011ea9c163ac8785d0682adf980",
           "bytes": 1441292,
           "rows": 3222
+        }
+      ]
+    },
+    "surge": {
+      "description": "Optional: share of each ZIP code's land inside NOAA/NHC's Category 1 and Category 3 storm-surge areas. Built by hand (rr-etl refresh --only surge), not in the quarterly refresh. Not needed to plan.",
+      "files": [
+        {
+          "path": "opt/surge/zip_surge.csv",
+          "job": "surge",
+          "sha256": "70c189cca81259c6f4ad9b882d95880ffc0283ab44ddd6ac2f948ebc889bca32",
+          "bytes": 292323,
+          "rows": 26459,
+          "key": [
+            "zip"
+          ]
+        }
+      ]
+    },
+    "wildfire_places": {
+      "description": "Optional: USFS Wildfire Risk to Communities by Census place, with the ZIP-to-place shares to use it. Not needed to plan; loaded only when the wildfire detail is shown.",
+      "files": [
+        {
+          "path": "opt/wildfire_places/places.csv",
+          "job": "wildfire_places",
+          "sha256": "532321514f3a35ce67a36926c181552911b5428b4af53dfae23c7e63f0b9b77e",
+          "bytes": 1291613,
+          "rows": 32038,
+          "key": [
+            "place"
+          ]
+        },
+        {
+          "path": "opt/wildfire_places/zip_places.csv",
+          "job": "wildfire_places",
+          "sha256": "9595ba4712d845da22bc4f47d0c962f241e93a3663d2d09573deecef5d83a11e",
+          "bytes": 692316,
+          "rows": 35568,
+          "key": [
+            "zip",
+            "place"
+          ]
         }
       ]
     }
@@ -1966,6 +2007,112 @@
         "strategic_class": "A: counterforce and command sites; C1: largest cities, the capital region and weapons plants; B: missile-field fallout corridor; C2: other large cities, ports, refineries and bases; D: downwind of a target; E: remote from targets and fallout paths. Rules and f_S priors in strategic_sites.toml."
       }
     },
+    "surge": {
+      "title": "NOAA/NHC storm-surge area shares by ZIP (optional pack; large rasters)",
+      "finished": "2026-09-26T18:19:44Z",
+      "sources": [
+        {
+          "name": "Census cartographic boundary ZCTAs 2020, 1:500,000",
+          "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_zcta520_500k.zip",
+          "version": "GENZ2020 cb_2020_us_zcta520_500k",
+          "retrieved": "2026-09-26T18:17:40Z",
+          "sha256": "c69a4ede8aebebfc7ed3a98a9075c6aaa1b75d514a129bc5c662fd806d2f3d17",
+          "bytes": 66655314,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2024 Gazetteer, ZCTAs (land area)",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_zcta_national.zip",
+          "version": "2024 Gazetteer; Last-Modified Fri, 30 Aug 2024 18:40:45 GMT",
+          "retrieved": "2026-09-26T18:17:47Z",
+          "sha256": "7b85c04a131672f58b38a950eb82855d5fd4054f0bd9bc3f69aa28897a714e3d",
+          "bytes": 1013803,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Texas to Maine (v2, 2016)",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/US_SLOSH_MOM_Inundation.zip",
+          "version": "US_SLOSH_MOM_Inundation.zip",
+          "retrieved": "2026-09-26T18:17:48Z",
+          "sha256": "9bec43a68025cdf0f7b032d11cd8d0b139122ed67bdd7ee17ad1eeb67b8a3048",
+          "bytes": 224067401,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Southern California (v3)",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/Southern_California_SLOSH_MOM_Inundation_v3.zip",
+          "version": "Southern_California_SLOSH_MOM_Inundation_v3.zip",
+          "retrieved": "2026-09-26T18:19:37Z",
+          "sha256": "2dcb93a50acb2ee8873af3f7b97ba29e63cb7d6123f340ac0c6df2bdf0539419",
+          "bytes": 4404341,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Hawaii",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/Hawaii_SLOSH_MOM_Inundation.zip",
+          "version": "Hawaii_SLOSH_MOM_Inundation.zip",
+          "retrieved": "2026-09-26T18:19:40Z",
+          "sha256": "976d7c720b5fe8e194b8965dc37c63de05c23d272c2c88bef0fadead4d5c4658",
+          "bytes": 8624841,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Puerto Rico",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/PR_SLOSH_MOM_Inundation.zip",
+          "version": "PR_SLOSH_MOM_Inundation.zip",
+          "retrieved": "2026-09-26T18:19:42Z",
+          "sha256": "6edd6660c211512b06c3e2d5846ea22937c5d056092aa14a654694433833dd74",
+          "bytes": 7271715,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), US Virgin Islands",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/USVI_SLOSH_MOM_Inundation.zip",
+          "version": "USVI_SLOSH_MOM_Inundation.zip",
+          "retrieved": "2026-09-26T18:19:43Z",
+          "sha256": "16597e35eef7681d84cc411d5614156a09c77a10fe22ac0272b8b44de27958a9",
+          "bytes": 956080,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), Guam (v3)",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/Guam_SLOSH_MOM_Inundation_v3.zip",
+          "version": "Guam_SLOSH_MOM_Inundation_v3.zip",
+          "retrieved": "2026-09-26T18:19:43Z",
+          "sha256": "ebc0a284621f5f3d004c9782f251a00c39ddc8b1952070038a3684d786c645ac",
+          "bytes": 2825545,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        },
+        {
+          "name": "NOAA NHC National Storm Surge Risk Maps (SLOSH MOM), American Samoa (v3)",
+          "url": "https://www.nhc.noaa.gov/gis/hazardmaps/American_Samoa_SLOSH_MOM_Inundation_v3.zip",
+          "version": "American_Samoa_SLOSH_MOM_Inundation_v3.zip",
+          "retrieved": "2026-09-26T18:19:43Z",
+          "sha256": "f2149c135740f171ec1d1d84b80817006f235adc80be3c5ff8ce396f19dec415",
+          "bytes": 2090447,
+          "license": "US Government work, public domain (17 U.S.C. 105)",
+          "obligations": "General education and awareness at a city or community level; not a replacement for official evacuation zones (NHC disclaimer)."
+        }
+      ],
+      "rows_in": 33791,
+      "rows_out": 26459,
+      "outputs": [
+        "opt/surge/zip_surge.csv"
+      ],
+      "notes": [
+        "Texas to Maine (v2, 2016): 25489 ZIPs sampled; Southern California (v3): 727 ZIPs sampled (Category 2 stands in for 3); Hawaii: 97 ZIPs sampled; Puerto Rico: 138 ZIPs sampled; US Virgin Islands: 6 ZIPs sampled; Guam (v3): 7 ZIPs sampled; American Samoa (v3): 1 ZIPs sampled. 3252 ZIPs have some Category 3 surge area. Lattice every 3 arc-seconds (about 90 m) inside each Census 2020 1:500k ZCTA outline; a point counts when its raster cell holds a depth class (1-21 feet bins); share = inundated points' area / the ZIP's land area (Census 2024 Gazetteer), capped at 1. ZIPs whose outline meets no raster have no row: outside the mapped area, which is not the same as no risk. Checks (Category 3 share): Miami Beach, FL (33139) 0.793, Key West, FL (33040) 0.634, Galveston, TX (77550) 0.899, Guam ZIPs sampled 7."
+      ],
+      "definitions": {
+        "surge_cat1_share": "Share of the ZIP code's area inside NOAA/NHC's Category 1 storm-surge area.",
+        "surge_cat3_share": "Share of the ZIP code's area inside NOAA/NHC's Category 3 storm-surge area (SLOSH Maximum of Maximums at high tide; it contains the Category 1 and 2 areas). Community-level awareness only; official evacuation zones decide who leaves."
+      }
+    },
     "surge_proxy": {
       "title": "County storm-surge proxy from NRI coastal-flood exposure, hurricane passages and evacuation zones",
       "finished": "2026-09-26T17:27:34Z",
@@ -2216,6 +2363,43 @@
           ]
         }
       ]
+    },
+    "wildfire_places": {
+      "title": "USFS Wildfire Risk to Communities by Census place, with ZIP-to-place shares (optional pack)",
+      "finished": "2026-09-26T18:20:10Z",
+      "sources": [
+        {
+          "name": "USDA Forest Service Wildfire Risk to Communities, tabular download (Communities sheet)",
+          "url": "https://wildfirerisk.org/wp-content/uploads/2026/04/wrc_download_20260415.xlsx",
+          "version": "wrc_download_20260415.xlsx (2nd edition; last update 2026-04-15)",
+          "retrieved": "2026-09-26T18:20:07Z",
+          "sha256": "437c25429eb2a1cfe755832c5a02f01f2707ffa4238712dd7ef1c4cccc76bdbd",
+          "bytes": 4968274,
+          "license": "USDA Forest Service data; free to use, citation requested",
+          "obligations": "Cite: USDA Forest Service. 2026. Wildfire Risk to Communities. https://wildfirerisk.org [date accessed]."
+        },
+        {
+          "name": "Census 2020 ZCTA to place relationship file",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_place20_natl.txt",
+          "version": "rel2020 zcta520-place20",
+          "retrieved": "2026-09-26T18:20:09Z",
+          "sha256": "698a5dad71ed419411677d0ffd8ecd9331067f59c472cdd239b92c12f698285d",
+          "bytes": 9811563,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 114918,
+      "rows_out": 67606,
+      "outputs": [
+        "opt/wildfire_places/places.csv",
+        "opt/wildfire_places/zip_places.csv"
+      ],
+      "notes": [
+        "32038 Census places from the Wildfire Risk to Communities Communities sheet (2nd edition, updated 2026-04-15); INSUFFICIENT_DATA places keep their name without values. buildings_direct / buildings_indirect: BUILDINGS_FRACTION_DE / _IE (share of the place's buildings directly / indirectly exposed); risk_national_rank: RISK_NATIONAL_RANK (national percentile of risk to homes). zip_places.csv: 35568 ZIP-place pairs from the Census 2020 ZCTA-to-place file where the place holds at least 1% of the ZIP's land."
+      ],
+      "definitions": {
+        "buildings_direct": "Share of the place's buildings directly exposed to wildfire (flames can reach them from adjacent burnable vegetation), USDA Forest Service Wildfire Risk to Communities."
+      }
     }
   },
   "attributions": [
@@ -2290,6 +2474,14 @@
       "accessed": "2026-09-26"
     },
     {
+      "source": "NOAA NHC storm surge maps",
+      "text": "Storm-surge areas from NOAA's National Hurricane Center National Storm Surge Risk Maps (Zachry, B. C., Booth, W. J., Rhome, J. R., and Sharon, T. M., 2015: A National View of Storm Surge Risk and Inundation. Weather, Climate, and Society, 7(2), 109-117). For awareness at a community level; check your official evacuation zone.",
+      "license": "US Government work (public domain)",
+      "url": "https://www.nhc.noaa.gov/nationalsurge/",
+      "version": "v2 (2016) Texas to Maine; v3 and earlier elsewhere",
+      "accessed": "2026-09-26"
+    },
+    {
       "source": "ORNL EAGLE-I",
       "text": "Power outage statistics derived by Ready Reckoner from: Brelsford, C., Tennille, S., Myers, A., et al., The Environment for Analysis of Geo-Located Energy Information's Recorded Electricity Outages 2014-2025, Oak Ridge National Laboratory, figshare, doi:10.6084/m9.figshare.24237376 (CC BY 4.0).",
       "license": "CC BY 4.0",
@@ -2328,6 +2520,14 @@
       "accessed": "2026-09-26"
     },
     {
+      "source": "USDA Forest Service Wildfire Risk to Communities",
+      "text": "USDA Forest Service. 2026. Wildfire Risk to Communities. https://wildfirerisk.org (accessed 2026-09-26).",
+      "license": "USDA Forest Service data (free to use; citation requested)",
+      "url": "https://wildfirerisk.org/",
+      "version": "2nd edition, tabular download of 2026-04-15",
+      "accessed": "2026-09-26"
+    },
+    {
       "source": "USGS National Seismic Hazard Model",
       "text": "Earthquake shaking probabilities from the U.S. Geological Survey National Seismic Hazard Model (2023 50-state model data release; Hawaii 2021.R2; Puerto Rico and U.S. Virgin Islands 2025).",
       "license": "US Government work, public domain (17 U.S.C. 105)",
@@ -2349,5 +2549,9 @@
       "what": "Ship Eviction Lab county eviction filing rates (ODC-BY 1.0: attribution required; the credit line below goes on the About screen and in the packet sources). Set approved = true, fill in by, and run `rr-etl refresh --out data --only eviction`.",
       "by": ""
     }
+  },
+  "attribution_packs": {
+    "NOAA NHC storm surge maps": "surge",
+    "USDA Forest Service Wildfire Risk to Communities": "wildfire_places"
   }
 }
