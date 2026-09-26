@@ -1,7 +1,10 @@
 //! The allocator (DESIGN §4.7, research risk-model §4.2).
 //!
-//! 1. **Month 0** applies what the household already has (`existing`), then every free action,
-//!    most valuable first.
+//! 1. **Free actions.** What the household already has (`existing`) counts from month 0. Free
+//!    actions still to do are ordered life-safety first, then by value; month 0 lists at most eight
+//!    and the rest follow in months 1 and 2 (about four a month, before that month's purchases),
+//!    so no step shows more than eight. Their coverage counts in the plan's numbers from their
+//!    month; purchases are planned knowing they are coming.
 //! 2. **What to buy next.** Walk the tiers (three days, two weeks, one month, three, six, twelve
 //!    months) with every bucket's target capped at the tier's horizon. The first tier with a
 //!    positive-value candidate is the current tier. Candidates are items unlocked at or below it:
@@ -54,6 +57,38 @@ const EPS: f64 = 1e-9;
 
 /// Values at or below this are treated as zero (no value).
 const VALUE_EPS: f64 = 1e-12;
+
+/// At most this many free actions still to do in month 0 (and in any month): the prior-art research
+/// on choice overload and one-next-action puts the useful limit at 7 to 10 per step.
+pub const FREE_ACTIONS_MONTH_0: usize = 8;
+
+/// Free actions left over from month 0 are scheduled at about this many a month.
+pub const FREE_ACTIONS_PER_MONTH: usize = 4;
+
+/// Every free action is scheduled by this month (the first three months are 0, 1 and 2).
+pub const FREE_ACTIONS_BY_MONTH: u16 = 2;
+
+/// Months for the free actions still to do, in the order given (life-safety first, then value):
+/// up to [`FREE_ACTIONS_MONTH_0`] in month 0, then [`FREE_ACTIONS_PER_MONTH`] a month, raised just
+/// enough (never above [`FREE_ACTIONS_MONTH_0`]) to finish by [`FREE_ACTIONS_BY_MONTH`]. Only a
+/// catalogue with more than 24 free actions runs past month 2, at eight a month.
+fn free_action_months(n: usize) -> Vec<u16> {
+    let first = n.min(FREE_ACTIONS_MONTH_0);
+    let mut out: Vec<u16> = std::iter::repeat_n(0, first).collect();
+    let mut rest = n - first;
+    let mut m: u16 = 1;
+    while rest > 0 {
+        let months_left = usize::from((FREE_ACTIONS_BY_MONTH + 1).saturating_sub(m).max(1));
+        let k = rest
+            .div_ceil(months_left)
+            .clamp(FREE_ACTIONS_PER_MONTH, FREE_ACTIONS_MONTH_0)
+            .min(rest);
+        out.extend(std::iter::repeat_n(m, k));
+        rest -= k;
+        m += 1;
+    }
+    out
+}
 
 /// Runs the allocator with the default coverage rule: [`ContributionTable`] built from the item
 /// metadata after folding in the requirement lines.
@@ -207,7 +242,10 @@ enum Event {
         paid: Option<f64>,
     },
     Buy {
+        /// As valued by the allocator.
         cand: Candidate,
+        /// Its effect on coverage as the plan reports it, for the explanation.
+        shown: Candidate,
         rare: bool,
         from_savings: f64,
     },
@@ -377,6 +415,7 @@ fn run(
         }
     }
     let so_far = state.clone();
+    let mut free_order: Vec<(usize, f64)> = Vec::new();
     let mut todo: Vec<usize> = free
         .iter()
         .copied()
@@ -405,8 +444,27 @@ fn run(
         let (pos, cand) = best.expect("todo is not empty");
         todo.remove(pos);
         apply(&ctx, &mut state, &cand);
-        month0_todo_free.push(Event::Free { cand, done: false });
+        free_order.push((cand.offer, cand.qty));
     }
+    // Free actions are spread over the first months (at most eight to do in any month). The
+    // allocator values purchases as if all of them were done, since they cost nothing and all
+    // come within three months, so it never buys what a scheduled free step will cover; the plan's
+    // coverage numbers (`credited`) count each one only from its month.
+    let free_months = free_action_months(free_order.len());
+    let last_free_month = free_months.last().copied().unwrap_or(0);
+    let scheduled_free: Vec<(u16, usize, f64)> = free_months
+        .iter()
+        .zip(&free_order)
+        .map(|(m, (i, q))| (*m, *i, *q))
+        .collect();
+    let mut credited = so_far.clone();
+    credit_free_actions(
+        &ctx,
+        &mut credited,
+        &scheduled_free,
+        0,
+        &mut month0_todo_free,
+    );
 
     // ---- Rare-catastrophe allowance. ----
     let finances = &input.household.finances;
@@ -463,11 +521,14 @@ fn run(
         input.options.rare_catastrophic_opt_in,
     );
 
-    for m in 0..=input.options.max_months {
-        if m > 0 && !future_money {
+    for m in 0..=input.options.max_months.max(last_free_month) {
+        if m > 0 && !future_money && m > last_free_month {
             break;
         }
         let mut month_events: Vec<Event> = Vec::new();
+        if m > 0 {
+            credit_free_actions(&ctx, &mut credited, &scheduled_free, m, &mut month_events);
+        }
         let new = if m == 0 { one_off } else { monthly };
         let rare_share = if rare_queue.is_empty() {
             0.0
@@ -613,6 +674,7 @@ fn run(
                     buy(
                         &ctx,
                         &mut state,
+                        &mut credited,
                         &mut main,
                         use_fund,
                         &mut ledger,
@@ -635,6 +697,7 @@ fn run(
                 buy(
                     &ctx,
                     &mut state,
+                    &mut credited,
                     &mut rare,
                     true,
                     &mut ledger,
@@ -652,6 +715,7 @@ fn run(
                     buy(
                         &ctx,
                         &mut state,
+                        &mut credited,
                         &mut rare,
                         false,
                         &mut ledger,
@@ -677,14 +741,16 @@ fn run(
             rare = Purse::default();
         }
 
-        // Coverage only changes when something is bought.
-        let bought = month_events.iter().any(|e| matches!(e, Event::Buy { .. }));
+        // Coverage only changes when something is bought or a free action is done.
+        let bought = month_events
+            .iter()
+            .any(|e| matches!(e, Event::Buy { .. } | Event::Free { .. }));
         let snap = match coverage_by_month.last() {
             Some(prev) if !bought && m > 0 => MonthCoverage {
                 month: m,
                 ..prev.clone()
             },
-            _ => snapshot(&ctx, &state, &checklist, m),
+            _ => snapshot(&ctx, &credited, &checklist, m),
         };
         coverage_by_month.push(snap);
         money_by_month.push(MonthMoney {
@@ -698,7 +764,7 @@ fn run(
             cheapest_usd,
         });
         events.push(month_events);
-        if stopped.is_some() && rare_queue.is_empty() {
+        if stopped.is_some() && rare_queue.is_empty() && m >= last_free_month {
             break;
         }
     }
@@ -725,7 +791,7 @@ fn run(
     first.extend(month0_owned);
     if events.is_empty() {
         events.push(Vec::new());
-        coverage_by_month.push(snapshot(&ctx, &state, &checklist, 0));
+        coverage_by_month.push(snapshot(&ctx, &credited, &checklist, 0));
         money_by_month.push(MonthMoney {
             month: 0,
             available_usd: main.free,
@@ -767,7 +833,16 @@ fn run(
     };
 
     let covered = covered_targets(&ctx, &state, &checklist);
-    let facts = guardrail_facts(&ctx, &state, &coverage_by_month, &purchase_months, stopped);
+    let free_month_of: BTreeMap<usize, u16> =
+        scheduled_free.iter().map(|&(m, i, _)| (i, m)).collect();
+    let facts = guardrail_facts(
+        &ctx,
+        &state,
+        &coverage_by_month,
+        &purchase_months,
+        &free_month_of,
+        stopped,
+    );
     let warnings = guardrails::check(input.household, input.context, input.risks, &facts);
 
     Ok(BudgetResult {
@@ -1332,6 +1407,7 @@ fn apply(ctx: &Ctx<'_>, state: &mut State, cand: &Candidate) {
 fn buy(
     ctx: &Ctx<'_>,
     state: &mut State,
+    credited: &mut State,
     purse: &mut Purse,
     use_fund: bool,
     ledger: &mut Ledger,
@@ -1361,12 +1437,24 @@ fn buy(
             needed_usd: money(cand.cost),
         });
     }
+    // What the purchase does to coverage as the plan reports it (free actions count only from
+    // their month), for its explanation.
+    let horizon = f64::from(cand.tier.days());
+    let mut shown = evaluate_fixed(ctx, credited, cand.offer, cand.qty, cand.tier, horizon);
+    // Rarely needed readiness value is mentioned only if the allocator counted it.
+    shown.value = if cand.value > cand.core + VALUE_EPS {
+        shown.core + shown.low_p
+    } else {
+        shown.core
+    };
     if rare {
         // The rare-catastrophe allowance never changes what the main plan sees, so its timing
         // (which depends on the budget) cannot reorder the main plan.
         state.owned[cand.offer] += cand.qty;
+        credited.owned[cand.offer] += cand.qty;
     } else {
         apply(ctx, state, cand);
+        apply(ctx, credited, &shown);
     }
     ledger.purchase_months.entry(cand.offer).or_insert(month);
     ledger.sequence.push(Purchase {
@@ -1382,9 +1470,28 @@ fn buy(
     });
     events.push(Event::Buy {
         cand: cand.clone(),
+        shown,
         rare,
         from_savings,
     });
+}
+
+/// Does the free actions scheduled for month `m` in the plan's own coverage (`credited`), recording
+/// each with what it adds at that point.
+fn credit_free_actions(
+    ctx: &Ctx<'_>,
+    credited: &mut State,
+    scheduled: &[(u16, usize, f64)],
+    m: u16,
+    events: &mut Vec<Event>,
+) {
+    for &(month, i, qty) in scheduled {
+        if month == m {
+            let cand = evaluate_fixed(ctx, credited, i, qty, TierId::Now, f64::INFINITY);
+            apply(ctx, credited, &cand);
+            events.push(Event::Free { cand, done: false });
+        }
+    }
 }
 
 fn snapshot(
@@ -1442,6 +1549,7 @@ fn plan_items(ctx: &Ctx<'_>, events: &[Event]) -> Vec<PlanItem> {
     for e in events {
         if let Event::Buy {
             cand,
+            shown,
             rare,
             from_savings,
         } = e
@@ -1449,13 +1557,15 @@ fn plan_items(ctx: &Ctx<'_>, events: &[Event]) -> Vec<PlanItem> {
             let found = merged.iter_mut().find_map(|m| match m {
                 Event::Buy {
                     cand: c,
+                    shown: sh,
                     rare: r,
                     from_savings: f,
-                } if c.offer == cand.offer && r == rare => Some((c, f)),
+                } if c.offer == cand.offer && r == rare => Some((c, sh, f)),
                 _ => None,
             });
-            if let Some((c, f)) = found {
+            if let Some((c, sh, f)) = found {
                 merge_into(c, cand);
+                merge_into(sh, shown);
                 *f += from_savings;
                 continue;
             }
@@ -1522,6 +1632,7 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
         }
         Event::Buy {
             cand,
+            shown,
             rare,
             from_savings,
         } => {
@@ -1539,6 +1650,9 @@ fn plan_item(ctx: &Ctx<'_>, e: &Event) -> PlanItem {
                 false,
                 None,
             );
+            // Explain with coverage as the plan reports it (free actions count from their month).
+            let parts = why_parts(ctx, shown);
+            item.why = explain::why(lead, &parts, ctx.people, ctx.years);
             if *from_savings > 0.005 {
                 item.why.push_str(&format!(
                     " Paid with {} saved in earlier months.",
@@ -1931,6 +2045,7 @@ fn guardrail_facts(
     state: &State,
     coverage_by_month: &[MonthCoverage],
     purchase_months: &BTreeMap<usize, u16>,
+    free_month_of: &BTreeMap<usize, u16>,
     stopped: Option<u16>,
 ) -> Facts {
     // When each role is first in hand: month 0 for what was owned or done, else its purchase month.
@@ -1961,6 +2076,9 @@ fn guardrail_facts(
             .filter(|(_, o)| has_role(o, role))
             .filter_map(|(i, o)| {
                 if let Some(m) = purchase_months.get(&i) {
+                    Some(*m)
+                } else if let Some(m) = free_month_of.get(&i) {
+                    // A free action still to do counts from the month it is scheduled.
                     Some(*m)
                 } else if state.owned[i] > 0.0 || o.item.free {
                     Some(0)
@@ -1998,5 +2116,48 @@ fn guardrail_facts(
         } else {
             Vec::new()
         },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn per_month(n: usize) -> Vec<usize> {
+        let months = free_action_months(n);
+        let last = months.last().copied().unwrap_or(0);
+        (0..=last)
+            .map(|m| months.iter().filter(|&&x| x == m).count())
+            .collect()
+    }
+
+    #[test]
+    fn free_actions_are_spread_eight_then_four_and_done_by_month_two() {
+        assert_eq!(per_month(0), [0]);
+        assert_eq!(per_month(5), [5]);
+        assert_eq!(per_month(8), [8]);
+        assert_eq!(per_month(12), [8, 4]);
+        assert_eq!(per_month(15), [8, 4, 3]);
+        assert_eq!(per_month(16), [8, 4, 4]);
+        // 22, the top of the fixture range: the pace rises so all are done by month 2.
+        assert_eq!(per_month(22), [8, 7, 7]);
+        assert_eq!(per_month(24), [8, 8, 8]);
+        // More than 24 cannot fit three months of eight; the rest follow at eight a month.
+        assert_eq!(per_month(30), [8, 8, 8, 6]);
+        for n in 0..=40 {
+            let months = free_action_months(n);
+            assert_eq!(months.len(), n);
+            assert!(
+                months.windows(2).all(|w| w[0] <= w[1]),
+                "order kept for {n}"
+            );
+            assert!(
+                per_month(n).iter().all(|&k| k <= FREE_ACTIONS_MONTH_0),
+                "{n}"
+            );
+            if n <= 24 {
+                assert!(months.iter().all(|&m| m <= FREE_ACTIONS_BY_MONTH), "{n}");
+            }
+        }
     }
 }

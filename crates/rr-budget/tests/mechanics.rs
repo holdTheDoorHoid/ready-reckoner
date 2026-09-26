@@ -652,3 +652,108 @@ fn cpap_battery_under_each_schedule() {
     assert!(research.sequence.iter().any(|p| p.month == 1));
     assert!(battery_month(&research) > battery_month(&fixed));
 }
+
+/// Month 0 lists at most eight free actions (life-safety first, then value); the rest move to
+/// month 1 (and 2), before that month's purchases, and their coverage counts only from then. The
+/// allocator still plans purchases knowing they are coming, so it does not buy water containers
+/// that a scheduled free step (the water-heater reserve) will make unnecessary.
+#[test]
+fn free_actions_beyond_eight_move_to_later_months_and_count_from_then() {
+    let mut s = Setup::new("philadelphia-renters-4", 60.0, 100.0)
+        .flat(BucketId::WaterOut, 0.2, 1.0)
+        .flat(BucketId::Power, 0.5, 3.0)
+        .readiness(BucketId::Fire, 0.3);
+    for j in 0..8 {
+        let id = format!("safety_step_{j}");
+        let mut m = ItemMeta::new(id.as_str());
+        m.readiness = vec![ReadinessCredit {
+            bucket: BucketId::Fire,
+            harm_day_equivalents: 0.1,
+        }];
+        s = s.add(
+            item(
+                &id,
+                &id,
+                "action",
+                &[BucketId::Fire],
+                TierId::Now,
+                true,
+                true,
+                (0.0, 0.0),
+            ),
+            m,
+        );
+    }
+    for j in 0..3 {
+        let id = format!("plain_step_{j}");
+        s = s.add(
+            item(
+                &id,
+                &id,
+                "action",
+                &[BucketId::HomeLoss],
+                TierId::Now,
+                true,
+                false,
+                (0.0, 0.0),
+            ),
+            ItemMeta::new(id.as_str()),
+        );
+    }
+    s = s
+        .add(
+            item(
+                "heater",
+                "Water-heater reserve",
+                "action",
+                &[BucketId::WaterOut],
+                TierId::Now,
+                true,
+                false,
+                (0.0, 0.0),
+            ),
+            set("heater", BucketId::WaterOut, 1.0),
+        )
+        .add(
+            buy("containers", BucketId::WaterOut, TierId::H72, 20.0),
+            set("containers", BucketId::WaterOut, 3.0),
+        )
+        .add(
+            buy("lights", BucketId::Power, TierId::H72, 30.0),
+            set("lights", BucketId::Power, 3.0),
+        );
+    let r = s.run();
+    let free_in = |m: usize| {
+        r.plan.months[m]
+            .items
+            .iter()
+            .filter(|i| i.kind == PlanItemKind::FreeAction)
+            .map(|i| i.item_id.as_str())
+            .collect::<Vec<_>>()
+    };
+    let m0 = free_in(0);
+    let m1 = free_in(1);
+    assert_eq!(m0.len(), 8);
+    assert!(m0.iter().all(|id| id.starts_with("safety_step_")), "{m0:?}");
+    assert_eq!(
+        m1.first(),
+        Some(&"heater"),
+        "most valuable of the rest first: {m1:?}"
+    );
+    assert_eq!(m1.len(), 4);
+    // Month 1 lists its free steps before its purchases.
+    let kinds: Vec<PlanItemKind> = r.plan.months[1].items.iter().map(|i| i.kind).collect();
+    assert!(
+        kinds
+            .windows(2)
+            .all(|w| !(w[0] != PlanItemKind::FreeAction && w[1] == PlanItemKind::FreeAction))
+    );
+    // Coverage counts the heater step from month 1, not month 0.
+    assert_eq!(common::days_at(&r, 0)[&BucketId::WaterOut], 0.0);
+    assert_eq!(common::days_at(&r, 1)[&BucketId::WaterOut], 1.0);
+    // The one-off money buys lights in month 0, never the containers the free step makes
+    // unnecessary.
+    assert_eq!(month_of(&r, "lights"), Some(0));
+    assert_eq!(month_of(&r, "containers"), None);
+    assert!(!r.warnings.iter().any(|w| w.id == "no_water_after_month_1"));
+}
