@@ -191,7 +191,7 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. For an
 
 | If this happens | Be ready for | Outside help likely arrives | Mostly back to normal | Enough at |
 | --- | --- | --- | --- | --- |
-| No grid power at home | about 3 days (up to 7 days) | not known | not known | three days |
+| No grid power at home | about 3 days (up to 5 days) | about 3 days | about 4 days | three days |
 | Tap water must be treated | about 7 days (2 days to 3 weeks) | not known | not known | two weeks |
 | No tap water at all | about 5 days (3–10) | not known | not known | two weeks |
 | Can't get to a store | about 10 days (up to 3 weeks) | not known | not known | two weeks |
@@ -201,7 +201,7 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. For an
 
 The range in brackets shows how uncertain each target is. "Not known": there are no restoration records for the event behind that target.
 
-### No grid power at home: about 3 days (up to 7 days)
+### No grid power at home: about 3 days (up to 5 days)
 
 **What helps.** Have a flashlight for each person.[79] Keep a battery or hand-crank radio, and a backup battery for each phone.[80] Keep the fridge and freezer closed. A closed fridge keeps food cold for about four hours, and a full freezer for about two days.[79] If someone relies on a powered medical device or cold medicine, make a plan with their medical provider now.[79] Join your power company's medical program for early warnings of outages, but plan as if your power will not come back first.[81] Many cities and counties keep a voluntary registry of people who may need help; ask yours.[14] A battery power station burns no fuel, so it makes no carbon monoxide.[82]
 
@@ -504,7 +504,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **171** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **172** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **173** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **174** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx **175** Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
 
-59 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+60 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

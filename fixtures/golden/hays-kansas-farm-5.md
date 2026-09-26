@@ -14,8 +14,8 @@
 
 ### The three things that matter most
 
-1. Of 100 households like yours, about 50 (40–80) will lose grid power for a day or more in the next 10 years. Be ready to manage about 5 days at home with no power, and about 2 months with no tap water.
-2. Of 100 households like yours, about 55 (35–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 10 days of food you normally eat.
+1. Of 100 households like yours, about 35 (25–75) will lose grid power for a day or more in the next 10 years. Be ready to manage about 3 days at home with no power, and about 2 months with no tap water.
+2. Of 100 households like yours, about 55 (30–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 10 days of food you normally eat.
 3. Of 100 households like yours, about 25 (10–45) will have an income gap of more than 3 months in the next 10 years. Losing a paycheck is the longest disruption most households face. Aim for about 6 months of expenses in savings over time, apart from this supplies budget.
 
 ### Start here
@@ -192,17 +192,17 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. For an
 
 | If this happens | Be ready for | Outside help likely arrives | Mostly back to normal | Enough at |
 | --- | --- | --- | --- | --- |
-| No grid power at home | about 5 days (3–10) | not known | not known | two weeks |
+| No grid power at home | about 3 days (up to 7 days) | not known | not known | three days |
 | Tap water must be treated | not needed at this setting | not known | not known | free steps |
 | No tap water at all | about 2 months (3 weeks to 6 months) | not known | not known | three months |
 | Can't get to a store | about 10 days (7 days to 3 weeks) | not known | not known | two weeks |
-| Dangerous heat or cold indoors | about 3 days (up to 7 days) | not known | not known | three days |
+| Dangerous heat or cold indoors | about 3 days (2–7) | not known | not known | three days |
 | Medication and medical-supply continuity | about 2 weeks (7 days to 1 month) | not known | not known | two weeks |
 | No phone, internet or card payments | about 5 days (2–10) | not known | not known | two weeks |
 
 The range in brackets shows how uncertain each target is. "Not known": there are no restoration records for the event behind that target.
 
-### No grid power at home: about 5 days (3–10)
+### No grid power at home: about 3 days (up to 7 days)
 
 **What helps.** Have a flashlight for each person.[76] Keep a battery or hand-crank radio, and a backup battery for each phone.[77] Keep the fridge and freezer closed. A closed fridge keeps food cold for about four hours, and a full freezer for about two days.[76] If someone relies on a powered medical device or cold medicine, make a plan with their medical provider now.[76] Join your power company's medical program for early warnings of outages, but plan as if your power will not come back first.[78] Many cities and counties keep a voluntary registry of people who may need help; ask yours.[7] A battery power station burns no fuel, so it makes no carbon monoxide.[79]
 
@@ -220,7 +220,7 @@ The range in brackets shows how uncertain each target is. "Not known": there are
 
 **What to avoid.** Do not buy everything at once. It strains your budget and the store. Do not buy or eat from cans that bulge, leak, are rusted or are deeply dented.[92] Do not trust a kit's "days" label. Check the calories on the package instead.
 
-### Dangerous heat or cold indoors: about 3 days (up to 7 days)
+### Dangerous heat or cold indoors: about 3 days (2–7)
 
 **What helps.** Agree who checks on whom, especially older neighbours and anyone who lives alone.[96, 97] In heat, go where there is air conditioning. Dial 2-1-1 to find one.[96] Cover windows with drapes or shades.[98] In cold, close off rooms you don't need, stuff towels under doors, and cover windows with blankets at night. Have extra blankets, sleeping bags and warm coats.[97] Babies under one year old should never sleep in a cold room.[97] If you cannot keep your home warm, go to a warming center. Dial 2-1-1 to find one.[99] If you heat with wood, have the stove and chimney professionally inspected and cleaned every year, because creosote from the smoke builds up and can start a fire.[100]
 
@@ -330,8 +330,8 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] **Bleeding-control kit (tourniquet and pressure bandage)**: 1 kit, about $71 (usually $48–95)
 - [ ] **Digital thermometer (and one for a baby, if you have one)**: 1 thermometer, about $8 (usually $7–8)
 - [ ] **Baby wipes**: 2 packs, about $5 (usually $5)
-- [ ] **Refrigerator and freezer thermometers**: 1 pair, about $8 (usually $5–11)
 - [ ] **Extra toilet paper**: 10 rolls, about $8 (usually $5–11)
+- [ ] **Refrigerator and freezer thermometers**: 1 pair, about $8 (usually $5–11)
 - [ ] **Disposable gloves, a box of 100**: 1 box, about $20 (usually $16–25)
 - [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17)
 
@@ -348,8 +348,8 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] **N95 respirators for teens and adults**: 15 respirators, about $15 (usually $11–20)
 - [ ] **Period products for two cycles**: 2 cycles' supplies, about $12 (usually $9–15)
 - [ ] **Extra pet food in an airtight container**: 13 pounds of dry food, about $16 (usually $10–22)
-- [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20)
 - [ ] **Personal straw or squeeze filter for a bag**: 1 filter, about $23 (usually $18–29)
+- [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20)
 
 **Month 4 (from February 1, 2027), $80 to spend**
 
@@ -374,8 +374,8 @@ Your monthly money starts next month, so this month is the free steps above.
 | Month | What | Spend |
 | --- | --- | --- |
 | 6 (April 2027) | Get-home bag for each commuter: a small bag you stock from home: 1 bag; Whistle for each go-bag: 5 whistles | $44 |
-| 7 (May 2027) | Family first-aid kit: 2 kits; Headlamp or flashlight for each person: 4 headlamps; Foil emergency blankets: 5 blankets; Indoor room thermometer: 1 thermometer | $140 |
-| 8 (June 2027) | Gravity water filter (removes bacteria and parasites): 1 filter | $75 |
+| 7 (May 2027) | Family first-aid kit: 2 kits; Headlamp or flashlight for each person: 4 headlamps; Foil emergency blankets: 5 blankets | $132 |
+| 8 (June 2027) | Gravity water filter (removes bacteria and parasites): 1 filter; Indoor room thermometer: 1 thermometer | $84 |
 | 9 (July 2027) | save toward water carriers for hauling, about 5 gallons each; Fire-resistant, waterproof document pouch: 1 pouch; Shut-off wrench for gas and water: 1 wrench | $85 |
 | 10 (August 2027) | save toward water carriers for hauling, about 5 gallons each; Water carriers for hauling, about 5 gallons each: 4 carriers, $80 of it from savings | $84 |
 | 11 (September 2027) | save toward household kit: paper plates, cups, utensils, trash bags, waterproof matches; NOAA Weather Radio with a tone alert: 1 radio | $80 |
@@ -415,15 +415,15 @@ One list per step, up to the step that is enough for your risks. The free steps 
 - [ ] Bleeding-control kit (tourniquet and pressure bandage): 1 kit
 - [ ] Digital thermometer (and one for a baby, if you have one): 1 thermometer
 - [ ] Baby wipes: 2 packs
-- [ ] Refrigerator and freezer thermometers: 1 pair
 - [ ] Extra toilet paper: 10 rolls
+- [ ] Refrigerator and freezer thermometers: 1 pair
 - [ ] Disposable gloves, a box of 100: 1 box
 - [ ] Chlorine dioxide water treatment: 1 pack
 - [ ] N95 respirators for teens and adults: 15 respirators
 - [ ] Period products for two cycles: 2 cycles' supplies
 - [ ] Extra pet food in an airtight container: 13 pounds of dry food
-- [ ] Spare batteries for lights and the radio: 1 × 24-pack
 - [ ] Personal straw or squeeze filter for a bag: 1 filter
+- [ ] Spare batteries for lights and the radio: 1 × 24-pack
 - [ ] Over-the-counter medicine basics: 1 set
 - [ ] Wound-care and splint add-on for the first-aid kit: 1 kit
 - [ ] Plastic sheeting and duct tape to shelter in place: 1 kit

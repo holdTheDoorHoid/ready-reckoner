@@ -14,7 +14,7 @@
 
 ### The three things that matter most
 
-1. Of 100 households like yours, about 35 (30–55) will lose grid power for a day or more in the next 10 years. Be ready to manage about 3 days at home with no power, and about 5 days with no tap water.
+1. Of 100 households like yours, about 35 (30–60) will lose grid power for a day or more in the next 10 years. Be ready to manage about 5 days at home with no power or tap water.
 2. Of 100 households like yours, about 60 (40–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 weeks of food you normally eat, and 3 weeks of daily medicine on hand.
 3. Of 100 households like yours, about 15 (7–30) will have an income gap of more than 3 months in the next 10 years. Losing a paycheck is the longest disruption most households face. Aim for about 4 months of expenses in savings over time, apart from this supplies budget.
 
@@ -194,7 +194,7 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. For an
 
 | If this happens | Be ready for | Outside help likely arrives | Mostly back to normal | Enough at |
 | --- | --- | --- | --- | --- |
-| No grid power at home | about 3 days (up to 10 days) | about 3 days | about 6 days | three days |
+| No grid power at home | about 5 days (3–7) | about 3 days | about 6 days | two weeks |
 | Tap water must be treated | about 5 days (1 day to 2 weeks) | not known | not known | two weeks |
 | No tap water at all | about 5 days (3–10) | not known | not known | two weeks |
 | Can't get to a store | about 2 weeks (10 days to 1 month) | not known | not known | two weeks |
@@ -204,7 +204,7 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. For an
 
 The range in brackets shows how uncertain each target is. "Not known": there are no restoration records for the event behind that target.
 
-### No grid power at home: about 3 days (up to 10 days)
+### No grid power at home: about 5 days (3–7)
 
 **What helps.** Have a flashlight for each person.[82] Keep a battery or hand-crank radio, and a backup battery for each phone.[83] Keep the fridge and freezer closed. A closed fridge keeps food cold for about four hours, and a full freezer for about two days.[82] If someone relies on a powered medical device or cold medicine, make a plan with their medical provider now.[82] Join your power company's medical program for early warnings of outages, but plan as if your power will not come back first.[84] Many cities and counties keep a voluntary registry of people who may need help; ask yours.[10] A battery power station burns no fuel, so it makes no carbon monoxide.[85]
 
@@ -337,18 +337,18 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Pack your pets' water in the go-kit (free)
 - [ ] Pack your pets' food in the go-kit (free)
 - [ ] Know and prepare your home: shut-offs, pipes, straps and the outside (free)
+- [ ] Plan how to stay cool: a cool room and your nearest cooling center (free)
 - [ ] Neighbours and skills: swap numbers, check on each other, learn first aid (free)
-- [ ] Your trusted circle: agree who helps whom (free)
 - Set aside $30 toward **multipurpose fire extinguisher**.
 - [ ] **N95 respirators for teens and adults**: 15 respirators, about $15 (usually $11–20)
 - [ ] **Period products for two cycles**: 2 cycles' supplies, about $12 (usually $9–15)
 
 **Month 3 (from January 1, 2027), $60 to spend**
 
+- [ ] Your trusted circle: agree who helps whom (free)
 - [ ] If you own firearms: safe storage and training (free)
 - [ ] Home and personal security: lock up, protect accounts, spot scams, stay calm (free)
 - [ ] Lockout plan: a spare key and a locksmith you checked (free)
-- [ ] Plan how to stay cool: a cool room and your nearest cooling center (free)
 - [ ] Pick a warm room for a winter outage (free)
 - [ ] Money: start an emergency fund and a bare-bones budget (free)
 - [ ] Decide: homeowners, condo or renters insurance (free)
@@ -628,8 +628,8 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 | May 1, 2027 | Check, then every 6 months: practice: ten-minute drills and the first things to do; store-bought bottled water. Use and restock, then every 6 months: unscented household bleach (for treating water) |
 | October 1, 2027 | Check, then every year: make a household plan and a contact card for each person; legal readiness: a lawyer's number, a will and powers of attorney. Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
 | November 1, 2027 | Check, then every year: documents and insurance: copy key papers, record belongings, check cover. Check, then every 6 months: family first-aid kit |
-| December 1, 2027 | Check, then every year: neighbours and skills: swap numbers, check on each other, learn first aid; your trusted circle: agree who helps whom |
-| January 1, 2028 | Check, then every year: lockout plan: a spare key and a locksmith you checked |
+| December 1, 2027 | Check, then every year: neighbours and skills: swap numbers, check on each other, learn first aid |
+| January 1, 2028 | Check, then every year: your trusted circle: agree who helps whom; lockout plan: a spare key and a locksmith you checked |
 | March 1, 2028 | Test, then every 6 months: headlamp or flashlight for each person |
 | April 1, 2028 | Check, then every 6 months: NOAA Weather Radio with a tone alert; pet go-kit: a carrier and a bag you pack from your supplies |
 | June 1, 2028 | Check, then every 6 months: car emergency kit. Check, then every year: over-the-counter medicine basics |
@@ -682,7 +682,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **181** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023 **182** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **183** Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020. Centers for Disease Control and Prevention, 2020. https://www.cdc.gov/mmwr/volumes/69/wr/mm6935a2.htm **184** Wildfire Smoke: Risk Factors and Protection. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/wildfires/risk-factors/index.html **185** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water **186** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **187** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline
 
-67 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+66 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

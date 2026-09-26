@@ -15,7 +15,7 @@
 ### The three things that matter most
 
 1. Of 100 households like yours, about 15 (10–30) will have to leave home quickly at least once in the next 10 years. Know your evacuation zone and where you would go; leave when told.[2, 3] On the coast, strong shaking is the warning: walk to high ground as soon as it stops.[4]
-2. Of 100 households like yours, about 55 (45–95) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 6 months at home with no power, and about 1 year with no tap water.
+2. Of 100 households like yours, about 60 (50–95) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 6 months at home with no power, and about 1 year with no tap water.
 3. Of 100 households like yours, about 80 (60–100) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 months of food you normally eat, and 3 months of daily medicine on hand.
 
 ### Start here

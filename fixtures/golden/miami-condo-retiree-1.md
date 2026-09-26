@@ -10,12 +10,12 @@
 
 ## Summary
 
-**Where you are now:** getting started. **What is enough for your risks:** one month of supplies. At your budget, the plan gets there by month 18 (April 2028).
+**Where you are now:** getting started. **What is enough for your risks:** one month of supplies. At your budget, the plan gets there by month 19 (May 2028).
 
 ### The three things that matter most
 
 1. Of 100 households like yours, about 50 (40–65) will have to leave home quickly at least once in the next 10 years. Know your evacuation zone and where you would go; leave when told.[2, 3]
-2. Of 100 households like yours, about 85 (80–95) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 2 weeks at home with no power or tap water.
+2. Of 100 households like yours, about 65 (55–85) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 2 weeks at home with no power or tap water.
 3. Of 100 households like yours, about 70 (50–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 weeks of food you normally eat, and 1 month of daily medicine on hand.
 
 ### Start here
@@ -33,6 +33,8 @@ These cost nothing and come first. This month's 8 free steps are all under Your 
 - [x] Manual can opener (1 opener)
 - [x] A cooking pot with a lid (1 pot)
 - [x] Three days of the food you normally eat (1 × 3 days of food for one person)
+- [x] A warm blanket for each person (1 blanket)
+- [x] Warm layers for each person: a coat, hat and gloves (1 set)
 - [x] Towels to wet and cool down (1 towel)
 
 If any is missing, untick "Assume everyday basics" on the Have screen and the plan will add it.
@@ -193,17 +195,17 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. For an
 
 | If this happens | Be ready for | Outside help likely arrives | Mostly back to normal | Enough at |
 | --- | --- | --- | --- | --- |
-| No grid power at home | about 2 weeks (10 days to 1 month) | about 3 days | about 3 weeks | two weeks |
+| No grid power at home | about 2 weeks (10 days to 3 weeks) | about 3 days | about 3 weeks | two weeks |
 | Tap water must be treated | about 2 weeks (5 days to 1 month) | not known | not known | two weeks |
-| No tap water at all | about 2 weeks (up to 1 month) | about 3 days | about 3 weeks | two weeks |
+| No tap water at all | about 2 weeks (10 days to 1 month) | about 3 days | about 3 weeks | two weeks |
 | Can't get to a store | about 2 weeks (10 days to 1 month) | not known | not known | two weeks |
-| Dangerous heat or cold indoors | about 10 days (7 days to 2 weeks) | about 3 days | about 3 weeks | two weeks |
+| Dangerous heat or cold indoors | about 7 days (5 days to 2 weeks) | about 3 days | about 3 weeks | two weeks |
 | Medication and medical-supply continuity | about 1 month (up to 2 months) | not known | not known | one month |
 | No phone, internet or card payments | about 5 days (up to 10 days) | not known | not known | two weeks |
 
 The range in brackets shows how uncertain each target is. "Not known": there are no restoration records for the event behind that target.
 
-### No grid power at home: about 2 weeks (10 days to 1 month)
+### No grid power at home: about 2 weeks (10 days to 3 weeks)
 
 **What helps.** Have a flashlight for each person.[85] Keep a battery or hand-crank radio, and a backup battery for each phone.[86] Keep the fridge and freezer closed. A closed fridge keeps food cold for about four hours, and a full freezer for about two days.[85] If someone relies on a powered medical device or cold medicine, make a plan with their medical provider now.[85] Join your power company's medical program for early warnings of outages, but plan as if your power will not come back first.[87] Many cities and counties keep a voluntary registry of people who may need help; ask yours.[14] A battery power station burns no fuel, so it makes no carbon monoxide.[31]
 
@@ -215,7 +217,7 @@ The range in brackets shows how uncertain each target is. "Not known": there are
 
 **What to avoid.** Do not use water or ice from the fridge dispenser while a notice is on. Boil tap water even if it went through a home filter or a filter pitcher.[92] Boiling does not help if the notice warns of chemicals. That is a do-not-drink notice, and you need stored or bottled water instead.[92, 93]
 
-### No tap water at all: about 2 weeks (up to 1 month)
+### No tap water at all: about 2 weeks (10 days to 1 month)
 
 **What helps.** Store at least one gallon per person per day, for drinking and keeping clean.[1] Fill clean bottles or jugs with tap water and replace it every six months.[94] You can pick a level in the plan. About 3 liters a day covers drinking to survive, one gallon is the basic default, and about 4 gallons (15 liters) is the humanitarian minimum for drinking, cooking and washing.[95] A tank water heater holds 20 to 80 gallons of clean water.[96, 97] For long outages, a filter and a source of raw water go further than more jugs.[84] Filters do not remove viruses, so add a disinfectant such as chlorine dioxide after filtering.[93] A two-bucket toilet keeps waste safe when toilets cannot flush.[98]
 
@@ -227,7 +229,7 @@ The range in brackets shows how uncertain each target is. "Not known": there are
 
 **What to avoid.** Do not buy everything at once. It strains your budget and the store. Do not buy or eat from cans that bulge, leak, are rusted or are deeply dented.[102] Do not trust a kit's "days" label. Check the calories on the package instead.
 
-### Dangerous heat or cold indoors: about 10 days (7 days to 2 weeks)
+### Dangerous heat or cold indoors: about 7 days (5 days to 2 weeks)
 
 **What helps.** See "Heat wave" and "Cold wave" under Your risks.
 
@@ -283,7 +285,7 @@ What to do about a damaged home is under Documents and money.
 
 A named scenario is one rare, severe event that would change your targets a lot. The plan includes it or leaves it out as shown; you can change either on the risks screen.
 
-- **Direct hit by a major hurricane** (included in your plan). Tropical storms and hurricanes reach Miami-Dade County about once every 3 years, and about 1 in 7 of them is a major storm (Category 3 or stronger) that can cut power and water for weeks. Hurricane guidance in Florida covers it, so the plan includes it. Planning for it changes: Power: 10 days → 14 days; Boil-water: 7 days → 14 days; Tap water: 10 days → 14 days; Food and supplies: 10 days → 14 days; Heat or cold: 7 days → 10 days; Phone and payments: 3 days → 5 days; households like yours that have to leave home quickly within 10 years: 27 → 49 in 100.[22, 23, 24, 25, 138, 139, 140, 141]
+- **Direct hit by a major hurricane** (included in your plan). Tropical storms and hurricanes reach Miami-Dade County about once every 3 years, and about 1 in 7 of them is a major storm (Category 3 or stronger) that can cut power and water for weeks. Hurricane guidance in Florida covers it, so the plan includes it. Planning for it changes: Power: 5 days → 14 days; Boil-water: 7 days → 14 days; Tap water: 7 days → 14 days; Food and supplies: 10 days → 14 days; Heat or cold: 3 days → 7 days; Phone and payments: 3 days → 5 days; households like yours that have to leave home quickly within 10 years: 27 → 49 in 100.[22, 23, 24, 25, 138, 139, 140, 141]
 
 ## Your plan
 
@@ -327,11 +329,6 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] **Insulated bag and cold packs for refrigerated medicine**: 1 set, about $26 (usually $15–37). Adds 2.1 days of cold storage for medicine, bringing you to 2.1 of the 30-day goal.
 - [ ] **Multipurpose fire extinguisher**: 1 extinguisher, about $33 (usually $22–44). Gets you ready for a fire at home.
 - [ ] **Carbon monoxide alarm on each sleeping level**: 1 alarm, about $27 (usually $23–30). Gets you ready for a fire at home.
-- [ ] **Extra pet food in an airtight container**: 2 pounds of dry food, about $2 (usually $1–3). Adds 13 days of pet food, bringing you to 13 of the 14-day goal.
-- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3). Gets you ready for leaving home quickly.
-- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5). Gets you ready for leaving home quickly.
-- [ ] **Heavy trash bags for the toilet bucket**: 7 bags, about $1 (usually $1). Adds 4.7 days of emergency toilet supplies for 1 person, bringing you to 9.3 of the 14-day goal.
-- [ ] **Extra toilet paper**: 3 rolls, about $2 (usually $1–3). Adds 14 days of toilet paper for 1 person, which completes the 14-day goal.
 
 ### Month by month
 
@@ -342,16 +339,22 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Plan how to stay cool: a cool room and your nearest cooling center (free)
 - [ ] Legal readiness: a lawyer's number, a will and powers of attorney (free)
 - [ ] Mental health: save 988 and the distress helpline, and write a calm plan (free)
+- [ ] Pick a warm room for a winter outage (free)
 - [ ] Neighbours and skills: swap numbers, check on each other, learn first aid (free)
 - [ ] Your trusted circle: agree who helps whom (free)
-- [ ] If you own firearms: safe storage and training (free)
-- [ ] **Extra supply of daily prescription medicine**: 11 days of one person's medicine, about $10 (usually $4–15)
 - [ ] **Bleeding-control kit (tourniquet and pressure bandage)**: 1 kit, about $71 (usually $48–95)
+- [ ] **Extra pet food in an airtight container**: 2 pounds of dry food, about $2 (usually $1–3)
+- [ ] **Whistle for each go-bag**: 1 whistle, about $2 (usually $1–3)
+- [ ] **Foil emergency blankets**: 1 blanket, about $3 (usually $1–5)
+- [ ] **Extra toilet paper**: 3 rolls, about $2 (usually $1–3)
+- [ ] **Extra supply of daily prescription medicine**: 11 days of one person's medicine, about $10 (usually $4–15)
+- [ ] **Heavy trash bags for the toilet bucket**: 7 bags, about $1 (usually $1)
 - [ ] **Headlamp or flashlight for each person**: 1 headlamp, about $12 (usually $3–20)
 - [ ] **Refrigerator and freezer thermometers**: 1 pair, about $8 (usually $5–11)
 
 **Month 3 (from January 1, 2027), $100 to spend**
 
+- [ ] If you own firearms: safe storage and training (free)
 - [ ] Home and personal security: lock up, protect accounts, spot scams, stay calm (free)
 - [ ] Lockout plan: a spare key and a locksmith you checked (free)
 - [ ] Know and prepare your home: shut-offs, pipes, straps and the outside (free)
@@ -359,58 +362,55 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Money: start an emergency fund and a bare-bones budget (free)
 - [ ] Check your hurricane or windstorm deductible (free)
 - [ ] Check your condominium unit-owners policy (free)
-- [ ] Going further: food for months (free)
-- [ ] **Store-bought bottled water**: 2 gallons, about $2 (usually $2)
+- Set aside $50 toward **portable battery power station (about 1,000 watt-hours)**.
 - [ ] **Butane canisters for the camp stove (places with mild winters)**: 6 × 8-ounce canister, about $13 (usually $9–16)
 - [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $28 (usually $23–33)
-- [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20)
-- [ ] **Pet go-kit: a carrier and a bag you pack from your supplies**: 1 (one per pet), about $32 (usually $30–35)
-- [ ] **Extra supply of daily prescription medicine**: 7 days of one person's medicine, about $6 (usually $3–9)
+- [ ] **Digital thermometer (and one for a baby, if you have one)**: 1 thermometer, about $8 (usually $7–8)
 
 **Month 4 (from February 1, 2027), $100 to spend**
 
+- [ ] Going further: food for months (free)
 - [ ] Antibiotics: talk with your own clinician (no stockpile) (free)
 - Set aside $50 toward **portable battery power station (about 1,000 watt-hours)**.
+- [ ] **Pet go-kit: a carrier and a bag you pack from your supplies**: 1 (one per pet), about $32 (usually $30–35)
+- [ ] **Extra supply of daily prescription medicine**: 7 days of one person's medicine, about $6 (usually $3–9)
+- [ ] **Store-bought bottled water**: 2 gallons, about $2 (usually $2)
 - [ ] **Bar soap and laundry soap**: 1 person-month, about $6 (usually $2–10)
-- [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $40 (usually $37–43)
-- [ ] **Store-bought bottled water**: 3 gallons, about $3 (usually $3)
 - [ ] **N95 respirators for teens and adults**: 5 respirators, about $5 (usually $4–7)
 
 **Month 5 (from March 1, 2027), $100 to spend**
 
 - Set aside $50 toward **portable battery power station (about 1,000 watt-hours)**.
+- [ ] **NOAA Weather Radio with a tone alert**: 1 radio, about $40 (usually $37–43)
 - [ ] **Unscented household bleach (for treating water)**: 1 bottle, about $8 (usually $7–9)
-- [ ] **Digital thermometer (and one for a baby, if you have one)**: 1 thermometer, about $8 (usually $7–8)
-- [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17)
-- [ ] **Extra supply of daily prescription medicine**: 9 days of one person's medicine, about $8 (usually $4–12)
-- [ ] **Store-bought bottled water**: 4 gallons, about $4 (usually $4–5)
 
 ### Later months
 
 | Month | What | Spend |
 | --- | --- | --- |
-| 6 (April 2027) | save toward portable battery power station (about 1,000 watt-hours); Disposable gloves, a box of 100: 1 box; Family first-aid kit: 1 kit | $106 |
-| 7 (May 2027) | save toward portable battery power station (about 1,000 watt-hours); Over-the-counter medicine basics: 1 set | $93 |
-| 8 (June 2027) | save toward portable battery power station (about 1,000 watt-hours); Wound-care and splint add-on for the first-aid kit: 1 kit | $98 |
-| 9 (July 2027) | save toward portable battery power station (about 1,000 watt-hours); Car emergency kit: 1 kit | $111 |
-| 10 (August 2027) | save toward portable battery power station (about 1,000 watt-hours); Plastic sheeting and duct tape to shelter in place: 1 kit | $82 |
-| 12 (October 2027) | save toward portable battery power station (about 1,000 watt-hours); Portable battery power station (about 1,000 watt-hours): 1 power station, $450 of it from savings | $83 |
-| 13 (November 2027) | Cash in small bills: $140; Indoor room thermometer: 1 thermometer; Two-bucket emergency toilet kit: 1 kit | $177 |
-| 14 (December 2027) | Spare batteries for lights and the radio: 1 × 24-pack; Extra shelf-stable food you already eat: 4,000 kcal; Battery or rechargeable fan: 2 fans | $68 |
-| 15 (January 2028) | Portable jump starter for the car: 1 jump starter; Extra shelf-stable food you already eat: 4,000 kcal; One-burner camp stove that burns propane (outdoors only): 1 stove; Extra pet food in an airtight container: 2 pounds of dry food | $134 |
-| 16 (February 2028) | Extra shelf-stable food you already eat: 14,000 kcal; Phone power bank (about 20,000 mAh): 1 power bank | $103 |
-| 17 (March 2028) | Cleanup gear for each teen and adult: P100 respirator, goggles, work gloves: 1 set | $61 |
-| 18 (April 2028) | Air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter): 1 air cleaner | $92 |
-
-Months that only add to savings are left out.
+| 6 (April 2027) | save toward portable battery power station (about 1,000 watt-hours); Chlorine dioxide water treatment: 1 pack; Store-bought bottled water: 7 gallons; Spare batteries for lights and the radio: 1 × 24-pack; Extra supply of daily prescription medicine: 9 days of one person's medicine | $94 |
+| 7 (May 2027) | save toward portable battery power station (about 1,000 watt-hours); Disposable gloves, a box of 100: 1 box; Family first-aid kit: 1 kit | $106 |
+| 8 (June 2027) | save toward portable battery power station (about 1,000 watt-hours); Over-the-counter medicine basics: 1 set | $93 |
+| 9 (July 2027) | save toward portable battery power station (about 1,000 watt-hours); Wound-care and splint add-on for the first-aid kit: 1 kit | $98 |
+| 10 (August 2027) | save toward portable battery power station (about 1,000 watt-hours); Car emergency kit: 1 kit | $111 |
+| 11 (September 2027) | save toward portable battery power station (about 1,000 watt-hours); Portable battery power station (about 1,000 watt-hours): 1 power station, $450 of it from savings | $83 |
+| 12 (October 2027) | save toward cash in small bills; Plastic sheeting and duct tape to shelter in place: 1 kit | $82 |
+| 13 (November 2027) | save toward cash in small bills; Cash in small bills: $140, $100 of it from savings; Indoor room thermometer: 1 thermometer; Two-bucket emergency toilet kit: 1 kit | $127 |
+| 14 (December 2027) | Extra shelf-stable food you already eat: 4,000 kcal; Spare batteries for lights and the radio: 1 × 24-pack | $34 |
+| 15 (January 2028) | Portable jump starter for the car: 1 jump starter; Extra shelf-stable food you already eat: 4,000 kcal; One-burner camp stove that burns propane (outdoors only): 1 stove; Battery or rechargeable fan: 2 fans; Extra pet food in an airtight container: 2 pounds of dry food | $168 |
+| 16 (February 2028) | Extra shelf-stable food you already eat: 6,000 kcal; Cold-weather sleeping bag for each person (an upgrade on blankets): 1 sleeping bag | $97 |
+| 17 (March 2028) | Extra shelf-stable food you already eat: 8,000 kcal; Phone power bank (about 20,000 mAh): 1 power bank | $74 |
+| 18 (April 2028) | Cleanup gear for each teen and adult: P100 respirator, goggles, work gloves: 1 set | $61 |
+| 19 (May 2028) | Air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter): 1 air cleaner | $92 |
 
 ### When you are done
 
-By month 18 (April 2028) every need is covered to the step that is enough for your risks. After that, keep up the maintenance calendar and put the same money toward savings.
+By month 19 (May 2028) every need is covered to the step that is enough for your risks. After that, keep up the maintenance calendar and put the same money toward savings.
 
 ### Things to watch
 
 - **Worth acting on: No way to keep refrigerated medicine cool through a power cut by month 3.** Insulin keeps working out of the fridge for a while if it stays cool, but a home without power in hot weather can get too warm, and other medicines must stay in the fridge. A cooler bag with cold packs helps only for a short time; a battery power station can keep a small cooler or the fridge running. Ask your pharmacist how long yours can stay out of the fridge.
+- **Worth acting on: No stored water beyond refilled bottles by month 3.** Refilled drink bottles are a good start, but they hold only a little. Water is the one supply you cannot go long without: a few gallons of bottled water or a water jug is the next step, and costs little.
 
 ## Checklists
 
@@ -422,45 +422,46 @@ One list per step, up to the step that is enough for your risks. The free steps 
 - [ ] Insulated bag and cold packs for refrigerated medicine: 1 set
 - [ ] Multipurpose fire extinguisher: 1 extinguisher
 - [ ] Carbon monoxide alarm on each sleeping level: 1 alarm
+- [ ] Bleeding-control kit (tourniquet and pressure bandage): 1 kit
 - [ ] Extra pet food in an airtight container: 2 pounds of dry food
 - [ ] Whistle for each go-bag: 1 whistle
 - [ ] Foil emergency blankets: 1 blanket
 - [ ] Extra toilet paper: 3 rolls
-- [ ] Bleeding-control kit (tourniquet and pressure bandage): 1 kit
 - [ ] Headlamp or flashlight for each person: 1 headlamp
 - [ ] Refrigerator and freezer thermometers: 1 pair
 - [ ] Butane canisters for the camp stove (places with mild winters): 6 × 8-ounce canister
 - [ ] Fire-resistant, waterproof document pouch: 1 pouch
-- [ ] Spare batteries for lights and the radio: 1 × 24-pack
-- [ ] Pet go-kit: a carrier and a bag you pack from your supplies: 1 (one per pet)
-- [ ] NOAA Weather Radio with a tone alert: 1 radio
-- [ ] N95 respirators for teens and adults: 5 respirators
 - [ ] Digital thermometer (and one for a baby, if you have one): 1 thermometer
+- [ ] Pet go-kit: a carrier and a bag you pack from your supplies: 1 (one per pet)
+- [ ] N95 respirators for teens and adults: 5 respirators
+- [ ] NOAA Weather Radio with a tone alert: 1 radio
 - [ ] Chlorine dioxide water treatment: 1 pack
+- [ ] Spare batteries for lights and the radio: 1 × 24-pack
 - [ ] Disposable gloves, a box of 100: 1 box
 - [ ] Family first-aid kit: 1 kit
 - [ ] Over-the-counter medicine basics: 1 set
 - [ ] Wound-care and splint add-on for the first-aid kit: 1 kit
 - [ ] Car emergency kit: 1 kit
-- [ ] Plastic sheeting and duct tape to shelter in place: 1 kit
 - [ ] Portable battery power station (about 1,000 watt-hours): 1 power station
+- [ ] Plastic sheeting and duct tape to shelter in place: 1 kit
 - [ ] Cash in small bills: $140
 
 ### Two weeks
 
-- [ ] Heavy trash bags for the toilet bucket: 7 bags
 - [ ] Extra supply of daily prescription medicine: 11 days of one person's medicine
+- [ ] Heavy trash bags for the toilet bucket: 7 bags
 - [ ] Store-bought bottled water: 9 gallons
 - [ ] Bar soap and laundry soap: 1 person-month
 - [ ] Unscented household bleach (for treating water): 1 bottle
 - [ ] Indoor room thermometer: 1 thermometer
 - [ ] Two-bucket emergency toilet kit: 1 kit
-- [ ] Spare batteries for lights and the radio: 1 × 24-pack
 - [ ] Extra shelf-stable food you already eat: 22,000 kcal
-- [ ] Battery or rechargeable fan: 2 fans
+- [ ] Spare batteries for lights and the radio: 1 × 24-pack
 - [ ] Portable jump starter for the car: 1 jump starter
 - [ ] One-burner camp stove that burns propane (outdoors only): 1 stove
+- [ ] Battery or rechargeable fan: 2 fans
 - [ ] Extra pet food in an airtight container: 2 pounds of dry food
+- [ ] Cold-weather sleeping bag for each person (an upgrade on blankets): 1 sleeping bag
 - [ ] Phone power bank (about 20,000 mAh): 1 power bank
 - [ ] Cleanup gear for each teen and adult: P100 respirator, goggles, work gloves: 1 set
 - [ ] Air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter): 1 air cleaner
@@ -558,7 +559,7 @@ No one in the household earns wages, so the plan sets no income-gap goal. Keep a
 ### Medicine
 
 - 1 person takes prescription medicine every day: keep 30 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. No agency sets a one-month amount: this step sits between the two-week advice (Red Cross, Oregon, Washington) and the Church's three-month pantry. (Florida DEM, CDC, Red Cross, Healthcare Ready)[22, 23, 24, 25, 35, 49, 51, 52, 54, 55, 106, 107, 109, 111, 178, 179, 180, 181, 182]
-- 1 person needs medicine kept cold, such as insulin. An insulated bag with fresh cold packs keeps it cool, never frozen, for about 1 day. Insulin in its vial or pen keeps working up to 28 days between 59 °F and 86 °F, so in a longer power cut keep it in the shade and below 86 °F; never use insulin that froze. Your power target is 14 days: plan a battery power station to run a small 12-volt cooler or the fridge (see its line), and a place with power you could go to. (FDA, CDC; some amounts are estimates)[4, 5, 22, 23, 24, 25, 113, 114, 140, 159, 183, 184]
+- 1 person needs medicine kept cold, such as insulin. An insulated bag with fresh cold packs keeps it cool, never frozen, for about 1 day. Insulin in its vial or pen keeps working up to 28 days between 59 °F and 86 °F, so in a longer power cut keep it in the shade and below 86 °F; never use insulin that froze. Your power target is 14 days: plan a battery power station to run a small 12-volt cooler or the fridge (see its line), and a place with power you could go to. (FDA, CDC; some amounts are estimates)[22, 23, 24, 25, 113, 114, 140, 159, 183, 184]
 
 - **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[14, 17, 38, 86, 106, 109, 110, 178, 185]
 - **Insulated bag and cold packs for refrigerated medicine.** An insulated bag with cold packs keeps medicine such as insulin in the shade and below 86°F, never frozen, for about a day when the power is out or you leave home. Insulin in its vial or pen keeps working for up to 28 days between 59°F and 86°F (FDA, CDC); for any other medicine that must stay cold, ask your pharmacist how long it keeps out of the fridge. Pack diabetes supplies with it for 1 to 2 weeks: a glucose meter with test strips and lancets, syringes or pen needles, glucose tablets or another quick sugar, ketone strips and spare batteries (CDC).[111, 113, 114, 148, 159]
@@ -604,15 +605,16 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 | April 1, 2027 | Check, then every 6 months: go-bag for each person: a backpack you pack from your supplies; keep medicines going: a written list, early refills, an emergency supply. Use and restock, then every 6 months: tap water in clean reused bottles |
 | May 1, 2027 | Check, then every 6 months: practice: ten-minute drills and the first things to do |
 | June 1, 2027 | Test, then every 6 months: headlamp or flashlight for each person |
-| July 1, 2027 | Check, then every 6 months: pet go-kit: a carrier and a bag you pack from your supplies; store-bought bottled water |
-| August 1, 2027 | Check, then every 6 months: NOAA Weather Radio with a tone alert |
-| September 1, 2027 | Use and restock, then every 6 months: unscented household bleach (for treating water) |
-| October 1, 2027 | Check, then every year: make a household plan and a contact card for each person. Check, then every 6 months: family first-aid kit. Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
-| November 1, 2027 | Check, then every year: documents and insurance: copy key papers, record belongings, check cover |
+| August 1, 2027 | Check, then every 6 months: pet go-kit: a carrier and a bag you pack from your supplies; store-bought bottled water |
+| September 1, 2027 | Check, then every 6 months: NOAA Weather Radio with a tone alert. Use and restock, then every 6 months: unscented household bleach (for treating water) |
+| October 1, 2027 | Check, then every year: make a household plan and a contact card for each person. Yearly review: go through this plan again, update your household's answers, check the documents and contact cards, and start a new calendar |
+| November 1, 2027 | Check, then every year: documents and insurance: copy key papers, record belongings, check cover. Check, then every 6 months: family first-aid kit |
 | December 1, 2027 | Check, then every year: neighbours and skills: swap numbers, check on each other, learn first aid; your trusted circle: agree who helps whom; legal readiness: a lawyer's number, a will and powers of attorney |
-| January 1, 2028 | Check, then every year: butane canisters for the camp stove (places with mild winters); spare batteries for lights and the radio; lockout plan: a spare key and a locksmith you checked. Check, then every 6 months: car emergency kit |
-| May 1, 2028 | Check, then every year: over-the-counter medicine basics |
-| June 1, 2028 | Check, then every year: wound-care and splint add-on for the first-aid kit |
+| January 1, 2028 | Check, then every year: butane canisters for the camp stove (places with mild winters); lockout plan: a spare key and a locksmith you checked |
+| February 1, 2028 | Check, then every 6 months: car emergency kit |
+| April 1, 2028 | Check, then every year: spare batteries for lights and the radio |
+| June 1, 2028 | Check, then every year: over-the-counter medicine basics |
+| July 1, 2028 | Check, then every year: wound-care and splint add-on for the first-aid kit |
 | December 1, 2028 | Use and restock, then every year: extra shelf-stable food you already eat |
 | January 1, 2029 | Check, then every year: one-burner camp stove that burns propane (outdoors only) |
 | November 1, 2031 | Use and restock, then every 5 years: carbon monoxide alarm on each sleeping level |

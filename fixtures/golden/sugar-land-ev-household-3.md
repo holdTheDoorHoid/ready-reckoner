@@ -15,7 +15,7 @@
 ### The three things that matter most
 
 1. Of 100 households like yours, about 25 (20–40) will have to leave home quickly at least once in the next 10 years. Know your evacuation zone and where you would go; leave when told.[2, 3]
-2. Of 100 households like yours, about 75 (65–85) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 5 days at home with no power, and about 2 days with no tap water.
+2. Of 100 households like yours, about 55 (50–75) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 5 days at home with no power, and about 2 days with no tap water.
 3. Of 100 households like yours, about 60 (35–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 10 days of food you normally eat, and 3 weeks of daily medicine on hand.
 
 ### Start here
@@ -194,17 +194,17 @@ How long to be ready for each kind of disruption at the 1-in-50 setting. For any
 
 | If this happens | Be ready for | Outside help likely arrives | Mostly back to normal | Enough at |
 | --- | --- | --- | --- | --- |
-| No grid power at home | about 5 days (up to 10 days) | about 3 days | about 6 days | two weeks |
+| No grid power at home | about 5 days (3–5) | about 3 days | about 6 days | two weeks |
 | Tap water must be treated | about 5 days (1 day to 2 weeks) | not known | not known | two weeks |
 | No tap water at all | about 2 days (up to 5 days) | not known | not known | three days |
 | Can't get to a store | about 10 days (7 days to 3 weeks) | not known | not known | two weeks |
-| Dangerous heat or cold indoors | about 3 days (up to 5 days) | about 3 days | about 6 days | three days |
+| Dangerous heat or cold indoors | about 3 days (2–5) | about 3 days | about 6 days | three days |
 | Medication and medical-supply continuity | about 3 weeks (2 weeks to 1½ months) | not known | not known | one month |
 | No phone, internet or card payments | about 2 days (up to 5 days) | not known | not known | three days |
 
 The range in brackets shows how uncertain each target is. "Not known": there are no restoration records for the event behind that target.
 
-### No grid power at home: about 5 days (up to 10 days)
+### No grid power at home: about 5 days (3–5)
 
 **What helps.** Have a flashlight for each person.[82] Keep a battery or hand-crank radio, and a backup battery for each phone.[83] Keep the fridge and freezer closed. A closed fridge keeps food cold for about four hours, and a full freezer for about two days.[82] If someone relies on a powered medical device or cold medicine, make a plan with their medical provider now.[82] Join your power company's medical program for early warnings of outages, but plan as if your power will not come back first.[84] Many cities and counties keep a voluntary registry of people who may need help; ask yours.[8] A battery power station burns no fuel, so it makes no carbon monoxide.[25]
 
@@ -228,7 +228,7 @@ The range in brackets shows how uncertain each target is. "Not known": there are
 
 **What to avoid.** Do not buy everything at once. It strains your budget and the store. Do not buy or eat from cans that bulge, leak, are rusted or are deeply dented.[99] Do not trust a kit's "days" label. Check the calories on the package instead.
 
-### Dangerous heat or cold indoors: about 3 days (up to 5 days)
+### Dangerous heat or cold indoors: about 3 days (2–5)
 
 **What helps.** Agree who checks on whom, especially older neighbours and anyone who lives alone.[103, 104] In heat, go where there is air conditioning. Dial 2-1-1 to find one.[103] Cover windows with drapes or shades.[105] In cold, close off rooms you don't need, stuff towels under doors, and cover windows with blankets at night. Have extra blankets, sleeping bags and warm coats.[104] Babies under one year old should never sleep in a cold room.[104] If you cannot keep your home warm, go to a warming center. Dial 2-1-1 to find one.[106] If you heat with wood, have the stove and chimney professionally inspected and cleaned every year, because creosote from the smoke builds up and can start a fire.[107]
 
@@ -286,7 +286,7 @@ What to do about lost income and a damaged home is under Documents and money.
 
 A named scenario is one rare, severe event that would change your targets a lot. The plan includes it or leaves it out as shown; you can change either on the risks screen.
 
-- **Direct hit by a major hurricane** (included in your plan). Tropical storms and hurricanes reach Fort Bend County about once every 6 years, and about 1 in 17 of them is a major storm (Category 3 or stronger) that can cut power and water for weeks. Hurricane guidance in Texas covers it, so the plan includes it. Planning for it changes: Food and supplies: 7 days → 10 days; households like yours that have to leave home quickly within 10 years: 21 → 27 in 100.[18, 19, 20, 21, 141, 142, 143, 144]
+- **Direct hit by a major hurricane** (included in your plan). Tropical storms and hurricanes reach Fort Bend County about once every 6 years, and about 1 in 17 of them is a major storm (Category 3 or stronger) that can cut power and water for weeks. Hurricane guidance in Texas covers it, so the plan includes it. Planning for it changes: Power: 3 days → 5 days; Food and supplies: 7 days → 10 days; Heat or cold: 2 days → 3 days; households like yours that have to leave home quickly within 10 years: 21 → 27 in 100.[18, 19, 20, 21, 141, 142, 143, 144]
 
 ## Your plan
 
@@ -298,8 +298,8 @@ Your budget is $200 a month, plus $1,000 once at the start. The plan does the fr
 - [ ] Make a household plan and a contact card for each person
 - [ ] Fire safety at home: alarms, an escape plan, safe cooking and heating
 - [ ] Water and food know-how: boil water, use your water heater, keep food cold
-- [ ] Plan how to stay cool: a cool room and your nearest cooling center
 - [ ] Keep medicines going: a written list, early refills, an emergency supply
+- [ ] Plan how to stay cool: a cool room and your nearest cooling center
 - [ ] Tap water in clean reused bottles
 - [ ] Legal readiness: a lawyer's number, a will and powers of attorney
 
@@ -328,16 +328,16 @@ Your budget is $200 a month, plus $1,000 once at the start. The plan does the fr
 - [ ] **Foil emergency blankets**: 3 blankets, about $8 (usually $2–15). Gets you ready for leaving home quickly.
 - [ ] **Baby wipes**: 2 packs, about $5 (usually $5). Adds 5 days of diapers and wipes, bringing you to 5 of the 10-day goal.
 - [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17). Gets you ready for getting home if you are stranded.
+- [ ] **Digital thermometer (and one for a baby, if you have one)**: 2 thermometers, about $16 (usually $15–17). Gets you ready for a medical emergency before help arrives.
 - [ ] **Refrigerator and freezer thermometers**: 1 pair, about $8 (usually $5–11). Adds 5 days of food-safety checks for the fridge, which completes the 5-day goal.
 - [ ] **Headlamp or flashlight for each person**: 2 headlamps, about $23 (usually $7–40). Adds 5 days of light during power cuts, which completes the 5-day goal.
-- [ ] **Digital thermometer (and one for a baby, if you have one)**: 2 thermometers, about $16 (usually $15–17). Gets you ready for a medical emergency before help arrives.
 - [ ] **Disposable gloves, a box of 100**: 1 box, about $20 (usually $16–25). Gets you ready for a medical emergency before help arrives.
 - [ ] **Period products for two cycles**: 2 cycles' supplies, about $12 (usually $9–15). Adds 10 days of period products, which completes the 10-day goal.
-- [ ] **Indoor room thermometer**: 1 thermometer, about $9 (usually $2–15). Adds 1.5 days of protection from dangerous heat, which completes the 3-day goal.
-- [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20). Adds 5 days of spare batteries for lights and a radio, which completes the 5-day goal.
 - [ ] **Fire-resistant, waterproof document pouch**: 1 pouch, about $28 (usually $23–33). Gets you ready for leaving home quickly.
+- [ ] **Spare batteries for lights and the radio**: 1 × 24-pack, about $15 (usually $10–20). Adds 5 days of spare batteries for lights and a radio, which completes the 5-day goal.
 - [ ] **Family first-aid kit**: 1 kit, about $36 (usually $27–44). Gets you ready for a medical emergency before help arrives.
 - [ ] **Pet go-kit: a carrier and a bag you pack from your supplies**: 1 (one per pet), about $32 (usually $30–35). Gets you ready for leaving home quickly.
+- [ ] **Indoor room thermometer**: 1 thermometer, about $9 (usually $2–15). Adds 1.5 days of protection from dangerous heat, which completes the 3-day goal.
 - [ ] **Over-the-counter medicine basics**: 1 set, about $43 (usually $34–52). Gets you ready for a medical emergency before help arrives.
 
 ### Next month: Month 1 (from November 1, 2026), $200 to spend
@@ -369,8 +369,8 @@ Your budget is $200 a month, plus $1,000 once at the start. The plan does the fr
 - [ ] **Car emergency kit**: 2 kits, about $123 (usually $70–176)
 - [ ] **Insulated bag and cold packs for refrigerated medicine**: 1 set, about $26 (usually $15–37)
 - [ ] **Bar soap and laundry soap**: 3 person-months, about $18 (usually $6–30)
-- [ ] **Two-bucket emergency toilet kit**: 1 kit, about $28 (usually $26–30)
 - [ ] **Shut-off wrench for gas and water**: 1 wrench, about $17 (usually $12–22)
+- [ ] **Two-bucket emergency toilet kit**: 1 kit, about $28 (usually $26–30)
 - [ ] **N95 respirators for teens and adults**: 10 respirators, about $10 (usually $7–13)
 - [ ] **Plastic sheeting and duct tape to shelter in place**: 1 kit, about $32 (usually $28–36)
 
@@ -433,23 +433,23 @@ One list per step, up to the step that is enough for your risks. The free steps 
 - [ ] Foil emergency blankets: 3 blankets
 - [ ] Baby wipes: 2 packs
 - [ ] Chlorine dioxide water treatment: 1 pack
+- [ ] Digital thermometer (and one for a baby, if you have one): 2 thermometers
 - [ ] Refrigerator and freezer thermometers: 1 pair
 - [ ] Headlamp or flashlight for each person: 2 headlamps
-- [ ] Digital thermometer (and one for a baby, if you have one): 2 thermometers
 - [ ] Disposable gloves, a box of 100: 1 box
 - [ ] Period products for two cycles: 2 cycles' supplies
-- [ ] Indoor room thermometer: 1 thermometer
-- [ ] Spare batteries for lights and the radio: 1 × 24-pack
 - [ ] Fire-resistant, waterproof document pouch: 1 pouch
+- [ ] Spare batteries for lights and the radio: 1 × 24-pack
 - [ ] Family first-aid kit: 1 kit
 - [ ] Pet go-kit: a carrier and a bag you pack from your supplies: 1 (one per pet)
+- [ ] Indoor room thermometer: 1 thermometer
 - [ ] Over-the-counter medicine basics: 1 set
 - [ ] NOAA Weather Radio with a tone alert: 1 radio
 - [ ] Get-home bag for each commuter: a small bag you stock from home: 2 bags
 - [ ] One-burner camp stove that burns propane (outdoors only): 1 stove
 - [ ] Car emergency kit: 2 kits
-- [ ] Two-bucket emergency toilet kit: 1 kit
 - [ ] Shut-off wrench for gas and water: 1 wrench
+- [ ] Two-bucket emergency toilet kit: 1 kit
 - [ ] N95 respirators for teens and adults: 10 respirators
 - [ ] Plastic sheeting and duct tape to shelter in place: 1 kit
 - [ ] Phone power bank (about 20,000 mAh): 2 power banks
@@ -592,38 +592,38 @@ Of 100 households like yours, about 15 (7–30) will have an income gap of more 
 ### Medicine
 
 - 1 person takes prescription medicine every day: keep 21 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. No agency sets a one-month amount: this step sits between the two-week advice (Red Cross, Oregon, Washington) and the Church's three-month pantry. (Florida DEM, CDC, Red Cross, Healthcare Ready)[18, 19, 20, 21, 40, 49, 50, 51, 54, 55, 109, 110, 112, 114, 143, 184, 185, 186, 187, 188]
-- 1 person needs medicine kept cold, such as insulin. An insulated bag with fresh cold packs keeps it cool, never frozen, for about 1 day. Insulin in its vial or pen keeps working up to 28 days between 59 °F and 86 °F, so in a longer power cut keep it in the shade and below 86 °F; never use insulin that froze. Your power target is 5 days: plan a battery power station to run a small 12-volt cooler or the fridge (see its line), and a place with power you could go to. (FDA, CDC; some amounts are estimates)[18, 19, 20, 21, 31, 46, 116, 117, 143, 149, 189, 190]
+- 1 person needs medicine kept cold, such as insulin. An insulated bag with fresh cold packs keeps it cool, never frozen, for about 1 day. Insulin in its vial or pen keeps working up to 28 days between 59 °F and 86 °F, so in a longer power cut keep it in the shade and below 86 °F; never use insulin that froze. Your power target is 5 days: plan a battery power station to run a small 12-volt cooler or the fridge (see its line), and a place with power you could go to. (FDA, CDC; some amounts are estimates)[18, 19, 20, 21, 31, 46, 116, 117, 143, 149, 189, 190, 191]
 
-- **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[8, 11, 17, 83, 109, 112, 113, 184, 191]
+- **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[8, 11, 17, 83, 109, 112, 113, 184, 192]
 - **Insulated bag and cold packs for refrigerated medicine.** An insulated bag with cold packs keeps medicine such as insulin in the shade and below 86°F, never frozen, for about a day when the power is out or you leave home. Insulin in its vial or pen keeps working for up to 28 days between 59°F and 86°F (FDA, CDC); for any other medicine that must stay cold, ask your pharmacist how long it keeps out of the fridge. Pack diabetes supplies with it for 1 to 2 weeks: a glucose meter with test strips and lancets, syringes or pen needles, glucose tablets or another quick sugar, ketone strips and spare batteries (CDC).[114, 116, 117, 149, 153]
 
 ### Antibiotics
 
-- No antibiotics are included in this plan. If you have a specific, foreseeable need, such as remote travel, talk to your own clinician about a standby prescription with written instructions. Never use fish or pet antibiotics, never share prescriptions, and don't use expired ones. (CDC, FDA)[10, 11, 192, 193]
+- No antibiotics are included in this plan. If you have a specific, foreseeable need, such as remote travel, talk to your own clinician about a standby prescription with written instructions. Never use fish or pet antibiotics, never share prescriptions, and don't use expired ones. (CDC, FDA)[10, 11, 193, 194]
 
 ### Babies and toddlers
 
-- Powdered formula for the days after the ready-to-feed formula's first 3 days: 1 baby on formula: up to 32 oz of prepared formula a day, about 5 oz of powder (labels differ), × 7 days = 35 oz of powder. Powder needs safe water (counted in the water line). Check the amount every month as the baby grows. (AAP, CDC; some amounts are estimates)[18, 19, 20, 21, 46, 54, 55, 149, 194, 195, 196, 197]
-- Diapers: about 8 a day for each baby (6 to 12; newborns use the most), × 10 days = 80 diapers. Keep at least one large pack on hand. (CDC, Sutter Health; some amounts are estimates)[18, 19, 20, 21, 46, 54, 55, 149, 195, 197, 198]
-- Baby wipes: at least 2 packs for each child in diapers for up to 2 weeks: 2 packs. (CDC)[18, 19, 20, 21, 46, 54, 55, 195, 197]
-- 1 oral thermometer (non-mercury, non-glass; it is on the Red Cross kit list) and 1 infant thermometer for the baby. (Red Cross, CDC)[7, 195]
+- Powdered formula for the days after the ready-to-feed formula's first 3 days: 1 baby on formula: up to 32 oz of prepared formula a day, about 5 oz of powder (labels differ), × 7 days = 35 oz of powder. Powder needs safe water (counted in the water line). Check the amount every month as the baby grows. (AAP, CDC; some amounts are estimates)[18, 19, 20, 21, 46, 54, 55, 149, 195, 196, 197, 198]
+- Diapers: about 8 a day for each baby (6 to 12; newborns use the most), × 10 days = 80 diapers. Keep at least one large pack on hand. (CDC, Sutter Health; some amounts are estimates)[18, 19, 20, 21, 46, 54, 55, 149, 196, 198, 199]
+- Baby wipes: at least 2 packs for each child in diapers for up to 2 weeks: 2 packs. (CDC)[18, 19, 20, 21, 46, 54, 55, 196, 198]
+- 1 oral thermometer (non-mercury, non-glass; it is on the Red Cross kit list) and 1 infant thermometer for the baby. (Red Cross, CDC)[7, 196]
 
-- **Pack an infant go-kit from CDC's checklist.** Use CDC's emergency checklist for families with infants: formula or breastfeeding supplies, diapers and wipes, an infant thermometer, a bulb syringe, a pain reliever made for infants, warm sleepwear or a sleep sack, and a portable crib. Babies under one should never sleep in a cold room (CDC).[104, 195]
+- **Pack an infant go-kit from CDC's checklist.** Use CDC's emergency checklist for families with infants: formula or breastfeeding supplies, diapers and wipes, an infant thermometer, a bulb syringe, a pain reliever made for infants, warm sleepwear or a sleep sack, and a portable crib. Babies under one should never sleep in a cold room (CDC).[104, 196]
 
 ### Pets and animals
 
-- Dry food for the dog for 10 days (at least a week): about 0.7 lb a day for each dog = 7 lb. Feed what the label says for yours, and keep it in an airtight, waterproof container. (ASPCA, Ready.gov; some amounts are estimates)[18, 19, 20, 21, 46, 54, 55, 149, 159, 160, 197]
+- Dry food for the dog for 10 days (at least a week): about 0.7 lb a day for each dog = 7 lb. Feed what the label says for yours, and keep it in an airtight, waterproof container. (ASPCA, Ready.gov; some amounts are estimates)[18, 19, 20, 21, 46, 54, 55, 149, 159, 160, 198]
 - 1 pet carrier, one for each pet, with a pet go-kit: water and food from your home supplies, any medicine it takes, records and a photo. Public shelters may take only service animals, so find pet-friendly places to stay ahead of time. (ASPCA, Ready.gov)[2, 160]
-- Water for the pet go-kit, set aside from your stored water rather than bought extra: 7 days for the dog = 2.2 gallons. Replace it every 2 months. (ASPCA, PetMD; some amounts are estimates)[149, 160, 199]
+- Water for the pet go-kit, set aside from your stored water rather than bought extra: 7 days for the dog = 2.2 gallons. Replace it every 2 months. (ASPCA, PetMD; some amounts are estimates)[149, 160, 200]
 - Food for the pet go-kit, set aside from your pet food rather than bought extra: 10 days (7 to 10 days) for the dog = 10 pet-days. Replace it every 2 months. (ASPCA)[160]
 
 ### Stress and mental health
 
 #### Stress, mental health and the 988 line
 
-**What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[200] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[201] Write a short calm plan: what you might feel, what helps you, and who you will call.[162] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[186]
+**What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[201] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[202] Write a short calm plan: what you might feel, what helps you, and who you will call.[162] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[186]
 
-**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[170] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[200]
+**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[170] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[201]
 
 ## Maintenance calendar
 
@@ -685,11 +685,11 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **181** What Is My Flood Risk?. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/flood-zones-and-maps/what-is-my-flood-risk **182** When the Unexpected Happens, Be Ready with an Emergency Fund. Federal Reserve Bank of St. Louis, 2025. https://www.stlouisfed.org/publications/page-one-economics/2025/sep/when-unexpected-happens-be-ready-with-emergency-fund **183** Economic Well-Being of U.S. Households in 2024. Board of Governors of the Federal Reserve System, 2025. https://www.federalreserve.gov/publications/2025-economic-well-being-of-us-households-in-2024-executive-summary.htm **184** Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/reproductive-health/emergency-preparation-response/safety-messages.html **185** Drug Shortages. U.S. Food and Drug Administration, 2026. https://www.fda.gov/drugs/drug-safety-and-availability/drug-shortages **186** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx **187** Prepare in a Year. Washington Emergency Management Division, 2024. https://mil.wa.gov/prepare-in-a-year **188** All Is Safely Gathered In: Family Home Storage. The Church of Jesus Christ of Latter-day Saints, 2007. https://www.churchofjesuschrist.org/bc/content/shared/content/english/pdf/language-materials/04008_eng.pdf **189** The Oregon Resilience Plan. Oregon Seismic Safety Policy Advisory Commission, 2013. https://www.oregon.gov/oem/documents/oregon_resilience_plan_executive_summary.pdf **190** A dataset of recorded electricity outages by United States county 2014–2022 (EAGLE-I), Scientific Data 11:271, data updated through 2025. Brelsford C. et al., Oak Ridge National Laboratory, 2024. https://doi.org/10.1038/s41597-024-03095-5
 
-**191** A Review of Direct-to-Consumer Home Antibiotic Kits: A Threat to Antimicrobial Stewardship and Patient Safety. Missouri State Medical Association, 2026. https://pmc.ncbi.nlm.nih.gov/articles/PMC13585011/ **192** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023 **193** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **194** Amount and Schedule of Baby Formula Feedings. American Academy of Pediatrics (HealthyChildren.org), 2025. https://www.healthychildren.org/English/ages-stages/baby/formula-feeding/Pages/Amount-and-Schedule-of-Formula-Feedings.aspx **195** Emergency List for Families With Infants and Young Children. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/infant-feeding-emergencies-toolkit/php/checklist.html **196** Feeding Your Child Safely During a Disaster. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/breastfeeding/php/guidelines-recommendations/feeding-your-child-safely-during-a-disaster.html **197** Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020. Centers for Disease Control and Prevention, 2020. https://www.cdc.gov/mmwr/volumes/69/wr/mm6935a2.htm **198** How many diapers a day should your newborn have?. Sutter Health, 2025. https://www.sutterhealth.org/health/how-many-diapers-a-day-your-newborn-should-have **199** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water **200** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988
+**191** How Blackouts during Heat Waves Amplify Mortality and Morbidity Risk. Stone B. Jr. et al., 2023. https://doi.org/10.1021/acs.est.2c09588 **192** A Review of Direct-to-Consumer Home Antibiotic Kits: A Threat to Antimicrobial Stewardship and Patient Safety. Missouri State Medical Association, 2026. https://pmc.ncbi.nlm.nih.gov/articles/PMC13585011/ **193** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023 **194** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **195** Amount and Schedule of Baby Formula Feedings. American Academy of Pediatrics (HealthyChildren.org), 2025. https://www.healthychildren.org/English/ages-stages/baby/formula-feeding/Pages/Amount-and-Schedule-of-Formula-Feedings.aspx **196** Emergency List for Families With Infants and Young Children. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/infant-feeding-emergencies-toolkit/php/checklist.html **197** Feeding Your Child Safely During a Disaster. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/breastfeeding/php/guidelines-recommendations/feeding-your-child-safely-during-a-disaster.html **198** Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020. Centers for Disease Control and Prevention, 2020. https://www.cdc.gov/mmwr/volumes/69/wr/mm6935a2.htm **199** How many diapers a day should your newborn have?. Sutter Health, 2025. https://www.sutterhealth.org/health/how-many-diapers-a-day-your-newborn-should-have **200** How Much Water Should a Dog Drink?. PetMD, 2020. https://www.petmd.com/dog/nutrition/evr_dg_the_importance_of_water
 
-**201** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline
+**201** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **202** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline
 
-66 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+65 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 
