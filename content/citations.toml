@@ -3736,3 +3736,13 @@ url = "https://www.fcc.gov/general/disaster-information-reporting-system-dirs-0"
 retrieved = "2026-09-26"
 quote = "The FCC's Disaster Information Reporting System (DIRS) is a web-based system through which the Commission collects operational status and restoration information from communications providers during major disasters and subsequent recovery efforts."
 license = "US Government Work (public domain)"
+
+[[citation]]
+id = "bjs_felony_defendants_2009"
+title = "Felony Defendants in Large Urban Counties, 2009: Statistical Tables (NCJ 243777)"
+publisher = "Reaves B.A., Bureau of Justice Statistics"
+year = 2013
+url = "https://bjs.ojp.gov/content/pub/pdf/fdluc09.pdf"
+retrieved = "2026-09-26"
+quote = "Overall, detained defendants had a median bail amount of $25,000, compared to $6,000 for released defendants."
+license = "US Government Work (public domain)"
