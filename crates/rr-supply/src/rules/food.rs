@@ -555,6 +555,42 @@ pub fn pet_food_days(days: f64, pets: &Pets) -> Option<Sizing> {
     )
 }
 
+/// Dry pet food in pounds for the supplies target, at least a week: a 40 lb dog 0.7 lb a day, a
+/// 10 lb cat 0.15, a small pet 0.05 (estimates; the sizes the water rule assumes). Rule
+/// `pet_food_lb`.
+pub fn pet_food_lb(days: f64, pets: &Pets) -> Option<Sizing> {
+    let n = u32::from(pets.dogs) + u32::from(pets.cats) + u32::from(pets.small);
+    if n == 0 || days <= 0.0 {
+        return None;
+    }
+    let mut b = Basis::new();
+    let min_days = b.k(keys::PET_FOOD_MIN_DAYS);
+    let mut per_day = 0.0;
+    let mut parts = Vec::new();
+    for (count_of, key, what) in [
+        (pets.dogs, keys::DOG_FOOD_LB_PER_DAY, "dog"),
+        (pets.cats, keys::CAT_FOOD_LB_PER_DAY, "cat"),
+        (pets.small, keys::SMALL_PET_FOOD_LB_PER_DAY, "small pet"),
+    ] {
+        if count_of > 0 {
+            let each = b.k(key);
+            per_day += f64::from(count_of) * each;
+            parts.push(format!("{} lb a day for each {what}", num(each, 2)));
+        }
+    }
+    b.cite("ready_gov_pets");
+    let d = days.max(min_days);
+    let q = per_day * d;
+    let text = format!(
+        "Dry food for {} for {} (at least a week): about {} = {} lb. Feed what the label says for yours, and keep it in an airtight, waterproof container.",
+        pets_phrase([pets.dogs, pets.cats, pets.small]),
+        fmt_days(d),
+        crate::format::and_list(&parts),
+        num(super::round_quantity("lb", q), 1)
+    );
+    Some(Sizing::new(&b, "pet_food_lb", "pet_food", q, "lb", Per::Pet, text).per_day(d, per_day))
+}
+
 /// Fuel canisters for a camp stove: about 0.2 lb a person a day to boil drinking water and heat one
 /// meal, in 8-ounce canisters, at least two (estimates). Optional line (rule
 /// `cooking_fuel_canisters`).
@@ -735,6 +771,22 @@ mod tests {
             "at least a week"
         );
         assert!(pet_food_days(17.0, &Pets::default()).is_none());
+    }
+
+    #[test]
+    fn pet_food_in_pounds() {
+        let p = fixtures::get("coos-bay-well-owner-2").unwrap();
+        // (2 dogs × 0.7 + 1 cat × 0.15) lb a day × 10 days = 15.5 lb
+        let s = pet_food_lb(10.0, &p.pets).unwrap();
+        assert_eq!(s.quantity, 15.5);
+        assert!(s.prior);
+        // One dog for a 3-day target still gets a week: 0.7 × 7 = 4.9 lb.
+        let one_dog = Pets {
+            dogs: 1,
+            ..Pets::default()
+        };
+        assert_eq!(pet_food_lb(3.0, &one_dog).unwrap().quantity, 4.9);
+        assert!(pet_food_lb(3.0, &Pets::default()).is_none());
     }
 
     #[test]

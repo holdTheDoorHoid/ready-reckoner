@@ -69,6 +69,7 @@ pub const LINE_RULES: &[&str] = &[
     "cooking_fuel_canisters",
     "infant_formula_oz",
     "nursing_supplies",
+    "pet_food_lb",
     "pet_food_days",
     "medication_days",
     "rx_cold_storage",
@@ -573,8 +574,18 @@ pub fn sized_requirements(
                 out.push(bucket, food::nursing_supplies(people), Need, h72, false);
                 out.push(
                     bucket,
-                    cited(bucket, food::pet_food_days(days, pets)),
+                    cited(bucket, food::pet_food_lb(days, pets)),
                     Need,
+                    None,
+                    false,
+                );
+                out.push(
+                    bucket,
+                    cited(bucket, food::pet_food_days(days, pets)),
+                    Shape::Alternative {
+                        of: "pet_food_lb",
+                        variant: "pet_days",
+                    },
                     None,
                     false,
                 );

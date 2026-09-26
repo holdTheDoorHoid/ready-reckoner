@@ -494,6 +494,31 @@ note = "ASPCA: 7 to 10 days of pet food; Ready.gov: several days."
 note_sources = ["aspca_disaster_prep", "ready_gov_pets"]
 
 [[constant]]
+key = "dog_food_lb_per_day"
+label = "Dry food a 40 lb dog eats a day"
+unit = "pound per day"
+default = 0.7
+prior = true
+sources = ["rr_expert_prior", "aspca_disaster_prep"]
+note = "Feed what the label says for your pet; this is a planning amount for the dog size the water rule assumes."
+
+[[constant]]
+key = "cat_food_lb_per_day"
+label = "Dry food a 10 lb cat eats a day"
+unit = "pound per day"
+default = 0.15
+prior = true
+sources = ["rr_expert_prior", "aspca_disaster_prep"]
+
+[[constant]]
+key = "small_pet_food_lb_per_day"
+label = "Food a small pet eats a day"
+unit = "pound per day"
+default = 0.05
+prior = true
+sources = ["rr_expert_prior", "ready_gov_pets"]
+
+[[constant]]
 key = "rx_days_on_hand"
 label = "Days of prescription medicine to keep on hand"
 unit = "day"
