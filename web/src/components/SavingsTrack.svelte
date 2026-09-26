@@ -1,10 +1,13 @@
 <!--
   The money buckets, kept visibly apart from the supplies budget: the emergency-savings goal for
-  lost income, and the home-loss checklist (insurance and papers).
+  lost income, and the home-loss checklist (insurance and papers). A long goal gets a nearer one
+  first (one month of expenses, or three once one is saved), dated from the same money the engine
+  suggests (the supplies budget, once the supplies plan is done); the full goal stays beside it.
 -->
 <script lang="ts">
-  import type { BucketAssessment, PlanItem, SavingsTrack } from '../engine/types';
-  import { monthsPhrase, targetMonths, usd } from '../lib/format';
+  import type { BucketAssessment, IsoDate, PlanItem, SavingsTrack } from '../engine/types';
+  import { nextMilestone } from '../lib/savings';
+  import { formatMonth, monthsPhrase, targetMonths, usd } from '../lib/format';
   import ExplainButton from './ExplainButton.svelte';
   import ReadinessCard from './ReadinessCard.svelte';
   import Sources from './Sources.svelte';
@@ -14,9 +17,21 @@
     track,
     homeLoss,
     homeItems,
-  }: { income: BucketAssessment | undefined; track: SavingsTrack | undefined; homeLoss: BucketAssessment | undefined; homeItems: PlanItem[] } = $props();
+    planningDate = undefined,
+    doneMonth = undefined,
+  }: {
+    income: BucketAssessment | undefined;
+    track: SavingsTrack | undefined;
+    homeLoss: BucketAssessment | undefined;
+    homeItems: PlanItem[];
+    /** The plan's first day, to date the nearer goal. */
+    planningDate?: IsoDate;
+    /** The month the supplies plan is done (`Plan.done_month`), when the saving can start. */
+    doneMonth?: number;
+  } = $props();
 
   const pct = $derived(track && track.target_months > 0 ? Math.min(100, (track.current_months / track.target_months) * 100) : 0);
+  const milestone = $derived(track ? nextMilestone(track, planningDate, doneMonth) : null);
 </script>
 
 <section class="savings" aria-labelledby="savings-title">
@@ -32,7 +47,18 @@
     {#if income && income.target.kind === 'months' && track}
       <article class="card" aria-labelledby="income-title" data-bucket={income.id} data-target={JSON.stringify(income.target)}>
         <h3 id="income-title">{income.name}</h3>
-        <p><span class="big">{targetMonths(income.target.value, income.target.low, income.target.high)}</span> of expenses{track.target_usd > 0 ? `, about ${usd(track.target_usd)}` : ''}.</p>
+        {#if milestone}
+          <p class="milestone">
+            <strong>{milestone.first ? 'First goal' : 'Next goal'}:</strong>
+            {milestone.months === 1 ? 'one month' : 'three months'} of expenses{milestone.usd !== undefined ? `, about ${usd(milestone.usd)}` : ''}{milestone.by
+              ? `, by ${formatMonth(milestone.by)}`
+              : ''}.
+          </p>
+        {/if}
+        <p>
+          {#if milestone}<strong>Full goal:</strong>{/if}
+          <span class="big">{targetMonths(income.target.value, income.target.low, income.target.high)}</span> of expenses{track.target_usd > 0 ? `, about ${usd(track.target_usd)}` : ''}.
+        </p>
         <div
           class="meter"
           role="meter"
@@ -87,6 +113,13 @@
   .big {
     font-size: var(--text-lg);
     font-weight: 700;
+  }
+  .milestone {
+    margin: 0 0 var(--s2);
+    padding: var(--s2) var(--s3);
+    border-left: 4px solid var(--accent);
+    background: var(--surface);
+    border-radius: var(--r1);
   }
   .meter {
     height: 0.75rem;

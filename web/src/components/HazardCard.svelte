@@ -1,9 +1,12 @@
 <!--
   One hazard: how often it reaches households like this one (natural frequency, with range), how
   bad and how sure, what it does, and what in the plan answers it. Threat and action together.
+  The card's id is `hazard-<id>`, the target of its row in the risk matrix; with `backToTable` it
+  links back to that row.
 -->
 <script lang="ts">
   import type { HazardProfile, PlanItem } from '../engine/types';
+  import { jumpTo } from '../lib/anchors';
   import { useApp } from '../lib/app.svelte';
   import { chanceWithin, CONFIDENCE_LABELS, percent, usd } from '../lib/format';
   import { bucketName, itemSourceIds, keyedItems, lowerFirst } from '../lib/lookup';
@@ -18,7 +21,8 @@
     featured = false,
     helps = [],
     years,
-  }: { hazard: HazardProfile; featured?: boolean; helps?: PlanItem[]; years: number } = $props();
+    backToTable = false,
+  }: { hazard: HazardProfile; featured?: boolean; helps?: PlanItem[]; years: number; backToTable?: boolean } = $props();
   const app = useApp();
   const uid = $props.id();
 
@@ -28,7 +32,7 @@
   const TIER_WORDS = { natural: 'Nature', societal: 'Society', personal: 'Household' } as const;
 </script>
 
-<article class="hazard card" class:featured aria-labelledby="{uid}-name">
+<article class="hazard card" class:featured id="hazard-{hazard.id}" aria-labelledby="{uid}-name">
   <header class="hazard__head">
     <h3 id="{uid}-name">{hazard.name}</h3>
     <span class="chip">{TIER_WORDS[hazard.tier]}</span>
@@ -67,6 +71,15 @@
   <footer class="hazard__foot">
     <ExplainButton kind="hazard" id={hazard.id} />
     <Sources ids={sourceIds} what={hazard.name} />
+    {#if backToTable}
+      <a
+        class="back no-print"
+        href="#matrix-{hazard.id}"
+        onclick={(e) => {
+          if (jumpTo(`matrix-${hazard.id}`, { block: 'center' })) e.preventDefault();
+        }}>Back to the table<span class="visually-hidden"> of risks</span></a
+      >
+    {/if}
   </footer>
 </article>
 
@@ -138,5 +151,11 @@
     gap: var(--s1) var(--s4);
     align-items: flex-start;
     margin-top: auto;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-size: var(--text-sm);
   }
 </style>
