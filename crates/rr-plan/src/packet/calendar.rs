@@ -1,4 +1,4 @@
-//! Section 9: the maintenance calendar. Rotation and check dates for everything in the plan,
+//! Section 9: the maintenance calendar. Rotation, check and test dates for everything in the plan,
 //! computed from the planning date and the month each item enters the plan; short intervals as
 //! repeating rows; drills; and the yearly review.
 
@@ -37,13 +37,22 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         let Some(item) = cx.item(id) else {
             continue;
         };
-        let Some(m) = item.maintenance else {
+        // Test: try it the way it would be used (contract v2's `Item.test_interval_months`: the
+        // lights, the generator, a jump starter, a key safe). A test at the check's interval
+        // replaces the check, since trying a thing checks it.
+        let test = item.test_interval_months.filter(|n| *n > 0);
+        let (check, rotate) = item
+            .maintenance
+            .map_or((None, None), |m| (m.check_months, m.rotate_months));
+        let check = check.filter(|c| Some(*c) != test);
+        if check.is_none() && rotate.is_none() && test.is_none() {
             continue;
-        };
+        }
         let name = md(&text::lower_first(&item.name));
         for (interval, verb) in [
-            (m.check_months, "Check"),
-            (m.rotate_months, "Use and restock"),
+            (check, "Check"),
+            (test, "Test"),
+            (rotate, "Use and restock"),
         ] {
             let Some(every) = interval.filter(|n| *n > 0) else {
                 continue;
