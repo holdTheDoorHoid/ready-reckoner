@@ -116,6 +116,7 @@
         <ChoiceGroup
           legend="How steady is the income?"
           name="stability"
+          help="Less steady income makes a savings buffer matter more."
           options={INCOME_STABILITIES.map((v) => ({ value: v, label: STABILITY[v].label }))}
           bind:value={input.finances.income.stability}
           columns={2}
@@ -126,7 +127,7 @@
     <section aria-labelledby="insurance-title">
       <h2 id="insurance-title">Insurance</h2>
       <p class="section-intro">Not sure? Leave it unticked. The plan includes checking your policy, which costs nothing.</p>
-      <CheckRow label={input.housing.tenure === 'rent' ? 'Renters insurance' : 'Homeowners insurance'} bind:checked={input.finances.insurance.home_or_renters} />
+      <CheckRow label={input.housing.tenure === 'rent' ? 'Renters insurance' : 'Homeowners insurance'} help="Usually pays for repairs or belongings, and often a place to stay." bind:checked={input.finances.insurance.home_or_renters} />
       <CheckRow label="Flood insurance" help="Usually a separate policy." bind:checked={input.finances.insurance.flood} />
       <CheckRow label="Earthquake insurance" help="Usually a separate policy." bind:checked={input.finances.insurance.earthquake} />
     </section>

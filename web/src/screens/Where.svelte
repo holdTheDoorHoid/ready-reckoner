@@ -240,6 +240,7 @@
       <ChoiceGroup
         legend="What kind of area is it?"
         name="setting"
+        help="Changes how far stores and help are, and how long outages last."
         options={SETTINGS.map((v) => ({ value: v, label: SETTING[v].label, help: SETTING[v].help }))}
         bind:value={input.location.setting}
         columns={3}
@@ -273,15 +274,16 @@
       {:else}
         <CheckRow label="The home has a basement" help="Basements flood first, and can be a safe spot in a tornado." bind:checked={input.housing.basement} />
       {/if}
-      <ChoiceGroup legend="Do you own or rent?" name="tenure" options={TENURES.map((v) => ({ value: v, label: TENURE[v].label }))} bind:value={input.housing.tenure} columns={2} />
+      <ChoiceGroup legend="Do you own or rent?" name="tenure" help="Renters can't always change the building, so the plan leans on things you can take with you." options={TENURES.map((v) => ({ value: v, label: TENURE[v].label }))} bind:value={input.housing.tenure} columns={2} />
       <ChoiceGroup
         legend="Where does your water come from?"
         name="water"
+        help="Decides whether a power cut also cuts your water."
         options={WATER_SOURCES.map((v) => ({ value: v, label: WATER[v].label, help: WATER[v].help }))}
         bind:value={input.housing.water}
         columns={2}
       />
-      <ChoiceGroup legend="Where does wastewater go?" name="sewer" options={WASTEWATER_KINDS.map((v) => ({ value: v, label: SEWER[v].label }))} bind:value={input.housing.sewer} columns={2} />
+      <ChoiceGroup legend="Where does wastewater go?" name="sewer" help="Decides what to do when toilets can't flush." options={WASTEWATER_KINDS.map((v) => ({ value: v, label: SEWER[v].label }))} bind:value={input.housing.sewer} columns={2} />
       <Field id="heating" label="Main heating" help="Most furnaces and heat pumps need electricity to run, even gas ones.">
         {#snippet children({ describedBy })}
           <select id="heating" class="input input--medium" aria-describedby={describedBy} bind:value={input.housing.heating}>
@@ -289,10 +291,11 @@
           </select>
         {/snippet}
       </Field>
-      <ChoiceGroup legend="Cooling" name="cooling" options={COOLING_KINDS.map((v) => ({ value: v, label: COOLING[v].label }))} bind:value={input.housing.cooling} columns={3} />
+      <ChoiceGroup legend="Cooling" name="cooling" help="Air conditioning stops in a power cut; the plan adds a cooling plan either way." options={COOLING_KINDS.map((v) => ({ value: v, label: COOLING[v].label }))} bind:value={input.housing.cooling} columns={3} />
       <ChoiceGroup
         legend="Backup power at home"
         name="backup"
+        help="What you could run during an outage, if anything."
         options={BACKUP_POWER_KINDS.map((v) => ({ value: v, label: BACKUP[v].label, help: BACKUP[v].help }))}
         bind:value={input.housing.backup_power}
         columns={2}

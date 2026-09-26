@@ -95,6 +95,11 @@
     }
   }
 
+  function firstSentence(text: string): string {
+    const m = /^.*?[.!?](?=\s|$)/.exec(text);
+    return m ? m[0] : text;
+  }
+
   function skip() {
     app.completeStep('have');
     router.go('risks');
@@ -115,11 +120,12 @@
       onchange={(v) => setOwned(item.id, v === undefined ? undefined : Math.round(v * eaters * 10) / 10)}
     />
   {:else if item.unit === 'dollar'}
-    <NumberField id="have-{item.id}" label={item.name} value={owned(item.id)} optional quiet prefix="$" example="100" onchange={(v) => setOwned(item.id, v)} />
+    <NumberField id="have-{item.id}" label={item.name} help={firstSentence(item.spec)} value={owned(item.id)} optional quiet prefix="$" example="100" onchange={(v) => setOwned(item.id, v)} />
   {:else}
     <NumberField
       id="have-{item.id}"
       label={item.name}
+      help={firstSentence(item.spec)}
       value={owned(item.id)}
       optional
       quiet
@@ -143,9 +149,9 @@
 
     <section aria-labelledby="safety-title">
       <h2 id="safety-title">Safety equipment</h2>
-      <CheckRow label="A working smoke alarm on each level" bind:checked={input.housing.alarms.smoke} />
+      <CheckRow label="A working smoke alarm on each level" help="Press its test button to check." bind:checked={input.housing.alarms.smoke} />
       <CheckRow label="A carbon monoxide alarm" help="Matters most if you have gas appliances or use a generator." bind:checked={input.housing.alarms.co} />
-      <CheckRow label="A fire extinguisher" bind:checked={input.housing.alarms.extinguisher} />
+      <CheckRow label="A fire extinguisher" help="A multipurpose (ABC) type, with the gauge in the green." bind:checked={input.housing.alarms.extinguisher} />
     </section>
 
     <section aria-labelledby="supplies-title">
@@ -168,7 +174,9 @@
 
     <section aria-labelledby="done-title">
       <h2 id="done-title">Free steps you may have done already</h2>
-      <p class="section-intro">Many households have done some of these. Each one counts.</p>
+      <fieldset>
+      <legend class="visually-hidden">Free steps you have done</legend>
+      <p class="section-intro">Many households have done some of these. Tick any you have; each one counts, and it comes off your plan.</p>
       {#each freeSteps as step (step.id)}
         {#if checkedOffOnPlan(step.id)}
           <CheckRow label={step.name} help="Checked off on your plan." checked disabled />
@@ -176,6 +184,7 @@
           <CheckRow label={step.name} checked={(owned(step.id) ?? 0) >= 1} onchange={(on) => setOwned(step.id, on ? 1 : undefined)} />
         {/if}
       {/each}
+      </fieldset>
     </section>
 
     <InterviewNav step="have" nextLabel="See your risks" />

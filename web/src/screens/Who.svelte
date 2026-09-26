@@ -106,7 +106,7 @@
               </button>
             {/if}
           </div>
-          <Field id="person-{i}-age" label="Age group">
+          <Field id="person-{i}-age" label="Age group" help="Sets how much water, food and medicine to plan for.">
             {#snippet children({ describedBy })}
               <select
                 id="person-{i}-age"
@@ -131,7 +131,7 @@
               <summary>Medical needs for person {i + 1}{hasMedical(person) ? '' : ': none so far'}</summary>
               <fieldset>
               <legend class="visually-hidden">Medical needs for person {i + 1}</legend>
-              <CheckRow label="Takes a daily prescription medicine" bind:checked={person.medical.daily_rx} />
+              <CheckRow label="Takes a daily prescription medicine" help="The plan keeps an extra supply on hand." bind:checked={person.medical.daily_rx} />
               <CheckRow label="Has medicine that must stay cold" help="For example insulin." bind:checked={person.medical.refrigerated_rx} />
               <Field id="person-{i}-device" label="Powered medical device" help="A device that needs electricity to work.">
                 {#snippet children({ describedBy })}
@@ -165,6 +165,7 @@
               <ChoiceGroup
                 legend="Getting around"
                 name="person-{i}-mobility"
+                help="Decides who helps with stairs and with leaving quickly."
                 options={MOBILITY_LEVELS.map((v) => ({ value: v, label: MOBILITY[v].label, help: MOBILITY[v].help }))}
                 bind:value={person.medical.mobility}
                 columns={3}
@@ -186,7 +187,7 @@
                   />
                 {/snippet}
               </Field>
-              <CheckRow label="Carries an epinephrine auto-injector" bind:checked={person.medical.epinephrine} />
+              <CheckRow label="Carries an epinephrine auto-injector" help="The plan keeps a spare in the go-bag." bind:checked={person.medical.epinephrine} />
               </fieldset>
             </details>
           {/if}
@@ -210,8 +211,8 @@
 
     <section aria-labelledby="pets-title">
       <h2 id="pets-title">Pets and animals</h2>
-      <Stepper label="Dogs" value={input.pets.dogs} noun="dog" onchange={(v) => (input.pets.dogs = v)} />
-      <Stepper label="Cats" value={input.pets.cats} noun="cat" onchange={(v) => (input.pets.cats = v)} />
+      <Stepper label="Dogs" help="Adds their food, water and a leash to the plan." value={input.pets.dogs} noun="dog" onchange={(v) => (input.pets.dogs = v)} />
+      <Stepper label="Cats" help="Adds their food, water and a carrier to the plan." value={input.pets.cats} noun="cat" onchange={(v) => (input.pets.cats = v)} />
       <Stepper label="Small pets" help="Birds, rabbits, fish and similar." value={input.pets.small} noun="small pet" onchange={(v) => (input.pets.small = v)} />
       <Stepper label="Large animals" help="Horses and livestock." value={input.pets.large_animals} noun="large animal" onchange={(v) => (input.pets.large_animals = v)} />
     </section>

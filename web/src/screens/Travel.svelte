@@ -54,7 +54,7 @@
       <ul class="vehicles">
         {#each input.mobility.vehicles as vehicle, i (i)}
           <li class="vehicle">
-            <Field id="vehicle-{i}" label="Vehicle {i + 1} runs on">
+            <Field id="vehicle-{i}" label="Vehicle {i + 1} runs on" help="Changes what to do before a storm: fill up or charge.">
               {#snippet children({ describedBy })}
                 <select id="vehicle-{i}" class="input input--medium" aria-describedby={describedBy} bind:value={vehicle.fuel}>
                   {#each FUELS as f (f)}<option value={f as Fuel}>{FUEL[f].label}</option>{/each}
@@ -82,6 +82,7 @@
             <legend>Person {i + 1}: {AGE[person.age_band].label.toLowerCase()}</legend>
             <CheckRow
               label={isChild(person) ? 'Goes to school or daycare away from home' : 'Travels to work or school'}
+              help="Someone away from home may need to get back on foot."
               checked={!!person.commute}
               onchange={(on) => setTravels(person, on)}
             />
@@ -101,11 +102,12 @@
               <ChoiceGroup
                 legend="Usually by"
                 name="trip-{i}-mode"
+                help="Transit and roads can stop in a storm or outage."
                 options={COMMUTE_MODES.map((v) => ({ value: v, label: COMMUTE_MODE[v].label }))}
                 bind:value={commute.mode}
                 columns={4}
               />
-              <CheckRow label={isChild(person) ? 'Can learn from home when needed' : 'Can work from home when needed'} bind:checked={commute.remote_possible} />
+              <CheckRow label={isChild(person) ? 'Can learn from home when needed' : 'Can work from home when needed'} help="Staying home on a bad day avoids getting stranded." bind:checked={commute.remote_possible} />
             {/if}
           </fieldset>
         {/if}
