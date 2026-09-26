@@ -27,7 +27,7 @@ title = "Build A Kit"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/kit"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Water (one gallon per person per day for several days, for drinking and sanitation)"
 license = "US Government Work (public domain)"
 
@@ -176,7 +176,7 @@ title = "Pandemic"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/pandemic"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Buy supplies slowly to ensure that everyone has the opportunity to buy what they need."
 license = "US Government Work (public domain)"
 
@@ -236,7 +236,7 @@ title = "Radiation Emergencies"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/radiation"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "The best way to stay safe in any radiation emergency is to get inside, stay inside and stay tuned."
 license = "US Government Work (public domain)"
 
@@ -737,7 +737,7 @@ title = "Potassium Iodide (KI)"
 publisher = "Centers for Disease Control and Prevention"
 year = 2025
 url = "https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 quote = "Do not take KI unless you are instructed by public health or emergency response officials or a healthcare provider."
 license = "US Government Work (public domain)"
 
@@ -1137,7 +1137,7 @@ title = "Stop the Bleed"
 publisher = "U.S. Department of Homeland Security"
 year = 2026
 url = "https://www.dhs.gov/stopthebleed"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -1831,7 +1831,7 @@ title = "Can Humanity Achieve a Century of Nuclear Peace?"
 publisher = "Forecasting Research Institute"
 year = 2024
 url = "https://forecastingresearch.org/research/nuclear-risk"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "All rights reserved (paraphrased, not quoted)"
 
 [[citation]]
@@ -2209,7 +2209,7 @@ title = "Quantitative core model specification (research report): hazards, conse
 publisher = "Ready Reckoner contributors"
 year = 2026
 url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/risk-model.md"
-retrieved = "2026-09-25"
+retrieved = "2026-09-26"
 license = "CC BY-SA 4.0"
 
 [[citation]]
@@ -3060,4 +3060,225 @@ year = 2026
 url = "https://www.nia.nih.gov/health/advance-care-planning/getting-your-affairs-order-checklist-documents-prepare-future"
 retrieved = "2026-09-26"
 quote = "A durable power of attorney for health care names your health care proxy, a person who can make health care decisions for you if you are unable to communicate these yourself."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "missilesonourland_2023"
+title = "The Missiles on our Land"
+publisher = "Princeton University, Program on Science and Global Security"
+year = 2023
+url = "https://missilesonourland.org/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "dod_mirta_points"
+title = "DoD Sites - Point (Military Installations, Ranges and Training Areas)"
+publisher = "U.S. Department of Defense, Defense Installations Spatial Data Infrastructure"
+year = 2024
+url = "https://services7.arcgis.com/n1YM8pTrFmm7L4hs/arcgis/rest/services/mirta/FeatureServer/0"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "census_cbsa_pop_2024"
+title = "Annual Estimates of the Resident Population for Metropolitan Statistical Areas in the United States and Puerto Rico: April 1, 2020 to July 1, 2024 (CBSA-MET-EST2024-POP)"
+publisher = "U.S. Census Bureau"
+year = 2025
+url = "https://www2.census.gov/programs-surveys/popest/tables/2020-2024/metro/totals/cbsa-met-est2024-pop.xlsx"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usc_10_2674"
+title = "10 U.S. Code § 2674(f)(2): definition of the National Capital Region"
+publisher = "U.S. Code (Cornell Legal Information Institute)"
+year = 2026
+url = "https://www.law.cornell.edu/uscode/text/10/2674"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nnsa_locations"
+title = "Locations (National Nuclear Security Administration)"
+publisher = "U.S. Department of Energy, National Nuclear Security Administration"
+year = 2026
+url = "https://www.energy.gov/nnsa/locations"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eia_refinery_capacity_2026"
+title = "Refinery Capacity Report, Table 3: Capacity of Operable Petroleum Refineries by State as of January 1, 2026"
+publisher = "U.S. Energy Information Administration"
+year = 2026
+url = "https://www.eia.gov/petroleum/refinerycapacity/table3.pdf"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_nuclear_72h_2023"
+title = "Nuclear Detonation Response Guidance: Planning for the First 72 Hours"
+publisher = "FEMA"
+year = 2023
+url = "https://www.fema.gov/sites/default/files/documents/fema_oet-72-hour-nuclear-detonation-response-guidance.pdf"
+retrieved = "2026-09-26"
+quote = "Prepare to stay inside for at least 24 hours unless officials provide other instructions, or your building is threatened by fire or collapse."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "morina_2019_carrington"
+title = "Probability estimation of a Carrington-like geomagnetic storm (Scientific Reports 9:2393)"
+publisher = "Moriña D. et al."
+year = 2019
+url = "https://www.nature.com/articles/s41598-019-38918-8"
+retrieved = "2026-09-26"
+license = "CC BY 4.0 (paraphrased)"
+
+[[citation]]
+id = "nerc_tpl007_benchmark"
+title = "Benchmark Geomagnetic Disturbance Event Description (Project 2013-03, TPL-007)"
+publisher = "North American Electric Reliability Corporation"
+year = 2014
+url = "https://www.nerc.com/globalassets/standards/projects/2013-03/benchmark_gmd_event_aug27_clean.pdf"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "swpc_power_grid"
+title = "Electric Power Transmission (space weather impacts)"
+publisher = "NOAA / NWS Space Weather Prediction Center"
+year = 2026
+url = "https://www.swpc.noaa.gov/impacts/electric-power-transmission"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nasa_tunguska_2019"
+title = "Tunguska Revisited: 111-Year-Old Mystery Impact Inspires New, More Optimistic Asteroid Predictions"
+publisher = "NASA"
+year = 2019
+url = "https://www.nasa.gov/solar-system/tunguska-revisited-111-year-old-mystery-impact-inspires-new-more-optimistic-asteroid-predictions/"
+retrieved = "2026-09-26"
+quote = "The research revealed that such relatively small but regionally devastating impacts happen on the order of millennia – not centuries, as previously thought."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "eia_maria_2017"
+title = "Puerto Rico’s electricity service is slow to return after Hurricane Maria (Today in Energy)"
+publisher = "U.S. Energy Information Administration"
+year = 2017
+url = "https://www.eia.gov/todayinenergy/detail.php?id=33452"
+retrieved = "2026-09-26"
+quote = "PREPA reported all 1,570,000 of its electricity customers were without power after the storm."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "npr_maria_2018"
+title = "11 Months After Hurricane Maria Hit Puerto Rico, Officials Say All Power Is Restored"
+publisher = "NPR"
+year = 2018
+url = "https://www.npr.org/2018/08/15/639001372/11-months-after-hurricane-maria-hit-puerto-rico-officials-say-all-power-is-resto"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "powermag_epri_2019_hemp"
+title = "EMP Threat Real but Limited, EPRI Says in Much-Anticipated Report"
+publisher = "POWER magazine"
+year = 2019
+url = "https://www.powermag.com/emp-threat-real-but-limited-epri-says-in-anticipated-report/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "pry_2015_emp_testimony"
+title = "The EMP Threat: The State of Preparedness Against the Threat of an Electromagnetic Pulse (EMP) Event (statement for the record, May 13, 2015)"
+publisher = "U.S. House Committee on Oversight and Government Reform (statement of Peter Vincent Pry)"
+year = 2015
+url = "https://oversight.house.gov/wp-content/uploads/2015/05/Pry-Statement-5-13-EMP.pdf"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_volt_typhoon_2024"
+title = "PRC State-Sponsored Actors Compromise and Maintain Persistent Access to U.S. Critical Infrastructure (AA24-038A)"
+publisher = "Cybersecurity and Infrastructure Security Agency"
+year = 2024
+url = "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-038a"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "start_poicn"
+title = "Profiles of Incidents Involving CBRN and Non-state Actors (POICN) Database"
+publisher = "START, University of Maryland"
+year = 2026
+url = "https://www.start.umd.edu/research-projects/profiles-incidents-involving-cbrn-and-non-state-actors-poicn-database"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "ready_gov_biohazard"
+title = "Biohazard Exposure"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/bioterrorism"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "duke_2021_pandemics"
+title = "Statistics Say Large Pandemics Are More Likely Than We Thought"
+publisher = "Duke Global Health Institute"
+year = 2021
+url = "https://globalhealth.duke.edu/news/statistics-say-large-pandemics-are-more-likely-we-thought"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cam_2022_volcano_risk"
+title = "Risk of volcano catastrophe ‘a roll of the dice’, say experts"
+publisher = "University of Cambridge"
+year = 2022
+url = "https://www.cam.ac.uk/research/news/risk-of-volcano-catastrophe-a-roll-of-the-dice-say-experts"
+retrieved = "2026-09-26"
+license = "CC BY-NC-SA 4.0 (paraphrased, not quoted)"
+
+[[citation]]
+id = "usgs_yvo_supervolcano"
+title = "Questions About Supervolcanoes (Yellowstone Volcano Observatory)"
+publisher = "U.S. Geological Survey"
+year = 2026
+url = "https://www.usgs.gov/volcanoes/yellowstone/questions-about-supervolcanoes"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fdic_deposit_insurance"
+title = "Deposit Insurance"
+publisher = "Federal Deposit Insurance Corporation"
+year = 2026
+url = "https://www.fdic.gov/resources/deposit-insurance"
+retrieved = "2026-09-26"
+quote = "Your deposits are automatically insured to at least $250,000 at each FDIC-insured bank."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fdic_history_1930s"
+title = "FDIC history timeline, 1930–1939"
+publisher = "Federal Deposit Insurance Corporation"
+year = 2026
+url = "https://www.fdic.gov/history/1930-1939"
+retrieved = "2026-09-26"
+quote = "March 6, 1933 President Franklin D. Roosevelt declares a nationwide bank holiday."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fbi_active_shooter_2024"
+title = "FBI report on active attacker incidents in the United States in 2024"
+publisher = "FBI (via Internet Archive)"
+year = 2025
+url = "https://web.archive.org/web/20260904170718/https://www.fbi.gov/file-repository/reports-and-publications/2024-active-shooter-report/view"
+retrieved = "2026-09-26"
 license = "US Government Work (public domain)"

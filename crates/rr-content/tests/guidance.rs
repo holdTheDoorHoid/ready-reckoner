@@ -15,39 +15,9 @@ fn block(id: &str) -> &'static rr_content::Guidance {
         .unwrap_or_else(|| panic!("no guidance block `{id}`"))
 }
 
-/// awaiting: content — blocks for the contract v2 bucket and hazards (`bucket_clean_air.md` and the
-/// hazard and family blocks, DESIGN-DELTA §3).
-const AWAITING_BUCKETS: &[BucketId] = &[];
-const AWAITING_HAZARDS: &[HazardId] = &[
-    HazardId::GeomagneticStorm,
-    HazardId::Vei7Eruption,
-    HazardId::MultiMonthBlackout,
-    HazardId::WarInfrastructure,
-    HazardId::CbrnAttack,
-    HazardId::SeverePandemic,
-    HazardId::FinancialCrisis,
-    HazardId::MassViolence,
-];
-
-/// awaiting: this branch — family blocks still to write (removed one by one as they land).
-const AWAITING_FAMILIES: &[&str] = &[
-    "nuclear_attack",
-    "geomagnetic_storm",
-    "multi_month_blackout",
-    "war_infrastructure",
-    "cbrn_attack",
-    "severe_pandemic",
-    "vei7_eruption",
-    "financial_crisis",
-    "mass_violence",
-];
-
 #[test]
 fn every_bucket_has_its_own_block() {
     for b in BucketId::ALL {
-        if AWAITING_BUCKETS.contains(b) {
-            continue;
-        }
         let id = format!("bucket_{}", b.as_str());
         let g = block(&id);
         let target = format!("bucket:{}", b.as_str());
@@ -61,9 +31,6 @@ fn every_bucket_has_its_own_block() {
 #[test]
 fn every_hazard_is_explained_by_a_block() {
     for h in HazardId::ALL {
-        if AWAITING_HAZARDS.contains(h) {
-            continue;
-        }
         let target = format!("hazard:{}", h.as_str());
         // A rare hazard may be explained by its family block instead (`family:<id>`).
         let by_family = h.is_rare() && content().family_block(h.as_str()).is_some();
@@ -79,9 +46,6 @@ fn every_rare_family_has_a_family_block() {
     // A rare family is named by its lead hazard id; its block applies to `family:<id>` and says
     // what the family changes in the plan.
     for id in rr_types::rare_family_ids() {
-        if AWAITING_FAMILIES.contains(&id) {
-            continue;
-        }
         let g = content()
             .family_block(id)
             .unwrap_or_else(|| panic!("no family block applies to family:{id}"));
