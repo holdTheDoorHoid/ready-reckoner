@@ -8,15 +8,86 @@
 /// The placeholder the engine replaces with the household's own natural-frequency sentence.
 pub const FREQUENCY_PLACEHOLDER: &str = "{frequency}";
 
-/// Opens a span of a hazard-family guidance block that is about one of its hazards only:
-/// `{if:avalanche}In avalanche country, get training ...{/if}`. The packet keeps the span when
-/// that hazard is likely enough for the household (a ten-year chance of at least 1 in 100) and
-/// drops it otherwise; every household-free view keeps it. The hazard must be one the block
-/// `applies_to`. Spans do not nest and stay within one paragraph.
+/// Opens a conditional span of a guidance block. Two kinds of condition (see [`Condition`]):
+///
+/// - a hazard: `{if:avalanche}In avalanche country, get training ...{/if}`. The packet keeps the
+///   span when that hazard is likely enough for the household (a ten-year chance of at least 1 in
+///   100) and drops it otherwise. The hazard must be one the block `applies_to`.
+/// - the kind of home: `{if:home:apartment_high_rise}…{/if}` keeps the span only for those homes,
+///   `{if:not_home:apartment_low_rise|apartment_high_rise}…{/if}` only for the others. Kinds are
+///   `HousingKind` strings, several joined with `|`.
+///
+/// Every household-free view keeps every span. Spans do not nest and stay within one paragraph.
 pub const CONDITION_OPEN: &str = "{if:";
 
 /// Closes a conditional span (see [`CONDITION_OPEN`]).
 pub const CONDITION_CLOSE: &str = "{/if}";
+
+/// Prefix of a condition on the kind of home: kept for these kinds of home.
+pub const HOME_PREFIX: &str = "home:";
+
+/// Prefix of a condition on the kind of home: kept for every other kind of home.
+pub const NOT_HOME_PREFIX: &str = "not_home:";
+
+/// What a conditional span depends on (the text between `{if:` and `}`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Condition {
+    /// A hazard id (`avalanche`): kept when that hazard is likely enough for the household.
+    Hazard(String),
+    /// `home:<kind>|<kind>…`: kept when the home is one of these kinds.
+    Home(Vec<rr_types::HousingKind>),
+    /// `not_home:<kind>|<kind>…`: kept when the home is none of these kinds.
+    NotHome(Vec<rr_types::HousingKind>),
+}
+
+impl Condition {
+    /// Reads a condition. A `home:` or `not_home:` condition needs at least one known kind of
+    /// home and no unknown one; anything else is taken as a hazard id (the validator checks the
+    /// hazard against the block's `applies_to`).
+    ///
+    /// # Errors
+    ///
+    /// A plain-language problem: an unknown kind of home, or none.
+    pub fn parse(id: &str) -> Result<Condition, String> {
+        let id = id.trim();
+        let (negated, kinds) = match (
+            id.strip_prefix(HOME_PREFIX),
+            id.strip_prefix(NOT_HOME_PREFIX),
+        ) {
+            (Some(k), _) => (false, k),
+            (None, Some(k)) => (true, k),
+            (None, None) => return Ok(Condition::Hazard(id.to_owned())),
+        };
+        let mut out: Vec<rr_types::HousingKind> = Vec::new();
+        for k in kinds.split('|').map(str::trim) {
+            match k.parse::<rr_types::HousingKind>() {
+                Ok(kind) if !out.contains(&kind) => out.push(kind),
+                Ok(_) => return Err(format!("`{{if:{id}}}` lists `{k}` twice")),
+                Err(_) => {
+                    return Err(format!(
+                        "`{{if:{id}}}` names `{k}`, which is not a kind of home (one of {:?})",
+                        rr_types::HousingKind::STRS
+                    ));
+                }
+            }
+        }
+        Ok(if negated {
+            Condition::NotHome(out)
+        } else {
+            Condition::Home(out)
+        })
+    }
+
+    /// Whether a span with this condition belongs in a packet for this kind of home: `Some` for
+    /// the home conditions, `None` for a hazard (which depends on the household's rates).
+    pub fn for_home(&self, kind: rr_types::HousingKind) -> Option<bool> {
+        match self {
+            Condition::Hazard(_) => None,
+            Condition::Home(kinds) => Some(kinds.contains(&kind)),
+            Condition::NotHome(kinds) => Some(!kinds.contains(&kind)),
+        }
+    }
+}
 
 /// `text` with the conditional spans whose hazard id `keep` rejects removed and the markers of
 /// the others dropped. A span removed from between two words takes one of the two spaces around
@@ -52,8 +123,9 @@ pub fn apply_conditions(text: &str, keep: impl Fn(&str) -> bool) -> String {
     out
 }
 
-/// Problems with the conditional spans of a guidance body: an unclosed or nested span, or a
-/// hazard id that is not one of `allowed` (the block's own `hazard:` targets).
+/// Problems with the conditional spans of a guidance body: an unclosed or nested span, a hazard
+/// id that is not one of `allowed` (the block's own `hazard:` targets), or a `home:` /
+/// `not_home:` condition that names no kind of home or an unknown one (see [`Condition`]).
 pub fn condition_problems(body: &str, allowed: &[&str]) -> Vec<String> {
     let mut problems = Vec::new();
     let mut rest = body;
@@ -64,10 +136,17 @@ pub fn condition_problems(body: &str, allowed: &[&str]) -> Vec<String> {
             break;
         };
         let id = after_open[..id_end].trim();
-        if !allowed.contains(&id) {
-            problems.push(format!(
-                "`{{if:{id}}}` names a hazard this block does not apply to (its applies_to lists {allowed:?})"
-            ));
+        match Condition::parse(id) {
+            Ok(Condition::Hazard(h)) if !allowed.contains(&h.as_str()) => {
+                problems.push(format!(
+                    "`{{if:{id}}}` names a hazard this block does not apply to (its applies_to lists {allowed:?})"
+                ));
+            }
+            Ok(Condition::Home(kinds) | Condition::NotHome(kinds)) if kinds.is_empty() => {
+                problems.push(format!("`{{if:{id}}}` names no kind of home"));
+            }
+            Ok(_) => {}
+            Err(p) => problems.push(p),
         }
         let inner_and_rest = &after_open[id_end + 1..];
         let Some(close) = inner_and_rest.find(CONDITION_CLOSE) else {
@@ -660,5 +739,64 @@ mod tests {
         );
         assert!(!condition_problems("a b{/if}", &["avalanche"]).is_empty());
         assert!(!condition_problems("{if:avalanche}a\n\nb{/if}", &["avalanche"]).is_empty());
+    }
+
+    #[test]
+    fn home_conditions_parse_and_pick_the_right_homes() {
+        use rr_types::HousingKind::*;
+        assert_eq!(
+            Condition::parse("avalanche"),
+            Ok(Condition::Hazard("avalanche".to_owned()))
+        );
+        assert_eq!(
+            Condition::parse("home:apartment_high_rise"),
+            Ok(Condition::Home(vec![ApartmentHighRise]))
+        );
+        let flats = Condition::parse("not_home:apartment_low_rise|apartment_high_rise").unwrap();
+        assert_eq!(
+            flats,
+            Condition::NotHome(vec![ApartmentLowRise, ApartmentHighRise])
+        );
+        assert_eq!(flats.for_home(Rowhouse), Some(true));
+        assert_eq!(flats.for_home(ApartmentHighRise), Some(false));
+        assert_eq!(
+            Condition::parse("home:mobile_home")
+                .unwrap()
+                .for_home(MobileHome),
+            Some(true)
+        );
+        assert_eq!(
+            Condition::parse("tornado").unwrap().for_home(Detached),
+            None
+        );
+        assert!(Condition::parse("home:castle").is_err());
+        assert!(Condition::parse("home:").is_err());
+        assert!(Condition::parse("home:detached|detached").is_err());
+    }
+
+    #[test]
+    fn home_conditions_are_validated_and_applied() {
+        // A home condition is allowed in any block, whatever it applies to.
+        let body = "Shelter now. {if:not_home:apartment_high_rise}Use the basement.{/if} \
+                    {if:home:apartment_high_rise}Stay on or below the 10th floor.{/if} Then wait.";
+        assert!(condition_problems(body, &[]).is_empty());
+        assert!(!condition_problems("{if:home:castle}x{/if}", &[]).is_empty());
+        assert!(!condition_problems("{if:not_home:}x{/if}", &[]).is_empty());
+        let keep = |kind: rr_types::HousingKind| {
+            apply_conditions(body, |id| {
+                Condition::parse(id)
+                    .ok()
+                    .and_then(|c| c.for_home(kind))
+                    .unwrap_or(true)
+            })
+        };
+        assert_eq!(
+            keep(rr_types::HousingKind::Rowhouse),
+            "Shelter now. Use the basement. Then wait."
+        );
+        assert_eq!(
+            keep(rr_types::HousingKind::ApartmentHighRise),
+            "Shelter now. Stay on or below the 10th floor. Then wait."
+        );
     }
 }

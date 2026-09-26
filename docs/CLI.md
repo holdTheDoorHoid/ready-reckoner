@@ -125,18 +125,30 @@ Ranked, most important first (29 hazards)
 rr targets --household <file> [dial options] [--sweep]
 ```
 
-For each need that lasts days (power, water, supplies, heat and cold, medicine, phone), the target
-with its range (10th to 90th percentile), what the plan covers, when outside help plausibly
-arrives and service is mostly back, the step that is enough, the frequency sentences and the
-hazards that drive it. Then the readiness needs (leaving home, getting home, a medical emergency,
-fire, security, the home itself) with the ten-year chance of needing each, the income savings goal,
-and any warning that one event drives the answer.
+First what the dial means (the same sentence as the packet, model review M-04): each target holds
+for its own need, and the chance that at least one need runs past its target is higher. At the
+default setting:
+
+```
+For any one need, something worse than its target comes in about 1 of every 10 ten-year stretches.
+Across all your needs together, the chance that at least one runs out is higher, roughly 1 in 3.
+That is why the plan also gives you ways to cope when a target runs out.
+```
+
+Then, for each need that lasts days (power, water, supplies, heat and cold, medicine, phone), the
+target with its range (10th to 90th percentile), what the plan covers, when outside help plausibly
+arrives and service is mostly back (for the event behind the target: its outages that last a day
+or more; "not known" when there are no records for it, or when the time would be under a third of
+the target), the step that is enough, the frequency sentences and the hazards that drive it. Then
+the readiness needs (leaving home, getting home, a medical emergency, fire, security, the home
+itself) with the ten-year chance of needing each, the income savings goal, and any warning that
+one event drives the answer.
 
 ```
 $ rr targets --household philadelphia-renters-4
 ...
  Need                                      Be ready for                        Plan covers  Help arrives  Mostly back   Enough at
- No grid power at home                     about 3 days (up to 7 days)         3 days       about 3 days  about 5 days  three days
+ No grid power at home                     about 3 days (up to 7 days)         3 days       about 3 days  about 6 days  three days
        Of 100 households like yours, about 35 (30–55) will lose grid power for a day or more in the
        next 10 years.
 ...
@@ -164,7 +176,7 @@ Days to be ready for (income in months), with the range in brackets. * marks the
  No phone, internet or card payments       1 (0.5–3)    5 (2–10) !    7 (3–14)       45 (21–90) !
  Loss of income (months)                   1 (0.5–1.5)  4 (2–7) !     6 (3–9)        12 (8–24)
 
- Worse, of 100 ten-year stretches          65           20            10             2
+ Worse for one need, of 100 ten-year stretches  65      20            10             2
  Enough for this household                 two weeks    one month     three months   one year
  Plan done by month                        4            6             9              15
  Purchases in the plan                     $1,076       $1,386        $1,755         $2,634

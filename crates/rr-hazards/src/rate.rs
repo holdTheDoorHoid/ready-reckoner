@@ -34,6 +34,10 @@ pub(crate) struct HazardRate {
     pub fixed_severity: Option<f64>,
     /// For rare catastrophes: confidence fixed rather than derived from the range.
     pub fixed_confidence: Option<DataConfidence>,
+    /// A second natural-frequency sentence about one part of the rate, appended to the card's
+    /// sentence: the part's rate today and around 2050, and its verb. The landslide card says how
+    /// many households have the home itself damaged, apart from roads cut off (model review M-05).
+    pub part_sentence: Option<(Estimate, Estimate, String)>,
 }
 
 impl HazardRate {
@@ -57,6 +61,7 @@ impl HazardRate {
             range_sentence: None,
             fixed_severity: None,
             fixed_confidence: None,
+            part_sentence: None,
         }
     }
 

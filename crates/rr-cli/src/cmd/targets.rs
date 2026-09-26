@@ -50,7 +50,8 @@ pub fn run(engine: &Engine<Source>, args: &TargetsArgs) -> Result<Output, CliErr
     Ok(out)
 }
 
-/// Of 100 ten-year stretches, how many bring something worse than the targets at this dial.
+/// Of 100 ten-year stretches, how many bring something worse than one need's target at this
+/// dial (each target holds for its own need; model review M-04).
 fn worse_per_100(rp: ReturnPeriod) -> String {
     format::per_100(format::chance(rr_consequence::dial_rate(rp), 10.0))
 }
@@ -101,9 +102,8 @@ fn targets(engine: &Engine<Source>, h: &Household, a: &Assessment) -> String {
         engine.store(),
     );
     s.push_str(&format!(
-        "\nAt this setting, something worse than these targets comes in about {} of every 100 \
-         ten-year stretches.\n",
-        worse_per_100(rp)
+        "\n{}\n",
+        format::wrap(&rr_plan::packet::dial_sentence(rp), 100, 0)
     ));
 
     s.push_str("\nHow long to manage on your own\n\n");
@@ -363,7 +363,7 @@ fn sweep(
         t.row(row);
     }
     t.row(vec![String::new(); runs.len() + 1]);
-    let mut worse = vec!["Worse, of 100 ten-year stretches".to_owned()];
+    let mut worse = vec!["Worse for one need, of 100 ten-year stretches".to_owned()];
     let mut tier = vec!["Enough for this household".to_owned()];
     let mut done = vec!["Plan done by month".to_owned()];
     let mut spend = vec!["Purchases in the plan".to_owned()];

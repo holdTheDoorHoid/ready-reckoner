@@ -8,8 +8,11 @@ use rr_types::{PlanItem, PlanItemKind, PlanMonth, WarningSeverity};
 use super::text::{self, md};
 use super::{Ctx, cite};
 
-/// Months shown in detail (months 0 to 11); later months go in a compact table.
-pub const DETAIL_MONTHS: u16 = 12;
+/// Months shown in detail (months 0 to 5); later months go in a compact table (each purchase
+/// with its quantity, and the month's spend). Six, not twelve, since v0.1.1: the space pays for
+/// the life-safety cards and rules every packet now carries within the page budget
+/// (docs/PACKET.md).
+pub const DETAIL_MONTHS: u16 = 6;
 
 /// What a step adds, in one sentence: the first sentence of its "why", after the "Free." that
 /// opens a free step's.
@@ -165,9 +168,9 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         (false, false) => "You have set no money aside, so the plan is free steps.".to_owned(),
     };
     out.push(format!(
-        "{budget} The plan does the free steps first. Then it buys whatever protects you most for \
-         each dollar, month by month, and stops once each need reaches the step that is enough \
-         for it. Water, medicine and safety come first within each step.{}",
+        "{budget} The plan does the free steps first, then buys what protects you most for each \
+         dollar until each need reaches the step that is enough for it. Water, medicine and \
+         safety come first within each step.{}",
         cite("prior_harm_weights")
     ));
     out.push(String::new());
@@ -192,6 +195,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         }
         out.push(String::new());
     }
+    // The warning of each life-safety step, whatever month the step falls in.
+    super::safety::write(out);
 
     out.push("### This month".to_owned());
     out.push(String::new());
@@ -251,20 +256,35 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             out.push(String::new());
         }
     }
-    let after: Vec<&PlanMonth> = plan
+    // Later months with a step in them; a month that only adds to savings shows up where the
+    // purchase it saves for says how much came from savings.
+    let later: Vec<&PlanMonth> = plan
         .months
         .iter()
         .filter(|m| m.index >= DETAIL_MONTHS && m.items.iter().any(|i| !i.done))
         .collect();
+    let after: Vec<&PlanMonth> = later
+        .iter()
+        .copied()
+        .filter(|m| {
+            m.items
+                .iter()
+                .any(|i| !i.done && i.kind != PlanItemKind::Reserve)
+        })
+        .collect();
     if !after.is_empty() {
-        out.push("### After the first year".to_owned());
+        out.push("### Later months".to_owned());
         out.push(String::new());
         out.push("| Month | What | Spend |".to_owned());
         out.push("| --- | --- | --- |".to_owned());
-        for m in after {
+        for m in &after {
             out.push(table_row(cx, m));
         }
         out.push(String::new());
+        if after.len() < later.len() {
+            out.push("Months that only add to savings are left out.".to_owned());
+            out.push(String::new());
+        }
     }
 
     // Funds still open when the plan ends (the rest were spent on their item).
@@ -302,8 +322,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             let date = text::month_start(a.input.planning_date, m);
             out.push(format!(
                 "By month {m} ({}) every need is covered to the step that is enough for your \
-                 risks. After that you are done: keep up the maintenance calendar below, and \
-                 put the same money toward your savings goal if you have one.",
+                 risks. After that, keep up the maintenance calendar and put the same money \
+                 toward savings.",
                 text::month_year(date)
             ));
         }

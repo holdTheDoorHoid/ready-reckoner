@@ -5,7 +5,7 @@
 
 use std::fmt::Write as _;
 
-use rr_consequence::{CountyData, DURATION_BUCKETS, assess};
+use rr_consequence::{CountyData, DURATION_BUCKETS, assess_with_parts};
 use rr_types::{BaseRate, BucketId, CountyRecord, LocationResolved, ReturnPeriod, Target};
 
 #[derive(serde::Deserialize)]
@@ -62,8 +62,8 @@ fn fixtures_end_to_end_with_rr_hazards() {
         .expect("county json");
         let hz = rr_hazards::assess(&input, &fixture.county, &base_rates, &fixture.location);
         let county = CountyData::from_record(&fixture.county);
-        let a = assess(&input, &hz.rates, county, &hz.scenarios);
-        let again = assess(&input, &hz.rates, county, &hz.scenarios);
+        let a = assess_with_parts(&input, &hz.rates, &hz.parts, county, &hz.scenarios);
+        let again = assess_with_parts(&input, &hz.rates, &hz.parts, county, &hz.scenarios);
         assert_eq!(
             serde_json::to_string(&a.buckets).unwrap(),
             serde_json::to_string(&again.buckets).unwrap(),
@@ -125,7 +125,7 @@ fn fixtures_end_to_end_with_rr_hazards() {
             .map(|rp| {
                 let mut p = input.clone();
                 p.dials.return_period = *rp;
-                let x = assess(&p, &hz.rates, county, &hz.scenarios);
+                let x = assess_with_parts(&p, &hz.rates, &hz.parts, county, &hz.scenarios);
                 let d: Vec<String> = DURATION_BUCKETS
                     .iter()
                     .chain([BucketId::Income].iter())

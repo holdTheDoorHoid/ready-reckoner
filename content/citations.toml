@@ -2400,12 +2400,99 @@ retrieved = "2026-09-26"
 license = "State government publication (paraphrased, not quoted)"
 
 [[citation]]
+# v0.1.1 (p1-engine): shelter advice by kind of home, and the packet's life-safety rules.
+# Every quote was checked against the source on 2026-09-26. Archived pages are cited where the
+# current federal page no longer carries the wording (Ready.gov's high-rise and mobile-home lines).
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "noaa_spc_tornado_safety"
+title = "Tornado Safety (The Online Tornado FAQ)"
+publisher = "NOAA National Weather Service, Storm Prediction Center"
+year = 2026
+url = "https://www.spc.noaa.gov/faq/tornado/safety.html"
+retrieved = "2026-09-26"
+quote = "In an office building, hospital, nursing home or skyscraper: Go directly to an enclosed, windowless area in the center of the building -- away from glass and on the lowest floor possible."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_tornadoes_2014"
+title = "Tornadoes (archived July 2014 version, with the high-rise and mobile-home wording)"
+publisher = "FEMA / Ready.gov (via Internet Archive)"
+year = 2014
+url = "https://web.archive.org/web/20140701131414/https://www.ready.gov/tornadoes"
+retrieved = "2026-09-26"
+quote = "In a high-rise building, go to a small interior room or hallway on the lowest floor possible."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_hurricanes_2014"
+title = "Hurricanes (archived July 2014 version, with the high-rise and mobile-home wording)"
+publisher = "FEMA / Ready.gov (via Internet Archive)"
+year = 2014
+url = "https://web.archive.org/web/20140701095429/https://www.ready.gov/hurricanes"
+retrieved = "2026-09-26"
+quote = "If in a high-rise building, when high winds are present, be prepared to take shelter on a lower floor because wind conditions increase with height, and in a small interior room without windows."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_hurricane_safety_tips_2012"
+title = "Hurricane safety tips: Learn what to do before, during and after a hurricane (news release, archived)"
+publisher = "FEMA (via Internet Archive)"
+year = 2012
+url = "https://web.archive.org/web/20160330010239/https://www.fema.gov/disaster/4068/updates/hurricane-safety-tips-learn-what-do-during-and-after-hurricane"
+retrieved = "2026-09-26"
+quote = "If in a high-rise building, be prepared to take shelter on or below the 10th floor."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nws_hurricane_safety_brochure"
+title = "Hurricane Safety: What to do before, during and after a hurricane (brochure)"
+publisher = "NOAA National Weather Service"
+year = 2010
+url = "https://www.weather.gov/media/safety/hurricane_safety.pdf"
+retrieved = "2026-09-26"
+quote = "Live in a high-rise. Hurricane winds can knock out electricity to elevators, break windows and more."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_food_and_water_2004"
+title = "Food and Water in an Emergency (FEMA 477, archived)"
+publisher = "FEMA and American Red Cross (via Internet Archive)"
+year = 2004
+url = "https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf"
+retrieved = "2026-09-26"
+quote = "To use the water in your hot-water tank, be sure the electricity or gas is off, and open the drain at the bottom of the tank."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "usfa_home_fire_escape_plans"
+title = "Home Fire Escape Plans"
+publisher = "U.S. Fire Administration"
+year = 2026
+url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/"
+retrieved = "2026-09-26"
+quote = "Go to your outside meeting place and stay there. Call the fire department."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cpsc_generator_alert_2021"
+title = "Portable Generator Hazards (Safety Alert, publication 5123)"
+publisher = "U.S. Consumer Product Safety Commission"
+year = 2021
+url = "https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf"
+retrieved = "2026-09-26"
+quote = "NEVER try to power the house wiring by plugging the generator into a wall outlet, a practice known as “backfeeding.”"
+license = "US Government Work (public domain)"
+
+[[citation]]
 id = "ready_gov_safety_skills"
 title = "Safety Skills"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/safety-skills"
 retrieved = "2026-09-26"
+quote = "Take a first aid and CPR class."
 license = "US Government Work (public domain)"
 
 [[citation]]

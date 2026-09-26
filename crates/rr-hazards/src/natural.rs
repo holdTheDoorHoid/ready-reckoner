@@ -45,6 +45,22 @@ pub(crate) struct HurricaneSplit {
     pub major_future: Estimate,
 }
 
+/// The wildfire rate split into its two event classes, today and around 2050 (model review M-06):
+/// warnings to leave (the burn part) and wildfire safety power shutoffs. They add up to the
+/// wildfire rate; `rr-consequence` keeps them apart, so a warning to leave is never re-split into
+/// shutoffs (and a state without shutoffs gets none).
+#[derive(Debug, Clone)]
+pub(crate) struct WildfireSplit {
+    /// Warnings to leave, today.
+    pub burn_today: Estimate,
+    /// The same around 2050.
+    pub burn_future: Estimate,
+    /// Safety power shutoffs, today (exactly zero outside the shutoff states).
+    pub shutoff_today: Estimate,
+    /// The same around 2050.
+    pub shutoff_future: Estimate,
+}
+
 /// All natural-hazard rates for one household.
 #[derive(Debug, Clone, Default)]
 pub(crate) struct Natural {
@@ -52,6 +68,11 @@ pub(crate) struct Natural {
     pub rates: Vec<HazardRate>,
     /// The hurricane split, when the county has hurricanes.
     pub hurricane: Option<HurricaneSplit>,
+    /// The wildfire split, when the county has wildfires.
+    pub wildfire: Option<WildfireSplit>,
+    /// The part of the landslide rate that damages the home (the rest cuts off the road);
+    /// landslide frequencies do not change around 2050.
+    pub landslide_damage: Option<Estimate>,
 }
 
 fn spread(value: f64, factor: f64, sources: &[&str]) -> Estimate {
@@ -509,27 +530,73 @@ fn coastal_flooding(ctx: &Ctx<'_>) -> Option<HazardRate> {
     )
 }
 
-fn landslide(ctx: &Ctx<'_>) -> Option<HazardRate> {
+/// Landslides: events that damage the home or cut off its road. The home-damage part is exposed
+/// residents × NRI's loss ratio ÷ a typical damage ratio, bounded by NRI's own expected annual
+/// loss (EAL ÷ the county's building value ÷ the damage ratio: the share of homes damaged a year
+/// that NRI's loss figure implies) and by [`LANDSLIDE_DAMAGE_CEILING`]; roads cut off are
+/// [`LANDSLIDE_ACCESS`] times as many (model review M-05). Returns the rate and the damage part.
+fn landslide(ctx: &Ctx<'_>, notes: &mut Notes) -> Option<(HazardRate, Estimate)> {
     let h = HazardId::Landslide;
     let lam = spread(ctx.afreq_rate(h)?, NRI_FREQUENCY_SPREAD, &[cite::NRI]);
-    let fp = match damage_footprint(ctx, h, LANDSLIDE_DAMAGE_RATIO) {
-        Some(d) => cap(
-            d.times(&prior(LANDSLIDE_ACCESS, &[cite::RR_HAZARD_PRIORS])),
-            1.0,
-        ),
-        None => prior(LANDSLIDE_FALLBACK_FOOTPRINT, &[cite::RR_HAZARD_PRIORS]),
+    let exposed = lam.times(&exposure(ctx, h));
+    let access = prior(LANDSLIDE_ACCESS, &[cite::RR_HAZARD_PRIORS]);
+    let mut damage = match damage_footprint(ctx, h, LANDSLIDE_DAMAGE_RATIO) {
+        Some(d) => exposed.times(&d),
+        // No loss ratio: the fallback footprint (damage or a road cut off), a tenth of it damage.
+        None => exposed
+            .times(&prior(
+                LANDSLIDE_FALLBACK_FOOTPRINT,
+                &[cite::RR_HAZARD_PRIORS],
+            ))
+            .scaled(1.0 / LANDSLIDE_ACCESS.0),
     };
-    let today = lam.times(&exposure(ctx, h)).times(&fp);
-    Some(
-        HazardRate::new(
-            h,
-            today,
-            "have a landslide damage their home or cut off their road",
-            30_000.0,
-        )
-        .with_eal(ctx.eal_per_household(h))
-        .with_climate(Climate::Unclear),
+    // NRI's expected annual loss spread over every building in the county: the share of homes a
+    // landslide damages each year that NRI's own loss figure supports. The exposure share above
+    // counts residents, and in landslide country it runs far ahead of the buildings NRI counts as
+    // exposed (Santa Barbara: 3 in 100 residents, 1 in 1,000 of the building value).
+    let eal_bound = ctx
+        .nri(h)
+        .and_then(|n| n.ealt)
+        .map(f64::from)
+        .zip(ctx.county.building_value_usd)
+        .filter(|(ealt, value)| ealt.is_finite() && *ealt >= 0.0 && *value > 0.0)
+        .map(|(ealt, value)| ealt / (value * LANDSLIDE_DAMAGE_RATIO.0));
+    if let Some(bound) = eal_bound {
+        if damage.value > bound {
+            damage = damage.scaled(bound / damage.value).cite(&[cite::NRI]);
+        }
+    }
+    if damage.value > LANDSLIDE_DAMAGE_CEILING {
+        notes.add(format!(
+            "Landslides: the records for {} would put the chance that one damages a home above 1 \
+             in 100 a year, more than a home in a high-risk flood zone faces. The plan uses 1 in \
+             100 a year, and counts roads cut off separately.",
+            ctx.county_label()
+        ));
+        damage = damage
+            .scaled(LANDSLIDE_DAMAGE_CEILING / damage.value)
+            .cite(&[cite::FEMA_FLOOD_ZONES]);
+    }
+    // Every household-significant event: the home damaged, or its road cut off. Never more than
+    // one per landslide reaching an exposed home.
+    let mut today = damage.times(&access);
+    if today.value > exposed.value && today.value > 0.0 {
+        today = today.scaled(exposed.value / today.value);
+    }
+    let mut rate = HazardRate::new(
+        h,
+        today,
+        "have a landslide cut off their road or damage their home",
+        30_000.0,
     )
+    .with_eal(ctx.eal_per_household(h))
+    .with_climate(Climate::Unclear);
+    rate.part_sentence = Some((
+        damage.clone(),
+        damage.clone(),
+        "have one damage their home".to_owned(),
+    ));
+    Some((rate, damage))
 }
 
 fn avalanche(ctx: &Ctx<'_>) -> Option<HazardRate> {
@@ -564,7 +631,7 @@ fn volcanic_activity(ctx: &Ctx<'_>) -> Option<HazardRate> {
     )
 }
 
-fn wildfire(ctx: &Ctx<'_>) -> Option<HazardRate> {
+fn wildfire(ctx: &Ctx<'_>) -> Option<(HazardRate, WildfireSplit)> {
     let h = HazardId::Wildfire;
     let raw = ctx.afreq_raw(h)?;
     // NRI gives a yearly burn probability for wildfire, used directly (a count would be turned
@@ -588,17 +655,24 @@ fn wildfire(ctx: &Ctx<'_>) -> Option<HazardRate> {
     } else {
         (Estimate::exact(0.0), 0.0)
     };
-    Some(
-        HazardRate::new(
-            h,
-            burn.plus(&psps),
-            "have to leave home or lose power because of a wildfire",
-            30_000.0,
-        )
-        .with_county_average(burn_base.value + psps_avg)
-        .with_eal(ctx.eal_per_household(h))
-        .with_climate(climate::treatment(ctx.county, h, 0.0, ctx.ground_level())),
+    let climate = climate::treatment(ctx.county, h, 0.0, ctx.ground_level());
+    let m = climate.multiplier();
+    let split = WildfireSplit {
+        burn_future: burn.times(&m),
+        shutoff_future: psps.times(&m),
+        burn_today: burn.clone(),
+        shutoff_today: psps.clone(),
+    };
+    let rate = HazardRate::new(
+        h,
+        burn.plus(&psps),
+        "have to leave home or lose power because of a wildfire",
+        30_000.0,
     )
+    .with_county_average(burn_base.value + psps_avg)
+    .with_eal(ctx.eal_per_household(h))
+    .with_climate(climate);
+    Some((rate, split))
 }
 
 fn drought(ctx: &Ctx<'_>) -> Option<HazardRate> {
@@ -736,7 +810,10 @@ pub(crate) fn assess(ctx: &Ctx<'_>, notes: &mut Notes) -> Natural {
                 "lose power or be stuck at home in an ice storm",
                 500.0,
             ),
-            Landslide => landslide(ctx),
+            Landslide => landslide(ctx, notes).map(|(r, damage)| {
+                out.landslide_damage = Some(damage);
+                r
+            }),
             Lightning => utility_storm(
                 ctx,
                 h,
@@ -755,7 +832,10 @@ pub(crate) fn assess(ctx: &Ctx<'_>, notes: &mut Notes) -> Natural {
             Tornado => tornado(ctx),
             Tsunami => tsunami(ctx),
             VolcanicActivity => volcanic_activity(ctx),
-            Wildfire => wildfire(ctx),
+            Wildfire => wildfire(ctx).map(|(r, split)| {
+                out.wildfire = Some(split);
+                r
+            }),
             WinterWeather => winter_weather(ctx),
             _ => None,
         };

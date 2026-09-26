@@ -8,7 +8,7 @@ use rr_types::{
 };
 
 use super::text::{self, md};
-use super::{Ctx, cite};
+use super::{Ctx, cite, cite_all};
 use crate::source::FIXTURE_DATA_NOTE;
 
 /// "Philadelphia County, Pennsylvania".
@@ -147,6 +147,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         cite("ready_gov_water")
     ));
     out.push(String::new());
+    out.push(format!("> {}", super::STATUS_LINE));
+    out.push(String::new());
     if a.location.data_note.as_deref() == Some(FIXTURE_DATA_NOTE) {
         out.push(format!("> **Sample data.** {FIXTURE_DATA_NOTE}"));
         out.push(String::new());
@@ -183,8 +185,7 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             .to_owned();
     }
     out.push(format!(
-        "**Where you are now:** {now}. **What is enough for your risks:** {}; each need stops at \
-         the step that covers it.{when}",
+        "**Where you are now:** {now}. **What is enough for your risks:** {}.{when}",
         tier_words(recommended)
     ));
     out.push(String::new());
@@ -244,7 +245,11 @@ fn assumptions(cx: &Ctx<'_>, out: &mut Vec<String>) {
             }
         }
         out.push(String::new());
-        out.push(crate::pipeline::ASSUMED_HOW_TO_UNTICK.to_owned());
+        out.push(
+            "If any is missing, untick \"Assume everyday basics\" on the Have screen and the plan \
+             will add it."
+                .to_owned(),
+        );
         out.push(String::new());
     } else if !a.input.assume_basics {
         out.push(
@@ -256,6 +261,43 @@ fn assumptions(cx: &Ctx<'_>, out: &mut Vec<String>) {
     }
 }
 
+/// From this ten-year chance of having to leave home quickly, the summary leads with the decision
+/// to leave (review S2, RR-P02).
+pub const LEAVE_FIRST_P10: f64 = 0.25;
+
+/// Named scenarios that make leaving the first thing that matters when the plan includes them.
+pub const LEAVE_FIRST_SCENARIOS: [&str; 2] = ["major_hurricane_direct_hit", "local_tsunami"];
+
+/// The decision to leave, when it comes before managing at home: the evacuation bucket's
+/// ten-year chance is at least [`LEAVE_FIRST_P10`], or the plan includes a major hurricane or a
+/// local tsunami. A local tsunami gives no time to be told, so its rule is added.
+fn leave_first(cx: &Ctx<'_>) -> Option<String> {
+    let a = cx.a;
+    let p = match a.bucket(BucketId::Evacuate).target {
+        rr_types::Target::Evacuate { p_need_10yr, .. } => p_need_10yr,
+        _ => 0.0,
+    };
+    let on = |id: &str| a.consequence.scenarios.iter().any(|s| s.on && s.id == id);
+    if p < LEAVE_FIRST_P10 && !LEAVE_FIRST_SCENARIOS.iter().any(|id| on(id)) {
+        return None;
+    }
+    let mut action = format!(
+        "Know your evacuation zone and where you would go; leave when told.{}",
+        cite_all([
+            &rr_types::CitationId::from("ready_gov_evacuation"),
+            &rr_types::CitationId::from("ready_gov_hurricanes"),
+        ])
+    );
+    if on("local_tsunami") {
+        action.push_str(&format!(
+            " On the coast, strong shaking is the warning: walk to high ground as soon as it \
+             stops.{}",
+            cite("dogami_tsunami_faq")
+        ));
+    }
+    Some(join(cx.bucket_frequency(BucketId::Evacuate), &action))
+}
+
 /// The three sentences that matter most: a threat paired with what to do about it.
 fn three_things(cx: &Ctx<'_>) -> Vec<String> {
     let a = cx.a;
@@ -263,6 +305,16 @@ fn three_things(cx: &Ctx<'_>) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     let days = |b: BucketId| a.target_days(b);
     let (power, water) = (days(BucketId::Power), days(BucketId::WaterOut));
+
+    // 0. Leaving, when it matters more than managing at home: then the stay-home amounts are
+    // for when you are not told to leave.
+    let leave = leave_first(cx);
+    let manage = if leave.is_some() {
+        "If you are not told to leave, be ready to manage"
+    } else {
+        "Be ready to manage"
+    };
+    out.extend(leave);
 
     // 1. Power and water.
     if power > 0.0 || water > 0.0 {
@@ -273,24 +325,23 @@ fn three_things(cx: &Ctx<'_>) -> Vec<String> {
         };
         let action = if power > 0.0 && (power - water).abs() < 1e-6 {
             format!(
-                "Be ready to manage about {} at home with no power or tap water.",
+                "{manage} about {} at home with no power or tap water.",
                 text::day_phrase(power)
             )
         } else if power > 0.0 && water > 0.0 {
             format!(
-                "Be ready to manage about {} at home with no power, and about {} with no tap \
-                 water.",
+                "{manage} about {} at home with no power, and about {} with no tap water.",
                 text::day_phrase(power),
                 text::day_phrase(water)
             )
         } else if power > 0.0 {
             format!(
-                "Be ready to manage about {} at home with no power.",
+                "{manage} about {} at home with no power.",
                 text::day_phrase(power)
             )
         } else {
             format!(
-                "Be ready to manage about {} with no tap water.",
+                "{manage} about {} with no tap water.",
                 text::day_phrase(water)
             )
         };
@@ -394,7 +445,8 @@ fn join(lead: Option<&str>, action: &str) -> String {
     }
 }
 
-/// Escapes a whole sentence for Markdown (numbers in brackets and dashes stay readable).
+/// Escapes a whole sentence for Markdown (numbers in brackets and dashes stay readable), keeping
+/// its citation markers.
 fn md_sentence(s: &str) -> String {
-    md(s)
+    super::md_marked(s)
 }

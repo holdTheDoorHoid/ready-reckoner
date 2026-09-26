@@ -353,6 +353,10 @@ impl ParamSet {
 pub(crate) struct BuildInput<'a> {
     pub plan: &'a PlanInput,
     pub rates: &'a [HouseholdEventRate],
+    /// Parts of hazard rates kept as separate event classes (rr-hazards' `RatePart`); rows with
+    /// a `part` fall back to the table's `fallback_share` of the whole rate when their hazard has
+    /// none here.
+    pub parts: &'a [rr_hazards::RatePart],
     pub county: CountyData<'a>,
     pub scenarios: &'a [ScenarioCandidate],
     /// On/off per scenario candidate (same order as `scenarios`).
@@ -476,6 +480,39 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
         );
         rate_param.insert(*h, id);
     }
+    // Parts of hazard rates (wildfire warnings to leave and safety shutoffs): the first valid
+    // entry per (hazard, part) wins. A hazard with any part here never falls back to the table's
+    // fixed split, so a part with no events (no shutoffs outside the West) stays at zero.
+    let mut parts: BTreeMap<(HazardId, &str), &rr_hazards::RatePart> = BTreeMap::new();
+    for p in inp.parts {
+        let ok = p.low.is_finite()
+            && p.rate_per_year.is_finite()
+            && p.high.is_finite()
+            && 0.0 <= p.low
+            && p.low <= p.rate_per_year
+            && p.rate_per_year <= p.high
+            && rates.contains_key(&p.hazard);
+        if ok {
+            parts.entry((p.hazard, p.part.as_str())).or_insert(p);
+        }
+    }
+    let split: Vec<HazardId> = parts.keys().map(|(h, _)| *h).collect();
+    let mut part_param: BTreeMap<(HazardId, &str), Option<usize>> = BTreeMap::new();
+    for (key, p) in &parts {
+        let label = table.part(key.0, key.1).map_or_else(
+            || words::hazard_plural(key.0).to_owned(),
+            |r| r.label.clone(),
+        );
+        let id = ps.rate(
+            format!("rate:{}:{}", key.0, key.1),
+            p.rate_per_year,
+            p.low,
+            p.high,
+            format!("how often {label} happen where you live"),
+            p.evidence,
+        );
+        part_param.insert(*key, id);
+    }
     let offered: Vec<&str> = inp.scenarios.iter().map(|c| c.id.as_str()).collect();
     let mut scenario_param: Vec<Option<usize>> = Vec::with_capacity(inp.scenarios.len());
     for c in inp.scenarios {
@@ -521,12 +558,39 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
                 }
                 (c.rate_per_year, scenario_param[i], Some(i))
             }
-            None => match rates.get(&row.hazard) {
-                Some(r) => {
+            None => match (rates.get(&row.hazard), row.part.as_deref()) {
+                (Some(r), part) => {
                     let factor = parent_factor.get(&row.hazard).copied().unwrap_or(1.0);
-                    (r.rate_per_year * factor, rate_param[&row.hazard], None)
+                    match part {
+                        None => (r.rate_per_year * factor, rate_param[&row.hazard], None),
+                        // The hazard crate split this rate: the part's own rate, or nothing.
+                        Some(name) if split.contains(&row.hazard) => {
+                            match parts.get(&(row.hazard, name)) {
+                                Some(p) if p.rate_per_year > 0.0 => (
+                                    p.rate_per_year * factor,
+                                    part_param[&(row.hazard, name)],
+                                    None,
+                                ),
+                                _ => continue,
+                            }
+                        }
+                        // Whole rates only: the table's fixed share of the whole.
+                        Some(name) => {
+                            let share = table
+                                .part(row.hazard, name)
+                                .map_or(0.0, |p| p.fallback_share);
+                            if share <= 0.0 {
+                                continue;
+                            }
+                            (
+                                r.rate_per_year * factor * share,
+                                rate_param[&row.hazard],
+                                None,
+                            )
+                        }
+                    }
                 }
-                None => continue,
+                (None, _) => continue,
             },
         };
         let term = table_term(row, rate, rparam, scenario, inp, &mut ps, &mut overrides);

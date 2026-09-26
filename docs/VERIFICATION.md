@@ -464,3 +464,33 @@ Fixed after this pass, each as its own commit on `agent/followups`:
 | `2c4e45b` | Chicago power range and heat-or-cold 3 → 2 days |
 | `7ce98e0` | Coos Bay tsunami card points to the earthquake card; "in a hurry" → "quickly" |
 | `2c11e41` | Miami and Sugar Land outage notes: "about 0.47 times a year" → "about once every 2 years" |
+
+## Round 2: v0.1.1 safety and correctness, engine and packet (agent/p1-engine, 2026-09-26)
+
+Findings from the round-2 review (`~/Desktop/ready-reckoner-briefs/round2/REVIEW.md`; source ids
+in brackets) fixed on `agent/p1-engine`, from main at `4f4e5b7`. Regression tests are in
+`crates/rr-plan/tests/round2.rs`, on the seven fixtures and five of the model review's backtest
+households (Paradise, a Queens basement flat, Lahaina, Utuado, Asheville; copied into
+`crates/rr-plan/tests/data/backtest/`).
+
+| # | Finding | What changed | Commit |
+| --- | --- | --- | --- |
+| S3 | Hazard cards were the six likeliest above 10 in 100: no house-fire card anywhere, no wildfire card in Paradise, no flood card for the Queens basement flat (RR-P03, M-07) | Cards: the likeliest six, house fire always, and any hazard from 1 in 100 in ten years that is Severe or worse, strikes fast or meets this home, plus scenario hazards; at most nine (docs/PACKET.md) | `f22ea3f` |
+| S3b | The life-safety warnings of the free steps reached 0 of 7 packets (RR-P03) | "Safety rules to learn now" in every packet: two ways out, gas, water heater, food at 40°F, generator backfeed, CPR; a test asserts every rule reaches every packet | `f22ea3f` |
+| S4 | Dosimeter and Faraday bag in every packet's extras (RR-P11) | Rare-catastrophe gear only with `rare_catastrophic_opt_in` | `f22ea3f` |
+| S2 | Miami (14th floor, whole city an evacuation zone) told to manage two weeks at home and to shelter in a basement (RR-P02) | Summary leads with the decision to leave (evacuation chance 25 in 100+, or a major hurricane or local tsunami in the plan); `{if:home:<kind>}` spans: basement advice for houses only, "on or below the 10th floor" for high-rises, elevator and mobile-home warnings | `4b722c8`, `f22ea3f` |
+| S5 | Landslides: Utuado 2.1 events a year and 90 in 100 homes damaged; 32 counties above 10 in 100 (M-05) | Home damage bounded by NRI's expected loss and 1 in 100 a year; roads cut off counted apart; a test checks all counties (6 held at the ceiling, Utuado 10 in 100) | `5094113` |
+| S8 | Wildfire warnings and shutoffs summed, then re-split 15/85: Butte evacuations 4.5 times too few, Maui given shutoffs (M-06) | Separate event classes end to end (`HazardAssessment::parts`, effects rows with a `part`); Butte 0.021 a year, Maui no shutoffs | `5094113` |
+| M-08 | Evacuation warning band ignored fast hazards under 5 % (Lahaina "as short as 2 hours") | Wildfire, flash-flood, tsunami and chemical-release warnings count whenever they contribute; Lahaina 6 minutes | `5094113` |
+| M-13 | "Mostly back" was the 90th percentile of all outages (Asheville half a day beside two weeks) | Restoration of the design class's outages that last a day or more; none printed under a third of the target; Asheville 6 days | `5094113` |
+| M-04 | "Something worse than these targets comes in about 10 of every 100 ten-year stretches" is per need | Canonical sentence in the packet and `rr targets`; `joint_rate` shows the model gives 20 to 39 in 100 for all needs together at 1 in 100 | `f22ea3f`, `38b2f63` |
+| H-01, H-03 | Rare box: the nuclear figure read as the household's chance; terrorism did not say what it counts | "anywhere in the world ... not for your household"; "shuts down the area ... not the chance of being hurt"; `rate_range` asserted for rare rows | `2b38f29` |
+| C1 | No statement that this is not official guidance (RR-P13) | The canonical status line under the packet's header block | `f22ea3f` |
+| W1 | "1 minutes" | Walkthrough text is the web's `noticeRange` (p1-web); the engine's formatters pin "1 minute" and read 59.5 minutes and up as "1 hour" | `f22ea3f` |
+
+**Commands.** `cargo test -p rr-plan -p rr-hazards -p rr-consequence -p rr-content -p rr-cli`
+(the goldens test fails until the planner regenerates them after the merge);
+`cargo test -p rr-plan --test round2 -- --nocapture` prints each packet's printed-page proxy and
+the joint chance; `RR_UPDATE_GOLDENS=1 cargo test -p rr-plan --test goldens` shows the golden
+changes (targets and plans are unchanged in all seven fixtures; cards, the summary, the safety
+rules, evacuation chances and relief times move).

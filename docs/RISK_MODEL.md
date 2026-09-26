@@ -104,10 +104,10 @@ cap; then the pack's ratio variables (future ÷ present at about +2 °C, optiona
 | Tsunami | a tsunami warning to leave the inundation zone | NRI | residents in the zone (NRI) × 0.3 of events bring a warning (0.1–0.6) | none | DERIVED + PRIOR |
 | Inland flooding | flood water reaches the home, or cuts off an upper-floor flat | flood-zone odds (below) | s·p_in + (1 − s)·p_out | basement ×1.5 (1.2–2); second floor or higher ×0.5 (0.3–0.8) | DERIVED + PRIOR |
 | Coastal flooding | coastal flood water reaches the home | present when NRI has it | residents in the coastal flood zone (NRI) × 1 %/yr (0.5–3 %) | as inland flooding | DERIVED + DATA |
-| Landslide | damages the home or cuts off its road | NRI | exposed share × loss ratio ÷ 0.3 (0.1–0.6) × 10 homes cut off per home damaged (3–30); else 0.001 | none | DERIVED + PRIOR |
+| Landslide | cuts off the road or damages the home (the card gives both) | NRI | home damage: exposed share × loss ratio ÷ 0.3 (0.1–0.6), bounded by NRI's expected loss and at most 1 in 100 a year (below); roads cut off: 10 homes per home damaged (3–30); no loss ratio: 0.001 of which a tenth is damage | none | DERIVED + PRIOR |
 | Avalanche | reaches the home or road | NRI | exposed share | none | DERIVED |
 | Volcanic activity | ash or mudflows reach the household | NRI | exposed share × 0.5 (0.2–1) | none | DERIVED + PRIOR |
-| Wildfire | must leave home, or loses power in a wildfire safety shutoff | NRI burn probability ×/÷ 1.5 | exposed share × 20 households warned per home that burns (5–50); plus shutoffs 0.02/yr (0.005–0.1) in AZ, CA, CO, ID, MT, NM, NV, OR, UT, WA, WY | burn part urban ×0.3, rural ×2; shutoffs urban ×0.1, suburban ×0.5, rural ×1 | PRIOR |
+| Wildfire | must leave home, or loses power in a wildfire safety shutoff (two parts, kept apart: below) | NRI burn probability ×/÷ 1.5 | warnings to leave: exposed share × 20 households warned per home that burns (5–50); plus shutoffs 0.02/yr (0.005–0.1) in AZ, CA, CO, ID, MT, NM, NV, OR, UT, WA, WY | burn part urban ×0.3, rural ×2; shutoffs urban ×0.1, suburban ×0.5, rural ×1 | PRIOR |
 | Drought | a private well runs low; or water limits that change daily life | NRI frequency ÷ national median 13.43, bounded ×0.25–×4 | — | well 1 %/yr (0.3–3 %, research §9); public water 0.2 %/yr (0.05–1 %) | PRIOR |
 
 NRI and Storm Events frequencies carry a ×/÷ 1.5 and ×/÷ 1.3 spread; earthquake models ×/÷ 2.
@@ -119,6 +119,36 @@ p_in is NFIP claims per policy-year (bounded 0.3–10 %) or the flood-zone defin
 inland-flood frequency ÷ the national median 0.9643 (bounded ×0.5–×2). Philadelphia with a
 basement comes to 0.6 % a year, in line with NRI's expected loss of about $270 a year on a
 $300,000 home (data-sources §1.4) at a typical flood claim.
+
+**Landslides: home damage bounded, roads cut off counted apart** (v0.1.1, model review M-05).
+The home-damage part is exposed residents × NRI's historic loss ratio ÷ a 0.3 damage ratio, as
+before, but it may not exceed what NRI's own expected annual loss supports: EAL ÷ (0.3 × the
+county's building value), the share of the county's homes a landslide damages each year if NRI's
+loss figure is right. The exposure share counts residents, and in landslide country it runs far
+ahead of the buildings NRI counts as exposed (Santa Barbara: 3 in 100 residents, 1 in 1,000 of the
+building value). Nor may it exceed 1 in 100 a year, the chance that defines a high-risk flood zone
+(`fema_flood_zones`), the yardstick the model uses for "likely to be damaged": no hazard makes a
+county-average home more likely to be damaged than a home in a mapped floodplain without a named
+source. When that ceiling binds, a note says so. Roads cut off stay 10 per home damaged (3–30,
+PRIOR), now per the bounded damage; `rr-hazards` passes the damage part to `rr-consequence`
+(`RatePart` `damage`), where only it forces the household out or damages the home, and the card
+gives both numbers: "Of 100 households like yours, about 63 will have a landslide cut off their
+road or damage their home in the next ten years. About 10 of 100 will have one damage their
+home." **Range:** before, 33 counties had a home-damage rate above 1 in 100 a year and NRI's
+landslide records gave Utuado 2.1 events a year with 90 in 100 homes damaged in ten years; with
+the expected-loss bound 6 counties are still above 1 in 100 (Maricao, Utuado, Las Marías, Jayuya,
+Adjuntas and Orocovis, all in Puerto Rico's central mountains) and are held at it, 13 counties are
+above 5 in 100 over ten years, and Santa Barbara comes to 2 in 100 damaged (18 cut off or
+damaged), Buncombe (Asheville) to about 1 in 1,300. `no_county_lets_landslides_damage_more_homes_than_the_ceiling`
+(`crates/rr-plan/tests/round2.rs`) checks every county in the pack.
+
+**Wildfire: warnings to leave and shutoffs are separate event classes** (v0.1.1, model review
+M-06). The two parts in the table above used to be added into one rate that `rr-consequence`
+re-split 15 % warnings / 85 % shutoffs, which gave Butte County 0.0047 evacuations a year against
+the 0.021 warnings the burn part counts (4.5 times too few) and put 85 % of Maui's warnings into
+power shutoffs Hawaii does not have. `rr-hazards` now passes each part (`HazardAssessment::parts`,
+`RatePart` `burn` and `shutoff`; they add up to the wildfire rate), and every warning is an
+evacuation, every shutoff a power cut. The register card still shows the whole rate.
 
 **The outage floor** (research §2.5, §7.5). When the county has EAGLE-I outage records, recorded
 outages × 0.7 (0.6–0.9) caused by weather (informed by Do et al. 2023: 62.1 % of long county
@@ -141,8 +171,8 @@ Natural hazards under 1 in 100,000 a year are left out of the register and named
 | Supply chain disruption | store shelves empty of what the household needs | 20 %/yr (10–40 %) | none | PRIOR, research §6.2 |
 | Chemical spill or release | a do-not-drink order or an order to stay inside | 2 %/yr (0.7–5 %) × TRI factor 1 + 0.5·log10((n + 1)/5), bounded ×0.65–×2 | TRI facilities in the county | PRIOR |
 | Nuclear plant accident | an order to shelter or leave | plant within 16 km: 2 in 10,000 a year (0.2 to 5 in 10,000); 16–80 km: 5 in 100,000 (1 to 20 in 100,000); beyond 80 km: not listed | distance | PRIOR (one US accident needing off-site action, Three Mile Island, in several thousand reactor-years) |
-| Nuclear attack (and EMP) | shown in the rare-catastrophe box | 1 in 2,000 to 1 in 400 a year worldwide (research §6.3, Forecasting Research Institute 2024); never a point estimate; the geometric middle, 1 in 894, is used only for arithmetic | none | PRIOR (published forecasts) |
-| Terrorist attack | shown in the rare-catastrophe box: an attack that disrupts daily life where you live | 1 in 10,000 to 1 in 1,000 a year for a city household | setting as unrest | PRIOR |
+| Nuclear attack (and EMP) | shown in the rare-catastrophe box | 1 in 2,000 to 1 in 400 a year worldwide (research §6.3, Forecasting Research Institute 2024); never a point estimate; the geometric middle, 1 in 894, is used only for arithmetic. Since v0.1.1 the sentence says it is "the chance of a nuclear catastrophe anywhere in the world ... not for your household" (hazard review H-01; the location-aware rebuild is v0.2.0) | none | PRIOR (published forecasts) |
+| Terrorist attack | shown in the rare-catastrophe box: an attack that shuts down the area where you live for half a day to two days; the sentence says it counts the disruption, not the chance of being hurt (H-03) | 1 in 10,000 to 1 in 1,000 a year for a city household | setting as unrest | PRIOR |
 
 ### Personal hazards
 
@@ -364,8 +394,12 @@ reproduce the research prototype's event classes:
   shaking, so damage shares are about a third of a damaging quake's.
 - **Pandemics** change daily life (a quarter of onsets): 9 in 10 disrupt shopping for about two
   weeks, and about 1 in 9 workers loses a job. **Chemical releases** bring a do-not-drink order (6
-  in 10) or an order to stay inside. **Wildfire** events are safety shutoffs (85 %) or warnings to
-  leave (15 %). **Drought** for a well household *is* the well running low.
+  in 10) or an order to stay inside. **Wildfire** comes in two parts that `rr-hazards` passes
+  separately (v0.1.1): every warning to leave is an evacuation (and 1 in 20 of them a burned home),
+  every safety shutoff a power cut; the table's rows name their `part`, and a caller with whole
+  rates only gets the old 15 / 85 split as a fallback. **Landslides** likewise: the `damage` part
+  forces the household out and damages the home, the whole rate (roads cut off included) closes
+  roads and cuts power. **Drought** for a well household *is* the well running low.
 - **Named scenarios** are extra event classes. rr-hazards passes each parent hazard's full rate;
   when a scenario is offered (on or off) its long-run share leaves the parent's ordinary rows:
   `[[overlap]]` rows scale the parent's rate by 1 − share/rate, never below a quarter (the same
@@ -463,8 +497,8 @@ big windstorms, grid failure, Cascadia).
 | ice_storm | get_home | icy_roads | icy roads | 0.05 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | landslide | supplies | slide | landslides closing roads | 0.5 | 1 d | 5 d | prior |  | rr_risk_model_priors |
 | landslide | power | slide | landslides closing roads | 0.1 | 12 h | 2 d | prior | in cold 0.5 | rr_risk_model_priors |
-| landslide | evacuate | slide | landslides closing roads | 0.1 | 5 d | 60 d | prior | warning 0–2 h | rr_risk_model_priors |
-| landslide | home_loss | slide | landslides closing roads | 0.1 | — | — | prior |  | rr_risk_model_priors |
+| landslide | evacuate | damage | landslides damaging the home | 1 | 5 d | 60 d | prior | share of the landslides that damage the home (part `damage`); warning 0–2 h | rr_risk_model_priors |
+| landslide | home_loss | damage | landslides damaging the home | 1 | — | — | prior | share of the landslides that damage the home (part `damage`) | rr_risk_model_priors |
 | landslide | get_home | slide | landslides closing roads | 0.1 | — | — | prior | households with a commuter | rr_risk_model_priors |
 | lightning | power | local | short storm outages | 0.5 | 3 h | 10 h | prior | county outage records replace the county-wide part; in heat 0.3 | rr_risk_model_priors |
 | riverine_flooding | evacuate | flood | floods at or near the home | 0.3 | 3 d | 30 d | prior | warning 1–12 h | rr_risk_model_priors |
@@ -491,10 +525,10 @@ big windstorms, grid failure, Cascadia).
 | volcanic_activity | water_boil | ash | volcanic ash | 0.2 | 2 d | 7 d | prior | homes on public water | rr_risk_model_priors |
 | volcanic_activity | comms | ash | volcanic ash | 0.1 | 1 d | 3 d | prior |  | rr_risk_model_priors |
 | volcanic_activity | home_loss | ash | volcanic ash | 0.02 | — | — | prior |  | rr_risk_model_priors |
-| wildfire | evacuate | threat | wildfires | 0.15 | 3 d | 30 d | prior | warning 0.25–12 h | rr_risk_model_priors |
-| wildfire | power | shutoff | wildfire safety power shutoffs | 0.85 | 1 d | 3 d | prior | in heat 0.3 | rr_risk_model_priors |
+| wildfire | evacuate | threat | wildfires | 1 | 3 d | 30 d | prior | share of the wildfire warnings to leave (part `burn`); warning 0.25–12 h | rr_risk_model_priors |
+| wildfire | power | shutoff | wildfire safety power shutoffs | 1 | 1 d | 3 d | prior | share of the wildfire safety power shutoffs (part `shutoff`); in heat 0.3 | rr_risk_model_priors |
 | wildfire | supplies | smoke | wildfire smoke | 0.3 | 2 d | 7 d | prior |  | rr_risk_model_priors |
-| wildfire | home_loss | threat | wildfires | 0.02 | — | — | prior |  | rr_risk_model_priors |
+| wildfire | home_loss | threat | wildfires | 0.05 | — | — | prior | share of the wildfire warnings to leave (part `burn`) | rr_risk_model_priors |
 | winter_weather | supplies | snowed_in | snow and ice storms | 1 | 1 d | 2 d | prior | county events: winter_weather, winter_storm, blizzard, heavy_snow | rr_risk_model_priors |
 | winter_weather | power | local | short storm outages | 0.3 | 3 h | 10 h | prior | county outage records replace the county-wide part; in cold 1 | rr_risk_model_priors |
 | winter_weather | comms | local | short storm outages | 0.02 | 10 h | 1.8 d | prior |  | rr_risk_model_priors |
@@ -590,6 +624,12 @@ big windstorms, grid failure, Cascadia).
 | *new_madrid_m7*: the regional economy after a New Madrid earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 | *hayward_m7*: the regional economy after a Hayward fault earthquake | 0.1 | 10 wk | 36 wk | yes | prior | rr_risk_model_priors |
 
+| Hazard | Part | Events it counts | Share when no split is passed | Why |
+|---|---|---|---|---|
+| wildfire | `burn` | wildfire warnings to leave | 0.15 | rr-hazards: NRI burn probability x residents exposed x 20 households warned per home that burns (model review M-06: these used to be added to the shutoffs and re-split 15/85, which undercounted evacuations 4 to 7 times). |
+| wildfire | `shutoff` | wildfire safety power shutoffs | 0.85 | rr-hazards: 0.02 a year in the western shutoff states (less in cities), none elsewhere. |
+| landslide | `damage` | landslides that damage the home | 0.1 | rr-hazards: exposed residents x NRI loss ratio / damage ratio 0.3, bounded by NRI's expected annual loss over the county's building value and by 1 in 100 a year (the high-risk flood-zone yardstick); roads cut off are 10 times as many (3 to 30). |
+
 | Scenario | Parent hazard whose ordinary rows give up the scenario's long-run share | Why |
 |---|---|---|
 | *cascadia_m9* | earthquake | The county earthquake rate includes Cascadia's own shaking (0.41 %/yr near Coos Bay, the long-run recurrence). |
@@ -674,12 +714,23 @@ For every duration bucket, Λ_b(d) = Σ r_h · q_{h,b} · S_{h,b}(d) (thresholds
   disability of an earner is left to insurance (a sentence says so), not added to the savings
   target.
 - **Readiness**: P_need = 1 − e^(−10·Σ r·q). `evacuate` adds the warning band (least and most
-  warning among causes with at least 5 % of the rate) and the typical days away (median of the
-  time-away mixture, on the ladder). `get_home` gives each commuter's walk and water. Tier `h72`
+  warning among causes with at least 5 % of the rate; since v0.1.1 the short warning of a fast
+  hazard, `FAST_WARNING_HAZARDS`: wildfire, flash floods under floods from rivers or heavy rain,
+  tsunami and chemical releases, counts whenever it contributes at all, model review M-08:
+  Lahaina read "as short as 2 hours" and now reads 6 minutes, the chemical-release band) and the
+  typical days away (median of the time-away mixture, on the ladder). `get_home` gives each commuter's walk and water. Tier `h72`
   when P_need ≥ 2 % (prior), else `now`. `home_loss`: the ten-year displacement chance and the
   Household Pulse shares (most back within a month; 1 in 4 renters and
   1 in 10 owners never back).
 - **Tier enough**: the smallest tier whose days cover the ladder target; income `m3`.
+- **All needs together** (v0.1.1, model review M-04): each target is outlasted at about the dial's
+  rate for its own need, so the chance that *at least one* need runs past its target is higher.
+  `ConsequenceAssessment::joint_rate` counts each event class once, at the need it runs past most
+  (co-monotone within an event, the well coupling's convention), and sums over classes. At the
+  1-in-100 setting the ten-year chance is 26 to 39 in 100 for ten of the twelve fixture and
+  backtest households (Philadelphia 36; the review's hand calculation gave 32) and about 20 in 100
+  for Coos Bay and Miami, where one named scenario drives most targets at once. The packet, the
+  CLI and the web app say "roughly 1 in 3" (the canonical dial sentence).
 
 ### Ranges
 
@@ -733,8 +784,15 @@ table has one (Cascadia coast: help in 14 days, the Oregon Resilience Plan's 1�
 mostly restored at 180 days, water 1,095 days on public water and 270 on a well; valley: help in 3
 days); otherwise, when its duration comes from measured restoration records (EAGLE-I county curves,
 ORNL hurricane restoration, county event records), help within the 72-hour standard (or sooner if
-service is back sooner) and "mostly restored" at the time to 90 % restored. `None` for
-expert-estimated durations.
+service is back sooner) and "mostly restored" when 90 % of that class's outages **that last at
+least a day** are over (`RELIEF_FROM_DAYS`, v0.1.1). Over all outages, most of them an hour or
+two, the 90th percentile described ordinary outages, not the design event: Asheville read "mostly
+back in about half a day" beside a two-week target (model review M-13). Now Asheville's power is
+mostly back in about 6 days, Philadelphia's in 6 (the hurricane curve: median 1.5 days, 5 days to
+90 %), Utuado's in 11 beside a month; Cascadia's own rating is unchanged. A rating whose "mostly
+restored" still comes out under a third of its target describes some smaller event, so it is
+dropped (`None`, "not known"): no screen may print a relief time that short without naming the
+event. `None` for expert-estimated durations.
 
 ### Sentences
 
@@ -809,6 +867,12 @@ weeks, tap water 3 weeks.)*
    long targets from the log-normal tail: 3 weeks in Philadelphia (3.7 episodes a year), 2 weeks in
    Chicago, a month in Phoenix (17 a year), against 3 days with air conditioning.
 5. **Gas stove** coverage waits for a catalogue id (`gas_stove` assumed until rr-content has one).
+6. **Storm surge and evacuation zones** (v0.1.1): the packet leads with the decision to leave when
+   the ten-year chance of leaving home is at least 25 in 100 or the plan includes a major
+   hurricane or a local tsunami, and shelter advice follows the kind of home. Surge exposure
+   itself is not in the data yet: the county-average hurricane and coastal-flood rates dilute a
+   barrier island. Per-ZIP surge shares from NOAA NHC's National Storm Surge Hazard Maps (a flag,
+   never the official zone) come in v0.2.0 (review S2, RR-P02).
 
 ### Citations
 

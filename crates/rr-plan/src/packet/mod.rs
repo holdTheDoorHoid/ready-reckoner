@@ -11,13 +11,19 @@ mod checklists;
 mod people;
 mod plan;
 mod risks;
+mod safety;
 mod sources;
 mod summary;
 mod targets;
 pub(crate) mod text;
 
 pub use plan::DETAIL_MONTHS;
-pub use risks::{CARD_MIN_P10, CARDS as HAZARD_CARDS};
+pub use risks::{
+    CARD_MIN_P10, CARDS as HAZARD_CARDS, FAST_HAZARDS, FREQUENT_CARDS, LIFE_SAFETY_MIN_P10, SEVERE,
+};
+pub use safety::{SAFETY_RULES, SafetyRule};
+pub use summary::{LEAVE_FIRST_P10, LEAVE_FIRST_SCENARIOS};
+pub use targets::dial_sentence;
 
 use std::collections::BTreeMap;
 
@@ -25,6 +31,12 @@ use rr_content::{Content, Guidance};
 use rr_types::{BucketId, Citation, CitationId, Item, PlanItem, PlanItemKind};
 
 use crate::pipeline::Assessment;
+
+/// The status line on page 1, under the header block (review C1, RR-P13): the exact words the
+/// Start screen also shows.
+pub const STATUS_LINE: &str = "Ready Reckoner is an independent, open-source planning aid. It is \
+    not official emergency guidance, and not medical, legal or financial advice. Follow \
+    instructions from your local officials first.";
 
 /// Marks where a citation marker starts and ends while the packet is assembled. Neither character
 /// can occur in content text.
@@ -57,6 +69,56 @@ pub const SECTION_HEADINGS: [&str; 10] = [
 /// A citation marker for one id.
 pub(crate) fn cite(id: &str) -> String {
     format!("{OPEN}{id}{CLOSE}")
+}
+
+/// Escapes text for Markdown ([`text::md`]) but leaves citation markers as they are, for a
+/// sentence that already carries its markers.
+pub(crate) fn md_marked(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 8);
+    let mut rest = s;
+    while let Some(start) = rest.find(OPEN) {
+        out.push_str(&text::md(&rest[..start]));
+        let after = &rest[start..];
+        match after.find(CLOSE) {
+            Some(end) => {
+                out.push_str(&after[..end + CLOSE.len_utf8()]);
+                rest = &after[end + CLOSE.len_utf8()..];
+            }
+            None => {
+                out.push_str(&text::md(after));
+                rest = "";
+            }
+        }
+    }
+    out.push_str(&text::md(rest));
+    out
+}
+
+/// A marked paragraph cut after its `n`th run of citation markers (a run is the markers after one
+/// sentence or group of sentences); the whole paragraph when it has fewer.
+pub(crate) fn up_to_citation_runs(p: &str, n: usize) -> String {
+    let mut runs = 0;
+    let mut i = 0;
+    let bytes = p.as_bytes();
+    while let Some(start) = p[i..].find(OPEN).map(|k| k + i) {
+        // The run: markers back to back.
+        let mut end = start;
+        while p[end..].starts_with(OPEN) {
+            match p[end..].find(CLOSE) {
+                Some(k) => end += k + CLOSE.len_utf8(),
+                None => return p.to_owned(),
+            }
+        }
+        runs += 1;
+        if runs == n {
+            return p[..end].to_owned();
+        }
+        i = end;
+        if i >= bytes.len() {
+            break;
+        }
+    }
+    p.to_owned()
 }
 
 /// Markers for several ids (deduplicated, in order).
@@ -132,14 +194,27 @@ impl<'a> Ctx<'a> {
         text::per_100(chance) != "fewer than 1"
     }
 
+    /// Whether a conditional span belongs in this household's packet: a span about one hazard of
+    /// a family block (`{if:avalanche}…{/if}`) when that hazard is relevant here
+    /// ([`Ctx::hazard_relevant`]); a span about a kind of home (`{if:home:apartment_high_rise}`,
+    /// `{if:not_home:…}`) when the household's home is (or is not) of that kind.
+    pub fn condition_holds(&self, id: &str) -> bool {
+        use rr_content::policy::Condition;
+        match Condition::parse(id) {
+            Ok(Condition::Hazard(h)) => self.hazard_relevant(&h),
+            Ok(c) => c.for_home(self.a.input.housing.kind).unwrap_or(true),
+            // Malformed conditions never pass the content validator; keep the text.
+            Err(_) => true,
+        }
+    }
+
     /// A guidance block's prose with the placeholders filled and its footnotes turned into
     /// citation markers. `frequency` fills `{frequency}` (the placeholder and the space after it
-    /// are dropped when there is none); `target` fills `{target}`. A span about one hazard of a
-    /// family block (`{if:avalanche}…{/if}`) stays only when that hazard is relevant here
-    /// ([`Ctx::hazard_relevant`]).
+    /// are dropped when there is none); `target` fills `{target}`. Conditional spans stay only
+    /// when their condition holds for this household ([`Ctx::condition_holds`]).
     pub fn guidance(&self, g: &Guidance, frequency: Option<&str>, target: Option<&str>) -> String {
         let mut body =
-            rr_content::policy::apply_conditions(g.prose().trim(), |h| self.hazard_relevant(h));
+            rr_content::policy::apply_conditions(g.prose().trim(), |id| self.condition_holds(id));
         let county = format!(
             "{}, {}",
             self.a.location.county_name, self.a.location.state_name
@@ -215,6 +290,18 @@ pub(crate) fn helps_paragraph(rendered: &str) -> Vec<String> {
     } else {
         advice
     }
+}
+
+/// A topic block's what-to-do: its "What helps" and "What to avoid" paragraphs when it has a
+/// "What helps", otherwise every paragraph that opens with a bold heading (a block written as
+/// steps, such as drills), otherwise the whole block. The why (opening paragraph, figures) is
+/// the app's Learn view.
+pub(crate) fn topic_paragraphs(rendered: &str) -> Vec<String> {
+    let advice = advice_paragraphs(rendered);
+    if advice.iter().any(|p| p.starts_with(HELPS)) {
+        return advice;
+    }
+    headed_paragraphs(rendered)
 }
 
 /// A topic block without its opening paragraph (the why, which the app's Learn view carries):

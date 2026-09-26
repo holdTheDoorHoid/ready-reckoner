@@ -59,14 +59,14 @@ pub mod words;
 
 pub use assess::{
     BucketDetail, CommuteWalk, ConsequenceAssessment, DURATION_BUCKETS, EvacuateDetail,
-    GAS_STOVE_ITEM_IDS, GetHomeDetail, HomeLossDetail, IncomeDetail, TermSummary, assess,
-    assess_with_draws,
+    FAST_WARNING_HAZARDS, GAS_STOVE_ITEM_IDS, GetHomeDetail, HomeLossDetail, IncomeDetail,
+    TermSummary, assess, assess_full, assess_with_draws, assess_with_parts,
 };
 pub use curve::{
     CurveTerm, DialPoint, ExceedanceCurve, LADDER_TOLERANCE, ONE_IN_100_RATE, dial_rate,
     round_up_to_ladder,
 };
-pub use effects::{EffectRow, EffectsTable, IncomeRow, OverlapRow, table};
+pub use effects::{EffectRow, EffectsTable, IncomeRow, OverlapRow, PartRow, table};
 pub use income::{GapRule, IncomeCurve, MONTHS_LADDER, round_up_months};
 pub use model::{CountyData, CouplingApplied, OverrideApplied, ScenarioCandidate};
 pub use ranges::DRAWS;

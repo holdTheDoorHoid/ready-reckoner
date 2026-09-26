@@ -115,13 +115,15 @@ pub fn why_we_think_this(hazard: HazardId) -> &'static str {
              several thousand years of reactor operation. Near a plant the chance is very small."
         }
         NuclearAttack => {
-            "Experts asked in 2024 put the chance of a nuclear catastrophe by 2045 at about 5 in \
-             100; forecasters with strong track records said about 1 in 100. No one can say what it \
-             would mean where you live."
+            "Experts asked in 2024 put the chance of a nuclear catastrophe anywhere in the world \
+             by 2045 at about 5 in 100; forecasters with strong track records said about 1 in 100. \
+             That is the world's chance, not your household's: no one can say what it would mean \
+             where you live."
         }
         Terrorism => {
-            "Attacks that stop daily life where people live for a day or more are rare. This is an \
-             expert estimate for a city, lower outside cities."
+            "Attacks that close down the area where people live for half a day to two days are \
+             rare. This is an expert estimate for a city, lower outside cities, and it counts the \
+             disruption, not the chance of being hurt."
         }
         JobLoss => {
             "About 8 in 100 working people were out of work at some point in 2024 (Bureau of Labor \

@@ -848,21 +848,24 @@ sources = ["rr_risk_model_priors"]
 
 [[effect]]
 hazard = "landslide"
+part = "damage"
 bucket = "evacuate"
-class = "slide"
-label = "landslides closing roads"
-p_given_event = 0.1
+class = "damage"
+label = "landslides damaging the home"
+p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 5.0, p90_days = 60.0 }
 notice_hours = [0.0, 2.0]
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
+note = "A landslide that damages the home forces the household out; one that only closes the road does not (model review M-05)."
 
 [[effect]]
 hazard = "landslide"
+part = "damage"
 bucket = "home_loss"
-class = "slide"
-label = "landslides closing roads"
-p_given_event = 0.1
+class = "damage"
+label = "landslides damaging the home"
+p_given_event = 1.0
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
@@ -1148,27 +1151,29 @@ sources = ["rr_risk_model_priors"]
 
 [[effect]]
 hazard = "wildfire"
+part = "burn"
 bucket = "evacuate"
 class = "threat"
 label = "wildfires"
-p_given_event = 0.15
+p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 3.0, p90_days = 30.0 }
 notice_hours = [0.25, 12.0]
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
-note = "rr-hazards counts warnings to leave and safety shutoffs; in the West most events are shutoffs. Wildfires give minutes to hours of warning."
+note = "Every event of the burn part is a warning to leave (rr-hazards counts households warned). Wildfires give minutes to hours of warning."
 
 [[effect]]
 hazard = "wildfire"
+part = "shutoff"
 bucket = "power"
 class = "shutoff"
 label = "wildfire safety power shutoffs"
-p_given_event = 0.85
+p_given_event = 1.0
 duration = { kind = "log_normal", median_days = 1.0, p90_days = 3.0 }
 heat_share = 0.3
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
-note = "Utilities cut power for one to three days when fire danger is extreme."
+note = "Every event of the shutoff part cuts the power. Utilities cut power for one to three days when fire danger is extreme."
 
 [[effect]]
 hazard = "wildfire"
@@ -1183,12 +1188,14 @@ note = "Heavy smoke keeps people indoors for days."
 
 [[effect]]
 hazard = "wildfire"
+part = "burn"
 bucket = "home_loss"
 class = "threat"
 label = "wildfires"
-p_given_event = 0.02
+p_given_event = 0.05
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
+note = "One home burns for every 20 households warned to leave (rr-hazards' households warned per home that burns, 5 to 50)."
 
 [[effect]]
 hazard = "winter_weather"
@@ -2272,3 +2279,30 @@ spell_weeks = { kind = "log_normal", median_days = 10.0, p90_days = 36.0 }
 unemployment_insurance = true
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
+
+# ---------------------------------------------------------------------------------------------
+# Parts of a hazard's rate (rows with `part = ...` take the part's rate instead of the whole).
+# rr-hazards passes each part's rate (rr_hazards::RatePart); `fallback_share` is used only when a
+# caller passes whole rates (the research calibration), and reproduces the earlier fixed split.
+# ---------------------------------------------------------------------------------------------
+
+[[part]]
+hazard = "wildfire"
+part = "burn"
+fallback_share = 0.15
+label = "wildfire warnings to leave"
+note = "rr-hazards: NRI burn probability x residents exposed x 20 households warned per home that burns (model review M-06: these used to be added to the shutoffs and re-split 15/85, which undercounted evacuations 4 to 7 times)."
+
+[[part]]
+hazard = "wildfire"
+part = "shutoff"
+fallback_share = 0.85
+label = "wildfire safety power shutoffs"
+note = "rr-hazards: 0.02 a year in the western shutoff states (less in cities), none elsewhere."
+
+[[part]]
+hazard = "landslide"
+part = "damage"
+fallback_share = 0.1
+label = "landslides that damage the home"
+note = "rr-hazards: exposed residents x NRI loss ratio / damage ratio 0.3, bounded by NRI's expected annual loss over the county's building value and by 1 in 100 a year (the high-risk flood-zone yardstick); roads cut off are 10 times as many (3 to 30)."

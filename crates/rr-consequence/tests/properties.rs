@@ -679,8 +679,9 @@ fn relief_follows_the_design_event() {
         r.sources,
         vec![rr_types::CitationId::from("oregon_resilience_plan_2013")]
     );
-    // Philadelphia's power design event is a hurricane with a measured restoration curve: help
-    // within the 72-hour standard, mostly restored at the time to 90 % restored (5 days).
+    // Philadelphia's power design event is a hurricane with a measured restoration curve (median
+    // 1.5 days, 90 % restored at 5): help within the 72-hour standard, and mostly restored when 90 %
+    // of those outages that last a day or more are over (model review M-13), about 6 days.
     let phl_stats = research::philadelphia_outages();
     let phl = assess_with_draws(
         &research::philadelphia_household(),
@@ -693,10 +694,24 @@ fn relief_follows_the_design_event() {
         TEST_DRAWS,
     );
     let r = phl.bucket(BucketId::Power).relief.clone().expect("relief");
+    let curve = rr_consequence::Survival::log_normal(1.5, 5.0);
+    let from = curve.sf(rr_consequence::assess::RELIEF_FROM_DAYS, 0.0);
+    let want = curve.quantile_days(1.0 - 0.1 * from);
+    assert!((want - 6.14).abs() < 0.01, "{want}");
     assert!(
-        (r.mostly_restored_days - 5.0).abs() < 1e-4 && r.help_arrives_days == 3.0,
+        (f64::from(r.mostly_restored_days) - want).abs() < 1e-4 && r.help_arrives_days == 3.0,
         "{r:?}"
     );
+    // Never shorter than a third of the target it sits beside.
+    for b in phl.buckets.iter().chain(coos.buckets.iter()) {
+        if let (Some(r), rr_types::Target::Days { value, .. }) = (&b.relief, b.target) {
+            assert!(
+                3.0 * r.mostly_restored_days >= value,
+                "{}: {r:?} vs {value}",
+                b.id
+            );
+        }
+    }
     // Water outages from expert estimates only: no relief rating.
     assert!(phl.bucket(BucketId::WaterOut).relief.is_none());
 }
