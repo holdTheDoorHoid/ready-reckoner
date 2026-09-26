@@ -753,6 +753,12 @@ function buildChunks(ctx: Ctx): Chunk[] {
       out.push(chunk(ctx, 'power_station', t.power.value > 14 ? 'm1' : 'w2', 1));
     }
   }
+
+  // Rare catastrophes: $0 by default; opted in, a single item in a late month (real allocator
+  // caps this at 10% of the monthly budget, `Dials.rare_catastrophic_opt_in`).
+  if (ctx.input.dials.rare_catastrophic_opt_in) {
+    out.push(chunk(ctx, 'radiation_meter', 'm3', 1));
+  }
   return out;
 }
 

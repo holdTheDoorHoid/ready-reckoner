@@ -7,6 +7,7 @@
 -->
 <script lang="ts">
   import BucketGauge from '../components/BucketGauge.svelte';
+  import CheckRow from '../components/CheckRow.svelte';
   import ChoiceGroup from '../components/ChoiceGroup.svelte';
   import CountyMap from '../components/CountyMap.svelte';
   import Dial from '../components/Dial.svelte';
@@ -47,6 +48,12 @@
     const d = app.plan.input.dials;
     d.scenario_overrides = [...(d.scenario_overrides ?? []).filter((t) => t.id !== id), { id, on }];
     announcement = on ? 'Scenario switched on; targets updated.' : 'Scenario switched off; targets updated.';
+  }
+
+  function setRareCatastrophicOptIn(on: boolean) {
+    if (!app.plan) return;
+    app.plan.input.dials.rare_catastrophic_opt_in = on;
+    announcement = on ? 'Rare-catastrophe budget allowed.' : 'Rare-catastrophe budget switched off.';
   }
 
   /**
@@ -176,6 +183,12 @@
                   value={dials.water_level ?? 'basic'}
                   onchange={(v: WaterLevel) => setDial('water_level', v, `${WATER_LEVEL[v].label} water`)}
                   columns={3}
+                />
+                <CheckRow
+                  label="Allow up to 10% of my budget for rare catastrophes (off by default)"
+                  help="Covers items like a radiation meter, potassium iodide only on official instruction, or Faraday storage. See Rare but severe below."
+                  checked={dials.rare_catastrophic_opt_in ?? false}
+                  onchange={setRareCatastrophicOptIn}
                 />
                 <div class="settings__live" aria-hidden="true">
                   {#each duration.filter((b) => ['power', 'water_out', 'supplies'].includes(b.id)) as b (b.id)}
