@@ -17,6 +17,7 @@ water systems, storm surge, eviction, dust storms, optional packs).
 ```
 cargo run -p rr-etl -- refresh --out data [--only <job>[,<job>]] [--optional] [--keep-raw] [--keep-intermediate]
 cargo run -p rr-etl -- verify --data data
+cargo run -p rr-etl -- manifest --rehash --data data
 cargo run -p rr-etl -- jobs
 ```
 
@@ -51,6 +52,13 @@ cargo run -p rr-etl -- jobs
 - **Deterministic output.** Rows are sorted by key, numbers are rounded to 4 significant figures
   (coordinates to fixed decimals), and transcendental maths uses the pure-Rust `rr_types::math`,
   so an unchanged input produces a byte-identical pack. Only the manifest's timestamps change.
+- **`manifest --rehash`** recomputes every listed file's sha256, size and row count, each job's
+  `rows_out` and `pack_version` from the files on disk, and notes the change in `data/CHANGES.md`;
+  it downloads nothing and runs no job. Use it after merging two data branches (a file both
+  rebuilt matches neither side's checksum, as `core/events.csv` did when data-model met
+  data-hazard in v0.2.0) or after a hand edit of a pack file, then run `verify`. It leaves
+  `generated` and the jobs' sources and timestamps alone: they date the refreshes that fetched
+  the data.
 - **`verify`** recomputes every file's sha256 and row count against the manifest and checks that
   every county on the map exists in every county-keyed pack or is listed under that job's
   `missing` reasons, that no pack uses an old Connecticut county code, and that ZIP shares sum
