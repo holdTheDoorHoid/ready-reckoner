@@ -50,3 +50,18 @@ Jobs run: geography.
 | `core/zip_centroids.csv` | 33791 | 33791 | 0 | 0 | 33459 | changed |
 | `core/zip_county.csv` | 46772 | 46772 | 0 | 0 | 0 | unchanged |
 | `geo/counties.json` | 3222 | 3222 | 0 | 0 | 0 | unchanged |
+
+## 2026-09-26T00:26:38Z — pack version 3d0e0f865336
+
+Jobs run: none.
+Job **nri failed**: unexpected source data: NRI data dictionary no longer lists field DRGT_EXPB
+
+## 2026-09-26T00:27:16Z — pack version c11c8a555ab8
+
+Jobs run: nri.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/nri_counties.csv` | 0 | 3232 | 0 | 0 | 0 | new |
+| `core/nri_hazards.csv` | 0 | 45853 | 0 | 0 | 0 | new |
+| `core/nri_semantics.toml` | 0 | 18 | 0 | 0 | 0 | new |

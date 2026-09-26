@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "3d0e0f865336",
-  "generated": "2026-09-26T00:23:53Z",
+  "pack_version": "c11c8a555ab8",
+  "generated": "2026-09-26T00:27:16Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -26,6 +26,34 @@
             "old_fips",
             "region_fips"
           ]
+        },
+        {
+          "path": "core/nri_counties.csv",
+          "job": "nri",
+          "sha256": "29b130d2997ff11be80df94a3b843d1d266095ef3c66508e383aeab670b95751",
+          "bytes": 198762,
+          "rows": 3232,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/nri_hazards.csv",
+          "job": "nri",
+          "sha256": "660b9005972da9b7ed87c5fbda6fcee7ba37d02d09f2bcdc9efaed8f621b7c76",
+          "bytes": 3973905,
+          "rows": 45853,
+          "key": [
+            "fips",
+            "hazard"
+          ]
+        },
+        {
+          "path": "core/nri_semantics.toml",
+          "job": "nri",
+          "sha256": "03d188e4fcc9e6f61f3b93979ff4b33841703adbf26f86a146c8ec3fb440bb86",
+          "bytes": 9832,
+          "rows": 18
         },
         {
           "path": "core/states.csv",
@@ -172,9 +200,71 @@
         "Connecticut: ZIP shares for Connecticut come from the 2022 town-to-ZCTA file, so they point at planning regions (091xx). ct_crosswalk.csv records the land-area overlap of the 8 retired counties and 9 regions, used to convert sources that still report old counties.",
         "states.csv: `coastal` means a marine (ocean, gulf or tidal estuary) shoreline; Pennsylvania counts through the tidal Delaware estuary. `great_lakes` means a Great Lakes shoreline. These two flags are curated, not downloaded."
       ]
+    },
+    "nri": {
+      "title": "FEMA National Risk Index v1.20, trimmed to the model's county fields",
+      "finished": "2026-09-26T00:27:16Z",
+      "sources": [
+        {
+          "name": "FEMA National Risk Index, counties (ArcGIS FeatureServer)",
+          "url": "https://services.arcgis.com/XG15cJAlne2vxtgt/arcgis/rest/services/National_Risk_Index_Counties/FeatureServer/0/query (POST where=1=1, 164 fields, ordered by STCOFIPS, pages of 1000)",
+          "version": "v1.20.0 (December 2025); NRI_VER field \"December 2025\"; item modified 1766093159000",
+          "retrieved": "2026-09-26T00:27:09Z",
+          "sha256": "ca70c180843ac2aa129b73a57cb8fc07e10c6b5f1de477864943d94f23ec8ea3",
+          "bytes": 14295278,
+          "license": "US Government data subject to the NRI Terms & Conditions (see item page)",
+          "obligations": "Cite the dataset with version and access date; show this statement: This product uses the Federal Emergency Management Agency’s National Risk Index dataset API or downloadable datasets but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s). Do not present modified data as FEMA's; FEMA may rescind use."
+        },
+        {
+          "name": "NRI item metadata and Terms & Conditions",
+          "url": "https://www.arcgis.com/sharing/rest/content/items/39485e8035d446a5bff03259508ae355?f=json",
+          "version": "item modified 1766093159000",
+          "retrieved": "2026-09-26T00:27:09Z",
+          "sha256": "d8834fe4d7420cc56b68a6db849a37b3c27f5f8594b38d34ea392a3b5939ad8b",
+          "bytes": 38231,
+          "license": "Terms & Conditions"
+        },
+        {
+          "name": "NRI data dictionary",
+          "url": "https://fema.maps.arcgis.com/sharing/rest/content/items/4b9db412e99542029b3c37c37ad714bb/data",
+          "version": "1.20.0 (December 2025)",
+          "retrieved": "2026-09-26T00:27:09Z",
+          "sha256": "fd613c89e547b852666ab8fe5c64fc7980c5da7654a90a305f6f40af31236311",
+          "bytes": 61179,
+          "license": "Terms & Conditions"
+        }
+      ],
+      "rows_in": 3232,
+      "rows_out": 49103,
+      "outputs": [
+        "core/nri_counties.csv",
+        "core/nri_hazards.csv",
+        "core/nri_semantics.toml"
+      ],
+      "notes": [
+        "Fields that NRI v1.20 does not publish (left empty): DRGT_EXPB, DRGT_EXPP, DRGT_EALB, DRGT_EALP, DRGT_HLRB, DRGT_ALRB. Drought is modelled for agriculture only.",
+        "3232 counties, 45853 hazard rows. Kept per hazard: AFREQ, EXPB, EXPP, EALB, EALP, EALT, HLRB, ALRB, RISKS; per county: POPULATION, BUILDVALUE, EAL_VALT, SOVI_SCORE, RESL_SCORE, CRF_VALUE. Values rounded to 4 significant figures. Hazard rows where every field is empty (hazard not applicable) are omitted.",
+        "536 counties are coastal and 118 have a tsunami zone by the definitions above (derived by Ready Reckoner, not FEMA fields).",
+        "Terms compliance: only the trimmed, rounded county fields the model uses are shipped (never the raw table); the About screen and the packet show the citation and disclaimer; numbers Ready Reckoner derives from NRI are labelled as ours."
+      ],
+      "definitions": {
+        "coastal": "A county is coastal when NRI v1.20 assigns it coastal-flooding building exposure (CFLD_EXPB > 0).",
+        "nri_citation": "Federal Emergency Management Agency (FEMA), National Risk Index Dataset: National Risk Index Counties - v1.20.0 (December 2025). Retrieved from https://fema.maps.arcgis.com/home/item.html?id=39485e8035d446a5bff03259508ae355 on 2026-09-26 (UTC).",
+        "nri_disclaimer": "This product uses the Federal Emergency Management Agency’s National Risk Index dataset API or downloadable datasets but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).",
+        "nri_version": "1.20.0 (December 2025)",
+        "tsunami_zone": "A county has a tsunami zone when NRI v1.20 assigns it tsunami building or population exposure (TSUN_EXPB > 0 or TSUN_EXPP > 0)."
+      }
     }
   },
   "attributions": [
+    {
+      "source": "FEMA National Risk Index",
+      "text": "Federal Emergency Management Agency (FEMA), National Risk Index Dataset: National Risk Index Counties - v1.20.0 (December 2025). Retrieved from https://fema.maps.arcgis.com/home/item.html?id=39485e8035d446a5bff03259508ae355 on 2026-09-26 (UTC). This product uses the Federal Emergency Management Agency’s National Risk Index dataset API or downloadable datasets but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).",
+      "license": "US Government data; NRI Terms & Conditions",
+      "url": "https://fema.maps.arcgis.com/home/item.html?id=39485e8035d446a5bff03259508ae355",
+      "version": "1.20.0 (December 2025)",
+      "accessed": "2026-09-26"
+    },
     {
       "source": "NCA5 Atlas regions",
       "text": "Region boundaries: U.S. Global Change Research Program, Fifth National Climate Assessment Interactive Atlas (CC0 1.0).",
