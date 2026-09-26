@@ -28,7 +28,7 @@
     <span class="scenario__state">{scenario.on ? 'On' : 'Off'}</span>
   </label>
   <p class="small" id="{uid}-why">{scenario.applies_because}</p>
-  <p class="small">{scenario.effect_summary}</p>
+  {#if !comparison?.length}<p class="small">{scenario.effect_summary}</p>{/if}
   {#if comparison?.length}
     <!-- Wide tables scroll sideways on phones; a focusable, labelled region lets keyboard users scroll it. -->
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->

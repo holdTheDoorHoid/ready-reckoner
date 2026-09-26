@@ -477,6 +477,11 @@ th {
   background: var(--surface-2);
 }
 
+tbody th[scope='row'] {
+  background: transparent;
+  font-weight: 600;
+}
+
 /* Disclosure ------------------------------------------------------------------------------ */
 
 details > summary {

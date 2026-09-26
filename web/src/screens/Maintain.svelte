@@ -118,7 +118,7 @@
     <section aria-labelledby="due-title">
       <h2 id="due-title">Due now</h2>
       {#if due.length === 0}
-        <p class="card"><Icon name="check" /> Nothing is due. {soon[0] ? `Next: ${soon[0].title.toLowerCase()} on ${formatDate(soon[0].due)}.` : ''}</p>
+        <p class="card"><Icon name="check" /> Nothing is due. {soon[0] ? `The next one is on ${formatDate(soon[0].due)}: ${soon[0].title}.` : ''}</p>
       {:else}
         <ul class="tasks">
           {#each due as t (t.key)}

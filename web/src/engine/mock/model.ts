@@ -305,7 +305,9 @@ function buildRegister(input: PlanInput, f: Facts, profile: RegionProfile, loc: 
     if (seed.eal !== undefined) hp.eal_per_household_usd = seed.eal;
     out.push({ profile: hp, seed, rate });
   }
-  const importance = (h: RankedHazard) => h.profile.annual_probability * h.profile.severity;
+  // Ten-year chance times severity squared: likely things lead, and a rare event that hits
+  // everything at once still ranks near the top instead of below everyday nuisances.
+  const importance = (h: RankedHazard) => chanceWithin(h.rate, 10) * h.profile.severity ** 2;
   const ranked = out
     .filter((h) => !h.seed.rare)
     .sort((a, b) => importance(b) - importance(a) || a.seed.id.localeCompare(b.seed.id));
@@ -1568,8 +1570,8 @@ function buildWarnings(
       out.push({
         id: `cliff_${s.seed.id}`,
         severity: 'warn',
-        message: `Your plan depends mostly on one event: ${hazardName(s.seed.hazard).toLowerCase().replace(/s$/, '')} (${s.seed.name.replace(/^Plan for /, '')}).`,
-        why: `At this setting, planning for it raises "${bucketName(b).toLowerCase()}" from about ${dayPhrase(off.days[b].value)} to about ${dayPhrase(targets.days[b].value)}. That is a reasonable choice where official guidance covers it. You can switch it off on the risks screen to see the plan without it.`,
+        message: `Your plan depends mostly on one event: ${s.seed.name.replace(/^Plan for /, '')}.`,
+        why: `At this setting, planning for it raises "${bucketName(b).toLowerCase()}" from about ${dayPhrase(off.days[b].value)} to about ${dayPhrase(targets.days[b].value)}. That is a reasonable choice where official guidance covers it. To see the plan without it, switch it off under "Named scenarios" on the risks screen.`,
         related: [s.seed.id, s.seed.hazard, b],
       });
     }

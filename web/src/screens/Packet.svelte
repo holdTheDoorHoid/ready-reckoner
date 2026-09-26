@@ -5,21 +5,9 @@
 <script lang="ts">
   import Icon from '../components/Icon.svelte';
   import PlanGate from '../components/PlanGate.svelte';
+  import { followInPageAnchor } from '../lib/anchors';
   import { renderMarkdown } from '../lib/markdown';
 
-  /** In-page links inside the packet (notes, sources) scroll without touching the page's route. */
-  function followAnchor(e: MouseEvent) {
-    const link = (e.target as HTMLElement | null)?.closest('a');
-    const target = link?.getAttribute('href');
-    if (!link || !target || !target.startsWith('#') || target.startsWith('#/')) return;
-    e.preventDefault();
-    const el = document.getElementById(target.slice(1));
-    if (el) {
-      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
-      el.scrollIntoView({ block: 'start' });
-      el.focus({ preventScroll: true });
-    }
-  }
 </script>
 
 <div class="page packet-page">
@@ -37,7 +25,7 @@
   <PlanGate>
     {#snippet children(output)}
       <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
-      <article class="packet card" aria-label="Preparedness packet" onclick={followAnchor}>
+      <article class="packet card" aria-label="Preparedness packet" onclick={followInPageAnchor}>
         {@html renderMarkdown(output.packet_markdown, { idPrefix: 'pk', headingOffset: 1 })}
       </article>
     {/snippet}

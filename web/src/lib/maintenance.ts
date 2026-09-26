@@ -42,6 +42,9 @@ export function intervalLabel(months: number): string {
 }
 
 function titleFor(kind: TaskKind, item: Item): string {
+  // Free steps are already phrased as actions ("Test smoke alarms..."), so they keep their names.
+  if (item.free) return kind === 'rotate' ? `${item.name} (swap it for fresh)` : item.name;
+  // Only the first letter is lowered, so "CO alarm" stays "CO alarm".
   const name = item.name.charAt(0).toLowerCase() + item.name.slice(1);
   if (kind === 'rotate') return `Use and replace: ${name}`;
   if (kind === 'drill') return `Practise: ${name}`;

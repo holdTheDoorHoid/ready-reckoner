@@ -2,6 +2,7 @@
 <script lang="ts">
   import Icon from '../components/Icon.svelte';
   import { ARTICLES, article } from '../learn/articles';
+  import { followInPageAnchor } from '../lib/anchors';
   import { renderMarkdown } from '../lib/markdown';
   import { href, useRouter } from '../lib/router.svelte';
 
@@ -14,7 +15,8 @@
     <p class="no-print"><a href={href('learn')}><Icon name="chevron-left" /> All articles</a></p>
     <h1 id="page-title" tabindex="-1">{current.title}</h1>
     {#if current.draft}<p class="chip draft">Draft text, still being reviewed</p>{/if}
-    <article class="prose">{@html renderMarkdown(current.body, { idPrefix: `learn-${current.slug}`, headingOffset: 1 })}</article>
+    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+    <article class="prose" onclick={followInPageAnchor}>{@html renderMarkdown(current.body, { idPrefix: `learn-${current.slug}`, headingOffset: 1 })}</article>
   {:else}
     <h1 id="page-title" tabindex="-1">Learn</h1>
     {#if router.current.param}<p class="card">That article could not be found. Here are the others.</p>{/if}

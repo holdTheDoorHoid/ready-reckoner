@@ -61,7 +61,7 @@
       <ul class="credits">
         {#each info.attributions as a (a.source)}
           <li class="card">
-            <p class="credit__source">{a.source}{a.version ? `, version ${a.version}` : ''}</p>
+            <p class="credit__source">{a.source}{a.version ? ` (${a.version})` : ''}</p>
             <p>{a.text}</p>
             <p class="small muted">Accessed {formatDate(a.accessed)}. <a href={a.url} target="_blank" rel="noopener noreferrer">{a.url}<span class="visually-hidden"> (opens in a new tab)</span></a></p>
           </li>

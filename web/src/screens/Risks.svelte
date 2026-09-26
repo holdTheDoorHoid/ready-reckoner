@@ -202,7 +202,7 @@
         <section aria-labelledby="scenarios-title">
           <h2 id="scenarios-title">Named scenarios for your area</h2>
           <p class="section-intro">One big event can decide most of your targets here. You can plan with it or without it; both are reasonable.</p>
-          <div class="grid">
+          <div class="scenarios">
             {#each output.scenarios as s (s.id)}
               <ScenarioToggle scenario={s} comparison={comparisons[s.id] ?? null} onchange={(on) => setScenario(s.id, on)} />
             {/each}
@@ -318,6 +318,11 @@
   }
   .settings__live p {
     margin: 0;
+  }
+  .scenarios {
+    display: grid;
+    gap: var(--s4);
+    max-width: 48rem;
   }
   .featured {
     display: grid;
