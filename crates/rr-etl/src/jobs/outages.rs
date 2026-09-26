@@ -67,7 +67,7 @@ pub const MIN_STATE_COVERAGE: f64 = 0.5;
 pub const PR_ISLAND: u32 = 72000;
 
 /// The event definition, quoted into the manifest and into every `OutageStats`.
-pub const DEFINITION: &str = "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (ORNL modelled customer count; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged. Short reversals inside an event (under half of the current peak or trough, or under the 1% level) are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power. Rates are customer outages in such events per customer per year of data.";
+pub const DEFINITION: &str = "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged. Short reversals inside an event (under half of the current peak or trough, or under the 1% level) are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power. Rates are customer outages in such events per customer per year of data.";
 
 #[derive(Debug, Clone, Default)]
 struct OpenEvent {
