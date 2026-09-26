@@ -880,6 +880,9 @@ impl DataStore {
                     flood: self.flood.get(fips).cloned(),
                     facilities: self.facilities.get(fips).map(|x| x.0.clone()),
                     vulnerability,
+                    // awaiting: data-hazard — its loader fills this from the v2 exposure files
+                    // (`exposure_of`); at merge, take data-hazard's side of this line.
+                    exposure: Default::default(),
                 },
             );
         }
