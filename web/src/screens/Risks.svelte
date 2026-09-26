@@ -300,12 +300,7 @@
   }
   .settings__grid {
     display: grid;
-    gap: 0 var(--s5);
-  }
-  @media (min-width: 48rem) {
-    .settings__grid {
-      grid-template-columns: 1fr 1fr;
-    }
+    gap: 0;
   }
   .settings__live {
     display: flex;

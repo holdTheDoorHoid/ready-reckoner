@@ -16,6 +16,7 @@
   <p class="help" id="{uid}-help">
     A more cautious setting plans for longer, rarer disruptions. "1-in-100" means an event that size has about a 1 in 100 chance each year.
   </p>
+  <div class="dial__wrap">
   <div class="dial__options">
     {#each RETURN_PERIODS as rp, i (rp)}
       <label class="dial__option">
@@ -29,20 +30,33 @@
       </label>
     {/each}
   </div>
+  </div>
 </fieldset>
 
 <style>
   .dial {
     margin-bottom: var(--s5);
   }
+  .dial__wrap {
+    container-type: inline-size;
+  }
   .dial__options {
     display: grid;
     gap: var(--s2);
   }
-  @media (min-width: 56rem) {
+  /* Two by two when there is room, four across only when each setting gets a comfortable width. */
+  @container (min-width: 34rem) {
+    .dial__options {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @container (min-width: 64rem) {
     .dial__options {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
+  }
+  .dial__option .chip {
+    white-space: normal;
   }
   .dial__option {
     position: relative;
