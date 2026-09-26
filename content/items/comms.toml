@@ -126,7 +126,7 @@ avoid = [
   "Using the phone as your only light",
   "Letting it run down before a storm",
 ]
-price_band_usd = { low = 0, high = 0, per = "phone", note = "Not bought by the plan: most people already have a phone." }
+price_band_usd = { low = 0, high = 0, per = "phone", note = "Free: the plan never buys a phone; it counts one for each teenager and adult as already owned." }
 quantity_rule = "per_person_13_plus"
 citations = ["ready_gov_alerts", "fcc_wea", "fcc_text_911", "ready_gov_kit", "ready_gov_low_cost"]
 hazard_extras = []
