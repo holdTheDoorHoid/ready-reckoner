@@ -7,8 +7,8 @@
 //!   tornado counts once per county), and days with hail of 1 in / 2 in or larger and days with
 //!   severe thunderstorm wind reports (any, and 65 kt or more).
 //! - **NOAA Storm Events** (1996-2025): county-episodes of winter storms, ice storms, extreme
-//!   cold, heat, floods, flash floods, coastal floods, wildfires, high wind, drought and tropical
-//!   cyclone impacts. An episode is NOAA's `EPISODE_ID` (one weather system); a zone-based record
+//!   cold, heat, floods, flash floods, coastal floods, wildfires, high wind, drought, dust storms
+//!   and tropical cyclone impacts. An episode is NOAA's `EPISODE_ID` (one weather system); a zone-based record
 //!   applies to every county in the zone (NWS zone-county correlation files). For each county
 //!   and type: episodes per year, share with reported damage, share with injuries or deaths, and
 //!   the median and 90th-percentile episode length where begin and end times are recorded.
@@ -65,6 +65,9 @@ const STORM_TYPES: &[(&str, &[&str])] = &[
     ("wildfire", &["wildfire"]),
     ("high_wind", &["high wind"]),
     ("drought", &["drought"]),
+    // Blowing dust that cuts visibility (Storm Events "Dust Storm", zone-based); "Dust Devil"
+    // (a small whirlwind) is a different type and not counted.
+    ("dust_storm", &["dust storm"]),
     (
         "tropical_cyclone_impact",
         &[
@@ -995,6 +998,11 @@ mod tests {
             "winter_storm"
         );
         assert_eq!(STORM_TYPES[storm_type("Excessive Heat").unwrap()].0, "heat");
+        assert_eq!(
+            STORM_TYPES[storm_type("Dust Storm").unwrap()].0,
+            "dust_storm"
+        );
+        assert!(storm_type("Dust Devil").is_none());
         assert!(storm_type("Thunderstorm Wind").is_none());
     }
 }
