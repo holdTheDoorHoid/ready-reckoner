@@ -82,19 +82,27 @@ fn before_any_pack_the_sample_counties_answer_and_engine_info_says_so() {
     assert!(!api::engine_info().contains("data_pack_version"));
 }
 
+/// The envelope path in sample-county mode gives, byte for byte, what rr-plan's fixture engine
+/// gives: the answer the goldens are written from (`rr_plan::golden`), so the golden files and the
+/// WebAssembly build's answers are the same thing whenever the goldens are current. Whether they
+/// are current is rr-plan's golden test; the WebAssembly tests compare with the files themselves.
 #[test]
-fn every_fixture_matches_its_golden_byte_for_byte() {
-    for (name, _) in rr_types::fixtures::RAW {
-        let envelope = api::assess(&fixture_json(name));
-        let golden = String::from_utf8(read(&format!("fixtures/golden/{name}.json"))).unwrap();
+fn in_sample_county_mode_every_fixture_is_exactly_what_the_goldens_are_made_from() {
+    let reference = rr_plan::Engine::with_fixtures().unwrap();
+    for (name, raw) in rr_types::fixtures::RAW {
+        let envelope = api::assess(raw);
+        let expected = rr_plan::to_json(
+            &reference
+                .assess(&PlanInput::from_json(raw).unwrap())
+                .unwrap(),
+        );
         let ours = value_text(&envelope);
-        if ours != minify(&golden) {
+        if ours != minify(&expected) {
             // Show where, using the pretty form of both.
             let pretty: serde_json::Value = serde_json::from_str(ours).unwrap();
-            let pretty = rr_plan::to_json(&pretty);
             panic!(
-                "{name}: the engine's answer differs from fixtures/golden/{name}.json:\n{}",
-                rr_plan::golden::diff(&golden, &pretty)
+                "{name}: the envelope differs from rr-plan's fixture engine:\n{}",
+                rr_plan::golden::diff(&expected, &rr_plan::to_json(&pretty))
             );
         }
         let output: PlanOutput = value(&envelope);
