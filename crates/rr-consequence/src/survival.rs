@@ -27,6 +27,15 @@ const TAIL_Z: f64 = 8.5;
 /// tail would give an effectively infinite expected duration.
 const MIN_SLOPE: f64 = 0.2;
 
+/// Smallest slope of an empirical curve beyond its last point, where it is an extrapolation: the
+/// tail decays at least as fast as a log-normal with σ = 2 (heavier than every duration in the
+/// effects table, σ 0.8–1.3, and than the 2 h / 20 h fit used for counties without records,
+/// σ 1.8). The rare, long outages a county's records cannot show are the table's own rows (big
+/// windstorms, ice storms of record, hurricanes, grid failure, the named scenarios). With only
+/// `MIN_SLOPE`, a small county's three points could put the 1-in-100 outage past a year
+/// (verification V-01).
+pub const MIN_TAIL_SLOPE: f64 = 0.5;
+
 /// A duration model the engine can evaluate quickly.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Survival {
@@ -264,7 +273,23 @@ impl EmpiricalCurve {
                 z[i] = min_z;
             }
         }
+        // Beyond the last point, decay at least at MIN_TAIL_SLOPE: one more point, a unit of ln d
+        // further on (the last segment is the one extended).
+        let n = ln_d.len();
+        let last = (z[n - 1] - z[n - 2]) / (ln_d[n - 1] - ln_d[n - 2]);
+        if last < MIN_TAIL_SLOPE {
+            ln_d.push(ln_d[n - 1] + 1.0);
+            z.push(z[n - 1] + MIN_TAIL_SLOPE);
+        }
         Some((EmpiricalCurve { ln_d, z }, dropped))
+    }
+
+    /// P(D > `days`) on this curve.
+    pub fn sf(&self, days: f64) -> f64 {
+        if days <= 0.0 {
+            return 1.0;
+        }
+        math::norm_sf(self.z_at(math::ln(days)))
     }
 
     /// The segment index for ln d: the first segment for points before the curve, the last one
@@ -529,6 +554,23 @@ mod tests {
             );
         }
         assert!(close(emp.p90_days(), 20.0 / 24.0, 1e-9));
+    }
+
+    #[test]
+    fn an_empirical_tail_is_never_heavier_than_sigma_two() {
+        // Eddy County, North Dakota, without its zeros: 1 h, 1 day at 13.75 %, 62 h at 10 %.
+        let pts = [(1.0 / 24.0, 0.5), (1.0, 0.1375), (61.5 / 24.0, 0.1)];
+        let (curve, _) = EmpiricalCurve::from_points(&pts).unwrap();
+        // Past the last point the curve falls at least half a standard deviation per unit of
+        // ln d: a year out it is far below the 0.2-slope tail's ~5 %.
+        let at = |d: f64| curve.sf(d);
+        let z = |d: f64| -probit(at(d));
+        let slope = (z(365.0) - z(61.5 / 24.0 * math::exp(1.0)))
+            / (math::ln(365.0) - math::ln(61.5 / 24.0 * math::exp(1.0)));
+        assert!(slope >= MIN_TAIL_SLOPE - 1e-9, "{slope}");
+        assert!(at(365.0) < 0.01, "{}", at(365.0));
+        // Inside the points nothing changes.
+        assert!(close(at(1.0), 0.1375, 1e-9));
     }
 
     #[test]

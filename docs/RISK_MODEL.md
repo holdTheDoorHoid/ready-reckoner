@@ -602,7 +602,13 @@ big windstorms, grid failure, Cascadia).
 - **Power (EAGLE-I).** With `OutageStats`, county-wide storm outages happen at the county's
   measured rate (`events_per_customer_year`) with its measured duration curve: a curve through the
   median, the 90th percentile and `p_ge_1d/3d/7d/14d`, linear in (ln d, normal score), so a
-  log-normal fit is reproduced exactly and the tail follows the county's own shares. The rate is
+  log-normal fit is reproduced exactly and the tail follows the county's own shares. Two bounds
+  (verification V-01, 2026-09-26): the first zero share past the last positive one is an upper
+  bound of 0.5 % at that length (no customer outage that long was recorded), not a missing point;
+  and beyond the last point the curve decays at least as fast as a log-normal with σ = 2. Without
+  them a small county's three points ran on to a year (Eddy County, North Dakota: longest recorded
+  event 62 hours, power target 365 days; now 5), and 88 counties were told to prepare for a year
+  without power. The rate is
   split between the storm hazards in proportion to their short-outage rates, for the
   contributions. Without records, county-wide outages are a third of short storm outages at 2 h /
   20 h (the Philadelphia fit, prior). Recorded in `overrides`; `ornl_eagle_i_outages` joins the

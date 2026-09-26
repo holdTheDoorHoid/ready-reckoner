@@ -151,17 +151,17 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. Someth
 
 | If this happens | Be ready for | Outside help likely arrives | Mostly back to normal | Enough at |
 | --- | --- | --- | --- | --- |
-| No grid power at home | about 3 days (up to 5 days) | not known | not known | three days |
+| No grid power at home | about 3 days (2–5) | not known | not known | three days |
 | Tap water must be treated | about 7 days (5 days to 2 weeks) | not known | not known | two weeks |
 | No tap water at all | about 5 days (3–10) | not known | not known | two weeks |
 | Can't get to a store | about 10 days (7 days to 3 weeks) | not known | not known | two weeks |
-| Dangerous heat or cold indoors | about 3 days (2–5) | not known | not known | three days |
+| Dangerous heat or cold indoors | about 2 days (up to 5 days) | not known | not known | three days |
 | Medication and medical-supply continuity | about 2 weeks (10 days to 1 month) | not known | not known | two weeks |
 | No phone, internet or card payments | about 2 days (1–5) | not known | not known | three days |
 
 The range in brackets shows where the target could sit when the inputs behind it are uncertain. "Not known" means no restoration records exist for that kind of disruption.
 
-### No grid power at home: about 3 days (up to 5 days)
+### No grid power at home: about 3 days (2–5)
 
 **What helps.** Have a flashlight for each person.[47] Keep a battery or hand-crank radio, and a backup battery for each phone.[25] Keep the fridge and freezer closed. A closed fridge keeps food cold for about four hours, and a full freezer for about two days.[47] If someone relies on a powered medical device or cold medicine, make a plan with their medical provider now.[47] You can also ask your power company to put you on its list for priority restoration.[11] A battery power station burns no fuel, so it makes no carbon monoxide.[48]
 
@@ -183,7 +183,7 @@ The range in brackets shows where the target could sit when the inputs behind it
 
 **What helps.** See "Supply chain disruption" under Your risks.
 
-### Dangerous heat or cold indoors: about 3 days (2–5)
+### Dangerous heat or cold indoors: about 2 days (up to 5 days)
 
 **What helps.** Agree who checks on whom, especially older neighbours and anyone who lives alone.[3, 6] In heat, go where there is air conditioning. Dial 2-1-1 to find one.[6] Cover windows with drapes or shades.[7] In cold, close off rooms you don't need, stuff towels under doors, and cover windows with blankets at night. Have extra blankets, sleeping bags and warm coats.[3] Babies under one year old should never sleep in a cold room.[3]
 
