@@ -166,9 +166,10 @@ pub fn supply_context(
         nuclear_plant_within_16km: Some(
             location.facility_flags.nuclear_plant_within_16km || near_by_county,
         ),
-        // rr-supply v0.2.0 (supply2): the clean-air respirators, the rain-barrel rule and the
-        // flood decision's wording. The smoke days arrive with the data-hazard pack; until then
-        // the respirators count five days. // awaiting: data-hazard (smoke_days_35 in the pack)
+        // rr-supply v0.2.0: the clean-air respirators count the county's smoke days (the core
+        // pack's `smoke_days_35`; five days when a pack lacks it), the rain barrels read the
+        // state's rule and rainfall, and the flood decision says when most homes are outside the
+        // mapped zone.
         smoke_days: location.exposure.smoke_days_35.as_ref().map(|s| s.value),
         state_fips: SupplyContext::state_of(&county.fips),
         sfha_home_share: county.flood.as_ref().map(|f| f64::from(f.sfha_home_share)),
