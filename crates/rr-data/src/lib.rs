@@ -26,7 +26,8 @@ pub mod verify;
 
 pub use climate::{CLIMATE_CLAMP, variables_for};
 pub use exposure::{
-    StrategicArea, StrategicClassDef, StrategicSite, StrategicSites, StrategicSource, UasiArea,
+    EXPOSURE_SOURCES, StrategicArea, StrategicClassDef, StrategicSite, StrategicSites,
+    StrategicSource, UasiArea, exposure_source,
 };
 pub use location::AMBIGUOUS_ZIP_SHARE;
 pub use manifest::Manifest;

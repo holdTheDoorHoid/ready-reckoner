@@ -376,3 +376,46 @@ fn zip_records_carry_dams_and_strategic_distance() {
         }
     }
 }
+
+#[test]
+fn resolved_locations_carry_sourced_exposure() {
+    if !has("core/strategic.csv") {
+        return;
+    }
+    let s = store();
+    // Hays by county: class B, the distance to the Warren field, each value with its source.
+    let hays = s.location("20051", None).unwrap();
+    let e = &hays.exposure;
+    assert_eq!(e.strategic_class.as_ref().unwrap().value, "B");
+    assert_eq!(
+        e.strategic_class.as_ref().unwrap().source.as_str(),
+        "rr_strategic_sites"
+    );
+    let km = e.strategic_km.as_ref().unwrap().value;
+    assert!((300.0..450.0).contains(&km), "{km}");
+    if has("core/geomag.csv") {
+        assert_eq!(
+            e.geomag_factor.as_ref().unwrap().source.as_str(),
+            "nerc_tpl007_gmd"
+        );
+    }
+    // Values keep the pack's decimals (0.29, not 0.2899999916553497).
+    let phl = s.location("42101", None).unwrap();
+    if let Some(g) = &phl.exposure.geomag_factor {
+        assert_eq!(g.value, 0.29);
+    }
+    // Port Townsend by ZIP: its county is class E, but the ZIP is near Bangor.
+    let pt = s.location("53031", Some("98368")).unwrap();
+    assert_eq!(pt.exposure.strategic_class.as_ref().unwrap().value, "E");
+    assert!(pt.exposure.strategic_km.as_ref().unwrap().value < 60.0);
+    // Every source id is one of the documented ones.
+    let ids: std::collections::BTreeSet<&str> = rr_data::EXPOSURE_SOURCES
+        .iter()
+        .map(|(_, id)| *id)
+        .collect();
+    let json = serde_json::to_value(&pt.exposure).unwrap();
+    for (_, v) in json.as_object().unwrap() {
+        let id = v["source"].as_str().unwrap();
+        assert!(ids.contains(id), "{id}");
+    }
+}

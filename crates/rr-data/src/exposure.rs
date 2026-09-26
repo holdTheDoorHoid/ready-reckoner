@@ -29,6 +29,40 @@ pub const COUNTY_FILES: &[&str] = &[
 
 /// The strategic-site table.
 pub const STRATEGIC_SITES: &str = "core/strategic_sites.toml";
+
+/// Citation ids for the exposure values `LocationResolved.exposure` carries, by `Exposure`
+/// field. Ids already in `content/citations.toml`: `usace_nld`, `fema_hsgp_fy2026`. The others
+/// are requested from the content workstream in `docs/DATA_SOURCES.md` §13 (title, publisher,
+/// URL for each).
+pub const EXPOSURE_SOURCES: &[(&str, &str)] = &[
+    ("strategic_class", "rr_strategic_sites"),
+    ("strategic_km", "rr_strategic_sites"),
+    ("surge_cat3_share", "nhc_storm_surge_maps"),
+    ("surge_proxy_class", "rr_surge_proxy"),
+    ("smoke_days_35", "epa_aqs_daily_pm25"),
+    ("leveed_pop_share", "usace_nld"),
+    ("dams_high_within_10km", "usace_nid"),
+    ("karst_share", "usgs_karst_2014"),
+    ("landslide_susceptible_share", "usgs_landslide_2024"),
+    ("water_system_flag", "epa_echo_sdwa"),
+    ("geomag_factor", "nerc_tpl007_gmd"),
+    ("uasi_share", "fema_hsgp_fy2026"),
+    ("eviction_rate", "eviction_lab_county_estimates"),
+];
+
+/// The citation id for an `Exposure` field (see [`EXPOSURE_SOURCES`]).
+pub fn exposure_source(field: &str) -> &'static str {
+    EXPOSURE_SOURCES
+        .iter()
+        .find(|(f, _)| *f == field)
+        .map(|(_, id)| *id)
+        .unwrap_or("rr_data_pack")
+}
+
+/// An `f32` pack value as the `f64` it was written as (0.29, not 0.2899999916553497).
+pub fn clean_f64(x: f32) -> f64 {
+    x.to_string().parse::<f64>().unwrap_or(f64::from(x))
+}
 /// Optional pack `surge`: NOAA/NHC surge-area shares by ZIP.
 pub const ZIP_SURGE: &str = "opt/surge/zip_surge.csv";
 /// Optional pack `wildfire_places`: Wildfire Risk to Communities by Census place.
