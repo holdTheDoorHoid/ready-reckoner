@@ -1026,10 +1026,18 @@ fn water_notes(
     }
     let mut parts = Vec::new();
     if let Some(s) = f.violation_share {
+        let who = if s <= 0.0 {
+            "no public-water customer in your county is".to_owned()
+        } else if s < 0.01 {
+            "fewer than 1 of 100 public-water customers in your county are".to_owned()
+        } else {
+            format!(
+                "about {} of 100 public-water customers in your county are",
+                words::per_100(100.0 * s)
+            )
+        };
         parts.push(format!(
-            "about {} of 100 public-water customers in your county are served by a system with a \
-             health-based violation in the last five years (EPA)",
-            words::per_100(100.0 * s)
+            "{who} served by a system with a health-based violation in the last five years (EPA)"
         ));
     }
     if let Some(r) = f.record {
@@ -1054,8 +1062,8 @@ fn water_notes(
             .to_owned()
     } else {
         format!(
-            "Water-system failures are counted {} as often as the national average here, because \
-             {} (an estimate).",
+            "Water-system failures are counted {} as often as the national average here (an \
+             expert estimate), because {}.",
             words::factor_phrase(f.multiplier),
             parts.join(" and ")
         )

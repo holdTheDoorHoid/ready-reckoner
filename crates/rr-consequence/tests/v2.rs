@@ -193,6 +193,34 @@ fn the_water_multiplier_follows_the_county_record_and_the_answer() {
     for b in [BucketId::WaterOut, BucketId::WaterBoil] {
         assert!(days(&a, b) >= days(&base, b), "{b}");
     }
+    // The sentence says what the record is, in words that fit a clean record too.
+    let said = |share: f64| -> String {
+        let a = run(
+            &research::philadelphia_household(),
+            &rates,
+            CountyData {
+                sdwis_violation_share: Some(share),
+                ..CountyData::default()
+            },
+        );
+        a.bucket(BucketId::WaterBoil)
+            .frequency_sentences
+            .iter()
+            .find(|s| s.starts_with("Water-system failures are counted"))
+            .cloned()
+            .unwrap_or_default()
+    };
+    assert!(
+        said(0.0).contains(
+            "about half as often as the national average here (an expert estimate), because no \
+             public-water customer in your county is served by a system with a health-based \
+             violation"
+        ),
+        "{}",
+        said(0.0)
+    );
+    assert!(said(0.004).contains("because fewer than 1 of 100 public-water customers"));
+    assert!(said(0.3).contains("because about 30 of 100 public-water customers"));
 }
 
 #[test]
