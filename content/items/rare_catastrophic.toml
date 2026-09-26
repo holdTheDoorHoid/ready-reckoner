@@ -4,29 +4,6 @@
 # instructions and only within a plant's emergency planning zone (CONTENT_STANDARDS §5).
 
 [[item]]
-id = "rare_get_inside_plan"
-name = "Know 'Get inside, stay inside, stay tuned'"
-category = "rare_catastrophic"
-unit = "action"
-buckets = ["supplies"]
-tier = "now"
-free = true
-spec = "For a radiation emergency, get inside the most protective place you can reach, such as a basement or the middle of a large brick or concrete building, stay there for at least 24 hours unless officials say otherwise, and listen for instructions (Ready.gov). Radiation levels fall quickly during the first day, and your three-day supplies cover this sheltering."
-look_for = [
-  "The most protective spot at home, work and school",
-  "A battery or crank radio for instructions",
-  "Pets brought inside with you",
-]
-avoid = [
-  "Leaving shelter early to look for family: stay put and stay in touch",
-  "Running fans or air systems that pull in outside air",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: the plan uses supplies you already keep." }
-quantity_rule = "once"
-citations = ["ready_gov_nuclear", "ready_gov_radiation"]
-hazard_extras = ["nuclear_attack", "nuclear_plant_incident"]
-
-[[item]]
 id = "rare_potassium_iodide"
 name = "Potassium iodide: only on official instruction, near a nuclear plant"
 category = "rare_catastrophic"

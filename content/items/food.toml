@@ -3,54 +3,6 @@
 # 2,000 kcal, about one adult-day, so the app can show cost per 2,000 kcal.
 
 [[item]]
-id = "food_outage_food_safety"
-name = "Know how long the fridge and freezer keep food cold"
-category = "food"
-unit = "action"
-buckets = ["power", "supplies"]
-tier = "now"
-free = true
-spec = "Keep the fridge and freezer closed in an outage: a closed fridge keeps food cold for about four hours and a full freezer for about 48 hours (Ready.gov). Throw out perishable food that has been above 40°F for two hours or more."
-look_for = [
-  "A thermometer in the fridge and the freezer",
-  "Where you could get ice or dry ice nearby",
-  "A cooler for the food you need first",
-]
-avoid = [
-  "Opening the doors to check again and again",
-  "Tasting food to decide if it is safe",
-  "Eating from cans that are swollen, dented or rusted (Ready.gov)",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: knowledge and habits." }
-quantity_rule = "once"
-citations = ["ready_gov_food", "ready_gov_power_outages"]
-hazard_extras = []
-
-[[item]]
-id = "food_buy_slowly"
-name = "Build food supplies a little at a time"
-category = "food"
-unit = "action"
-buckets = ["supplies"]
-tier = "now"
-free = true
-spec = "Add a few extra cans or boxes of what you already eat on each shopping trip, and put the new ones at the back. Ready.gov asks people to buy supplies slowly so everyone can get what they need."
-look_for = [
-  "A shelf or bin where the extra food lives",
-  "Oldest food at the front, newest at the back",
-  "A short list of what your household eats in a week",
-]
-avoid = [
-  "Buying a lot at once when a storm is in the news",
-  "Foods nobody in the house will eat",
-  "Letting the extra food expire unused",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: the food itself is priced in the pantry item." }
-quantity_rule = "once"
-citations = ["ready_gov_pandemic", "ready_gov_food"]
-hazard_extras = []
-
-[[item]]
 id = "food_pantry_rotation"
 name = "Extra shelf-stable food you already eat"
 category = "food"
@@ -140,7 +92,8 @@ unit = "opener"
 buckets = ["supplies"]
 tier = "h72"
 free = false
-spec = "A hand-crank can opener kept with the stored food, because electric openers stop in an outage (Ready.gov lists one in every kit)."
+assumed_basic = true
+spec = "A hand-crank can opener kept with the stored food, because electric openers stop in an outage (Ready.gov lists one in every kit). Most kitchens already have one."
 look_for = [
   "A sturdy crank and a comfortable grip",
   "A spare kept in the go-bag if your food there is canned",
@@ -174,8 +127,8 @@ avoid = [
   "Keeping fuel near heat or in a hot car",
   "Leaving it burning unattended",
 ]
-price_band_usd = { low = 39.99, high = 49.99, per = "stove", note = "Two retail listings for one-burner stoves: butane $39.99, propane $49.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 26.35, high = 39.99, per = "stove", note = "Two home-center listings for one-burner butane stoves: $26.35 and $39.99." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["cdc_co_basics", "cdc_infant_checklist", "rr_price_observations_2026_09"]
 hazard_extras = []
@@ -226,8 +179,8 @@ avoid = [
   "Watering down formula to make it last",
   "Homemade formula",
 ]
-price_band_usd = { low = 1.21, high = 1.60, per = "ounce of powder", note = "Two online listings for 28.2-ounce cans: $33.99 and $44.99. Prices vary widely by brand and store." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 1.09, high = 1.56, per = "ounce of powder", note = "Two supermarket listings for powder at the regular price: a store brand at $36.99 for 34 ounces ($1.09 an ounce) and a name brand at $47.99 for 30.8 ounces ($1.56)." }
+retrieved = "2026-09-26"
 quantity_rule = "infant_formula_oz"
 maintenance = { check_months = 1 }
 citations = ["cdc_infant_feeding_disaster", "cdc_infant_checklist", "ready_gov_food", "aap_formula_amounts", "fsis_shelf_stable", "rr_price_observations_2026_09"]
@@ -274,8 +227,57 @@ avoid = [
   "Putting medicine directly on ice (it can freeze)",
   "Leaving the cooler in the sun",
 ]
-price_band_usd = { low = 30.99, high = 49.99, per = "cooler", note = "Two retail listings for 30-quart coolers: $30.99 and $49.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 49.98, high = 54.99, per = "cooler", note = "Two home-center listings for 50 to 52 quart hard coolers: $49.98 and $54.99." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["ready_gov_power_outages", "cdc_insulin_emergency", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_cooking_pot"
+name = "A cooking pot with a lid"
+category = "food"
+unit = "pot"
+buckets = ["water_boil", "supplies"]
+tier = "h72"
+free = false
+assumed_basic = true
+spec = "A pot with a lid for boiling water when a boil-water notice is on and for heating food (EPA, CDC). Most kitchens already have one; a large one lets you boil a day's drinking water in a batch or two."
+look_for = [
+  "A large pot that sits steadily on your stove",
+  "A lid that fits, to boil water faster and use less fuel",
+]
+avoid = [
+  "Using it on a camp stove indoors (carbon monoxide)",
+  "Boiling water that may hold fuel or chemicals: boiling does not make it safe (CDC)",
+]
+price_band_usd = { low = 17.99, high = 28.99, per = "pot", note = "A pot you already own costs nothing. New: a 12-quart stainless pot with lid at a supermarket, $17.99, and an 8-quart aluminum pot with cover at a restaurant supplier, $28.99." }
+retrieved = "2026-09-26"
+quantity_rule = "once"
+citations = ["epa_emergency_disinfection", "cdc_water_disinfection", "cdc_co_basics", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "food_three_days_basic"
+name = "Three days of the food you normally eat"
+category = "food"
+unit = "3 days of food for one person"
+buckets = ["supplies", "power"]
+tier = "h72"
+free = false
+assumed_basic = true
+spec = "In FEMA's 2024 survey, 69 of every 100 people asked had put together emergency supplies, and nearly 9 in 10 of them said the supplies would last more than three days. The plan counts three days of the food you normally eat as already on hand, and builds from there with food that needs no refrigeration, cooking or water (Ready.gov)."
+look_for = [
+  "Enough on the shelves for three days of meals for everyone",
+  "Some foods that need no cooking or water, and a manual can opener",
+]
+avoid = [
+  "Counting food that needs the fridge or freezer after the power has been off for hours",
+  "Counting on a store trip once a storm is forecast",
+]
+price_band_usd = { low = 25.32, high = 31.37, per = "3 days of food for one person", note = "Three days at USDA's August 2026 food-plan costs: the Thrifty plan's $8.44 a person-day and the Low-Cost plan's $10.46 for a man aged 19 to 50." }
+retrieved = "2026-09-26"
+quantity_rule = "per_person"
+energy_kcal_per_unit = 6300.0
+citations = ["fema_nhs_2024", "ready_gov_food", "usda_tfp_aug2026", "usda_food_plans_aug2026", "usda_dga_2020_2025", "rr_price_observations_2026_09"]
 hazard_extras = []

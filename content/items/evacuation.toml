@@ -3,234 +3,116 @@
 
 [[item]]
 id = "evac_know_zone"
-name = "Know your evacuation zone, routes and where you would go"
+name = "Plan how you would leave: zone, routes, destination and triggers"
 category = "evacuation"
 unit = "action"
-buckets = ["evacuate"]
+buckets = ["evacuate", "get_home", "fire", "security"]
 tier = "now"
 free = true
-spec = "Many states set evacuation zones and routes; look up yours on your state and county emergency management websites (Ready.gov). Pick where you would go: a friend's or relative's home out of the area, a pet-friendly hotel, or a public shelter."
+spec = "Look up your evacuation zone and routes on your state and county emergency management websites, mark two routes on a paper map, and pick where you would go, pet-friendly if you have pets (Ready.gov). For each likely hazard, write a go-or-stay card and an if-then trigger, such as 'If our zone gets an evacuation warning, we leave within 30 minutes.' Plans written in if-then form make people more likely to follow through."
 look_for = [
   "Your zone name or number for home, work and school",
-  "Two routes out, in different directions",
-  "Two destinations, one of them out of the area and pet-friendly if you have pets",
+  "Two routes out in different directions, marked on a paper map for the car and the go-bag",
+  "Two destinations, one out of the area and pet-friendly if you have pets",
+  "A go-or-stay card for each hazard your plan names, kept by the door",
+  "Each trigger with a time limit, a meeting place and who does each task",
 ]
 avoid = [
   "Planning to follow the crowd without a destination",
   "Assuming public shelters take pets: many take only service animals",
+  "Relying only on phone navigation",
+  "Deciding for the first time while the warning is sounding",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a website visit and a conversation." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: planning, and a free state road map or a printed county map." }
 quantity_rule = "once"
-citations = ["ready_gov_evacuation", "ready_gov_hurricanes", "ready_gov_pets", "aspca_disaster_prep"]
+citations = ["ready_gov_evacuation", "ready_gov_hurricanes", "ready_gov_pets", "aspca_disaster_prep", "ready_gov_kit", "gollwitzer_sheeran_2006", "wood_2018_milling", "rr_research_prior_art"]
 hazard_extras = []
 
 [[item]]
 id = "evac_half_tank"
-name = "Keep the gas tank at least half full"
+name = "Keep your vehicle ready: half a tank, a charged battery, a good spare"
 category = "evacuation"
 unit = "action"
-buckets = ["evacuate", "get_home"]
+buckets = ["evacuate", "get_home", "power"]
 tier = "now"
 free = true
-spec = "Ready.gov advises keeping at least half a tank of gas at all times in case you have to leave suddenly, and a full tank when an evacuation looks likely. Gas stations close or run dry when the power is out."
+spec = "Keep at least half a tank of gas at all times and a full tank when an evacuation looks likely (Ready.gov); if you drive an electric car, keep it charged through storm season and pick destinations within its range (Hillsborough County, Florida). Check the spare tire with the others each month, and keep a phone charging cable in the car (NHTSA). Run the engine only outdoors, never in a garage (CDC)."
 look_for = [
-  "Refueling when the gauge reaches half",
-  "Filling up as soon as a storm is forecast",
+  "Refueling when the gauge reaches half, and filling up when a storm is forecast",
+  "Electric car: charged to full before any warning, and destinations within about two-thirds of its range",
+  "Chargers along two routes, from the federal station locator",
+  "The spare, jack and lug wrench, with the spare's pressure checked monthly",
+  "A phone charging cable kept in the glove box",
 ]
 avoid = [
   "Running on empty during storm or fire season",
+  "Running the engine in any garage (carbon monoxide)",
+  "Driving or charging an electric car that sat in floodwater, especially salt water",
   "Storing extra gasoline inside the home",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it changes when you buy fuel, not how much." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits and checks." }
 quantity_rule = "once_if_vehicle"
-citations = ["ready_gov_evacuation", "ready_gov_winter"]
-hazard_extras = []
-
-[[item]]
-id = "evac_go_stay_card"
-name = "Write a go-or-stay card for each likely hazard"
-category = "evacuation"
-unit = "action"
-buckets = ["evacuate", "fire", "security"]
-tier = "now"
-free = true
-spec = "For each hazard your plan names, write one card that says when you leave, when you stay and shelter, and what you do first. People who get complete warnings spend less time checking with others before acting, and a card decided in advance works the same way."
-look_for = [
-  "One short card per hazard, such as flood, wildfire, tornado or chemical release",
-  "The trigger, the action and who does what",
-  "Cards kept by the door and in each go-bag",
-]
-avoid = [
-  "Deciding for the first time while the warning is sounding",
-  "Waiting to see what the neighbours do",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: index cards and a pen." }
-quantity_rule = "once"
-citations = ["wood_2018_milling", "rr_research_prior_art"]
-hazard_extras = []
-
-[[item]]
-id = "evac_if_then_triggers"
-name = "Agree if-then triggers for leaving"
-category = "evacuation"
-unit = "action"
-buckets = ["evacuate", "fire", "security"]
-tier = "now"
-free = true
-spec = "Write short promises such as 'If the county issues an evacuation warning for our zone, we leave within 30 minutes; the bag is by the door; Sam gets the kids.' Plans in if-then form make people much more likely to follow through."
-look_for = [
-  "A trigger you will actually hear, such as an alert or a smell of smoke",
-  "A time limit, a place to meet and who does each task",
-  "Everyone in the household agreeing",
-]
-avoid = [
-  "Vague plans like 'we'll leave if it gets bad'",
-  "Triggers that depend on seeing the danger yourself",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: ten minutes of talk." }
-quantity_rule = "once"
-citations = ["gollwitzer_sheeran_2006", "rr_research_prior_art"]
+citations = ["ready_gov_evacuation", "ready_gov_winter", "hcfl_ev_safety", "doe_afdc_stations", "doe_fueleconomy_ev", "nhtsa_tires", "cdc_co_basics", "rr_expert_prior"]
 hazard_extras = []
 
 [[item]]
 id = "evac_ten_minute_drills"
-name = "Run ten-minute drills twice a year"
+name = "Practice: ten-minute drills and the first things to do"
 category = "evacuation"
 unit = "action"
-buckets = ["evacuate", "fire", "security", "medical_emergency"]
+buckets = ["evacuate", "fire", "medical_emergency", "security"]
 tier = "now"
 free = true
-spec = "Practice a fire escape, grabbing the go-bag against a timer, or Drop, Cover and Hold On, for ten minutes at a time. Ready.gov advises practicing your home fire escape plan twice a year, and people who have drilled act faster and cope better in real emergencies."
+spec = "Twice a year, practice for ten minutes at a time: your fire escape, grabbing the go-bag against a timer, and the first action for each hazard where you live (Ready.gov). People who have drilled know the right actions better and use them more when it is real (New Zealand ShakeOut study). Keep drills calm and short, especially with children."
 look_for = [
-  "A drill on the calendar every six months, for example when clocks change",
-  "Children taking part, and learning not to hide from firefighters",
-  "A quick talk afterward about what to fix",
+  "Earthquake: drop to your hands and knees, cover your head and neck, and hold on until the shaking stops",
+  "Tornado: go to your shelter spot, a small, windowless room or basement on the lowest floor of a sturdy building",
+  "Coast: after long or strong shaking, walk to high ground right away, without waiting for an alert",
+  "Flood: turn around, because six inches of moving water can knock you down",
+  "Radiation: get inside, stay inside and stay tuned for at least 24 hours unless officials say otherwise",
+  "A drill on the calendar, for example when the clocks change",
 ]
 avoid = [
-  "Drills that frighten children: keep them calm and short",
   "Skipping practice because the plan is written down",
+  "Drills that frighten children",
+  "Standing in a doorway or running outside during shaking",
+  "Going to the shore to watch, or returning before officials say it is safe",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: ten minutes, twice a year." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: ten minutes twice a year." }
 quantity_rule = "once"
 maintenance = { check_months = 6 }
-citations = ["ready_gov_home_fires", "vinnell_2020_shakeout", "gargano_2017_wtc_training"]
+citations = ["ready_gov_home_fires", "vinnell_2020_shakeout", "gargano_2017_wtc_training", "ready_gov_earthquakes", "ready_gov_tornadoes", "nws_tsunami_safety", "ready_gov_tsunamis", "dogami_tsunami_faq", "ready_gov_floods", "nws_turn_around_dont_drown", "ready_gov_nuclear", "ready_gov_radiation"]
 hazard_extras = []
 
 [[item]]
-id = "evac_tsunami_high_ground"
-name = "Coast: walk to high ground right after a long or strong earthquake"
-category = "evacuation"
-unit = "action"
-buckets = ["evacuate"]
-tier = "now"
-free = true
-spec = "If you are near the coast and feel an earthquake, move off the beach to high ground or inland as soon as it is safe, without waiting for an alert: a tsunami can arrive within minutes (NWS). Learn the walking route to high ground from home, work and school."
-look_for = [
-  "Tsunami evacuation route signs and maps for places you spend time",
-  "A walking route that avoids bridges",
-  "The natural warnings: long shaking, the sea pulling back, a roar from the ocean",
-]
-avoid = [
-  "Driving if the route may be blocked: walk",
-  "Going to the shore to watch",
-  "Returning before officials say it is safe; waves can keep coming for hours",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a walk and a map." }
-quantity_rule = "once"
-citations = ["nws_tsunami_safety", "ready_gov_tsunamis", "dogami_tsunami_faq"]
-hazard_extras = ["tsunami"]
-
-[[item]]
-id = "evac_quake_drop_cover"
-name = "Know Drop, Cover and Hold On"
-category = "evacuation"
-unit = "action"
-buckets = ["medical_emergency", "evacuate"]
-tier = "now"
-free = true
-spec = "When shaking starts, drop to your hands and knees, cover your head and neck, and hold on until it stops (Ready.gov). Stay inside and away from doorways; after the shaking, expect aftershocks and check for gas leaks and damage."
-look_for = [
-  "A sturdy table or desk in each room you use",
-  "Heavy items stored on low shelves",
-  "A practice drill with the household",
-]
-avoid = [
-  "Running outside during shaking",
-  "Standing in a doorway",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: practice." }
-quantity_rule = "once"
-citations = ["ready_gov_earthquakes", "vinnell_2020_shakeout"]
-hazard_extras = ["earthquake"]
-
-[[item]]
-id = "evac_flood_turn_around"
-name = "Never walk or drive through floodwater"
-category = "evacuation"
-unit = "action"
-buckets = ["evacuate", "get_home"]
-tier = "now"
-free = true
-spec = "Just six inches of moving water can knock you down and one foot can sweep a vehicle away (Ready.gov). Turn around and find another way, and move to higher ground or a higher floor if water rises."
-look_for = [
-  "Routes from home and work that avoid low spots and underpasses",
-  "Knowing whether your home is in a flood zone",
-]
-avoid = [
-  "Driving around barricades",
-  "Walking through water that may hide downed power lines",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a rule to live by." }
-quantity_rule = "once"
-citations = ["ready_gov_floods", "nws_turn_around_dont_drown"]
-hazard_extras = ["riverine_flooding", "coastal_flooding", "hurricane"]
-
-[[item]]
-id = "evac_tornado_shelter_spot"
-name = "Pick your tornado shelter spot"
-category = "evacuation"
-unit = "action"
-buckets = ["security", "medical_emergency"]
-tier = "now"
-free = true
-spec = "Choose where you will go when a tornado warning sounds: a safe room or storm shelter if you have one, otherwise a small, interior, windowless room or basement on the lowest floor of a sturdy building (Ready.gov). If you live in a mobile home, plan which sturdy building you would go to instead."
-look_for = [
-  "The lowest, most central room in your home",
-  "A nearby sturdy building if you live in a mobile home",
-  "Shoes, a flashlight and helmets or pillows kept there",
-]
-avoid = [
-  "Rooms with windows",
-  "Waiting to see the tornado before moving",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a decision made in advance." }
-quantity_rule = "once"
-citations = ["ready_gov_tornadoes"]
-hazard_extras = ["tornado", "strong_wind"]
-
-[[item]]
 id = "evac_go_bag"
-name = "Go-bag for each person"
+name = "Go-bag for each person: a backpack you pack from your supplies"
 category = "evacuation"
-unit = "backpack"
+unit = "bag"
 buckets = ["evacuate"]
 tier = "h72"
 free = false
-spec = "A backpack for each person, light enough to carry, holding about three days of water and food plus the medicines, documents, light, cash and clothes listed elsewhere in this plan. Ready.gov says to build a go-bag; CDC says take only what you really need."
+assumed_basic = true
+spec = "Any sturdy backpack each person can carry, packed from the household's own supplies rather than bought as a kit: about three days of water and food that needs no cooking, medicines, copies of documents and the contact card, a light, a whistle, first-aid basics, a phone charger, cash, and a change of clothes and sturdy shoes (Ready.gov, CDC). Most homes already have a bag for each person."
 look_for = [
-  "A comfortable backpack each adult and child can carry",
-  "Copies of documents, the medicine list and the contact card inside",
+  "Water and no-cook food moved from your stored supplies; refill the water every six months (CDC)",
+  "Three days of each person's medicines, and the written medicine list",
+  "Copies of documents and the contact card in a waterproof bag",
+  "A headlamp or flashlight, spare batteries and a whistle",
+  "First-aid basics, hand sanitizer and any masks you keep",
+  "A phone charger or power bank, and cash in small bills",
   "A change of clothes, sturdy shoes and rain gear",
 ]
 avoid = [
   "A bag too heavy to carry for an hour",
+  "Buying a pre-packed kit that repeats what you already store",
   "Packing it once and never checking the food, water and medicines",
 ]
-price_band_usd = { low = 59.99, high = 79.99, per = "backpack", note = "Two retail listings for 30–35 liter backpacks: $59.99 and $79.99. The contents are priced as separate items." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 29.73, high = 38.8, per = "bag", note = "A sturdy backpack you already own costs nothing. New, two home-center listings for basic backpacks: $29.73 and $38.80. The contents come from your household supplies, so nothing is bought twice." }
+retrieved = "2026-09-26"
 quantity_rule = "per_person"
 maintenance = { check_months = 6 }
-citations = ["ready_gov_evacuation", "cdc_evacuation_psa", "washington_prepare_in_a_year", "redcross_survival_kit", "rr_price_observations_2026_09"]
+citations = ["ready_gov_evacuation", "cdc_evacuation_psa", "ready_gov_kit", "cdc_water_storage", "washington_prepare_in_a_year", "redcross_survival_kit", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]
@@ -274,8 +156,31 @@ avoid = [
   "Leaving fans, air conditioning or forced-air heat running while sheltering",
   "A basement: Ready.gov advises an above-ground room for chemical releases",
 ]
-price_band_usd = { low = 43.48, high = 70.48, per = "kit", note = "Two restaurant-supply combinations: a roll of 6-mil sheeting ($35.99 or $62.99) plus duct tape ($7.49)." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 28.08, high = 35.68, per = "kit", note = "Two home-center combinations of a roll of 6-mil plastic sheeting ($21.10 or $28.70) and a roll of duct tape ($6.98)." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["ready_gov_shelter", "ready_gov_chemical", "ready_gov_kit", "rr_price_observations_2026_09"]
 hazard_extras = ["hazmat_release", "nuclear_plant_incident"]
+
+[[item]]
+id = "evac_ride_plan"
+name = "No car? Plan your ride out"
+category = "evacuation"
+unit = "plan"
+buckets = ["evacuate"]
+tier = "now"
+free = true
+spec = "If your household has no vehicle, decide now how you would leave: a friend, relative or neighbour who would drive you, or the bus or train that leads out of your area (Ready.gov). Leave early, before roads fill. If someone in your home has a disability, ask your local emergency management office about its voluntary registry for people who need help (Ready.gov)."
+look_for = [
+  "One or two people who would drive you, with their numbers on your contact card",
+  "The bus or train routes that lead out of your area, and where they stop near you",
+  "Room for your pets and your go-bags in the ride you plan",
+]
+avoid = [
+  "Waiting for the last bus or ride",
+  "A plan that depends on a single driver",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a plan and a few phone calls." }
+quantity_rule = "evacuation_ride_plan"
+citations = ["ready_gov_evacuation", "ready_gov_older_adults", "ready_gov_disability"]
+hazard_extras = []

@@ -2,49 +2,27 @@
 # Rules: docs/CONTENT_STANDARDS.md §3. Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
 
 [[item]]
-id = "san_handwash_station"
-name = "Set up a hand-washing station from a water jug"
+id = "san_cover_material"
+name = "Get the toilet and hand washing ready: cover material and a wash station"
 category = "sanitation"
 unit = "action"
 buckets = ["water_out", "water_boil"]
 tier = "now"
 free = true
-spec = "Use a water jug with a spigot, a bucket to catch the water, and soap to make a hand-washing station, as CDC suggests. When there is no soap and water, use hand sanitizer with at least 60% alcohol."
+spec = "Keep a bag of dry, carbon-rich cover material for the toilet bucket, such as sawdust, shredded paper, dry leaves or pet bedding; a handful after each use controls smell (RDPO). Make a hand-washing station from a water jug with a spigot, a bucket underneath and soap (CDC). When there is no soap and water, use hand sanitizer with at least 60% alcohol (CDC)."
 look_for = [
-  "A jug with a spigot, raised so the water runs freely",
-  "Soap and a towel kept beside it",
-  "A bucket underneath for the used water",
-]
-avoid = [
-  "Dipping hands into the stored water",
-  "Skipping hand washing after using the toilet or before handling food",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it uses the water jug and soap already in the plan." }
-quantity_rule = "once"
-citations = ["cdc_hygiene_emergency"]
-hazard_extras = []
-
-[[item]]
-id = "san_cover_material"
-name = "Collect cover material for the toilet"
-category = "sanitation"
-unit = "action"
-buckets = ["water_out"]
-tier = "now"
-free = true
-spec = "Keep a bag of dry, carbon-rich cover material for the toilet bucket, such as sawdust, shredded paper, dry leaves or pet bedding. A handful after each use controls smell and helps waste dry out (RDPO)."
-look_for = [
-  "Shredded paper or cardboard from your own recycling",
-  "Sawdust or pet bedding (not cedar)",
-  "A dry, covered bin to keep it in",
+  "Shredded paper or cardboard from your own recycling, or sawdust or pet bedding (not cedar)",
+  "A dry, covered bin for the cover material",
+  "A jug with a spigot, raised so the water runs freely, with soap and a towel beside it",
 ]
 avoid = [
   "Wet material, which does not control smell",
-  "Cedar chips",
+  "Dipping hands into the stored water",
+  "Skipping hand washing after using the toilet or before handling food",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free if you use shredded paper or leaves; pet bedding costs a few dollars a bag." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: recycling, a jug you own and soap." }
 quantity_rule = "once"
-citations = ["rdpo_emergency_toilet"]
+citations = ["rdpo_emergency_toilet", "cdc_hygiene_emergency"]
 hazard_extras = []
 
 [[item]]
@@ -66,8 +44,8 @@ avoid = [
   "An airtight lid on the poo bucket: waste should be able to dry",
   "Pool noodles as a seat (they cannot be cleaned)",
 ]
-price_band_usd = { low = 39.98, high = 52.99, per = "kit", note = "A bucket toilet with seat ($25.99) plus a second bucket ($13.99), or a complete bucket-toilet set at $52.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 25.95, high = 29.97, per = "kit", note = "Two combinations: two 5-gallon buckets ($3.98 each, home center) with a snap-on bucket toilet seat ($17.99, maker's list price), or a bucket toilet with seat ($25.99, maker's list price) plus a second bucket." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["rdpo_emergency_toilet", "oregon_b2wr_toolkit", "rr_price_observations_2026_09"]
 hazard_extras = []
@@ -191,16 +169,15 @@ hazard_extras = []
 
 [[item]]
 id = "san_diapers"
-name = "Diapers and baby wipes"
+name = "Diapers"
 category = "sanitation"
 unit = "diaper"
 buckets = ["supplies"]
 tier = "h72"
 free = false
-spec = "Diapers in the size your baby wears now, plus wipes, rash cream and gallon zip-top bags for dirty diapers, as CDC's family checklist lists. After the first week, a newborn has more than six wet diapers a day (Sutter Health)."
+spec = "Diapers in the size your baby wears now, plus rash cream and gallon zip-top bags for dirty diapers, as CDC's family checklist lists. After the first week, a newborn has more than six wet diapers a day (Sutter Health)."
 look_for = [
   "The current size, plus a pack of the next size up",
-  "At least two packs of wipes (CDC)",
   "Zip-top bags for used diapers and dirty clothes",
 ]
 avoid = [
@@ -211,4 +188,27 @@ price_band_usd = { low = 0.32, high = 0.47, per = "diaper", note = "Two listings
 retrieved = "2026-09-25"
 quantity_rule = "diapers"
 citations = ["cdc_infant_checklist", "sutter_diapers", "rdpo_emergency_toilet", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "san_baby_wipes"
+name = "Baby wipes"
+category = "sanitation"
+unit = "pack"
+buckets = ["supplies", "water_out"]
+tier = "h72"
+free = false
+spec = "Packs of baby wipes for each baby or toddler, which CDC's checklist for families with young children includes. Ready.gov's basic kit also lists moist towelettes for personal sanitation."
+look_for = [
+  "Fragrance-free wipes in packs that reseal",
+  "At least two packs for each child (CDC)",
+]
+avoid = [
+  "Flushing wipes, even ones labeled flushable",
+  "Putting used wipes in the toilet bucket: they go in regular trash (RDPO)",
+]
+price_band_usd = { low = 2.29, high = 2.69, per = "pack", note = "Two supermarket listings for packs of 56 to 72 wipes: $2.29 and $2.69." }
+retrieved = "2026-09-26"
+quantity_rule = "baby_wipes"
+citations = ["cdc_infant_checklist", "ready_gov_kit", "rdpo_emergency_toilet", "rr_price_observations_2026_09"]
 hazard_extras = []

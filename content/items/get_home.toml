@@ -2,120 +2,31 @@
 # docs/CONTENT_STANDARDS.md §3. Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
 
 [[item]]
-id = "gethome_route_plan"
-name = "Plan and walk part of your route home"
-category = "get_home"
-unit = "action"
-buckets = ["get_home"]
-tier = "now"
-free = true
-spec = "Map two walking routes from work to home and walk part of one. Plan on about 2 to 2.4 miles an hour with a loaded bag, and about 24 to 32 ounces of water an hour in heat, so a 12-mile walk takes five to six hours."
-look_for = [
-  "Two routes that avoid bridges, tunnels and flood-prone roads",
-  "Places to refill water and rest along the way",
-  "Where you would stay if you cannot get home tonight",
-]
-avoid = [
-  "Planning to drive a route that may be gridlocked or blocked",
-  "Setting out at night in bad weather when you could shelter at work",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a map and a walk." }
-quantity_rule = "once_if_commuter"
-citations = ["fhwa_mutcd_walking_speed", "cdc_niosh_heat_hydration", "rr_research_supply_standards"]
-hazard_extras = []
-
-[[item]]
-id = "gethome_work_plan"
-name = "Know your workplace's emergency plan"
-category = "get_home"
-unit = "action"
-buckets = ["get_home"]
-tier = "now"
-free = true
-spec = "Ask how your workplace would shelter people if roads closed; Ready.gov's work-kit advice is to be ready to shelter at work for at least 24 hours. Keep your medicines, walking shoes and a phone charger there."
-look_for = [
-  "Where people would shelter at work and who is in charge",
-  "A drawer or locker with your medicines and walking shoes",
-  "Whether you could work from home when roads are closed",
-]
-avoid = [
-  "Starting a long walk home into a storm",
-  "Leaving your daily medicines only at home",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: one conversation." }
-quantity_rule = "once_if_commuter"
-citations = ["ready_gov_kit_2020"]
-hazard_extras = []
-
-[[item]]
-id = "gethome_school_plan"
-name = "Know your children's school or daycare emergency plan"
-category = "get_home"
-unit = "action"
-buckets = ["get_home", "evacuate"]
-tier = "now"
-free = true
-spec = "Find out how the school or daycare would shelter or move children and how it contacts parents, and list who else may pick your children up. Ready.gov asks families to include school and daycare in their plans."
-look_for = [
-  "The school's shelter and relocation plan",
-  "Up-to-date pickup authorizations with a backup adult",
-  "How the school sends alerts",
-]
-avoid = [
-  "Driving into a danger zone to reach a school that is already sheltering",
-  "An emergency contact list that is out of date",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a call to the school office." }
-quantity_rule = "once_if_children"
-citations = ["ready_gov_plan", "ready_gov_wildfires"]
-hazard_extras = []
-
-[[item]]
-id = "gethome_spare_tire_check"
-name = "Check the spare tire and jack"
-category = "get_home"
-unit = "action"
-buckets = ["get_home"]
-tier = "now"
-free = true
-spec = "Find the spare tire, jack and wrench, and check the spare's pressure when you check the others. A flat tire is a common way to be stranded, and it is easier to learn the steps on a dry day."
-look_for = [
-  "The spare's pressure, checked with the other tires",
-  "The jack and lug wrench in the car",
-  "Roadside help numbers in your phone and on the contact card",
-]
-avoid = [
-  "Finding out during a storm that the spare is flat",
-  "Changing a tire close to moving traffic",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: ten minutes." }
-quantity_rule = "once_if_vehicle"
-citations = ["nhtsa_tires", "rr_research_risk_model"]
-hazard_extras = ["vehicle_stranding"]
-
-[[item]]
 id = "gethome_bag"
-name = "Get-home bag for each commuter"
+name = "Get-home bag for each commuter: a small bag you stock from home"
 category = "get_home"
 unit = "bag"
 buckets = ["get_home"]
 tier = "h72"
 free = false
-spec = "A small backpack kept at work or in the car with a water bottle, snacks, a rain layer, comfortable walking shoes and socks, medicines, a phone charger, cash and a paper map. Ready.gov's work-kit advice includes food, water, medicines and comfortable walking shoes."
+spec = "A small bag kept at work or in the car and stocked from home: a filled water bottle, snacks, comfortable walking shoes and socks, a rain layer, medicines, a phone charger, cash and a paper map (Ready.gov). The bag you already carry can be it."
 look_for = [
-  "Walking shoes you have already broken in",
-  "A refillable bottle and a filter if the walk is long",
-  "Food that needs no cooking, and a copy of the contact card",
+  "A filled water bottle, refilled every six months (CDC); a filter if the walk is long",
+  "Snacks that need no cooking, swapped before they expire",
+  "Walking shoes you have already broken in, and warm socks",
+  "A day of your medicines and a copy of the contact card",
+  "A phone charger, cash in small bills and a paper map",
 ]
 avoid = [
   "A bag so heavy you would leave it behind",
+  "Buying a kit that repeats what you keep at home",
   "Letting snacks and medicines expire",
 ]
-price_band_usd = { low = 59.99, high = 79.99, per = "bag", note = "Two retail listings for 30–35 liter backpacks: $59.99 and $79.99. Filters, lights and food are priced as separate items." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 29.73, high = 38.8, per = "bag", note = "A bag you already carry to work costs nothing. New, two home-center listings for basic backpacks: $29.73 and $38.80. Water and snacks come from home; a filter is a separate item." }
+retrieved = "2026-09-26"
 quantity_rule = "per_commuter"
 maintenance = { check_months = 6 }
-citations = ["ready_gov_kit_2020", "ready_gov_kit", "rr_price_observations_2026_09"]
+citations = ["ready_gov_kit_2020", "ready_gov_kit", "cdc_water_storage", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]
@@ -136,8 +47,8 @@ avoid = [
   "Running the engine with snow blocking the exhaust pipe",
   "Leaving the kit's water and snacks to expire",
 ]
-price_band_usd = { low = 129.95, high = 149.74, per = "kit", note = "Two retail car survival kits: $129.95 and $149.74. Assembling your own from the list, using what you already own, usually costs less." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 34.97, high = 87.89, per = "kit", note = "Two home-center listings for packed roadside kits: $34.97 and $87.89. Assembling the Ready.gov list from what you already own costs less." }
+retrieved = "2026-09-26"
 quantity_rule = "per_vehicle"
 maintenance = { check_months = 6 }
 citations = ["ready_gov_winter", "cdc_winter_safety", "rr_price_observations_2026_09"]

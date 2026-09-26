@@ -81,6 +81,12 @@ checks citation titles, publishers and quotes for brand names; only URLs are exe
 
 ## Data pack source ids
 
+**Seismic grids (added 2026-09-26).** The data pack reads the original 2023 NSHM grids for the
+contiguous US and Alaska and the Hawaii 2021.R2 grid. Cite `usgs_nshm_2023_grid`
+(doi:10.5066/P9GNPCOD) and `usgs_nshm_hawaii_2021` (ScienceBase item 6802a4fad4be0210cdcc996b,
+part of doi:10.5066/P14VGAV4). `usgs_nshm_2023` stays for the revised 2023.R2 release, for when
+its contiguous-US grid can be downloaded (GitHub issue #16).
+
 The data workstream writes source ids into `data/core/base_rates.toml` and the manifest. Use these
 registry ids, so each source has exactly one id:
 

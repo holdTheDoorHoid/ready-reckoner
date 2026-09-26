@@ -29,52 +29,30 @@ citations = ["cdc_water_storage", "ready_gov_water", "church_emergency_prep_manu
 hazard_extras = []
 
 [[item]]
-id = "water_heater_reserve"
-name = "Know how to use the water in your water heater"
+id = "water_boil_method"
+name = "Water and food know-how: boil water, use your water heater, keep food cold"
 category = "water"
 unit = "action"
-buckets = ["water_out"]
+buckets = ["water_boil", "water_out", "power", "supplies"]
 tier = "now"
 free = true
 life_safety = true
-spec = "A tank water heater holds 20 to 80 gallons of clean tap water, and CDC lists it as a safe source when the taps are off. Learn where its drain valve and your home's main water shut-off are, so you can keep unsafe water out and drain the tank when you need it."
+spec = "To make tap water safe, bring clear water to a rolling boil for 1 minute, or 3 minutes above 5,000 feet, then let it cool (EPA). A tank water heater holds 20 to 80 gallons of clean water; learn where its drain valve and your main water shut-off are (DOE, CDC). In an outage keep the fridge and freezer closed: a closed fridge keeps food cold for about four hours and a full freezer about 48 hours (Ready.gov)."
 look_for = [
-  "The tank size printed on the heater's label",
-  "The drain valve at the bottom of the tank, and a hose or pan that fits under it",
-  "Your home's main water shut-off valve",
-]
-avoid = [
-  "Water from a boiler or radiator system: CDC says use the tap water heater, not the heating tank",
-  "Draining the tank while its power or gas is still on",
-  "Letting unsafe city water flow in: officials may tell you to shut the main valve",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it uses water you already have." }
-quantity_rule = "once"
-citations = ["doe_water_heaters", "cdc_find_clean_water"]
-hazard_extras = []
-
-[[item]]
-id = "water_boil_method"
-name = "Know how to boil water safely"
-category = "water"
-unit = "action"
-buckets = ["water_boil"]
-tier = "now"
-free = true
-spec = "Bring clear water to a rolling boil for 1 minute, or 3 minutes above 5,000 feet, then let it cool before storing it (EPA, CDC). Let cloudy water settle or strain it through a clean cloth first."
-look_for = [
-  "A pot with a lid that you keep for boiling",
-  "A safe indoor heat source: an electric stove when power is on, or a gas stove you know how to light with a match",
-  "Clean containers with lids for the cooled water",
+  "A pot with a lid kept for boiling, and clean containers for the cooled water",
+  "The water heater's tank size, its drain valve, and a hose or pan that fits under it",
+  "Thermometers in the fridge and freezer, and where you could get ice nearby",
+  "A few extra cans or boxes of what you already eat on each shopping trip, newest at the back",
 ]
 avoid = [
   "Camp stoves, grills or generators indoors (carbon monoxide)",
-  "Boiling water that smells of fuel or chemicals: boiling does not make it safe (CDC)",
-  "Pitcher or fridge filters during a boil notice: boil filtered tap water too (CDC)",
+  "Boiling water that may hold fuel or chemicals: boiling does not make it safe (CDC)",
+  "Draining the water heater while its power or gas is still on",
+  "Eating perishable food that has been above 40°F for two hours or more",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it uses a pot and stove you already have." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: know-how, with a pot you already have." }
 quantity_rule = "once"
-citations = ["epa_emergency_disinfection", "cdc_water_disinfection", "cdc_water_advisories", "cdc_co_basics"]
+citations = ["epa_emergency_disinfection", "cdc_water_disinfection", "cdc_water_advisories", "cdc_co_basics", "doe_water_heaters", "cdc_find_clean_water", "ready_gov_food", "ready_gov_power_outages", "ready_gov_pandemic"]
 hazard_extras = []
 
 [[item]]
@@ -260,4 +238,29 @@ price_band_usd = { low = 9.99, high = 16.99, per = "pack", note = "Two retail li
 retrieved = "2026-09-25"
 quantity_rule = "once"
 citations = ["cdc_water_disinfection", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "water_livestock_tank"
+name = "Stock tank to hold water for horses and livestock"
+category = "water"
+unit = "gallon of tank space"
+buckets = ["water_out"]
+tier = "w2"
+free = false
+spec = "A stock tank or trough big enough to hold several days of water for large animals, filled before a storm or outage, because an electric well pump stops when the power does. Large and medium animals need about 20 to 30 liters (5 to 8 gallons) of water each a day (Sphere), and ASPCA advises filling bathtubs and sinks before a power loss so animals have water."
+look_for = [
+  "A tank sized for your animals and the days you plan for",
+  "A spot near the animals where it can be filled from a hose",
+  "A lid or float to keep the water clean",
+]
+avoid = [
+  "Relying on an electric pump for animal water in an outage",
+  "Letting stored water go stagnant: empty, scrub and refill it",
+]
+price_band_usd = { low = 1.13, high = 1.6, per = "gallon of tank space", note = "Two home-center listings for stock tanks: 350 gallons at $397 ($1.13 a gallon of space) and 100 gallons at $159.98 ($1.60)." }
+retrieved = "2026-09-26"
+quantity_rule = "livestock_water"
+volume_l_per_unit = 3.785
+citations = ["sphere_2018", "aspca_disaster_prep", "rr_price_observations_2026_09"]
 hazard_extras = []

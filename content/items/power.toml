@@ -2,98 +2,6 @@
 # docs/CONTENT_STANDARDS.md §3. Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
 
 [[item]]
-id = "power_utility_outage_report"
-name = "Know how to report an outage and get your utility's alerts"
-category = "power"
-unit = "action"
-buckets = ["power", "comms"]
-tier = "now"
-free = true
-spec = "Save your power company's outage number and sign up for its outage texts, so you can report a problem and hear when repairs are expected. Keep the number on paper too, since your phone may be low."
-look_for = [
-  "The outage phone number and website on your contact card",
-  "Text or app alerts turned on",
-  "The account number from a recent bill",
-]
-avoid = [
-  "Assuming the utility already knows your street is out",
-  "Going near downed power lines: stay away and report them",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a sign-up and a phone number." }
-quantity_rule = "once"
-citations = ["ready_gov_power_outages", "rr_research_risk_model"]
-hazard_extras = []
-
-[[item]]
-id = "power_car_charging"
-name = "Charge phones from the car, outdoors only"
-category = "power"
-unit = "action"
-buckets = ["power", "comms"]
-tier = "now"
-free = true
-spec = "A car's USB port or 12-volt socket can recharge phones and power banks in an outage. Run the engine only outdoors: CDC says never run a car inside a garage attached to a house, even with the door open."
-look_for = [
-  "A car charging cable kept in the glove box",
-  "The car parked outdoors, away from windows, when the engine runs",
-]
-avoid = [
-  "Running the engine in any garage",
-  "Draining the car battery so it will not start",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses the car and cables you have." }
-quantity_rule = "once_if_vehicle"
-citations = ["cdc_co_basics"]
-hazard_extras = []
-
-[[item]]
-id = "power_ev_storm_charge"
-name = "Charge the electric car to full when a storm or evacuation is possible"
-category = "power"
-unit = "action"
-buckets = ["evacuate", "power"]
-tier = "now"
-free = true
-spec = "If you might leave in an electric car, keep it fully charged through storm season and charge it to 100% when a storm is forecast, because chargers may have long lines or no power (Hillsborough County, Florida). If you leave it behind in a flood-prone area, park it on high ground about 50 feet from buildings, unplugged."
-look_for = [
-  "A full charge before any warning, not after",
-  "Where you would park the car above flood level",
-  "The car's real range with the air conditioning or heat on",
-]
-avoid = [
-  "Driving an electric car through floodwater: water can damage the battery and start a fire",
-  "Charging or driving a car that sat in floodwater, especially salt water",
-  "Leaving it plugged in or in the garage when you evacuate",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits." }
-quantity_rule = "once_if_ev"
-citations = ["hcfl_ev_safety", "ready_gov_evacuation"]
-hazard_extras = ["hurricane", "coastal_flooding", "riverine_flooding"]
-
-[[item]]
-id = "power_ev_range_plan"
-name = "Plan evacuation routes that fit your electric car's range"
-category = "power"
-unit = "action"
-buckets = ["evacuate", "get_home"]
-tier = "now"
-free = true
-spec = "Check how far your electric car goes on a full charge in heat or cold, and pick evacuation destinations inside that range. Plan to arrive without public chargers, which may be crowded or without power (Hillsborough County, Florida), and note chargers along the way on the Department of Energy's station map."
-look_for = [
-  "Destinations within about two-thirds of your full range, to leave room for traffic",
-  "Chargers along two routes, from the federal station locator",
-  "A charging cable kept in the car",
-]
-avoid = [
-  "Planning a trip that needs a charger halfway",
-  "Waiting for the evacuation order to charge",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: planning." }
-quantity_rule = "once_if_ev"
-citations = ["hcfl_ev_safety", "doe_afdc_stations", "doe_fueleconomy_ev", "rr_expert_prior"]
-hazard_extras = []
-
-[[item]]
 id = "power_headlamp"
 name = "Headlamp or flashlight for each person"
 category = "power"
@@ -111,8 +19,8 @@ avoid = [
   "Candles for light",
   "Lights that use odd battery sizes you do not stock",
 ]
-price_band_usd = { low = 14.99, high = 22.99, per = "headlamp", note = "Two retail listings for rechargeable LED headlamps: $14.99 and $22.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 3.32, high = 19.97, per = "headlamp", note = "Three home-center listings: basic headlamps in a three-pack ($3.32 each), a 300-lumen headlamp ($17.47) and a rechargeable one ($19.97)." }
+retrieved = "2026-09-26"
 quantity_rule = "per_person"
 citations = ["ready_gov_kit", "rr_price_observations_2026_09"]
 hazard_extras = []
@@ -134,8 +42,8 @@ avoid = [
   "Fuel lanterns indoors",
   "Lanterns left uncharged in a drawer",
 ]
-price_band_usd = { low = 29.00, high = 29.95, per = "lantern", note = "Two retail listings for rechargeable LED lanterns: $29.00 and $29.95." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 21.82, high = 24.99, per = "lantern", note = "Two home-center listings for rechargeable LED lanterns: a solar lantern at $21.82 and one with a phone-charging port at $24.99." }
+retrieved = "2026-09-26"
 quantity_rule = "once"
 maintenance = { check_months = 6 }
 citations = ["ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
@@ -183,8 +91,8 @@ avoid = [
   "Leaving it uncharged for months",
   "Very cheap packs with no safety marks",
 ]
-price_band_usd = { low = 41.39, high = 59.99, per = "power bank", note = "Two retail listings for 20,000 mAh power banks: $41.39 and $59.99." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 32.99, high = 39.99, per = "power bank", note = "Two maker's list prices for 20,000 mAh power banks: $32.99 and $39.99." }
+retrieved = "2026-09-26"
 quantity_rule = "per_person_13_plus"
 maintenance = { check_months = 3 }
 citations = ["ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
@@ -208,8 +116,8 @@ avoid = [
   "Expecting it to run a whole house or central air",
   "Leaving it at zero charge for months",
 ]
-price_band_usd = { low = 499.00, high = 559.00, per = "power station", note = "Two retail listings for units of about 1,000 Wh: $499 and $559." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 479, high = 487.9, per = "power station", note = "Two home-center listings for power stations of about 1,000 Wh: $479 and $487.90." }
+retrieved = "2026-09-26"
 quantity_rule = "power_station_units"
 maintenance = { check_months = 3 }
 citations = ["rr_research_supply_standards", "sil_cpap_power", "epa_energy_star_refrigerators", "rr_expert_prior", "rr_price_observations_2026_09"]
@@ -235,8 +143,8 @@ avoid = [
   "Buying one if you live in an apartment or cannot keep it 20 feet from the building",
   "Assuming a small unit can start a well pump: check the pump's starting watts",
 ]
-price_band_usd = { low = 499.00, high = 1199.00, per = "generator", note = "Three listings for 2,200–2,800 W inverter generators: $499, $549 and a $1,199 list price." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 389.99, high = 499, per = "generator", note = "Two home-center listings for 2,300 to 2,800 W gasoline inverter generators: $389.99 and $499. Premium models cost more." }
+retrieved = "2026-09-26"
 quantity_rule = "generator_units"
 maintenance = { check_months = 3 }
 citations = ["cdc_co_basics", "ready_gov_power_outages", "rr_research_supply_standards", "rr_expert_prior", "rr_price_observations_2026_09"]
@@ -287,8 +195,8 @@ avoid = [
   "Expecting it to run a refrigerator in winter",
   "Laying it flat or in partial shade, which cuts output",
 ]
-price_band_usd = { low = 199.00, high = 249.00, per = "panel", note = "Three retail listings for 100 W portable panels: $199, $247 and $249." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 199, high = 259, per = "panel", note = "Two makers' list prices for folding 100 to 110 W panels: $199 and $259." }
+retrieved = "2026-09-26"
 quantity_rule = "solar_panel_units"
 citations = ["nlr_pvwatts_v8", "rr_research_supply_standards", "rr_price_observations_2026_09"]
 hazard_extras = []
@@ -312,8 +220,8 @@ avoid = [
   "Guessing the size: check the label or ask the supplier",
   "Running the humidifier on battery when power is short",
 ]
-price_band_usd = { low = 169.00, high = 299.00, per = "battery", note = "Two retail listings for small portable power stations (183 and 286 Wh): $169 and $299." }
-retrieved = "2026-09-25"
+price_band_usd = { low = 209, high = 279, per = "battery", note = "Two makers' list prices for small portable power stations of about 250 to 300 Wh: $209 and $279." }
+retrieved = "2026-09-26"
 quantity_rule = "device_battery_units"
 maintenance = { check_months = 3 }
 citations = ["sil_cpap_power", "ready_gov_disability", "rr_expert_prior", "rr_price_observations_2026_09"]
