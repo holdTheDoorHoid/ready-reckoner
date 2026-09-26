@@ -197,12 +197,12 @@ sources = ["rr_expert_prior"]
 
 [[constant]]
 key = "livestock_pump_bridge_days"
-label = "Days of water to store for large animals when a generator can run the well pump"
+label = "Days of water to store for large animals when the household can already run the well pump on its own generator"
 unit = "day"
 default = 3.0
 prior = true
 sources = ["rr_expert_prior"]
-note = "Stored water for horses and livestock only has to last until a generator is running the well pump: three days, the three-day step, leaves time to set it up, fix it or refuel it. Without a way to power the pump, the animals' stored water follows people's, up to 14 days (`water_stored_cap_days`). A drought that lowers the well is not a power problem: no amount of stored water or pump power replaces hauling water in."
+note = "Stored water for horses and livestock only has to last until a generator is running the well pump: three days, the three-day step, leaves time to set it up, fix it or refuel it. That holds only once pump power actually exists: a generator the household owns, connected through an interlock or transfer switch it also has. Until then (a generator merely planned, or one with no safe way to reach a hardwired pump) the animals' stored water follows people's, up to 14 days (`water_stored_cap_days`). A drought that lowers the well is not a power problem: no amount of stored water or pump power replaces hauling water in."
 
 [[constant]]
 key = "water_rotation_months"
@@ -568,11 +568,47 @@ note = "Ten states allow up to 30 days after a governor's emergency declaration;
 note_sources = ["healthcare_ready_refill_laws", "hhs_aspr_epap"]
 
 [[constant]]
-key = "refrigerated_rx_hold_days"
-label = "Days refrigerated medicine lasts without power (unless the label says otherwise)"
+key = "cooler_hold_days"
+label = "Days an insulated bag with fresh cold packs keeps medicine cool"
 unit = "day"
 default = 1.0
-sources = ["ready_gov_power_outages"]
+low = 0.5
+high = 2.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "Gel packs in a soft bag thaw within hours to about a day in summer heat, and refreezing them needs the power that is out; replacing the ice stretches that to about two days. No agency gives a figure, so this is an estimate (round-2 review, practitioner and professional panels). The plan counts the bag for this long and no longer."
+
+[[constant]]
+key = "rx_power_min_days"
+label = "Power target from which refrigerated medicine needs a power source, not only a cooler bag"
+unit = "day"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "Past about two days a cooler bag cannot keep medicine cool on its own, so the plan makes a battery power station a need, unless the household already has a generator, a power station or solar with a battery. Insulin tolerates up to 86 °F for 28 days, but a home without power in summer heat can pass that, and other refrigerated medicines need the fridge."
+
+[[constant]]
+key = "insulin_room_temp_days"
+label = "Days insulin in its vial or pen keeps working unrefrigerated between 59 °F and 86 °F"
+unit = "day"
+default = 28.0
+sources = ["fda_insulin_emergency"]
+note = "FDA: vials or cartridges, opened or not, may be left unrefrigerated between 59 °F and 86 °F for up to 28 days and continue to work, and in an emergency you might still need to use insulin stored above 86 °F. Do not use insulin that has been frozen (FDA, CDC). Ready.gov's general rule of discarding refrigerated medicine after a day without power does not apply to insulin."
+note_sources = ["fda_insulin_emergency", "cdc_insulin_emergency", "ready_gov_power_outages"]
+
+[[constant]]
+key = "insulin_room_temp_min_f"
+label = "Lowest temperature for keeping insulin out of the fridge"
+unit = "°F"
+default = 59.0
+sources = ["fda_insulin_emergency"]
+
+[[constant]]
+key = "insulin_room_temp_max_f"
+label = "Highest temperature for keeping insulin out of the fridge"
+unit = "°F"
+default = 86.0
+sources = ["fda_insulin_emergency"]
 
 [[constant]]
 key = "antibiotic_quantity"
@@ -663,6 +699,28 @@ label = "Hours a full freezer holds its temperature"
 unit = "hour"
 default = 48.0
 sources = ["ready_gov_power_outages"]
+
+[[constant]]
+key = "fridge_thermometer_pairs"
+label = "Appliance thermometers: one in the fridge and one in the freezer"
+unit = "pair"
+default = 1.0
+sources = ["ready_gov_food"]
+note = "Ready.gov: use a refrigerator thermometer to check the temperature. After a power cut, the thermometer is how you know whether food stayed at 40 °F or below."
+
+[[constant]]
+key = "food_safe_max_f"
+label = "Highest safe temperature for refrigerated food"
+unit = "degree Fahrenheit"
+default = 40.0
+sources = ["ready_gov_food"]
+
+[[constant]]
+key = "food_unsafe_hours"
+label = "Hours above 40 °F after which perishable food is thrown out"
+unit = "hour"
+default = 2.0
+sources = ["ready_gov_food"]
 
 [[constant]]
 key = "phone_wh_per_day"
@@ -840,6 +898,15 @@ unit = "day"
 default = 7.0
 prior = true
 sources = ["rr_expert_prior", "nlr_pvwatts_v8"]
+
+[[constant]]
+key = "fuel_can_gal"
+label = "Gasoline one approved portable can holds"
+unit = "gallon"
+default = 5.0
+sources = ["rr_price_observations_2026_09"]
+note = "The common size of approved portable gasoline cans in the price observations. CPSC says to store fuel outside the living space in labeled, non-glass safety containers; fire codes also cap how much a home may store (`fuel_storage_max_gal`)."
+note_sources = ["cpsc_generator_safety_alert", "lehi_fuel_storage"]
 
 [[constant]]
 key = "noaa_radios_per_household"
@@ -1094,6 +1161,22 @@ unit = "thermometer"
 default = 1.0
 sources = ["redcross_first_aid_kit"]
 
+[[constant]]
+key = "bleeding_kits_per_household"
+label = "Bleeding-control kits (a tourniquet and a pressure bandage) per household"
+unit = "kit"
+default = 1.0
+sources = ["dhs_stop_the_bleed"]
+
+[[constant]]
+key = "bleeding_kit_life_safety_p10"
+label = "Ten-year chance of a medical emergency from which the bleeding-control kit is a life-safety item"
+unit = "fraction"
+default = 0.5
+prior = true
+sources = ["rr_expert_prior"]
+note = "The round-2 review asked for the kit to be a three-day, life-safety item where the household is rural (ambulances take longer) or where a medical emergency is among the likeliest events it faces. The supply rules do not see the hazard register's ranking, so a medical emergency at least as likely as not in ten years stands in for 'in the top three'; medical emergencies (about 2.4 a year per household) lead or nearly lead every register."
+
 # ---------------------------------------------------------------------------------------------
 # Heat and cold (research §5)
 # ---------------------------------------------------------------------------------------------
@@ -1106,6 +1189,14 @@ default = 90.0
 sources = ["cdc_heat_health"]
 note = "CDC: use fans only below 90 °F indoors. Ready.gov: fans give a false sense of comfort and do not lower body temperature. The plan warns above 90 °F and points to cooling centres."
 note_sources = ["cdc_heat_health", "ready_gov_heat"]
+
+[[constant]]
+key = "room_thermometers_per_household"
+label = "Room thermometers per household (in the room where the most vulnerable person sleeps)"
+unit = "thermometer"
+default = 1.0
+sources = ["cdc_heat_health"]
+note = "CDC's fan rule (only below 90 °F indoors) cannot be followed without knowing the room's temperature, so the plan counts one room thermometer wherever it plans for heat."
 
 [[constant]]
 key = "battery_fans_base"
@@ -1243,6 +1334,21 @@ prior = true
 sources = ["rr_expert_prior"]
 note = "The form does not ask how many floors a home has or where the kitchen is. The plan counts the floors people live on (1 for an apartment or mobile home, 2 for a house; not the basement) and assumes the kitchen is on the floor with the way out; a kitchen on another floor gets its own. USFA: a multipurpose A-B-C extinguisher works on most home fires."
 note_sources = ["usfa_extinguishers"]
+
+[[constant]]
+key = "home_fires_per_100_households"
+label = "Home fires a year for every 100 households, counting small ones never reported"
+unit = "fire per 100 households per year"
+default = 6.6
+sources = ["cpsc_unreported_fires_2009"]
+note = "CPSC's national survey of unreported residential fires (2004–2005): 7.4 million a year, 6.6 per 100 households, about two thirds of them cooking fires. Fire departments attended only about 3.4 % of them, so the reported house-fire rate the risk register uses counts a small share. Extinguishers were used in about 5 % of these fires and put about half of those out."
+
+[[constant]]
+key = "home_fires_reported_share"
+label = "Share of home fires that fire departments attend"
+unit = "fraction"
+default = 0.034
+sources = ["cpsc_unreported_fires_2009"]
 
 [[constant]]
 key = "neighbour_contacts"
@@ -2610,3 +2716,52 @@ short = "USFA"
 title = "Fire extinguishers"
 publisher = "U.S. Fire Administration"
 url = "https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/fire-extinguishers/"
+
+[[source]]
+id = "fda_insulin_emergency"
+short = "FDA"
+title = "Information Regarding Insulin Storage and Switching Between Products in an Emergency"
+publisher = "U.S. Food and Drug Administration"
+url = "https://www.fda.gov/drugs/emergency-preparedness-drugs/information-regarding-insulin-storage-and-switching-between-products-emergency"
+
+[[source]]
+id = "cpsc_unreported_fires_2009"
+short = "CPSC"
+title = "2004–2005 National Sample Survey of Unreported Residential Fires"
+publisher = "U.S. Consumer Product Safety Commission (Greene and Andres)"
+url = "https://www.cpsc.gov/s3fs-public/UnreportedResidentialFires.pdf"
+
+[[source]]
+id = "cpsc_generator_safety_alert"
+short = "CPSC"
+title = "Portable Generator Hazards (Safety Alert, Publication 5123)"
+publisher = "U.S. Consumer Product Safety Commission"
+url = "https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf"
+
+[[source]]
+id = "osha_portable_generators"
+short = "OSHA"
+title = "Using Portable Generators Safely (fact sheet)"
+publisher = "Occupational Safety and Health Administration"
+url = "https://www.osha.gov/sites/default/files/publications/OSHA3286.pdf"
+
+[[source]]
+id = "redcross_sound_the_alarm"
+short = "Red Cross"
+title = "Sound the Alarm: free smoke alarm installation (Home Fire Campaign)"
+publisher = "American Red Cross"
+url = "https://www.redcross.org/sound-the-alarm.html"
+
+[[source]]
+id = "dhs_stop_the_bleed"
+short = "DHS"
+title = "Stop the Bleed"
+publisher = "U.S. Department of Homeland Security"
+url = "https://www.dhs.gov/stopthebleed"
+
+[[source]]
+id = "mell_2017_ems_response"
+short = "JAMA Surgery"
+title = "Emergency Medical Services Response Times in Rural, Suburban, and Urban Areas (JAMA Surgery)"
+publisher = "Mell H.K. et al."
+url = "https://doi.org/10.1001/jamasurg.2017.2230"

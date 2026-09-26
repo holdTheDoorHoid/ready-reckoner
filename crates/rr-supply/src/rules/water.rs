@@ -335,6 +335,7 @@ pub fn water_storage(
     pets: &Pets,
     level: WaterLevel,
     hot: bool,
+    well: bool,
 ) -> (Sizing, Option<Sizing>) {
     let cap = constants().value(keys::WATER_STORED_CAP_DAYS);
     let mut base = Basis::new();
@@ -353,18 +354,26 @@ pub fn water_storage(
         fmt_days(cap)
     );
     let line = line.extend(&sentence, &why);
-    let treat = treatment_beyond(&mut base, &d, target_days);
+    let treat = treatment_beyond(&mut base, &d, target_days, well);
     (line, Some(treat))
 }
 
-/// Water to make safe after the stored days run out (rule `water_treatment_capacity`).
-fn treatment_beyond(b: &mut Basis, d: &WaterDaily, target_days: f64) -> Sizing {
+/// Water to make safe after the stored days run out (rule `water_treatment_capacity`). A filter
+/// counts only with a raw-water source, and the line names it: the household's own well (with a
+/// way to run its pump), or the source it picks in the water know-how step (a rain barrel where the
+/// state allows it, a creek or a pond).
+fn treatment_beyond(b: &mut Basis, d: &WaterDaily, target_days: f64, well: bool) -> Sizing {
     let cap = b.k(keys::WATER_STORED_CAP_DAYS);
     let extra_days = target_days - cap;
     let q = d.total_gal() * extra_days;
     let how = how_to_treat(b);
+    let source = if well {
+        "water from your well, which needs a way to run its pump in a power cut (a generator connected through an interlock or transfer switch an electrician installs, or a hand pump)"
+    } else {
+        "a raw-water source you pick now in your water plan: a rain barrel where your state allows it, a creek or a pond"
+    };
     let text = format!(
-        "After day {}, for the other {}: make about {} of water safe each day, about {} in all, with a water filter and a source such as rain barrels, a stream or a pond, instead of storing more. Filter it, then {}. If there is no water source near you, store more water instead.",
+        "After day {}, for the other {}: make about {} of water safe each day, about {} in all, with a water filter and {source}, instead of storing more. Filter it, then {}. If you have no raw-water source, store more water instead.",
         num(cap, 1),
         fmt_days(extra_days),
         gallons(d.total_gal()),
@@ -612,12 +621,13 @@ pub fn boil_fuel(gallons_to_boil: f64) -> Sizing {
 /// as people's stored water (an estimate for animals). Beyond that the line points to power for the
 /// well pump or a plan to haul water instead of more tank space.
 ///
-/// `pump`: the household is on a well and a generator can run the pump in a power cut (it owns one,
-/// or its plan includes one: the power bucket's generator line is then a need). The animals'
-/// stored water then only has to last until the generator runs the pump
-/// (`livestock_pump_bridge_days`, 3, an estimate), and two weeks in stock tanks becomes an
-/// alternative ([`livestock_water_stored`]). `drought`: a drought drives the no-water target, and
-/// the line says that hauling water in is the answer to a dry well. Rule `livestock_water`.
+/// `pump`: the household is on a well and pump power actually exists: it owns a generator and the
+/// interlock or transfer switch that connects it to the pump (a generator merely planned does not
+/// count, round-2 review P-02). The animals' stored water then only has to last until the
+/// generator runs the pump (`livestock_pump_bridge_days`, 3, an estimate), and two weeks in stock
+/// tanks becomes an alternative ([`livestock_water_stored`]). `drought`: a drought drives the
+/// no-water target, and the line says that hauling water in is the answer to a dry well. Rule
+/// `livestock_water`.
 pub fn livestock_water(days: f64, large_animals: u8, pump: bool, drought: bool) -> Option<Sizing> {
     if large_animals == 0 || days <= 0.0 {
         return None;
@@ -665,7 +675,7 @@ pub fn livestock_water(days: f64, large_animals: u8, pump: bool, drought: bool) 
         }
     } else if capped {
         text.push_str(&format!(
-            " Your target is {}; store the first {}, as for people, and beyond that keep the well pump powered (a generator or battery sized for it) or plan to haul water, instead of buying more tank space.",
+            " Your target is {}; store the first {}, as for people, instead of buying more tank space. A power cut longer than that needs a generator that can start the well pump, connected through an interlock or transfer switch an electrician installs; in a drought that lowers the well, haul water in, and a stock tank holds what you haul.",
             fmt_days(days),
             fmt_days(stored_days)
         ));
@@ -814,8 +824,28 @@ mod tests {
     #[test]
     fn coos_bay_fifty_days_prefers_a_filter_to_a_hundred_gallons() {
         let p = fixtures::get("coos-bay-well-owner-2").unwrap();
-        let (stored, treat) = water_storage(50.0, &p.people, &p.pets, WaterLevel::Basic, false);
+        let (stored, treat) =
+            water_storage(50.0, &p.people, &p.pets, WaterLevel::Basic, false, true);
         let treat = treat.expect("a treatment line beyond 14 days");
+        // The filter counts only with a raw-water source, and the line names it: their well.
+        assert!(
+            treat.plain.contains("water from your well"),
+            "{}",
+            treat.plain
+        );
+        assert!(
+            treat.plain.contains("interlock or transfer switch"),
+            "{}",
+            treat.plain
+        );
+        let (_, town) = water_storage(50.0, &p.people, &p.pets, WaterLevel::Basic, false, false);
+        let town = town.unwrap();
+        assert!(
+            town.plain.contains("raw-water source you pick"),
+            "{}",
+            town.plain
+        );
+        assert!(town.plain.contains("rain barrel"), "{}", town.plain);
         // 2 people + 2 dogs × 0.3125 + 1 cat × 0.0625 = 2.6875 gal/day
         assert_eq!(stored.quantity, 37.6, "14 days stored");
         assert!(stored.quantity < 100.0);
@@ -837,7 +867,7 @@ mod tests {
                 .any(|c| c == "epa_emergency_disinfection")
         );
         // At or under the cap there is no treatment line.
-        let (short, none) = water_storage(14.0, &p.people, &p.pets, WaterLevel::Basic, false);
+        let (short, none) = water_storage(14.0, &p.people, &p.pets, WaterLevel::Basic, false, true);
         assert!(none.is_none());
         assert_eq!(short.quantity, 37.6);
     }

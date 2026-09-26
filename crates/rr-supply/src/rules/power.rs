@@ -265,11 +265,22 @@ pub fn generator_fuel_gallons(days: f64, housing: &Housing) -> Option<Sizing> {
     )
 }
 
+/// The item class of the power station line when it keeps refrigerated medicine cold (a need, see
+/// [`crate::rules::medication::rx_power_needed`]). rr-plan names the part after it ("power for cold
+/// medicine"), so the station is its own part of the power bucket rather than the medical-device
+/// part, and the budget's cold-chain guardrail looks for that part.
+pub const COLD_MEDICINE_POWER_CLASS: &str = "power_for_cold_medicine";
+
 /// How many power stations: enough for a powered medical device through the outage (at most two,
-/// an estimate); one for refrigerated medicine; otherwise one as an optional upgrade when the outage
-/// target is 3 days or more. The flag says whether it is needed (a medical device) or optional.
-/// Rule `power_station_units`.
-pub fn power_station_units(days: f64, people_list: &[Person]) -> Option<(Sizing, bool)> {
+/// an estimate); one to keep refrigerated medicine cool when the power target is 2 days or more and
+/// the household has no backup power (a need: a cooler bag lasts about a day); one as an option
+/// for refrigerated medicine otherwise; else one as an optional upgrade when the outage target is
+/// 3 days or more. The flag says whether it is needed. Rule `power_station_units`.
+pub fn power_station_units(
+    days: f64,
+    people_list: &[Person],
+    housing: &Housing,
+) -> Option<(Sizing, bool)> {
     if days <= 0.0 {
         return None;
     }
@@ -279,16 +290,35 @@ pub fn power_station_units(days: f64, people_list: &[Person]) -> Option<(Sizing,
     let usable = station * b.k(keys::POWER_STATION_USABLE_SHARE);
     let fridge = b.k(keys::FRIDGE_WH_PER_DAY);
     let cold_rx = people_list.iter().any(|p| p.medical.refrigerated_rx);
+    let cold_needed = super::medication::rx_power_needed(Some(days), people_list, housing);
+    let mut class = "power_station";
     let (units, needed, why) = if devices > 0.0 {
         let max_units = b.k(keys::POWER_STATION_MAX_UNITS);
         let u = ceil_count(devices * days / usable).clamp(1.0, max_units);
-        (u, true, "to run the medical equipment through the outage")
+        (
+            u,
+            true,
+            "to run the medical equipment through the outage".to_owned(),
+        )
+    } else if cold_needed {
+        b.k(keys::RX_POWER_MIN_DAYS);
+        let hold = b.k(keys::COOLER_HOLD_DAYS);
+        class = COLD_MEDICINE_POWER_CLASS;
+        (
+            1.0,
+            true,
+            format!(
+                "to keep refrigerated medicine cool through a {} power cut, because a cooler bag lasts only about {}",
+                day_adjective(days),
+                fmt_days(hold)
+            ),
+        )
     } else if cold_rx {
         b.cite("ready_gov_power_outages");
         (
             1.0,
             false,
-            "to keep refrigerated medicine cold in a small cooler",
+            "to keep refrigerated medicine cold in a small cooler".to_owned(),
         )
     } else {
         let from = b.k(keys::POWER_STATION_UPGRADE_DAYS);
@@ -298,7 +328,7 @@ pub fn power_station_units(days: f64, people_list: &[Person]) -> Option<(Sizing,
         (
             1.0,
             false,
-            "as an optional upgrade for lights, phones and a radio",
+            "as an optional upgrade for lights, phones and a radio".to_owned(),
         )
     };
     let load = if devices > 0.0 {
@@ -306,7 +336,7 @@ pub fn power_station_units(days: f64, people_list: &[Person]) -> Option<(Sizing,
     } else {
         "phones"
     };
-    let text = format!(
+    let mut text = format!(
         "{} (about {} Wh each) {why}. Your essential load ({load}) is about {} Wh a day, {} Wh for {}; one station gives about {} Wh after losses, enough for about {} of that load. A full-size fridge alone would drain one in about {}.",
         count(units, "battery power station", "battery power stations"),
         num(station, 0),
@@ -317,22 +347,37 @@ pub fn power_station_units(days: f64, people_list: &[Person]) -> Option<(Sizing,
         fmt_days(round_dp(usable / essential.max(f64::MIN_POSITIVE), 1)),
         fmt_days(round_dp(usable / fridge, 1))
     );
+    if cold_needed && devices <= 0.0 {
+        b.cite("cdc_co_basics");
+        text.push_str(" It can run a small 12-volt cooler for the medicine, or the fridge in short spells. Recharge it from a car, gas or electric, with the engine running outdoors only, or from a solar panel.");
+    } else if cold_rx && devices > 0.0 {
+        text.push_str(" It can also keep refrigerated medicine cool in a small 12-volt cooler.");
+    }
     let sizing = Sizing::new(
         &b,
         "power_station_units",
-        "power_station",
+        class,
         units,
         "power station",
         Per::Household,
         text,
     )
-    .math(vec![format!(
-        "devices {} Wh/day × {} days ÷ {} usable Wh = {} stations",
-        num(devices, 1),
-        num(days, 2),
-        num(usable, 1),
-        num(units, 0)
-    )]);
+    .math(vec![if devices <= 0.0 && cold_rx {
+        format!(
+            "refrigerated medicine, {} days of power target: {} station ({})",
+            num(days, 2),
+            num(units, 0),
+            if needed { "a need" } else { "optional" }
+        )
+    } else {
+        format!(
+            "devices {} Wh/day × {} days ÷ {} usable Wh = {} stations",
+            num(devices, 1),
+            num(days, 2),
+            num(usable, 1),
+            num(units, 0)
+        )
+    }]);
     Some((sizing, needed))
 }
 
@@ -362,15 +407,20 @@ pub fn generator_units(days: f64, housing: &Housing) -> Option<Sizing> {
     }
     let clearance = b.k(keys::GENERATOR_CLEARANCE_FT);
     let mut text = format!(
-        "Optional: a portable generator can run {} through a {} outage. It must run outdoors, at least {} feet from windows, doors and vents, never in a garage, and it needs fuel (see the fuel line).",
-        if well {
-            "the fridge, lights and the well pump"
-        } else {
-            "the fridge and lights"
-        },
+        "Optional: a portable generator can run the fridge and lights through a {} outage. It must run outdoors, at least {} feet from windows, doors and vents, never in a garage, and it needs fuel (see the fuel line).",
         day_adjective(days),
         num(clearance, 0)
     );
+    if well {
+        let (s_lo, s_hi) = b.range(keys::WELL_PUMP_START_MULTIPLIER);
+        b.cite("cpsc_generator_safety_alert");
+        b.cite("osha_portable_generators");
+        text.push_str(&format!(
+            " To run the well pump it must supply the pump's starting watts, {} to {} times its running watts, and 240 volts if the pump runs on 240 (check the nameplate), and it reaches the pump only through an inlet with an interlock or transfer switch that an electrician installs. Never plug a generator into a wall outlet: backfeeding can electrocute utility workers.",
+            num(s_lo, 0),
+            num(s_hi, 0)
+        ));
+    }
     if housing.tenure == Tenure::Rent {
         text.push_str(" Ask your landlord first.");
     }
@@ -492,12 +542,21 @@ pub fn fridge_wh(days: f64) -> Option<Sizing> {
     )
 }
 
-/// A generator for a household on a well with horses or livestock: a need, not an option. In a
-/// power cut it runs the well pump so the animals have water after the first days their stored
-/// water covers (`livestock_water`), and the fridge and lights too. The same homes as
-/// [`generator_units`] (a house, and a power target of a day or more on a well); `None` without
-/// large animals, off a well, or where a generator is not offered. Rule `generator_units`.
-pub fn generator_for_well_pump(days: f64, housing: &Housing, large_animals: u8) -> Option<Sizing> {
+/// A generator for a household on a well with horses or livestock: a need, not an option, when
+/// a power cut can outlast the animals' stored water. In a power cut it runs the well pump so the
+/// animals have water after the `stored_days` their stored water covers (`livestock_water`), and
+/// the fridge and lights too. It must be pump-rated (the pump's starting watts, 240 volts if the
+/// pump runs on 240) and reaches the hardwired pump only through an electrician-installed inlet
+/// with an interlock or transfer switch (`generator_connection_units`), never a wall outlet (CPSC,
+/// OSHA). The same homes as [`generator_units`] (a house, and a power target of a day or more on a
+/// well); `None` without large animals, off a well, or where a generator is not offered. Rule
+/// `generator_units`.
+pub fn generator_for_well_pump(
+    days: f64,
+    housing: &Housing,
+    large_animals: u8,
+    stored_days: f64,
+) -> Option<Sizing> {
     if large_animals == 0 || housing.water != WaterSource::Well {
         return None;
     }
@@ -507,15 +566,16 @@ pub fn generator_for_well_pump(days: f64, housing: &Housing, large_animals: u8) 
     b.cite("ready_gov_power_outages");
     b.cite("aspca_disaster_prep");
     b.cite(crate::constants::PRIOR_SOURCE);
-    let bridge = b.k(keys::LIVESTOCK_PUMP_BRIDGE_DAYS);
     let w = b.k(keys::WELL_PUMP_W);
     let (s_lo, s_hi) = b.range(keys::WELL_PUMP_START_MULTIPLIER);
     let clearance = b.k(keys::GENERATOR_CLEARANCE_FT);
+    b.cite("cpsc_generator_safety_alert");
+    b.cite("osha_portable_generators");
     let n = f64::from(large_animals);
     let mut text = format!(
-        "A portable generator that can start your well pump, so your {} have water after the first {} of a power cut; it runs the fridge and lights too. Starting a pump takes {} to {} times its running watts (about {} W): check the pump's nameplate before you buy. It must run outdoors, at least {} feet from windows, doors and vents, never in a garage, and it needs fuel (see the fuel line).",
+        "A generator that can start your well pump, so your {} have water in a power cut that outlasts their {} of stored water; it runs the fridge and lights too. Starting a pump takes {} to {} times its running watts (about {} W running): check the pump's nameplate, and if it runs on 240 volts, choose a generator with a 240-volt outlet. It reaches the pump only through an inlet with an interlock or transfer switch that an electrician installs (see that line); never plug it into a wall outlet, because backfeeding can electrocute utility workers and neighbours. It must run outdoors, at least {} feet from windows, doors and vents, never in a garage, and its fuel goes in approved cans (see the fuel lines).",
         count(n, "large animal", "large animals"),
-        fmt_days(bridge),
+        fmt_days(stored_days),
         num(s_lo, 0),
         num(s_hi, 0),
         num(w, 0),
@@ -533,6 +593,118 @@ pub fn generator_for_well_pump(days: f64, housing: &Housing, large_animals: u8) 
         Per::Household,
         text,
     ))
+}
+
+/// Whether the generator in [`generator_connection_units`] is one the household owns or one its
+/// plan buys.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeneratorFor {
+    /// A generator the household already has (`backup_power = generator`).
+    Owned,
+    /// The generator the plan buys to run the well pump for large animals.
+    Planned,
+}
+
+/// An inlet with an interlock or transfer switch, installed by a licensed electrician, so a
+/// generator can run a hardwired well pump safely: 1 for a house on a well that its household owns,
+/// with a generator owned or planned. OSHA: connect a generator to a building only through a
+/// transfer switch a qualified electrician installed; CPSC: plugging one into a wall outlet
+/// ("backfeeding") can electrocute utility workers and neighbours. Renters ask the landlord, so
+/// the line is only for owners. Rule `generator_connection_units`.
+pub fn generator_connection_units(housing: &Housing, generator: GeneratorFor) -> Option<Sizing> {
+    let house = matches!(
+        housing.kind,
+        HousingKind::Detached
+            | HousingKind::Rowhouse
+            | HousingKind::MobileHome
+            | HousingKind::RuralProperty
+    );
+    if !house || housing.water != WaterSource::Well || housing.tenure != Tenure::Own {
+        return None;
+    }
+    let mut b = Basis::new();
+    b.cite("osha_portable_generators");
+    b.cite("cpsc_generator_safety_alert");
+    let whose = match generator {
+        GeneratorFor::Owned => "Your generator",
+        GeneratorFor::Planned => "The generator for the well pump",
+    };
+    let text = format!(
+        "{whose} can run the well pump, which is wired into the house, only through an inlet with an interlock or transfer switch that a licensed electrician installs: 1 installed kit, with the pump's circuit on it. Never plug a generator into a wall outlet or connect it to the house wiring any other way: backfeeding can electrocute utility workers and neighbours, and OSHA says to connect a generator to a building only through a transfer switch a qualified electrician installed."
+    );
+    Some(Sizing::new(
+        &b,
+        "generator_connection_units",
+        "generator_connection",
+        1.0,
+        "installed kit",
+        Per::Household,
+        text,
+    ))
+}
+
+/// Approved gasoline cans for a generator's fuel: ceil(gallons ÷ 5), with fuel stabilizer, stored
+/// outside the living space (CPSC) and used within six months. For a generator the household owns
+/// the cans go with the fuel it buys (item class `generator_fuel`); for the generator the plan buys
+/// for the well pump they are part of that purchase (item class `generator`). Rule `fuel_cans`.
+pub fn fuel_cans(fuel_gallons: f64, generator: GeneratorFor) -> Option<Sizing> {
+    if fuel_gallons <= 0.0 {
+        return None;
+    }
+    let mut b = Basis::new();
+    let per_can = b.k(keys::FUEL_CAN_GAL);
+    let rotate = b.k(keys::FUEL_ROTATION_MONTHS);
+    b.cite("cpsc_generator_safety_alert");
+    let q = ceil_count(fuel_gallons / per_can);
+    let text = format!(
+        "{} for the generator's {} of fuel, with fuel stabilizer added: keep them outside the living space, away from a gas water heater, in labeled safety containers, and use the fuel within {}.",
+        count(
+            q,
+            &format!("approved {}-gallon gasoline can", num(per_can, 0)),
+            &format!("approved {}-gallon gasoline cans", num(per_can, 0))
+        ),
+        gallons(fuel_gallons),
+        count(rotate, "month", "months")
+    );
+    let class = match generator {
+        GeneratorFor::Owned => "generator_fuel",
+        GeneratorFor::Planned => "generator",
+    };
+    Some(
+        Sizing::new(&b, "fuel_cans", class, q, "can", Per::Household, text).math(vec![format!(
+            "ceil({} gal ÷ {} gal a can) = {} cans",
+            num(fuel_gallons, 2),
+            num(per_can, 0),
+            num(q, 0)
+        )]),
+    )
+}
+
+/// Thermometers for the fridge and the freezer whenever there is a power target: after a power
+/// cut, the plan's own 40 °F rule (keep refrigerated food only if it stayed at 40 °F or below;
+/// throw out perishable food above 40 °F for 2 hours or more) needs them (Ready.gov). Rule
+/// `fridge_thermometers`.
+pub fn fridge_thermometers() -> Sizing {
+    let mut b = Basis::new();
+    let q = b.k(keys::FRIDGE_THERMOMETER_PAIRS);
+    let max_f = b.k(keys::FOOD_SAFE_MAX_F);
+    let hours = b.k(keys::FOOD_UNSAFE_HOURS);
+    let text = format!(
+        "{} of appliance thermometers, one in the fridge and one in the freezer: after a power cut, keep refrigerated food only if it stayed at {} °F or below, and throw out perishable food that was above {} °F for {} or more.",
+        count(q, "pair", "pairs"),
+        num(max_f, 0),
+        num(max_f, 0),
+        count(hours, "hour", "hours")
+    );
+    Sizing::new(
+        &b,
+        "fridge_thermometers",
+        "fridge_thermometer",
+        q,
+        "pair",
+        Per::Household,
+        text,
+    )
 }
 
 /// Energy to run a well pump for essential water (an estimate; optional, because stored water
@@ -615,12 +787,15 @@ mod tests {
         assert!(!s.prior);
         assert_eq!(device_battery_units(&p.people).unwrap().quantity, 1.0);
         // 170 Wh × 3 nights = 510 Wh: one 1,070 Wh station (909.5 usable) covers it, and it is needed.
-        let (station, needed) = power_station_units(3.0, &p.people).unwrap();
+        let (station, needed) = power_station_units(3.0, &p.people, &p.housing).unwrap();
         assert_eq!(station.quantity, 1.0);
         assert!(needed);
         // 14 nights = 2,380 Wh: three stations' worth, capped at two.
         assert_eq!(
-            power_station_units(14.0, &p.people).unwrap().0.quantity,
+            power_station_units(14.0, &p.people, &p.housing)
+                .unwrap()
+                .0
+                .quantity,
             2.0
         );
     }
@@ -655,9 +830,9 @@ mod tests {
     fn stations_generators_and_panels_follow_the_content_rules() {
         let philly = fixtures::get("philadelphia-renters-4").unwrap();
         // No device: an optional upgrade at 3 days or more, nothing below.
-        let (s, needed) = power_station_units(3.0, &philly.people).unwrap();
+        let (s, needed) = power_station_units(3.0, &philly.people, &philly.housing).unwrap();
         assert_eq!((s.quantity, needed), (1.0, false));
-        assert!(power_station_units(2.0, &philly.people).is_none());
+        assert!(power_station_units(2.0, &philly.people, &philly.housing).is_none());
         // Houses get a generator from 3 days (1 on a well); apartments never.
         assert_eq!(generator_units(3.0, &philly.housing).unwrap().quantity, 1.0);
         assert!(generator_units(2.0, &philly.housing).is_none());
@@ -705,5 +880,124 @@ mod tests {
         assert!(wheelchair_battery(&philly.people).is_none());
         assert_eq!(battery_packs(3.0).unwrap().quantity, 1.0);
         assert_eq!(battery_packs(13.0).unwrap().quantity, 2.0);
+    }
+
+    #[test]
+    fn refrigerated_medicine_makes_a_power_station_a_need() {
+        let sl = fixtures::get("sugar-land-ev-household-3").unwrap();
+        // Insulin, a 5-day power target, no backup power (the electric car does not count):
+        // one station, a need, in its own part of the power bucket.
+        let (s, needed) = power_station_units(5.0, &sl.people, &sl.housing).unwrap();
+        assert!(needed);
+        assert_eq!(s.quantity, 1.0);
+        assert_eq!(s.item_class, COLD_MEDICINE_POWER_CLASS);
+        assert!(
+            s.plain.contains("refrigerated medicine cool"),
+            "{}",
+            s.plain
+        );
+        assert!(
+            s.plain.contains("engine running outdoors only"),
+            "{}",
+            s.plain
+        );
+        assert!(s.citations.iter().any(|c| c == "cdc_co_basics"));
+        assert!(s.prior);
+        // Under 2 days the bag is enough: the station is an option again.
+        let (s, needed) = power_station_units(1.5, &sl.people, &sl.housing).unwrap();
+        assert!(!needed);
+        assert_eq!(s.item_class, "power_station");
+        // A generator of their own already runs the fridge.
+        let mut owns = sl.clone();
+        owns.housing.backup_power = rr_types::BackupPower::Generator;
+        let (_, needed) = power_station_units(5.0, &owns.people, &owns.housing).unwrap();
+        assert!(!needed);
+        // A CPAP user who also keeps insulin: the device sizes the stations; still a need.
+        let mut both = fixtures::get("phoenix-apartment-cpap-1").unwrap();
+        both.people[0].medical.refrigerated_rx = true;
+        let (s, needed) = power_station_units(3.0, &both.people, &both.housing).unwrap();
+        assert!(needed);
+        assert_eq!(s.item_class, "power_station");
+        assert!(s.plain.contains("refrigerated medicine"), "{}", s.plain);
+    }
+
+    #[test]
+    fn the_pump_generator_is_pump_rated_and_connects_through_an_interlock() {
+        let hays = fixtures::get("hays-kansas-farm-5").unwrap();
+        let g = generator_for_well_pump(30.0, &hays.housing, 12, 14.0).unwrap();
+        assert!(g.plain.contains("240-volt outlet"), "{}", g.plain);
+        assert!(
+            g.plain.contains("2 to 3 times its running watts"),
+            "{}",
+            g.plain
+        );
+        assert!(
+            g.plain.contains("interlock or transfer switch"),
+            "{}",
+            g.plain
+        );
+        assert!(
+            g.plain.contains("never plug it into a wall outlet"),
+            "{}",
+            g.plain
+        );
+        assert!(g.plain.contains("14 days of stored water"), "{}", g.plain);
+        for id in ["cpsc_generator_safety_alert", "osha_portable_generators"] {
+            assert!(g.citations.iter().any(|c| c == id), "{id}");
+        }
+        // The optional line on a well says the same about the pump; off a well it does not.
+        let opt = generator_units(3.0, &hays.housing).unwrap();
+        assert!(
+            opt.plain.contains("interlock or transfer switch"),
+            "{}",
+            opt.plain
+        );
+        let philly = fixtures::get("philadelphia-renters-4").unwrap();
+        assert!(
+            !generator_units(3.0, &philly.housing)
+                .unwrap()
+                .plain
+                .contains("interlock")
+        );
+
+        // The connection: owners of a house on a well, with a generator owned or planned.
+        let c = generator_connection_units(&hays.housing, GeneratorFor::Planned).unwrap();
+        assert_eq!((c.quantity, c.unit), (1.0, "installed kit"));
+        assert_eq!(c.item_class, "generator_connection");
+        assert!(
+            c.plain.starts_with("The generator for the well pump"),
+            "{}",
+            c.plain
+        );
+        assert!(c.plain.contains("licensed electrician"), "{}", c.plain);
+        let coos = fixtures::get("coos-bay-well-owner-2").unwrap();
+        let c = generator_connection_units(&coos.housing, GeneratorFor::Owned).unwrap();
+        assert!(c.plain.starts_with("Your generator"), "{}", c.plain);
+        let mut renter = coos.clone();
+        renter.housing.tenure = Tenure::Rent;
+        assert!(generator_connection_units(&renter.housing, GeneratorFor::Owned).is_none());
+        assert!(generator_connection_units(&philly.housing, GeneratorFor::Owned).is_none());
+    }
+
+    #[test]
+    fn fuel_cans_hold_the_fuel_and_thermometers_check_the_fridge() {
+        // 25 gallons of fuel: 5 cans; 8.4 gallons: 2 cans.
+        let c = fuel_cans(25.0, GeneratorFor::Owned).unwrap();
+        assert_eq!((c.quantity, c.unit), (5.0, "can"));
+        assert_eq!(c.item_class, "generator_fuel");
+        assert!(
+            c.plain.contains("5 approved 5-gallon gasoline cans"),
+            "{}",
+            c.plain
+        );
+        assert!(c.plain.contains("fuel stabilizer"), "{}", c.plain);
+        let p = fuel_cans(8.4, GeneratorFor::Planned).unwrap();
+        assert_eq!(p.quantity, 2.0);
+        assert_eq!(p.item_class, "generator");
+        assert!(fuel_cans(0.0, GeneratorFor::Owned).is_none());
+        let t = fridge_thermometers();
+        assert_eq!((t.quantity, t.unit), (1.0, "pair"));
+        assert!(t.plain.contains("40 °F or below"), "{}", t.plain);
+        assert!(t.citations.iter().any(|c| c == "ready_gov_food"));
     }
 }

@@ -38,6 +38,7 @@ pub const GENERIC_RULES: &[&str] = &[
     "once_if_earner",
     "once_if_gas_service",
     "once_if_house",
+    "once_if_house_ground_floor",
     "once_if_near_nuclear_plant",
     "once_if_generator",
 ];
@@ -99,6 +100,17 @@ pub(crate) fn quantity(rule: &str, input: &PlanInput, ctx: &SupplyContext) -> Op
                 | HousingKind::MobileHome
                 | HousingKind::RuralProperty
         )),
+        // An outdoor light at the door or path of a house the household lives in at street level
+        // (floor 1 or below), not a flat upstairs (round-2 review P-14).
+        "once_if_house_ground_floor" => switch(
+            matches!(
+                input.housing.kind,
+                HousingKind::Detached
+                    | HousingKind::Rowhouse
+                    | HousingKind::MobileHome
+                    | HousingKind::RuralProperty
+            ) && input.housing.floor <= 1,
+        ),
         "once_if_near_nuclear_plant" => switch(ctx.nuclear_plant_within_16km == Some(true)),
         "once_if_generator" => switch(input.housing.backup_power == BackupPower::Generator),
         _ => return None,
@@ -138,8 +150,26 @@ mod tests {
         assert_eq!(q(coos, "once_if_well"), 1.0);
         assert_eq!(q(coos, "once_if_generator"), 1.0);
         assert_eq!(q(coos, "per_pet"), 3.0);
+        assert_eq!(q(p, "once_if_house_ground_floor"), 1.0);
         let miami = "miami-condo-retiree-1";
         assert_eq!(q(miami, "once_if_house"), 0.0);
+        assert_eq!(q(miami, "once_if_house_ground_floor"), 0.0);
+        assert_eq!(
+            q("phoenix-apartment-cpap-1", "once_if_house_ground_floor"),
+            0.0
+        );
+        let mut upstairs = fixtures::get(p).unwrap();
+        upstairs.housing.floor = 2;
+        assert_eq!(
+            quantity(
+                "once_if_house_ground_floor",
+                &upstairs,
+                &SupplyContext::default()
+            )
+            .unwrap()
+            .0,
+            0.0
+        );
         assert_eq!(q(miami, "once_if_earner"), 0.0);
         assert_eq!(q("hays-kansas-farm-5", "once_if_large_animals"), 1.0);
         assert_eq!(q("hays-kansas-farm-5", "once_if_pregnant_or_nursing"), 1.0);

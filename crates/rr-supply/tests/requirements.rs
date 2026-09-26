@@ -242,6 +242,9 @@ fn every_line_is_cited_and_well_formed() {
         "power station",
         "generator",
         "panel",
+        "pair",
+        "installed kit",
+        "can",
     ];
     for (name, input, targets) in common::all() {
         for ctx in [
@@ -357,103 +360,151 @@ fn livestock_water_stops_at_the_stored_days() {
     assert!(!has(&lines, "water_out.livestock_water.alt.stock_tank"));
 }
 
-/// A farm on a well with a power target: the generator that runs the pump is a need (with its
-/// fuel), the animals' stored water bridges 3 days until it runs, and two weeks in stock tanks is
-/// the alternative. 14 days stay the need only where no pump power is planned.
+/// Horses or livestock on a well (round-2 review P-02). Pump power exists only when the household
+/// owns a generator and the interlock or transfer switch that connects it: then the animals'
+/// stored water bridges 3 days, with two weeks in stock tanks as the alternative. Until then they
+/// store 14 days, like people. A pump-rated generator is a need only when a power cut can outlast
+/// that water, and it comes with its connection (life-safety) and fuel cans.
 #[test]
-fn livestock_on_a_well_store_three_days_when_a_generator_runs_the_pump() {
+fn livestock_on_a_well_store_two_weeks_until_pump_power_exists() {
     let input = fixtures::get("hays-kansas-farm-5").unwrap();
-    let targets = || {
+    let targets = |power: f32| {
         vec![
-            common::days(BucketId::Power, 3.0),
+            common::days(BucketId::Power, power),
             common::driven_by(
                 common::days(BucketId::WaterOut, 60.0),
                 &[(rr_types::HazardId::Drought, 1.0)],
             ),
         ]
     };
-    let lines = requirements(&input, &targets());
-    // 12 × 25 L × 3 days = 900 L = 237.8 gal (it was 14 days, 1,109.5 gal: a $1,515 tank).
+    // Hays: a 3-day power target and 14 days of stored animal water. The generator would add
+    // nothing, so it stays optional; the drought is met by hauling water.
+    let lines = requirements(&input, &targets(3.0));
+    let l = line(&lines, "water_out.livestock_water");
+    assert_eq!(l.quantity, 1109.5, "14 days, not the 3-day bridge");
+    assert!(l.plain.contains("haul water in"), "{}", l.plain);
+    assert!(
+        l.plain.contains("interlock or transfer switch"),
+        "{}",
+        l.plain
+    );
+    assert!(!has(&lines, "water_out.livestock_water.alt.stock_tank"));
+    assert!(!has(&lines, "power.generator_units"));
+    let optional = line(&lines, "power.generator_units.optional");
+    assert!(
+        optional.plain.contains("starting watts") && optional.plain.contains("wall outlet"),
+        "{}",
+        optional.plain
+    );
+    assert!(!has(&lines, "power.generator_connection_units"));
+    assert!(!has(&lines, "power.fuel_cans"));
+    assert!(!has(&lines, "power.generator_fuel_gallons.note"));
+
+    // A power target longer than the stored water: a pump-rated generator is a need, with an
+    // electrician-installed interlock (life-safety), fuel cans, and the fuel as a note so the
+    // plan never buys fuel before the generator. The animals still store 14 days until it exists.
+    let sized = sized_requirements(&input, &targets(30.0), &SupplyContext::default());
+    let get = |id: &str| {
+        sized
+            .iter()
+            .find(|l| l.line.id == id)
+            .unwrap_or_else(|| panic!("no {id}"))
+    };
+    let generator = get("power.generator_units");
+    assert_eq!(generator.kind, LineKind::Need);
+    assert!(
+        generator.line.plain.contains("240-volt outlet")
+            && generator.line.plain.contains("14 days of stored water"),
+        "{}",
+        generator.line.plain
+    );
+    let connection = get("power.generator_connection_units");
+    assert_eq!(connection.kind, LineKind::Need);
+    assert!(connection.life_safety);
+    assert_eq!(connection.line.unit, "installed kit");
+    assert!(
+        connection
+            .line
+            .citations
+            .iter()
+            .any(|c| c == "osha_portable_generators")
+    );
+    let cans = get("power.fuel_cans");
+    assert_eq!(cans.kind, LineKind::Need);
+    // 30 days × 2.8 gal = 84 gal, capped at the 25 gal a home may store: 5 cans.
+    assert_eq!(get("power.generator_fuel_gallons.note").quantity, 25.0);
+    assert_eq!(cans.quantity, 5.0);
+    assert_eq!(cans.line.item_class, "generator");
+    assert_eq!(get("water_out.livestock_water").quantity, 1109.5);
+
+    // A generator of their own, but no interlock listed: pump power does not exist yet, so the
+    // animals store 14 days; the connection is a need, and the fuel and its cans are needs.
+    let mut owns = input.clone();
+    owns.housing.backup_power = rr_types::BackupPower::Generator;
+    let sized = sized_requirements(&owns, &targets(3.0), &SupplyContext::default());
+    let get = |id: &str| sized.iter().find(|l| l.line.id == id);
+    assert_eq!(get("water_out.livestock_water").unwrap().quantity, 1109.5);
+    assert!(get("power.generator_units").is_none());
+    assert_eq!(
+        get("power.generator_connection_units").map(|l| l.kind),
+        Some(LineKind::Need)
+    );
+    assert_eq!(
+        get("power.generator_fuel_gallons").map(|l| l.kind),
+        Some(LineKind::Need)
+    );
+    let cans = get("power.fuel_cans").unwrap();
+    assert_eq!(
+        (cans.quantity, cans.line.item_class.as_str()),
+        (2.0, "generator_fuel")
+    );
+
+    // With the interlock listed as owned, pump power exists: 3 days stored, the stock tank the
+    // alternative.
+    owns.existing.push(rr_types::Owned {
+        item_id: rr_types::ItemId::from(rr_supply::TRANSFER_INTERLOCK_ITEM),
+        qty: 1.0,
+        paid_usd: None,
+    });
+    let lines = requirements(&owns, &targets(3.0));
     let l = line(&lines, "water_out.livestock_water");
     assert_eq!(l.quantity, 237.8);
-    assert!(l.plain.contains("× 3 days = 900 L"), "{}", l.plain);
     assert!(
         l.plain.contains("until the generator runs the well pump"),
         "{}",
         l.plain
     );
-    assert!(
-        l.plain.contains("haul water in"),
-        "a drought drives the target: {}",
-        l.plain
-    );
-    assert!(l.citations.iter().any(|c| c == "rr_expert_prior"));
+    assert!(l.plain.contains("haul water in"), "a drought: {}", l.plain);
     let alt = line(&lines, "water_out.livestock_water.alt.stock_tank");
-    assert_eq!(alt.quantity, 1109.5);
-    assert_eq!(alt.rule, "livestock_water_stored");
-    assert!(alt.plain.starts_with("Instead of relying on the generator"));
-    let generator = line(&lines, "power.generator_units");
     assert_eq!(
-        (generator.quantity, generator.unit.as_str()),
-        (1.0, "generator")
+        (alt.quantity, alt.rule.as_str()),
+        (1109.5, "livestock_water_stored")
     );
-    assert!(generator.plain.contains("well pump") && generator.plain.contains("12 large animals"));
-    assert!(!has(&lines, "power.generator_units.optional"));
-    // The fuel to keep for it, 2.8 gal a day × 3 days of power target: a note, so the plan never
-    // buys fuel before the generator.
-    assert_eq!(
-        line(&lines, "power.generator_fuel_gallons.note").quantity,
-        8.4
-    );
-    assert!(!has(&lines, "power.generator_fuel_gallons"));
-    let sized = sized_requirements(&input, &targets(), &SupplyContext::default());
-    let kind = |id: &str| sized.iter().find(|l| l.line.id == id).map(|l| l.kind);
-    assert_eq!(kind("power.generator_units"), Some(LineKind::Need));
-    assert_eq!(
-        kind("power.generator_fuel_gallons.note"),
-        Some(LineKind::Note)
-    );
-    assert_eq!(
-        kind("water_out.livestock_water.alt.stock_tank"),
-        Some(LineKind::Alternative)
-    );
+    assert!(has(&lines, "power.generator_connection_units"));
 
-    // A generator the household owns runs the pump too: 3 days, no generator to buy, its fuel.
-    let mut owns = input.clone();
-    owns.housing.backup_power = rr_types::BackupPower::Generator;
-    let lines = requirements(&owns, &targets());
-    assert_eq!(line(&lines, "water_out.livestock_water").quantity, 237.8);
-    assert!(!has(&lines, "power.generator_units"));
-    assert!(has(&lines, "power.generator_units.optional"));
-    assert!(has(&lines, "power.generator_fuel_gallons"));
-    assert!(!has(&lines, "power.generator_fuel_gallons.note"));
-
-    // Town water: no pump to power, so the animals' water stays at 14 stored days.
+    // Town water: no pump to power, no connection.
     let mut town = input.clone();
     town.housing.water = rr_types::WaterSource::Municipal;
-    let lines = requirements(&town, &targets());
+    let lines = requirements(&town, &targets(30.0));
     assert_eq!(line(&lines, "water_out.livestock_water").quantity, 1109.5);
     assert!(!has(&lines, "power.generator_units"));
-    assert!(!has(&lines, "water_out.livestock_water.alt.stock_tank"));
+    assert!(!has(&lines, "power.generator_connection_units"));
 
-    // No animals: the generator stays optional.
+    // No animals: the generator stays optional and needs no connection line.
     let mut none = input.clone();
     none.pets.large_animals = 0;
-    let lines = requirements(&none, &targets());
+    let lines = requirements(&none, &targets(30.0));
     assert!(has(&lines, "power.generator_units.optional"));
     assert!(!has(&lines, "power.generator_units"));
-    assert!(!has(&lines, "power.generator_fuel_gallons.note"));
+    assert!(!has(&lines, "power.generator_connection_units"));
 
-    // A no-water target of 3 days or less is stored whole: no generator needed for it.
-    let short = requirements(
-        &input,
-        &[
-            common::days(BucketId::Power, 3.0),
-            common::days(BucketId::WaterOut, 3.0),
-        ],
-    );
-    assert!(!has(&short, "power.generator_units"));
-    assert_eq!(line(&short, "water_out.livestock_water").quantity, 237.8);
+    // Renters ask the landlord: no connection line.
+    let mut renter = owns.clone();
+    renter.housing.tenure = rr_types::Tenure::Rent;
+    assert!(!has(
+        &requirements(&renter, &targets(3.0)),
+        "power.generator_connection_units"
+    ));
 }
 
 #[test]
@@ -665,6 +716,10 @@ fn life_safety_lines_are_marked() {
         "medication.medication_days",
         "medication.rx_cold_storage",
         "supplies.infant_formula_oz",
+        // Insulin and a 3-day power target with no backup power: the station is a need.
+        "power.power_station_units",
+        // The generic targets give a medical emergency a 0.9 ten-year chance.
+        "medical_emergency.bleeding_control_kit",
     ] {
         let s = sized
             .iter()
@@ -679,6 +734,89 @@ fn life_safety_lines_are_marked() {
             .unwrap()
             .life_safety
     );
+    let station = sized
+        .iter()
+        .find(|s| s.line.id == "power.power_station_units")
+        .unwrap();
+    assert_eq!(station.kind, LineKind::Need);
+    assert_eq!(
+        station.line.item_class,
+        rr_supply::COLD_MEDICINE_POWER_CLASS
+    );
+    // A town household with a medical emergency unlikely and no rural setting: the kit is an
+    // ordinary step.
+    let mut low = common::generic();
+    for b in &mut low {
+        if b.id == BucketId::MedicalEmergency {
+            *b = common::readiness(BucketId::MedicalEmergency, 0.3);
+        }
+    }
+    let philly = fixtures::get("philadelphia-renters-4").unwrap();
+    let sized = sized_requirements(&philly, &low, &SupplyContext::default());
+    let kit = sized
+        .iter()
+        .find(|s| s.line.id == "medical_emergency.bleeding_control_kit")
+        .unwrap();
+    assert!(!kit.life_safety);
+    // Rural homes: life-safety whatever the chance, and the line says why.
+    let hays = fixtures::get("hays-kansas-farm-5").unwrap();
+    let sized = sized_requirements(&hays, &low, &SupplyContext::default());
+    let kit = sized
+        .iter()
+        .find(|s| s.line.id == "medical_emergency.bleeding_control_kit")
+        .unwrap();
+    assert!(kit.life_safety);
+    assert!(kit.line.plain.contains("rural homes"), "{}", kit.line.plain);
+    assert!(
+        kit.line
+            .citations
+            .iter()
+            .any(|c| c == "mell_2017_ems_response")
+    );
+}
+
+/// Round-2 review RR-P11: the plan's 40 °F and 90 °F rules need thermometers, so they are needs
+/// wherever a power or heat target exists.
+#[test]
+fn thermometers_are_needs_with_a_power_or_heat_target() {
+    let input = fixtures::get("philadelphia-renters-4").unwrap();
+    let lines = requirements(&input, &common::philadelphia());
+    let fridge = line(&lines, "power.fridge_thermometers");
+    assert_eq!((fridge.quantity, fridge.unit.as_str()), (1.0, "pair"));
+    assert!(fridge.plain.contains("40 °F"), "{}", fridge.plain);
+    let room = line(&lines, "thermal.room_thermometer");
+    assert_eq!(room.item_class, "thermal_heat");
+    assert!(room.plain.contains("below 90 °F"), "{}", room.plain);
+    // No power target, no fridge thermometer; cold alone, no room thermometer.
+    let cold_only = requirements(
+        &input,
+        &[common::driven_by(
+            common::days(BucketId::Thermal, 3.0),
+            &[(rr_types::HazardId::ColdWave, 1.0)],
+        )],
+    );
+    assert!(!has(&cold_only, "power.fridge_thermometers"));
+    assert!(!has(&cold_only, "thermal.room_thermometer"));
+}
+
+/// Round-2 review RR-P16: renters ask the landlord for smoke alarms (a note, never a purchase the
+/// plan saves toward), owners ask the fire department or the Red Cross first.
+#[test]
+fn renters_ask_the_landlord_for_smoke_alarms() {
+    let mut input = fixtures::get("philadelphia-renters-4").unwrap();
+    input.housing.alarms.smoke = false;
+    let sized = sized_requirements(&input, &common::philadelphia(), &SupplyContext::default());
+    let kind = |id: &str| sized.iter().find(|l| l.line.id == id).map(|l| l.kind);
+    assert_eq!(kind("fire.smoke_alarm_count.note"), Some(LineKind::Note));
+    assert_eq!(kind("fire.smoke_alarm_count"), None);
+    input.housing.tenure = rr_types::Tenure::Own;
+    let sized = sized_requirements(&input, &common::philadelphia(), &SupplyContext::default());
+    let alarms = sized
+        .iter()
+        .find(|l| l.line.id == "fire.smoke_alarm_count")
+        .unwrap();
+    assert_eq!(alarms.kind, LineKind::Need);
+    assert!(alarms.life_safety);
 }
 
 #[test]
@@ -753,8 +891,13 @@ fn directional_cover_has_its_own_item_class() {
         for l in requirements(&input, &targets) {
             assert_ne!(l.item_class, "thermal", "{name}: {}", l.id);
             if l.bucket == BucketId::Thermal {
-                let heat =
-                    ["battery_fan", "cooling_towel", "cooling_plan"].contains(&l.rule.as_str());
+                let heat = [
+                    "battery_fan",
+                    "cooling_towel",
+                    "cooling_plan",
+                    "room_thermometer",
+                ]
+                .contains(&l.rule.as_str());
                 let want = if heat { "thermal_heat" } else { "thermal_cold" };
                 assert_eq!(l.item_class, want, "{name}: {}", l.id);
             }

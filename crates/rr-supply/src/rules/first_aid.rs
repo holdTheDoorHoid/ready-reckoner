@@ -5,7 +5,7 @@ use rr_types::{AgeBand, Per, Person};
 
 use super::Sizing;
 use crate::basis::Basis;
-use crate::constants::keys;
+use crate::constants::{constants, keys};
 use crate::format::{ceil_count, count, days as fmt_days, num};
 use crate::household::is_4_plus;
 
@@ -124,6 +124,39 @@ pub fn thermometer(people_list: &[Person]) -> Sizing {
         Per::Household,
         text,
     )
+}
+
+/// A bleeding-control kit (a tourniquet and a pressure bandage) for every household, with a class
+/// to use it (Stop the Bleed). It is a life-safety item where the household is rural, because
+/// ambulances take longer to reach rural homes (Mell 2017), or where a medical emergency is at
+/// least as likely as not in ten years (`bleeding_kit_life_safety_p10`, standing in for "among the
+/// likeliest events in the register"). Returns the line and whether it is life-safety. Rule
+/// `bleeding_control_kit`.
+pub fn bleeding_control_kit(rural: bool, p_medical_10yr: Option<f64>) -> (Sizing, bool) {
+    let mut b = Basis::new();
+    let q = b.k(keys::BLEEDING_KITS_PER_HOUSEHOLD);
+    let threshold = constants().value(keys::BLEEDING_KIT_LIFE_SAFETY_P10);
+    let likely = p_medical_10yr.is_some_and(|p| p.is_finite() && p >= threshold);
+    let mut text = format!(
+        "{}: a tourniquet and a pressure bandage for serious bleeding, and a Stop the Bleed class so you know how to use them. Serious bleeding can kill before help arrives.",
+        count(q, "bleeding-control kit", "bleeding-control kits")
+    );
+    // The threshold decides only the ordering, never the amount or the words, so the line does
+    // not cite it.
+    if rural {
+        b.cite("mell_2017_ems_response");
+        text.push_str(" Ambulances take longer to reach rural homes, so keep it where everyone can find it fast.");
+    }
+    let sizing = Sizing::new(
+        &b,
+        "bleeding_control_kit",
+        "bleeding_control_kit",
+        q,
+        "kit",
+        Per::Household,
+        text,
+    );
+    (sizing, rural || likely)
 }
 
 /// Oral rehydration salts: three packets per person per two weeks (an estimate), each mixed into a

@@ -2259,3 +2259,62 @@ url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MOD
 retrieved = "2026-09-25"
 license = "CC BY-SA 4.0"
 prior = true
+
+[[citation]]
+id = "fda_insulin_emergency"
+title = "Information Regarding Insulin Storage and Switching Between Products in an Emergency"
+publisher = "U.S. Food and Drug Administration"
+year = 2017
+url = "https://www.fda.gov/drugs/emergency-preparedness-drugs/information-regarding-insulin-storage-and-switching-between-products-emergency"
+retrieved = "2026-09-26"
+quote = "Insulin products contained in vials or cartridges supplied by the manufacturers (opened or unopened) may be left unrefrigerated at a temperature between 59°F and 86°F for up to 28 days and continue to work."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cpsc_unreported_fires_2009"
+title = "2004–2005 National Sample Survey of Unreported Residential Fires"
+publisher = "U.S. Consumer Product Safety Commission"
+year = 2009
+url = "https://www.cpsc.gov/s3fs-public/UnreportedResidentialFires.pdf"
+retrieved = "2026-09-26"
+quote = "In the present survey, it was estimated that there were 7.4 million fires in the U. S. (annualized rate for 2004-2005) and a rate of 6.6 residential structure fires per year per 100 households."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cpsc_generator_safety_alert"
+title = "Portable Generator Hazards (Safety Alert, Publication 5123)"
+publisher = "U.S. Consumer Product Safety Commission"
+year = 2021
+url = "https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf"
+retrieved = "2026-09-26"
+quote = "This is extremely dangerous and presents an electrocution risk to utility workers and neighbors served by the same utility transformer."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "osha_portable_generators"
+title = "Using Portable Generators Safely (fact sheet)"
+publisher = "Occupational Safety and Health Administration"
+year = 2005
+url = "https://www.osha.gov/sites/default/files/publications/OSHA3286.pdf"
+retrieved = "2026-09-26"
+quote = "Never attach a generator directly to the electrical system of a structure (home, office, trailer, etc.) unless a qualified electrician has properly installed the generator with a transfer switch."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "redcross_sound_the_alarm"
+title = "Sound the Alarm: free smoke alarm installation (Home Fire Campaign)"
+publisher = "American Red Cross"
+year = 2026
+url = "https://www.redcross.org/sound-the-alarm.html"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "dhs_saver_trauma_kits_2015"
+title = "Individual Officer Trauma Kits (SAVER TechNote)"
+publisher = "U.S. Department of Homeland Security, Science and Technology Directorate"
+year = 2015
+url = "https://www.dhs.gov/sites/default/files/publications/Trauma-Kits-TN_1015-508_0.pdf"
+retrieved = "2026-09-26"
+quote = "the counterfeit tourniquets have been shown to fail before the necessary force to stop bleeding can be applied, possibly leading to catastrophic results."
+license = "US Government Work (public domain)"

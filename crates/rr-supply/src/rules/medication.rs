@@ -1,11 +1,11 @@
 //! Medication continuity (research §3.2–§3.4): prescriptions on hand, cold storage, the antibiotics
 //! clinician card and epinephrine checks. No dosing, ever.
 
-use rr_types::{Per, Person};
+use rr_types::{BackupPower, Housing, Per, Person};
 
 use super::Sizing;
 use crate::basis::Basis;
-use crate::constants::keys;
+use crate::constants::{constants, keys};
 use crate::format::{count, days as fmt_days, num, people};
 
 /// Days of prescription medicine to keep on hand for everyone who takes daily or refrigerated
@@ -80,40 +80,116 @@ pub fn medication_days(target_days: Option<f64>, people_list: &[Person]) -> Opti
     )
 }
 
-/// Days of cold storage for refrigerated medicine through a power outage (Ready.gov, CDC).
-/// Rule `rx_cold_storage`.
-pub fn rx_cold_storage(power_days: f64, people_list: &[Person]) -> Option<Sizing> {
+/// Whether refrigerated medicine needs a power source through the outage, not only a cooler bag:
+/// someone takes it, the power target is at least `rx_power_min_days` (2 days, an estimate), and the
+/// household has no backup power of its own (a generator, a power station, or solar with a
+/// battery). The power bucket's `power_station_units` line is then a need, and the cold-storage
+/// line counts the whole power target.
+pub fn rx_power_needed(power_days: Option<f64>, people_list: &[Person], housing: &Housing) -> bool {
+    let min = constants().value(keys::RX_POWER_MIN_DAYS);
+    people_list.iter().any(|p| p.medical.refrigerated_rx)
+        && housing.backup_power == BackupPower::None
+        && power_days.is_some_and(|d| d.is_finite() && d >= min)
+}
+
+/// Days of cold storage for refrigerated medicine through a power outage. An insulated bag with
+/// fresh cold packs keeps medicine cool for about a day (`cooler_hold_days`, an estimate); insulin
+/// keeps working for up to 28 days between 59 °F and 86 °F (FDA), so the job is keeping it in the
+/// shade and below 86 °F, never frozen. When a power source is needed ([`rx_power_needed`]) the
+/// line counts the whole power target, which the bag covers only a day of; otherwise (a short
+/// power target, or backup power the household already has) it counts the bag's day. `cold_days`
+/// is the power target (the medication target when there is none). Rule `rx_cold_storage`.
+pub fn rx_cold_storage(
+    cold_days: f64,
+    power_days: Option<f64>,
+    people_list: &[Person],
+    housing: &Housing,
+) -> Option<Sizing> {
     let n = people_list
         .iter()
         .filter(|p| p.medical.refrigerated_rx)
         .count();
-    if n == 0 || power_days <= 0.0 {
+    if n == 0 || cold_days <= 0.0 {
         return None;
     }
     let mut b = Basis::new();
-    let hold = b.k(keys::REFRIGERATED_RX_HOLD_DAYS);
+    let hold = b.k(keys::COOLER_HOLD_DAYS);
+    let insulin_days = b.k(keys::INSULIN_ROOM_TEMP_DAYS);
+    let low_f = b.k(keys::INSULIN_ROOM_TEMP_MIN_F);
+    let high_f = b.k(keys::INSULIN_ROOM_TEMP_MAX_F);
     b.cite("cdc_insulin_emergency");
-    let text = format!(
-        "{} needs medicine kept cold, such as insulin: plan to keep it cool but never frozen for up to {} without power, with an insulated cooler and cold packs or ice you can replace. After {} without power, throw refrigerated medicine out unless its label says otherwise; ask your pharmacist how long yours can stay warm.",
-        if n == 1 {
-            "1 person".to_owned()
-        } else {
-            people(n as f64)
-        },
-        fmt_days(power_days),
-        fmt_days(hold)
+    let needed = rx_power_needed(power_days, people_list, housing);
+    let days = if needed {
+        cold_days
+    } else {
+        cold_days.min(hold)
+    };
+    let who = if n == 1 {
+        "1 person needs".to_owned()
+    } else {
+        format!("{} need", people(n as f64))
+    };
+    let mut text = format!(
+        "{who} medicine kept cold, such as insulin. An insulated bag with fresh cold packs keeps it cool, but never frozen, for about {}: enough to leave home or ride out a short outage. Insulin in its vial or pen keeps working for up to {} between {} °F and {} °F, so in a longer power cut keep it in the shade and below {} °F; it does not have to stay fridge-cold, but do not use insulin that has frozen. For any other medicine that must stay cold, ask your pharmacist now how long it keeps out of the fridge, and write the answer on your medicine list.",
+        fmt_days(hold),
+        fmt_days(insulin_days),
+        num(low_f, 0),
+        num(high_f, 0),
+        num(high_f, 0)
     );
+    let mut math = Vec::new();
+    if needed {
+        let min = b.k(keys::RX_POWER_MIN_DAYS);
+        text.push_str(&format!(
+            " Your power target is {}: plan to keep it cool for all of it with a battery power station that runs a small 12-volt cooler or the fridge (see the power station line), and know where you could take it if the power stays off.",
+            fmt_days(cold_days)
+        ));
+        math.push(format!(
+            "power target {} days ≥ {} days, no backup power: cold storage for all {} days (the bag covers {})",
+            num(cold_days, 2),
+            num(min, 0),
+            num(cold_days, 2),
+            num(hold, 1)
+        ));
+    } else {
+        match housing.backup_power {
+            BackupPower::Generator => text.push_str(
+                " Your generator can keep the fridge or a small cooler running; keep fuel for it.",
+            ),
+            BackupPower::PowerStation => text.push_str(
+                " Your power station can keep a small 12-volt cooler or the fridge running for a while; keep it charged.",
+            ),
+            BackupPower::SolarBattery => text.push_str(
+                " Your solar panels and battery can keep the fridge or a small cooler running; check how long they last on cloudy days.",
+            ),
+            BackupPower::None if cold_days > hold => {
+                let min = b.k(keys::RX_POWER_MIN_DAYS);
+                text.push_str(&format!(
+                    " For a power cut of up to {}, replace the cold packs with ice or frozen water bottles.",
+                    fmt_days(min)
+                ));
+            }
+            BackupPower::None => {}
+        }
+        math.push(format!(
+            "cooler bag: min({} days, {} days) = {} days",
+            num(cold_days, 2),
+            num(hold, 1),
+            num(days, 2)
+        ));
+    }
     Some(
         Sizing::new(
             &b,
             "rx_cold_storage",
             "medicine_cooler",
-            power_days,
+            days,
             "day",
             Per::Household,
             text,
         )
-        .days(power_days),
+        .days(days)
+        .math(math),
     )
 }
 
@@ -210,14 +286,84 @@ mod tests {
             medication_days(Some(21.0), &p.people).unwrap().quantity,
             21.0
         );
-        let cold = rx_cold_storage(5.0, &p.people).unwrap();
+        // A 5-day power target and no backup power: the line counts all 5 days, which the bag
+        // covers only one of, so the power station line is a need.
+        assert!(rx_power_needed(Some(5.0), &p.people, &p.housing));
+        let cold = rx_cold_storage(5.0, Some(5.0), &p.people, &p.housing).unwrap();
         assert_eq!(cold.quantity, 5.0);
         assert!(cold.plain.contains("never frozen"));
         assert!(
-            cold.citations
+            cold.plain.contains("up to 28 days between 59 °F and 86 °F"),
+            "{}",
+            cold.plain
+        );
+        assert!(cold.plain.contains("for about 1 day"), "{}", cold.plain);
+        assert!(
+            cold.plain.contains("battery power station"),
+            "{}",
+            cold.plain
+        );
+        assert!(cold.plain.contains("ask your pharmacist"), "{}", cold.plain);
+        // Never the one-day discard rule (round-2 review S1).
+        let lower = cold.plain.to_lowercase();
+        assert!(
+            !lower.contains("throw") && !lower.contains("discard"),
+            "{lower}"
+        );
+        for id in [
+            "fda_insulin_emergency",
+            "cdc_insulin_emergency",
+            "rr_expert_prior",
+        ] {
+            assert!(cold.citations.iter().any(|c| c == id), "{id}");
+        }
+        assert!(
+            !cold
+                .citations
                 .iter()
                 .any(|c| c == "ready_gov_power_outages")
         );
+    }
+
+    #[test]
+    fn a_cooler_bag_counts_one_day_unless_a_power_source_is_needed() {
+        let p = fixtures::get("sugar-land-ev-household-3").unwrap();
+        // Under 2 days of power target the bag (with ice replaced) is the plan: 1 day counted.
+        assert!(!rx_power_needed(Some(1.5), &p.people, &p.housing));
+        let short = rx_cold_storage(1.5, Some(1.5), &p.people, &p.housing).unwrap();
+        assert_eq!(short.quantity, 1.0);
+        assert!(
+            short.plain.contains("replace the cold packs with ice"),
+            "{}",
+            short.plain
+        );
+        // A generator the household owns keeps the fridge running: the bag's day, no station.
+        let mut owns = p.clone();
+        owns.housing.backup_power = BackupPower::Generator;
+        assert!(!rx_power_needed(Some(5.0), &owns.people, &owns.housing));
+        let g = rx_cold_storage(5.0, Some(5.0), &owns.people, &owns.housing).unwrap();
+        assert_eq!(g.quantity, 1.0);
+        assert!(g.plain.contains("Your generator"), "{}", g.plain);
+        // An electric car is not counted as a power source: the engine cannot tell whether it can
+        // power a cooler (a v0.2.0 input), so Sugar Land still needs a station.
+        assert!(
+            owns.mobility
+                .vehicles
+                .iter()
+                .any(|v| v.fuel == rr_types::Fuel::Ev)
+        );
+        // No power target: the medication target stands in, and only the bag's day is counted.
+        assert!(!rx_power_needed(None, &p.people, &p.housing));
+        assert_eq!(
+            rx_cold_storage(10.0, None, &p.people, &p.housing)
+                .unwrap()
+                .quantity,
+            1.0
+        );
+        // Nobody on refrigerated medicine: no line.
+        let philly = fixtures::get("philadelphia-renters-4").unwrap();
+        assert!(rx_cold_storage(3.0, Some(3.0), &philly.people, &philly.housing).is_none());
+        assert!(!rx_power_needed(Some(3.0), &philly.people, &philly.housing));
     }
 
     #[test]

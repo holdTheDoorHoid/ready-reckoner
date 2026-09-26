@@ -69,6 +69,29 @@ pub fn cooling_towel(people_list: &[Person]) -> Sizing {
     )
 }
 
+/// A room thermometer wherever the plan covers heat: CDC's rule that fans help only below 90 °F
+/// indoors cannot be followed without one (round-2 review RR-P11). It is part of the heat cover,
+/// with the fans, towels and the heat plan. Rule `room_thermometer`.
+pub fn room_thermometer() -> Sizing {
+    let mut b = Basis::new();
+    let q = b.k(keys::ROOM_THERMOMETERS_PER_HOUSEHOLD);
+    let max_f = b.k(keys::FAN_MAX_INDOOR_F);
+    let text = format!(
+        "{} in the room where the most vulnerable person sleeps: fans help only while it is below {} °F indoors, so when it reads higher, go somewhere cooler.",
+        count(q, "room thermometer", "room thermometers"),
+        num(max_f, 0)
+    );
+    Sizing::new(
+        &b,
+        "room_thermometer",
+        "thermal_heat",
+        q,
+        "thermometer",
+        Per::Household,
+        text,
+    )
+}
+
 /// A heat plan: the nearest cooling centre, the coolest room, who checks on whom. Rule
 /// `cooling_plan`.
 pub fn cooling_plan() -> Sizing {
