@@ -1,0 +1,50 @@
+[
+  {
+    "id": "house_fire_per_household_year",
+    "value": 0.002622,
+    "unit": "per household per year",
+    "source": "usfa_residential_fires_2023",
+    "year": 2023,
+    "note": "344,600 reported residential building fires (USFA 2023) / 131,434,000 households (Census CPS HH-1, 2023)."
+  },
+  {
+    "id": "unemployment_spell_per_worker_year",
+    "value": 0.083,
+    "unit": "per labour-force participant per year",
+    "source": "bls_work_experience_2024",
+    "year": 2024,
+    "note": "8.3% of people who worked or looked for work in 2024 were unemployed at some point (BLS Work Experience of the Population)."
+  },
+  {
+    "id": "layoff_per_worker_month",
+    "value": 0.01117,
+    "unit": "per worker per month",
+    "source": "bls_jolts_2025",
+    "year": 2025,
+    "note": "JOLTS layoffs and discharges rate, monthly average for 2025 (series JTS000000000000000LDR)."
+  },
+  {
+    "id": "ed_visits_per_100_persons_year",
+    "value": 47.3,
+    "unit": "per 100 persons per year",
+    "source": "cdc_nhamcs_ed_2022",
+    "year": 2022,
+    "note": "155.4 million emergency department visits in 2022 (NCHS FastStats, NHAMCS)."
+  },
+  {
+    "id": "pandemic_onset_per_year",
+    "value": 0.046,
+    "unit": "onsets per year",
+    "source": "cdc_pandemic_history",
+    "year": 2025,
+    "note": "Five pandemic onsets (1918, 1957, 1968, 2009, 2020) in 108 years, crude Poisson rate."
+  },
+  {
+    "id": "accidental_death_per_person_year",
+    "value": 0.000581,
+    "unit": "per person per year",
+    "source": "nchs_accidental_injury_2024",
+    "year": 2024,
+    "note": "197,449 unintentional injury deaths, 58.1 per 100,000 (NCHS FastStats, 2024)."
+  }
+]
