@@ -68,18 +68,64 @@ fn philadelphia_matches_the_research() {
         "the household has smoke alarms"
     );
     assert_eq!(line(&lines, "income.emergency_fund_months").quantity, 3.8);
+    // The walk home's water and snacks are staged from home: alternatives of each person's bag.
     assert_eq!(
-        line(&lines, "get_home.get_home_water.person_1").quantity,
+        line(&lines, "get_home.get_home_bag.alt.staged_water.person_1").quantity,
         2.0
     );
     assert_eq!(
-        line(&lines, "get_home.get_home_water.person_2").quantity,
+        line(&lines, "get_home.get_home_bag.alt.staged_water.person_2").quantity,
         0.6
     );
+    assert_eq!(
+        line(&lines, "get_home.get_home_bag.alt.staged_food.person_1").quantity,
+        400.0
+    );
+    assert!(!has(&lines, "get_home.get_home_water.person_1"));
     assert_eq!(line(&lines, "evacuate.go_bag").quantity, 4.0);
     assert_eq!(line(&lines, "evacuate.pet_carrier").quantity, 1.0);
-    // Thermal is driven by both heat and cold.
-    assert!(has(&lines, "thermal.battery_fan") && has(&lines, "thermal.sleeping_bag_or_blanket"));
+    // The go-bags' and the pet kit's water and food come out of the household's supplies.
+    for id in [
+        "evacuate.go_bag.alt.staged_water",
+        "evacuate.go_bag.alt.staged_food",
+        "evacuate.pet_carrier.alt.staged_water",
+        "evacuate.pet_carrier.alt.staged_food",
+    ] {
+        assert_eq!(
+            LineKind::of(&line(&lines, id).id),
+            LineKind::Alternative,
+            "{id}"
+        );
+    }
+    assert_eq!(
+        line(&lines, "evacuate.go_bag.alt.staged_water").quantity,
+        12.0
+    );
+    for old in [
+        "evacuate.go_bag_water",
+        "evacuate.go_bag_food",
+        "evacuate.pet_go_water",
+        "evacuate.pet_go_food",
+    ] {
+        assert!(!has(&lines, old), "{old} is staged now");
+    }
+    // One bottle of bleach, whatever the target.
+    assert_eq!(line(&lines, "water_boil.bleach_bottles").quantity, 1.0);
+    // Reused bottles cite the cap and the rotation, not the dog's water.
+    let reused = line(&lines, "water_out.water_gallons.alt.reused_bottles");
+    assert!(!reused.citations.iter().any(|c| c == "petmd_dog_water"));
+    // One extinguisher per floor of a two-floor rowhouse; no ladder at street level.
+    assert_eq!(line(&lines, "fire.extinguisher_count").quantity, 2.0);
+    assert!(!has(&lines, "fire.escape_ladder_count"));
+    // Thermal is driven by both heat and cold. Blankets and layers for everyone; a sleeping bag
+    // for the senior only (1.7 days of cold).
+    assert!(has(&lines, "thermal.battery_fan") && has(&lines, "thermal.blankets"));
+    assert_eq!(line(&lines, "thermal.blankets").quantity, 4.0);
+    assert_eq!(line(&lines, "thermal.warm_layers").quantity, 4.0);
+    assert_eq!(
+        line(&lines, "thermal.sleeping_bag_or_blanket").quantity,
+        1.0
+    );
     // Flooding and fire drive home loss, not earthquakes.
     assert!(has(&lines, "home_loss.insurance_flood"));
     assert!(!has(&lines, "home_loss.insurance_earthquake"));
@@ -113,6 +159,17 @@ fn coos_bay_prefers_a_filter_and_a_source_to_a_hundred_gallons() {
     );
     assert!(lines.iter().all(|l| l.bucket != BucketId::WaterBoil));
     assert!(line(&lines, "evacuate.go_bag").plain.contains("minutes"));
+    // Fifty days without well water still means one bottle of bleach (it treats thousands of
+    // gallons), with the no-water lines because there is no boil-water target.
+    let bleach = line(&lines, "water_out.bleach_bottles");
+    assert_eq!(bleach.quantity, 1.0);
+    assert!(
+        !bleach.citations.iter().any(|c| c == common::TARGET_SOURCE),
+        "the target's days do not size it"
+    );
+    // The household has an extinguisher; a detached house at street level gets no ladder.
+    assert!(!has(&lines, "fire.extinguisher_count"));
+    assert!(!has(&lines, "fire.escape_ladder_count"));
 
     // 17 days of food is the first line in the one-month tier: the note is said there, once.
     let noted: Vec<&RequirementLine> = lines
@@ -169,6 +226,7 @@ fn every_line_is_cited_and_well_formed() {
         "towel",
         "plan",
         "item",
+        "blanket",
         "set",
         "alarm",
         "extinguisher",
@@ -536,9 +594,15 @@ fn items_are_sized_by_their_rule() {
     assert_eq!(q("food_kcal").unwrap().0, 82_000.0);
     assert_eq!(q("medication_days").unwrap().0, 14.0);
     assert_eq!(q("water_reused_bottles").unwrap().0, 6.0);
-    // Per-commuter lines add up: 2 L + 0.6 L.
+    // Per-commuter lines add up: 2 L + 0.6 L (staged alternatives size an item the same way).
     assert_eq!(q("get_home_water").unwrap().0, 2.6);
+    assert_eq!(q("get_home_food").unwrap().0, 500.0);
     assert_eq!(q("get_home_bag").unwrap().0, 2.0);
+    assert_eq!(q("bleach_bottles").unwrap().0, 1.0);
+    assert_eq!(q("extinguisher_count").unwrap().0, 2.0);
+    assert_eq!(q("escape_ladder_count").unwrap().0, 0.0);
+    assert_eq!(q("blankets").unwrap().0, 4.0);
+    assert_eq!(q("sleeping_bag_or_blanket").unwrap().0, 1.0);
     // No filter for a short no-water target on city water; no line means 0.
     assert_eq!(q("water_treatment_capacity").unwrap().0, 0.0);
     assert_eq!(q("infant_formula_oz").unwrap().0, 0.0);

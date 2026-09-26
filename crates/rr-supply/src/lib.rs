@@ -108,6 +108,7 @@ pub const LINE_RULES: &[&str] = &[
     "battery_fan",
     "cooling_towel",
     "cooling_plan",
+    "blankets",
     "sleeping_bag_or_blanket",
     "warm_layers",
     "warm_room_plan",
@@ -124,6 +125,7 @@ pub const LINE_RULES: &[&str] = &[
     "emergency_fund_months",
     "get_home_bag",
     "get_home_water",
+    "get_home_food",
     "car_kit",
     "go_bag",
     "go_bag_water",
@@ -452,15 +454,8 @@ pub fn sized_requirements(
                 let treat = water::water_treatment_boil(days, people, pets, hot);
                 let fuel = water::boil_fuel(treat.quantity);
                 out.push(bucket, cited(bucket, Some(treat)), Need, None, false);
-                if let Some((bleach_days, src)) = longest(BucketId::WaterBoil, BucketId::WaterOut) {
-                    out.push(
-                        bucket,
-                        cited(src, Some(water::bleach_bottles(bleach_days))),
-                        Need,
-                        h72,
-                        false,
-                    );
-                }
+                // One bottle whatever the target: it does not depend on the days.
+                out.push(bucket, Some(water::bleach_bottles()), Need, h72, false);
                 out.push(
                     bucket,
                     Some(fuel),
@@ -494,13 +489,7 @@ pub fn sized_requirements(
                 );
                 // Bleach goes with the boil-water lines when there are any, otherwise here.
                 if days_of(BucketId::WaterBoil).is_none() {
-                    out.push(
-                        bucket,
-                        cited(bucket, Some(water::bleach_bottles(days))),
-                        Need,
-                        h72,
-                        false,
-                    );
+                    out.push(bucket, Some(water::bleach_bottles()), Need, h72, false);
                 }
                 out.push(
                     bucket,
@@ -637,9 +626,9 @@ pub fn sized_requirements(
                 );
             }
             BucketId::Thermal => {
-                if days_of(bucket).is_none() {
+                let Some(days) = days_of(bucket) else {
                     continue;
-                }
+                };
                 let heat = t.driven_by(bucket, HEAT);
                 let cold = t.driven_by(bucket, COLD);
                 // With no heat or cold hazard named (or no contributions at all), cover both.
@@ -656,14 +645,27 @@ pub fn sized_requirements(
                     out.push(bucket, Some(thermal::cooling_plan()), Need, now, false);
                 }
                 if cold == Some(true) || neither {
-                    out.push(
-                        bucket,
-                        Some(thermal::sleeping_bag_or_blanket(people)),
-                        Need,
-                        h72,
-                        false,
-                    );
+                    // Blankets and warm layers first (most homes have them); a sleeping bag or an
+                    // extra heavy blanket only for a long target or someone 65 or over.
+                    out.push(bucket, thermal::blankets(people), Need, h72, false);
                     out.push(bucket, Some(thermal::warm_layers(people)), Need, h72, false);
+                    if let Some((s, needed)) =
+                        thermal::sleeping_bag_or_blanket(days, people, housing)
+                    {
+                        // The target's sources stand behind it only when its days decided it.
+                        let s = if s.days.is_some() {
+                            s.also_cite(t.sources(bucket))
+                        } else {
+                            s
+                        };
+                        out.push(
+                            bucket,
+                            Some(s),
+                            if needed { Need } else { Optional },
+                            Some(tier_for_days(days)),
+                            false,
+                        );
+                    }
                     out.push(
                         bucket,
                         Some(thermal::warm_room_plan(housing, people)),
@@ -751,26 +753,52 @@ pub fn sized_requirements(
                     h72,
                     false,
                 );
+                // The go-bags' water and food, and the pet go-kit's, are staged from the
+                // household's own supplies: alternative lines of the bag, never additions.
                 out.push(
                     bucket,
                     cited(
                         bucket,
                         Some(evacuate::go_bag_water(people, level, hot, e.days_away)),
                     ),
-                    Need,
+                    Shape::Alternative {
+                        of: "go_bag",
+                        variant: "staged_water",
+                    },
                     h72,
                     false,
                 );
                 out.push(
                     bucket,
                     cited(bucket, evacuate::go_bag_food(people, e.days_away)),
-                    Need,
+                    Shape::Alternative {
+                        of: "go_bag",
+                        variant: "staged_food",
+                    },
                     h72,
                     false,
                 );
                 out.push(bucket, evacuate::pet_carrier(pets), Need, h72, false);
-                out.push(bucket, evacuate::pet_go_water(pets), Need, h72, false);
-                out.push(bucket, evacuate::pet_go_food(pets), Need, h72, false);
+                out.push(
+                    bucket,
+                    evacuate::pet_go_water(pets),
+                    Shape::Alternative {
+                        of: "pet_carrier",
+                        variant: "staged_water",
+                    },
+                    h72,
+                    false,
+                );
+                out.push(
+                    bucket,
+                    evacuate::pet_go_food(pets),
+                    Shape::Alternative {
+                        of: "pet_carrier",
+                        variant: "staged_food",
+                    },
+                    h72,
+                    false,
+                );
                 out.push(
                     bucket,
                     evacuate::fuel_half_tank(h.vehicles(), h.evs()),
@@ -794,18 +822,35 @@ pub fn sized_requirements(
                 );
             }
             BucketId::GetHome => {
+                // Each commuter's bag, with its water and snacks staged from home: alternative
+                // lines of that person's bag, never additions.
                 for (index, commute) in h.commuters() {
                     out.push(
                         bucket,
-                        Some(get_home::get_home_bag(index, commute, hot)),
+                        Some(get_home::get_home_bag(index, commute)),
                         Shape::PerPerson(index),
                         h72,
                         false,
                     );
                     out.push(
                         bucket,
-                        Some(get_home::get_home_water(commute, hot)),
-                        Shape::PerPerson(index),
+                        Some(get_home::get_home_water(index, commute, hot)),
+                        Shape::PersonAlternative {
+                            of: "get_home_bag",
+                            variant: "staged_water",
+                            person: index,
+                        },
+                        h72,
+                        false,
+                    );
+                    out.push(
+                        bucket,
+                        Some(get_home::get_home_food(index, commute)),
+                        Shape::PersonAlternative {
+                            of: "get_home_bag",
+                            variant: "staged_food",
+                            person: index,
+                        },
                         h72,
                         false,
                     );
@@ -813,7 +858,17 @@ pub fn sized_requirements(
                 out.push(bucket, get_home::car_kit(h.vehicles()), Need, h72, false);
             }
             BucketId::MedicalEmergency => {
-                let days = days_of(BucketId::Supplies).unwrap_or(f64::from(TierId::W2.days()));
+                let supplies = days_of(BucketId::Supplies);
+                let days = supplies.unwrap_or(f64::from(TierId::W2.days()));
+                // The supplies target's sources stand behind the medicine counts only when its days
+                // size them (two weeks otherwise).
+                let by_days = |s: Sizing| {
+                    if supplies.is_some() {
+                        s.also_cite(t.sources(BucketId::Supplies))
+                    } else {
+                        s
+                    }
+                };
                 out.push(
                     bucket,
                     Some(first_aid::first_aid_kit(people)),
@@ -823,7 +878,7 @@ pub fn sized_requirements(
                 );
                 out.push(
                     bucket,
-                    Some(first_aid::otc_medicines(days, people)),
+                    Some(by_days(first_aid::otc_medicines(days, people))),
                     Need,
                     h72,
                     false,
@@ -838,7 +893,7 @@ pub fn sized_requirements(
                 );
                 out.push(
                     bucket,
-                    Some(first_aid::ors_packets(days, people)),
+                    Some(by_days(first_aid::ors_packets(days, people))),
                     Need,
                     h72,
                     false,
