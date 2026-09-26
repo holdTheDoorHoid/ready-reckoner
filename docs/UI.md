@@ -137,3 +137,112 @@ separately under `rr.prefs.v1`; they hold no household data and are not part of 
 ## Non-goals for v1
 
 Accounts, sync, sharing links that carry household data, push notifications, native app stores.
+
+## v0.2.0: the family plan and the new questions (web-interview)
+
+### Your family plan (`#/family`)
+
+**One job:** write down the household's own plan, in its own words, so it prints on paper. The screen
+sits outside the numbered interview steps. The site navigation lists it right after "Your answers"
+("Family plan"), and each plan step whose answer belongs here links to it: "Make a household plan"
+("Fill in your household plan here"), "Your trusted circle", "Legal readiness", "Plan how you would
+leave" and "Know your shut-offs" (the catalogue ids are listed beside `familySectionFor` in
+`web/src/lib/family.ts`).
+`#/family/<section>` opens the screen at one part: `contact`, `children`, `shelter`, `leave`, `home`,
+`circle`, `lawyer`.
+
+**Privacy.** A box under the lead says the plan is saved only in this browser and in the plan file
+the household saves, never sent anywhere, and never used to work out the plan. A smaller line says
+the names and numbers are other people's details too, and that until the site has a web address of
+its own, other pages at the same address could in principle read what the browser keeps; if that
+matters, write the plan on the printed packet instead (warn, don't block; DESIGN §10).
+
+**Fields** (every one optional free text, `PlanInput.family_plan`; `maxlength` is the engine's
+limit, 300 characters for notes and 80 for names and numbers, so nothing typed is cut later):
+
+| Section | Asks | Shown when |
+| --- | --- | --- |
+| Staying in touch | Someone out of the area everyone checks in with (name, phone); where to meet near home; where to meet outside the neighbourhood; numbers to know by heart (add one at a time, up to 5) | always |
+| Children, school and work | Who picks up the children, and from where; what each person does at work or school | the first only with a child, toddler, baby or teenager, or when already answered; the heading says "Work and school" otherwise |
+| Where to shelter | The safest spot at home; at work or school | always |
+| If you have to leave | Where you would go; two ways out; who takes the animals; roadside assistance number | animals only with pets or livestock, roadside only with a vehicle (or when already answered) |
+| Around the home | Gas shut-off; main water shut-off; electrical panel; neighbours who check on you | always (the gas help adds "leave it blank if you have no gas" when neither the heat nor the stove is gas) |
+| Your trusted circle | Up to 4 people: name, phone, and what they hold (a spare key, copies of our papers, medical power of attorney, backup codes for our accounts) | always; "Add someone" until four |
+| A lawyer | Name or office; phone | always |
+
+**Help from the content blocks.** "Staying in touch" and "Where to shelter" each have a folded guide,
+"How to plan staying in touch" (`plan_communication`) and "Where to shelter, danger by danger"
+(`plan_shelter`), read from `content/guidance/plan_*.md` at build time and trimmed for the household
+exactly as the packet trims them (`web/src/lib/conditions.ts` is rr-content's `apply_conditions_for`,
+ported): a hazard's paragraph stays only where its ten-year chance is at least 1 in 100, the high-rise
+line only in a tall building. Notes are numbered, each linked to its source. A build without the
+files shows a one-paragraph fallback instead.
+
+**Saving.** What is typed is saved as it is typed; leaving a field tidies it the way the engine
+does (trimmed, capped; a blank field is removed; an empty plan leaves no `family_plan` behind).
+List entries (routes, numbers, people) keep their place while being edited; the engine drops empty
+ones. "Put it on paper" at the end has **Print wallet cards** (opens `#/packet/wallet-cards`), **See
+the whole packet**, and, while the plan's household-plan step is not done, **Mark "…" as done**.
+
+### Wallet cards in the packet
+
+The packet prints the family plan right after the summary, then the wallet cards. The web finds the
+cards as the section whose heading names them (its slug contains `wallet`, as in "## Wallet cards"),
+or else the family-plan section (`cardsSection` in `web/src/lib/markdown.ts`). `#/packet/wallet-cards`
+(or `#/packet/<any section slug>`) scrolls to that section and moves focus to its heading. The
+toolbar gains **Print only the wallet cards**, which prints that section alone. Each card is a block
+quote in the packet's Markdown: the web draws it with a dashed cut line, two across on paper, and
+never splits one across pages.
+
+### New questions in the interview
+
+All optional; a question never answered stays absent ("not asked") and the engine assumes nothing.
+
+- **Who is in your household.** Under each person's medical details, a second fold: **Help in an
+  emergency for person N**, grouped as planners group access and functional needs (CMIST): *Getting
+  warnings* (deaf or hard of hearing; blind or low vision; limited English), *Support and safety*
+  (memory, thinking or understanding; needs someone with them; has a service animal), *Care that
+  can't wait* (needs dialysis; gets home health care). The yes/no question that reveals the details
+  now names "extra help in an emergency"; answering No clears both folds and says so.
+- **Where you live.** "Someone sleeps below street level", only with a basement or a flat below
+  ground (a hidden question keeps no answer); "Has your water system had problems?" (no problems we
+  know of / now and then / often / not sure), public water only and cleared on switching to a well;
+  "Is there water nearby you could filter if the taps stopped?" (none nearby, a well, a river, lake,
+  pond or creek, a rain barrel or cistern, a neighbour's well); "What do you cook on?" (gas or propane
+  stove, electric stove, induction cooktop, no stove).
+- **Money.** "Show me the bare minimum first" under the one-off amount (also in the settings);
+  **Pay and benefits**: "Does your household rely on any of these?" (federal pay, SNAP or WIC, SSI or
+  SSDI, VA benefits, unemployment benefits) with "Ticking one only adds one risk to your list: these
+  payments can pause during a government shutdown or a funding gap. It stays on this device.";
+  insurance gains sewer or water backup cover and, when someone earns, life or disability insurance.
+- **What you already have.** An item that needs trying now and then (`Item.test_interval_months`)
+  asks **When did you last try it?** once the household has some: a date field (never after today)
+  and a **Tried it today** button, then "Last tried <date>". The assumed-basics box is unchanged.
+
+### Settings on the Risks screen
+
+The single "Allow up to 10% of my budget for rare catastrophes" box becomes a list: **All of them**
+(written as `["all"]`, which also covers families added later; half-ticked when only some are) and
+one box per rare family, named from the catalogue. A saved v1 plan's single switch reads as all of
+them and is retired on the first change; ticking every family also writes `["all"]`. Two switches
+join it: **Show me the bare minimum first** and **Show the long-horizon part of the plan**. The
+settings summary adds "bare minimum first" and "rare-catastrophe allowance: 2 of 9" (or "all of
+them") when they are on.
+
+### Persistence (v2)
+
+Every new answer lives in `input` (the household), so it is saved, exported and imported with no
+change to the file's version. The one exception is when an item was last tried (`Owned.tested_on`):
+kept on its entry in `input.existing` when the household had it before the plan, otherwise on its
+latest check-off (`Purchase.tested_on`); the engine is given the latest date for each item.
+
+### Shared pieces other screens use
+
+- `web/src/lib/dials.ts`: the rare allowance read as the engine reads it (`rareFamilies`,
+  `allowsRare`, `allowsEveryRareFamily`) and changed (`setRareFamily`, `setEveryRareFamily`), plus
+  bare minimum and the long horizon. `RareOptIn.svelte` is the family list; the rare box may use it.
+- `web/src/lib/persistence.ts`: `heldQuantity`, `testedOn`, `setTestedOn` (one tested-on date for the
+  Have screen and Keep it up).
+- `web/src/lib/family.ts`: `tidyFamilyPlan` (the engine's tidy), the form's edits, and
+  `familySectionFor(itemId)`. `web/src/lib/conditions.ts` and `web/src/lib/guidance.ts` show any
+  reviewed block trimmed for the household.
