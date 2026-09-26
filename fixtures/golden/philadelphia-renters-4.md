@@ -14,7 +14,7 @@
 
 ### The three things that matter most
 
-1. Of 100 households like yours, about 35 (25–55) will lose grid power for a day or more in the next 10 years. Be ready to manage about 3 days at home with no power, and about 5 days with no tap water.
+1. Of 100 households like yours, about 35 (30–55) will lose grid power for a day or more in the next 10 years. Be ready to manage about 3 days at home with no power, and about 5 days with no tap water.
 2. Of 100 households like yours, about 60 (40–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 weeks of food you normally eat, and 3 weeks of daily medicine on hand.
 3. Of 100 households like yours, about 15 (7–30) will have an income gap of more than 3 months in the next 10 years. Losing a paycheck is the longest disruption most households face. Aim for about 4 months of expenses in savings over time, apart from this supplies budget.
 
@@ -363,8 +363,8 @@ Your monthly money starts next month, so this month is the free steps above.
 - [ ] Decide: disability and life insurance for the people who earn (free)
 - [ ] Antibiotics: talk with your own clinician (no stockpile) (free)
 - Set aside $30 toward **bleeding-control kit (tourniquet and pressure bandage)**.
-- [ ] **Foil emergency blankets**: 4 blankets, about $11 (usually $2–20)
 - [ ] **Refrigerator and freezer thermometers**: 1 pair, about $8 (usually $5–11)
+- [ ] **Foil emergency blankets**: 4 blankets, about $11 (usually $2–20)
 - [ ] **Indoor room thermometer**: 1 thermometer, about $9 (usually $2–15)
 
 **Month 5 (from March 1, 2027), $60 to spend**
@@ -425,8 +425,8 @@ One list per step, up to the step that is enough for your risks. The free steps 
 - [ ] Period products for two cycles: 2 cycles' supplies
 - [ ] Multipurpose fire extinguisher: 2 extinguishers
 - [ ] Disposable gloves, a box of 100: 1 box
-- [ ] Foil emergency blankets: 4 blankets
 - [ ] Refrigerator and freezer thermometers: 1 pair
+- [ ] Foil emergency blankets: 4 blankets
 - [ ] Indoor room thermometer: 1 thermometer
 - [ ] Bleeding-control kit (tourniquet and pressure bandage): 1 kit
 - [ ] Carbon monoxide alarm on each sleeping level: 2 alarms
@@ -704,9 +704,15 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 > **NOAA HMS and EPA AQS, version 2016-2023, accessed September 26, 2026.** Smoke days from NOAA NESDIS Hazard Mapping System smoke analysis polygons and U.S. EPA Air Quality System daily PM2.5 data. https://www.ospo.noaa.gov/products/land/hms.html
 
+> **NOAA nClimGrid-Daily, version v1.0.0, accessed September 26, 2026.** Daily temperature from NOAA's NClimGrid-Daily county averages (Durre et al., NOAA National Centers for Environmental Information). https://www.ncei.noaa.gov/products/land-based-station/nclimgrid-daily
+
 > **ORNL EAGLE-I, version figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4), accessed September 26, 2026.** Power outage statistics derived by Ready Reckoner from: Brelsford, C., Tennille, S., Myers, A., et al., The Environment for Analysis of Geo-Located Energy Information's Recorded Electricity Outages 2014-2025, Oak Ridge National Laboratory, figshare, doi:10.6084/m9.figshare.24237376 (CC BY 4.0). https://doi.org/10.6084/m9.figshare.24237376
 
 > **OpenFEMA (NFIP), version Penetration v1, Claims v3, accessed September 26, 2026.** Federal Emergency Management Agency (FEMA), OpenFEMA Datasets: NFIP Residential Penetration Rates - v1 and FIMA NFIP Redacted Claims - v3. Retrieved from https://www.fema.gov/openfema-data-page/nfip-residential-penetration-rates-v1 and https://www.fema.gov/openfema-data-page/nfip-redacted-claims-v3 on 2026-09-26 (UTC). This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).
+
+> **OpenFEMA declarations and housing assistance, version v2, accessed September 26, 2026.** Federal Emergency Management Agency (FEMA), OpenFEMA Datasets: Disaster Declarations Summaries - v2, Housing Assistance Program Data - Owners - v2 and Renters - v2. Retrieved from https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2, https://www.fema.gov/openfema-data-page/housing-assistance-program-data-owners-v2 and https://www.fema.gov/openfema-data-page/housing-assistance-program-data-renters-v2. This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).
+
+> **PNNL Event-correlated Outage Dataset, version release 1 (Outage_Dataset_R1.zip), accessed September 26, 2026.** Grid disturbance counts derived by Ready Reckoner from the Event-correlated Outage Dataset in America, Pacific Northwest National Laboratory, OpenEI submission 6458 (CC BY 4.0), which links U.S. Department of Energy Form OE-417 electric emergency and disturbance reports to ORNL EAGLE-I outages. https://data.openei.org/submissions/6458
 
 > **Storm-surge proxy, accessed September 26, 2026.** County storm-surge proxy built by Ready Reckoner from the FEMA National Risk Index (coastal flooding exposure), NOAA NHC HURDAT2 storm tracks and state and local hurricane evacuation-zone tools. https://www.nhc.noaa.gov/nationalsurge/
 

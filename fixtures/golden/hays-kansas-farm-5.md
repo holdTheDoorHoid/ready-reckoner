@@ -14,7 +14,7 @@
 
 ### The three things that matter most
 
-1. Of 100 households like yours, about 45 (35–80) will lose grid power for a day or more in the next 10 years. Be ready to manage about 3 days at home with no power, and about 2 months with no tap water.
+1. Of 100 households like yours, about 50 (40–80) will lose grid power for a day or more in the next 10 years. Be ready to manage about 5 days at home with no power, and about 2 months with no tap water.
 2. Of 100 households like yours, about 55 (35–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 10 days of food you normally eat.
 3. Of 100 households like yours, about 25 (10–45) will have an income gap of more than 3 months in the next 10 years. Losing a paycheck is the longest disruption most households face. Aim for about 6 months of expenses in savings over time, apart from this supplies budget.
 
@@ -192,17 +192,17 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. For an
 
 | If this happens | Be ready for | Outside help likely arrives | Mostly back to normal | Enough at |
 | --- | --- | --- | --- | --- |
-| No grid power at home | about 3 days (up to 10 days) | not known | not known | three days |
+| No grid power at home | about 5 days (3–10) | not known | not known | two weeks |
 | Tap water must be treated | not needed at this setting | not known | not known | free steps |
 | No tap water at all | about 2 months (3 weeks to 6 months) | not known | not known | three months |
 | Can't get to a store | about 10 days (7 days to 3 weeks) | not known | not known | two weeks |
-| Dangerous heat or cold indoors | about 3 days (2–7) | not known | not known | three days |
+| Dangerous heat or cold indoors | about 3 days (up to 7 days) | not known | not known | three days |
 | Medication and medical-supply continuity | about 2 weeks (7 days to 1 month) | not known | not known | two weeks |
 | No phone, internet or card payments | about 5 days (2–10) | not known | not known | two weeks |
 
 The range in brackets shows how uncertain each target is. "Not known": there are no restoration records for the event behind that target.
 
-### No grid power at home: about 3 days (up to 10 days)
+### No grid power at home: about 5 days (3–10)
 
 **What helps.** Have a flashlight for each person.[76] Keep a battery or hand-crank radio, and a backup battery for each phone.[77] Keep the fridge and freezer closed. A closed fridge keeps food cold for about four hours, and a full freezer for about two days.[76] If someone relies on a powered medical device or cold medicine, make a plan with their medical provider now.[76] Join your power company's medical program for early warnings of outages, but plan as if your power will not come back first.[78] Many cities and counties keep a voluntary registry of people who may need help; ask yours.[7] A battery power station burns no fuel, so it makes no carbon monoxide.[79]
 
@@ -220,7 +220,7 @@ The range in brackets shows how uncertain each target is. "Not known": there are
 
 **What to avoid.** Do not buy everything at once. It strains your budget and the store. Do not buy or eat from cans that bulge, leak, are rusted or are deeply dented.[92] Do not trust a kit's "days" label. Check the calories on the package instead.
 
-### Dangerous heat or cold indoors: about 3 days (2–7)
+### Dangerous heat or cold indoors: about 3 days (up to 7 days)
 
 **What helps.** Agree who checks on whom, especially older neighbours and anyone who lives alone.[96, 97] In heat, go where there is air conditioning. Dial 2-1-1 to find one.[96] Cover windows with drapes or shades.[98] In cold, close off rooms you don't need, stuff towels under doors, and cover windows with blankets at night. Have extra blankets, sleeping bags and warm coats.[97] Babies under one year old should never sleep in a cold room.[97] If you cannot keep your home warm, go to a warming center. Dial 2-1-1 to find one.[99] If you heat with wood, have the stove and chimney professionally inspected and cleaned every year, because creosote from the smoke builds up and can start a fire.[100]
 
@@ -704,9 +704,15 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 > **NOAA HMS and EPA AQS, version 2016-2023, accessed September 26, 2026.** Smoke days from NOAA NESDIS Hazard Mapping System smoke analysis polygons and U.S. EPA Air Quality System daily PM2.5 data. https://www.ospo.noaa.gov/products/land/hms.html
 
+> **NOAA nClimGrid-Daily, version v1.0.0, accessed September 26, 2026.** Daily temperature from NOAA's NClimGrid-Daily county averages (Durre et al., NOAA National Centers for Environmental Information). https://www.ncei.noaa.gov/products/land-based-station/nclimgrid-daily
+
 > **ORNL EAGLE-I, version figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4), accessed September 26, 2026.** Power outage statistics derived by Ready Reckoner from: Brelsford, C., Tennille, S., Myers, A., et al., The Environment for Analysis of Geo-Located Energy Information's Recorded Electricity Outages 2014-2025, Oak Ridge National Laboratory, figshare, doi:10.6084/m9.figshare.24237376 (CC BY 4.0). https://doi.org/10.6084/m9.figshare.24237376
 
 > **OpenFEMA (NFIP), version Penetration v1, Claims v3, accessed September 26, 2026.** Federal Emergency Management Agency (FEMA), OpenFEMA Datasets: NFIP Residential Penetration Rates - v1 and FIMA NFIP Redacted Claims - v3. Retrieved from https://www.fema.gov/openfema-data-page/nfip-residential-penetration-rates-v1 and https://www.fema.gov/openfema-data-page/nfip-redacted-claims-v3 on 2026-09-26 (UTC). This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).
+
+> **OpenFEMA declarations and housing assistance, version v2, accessed September 26, 2026.** Federal Emergency Management Agency (FEMA), OpenFEMA Datasets: Disaster Declarations Summaries - v2, Housing Assistance Program Data - Owners - v2 and Renters - v2. Retrieved from https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2, https://www.fema.gov/openfema-data-page/housing-assistance-program-data-owners-v2 and https://www.fema.gov/openfema-data-page/housing-assistance-program-data-renters-v2. This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).
+
+> **PNNL Event-correlated Outage Dataset, version release 1 (Outage_Dataset_R1.zip), accessed September 26, 2026.** Grid disturbance counts derived by Ready Reckoner from the Event-correlated Outage Dataset in America, Pacific Northwest National Laboratory, OpenEI submission 6458 (CC BY 4.0), which links U.S. Department of Energy Form OE-417 electric emergency and disturbance reports to ORNL EAGLE-I outages. https://data.openei.org/submissions/6458
 
 > **Storm-surge proxy, accessed September 26, 2026.** County storm-surge proxy built by Ready Reckoner from the FEMA National Risk Index (coastal flooding exposure), NOAA NHC HURDAT2 storm tracks and state and local hurricane evacuation-zone tools. https://www.nhc.noaa.gov/nationalsurge/
 

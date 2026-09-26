@@ -15,7 +15,7 @@
 ### The three things that matter most
 
 1. Of 100 households like yours, about 15 (10–30) will have to leave home quickly at least once in the next 10 years. Know your evacuation zone and where you would go; leave when told.[2, 3] On the coast, strong shaking is the warning: walk to high ground as soon as it stops.[4]
-2. Of 100 households like yours, about 50 (40–90) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 6 months at home with no power, and about 1 year with no tap water.
+2. Of 100 households like yours, about 55 (45–95) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 6 months at home with no power, and about 1 year with no tap water.
 3. Of 100 households like yours, about 80 (60–100) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 months of food you normally eat, and 3 months of daily medicine on hand.
 
 ### Start here
@@ -317,8 +317,8 @@ Your budget is $150 a month, plus $500 once at the start. The plan does the free
 - [ ] **Whistle for each go-bag**: 2 whistles, about $4 (usually $2–5). Gets you ready for leaving home quickly.
 - [ ] **Foil emergency blankets**: 2 blankets, about $5 (usually $1–10). Gets you ready for leaving home quickly.
 - [ ] **Extra toilet paper**: 24 rolls, about $19 (usually $12–27). Adds 60 days of toilet paper for 2 people, which completes the 60-day goal.
-- [ ] **Digital thermometer (and one for a baby, if you have one)**: 1 thermometer, about $8 (usually $7–8). Gets you ready for a medical emergency before help arrives.
 - [ ] **Refrigerator and freezer thermometers**: 1 pair, about $8 (usually $5–11). Adds 180 days of food-safety checks for the fridge, which completes the 180-day goal.
+- [ ] **Digital thermometer (and one for a baby, if you have one)**: 1 thermometer, about $8 (usually $7–8). Gets you ready for a medical emergency before help arrives.
 - [ ] **Chlorine dioxide water treatment**: 1 pack, about $13 (usually $10–17). Gets you ready for getting home if you are stranded.
 - [ ] **Period products for two cycles**: 4 cycles' supplies, about $23 (usually $17–30). Adds 60 days of period products, which completes the 60-day goal.
 - [ ] **Headlamp or flashlight for each person**: 2 headlamps, about $23 (usually $7–40). Adds 180 days of light during power cuts, which completes the 180-day goal.
@@ -352,8 +352,8 @@ Your budget is $150 a month, plus $500 once at the start. The plan does the free
 - [ ] Neighbours and skills: swap numbers, check on each other, learn first aid (free)
 - [ ] Your trusted circle: agree who helps whom (free)
 - [ ] **Gravity water filter (removes bacteria and parasites)**: 1 filter, about $75 (usually $55–96)
-- [ ] **Bar soap and laundry soap**: 4 person-months, about $24 (usually $8–40)
 - [ ] **Household kit: paper plates, cups, utensils, trash bags, waterproof matches**: 3 kits, about $108 (usually $84–131)
+- [ ] **Bar soap and laundry soap**: 4 person-months, about $24 (usually $8–40)
 
 **Month 3 (from January 1, 2027), $150 to spend**
 
@@ -399,8 +399,8 @@ Your budget is $150 a month, plus $500 once at the start. The plan does the free
 | 12 (October 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Extra shelf-stable food you already eat: 18,000 kcal | $160 |
 | 13 (November 2027) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Key safe for a spare house key: 1 key safe | $125 |
 | 15 (January 2028) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Portable jump starter for the car: 2 jump starters; Spare batteries for lights and the radio: 1 × 24-pack; Extra pet food in an airtight container: 11 pounds of dry food | $258 |
-| 16 (February 2028) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Heavy trash bags for the toilet bucket: 329 bags; Extra pet food in an airtight container: 22 pounds of dry food | $138 |
-| 19 (May 2028) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Generator inlet and interlock or transfer switch, installed by an electrician: 1 installed kit, $750 of it from savings | $225 |
+| 16 (February 2028) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Heavy trash bags for the toilet bucket: 329 bags | $111 |
+| 19 (May 2028) | save toward generator inlet and interlock or transfer switch, installed by an electrician; Generator inlet and interlock or transfer switch, installed by an electrician: 1 installed kit, $750 of it from savings; Extra pet food in an airtight container: 22 pounds of dry food | $252 |
 | 20 (June 2028) | Extra shelf-stable food you already eat: 32,000 kcal | $151 |
 | 21 (July 2028) | Gasoline for the generator, in approved cans: 25 gallons; Extra pet food in an airtight container: 22 pounds of dry food | $131 |
 | 22 (August 2028) | Extra shelf-stable food you already eat: 40,000 kcal; Dry staples for long storage (rice, beans, oats, wheat): 68,000 kcal | $249 |
@@ -433,8 +433,8 @@ One list per step, up to the step that is enough for your risks. The free steps 
 - [ ] Whistle for each go-bag: 2 whistles
 - [ ] Foil emergency blankets: 2 blankets
 - [ ] Extra toilet paper: 24 rolls
-- [ ] Digital thermometer (and one for a baby, if you have one): 1 thermometer
 - [ ] Refrigerator and freezer thermometers: 1 pair
+- [ ] Digital thermometer (and one for a baby, if you have one): 1 thermometer
 - [ ] Chlorine dioxide water treatment: 1 pack
 - [ ] Period products for two cycles: 4 cycles' supplies
 - [ ] Headlamp or flashlight for each person: 2 headlamps
@@ -470,13 +470,13 @@ One list per step, up to the step that is enough for your risks. The free steps 
 
 ### One month
 
-- [ ] Extra pet food in an airtight container: 11 pounds of dry food
+- [ ] Extra pet food in an airtight container: 33 pounds of dry food
 - [ ] Extra shelf-stable food you already eat: 72,000 kcal
 
 ### Three months
 
 - [ ] Extra supply of daily prescription medicine: 30 days of one person's medicine
-- [ ] Extra pet food in an airtight container: 66 pounds of dry food
+- [ ] Extra pet food in an airtight container: 44 pounds of dry food
 - [ ] Dry staples for long storage (rice, beans, oats, wheat): 136,000 kcal
 - [ ] Phone power bank (about 20,000 mAh): 2 power banks
 
@@ -704,9 +704,15 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 > **NOAA HMS and EPA AQS, version 2016-2023, accessed September 26, 2026.** Smoke days from NOAA NESDIS Hazard Mapping System smoke analysis polygons and U.S. EPA Air Quality System daily PM2.5 data. https://www.ospo.noaa.gov/products/land/hms.html
 
+> **NOAA nClimGrid-Daily, version v1.0.0, accessed September 26, 2026.** Daily temperature from NOAA's NClimGrid-Daily county averages (Durre et al., NOAA National Centers for Environmental Information). https://www.ncei.noaa.gov/products/land-based-station/nclimgrid-daily
+
 > **ORNL EAGLE-I, version figshare version 4 published 2026-02-25T18:52:23Z (10.6084/m9.figshare.24237376.v4), accessed September 26, 2026.** Power outage statistics derived by Ready Reckoner from: Brelsford, C., Tennille, S., Myers, A., et al., The Environment for Analysis of Geo-Located Energy Information's Recorded Electricity Outages 2014-2025, Oak Ridge National Laboratory, figshare, doi:10.6084/m9.figshare.24237376 (CC BY 4.0). https://doi.org/10.6084/m9.figshare.24237376
 
 > **OpenFEMA (NFIP), version Penetration v1, Claims v3, accessed September 26, 2026.** Federal Emergency Management Agency (FEMA), OpenFEMA Datasets: NFIP Residential Penetration Rates - v1 and FIMA NFIP Redacted Claims - v3. Retrieved from https://www.fema.gov/openfema-data-page/nfip-residential-penetration-rates-v1 and https://www.fema.gov/openfema-data-page/nfip-redacted-claims-v3 on 2026-09-26 (UTC). This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).
+
+> **OpenFEMA declarations and housing assistance, version v2, accessed September 26, 2026.** Federal Emergency Management Agency (FEMA), OpenFEMA Datasets: Disaster Declarations Summaries - v2, Housing Assistance Program Data - Owners - v2 and Renters - v2. Retrieved from https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2, https://www.fema.gov/openfema-data-page/housing-assistance-program-data-owners-v2 and https://www.fema.gov/openfema-data-page/housing-assistance-program-data-renters-v2. This product uses the Federal Emergency Management Agency’s OpenFEMA API, but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).
+
+> **PNNL Event-correlated Outage Dataset, version release 1 (Outage_Dataset_R1.zip), accessed September 26, 2026.** Grid disturbance counts derived by Ready Reckoner from the Event-correlated Outage Dataset in America, Pacific Northwest National Laboratory, OpenEI submission 6458 (CC BY 4.0), which links U.S. Department of Energy Form OE-417 electric emergency and disturbance reports to ORNL EAGLE-I outages. https://data.openei.org/submissions/6458
 
 > **Storm-surge proxy, accessed September 26, 2026.** County storm-surge proxy built by Ready Reckoner from the FEMA National Risk Index (coastal flooding exposure), NOAA NHC HURDAT2 storm tracks and state and local hurricane evacuation-zone tools. https://www.nhc.noaa.gov/nationalsurge/
 
