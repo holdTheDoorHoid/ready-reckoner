@@ -93,7 +93,7 @@ pub fn medication_fills(target_days: Option<f64>, people_list: &[Person]) -> Opt
     let target = target_days?;
     let reg = constants().constant(keys::RX_DAYS_ON_HAND);
     let cap = reg.high.unwrap_or(reg.default);
-    if n == 0 || !(target > cap) {
+    if n == 0 || target.is_nan() || target <= cap {
         return None;
     }
     let mut b = Basis::new();

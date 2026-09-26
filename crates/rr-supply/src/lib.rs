@@ -1315,7 +1315,7 @@ pub fn sized_requirements(
                     _ => None,
                 });
                 let min = constants().value(constants::keys::CLEAN_AIR_MIN_P10);
-                if p.is_some_and(|p| !(p >= min)) {
+                if p.is_some_and(|p| p.is_nan() || p < min) {
                     continue;
                 }
                 out.push(

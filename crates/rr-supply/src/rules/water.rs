@@ -859,7 +859,8 @@ pub fn rain_catchment_units(
         .raw_water_source
         .is_some_and(|s| s != RawWaterSource::None);
     if !is_house(housing)
-        || !(target_days > cap)
+        || target_days.is_nan()
+        || target_days <= cap
         || drought
         || named
         || housing.water == WaterSource::Well
@@ -1082,7 +1083,7 @@ pub fn livestock_haul_tank(days: f64, large_animals: u8, drought: bool) -> Optio
 /// too deep. Rule `well_hand_pump`.
 pub fn well_hand_pump(days: f64, housing: &Housing) -> Option<Sizing> {
     let min = constants().value(keys::HAND_PUMP_MIN_DAYS);
-    if housing.water != WaterSource::Well || !(days > min) {
+    if housing.water != WaterSource::Well || days.is_nan() || days <= min {
         return None;
     }
     let mut b = Basis::new();

@@ -495,7 +495,7 @@ pub fn infant_formula_rtf(people_list: &[Person]) -> Option<Sizing> {
 pub fn infant_formula_oz(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let n = people_list.iter().filter(|p| is_formula_fed(p)).count() as f64;
     let rtf_days = constants().value(keys::BABY_SUPPLY_MIN_DAYS);
-    if n == 0.0 || !(days > rtf_days) {
+    if n == 0.0 || days.is_nan() || days <= rtf_days {
         return None;
     }
     let mut b = Basis::new();

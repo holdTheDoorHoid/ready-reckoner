@@ -141,7 +141,7 @@ pub fn toilet_cover_material(
 /// the water washing dishes would take. Rule `household_ops_kits`.
 pub fn household_ops_kits(days: f64) -> Option<Sizing> {
     let cap = constants().value(keys::WATER_STORED_CAP_DAYS);
-    if !(days > cap) {
+    if days.is_nan() || days <= cap {
         return None;
     }
     let mut b = Basis::new();
