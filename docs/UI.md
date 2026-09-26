@@ -137,3 +137,115 @@ separately under `rr.prefs.v1`; they hold no household data and are not part of 
 ## Non-goals for v1
 
 Accounts, sync, sharing links that carry household data, push notifications, native app stores.
+
+## v0.2.0: rare families, targets, validation, plan and upkeep (web-risks)
+
+Contract v2 (`docs/ENGINE-API.md`). This section supersedes the v0.1.1 notes above where they
+disagree: the rare box is no longer two columns, rare rows in the matrix jump to their own row, and
+the nuclear note shows only while the nuclear row has no location term.
+
+### Rare but severe (Risks screen; REVIEW §2.4, hazard-expansion Deliverable C)
+
+- **Nine families, one row each**, sorted by how likely here (the engine's order: the middle of
+  the range, never shown), never by how bad. The intro says so, and that each chance is a range.
+- **Five columns**: *What* (the family name, a button that opens the row); *How likely for you (in
+  the next N years)* (the range only, as the matrix words it, then the engine's
+  `anchor_sentence`, muted: "Less likely than a house fire (about 6 in 100 for you in the next ten
+  years)"); *If it reaches you* (`if_it_reaches_you`); *Why here* (the first sentence of
+  `location_factor.label`, or "The same everywhere: this chance does not depend on where you
+  live."); *What it changes in your plan* (`what_it_changes`, with a check mark and in green when
+  it starts "Nothing").
+- **Opening a row** shows *What it includes* (each `sub_cause` with its own range a year where the
+  engine gives one, and its note) and a **"How this number is made"** drawer: the range over the
+  chosen years and in any one year; why it is a range; *Where you live* (the full location label;
+  for the nuclear family also the chance the county would be in a blast or dangerous-fallout zone
+  if a large attack happened, from the class factor: "about 6 in 10 (3 to 9 in 10)"); what goes
+  into it; every source (the row's, the location factor's and each sub-cause's). The expert view
+  adds the location group and factor. Then "What to do if it happens" and "Back to the table".
+- **What the plan spends on these**, under the table: "Nothing" until the household allows it; or
+  "Your rare-event allowance (up to $X a month) buys a radiation meter ($N, around Month YYYY) for
+  the nuclear attack row"; or that its basics already cover the rows it chose (the money stays in
+  the main plan). "Choose what the plan may spend on" opens Your settings at the family list (the
+  opt-in itself, `Dials.rare_opt_in`, belongs to the settings; web-interview's `RareOptIn`).
+- **Phones and narrow windows** (48 rem and below): each family is a bordered block, each cell
+  labelled; the table keeps explicit roles so screen readers still read a table.
+- **Print**: the collapsed rows only (no buttons, no sub-rows); the packet prints its own
+  collapsed table.
+
+### The matrix, cards and "Also checked"
+
+- Rare rows follow the box's order under "Rare but severe: sorted by how likely here, shown as a
+  range, never ranked"; each name jumps to its row in the box and focuses its button.
+- A ranked row whose chance rests on stacked expert estimates (`range_only`, such as an attack
+  closing the area) shows the range over the years and the range a year, never one number; its card
+  draws no picture of 100 households.
+- A ranked row with named causes has a small "What it includes (N)" disclosure; the card has the
+  same list with each note and its sources.
+- **Also checked**: under the matrix, folded: "Also checked: N more, too rare here to list", then
+  each hazard or sub-row with its rate in words, read from the engine's note in the packet ("Also
+  checked, and under 1 in 100,000 a year here: …"; the v0.1 wording is read too).
+
+### Targets (model review 3.3–3.4)
+
+- **Badge** beside each duration target: "From records", "Partly estimates" or "Estimates", by how
+  much of the target's drivers (`contributions`) rest on hazards whose chance is an expert estimate
+  (`confidence: prior`): under a quarter, a quarter to three quarters, over three quarters. The
+  border style differs too (solid, dashed, dotted), so it reads without colour.
+- **Stress line** under the relief line, from `stress_test`: "In the worst power cut in your
+  region's records (Hurricane Helene, 2024), some homes were without power for up to 1 month. It
+  was worst about 40 miles away. A target of 2 weeks would have left about 20 in 100 homes there
+  still waiting." (or "would have covered at least 9 in 10 homes there", with a check). The share
+  still out at the target is read off the event's points exactly as rr-consequence reads them.
+  Water events say "it lasted about 7 days for most homes and up to 10 days for some". Its source
+  follows inline.
+- **Driver bars** at the top of the target's "Why?" drawer: each hazard, its share ("65 in 100"),
+  and "from records" or "an estimate"; estimates are striped. Every "Why?" drawer ends with a link
+  to the validation page.
+
+### How well do these numbers hold up? (`#/validation`; model review 3.1)
+
+- Route `#/validation`, linked from every "Why?" drawer and from About (with the tally).
+- **The tally first**: "We checked 22 real disasters. This version covered 6, partly covered 9 and
+  fell short on 6. We cannot model one yet." with four boxes, and the earlier tally (6, 5, 10, 1)
+  beside it. Counts come from the engine (`EngineInfo.validation`); a note appears if they ever
+  disagree with the rows.
+- **What the results mean**: the four words of the scoring rule, and what "In our records" means.
+- **Every event**: one row each (event, place and date; who we planned for; what happened, with
+  sources; what the planner says today; the result, and the result before this round's changes
+  where it differs; what we changed). "In our records" marks the 11 events inside the data the
+  model learned from. On narrow screens each event is a labelled block.
+- **What the misses need**, **How we keep this honest**, and a link to the full test
+  (`docs/VALIDATION.md`). The rows are the web's copy of that file (`web/src/lib/validation.ts`);
+  a test checks them against it verdict for verdict once it is in the repository.
+
+### Plan screen
+
+- **Bare minimum first** (`Plan.minimum_kit`): a banner above the warnings: why (the household asked,
+  or the full plan would take more than three years), that the smallest three-day kit comes first,
+  and a folded list of what falls beyond three years (the `plan_too_long` warning's `related`
+  items). The warning itself is not repeated below the banner.
+- **Decisions** (`PlanItem.decision`): a "Decision" chip, no price, and the check-off says
+  "Decided"; the details say it is never paid from the supplies budget.
+- **"With: …"** under an item that needs another first (`requires`), by name.
+- **First savings goal**: the engine's `first_milestone` when sent ("First goal: $500 in savings,
+  by February 2028."); otherwise the v0.1.1 nearer goal. The full goal stays beside it.
+- **If it lasts for months** (`Plan.long_horizon`): after the whole plan, when a target is a month or
+  more or the household asked (`Dials.long_horizon`): "Worth having" and "Worth learning", outside
+  the monthly schedule.
+
+### Keep it up
+
+- **Tests** (`Item.test_interval_months`): "Test: jump starter pack", due from the last day it was
+  tried (`Owned.tested_on`, on the household's own entry or else its latest check-off) or else from
+  when it was bought; "Not tested yet: try it and record the day"; "Tested today" records the date.
+- **Seasonal anchors** (`Item.season`): "Before summer: check battery fans", due on the first day of
+  the season (meteorological: March, June, September, December), yearly; and a **Through the year**
+  view: one card per season with its month and what to have ready.
+- The **calendar file** (`.ics`) carries the tests and the seasonal checks with the rest.
+
+### Components (v0.2.0)
+
+- `RareBox`: as above. `RiskMatrix`: gains `alsoChecked`. `BucketGauge`: badge, stress line,
+  driver bars. `ExplainButton`: takes content to show first, and ends with the validation link.
+  `ItemCard`: decisions and "With:". `SavingsTrack`: the engine's first goal.
+- `web/src/lib/rare.ts`, `targets.ts`, `validation.ts`: the wording and reading rules, with tests.

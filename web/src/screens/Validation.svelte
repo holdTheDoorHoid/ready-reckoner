@@ -58,8 +58,8 @@
       {/each}
     </ul>
     <p class="small muted">
-      The first version, checked the same way: covered {VALIDATION_RUN.first.covered}, partly covered {VALIDATION_RUN.first.partial}, short on
-      {VALIDATION_RUN.first.short}, not modelled {VALIDATION_RUN.first.not_modelled}.
+      Before this round's changes, and in the first version, checked the same way: covered {VALIDATION_RUN.first.covered}, partly covered
+      {VALIDATION_RUN.first.partial}, short on {VALIDATION_RUN.first.short}, not modelled {VALIDATION_RUN.first.not_modelled}.
     </p>
     <p class="small muted">
       Recorded {formatDate(VALIDATION_RUN.recorded)} for {VALIDATION_RUN.label}{summary ? `; data ${summary.data_pack}` : ''}{app.info
@@ -129,7 +129,7 @@
             <td role="cell">
               <span class="cell-label" aria-hidden="true">Result</span>
               <span class="badge badge--{r.verdict}"><Icon name={ICON[r.verdict]} /> {VERDICT_WORDS[r.verdict].label}</span>
-              {#if r.before !== r.verdict}<span class="before">First version: {VERDICT_WORDS[r.before].label.toLowerCase()}</span>{/if}
+              {#if r.before !== r.verdict}<span class="before">Before these changes: {VERDICT_WORDS[r.before].label.toLowerCase()}</span>{/if}
             </td>
             <td role="cell"><span class="cell-label" aria-hidden="true">What we changed</span>{r.changed}</td>
           </tr>

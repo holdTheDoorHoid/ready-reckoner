@@ -463,7 +463,7 @@ const WORLDWIDE: RareRow[] = [
     confidence: 'medium',
     sources: ['mock_rare_prior'],
     sub_causes: [
-      sub('yellowstone', 'A Yellowstone super-eruption', 'Devastation nearby and ash across much of the country. The US Geological Survey puts it at about 1 in 730,000 a year.', [7e-7, 3e-6], ['mock_rare_prior']),
+      sub('yellowstone', 'A Yellowstone super-eruption', 'Devastation nearby and ash across much of the country. The US Geological Survey puts it at about 1 in 730,000 a year.', [5e-7, 3e-6], ['mock_rare_prior']),
     ],
     if_it_reaches_you: 'A year or two of higher food prices and some shortages.',
     what_it_changes: 'Nothing beyond a two-week pantry.',
@@ -693,7 +693,7 @@ export function alsoCheckedNote(register: readonly RankedHazard[]): string {
   const checked: [string, number][] = (Object.keys(PLURAL) as HazardId[])
     .filter((id) => !present.has(id))
     .map((id) => [PLURAL[id]!, 0]);
-  checked.push(['an asteroid or comet impact', 3e-9], ['a Yellowstone super-eruption', 1.4e-6]);
+  checked.push(['an asteroid or comet impact', 3e-9], ['a Yellowstone super-eruption', 1 / 730_000]);
   const list = checked.map(([name, rate]) => `${name} (${perYearWords(rate)})`);
   const joined = list.length > 1 ? `${list.slice(0, -1).join(', ')} and ${list.at(-1)!}` : list[0]!;
   return `Also checked, and under 1 in 100,000 a year here: ${joined}.`;
@@ -731,14 +731,22 @@ interface WorstWater {
   p90: number;
 }
 
-/** Documented water failures by state (rr-consequence's water events table), for homes on public water. */
+/**
+ * Documented water failures by state, for homes on public water: the rows of rr-consequence's
+ * water events table (`effects.toml` in agent/consequence2) for the states the mock knows.
+ */
 const WORST_WATER: Record<string, { water_out?: WorstWater; water_boil?: WorstWater }> = {
-  TX: {
-    water_out: { event: 'the February 2021 winter storm (Uri)', date: '2021-02-15', place: 'Austin', median: 3, p90: 6 },
-    water_boil: { event: 'the February 2021 winter storm (Uri)', date: '2021-02-17', place: 'Austin', median: 6, p90: 6 },
+  TX: { water_boil: { event: 'Winter Storm Uri', date: '2021-02-17', place: 'Austin, Texas', median: 6, p90: 6 } },
+  NC: {
+    water_out: { event: 'Hurricane Helene', date: '2024-09-27', place: 'Asheville, North Carolina', median: 18, p90: 21 },
+    water_boil: { event: 'Hurricane Helene', date: '2024-09-27', place: 'Asheville, North Carolina', median: 52, p90: 52 },
   },
-  FL: { water_boil: { event: 'Hurricane Ian', date: '2022-09-28', place: 'Lee County', median: 5, p90: 10 } },
-  PA: { water_boil: { event: 'a water main break', date: '2023-03-24', place: 'Philadelphia', median: 1, p90: 3 } },
+  MS: {
+    water_out: { event: 'the Jackson water crisis', date: '2022-08-29', place: 'Jackson, Mississippi', median: 7, p90: 10 },
+    water_boil: { event: 'the Jackson water crisis', date: '2022-07-29', place: 'Jackson, Mississippi', median: 48, p90: 48 },
+  },
+  NY: { water_out: { event: 'Superstorm Sandy', date: '2012-10-29', place: 'Long Beach, New York', median: 13, p90: 13 } },
+  OH: { water_boil: { event: 'the August 2003 Northeast blackout', date: '2003-08-14', place: 'Cleveland, Ohio', median: 3, p90: 3 } },
 };
 
 /** The stress test for a duration bucket, where the mock has a record for the place. */
@@ -762,7 +770,7 @@ export function stressTestFor(profileKey: string, state: string, bucket: BucketI
     const e = WORST_WATER[state]?.[bucket];
     if (!e) return undefined;
     return {
-      event: e.event.charAt(0).toUpperCase() + e.event.slice(1),
+      event: e.event,
       date: e.date,
       region: e.place,
       share_out_at_days: e.p90 > e.median ? [[e.median, 0.5], [e.p90, 0.1]] : [[e.median, 1]],

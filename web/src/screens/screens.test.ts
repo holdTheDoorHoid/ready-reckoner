@@ -22,6 +22,7 @@ import PlanScreen from './PlanScreen.svelte';
 import Risks from './Risks.svelte';
 import Start from './Start.svelte';
 import Travel from './Travel.svelte';
+import Validation from './Validation.svelte';
 import Where from './Where.svelte';
 import Who from './Who.svelte';
 
@@ -39,6 +40,7 @@ const SCREENS: [string, Component, string, string][] = [
   ['learn', Learn, 'learn', 'Learn'],
   ['learn article', Learn, 'learn/myths', 'Disaster myths'],
   ['about', About, 'about', 'About and method'],
+  ['validation', Validation, 'validation', 'How well do these numbers hold up?'],
   ['not found', NotFound, 'missing', 'Page not found'],
 ];
 

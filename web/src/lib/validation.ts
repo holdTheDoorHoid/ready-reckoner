@@ -43,7 +43,11 @@ export interface ValidationEvent {
   /** What the planner tells that household today. */
   target: string;
   verdict: Verdict;
-  /** The verdict of the first version (v0.1.0), scored the same way. */
+  /**
+   * The verdict before this round's model changes (docs/VALIDATION.md "Before": the engine as
+   * merged at the start of v0.2, `3c46b9b`, scored by the same rule). Its tally, 6 / 5 / 10 / 1,
+   * is also the first version's as the round-2 review scored it.
+   */
   before: Verdict;
   /** The event is inside the records the model learned from. */
   in_sample: boolean;
@@ -58,7 +62,7 @@ export const VALIDATION_RUN = {
   /** The run the rows report: this version, with the data pack v2 tables and the v2 answers. */
   label: 'this version, with the data pack v2 tables',
   recorded: '2026-09-26',
-  /** The first version's tally, for comparison. */
+  /** The tally before this round's changes (and of the first version), for comparison. */
   first: { covered: 6, partial: 5, short: 10, not_modelled: 1 },
 } as const;
 
@@ -269,7 +273,7 @@ export const VALIDATION_EVENTS: readonly ValidationEvent[] = [
     when: 'November 2025',
     household: 'A single working parent with a child and a toddler, renting, on SNAP, $10 a month',
     happened: 'Food benefits stopped for 12 days.',
-    target: 'Food 30 days.',
+    target: 'Food 3 weeks.',
     verdict: 'covered',
     before: 'short',
     in_sample: false,
@@ -339,7 +343,7 @@ export const VALIDATION_EVENTS: readonly ValidationEvent[] = [
     when: 'October 2020',
     household: 'The usual family in a house',
     happened: 'Power: about 40,000 of 370,000 homes still out on day 10.',
-    target: 'Power 7 days.',
+    target: 'Power 5 days.',
     verdict: 'partial',
     before: 'covered',
     in_sample: true,
