@@ -909,9 +909,10 @@ air cleaner or box-fan filter, respirators) is sized by rr-supply.
 Model review M-08. The short end of the warning band is the least warning among causes (terms
 summed by hazard, a scenario under its family) whose own ten-year chance is at least 1 in 1,000,
 and the sentence names it; when something with no warning sets it (a fire at home, an
-earthquake), the fastest of the hazards that give minutes or hours (wildfire, flash flooding,
-tsunami, a chemical release, a dam or levee failure, a sinkhole) gets its own sentence ("For
-wildfires, plan for as little as 15 minutes of warning"). The long end is
+earthquake), the two fastest of the hazards that give minutes or hours (wildfire, flash flooding,
+tsunami, a chemical release, a dam or levee failure, a sinkhole; the more likely first on a tie)
+get their own sentence (Lahaina: "For chemical spills and releases, plan for as little as a few
+minutes of warning; for tsunamis, 15 minutes"). The long end is
 the most warning among terms with at least 5 % of the rate. "Plan to be away" stays the median
 (the go-bag's horizon), and the likely cause with the longest time away gets a sentence ("after a
 wildfire you could be away for a month or more"). Home loss adds the displacement estimate: if
