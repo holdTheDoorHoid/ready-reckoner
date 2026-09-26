@@ -18,7 +18,57 @@ use crate::pipeline::Assessment;
 /// Ids requested in `docs/CITATION_IDS.md` that `content/citations.toml` does not define yet:
 /// tolerated with a placeholder, even in debug builds. A test fails once content defines one, so
 /// the list only shrinks. // awaiting: rr-content
-pub const AWAITING_CONTENT: &[&str] = &["county_boil_water_records"];
+pub const AWAITING_CONTENT: &[&str] = &[
+    "county_boil_water_records",
+    // Requested by rr-hazards for v0.2.0 (docs/CITATION_IDS.md, "Requested by hazards for
+    // v0.2.0"; bold there until content writes them).
+    "rr_strategic_sites_2026",
+    "fema_protection_nuclear_age_1985",
+    "fema_napb90",
+    "philippe_2023_icbm_fallout",
+    "fema_uasi_fy2026",
+    "nerc_tpl007_benchmark",
+    "igrf14_coefficients",
+    "noaa_hms_smoke",
+    "epa_aqs_daily_pm25",
+    "usgs_karst_2014",
+    "usace_nid",
+    "usace_nld",
+    "asdso_dam_failures",
+    "eviction_lab",
+    "iii_water_damage",
+    "fcc_att_outage_2024",
+    "ashp_shortages",
+    "openfda_drug_shortages",
+    "crs_rs20348_funding_gaps",
+    "snap_lapse_2025",
+    "csis_terrorism_2025",
+    "fbi_cde_arrests",
+    "fbi_active_shooter_2024",
+    "start_poicn",
+    "xpt_2023_karger",
+    "rp_2019_nuclear",
+    "barrett_2013_inadvertent",
+    "fema_nuclear_72h_2023",
+    "epri_2019_hemp",
+    "riley_2012_carrington",
+    "morina_2019_carrington",
+    "love_carrington",
+    "lloyds_2013_solar",
+    "cassidy_mani_2022",
+    "usgs_yvo",
+    "nasa_tunguska_2019",
+    "fdic_failed_banks",
+    "npr_maria_2018",
+    "utah_wguep_2016",
+    "usgs_seattle_fault",
+    "pnnl_oe417_linkage",
+    "cdc_co_quickstats",
+    "ftc_sentinel_2024",
+    "usgs_barry_arm",
+    "cdc_h5n1_situation",
+    "iv_fluids_helene_2024",
+];
 
 /// Where a placeholder source points: the index where requested ids wait for their entry.
 const PLACEHOLDER_URL: &str =

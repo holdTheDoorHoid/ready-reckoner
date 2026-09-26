@@ -1,6 +1,6 @@
 //! Every citation id rr-hazards can attach to a number resolves: it is defined in
 //! `content/citations.toml` (once the content workstream's registry is merged) or listed in
-//! `docs/CITATION_IDS.md`, where requested ids wait for their entry (in bold until written).
+//! `docs/CITATION_IDS.md`, where requested ids wait for their entry.
 
 use std::path::PathBuf;
 
