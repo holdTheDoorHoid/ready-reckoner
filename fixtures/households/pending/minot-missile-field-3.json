@@ -1,0 +1,32 @@
+{
+  "planning_date": "2026-10-01",
+  "location": { "country": "US", "zip": "58701", "setting": "suburban" },
+  "housing": {
+    "kind": "detached", "tenure": "own", "floor": 1, "basement": true,
+    "water": "municipal", "sewer": "sewer", "heating": "gas", "cooling": "central",
+    "backup_power": "none", "alarms": { "smoke": true, "co": true, "extinguisher": false },
+    "below_grade_bedroom": false, "cooking": "gas", "water_system_record": "fine"
+  },
+  "people": [
+    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 22, "mode": "car", "remote_possible": false } },
+    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": true, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 5, "mode": "car", "remote_possible": true } },
+    { "age_band": "child", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": false }
+  ],
+  "pets": { "dogs": 1, "cats": 0, "small": 0, "large_animals": 0 },
+  "mobility": { "vehicles": [ { "fuel": "gas" }, { "fuel": "hybrid" } ] },
+  "finances": {
+    "monthly_budget_usd": 80, "one_off_budget_usd": 300,
+    "emergency_fund_months": 1.5, "monthly_expenses_usd": 4800,
+    "income": { "earners": 2, "stability": "very_stable" },
+    "insurance": { "home_or_renters": true, "flood": false, "earthquake": false, "sewer_backup": false, "life_or_disability": true },
+    "benefits": ["federal_pay"]
+  },
+  "existing": [
+    { "item_id": "power_headlamp", "qty": 3, "tested_on": "2026-09-14" },
+    { "item_id": "power_lantern", "qty": 1, "paid_usd": 24, "tested_on": "2026-09-14" }
+  ],
+  "dials": {
+    "return_period": "one_in_100", "climate": "today", "horizon_years": 10,
+    "rare_opt_in": ["nuclear_attack", "geomagnetic_storm"]
+  }
+}

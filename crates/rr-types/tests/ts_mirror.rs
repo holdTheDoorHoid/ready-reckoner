@@ -42,7 +42,7 @@ fn every_ts_interface_matches_the_rust_types() {
         &json(&PlanInput::defaults()),
         &parses::<PlanInput>,
     );
-    for (_, input) in fixtures::all() {
+    for (_, input) in fixtures::all().into_iter().chain(fixtures::pending()) {
         c.check_root("PlanInput", &json(&input), &parses::<PlanInput>);
     }
     c.check_root(
