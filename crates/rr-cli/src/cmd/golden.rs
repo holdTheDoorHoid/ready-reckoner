@@ -62,7 +62,7 @@ pub fn run(data: &DataArgs, args: &GoldenArgs) -> Result<Output, CliError> {
 }
 
 /// Renders every fixture household on `engine`, exactly as `rr_plan::golden::render_all` does
-/// on the fixture counties.
+/// on the repository's data packs.
 fn render_with(engine: &Engine<Source>) -> Result<Vec<Golden>, CliError> {
     let mut out = Vec::new();
     for (name, input) in rr_types::fixtures::all() {

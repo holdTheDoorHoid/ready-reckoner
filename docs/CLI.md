@@ -303,8 +303,9 @@ about what a golden contains.
 
 With `--data <dir>` or `--fixtures`, the fixture households are rendered on that source instead
 and compared with the same files. This is read-only (`--update` refuses it): a preview of what
-would change if the goldens moved to that source. The goldens on main are rendered on the fixture
-counties, so `rr --data data golden` currently reports every file as different.
+would change if the goldens moved to that source. The goldens are rendered on the data pack in
+`data/`, so `rr --data data golden` matches them, and `rr --fixtures golden` shows how the sample
+counties would differ.
 
 ### `rr doctor`: every fixture, checked
 

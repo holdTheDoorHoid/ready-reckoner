@@ -8,7 +8,8 @@
 //! - the **built-in sample counties** (`rr_plan::FixtureSource`): the seven hand-built counties
 //!   the fixture households live in. They answer only while no pack file has been loaded, so the
 //!   engine works (for those seven counties) before any data is fetched, in tests, and on a site
-//!   built without `data/`. The fixture goldens in `fixtures/golden/` come from this mode.
+//!   built without `data/`. The goldens in `fixtures/golden/` are planned from the packs, not from
+//!   this mode; this mode is checked against rr-plan's own sample-county engine instead.
 //!
 //! Once any pack file is loaded the packs decide everything, and the engine plans from them only
 //! when the manifest and every file of the `core` pack are in: a half-loaded core pack would give
@@ -213,8 +214,8 @@ impl CountySource for WasmSource {
         }
     }
 
-    /// The version stamped on every plan: the fixtures' version while they answer (so plans match
-    /// the goldens), otherwise the manifest's `pack_version`.
+    /// The version stamped on every plan: the fixtures' version while they answer (so a plan says
+    /// it came from sample data), otherwise the manifest's `pack_version`.
     fn pack_version(&self) -> Option<String> {
         match self.mode() {
             Mode::Fixtures => self.fixtures.pack_version(),

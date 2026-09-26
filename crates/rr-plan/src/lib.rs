@@ -30,6 +30,8 @@
 
 pub mod coverage;
 pub mod explain;
+// Reads the repository's data packs from disk (`Engine::with_data_dir`): native builds only.
+#[cfg(not(target_arch = "wasm32"))]
 pub mod golden;
 pub mod location;
 pub mod packet;

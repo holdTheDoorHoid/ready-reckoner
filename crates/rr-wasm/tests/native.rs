@@ -1,5 +1,6 @@
 //! The string-level engine run natively: the envelopes every export returns, the built-in sample
-//! counties the goldens come from, and the real data packs in `data/`.
+//! counties (the engine with no data loaded), and the real data packs in `data/`, which the goldens
+//! in `fixtures/golden/` are planned from.
 //!
 //! Each test runs on its own thread and so has its own engine (the engine is thread-local), which
 //! lets one test load packs without changing what another sees.
@@ -82,12 +83,13 @@ fn before_any_pack_the_sample_counties_answer_and_engine_info_says_so() {
     assert!(!api::engine_info().contains("data_pack_version"));
 }
 
-/// The envelope path in sample-county mode gives, byte for byte, what rr-plan's fixture engine
-/// gives: the answer the goldens are written from (`rr_plan::golden`), so the golden files and the
-/// WebAssembly build's answers are the same thing whenever the goldens are current. Whether they
-/// are current is rr-plan's golden test; the WebAssembly tests compare with the files themselves.
+/// The sample-county check: with no pack loaded, the envelope path gives, byte for byte, what
+/// rr-plan's engine gives on its built-in sample counties (`Engine::with_fixtures`), so a site
+/// built without `data/` still plans the seven fixture households, and says it is using sample
+/// data. The goldens are planned from the packs; see
+/// `with_the_packs_loaded_every_fixture_is_its_golden_file_to_the_last_digit`.
 #[test]
-fn in_sample_county_mode_every_fixture_is_exactly_what_the_goldens_are_made_from() {
+fn in_sample_county_mode_every_fixture_is_exactly_what_rr_plan_plans_with_no_packs() {
     let reference = rr_plan::Engine::with_fixtures().unwrap();
     for (name, raw) in rr_types::fixtures::RAW {
         let envelope = api::assess(raw);
@@ -107,6 +109,14 @@ fn in_sample_county_mode_every_fixture_is_exactly_what_the_goldens_are_made_from
         }
         let output: PlanOutput = value(&envelope);
         assert!(output.data_pack_version.starts_with("fixtures+"));
+        assert!(
+            output
+                .location
+                .data_note
+                .unwrap_or_default()
+                .contains("sample counties"),
+            "{name}: a plan from the sample counties says so"
+        );
     }
 }
 
@@ -398,6 +408,67 @@ fn the_data_packs_load_file_by_file_and_then_answer_for_every_fixture() {
     ));
     let info: EngineInfo = value(&api::engine_info());
     assert_eq!(info.packs_loaded, ["core", "geo"]);
+}
+
+/// Loads `data/manifest.json`, then every file of the core pack with the county list last, as
+/// `web/src/engine/wasm.ts` does. Returns the manifest's pack version.
+fn load_core_packs() -> String {
+    let manifest_bytes = read("data/manifest.json");
+    let manifest: serde_json::Value = serde_json::from_slice(&manifest_bytes).unwrap();
+    let _: PackInfo = value(&api::load_pack("manifest.json", &manifest_bytes));
+    let mut files = core_files(&manifest);
+    files.retain(|f| f != "core/counties.csv");
+    files.push("core/counties.csv".to_owned());
+    for f in &files {
+        let _: PackInfo = value(&api::load_pack(f, &read(&format!("data/{f}"))));
+    }
+    manifest["pack_version"].as_str().unwrap().to_owned()
+}
+
+/// With the packs in `data/` loaded file by file, every fixture's envelope carries, as text,
+/// exactly its golden file. The goldens are planned by the native engine from the same packs
+/// (`rr_plan::golden`, `rr golden`), so this is the WebAssembly path and the CLI agreeing to the
+/// last digit. On a difference the test says which side moved: the goldens (older than the engine)
+/// or the envelope path (a real disagreement with the native engine on the same data).
+#[test]
+fn with_the_packs_loaded_every_fixture_is_its_golden_file_to_the_last_digit() {
+    let pack_version = load_core_packs();
+    let mut native: Option<rr_plan::Engine<rr_data::DataStore>> = None;
+    let mut problems = Vec::new();
+    for (name, raw) in rr_types::fixtures::RAW {
+        let golden = String::from_utf8(read(&format!("fixtures/golden/{name}.json"))).unwrap();
+        let envelope = api::assess(raw);
+        let ours = value_text(&envelope);
+        if ours == minify(&golden) {
+            continue;
+        }
+        let golden_version =
+            serde_json::from_str::<serde_json::Value>(&golden).unwrap()["data_pack_version"]
+                .as_str()
+                .unwrap_or_default()
+                .to_owned();
+        let engine = native.get_or_insert_with(|| {
+            rr_plan::Engine::with_data_dir(repo().join("data")).expect("data/ loads natively")
+        });
+        let expected =
+            rr_plan::to_json(&engine.assess(&PlanInput::from_json(raw).unwrap()).unwrap());
+        let pretty = rr_plan::to_json(&serde_json::from_str::<serde_json::Value>(ours).unwrap());
+        if ours == minify(&expected) {
+            problems.push(format!(
+                "{name}: fixtures/golden/{name}.json is older than the engine or the packs \
+                 (golden planned on {golden_version}, data/ is {pack_version}); the WebAssembly \
+                 path agrees with the native engine. Regenerate the goldens: \
+                 RR_UPDATE_GOLDENS=1 cargo test -p rr-plan --test goldens\n{}",
+                rr_plan::golden::diff(&golden, &pretty)
+            ));
+        } else {
+            problems.push(format!(
+                "{name}: the envelope differs from the native engine on the same packs:\n{}",
+                rr_plan::golden::diff(&expected, &pretty)
+            ));
+        }
+    }
+    assert!(problems.is_empty(), "{}", problems.join("\n\n"));
 }
 
 /// A ZIP code in `data/core/zip_county.csv` whose largest county holds less than 80 % of it.

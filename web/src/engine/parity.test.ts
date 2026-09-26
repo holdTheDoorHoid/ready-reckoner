@@ -6,13 +6,15 @@
  *    holding the same kinds of value, at every depth. A key the contract marks optional (`?` in
  *    types.ts) may be missing on either side; array elements are compared as the union of their
  *    shapes.
- * 2. **WebAssembly vs the CLI, numbers.** Every fixture's answer equals
- *    `fixtures/golden/<name>.json` (written by the native engine: `rr golden`, rr-plan's golden
- *    helper) value for value, every number to the last bit.
+ * 2. **WebAssembly vs the CLI, numbers.** With the real packs in `data/` loaded through
+ *    `loadCorePacks` (the loader the site uses), every fixture's answer equals
+ *    `fixtures/golden/<name>.json` (planned by the native engine from the same packs: `rr golden`,
+ *    rr-plan's golden helper) value for value, every number to the last bit.
  *
- * The WebAssembly engine runs twice: once on its built-in sample counties (the goldens are made
- * that way) and once loaded with the real packs in `data/` through `loadCorePacks`, the loader
- * the site uses.
+ * The WebAssembly engine runs twice: loaded with the packs, and on its built-in sample counties
+ * (the engine before any data arrives, or on a site built without `data/`). The sample counties
+ * are checked for shape against the mock; their numbers are rr-plan's own test
+ * (`crates/rr-wasm/tests/native.rs`).
  *
  * Needs the WebAssembly build (`bash crates/rr-wasm/build-web.sh`). Without it the suite is
  * skipped, unless RR_WASM_PARITY=required (CI), which turns a missing build into a failure.
@@ -245,24 +247,20 @@ describe.runIf(BUILT)('parity: mock and WebAssembly engines, and the goldens', (
     const lines: string[] = [];
     for (const name of FIXTURE_NAMES) {
       const golden = JSON.parse(readFileSync(`${REPO}fixtures/golden/${name}.json`, 'utf8')) as PlanOutput;
-      // The goldens record which data made them; run the engine the same way.
-      const onPacks = !golden.data_pack_version.startsWith('fixtures+');
-      if (onPacks) expect(golden.data_pack_version, `${name}: the golden was made from other packs than data/`).toBe(packVersion);
-      const engine = onPacks ? packsWasm : fixturesWasm;
+      // The goldens record which data made them: the packs in data/, the ones loaded here.
+      expect(golden.data_pack_version, `${name}: the golden was planned from other data than data/ (regenerate: rr golden --update)`).toBe(packVersion);
       const times: number[] = [];
       let out: PlanOutput | undefined;
       for (let i = 0; i < 3; i++) {
         const t = performance.now();
-        out = value(await engine.assess(FIXTURES[name]), name);
+        out = value(await packsWasm.assess(FIXTURES[name]), name);
         times.push(performance.now() - t);
       }
       const r: ValueReport = { differences: [], numbers: 0, strings: 0 };
       compareValues(golden, out, '', r);
       expect(r.differences, `${name}: the WebAssembly answer differs from fixtures/golden/${name}.json. Either web/public/pkg is older than the engine (rebuild: bash crates/rr-wasm/build-web.sh) or the goldens are older than the engine (check: cargo test -p rr-plan --test goldens)`).toEqual([]);
       expect(JSON.stringify(out)).toBe(JSON.stringify(golden));
-      lines.push(
-        `${name}: ${r.numbers} numbers and ${r.strings} strings identical to the golden (${onPacks ? 'data packs' : 'sample counties'}); assess ${median(times).toFixed(0)} ms`,
-      );
+      lines.push(`${name}: ${r.numbers} numbers and ${r.strings} strings identical to the golden (data packs); assess ${median(times).toFixed(0)} ms`);
     }
     console.info(`parity with fixtures/golden:\n  ${lines.join('\n  ')}`);
   });
