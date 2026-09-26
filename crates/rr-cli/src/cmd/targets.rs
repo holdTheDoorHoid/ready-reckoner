@@ -241,10 +241,13 @@ fn targets(engine: &Engine<Source>, h: &Household, a: &Assessment) -> String {
     }
 
     let recommended = rr_supply::tier_recommended(&a.buckets);
+    let now = match a.budget.tier_reached {
+        TierId::Now => "getting started".to_owned(),
+        t => format!("{} covered", format::lower_first(t.name())),
+    };
     s.push_str(&format!(
-        "\nEnough for this household: {}. The plan has reached: {}.\n",
-        tier_words(recommended),
-        tier_words(a.budget.tier_reached)
+        "\nEnough for this household: {}. Where you are now: {now}.\n",
+        tier_words(recommended)
     ));
     let cliffs: Vec<&rr_types::Warning> = a
         .warnings

@@ -199,12 +199,8 @@ pub fn run(engine: &Engine<Source>, args: &DoctorArgs) -> Result<Output, CliErro
         }
         s.push_str(&format!("  {}:\n", r.name));
         for w in &r.warnings {
-            s.push_str(&format!(
-                "    {:<4} {}: {}\n",
-                w.severity.as_str(),
-                w.id,
-                wrap(&w.message, 84, 10)
-            ));
+            let line = format!("{:<4}  {}: {}", w.severity.as_str(), w.id, w.message);
+            s.push_str(&format!("    {}\n", wrap(&line, 96, 10)));
         }
     }
     let placeholders: Vec<String> = reports

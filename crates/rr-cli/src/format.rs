@@ -59,20 +59,18 @@ pub fn number(q: f64) -> String {
     }
 }
 
-/// A rate with two significant figures: "0.083", "0.00012", "1.4", "12".
+/// A rate with two significant figures: "0.083", "0.00012", "1.4", "12". The decimal places come
+/// from the value as rounded to two figures, so 0.00999 prints "0.010", not "0.0100".
 pub fn sig2(x: f64) -> String {
     if x == 0.0 || !x.is_finite() {
         return "0".to_owned();
     }
-    let mut decimals = 1i32;
-    let mut scaled = x.abs();
-    while scaled < 10.0 && decimals < 12 {
-        scaled *= 10.0;
-        decimals += 1;
-    }
-    // `scaled` now has two digits before the point, so `decimals - 1` places keep two
-    // significant figures (none when x is 10 or more).
-    let places = (decimals - 1).max(0) as usize;
+    let sci = format!("{x:.1e}");
+    let exp: i32 = sci
+        .split_once('e')
+        .and_then(|(_, e)| e.parse().ok())
+        .unwrap_or(0);
+    let places = (1 - exp).max(0) as usize;
     format!("{x:.places$}")
 }
 
@@ -533,6 +531,9 @@ mod tests {
         assert_eq!(sig2(1.43), "1.4");
         assert_eq!(sig2(12.3), "12");
         assert_eq!(sig2(0.0), "0");
+        assert_eq!(sig2(4.5), "4.5");
+        assert_eq!(sig2(f64::from(0.01_f32)), "0.010");
+        assert_eq!(sig2(9.96), "10");
     }
 
     #[test]

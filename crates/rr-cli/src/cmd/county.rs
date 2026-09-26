@@ -201,8 +201,12 @@ pub fn render(c: &CountyRecord, loc: Option<&rr_types::LocationResolved>) -> Str
         t.row(["Years covered".to_owned(), o.years_covered.clone()]);
         s.push_str(&t.render(1));
         s.push_str(&format!(
-            "  What counts as an outage: {}\n",
-            wrap(&o.event_definition, 90, 4)
+            "  {}\n",
+            wrap(
+                &format!("What counts as an outage: {}", o.event_definition),
+                96,
+                2
+            )
         ));
     }
 

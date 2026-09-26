@@ -80,8 +80,9 @@ pub fn run(engine: &Engine<Source>, args: &HouseholdArgs) -> Result<Output, CliE
 
     if !rare.is_empty() {
         s.push_str(
-            "\nRare but severe (shown apart: how likely and how bad are separate columns, never \
-             ranked by expected loss,\nand the plan never lets them take over the budget)\n\n",
+            "\nRare but severe\n\n Shown apart: how likely and how bad are separate columns, \
+             never ranked by expected loss,\n and the plan never lets them take over the \
+             budget.\n\n",
         );
         let mut t = Table::new(["Hazard", "How likely (per year)", "How bad", "How sure"]);
         for p in &rare {

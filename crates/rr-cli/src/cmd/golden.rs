@@ -52,7 +52,13 @@ pub fn run(data: &DataArgs, args: &GoldenArgs) -> Result<Output, CliError> {
             "rr-plan's golden helper (rr_plan::golden::render_all)".to_owned(),
         )
     };
-    Ok(compare(&dir, &shown, &goldens, &rendered_by))
+    Ok(compare(
+        &dir,
+        &shown,
+        &goldens,
+        &rendered_by,
+        data.explicit(),
+    ))
 }
 
 /// Renders every fixture household on `engine`, exactly as `rr_plan::golden::render_all` does
@@ -85,7 +91,13 @@ fn files(goldens: &[Golden]) -> Vec<(String, &str)> {
         .collect()
 }
 
-fn compare(dir: &Path, shown: &str, goldens: &[Golden], rendered_by: &str) -> Output {
+fn compare(
+    dir: &Path,
+    shown: &str,
+    goldens: &[Golden],
+    rendered_by: &str,
+    read_only: bool,
+) -> Output {
     let expected = files(goldens);
     let mut s = format!(
         "Golden files in {shown}: {} fixtures, {} files\nRendered by {rendered_by}\n\n",
@@ -131,10 +143,13 @@ fn compare(dir: &Path, shown: &str, goldens: &[Golden], rendered_by: &str) -> Ou
     ));
     if matching < expected.len() {
         out.exit = Exit::Failure;
-        s.push_str(
+        s.push_str(if read_only {
+            "This was a read-only comparison: the goldens stay as rr-plan's helper renders them \
+             until that helper changes source.\n"
+        } else {
             "If the change is intended, run `cargo run -p rr-cli -- golden --update` and explain \
-             the change in the commit message.\n",
-        );
+             the change in the commit message.\n"
+        });
     }
     out.stdout = s;
     out

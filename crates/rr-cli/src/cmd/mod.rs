@@ -113,20 +113,21 @@ pub fn sources_legend(ids: &[CitationId], content: &Content) -> String {
     let mut s = String::from("Sources\n");
     for id in seen {
         match content.citation(id.as_str()) {
-            Some(c) => {
-                let year = c.year.map(|y| format!(", {y}")).unwrap_or_default();
-                let prior = if c.prior { " [expert estimate]" } else { "" };
-                s.push_str(&format!(
-                    "  {id}  {}. {}{year}.{prior} {}\n",
-                    c.title, c.publisher, c.url
-                ));
-            }
+            Some(c) => s.push_str(&citation_lines(c)),
             None => s.push_str(&format!(
                 "  {id}  (not in content/citations.toml yet; see `rr citations --missing`)\n"
             )),
         }
     }
     s
+}
+
+/// One source: its id, title, publisher and year (wrapped), then its URL on a line of its own.
+pub fn citation_lines(c: &rr_types::Citation) -> String {
+    let year = c.year.map(|y| format!(", {y}")).unwrap_or_default();
+    let prior = if c.prior { " [expert estimate]" } else { "" };
+    let text = format!("{}: {}. {}{year}.{prior}", c.id, c.title, c.publisher);
+    format!("  {}\n    {}\n", wrap(&text, 96, 4), c.url)
 }
 
 /// The ids of a list, as one "Sources: a, b" line.

@@ -88,12 +88,7 @@ pub fn render(e: &Explanation) -> String {
     if !e.sources.is_empty() {
         s.push_str("Sources\n");
         for c in &e.sources {
-            let year = c.year.map(|y| format!(", {y}")).unwrap_or_default();
-            let prior = if c.prior { " [expert estimate]" } else { "" };
-            s.push_str(&format!(
-                "  {}  {}. {}{year}.{prior} {}\n",
-                c.id, c.title, c.publisher, c.url
-            ));
+            s.push_str(&super::citation_lines(c));
         }
     }
     s
