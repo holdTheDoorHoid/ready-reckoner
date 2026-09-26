@@ -105,6 +105,7 @@ pub fn plan_input() -> PlanInput {
                 id: "cascadia_m9".into(),
                 on: false,
             }],
+            rare_catastrophic_opt_in: true,
         },
         stage: Some(Stage::HaveSomeThings),
         confidence_1to5: Some(3),

@@ -204,6 +204,13 @@ fn more_earners_and_less_steady_income_mean_more_job_loss() {
     let fixture = county("42101");
     let base = household("philadelphia-renters-4");
     let r0 = profile(&run(&base, &fixture), H::JobLoss).rate_per_year;
+    let mut steadier = base.clone();
+    steadier.finances.income.stability = IncomeStability::VeryStable;
+    let r_steadier = profile(&run(&steadier, &fixture), H::JobLoss).rate_per_year;
+    assert!(
+        r_steadier < r0 && close(r_steadier / r0, 0.5, 1e-12),
+        "very_stable should halve job-loss incidence versus stable (research §2.7): {r_steadier} vs {r0}"
+    );
     let mut more = base.clone();
     more.people[2].earner = true;
     more.finances.income.earners = 3;

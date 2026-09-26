@@ -117,7 +117,7 @@
           legend="How steady is the income?"
           name="stability"
           help="Less steady income makes a savings buffer matter more."
-          options={INCOME_STABILITIES.map((v) => ({ value: v, label: STABILITY[v].label }))}
+          options={INCOME_STABILITIES.map((v) => ({ value: v, label: STABILITY[v].label, help: STABILITY[v].help }))}
           bind:value={input.finances.income.stability}
           columns={2}
         />

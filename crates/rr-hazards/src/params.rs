@@ -186,11 +186,14 @@ pub(crate) const FIRE_ATTACHED: Triple = (2.0, 1.5, 3.0);
 /// limit spread from other units.
 pub(crate) const FIRE_HIGH_RISE: Triple = (1.5, 1.0, 2.0);
 
-/// PRIOR (research §2.7; DESIGN §4.3): how income stability scales job-loss incidence. The v1
-/// input has no "tenured or public" choice, so the ×0.5 step cannot be selected; `stable` (a
-/// regular salary) is the typical W-2 job at ×1, as in the research's Philadelphia example.
+/// PRIOR (research §2.7; DESIGN §4.3): how income stability scales job-loss incidence. `stable` (a
+/// regular salary) is the typical W-2 job at ×1, as in the research's Philadelphia example;
+/// `very_stable` (tenured, public sector, a pension) is the research's ×0.5 step. The research
+/// gives only the point estimate for `very_stable`; the range here is this crate's own symmetric
+/// spread (±40%), the same shape used for the other stability priors below.
 pub(crate) fn income_stability(stability: IncomeStability) -> Estimate {
     match stability {
+        IncomeStability::VeryStable => prior((0.5, 0.3, 0.7), &[cite::RR_PRIORS]),
         IncomeStability::Stable => Estimate::exact(1.0),
         IncomeStability::Variable => prior((1.5, 1.0, 2.0), &[cite::RR_PRIORS]),
         IncomeStability::Seasonal => prior((1.75, 1.5, 2.0), &[cite::RR_PRIORS]),

@@ -103,7 +103,9 @@ function roundHalf(x: number): number {
 
 const KCAL: Record<AgeBand, number> = { infant: 0, toddler: 1100, child: 1600, teen: 2400, adult: 2100, senior: 1900 };
 const WATER_GAL = { survival: 0.8, basic: 1, comfortable: 4 } as const;
-const STABILITY = { stable: 0.7, variable: 1, seasonal: 1.4, gig: 1.5 } as const;
+// very_stable is treated like stable here (per brief); the real ×0.5 factor lives in
+// crates/rr-hazards/src/params.rs::income_stability.
+const STABILITY = { very_stable: 0.7, stable: 0.7, variable: 1, seasonal: 1.4, gig: 1.5 } as const;
 const DEVICE_WATTS = { cpap: 50, oxygen: 300 } as const;
 
 export interface Facts {
@@ -750,6 +752,12 @@ function buildChunks(ctx: Ctx): Chunk[] {
     else if (t.power.value >= 7 && f.backup === 'none' && f.deviceWatts.length === 0) {
       out.push(chunk(ctx, 'power_station', t.power.value > 14 ? 'm1' : 'w2', 1));
     }
+  }
+
+  // Rare catastrophes: $0 by default; opted in, a single item in a late month (real allocator
+  // caps this at 10% of the monthly budget, `Dials.rare_catastrophic_opt_in`).
+  if (ctx.input.dials.rare_catastrophic_opt_in) {
+    out.push(chunk(ctx, 'radiation_meter', 'm3', 1));
   }
   return out;
 }

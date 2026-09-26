@@ -121,6 +121,7 @@ export const FUEL: Record<Fuel, Choice> = {
 };
 
 export const STABILITY: Record<IncomeStability, Choice> = {
+  very_stable: { label: 'Very steady', help: 'Tenured, public sector, or a pension.' },
   stable: { label: 'Steady paycheck' },
   variable: { label: 'Changes from month to month' },
   seasonal: { label: 'Seasonal work' },

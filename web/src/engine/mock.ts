@@ -229,7 +229,7 @@ export function mockDefaults(): PlanInput {
       insurance: { home_or_renters: false, flood: false, earthquake: false },
     },
     existing: [],
-    dials: { return_period: 'one_in_100', climate: 'today', horizon_years: 10, water_level: 'basic', scenario_overrides: [] },
+    dials: { return_period: 'one_in_100', climate: 'today', horizon_years: 10, water_level: 'basic', scenario_overrides: [], rare_catastrophic_opt_in: false },
   };
 }
 

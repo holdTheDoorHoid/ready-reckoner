@@ -586,7 +586,7 @@ mod tests {
         for id in [
             "ready_gov_water",
             "cdc_water_storage",
-            "rr_research_supply_standards",
+            "petmd_dog_water",
             "rr_expert_prior",
         ] {
             assert!(

@@ -65,6 +65,12 @@ FEMA does not endorse the app; CC BY sources (EAGLE-I, the NCA5 Atlas) need cred
 - Every struct rejects unknown fields, so a typo in the app, a fixture, an imported plan or a content
   file is an error rather than a silently ignored value. Fields marked "defaults when absent" below
   may be left out of input and are always present in the engine's output.
+- `PlanInput.existing` holds at most one entry per item id: the UI merges check-offs into the one
+  entry rather than appending a new one. In `BucketAssessment.covered`, `Target::days.value` (and
+  the other target kinds' `value`) may be 0, meaning the household is not on the ladder for that
+  bucket at all, not that the target itself is 0. `Plan.envelopes` holds one `SavingsEnvelope` per
+  item id. `Plan.months[0]` may list items that are already done (`PlanItem.kind = "free_action"`,
+  `done: true`), not only ones still to do.
 - Deterministic: same input, same output, byte for byte, on every target. Engine crates compute
   exp, ln, pow and the normal distribution with `rr_types::math` (pure-Rust libm), because the
   platform maths library differs between native builds and WebAssembly in the last bit.
@@ -107,13 +113,14 @@ Commute { distance_km: f32, mode: car|transit|walk|bike, remote_possible }
 Pets { dogs, cats, small, large_animals }                      # u8 counts
 HouseholdMobility { vehicles: [{ fuel: gas|diesel|hybrid|ev }] }   # JSON field `mobility`
 Finances { monthly_budget_usd, one_off_budget_usd, emergency_fund_months, monthly_expenses_usd?,
-           income: { earners: u8, stability: stable|variable|seasonal|gig },
+           income: { earners: u8, stability: very_stable|stable|variable|seasonal|gig },
            insurance: { home_or_renters, flood, earthquake } }
 Owned { item_id, qty: f32, paid_usd? }
 Dials { return_period: one_in_10|one_in_50|one_in_100|one_in_500,
         climate: today|y2050, horizon_years: u8,
         water_level: survival|basic|comfortable,               # defaults to basic when absent
-        scenario_overrides: [{ id, on }] }                     # defaults to [] when absent
+        scenario_overrides: [{ id, on }],                      # defaults to [] when absent
+        rare_catastrophic_opt_in: bool }                       # defaults to false when absent
 ```
 
 `existing` is the baseline inventory. A free action counts as done when it appears there with `qty`
@@ -206,8 +213,9 @@ GuidanceMeta { id, title, applies_to: [string], citations: [CitationId] }
   as an estimate ("tagged Prior").
 - `Item.life_safety`: the allocator orders it first within its tier (smoke and CO alarms, water, a
   dependent's medication, powered-device backup). `Item.rare_catastrophic`: the allocator gives it
-  $0 by default and at most 10% of the monthly budget on opt-in (radiation meter, potassium iodide,
-  Faraday storage).
+  $0 by default and, when the household turns on `Dials.rare_catastrophic_opt_in`, at most 10% of
+  the monthly budget (a radiation meter, potassium iodide only on official instruction, Faraday
+  storage); off by default.
 - `energy_kcal_per_unit` and `volume_l_per_unit` let the app show cost per 2,000 kcal and per litre or
   gallon.
 
