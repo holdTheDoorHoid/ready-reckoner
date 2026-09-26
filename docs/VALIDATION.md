@@ -95,22 +95,24 @@ from `round2/reports/hazard-candidates.csv`); its own rates replace them when it
 | v0.1.0, as the review scored it | 6 | 5 | 10 | 1 |
 | v0.2 as merged before tier 1 (`3c46b9b`), this rule | 6 | 5 | 10 | 1 |
 | This version, today's data pack (county-only model) | 7 | 5 | 9 | 1 |
-| This version, with the data pack v2 tables | 5 | 8 | 8 | 1 |
-| This version, with the tables and the v2 answers | 7 | 8 | 6 | 1 |
-| The same, with Buncombe's pre-Helene water record | 7 | 8 | 6 | 1 |
+| This version, with the data pack v2 tables | 4 | 9 | 8 | 1 |
+| This version, with the tables and the v2 answers | 6 | 9 | 6 | 1 |
+| The same, with Buncombe's pre-Helene water record | 6 | 9 | 6 | 1 |
 
 The data pack v2 tables are the regional outage model and restoration curves (`agent/data-model`)
 and the drinking-water violations and smoke days (`agent/data-hazard`), frozen in
 `crates/rr-consequence/tests/data/backtest/regional.json` until those branches merge. The
-covered count falls with them on purpose: four power verdicts were covered only because the storm
-was in the county's own record, and pooling the region's records takes that luck away.
+covered count falls with them on purpose: power verdicts that were covered only because the storm
+was in the county's own record (Oklahoma City, Linn) lose that luck when the region's records are
+pooled, and Uri's rolling blackouts in Austin now follow the region's record of such emergencies,
+which restored faster than Austin's worst.
 
 **By event** (target at 1 in 100; before = v0.2 as merged, after = this version with the tables
 and the v2 answers; the county-only and pre-event runs are in `target/backtest.md`):
 
 | # | Event | Before | After | What changed |
 | --- | --- | --- | --- | --- |
-| 1 | Uri, Austin\* | short: boil water 5 d vs 6 | covered: power 5, heat or cold 5, boil water 21 d | a grid emergency in extreme cold is its own class (M-11); Austin's violation record raises the water rows (partly in-sample) |
+| 1 | Uri, Austin\* | short: boil water 5 d vs 6 | partial: power 5, heat or cold 3 (vs 2 / 4), boil water 21 d | a grid emergency in extreme cold is its own class (M-11), with the region's pooled record of such emergencies (half back in about a day); Austin's violation record raises the water rows (partly in-sample). County-only: covered |
 | 2 | Uri, Houston\* | covered: power 7 d | covered: power 10 d | hurricane restoration stretched by the region's factor (1.6) |
 | 3 | Helene, Asheville\* | short: no tap water 3 d, boil 5 d | short: no tap water 21 d (covered), boil 45 d (short), power 10 d (partial) | floods that shut the water plant, the boil notice after a system failure, and the water-system multiplier (M-03). With the pre-Helene record: no tap water 7 d, short |
 | 4 | Helene, well\* | covered: 45 d | covered: 45 d | |

@@ -229,7 +229,7 @@ const EVENTS: &[Event] = &[
         not_modelled: false,
         answers: none,
         in_sample: "the storm is in the 2014-2025 outage records",
-        expected: [Covered, Covered, Covered, Covered],
+        expected: [Covered, Partial, Partial, Partial],
     },
     Event {
         id: "uri_houston",

@@ -564,7 +564,7 @@ big windstorms, grid failure, Cascadia).
 | winter_weather | power | local | short storm outages | 0.3 | 3 h | 10 h | prior | county outage records replace the county-wide part; in cold 1 | rr_risk_model_priors |
 | winter_weather | comms | local | short storm outages | 0.02 | 10 h | 1.8 d | prior |  | rr_risk_model_priors |
 | winter_weather | get_home | snowed_in | snow and ice storms | 0.05 | — | — | prior | households with a commuter | rr_risk_model_priors |
-| cold_wave | power | cold_emergency | a grid emergency in extreme cold (rolling blackouts) | 1 | 1.5 d | 4 d | prior | places whose grid has failed in extreme cold; rate from `cold_emergency_rate`; regional restoration: cold_grid; in cold 1 | rr_risk_model_priors |
+| cold_wave | power | cold_emergency | a grid emergency in extreme cold (rolling blackouts) | 1 | 1.1 d | 1.9 d | duration data, share prior | places whose grid has failed in extreme cold; rate from `cold_emergency_rate`; regional restoration: cold_grid; in cold 1 | ornl_eagle_i_outages, rr_risk_model_priors |
 | cold_wave | water_boil | cold_emergency | a grid emergency in extreme cold (rolling blackouts) | 0.3 | 7 d | 21 d | prior | places whose grid has failed in extreme cold; homes on public water; scaled by how easily the water system breaks; rate from `cold_emergency_rate` | shaffer_2026_texas_boil_notices, rr_risk_model_priors |
 | cold_wave | water_out | cold_emergency | a grid emergency in extreme cold (rolling blackouts) | 0.1 | 2 d | 10 d | prior | places whose grid has failed in extreme cold; homes on public water; scaled by how easily the water system breaks; rate from `cold_emergency_rate` | rr_risk_model_priors |
 | cold_wave | supplies | cold_emergency | a grid emergency in extreme cold (rolling blackouts) | 0.5 | 2 d | 5 d | prior | places whose grid has failed in extreme cold; rate from `cold_emergency_rate` | rr_risk_model_priors |
@@ -831,10 +831,11 @@ had its power in the county record and its water as a cold-wave row at 1 in 300 
 `cold_emergency` class under cold waves now runs at a fixed PRIOR rate of 1 in 30 a year (1 in 60
 to 1 in 15) where the county's records show a cold-driven grid emergency (the regional model's
 `cold_grid` cause), or, without those records, in the ERCOT, SPP and MISO-South states: power
-(1.5 d / 4 d, or the region's cold-emergency curve; every such cut is in the cold, so homes whose
-heat needs power face dangerous cold), a boil notice for 3 in 10 public-water homes (Texas winter
-median 7 days), no tap water for 1 in 10 (2 d / 10 d), and iced roads for half. The pooled tail
-leaves these outages out, so they are counted once.
+(half back in 1.1 days, nine in ten in 1.9: the pooled EAGLE-I record of 269 such events, stretched
+by the region's factor; the review had guessed 2 to 4 days; every such cut is in the cold, so homes
+whose heat needs power face dangerous cold), a boil notice for 3 in 10 public-water homes (Texas
+winter median 7 days), no tap water for 1 in 10 (2 d / 10 d), and iced roads for half. The pooled
+tail leaves these outages out, so they are counted once.
 
 ### Clean air (v0.2.0)
 

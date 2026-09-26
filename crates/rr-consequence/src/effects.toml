@@ -353,10 +353,9 @@ value = 0.033
 low = 0.017
 high = 0.067
 unit = "grid emergencies in extreme cold per year"
-duration = { kind = "log_normal", median_days = 1.5, p90_days = 4.0 }
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
-note = "Model review M-11: about 1 in 30 a year (1 in 60 to 1 in 15) where the grid has failed in extreme cold (Texas, February 2011 and 2021; the Southeast, December 2022). The duration is the fallback when the region's cold-emergency restoration curve is not loaded."
+note = "Model review M-11: about 1 in 30 a year (1 in 60 to 1 in 15) where the grid has failed in extreme cold (Texas, February 2011 and 2021; the Southeast, December 2022)."
 
 [params.public_water_power_share]
 value = 0.1
@@ -1386,14 +1385,15 @@ bucket = "power"
 class = "cold_emergency"
 label = "a grid emergency in extreme cold (rolling blackouts)"
 p_given_event = 1.0
-duration = { kind = "log_normal", median_days = 1.5, p90_days = 4.0 }
+duration = { kind = "log_normal", median_days = 1.1, p90_days = 1.9 }
 fixed_rate = "cold_emergency_rate"
 requires = "cold_grid_region"
 cold_share = 1.0
 curve_class = "cold_grid"
+duration_evidence = "empirical"
 evidence = "prior"
-sources = ["rr_risk_model_priors"]
-note = "Model review M-11: one event takes power, heat, water and roads together (Texas, February 2021: load shed reached 20,000 MW). Where the regional outage records are loaded, the duration follows the region's cold-emergency restoration curve; outages of this kind leave the pooled county record, so they are counted once, here."
+sources = ["ornl_eagle_i_outages", "rr_risk_model_priors"]
+note = "Model review M-11: one event takes power, heat, water and roads together (Texas, February 2021: load shed reached 20,000 MW). The duration is the pooled EAGLE-I record of 269 cold-driven grid emergencies across the mainland (half the customers back in 1.1 days, nine in ten in 1.9), stretched by the region's own record where the pack has it (the Southwest's is about 5 times longer); the review's guess was 2 to 4 days. Outages of this kind leave the pooled county record, so they are counted once, here."
 
 [[effect]]
 hazard = "cold_wave"
