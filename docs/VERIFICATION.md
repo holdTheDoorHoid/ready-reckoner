@@ -52,15 +52,17 @@ money never overspent, every step and number cites, targets monotone in the dial
 never need less, a well puts no-water at or above power, confidence answers move nothing,
 assumed basics never credit less, more money never covers less, byte-identical reruns, `assess`
 under 100 ms); every guardrail fires when it should and not otherwise; every named scenario appears
-where documented with the documented default; 33 of the 44 sampled source figures match exactly;
+where documented with the documented default; of 43 sampled groups of source figures (46
+citations and five price listings), 38 match the source, one partly and four do not (V-03–V-06);
 packets read at grade 5.7–6.8, with no brands, no dosing, firearms only in the one free action, the
 NRI statement with version and date; and the site makes no request to any other origin.
 
 ## 1. Numbers against their sources
 
-44 figures in 33 citations were opened at the cited URL (two sub-checks run in parallel; WebFetch,
-with at most eight searches in all). The water, food, medicine, sanitation, power, outage, base-rate,
-scenario and price figures sampled:
+46 citations and five price listings were opened at the cited URL (two sub-checks run in parallel;
+WebFetch, with at most eight searches in all): 43 groups of figures (about 80 numbers) across
+water, food, medicine, sanitation, power, outages, base rates, scenarios and prices. 38 groups
+match, one partly, four do not:
 
 | Area | Citation | Figure the app uses | Result |
 | --- | --- | --- | --- |
