@@ -93,6 +93,7 @@ const PLAN_INPUT: Schema = obj(
       ['monthly_expenses_usd'],
     ),
     existing: { t: 'array', of: obj({ item_id: str, qty: num, paid_usd: num }, ['paid_usd']) },
+    assume_basics: bool,
     dials: obj(
       {
         return_period: en(RETURN_PERIODS),
@@ -107,7 +108,7 @@ const PLAN_INPUT: Schema = obj(
     stage: en(STAGES),
     confidence_1to5: u8,
   },
-  ['stage', 'confidence_1to5'],
+  ['stage', 'confidence_1to5', 'assume_basics'],
 );
 
 function problem(code: ProblemCode, field: string, message: string): Problem {

@@ -147,6 +147,16 @@
       <span class="small muted">The plan will include checking what you have.</span>
     </p>
 
+    <section aria-labelledby="basics-title">
+      <h2 id="basics-title" class="visually-hidden">Everyday basics</h2>
+      <CheckRow
+        label="Assume I have everyday basics (blankets, a pot, a phone, a bag, three days of ordinary food)"
+        help="Checked by default. Most households already have these, so your plan won't ask you to buy them again — enter specific amounts below if you're missing any. Your packet lists what was assumed."
+        checked={input.assume_basics ?? true}
+        onchange={(on) => (input.assume_basics = on)}
+      />
+    </section>
+
     <section aria-labelledby="safety-title">
       <h2 id="safety-title">Safety equipment</h2>
       <CheckRow label="A working smoke alarm on each level" help="Press its test button to check." bind:checked={input.housing.alarms.smoke} />
