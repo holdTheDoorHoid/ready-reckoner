@@ -98,9 +98,9 @@ avoid = [
   "A cheap four-dial box or a fake rock",
   "Leaving the factory code, or writing the code on the box",
 ]
-price_band_usd = { low = 37.0, high = 62.57, per = "key safe", note = "Two home-center listings for wall-mounted push-button key safes: $37.00 and $62.57. A spare key with a trusted neighbour costs nothing." }
+price_band_usd = { low = 37.0, high = 62.57, per = "key safe", note = "Two home-center listings for wall-mounted push-button key safes: $37.00 and $62.57. A spare key with a trusted neighbour costs nothing; renters keep one with a neighbour instead (the lockout plan)." }
 retrieved = "2026-09-26"
-quantity_rule = "once_if_house"
+quantity_rule = "once_if_owned_house"
 citations = ["sold_secure_key_safes", "thurrock_key_safe_advice", "ollam_2022_lawyer_passport_locksmith_gun", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
 readiness_share = 0.2
