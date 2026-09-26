@@ -181,6 +181,23 @@ fn uasi_shares_sum_to_one_and_new_york_leads() {
     // A rural county gets none.
     assert_eq!(exposure("41011").uasi_share, Some(0.0));
     assert_eq!(exposure("41011").uasi_area, None);
+    // The urban area's own share is the same in each of its counties: New York-White Plains
+    // holds $142,481,143 of $584,250,000 (FEMA FY2026 HSGP NOFO, Appendix I).
+    if kings.uasi_area_share.is_some() {
+        let ny = 142_481_143.0 / 584_250_000.0;
+        for fips in ["36047", "36061", "36119", "36059"] {
+            let a = f64::from(exposure(fips).uasi_area_share.unwrap());
+            assert!((a - ny).abs() < 1e-4, "{fips}: {a}");
+        }
+        // Los Angeles is a one-county area: both shares agree.
+        let la_area = exposure("06037").uasi_area_share.unwrap();
+        assert!((la_area - la).abs() < 1e-4, "{la_area} vs {la}");
+        assert_eq!(exposure("41011").uasi_area_share, Some(0.0));
+        assert_eq!(
+            rr_data::exposure_source("uasi_area_share"),
+            "fema_hsgp_fy2026"
+        );
+    }
 }
 
 #[test]

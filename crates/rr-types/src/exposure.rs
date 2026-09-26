@@ -99,9 +99,15 @@ pub struct CountyExposure {
     /// Compass bearing from the county to that place, degrees clockwise from north.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub strategic_bearing: Option<f32>,
-    /// The county's share of the national FY2026 UASI total, 0 to 1 (`strategic.csv`).
+    /// The county's share of the national FY2026 UASI total, 0 to 1: its urban area's share
+    /// split among the area's counties by population (`strategic.csv`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub uasi_share: Option<f32>,
+    /// The urban area's own share of the national FY2026 UASI total, 0 to 1, the same for every
+    /// county in the area; 0 outside every funded urban area (`strategic.csv`). Source id:
+    /// `fema_hsgp_fy2026` (`rr_data::exposure_source("uasi_area_share")`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub uasi_area_share: Option<f32>,
     /// The FEMA urban area the county is funded under, if any.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub uasi_area: Option<String>,

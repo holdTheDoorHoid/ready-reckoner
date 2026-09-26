@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "0fdc6e19e670",
-  "generated": "2026-09-26T18:42:20Z",
+  "pack_version": "685e9975f3ce",
+  "generated": "2026-09-26T18:49:36Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -186,8 +186,8 @@
         {
           "path": "core/strategic.csv",
           "job": "strategic",
-          "sha256": "79f519ae23652301665d59c4be24eeb90ab3ae92e46bfe4293cef9a1a22f8e19",
-          "bytes": 71820,
+          "sha256": "a05501372e5806a95fbd09d14e4d42494a565cf2679055bdfa8308b23fa7d0ea",
+          "bytes": 80693,
           "rows": 3232,
           "key": [
             "fips"
@@ -1940,13 +1940,13 @@
     },
     "strategic": {
       "title": "Strategic-site classes (nuclear family) and FEMA UASI shares by county",
-      "finished": "2026-09-26T18:42:20Z",
+      "finished": "2026-09-26T18:49:36Z",
       "sources": [
         {
           "name": "Ready Reckoner curated strategic sites (sites, class rules, metros, refineries, ports, FY2026 UASI table)",
           "url": "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml",
           "version": "strategic_sites/1 (reviewed), reviewed 2026-09-26",
-          "retrieved": "2026-09-26T18:42:18Z",
+          "retrieved": "2026-09-26T18:49:33Z",
           "sha256": "7447345cfd13379a0ffd703d1e5d3549227c878abaa2b2515bc4ded1bf85ae12",
           "bytes": 91132,
           "license": "Compiled by Ready Reckoner from the public sources listed in the file"
@@ -1973,7 +1973,7 @@
           "name": "Census 2020 centers of population by county",
           "url": "https://www2.census.gov/geo/docs/reference/cenpop2020/county/CenPop2020_Mean_CO.txt",
           "version": "CenPop2020_Mean_CO",
-          "retrieved": "2026-09-26T18:42:18Z",
+          "retrieved": "2026-09-26T18:49:33Z",
           "sha256": "4f754a3bda9714e5820d73bfac44ef1dab2b8c371f6c136305474cda7a752014",
           "bytes": 171276,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -1982,7 +1982,7 @@
           "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon and areas)",
           "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
           "version": "GENZ2024",
-          "retrieved": "2026-09-26T18:42:19Z",
+          "retrieved": "2026-09-26T18:49:33Z",
           "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
           "bytes": 11626066,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -2000,11 +2000,12 @@
         "Class B distances are measured from the Gazetteer internal point of each county holding launch facilities (23 counties; a stand-in for the 450 launch facilities, whose coordinates no public source reached here provides). The missile-field county lists match the Sentinel Final EIS Volume I (sections 2.1.6.1, 2.1.7.1, 2.1.8.1).",
         "Counties whose land comes within 30 km of an A point site while their centre of population does not (for review; zip_facilities.csv gives each ZIP's own distance): 02290 (clear_sfs, now E); 06007 (beale_afb, now E); 06057 (beale_afb, now D); 06061 (beale_afb, now C2); 06079 (vandenberg_sfb, now E); 08043 (cheyenne_mountain, now E); 08043 (peterson_sfb, now E); 08069 (fe_warren_afb, now B); 08101 (cheyenne_mountain, now E); 08119 (cheyenne_mountain, now E); 08119 (peterson_sfb, now E); 12031 (kings_bay, now C2); 13127 (kings_bay, now E); 19071 (offutt_afb, now B); 22013 (barksdale_afb, now D); 22031 (barksdale_afb, now E); 22081 (barksdale_afb, now E); 22119 (barksdale_afb, now D); 24003 (pentagon, now C2); 24013 (raven_rock, now C2); 24017 (pentagon, now C1); 24021 (raven_rock, now C1); 25005 (cape_cod_sfs, now C2); 25007 (cape_cod_sfs, now E); 25023 (cape_cod_sfs, now C2); 29015 (whiteman_afb, now D); 29083 (whiteman_afb, now D); 29107 (whiteman_afb, now C2); 29195 (whiteman_afb, now D); 31177 (offutt_afb, now B); 35043 (kirtland_afb, now E); 35049 (kirtland_afb, now D); 35057 (kirtland_afb, now D); 35061 (kirtland_afb, now E); 40017 (tinker_afb, now C2); 40051 (tinker_afb, now C2); 40081 (tinker_afb, now B); 40087 (tinker_afb, now C2); 40125 (tinker_afb, now D); 42041 (raven_rock, now E); 46081 (ellsworth_afb, now B); 48381 (pantex, now E); 51061 (mount_weather, now C1); 51153 (mount_weather, now C1); 51153 (pentagon, now C1); 51157 (mount_weather, now C1); 53009 (kitsap_bangor, now E); 53029 (kitsap_bangor, now E); 53031 (kitsap_bangor, now E); 53033 (kitsap_bangor, now C2); 53045 (kitsap_bangor, now E); 53061 (kitsap_bangor, now C2); 54003 (mount_weather, now E).",
         "strategic_site_ids: the sites or areas that put the county in its class, membership first (the county is in the metro, holds the launch facilities, and so on), then by distance; ids resolve in strategic_sites.toml (site ids, metro_<cbsa>, port_<rank>, refinery_<county>). strategic_km and strategic_bearing: distance (km, 1 decimal) and compass bearing (degrees clockwise from north) from the county's centre of population to the first distance-based reason, empty for membership and for class E.",
-        "uasi_share: the county's share of the national FY2026 UASI total ($584,250,000, 44 urban areas): the urban area's share split among its counties by 2020 population; 0 outside every funded urban area. uasi_area: rank of that urban area in strategic_sites.toml. Amounts checked against FEMA's PDF (2026-09-26); county footprints are a proposal (UNVERIFIED: FEMA publishes none)."
+        "uasi_share: the county's share of the national FY2026 UASI total ($584,250,000, 44 urban areas): the urban area's share split among its counties by 2020 population; 0 outside every funded urban area. uasi_area_share: the urban area's own share of that total, the same for every county in the area (0 outside). uasi_area: rank of that urban area in strategic_sites.toml. Amounts checked against FEMA's PDF (2026-09-26); county footprints are a proposal (UNVERIFIED: FEMA publishes none)."
       ],
       "definitions": {
         "precedent": "FEMA, Protection in the Nuclear Age (H-20, 1985), p. 12: \"Designating a place as a 'risk' area does not mean that it will be attacked; it does indicate a greater potential for attack.\" NAPB-90 (1987, released 2005) is a method precedent, not a public one.",
-        "strategic_class": "A: counterforce and command sites; C1: largest cities, the capital region and weapons plants; B: missile-field fallout corridor; C2: other large cities, ports, refineries and bases; D: downwind of a target; E: remote from targets and fallout paths. Rules and f_S priors in strategic_sites.toml."
+        "strategic_class": "A: counterforce and command sites; C1: largest cities, the capital region and weapons plants; B: missile-field fallout corridor; C2: other large cities, ports, refineries and bases; D: downwind of a target; E: remote from targets and fallout paths. Rules and f_S priors in strategic_sites.toml.",
+        "uasi_area_share": "The FEMA urban area's share of the national FY2026 Urban Area Security Initiative allocation (its dollars / $584,250,000), the same for every county in the urban area; 0 outside every funded urban area. The county footprints are Ready Reckoner's proposal, not a FEMA list."
       }
     },
     "surge": {

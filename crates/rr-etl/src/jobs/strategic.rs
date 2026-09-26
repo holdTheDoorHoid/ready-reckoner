@@ -612,13 +612,25 @@ pub fn classify(f: &SitesFile, points: &Points) -> Result<BTreeMap<String, Assig
     Ok(out)
 }
 
+/// A county's part of the FY2026 UASI allocation.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct UasiCounty {
+    /// The county's share of the national total: its urban area's share split among the area's
+    /// counties by population.
+    pub share: f64,
+    /// The urban area's own share of the national total (the same for every county in it).
+    pub area_share: f64,
+    /// Rank of the urban area in `strategic_sites.toml`.
+    pub rank: u32,
+}
+
 /// Each county's share of the national UASI total (area share split by population) and the rank
 /// of the urban area it falls in.
 pub fn uasi_shares(
     f: &SitesFile,
     population: &BTreeMap<String, f64>,
-) -> Result<BTreeMap<String, (f64, u32)>> {
-    let mut out: BTreeMap<String, (f64, u32)> = BTreeMap::new();
+) -> Result<BTreeMap<String, UasiCounty>> {
+    let mut out: BTreeMap<String, UasiCounty> = BTreeMap::new();
     // Shares from the dollars (the file's `share` column is rounded to five decimals).
     let national: f64 = f.uasi.iter().map(|u| u.usd_fy2026 as f64).sum();
     for u in &f.uasi {
@@ -637,8 +649,21 @@ pub fn uasi_shares(
             return Err(data_err(format!("UASI {}: zero population", u.urban_area)));
         }
         for (c, p) in pops {
-            let e = out.entry(c.clone()).or_insert((0.0, u.rank));
-            e.0 += area_share * p / total;
+            // A county funded under two urban areas would make its area share ambiguous.
+            if let Some(prev) = out.get(c) {
+                return Err(data_err(format!(
+                    "UASI: county {c} is in urban areas ranked {} and {}",
+                    prev.rank, u.rank
+                )));
+            }
+            out.insert(
+                c.clone(),
+                UasiCounty {
+                    share: area_share * p / total,
+                    area_share,
+                    rank: u.rank,
+                },
+            );
         }
     }
     Ok(out)
@@ -1057,6 +1082,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             "strategic_km",
             "strategic_bearing",
             "uasi_share",
+            "uasi_area_share",
             "uasi_area",
         ],
         1,
@@ -1074,10 +1100,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             }) => (fixed(*k, 1), format!("{:.0}", b.round().rem_euclid(360.0))),
             _ => (String::new(), String::new()),
         };
-        let (share, area) = uasi
+        let (share, area_share, area) = uasi
             .get(&c.fips)
-            .map(|(s, r)| (sig4(*s), r.to_string()))
-            .unwrap_or_else(|| ("0".to_string(), String::new()));
+            .map(|u| (sig4(u.share), sig4(u.area_share), u.rank.to_string()))
+            .unwrap_or_else(|| ("0".to_string(), "0".to_string(), String::new()));
         table.push(vec![
             c.fips.clone(),
             a.class.to_string(),
@@ -1089,6 +1115,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             km,
             bearing,
             share,
+            area_share,
             area,
         ]);
         let e = counts.entry(a.class).or_default();
@@ -1178,9 +1205,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     ));
     out.notes.push("strategic_site_ids: the sites or areas that put the county in its class, membership first (the county is in the metro, holds the launch facilities, and so on), then by distance; ids resolve in strategic_sites.toml (site ids, metro_<cbsa>, port_<rank>, refinery_<county>). strategic_km and strategic_bearing: distance (km, 1 decimal) and compass bearing (degrees clockwise from north) from the county's centre of population to the first distance-based reason, empty for membership and for class E.".into());
     out.notes.push(format!(
-        "uasi_share: the county's share of the national FY2026 UASI total ($584,250,000, 44 urban areas): the urban area's share split among its counties by 2020 population; 0 outside every funded urban area. uasi_area: rank of that urban area in strategic_sites.toml. Amounts checked against FEMA's PDF ({}); county footprints are a proposal (UNVERIFIED: FEMA publishes none).",
+        "uasi_share: the county's share of the national FY2026 UASI total ($584,250,000, 44 urban areas): the urban area's share split among its counties by 2020 population; 0 outside every funded urban area. uasi_area_share: the urban area's own share of that total, the same for every county in the area (0 outside). uasi_area: rank of that urban area in strategic_sites.toml. Amounts checked against FEMA's PDF ({}); county footprints are a proposal (UNVERIFIED: FEMA publishes none).",
         sites.uasi_check.checked
     ));
+    out.definitions.insert("uasi_area_share".into(), "The FEMA urban area's share of the national FY2026 Urban Area Security Initiative allocation (its dollars / $584,250,000), the same for every county in the urban area; 0 outside every funded urban area. The county footprints are Ready Reckoner's proposal, not a FEMA list.".into());
     out.definitions.insert("strategic_class".into(), "A: counterforce and command sites; C1: largest cities, the capital region and weapons plants; B: missile-field fallout corridor; C2: other large cities, ports, refineries and bases; D: downwind of a target; E: remote from targets and fallout paths. Rules and f_S priors in strategic_sites.toml.".into());
     out.definitions.insert("precedent".into(), "FEMA, Protection in the Nuclear Age (H-20, 1985), p. 12: \"Designating a place as a 'risk' area does not mean that it will be attacked; it does indicate a greater potential for attack.\" NAPB-90 (1987, released 2005) is a method precedent, not a public one.".into());
     out.attributions.push(Attribution {
@@ -1290,11 +1318,20 @@ mod tests {
             }
         }
         let s = uasi_shares(&f, &pop).unwrap();
-        let total: f64 = s.values().map(|x| x.0).sum();
+        let total: f64 = s.values().map(|x| x.share).sum();
         assert!((total - 1.0).abs() < 1e-9, "{total}");
         // San Diego is one county: it carries its area's whole share.
-        assert!((s["06073"].0 - 16_266_915.0 / 584_250_000.0).abs() < 1e-9);
-        assert_eq!(s["06073"].1, 9);
+        let sd = s["06073"];
+        assert!((sd.share - 16_266_915.0 / 584_250_000.0).abs() < 1e-9);
+        assert_eq!((sd.area_share, sd.rank), (sd.share, 9));
+        // New York-White Plains: every county carries the area's whole share as `area_share`
+        // and a population part of it as `share`.
+        let nyc = 142_481_143.0 / 584_250_000.0;
+        let ny: Vec<&UasiCounty> = s.values().filter(|u| u.rank == 1).collect();
+        assert_eq!(ny.len(), 10);
+        assert!(ny.iter().all(|u| (u.area_share - nyc).abs() < 1e-12));
+        let parts: f64 = ny.iter().map(|u| u.share).sum();
+        assert!((parts - nyc).abs() < 1e-12, "{parts}");
     }
 
     #[test]

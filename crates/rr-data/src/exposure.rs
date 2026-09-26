@@ -31,9 +31,10 @@ pub const COUNTY_FILES: &[&str] = &[
 pub const STRATEGIC_SITES: &str = "core/strategic_sites.toml";
 
 /// Citation ids for the exposure values `LocationResolved.exposure` carries, by `Exposure`
-/// field. Ids already in `content/citations.toml`: `usace_nld`, `fema_hsgp_fy2026`. The others
-/// are requested from the content workstream in `docs/DATA_SOURCES.md` §13 (title, publisher,
-/// URL for each).
+/// field, plus the county-only columns the hazard crates read from `CountyExposure`
+/// (`uasi_area_share`). Ids already in `content/citations.toml`: `usace_nld`,
+/// `fema_hsgp_fy2026`. The others are requested from the content workstream in
+/// `docs/DATA_SOURCES.md` §13 (title, publisher, URL for each).
 pub const EXPOSURE_SOURCES: &[(&str, &str)] = &[
     ("strategic_class", "rr_strategic_sites"),
     ("strategic_km", "rr_strategic_sites"),
@@ -47,6 +48,7 @@ pub const EXPOSURE_SOURCES: &[(&str, &str)] = &[
     ("water_system_flag", "epa_echo_sdwa"),
     ("geomag_factor", "nerc_tpl007_gmd"),
     ("uasi_share", "fema_hsgp_fy2026"),
+    ("uasi_area_share", "fema_hsgp_fy2026"),
     ("eviction_rate", "eviction_lab_county_estimates"),
 ];
 
@@ -104,6 +106,7 @@ pub(crate) fn apply_column(
         "strategic_km" => e.strategic_km = f32c(cell),
         "strategic_bearing" => e.strategic_bearing = f32c(cell),
         "uasi_share" => e.uasi_share = f32c(cell),
+        "uasi_area_share" => e.uasi_area_share = f32c(cell),
         "geomag_lat" => e.geomag_lat = f32c(cell),
         "geomag_factor" => e.geomag_factor = f32c(cell),
         "smoke_days_35" => e.smoke_days_35 = f32c(cell),
@@ -142,6 +145,7 @@ pub(crate) fn merge(into: &mut CountyExposure, part: &CountyExposure) {
         strategic_km,
         strategic_bearing,
         uasi_share,
+        uasi_area_share,
         uasi_area,
         geomag_lat,
         geomag_factor,

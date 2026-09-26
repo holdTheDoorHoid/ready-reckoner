@@ -538,7 +538,7 @@ columns added to an existing file).
 
 | File (job) | Columns | Rows | Size (gz) |
 | --- | --- | ---: | ---: |
-| `core/strategic.csv` (`strategic`) | `strategic_class`, `strategic_site_ids`, `strategic_km`, `strategic_bearing`, `uasi_share`, `uasi_area` | 3,232 | 16.7 KB |
+| `core/strategic.csv` (`strategic`) | `strategic_class`, `strategic_site_ids`, `strategic_km`, `strategic_bearing`, `uasi_share`, `uasi_area_share`, `uasi_area` | 3,232 | 17.0 KB |
 | `core/strategic_sites.toml` (`strategic`) | classes with f_S priors and "Why here" templates, 39 sites, metros, ports, refineries, UASI areas, sources | 207 entries | 16.5 KB |
 | `core/geomag.csv` (`geomag`) | `geomag_lat`, `geomag_factor` | 3,232 | 13.0 KB |
 | `core/smoke.csv` (`smoke`) | `smoke_days_35`, `smoke_days_55`, `smoke_trend`, `hms_smoke_days`, `smoke_basis` | 3,225 | 28.2 KB |
@@ -562,7 +562,8 @@ alone; a file compresses a little better than the sum of its columns):
 | `strategic_km` (county) | 2.9 | `smoke_trend` | 5.7 |
 | `strategic_bearing` (county) | 2.0 | `hms_smoke_days` | 4.6 |
 | `uasi_share` | 1.9 | `smoke_basis` | 1.5 |
-| `uasi_area` | 0.4 | `leveed_pop_share` | 3.3 |
+| `uasi_area_share` | 0.9 | `leveed_pop_share` | 3.3 |
+| `uasi_area` | 0.4 | | |
 | `geomag_lat` | 4.3 | `levee_risk_high_share` | 0.5 |
 | `geomag_factor` | 2.6 | `sdwis_violation_pop_share` | 5.9 |
 | `karst_share` | 5.4 | `cws_pop_share` | 5.0 |
@@ -615,9 +616,11 @@ method precedent only (recorded in the manifest's definitions).
 
 **UASI.** `uasi_share` = the county's share of the national FY2026 UASI total ($584,250,000 across
 44 urban areas): the area's allocation share split among its counties by 2020 population (NRI); 0
-outside every funded area; `uasi_area` = the area's rank. All 44 allocations were checked digit by
-digit against FEMA's FY2026 HSGP NOFO PDF (Appendix I, pp. 71-73; sha256 recorded in the
-manifest). The county footprint of each urban area is a proposal: FEMA publishes none (each urban
+outside every funded area; `uasi_area_share` = the urban area's own share of the national total,
+the same in each of its counties (New York-White Plains 0.2439 in all ten; 0 outside), for the
+hazard crates' metro tier; `uasi_area` = the area's rank. Both shares cite `fema_hsgp_fy2026`.
+All 44 allocations were checked digit by digit against FEMA's FY2026 HSGP NOFO PDF (Appendix I,
+pp. 71-73; sha256 recorded in the manifest). The county footprint of each urban area is a proposal: FEMA publishes none (each urban
 area working group sets its own), so the footprints stay **UNVERIFIED**. Per county the shares
 favour single-county areas (Los Angeles County 0.058 is the largest); per resident, the New
 York-White Plains counties lead.

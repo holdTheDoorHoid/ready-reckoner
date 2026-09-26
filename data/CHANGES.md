@@ -241,3 +241,12 @@ Jobs run: strategic.
 |---|---:|---:|---:|---:|---:|---|
 | `core/strategic.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
 | `core/strategic_sites.toml` | 207 | 207 | 0 | 0 | 207 | changed |
+
+## 2026-09-26T18:49:36Z — pack version 685e9975f3ce
+
+Jobs run: strategic.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/strategic.csv` | 3232 | 3232 | 0 | 0 | 3232 | changed |
+| `core/strategic_sites.toml` | 207 | 207 | 0 | 0 | 0 | unchanged |
