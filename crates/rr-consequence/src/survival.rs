@@ -199,6 +199,27 @@ impl Survival {
     pub fn mean_days(&self) -> f64 {
         self.expected_excess_unscaled(0.0)
     }
+
+    /// The same shape with every duration multiplied by `factor` (> 0): P(D' > d) = S(d / factor).
+    pub fn scaled(&self, factor: f64) -> Survival {
+        if !factor.is_finite() || factor <= 0.0 {
+            return self.clone();
+        }
+        let ln_f = math::ln(factor);
+        match self {
+            Survival::LogNormal { mu, spread } => Survival::LogNormal {
+                mu: mu + ln_f,
+                spread: *spread,
+            },
+            Survival::Fixed { days } => Survival::Fixed {
+                days: days * factor,
+            },
+            Survival::Empirical(c) => Survival::Empirical(EmpiricalCurve {
+                ln_d: c.ln_d.iter().map(|l| l + ln_f).collect(),
+                z: c.z.clone(),
+            }),
+        }
+    }
 }
 
 /// E[(D − x)⁺] for a log-normal with log-mean `mu` and log-sd `sigma`, x ≥ 0 (the
@@ -445,6 +466,24 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn a_scaled_curve_is_the_same_shape_stretched() {
+        let ln = Survival::log_normal(1.5, 5.0);
+        let s = ln.scaled(4.0);
+        assert!(close(s.median_days(), 6.0, 1e-12));
+        assert!(close(s.p90_days(), 20.0, 1e-12));
+        let pts = [(1.0, 0.6), (3.0, 0.25), (7.0, 0.05), (14.0, 0.005)];
+        let emp = Survival::Empirical(EmpiricalCurve::from_points(&pts).unwrap().0);
+        let st = emp.scaled(2.0);
+        for d in [0.5, 2.0, 6.0, 14.0, 28.0] {
+            assert!(close(st.sf(d, 0.0), emp.sf(d / 2.0, 0.0), 1e-12), "{d}");
+        }
+        assert_eq!(
+            Survival::Fixed { days: 3.0 }.scaled(2.0),
+            Survival::Fixed { days: 6.0 }
+        );
     }
 
     #[test]

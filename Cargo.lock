@@ -1247,6 +1247,7 @@ dependencies = [
 name = "rr-consequence"
 version = "0.1.1"
 dependencies = [
+ "rr-data",
  "rr-hazards",
  "rr-types",
  "serde",
