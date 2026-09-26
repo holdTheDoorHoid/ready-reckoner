@@ -6,9 +6,15 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-description = "Ready Reckoner: plan"
+description = "Ready Reckoner: the engine pipeline (hazards, consequences, supplies, budget), PlanOutput, explanations and the printable packet"
 
 [dependencies]
+rr-types = { path = "../rr-types" }
+rr-hazards = { path = "../rr-hazards" }
+rr-consequence = { path = "../rr-consequence" }
+rr-supply = { path = "../rr-supply" }
+rr-budget = { path = "../rr-budget" }
+rr-content = { path = "../rr-content" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

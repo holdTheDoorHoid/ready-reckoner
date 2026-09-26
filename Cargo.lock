@@ -133,6 +133,12 @@ dependencies = [
 name = "rr-plan"
 version = "0.1.0"
 dependencies = [
+ "rr-budget",
+ "rr-consequence",
+ "rr-content",
+ "rr-hazards",
+ "rr-supply",
+ "rr-types",
  "serde",
  "serde_json",
  "thiserror",
