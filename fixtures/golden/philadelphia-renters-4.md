@@ -12,7 +12,7 @@
 
 ### The three things that matter most
 
-1. Of 100 households like yours, about 35 (30–60) will lose grid power for a day or more in the next 10 years. Be ready to manage about 5 days at home with no power, and about 3 days with no tap water.
+1. Of 100 households like yours, about 35 (30–55) will lose grid power for a day or more in the next 10 years. Be ready to manage about 3 days at home with no power or tap water.
 2. Of 100 households like yours, about 55 (30–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 10 days of food you normally eat, and 2 weeks of daily medicine on hand.
 3. Of 100 households like yours, about 15 (6–30) will have an income gap of more than 3 months in the next 10 years. Losing a paycheck is the longest disruption most households face. Aim for about 4 months of expenses in savings over time, apart from this supplies budget.
 
@@ -110,7 +110,7 @@ Of 100 households like yours, about 81 will have someone lose a job in the next 
 | Local water or gas outage | about 80 of 100[16, 30] | Minor | Mostly data |
 | Stranded in a vehicle | about 80 of 100[16, 31] | Minor | Mostly data |
 | Winter storm | about 65 of 100[2, 16] | Minor | Rough data |
-| Hurricane | about 40 of 100[16, 32, 33] | Moderate | Mostly data |
+| Hurricane | about 35 of 100[16, 32, 33] | Moderate | Mostly data |
 | Long illness in the household | about 35 of 100[16] | Serious | Expert estimate |
 | Civil unrest | about 25 of 100[16] | Minor | Expert estimate |
 | Chemical spill or release | about 25 of 100[16, 34] | Moderate | Mostly data |
@@ -154,7 +154,7 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. Someth
 
 | If this happens | Be ready for | Outside help likely arrives | Mostly back to normal | Enough at |
 | --- | --- | --- | --- | --- |
-| No grid power at home | about 5 days (3–7) | about 3 days | about 5 days | two weeks |
+| No grid power at home | about 3 days (up to 7 days) | about 3 days | about 5 days | three days |
 | Tap water must be treated | about 7 days (5 days to 2 weeks) | not known | not known | two weeks |
 | No tap water at all | about 3 days (2–7) | not known | not known | three days |
 | Can't get to a store | about 10 days (7 days to 1 month) | not known | not known | two weeks |
@@ -164,7 +164,7 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. Someth
 
 The range in brackets shows where the target could sit when the inputs behind it are uncertain. "Not known" means no restoration records exist for that kind of disruption.
 
-### No grid power at home: about 5 days (3–7)
+### No grid power at home: about 3 days (up to 7 days)
 
 **What helps.** Have a flashlight for each person.[50] Keep a battery or hand-crank radio, and a backup battery for each phone.[51] Keep the fridge and freezer closed. A closed fridge keeps food cold for about four hours, and a full freezer for about two days.[50] If someone relies on a powered medical device or cold medicine, make a plan with their medical provider now.[50] You can also ask your power company to put you on its list for priority restoration.[8] A battery power station burns no fuel, so it makes no carbon monoxide.[52]
 

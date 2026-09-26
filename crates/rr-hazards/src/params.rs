@@ -61,9 +61,22 @@ pub(crate) const WINTER_FOOTPRINT: Triple = (0.05, 0.02, 0.15);
 pub(crate) const HURRICANE_FOOTPRINT: Triple = (0.5, 0.3, 0.8);
 /// PRIOR. Share of major-hurricane passages (Category 3+) that reach this household.
 pub(crate) const MAJOR_HURRICANE_FOOTPRINT: Triple = (0.8, 0.5, 1.0);
-/// PRIOR (informed by HURDAT2): share of hurricanes affecting a Gulf or Atlantic county that are
-/// major (Category 3+). About a third of US landfalling hurricanes since 1851 were major.
-pub(crate) const MAJOR_HURRICANE_SHARE: Triple = (1.0 / 3.0, 0.2, 0.45);
+/// DERIVED from HURDAT2 in the pack (verification, 2026-09-26): the share of NRI hurricane events
+/// that are major (Category 3+). NRI's hurricane frequency counts about as many events as
+/// HURDAT2's tropical-storm-strength passages within 50 nautical miles (median ratio 0.81 over
+/// 1,836 counties; 3.8 against hurricane-strength passages), so the share is taken against
+/// tropical-storm passages: 601 major passages in 11,155 tropical-storm passages across the 556
+/// counties the major-hurricane scenario can apply to, 5.4 %. The range is a PRIOR. (The older
+/// one-third was the share of *landfalling hurricanes* that are major, applied to NRI's
+/// tropical-storm-strength count, which inflated major storms about four times.)
+pub(crate) const MAJOR_HURRICANE_SHARE: Triple = (0.054, 0.03, 0.10);
+/// PRIOR. The weight, in tropical-storm passages, of [`MAJOR_HURRICANE_SHARE`] when a county's
+/// own HURDAT2 record sets its share: (majors + 5 × 0.054) ÷ (passages + 5). A short record then
+/// neither rules a major storm out nor lets one storm set the rate.
+pub(crate) const MAJOR_SHARE_PRIOR_PASSAGES: f64 = 5.0;
+/// The years of HURDAT2 track data behind the pack's passage rates (1950–2025, `events.csv`),
+/// to turn a rate back into a count.
+pub(crate) const HURDAT2_YEARS: f64 = 76.0;
 /// PRIOR. Mean damage to a home that hail damages, as a share of its value (a roof and siding
 /// claim on a typical home). The footprint is NRI's historic loss ratio divided by this.
 pub(crate) const HAIL_DAMAGE_RATIO: Triple = (0.02, 0.01, 0.05);

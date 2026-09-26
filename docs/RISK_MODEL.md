@@ -99,7 +99,7 @@ cap; then the pack's ratio variables (future ÷ present at about +2 °C, optiona
 | Lightning | damages the home or cuts its power | NRI (days with strikes) | 1 in 10,000 (3 in 100,000 – 3 in 10,000) | power-line exposure | PRIOR |
 | Hail | damages the home or car | NRI | NRI loss ratio ÷ 0.02 mean damage (0.01–0.05); else 0.005 | none | DERIVED + PRIOR |
 | Tornado | damages or cuts off the neighborhood | NRI | loss ratio ÷ 0.25 (0.1–0.5) × 5 homes disrupted per home damaged (2–10), at most 1; else 0.005 | none | DERIVED + PRIOR |
-| Hurricane | cuts the power or damages the home | NRI | Category 1–2: 0.5 (0.3–0.8); major: 0.8 (0.5–1.0); major share from HURDAT2 passages, else 1/3 (0.2–0.45) | none | PRIOR (DERIVED share where the pack has it) |
+| Hurricane | cuts the power or damages the home | NRI (its frequency counts about as many events as HURDAT2's tropical-storm-strength passages) | Category 1–2 and tropical storms: 0.5 (0.3–0.8); major: 0.8 (0.5–1.0); major share = (HURDAT2 major passages + 5 × 5.4 %) ÷ (tropical-storm passages + 5), else 5.4 % (3–10 %) | none | PRIOR (DERIVED share where the pack has it) |
 | Earthquake | shaking strong enough to knock things off shelves (0.1 g, about intensity VI) | USGS yearly chance → −ln(1 − p); else the 100-year intensity-VI chance; else NRI; ×/÷ 2 | 1 | none | DATA (hazard model) |
 | Tsunami | a tsunami warning to leave the inundation zone | NRI | residents in the zone (NRI) × 0.3 of events bring a warning (0.1–0.6) | none | DERIVED + PRIOR |
 | Inland flooding | flood water reaches the home, or cuts off an upper-floor flat | flood-zone odds (below) | s·p_in + (1 − s)·p_out | basement ×1.5 (1.2–2); second floor or higher ×0.5 (0.3–0.8) | DERIVED + PRIOR |
@@ -276,10 +276,19 @@ earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092
   for earthquakes, so with Cascadia on, the part of the county earthquake rate that is Cascadia's
   own long-run share (0.41 %/yr near Coos Bay) is planned both as a typical damaging earthquake
   and inside the scenario. The effect is small beside the scenario's own 1.02 %/yr.
-- **Missing event rows.** The pack writes no row for an event type a county never recorded. A
-  missing `major_hurricane_passage` row is read as "unknown" (the national one-third major
-  share), not "zero", which errs toward preparing; a recorded share near zero drops the
-  major-hurricane scenario.
+- **Missing event rows and the major-hurricane share** (changed in the verification pass,
+  2026-09-26). The pack writes no row for an event type a county never recorded, and HURDAT2
+  covers every county, so a missing `major_hurricane_passage` row next to passage rows means none
+  was recorded. The share of NRI's hurricane events that are major is taken against HURDAT2's
+  *tropical-storm-strength* passages, because NRI's frequency counts about as many events as those
+  (median ratio 0.81 over 1,836 counties; 3.8 against hurricane-strength passages), and it is
+  shrunk toward the pooled 5.4 % (601 majors in 11,155 tropical-storm passages in the 556 counties
+  the scenario can apply to) with the weight of 5 passages. The earlier rule (major ÷
+  hurricane-strength passages, a missing row read as the national one-third) put a direct hit by a
+  major hurricane on Hartford, Connecticut at 1 in 25 years (HURDAT2: 1 major passage in 76
+  years) and on Sagadahoc County, Maine at 1 in 36 (none recorded). Now the scenario rate is about
+  HURDAT2's own major-passage rate × the 0.8 direct-hit footprint (Miami-Dade 0.037 a year,
+  against 4 majors in 76 years × 0.8 = 0.042).
 - **Income stability.** The research's ×0.5 step is `IncomeStability::very_stable` (tenured, public
   sector, pension); `stable` still means the typical salaried job (×1), as in the Philadelphia
   example. The research report gives only the ×0.5 point estimate for that step; its 0.3–0.7 range
@@ -771,7 +780,10 @@ counts should lower it). The Coos Bay fixture (well, Cascadia on; its own dial i
 1 in 100 gets power 14 d, water 90 d (its drought rate and ordinary 0.1 g earthquakes add to the
 research's classes), food 21 d, medicine 30 d. Miami's targets (3 weeks of power, a month of
 water) come from the major-hurricane scenario at about 0.1 a year; Hays, Kansas (well) gets 2
-months of water from the well-drought prior. Each household's rates are listed in the report.
+months of water from the well-drought prior. Each household's rates are listed in the report. *(Verification, 2026-09-26: this paragraph describes the earlier one-third major share. With the
+share taken against tropical-storm passages, Philadelphia's power target is 3 days on the data
+pack, as the research gives, and Miami's major-hurricane scenario runs at 0.037 a year: power 2
+weeks, tap water 3 weeks.)*
 
 ### Decisions and open questions
 

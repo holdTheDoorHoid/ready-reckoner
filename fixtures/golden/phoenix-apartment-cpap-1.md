@@ -115,7 +115,7 @@ Of 100 households like yours, about 78 (39–98) will be stranded away from home
 | Death or disability of an earner | about 9 of 100[15, 43, 44] | Very severe | Mostly data |
 | Drought | about 8 of 100[3, 15, 45] | Moderate | Rough data |
 | Winter storm | about 8 of 100[2, 15] | Minor | Rough data |
-| Hurricane | about 7 of 100[15, 45, 46, 47] | Minor | Mostly data |
+| Hurricane | about 6 of 100[15, 45, 46, 47] | Minor | Mostly data |
 | House fire | about 5 of 100[15, 48] | Severe | Mostly data |
 | Regional blackout | about 5 of 100[15] | Moderate | Expert estimate |
 | Wildfire | about 3 of 100[3, 15, 45] | Moderate | Rough data |
@@ -160,7 +160,7 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. Someth
 | Tap water must be treated | about 5 days (2–10) | not known | not known | two weeks |
 | No tap water at all | about 3 days (2–10) | not known | not known | three days |
 | Can't get to a store | about 10 days (7 days to 3 weeks) | not known | not known | two weeks |
-| Dangerous heat or cold indoors | about 3 days (2–7) | not known | not known | three days |
+| Dangerous heat or cold indoors | about 3 days (2–5) | not known | not known | three days |
 | Medication and medical-supply continuity | about 2 weeks (10 days to 1 month) | not known | not known | two weeks |
 | No phone, internet or card payments | about 3 days (1–7) | not known | not known | three days |
 
@@ -188,7 +188,7 @@ The range in brackets shows where the target could sit when the inputs behind it
 
 **What helps.** See "Supply chain disruption" under Your risks.
 
-### Dangerous heat or cold indoors: about 3 days (2–7)
+### Dangerous heat or cold indoors: about 3 days (2–5)
 
 **What helps.** Agree who checks on whom, especially older neighbours and anyone who lives alone.[4, 34] In heat, go where there is air conditioning. Dial 2-1-1 to find one.[4] Cover windows with drapes or shades.[5] In cold, close off rooms you don't need, stuff towels under doors, and cover windows with blankets at night. Have extra blankets, sleeping bags and warm coats.[34] Babies under one year old should never sleep in a cold room.[34]
 
@@ -451,7 +451,7 @@ Fill this in together, and keep a copy in each go-bag and one on the fridge. Wri
 
 ### Leaving home: triggers and routes
 
-About 15 of 100 households like yours have to leave home quickly at least once in 10 years. Warning can be 1 minute to 3 days ahead. Plan to be away for about 2 days.[3, 15, 23, 40, 45, 46, 47, 48, 49]
+About 15 of 100 households like yours have to leave home quickly at least once in 10 years. Warning can be 1 minute to 2 hours ahead. Plan to be away for about 2 days.[3, 15, 23, 40, 45, 46, 47, 48, 49]
 
 - **Plan how you would leave: zone, routes, destination and triggers.** Look up your evacuation zone and routes on your state and county emergency management websites, mark two routes on a paper map, and pick where you would go, pet-friendly if you have pets (Ready.gov). For each likely hazard, write a go-or-stay card and an if-then trigger, such as 'If our zone gets an evacuation warning, we leave within 30 minutes.' Plans written in if-then form make people more likely to follow through.[24, 32, 79, 101, 102, 103, 104, 105]
 - **Keep your vehicle ready: half a tank, a charged battery, a good spare.** Keep at least half a tank of gas at all times and a full tank when an evacuation looks likely (Ready.gov); if you drive an electric car, keep it charged through storm season and pick destinations within its range (Hillsborough County, Florida). Check the spare tire with the others each month, and keep a phone charging cable in the car (NHTSA). Run the engine only outdoors, never in a garage (CDC).[31, 32, 33, 35, 36, 59, 90, 106]
@@ -512,7 +512,7 @@ Of 100 households like yours, about 20 (10–40) will have an income gap of more
 
 ### Medicine
 
-- 1 person takes prescription medicine every day: keep 14 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[15, 23, 41, 42, 45, 46, 47, 48, 69, 70, 71, 72, 120]
+- 1 person takes prescription medicine every day: keep 14 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[15, 23, 41, 42, 48, 69, 70, 71, 72, 120]
 
 - **Keep medicines going: a written list, early refills, an emergency supply.** Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov).[10, 12, 14, 24, 69, 72, 73, 99, 120]
 

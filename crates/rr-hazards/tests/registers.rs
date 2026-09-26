@@ -373,7 +373,8 @@ fn gulf_and_atlantic_counties_get_the_major_hurricane_scenario() {
 #[test]
 fn miami_2050_raises_major_hurricanes_not_hurricane_frequency() {
     // Miami's fixture uses the 2050 dial. NRI hurricane frequency 0.305 a year stays; the major
-    // share (1/3) rises ×1.2, so the major part rises ×1.2 and the card total only slightly.
+    // share (the pooled 5.4 %: the fixture has no passages) rises ×1.2, so the major part rises
+    // ×1.2 and the card total only slightly.
     let a = assess("miami-condo-retiree-1", "12086");
     let card = profile(&a, H::Hurricane);
     assert!(card.climate_multiplier > 1.0 && card.climate_multiplier < 1.1);
@@ -383,7 +384,7 @@ fn miami_2050_raises_major_hurricanes_not_hurricane_frequency() {
         .find(|s| s.id == "major_hurricane_direct_hit")
         .unwrap()
         .rate_per_year;
-    let today = 0.305 * (1.0 / 3.0) * 0.8;
+    let today = 0.305 * 0.054 * 0.8;
     assert!(close(major, today * 1.2, 1e-3), "{major}");
 }
 

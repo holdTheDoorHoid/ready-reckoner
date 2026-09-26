@@ -496,6 +496,7 @@ fn major_hurricane(ctx: &Ctx<'_>, natural: &Natural) -> Option<Draft> {
     let county = ctx.county_label();
     let state_name = ctx.county.state_name.as_str();
     let years = (1.0 / split.county_rate).round().max(1.0);
+    let one_in = (1.0 / split.major_share.max(1e-6)).round().max(1.0);
     let mut sources = split.major_today.sources.clone();
     for id in [cite::NRI, cite::HURDAT2] {
         let id = CitationId::from(id);
@@ -513,9 +514,10 @@ fn major_hurricane(ctx: &Ctx<'_>, natural: &Natural) -> Option<Draft> {
         alternatives: Vec::new(),
         default_on: true,
         applies_because: format!(
-            "Hurricanes reach {county} about once every {years:.0} years, and about 1 in 3 of \
-             them is a major storm (Category 3 or stronger) that can cut power and water for \
-             weeks. Hurricane guidance in {state_name} covers it, so the plan includes it."
+            "Tropical storms and hurricanes reach {county} about once every {years:.0} years, \
+             and about 1 in {one_in:.0} of them is a major storm (Category 3 or stronger) that \
+             can cut power and water for weeks. Hurricane guidance in {state_name} covers it, so \
+             the plan includes it."
         ),
         sources,
         remainder: Some((split.cat12_today.clone(), split.cat12_future.clone())),

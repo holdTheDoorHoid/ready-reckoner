@@ -14,7 +14,7 @@
 
 1. Of 100 households like yours, about 30 (25–60) will lose grid power for a day or more in the next 10 years. Be ready to manage about 3 days at home with no power, and about 5 days with no tap water.
 2. Of 100 households like yours, about 55 (30–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 10 days of food you normally eat.
-3. Of 100 households like yours, about 15 (9–20) will have to leave home quickly at least once in the next 10 years. Keep a packed go-bag for each person near the door.
+3. Of 100 households like yours, about 10 (9–20) will have to leave home quickly at least once in the next 10 years. Keep a packed go-bag for each person near the door.
 
 ### Start here
 
@@ -115,15 +115,15 @@ Of 100 households like yours, about 78 (50–95) will have a water main break or
 | Pandemic | about 10 of 100[16, 32, 33] | Serious | Rough data |
 | Long illness in the household | about 10 of 100[16] | Serious | Expert estimate |
 | Break-in | about 10 of 100[16] | Serious | Expert estimate |
-| Hurricane | about 5 of 100[16, 34, 35] | Minor | Mostly data |
-| House fire | about 5 of 100[16, 36] | Severe | Mostly data |
+| House fire | about 5 of 100[16, 34] | Severe | Mostly data |
 | Ice storm | about 5 of 100[2, 16] | Minor | Rough data |
 | Regional blackout | about 5 of 100[16] | Moderate | Expert estimate |
-| Tornado | about 2 of 100[16, 34] | Severe | Rough data |
+| Hurricane | about 5 of 100[16, 35, 36] | Minor | Mostly data |
+| Tornado | about 2 of 100[16, 35] | Severe | Rough data |
 | Flooding from rivers or heavy rain | about 2 of 100[16, 37] | Very severe | Rough data |
-| Lightning | about 2 of 100[16, 34] | Moderate | Rough data |
+| Lightning | about 2 of 100[16, 35] | Moderate | Rough data |
 
-Fewer than 1 in 100 households like yours, the next 10 years: drought, hail, earthquake, coastal flooding, nuclear power plant accident and landslide.[16, 34, 38, 39, 40]
+Fewer than 1 in 100 households like yours, the next 10 years: drought, hail, earthquake, coastal flooding, nuclear power plant accident and landslide.[16, 35, 38, 39, 40]
 
 ### Rare but severe
 
@@ -319,7 +319,7 @@ Fill this in together, and keep a copy in each go-bag and one on the fridge. Wri
 
 ### Leaving home: triggers and routes
 
-About 15 of 100 households like yours have to leave home quickly at least once in 10 years. Warning can be 1 minute to 12 hours ahead. Plan to be away for about 2 days.[16, 24, 31, 34, 35, 36, 37]
+About 10 of 100 households like yours have to leave home quickly at least once in 10 years. Warning can be 1 minute to 12 hours ahead. Plan to be away for about 2 days.[16, 24, 31, 34, 35, 36, 37]
 
 - **Plan how you would leave: zone, routes, destination and triggers.** Look up your evacuation zone and routes on your state and county emergency management websites, mark two routes on a paper map, and pick where you would go, pet-friendly if you have pets (Ready.gov). For each likely hazard, write a go-or-stay card and an if-then trigger, such as 'If our zone gets an evacuation warning, we leave within 30 minutes.' Plans written in if-then form make people more likely to follow through.[25, 67, 68, 91, 92, 93, 94, 95]
 - **No car? Plan your ride out.** If your household has no vehicle, decide now how you would leave: a friend, relative or neighbour who would drive you, or the bus or train that leads out of your area (Ready.gov). Leave early, before roads fill. If someone in your home has a disability, ask your local emergency management office about its voluntary registry for people who need help (Ready.gov).[11, 68, 96]
@@ -369,7 +369,7 @@ Keep paper copies in a waterproof pouch and photos you can reach from any phone.
 
 ### Cash
 
-- Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about $100 to start, or enough for about 3 days of basics (food, fuel, medicine) at your own daily spending. No agency gives a dollar amount. (Ready.gov, FEMA; some amounts are estimates)[2, 16, 26, 34, 35, 81, 89]
+- Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about $100 to start, or enough for about 3 days of basics (food, fuel, medicine) at your own daily spending. No agency gives a dollar amount. (Ready.gov, FEMA; some amounts are estimates)[2, 16, 26, 35, 36, 81, 89]
 
 ### Savings
 
@@ -416,7 +416,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **21** Pandemic. FEMA / Ready.gov, 2026. https://www.ready.gov/pandemic **22** Supply-sizing evidence base (research report): quantities, shelf lives and costs, with derivations. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/supply-standards.md **23** Dietary Guidelines for Americans, 2020–2025, Appendix 2: Estimated Calorie Needs. U.S. Department of Agriculture and U.S. Department of Health and Human Services, 2020. https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf **24** National Occurrence and Causes of Boil Water Advisories in the United States, Report to Congress. U.S. Environmental Protection Agency, 2024. https://www.epa.gov/system/files/documents/2025-01/10586_boil-water-advisories_final_rtc_20240603_admin.pdf **25** Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit **26** Financial Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/financial-preparedness **27** Low and No Cost Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/low-and-no-cost **28** Cybersecurity. FEMA / Ready.gov, 2026. https://www.ready.gov/cybersecurity **29** Secure Our World. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/secure-our-world **30** Drinking Water Advisories: An Overview. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/about/drinking-water-advisories-an-overview.html
 
-**31** Toxics Release Inventory, 2024 national data. U.S. Environmental Protection Agency, 2025. https://www.epa.gov/toxics-release-inventory-tri-program **32** 1918 Pandemic (H1N1 virus), with CDC's archived pages on the 1957, 1968 and 2009 pandemics. Centers for Disease Control and Prevention (archive), 2019. https://archive.cdc.gov/www_cdc_gov/flu/pandemic-resources/1918-pandemic-h1n1.html **33** Intensity and frequency of extreme novel epidemics. Marani M., Katul G.G., Pan W.K. and Parolari A.J., 2021. https://pmc.ncbi.nlm.nih.gov/articles/PMC8536331/ **34** National Risk Index, version 1.20.0 (December 2025), county data. FEMA, 2025. https://www.fema.gov/about/openfema/data-sets/national-risk-index-data **35** Continental United States Hurricane Impacts/Landfalls 1851–2025. NOAA AOML Hurricane Research Division and National Hurricane Center, 2026. https://www.aoml.noaa.gov/hrd/hurdat/All_U.S._Hurricanes.html **36** Residential fire estimate summaries. U.S. Fire Administration, 2025. https://www.usfa.fema.gov/statistics/residential-fires/ **37** OpenFEMA: NFIP Residential Penetration Rates (v1) and FIMA NFIP Redacted Claims. FEMA, 2026. https://www.fema.gov/about/openfema/data-sets **38** 2023 National Seismic Hazard Model for the conterminous United States. U.S. Geological Survey, 2023. https://doi.org/10.5066/P14VGAV4 **39** Flood Zones (glossary): the Special Flood Hazard Area has a 1-percent chance of flooding in any given year. FEMA, 2026. https://www.fema.gov/about/glossary/flood-zones **40** Operating Nuclear Power Plant Sites. FEMA, 2026. https://gis.fema.gov/arcgis/rest/services/Partner/Operating_Nuclear_Power_Plant_Sites/FeatureServer/0
+**31** Toxics Release Inventory, 2024 national data. U.S. Environmental Protection Agency, 2025. https://www.epa.gov/toxics-release-inventory-tri-program **32** 1918 Pandemic (H1N1 virus), with CDC's archived pages on the 1957, 1968 and 2009 pandemics. Centers for Disease Control and Prevention (archive), 2019. https://archive.cdc.gov/www_cdc_gov/flu/pandemic-resources/1918-pandemic-h1n1.html **33** Intensity and frequency of extreme novel epidemics. Marani M., Katul G.G., Pan W.K. and Parolari A.J., 2021. https://pmc.ncbi.nlm.nih.gov/articles/PMC8536331/ **34** Residential fire estimate summaries. U.S. Fire Administration, 2025. https://www.usfa.fema.gov/statistics/residential-fires/ **35** National Risk Index, version 1.20.0 (December 2025), county data. FEMA, 2025. https://www.fema.gov/about/openfema/data-sets/national-risk-index-data **36** Continental United States Hurricane Impacts/Landfalls 1851–2025. NOAA AOML Hurricane Research Division and National Hurricane Center, 2026. https://www.aoml.noaa.gov/hrd/hurdat/All_U.S._Hurricanes.html **37** OpenFEMA: NFIP Residential Penetration Rates (v1) and FIMA NFIP Redacted Claims. FEMA, 2026. https://www.fema.gov/about/openfema/data-sets **38** 2023 National Seismic Hazard Model for the conterminous United States. U.S. Geological Survey, 2023. https://doi.org/10.5066/P14VGAV4 **39** Flood Zones (glossary): the Special Flood Hazard Area has a 1-percent chance of flooding in any given year. FEMA, 2026. https://www.fema.gov/about/glossary/flood-zones **40** Operating Nuclear Power Plant Sites. FEMA, 2026. https://gis.fema.gov/arcgis/rest/services/Partner/Operating_Nuclear_Power_Plant_Sites/FeatureServer/0
 
 **41** Can Humanity Achieve a Century of Nuclear Peace?. Forecasting Research Institute, 2024. https://forecastingresearch.org/research/nuclear-risk **42** Nuclear Explosion. FEMA / Ready.gov, 2026. https://www.ready.gov/nuclear-explosion **43** Radiation Emergencies. FEMA / Ready.gov, 2026. https://www.ready.gov/radiation **44** Potassium Iodide. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html **45** Consideration of Potassium Iodide in Emergency Planning. U.S. Nuclear Regulatory Commission, 2025. https://www.nrc.gov/about-nrc/emerg-preparedness/about-emerg-preparedness/potassium-iodide-use.html **46** Quantitative core model specification (research report): hazards, consequence buckets, durations. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/risk-model.md **47** Power Outages. FEMA / Ready.gov, 2026. https://www.ready.gov/power-outages **48** Carbon Monoxide Poisoning Basics. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/carbon-monoxide/about/index.html **49** Emergency Disinfection of Drinking Water. U.S. Environmental Protection Agency, 2026. https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water **50** How to Make Water Safe in an Emergency. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/about/index.html
 

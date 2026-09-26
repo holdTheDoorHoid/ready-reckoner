@@ -419,8 +419,9 @@ fn targets_come_from_consequence_and_tiers_from_supply() {
 }
 
 /// `docs/RISK_MODEL.md` § "End to end with rr-hazards' rates": Philadelphia at the default dial
-/// gets power 5 d, boil-water 7 d, no tap water 3 d, food 10 d, heat or cold 3 d, medicine 14 d,
-/// phone 2 d, income 4 months; two weeks is enough.
+/// gets power 3 d (the research's 2.8; 5 before the major-hurricane share was taken against
+/// tropical-storm passages, verification V-02), boil-water 7 d, no tap water 3 d, food 10 d, heat
+/// or cold 3 d, medicine 14 d, phone 2 d, income 4 months; two weeks is enough.
 #[test]
 fn philadelphia_targets_match_the_risk_model_report() {
     let (_, _, out) = outputs()
@@ -432,7 +433,7 @@ fn philadelphia_targets_match_the_risk_model_report() {
         Target::Months { value, .. } => value,
         _ => f32::NAN,
     };
-    assert_eq!(days(BucketId::Power), 5.0);
+    assert_eq!(days(BucketId::Power), 3.0);
     assert_eq!(days(BucketId::WaterBoil), 7.0);
     assert_eq!(days(BucketId::WaterOut), 3.0);
     assert_eq!(days(BucketId::Supplies), 10.0);

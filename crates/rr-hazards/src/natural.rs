@@ -33,6 +33,8 @@ use crate::rate::HazardRate;
 pub(crate) struct HurricaneSplit {
     /// NRI (or Storm Events) hurricane events a year in the county.
     pub county_rate: f64,
+    /// The share of those events that are major (Category 3+), today.
+    pub major_share: f64,
     /// Category 1–2 and tropical-storm household events, today.
     pub cat12_today: Estimate,
     /// The same around 2050.
@@ -318,16 +320,20 @@ fn tornado(ctx: &Ctx<'_>) -> Option<HazardRate> {
 fn hurricane(ctx: &Ctx<'_>) -> Option<(HazardRate, HurricaneSplit)> {
     let h = HazardId::Hurricane;
     let lam = frequency(ctx, h)?;
-    // The major share: HURDAT2 passages within 50 nautical miles at major-hurricane strength ÷
-    // those at hurricane strength, when the pack has both (DERIVED for this county); otherwise
-    // the national one-third (PRIOR informed by HURDAT2).
+    // The major share of NRI's hurricane events. NRI counts about as many events as HURDAT2's
+    // tropical-storm-strength passages within 50 nautical miles (see `MAJOR_HURRICANE_SHARE`),
+    // so the share is major passages ÷ tropical-storm passages (DERIVED for this county). A
+    // county with passage rows but no major row recorded none (docs/DATA_SOURCES.md); the counts
+    // are shrunk toward the pooled share with the weight of `MAJOR_SHARE_PRIOR_PASSAGES`
+    // passages. Without tropical-storm passages, the pooled share (PRIOR informed by HURDAT2).
     let passages = |k: &str| ctx.event(k).map(|e| f64::from(e.rate_per_year));
-    let share = match (
-        passages("major_hurricane_passage"),
-        passages("hurricane_passage"),
-    ) {
-        (Some(major), Some(all)) if all > 0.0 => {
-            let s = (major / all).clamp(0.0, 1.0);
+    let share = match passages("tropical_storm_passage") {
+        Some(ts) if ts > 0.0 => {
+            let n_ts = ts * HURDAT2_YEARS;
+            let n_major = passages("major_hurricane_passage").unwrap_or(0.0) * HURDAT2_YEARS;
+            let s = ((n_major + MAJOR_SHARE_PRIOR_PASSAGES * MAJOR_HURRICANE_SHARE.0)
+                / (n_ts + MAJOR_SHARE_PRIOR_PASSAGES))
+                .clamp(0.0, 1.0);
             Estimate::data(
                 s,
                 s / STORM_EVENTS_SPREAD,
@@ -384,6 +390,7 @@ fn hurricane(ctx: &Ctx<'_>) -> Option<(HazardRate, HurricaneSplit)> {
     };
     let split = HurricaneSplit {
         county_rate: lam.value,
+        major_share: share.value,
         cat12_today,
         cat12_future,
         major_today,
