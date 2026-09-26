@@ -178,3 +178,23 @@ their open product feeds. Composite rows add two listings bought together, as be
 | `special_nursing_supplies` | lansinoh.com + drbrownsbaby.com | Composite: manual breast pump ($34.99) + disposable breast pads ($9.99), makers' list prices | 44.98 | 1 | 44.98 | kit | https://www.drbrownsbaby.com/products.json |
 | `water_livestock_tank` | homedepot.com (browser) | 350-gallon poly stock tank (model WTDT62G) | 397.00 | 350 | 1.13 | gallon of tank space | https://www.homedepot.com/s/rubbermaid%20stock%20tank |
 | `water_livestock_tank` | homedepot.com (browser) | 100-gallon galvanized oval stock tank (model WT224) | 159.98 | 100 | 1.60 | gallon of tank space | https://www.homedepot.com/s/100%20gallon%20stock%20tank |
+
+## Round 2, v0.1.1 (observed 2026-09-26)
+
+Rows for the items the round-2 review added or re-specified (review S6 and P-02): a generator that
+can start a well pump, the electrician-installed connection it needs, and approved fuel cans.
+Home-center listings were read from the store's search pages in an ordinary browser, as in the
+polish round. An installed interlock is a service, not a shelf item, so its rows are two licensed
+electricians' published installed prices, the low and high end of each range; the band runs from
+the lowest to the highest. The fuel-can rows add each can's share of a bottle of fuel stabilizer.
+
+| Item | Source | Listing | Listed price (USD) | Units | Unit price (USD) | Per | URL |
+|---|---|---|---|---|---|---|---|
+| `power_generator` | homedepot.com (browser) | 6,600 W starting / 5,300 W running gasoline portable generator with a 30 A 120/240-volt outlet (model WGen5300sc) | 579.00 | 1 | 579.00 | generator | https://www.homedepot.com/s/portable%20generator%20240v%20outlet%20transfer%20switch%20ready |
+| `power_generator` | homedepot.com (browser) | 9,500 W starting / 7,500 W running dual-fuel portable generator with a 30 A 120/240-volt outlet (model WGen7500DFc) | 949.00 | 1 | 949.00 | generator | https://www.homedepot.com/s/portable%20generator%20240v%20outlet%20transfer%20switch%20ready |
+| `power_transfer_interlock` | northernmistersparky.com | Professionally installed generator interlock kit, Twin Cities, low end of "$400-$850 or more" (page dated 2026-07-21) | 400.00 | 1 | 400.00 | installed kit | https://www.northernmistersparky.com/blog/generator-interlock-kit-installation/ |
+| `power_transfer_interlock` | northernmistersparky.com | The same, high end of the range | 850.00 | 1 | 850.00 | installed kit | https://www.northernmistersparky.com/blog/generator-interlock-kit-installation/ |
+| `power_transfer_interlock` | epicelectrical.com | Professionally installed interlock kit with inlet box, breaker, wire, permit and labor, Dallas-Fort Worth, low end of "$900 to $1,400" (page dated 2026-01-27) | 900.00 | 1 | 900.00 | installed kit | https://epicelectrical.com/generator-interlock-kit-affordable-connection/ |
+| `power_transfer_interlock` | epicelectrical.com | The same, high end of the range | 1400.00 | 1 | 1400.00 | installed kit | https://epicelectrical.com/generator-interlock-kit-affordable-connection/ |
+| `power_fuel_cans` | homedepot.com (browser) | Composite: 5-gallon gas can (model FSCG571, $24.97) + a quarter of an 8 oz fuel stabilizer that treats 20 gallons (model 22208, $8.97) | 27.21 | 1 | 27.21 | can | https://www.homedepot.com/s/5%20gallon%20gas%20can |
+| `power_fuel_cans` | homedepot.com (browser) | Composite: 5-gallon gasoline can with view stripe (model 1460, $39.12) + an eighth of an 8 oz stabilizer that treats 40 gallons (model GDE-22288, $10.97) | 40.49 | 1 | 40.49 | can | https://www.homedepot.com/s/fuel%20stabilizer |

@@ -13,6 +13,7 @@ life_safety = true
 spec = "Test every smoke and carbon monoxide alarm once a month (USFA), and make an escape plan with two ways out of every room and a meeting spot outside, practiced twice a year (Ready.gov). Cooking is by far the leading cause of home fires, so stay with your cooking and keep a lid nearby (USFA). Keep anything that can burn 3 feet from heaters, and never heat the home with an oven (USFA)."
 look_for = [
   "A monthly alarm test, for example on the first of the month",
+  "No working smoke alarms? Renters ask the landlord first; anyone can ask the fire department or the Red Cross to install free ones",
   "Smoke alarms replaced 10 years after they were made, and carbon monoxide alarms as the maker says or every 5 years",
   "Two ways out of every room, windows that open, and a meeting spot in front of the home",
   "A pan lid or baking sheet within reach of the stove",
@@ -28,7 +29,7 @@ avoid = [
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: monthly checks and a plan." }
 quantity_rule = "once"
 maintenance = { check_months = 1 }
-citations = ["usfa_smoke_alarms", "cdc_co_basics", "ready_gov_home_fires", "usfa_cooking_fires", "usfa_heating_fires", "cdc_winter_safety"]
+citations = ["usfa_smoke_alarms", "redcross_sound_the_alarm", "cdc_co_basics", "ready_gov_home_fires", "usfa_cooking_fires", "usfa_heating_fires", "cdc_winter_safety"]
 hazard_extras = []
 
 [[item]]
@@ -67,8 +68,9 @@ buckets = ["fire"]
 tier = "h72"
 free = false
 life_safety = true
-spec = "Smoke alarms inside and outside each bedroom and sleeping area and on every level of the home (USFA). Interconnected alarms, which all sound together, give more warning."
+spec = "Smoke alarms inside and outside each bedroom and sleeping area and on every level of the home (USFA). Ask first: some fire departments and the Red Cross install free smoke alarms, and renters should ask the landlord, so buy them only if that fails (USFA, Red Cross). Interconnected alarms, which all sound together, give more warning."
 look_for = [
+  "A free installation visit from your fire department or the Red Cross, or your landlord's",
   "A listing mark from a testing lab on the package",
   "Sealed 10-year batteries, or plan to change batteries yearly",
   "Alarms with strobes or bed shakers for anyone who is deaf or hard of hearing",
@@ -81,7 +83,7 @@ price_band_usd = { low = 18.97, high = 32.47, per = "alarm", note = "Two home-ce
 retrieved = "2026-09-26"
 quantity_rule = "smoke_alarm_count"
 maintenance = { rotate_months = 120, check_months = 1 }
-citations = ["usfa_smoke_alarms", "ready_gov_home_fires", "rr_price_observations_2026_09"]
+citations = ["usfa_smoke_alarms", "redcross_sound_the_alarm", "ready_gov_home_fires", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]
@@ -118,7 +120,8 @@ unit = "extinguisher"
 buckets = ["fire"]
 tier = "h72"
 free = false
-spec = "A multipurpose extinguisher labeled A-B-C, which works on most home fires (USFA). The plan counts one for each floor you live on, an estimate, with one near the kitchen. Use it only on a small fire with a clear way out: pull the pin, aim at the base, squeeze and sweep."
+life_safety = true
+spec = "A multipurpose extinguisher labeled A-B-C, which works on most home fires (USFA). The plan counts one for each floor you live on, an estimate, with one near the kitchen, where most small home fires start (CPSC). Use it only on a small fire with a clear way out: pull the pin, aim at the base, squeeze and sweep."
 look_for = [
   "An A-B-C rating and a testing-lab listing",
   "A size you can lift and aim: 2.5 to 5 pounds",
@@ -132,7 +135,7 @@ price_band_usd = { low = 22.49, high = 44.47, per = "extinguisher", note = "Two 
 retrieved = "2026-09-26"
 quantity_rule = "extinguisher_count"
 maintenance = { check_months = 1 }
-citations = ["usfa_extinguishers", "ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
+citations = ["usfa_extinguishers", "cpsc_unreported_fires_2009", "ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]
@@ -178,7 +181,7 @@ avoid = [
 ]
 price_band_usd = { low = 11.63, high = 21.99, per = "wrench", note = "Two home-center listings for gas-and-water shut-off wrenches: $11.63 and $21.99. A wrench you already own works if it fits." }
 retrieved = "2026-09-26"
-quantity_rule = "once"
+quantity_rule = "once_if_house"
 citations = ["ready_gov_kit", "rr_price_observations_2026_09"]
 hazard_extras = []
 

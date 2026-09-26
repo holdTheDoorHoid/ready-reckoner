@@ -194,7 +194,7 @@ unit = "pair"
 buckets = ["power", "supplies"]
 tier = "h72"
 free = false
-spec = "One thermometer in the fridge and one in the freezer, so after an outage you know whether food stayed at 40°F or below (Ready.gov)."
+spec = "One thermometer in the fridge and one in the freezer, so after a power cut you know whether food stayed at 40°F or below; throw out perishable food that was above 40°F for two hours or more (Ready.gov)."
 look_for = [
   "A clear dial or digital display",
   "A range that reads below freezing",
@@ -205,7 +205,7 @@ avoid = [
 ]
 price_band_usd = { low = 4.78, high = 10.58, per = "pair", note = "Two restaurant-supply listings: dial thermometers at $2.39 and digital at $5.29 each, doubled for a pair." }
 retrieved = "2026-09-25"
-quantity_rule = "once"
+quantity_rule = "fridge_thermometers"
 citations = ["ready_gov_food", "rr_price_observations_2026_09"]
 hazard_extras = []
 
@@ -266,7 +266,7 @@ buckets = ["supplies", "power"]
 tier = "h72"
 free = false
 assumed_basic = true
-spec = "In FEMA's 2024 survey, 69 of every 100 people asked had put together emergency supplies, and nearly 9 in 10 of them said the supplies would last more than three days. The plan counts three days of the food you normally eat as already on hand, and builds from there with food that needs no refrigeration, cooking or water (Ready.gov)."
+spec = "The three days of ordinary food most homes already have; the plan credits it unless you say otherwise. In FEMA's 2024 survey, 69 of every 100 people asked had put together emergency supplies, and nearly 9 in 10 of them said the supplies would last more than three days. The plan builds from there with food that needs no refrigeration, cooking or water (Ready.gov)."
 look_for = [
   "Enough on the shelves for three days of meals for everyone",
   "Some foods that need no cooking or water, and a manual can opener",

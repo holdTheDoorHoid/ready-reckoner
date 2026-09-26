@@ -104,7 +104,7 @@ name = "Portable battery power station (about 1,000 watt-hours)"
 category = "power"
 unit = "power station"
 buckets = ["power", "medication", "comms"]
-tier = "w2"
+tier = "h72"
 free = false
 spec = "A rechargeable battery of about 1,000 watt-hours with outlets, safe to use indoors because it burns no fuel. On a full charge it runs a CPAP for about five nights with the humidifier on, or a top-freezer fridge for most of a day."
 look_for = [
@@ -125,29 +125,30 @@ hazard_extras = []
 
 [[item]]
 id = "power_generator"
-name = "Inverter generator (outdoors only, 20 feet from the house)"
+name = "Portable generator (outdoors only, 20 feet from the house)"
 category = "power"
 unit = "generator"
 buckets = ["power", "thermal", "water_out"]
 tier = "w2"
 free = false
-spec = "A 2,000 to 3,000 watt gasoline inverter generator for homes with a safe spot outdoors, 20 feet or more from windows, doors and vents (CDC). It uses about 2.8 gallons of fuel a day at light load and up to 7 at full load."
+spec = "A gasoline portable generator sized to what it must run: a 2,000 to 3,000 watt inverter runs a fridge and lights, but a well pump needs one that supplies the pump's starting watts, 2 to 3 times its running watts, with a 240-volt outlet if the pump runs on 240 volts. It must run outdoors, 20 feet or more from windows, doors and vents (CDC), and it reaches house wiring only through an interlock or transfer switch an electrician installs (OSHA). A small inverter uses about 2.8 gallons of fuel a day at light load and up to 7 at full load; bigger units use more."
 look_for = [
   "A built-in carbon monoxide sensor that shuts it off",
-  "Heavy-duty extension cords to plug appliances into it directly (Ready.gov)",
+  "For a well pump: starting watts above the pump's, and a 240-volt outlet if the pump needs it (check its nameplate)",
+  "Heavy-duty outdoor extension cords to plug appliances into it directly (Ready.gov)",
   "A carbon monoxide alarm inside the house",
 ]
 avoid = [
   "Running it in a garage, porch or near any opening, even with doors open (CDC)",
-  "Connecting it to the house wiring instead of plugging appliances into it with cords",
+  "Plugging it into a wall outlet or the house wiring: backfeeding can electrocute utility workers and neighbours (CPSC)",
   "Buying one if you live in an apartment or cannot keep it 20 feet from the building",
   "Assuming a small unit can start a well pump: check the pump's starting watts",
 ]
-price_band_usd = { low = 389.99, high = 499, per = "generator", note = "Two home-center listings for 2,300 to 2,800 W gasoline inverter generators: $389.99 and $499. Premium models cost more." }
+price_band_usd = { low = 389.99, high = 949, per = "generator", note = "Four home-center listings: 2,300 and 2,800 W inverter generators at $389.99 and $499 run a fridge and lights; units with a 120/240-volt outlet that can start a well pump cost $579 (5,300 W running) and $949 (7,500 W running)." }
 retrieved = "2026-09-26"
 quantity_rule = "generator_units"
 maintenance = { check_months = 3 }
-citations = ["cdc_co_basics", "ready_gov_power_outages", "rr_research_supply_standards", "rr_expert_prior", "rr_price_observations_2026_09"]
+citations = ["cdc_co_basics", "ready_gov_power_outages", "osha_portable_generators", "cpsc_generator_safety_alert", "rr_research_supply_standards", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]
@@ -158,7 +159,7 @@ unit = "gallon"
 buckets = ["power"]
 tier = "w2"
 free = false
-spec = "Fuel for the generator's run time, in approved cans, used within about six months as many appliance makers advise. Fire codes typically allow no more than 25 gallons at home, 10 in an attached garage and none in living space (IFC as summarized by Lehi, Utah)."
+spec = "Fuel for the generator's run time, used within about six months as many appliance makers advise, kept in the approved cans on the next line. Fire codes typically allow no more than 25 gallons at home, 10 in an attached garage and none in living space (IFC as summarized by Lehi, Utah)."
 look_for = [
   "Approved gasoline cans with tight caps",
   "A detached shed or garage for storage",
@@ -169,7 +170,7 @@ avoid = [
   "Refueling a hot generator: let it cool first (Ready.gov)",
   "Storing more than your local fire code allows",
 ]
-price_band_usd = { low = 4.09, high = 4.20, per = "gallon", note = "US average price of regular gasoline, July and August 2026: $4.09 and $4.20 a gallon. Approved 5-gallon cans cost extra." }
+price_band_usd = { low = 4.09, high = 4.20, per = "gallon", note = "US average price of regular gasoline, July and August 2026: $4.09 and $4.20 a gallon. The approved cans are their own line." }
 retrieved = "2026-09-25"
 quantity_rule = "generator_fuel_gallons"
 volume_l_per_unit = 3.785
@@ -225,4 +226,57 @@ retrieved = "2026-09-26"
 quantity_rule = "device_battery_units"
 maintenance = { check_months = 3 }
 citations = ["sil_cpap_power", "ready_gov_disability", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_transfer_interlock"
+name = "Generator inlet and interlock or transfer switch, installed by an electrician"
+category = "power"
+unit = "installed kit"
+buckets = ["power", "water_out"]
+tier = "h72"
+free = false
+life_safety = true
+spec = "An inlet on the outside wall with an interlock kit on the main panel, or a transfer switch, installed by a licensed electrician, so a portable generator can run the well pump and other chosen circuits. It is the only safe way to connect a generator to house wiring: OSHA says to attach one only through a transfer switch a qualified electrician installed, and CPSC warns that plugging a generator into a wall outlet can electrocute utility workers and neighbours."
+look_for = [
+  "A licensed electrician, and a permit where your town requires one",
+  "An inlet and interlock rated for your generator's outlet, 240 volts if your well pump runs on it",
+  "A labeled list of the circuits it can run, with the well pump first",
+]
+avoid = [
+  "A cord with a plug on both ends: it backfeeds the house wiring (CPSC)",
+  "Running the generator while the main breaker is still on",
+  "Installing it yourself",
+]
+price_band_usd = { low = 400, high = 1400, per = "installed kit", note = "Two electricians' published prices for a professionally installed interlock kit with an inlet, July and January 2026: $400 to $850 in the Twin Cities and $900 to $1,400 in the Dallas-Fort Worth area, permit included in the second. A manual transfer switch costs more." }
+retrieved = "2026-09-26"
+quantity_rule = "generator_connection_units"
+maintenance = { check_months = 12 }
+citations = ["osha_portable_generators", "cpsc_generator_safety_alert", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_fuel_cans"
+name = "Approved 5-gallon gasoline cans, with fuel stabilizer"
+category = "power"
+unit = "can"
+buckets = ["power"]
+tier = "w2"
+free = false
+spec = "Approved gasoline cans with fuel stabilizer for the generator's fuel, kept outside the living space and away from a gas water heater: CPSC says to store fuel in labeled, non-glass safety containers. Date each can and use the fuel within about six months (Lehi, Utah)."
+look_for = [
+  "Cans labeled for gasoline, with a spout that seals",
+  "Fuel stabilizer added when you fill them",
+  "A detached shed or garage to keep them in",
+]
+avoid = [
+  "Storing gasoline in the home or near a gas water heater (CPSC)",
+  "Glass jugs or unmarked containers",
+  "Storing more than your local fire code allows",
+]
+price_band_usd = { low = 27.21, high = 40.49, per = "can", note = "Two home-center listings for 5-gallon gas cans, $24.97 and $39.12, each with its share of a bottle of fuel stabilizer: a quarter of an 8-ounce bottle that treats 20 gallons ($8.97), or an eighth of one that treats 40 ($10.97)." }
+retrieved = "2026-09-26"
+quantity_rule = "fuel_cans"
+maintenance = { rotate_months = 6 }
+citations = ["cpsc_generator_safety_alert", "lehi_fuel_storage", "rr_price_observations_2026_09"]
 hazard_extras = []

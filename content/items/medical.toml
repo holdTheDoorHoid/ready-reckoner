@@ -218,21 +218,23 @@ buckets = ["medication", "power"]
 tier = "h72"
 free = false
 life_safety = true
-spec = "An insulated bag with cold packs to keep medicine such as insulin cool, but never frozen, when the power is out or you have to leave. Ready.gov advises throwing out refrigerated medicine after a day without power unless its label says otherwise, so ask your pharmacist how long yours lasts."
+spec = "An insulated bag with cold packs keeps medicine such as insulin in the shade and below 86°F, never frozen, for about a day when the power is out or you leave home. Insulin in its vial or pen keeps working for up to 28 days between 59°F and 86°F (FDA, CDC); for any other medicine that must stay cold, ask your pharmacist how long it keeps out of the fridge. Pack diabetes supplies with it for 1 to 2 weeks: a glucose meter with test strips and lancets, syringes or pen needles, glucose tablets or another quick sugar, ketone strips and spare batteries (CDC)."
 look_for = [
-  "A bag that fits your medicine and two cold packs",
-  "A small thermometer or temperature strip",
-  "Your pharmacist's answer on how long it lasts out of the fridge",
+  "A bag that fits your medicine and two cold packs, with a cloth between them",
+  "A small thermometer or temperature strip, to check it stays below 86°F",
+  "Your pharmacist's answer on how long each medicine keeps out of the fridge, written on your medicine list",
+  "Diabetes supplies for 1 to 2 weeks packed with it, if anyone has diabetes (CDC)",
 ]
 avoid = [
-  "Medicine pressed directly against ice or frozen packs",
-  "A hot car",
-  "Using insulin that froze or overheated before asking a pharmacist (CDC)",
+  "Medicine pressed directly against ice or frozen packs, which can freeze it",
+  "A hot car or direct sun",
+  "Insulin that has frozen: do not use it (FDA)",
+  "Counting on the bag alone for a power cut of more than a day or two",
 ]
 price_band_usd = { low = 14.74, high = 36.73, per = "set", note = "Two combinations of retail listings: a small insulated bag ($12.99) or a soft cooler ($34.99), each with two gel packs at $0.87." }
 retrieved = "2026-09-25"
 quantity_rule = "once_if_refrigerated_rx"
-citations = ["ready_gov_power_outages", "cdc_insulin_emergency", "rr_price_observations_2026_09"]
+citations = ["fda_insulin_emergency", "cdc_insulin_emergency", "cdc_diabetes_emergencies", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]
@@ -241,23 +243,25 @@ name = "Bleeding-control kit (tourniquet and pressure bandage)"
 category = "medical"
 unit = "kit"
 buckets = ["medical_emergency"]
-tier = "w2"
+tier = "h72"
 free = false
-spec = "A tourniquet, a pressure bandage and gloves for serious bleeding when help is far away or delayed, as taught in Stop the Bleed classes. It matters most where ambulances take longer to arrive, such as rural areas."
+spec = "A tourniquet, a pressure bandage and gloves for serious bleeding when help is far away or delayed, as taught in Stop the Bleed classes; it matters most where ambulances take longer to arrive, such as rural areas. Buy a packaged kit, or a tourniquet from its maker or an authorized seller: counterfeit tourniquets sold on their own have broken before they could stop the bleeding (DHS)."
 look_for = [
   "A tourniquet with a windlass, a rod you turn to tighten it",
   "A pressure bandage or trauma dressing",
+  "A packaged kit, or a tourniquet from its maker or an authorized seller",
   "A Stop the Bleed class so you know how to use it",
 ]
 avoid = [
+  "Unusually cheap tourniquets from unknown sellers, which may be counterfeit (DHS)",
   "Tourniquets sold without instructions",
   "Buying it without learning how to use it",
   "Storing it where you cannot find it fast",
 ]
 price_band_usd = { low = 47.90, high = 94.95, per = "kit", note = "A tourniquet ($37.95) and a pressure bandage ($9.95) bought separately, or a packaged bleeding-control kit at $94.95." }
 retrieved = "2026-09-25"
-quantity_rule = "once"
-citations = ["dhs_stop_the_bleed", "wms_wound_2014", "mell_2017_ems_response", "rr_price_observations_2026_09"]
+quantity_rule = "bleeding_control_kit"
+citations = ["dhs_stop_the_bleed", "dhs_saver_trauma_kits_2015", "wms_wound_2014", "mell_2017_ems_response", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]

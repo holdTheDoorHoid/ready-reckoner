@@ -42,6 +42,7 @@ look_for = [
   "A pot with a lid kept for boiling, and clean containers for the cooled water",
   "The water heater's tank size, its drain valve, and a hose or pan that fits under it",
   "Thermometers in the fridge and freezer, and where you could get ice nearby",
+  "Your raw-water source for a long outage: your well (with a way to run its pump), a rain barrel where your state allows it, or a creek or pond you can reach; filter it, then disinfect it",
   "A few extra cans or boxes of what you already eat on each shopping trip, newest at the back",
 ]
 avoid = [
@@ -173,7 +174,7 @@ unit = "filter"
 buckets = ["water_out", "water_boil"]
 tier = "w2"
 free = false
-spec = "A bag or bucket system that cleans raw water by gravity, with an absolute pore size of 0.3 micron or smaller (CDC). It does not remove viruses, so add a disinfectant such as bleach or chlorine dioxide after filtering."
+spec = "A bag or bucket system that cleans raw water by gravity, with an absolute pore size of 0.3 micron or smaller (CDC). It needs a raw-water source, such as your well, a rain barrel or a creek or pond you have picked, and it does not remove viruses, so add a disinfectant such as bleach or chlorine dioxide after filtering."
 look_for = [
   "An absolute pore size of 0.3 micron or smaller on the package",
   "A rated capacity in gallons, with replacement filters sold",
