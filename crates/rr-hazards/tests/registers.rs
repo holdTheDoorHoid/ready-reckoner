@@ -158,6 +158,29 @@ fn philadelphia_has_no_named_scenarios_and_shows_rare_catastrophes_last() {
             .contains("about 1 in 2,000 to about 1 in 400 a year")
     );
     assert_eq!(nuke.rate_range, [0.0005, 0.0025]);
+    // The figure is the world's, not the household's (hazard review H-01), and the terrorism row
+    // says what it counts: a closure of the area, not the chance of being hurt (H-03).
+    assert!(
+        nuke.frequency_sentence.contains("anywhere in the world")
+            && nuke.frequency_sentence.contains("not for your household"),
+        "{}",
+        nuke.frequency_sentence
+    );
+    let terror = profile(&a, H::Terrorism);
+    assert!(
+        terror.frequency_sentence.contains("half a day to two days")
+            && terror
+                .frequency_sentence
+                .contains("not the chance of being hurt"),
+        "{}",
+        terror.frequency_sentence
+    );
+    // Both rare rows carry the range the web shows instead of a point.
+    for p in &a.profiles[n - 2..] {
+        let [lo, hi] = p.rate_range;
+        assert!(lo > 0.0 && hi >= 4.0 * lo, "{}: {lo} {hi}", p.id);
+        assert!(lo <= p.rate_per_year && p.rate_per_year <= hi);
+    }
     // A plant within 80 km (Limerick): the incident appears, ranked, with a tiny rate.
     let plant = profile(&a, H::NuclearPlantIncident);
     assert_eq!(plant.display, HazardDisplay::Ranked);

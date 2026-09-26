@@ -162,12 +162,14 @@ fn nuclear_attack() -> HazardRate {
         (lo, hi),
         &[cite::FRI_NUCLEAR, cite::READY_NUCLEAR],
         sentence::range_only(
-            "Forecasters asked in 2024 put the chance of a nuclear catastrophe (10 million or more \
-             deaths worldwide) before 2045 at 1 to 5 in 100. Spread over those years, that is",
+            "Forecasters asked in 2024 put the chance of a nuclear catastrophe anywhere in the \
+             world (10 million or more deaths) before 2045 at 1 to 5 in 100. Spread over those \
+             years, that is",
             lo,
             hi,
-            " No reliable estimate exists for effects where you live. The first 24 hours of \
-             sheltering inside are covered by your basic supplies.",
+            " That is the chance for the whole world, not for your household: no reliable \
+             estimate exists for effects where you live. The first 24 hours of sheltering inside \
+             are covered by your basic supplies.",
         ),
         1.0,
     )
@@ -181,11 +183,12 @@ fn terrorism(ctx: &Ctx<'_>) -> HazardRate {
         (lo, hi),
         &[cite::RR_HAZARD_PRIORS],
         sentence::range_only(
-            "An attack that disrupts daily life where you live is rare: expert estimates range \
-             from",
+            "An attack that shuts down the area where you live for half a day to two days (roads, \
+             schools and shops closed) is rare: for a household like yours, expert estimates \
+             range from",
             lo,
             hi,
-            "",
+            " This counts the disruption to daily life, not the chance of being hurt.",
         ),
         0.9,
     )
