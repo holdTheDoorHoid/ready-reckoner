@@ -267,3 +267,28 @@ fn levee_shares_match_known_places() {
         assert!((0.0..=1.0).contains(&p.unwrap()) && (0.0..=1.0).contains(&h.unwrap()));
     }
 }
+
+#[test]
+fn water_system_violations_flag_jackson() {
+    if !has("core/water_systems.csv") {
+        return;
+    }
+    // Jackson, Mississippi's system (most of Hinds County) had health-based violations.
+    assert!(
+        exposure("28049").sdwis_violation_pop_share.unwrap() > 0.4,
+        "Hinds County, MS"
+    );
+    // Philadelphia's did not.
+    assert_eq!(exposure("42101").sdwis_violation_pop_share, Some(0.0));
+    for c in store().counties() {
+        for v in [
+            c.exposure.sdwis_violation_pop_share,
+            c.exposure.cws_pop_share,
+        ]
+        .into_iter()
+        .flatten()
+        {
+            assert!((0.0..=1.0).contains(&v), "{}: {v}", c.fips);
+        }
+    }
+}

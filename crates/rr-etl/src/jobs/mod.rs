@@ -21,6 +21,7 @@ pub mod outages;
 pub mod seismic;
 pub mod strategic;
 pub mod vulnerability;
+pub mod water_systems;
 
 /// Shared state for a refresh.
 pub struct Ctx {
@@ -152,6 +153,12 @@ pub const JOBS: &[JobSpec] = &[
         id: "levees",
         title: "People behind levees and levee risk ratings by county (USACE National Levee Database)",
         run: levees::run,
+        default: true,
+    },
+    JobSpec {
+        id: "water_systems",
+        title: "Community water systems with health-based violations in five years (EPA ECHO SDWA)",
+        run: water_systems::run,
         default: true,
     },
     JobSpec {

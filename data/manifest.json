@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "99d062d2414a",
-  "generated": "2026-09-26T16:59:28Z",
+  "pack_version": "e620dc2a2dca",
+  "generated": "2026-09-26T17:15:57Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -196,6 +196,16 @@
           "sha256": "902f8272b9853bd9a49b899b399b8b9534667a7f0fb736f5b445d34314f32e5b",
           "bytes": 123023,
           "rows": 3144,
+          "key": [
+            "fips"
+          ]
+        },
+        {
+          "path": "core/water_systems.csv",
+          "job": "water_systems",
+          "sha256": "30970c79020a0c984013e4685ae8d87af2d269d50aefa16beab9fbd572f4b1ff",
+          "bytes": 50033,
+          "rows": 3171,
           "key": [
             "fips"
           ]
@@ -1913,6 +1923,111 @@
           ]
         }
       ]
+    },
+    "water_systems": {
+      "title": "Community water systems with health-based violations in five years (EPA ECHO SDWA)",
+      "finished": "2026-09-26T17:15:57Z",
+      "sources": [
+        {
+          "name": "EPA ECHO SDWA system search download (all public water systems)",
+          "url": "https://echo.epa.gov/files/echodownloads/SDWA_system_search_download.zip",
+          "version": "SDWA_SYSTEM_SEARCH.csv; Last-Modified Mon, 21 Sep 2026 13:25:50 GMT",
+          "retrieved": "2026-09-26T17:13:44Z",
+          "sha256": "87b5b54dc1288a935621626c0b903b56562619b0fcc3b6c7b5af1dc900cc8a27",
+          "bytes": 34965432,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "EPA ECHO SDWA latest downloads: SDWA_VIOLATIONS_ENFORCEMENT.csv",
+          "url": "https://echo.epa.gov/files/echodownloads/SDWA_latest_downloads.zip",
+          "version": "quarterly national download",
+          "retrieved": "2026-09-26T17:13:59Z",
+          "sha256": "a18a20f9091c2e0466c91c83d0bac5651473441642331d09504e447a6e2ac7a4",
+          "bytes": 423774232,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
+        }
+      ],
+      "rows_in": 2041774,
+      "rows_out": 3171,
+      "outputs": [
+        "core/water_systems.csv"
+      ],
+      "notes": [
+        "48519 active community water systems serving 326.9 million people; 22774 systems (58.8 million people) had a health-based violation (MCL, MRDL or treatment technique) open at some time between 2021-06-05 and 2026-06-05 (the file's latest begin date). Counting only violations that began in the window would flag 21307 systems (47.8 million people). 859 systems (4066601 people) list no county and 0 people sit under county codes that match nothing; both are left out.",
+        "Each system's population is split over the counties it lists in proportion to their residents (NRI 2020; EPA publishes no split); Connecticut's retired county codes are split to planning regions by land share first. Violations measure compliance, not the physical state of the pipes: one large system flips a whole county (New York City's open treatment-technique case since 2017, the uncovered Hillview Reservoir, flags all five boroughs; Asheville's post-Helene violations flag Buncombe County)."
+      ],
+      "definitions": {
+        "cws_pop_share": "Population served by active community water systems / county population (NRI 2020), capped at 1.",
+        "sdwis_violation_pop_share": "Share of the county's community-water-system population served by a system with at least one health-based violation (maximum contaminant level, maximum residual disinfectant level or treatment technique) open at some time in the 5 years to 2026-06-05."
+      },
+      "missing": [
+        {
+          "reason": "No active community water system on record in EPA's SDWA data",
+          "fips": [
+            "02105",
+            "02195",
+            "02198",
+            "02230",
+            "02275",
+            "15005",
+            "21037",
+            "21187",
+            "30079",
+            "31005",
+            "31115",
+            "31117",
+            "31173",
+            "32510",
+            "38085",
+            "51510",
+            "51520",
+            "51530",
+            "51540",
+            "51550",
+            "51570",
+            "51580",
+            "51590",
+            "51595",
+            "51600",
+            "51610",
+            "51620",
+            "51630",
+            "51640",
+            "51650",
+            "51660",
+            "51670",
+            "51678",
+            "51680",
+            "51683",
+            "51685",
+            "51690",
+            "51700",
+            "51710",
+            "51720",
+            "51730",
+            "51735",
+            "51740",
+            "51750",
+            "51760",
+            "51770",
+            "51775",
+            "51790",
+            "51800",
+            "51810",
+            "51820",
+            "51830",
+            "51840",
+            "54005",
+            "55078",
+            "69100",
+            "69110",
+            "69120",
+            "72033",
+            "72049",
+            "72137"
+          ]
+        }
+      ]
     }
   },
   "attributions": [
@@ -1930,6 +2045,13 @@
       "license": "US Government work",
       "url": "https://www.arcgis.com/home/item.html?id=54f4e2343500422bbddf1f5dafb30bbd",
       "version": "CMRA 2025",
+      "accessed": "2026-09-26"
+    },
+    {
+      "source": "EPA ECHO SDWA",
+      "text": "Drinking-water system violations from the U.S. Environmental Protection Agency's Enforcement and Compliance History Online (ECHO), Safe Drinking Water Act data downloads.",
+      "license": "US Government work (public domain)",
+      "url": "https://echo.epa.gov/tools/data-downloads/sdwa-download-summary",
       "accessed": "2026-09-26"
     },
     {

@@ -106,3 +106,27 @@ Jobs run: levees.
 | File | Rows before | Rows after | Added | Removed | Changed | Status |
 |---|---:|---:|---:|---:|---:|---|
 | `core/levees.csv` | 3232 | 3232 | 0 | 0 | 198 | changed |
+
+## 2026-09-26T17:04:10Z — pack version 98f7c8387c2e
+
+Jobs run: water_systems.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/water_systems.csv` | 0 | 3171 | 0 | 0 | 0 | new |
+
+## 2026-09-26T17:11:51Z — pack version 2a85e3300602
+
+Jobs run: water_systems.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/water_systems.csv` | 3171 | 3171 | 0 | 0 | 325 | changed |
+
+## 2026-09-26T17:15:57Z — pack version e620dc2a2dca
+
+Jobs run: water_systems.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/water_systems.csv` | 3171 | 3171 | 0 | 0 | 243 | changed |
