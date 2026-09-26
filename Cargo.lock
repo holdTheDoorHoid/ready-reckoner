@@ -972,9 +972,9 @@ dependencies = [
 name = "rr-hazards"
 version = "0.1.0"
 dependencies = [
+ "rr-types",
  "serde",
  "serde_json",
- "thiserror",
 ]
 
 [[package]]
