@@ -511,11 +511,16 @@ pub(crate) const ATTACK_NON_UASI: Triple = (3.0e-6, 1.0e-6, 3.0e-5);
 /// 0.3, "a few days' disruption" (hazard-expansion H-10).
 pub(crate) const ATTACK_LOSS_USD: f64 = 800.0;
 
-/// DATA (FBI Crime in the United States 2023–2025, Tables 29, 39 and 40, via the data-model
-/// series `fbi_arrests`): arrests per 100,000 people a year by age band, as `(band, first age,
-/// last age, male (value, low, high), female (value, low, high))`. The value is the mean of the
-/// three years; low and high are the lowest and highest year. The FBI counts arrests, not people
-/// or convictions: one person arrested twice counts twice.
+/// DATA (FBI Crime in the United States, the 2023, 2024 and 2025 editions, Tables 29, 39 and 40;
+/// Census Vintage 2025 population by age and sex; the same method as the data-model series
+/// `fbi_arrests`): arrests per 100,000 people a year by age band, as `(band, first age, last age,
+/// male (value, low, high), female (value, low, high))`. For each year, a band's reported arrests
+/// (Tables 39 and 40) are scaled by Table 29's national estimate over the reported total, since
+/// the FBI publishes no national estimate by age or sex, and divided by the band's population on
+/// 1 July of that year. The value is the mean of the three years; low and high are the lowest and
+/// highest year. Recomputed from those tables on 2026-09-26: every figure matches to four
+/// significant figures. The FBI counts arrests, not people or convictions: one person arrested
+/// twice counts twice.
 pub(crate) const ARRESTS_PER_100K: &[(&str, u8, u8, Triple, Triple)] = &[
     (
         "10_17",
