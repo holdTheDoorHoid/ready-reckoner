@@ -21,9 +21,12 @@ cargo run -p rr-etl -- jobs
 - **Jobs** (run order): `geography`, `nri`, `outages`, `events`, `seismic`, `climate`, `flood`,
   `facilities`, `vulnerability`, `base_rates`. Later jobs read the county list and the
   Connecticut crosswalk written by `geography`.
-- **Raw inputs are never stored.** Small sources are held in memory; the 11.6 GB of EAGLE-I outage
-  files are streamed from figshare and parsed on the fly. `--keep-raw` keeps copies of the small
-  inputs under `data/raw/` (git-ignored); the multi-gigabyte EAGLE-I years are never kept.
+- **Raw inputs are not kept.** Small sources are held in memory; the 11.6 GB of EAGLE-I outage
+  files are streamed from figshare and parsed on the fly; the three USGS hazard-curve grid ZIPs
+  (0.9 GB for the contiguous US) are written to `data/raw/seismic/` only while they are read (a
+  ZIP needs random access) and deleted straight after. `--keep-raw` keeps copies of the small
+  inputs and the grid ZIPs under `data/raw/` (git-ignored); the multi-gigabyte EAGLE-I years are
+  never kept.
 - **Deterministic output.** Rows are sorted by key, numbers are rounded to 4 significant figures
   (coordinates to fixed decimals), and transcendental maths uses the pure-Rust `rr_types::math`,
   so an unchanged input produces a byte-identical pack. Only the manifest's timestamps change.
@@ -41,8 +44,9 @@ cargo run -p rr-etl -- jobs
 
 ## 2. The packs
 
-Sizes are gzip -9 as a static host would serve them. The core pack totals **SIZE_CORE_GZ**
-gzipped (budget 5 MB); `geo/counties.json` is **SIZE_GEO_GZ** (budget 0.35 MB).
+Sizes are gzip -9 as a static host would serve them. The core pack totals **2.99 MB**
+gzipped file by file (3.05 MB as one `gzip -c data/core/*` stream; budget 5 MB) and 10.8 MB
+uncompressed; `geo/counties.json` is **0.30 MB** gzipped (budget 0.35 MB).
 
 Licence shorthand: **PD** = US Government work, public domain (17 U.S.C. 105).
 
@@ -118,7 +122,7 @@ yearly chance) and `notes`. The traps it records:
 - **Inland flooding** replaced riverine flooding in v1.20 and treats about 100% of a county's
   buildings as exposed: `ealb/expb` is a county-wide average, not an in-floodplain rate.
 
-### core/outages.csv (3,082 rows) and core/outages_state.csv (53 rows) — see §5
+### core/outages.csv (3,153 rows) and core/outages_state.csv (53 rows) — see §5
 
 | Column | Meaning |
 | --- | --- |
@@ -129,7 +133,7 @@ yearly chance) and `notes`. The traps it records:
 | `years_of_data` | Months with at least one EAGLE-I record ÷ 12 (the rate's denominator) |
 | `duration_basis` | `county`; `state` when the county has fewer than 10 events and the duration columns come from the state pool; `island` for Puerto Rico (§10) |
 | `events_per_year`, `events` | County events per year and in total |
-| `customers` | Customer count used (larger of ORNL MCC and households, §10) |
+| `customers` | Customer count used (larger of ORNL MCC and households, §10); for Puerto Rico the municipio's own count, while its rates are the island's |
 | `customer_hours_per_customer_year` | All recorded outage time per customer (comparable to SAIDI with major events) |
 | `share_customer_hours_in_events` | How much of that time falls inside qualifying events |
 | `longest_event_hours` | Longest qualifying event |
@@ -140,7 +144,7 @@ doi:10.6084/m9.figshare.24237376 (v4, 2026-02-25), `MCC.csv`, `coverage_history.
 household counts. **CC BY 4.0: the credit line in §7 must be shown.** Refresh: yearly (a new year
 is added each spring).
 
-### core/events.csv (43,724 rows)
+### core/events.csv (44,057 rows)
 
 Long format: `fips`, `event_type`, `rate_per_year`, `share_damaging`, `median_days`, `p90_days`,
 `events`, `share_injury`, `source`, `years`. A missing row means no recorded event of that type in
@@ -164,15 +168,28 @@ fields or `tropical_cyclone_impact` there. PD. Refresh: yearly.
 
 `fips`, `p_pga_ge_0_1g_per_year`, `p_pga_ge_0_2g_per_year` (yearly chance of peak ground
 acceleration ≥ 0.1 g / ≥ 0.2 g on firm rock, Vs30 760 m/s, at the county's internal point:
-`1 - exp(-annual rate)` from the USGS mean hazard curve by log-log interpolation), `mmi6_100yr`
-(chance of shaking of intensity VI or more in 100 years, USGS map with local soil, nearest
-0.05° grid point within 8 km; contiguous US, Alaska and Hawaii only), `model`. Sources: USGS
-NSHM web service (`conus-2023` → 2023.R2, `alaska-2023`, `hawaii-2021`, `prvi-2025`), one call per
-county by three workers (about 0.7 requests a second); USGS MMI VI 100-year data release (doi:10.5066/P9GNPCOD). PD. Guam, the
-Northern Mariana Islands and American Samoa have no service model. Refresh: with each NSHM
-release (about every five years).
+`1 - exp(-annual rate)`; each grid node's USGS mean hazard curve is read at 0.1 g and 0.2 g by
+log-log interpolation, and the county value is the bilinear interpolation of the log rate between
+the four surrounding nodes), `mmi6_100yr` (chance of shaking of intensity VI or more in 100 years,
+USGS map with local soil, nearest 0.05° grid point within 8 km; contiguous US, Alaska and Hawaii
+only), `model` (`conus-2023-grid`, `alaska-2023-grid`, `hawaii-2021.R2-grid`, `prvi-2025.R1`).
 
-### core/climate.csv (3,202 rows) — projections
+Sources, all USGS and PD:
+- contiguous US and Alaska: gridded hazard curves from the 2023 50-state NSHM data release
+  (doi:10.5066/P9GNPCOD; `hazard_output_CONUS.zip` 0.9 GB and `hazard_output_AK.zip` 25 MB, both
+  on a 0.2° grid, about 20 km);
+- Hawaii: the 2021.R2 grid from the revised release (doi:10.5066/P14VGAV4; 0.02° grid);
+- Puerto Rico and the US Virgin Islands (no grid published): the NSHM web service
+  (`prvi-2025`, now answering as `prvi-2025.R1`), one PGA-only call per county, one at a time;
+- `mmi6_100yr`: the MMI VI 100-year data release (child of doi:10.5066/P9GNPCOD).
+
+Why grids: the web service covers every region, but on a full run of about 3,200 calls it
+rate-limited (HTTP 429) and then answered with errors. The grids are three downloads, give the
+same answer every time and put no load on the service. The grid ZIPs are only on disk while they
+are read. Guam, the Northern Mariana Islands and American Samoa have no USGS model. Refresh: with
+each NSHM release (about every five years); see §10 for the 2026 model revision.
+
+### core/climate.csv (3,231 rows) — projections
 
 Every value is a **projection** for the 2050 dial. Ratio columns multiply today's frequency; each
 has a central value and a `_high` value so 2050 numbers can show a range.
@@ -196,7 +213,11 @@ ratios are its fallback. Sources: NCA5 Interactive Atlas county layers at global
 and 3 °C (changes vs 1991–2020, SSP5-8.5 runs; **CC BY 4.0**), LOCA2 ensemble decadal county series
 (**CC BY 4.0**), CMRA 2025 (NOAA / U.S. Climate Resilience Toolkit; the ArcGIS item's licence field
 is blank, treated as US Government work). The Atlas 1.5 °C layer is read but not written, as
-nothing uses it. Contiguous US only. No county fire-weather index exists in these sources;
+nothing uses it. Coverage: the Atlas and LOCA2 columns cover the contiguous US; CMRA covers every
+state and island area, but publishes no RCP4.5 values for Alaska, so Alaska rows have only the
+`_high` (RCP8.5) CMRA ratios and counts. Chugach and Copper River (Alaska, created in 2019) take the
+values CMRA reports for the Valdez-Cordova Census Area they were split from; Ketchikan Gateway has
+no CMRA values and is the one county missing. No county fire-weather index exists in these sources;
 dry-day and hot-day ratios are the closest proxies. `rr-data::climate_multiplier` maps hazards to
 the ratio columns by a documented default (`variables_for`), clamped to 0.2–5; `rr-hazards` has its
 own order of preference. Refresh: when NCA6 or CMRA publish new county values.
@@ -316,8 +337,8 @@ of customers). Without filtering, each flicker reads as customers restored and n
 which inflates outage counts and truncates long outages. The filter keeps genuine second waves (a
 second storm) and removes flicker; on the 2023 test year it changed customer-hours by under 2%
 while restoring the multi-day tail (Wayne County: share of outages lasting 3+ days from 3% to
-14%, consistent with the raw curve). Assuming last-out-first-restored instead gives tails within
-about 30% of these, so the results do not hinge on the ordering assumption.
+14%, consistent with the raw curve). Assuming last-out-first-restored instead raises the multi-day shares by up to about a third in
+the hardest-hit counties, so the ordering assumption matters at the margin, not in kind.
 
 **Denominators.** Years of data count months with at least one record (EAGLE-I lists only
 snapshots with someone out); state-years in 2018–2022 with under 50% customer coverage (ORNL's
@@ -325,7 +346,7 @@ coverage history) are dropped (Montana 2018, Nebraska 2018–2022, South Dakota 
 the larger of ORNL's modelled count and the county's households (§10).
 
 **Result, nationally.** Weighting counties by customers, a customer has about 0.05 outages a year
-lasting at least a day and about 0.011 lasting at least three days. The median county records 5.6
+lasting at least a day and about 0.011 lasting at least three days. The median county records 5.8
 hours of outage per customer per year, close to EIA's national interruption figures with major
 events.
 
@@ -398,8 +419,9 @@ recipient and what it learns.
 - **Puerto Rico**: EAGLE-I files LUMA's outages by utility region, each under one "hub"
   municipio (the hubs' customer counts in the 2024 file sum to the island's 1.49 million). Read
   per municipio, those hubs showed up to 66 outages per customer-year. The ETL sums the hubs into
-  one island-wide series and gives every municipio the island's figures (`duration_basis =
-  island`); data start in 2021. The US Virgin Islands are reported per district; their rates are
+  one island-wide series and gives every municipio the island's rates, durations and event counts
+  (`duration_basis = island`; `customers` stays the municipio's own count, so weighting by it
+  counts the island once); data start in 2021. The US Virgin Islands are reported per district; their rates are
   high and, for St. John (about 2,700 customers), noisy.
 - **EAGLE-I coverage** before 2018 is not published by state; partial utility coverage then biases
   rates low. 72 mainland counties have no usable records.
@@ -410,11 +432,24 @@ recipient and what it learns.
   optional or add a basis field.
 - **NFIP claim rates** divide 30 years of claims by today's policy count; counties whose insured
   base changed a lot are off accordingly. Mean paid amounts are nominal dollars.
-- **Storm Events** damage fields are often blank (`share_damaging` is a lower bound); about
-  EVENTS_UNMAPPED_PCT of zone records use retired zone codes that could not be placed.
-- **Climate multipliers** exist for the contiguous US only; elsewhere the engine uses 1.
+- **Storm Events** damage fields are often blank (`share_damaging` is a lower bound); 5.1% of the
+  zone records used (34,015 records in 382 retired forecast zones) could not be placed in a county
+  and are skipped, so rates for zone-based types (winter storm, heat, high wind, coastal flood)
+  are slightly low where zones were redrawn.
+- **Climate multipliers**: the Atlas and LOCA2 ratios exist for the contiguous US only. Hawaii,
+  Puerto Rico and the island areas have CMRA ratios and counts; Alaska has only the RCP8.5
+  (`_high`) CMRA columns, so the default mapping (`climate_multiplier`, central columns) gives 1
+  there.
 - **Seismic** values are for firm rock (Vs30 760 m/s); softer soils shake more (`mmi6_100yr`
-  includes soil). No values for Guam, the Northern Mariana Islands or American Samoa.
+  includes soil). No values for Guam, the Northern Mariana Islands or American Samoa. The
+  contiguous-US and Alaska grids are the original 2023 release on a 0.2° (about 20 km) grid; the
+  USGS web service now runs a 2026 revision (2023.R2) whose grid is offered only through
+  ScienceBase's new file manager, which has no direct download link. Against the 307 contiguous-US
+  and Alaska counties the service answered before it failed, the grid values differ by a median
+  of 8–9% (87–92% of counties within ±20%, at 0.2 g and 0.1 g), but they are about twice the revised values on the Colorado
+  Plateau (Apache, Navajo and Coconino in Arizona; San Juan in Utah) and 2.5–3 times in Southeast
+  Alaska (Wrangell, Petersburg, Ketchikan, Juneau). Treat shaking chances as order-of-magnitude
+  there, and switch to the revised grid when USGS publishes a direct link.
 - **NRI is county-scale**; a ZIP in a large county can sit in a very different flood or wildfire
   regime. Copy must say "your county" until tract packs exist.
 
@@ -424,8 +459,15 @@ recipient and what it learns.
   NRI comes through ArcGIS, the documentation and the OpenFEMA terms were read from Internet
   Archive copies.
 - **Census Data API (ACS)** needs a key: skipped for v1 as briefed (households come from SVI).
-- **USGS hazard service** has no Guam or American Samoa model (`guam-2025`, `amsam-2025` return the
-  web app, not a service).
+- **USGS hazard web service** rate-limited (HTTP 429) and then answered
+  `{"status":"error"}` for every point during a full run on 2026-09-25 (about 3,200 calls from
+  three workers). The contiguous US, Alaska and Hawaii now come from the gridded data releases; the
+  service is used only for Puerto Rico and the US Virgin Islands (81 small calls, one at a time).
+  It has no Guam or American Samoa model (`guam-2025`, `amsam-2025` return the web app, not a
+  service).
+- **ScienceBase's new file manager** (where the 2026 revised NSHM grids are listed) is a
+  JavaScript app with no direct file links; the classic `catalog/file/get` links work for the
+  original 2023 grids and the Hawaii 2021.R2 grid, which are what the ETL uses.
 - **Not bundled by policy:** GEM (non-commercial share-alike), rmpmap (share-alike), First Street,
   PowerOutage.us.
 - **Optional, not built yet:** US Drought Monitor weeks in D2+, NOAA Atlas 14 100-year 24-hour
@@ -436,6 +478,6 @@ recipient and what it learns.
 `.github/workflows/data-refresh.yml` runs quarterly (and on demand with an optional job list),
 builds with `cargo run --release -p rr-etl -- refresh --out data`, gates on `rr-etl verify`, and
 opens a pull request; nothing merges automatically. A failing source keeps its previous pack and is
-named in `data/CHANGES.md`. The About screen shows `manifest.pack_version` and `manifest.generated`
-so a stale snapshot is obvious. The full run takes about an hour and a half (EAGLE-I streaming and
-one USGS call per county dominate).
+named in `data/CHANGES.md`; a file a job stops writing is deleted and listed there as removed. The About screen shows `manifest.pack_version` and `manifest.generated`
+so a stale snapshot is obvious. The full run takes about half an hour (streaming 11.6 GB of EAGLE-I
+files dominates).
