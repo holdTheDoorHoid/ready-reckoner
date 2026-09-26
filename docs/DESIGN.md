@@ -593,6 +593,20 @@ guidance beyond safe storage and training pointers.
 
 ## 14. Decision log (append only)
 
+- 2026-09-26 — Verification pass (agent/verify; `docs/VERIFICATION.md`). Model decisions taken to fix
+  implausible real-pack numbers: a county outage curve treats the first zero share past its last
+  positive one as an upper bound (0.5 %) and never decays more slowly than a log-normal with σ = 2
+  beyond its last point (88 counties had a 365-day power target; none now exceeds 90 days); the
+  major-hurricane share is taken against HURDAT2 tropical-storm passages, which NRI's frequency
+  counts, shrunk toward the pooled 5.4 % with the weight of 5 passages (a missing major row now
+  means none recorded, replacing the one-third fallback; Philadelphia power 5 → 3 days, as the
+  research gives); heat and cold waves show at least "Serious" for households with someone 65+,
+  a baby, a powered device, pregnancy (heat) or no cooling/heating (display only); family guidance
+  marks one hazard's sentences `{if:<hazard>}…{/if}` and the packet keeps them only where that
+  hazard's ten-year chance is at least 1 in 100. Housekeeping: `rr_data::verify` replaces
+  `rr_etl::verify` (rr-cli drops rr-etl), and rr-data returns the NRI statement first. Open for the
+  web workstream: the plan screen's list keys (V-10). Proposed, not done: pool counties without
+  (or with few) outage records with the state series (V-15).
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
 - 2026-09-26 — Polish round merged (supply2 296939c, budget2 c4e0452, content2 17a6334, supply3 c9db968,
   plan-2 24aec38; plus rr-cli 0be9046 and rr-wasm 7efef62). Goldens now come from the REAL data pack and
