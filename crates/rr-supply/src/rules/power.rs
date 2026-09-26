@@ -114,6 +114,7 @@ pub fn medical_device_wh(days: f64, people_list: &[Person]) -> Option<Sizing> {
 pub fn lights(people_list: &[Person]) -> Sizing {
     let mut b = Basis::new();
     let each = b.k(keys::LIGHTS_PER_PERSON);
+    b.cite("ready_gov_power_outages");
     let n = people_list.iter().filter(|p| is_4_plus(p)).count().max(1) as f64;
     let q = (n * each).max(1.0);
     let text = format!(
@@ -221,7 +222,12 @@ pub fn power_station_wh(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let usable = station * usable_share;
     let q = per_day * days;
     let text = format!(
-        "If you want a battery power station: your essential load (medical devices and phones) is about {} Wh a day, {} Wh for {}. A {} Wh station gives about {} Wh after losses, enough for about {} of that load; a full-size fridge alone would drain it in about {}.",
+        "If you want a battery power station: your essential load ({}) is about {} Wh a day, {} Wh for {}. A {} Wh station gives about {} Wh after losses, enough for about {} of that load; a full-size fridge alone would drain it in about {}.",
+        if devices > 0.0 {
+            "medical equipment and phones"
+        } else {
+            "phones"
+        },
         num(per_day, 0),
         num(super::round_quantity("Wh", q), 0),
         fmt_days(days),

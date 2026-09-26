@@ -135,8 +135,10 @@ pub fn ors_packets(days: f64, people_list: &[Person]) -> Sizing {
     let n = people_list.len().max(1) as f64;
     let q = ceil_count(per_2wk * n * (days.max(0.0) / 14.0).max(1.0));
     let text = format!(
-        "Oral rehydration salts for vomiting, diarrhea or heat illness: {} a person for up to 2 weeks = {} packets. Mix each packet into {} of safe water.",
+        "Oral rehydration salts for vomiting, diarrhea or heat illness: {} packets a person for every 2 weeks, at least 2 weeks' worth. For {} and {} that is {} packets. Mix each packet into {} of safe water.",
         num(per_2wk, 0),
+        count(n, "person", "people"),
+        fmt_days(days.max(14.0)),
         num(q, 0),
         count(litres, "litre", "litres")
     );

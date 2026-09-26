@@ -97,13 +97,39 @@ pub fn fire_extinguisher(housing: &Housing) -> Option<Sizing> {
     ))
 }
 
+/// A fire escape plan: two ways out of every room and a meeting spot outside. Every household
+/// gets it, alarms or not. Rule `fire_escape_plan`.
+pub fn fire_escape_plan(housing: &Housing) -> Sizing {
+    let mut b = Basis::new();
+    b.cite("ready_gov_home_fires");
+    let mut text = "A fire escape plan: two ways out of every room, a meeting spot outside, and a practice run with everyone.".to_owned();
+    if matches!(
+        housing.kind,
+        HousingKind::ApartmentHighRise | HousingKind::ApartmentLowRise
+    ) {
+        text.push_str(" In a building, know both stairways; never use the elevator in a fire.");
+    }
+    if housing.alarms.smoke {
+        text.push_str(" Test your smoke alarms every month.");
+    }
+    Sizing::new(
+        &b,
+        "fire_escape_plan",
+        "fire_escape_plan",
+        1.0,
+        "plan",
+        Per::Household,
+        text,
+    )
+}
+
 /// Swap numbers with neighbours and agree who checks on whom (an estimate of how many). Rule
 /// `neighbour_contacts`.
 pub fn neighbour_contacts() -> Sizing {
     let mut b = Basis::new();
     let n = b.k(keys::NEIGHBOUR_CONTACTS);
     let text = format!(
-        "Swap phone numbers with {} and agree who checks on whom after a storm or an outage. Neighbours are usually the first help to arrive.",
+        "Swap phone numbers with {} and agree who checks on whom after a storm or an outage, when phones and roads may be down.",
         count(n, "neighbour", "neighbours")
     );
     Sizing::new(
@@ -130,6 +156,13 @@ mod tests {
         assert_eq!(co.quantity, 3.0, "rowhouse: 2 levels plus a basement");
         assert!(co.citations.iter().any(|c| c == "ready_gov_power_outages"));
         assert_eq!(fire_extinguisher(&p.housing).unwrap().quantity, 1.0);
+        let plan = fire_escape_plan(&p.housing);
+        assert_eq!(plan.quantity, 1.0);
+        assert!(plan.plain.contains("two ways out") && plain_has_month(&plan.plain));
+    }
+
+    fn plain_has_month(s: &str) -> bool {
+        s.contains("every month")
     }
 
     #[test]

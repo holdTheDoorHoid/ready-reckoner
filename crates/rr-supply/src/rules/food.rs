@@ -175,7 +175,8 @@ pub fn food_cost_estimates(days: f64, people_list: &[Person]) -> Vec<Sizing> {
 
     let mut b = Basis::new();
     let pantry = b.k(keys::FOOD_COST_PANTRY_USD_PER_PERSON_DAY);
-    let factor = size_factor(&mut b, people_list.len());
+    // Babies on breast milk or formula do not change grocery economies, so they are not counted.
+    let factor = size_factor(&mut b, fed_n);
     let cost = person_days * pantry * factor;
     let adjust = if (factor - 1.0).abs() < 1e-9 {
         String::new()
@@ -185,7 +186,7 @@ pub fn food_cost_estimates(days: f64, people_list: &[Person]) -> Vec<Sizing> {
             ", {} {} % for a household of {}",
             if pct > 0.0 { "plus" } else { "minus" },
             num(pct.abs(), 0),
-            people_list.len()
+            fed_n
         )
     };
     let text = format!(
@@ -529,10 +530,11 @@ pub fn pet_food(days: f64, pets: &Pets) -> Option<Sizing> {
     b.cite("aspca_disaster_prep");
     let q = f64::from(n) * days;
     let text = format!(
-        "Food for {} for {} ({} pet-days): what they eat now, in an airtight, waterproof container.",
+        "Food for {} for {} ({} pet-days): what {} now, in an airtight, waterproof container.",
         pets_phrase([pets.dogs, pets.cats, pets.small]),
         fmt_days(days),
-        num(q, 1)
+        num(q, 1),
+        if n == 1 { "it eats" } else { "they eat" }
     );
     Some(
         Sizing::new(&b, "pet_food", "pet_food", q, "pet_day", Per::Pet, text)

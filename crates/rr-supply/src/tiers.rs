@@ -11,7 +11,8 @@ use crate::targets::clean_days;
 /// up to 3 is `h72`, up to 14 `w2`, up to 30 `m1`, up to 90 `m3`, up to 180 `m6`, and anything
 /// longer `y1` (DESIGN §4.5: a tier enters the plan when a target exceeds the tier before it).
 pub fn tier_for_days(days: f64) -> TierId {
-    if !(days > 0.0) {
+    // NaN, zero and negative days all mean nothing to store.
+    if days.is_nan() || days <= 0.0 {
         return TierId::Now;
     }
     TierId::ALL

@@ -102,7 +102,7 @@ pub fn go_bag_water(
     let per_day = d.people_gal();
     let q = per_day * days;
     let text = format!(
-        "Water for the go-bags: {} a day for {} × {} = {}. If you leave on foot, carry what you can (about {} L each) and a filter; the rest goes in the car.",
+        "Water for the go-bags, the Red Cross three-day supply for leaving home: about {} a day for the {} × {} = {}. If you leave on foot, carry what you can (about {} L each) and a filter; the rest goes in the car.",
         gallons(per_day),
         count(people_list.len() as f64, "person", "people"),
         fmt_days(days),
@@ -216,12 +216,13 @@ pub fn pet_go_food(pets: &Pets) -> Option<Sizing> {
     let rotate = b.k(keys::PET_KIT_ROTATION_MONTHS);
     let q = f64::from(n) * days;
     let text = format!(
-        "Food in the pet go-kit for {}: {} ({} to {} days) = {} pet-days, with any medicine they take, their records and a photo. Replace the food every {}.",
+        "Food in the pet go-kit for {}: {} ({} to {} days) = {} pet-days, with any medicine {} takes, records and a photo. Replace the food every {}.",
         pets_phrase([pets.dogs, pets.cats, pets.small]),
         fmt_days(days),
         num(lo, 0),
         num(hi, 0),
         num(q, 0),
+        if n == 1 { "it" } else { "each" },
         count(rotate, "month", "months")
     );
     Some(
@@ -245,10 +246,10 @@ pub fn fuel_half_tank(vehicles: usize, evs: usize) -> Option<Sizing> {
     };
     let mut text = format!(
         "Keep {} at least {half} full at all times, and fill up when leaving looks likely.",
-        if vehicles == 1 {
-            "the vehicle".to_owned()
-        } else {
-            format!("all {vehicles} vehicles")
+        match vehicles {
+            1 => "the vehicle".to_owned(),
+            2 => "both vehicles".to_owned(),
+            n => format!("all {n} vehicles"),
         }
     );
     if evs > 0 {

@@ -104,6 +104,7 @@ pub const RULE_IDS: &[&str] = &[
     "smoke_alarm",
     "co_alarm",
     "fire_extinguisher",
+    "fire_escape_plan",
     "neighbour_contacts",
     "document_kit",
     "insurance_home_or_renters",
@@ -329,10 +330,16 @@ pub fn sized_requirements(
                 let Some(days) = days_of(bucket) else {
                     continue;
                 };
-                let treat = water::water_treatment_boil(days, people, pets, level, hot);
+                let treat = water::water_treatment_boil(days, people, pets, hot);
                 let fuel = water::boil_fuel(treat.quantity);
                 out.push(bucket, cited(bucket, Some(treat)), Need, None, false);
-                out.push(bucket, Some(fuel), Optional, None, false);
+                out.push(
+                    bucket,
+                    Some(fuel),
+                    Optional,
+                    Some(tier_for_days(days)),
+                    false,
+                );
             }
             BucketId::WaterOut => {
                 let Some(days) = days_of(bucket) else {
@@ -662,6 +669,13 @@ pub fn sized_requirements(
                 );
             }
             BucketId::Fire => {
+                out.push(
+                    bucket,
+                    Some(fire::fire_escape_plan(housing)),
+                    Need,
+                    now,
+                    false,
+                );
                 out.push(bucket, fire::smoke_alarm(housing), Need, h72, true);
                 out.push(bucket, fire::co_alarm(housing), Need, h72, true);
                 out.push(bucket, fire::fire_extinguisher(housing), Need, h72, false);

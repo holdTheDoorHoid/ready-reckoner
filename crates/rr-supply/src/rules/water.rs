@@ -76,6 +76,7 @@ pub(crate) fn daily(
     hot: bool,
 ) -> WaterDaily {
     let (total, drinking) = match level {
+        _ if people.is_empty() => (0.0, 0.0),
         WaterLevel::Survival => {
             let s = b.k(keys::WATER_SURVIVAL_GAL);
             (s, s)
@@ -90,7 +91,7 @@ pub(crate) fn daily(
             b.k(keys::WATER_SURVIVAL_GAL),
         ),
     };
-    let (allowance_gal, drinking_gal) = if hot {
+    let (allowance_gal, drinking_gal) = if hot && !people.is_empty() {
         let m = b.k(keys::WATER_HEAT_DRINKING_MULTIPLIER);
         b.k(keys::HOT_CLIMATE_DAYS_95F);
         (total + drinking * (m - 1.0), drinking * m)
@@ -384,17 +385,13 @@ pub(crate) fn how_to_treat(b: &mut Basis) -> String {
     )
 }
 
-/// Water to make safe during a boil-water notice of `days` days: the drinking share for people,
-/// plus pregnancy, nursing, formula and pets. Rule `water_treatment_capacity` (bucket `water_boil`).
-pub fn water_treatment_boil(
-    days: f64,
-    people_list: &[Person],
-    pets: &Pets,
-    level: WaterLevel,
-    hot: bool,
-) -> Sizing {
+/// Water to make safe during a boil-water notice of `days` days: the drinking share (Ready.gov's
+/// 3/4 gallon a person, doubled in heat) plus pregnancy, nursing, formula and pets. It does not
+/// depend on the water level, which only changes how much washing water is stored. Rule
+/// `water_treatment_capacity` (bucket `water_boil`).
+pub fn water_treatment_boil(days: f64, people_list: &[Person], pets: &Pets, hot: bool) -> Sizing {
     let mut b = Basis::new();
-    let d = daily(&mut b, people_list, pets, level, hot);
+    let d = daily(&mut b, people_list, pets, WaterLevel::Basic, hot);
     let per_day = d.drinking_total_gal();
     let q = per_day * days;
     let how = how_to_treat(&mut b);
@@ -618,7 +615,7 @@ mod tests {
     #[test]
     fn boil_notice_treats_the_drinking_share() {
         let p = philly();
-        let s = water_treatment_boil(4.0, &p.people, &p.pets, WaterLevel::Basic, false);
+        let s = water_treatment_boil(4.0, &p.people, &p.pets, false);
         // 4 × 0.75 + dog 0.3125 = 3.3125 gal/day × 4 = 13.25
         assert_eq!(s.quantity, 13.3);
         assert!(
