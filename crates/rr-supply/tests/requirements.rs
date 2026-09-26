@@ -340,6 +340,21 @@ fn every_duration_and_readiness_bucket_gets_lines() {
 }
 
 #[test]
+fn livestock_water_stops_at_the_stored_days() {
+    // Hays farm, 12 large animals, 60 days without water: 12 × 25 L × min(60, 14) days = 4,200 L.
+    let input = fixtures::get("hays-kansas-farm-5").unwrap();
+    assert_eq!(input.pets.large_animals, 12);
+    let lines = requirements(&input, &[common::days(BucketId::WaterOut, 60.0)]);
+    let l = line(&lines, "water_out.livestock_water");
+    assert_eq!(l.quantity, 1109.5, "was 4,755 gallons uncapped");
+    assert!(l.plain.contains("well pump") && l.plain.contains("haul water"));
+    assert!(l.citations.iter().any(|c| c == common::TARGET_SOURCE));
+    // Under the cap nothing changes: 12 × 25 L × 3 days = 900 L.
+    let short = requirements(&input, &[common::days(BucketId::WaterOut, 3.0)]);
+    assert_eq!(line(&short, "water_out.livestock_water").quantity, 237.8);
+}
+
+#[test]
 fn deterministic_byte_for_byte() {
     for (name, input, targets) in common::all() {
         let a = requirements(&input, &targets);

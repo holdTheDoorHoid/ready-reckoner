@@ -607,7 +607,10 @@ pub fn boil_fuel(gallons_to_boil: f64) -> Sizing {
     )])
 }
 
-/// Water for livestock and horses for `days` days (Sphere). Rule `livestock_water`.
+/// Water for livestock and horses (Sphere): 25 L a day per large animal for the target's days, but
+/// no more than the days of water a household stores (`water_stored_cap_days`, 14), the same cap
+/// as people's stored water (an estimate for animals). Beyond that the line points to power for the
+/// well pump or a plan to haul water instead of more tank space. Rule `livestock_water`.
 pub fn livestock_water(days: f64, large_animals: u8) -> Option<Sizing> {
     if large_animals == 0 || days <= 0.0 {
         return None;
@@ -616,19 +619,34 @@ pub fn livestock_water(days: f64, large_animals: u8) -> Option<Sizing> {
     let l_each = b.k(keys::WATER_LIVESTOCK_L_DAY);
     let (lo, hi) = b.range(keys::WATER_LIVESTOCK_L_DAY);
     b.cite("aspca_disaster_prep");
+    // The cap stands behind the line only when it binds.
+    let capped = days > constants().value(keys::WATER_STORED_CAP_DAYS);
+    let stored_days = if capped {
+        b.cite(crate::constants::PRIOR_SOURCE);
+        b.k(keys::WATER_STORED_CAP_DAYS)
+    } else {
+        days
+    };
     let n = f64::from(large_animals);
-    let litres = n * l_each * days;
+    let litres = n * l_each * stored_days;
     let gal = litres / L_PER_GAL;
-    let text = format!(
+    let mut text = format!(
         "{} × {} L a day ({} to {}) × {} = {} L, about {}. Fill tubs or stock tanks before a storm or an outage.",
         count(n, "large animal", "large animals"),
         num(l_each, 0),
         num(lo, 0),
         num(hi, 0),
-        fmt_days(days),
+        fmt_days(stored_days),
         num(litres, 0),
         gallons(super::round_quantity("gallon", gal))
     );
+    if capped {
+        text.push_str(&format!(
+            " Your target is {}; store the first {}, as for people, and beyond that keep the well pump powered (a generator or battery sized for it) or plan to haul water, instead of buying more tank space.",
+            fmt_days(days),
+            fmt_days(stored_days)
+        ));
+    }
     Some(
         Sizing::new(
             &b,
@@ -639,7 +657,7 @@ pub fn livestock_water(days: f64, large_animals: u8) -> Option<Sizing> {
             Per::Pet,
             text,
         )
-        .per_day(days, n * l_each / L_PER_GAL),
+        .per_day(stored_days, n * l_each / L_PER_GAL),
     )
 }
 
@@ -781,7 +799,30 @@ mod tests {
         // 12 × 25 × 3 = 900 L = 237.8 gal
         assert_eq!(s.quantity, 237.8);
         assert_eq!(s.citations[0], "sphere_2018");
+        assert!(!s.prior && !s.plain.contains("well pump"));
         assert!(livestock_water(3.0, 0).is_none());
+    }
+
+    #[test]
+    fn livestock_water_is_capped_at_the_stored_days() {
+        // 12 large animals × 25 L × min(target, 14) days: a 60-day target stores 14 days,
+        // 4,200 L = 1,109.5 gal (it was 18,000 L, 4,755 gal).
+        let s = livestock_water(60.0, 12).unwrap();
+        assert_eq!(s.quantity, 1109.5);
+        assert_eq!(s.days, Some(14.0));
+        assert_eq!(s.per_day, Some(12.0 * 25.0 / L_PER_GAL));
+        assert!(s.plain.contains("× 14 days = 4,200 L"), "{}", s.plain);
+        assert!(s.plain.contains("well pump") && s.plain.contains("haul water"));
+        assert!(s.prior, "the human cap applied to animals is an estimate");
+        assert!(
+            s.citations
+                .iter()
+                .any(|c| c == "byu_longer_term_storage_2019")
+        );
+        // Exactly 14 days is not capped; the cap never lowers a shorter target.
+        let at = livestock_water(14.0, 12).unwrap();
+        assert_eq!(at.quantity, s.quantity);
+        assert!(!at.prior && !at.plain.contains("well pump"));
     }
 
     #[test]
