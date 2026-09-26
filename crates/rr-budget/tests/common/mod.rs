@@ -153,6 +153,7 @@ pub fn item(
         free,
         life_safety,
         rare_catastrophic: false,
+        assumed_basic: false,
         spec: "Test item.".into(),
         look_for: Vec::new(),
         avoid: Vec::new(),

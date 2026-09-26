@@ -1,0 +1,57 @@
+state_fips,state_abbr,state_name,nca_region,coastal,great_lakes
+01,AL,Alabama,southeast,true,false
+02,AK,Alaska,alaska,true,false
+04,AZ,Arizona,southwest,false,false
+05,AR,Arkansas,southeast,false,false
+06,CA,California,southwest,true,false
+08,CO,Colorado,southwest,false,false
+09,CT,Connecticut,northeast,true,false
+10,DE,Delaware,northeast,true,false
+11,DC,District of Columbia,northeast,false,false
+12,FL,Florida,southeast,true,false
+13,GA,Georgia,southeast,true,false
+15,HI,Hawaii,hawaii_pacific,true,false
+16,ID,Idaho,northwest,false,false
+17,IL,Illinois,midwest,false,true
+18,IN,Indiana,midwest,false,true
+19,IA,Iowa,midwest,false,false
+20,KS,Kansas,southern_great_plains,false,false
+21,KY,Kentucky,southeast,false,false
+22,LA,Louisiana,southeast,true,false
+23,ME,Maine,northeast,true,false
+24,MD,Maryland,northeast,true,false
+25,MA,Massachusetts,northeast,true,false
+26,MI,Michigan,midwest,false,true
+27,MN,Minnesota,midwest,false,true
+28,MS,Mississippi,southeast,true,false
+29,MO,Missouri,midwest,false,false
+30,MT,Montana,northern_great_plains,false,false
+31,NE,Nebraska,northern_great_plains,false,false
+32,NV,Nevada,southwest,false,false
+33,NH,New Hampshire,northeast,true,false
+34,NJ,New Jersey,northeast,true,false
+35,NM,New Mexico,southwest,false,false
+36,NY,New York,northeast,true,true
+37,NC,North Carolina,southeast,true,false
+38,ND,North Dakota,northern_great_plains,false,false
+39,OH,Ohio,midwest,false,true
+40,OK,Oklahoma,southern_great_plains,false,false
+41,OR,Oregon,northwest,true,false
+42,PA,Pennsylvania,northeast,true,true
+44,RI,Rhode Island,northeast,true,false
+45,SC,South Carolina,southeast,true,false
+46,SD,South Dakota,northern_great_plains,false,false
+47,TN,Tennessee,southeast,false,false
+48,TX,Texas,southern_great_plains,true,false
+49,UT,Utah,southwest,false,false
+50,VT,Vermont,northeast,false,false
+51,VA,Virginia,southeast,true,false
+53,WA,Washington,northwest,true,false
+54,WV,West Virginia,northeast,false,false
+55,WI,Wisconsin,midwest,false,true
+56,WY,Wyoming,northern_great_plains,false,false
+60,AS,American Samoa,hawaii_pacific,true,false
+66,GU,Guam,hawaii_pacific,true,false
+69,MP,Commonwealth of the Northern Mariana Islands,hawaii_pacific,true,false
+72,PR,Puerto Rico,caribbean,true,false
+78,VI,United States Virgin Islands,caribbean,true,false

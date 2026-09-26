@@ -19,6 +19,12 @@ pub const PLACEHOLDER_PLANNING_DATE: Date = match Date::from_ymd(2026, 10, 1) {
     None => panic!("placeholder planning date is invalid"),
 };
 
+/// The `#[serde(default = ...)]` for fields that default to `true` when absent (plain `bool`'s own
+/// `Default` is `false`).
+const fn default_true() -> bool {
+    true
+}
+
 /// Everything the engine needs about one household. `assess` turns this into a
 /// [`crate::PlanOutput`].
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -40,6 +46,12 @@ pub struct PlanInput {
     pub finances: Finances,
     /// What the household already has, and free actions already done. May be empty.
     pub existing: Vec<Owned>,
+    /// Credit the household with everyday basics that almost every home has (blankets and warm
+    /// layers, a cooking pot and can opener, a phone, a bag per person, three days of ordinary
+    /// food) unless the Have screen says otherwise. On by default; the packet lists what was
+    /// assumed. Items the allocator credits this way are marked [`crate::Item::assumed_basic`].
+    #[serde(default = "default_true")]
+    pub assume_basics: bool,
     /// The dials: how rare an event to be ready for, climate horizon, planning horizon, water
     /// level.
     pub dials: Dials,
@@ -622,6 +634,7 @@ impl PlanInput {
                 insurance: Insurance::default(),
             },
             existing: Vec::new(),
+            assume_basics: true,
             dials: Dials {
                 return_period: ReturnPeriod::OneIn100,
                 climate: ClimateHorizon::Today,
@@ -659,10 +672,12 @@ mod tests {
             "mobility",
             "finances",
             "existing",
+            "assume_basics",
             "dials",
         ] {
             assert!(v.get(key).is_some(), "defaults() is missing {key}");
         }
+        assert_eq!(v["assume_basics"], true);
         assert_eq!(v["dials"]["water_level"], "basic");
         assert_eq!(v["dials"]["return_period"], "one_in_100");
         assert_eq!(v["dials"]["scenario_overrides"], serde_json::json!([]));
@@ -728,6 +743,26 @@ mod tests {
         ] {
             assert!(serde_json::from_str::<Dials>(bad).is_err(), "{bad}");
         }
+    }
+
+    #[test]
+    fn assume_basics_defaults_to_true_when_absent() {
+        let mut v = serde_json::to_value(PlanInput::defaults()).unwrap();
+        assert_eq!(v["assume_basics"], true);
+        v.as_object_mut().unwrap().remove("assume_basics");
+        let parsed: PlanInput = serde_json::from_value(v.clone()).unwrap();
+        assert!(
+            parsed.assume_basics,
+            "absent assume_basics must default to true"
+        );
+
+        v["assume_basics"] = serde_json::json!(false);
+        let parsed: PlanInput = serde_json::from_value(v).unwrap();
+        assert!(!parsed.assume_basics);
+        assert_eq!(
+            serde_json::to_value(&parsed).unwrap()["assume_basics"],
+            false
+        );
     }
 
     #[test]
