@@ -52,3 +52,52 @@ export interface RawEngine {
   catalogue(): string;
   defaults(): string;
 }
+
+// ---------------------------------------------------------------------------------------------
+// Choosing the engine (web-shell). Kept below the contract so the interfaces above stay as agreed.
+// ---------------------------------------------------------------------------------------------
+
+/** Which engine is answering, for the About screen and the sample-data banner. */
+export interface EngineSource {
+  kind: 'wasm' | 'mock';
+  /** Why the mock is answering when the build asked for the WebAssembly engine. */
+  fallback?: string;
+}
+
+interface Chosen {
+  engine: Engine;
+  source: EngineSource;
+}
+
+let chosen: Promise<Chosen> | undefined;
+
+async function choose(): Promise<Chosen> {
+  if (__RR_ENGINE__ === 'wasm') {
+    try {
+      const { loadWasmEngine } = await import('./wasm');
+      return { engine: await loadWasmEngine(import.meta.env.BASE_URL), source: { kind: 'wasm' } };
+    } catch (e) {
+      console.warn('The WebAssembly engine did not load; using the mock engine instead.', e);
+      const { createMockEngine } = await import('./mock');
+      return { engine: createMockEngine(), source: { kind: 'mock', fallback: String(e) } };
+    }
+  }
+  const { createMockEngine } = await import('./mock');
+  return { engine: createMockEngine(), source: { kind: 'mock' } };
+}
+
+/**
+ * The engine the app talks to: the WebAssembly engine when the site is built with it
+ * (`VITE_ENGINE=wasm`, or `public/pkg/` present at build time), otherwise the mock. Both implement
+ * `Engine`, so callers never need to know which one answered.
+ */
+export function getEngine(): Promise<Engine> {
+  chosen ??= choose();
+  return chosen.then((c) => c.engine);
+}
+
+/** Which engine `getEngine()` resolved to. */
+export function getEngineSource(): Promise<EngineSource> {
+  chosen ??= choose();
+  return chosen.then((c) => c.source);
+}

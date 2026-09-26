@@ -1,0 +1,184 @@
+/*
+ * Design tokens. Light by default; dark follows the system setting unless the person picks a
+ * theme (html[data-theme="light"|"dark"], set from the footer and remembered on this device).
+ * Every colour pairing used for text meets WCAG AA contrast on its background. Severity steps
+ * differ in lightness as well as hue, and always travel with a text label and a pattern.
+ */
+:root {
+  color-scheme: light;
+
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --surface-2: #f1efe9;
+  --surface-3: #e6e3dc;
+  --text: #1c2226;
+  --text-muted: #4f5860;
+  --border: #d6d2c9;
+  --border-strong: #8c877e;
+
+  --accent: #0e5c69;
+  --accent-hover: #0a4852;
+  --accent-soft: #e1eef0;
+  --on-accent: #ffffff;
+  --focus: #1a5fb4;
+  --focus-halo: #ffffff;
+
+  --good: #2b6a3c;
+  --good-soft: #e3f1e6;
+  --warn: #7f5200;
+  --warn-soft: #fbf1db;
+  --warn-edge: #c99a3a;
+  --note: #1f4f8a;
+  --note-soft: #e5edf8;
+  --note-edge: #7ea3d6;
+  --danger: #a3322a;
+  --danger-soft: #f9e6e4;
+
+  --sev-1: #f4e6c9;
+  --sev-2: #eac27f;
+  --sev-3: #d88f3a;
+  --sev-4: #b05d1e;
+  --sev-5: #6f310d;
+  --sev-ink: #1c2226;
+  --sev-ink-strong: #ffffff;
+
+  --gauge-track: #e3e0d8;
+  --gauge-fill: #0e5c69;
+  --gauge-over: #2b6a3c;
+
+  --mock-bg: #fff3c4;
+  --mock-ink: #4d3a00;
+  --mock-edge: #d8b44a;
+
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 0.75rem;
+  --s4: 1rem;
+  --s5: 1.5rem;
+  --s6: 2rem;
+  --s7: 3rem;
+  --s8: 4rem;
+
+  --r1: 6px;
+  --r2: 10px;
+  --r3: 16px;
+
+  --shadow-1: 0 1px 2px rgb(20 24 26 / 0.06), 0 1px 1px rgb(20 24 26 / 0.04);
+  --shadow-2: 0 4px 16px rgb(20 24 26 / 0.08), 0 1px 3px rgb(20 24 26 / 0.06);
+
+  --w-text: 42rem;
+  --w-wide: 74rem;
+  --tap: 44px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: #121517;
+    --surface: #1a1e21;
+    --surface-2: #22272b;
+    --surface-3: #2c3237;
+    --text: #e9e7e2;
+    --text-muted: #aab1b8;
+    --border: #353c42;
+    --border-strong: #7a838b;
+
+    --accent: #62b6c4;
+    --accent-hover: #86c9d4;
+    --accent-soft: #1b3337;
+    --on-accent: #0a1a1d;
+    --focus: #8ab4f8;
+    --focus-halo: #121517;
+
+    --good: #7fc792;
+    --good-soft: #1b3122;
+    --warn: #eabb5f;
+    --warn-soft: #362b14;
+    --warn-edge: #a67a25;
+    --note: #93b8ec;
+    --note-soft: #1a283a;
+    --note-edge: #45699c;
+    --danger: #f1918a;
+    --danger-soft: #3b1f1c;
+
+    --sev-1: #3d3321;
+    --sev-2: #6b5125;
+    --sev-3: #a36e2d;
+    --sev-4: #d8994d;
+    --sev-5: #f5cf9c;
+    --sev-ink: #e9e7e2;
+    --sev-ink-strong: #1a1e21;
+
+    --gauge-track: #2e3439;
+    --gauge-fill: #62b6c4;
+    --gauge-over: #7fc792;
+
+    --mock-bg: #3a2f10;
+    --mock-ink: #f5dc93;
+    --mock-edge: #8a6d1d;
+
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-2: 0 4px 16px rgb(0 0 0 / 0.45);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #121517;
+  --surface: #1a1e21;
+  --surface-2: #22272b;
+  --surface-3: #2c3237;
+  --text: #e9e7e2;
+  --text-muted: #aab1b8;
+  --border: #353c42;
+  --border-strong: #7a838b;
+
+  --accent: #62b6c4;
+  --accent-hover: #86c9d4;
+  --accent-soft: #1b3337;
+  --on-accent: #0a1a1d;
+  --focus: #8ab4f8;
+  --focus-halo: #121517;
+
+  --good: #7fc792;
+  --good-soft: #1b3122;
+  --warn: #eabb5f;
+  --warn-soft: #362b14;
+  --warn-edge: #a67a25;
+  --note: #93b8ec;
+  --note-soft: #1a283a;
+  --note-edge: #45699c;
+  --danger: #f1918a;
+  --danger-soft: #3b1f1c;
+
+  --sev-1: #3d3321;
+  --sev-2: #6b5125;
+  --sev-3: #a36e2d;
+  --sev-4: #d8994d;
+  --sev-5: #f5cf9c;
+  --sev-ink: #e9e7e2;
+  --sev-ink-strong: #1a1e21;
+
+  --gauge-track: #2e3439;
+  --gauge-fill: #62b6c4;
+  --gauge-over: #7fc792;
+
+  --mock-bg: #3a2f10;
+  --mock-ink: #f5dc93;
+  --mock-edge: #8a6d1d;
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-2: 0 4px 16px rgb(0 0 0 / 0.45);
+}
