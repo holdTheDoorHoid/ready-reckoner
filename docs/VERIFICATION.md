@@ -173,15 +173,19 @@ and 30 without, because with basics assumed the plan starts saving for the gravi
 117 instead of 111 and the ten-year horizon ends first. It is the greedy allocator's path
 dependence on a budget that never finishes; noted, not fixed.
 
-Along the way the harness found V-07 (in 29 of 500 packets before the fix, and in 13 more from a
-second sentence, fixed in `2c11e41`) and the missing "What helps" of V-13; an apparent overspend (household 367) was the harness's own accounting (a sinking
-fund's money can move to the next top item), and it now checks purchases alone against the money,
-as the allocator promises.
+Along the way the harness found V-07 (29 of 500 packets before the first fix; 13 after it, from a
+second sentence fixed in `2c11e41`). An apparent overspend (household 367) was the harness's own
+accounting (a sinking fund's money can move to the next top item); it now checks purchases alone
+against the money, as the allocator promises. The "What helps" check was added after the packet
+review of §6 found V-13.
 
 ## 3. Guardrails
 
-Each case is the Philadelphia fixture with one change, run through `rr plan --format json`
-(`python3 guard.py` in the verification notes; the commands are in the table):
+Each case is `fixtures/households/philadelphia-renters-4.json` with the change in the table,
+run as `rr plan --household case.json --format json` and read from `.warnings[].id` (for example
+the CPAP case sets `people[0].medical.powered_device` to `"cpap"` and
+`finances.monthly_budget_usd` to 10; the flood case sets `housing.tenure` to `"own"` and
+`location` to `{"country": "US", "county_fips": "22109", "setting": "suburban"}`):
 
 | Guardrail | Should fire | Fires | Control (should not fire) | Fires |
 | --- | --- | --- | --- | --- |
@@ -411,8 +415,9 @@ the risks screen, a dial change, the packet and the About screen.
 throws `each_key_duplicate` (console: `https://svelte.dev/e/each_key_duplicate`) and the router
 stays on "Your risks". When a sinking fund fills, the engine lists that month's last deposit
 (`reserve`) and the purchase (`purchase`) for the same item and tier; `PlanScreen.svelte` keys its
-month lists by `item.item_id + item.tier`. It happens for most real plans (the Philadelphia, Hays
-and Phoenix goldens have 4–6 such months) but never for the mock engine, so the screen tests pass.
+month lists by `item.item_id + item.tier`. It happens whenever a sinking fund fills (three of the
+seven goldens, Philadelphia, Hays and Phoenix, have 4–6 such months; so did the one-adult household
+of the browser run), never with the mock engine, so the screen tests pass.
 *Fix (web):* key by `item.item_id + item.tier + item.kind` (PlanScreen.svelte lines 113, 129, 134,
 143, 189, 213; ReadinessCard.svelte 34, 42; HazardCard.svelte 61). `web/src/screens/verify.real-output.test.ts`
 reproduces it with the real Philadelphia golden (recorded as `it.fails`; flip to `it` with the fix).
