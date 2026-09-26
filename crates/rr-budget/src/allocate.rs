@@ -368,13 +368,16 @@ fn run(
         }
         let mut month_events: Vec<Event> = Vec::new();
         let new = if m == 0 { one_off } else { monthly };
-        let rare_new = if rare_queue.is_empty() {
+        let rare_share = if rare_queue.is_empty() {
             0.0
         } else {
-            RARE_CATASTROPHIC_SHARE * new
+            RARE_CATASTROPHIC_SHARE
         };
+        let rare_new = rare_share * new;
         cash += new - rare_new;
         rare_cash += rare_new;
+        // What the main plan receives each month (all of it unless the rare allowance takes 10 %).
+        let main_monthly = monthly * (1.0 - rare_share);
 
         // Main track.
         while stopped.is_none() {
@@ -393,7 +396,7 @@ fn run(
                 picks.iter().find(affordable).copied()
             } else if schedule == Schedule::ResearchShortcuts && !saving_for_top {
                 picks.iter().find(affordable).copied().filter(|p| {
-                    let wait = top.cost <= SINKING_FUND_MAX_MONTHS * monthly + EPS
+                    let wait = top.cost <= SINKING_FUND_MAX_MONTHS * main_monthly + EPS
                         && p.density() < SINKING_FUND_VALUE_RATIO * top.density();
                     !wait
                 })
@@ -419,7 +422,7 @@ fn run(
                     cache.invalidate(&ctx, pick.offer);
                 }
                 None => {
-                    if future_money && top.cost > monthly + EPS {
+                    if future_money && top.cost > main_monthly + EPS {
                         save_toward(
                             &mut env,
                             top.offer,

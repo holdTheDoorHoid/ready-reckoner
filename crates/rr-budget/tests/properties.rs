@@ -53,6 +53,15 @@ fn spend_never_exceeds_budget() {
             for p in &r.sequence {
                 assert!(p.cost_usd >= 0.0 && p.quantity > 0.0, "seed {seed}: {p:?}");
             }
+            // Every month after month 0 shows a step (a purchase or a deposit), and months are
+            // numbered without gaps.
+            for (m, month) in r.plan.months.iter().enumerate() {
+                assert_eq!(usize::from(month.index), m, "seed {seed}");
+                assert!(
+                    m == 0 || !month.items.is_empty(),
+                    "seed {seed} {schedule:?}: month {m} is empty"
+                );
+            }
         }
     }
 }
