@@ -594,6 +594,14 @@ guidance beyond safe storage and training pointers.
 ## 14. Decision log (append only)
 
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
+- 2026-09-26 — Polish round merged (supply2 296939c, budget2 c4e0452, content2 17a6334, supply3 c9db968,
+  plan-2 24aec38; plus rr-cli 0be9046 and rr-wasm 7efef62). Goldens now come from the REAL data pack and
+  the wasm engine matches them number for number. Philadelphia: done in month 25 for $1,492 (was 44 /
+  $2,585); Phoenix CPAP battery month 3 (was 10); Hays month 43; packets ≈ 10,000 words / ≈ 30 printed
+  pages (target 20; the remaining lever is the print stylesheet: no page break before every section,
+  sources in two columns). Decisions: livestock water capped at 14 stored days; 8 assumed basics credited
+  in month 0 and listed in the packet; free actions grouped to 28 parents; kits are containers; each
+  bucket keeps its "what to avoid" paragraph (CO, floodwater, do-not-drink warnings).
 - 2026-09-26 — First end-to-end plan (rr-plan merged, 217f394) exposed presentation and catalogue
   problems, not model problems; polish round decided (`~/Desktop/ready-reckoner-briefs/POLISH_ROUND.md`):
   assumed household basics (`PlanInput.assume_basics`, `Item.assumed_basic`, listed in the packet);
