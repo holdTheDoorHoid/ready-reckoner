@@ -1,0 +1,188 @@
+# Security: habits, neighbours, lighting, scams and online accounts. Rules: docs/CONTENT_STANDARDS.md
+# §3, §5. Firearm words appear in exactly one item, the free action below; the validator enforces it.
+
+[[item]]
+id = "security_firearms_safe_storage"
+name = "If you own firearms: safe storage and training"
+category = "security"
+unit = "action"
+buckets = ["security"]
+tier = "now"
+free = true
+spec = "Firearms are a personal and legal decision, and this plan never budgets for them. Research finds that having a firearm at home is linked to a higher risk of suicide for the people who live there, so if you own firearms, store them locked and unloaded and get training."
+look_for = [
+  "A locked safe, lockbox or cable lock for each firearm",
+  "Ammunition locked up apart from the firearms",
+  "A safety course from a certified instructor, and your state's storage laws",
+  "988 saved in every phone in the house",
+]
+avoid = [
+  "Firearms left loaded or unlocked where children, visitors or someone in crisis could reach them",
+  "Counting firearms as a substitute for water, heat, medicine or neighbours",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free action: the plan never includes firearms, ammunition or related equipment in a budget." }
+quantity_rule = "once"
+citations = ["anglemyer_2014_firearm_access", "samhsa_988"]
+hazard_extras = []
+
+[[item]]
+id = "security_home_basics"
+name = "Lock up, light up, and keep the spare key with a neighbour"
+category = "security"
+unit = "action"
+buckets = ["security"]
+tier = "now"
+free = true
+spec = "Lock doors and windows as a habit, leave no easy hiding places by the doors, and use timers on lights when you are away. Keep a spare key with a trusted neighbour instead of under the mat (National Crime Prevention Council)."
+look_for = [
+  "Working locks on every outside door and ground-floor window",
+  "Clear, lit paths to your doors",
+  "A neighbour who holds a spare key and watches the house when you are away",
+]
+avoid = [
+  "A key under the doormat, a planter or in the mailbox",
+  "Posting travel plans or new purchases online",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits and a spare key you already have." }
+quantity_rule = "once"
+citations = ["ncpc_home_safety", "ready_gov_cybersecurity"]
+hazard_extras = []
+
+[[item]]
+id = "security_motion_light"
+name = "Solar motion-sensor outdoor light"
+category = "security"
+unit = "light"
+buckets = ["security", "power"]
+tier = "w2"
+free = false
+spec = "A battery or solar light that switches on when someone approaches a door or path, and keeps working when the grid is down. Lighting the places an intruder could hide is a standard crime-prevention step."
+look_for = [
+  "A solar panel or battery, so it works in an outage",
+  "A motion sensor you can aim at the path",
+  "Easy mounting that renters can remove",
+]
+avoid = [
+  "Pointing it into a neighbour's windows",
+  "Lights that need wiring if you rent",
+]
+price_band_usd = { low = 24.49, high = 24.99, per = "light", note = "Two retail listings for solar motion-sensor lights: $24.49 and $24.99." }
+retrieved = "2026-09-25"
+quantity_rule = "once"
+citations = ["ncpc_home_safety", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "security_cyber_basics"
+name = "Protect your key accounts (two-step login, updates, strong passwords)"
+category = "security"
+unit = "action"
+buckets = ["security", "comms", "income"]
+tier = "now"
+free = true
+spec = "Turn on two-step login for your bank, email and phone accounts, use strong passwords or a password manager, and keep devices updated (Ready.gov, CISA). Keep account numbers and your bank's and insurer's phone numbers on paper too."
+look_for = [
+  "Two-step (multifactor) login on email, bank and phone-company accounts",
+  "Automatic software updates turned on",
+  "A paper list of account numbers kept with your documents",
+]
+avoid = [
+  "Clicking links in messages that rush you or ask for personal details",
+  "Reusing one password everywhere",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: settings on devices you own." }
+quantity_rule = "once"
+citations = ["ready_gov_cybersecurity", "cisa_secure_our_world"]
+hazard_extras = ["cyber_outage"]
+
+[[item]]
+id = "security_scam_awareness"
+name = "Know the signs of disaster scams"
+category = "security"
+unit = "action"
+buckets = ["security", "home_loss"]
+tier = "now"
+free = true
+spec = "After disasters, scammers pose as contractors, charities and even government staff. Be wary of anyone who rushes you, wants payment in cash, gift cards or wire transfers, or asks for personal details, and report scams at ReportFraud.ftc.gov (FTC)."
+look_for = [
+  "Contractors with a local address, a license you can check and a written estimate",
+  "Charities you can look up yourself before giving",
+  "Official help reached through numbers and websites you found yourself",
+]
+avoid = [
+  "Paying upfront in cash, gift cards or wire transfers",
+  "Giving bank or Social Security numbers to someone who called you",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: knowing the warning signs." }
+quantity_rule = "once"
+citations = ["ftc_disaster_scams"]
+hazard_extras = []
+
+[[item]]
+id = "security_deescalation"
+name = "Learn simple ways to calm a tense situation"
+category = "security"
+unit = "action"
+buckets = ["security"]
+tier = "now"
+free = true
+spec = "CISA teaches a short approach for noticing and calming a tense encounter: observe, say hello, judge the risk, and get help. Calm words and distance prevent more harm than confrontation."
+look_for = [
+  "CISA's free de-escalation and Power of Hello materials",
+  "Knowing when to step away and call for help",
+  "Practice with your household, so it feels natural",
+]
+avoid = [
+  "Arguing with someone who is escalating",
+  "Staying close to a person who makes you feel unsafe",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: CISA's materials cost nothing." }
+quantity_rule = "once"
+citations = ["cisa_deescalation"]
+hazard_extras = ["civil_unrest"]
+
+[[item]]
+id = "security_run_hide_fight"
+name = "Know what to do if an attack happens in a public place"
+category = "security"
+unit = "action"
+buckets = ["security"]
+tier = "now"
+free = true
+spec = "Ready.gov's advice for an attack in a public place is to run, hide, or, only as a last resort, fight: getting away is the top priority. Notice the exits when you arrive somewhere new."
+look_for = [
+  "The two nearest exits wherever you go",
+  "Places to hide that lock or block the attacker's view",
+  "Calling 911 once you are safe",
+]
+avoid = [
+  "Freezing in place or waiting for others to decide",
+  "Going back for belongings",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: knowledge." }
+quantity_rule = "once"
+citations = ["ready_gov_public_spaces"]
+hazard_extras = ["terrorism"]
+
+[[item]]
+id = "security_window_protection_plan"
+name = "Plan how you will protect windows before a hurricane"
+category = "security"
+unit = "action"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+spec = "Before storm season, decide how you will protect windows and doors, such as permanent hurricane shutters or pre-cut plywood, and clear drains and gutters and bring in outdoor furniture when a storm threatens (Ready.gov). Renters can ask the landlord what the building's plan is."
+look_for = [
+  "Window sizes measured and written down",
+  "Shutters or boards stored where you can reach them",
+  "Outdoor furniture and loose items you would bring inside",
+]
+avoid = [
+  "Leaving loose outdoor items that wind can throw",
+  "Waiting for the warning to buy materials",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to plan; shutters and plywood are priced when you buy them." }
+quantity_rule = "once_if_house"
+citations = ["ready_gov_hurricanes"]
+hazard_extras = ["hurricane", "strong_wind"]

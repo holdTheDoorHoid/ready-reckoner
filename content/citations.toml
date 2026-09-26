@@ -754,6 +754,7 @@ publisher = "U.S. Environmental Protection Agency"
 year = 2026
 url = "https://www.epa.gov/air-research/research-diy-air-cleaners-reduce-wildfire-smoke-indoors"
 retrieved = "2026-09-25"
+quote = "Do-It-Yourself (DIY) air cleaners, made with a box fan and MERV 13 air filter, are a cost-effective method for reducing smoke concentrations."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -794,20 +795,20 @@ license = "US Government Work (public domain)"
 
 [[citation]]
 id = "doe_water_heaters"
-title = "Storage Water Heaters"
-publisher = "U.S. Department of Energy, Energy Saver"
+title = "Storage Water Heaters (archived May 2026; the Energy Saver page was later removed)"
+publisher = "U.S. Department of Energy, Energy Saver (via Internet Archive)"
 year = 2026
-url = "https://www.energy.gov/energysaver/storage-water-heaters"
+url = "https://web.archive.org/web/20260501030607/https://www.energy.gov/energysaver/storage-water-heaters"
 retrieved = "2026-09-25"
 quote = "A single-family storage water heater offers a ready reservoir -- from 20 to 80 gallons -- of hot water."
 license = "US Government Work (public domain)"
 
 [[citation]]
 id = "doe_appliance_energy"
-title = "Estimating Appliance and Home Electronic Energy Use"
-publisher = "U.S. Department of Energy, Energy Saver"
+title = "Estimating Appliance and Home Electronic Energy Use (archived December 2024; the page was later removed)"
+publisher = "U.S. Department of Energy, Energy Saver (via Internet Archive)"
 year = 2024
-url = "https://www.energy.gov/energysaver/estimating-appliance-and-home-electronic-energy-use"
+url = "https://web.archive.org/web/20241231180235/https://www.energy.gov/energysaver/estimating-appliance-and-home-electronic-energy-use"
 retrieved = "2026-09-25"
 license = "US Government Work (public domain)"
 
@@ -1011,6 +1012,15 @@ retrieved = "2026-09-25"
 license = "US Government Work (public domain)"
 
 [[citation]]
+id = "usda_fooddata_central"
+title = "FoodData Central, SR Legacy: rice, white, long-grain, raw (169756); beans, pinto, mature seeds, raw (175199); wheat, hard red winter (168890)"
+publisher = "USDA Agricultural Research Service"
+year = 2019
+url = "https://fdc.nal.usda.gov/"
+retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
 id = "fda_expired_medicines"
 title = "Don't Be Tempted to Use Expired Medicines"
 publisher = "U.S. Food and Drug Administration"
@@ -1063,6 +1073,7 @@ publisher = "Substance Abuse and Mental Health Services Administration"
 year = 2026
 url = "https://www.samhsa.gov/find-help/988"
 retrieved = "2026-09-25"
+quote = "988 offers 24/7 judgment-free support for mental health, substance use, and more."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -1072,6 +1083,7 @@ publisher = "Substance Abuse and Mental Health Services Administration"
 year = 2026
 url = "https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline"
 retrieved = "2026-09-25"
+quote = "Call or text 1-800-985-5990."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -1103,11 +1115,12 @@ license = "US Government Work (public domain)"
 
 [[citation]]
 id = "ftc_disaster_scams"
-title = "Avoiding and Reporting Scams After a Disaster"
+title = "Dealing with Weather Emergencies (spotting and reporting disaster scams)"
 publisher = "Federal Trade Commission"
-year = 2025
-url = "https://consumer.ftc.gov/articles/avoiding-and-reporting-scams-after-disaster"
+year = 2026
+url = "https://consumer.ftc.gov/features/dealing-weather-emergencies"
 retrieved = "2026-09-25"
+quote = "Did you spot a weather-related scam? Report it at ReportFraud.ftc.gov"
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -1260,6 +1273,15 @@ retrieved = "2026-09-25"
 license = "US Government Work (public domain)"
 
 [[citation]]
+id = "kff_ehbs_2025"
+title = "2025 Employer Health Benefits Survey, section 9: prescription drug benefits"
+publisher = "KFF"
+year = 2025
+url = "https://www.kff.org/health-costs/2025-employer-health-benefits-survey/"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
 id = "stlouisfed_emergency_fund_2025"
 title = "When the Unexpected Happens, Be Ready with an Emergency Fund (Page One Economics)"
 publisher = "Federal Reserve Bank of St. Louis"
@@ -1399,6 +1421,15 @@ title = "CPAP Power Options (user-measured battery use)"
 publisher = "SIL International"
 year = 2024
 url = "https://power.sil.org/cpap-power-options/"
+retrieved = "2026-09-25"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "ncpc_home_safety"
+title = "Home and Neighborhood Safety"
+publisher = "National Crime Prevention Council"
+year = 2026
+url = "https://www.ncpc.org/resources/home-neighborhood-safety/"
 retrieved = "2026-09-25"
 license = "All rights reserved (paraphrased, not quoted)"
 
