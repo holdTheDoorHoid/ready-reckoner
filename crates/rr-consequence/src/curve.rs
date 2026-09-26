@@ -392,6 +392,11 @@ pub struct CurveTerm {
     pub floor: Option<(Survival, f64)>,
     /// The hazard it belongs to.
     pub hazard: HazardId,
+    /// The named scenario it belongs to (an index into the assessment's scenario candidates).
+    pub scenario: Option<usize>,
+    /// Its event class: terms of one hazard (or scenario) and class are the same event hitting
+    /// several buckets.
+    pub class: String,
 }
 
 impl CurveTerm {
@@ -479,6 +484,8 @@ impl ExceedanceCurve {
                     .as_ref()
                     .map(|m| (m.survival.clone(), m.threshold)),
                 hazard: t.hazard,
+                scenario: t.scenario,
+                class: t.class.clone(),
             })
             .collect();
         ExceedanceCurve {

@@ -633,3 +633,28 @@ fn relief_describes_the_event_behind_the_target() {
     let r = relief("coos-bay-well-owner-2", BucketId::Power).expect("Coos Bay relief");
     assert_eq!((r.help_arrives_days, r.mostly_restored_days), (14.0, 180.0));
 }
+
+// ------------------------------------------------------------------------------------------------
+// M-04: "roughly 1 in 3" across all needs, checked against the model
+// ------------------------------------------------------------------------------------------------
+
+/// The canonical dial sentence says that at the 1-in-100 setting the chance that at least one need
+/// runs past its target in ten years is "roughly 1 in 3". The model's own event list gives it
+/// (`ConsequenceAssessment::joint_rate`): each target alone is outlasted in about 10 of 100
+/// ten-year stretches, all together in 26 to 39 of 100 for ten of these twelve households, and
+/// about 20 of 100 where one named scenario drives most targets at once (Coos Bay's Cascadia,
+/// Miami's major hurricane).
+#[test]
+fn roughly_one_in_three_needs_run_out_together() {
+    let mut seen = 0;
+    for (name, input, _) in all() {
+        let mut one_in_100 = input.clone();
+        one_in_100.dials.return_period = rr_types::ReturnPeriod::OneIn100;
+        let a = run(&one_in_100);
+        let joint = -rr_types::math::exp_m1(-10.0 * a.consequence.joint_rate());
+        eprintln!("{name}: at least one need past its target in 10 years: {joint:.2}");
+        assert!((0.15..=0.45).contains(&joint), "{name}: {joint:.3}");
+        seen += 1;
+    }
+    assert_eq!(seen, all().len());
+}

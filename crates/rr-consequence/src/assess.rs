@@ -107,6 +107,30 @@ impl ConsequenceAssessment {
     pub fn bucket(&self, bucket: BucketId) -> &BucketAssessment {
         &self.buckets[BucketId::ALL.iter().position(|b| *b == bucket).unwrap_or(0)]
     }
+
+    /// Events a year that outlast at least one duration target (model review M-04): each event
+    /// class counts once, at the need it runs past most (the needs of one event are taken as
+    /// co-monotone, the convention the well coupling uses), summed over classes. Each target
+    /// alone is outlasted at about the dial's rate; together they are outlasted more often.
+    pub fn joint_rate(&self) -> f64 {
+        let mut by: BTreeMap<(HazardId, Option<usize>, &str), f64> = BTreeMap::new();
+        for d in &self.details {
+            let target = f64::from(d.ladder_days);
+            if target <= 0.0 {
+                continue;
+            }
+            for t in &d.curve.terms {
+                let e = t.weight * t.sf(target);
+                let slot = by
+                    .entry((t.hazard, t.scenario, t.class.as_str()))
+                    .or_insert(0.0);
+                if e > *slot {
+                    *slot = e;
+                }
+            }
+        }
+        by.values().sum()
+    }
 }
 
 /// One way a bucket can be disrupted, as the expert view shows it.
