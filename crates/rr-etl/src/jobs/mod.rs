@@ -16,6 +16,7 @@ pub mod geography;
 pub mod nri;
 pub mod outages;
 pub mod seismic;
+pub mod strategic;
 pub mod vulnerability;
 
 /// Shared state for a refresh.
@@ -77,6 +78,9 @@ pub struct JobSpec {
     pub title: &'static str,
     /// Entry point.
     pub run: fn(&Ctx) -> Result<JobOutput>,
+    /// Runs in a plain `refresh` (and so in the quarterly Action). Heavy one-off jobs that build
+    /// optional packs are `false`: they run only when named with `--only` or with `--optional`.
+    pub default: bool,
 }
 
 /// All jobs, in run order (later jobs read earlier jobs' outputs, e.g. the county list).
@@ -85,60 +89,80 @@ pub const JOBS: &[JobSpec] = &[
         id: "geography",
         title: "Counties, ZIP-to-county shares, states and the Connecticut crosswalk",
         run: geography::run,
+        default: true,
     },
     JobSpec {
         id: "nri",
         title: "FEMA National Risk Index v1.20, trimmed to the model's county fields",
         run: nri::run,
+        default: true,
     },
     JobSpec {
         id: "outages",
         title: "Power outage frequency and duration per county from ORNL EAGLE-I 2014-2025",
         run: outages::run,
+        default: true,
     },
     JobSpec {
         id: "events",
         title: "Event rates per county from HURDAT2, SPC severe reports and NOAA Storm Events",
         run: events::run,
+        default: true,
     },
     JobSpec {
         id: "seismic",
         title: "USGS NSHM ground-shaking exceedance at county centroids",
         run: seismic::run,
+        default: true,
     },
     JobSpec {
         id: "climate",
         title: "Climate change multipliers from the NCA5 Atlas, LOCA2 and CMRA (projections)",
         run: climate::run,
+        default: true,
     },
     JobSpec {
         id: "flood",
         title: "Flood priors from OpenFEMA NFIP penetration rates and claims v3",
         run: flood::run,
+        default: true,
+    },
+    JobSpec {
+        id: "strategic",
+        title: "Strategic-site classes (nuclear family) and FEMA UASI shares by county",
+        run: strategic::run,
+        default: true,
     },
     JobSpec {
         id: "facilities",
         title: "Nuclear plants, TRI facilities and high-hazard dams by county and ZIP",
         run: facilities::run,
+        default: true,
     },
     JobSpec {
         id: "vulnerability",
         title: "Census Community Resilience Estimates 2024 and CDC SVI 2022",
         run: vulnerability::run,
+        default: true,
     },
     JobSpec {
         id: "base_rates",
         title: "National personal-risk base rates with sources",
         run: base_rates::run,
+        default: true,
     },
 ];
 
-/// Pack a file belongs to, from its path.
-pub fn pack_of(path: &str) -> &'static str {
+/// Pack a file belongs to, from its path: `geo/...` is the map, `opt/<name>/...` is the
+/// optional pack `<name>` (issue #15: loaded only when a feature asks for it), anything else is
+/// `core`.
+pub fn pack_of(path: &str) -> String {
     if path.starts_with("geo/") {
-        "geo"
+        "geo".to_string()
+    } else if let Some(rest) = path.strip_prefix("opt/") {
+        rest.split('/').next().unwrap_or("opt").to_string()
     } else {
-        "core"
+        "core".to_string()
     }
 }
 
@@ -146,9 +170,16 @@ pub fn pack_of(path: &str) -> &'static str {
 pub fn pack_description(name: &str) -> &'static str {
     match name {
         "geo" => "County boundaries for the map thumbnail and click-to-select. Loaded lazily.",
-        _ => {
+        "core" => {
             "Everything the engine needs for county-level planning. Loaded at start; works offline."
         }
+        "wildfire_places" => {
+            "Optional: USFS Wildfire Risk to Communities by Census place, with the ZIP-to-place shares to use it. Not needed to plan; loaded only when the wildfire detail is shown."
+        }
+        "surge" => {
+            "Optional: share of each ZIP code's land inside NOAA/NHC's Category 1 and Category 3 storm-surge areas. Built by hand (rr-etl refresh --only surge), not in the quarterly refresh. Not needed to plan."
+        }
+        _ => "Optional pack (not needed to plan; loaded only when a feature asks for it).",
     }
 }
 
@@ -239,8 +270,10 @@ pub struct RefreshSummary {
     pub changes: Vec<Written>,
 }
 
-/// Run the selected jobs (all when `only` is empty), update the manifest and `data/CHANGES.md`.
-pub fn refresh(ctx: &Ctx, only: &[String]) -> Result<RefreshSummary> {
+/// Run the selected jobs, update the manifest and `data/CHANGES.md`. With `only` empty every
+/// default job runs, plus the optional ones when `optional` is set; a job named in `only` runs
+/// whether it is a default job or not.
+pub fn refresh(ctx: &Ctx, only: &[String], optional: bool) -> Result<RefreshSummary> {
     for id in only {
         if !JOBS.iter().any(|j| j.id == id) {
             return Err(data_err(format!(
@@ -255,7 +288,12 @@ pub fn refresh(ctx: &Ctx, only: &[String]) -> Result<RefreshSummary> {
     manifest.schema = crate::manifest::SCHEMA;
     let mut summary = RefreshSummary::default();
     for job in JOBS {
-        if !only.is_empty() && !only.iter().any(|o| o == job.id) {
+        let selected = if only.is_empty() {
+            job.default || optional
+        } else {
+            only.iter().any(|o| o == job.id)
+        };
+        if !selected {
             continue;
         }
         eprintln!("== {} ({})", job.id, job.title);
@@ -335,13 +373,11 @@ fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
         pack.files.retain(|f| f.job != job.id);
     }
     for w in &out.written {
-        let pack = manifest
-            .packs
-            .entry(pack_of(&w.path).to_string())
-            .or_insert_with(|| Pack {
-                description: pack_description(pack_of(&w.path)).to_string(),
-                files: Vec::new(),
-            });
+        let name = pack_of(&w.path);
+        let pack = manifest.packs.entry(name.clone()).or_insert_with(|| Pack {
+            description: pack_description(&name).to_string(),
+            files: Vec::new(),
+        });
         pack.files.push(FileEntry {
             path: w.path.clone(),
             job: job.id.to_string(),
@@ -378,6 +414,7 @@ fn record(manifest: &mut Manifest, job: &JobSpec, out: &JobOutput) {
 }
 
 fn finish_manifest(manifest: &mut Manifest) {
+    manifest.packs.retain(|_, p| !p.files.is_empty());
     for (name, pack) in manifest.packs.iter_mut() {
         pack.description = pack_description(name).to_string();
     }

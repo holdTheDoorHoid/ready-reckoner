@@ -25,6 +25,7 @@ pub mod http;
 pub mod jobs;
 pub mod manifest;
 pub mod num;
+pub mod raster;
 pub mod shp;
 pub mod timefmt;
 pub mod verify;

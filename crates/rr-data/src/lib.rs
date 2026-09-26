@@ -15,6 +15,7 @@
 #![cfg_attr(not(test), deny(missing_docs))]
 
 mod climate;
+mod exposure;
 mod location;
 pub mod manifest;
 mod search;
@@ -24,14 +25,17 @@ mod table;
 pub mod verify;
 
 pub use climate::{CLIMATE_CLAMP, variables_for};
+pub use exposure::{
+    StrategicArea, StrategicClassDef, StrategicSite, StrategicSites, StrategicSource, UasiArea,
+};
 pub use location::AMBIGUOUS_ZIP_SHARE;
 pub use manifest::Manifest;
 pub use search::MAX_RESULTS;
 
 use rr_types::{
-    AfreqKind, Attribution, BaseRate, CitationId, CountyRecord, Date, EngineError, ErrorCode,
-    EventRate, Facilities, FloodPriors, HazardId, LatLon, NriHazard, OutageStats, PackInfo,
-    Seismic, Vulnerability,
+    AfreqKind, Attribution, BaseRate, CitationId, CountyExposure, CountyRecord, Date, EngineError,
+    ErrorCode, EventRate, Facilities, FloodPriors, HazardId, LatLon, NriHazard, OutageStats,
+    PackInfo, PlaceWildfire, Seismic, Vulnerability, ZipRecord,
 };
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -61,7 +65,21 @@ pub const PACK_FILES: &[&str] = &[
     "core/zip_facilities.csv",
     "core/vulnerability.csv",
     "core/base_rates.toml",
+    // Data pack v2 exposure files (DESIGN-DELTA §2).
+    "core/strategic.csv",
+    "core/strategic_sites.toml",
+    "core/geomag.csv",
+    "core/smoke.csv",
+    "core/ground.csv",
+    "core/levees.csv",
+    "core/water_systems.csv",
+    "core/surge_proxy.csv",
+    "core/eviction.csv",
     "geo/counties.json",
+    // Optional packs (issue #15), loaded only when a feature asks for them.
+    "opt/surge/zip_surge.csv",
+    "opt/wildfire_places/places.csv",
+    "opt/wildfire_places/zip_places.csv",
 ];
 
 /// What the store keeps per county from `counties.csv`.
@@ -239,6 +257,15 @@ pub struct DataStore {
     base_rate_entries: Vec<BaseRateEntry>,
     publications: Vec<Publication>,
     map_ids: BTreeSet<String>,
+    /// Exposure files by path (data pack v2), merged into each record's `exposure`.
+    exposure_parts: BTreeMap<String, exposure::CountyPart>,
+    /// High-hazard dams and those in poor condition, from `facilities.csv`.
+    facility_dams: BTreeMap<String, (u16, Option<u16>)>,
+    strategic: Option<StrategicSites>,
+    zip_extra: BTreeMap<String, ZipRecord>,
+    zip_surge: BTreeMap<String, exposure::SurgeShares>,
+    places: BTreeMap<String, PlaceWildfire>,
+    zip_places: BTreeMap<String, Vec<(String, f32)>>,
     counties: BTreeMap<String, CountyRecord>,
     defer_rebuild: bool,
 }
@@ -403,6 +430,19 @@ impl DataStore {
                     self.publications = s.publication;
                     Ok(n)
                 }
+                exposure::STRATEGIC_SITES => {
+                    let s: StrategicSites = toml::from_str(text).map_err(|e| corrupt(name, e))?;
+                    let n = (s.precedence.len()
+                        + s.class.len()
+                        + s.site.len()
+                        + s.metro.len()
+                        + s.port.len()
+                        + s.refinery.len()
+                        + s.uasi.len()
+                        + s.source.len()) as u32;
+                    self.strategic = Some(s);
+                    Ok(n)
+                }
                 _ => Err(bad_name(name)),
             };
         }
@@ -420,6 +460,26 @@ impl DataStore {
         }
         let t = Csv::parse(name, bytes)?;
         let n = t.rows.len() as u32;
+        if exposure::COUNTY_FILES.contains(&name) {
+            let part = exposure::parse_county_file(name, &t)?;
+            self.exposure_parts.insert(name.to_string(), part);
+            return Ok(n);
+        }
+        match name {
+            exposure::ZIP_SURGE => {
+                self.zip_surge = exposure::zip_surge(&t)?;
+                return Ok(n);
+            }
+            exposure::WILDFIRE_PLACES => {
+                self.places = exposure::places(&t)?;
+                return Ok(n);
+            }
+            exposure::ZIP_PLACES => {
+                self.zip_places = exposure::zip_places(&t)?;
+                return Ok(n);
+            }
+            _ => {}
+        }
         match name {
             "core/counties.csv" => {
                 let (i_f, i_n, i_s, i_sn, i_lat, i_lon, i_r) = (
@@ -683,10 +743,21 @@ impl DataStore {
                     t.opt_col("nuclear_within_16km"),
                     t.opt_col("nuclear_within_80km"),
                 );
+                let i_poor = t.opt_col("dams_high_poor_condition");
                 let u16c = |s: &str| {
                     f(s).map(|v| v.round().clamp(0.0, u16::MAX as f64) as u16)
                         .unwrap_or(0)
                 };
+                self.facility_dams = t
+                    .rows
+                    .iter()
+                    .map(|r| {
+                        let poor = i_poor.and_then(|i| {
+                            f(&r[i]).map(|v| v.round().clamp(0.0, u16::MAX as f64) as u16)
+                        });
+                        (r[i_f].clone(), (u16c(&r[i_h]), poor))
+                    })
+                    .collect();
                 self.facilities = t
                     .rows
                     .iter()
@@ -714,6 +785,7 @@ impl DataStore {
                     t.col("nearest_nuclear_km")?,
                     t.col("tri_within_5km")?,
                 );
+                self.zip_extra = exposure::zip_extras(&t)?;
                 self.zip_facilities = t
                     .rows
                     .iter()
@@ -857,6 +929,7 @@ impl DataStore {
                 Some((v, h)) => (Some(v.clone()), *h),
                 None => (None, None),
             };
+            let exposure = self.exposure_of(fips);
             out.insert(
                 fips.clone(),
                 CountyRecord {
@@ -880,6 +953,7 @@ impl DataStore {
                     flood: self.flood.get(fips).cloned(),
                     facilities: self.facilities.get(fips).map(|x| x.0.clone()),
                     vulnerability,
+                    exposure,
                 },
             );
         }
@@ -918,6 +992,69 @@ impl DataStore {
     /// Facility data for a ZIP, if known.
     pub fn zip_facilities(&self, zip: &str) -> Option<ZipFacilities> {
         self.zip_facilities.get(zip.trim()).copied()
+    }
+
+    /// A county's data pack v2 exposure columns, from whichever exposure files are loaded, with
+    /// the strategic sites resolved and the UASI area named.
+    fn exposure_of(&self, fips: &str) -> CountyExposure {
+        let mut e = CountyExposure::default();
+        let mut uasi_rank = None;
+        for part in self.exposure_parts.values() {
+            if let Some(p) = part.rows.get(fips) {
+                exposure::merge(&mut e, p);
+            }
+            if let Some(r) = part.uasi_rank.get(fips) {
+                uasi_rank = Some(*r);
+            }
+        }
+        if let Some((total, poor)) = self.facility_dams.get(fips) {
+            e.dams_high_total = Some(*total);
+            e.dams_high_poor_condition = *poor;
+        }
+        if let Some(s) = &self.strategic {
+            e.strategic_places = e
+                .strategic_site_ids
+                .iter()
+                .filter_map(|id| s.place(id))
+                .collect();
+            if let Some(r) = uasi_rank {
+                e.uasi_area = s.uasi_area(r).map(|u| u.urban_area.clone());
+            }
+        }
+        e
+    }
+
+    /// Everything the packs know about a ZIP code beyond its counties (facility distances, dams,
+    /// the nearest strategic site, and the optional surge and wildfire packs when loaded).
+    /// `None` when the ZIP is not in `zip_facilities.csv` (or it is not loaded yet).
+    pub fn zip_record(&self, zip: &str) -> Option<ZipRecord> {
+        let zip = zip.trim();
+        let base = self.zip_facilities.get(zip)?;
+        let mut r = self.zip_extra.get(zip).cloned().unwrap_or_default();
+        r.zip = zip.to_string();
+        r.nearest_nuclear_km = base.nearest_nuclear_km;
+        r.tri_within_5km = base.tri_within_5km;
+        if let Some((c1, c3)) = self.zip_surge.get(zip) {
+            r.surge_cat1_share = *c1;
+            r.surge_cat3_share = *c3;
+        }
+        if let Some(list) = self.zip_places.get(zip) {
+            r.wildfire_places = list
+                .iter()
+                .filter_map(|(p, share)| {
+                    let mut w = self.places.get(p)?.clone();
+                    w.zip_land_share = *share;
+                    Some(w)
+                })
+                .collect();
+        }
+        Some(r)
+    }
+
+    /// The strategic-site table (`core/strategic_sites.toml`), once loaded: class definitions
+    /// with their priors and "Why here" templates, sites, areas and sources.
+    pub fn strategic_sites(&self) -> Option<&StrategicSites> {
+        self.strategic.as_ref()
     }
 
     /// County-level nuclear proximity flags, if `facilities.csv` is loaded.

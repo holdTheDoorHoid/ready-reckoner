@@ -29,6 +29,66 @@ pub fn haversine_km(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
     2.0 * EARTH_RADIUS_KM * a.sqrt().min(1.0).asin()
 }
 
+/// Initial great-circle bearing (forward azimuth) from point 1 to point 2, in degrees clockwise
+/// from true north, in `[0, 360)`.
+///
+/// ```
+/// // Due east along the equator is 90 degrees; due north is 0.
+/// assert!((rr_etl::geo::bearing_deg(0.0, 0.0, 0.0, 1.0) - 90.0).abs() < 1e-9);
+/// assert!(rr_etl::geo::bearing_deg(40.0, -100.0, 41.0, -100.0).abs() < 1e-9);
+/// ```
+pub fn bearing_deg(lat1: f64, lon1: f64, lat2: f64, lon2: f64) -> f64 {
+    let (p1, p2) = (lat1.to_radians(), lat2.to_radians());
+    let dl = (lon2 - lon1).to_radians();
+    let y = dl.sin() * p2.cos();
+    let x = p1.cos() * p2.sin() - p1.sin() * p2.cos() * dl.cos();
+    let b = y.atan2(x).to_degrees();
+    let b = if b < 0.0 { b + 360.0 } else { b };
+    if b >= 360.0 { 0.0 } else { b }
+}
+
+/// True when `bearing` (degrees) lies in the clockwise sector from `from` to `to` (degrees),
+/// both ends included. Handles sectors that wrap through north (for example 315 to 45).
+pub fn in_sector(bearing: f64, from: f64, to: f64) -> bool {
+    let norm = |x: f64| x.rem_euclid(360.0);
+    let (b, f, t) = (norm(bearing), norm(from), norm(to));
+    if f <= t {
+        b >= f && b <= t
+    } else {
+        b >= f || b <= t
+    }
+}
+
+/// The 16-point compass name of a bearing in degrees ("north", "north-northeast", ...).
+///
+/// ```
+/// assert_eq!(rr_etl::geo::compass16(0.0), "north");
+/// assert_eq!(rr_etl::geo::compass16(292.0), "west-northwest");
+/// assert_eq!(rr_etl::geo::compass16(359.0), "north");
+/// ```
+pub fn compass16(deg: f64) -> &'static str {
+    const NAMES: [&str; 16] = [
+        "north",
+        "north-northeast",
+        "northeast",
+        "east-northeast",
+        "east",
+        "east-southeast",
+        "southeast",
+        "south-southeast",
+        "south",
+        "south-southwest",
+        "southwest",
+        "west-southwest",
+        "west",
+        "west-northwest",
+        "northwest",
+        "north-northwest",
+    ];
+    let i = ((deg.rem_euclid(360.0) + 11.25) / 22.5).floor() as usize % 16;
+    NAMES[i]
+}
+
 /// Signed planar area of a ring (positive when counter-clockwise).
 pub fn ring_signed_area(ring: &[[f64; 2]]) -> f64 {
     let n = ring.len();
@@ -343,6 +403,26 @@ mod tests {
         assert_eq!(polys.len(), 1);
         assert!(ring_signed_area(&polys[0][0]) > 0.0);
         assert!(ring_signed_area(&polys[0][1]) < 0.0);
+    }
+
+    #[test]
+    fn bearings_and_sectors() {
+        // Hays, KS lies east-southeast of the F.E. Warren missile field.
+        let b = bearing_deg(41.23, -103.85, 38.91, -99.32);
+        assert!(in_sector(b, 45.0, 135.0), "{b}");
+        // Seen from Hays the field lies to the north-west (305 degrees).
+        let back = bearing_deg(38.91, -99.32, 41.23, -103.85);
+        assert!((back - 305.2).abs() < 0.5, "{back}");
+        assert_eq!(compass16(back), "northwest");
+        assert_eq!(
+            compass16(bearing_deg(0.0, 0.0, 0.4, -1.0)),
+            "west-northwest"
+        );
+        assert!(in_sector(350.0, 315.0, 45.0));
+        assert!(in_sector(10.0, 315.0, 45.0));
+        assert!(!in_sector(90.0, 315.0, 45.0));
+        assert_eq!(compass16(180.0), "south");
+        assert_eq!(compass16(-90.0), "west");
     }
 
     #[test]

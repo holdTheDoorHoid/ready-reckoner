@@ -52,3 +52,12 @@ a first visit fetches 1.99 MB of it instead of 2.36 MB.
 | `core/zip_county.csv` | 46772 | 46772 | 0 | 0 | 0 | unchanged |
 | `core/zip_facilities.csv` | 33791 | 33791 | 0 | 0 | 0 | unchanged |
 | `geo/counties.json` | 3222 | 3222 | 0 | 0 | 0 | unchanged |
+
+## 2026-09-26T16:29:39Z — pack version c535534b0e6c
+
+Jobs run: strategic.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/strategic.csv` | 0 | 3232 | 0 | 0 | 0 | new |
+| `core/strategic_sites.toml` | 0 | 207 | 0 | 0 | 0 | new |
