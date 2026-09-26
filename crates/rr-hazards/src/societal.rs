@@ -15,12 +15,13 @@
 //! | `supply_chain_disruption_per_year` | per year | store shortages |
 //! | `hazmat_release_per_year` | per year, typical county | chemical spill or release |
 
-use rr_types::{DataConfidence, HazardDisplay, HazardId, math};
+use rr_types::{Benefit, HazardId, LocationFactor, math};
 
 use crate::cite;
 use crate::ctx::{Ctx, Notes};
 use crate::estimate::Estimate;
 use crate::params::*;
+use crate::rare::metro_weight;
 use crate::rate::HazardRate;
 use crate::sentence;
 
@@ -136,67 +137,258 @@ fn nuclear_plant_incident(ctx: &Ctx<'_>, notes: &mut Notes) -> Option<HazardRate
     ))
 }
 
-/// A rare catastrophe: its rate is the geometric middle of the range (for arithmetic only), its
-/// sentence gives only the range (research §6.3), and it rests on expert judgement (published
-/// forecasts for nuclear war, an estimate for terrorism).
-fn rare(
-    hazard: HazardId,
-    (low, high): (f64, f64),
-    sources: &[&str],
-    sentence_text: String,
-    severity: f64,
-) -> HazardRate {
-    let mid = (low * high).sqrt();
-    let est = Estimate::prior(mid, low, high, sources);
-    let mut r = HazardRate::new(hazard, est, "", 0.0);
-    r.display = HazardDisplay::RareCatastrophic;
-    r.range_sentence = Some(sentence_text);
-    r.fixed_severity = Some(severity);
-    r.fixed_confidence = Some(DataConfidence::Prior);
+/// Dam or levee failure (REVIEW H4): high-hazard dams whose listed downstream town lies in the
+/// household's ZIP code (else the county's high-hazard dams, reaching a small share of its
+/// households), weighted up for dams in poor condition, plus the residual chance for the share of
+/// the county's people behind levees. Every factor is expert judgement on top of the inventories,
+/// so the card shows the range only. `None` when the pack knows neither dams nor levees.
+fn dam_failure(ctx: &Ctx<'_>) -> Option<HazardRate> {
+    let e = ctx.exposure();
+    let dams = e.dams();
+    let levees = e.levees();
+    let per_dam = prior(DAM_EVENT_PER_DAM, &[cite::ASDSO, cite::RR_HAZARD_PRIORS]);
+    let poor = match (dams.county_poor, dams.county_total) {
+        (Some(p), Some(t)) if t > 0 => {
+            1.0 + (DAM_POOR_CONDITION - 1.0) * (f64::from(p.min(t)) / f64::from(t))
+        }
+        _ => 1.0,
+    };
+    let (dam_part, dam_label, footprint) = match (dams.zip_downstream, dams.county_total) {
+        (Some(n), _) => (
+            per_dam
+                .scaled(f64::from(n) * poor)
+                .times(&prior(DAM_DOWNSTREAM_FOOTPRINT, &[cite::RR_HAZARD_PRIORS]))
+                .cite(&[cite::USACE_NID]),
+            if n > 0 {
+                format!(
+                    "Your ZIP code is within 10 km of {n} high-hazard dam{} that list{} a town in \
+                     it as the place a failure would flood. High hazard describes what a failure \
+                     would do, not how likely it is.",
+                    if n == 1 { "" } else { "s" },
+                    if n == 1 { "s" } else { "" }
+                )
+            } else {
+                "No high-hazard dam within 10 km lists your ZIP code's towns as the place a failure \
+                 would flood."
+                    .to_owned()
+            },
+            Some(DAM_DOWNSTREAM_FOOTPRINT),
+        ),
+        (None, Some(n)) => (
+            per_dam
+                .scaled(f64::from(n) * poor)
+                .times(&prior(DAM_COUNTY_FOOTPRINT, &[cite::RR_HAZARD_PRIORS]))
+                .cite(&[cite::USACE_NID]),
+            format!(
+                "{} has {n} high-hazard dam{}; without a ZIP code we cannot tell whether you live \
+                 downstream of one, so this assumes each could reach about 1 in 100 homes in the \
+                 county.",
+                ctx.county_label(),
+                if n == 1 { "" } else { "s" }
+            ),
+            Some(DAM_COUNTY_FOOTPRINT),
+        ),
+        (None, None) => (
+            Estimate::data(0.0, 0.0, 0.0, &[cite::USACE_NID]),
+            String::new(),
+            None,
+        ),
+    };
+    let levee_part = levees.map(|l| {
+        let k = 1.0 + (LEVEE_HIGH_RISK - 1.0) * l.high_share;
+        Estimate::data(l.pop_share, l.pop_share, l.pop_share, &[cite::USACE_NLD])
+            .times(&prior(LEVEE_RESIDUAL, &[cite::RR_HAZARD_PRIORS]))
+            .scaled(k)
+    });
+    if dams.zip_downstream.is_none() && dams.county_total.is_none() && levees.is_none() {
+        return None;
+    }
+    let today = match &levee_part {
+        Some(l) => dam_part.plus(l),
+        None => dam_part.clone(),
+    };
+    let mut r = HazardRate::new(
+        HazardId::DamFailure,
+        today,
+        "be told to leave because a dam or levee fails or threatens to",
+        40_000.0,
+    );
+    r.range_only = true;
+    let mut label = dam_label;
+    if let Some(l) = levees.filter(|l| l.pop_share > 0.0) {
+        if !label.is_empty() {
+            label.push(' ');
+        }
+        label.push_str(&format!(
+            "About {} in 100 people in {} live behind a levee.",
+            sentence::sig2((l.pop_share * 100.0).max(0.1)),
+            ctx.county_label()
+        ));
+    }
+    if let Some(fp) = footprint {
+        r.location_factor = Some(LocationFactor {
+            class: if dams.zip_downstream.is_some() {
+                "zip_downstream".to_owned()
+            } else {
+                "county_dams".to_owned()
+            },
+            label,
+            multiplier: [fp.1, fp.0, fp.2],
+            sources: vec![cite::USACE_NID.into(), cite::USACE_NLD.into()],
+        });
+    }
+    if let Some(l) = levee_part {
+        r.sub_causes.push(rr_types::SubCause {
+            id: "levee_failure".to_owned(),
+            name: "Levee failure or overtopping".to_owned(),
+            note: "Land behind a levee is mapped outside the high-risk flood zone, so the flood \
+                   card does not count it; a levee that is overtopped or breaks floods it deep and \
+                   fast. Counted here."
+                .to_owned(),
+            rate_range: Some([l.low, l.high]),
+            sources: vec![cite::USACE_NLD.into(), cite::RR_HAZARD_PRIORS.into()],
+        });
+    }
+    Some(r)
+}
+
+/// A phone or internet network outage (split from cyber outages): a national prior.
+fn network_outage() -> HazardRate {
+    HazardRate::new(
+        HazardId::NetworkOutage,
+        prior(
+            NETWORK_OUTAGE,
+            &[cite::FCC_ATT_2024, cite::RR_HAZARD_PRIORS],
+        ),
+        "lose phone and internet service for hours in a network outage",
+        100.0,
+    )
+}
+
+/// A daily prescription that cannot be filled (REVIEW H7): per person who takes one, more for a
+/// medicine that must stay cold. `None` (with a note) when no one takes a daily prescription.
+fn drug_shortage(ctx: &Ctx<'_>, notes: &mut Notes) -> Option<HazardRate> {
+    let base = prior(
+        DRUG_SHORTAGE,
+        &[
+            cite::ASHP_SHORTAGES,
+            cite::OPENFDA_SHORTAGES,
+            cite::RR_HAZARD_PRIORS,
+        ],
+    );
+    let cold = prior(
+        DRUG_SHORTAGE_COLD,
+        &[cite::OPENFDA_SHORTAGES, cite::RR_HAZARD_PRIORS],
+    );
+    let mut total: Option<Estimate> = None;
+    for p in &ctx.input.people {
+        let m = &p.medical;
+        if !(m.daily_rx || m.refrigerated_rx) {
+            continue;
+        }
+        let e = if m.refrigerated_rx {
+            base.times(&cold)
+        } else {
+            base.clone()
+        };
+        total = Some(match total {
+            Some(t) => t.plus(&e),
+            None => e,
+        });
+    }
+    let Some(today) = total else {
+        notes.add("Medicine shortages are left out: no one takes a daily prescription.");
+        return None;
+    };
+    Some(HazardRate::new(
+        HazardId::DrugShortage,
+        today,
+        "have a daily medicine they cannot fill for days or weeks because of a shortage",
+        500.0,
+    ))
+}
+
+/// Pay or benefits stopping (REVIEW H7): only for households that rely on one. One lapse stops
+/// every benefit it reaches, so the household rate is the largest of its benefits' rates, not
+/// their sum.
+fn benefit_interruption(ctx: &Ctx<'_>) -> Option<HazardRate> {
+    let benefits = &ctx.input.finances.benefits;
+    let gap = data(FUNDING_GAP_14D, &[cite::CRS_FUNDING_GAPS]);
+    let mut best: Option<(Estimate, &'static str)> = None;
+    for b in benefits {
+        let (e, verb) = match b {
+            Benefit::FederalPay => (
+                gap.clone(),
+                "have federal pay stop for two weeks or more in a government shutdown",
+            ),
+            Benefit::SnapWic => (
+                gap.times(&prior(
+                    SNAP_LAPSE_GIVEN_GAP,
+                    &[cite::SNAP_LAPSE_2025, cite::RR_HAZARD_PRIORS],
+                )),
+                "have SNAP or WIC payments stop in a government shutdown",
+            ),
+            Benefit::SsiSsdi | Benefit::Va => (
+                prior(
+                    MANDATORY_BENEFIT_DELAY,
+                    &[cite::CRS_FUNDING_GAPS, cite::RR_HAZARD_PRIORS],
+                ),
+                "have a Social Security, SSI, SSDI or VA payment delayed",
+            ),
+            Benefit::Unemployment => (
+                prior(UNEMPLOYMENT_DELAY, &[cite::RR_HAZARD_PRIORS]),
+                "have unemployment benefits delayed",
+            ),
+        };
+        if best.as_ref().is_none_or(|(x, _)| e.value > x.value) {
+            best = Some((e, verb));
+        }
+    }
+    let (today, verb) = best?;
+    Some(HazardRate::new(
+        HazardId::BenefitInterruption,
+        today,
+        verb,
+        BENEFIT_LOSS_USD,
+    ))
+}
+
+/// An attack or credible threat closes the household's area (REVIEW H2, B3): national attacks ×
+/// the metro area's UASI share × the share of the metro's households under the order. Outside the
+/// funded urban areas, a small residual. Stacked expert judgement: range only.
+fn attack_disruption(ctx: &Ctx<'_>) -> HazardRate {
+    let mw = metro_weight(ctx);
+    let sources = [
+        cite::CSIS_TERRORISM,
+        cite::FEMA_UASI_FY2026,
+        cite::RR_HAZARD_PRIORS,
+    ];
+    let lambda = prior(ATTACK_US, &sources);
+    let share = prior(ATTACK_METRO_SHARE, &[cite::RR_HAZARD_PRIORS]);
+    // Outside every funded urban area, and the fallback of 0 when the pack does not say.
+    let today = match mw.w {
+        Some(w) => lambda.scaled(w).times(&share),
+        None => prior(ATTACK_NON_UASI, &sources),
+    };
+    let base = ATTACK_US.0 * ATTACK_METRO_SHARE.0;
+    let multiplier = match mw.w {
+        Some(w) => [w, w, w],
+        None => [today.low / base, today.value / base, today.high / base],
+    };
+    let mut r = HazardRate::new(
+        HazardId::AttackDisruption,
+        today,
+        "have an attack or threat close their area or its transit for half a day or more",
+        ATTACK_LOSS_USD,
+    );
+    r.range_only = true;
+    r.location_factor = Some(LocationFactor {
+        class: mw.class.to_owned(),
+        label: mw.label,
+        multiplier,
+        sources: vec![cite::FEMA_UASI_FY2026.into(), cite::RR_HAZARD_PRIORS.into()],
+    });
     r
-}
-
-fn nuclear_attack() -> HazardRate {
-    let (lo, hi) = NUCLEAR_ATTACK_RANGE;
-    rare(
-        HazardId::NuclearAttack,
-        (lo, hi),
-        &[cite::FRI_NUCLEAR, cite::READY_NUCLEAR],
-        sentence::range_only(
-            "Forecasters asked in 2024 put the chance of a nuclear catastrophe anywhere in the \
-             world (10 million or more deaths) before 2045 at 1 to 5 in 100. Spread over those \
-             years, that is",
-            lo,
-            hi,
-            " That is the chance for the whole world, not for your household: no reliable \
-             estimate exists for effects where you live. The first 24 hours of sheltering inside \
-             are covered by your basic supplies.",
-        ),
-        1.0,
-    )
-}
-
-// awaiting: hazards — `terrorism` is retired in contract v2 and no longer emitted (see `assess`);
-// its disruption half becomes the ranked `attack_disruption` and its personal-safety half the rare
-// `mass_violence` family (DESIGN-DELTA §1, REVIEW H2). Kept, unused, for that rewrite.
-#[allow(dead_code, deprecated)]
-fn terrorism(ctx: &Ctx<'_>) -> HazardRate {
-    let k = unrest_setting(ctx.setting()).value;
-    let (lo, hi) = (TERRORISM_RANGE.0 * k, TERRORISM_RANGE.1 * k);
-    rare(
-        HazardId::Terrorism,
-        (lo, hi),
-        &[cite::RR_HAZARD_PRIORS],
-        sentence::range_only(
-            "An attack that shuts down the area where you live for half a day to two days (roads, \
-             schools and shops closed) is rare: for a household like yours, expert estimates \
-             range from",
-            lo,
-            hi,
-            " This counts the disruption to daily life, not the chance of being hurt.",
-        ),
-        0.9,
-    )
 }
 
 /// Every societal hazard that applies to this household.
@@ -253,11 +445,13 @@ pub(crate) fn assess(ctx: &Ctx<'_>, notes: &mut Notes) -> Vec<HazardRate> {
             100.0,
         ),
         hazmat_release(ctx),
-        nuclear_attack(),
-        // `terrorism` is retired in contract v2 and never emitted. awaiting: hazards —
-        // `attack_disruption` (ranked) and `mass_violence` (rare) replace it.
+        network_outage(),
+        attack_disruption(ctx),
     ];
     out.extend(nuclear_plant_incident(ctx, notes));
+    out.extend(dam_failure(ctx));
+    out.extend(drug_shortage(ctx, notes));
+    out.extend(benefit_interruption(ctx));
     out.sort_by_key(|r| r.hazard);
     out
 }

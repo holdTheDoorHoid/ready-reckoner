@@ -1,6 +1,7 @@
 ---
 id: topic_how_numbers_are_made
 title: How the numbers are made
+kind: topic
 applies_to: [topic:how_numbers_are_made]
 citations: [fema_nri_v120, ornl_eagle_i_outages, shaffer_2026_texas_boil_notices, rr_research_risk_model, rr_risk_model_priors, akl_2011_cochrane_frequencies, gigerenzer_2007_statistics, fema_nri_disclaimer]
 ---

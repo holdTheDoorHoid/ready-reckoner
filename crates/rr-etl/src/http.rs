@@ -375,6 +375,30 @@ pub fn zip_entry(zip_bytes: &[u8], name_suffix: &str) -> Result<Vec<u8>> {
     Ok(out)
 }
 
+/// Read one entry of a ZIP archive on disk (for archives too large to hold in memory whole); the
+/// entry is matched by a case-insensitive path suffix.
+pub fn zip_entry_file(path: &Path, name_suffix: &str) -> Result<Vec<u8>> {
+    let mut archive = zip::ZipArchive::new(std::io::BufReader::new(File::open(path)?))?;
+    let wanted = name_suffix.to_ascii_lowercase();
+    let idx = (0..archive.len())
+        .find(|&i| {
+            archive
+                .by_index(i)
+                .map(|e| e.name().to_ascii_lowercase().ends_with(&wanted))
+                .unwrap_or(false)
+        })
+        .ok_or_else(|| {
+            crate::data_err(format!(
+                "{} has no entry ending in {name_suffix}",
+                path.display()
+            ))
+        })?;
+    let mut entry = archive.by_index(idx)?;
+    let mut out = Vec::with_capacity(entry.size() as usize);
+    entry.read_to_end(&mut out)?;
+    Ok(out)
+}
+
 /// Delete a raw file or directory if it exists (used when a job finishes and `--keep-raw` is off).
 pub fn remove_raw(path: &Path) -> Result<()> {
     if path.is_dir() {

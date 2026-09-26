@@ -60,6 +60,26 @@ a price observation), forums, influencer content, product marketing.
 - **When federal pages disagree,** follow the agency whose job it is (CDC for first aid, FDA for
   medicines) and note the other wording in `docs/CITATION_IDS.md`. Ready.gov's heat page still
   says heat-stroke skin is "dry with no sweat"; CDC says dry or damp, and the guidance follows CDC.
+- **How it was read.** When a page was not read as a plain download, say how in
+  `docs/CITATION_IDS.md`: a browser page (cdc.gov and travel.state.gov refuse scripted clients),
+  a summarising fetch, a site's own data endpoint, or an Internet Archive capture of the same URL
+  with its date. A quote read in a browser page counts as matched when it is found in the page's
+  own text; a summarising fetch never supports a quote. A live address that refuses scripted
+  clients keeps its own URL in the registry (a person can open it), with "(via Internet Archive)"
+  in the publisher when a capture was what was read (`state_dept_passport_card`).
+- **Principles, not numbers.** A talk, essay or other personal source may back an idea or a
+  checklist step ("find a lawyer before you need one"), never a number or a claim about the
+  world. Wherever such a sentence also states a fact, cite an agency, legal-aid or research source
+  beside it (`ollam_2022_lawyer_passport_locksmith_gun`, whose licence line says so).
+- **Neutral titles.** Titles, publishers and quotes are checked like prose (brands, firearm
+  words), so a source whose own title carries one gets a neutral registry title and keeps its
+  URL. Footnote ids are not checked as words: an id may keep a source's own name.
+- **Our own documents** (`rr_…`) point at the file on `main`. When the text is not on `main` yet
+  (a decision-log entry on a release branch), store no quote and say in `docs/CITATION_IDS.md`
+  where it was read.
+- **A trade body is a last resort.** An industry association's consumer sheet may back a
+  sentence only when no agency, university or professional-body page says the same thing, and
+  `docs/CITATION_IDS.md` records the search (`wsc_wellcare_help_2025`, the hand-pump sentence).
 
 ## 3. Items
 
@@ -86,7 +106,11 @@ One `[[item]]` per distinct thing a household would acquire or do. Fields are in
   steps. A new free step joins the closest parent. It stands alone only when the plan must count it
   on its own: it has its own quantity rule (`evacuation_ride_plan`, `epinephrine_check`, the staged
   pet food and water) or a `once_if_*` rule keys on its id. The catalogue test
-  `free_actions_are_grouped_into_at_most_thirty_parents` holds the cap.
+  `free_actions_are_grouped_into_at_most_thirty_parents` holds the cap. Three more stand alone at
+  the owner's request (the Deviant Ollam lessons, 2026-09-26): "Your trusted circle"
+  (`community_trusted_circle`), "Legal readiness" (`docs_legal_readiness`) and "Lockout plan"
+  (`security_lockout_plan`). Each is at most 120 words across name, spec, `look_for` and `avoid`
+  and cites a source beyond the talk (`the_ollam_steps_stay_short_and_cited`).
 - **Assumed basics.** `assumed_basic = true` marks an everyday thing most homes already have:
   blankets, warm layers, a cooking pot, a manual can opener, a phone, a bag for each person, three
   days of ordinary food, bath towels. The plan credits them when "assume basics" is on and lists them
@@ -121,28 +145,55 @@ One `[[item]]` per distinct thing a household would acquire or do. Fields are in
 ```yaml
 id: bucket_water_out
 title: No running water at home
-applies_to: [bucket:water_out]      # bucket:<id>, hazard:<id>, tier:<id>, topic:<slug>
+kind: bucket                        # after, plan, hazard, bucket, tier, topic or family
+applies_to: [bucket:water_out]      # targets of the block's own kind (table below)
 citations: [ready_gov_water, cdc_water_storage]
 ```
 
-Only these four keys are allowed. There is no `reading_level` key: the validator computes the grade
-from the text. The file name is the id. Ids are `bucket_<bucket>`, `hazard_<family>`,
-`tier_<tier>` and `topic_<slug>`.
+Only these five keys are allowed. There is no `reading_level` key: the validator computes the grade
+from the text. The file name is the id, and the id starts with its kind (`bucket_`, `hazard_`,
+`family_`, `tier_`, `plan_`, `after_`, `topic_`). A block applies to at least one target of its own
+kind; the plan workstream decides where each kind prints (`docs/PACKET.md`).
 
-Body rules: under 300 words (the Sources section is not counted); the first sentence says what the
-consequence is and how common it is (the engine substitutes the household's own frequency sentence
-where `{frequency}` appears, and drops the placeholder when it has none; bucket and hazard blocks
-must open with it); in a block for several hazards, a sentence about one of them is wrapped in
-`{if:<hazard_id>}…{/if}` so the packet shows it only where that hazard is likely enough
-(`docs/PACKET.md`); the second paragraph is what to do; the third is what not to do; end with a
-`## Sources` section of footnotes. Every citation in the front matter is used inline as `[^id]` and
-defined as `[^id]: Publisher, title (year).`, copying the registry's publisher and title (a test
-checks that each footnote names its source's title). One idea per sentence. Eighth-grade reading level (the
+| Kind | Target | What it is |
+| --- | --- | --- |
+| `bucket` | `bucket:<bucket id>` | one consequence (no running water, no power) |
+| `hazard` | `hazard:<hazard id>` | one ranked hazard. A rare hazard may be explained by its family block instead |
+| `family` | `family:<lead hazard id>` | one of the nine rare families, named by its lead hazard (`rr_types::HazardId::family`: `family:nuclear_attack`, `family:geomagnetic_storm`, ...). It has a paragraph that starts `**What it changes in your plan.**` (test `every_rare_family_has_a_family_block`), and a location-driven family says why here |
+| `tier` | `tier:<tier id>` | one phase of the plan |
+| `plan` | `plan:<slug>` | a page of the household's own plan (`plan:shelter`, `plan:forecast_48h`, `plan:communication`) |
+| `after` | `after:<slug>` | recovery (`after:first_30_days`) |
+| `topic` | `topic:<slug>` | a Learn article (`topic:validation`, `topic:strategic_sites`, ...) |
+
+Body rules: under 300 words (the Sources section is not counted), and at most 250 for every block
+added since v0.2.0 (`new_blocks_stay_within_the_briefs_word_budget` counts every conditional span
+and prints the table with `--nocapture`); the first sentence says what the consequence is and how
+common it is (the engine substitutes the household's own frequency sentence where `{frequency}`
+appears, and drops the placeholder when it has none; bucket, hazard and family blocks must open
+with it); the second paragraph is what to do; the third is what not to do; end with a `## Sources`
+section of footnotes. Every citation in the front matter is used inline as `[^id]` and defined as
+`[^id]: Publisher, title (year).`, copying the registry's publisher and title (a test checks that
+each footnote names its source's title). One idea per sentence. Eighth-grade reading level (the
 validator computes Flesch-Kincaid and warns above 9). No countdowns, no scarcity, no imagery of
-suffering, no "when the SHTF". The validator rejects pressure phrases ("you must", "act now", "don't
-wait" and "do not wait", "hurry", "while supplies last", "before it's too late" and similar) and
-warns on exclamation marks. Say what to do and when instead ("Meet the people next door before
+suffering, no "when the SHTF". The validator rejects pressure phrases ("you must", "act now",
+"don't wait" and "do not wait", "hurry", "while supplies last", "before it's too late" and similar)
+and warns on exclamation marks. Say what to do and when instead ("Meet the people next door before
 you need them", "Leave as soon as authorities tell you to").
+
+**Conditional spans.** A sentence for some households only is wrapped in a span, and the packet
+keeps it only for them. Spans never nest and each closes with `{/if}`. Several values may be joined
+with `|` (any one matches); an unknown, empty or repeated value is an error.
+
+| Span | Kept when | Values |
+| --- | --- | --- |
+| `{if:<hazard id>}` | the hazard is likely enough for this household (`docs/PACKET.md`) | hazard ids. Hazard and family blocks may name only their own hazards; bucket and tier blocks take none; plan, after and topic blocks may name any |
+| `{if:home:<kind>}`, `{if:not_home:<kind>}` | the home is, or is not, of that kind | `apartment_high_rise`, `apartment_low_rise`, `rowhouse`, `detached`, `mobile_home`, `rural_property` |
+| `{if:need:<need>}` | someone in the household has that access or functional need | `hearing`, `vision`, `limited_english`, `cognitive`, `supervision`, `service_animal`, `dialysis`, `home_health` |
+| `{if:has:<item id>}` | the household owns the item or the plan includes it | any catalogue item id |
+| `{if:benefit:<benefit>}` | the household relies on that benefit | `federal_pay`, `snap_wic`, `ssi_ssdi`, `va`, `unemployment` |
+
+A sentence for a condition no span covers (a well, wood heat) is written plainly and opens with its
+condition ("If you heat with wood, ...").
 
 **Life-safety sentences reach paper.** A sentence that could save a life (fire escape, gas leak,
 carbon monoxide, downed lines, CPR, heat stroke, medicine storage) goes in a block the packet
@@ -150,10 +201,8 @@ prints for every household it concerns, and you confirm it in the regenerated pa
 (`docs/PACKET.md`). The packet prints the "What helps" and "What to avoid" paragraphs of every
 active bucket block and of each hazard card. When a bucket's only hazard has a card (medical
 emergency), the bucket prints a pointer to the card instead, so its life-safety lines also go in
-the hazard block (`hazard_medical`). `{if:…}` spans take hazard ids only, so a sentence for some
-homes (a well, wood heat, a generator) is written plainly and opens with its condition ("If you
-heat with wood, ..."). Every printed sentence costs space in every packet, and so does each new
-source line, so reuse a source the block already cites when it says the same thing.
+the hazard block (`hazard_medical`). Every printed sentence costs space in every packet, and so
+does each new source line, so reuse a source the block already cites when it says the same thing.
 
 ## 5. Sensitive topics (mechanical enforcement of PRINCIPLES §9)
 
@@ -167,7 +216,14 @@ source line, so reuse a source the block already cites when it says the same thi
 - Firearm, ammunition and weapon words appear only in the free action "If you own firearms: safe
   storage and training" (`security_firearms_safe_storage`): free, unpriced, category `security`,
   tier `now`, quantity `once`. It includes one neutral, cited sentence that a firearm at home is
-  linked to a higher suicide risk for the people who live there, with the 988 line.
+  linked to a higher suicide risk for the people who live there, with the 988 line. The rule holds
+  for rare hazards too: guidance says "mass violence" and "an attack" (never the words the FBI's
+  report title uses), and cited titles are neutral (`fbi_active_shooter_2024`,
+  `ollam_2022_lawyer_passport_locksmith_gun`).
+- Arrest and detention (`hazard_arrest_or_detention`) is factual and calm: the count says it counts
+  arrests, not people, and says nothing about guilt; readiness steps come from mainstream
+  know-your-rights sources (ACLU, National Lawyers Guild); nothing assumes anything about the
+  household.
 - Potassium iodide may be mentioned only together with "official" instructions. Nuclear and
   radiological guidance cites FEMA, CDC or NRC text and does not recommend it outside the emergency
   planning zone of a plant.
@@ -214,3 +270,29 @@ anything.
 `content/glossary.toml`, one `[[term]]` per entry: `plain` (the everyday words, shown first),
 `term` (the jargon, shown second), `definition` (one or two plain sentences) and optional
 `citations`. The same brand, pressure-word and dose checks apply.
+
+## 10. The state table
+
+`content/tables/state_registries.toml` has one `[[state]]` row for each state, DC and Puerto Rico
+(52 rows), with the date it was checked and the state emergency management agency's own site
+(`em_agency`, `em_url`). The packet prints the household's own row; nothing about the household
+leaves the device.
+
+- **Name a tool only where it was confirmed.** `zone`, `registry` and `alerts` each hold a
+  state-level tool's name, address and an optional one-sentence note, and appear only where the
+  tool was confirmed on its own page (or a page the agency links to) on the `checked` date.
+  Everywhere else the row sends the household to the office that runs it: "Your county emergency
+  management office handles ... Find yours through the state agency: <agency> (<url>)", citing
+  Ready.gov's disability and evacuation pages (registries and zones are local). `local_office`
+  names a different local office (parish, borough, city or town, municipio), or is empty where the
+  state agency runs the service itself (DC). `none_found = true` says plainly what was not found
+  for the whole jurisdiction (Puerto Rico).
+- **Refill rules carry numbers, so they cite.** Each row's `refill` follows Healthcare Ready's
+  review of state emergency-refill laws, with a second source where one was read (a state
+  pharmacy board, NACDS). Where two sources disagree, the row says "Rules differ ... ask your
+  pharmacist" and cites both (Virginia, North Carolina); where they agree once both are read, it
+  says the rule plainly (Florida's 72 hours, and 30 days in a declared emergency).
+- **No vendors, no lapsed domains.** Alert systems run on a vendor platform are linked through
+  the state's own page; a registry domain that has lapsed or changed hands is dropped (test
+  `no_row_points_at_a_vendor_or_a_lapsed_domain`). The validator checks the codes, https
+  addresses, refill sources and the text rules on every line.

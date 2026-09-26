@@ -1,6 +1,7 @@
 ---
 id: tier_now
 title: Free actions
+kind: tier
 applies_to: [tier:now]
 citations: [fema_nhs_2024, ready_gov_alerts, ready_gov_low_cost, ready_gov_earthquakes, cdc_water_storage, usfa_smoke_alarms, ready_gov_disability, fema_effak, washington_prepare_in_a_year]
 ---

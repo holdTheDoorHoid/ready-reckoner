@@ -1,6 +1,7 @@
 ---
 id: topic_pets
 title: Pets and service animals
+kind: topic
 applies_to: [topic:pets]
 citations: [ready_gov_pets, ready_gov_evacuation, aspca_disaster_prep, petmd_dog_water, merck_vet_maintenance_fluids, ready_gov_heat]
 ---

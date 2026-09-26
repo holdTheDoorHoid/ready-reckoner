@@ -1,6 +1,7 @@
 ---
 id: bucket_thermal
 title: Dangerous heat or cold indoors
+kind: bucket
 applies_to: [bucket:thermal]
 citations: [cdc_heat_health, semenza_1996_heat_deaths, cdc_winter_safety, ready_gov_heat, ready_gov_stay_safe_warm, epa_burnwise_faq, cdc_co_basics, cpsc_co_information_center, usfa_heating_fires]
 ---

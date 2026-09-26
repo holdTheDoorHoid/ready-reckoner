@@ -1,6 +1,7 @@
 ---
 id: bucket_power
 title: No grid power at home
+kind: bucket
 applies_to: [bucket:power]
 citations: [eia_outage_hours_2024, ornl_repowrd_2022, ready_gov_power_outages, ready_gov_kit, psegli_critical_care, ready_gov_disability, cdc_co_basics, cpsc_co_information_center, pa_puc_power_line_safety, osha_downed_wires]
 ---

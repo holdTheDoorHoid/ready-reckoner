@@ -88,6 +88,18 @@ const CORE: &[(&str, &[u8])] = &[
         include_bytes!("../../../data/core/flood.csv"),
     ),
     (
+        "core/geomag.csv",
+        include_bytes!("../../../data/core/geomag.csv"),
+    ),
+    (
+        "core/ground.csv",
+        include_bytes!("../../../data/core/ground.csv"),
+    ),
+    (
+        "core/levees.csv",
+        include_bytes!("../../../data/core/levees.csv"),
+    ),
+    (
         "core/nri_counties.csv",
         include_bytes!("../../../data/core/nri_counties.csv"),
     ),
@@ -112,12 +124,32 @@ const CORE: &[(&str, &[u8])] = &[
         include_bytes!("../../../data/core/seismic.csv"),
     ),
     (
+        "core/smoke.csv",
+        include_bytes!("../../../data/core/smoke.csv"),
+    ),
+    (
         "core/states.csv",
         include_bytes!("../../../data/core/states.csv"),
     ),
     (
+        "core/strategic.csv",
+        include_bytes!("../../../data/core/strategic.csv"),
+    ),
+    (
+        "core/strategic_sites.toml",
+        include_bytes!("../../../data/core/strategic_sites.toml"),
+    ),
+    (
+        "core/surge_proxy.csv",
+        include_bytes!("../../../data/core/surge_proxy.csv"),
+    ),
+    (
         "core/vulnerability.csv",
         include_bytes!("../../../data/core/vulnerability.csv"),
+    ),
+    (
+        "core/water_systems.csv",
+        include_bytes!("../../../data/core/water_systems.csv"),
     ),
     (
         "core/zip_county.csv",

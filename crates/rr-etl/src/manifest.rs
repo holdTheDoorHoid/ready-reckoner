@@ -29,6 +29,29 @@ pub struct Manifest {
     pub jobs: BTreeMap<String, JobRecord>,
     /// Credit lines the app must show (About screen and packet sources).
     pub attributions: Vec<Attribution>,
+    /// Owner decisions a job must see before it may ship a source, by key (for example
+    /// `eviction_lab_odc_by`: an attribution licence needs the owner's approval under CLAUDE.md
+    /// rule 5). Refreshes keep this section as it is; only a person sets `approved`.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub sign_offs: BTreeMap<String, SignOff>,
+    /// Attributions that belong to an optional pack, by attribution `source` -> pack name. The
+    /// engine shows those credit lines only once the pack is loaded (a packet should not credit
+    /// data it never read).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub attribution_packs: BTreeMap<String, String>,
+}
+
+/// One owner decision (see [`Manifest::sign_offs`]).
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct SignOff {
+    /// True once the owner has approved; jobs gated on this key write their output only then.
+    pub approved: bool,
+    /// What is being approved, in words.
+    #[serde(default)]
+    pub what: String,
+    /// Who approved it and when (for example "owner, 2026-10-01"); empty until approved.
+    #[serde(default)]
+    pub by: String,
 }
 
 /// One pack: a set of files loaded together.
@@ -192,5 +215,10 @@ impl Manifest {
     /// Every file entry across packs.
     pub fn all_files(&self) -> impl Iterator<Item = &FileEntry> {
         self.packs.values().flat_map(|p| p.files.iter())
+    }
+
+    /// Whether the owner has approved the decision `key`.
+    pub fn signed_off(&self, key: &str) -> bool {
+        self.sign_offs.get(key).is_some_and(|s| s.approved)
     }
 }

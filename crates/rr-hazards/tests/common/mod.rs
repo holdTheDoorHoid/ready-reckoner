@@ -90,3 +90,32 @@ pub fn close(a: f64, b: f64, rel: f64) -> bool {
 pub fn per_100(rate: f64, years: f64) -> f64 {
     100.0 * (1.0 - rr_types::math::exp(-rate * years))
 }
+
+/// A test county: the fixture `base` with another county's name, code and v2 exposure columns
+/// (values from the data pack's own rows, so the class examples read like the real counties).
+pub fn county_like(
+    base: &str,
+    fips: &str,
+    name: &str,
+    state_abbr: &str,
+    state_name: &str,
+    exposure: serde_json::Value,
+) -> Fixture {
+    let mut f = county(base);
+    f.county.fips = fips.to_owned();
+    f.county.name = name.to_owned();
+    f.county.state_abbr = state_abbr.to_owned();
+    f.county.state_name = state_name.to_owned();
+    f.county.exposure = serde_json::from_value(exposure).expect("exposure json");
+    f.location.county_fips = fips.to_owned();
+    f.location.county_name = name.to_owned();
+    f.location.state_abbr = state_abbr.to_owned();
+    f.location.state_name = state_name.to_owned();
+    f.location.zip = None;
+    f
+}
+
+/// A strategic place as the data pack resolves it.
+pub fn place(id: &str, name: &str, kind: &str, role: &str, state: &str) -> serde_json::Value {
+    serde_json::json!({ "id": id, "name": name, "kind": kind, "role_plain": role, "state": state })
+}

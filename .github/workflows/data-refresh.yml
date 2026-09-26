@@ -3,14 +3,22 @@ name: Refresh data packs
 # Quarterly: re-run the ETL against the federal sources and open a pull request with the new packs
 # and provenance manifest. Nothing merges automatically; a human reads data/CHANGES.md and the
 # manifest diff. The full run takes about an hour and a half (11.6 GB of EAGLE-I outage data are
-# streamed, never stored; the USGS hazard service is called once per county).
+# streamed, never stored; the USGS hazard service is called once per county; the karst map,
+# 0.28 GB, and EPA's drinking-water archive, 0.42 GB, sit on disk only while they are read).
+#
+# Default jobs (run order, see `rr-etl jobs`): geography, nri, outages, events, seismic, climate,
+# flood, strategic, geomag, ground, levees, water_systems, smoke, facilities, surge_proxy,
+# eviction (writes nothing until the owner's sign-off in data/manifest.json), vulnerability,
+# base_rates. The optional jobs `surge` (0.25 GB of NHC map archives) and `wildfire_places` build
+# optional packs and are not run here; name them in `only` to run them on demand.
+# `rr-etl verify` also fails the run if the core pack grows past its 5 MB gzipped budget.
 on:
   schedule:
     - cron: '0 6 1 1,4,7,10 *'
   workflow_dispatch:
     inputs:
       only:
-        description: 'Comma-separated job ids to run (empty runs all; see `rr-etl jobs`)'
+        description: 'Comma-separated job ids to run (empty runs every default job; optional jobs such as surge and wildfire_places run only when named; see `rr-etl jobs`)'
         required: false
         default: ''
 

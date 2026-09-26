@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{CitationId, HazardId, LatLon};
+use crate::{CitationId, CountyExposure, HazardId, LatLon};
 
 /// Everything the core pack knows about one county.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -67,6 +67,11 @@ pub struct CountyRecord {
     /// Social vulnerability measures.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub vulnerability: Option<Vulnerability>,
+    /// Data pack v2 exposure columns (strategic class, smoke, levees, karst, ...) for the hazard
+    /// and consequence crates; empty when the pack predates them. The app's copy is
+    /// `LocationResolved.exposure`.
+    #[serde(default, skip_serializing_if = "CountyExposure::is_empty")]
+    pub exposure: CountyExposure,
 }
 
 string_enum! {

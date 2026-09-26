@@ -290,15 +290,6 @@ pub(crate) const PANDEMIC_DISRUPTIVE_SHARE: Triple = (0.25, 0.1, 0.4);
 pub(crate) const NUCLEAR_PLANT_EPZ: Triple = (2.0e-4, 2.0e-5, 5.0e-4);
 /// PRIOR. Same, for a plant 16–80 km away (food and water advisories in the ingestion zone).
 pub(crate) const NUCLEAR_PLANT_INGESTION: Triple = (5.0e-5, 1.0e-5, 2.0e-4);
-/// SRC (research §6.3, from the Forecasting Research Institute): superforecasters' and experts'
-/// medians of 1 % and 5 % for a catastrophe killing 10 million or more before 2045, spread over
-/// the years to 2045: about 1 in 2,000 to about 1 in 400 a year (our arithmetic). Never
-/// shown as a point estimate; the value used for arithmetic is the geometric middle.
-pub(crate) const NUCLEAR_ATTACK_RANGE: (f64, f64) = (1.0 / 2000.0, 1.0 / 400.0);
-/// PRIOR. An attack that disrupts daily life where a city household lives: 1 in 10,000 to 1 in
-/// 1,000 a year. Never shown as a point estimate.
-#[allow(dead_code)] // awaiting: hazards — used only by the retired `terrorism` row.
-pub(crate) const TERRORISM_RANGE: (f64, f64) = (1.0e-4, 1.0e-3);
 
 // ---------------------------------------------------------------------------------------------
 // Personal hazards (research §6.1, data-sources §8).
@@ -394,6 +385,308 @@ pub(crate) const NATURAL_SEVERITY_FLOOR: f64 = 0.1;
 /// for exactly these households (CDC; Semenza et al. 1996, Chicago 1995).
 pub(crate) const AT_RISK_TEMPERATURE_SEVERITY: f64 = 0.4;
 
+// ---------------------------------------------------------------------------------------------
+// Contract v2 ranked hazards (REVIEW §2.2; hazard-expansion Deliverable A and
+// hazard-candidates.csv). Each is listed with its derivation in `docs/RISK_MODEL.md`.
+// ---------------------------------------------------------------------------------------------
+
+/// DATA (Insurance Information Institute, from ISO claim data, 2019–2023; read through its
+/// published summary): water damage and freezing claims come to about 1 in 67 insured homes a
+/// year. The range is PRIOR.
+pub(crate) const WATER_DAMAGE: Triple = (0.015, 0.01, 0.02);
+/// PRIOR (hazard-expansion H-06): frozen pipes add claims where days that stay below freezing
+/// are common.
+pub(crate) const WATER_DAMAGE_FREEZE: Triple = (1.3, 1.1, 1.6);
+/// Days a year that stay below freezing (CMRA `icing_days_hist`) from which the freeze modifier
+/// applies: about a week of hard cold a winter.
+pub(crate) const WATER_DAMAGE_FREEZE_DAYS: f64 = 5.0;
+/// PRIOR (H-06): a basement (water heater, sump, washing machine and pipes below grade).
+pub(crate) const WATER_DAMAGE_BASEMENT: Triple = (1.2, 1.0, 1.5);
+/// PRIOR (H-06): renters report fewer water claims of their own; the building's pipes are the
+/// landlord's.
+pub(crate) const WATER_DAMAGE_RENTER: Triple = (0.8, 0.6, 1.0);
+/// DATA (III): the average water-damage and freezing claim, about $15,400; the severity of one
+/// event.
+pub(crate) const WATER_DAMAGE_LOSS_USD: f64 = 15_400.0;
+
+/// PRIOR (hazard-expansion, `wildfire_smoke`): days in one smoke episode.
+pub(crate) const SMOKE_EPISODE_DAYS: Triple = (3.0, 2.0, 5.0);
+/// How far a county's smoke-day count may be off, as a factor either way, when it comes from
+/// its own air monitors.
+pub(crate) const SMOKE_MONITOR_SPREAD: f64 = 1.3;
+/// The same when the count is imputed from satellite smoke maps and nearby monitors.
+pub(crate) const SMOKE_IMPUTED_SPREAD: f64 = 2.0;
+
+/// PRIOR (hazard-expansion, `dust_storm`): share of a county's dust-storm episodes (Storm Events
+/// counts them by forecast zone, which is larger than a neighbourhood) that reach one household.
+pub(crate) const DUST_FOOTPRINT: Triple = (0.3, 0.1, 0.6);
+
+/// PRIOR (hazard-expansion, `sinkhole`: Florida's subsidence reports and sinkhole claims; low
+/// confidence): yearly chance that a sinkhole or ground collapse damages a home on karst ground.
+pub(crate) const SINKHOLE_ON_KARST: Triple = (2.0e-4, 5.0e-5, 1.0e-3);
+
+/// PRIOR (hazard-expansion H-05; ASDSO counts 173 failures and 587 incidents in 2005 to mid-2013,
+/// about 2 in 10,000 failures per dam a year across every class): failures, or incidents that
+/// force an evacuation (Oroville 2017), per high-hazard dam a year.
+pub(crate) const DAM_EVENT_PER_DAM: Triple = (1.0e-4, 3.0e-5, 5.0e-4);
+/// PRIOR (H-05): share of a ZIP code's households told to leave when a dam whose listed
+/// downstream town lies in it fails or threatens to.
+pub(crate) const DAM_DOWNSTREAM_FOOTPRINT: Triple = (0.3, 0.1, 0.6);
+/// PRIOR (H-05): share of a county's households reached by one of its high-hazard dams, used when
+/// the ZIP-level downstream count is not known.
+pub(crate) const DAM_COUNTY_FOOTPRINT: Triple = (0.01, 0.003, 0.03);
+/// PRIOR (H-05): a dam whose latest condition rating is Poor or Unsatisfactory fails or forces an
+/// evacuation three times as often.
+pub(crate) const DAM_POOR_CONDITION: f64 = 3.0;
+/// PRIOR (hazard-expansion, `levee_failure`): yearly chance that a levee is overtopped or fails
+/// for a household behind it. Leveed land is mapped outside the high-risk flood zone, so the
+/// flood rate does not count it.
+pub(crate) const LEVEE_RESIDUAL: Triple = (0.002, 0.0005, 0.01);
+/// PRIOR: people behind levees that USACE rates High or Very High risk face twice the residual
+/// chance.
+pub(crate) const LEVEE_HIGH_RISK: f64 = 2.0;
+
+/// PRIOR (hazard-expansion, `network_outage`; FCC report on the AT&T outage of 22 February 2024:
+/// more than 92 million calls and 25,000 calls to 911 blocked for at least 12 hours):
+/// carrier-wide outages of several hours come about once a year, and about a third of households
+/// are on the carrier that fails.
+pub(crate) const NETWORK_OUTAGE: Triple = (0.3, 0.1, 1.0);
+
+/// PRIOR (hazard-expansion, `drug_shortage`; ASHP counted 323 active shortages at the peak in
+/// early 2024; openFDA listed 70 medicines as currently short on 2026-09-26): yearly chance that
+/// one person's daily prescription is short for days to weeks.
+pub(crate) const DRUG_SHORTAGE: Triple = (0.05, 0.02, 0.15);
+/// PRIOR: a medicine that must stay cold, usually an injectable, runs short more often (50 of the
+/// 70 medicines openFDA listed as short on 2026-09-26 are injectables).
+pub(crate) const DRUG_SHORTAGE_COLD: Triple = (1.5, 1.2, 2.0);
+
+/// DATA (CRS RS20348, Table 1, via the data-model series `funding_gaps`): federal funding gaps
+/// of 14 full days or more came in 4 of the 45 fiscal years 1982–2026 (FY1996, FY2014, FY2019,
+/// FY2026): 0.089 a year, exact Poisson 90 % interval 0.030–0.203. Federal pay stops until the
+/// gap ends.
+pub(crate) const FUNDING_GAP_14D: Triple = (0.08889, 0.03036, 0.2034);
+/// PRIOR: share of those long gaps that stop SNAP or WIC payments (one of four so far, November
+/// 2025, the first lapse in SNAP's history).
+pub(crate) const SNAP_LAPSE_GIVEN_GAP: Triple = (0.25, 0.1, 0.6);
+/// PRIOR: Social Security, SSI, SSDI and VA payments continued through every shutdown; a delay
+/// needs something that has not happened (the debt limit breached).
+pub(crate) const MANDATORY_BENEFIT_DELAY: Triple = (0.005, 0.001, 0.02);
+/// PRIOR: unemployment benefits are run by the states and kept paying through shutdowns; a
+/// delay comes from a state system failing or a federal funding lapse.
+pub(crate) const UNEMPLOYMENT_DELAY: Triple = (0.01, 0.002, 0.04);
+/// PRIOR: a month of lost pay or benefits, the severity of one interruption.
+pub(crate) const BENEFIT_LOSS_USD: f64 = 1_500.0;
+
+/// PRIOR (Eviction Lab, national rate for 2016: about 2.3 eviction judgments per 100 renter
+/// households; UNVERIFIED beyond summaries): judgments per renter household a year, used when
+/// the county's filing rate is not in the pack.
+pub(crate) const EVICTION_NATIONAL: Triple = (0.023, 0.01, 0.05);
+/// PRIOR (Eviction Lab 2016: about 0.9 million judgments from 2.3 million filings; UNVERIFIED):
+/// share of eviction filings that end in an order to leave.
+pub(crate) const EVICTION_JUDGMENT_SHARE: Triple = (0.4, 0.3, 0.55);
+/// PRIOR (hazard-expansion, `eviction`): three months or more of savings halves the rate.
+pub(crate) const EVICTION_SAVINGS: Triple = (0.5, 0.3, 0.8);
+/// Months of savings from which [`EVICTION_SAVINGS`] applies.
+pub(crate) const EVICTION_SAVINGS_MONTHS: f32 = 3.0;
+
+/// PRIOR (CSIS terrorism dataset 1994–2025; hazard-expansion B3): attacks or credible threats a
+/// year that put a metro area under an order covering 100,000 people or more for 12 hours or
+/// more (Oklahoma City 1995, 11 September 2001, the anthrax letters of 2001, Boston 2013).
+pub(crate) const ATTACK_US: Triple = (0.1, 0.04, 0.25);
+/// PRIOR (B3): share of the metro area's households under the order.
+pub(crate) const ATTACK_METRO_SHARE: Triple = (0.3, 0.1, 0.8);
+/// DERIVED + PRIOR: a household outside every funded urban area. The 5 % of attacks held back
+/// from the funded areas, over the roughly 64 million households outside them (48 % of people,
+/// data-hazard's UASI table and the NRI population), with an order covering 40,000 households:
+/// 0.1 × 0.05 × 40,000 ÷ 64,000,000 ≈ 3 in a million a year.
+pub(crate) const ATTACK_NON_UASI: Triple = (3.0e-6, 1.0e-6, 3.0e-5);
+/// PRIOR: what one closure costs a household (a day or two of lost work and school); severity
+/// 0.3, "a few days' disruption" (hazard-expansion H-10).
+pub(crate) const ATTACK_LOSS_USD: f64 = 800.0;
+
+/// DATA (FBI Crime in the United States 2023–2025, Tables 29, 39 and 40, via the data-model
+/// series `fbi_arrests`): arrests per 100,000 people a year by age band, as `(band, first age,
+/// last age, male (value, low, high), female (value, low, high))`. The value is the mean of the
+/// three years; low and high are the lowest and highest year. The FBI counts arrests, not people
+/// or convictions: one person arrested twice counts twice.
+pub(crate) const ARRESTS_PER_100K: &[(&str, u8, u8, Triple, Triple)] = &[
+    (
+        "10_17",
+        10,
+        17,
+        (1992.0, 1894.0, 2079.0),
+        (948.5, 880.8, 1006.0),
+    ),
+    (
+        "18_24",
+        18,
+        24,
+        (5390.0, 5243.0, 5603.0),
+        (2122.0, 2051.0, 2202.0),
+    ),
+    (
+        "25_34",
+        25,
+        34,
+        (6816.0, 6500.0, 7168.0),
+        (2647.0, 2534.0, 2758.0),
+    ),
+    (
+        "35_44",
+        35,
+        44,
+        (6198.0, 6150.0, 6247.0),
+        (2400.0, 2353.0, 2450.0),
+    ),
+    (
+        "45_54",
+        45,
+        54,
+        (3784.0, 3643.0, 3964.0),
+        (1295.0, 1221.0, 1375.0),
+    ),
+    (
+        "55_64",
+        55,
+        64,
+        (2093.0, 1989.0, 2221.0),
+        (584.0, 538.0, 630.8),
+    ),
+    (
+        "65_plus",
+        65,
+        84,
+        (495.3, 445.3, 549.9),
+        (115.3, 99.29, 132.0),
+    ),
+];
+/// PRIOR: what one arrest costs the household (bail, a lawyer, lost pay, care for children or
+/// pets), for severity only.
+pub(crate) const ARREST_LOSS_USD: f64 = 5_000.0;
+
+// ---------------------------------------------------------------------------------------------
+// The rare families (REVIEW §2.3; hazard-expansion Deliverable B). Every factor is expert
+// judgement stacked on expert judgement: `prior`, shown only as a range. The ranges multiply
+// low by low and high by high, so they span every combination of the factors (the review's own
+// arithmetic), rather than adding log-spreads in quadrature as the ranked rates do.
+// ---------------------------------------------------------------------------------------------
+
+/// PRIOR (B1.3): a large nuclear attack on the US homeland, a year. FRI 2024 (a catastrophe of 10
+/// million deaths or more by 2045: experts 5 %, superforecasters 1%, i.e. 0.049–0.25 % a year)
+/// × the chance it reaches US soil, 0.33 (0.23–0.46) from FRI's dyad shares; the high end
+/// reaches Rethink Priorities' 0.38 % a year for a US–Russia exchange.
+pub(crate) const NUCLEAR_STRATEGIC_US: Triple = (4.0e-4, 1.0e-4, 4.0e-3);
+/// PRIOR (B1.3): a limited strike (one or a few weapons) on US territory: use anywhere × 2 %
+/// (0.5–5 %).
+pub(crate) const NUCLEAR_LIMITED_US: Triple = (1.0e-4, 2.0e-5, 5.0e-4);
+/// PRIOR (B1.3): a crude nuclear device in a US city: FRI's non-state acquisition forecasts
+/// (0.05–0.17 % a year) × 0.3 detonated × 0.25 in a US city; the low end respects 80 years of none.
+pub(crate) const NUCLEAR_IND_US: Triple = (5.0e-5, 1.0e-6, 5.0e-4);
+/// PRIOR (B1.3): a nuclear weapon used anywhere in the world (XPT 0.48–0.54 %, FRI 0.11–0.55 %,
+/// Good Judgment 0.40 %, Rethink Priorities about 1.1 %, the 80-year record 0.62 % a year).
+pub(crate) const NUCLEAR_USE_WORLD: Triple = (5.0e-3, 1.0e-3, 1.5e-2);
+/// PRIOR (B2): chance a large attack includes a high-altitude burst (EMP).
+pub(crate) const HEMP_GIVEN_STRATEGIC: Triple = (0.5, 0.2, 0.8);
+/// PRIOR (B2): the same for a limited strike.
+pub(crate) const HEMP_GIVEN_LIMITED: Triple = (0.3, 0.1, 0.5);
+/// PRIOR (B1.1): share of a targeted county's households seriously affected by one weapon.
+pub(crate) const LIMITED_STRIKE_HOUSEHOLD_SHARE: f64 = 0.3;
+/// PRIOR (B1.4): a limited strike's weight on one of the most plausible target counties (the
+/// counterforce sites of class A, and the military bases of Hawaii and Guam): a flat 1 in 20.
+pub(crate) const LIMITED_STRIKE_WEIGHT: f64 = 0.05;
+/// PRIOR (B1.1): share of a metro area's households in the damage zone or the dangerous fallout
+/// zone of a crude device.
+pub(crate) const IND_METRO_HOUSEHOLD_SHARE: f64 = 0.1;
+/// DERIVED: the population-weighted mean of f_S over every county in the first cut (A 3.5 %,
+/// B 4.4 %, C1 26.0 %, C2 28.9 %, D 5.8 %, E 31.5 % of people), for a county whose class is not
+/// known; its range runs from class E's low to class A's high.
+pub(crate) const STRATEGIC_FACTOR_UNKNOWN: Triple = (0.314, 0.01, 0.99);
+
+/// PRIOR (B2): a Carrington-class geomagnetic storm, a year: the geometric middle of five
+/// published estimates (Riley 2012 about 1.3 %, Love about 1.1 %, Riley and Love 2017 0.3–1.1 %,
+/// Moriña 2019 0.05–0.19 %, Lloyd's 2013 about 0.7 %).
+pub(crate) const CARRINGTON_STORM: Triple = (3.0e-3, 5.0e-4, 1.3e-2);
+/// PRIOR (Lloyd's 2013: 20–40 million people at risk of a long outage out of about 330 million):
+/// chance that such a storm cuts a household's power for days, at the population-average
+/// geomagnetic latitude.
+pub(crate) const GMD_OUTAGE_GIVEN_STORM: Triple = (0.09, 0.06, 0.12);
+/// DERIVED (data-hazard's `geomag.csv` × NRI 2020 population): the population-weighted mean NERC
+/// scaling factor α over every county, 0.2285. A county's factor over this is its location
+/// multiplier.
+pub(crate) const GMD_ALPHA_POP_MEAN: f64 = 0.2285;
+/// The chance that one storm cuts a household's power for days never exceeds this.
+pub(crate) const GMD_OUTAGE_CAP: f64 = 0.5;
+
+/// PRIOR (Lloyd's 2013: the worst-hit areas out for 16 days to a year or two): share of the
+/// multi-day outages from a severe solar storm that last two months or more.
+pub(crate) const GMD_SHARE_GE_60D: Triple = (0.1, 0.02, 0.3);
+/// PRIOR (B2: power 3 days median, 60 days at the 90th percentile; EPRI 2019 does not support
+/// months-long nationwide blackouts): share of EMP outages that last two months or more.
+pub(crate) const HEMP_SHARE_GE_60D: Triple = (0.1, 0.02, 0.3);
+/// PRIOR (B5: wartime outages 1 day median, 7 days at the 90th percentile): share lasting two
+/// months or more.
+pub(crate) const WAR_SHARE_GE_60D: Triple = (0.02, 0.005, 0.1);
+
+/// PRIOR (B5; FRI 2024: violent Russia–USA conflict by 2030, experts 5 %, superforecasters
+/// 1.8 %): a great-power war, a year.
+pub(crate) const GREAT_POWER_WAR: Triple = (5.0e-3, 2.0e-3, 1.0e-2);
+/// PRIOR (B5): chance such a war brings attacks (cyber, sabotage or missiles) on power, water or
+/// communications in the US that reach a household near military sites and infrastructure.
+pub(crate) const WAR_HOMELAND_ATTACKED: Triple = (0.5, 0.2, 0.8);
+/// PRIOR (B5): the same far from military sites, big cities, ports and refineries (classes B, D
+/// and E), relative to near them.
+pub(crate) const WAR_FAR_FROM_TARGETS: f64 = 0.3;
+
+/// PRIOR (B4; START POICN counts 517 CBRN events worldwide in 1990–2017, about 76 % chemical):
+/// chemical, biological or radiological attacks a year that disrupt daily life in a US metro.
+pub(crate) const CBRN_US: Triple = (0.03, 0.01, 0.1);
+/// PRIOR (B4): share of the metro area's households under an order (buildings and blocks, not
+/// the whole metro, as with the anthrax letters).
+pub(crate) const CBRN_METRO_SHARE: Triple = (0.05, 0.01, 0.2);
+/// DERIVED + PRIOR, as [`ATTACK_NON_UASI`]: 0.03 × 0.05 × 5,000 households ÷ 64 million.
+pub(crate) const CBRN_NON_UASI: Triple = (1.5e-7, 1.0e-8, 2.0e-6);
+
+/// PRIOR (B5; Marani et al. 2021: a COVID-intensity pandemic about 0.5 % a year): a pandemic far
+/// deadlier than COVID-19, natural or engineered, anywhere, a year.
+pub(crate) const SEVERE_PANDEMIC: Triple = (1.5e-3, 5.0e-4, 5.0e-3);
+/// DATA-based PRIOR (Cassidy and Mani 2022: "one-in-six" chance of a VEI 7 eruption this century):
+/// a very large eruption anywhere, a year.
+pub(crate) const VEI7_WORLD: Triple = (1.8e-3, 8.0e-4, 4.0e-3);
+/// DATA (USGS Yellowstone Volcano Observatory: about 1 in 730,000 a year): a caldera-forming
+/// eruption at Yellowstone.
+pub(crate) const YELLOWSTONE: Triple = (1.0 / 730_000.0, 5.0e-7, 3.0e-6);
+/// DERIVED (NASA 2019: Tunguska-class impacts "on the order of millennia"; a 2,000–3,000 km²
+/// damage area over the Earth's surface): an asteroid or comet damaging the area where a
+/// household lives, a year.
+pub(crate) const ASTEROID: Triple = (3.0e-9, 1.0e-9, 6.0e-9);
+/// PRIOR (B5; one national bank holiday, 1933, in about a century; deposit insurance since):
+/// banks closed for three days or more across the country, a year.
+pub(crate) const FINANCIAL_CRISIS: Triple = (2.0e-3, 5.0e-4, 1.0e-2);
+/// DATA (FBI, Active Shooter Incidents in the United States in 2024: 23 killed and 83 wounded
+/// among about 336 million people): being hurt or killed in a mass shooting or bombing, per person
+/// a year; the range covers broader definitions.
+pub(crate) const MASS_VIOLENCE_PER_PERSON: Triple = (3.0e-7, 1.0e-7, 1.0e-6);
+
+// ---------------------------------------------------------------------------------------------
+// Named scenarios added in v0.2.0 (REVIEW H10; hazard-expansion H-13).
+// ---------------------------------------------------------------------------------------------
+
+/// DATA (Working Group on Utah Earthquake Probabilities 2016; confirm): 43 % chance of a
+/// magnitude 6.75 or larger earthquake on the Wasatch Front in 50 years. Low and high are PRIOR.
+pub(crate) const WASATCH_50YR: Triple = (0.43, 0.30, 0.57);
+/// DATA (UCERF3, USGS Fact Sheet 2015–3009; confirm): 19 % chance of magnitude 6.7 or larger on
+/// the southern San Andreas fault in 30 years. Low and high are PRIOR.
+pub(crate) const SAN_ANDREAS_SOUTH_30YR: Triple = (0.19, 0.12, 0.28);
+/// DATA (USGS and Washington DNR on the Seattle fault zone; confirm): about 5 % chance of a
+/// magnitude 6.5 or larger earthquake on the Seattle fault in 50 years. Low and high are PRIOR.
+pub(crate) const SEATTLE_FAULT_50YR: Triple = (0.05, 0.02, 0.10);
+/// Days a year over 95 °F (CMRA historical baseline) from which a county counts as a desert
+/// heat county for the heat-and-blackout scenario (Maricopa about 140, Clark about 125).
+pub(crate) const DESERT_HEAT_DAYS_95F: f64 = 60.0;
+/// PRIOR (EAGLE-I national pattern; research §2.5): power cuts of a day or more a year for a
+/// household, used for the heat-and-blackout scenario when the county has no outage record.
+pub(crate) const OUTAGE_GE_1D_FALLBACK: Triple = (0.02, 0.005, 0.06);
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -458,6 +751,54 @@ mod tests {
             ("illness", LONG_ILLNESS),
             ("outage weather", OUTAGE_WEATHER_SHARE),
             ("hurricane intensity", HURRICANE_INTENSITY),
+            ("water damage", WATER_DAMAGE),
+            ("water damage freeze", WATER_DAMAGE_FREEZE),
+            ("water damage basement", WATER_DAMAGE_BASEMENT),
+            ("water damage renter", WATER_DAMAGE_RENTER),
+            ("smoke episode", SMOKE_EPISODE_DAYS),
+            ("dust footprint", DUST_FOOTPRINT),
+            ("sinkhole", SINKHOLE_ON_KARST),
+            ("dam event", DAM_EVENT_PER_DAM),
+            ("dam downstream", DAM_DOWNSTREAM_FOOTPRINT),
+            ("dam county", DAM_COUNTY_FOOTPRINT),
+            ("levee", LEVEE_RESIDUAL),
+            ("network", NETWORK_OUTAGE),
+            ("drug shortage", DRUG_SHORTAGE),
+            ("drug shortage cold", DRUG_SHORTAGE_COLD),
+            ("funding gap", FUNDING_GAP_14D),
+            ("snap lapse", SNAP_LAPSE_GIVEN_GAP),
+            ("mandatory benefit", MANDATORY_BENEFIT_DELAY),
+            ("unemployment", UNEMPLOYMENT_DELAY),
+            ("eviction", EVICTION_NATIONAL),
+            ("eviction judgment", EVICTION_JUDGMENT_SHARE),
+            ("eviction savings", EVICTION_SAVINGS),
+            ("attack", ATTACK_US),
+            ("attack share", ATTACK_METRO_SHARE),
+            ("attack non-uasi", ATTACK_NON_UASI),
+            ("strategic", NUCLEAR_STRATEGIC_US),
+            ("limited", NUCLEAR_LIMITED_US),
+            ("ind", NUCLEAR_IND_US),
+            ("use abroad", NUCLEAR_USE_WORLD),
+            ("hemp strategic", HEMP_GIVEN_STRATEGIC),
+            ("hemp limited", HEMP_GIVEN_LIMITED),
+            ("unknown class", STRATEGIC_FACTOR_UNKNOWN),
+            ("carrington", CARRINGTON_STORM),
+            ("gmd outage", GMD_OUTAGE_GIVEN_STORM),
+            ("gmd 60 d", GMD_SHARE_GE_60D),
+            ("hemp 60 d", HEMP_SHARE_GE_60D),
+            ("war 60 d", WAR_SHARE_GE_60D),
+            ("war", GREAT_POWER_WAR),
+            ("war homeland", WAR_HOMELAND_ATTACKED),
+            ("cbrn", CBRN_US),
+            ("cbrn share", CBRN_METRO_SHARE),
+            ("cbrn non-uasi", CBRN_NON_UASI),
+            ("severe pandemic", SEVERE_PANDEMIC),
+            ("vei 7", VEI7_WORLD),
+            ("yellowstone", YELLOWSTONE),
+            ("asteroid", ASTEROID),
+            ("financial", FINANCIAL_CRISIS),
+            ("mass violence", MASS_VIOLENCE_PER_PERSON),
+            ("outage 1 d fallback", OUTAGE_GE_1D_FALLBACK),
         ];
         for (name, (v, lo, hi)) in all {
             assert!(*lo > 0.0 && lo <= v && v <= hi, "{name}: {lo} {v} {hi}");
@@ -471,7 +812,33 @@ mod tests {
     }
 
     #[test]
-    fn nuclear_range_is_research_section_6_3() {
-        assert_eq!(NUCLEAR_ATTACK_RANGE, (0.0005, 0.0025));
+    fn rare_family_priors_are_the_review_values() {
+        // REVIEW §2.3 and hazard-expansion B1.3.
+        assert_eq!(NUCLEAR_STRATEGIC_US, (4.0e-4, 1.0e-4, 4.0e-3));
+        assert_eq!(NUCLEAR_LIMITED_US, (1.0e-4, 2.0e-5, 5.0e-4));
+        assert_eq!(NUCLEAR_IND_US, (5.0e-5, 1.0e-6, 5.0e-4));
+        assert_eq!(NUCLEAR_USE_WORLD, (5.0e-3, 1.0e-3, 1.5e-2));
+        // The unknown-class factor lies between the classes it averages.
+        assert!(STRATEGIC_FACTOR_UNKNOWN.0 > 0.03 && STRATEGIC_FACTOR_UNKNOWN.0 < 0.9);
+    }
+
+    #[test]
+    fn arrest_bands_are_ordered_and_men_are_arrested_more_often() {
+        let mut last = 0;
+        for (band, first, age_last, m, f) in ARRESTS_PER_100K {
+            assert!(*first > last || last == 0, "{band}");
+            assert!(first <= age_last, "{band}");
+            last = *age_last;
+            for (v, lo, hi) in [m, f] {
+                assert!(lo <= v && v <= hi && *lo > 0.0, "{band}");
+            }
+            assert!(m.0 > f.0, "{band}");
+        }
+    }
+
+    #[test]
+    fn a_long_funding_gap_is_four_in_forty_five_years() {
+        // CRS RS20348: FY1996, FY2014, FY2019 and FY2026 in fiscal years 1982-2026.
+        assert!((FUNDING_GAP_14D.0 - 4.0 / 45.0).abs() < 1e-5);
     }
 }

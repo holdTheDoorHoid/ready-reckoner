@@ -340,10 +340,14 @@ fn the_data_packs_load_file_by_file_and_then_answer_for_every_fixture() {
         info.data_pack_version.as_deref(),
         Some(pack_version.as_str())
     );
-    // Attributions now come from the manifest, the National Risk Index statement first.
+    // Attributions now come from the manifest, the National Risk Index statement first. Credit
+    // lines of optional packs (manifest `attribution_packs`) wait until their pack is loaded.
+    let optional = manifest["attribution_packs"]
+        .as_object()
+        .map_or(0, serde_json::Map::len);
     assert_eq!(
         info.attributions.len(),
-        manifest["attributions"].as_array().unwrap().len()
+        manifest["attributions"].as_array().unwrap().len() - optional
     );
     assert_eq!(info.attributions[0].source, "FEMA National Risk Index");
     assert!(info.attributions[0].text.contains("not endorsed by FEMA"));

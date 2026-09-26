@@ -3,10 +3,11 @@
 //!
 //! ```text
 //! PlanInput + CountyRecord + [BaseRate] + LocationResolved ─► assess ─► HazardAssessment
-//!                                                                    ├─ profiles  (register cards)
-//!                                                                    ├─ rates     (to rr-consequence)
-//!                                                                    ├─ scenarios (named scenarios)
-//!                                                                    └─ notes     (plain-language caveats)
+//!                                                                    ├─ profiles     (register cards)
+//!                                                                    ├─ rates        (to rr-consequence)
+//!                                                                    ├─ scenarios    (named scenarios)
+//!                                                                    ├─ also_checked (under 1 in 100,000)
+//!                                                                    └─ notes        (plain-language caveats)
 //! ```
 //!
 //! # What a rate means
@@ -25,7 +26,14 @@
 //!   the home; winter storms when they keep the household in or cut the power;
 //! - floods count when water reaches the home (or cuts off an upper-floor flat);
 //! - job loss counts spells of unemployment of any earner; medical emergencies count emergency
-//!   department visits.
+//!   department visits; arrests count arrests (events, not people).
+//!
+//! # The rare families
+//!
+//! The nine rare families (contract v2, [`HazardId::RARE`]) are display-only: they are in
+//! [`HazardAssessment::profiles`], range only, sorted by how likely they are here, but never in
+//! [`HazardAssessment::rates`], so no rare row enters a bucket's Λ, a target or the budget
+//! (REVIEW §2.3–§2.4). See the `rare` module.
 //!
 //! # Scenarios
 //!
@@ -46,21 +54,25 @@ mod cite;
 mod climate;
 mod ctx;
 mod estimate;
+mod exposure;
 mod natural;
 mod params;
 mod personal;
+mod rare;
 mod rate;
 mod scenarios;
 mod sentence;
 mod severity;
 mod societal;
+mod strategic;
+mod subcauses;
 mod why;
 
 use serde::{Deserialize, Serialize};
 
 use rr_types::{
     BaseRate, CitationId, CountyRecord, Evidence, HazardDisplay, HazardId, HazardProfile,
-    HouseholdEventRate, LocationResolved, PlanInput, math,
+    HouseholdEventRate, LocationResolved, PlanInput, SubCause, math,
 };
 
 pub use scenarios::{AlternativeRate, ScenarioCandidate};
@@ -83,11 +95,13 @@ pub const CITATION_IDS: &[&str] = cite::ALL;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct HazardAssessment {
     /// The register: one card per hazard that applies, `ranked` ones first (most likely first,
-    /// by today's rate, so the 2050 dial never re-orders the list silently), then the
-    /// `rare_catastrophic` ones.
+    /// by today's rate, so the 2050 dial never re-orders the list silently), then the nine
+    /// `rare_catastrophic` families, most likely here first (by the middle of their range, which
+    /// is never shown).
     pub profiles: Vec<HazardProfile>,
-    /// Household event rates for `rr-consequence`, one per hazard in the register, in
-    /// `HazardId` order: each hazard's full rate (a named scenario is an extra event class).
+    /// Household event rates for `rr-consequence`, one per **ranked** hazard in the register, in
+    /// `HazardId` order: each hazard's full rate (a named scenario is an extra event class). The
+    /// rare families are never here: they are shown, not planned for.
     pub rates: Vec<HouseholdEventRate>,
     /// Named scenarios that apply to this location, with defaults and the user's overrides.
     pub scenarios: Vec<ScenarioCandidate>,
@@ -98,8 +112,28 @@ pub struct HazardAssessment {
     /// rate (the rest cut off the road).
     #[serde(default)]
     pub parts: Vec<RatePart>,
+    /// "Also checked": every hazard and rare sub-row checked for this household and found under
+    /// 1 in 100,000 a year, with its rate (REVIEW §2.4, H-12). They have no card; the packet and
+    /// the risks screen list them in one line.
+    #[serde(default)]
+    pub also_checked: Vec<AlsoChecked>,
     /// Plain-language caveats for the packet and the "why" drawers.
     pub notes: Vec<String>,
+}
+
+/// A hazard or rare sub-row checked for this household and found under 1 in 100,000 a year.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AlsoChecked {
+    /// A hazard id (`tornado`) or a rare sub-row id (`asteroid`, `yellowstone`).
+    pub id: String,
+    /// What it is, in plain words, lower case ("tornadoes", "an asteroid or comet impact").
+    pub name: String,
+    /// Events a year for this household (0 when none is recorded).
+    pub rate_per_year: f64,
+    /// A plausible low and high, as `[low, high]`.
+    pub rate_range: [f64; 2],
+    /// Where the rate comes from.
+    pub sources: Vec<CitationId>,
 }
 
 /// The wildfire part that counts warnings to leave home (NRI burn probability × residents
@@ -178,59 +212,65 @@ pub fn assess(
 
     let natural = natural::assess(&ctx, &mut notes);
     let detected = scenarios::detect(&ctx, &natural, &mut notes);
+    missing_data_note(&ctx, &mut notes);
 
-    // Leave out natural hazards too rare to matter, unless a scenario hangs on them.
+    // Every ranked hazard: natural, societal and personal. Those too rare to matter here (under
+    // 1 in 100,000 a year today and around 2050) go to "Also checked", unless a scenario hangs
+    // on them.
+    let mut candidates: Vec<HazardRate> = natural.rates.clone();
+    candidates.extend(societal::assess(&ctx, &mut notes));
+    candidates.extend(personal::assess(&ctx, &mut notes));
+    candidates.sort_by_key(|r| r.hazard);
     let mut rates: Vec<HazardRate> = Vec::new();
-    let mut negligible: Vec<&'static str> = Vec::new();
-    for r in &natural.rates {
+    let mut also_checked: Vec<AlsoChecked> = Vec::new();
+    for r in candidates {
         let parent = detected.iter().any(|d| d.candidate.hazard == r.hazard);
         if r.today.value < params::NEGLIGIBLE_RATE
             && r.future.value < params::NEGLIGIBLE_RATE
             && !parent
         {
-            negligible.push(plural(r.hazard));
+            let e = r.effective(y2050);
+            also_checked.push(AlsoChecked {
+                id: r.hazard.as_str().to_owned(),
+                name: plural(r.hazard).to_owned(),
+                rate_per_year: e.value,
+                rate_range: [e.low, e.high],
+                sources: e.sources.clone(),
+            });
         } else {
-            rates.push(r.clone());
+            rates.push(r);
         }
     }
-    if !negligible.is_empty() {
+    for (id, name, (v, lo, hi), sources) in rare::also_checked() {
+        also_checked.push(AlsoChecked {
+            id: id.to_owned(),
+            name: name.to_owned(),
+            rate_per_year: v,
+            rate_range: [lo, hi],
+            sources: sources.iter().map(|s| CitationId::from(*s)).collect(),
+        });
+    }
+    if !also_checked.is_empty() {
+        let list: Vec<String> = also_checked
+            .iter()
+            .map(|a| format!("{} ({})", a.name, sentence::per_year_words(a.rate_per_year)))
+            .collect();
         notes.add(format!(
-            "Also checked, and too rare here to list (under 1 in 100,000 a year): {}.",
-            join_lower(&negligible)
+            "Also checked, and under 1 in 100,000 a year here: {}.",
+            join_plain(&list)
         ));
     }
     if y2050 {
         climate_notes(&rates, &mut notes);
     }
-    rates.extend(societal::assess(&ctx, &mut notes));
-    rates.extend(personal::assess(&ctx, &mut notes));
-    rates.sort_by_key(|r| r.hazard);
-    // Heat and cold waves marked Serious for a household at risk: one note when the reason is the
-    // same for both (someone 65 or older), otherwise one each.
-    let reason = |h: HazardId| {
-        rates
-            .iter()
-            .any(|r| r.hazard == h)
-            .then(|| severity::at_risk_reason(input, h))
-            .flatten()
-    };
-    let (heat, cold) = (reason(HazardId::HeatWave), reason(HazardId::ColdWave));
-    let marked = match (heat, cold) {
-        (Some(h), Some(c)) if h == c => vec![("Heat and cold waves", h)],
-        (h, c) => [("Heat waves", h), ("Cold waves", c)]
-            .into_iter()
-            .filter_map(|(what, why)| why.map(|w| (what, w)))
-            .collect(),
-    };
-    for (what, why) in marked {
-        notes.add(format!(
-            "{what} are marked Serious for this household because {why}; they are most \
-             dangerous for households like yours."
-        ));
+    for r in &mut rates {
+        let mut named = subcauses::for_hazard(&ctx, r.hazard);
+        r.sub_causes.append(&mut named);
     }
+    at_risk_notes(input, &rates, &mut notes);
 
-    // rr-consequence gets each hazard's full rate; a named scenario is an extra event class
-    // (see the `scenarios` module).
+    // rr-consequence gets each ranked hazard's full rate; a named scenario is an extra event
+    // class (see the `scenarios` module). The rare families never reach it.
     let household_rates = rates
         .iter()
         .map(|r| household_rate(r.hazard, r.effective(y2050)))
@@ -264,34 +304,187 @@ pub fn assess(
         parts.push(RatePart::new(HazardId::Landslide, LANDSLIDE_DAMAGE_PART, d));
     }
 
-    let mut cards: Vec<(f64, HazardProfile)> = rates
+    let mut ranked: Vec<(f64, HazardProfile)> = rates
         .iter()
         .map(|r| {
             let (today, effective) = register_rate(r, &detected, y2050);
             (today.value, profile(&ctx, r, &effective))
         })
         .collect();
-    cards.sort_by(|(ta, a), (tb, b)| {
-        let rare = |p: &HazardProfile| p.display == HazardDisplay::RareCatastrophic;
-        rare(a)
-            .cmp(&rare(b))
-            .then_with(|| {
-                if rare(a) {
-                    core::cmp::Ordering::Equal
-                } else {
-                    tb.total_cmp(ta)
-                        .then_with(|| b.severity.total_cmp(&a.severity))
-                }
-            })
+    ranked.sort_by(|(ta, a), (tb, b)| {
+        tb.total_cmp(ta)
+            .then_with(|| b.severity.total_cmp(&a.severity))
+            .then_with(|| a.id.cmp(&b.id))
+    });
+    let anchors: Vec<(HazardId, f64)> = ranked
+        .iter()
+        .map(|(_, p)| (p.id, p.rate_per_year))
+        .collect();
+    let mut rare_cards: Vec<HazardProfile> = rare::assess(&ctx, &mut notes)
+        .iter()
+        .map(|r| {
+            let mut p = profile(&ctx, r, &r.today);
+            p.anchor_sentence = anchor_for(p.rate_range[1], &anchors, ctx.years());
+            p
+        })
+        .collect();
+    rare_cards.sort_by(|a, b| {
+        b.rate_per_year
+            .total_cmp(&a.rate_per_year)
             .then_with(|| a.id.cmp(&b.id))
     });
 
+    let mut profiles: Vec<HazardProfile> = ranked.into_iter().map(|(_, p)| p).collect();
+    profiles.extend(rare_cards);
     HazardAssessment {
-        profiles: cards.into_iter().map(|(_, p)| p).collect(),
+        profiles,
         rates: household_rates,
         scenarios: detected.into_iter().map(|d| d.candidate).collect(),
         parts,
+        also_checked,
         notes: notes.0,
+    }
+}
+
+impl HazardAssessment {
+    /// Finishes the "power out for months" family with the household's own power curve: `per_year`
+    /// is the yearly rate of power cuts lasting 60 days or more that `rr-consequence` reads off
+    /// its exceedance curve for this household, as `(value, low, high)`. `rr-hazards` runs
+    /// before `rr-consequence`, so the family first holds only the solar-storm, EMP and war
+    /// parts; the plan pipeline calls this once the curve exists. awaiting: plan — `rr-plan`
+    /// calls it after `rr_consequence::assess_with_parts`; awaiting: consequence — the curve
+    /// value at 60 days.
+    pub fn add_power_curve(&mut self, per_year: (f64, f64, f64), years: u8) {
+        let (v, lo, hi) = per_year;
+        if !(v.is_finite() && lo.is_finite() && hi.is_finite()) || v < 0.0 {
+            return;
+        }
+        let (lo, hi) = (lo.clamp(0.0, v), hi.max(v));
+        let anchors: Vec<(HazardId, f64)> = self
+            .profiles
+            .iter()
+            .filter(|p| p.display == HazardDisplay::Ranked)
+            .map(|p| (p.id, p.rate_per_year))
+            .collect();
+        let Some(p) = self
+            .profiles
+            .iter_mut()
+            .find(|p| p.id == HazardId::MultiMonthBlackout)
+        else {
+            return;
+        };
+        if p.sub_causes.iter().any(|s| s.id == "own_record") {
+            return;
+        }
+        p.rate_per_year += v;
+        p.rate_range = [p.rate_range[0] + lo, p.rate_range[1] + hi];
+        p.annual_probability = chance(p.rate_per_year);
+        p.probability_range = [chance(p.rate_range[0]), chance(p.rate_range[1])];
+        p.frequency_sentence = sentence::range_sentence(
+            "be without power for two months or more",
+            p.rate_range[0],
+            p.rate_range[1],
+            years,
+        );
+        p.sub_causes.push(SubCause {
+            id: "own_record".to_owned(),
+            name: "Your county's own outage record".to_owned(),
+            note: "Storms and failures like the ones in your county's outage records, with the \
+                   long tail the records cannot show yet."
+                .to_owned(),
+            rate_range: Some([lo, hi]),
+            sources: vec![CitationId::from(cite::EAGLE_I)],
+        });
+        let source = CitationId::from(cite::EAGLE_I);
+        if !p.sources.contains(&source) {
+            p.sources.push(source);
+        }
+        p.anchor_sentence = anchor_for(p.rate_range[1], &anchors, years);
+    }
+}
+
+/// The anchor of a rare row (REVIEW §2.4): the household's own ranked hazard with the smallest
+/// rate still above the row's upper bound.
+fn anchor_for(high: f64, ranked: &[(HazardId, f64)], years: u8) -> Option<String> {
+    ranked
+        .iter()
+        .filter(|(_, r)| *r > high)
+        .min_by(|a, b| a.1.total_cmp(&b.1))
+        .map(|(h, r)| sentence::anchor(anchor_phrase(*h), *r, years))
+}
+
+/// One note naming the v2 data columns the pack does not have for this county, so a reader knows
+/// which rows rest on national averages or are left out, and one when the urban area's UASI share
+/// is missing (the attack, CBRN and crude-device terms then fall back to a share of 0).
+fn missing_data_note(ctx: &Ctx<'_>, notes: &mut Notes) {
+    let e = ctx.exposure();
+    let mut missing = Vec::new();
+    if e.smoke().is_none() {
+        missing.push("smoke days (wildfire smoke is left out)");
+    }
+    if e.karst_share().is_none() {
+        missing.push("karst maps (sinkholes are left out)");
+    }
+    if e.levees().is_none() {
+        missing.push("levees");
+    }
+    if e.geomag().is_none() {
+        missing.push("geomagnetic latitude");
+    }
+    if !missing.is_empty() {
+        notes.add(format!(
+            "Some of the newer data are not loaded for {}: {}. The rows that need them use \
+             national averages or are left out.",
+            ctx.county_label(),
+            join_plain(&missing.iter().map(|s| (*s).to_owned()).collect::<Vec<_>>())
+        ));
+    }
+    // The metro weight falls back to 0 rather than to an average, so it has a note of its own.
+    if matches!(e.uasi(), exposure::Uasi::Absent) {
+        notes.add(format!(
+            "FEMA's urban-area funding shares are not loaded for {}, so the estimates for an \
+             attack that closes your area, a chemical, biological or radiological attack, and a \
+             crude nuclear device count it as outside the 44 funded urban areas. In a big city \
+             those estimates are too low.",
+            ctx.county_label()
+        ));
+    }
+}
+
+/// Heat waves, cold waves, smoke and dust marked Serious for a household at risk: one note when
+/// the reason is the same, otherwise one each.
+fn at_risk_notes(input: &PlanInput, rates: &[HazardRate], notes: &mut Notes) {
+    let reason = |h: HazardId| {
+        rates
+            .iter()
+            .any(|r| r.hazard == h)
+            .then(|| severity::at_risk_reason(input, h))
+            .flatten()
+    };
+    let (heat, cold) = (reason(HazardId::HeatWave), reason(HazardId::ColdWave));
+    let marked = match (heat, cold) {
+        (Some(h), Some(c)) if h == c => vec![("Heat and cold waves", h)],
+        (h, c) => [("Heat waves", h), ("Cold waves", c)]
+            .into_iter()
+            .filter_map(|(what, why)| why.map(|w| (what, w)))
+            .collect(),
+    };
+    for (what, why) in marked {
+        notes.add(format!(
+            "{what} are marked Serious for this household because {why}; they are most \
+             dangerous for households like yours."
+        ));
+    }
+    let smoke = rates
+        .iter()
+        .any(|r| r.hazard == HazardId::WildfireSmoke && r.today.value >= params::NEGLIGIBLE_RATE)
+        .then(|| severity::at_risk_reason(input, HazardId::WildfireSmoke))
+        .flatten();
+    if let Some(why) = smoke {
+        notes.add(format!(
+            "Wildfire smoke is marked Serious for this household because {why}; smoke harms them \
+             most."
+        ));
     }
 }
 
@@ -305,10 +498,19 @@ fn register_rate(r: &HazardRate, detected: &[Detected], y2050: bool) -> (Estimat
     if mine.is_empty() {
         return (r.today.clone(), r.effective(y2050).clone());
     }
-    let (mut today, mut future) = mine
-        .iter()
-        .find_map(|d| d.remainder.clone())
-        .unwrap_or_else(|| (r.today.clone(), r.future.clone()));
+    let (mut today, mut future) = match mine.iter().find_map(|d| d.remainder.clone()) {
+        Some(split) => split,
+        None => {
+            let (s_today, s_future) = mine
+                .iter()
+                .filter_map(|d| d.share)
+                .fold((0.0, 0.0), |(a, b), (x, y)| (a + x, b + y));
+            (
+                scenarios::without(&r.today, s_today),
+                scenarios::without(&r.future, s_future),
+            )
+        }
+    };
     for d in mine {
         today = today.plus(&d.today);
         future = future.plus(&d.future);
@@ -344,17 +546,21 @@ fn profile(ctx: &Ctx<'_>, r: &HazardRate, e: &Estimate) -> HazardProfile {
     };
     let around_2050 = y2050 && (climate_multiplier - 1.0).abs() > 1e-9;
     let sentence_for = |e: &Estimate, verb: &str| {
-        sentence::natural_frequency(
-            sentence::Frequency {
-                rate: e.value,
-                low: e.low,
-                high: e.high,
-                show_range: e.evidence == rr_types::Evidence::Prior,
-                years: ctx.years(),
-                around_2050,
-            },
-            verb,
-        )
+        if r.range_only {
+            sentence::range_sentence(verb, e.low, e.high, ctx.years())
+        } else {
+            sentence::natural_frequency(
+                sentence::Frequency {
+                    rate: e.value,
+                    low: e.low,
+                    high: e.high,
+                    show_range: e.evidence == rr_types::Evidence::Prior,
+                    years: ctx.years(),
+                    around_2050,
+                },
+                verb,
+            )
+        }
     };
     let mut frequency_sentence = match &r.range_sentence {
         Some(s) => s.clone(),
@@ -395,21 +601,92 @@ fn profile(ctx: &Ctx<'_>, r: &HazardRate, e: &Estimate) -> HazardProfile {
         buckets: buckets::for_hazard(r.hazard),
         // Contract v2: a rare row names the family it heads (a family's id is its hazard's id).
         family: r.hazard.family().map(str::to_owned),
-        // awaiting: hazards — sub-causes, location factor, range-only display, the anchor sentence
-        // and the "if it reaches you" / "what it changes" words (DESIGN-DELTA §1.3).
-        sub_causes: Vec::new(),
-        location_factor: None,
-        range_only: false,
+        sub_causes: r.sub_causes.clone(),
+        location_factor: r.location_factor.clone(),
+        range_only: r.range_only,
         anchor_sentence: None,
-        if_it_reaches_you: None,
-        what_it_changes: None,
+        if_it_reaches_you: r.if_it_reaches_you.clone(),
+        what_it_changes: r.what_it_changes.clone(),
     }
 }
 
-/// A natural hazard's plural name for lists in notes ("heat waves", "tornadoes").
-fn plural(hazard: HazardId) -> &'static str {
+/// How the anchor names a ranked hazard: "less likely than {phrase}".
+fn anchor_phrase(hazard: HazardId) -> &'static str {
     use HazardId::*;
     match hazard {
+        Avalanche => "an avalanche reaching your home or road",
+        CoastalFlooding => "coastal flooding reaching your home",
+        ColdWave => "a cold wave",
+        Drought => "a drought that limits your water",
+        Earthquake => "an earthquake strong enough to knock things off shelves",
+        Hail => "hail damage",
+        HeatWave => "a heat wave",
+        Hurricane => "a hurricane or tropical storm",
+        IceStorm => "an ice storm",
+        Landslide => "a landslide",
+        Lightning => "lightning damaging your home",
+        RiverineFlooding => "flood water reaching your home",
+        StrongWind => "a windstorm",
+        Tornado => "a tornado",
+        Tsunami => "a tsunami warning",
+        VolcanicActivity => "ash or mudflows from a volcano",
+        Wildfire => "a wildfire",
+        WinterWeather => "a winter storm",
+        WildfireSmoke => "days of wildfire smoke",
+        DustStorm => "a dust storm",
+        Sinkhole => "a sinkhole",
+        Pandemic => "a pandemic that changes daily life",
+        GridFailure => "a regional blackout",
+        CyberOutage => "a computer outage that stops services",
+        CivilUnrest => "a curfew",
+        SupplyChainDisruption => "empty store shelves",
+        HazmatRelease => "a chemical spill order",
+        NuclearPlantIncident => "a nuclear plant accident",
+        DamFailure => "a dam or levee failure",
+        NetworkOutage => "a phone or internet outage",
+        DrugShortage => "a medicine shortage",
+        BenefitInterruption => "pay or benefits stopping",
+        AttackDisruption => "an attack or threat closing your area",
+        JobLoss => "a job loss",
+        HouseFire => "a house fire",
+        MedicalEmergency => "a medical emergency",
+        VehicleStranding => "being stranded in a vehicle",
+        LocalUtilityOutage => "a water main break or boil-water notice",
+        Burglary => "a break-in",
+        EarnerDeathOrDisability => "the death or disability of an earner",
+        ExtendedHouseholdIllness => "a long illness at home",
+        WaterDamage => "a burst pipe or leak",
+        Eviction => "an eviction",
+        ArrestOrDetention => "an arrest in the household",
+        other => other.name(),
+    }
+}
+
+/// "a, b and c" (items kept as written).
+fn join_plain(items: &[String]) -> String {
+    match items.len() {
+        0 => String::new(),
+        1 => items[0].clone(),
+        n => format!("{} and {}", items[..n - 1].join(", "), items[n - 1]),
+    }
+}
+
+/// A hazard's plural name for lists in notes ("heat waves", "tornadoes"), lower case.
+pub(crate) fn plural(hazard: HazardId) -> &'static str {
+    use HazardId::*;
+    match hazard {
+        WildfireSmoke => "days of unhealthy wildfire smoke",
+        DustStorm => "dust storms",
+        Sinkhole => "sinkholes",
+        DamFailure => "dam or levee failures",
+        AttackDisruption => "an attack or threat closing your area",
+        NetworkOutage => "phone or internet outages",
+        DrugShortage => "medicine shortages",
+        BenefitInterruption => "pay or benefits stopping",
+        NuclearPlantIncident => "a nuclear plant accident",
+        WaterDamage => "burst pipes or leaks",
+        Eviction => "eviction",
+        ArrestOrDetention => "an arrest in the household",
         Avalanche => "avalanches",
         CoastalFlooding => "coastal floods",
         ColdWave => "cold waves",
@@ -441,7 +718,7 @@ fn too_few_of(hazard: HazardId) -> &'static str {
     }
 }
 
-fn join_lower(names: &[&str]) -> String {
+pub(crate) fn join_lower(names: &[&str]) -> String {
     let lower: Vec<String> = names.iter().map(|n| n.to_lowercase()).collect();
     match lower.len() {
         0 => String::new(),
