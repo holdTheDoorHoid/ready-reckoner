@@ -312,15 +312,15 @@ comes back at once.
 
 1. `manifest.json` first. The engine checks every later file against the sha256 it records (a file
    loaded before the manifest is checked when the manifest arrives).
-2. Every file listed under `packs.core.files` except the three ZIP tables, fetched at once and
+2. Every file listed under `packs.core.files` except the two ZIP tables, fetched at once and
    loaded one by one with `core/counties.csv` last. The engine reassembles the county records
    after each file, which is only real work once the county list is in, so this order is the
    fastest; any order gives the same answers.
-3. The ZIP tables (`core/zip_county.csv`, `core/zip_centroids.csv`, `core/zip_facilities.csv`;
-   `ZIP_FILES` in `crates/rr-wasm/src/source.rs`) when a location has a real ZIP code: the app
-   starts fetching them when someone starts typing one, or when a saved plan has one. Only ZIP
-   lookups read them, so a first visit is about 0.65 MB lighter, and someone who finds their
-   county by name never downloads them.
+3. The ZIP tables (`core/zip_county.csv`, `core/zip_facilities.csv`; `ZIP_FILES` in
+   `crates/rr-wasm/src/source.rs`) when a location has a real ZIP code: the app starts fetching
+   them when someone starts typing one, or when a saved plan has one. Only ZIP lookups read them,
+   so a first visit is about 0.38 MB lighter, and someone who finds their county by name never
+   downloads them.
 4. `geo/counties.json` (county outlines for the map) only when a map is shown; nothing else needs
    it.
 

@@ -48,7 +48,6 @@ pub const PACK_FILES: &[&str] = &[
     "core/states.csv",
     "core/ct_crosswalk.csv",
     "core/zip_county.csv",
-    "core/zip_centroids.csv",
     "core/nri_counties.csv",
     "core/nri_hazards.csv",
     "core/nri_semantics.toml",
@@ -87,13 +86,10 @@ struct NriCounty {
 struct RawNri {
     hazard: HazardId,
     afreq: Option<f32>,
-    expb: Option<f32>,
     expp: Option<f32>,
-    ealb: Option<f32>,
     ealp: Option<f32>,
     ealt: Option<f32>,
     hlrb: Option<f32>,
-    alrb: Option<f32>,
     risk_score: Option<f32>,
 }
 
@@ -228,7 +224,6 @@ pub struct DataStore {
     facilities: BTreeMap<String, (Facilities, CountyFacilityFlags)>,
     vulnerability: BTreeMap<String, (Vulnerability, Option<u32>)>,
     zip_county: BTreeMap<String, Vec<(String, f32)>>,
-    zip_points: BTreeMap<String, LatLon>,
     zip_facilities: BTreeMap<String, ZipFacilities>,
     base_rates: Vec<BaseRate>,
     base_rate_entries: Vec<BaseRateEntry>,
@@ -461,22 +456,6 @@ impl DataStore {
                     v.sort_by(|a, b| b.1.total_cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
                 }
             }
-            "core/zip_centroids.csv" => {
-                let (i_z, i_lat, i_lon) = (t.col("zip")?, t.col("lat")?, t.col("lon")?);
-                self.zip_points = t
-                    .rows
-                    .iter()
-                    .filter_map(|r| {
-                        Some((
-                            r[i_z].clone(),
-                            LatLon {
-                                lat: f(&r[i_lat])?,
-                                lon: f(&r[i_lon])?,
-                            },
-                        ))
-                    })
-                    .collect();
-            }
             "core/nri_counties.csv" => {
                 let (i_f, i_p, i_b, i_c, i_t) = (
                     t.col("fips")?,
@@ -505,15 +484,14 @@ impl DataStore {
             "core/nri_hazards.csv" => {
                 let ix = |c: &str| t.col(c);
                 let (i_f, i_h) = (ix("fips")?, ix("hazard")?);
+                // The pack's columns since 2026-09-26; older packs also carry expb, ealb and
+                // alrb, which nothing reads.
                 let cols = [
                     ix("afreq")?,
-                    ix("expb")?,
                     ix("expp")?,
-                    ix("ealb")?,
                     ix("ealp")?,
                     ix("ealt")?,
                     ix("hlrb")?,
-                    ix("alrb")?,
                     ix("risk_score")?,
                 ];
                 self.nri_rows.clear();
@@ -527,14 +505,11 @@ impl DataStore {
                         .push(RawNri {
                             hazard,
                             afreq: v[0],
-                            expb: v[1],
-                            expp: v[2],
-                            ealb: v[3],
-                            ealp: v[4],
-                            ealt: v[5],
-                            hlrb: v[6],
-                            alrb: v[7],
-                            risk_score: v[8],
+                            expp: v[1],
+                            ealp: v[2],
+                            ealt: v[3],
+                            hlrb: v[4],
+                            risk_score: v[5],
                         });
                 }
             }
@@ -773,13 +748,13 @@ impl DataStore {
                         NriHazard {
                             afreq: r.afreq,
                             afreq_kind: kind,
-                            expb: r.expb,
+                            expb: None,
                             expp: r.expp,
-                            ealb: r.ealb,
+                            ealb: None,
                             ealp: r.ealp,
                             ealt: r.ealt,
                             hlrb: r.hlrb,
-                            alrb: r.alrb,
+                            alrb: None,
                             risk_score: r.risk_score,
                         },
                     ))
@@ -853,9 +828,9 @@ impl DataStore {
         self.zip_county.iter()
     }
 
-    /// The ZIP centroid, if known.
-    pub fn zip_centroid(&self, zip: &str) -> Option<LatLon> {
-        self.zip_points.get(zip.trim()).copied()
+    /// How many ZIP codes (ZCTAs) `zip_county.csv` holds (0 before it is loaded).
+    pub fn zip_count(&self) -> usize {
+        self.zip_county.len()
     }
 
     /// Facility data for a ZIP, if known.

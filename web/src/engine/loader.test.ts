@@ -14,7 +14,6 @@ const MANIFEST: Manifest = {
         { path: 'core/counties.csv', bytes: 200 },
         { path: 'core/nri_hazards.csv', bytes: 3000 },
         { path: 'core/zip_county.csv', bytes: 50 },
-        { path: 'core/zip_centroids.csv', bytes: 40 },
         { path: 'core/zip_facilities.csv', bytes: 30 },
       ],
     },
@@ -44,7 +43,6 @@ const fullSite = () =>
     'data/core/counties.csv': { body: 'counties' },
     'data/core/nri_hazards.csv': { body: 'nri' },
     'data/core/zip_county.csv': { body: 'zc' },
-    'data/core/zip_centroids.csv': { body: 'zp' },
     'data/core/zip_facilities.csv': { body: 'zf' },
     'data/geo/counties.json': { body: JSON.stringify(MAP), type: 'application/json' },
   });
@@ -78,7 +76,6 @@ describe('which files load when', () => {
       'core/base_rates.toml',
       'core/nri_hazards.csv',
       'core/zip_county.csv',
-      'core/zip_centroids.csv',
       'core/zip_facilities.csv',
       'core/counties.csv',
     ]);
@@ -130,10 +127,9 @@ describe('the pack loader', () => {
       'core/nri_hazards.csv',
       'core/counties.csv',
       'core/zip_county.csv',
-      'core/zip_centroids.csv',
       'core/zip_facilities.csv',
     ]);
-    expect(loader.status.zip).toMatchObject({ phase: 'ready', bytesLoaded: 120, bytesTotal: 120 });
+    expect(loader.status.zip).toMatchObject({ phase: 'ready', bytesLoaded: 80, bytesTotal: 80 });
     expect(await loader.map()).toEqual(MAP);
     expect(loaded.at(-1)!.name).toBe('geo/counties.json');
     expect(requested.filter((u) => u.includes('manifest')).length).toBe(1);

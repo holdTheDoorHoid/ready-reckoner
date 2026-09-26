@@ -22,7 +22,7 @@ export const CORE_PACK = 'core';
 /** Loaded last so county records are assembled once. */
 export const COUNTY_LIST = 'core/counties.csv';
 /** The core files only ZIP-code lookups read; loaded when a ZIP code is needed. Same list as `ZIP_FILES` in crates/rr-wasm/src/source.rs. */
-export const ZIP_FILES: readonly string[] = ['core/zip_county.csv', 'core/zip_centroids.csv', 'core/zip_facilities.csv'];
+export const ZIP_FILES: readonly string[] = ['core/zip_county.csv', 'core/zip_facilities.csv'];
 /** County outlines for the map thumbnail; loaded when a map is shown. */
 export const MAP_FILE = 'geo/counties.json';
 /** `defaults()` puts this well-formed but unreal ZIP code in a new plan; the app must replace it. */

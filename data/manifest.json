@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "pack_version": "e8b8cd6861e6",
-  "generated": "2026-09-26T03:43:09Z",
+  "pack_version": "25f3ed156688",
+  "generated": "2026-09-26T08:24:54Z",
   "packs": {
     "core": {
       "description": "Everything the engine needs for county-level planning. Loaded at start; works offline.",
@@ -88,8 +88,8 @@
         {
           "path": "core/nri_hazards.csv",
           "job": "nri",
-          "sha256": "660b9005972da9b7ed87c5fbda6fcee7ba37d02d09f2bcdc9efaed8f621b7c76",
-          "bytes": 3973905,
+          "sha256": "c6ad8c6ae2f3fd3750b7b88184ac11f6c20b2884cbaf174cce869580a1a10974",
+          "bytes": 2731200,
           "rows": 45853,
           "key": [
             "fips",
@@ -151,16 +151,6 @@
           "rows": 3144,
           "key": [
             "fips"
-          ]
-        },
-        {
-          "path": "core/zip_centroids.csv",
-          "job": "geography",
-          "sha256": "93d7ed18b5325143d10c5eb02d5914f674ee4c7c185f8093662f28290e237fe0",
-          "bytes": 708501,
-          "rows": 33791,
-          "key": [
-            "zip"
           ]
         },
         {
@@ -820,13 +810,13 @@
     },
     "facilities": {
       "title": "Nuclear plants, TRI facilities and high-hazard dams by county and ZIP",
-      "finished": "2026-09-26T03:43:08Z",
+      "finished": "2026-09-26T08:24:54Z",
       "sources": [
         {
           "name": "Census cartographic boundary counties 2024, 1:500,000 (for point-in-polygon)",
           "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
           "version": "GENZ2024",
-          "retrieved": "2026-09-26T03:42:22Z",
+          "retrieved": "2026-09-26T08:24:01Z",
           "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
           "bytes": 11626066,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -835,7 +825,7 @@
           "name": "FEMA Operating Nuclear Power Plant Sites",
           "url": "https://gis.fema.gov/arcgis/rest/services/Partner/Operating_Nuclear_Power_Plant_Sites/FeatureServer/0/query (POST where=1=1; fields plant_name,latitude,longitude,update_dat; ordered by plant_name)",
           "version": "FEMA Partner layer Operating_Nuclear_Power_Plant_Sites",
-          "retrieved": "2026-09-26T03:42:23Z",
+          "retrieved": "2026-09-26T08:24:03Z",
           "sha256": "835f768615ab24034afa84a5b3ae4b4ac341965954c7702e2155a5719e8e9e72",
           "bytes": 7111,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -844,7 +834,7 @@
           "name": "EPA Toxics Release Inventory basic data file 2024, US",
           "url": "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/2024_US/csv",
           "version": "TRI reporting year 2024",
-          "retrieved": "2026-09-26T03:42:27Z",
+          "retrieved": "2026-09-26T08:24:04Z",
           "sha256": "06dfa3a67bb4c5bd38d9e9f0f7b8bff10b95254a63169423632d7f6f251e1506",
           "bytes": 60550684,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -853,13 +843,22 @@
           "name": "USACE National Inventory of Dams (nation CSV)",
           "url": "https://nid.sec.usace.army.mil/api/nation/csv",
           "version": "Data Last Updated 2026-9-23",
-          "retrieved": "2026-09-26T03:42:56Z",
+          "retrieved": "2026-09-26T08:24:35Z",
           "sha256": "d2ab9d97237f8ed814761cef953aa82d2761b909c3dfd8b66352f71c5e2ca645",
           "bytes": 67285174,
           "license": "US Government work, public domain (17 U.S.C. 105)"
+        },
+        {
+          "name": "Census 2024 Gazetteer, ZCTAs",
+          "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_zcta_national.zip",
+          "version": "2024 Gazetteer; Last-Modified Fri, 30 Aug 2024 18:40:45 GMT",
+          "retrieved": "2026-09-26T08:24:52Z",
+          "sha256": "7b85c04a131672f58b38a950eb82855d5fd4054f0bd9bc3f69aa28897a714e3d",
+          "bytes": 1013803,
+          "license": "US Government work, public domain (17 U.S.C. 105)"
         }
       ],
-      "rows_in": 170118,
+      "rows_in": 203909,
       "rows_out": 37023,
       "outputs": [
         "core/facilities.csv",
@@ -1012,13 +1011,13 @@
     },
     "geography": {
       "title": "Counties, ZIP-to-county shares, states and the Connecticut crosswalk",
-      "finished": "2026-09-26T03:41:10Z",
+      "finished": "2026-09-26T08:23:55Z",
       "sources": [
         {
           "name": "Census cartographic boundary counties 2024, 1:500,000",
           "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_500k.zip",
           "version": "GENZ2024; Last-Modified Thu, 10 Apr 2025 16:26:02 GMT",
-          "retrieved": "2026-09-26T03:41:02Z",
+          "retrieved": "2026-09-26T08:23:46Z",
           "sha256": "da4051717caec55c75e3748c3608c2a3dbde8d1ff401bbaf4f952e3c3fb63ef1",
           "bytes": 11626066,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -1027,7 +1026,7 @@
           "name": "Census 2024 Gazetteer, counties",
           "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_counties_national.zip",
           "version": "2024 Gazetteer; Last-Modified Fri, 30 Aug 2024 18:40:41 GMT",
-          "retrieved": "2026-09-26T03:41:04Z",
+          "retrieved": "2026-09-26T08:23:49Z",
           "sha256": "3c337402b5c6e8d5aa26b4278ccf4edc8989f2683765b3ffbf22296cdb2df3a0",
           "bytes": 141679,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -1036,7 +1035,7 @@
           "name": "NCA5 Interactive Atlas regions (ArcGIS layer NCA_Regions)",
           "url": "https://services3.arcgis.com/0Fs3HcaFfvzXvm7w/arcgis/rest/services/NCA_Regions/FeatureServer/0/query?where=1%3D1&outFields=RegionName&returnGeometry=true&outSR=4326&maxAllowableOffset=0.02&geometryPrecision=3&f=json",
           "version": "NCA5 (2023) Atlas regions; generalised to 0.02 degrees for this lookup",
-          "retrieved": "2026-09-26T03:41:04Z",
+          "retrieved": "2026-09-26T08:23:49Z",
           "sha256": "96f8cf74fd2c18aa6eb6aa71cfcd15ef0d6eda038beef0e957a9bbb0afdafa1a",
           "bytes": 2733046,
           "license": "CC0 1.0 Universal"
@@ -1045,7 +1044,7 @@
           "name": "Census Connecticut county-to-county-subdivision crosswalk",
           "url": "https://www2.census.gov/geo/docs/reference/ct_change/ct_cou_to_cousub_crosswalk.txt",
           "version": "ct_change crosswalk; Last-Modified Mon, 11 Sep 2023 13:42:52 GMT",
-          "retrieved": "2026-09-26T03:41:07Z",
+          "retrieved": "2026-09-26T08:23:52Z",
           "sha256": "13ad002564e30e6dcd1df112fdaa985f2cd0cdb908f7f3017cd2723db294cff8",
           "bytes": 22091,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -1054,7 +1053,7 @@
           "name": "Census 2022 Connecticut county subdivision to 2020 ZCTA relationship file",
           "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2022/acs22_cousub22_zcta520_st09.txt",
           "version": "rel2022 acs22; Last-Modified Fri, 20 Jan 2023 15:22:07 GMT",
-          "retrieved": "2026-09-26T03:41:07Z",
+          "retrieved": "2026-09-26T08:23:52Z",
           "sha256": "1ef973388b3c3f9e9553b60aa7db0ee47762d3cb2b3d03f5b7796165590f1820",
           "bytes": 62822,
           "license": "US Government work, public domain (17 U.S.C. 105)"
@@ -1063,38 +1062,28 @@
           "name": "Census 2020 ZCTA to county relationship file",
           "url": "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_county20_natl.txt",
           "version": "rel2020; Last-Modified Thu, 09 Dec 2021 16:27:40 GMT",
-          "retrieved": "2026-09-26T03:41:07Z",
+          "retrieved": "2026-09-26T08:23:52Z",
           "sha256": "3ed41278d637dc249e0323306f68be8a6c234e3090f4de88ef328dee71aeaaaf",
           "bytes": 6821287,
-          "license": "US Government work, public domain (17 U.S.C. 105)"
-        },
-        {
-          "name": "Census 2024 Gazetteer, ZCTAs",
-          "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_zcta_national.zip",
-          "version": "2024 Gazetteer; Last-Modified Fri, 30 Aug 2024 18:40:45 GMT",
-          "retrieved": "2026-09-26T03:41:09Z",
-          "sha256": "7b85c04a131672f58b38a950eb82855d5fd4054f0bd9bc3f69aa28897a714e3d",
-          "bytes": 1013803,
           "license": "US Government work, public domain (17 U.S.C. 105)"
         },
         {
           "name": "Census cartographic boundary counties 2024, 1:20,000,000",
           "url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_county_20m.zip",
           "version": "GENZ2024; Last-Modified Thu, 10 Apr 2025 16:25:55 GMT",
-          "retrieved": "2026-09-26T03:41:09Z",
+          "retrieved": "2026-09-26T08:23:54Z",
           "sha256": "c9a54fd95422436b8822e0b070a45a9bc3de08eb13f943cdba66e7a9c2a135ff",
           "bytes": 900230,
           "license": "US Government work, public domain (17 U.S.C. 105)"
         }
       ],
-      "rows_in": 87388,
-      "rows_out": 87092,
+      "rows_in": 53597,
+      "rows_out": 53301,
       "outputs": [
         "core/counties.csv",
         "core/states.csv",
         "core/ct_crosswalk.csv",
         "core/zip_county.csv",
-        "core/zip_centroids.csv",
         "geo/counties.json"
       ],
       "notes": [
@@ -1111,15 +1100,15 @@
     },
     "nri": {
       "title": "FEMA National Risk Index v1.20, trimmed to the model's county fields",
-      "finished": "2026-09-26T03:41:15Z",
+      "finished": "2026-09-26T08:24:01Z",
       "sources": [
         {
           "name": "FEMA National Risk Index, counties (ArcGIS FeatureServer)",
-          "url": "https://services.arcgis.com/XG15cJAlne2vxtgt/arcgis/rest/services/National_Risk_Index_Counties/FeatureServer/0/query (POST where=1=1, 164 fields, ordered by STCOFIPS, pages of 1000)",
+          "url": "https://services.arcgis.com/XG15cJAlne2vxtgt/arcgis/rest/services/National_Risk_Index_Counties/FeatureServer/0/query (POST where=1=1, 115 fields, ordered by STCOFIPS, pages of 1000)",
           "version": "v1.20.0 (December 2025); NRI_VER field \"December 2025\"; item modified 1766093159000",
-          "retrieved": "2026-09-26T03:41:10Z",
-          "sha256": "ca70c180843ac2aa129b73a57cb8fc07e10c6b5f1de477864943d94f23ec8ea3",
-          "bytes": 14295278,
+          "retrieved": "2026-09-26T08:23:55Z",
+          "sha256": "e86103fd1ca80068dfcd87d72942ae893749822ad690fbbe6719d1a34c2dc608",
+          "bytes": 9876489,
           "license": "US Government data subject to the NRI Terms & Conditions (see item page)",
           "obligations": "Cite the dataset with version and access date; show this statement: This product uses the Federal Emergency Management Agency’s National Risk Index dataset API or downloadable datasets but is not endorsed by FEMA. The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s). Do not present modified data as FEMA's; FEMA may rescind use."
         },
@@ -1127,8 +1116,8 @@
           "name": "NRI item metadata and Terms & Conditions",
           "url": "https://www.arcgis.com/sharing/rest/content/items/39485e8035d446a5bff03259508ae355?f=json",
           "version": "item modified 1766093159000",
-          "retrieved": "2026-09-26T03:41:10Z",
-          "sha256": "6aa30049b11798771066ab7dfe58191a98c76d3f7d0dbb961be3d8a2822959f5",
+          "retrieved": "2026-09-26T08:23:55Z",
+          "sha256": "818e329a6f303fe4b88f67d5edc6af63eb7fd3104fd6a90e4d2744a4fc5cff21",
           "bytes": 38248,
           "license": "Terms & Conditions"
         },
@@ -1136,7 +1125,7 @@
           "name": "NRI data dictionary",
           "url": "https://fema.maps.arcgis.com/sharing/rest/content/items/4b9db412e99542029b3c37c37ad714bb/data",
           "version": "1.20.0 (December 2025)",
-          "retrieved": "2026-09-26T03:41:10Z",
+          "retrieved": "2026-09-26T08:23:55Z",
           "sha256": "fd613c89e547b852666ab8fe5c64fc7980c5da7654a90a305f6f40af31236311",
           "bytes": 61179,
           "license": "Terms & Conditions"
@@ -1150,8 +1139,8 @@
         "core/nri_semantics.toml"
       ],
       "notes": [
-        "Fields that NRI v1.20 does not publish (left empty): DRGT_EXPB, DRGT_EXPP, DRGT_EALB, DRGT_EALP, DRGT_HLRB, DRGT_ALRB. Drought is modelled for agriculture only.",
-        "3232 counties, 45853 hazard rows. Kept per hazard: AFREQ, EXPB, EXPP, EALB, EALP, EALT, HLRB, ALRB, RISKS; per county: POPULATION, BUILDVALUE, EAL_VALT, SOVI_SCORE, RESL_SCORE, CRF_VALUE. Values rounded to 4 significant figures. Hazard rows where every field is empty (hazard not applicable) are omitted.",
+        "Fields that NRI v1.20 does not publish (left empty): DRGT_EXPP, DRGT_EALP, DRGT_HLRB. Drought is modelled for agriculture only.",
+        "3232 counties, 45853 hazard rows. Kept per hazard: AFREQ, EXPP, EALP, EALT, HLRB, RISKS; per county: POPULATION, BUILDVALUE, EAL_VALT, SOVI_SCORE, RESL_SCORE, CRF_VALUE. CFLD_EXPB and TSUN_EXPB are read only for the coastal and tsunami-zone flags; EXPB, EALB and ALRB are not shipped (no engine crate reads them). Values rounded to 4 significant figures. Hazard rows where every field is empty (hazard not applicable) are omitted.",
         "536 counties are coastal and 118 have a tsunami zone by the definitions above (derived by Ready Reckoner, not FEMA fields).",
         "Terms compliance: only the trimmed, rounded county fields the model uses are shipped (never the raw table); the About screen and the packet show the citation and disclaimer; numbers Ready Reckoner derives from NRI are labelled as ours."
       ],

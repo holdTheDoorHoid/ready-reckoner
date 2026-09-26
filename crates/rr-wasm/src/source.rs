@@ -16,7 +16,7 @@
 //! plausible but wrong numbers (county records without their hazard rows), so until then
 //! `assess`, `resolve_location` and `county_search` answer `pack_missing`.
 //!
-//! One exception keeps the first download small: the three ZIP tables ([`ZIP_FILES`]) are read
+//! One exception keeps the first download small: the two ZIP tables ([`ZIP_FILES`]) are read
 //! only by ZIP-code lookups, so the web app loads them when a ZIP code is typed. With every other
 //! core file in, a county plans (and `county_search` answers) as it will with the whole pack; any
 //! location that carries a ZIP code answers `pack_missing` until the ZIP tables are in, because
@@ -37,14 +37,10 @@ pub const CORE_PACK: &str = "core";
 /// The manifest's own path; it is loaded first.
 pub const MANIFEST_PATH: &str = "manifest.json";
 
-/// The core files only ZIP-code lookups read: which counties a ZIP code covers, the ZIP centres,
-/// and facility distances from them. The web app loads them when a ZIP code is typed (the same
+/// The core files only ZIP-code lookups read: which counties a ZIP code covers, and facility
+/// distances from the ZIP's centre. The web app loads them when a ZIP code is typed (the same
 /// list is `ZIP_FILES` in `web/src/engine/data-files.ts`).
-pub const ZIP_FILES: &[&str] = &[
-    "core/zip_county.csv",
-    "core/zip_centroids.csv",
-    "core/zip_facilities.csv",
-];
+pub const ZIP_FILES: &[&str] = &["core/zip_county.csv", "core/zip_facilities.csv"];
 
 /// Which data is answering.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

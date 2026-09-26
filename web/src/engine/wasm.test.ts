@@ -72,7 +72,6 @@ const MANIFEST: Manifest = {
       files: [
         { path: 'core/counties.csv', bytes: 10 },
         { path: 'core/zip_county.csv', bytes: 10 },
-        { path: 'core/zip_centroids.csv', bytes: 10 },
         { path: 'core/zip_facilities.csv', bytes: 10 },
       ],
     },
@@ -175,7 +174,7 @@ describe('calls that need data wait for it', () => {
     await loader.core();
     await tick();
     expect(answer).toBeUndefined();
-    expect(s.requested.filter((u) => u.includes('zip_')).length).toBe(3);
+    expect(s.requested.filter((u) => u.includes('zip_')).length).toBe(2);
     s.releaseAll();
     await loader.zip();
     await tick();

@@ -9,10 +9,11 @@
 //! - **USACE National Inventory of Dams**: dams with High and Significant hazard potential per
 //!   county (hazard potential rates the consequence of failure, not the chance of it).
 //!
-//! County boundaries: Census 2024 cartographic 1:500,000 counties.
+//! County boundaries: Census 2024 cartographic 1:500,000 counties. ZIP points: the Census 2024
+//! Gazetteer's ZCTA internal points, rounded to 3 decimals (`geography::zcta_points`).
 
 use super::{Ctx, JobOutput, arcgis_query, attr_f64, load_counties};
-use crate::csvout::{Table, col, parse_delimited, read_table};
+use crate::csvout::{Table, col, parse_delimited};
 use crate::geo::{KM_PER_MILE, Poly, haversine_km};
 use crate::http::zip_entry;
 use crate::manifest::Attribution;
@@ -329,20 +330,19 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     }
     out.table(ctx, FACILITIES, &mut table)?;
 
-    // ZIP table.
-    let (zh, zrows) = read_table(&ctx.data, super::geography::ZIP_CENTROIDS)?;
-    let (iz, ilat, ilon) = (col(&zh, "zip")?, col(&zh, "lat")?, col(&zh, "lon")?);
+    // ZIP table, measured from each ZIP's internal point (Census Gazetteer).
+    let zcta = super::geography::zcta_points(ctx)?;
+    out.source(zcta.source);
+    out.rows_in += zcta.rows_in;
     let mut zt = Table::new(&["zip", "nearest_nuclear_km", "tri_within_5km"], 1);
-    for r in &zrows {
-        let (Ok(lat), Ok(lon)) = (r[ilat].parse::<f64>(), r[ilon].parse::<f64>()) else {
-            continue;
-        };
+    for (zip, lat, lon) in &zcta.points {
+        let (lat, lon) = (*lat, *lon);
         let nearest = sites
             .iter()
             .map(|(a, b)| haversine_km(lat, lon, *a, *b))
             .fold(f64::INFINITY, f64::min);
         zt.push(vec![
-            r[iz].clone(),
+            zip.clone(),
             fixed(nearest, 1),
             tri_grid.count_within(lat, lon, TRI_RADIUS_KM).to_string(),
         ]);
