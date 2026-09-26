@@ -3,54 +3,6 @@
 # 2,000 kcal, about one adult-day, so the app can show cost per 2,000 kcal.
 
 [[item]]
-id = "food_outage_food_safety"
-name = "Know how long the fridge and freezer keep food cold"
-category = "food"
-unit = "action"
-buckets = ["power", "supplies"]
-tier = "now"
-free = true
-spec = "Keep the fridge and freezer closed in an outage: a closed fridge keeps food cold for about four hours and a full freezer for about 48 hours (Ready.gov). Throw out perishable food that has been above 40°F for two hours or more."
-look_for = [
-  "A thermometer in the fridge and the freezer",
-  "Where you could get ice or dry ice nearby",
-  "A cooler for the food you need first",
-]
-avoid = [
-  "Opening the doors to check again and again",
-  "Tasting food to decide if it is safe",
-  "Eating from cans that are swollen, dented or rusted (Ready.gov)",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: knowledge and habits." }
-quantity_rule = "once"
-citations = ["ready_gov_food", "ready_gov_power_outages"]
-hazard_extras = []
-
-[[item]]
-id = "food_buy_slowly"
-name = "Build food supplies a little at a time"
-category = "food"
-unit = "action"
-buckets = ["supplies"]
-tier = "now"
-free = true
-spec = "Add a few extra cans or boxes of what you already eat on each shopping trip, and put the new ones at the back. Ready.gov asks people to buy supplies slowly so everyone can get what they need."
-look_for = [
-  "A shelf or bin where the extra food lives",
-  "Oldest food at the front, newest at the back",
-  "A short list of what your household eats in a week",
-]
-avoid = [
-  "Buying a lot at once when a storm is in the news",
-  "Foods nobody in the house will eat",
-  "Letting the extra food expire unused",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: the food itself is priced in the pantry item." }
-quantity_rule = "once"
-citations = ["ready_gov_pandemic", "ready_gov_food"]
-hazard_extras = []
-
-[[item]]
 id = "food_pantry_rotation"
 name = "Extra shelf-stable food you already eat"
 category = "food"

@@ -3,93 +3,27 @@
 
 [[item]]
 id = "community_know_two_neighbours"
-name = "Get to know two neighbours and swap phone numbers"
+name = "Neighbours and skills: swap numbers, check on each other, learn first aid"
 category = "community"
 unit = "action"
-buckets = ["security", "medical_emergency", "thermal", "evacuate", "supplies"]
+buckets = ["security", "medical_emergency", "thermal", "evacuate", "supplies", "fire"]
 tier = "now"
 free = true
-spec = "Introduce yourself to at least two neighbours and save each other's numbers. After the 2011 Japan tsunami, places with stronger social ties had fewer deaths, especially among older and low-income people. About 7 in 10 people expect help from friends and family first (FEMA's 2024 survey)."
+spec = "Swap phone numbers with at least two neighbours, agree who checks on whom in heat waves, storms and outages, and make a simple street contact list with the neighbours who agree. After the 2011 Japan tsunami, places with stronger social ties had fewer deaths, and in the 1995 Chicago heat wave living alone raised the risk of dying. Take a first-aid, bleeding-control and hands-only CPR class, or free CERT training, so you can help until responders arrive (Ready.gov)."
 look_for = [
-  "Two neighbours on your street or in your building",
-  "Their numbers in your phone and on your contact card",
-  "Who has medical needs, pets or no car",
+  "Two neighbours' numbers in your phone and on your contact card",
+  "A daily check-in by phone or at the door in extreme heat or cold, especially for people who live alone",
+  "A street list with only what each neighbour agrees to share, updated each year",
+  "A free Stop the Bleed class, and a first-aid and CPR class from a hospital, fire department or the Red Cross",
+  "Your local CERT program or a neighbourhood group",
 ]
 avoid = [
   "Waiting for a disaster to meet the people next door",
-  "Assuming someone else on the street will check in",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a knock on the door." }
-quantity_rule = "once"
-citations = ["aldrich_sawada_2015", "ye_aldrich_2019", "fema_nhs_2024"]
-hazard_extras = []
-
-[[item]]
-id = "community_check_in_agreement"
-name = "Agree who checks on whom"
-category = "community"
-unit = "action"
-buckets = ["thermal", "medical_emergency", "security"]
-tier = "now"
-free = true
-spec = "Agree with neighbours or relatives who checks on whom during heat waves, storms and outages, especially older people who live alone. In the 1995 Chicago heat wave, living alone and not leaving home each day made death far more likely, and regular social contact was protective."
-look_for = [
-  "A daily check-in by phone or at the door in extreme heat or cold",
-  "Someone who can check on you if you live alone",
-  "A spare key with a trusted neighbour",
-]
-avoid = [
-  "Assuming a quiet neighbour is fine",
-  "Checking once and not again",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: one conversation." }
-quantity_rule = "once"
-citations = ["semenza_1996_heat_deaths", "ready_gov_older_adults", "cdc_heat_health"]
-hazard_extras = []
-
-[[item]]
-id = "community_block_group_cert"
-name = "Join or start a block group, or take CERT training"
-category = "community"
-unit = "action"
-buckets = ["medical_emergency", "fire", "security", "evacuate"]
-tier = "now"
-free = true
-spec = "Join a neighbourhood preparedness group or take free Community Emergency Response Team (CERT) training, which teaches fire safety, light search and rescue, team organization and disaster first aid (Ready.gov). Trained neighbours can help until responders arrive."
-look_for = [
-  "Your local CERT program or neighbourhood association",
-  "A block party or group chat to start one",
-  "A shared list of skills and tools on your street",
-]
-avoid = [
+  "Posting the street list online, or sharing someone's medical details without permission",
   "Self-deploying into danger: CERT training teaches when to stop",
-  "Groups that spread rumours instead of official information",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "CERT training is free through local programs." }
-quantity_rule = "once"
-citations = ["ready_gov_cert", "listos_california", "gargano_2017_wtc_training"]
-hazard_extras = []
-
-[[item]]
-id = "community_street_list"
-name = "Make a simple street contact list"
-category = "community"
-unit = "action"
-buckets = ["security", "medical_emergency", "evacuate"]
-tier = "now"
-free = true
-spec = "With willing neighbours, list names, phone numbers and anything useful in an emergency: who needs help to evacuate, who has a generator or medical skills, and who has pets. State programs such as Listos California offer templates for exactly this."
-look_for = [
-  "Only what each neighbour agrees to share",
-  "A paper copy for each household on the list",
-  "An update each year",
-]
-avoid = [
-  "Posting the list online",
-  "Sharing someone's medical details without permission",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: paper and a few conversations." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: introductions, a shared list and free classes." }
 quantity_rule = "once"
 maintenance = { check_months = 12 }
-citations = ["listos_california", "ready_gov_older_adults"]
+citations = ["aldrich_sawada_2015", "ye_aldrich_2019", "fema_nhs_2024", "semenza_1996_heat_deaths", "ready_gov_older_adults", "cdc_heat_health", "listos_california", "ready_gov_cert", "dhs_stop_the_bleed", "gargano_2017_wtc_training", "redcross_first_aid_kit"]
 hazard_extras = []

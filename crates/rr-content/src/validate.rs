@@ -9,7 +9,7 @@
 //! | ids well formed and unique; guidance id equals its file name; item category equals its file | error |
 //! | every item and guidance block cites; every cited id resolves; every citation has a URL and a licence, and any quote is under 50 words | error |
 //! | `quantity_rule` is `once` or a row in `docs/QUANTITY_RULES.md` | error |
-//! | `look_for` and `avoid` have 2–5 entries | error |
+//! | `look_for` has 2–5 entries (up to 8 for a free action's steps or a kit's contents); `avoid` 2–5 | error |
 //! | free items cost $0 and sit in tier `now` (rare-catastrophic items excepted); priced items have a note, a `retrieved` date and cite the price-observation log | error |
 //! | `rare_catastrophic` items sit in tier `y1` | error |
 //! | no brand names (a citation's URL may name a maker; its title, publisher and quote may not); no pressure phrases; no drug name with a dose anywhere | error |
@@ -371,11 +371,14 @@ fn check_items(content: &Content, rules: &BTreeSet<String>, r: &mut Report) {
                 "spec is longer than three sentences (the standard is one or two)",
             );
         }
-        for (field, list) in [("look_for", &item.look_for), ("avoid", &item.avoid)] {
-            if !(2..=5).contains(&list.len()) {
+        for (field, list, max) in [
+            ("look_for", &item.look_for, max_look_for(item)),
+            ("avoid", &item.avoid, 5),
+        ] {
+            if !(2..=max).contains(&list.len()) {
                 r.error(
                     &loc,
-                    format!("`{field}` needs 2–5 entries (has {})", list.len()),
+                    format!("`{field}` needs 2–{max} entries (has {})", list.len()),
                 );
             }
             if list.iter().any(|s| s.trim().is_empty()) {
@@ -502,6 +505,16 @@ fn check_price(item: &Item, loc: &str, r: &mut Report) {
                 ),
             );
         }
+    }
+}
+
+/// Most `look_for` entries an item may have: 5 checks for a purchase, but up to 8 for a free
+/// action (its steps) or a kit you assemble (its contents), `docs/CONTENT_STANDARDS.md` §3.
+pub fn max_look_for(item: &Item) -> usize {
+    if item.free || matches!(item.unit.as_str(), "bag" | "kit") {
+        8
+    } else {
+        5
     }
 }
 

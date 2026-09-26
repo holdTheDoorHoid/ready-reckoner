@@ -3,169 +3,60 @@
 
 [[item]]
 id = "fire_test_alarms"
-name = "Test smoke and carbon monoxide alarms every month"
-category = "fire"
-unit = "action"
-buckets = ["fire"]
-tier = "now"
-free = true
-life_safety = true
-spec = "Press the test button on every smoke and carbon monoxide alarm once a month (USFA). Replace smoke alarms 10 years after they were made, and carbon monoxide alarms as the maker says or every 5 years (CDC)."
-look_for = [
-  "A monthly reminder, such as the first of the month",
-  "The date printed on the back of each alarm",
-  "Batteries replaced yearly in alarms that use 9-volt batteries",
-]
-avoid = [
-  "Taking the battery out to stop cooking alarms",
-  "Painting over or covering an alarm",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a monthly button press." }
-quantity_rule = "once"
-maintenance = { check_months = 1 }
-citations = ["usfa_smoke_alarms", "cdc_co_basics", "ready_gov_home_fires"]
-hazard_extras = []
-
-[[item]]
-id = "fire_escape_plan"
-name = "Make a home fire escape plan with two ways out"
+name = "Fire safety at home: alarms, an escape plan, safe cooking and heating"
 category = "fire"
 unit = "action"
 buckets = ["fire", "evacuate"]
 tier = "now"
 free = true
 life_safety = true
-spec = "Find two ways out of every room, pick a meeting spot outside, and practice twice a year, including feeling your way out in the dark (Ready.gov). Fire can make a home dark and deadly in minutes."
+spec = "Test every smoke and carbon monoxide alarm once a month (USFA), and make an escape plan with two ways out of every room and a meeting spot outside, practiced twice a year (Ready.gov). Cooking is by far the leading cause of home fires, so stay with your cooking and keep a lid nearby (USFA). Keep anything that can burn 3 feet from heaters, and never heat the home with an oven (USFA)."
 look_for = [
-  "Windows that open and screens that come out quickly",
-  "A meeting spot in front of the home, such as a mailbox",
+  "A monthly alarm test, for example on the first of the month",
+  "Smoke alarms replaced 10 years after they were made, and carbon monoxide alarms as the maker says or every 5 years",
+  "Two ways out of every room, windows that open, and a meeting spot in front of the home",
+  "A pan lid or baking sheet within reach of the stove",
+  "Space heaters with automatic shut-off, turned off when you leave the room or go to bed",
   "Children who know not to hide from firefighters",
 ]
 avoid = [
-  "Going back inside for belongings or pets",
-  "Security bars without a quick-release",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a floor plan and practice." }
-quantity_rule = "once"
-maintenance = { check_months = 6 }
-citations = ["ready_gov_home_fires", "usfa_smoke_alarms"]
-hazard_extras = []
-
-[[item]]
-id = "fire_kitchen_safety"
-name = "Stay with your cooking and keep a lid nearby"
-category = "fire"
-unit = "action"
-buckets = ["fire"]
-tier = "now"
-free = true
-spec = "Cooking is by far the leading cause of home fires (USFA). Stay in the kitchen while frying or broiling, and keep a pan lid or baking sheet nearby to cover a pan fire."
-look_for = [
-  "A lid within reach of the stove",
-  "Pot handles turned toward the back",
-  "Towels, mitts and packaging kept away from burners",
-]
-avoid = [
-  "Throwing water on a grease fire",
+  "Taking the battery out to stop cooking alarms",
+  "Going back inside for belongings",
   "Leaving the kitchen with a burner on",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits." }
-quantity_rule = "once"
-citations = ["usfa_cooking_fires"]
-hazard_extras = []
-
-[[item]]
-id = "fire_heating_safety"
-name = "Heat safely: space heaters 3 feet from anything that burns"
-category = "fire"
-unit = "action"
-buckets = ["fire", "thermal"]
-tier = "now"
-free = true
-spec = "Keep anything that can burn at least 3 feet from heaters, fireplaces and stoves, turn space heaters off when you leave the room or go to bed, and have chimneys and heating equipment checked each year (USFA). Never heat the home with an oven."
-look_for = [
-  "Space heaters with automatic shut-off (CDC)",
-  "A clear 3-foot zone around every heater",
-  "A yearly chimney and furnace check",
-]
-avoid = [
-  "Extension cords for space heaters",
   "Grills, camp stoves or generators indoors for heat (carbon monoxide)",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: habits; a chimney check costs extra." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: monthly checks and a plan." }
 quantity_rule = "once"
-citations = ["usfa_heating_fires", "cdc_winter_safety", "cdc_co_basics"]
-hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+maintenance = { check_months = 1 }
+citations = ["usfa_smoke_alarms", "cdc_co_basics", "ready_gov_home_fires", "usfa_cooking_fires", "usfa_heating_fires", "cdc_winter_safety"]
+hazard_extras = []
 
 [[item]]
 id = "fire_learn_shutoffs"
-name = "Learn where your water, gas and power shut-offs are"
+name = "Know and prepare your home: shut-offs, pipes, straps and the outside"
 category = "fire"
 unit = "action"
-buckets = ["fire", "water_out"]
+buckets = ["fire", "water_out", "home_loss"]
 tier = "now"
 free = true
-spec = "Find your home's main water valve, gas meter valve and electrical panel, and learn how each one works; Ready.gov's basic kit includes a wrench or pliers to turn off utilities. Officials may tell you to shut the water main to keep unsafe water out (CDC)."
+spec = "Find your main water valve, gas meter valve and electrical panel, learn how each works, and keep a wrench or pliers by them (Ready.gov). Before winter, learn how to keep pipes from freezing; in earthquake country, strap the water heater and anchor tall furniture (Ready.gov). If you live in a house in wildfire or hurricane country, clear a fire-resistant zone at least 30 feet around it, or plan how you will protect windows, before the season starts (Ready.gov)."
 look_for = [
-  "Labels on the main breaker and water valve",
-  "A wrench or pliers kept by the gas meter and water valve",
-  "Everyone old enough knowing where they are",
+  "Labels on the main breaker and water valve, and everyone old enough knowing where they are",
+  "Pipes in unheated spaces insulated, and a tool to shut the main water valve",
+  "A water heater strap kit and anti-tip straps for tall furniture",
+  "Wildfire areas: clean gutters and nothing that burns within 30 feet of the walls",
+  "Hurricane areas: window sizes measured, and shutters or boards stored where you can reach them",
 ]
 avoid = [
-  "Trying a stiff valve for the first time in the dark",
   "Turning gas back on yourself after it was shut off: call the gas company",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a walk around the house." }
-quantity_rule = "once"
-citations = ["ready_gov_kit", "cdc_find_clean_water", "ready_gov_earthquakes"]
-hazard_extras = []
-
-[[item]]
-id = "fire_defensible_space"
-name = "Clear a fire-resistant zone around the house"
-category = "fire"
-unit = "action"
-buckets = ["fire", "home_loss"]
-tier = "now"
-free = true
-spec = "Keep a zone free of leaves, debris and anything flammable for at least 30 feet around your home, clean gutters, and find a hose that reaches every side (Ready.gov). Work closest to the house first."
-look_for = [
-  "Clean gutters and roof",
-  "Firewood, mulch and propane tanks moved away from the walls",
-  "A hose that reaches all sides of the house",
-]
-avoid = [
-  "Dry plants and wood piles against the house",
-  "Waiting for a fire warning to start",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: yard work." }
-quantity_rule = "once_if_house"
-maintenance = { check_months = 12 }
-citations = ["ready_gov_wildfires"]
-hazard_extras = ["wildfire"]
-
-[[item]]
-id = "fire_quake_secure"
-name = "Secure the water heater and tall furniture"
-category = "fire"
-unit = "action"
-buckets = ["fire", "water_out", "medical_emergency"]
-tier = "now"
-free = true
-spec = "Strap the water heater and anchor bookcases, refrigerators, televisions and wall hangings, and store heavy or breakable things on low shelves (Ready.gov). A strapped tank stays a store of clean water; a fallen one can break a gas line."
-look_for = [
-  "A water heater strap kit sized for your tank",
-  "Anti-tip straps for tall furniture",
-  "Heavy objects moved to low shelves",
-]
-avoid = [
-  "Tall furniture over beds",
+  "Thawing pipes with an open flame",
   "Renters drilling without asking: ask the landlord, who may do it",
+  "Waiting for a warning to buy materials",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free to plan and rearrange; strap kits cost extra at a hardware store." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: learning your home, plus straps or materials you may already have." }
 quantity_rule = "once"
-citations = ["ready_gov_earthquakes", "doe_water_heaters"]
-hazard_extras = ["earthquake"]
+citations = ["ready_gov_kit", "cdc_find_clean_water", "ready_gov_earthquakes", "ready_gov_winter", "doe_water_heaters", "ready_gov_wildfires", "ready_gov_hurricanes"]
+hazard_extras = []
 
 [[item]]
 id = "fire_smoke_alarm"

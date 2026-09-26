@@ -190,3 +190,52 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free to plan." }
 quantity_rule = "once_if_large_animals"
 citations = ["aspca_disaster_prep", "sphere_2018"]
 hazard_extras = []
+
+[[item]]
+id = "special_pet_go_water"
+name = "Pack your pets' water in the go-kit"
+category = "special_needs"
+unit = "gallon"
+buckets = ["evacuate"]
+tier = "now"
+free = true
+spec = "Move at least seven days of water for each pet from your stored water into the pet go-kit, and replace it every two months (ASPCA). A dog drinks about 1 ounce of water per pound of body weight a day (PetMD)."
+look_for = [
+  "Sealed bottles or a jug that fits in the go-kit or next to it",
+  "A collapsible bowl packed with the water",
+  "A date on the water so you know when to swap it",
+]
+avoid = [
+  "Counting the same water twice: it comes from your household stock",
+  "Letting the kit water sit longer than two months",
+]
+price_band_usd = { low = 0, high = 0, per = "gallon", note = "Free: water moved from your household supply." }
+quantity_rule = "pet_go_water"
+volume_l_per_unit = 3.785
+maintenance = { rotate_months = 2 }
+citations = ["aspca_disaster_prep", "petmd_dog_water", "merck_vet_maintenance_fluids"]
+hazard_extras = []
+
+[[item]]
+id = "special_pet_go_food"
+name = "Pack your pets' food in the go-kit"
+category = "special_needs"
+unit = "pet-day"
+buckets = ["evacuate"]
+tier = "now"
+free = true
+spec = "Move 7 to 10 days of each pet's food from your pet-food supply into an airtight, waterproof container in the go-kit, and rotate it every two months (ASPCA, Ready.gov)."
+look_for = [
+  "Canned food with pop-top lids, or dry food in a sealed container",
+  "The food your pet already eats, so a stressful trip brings no stomach upset",
+  "A scoop and a bowl packed with it",
+]
+avoid = [
+  "Buying separate food for the kit: use and replace from the household supply",
+  "Food that has passed its date",
+]
+price_band_usd = { low = 0, high = 0, per = "pet-day", note = "Free: food moved from your household supply." }
+quantity_rule = "pet_go_food"
+maintenance = { rotate_months = 2 }
+citations = ["aspca_disaster_prep", "ready_gov_pets"]
+hazard_extras = []

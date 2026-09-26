@@ -59,7 +59,9 @@ One `[[item]]` per distinct thing a household would acquire or do. Fields are in
 - `spec` is one or two sentences saying what the thing must do. It never names a brand or model.
   The validator rejects a denylist of brand tokens; if a generic term is also a brand (Thermos,
   Band-Aid), use the generic word (vacuum flask, adhesive bandage).
-- `look_for` and `avoid` are 2–5 bullets each, concrete and checkable in a store aisle.
+- `look_for` and `avoid` are 2–5 bullets each, concrete and checkable in a store aisle. For a free
+  action, `look_for` is its list of steps, and for a kit you assemble (unit `bag` or `kit`) it is the
+  contents; either may run to 8 entries.
 - `price_band_usd` is a range for the spec, from at least two current retail observations, with a
   `note` ("DIY with reused bottles is free; bottled water about $1 per gallon") and a `retrieved`
   date on the item. Bands are reviewed at each data refresh.

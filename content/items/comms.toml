@@ -3,164 +3,58 @@
 
 [[item]]
 id = "comms_wea_alerts_on"
-name = "Turn on emergency alerts on every phone"
+name = "Set up emergency alerts and know how to reach 911"
 category = "comms"
 unit = "action"
-buckets = ["comms", "evacuate"]
+buckets = ["comms", "evacuate", "medical_emergency", "power"]
 tier = "now"
 free = true
-spec = "Check that Wireless Emergency Alerts are switched on in each phone's settings. They are free and need no sign-up (Ready.gov), but a phone only gets them when it is on, not in airplane mode, and served by a carrier that takes part (FCC)."
+spec = "Make sure every phone can get warnings: Wireless Emergency Alerts are free and need no sign-up (Ready.gov), but a phone only gets them when it is on, not in airplane mode, and served by a carrier that takes part (FCC). Add your county's text and email alerts and your power company's outage texts for local news. Call 911 when you can, because texting 911 works only in some places (FCC)."
 look_for = [
-  "Emergency and public safety alerts switched on in phone settings",
-  "Phones kept charged and switched on at night during storms",
+  "Emergency and public safety alerts switched on in every phone's settings",
+  "Your county's text and email alerts, for home, work and school addresses",
+  "Your power company's outage number and text alerts, written on paper too",
+  "Whether your county accepts texts to 911, and children who know how to call",
+  "Your address written by the phone for visitors and sitters",
 ]
 avoid = [
   "Turning alerts off because a test was annoying",
-  "Relying only on alerts: add a weather radio and county alerts",
+  "Assuming national alerts cover local notices such as boil-water orders",
+  "Texting 911 when you could call",
+  "Going near downed power lines: stay away and report them",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a phone setting." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: phone settings and sign-ups." }
 quantity_rule = "once"
-citations = ["ready_gov_alerts", "fcc_wea"]
-hazard_extras = []
-
-[[item]]
-id = "comms_county_alerts"
-name = "Sign up for your county's emergency alerts"
-category = "comms"
-unit = "action"
-buckets = ["comms", "evacuate"]
-tier = "now"
-free = true
-spec = "Sign up for your county or city's emergency text and email alerts, which carry local warnings such as evacuation orders and boil-water notices. Ready.gov's planning questions start with how you will receive alerts and warnings."
-look_for = [
-  "Your county emergency management office's alert sign-up",
-  "Every adult's phone number registered",
-  "Alerts for your home and for work or school addresses",
-]
-avoid = [
-  "Assuming national alerts cover local notices",
-  "Signing up once and never updating your number",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a sign-up." }
-quantity_rule = "once"
-citations = ["ready_gov_alerts", "ready_gov_plan"]
+citations = ["ready_gov_alerts", "fcc_wea", "ready_gov_plan", "ready_gov_power_outages", "fcc_text_911"]
 hazard_extras = []
 
 [[item]]
 id = "comms_contact_card"
-name = "Written contact card for each person"
+name = "Make a household plan and a contact card for each person"
 category = "comms"
 unit = "action"
 buckets = ["comms", "evacuate", "get_home"]
 tier = "now"
 free = true
-spec = "Write key phone numbers on a card for each person's wallet or bag: family, the out-of-area contact, work, school, doctor and 988. Ready.gov advises storing important numbers somewhere besides your phone, and offers a fillable card."
-look_for = [
-  "Ready.gov's free fillable family communication card",
-  "A card in every wallet, backpack and the go-bag",
-  "The out-of-area contact's number on every card",
-]
-avoid = [
-  "Relying on a phone's contact list that dies with the battery",
-  "Letting cards go out of date",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: paper and a pen, or the fillable card." }
-quantity_rule = "once"
-maintenance = { check_months = 12 }
-citations = ["ready_gov_low_cost", "ready_gov_family_comm_card", "fema_effak"]
-hazard_extras = []
-
-[[item]]
-id = "comms_out_of_area_contact"
-name = "Choose an out-of-area contact everyone can text"
-category = "comms"
-unit = "action"
-buckets = ["comms", "evacuate"]
-tier = "now"
-free = true
-spec = "Pick one relative or friend in another state whom everyone in the household will text to say they are safe (Ready.gov). Texts often get through when calls do not, and they use less battery."
-look_for = [
-  "Someone likely to answer, outside your region",
-  "Their number on every contact card",
-  "Everyone knowing to text first",
-]
-avoid = [
-  "Tying up local phone lines with calls",
-  "Choosing someone who lives nearby and faces the same disaster",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: one conversation." }
-quantity_rule = "once"
-citations = ["ready_gov_earthquakes", "ready_gov_plan"]
-hazard_extras = []
-
-[[item]]
-id = "comms_family_plan"
-name = "Make a family emergency plan"
-category = "comms"
-unit = "action"
-buckets = ["comms", "evacuate", "get_home"]
-tier = "now"
-free = true
-spec = "Agree how you will reach each other, where you will meet if you are separated, and who picks up the children (Ready.gov). Include each person's medical needs, pets and school or work plans, then practice it."
+spec = "Agree how you will reach each other, where you will meet if you are separated, and who picks up the children (Ready.gov). Pick one out-of-state contact everyone texts to say they are safe, since texts often get through when calls do not, and write key numbers on a card for each wallet or bag (Ready.gov). Add school, daycare and work plans, and go over the plan together once a year."
 look_for = [
   "A meeting place near home and one outside the neighbourhood",
-  "Who collects each child, with a backup",
-  "Ready.gov's fillable family emergency plan",
+  "An out-of-state contact whose number is on every card",
+  "A card in every wallet, backpack and go-bag, from Ready.gov's free fillable form",
+  "Children: the school or daycare's shelter plan and up-to-date pick-up adults",
+  "Commuters: your workplace's shelter plan, and a walking route home you have partly walked",
+  "Each person's medical needs and pets written into the plan",
 ]
 avoid = [
   "A plan only one person knows",
-  "Never practicing it",
+  "Relying on a phone's contact list that dies with the battery",
+  "Choosing a contact who lives nearby and faces the same disaster",
+  "Driving into a danger zone to reach a school that is already sheltering",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: an hour with your household." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a conversation and Ready.gov's printable card." }
 quantity_rule = "once"
 maintenance = { check_months = 12 }
-citations = ["ready_gov_plan", "ready_gov_family_comm_card"]
-hazard_extras = []
-
-[[item]]
-id = "comms_text_911"
-name = "Know how to reach 911 by call or text"
-category = "comms"
-unit = "action"
-buckets = ["comms", "medical_emergency"]
-tier = "now"
-free = true
-spec = "Always call 911 when you can, because a voice call gives the call center more information; text-to-911 works only in some places (FCC). Find out whether your county accepts texts, which helps when speaking is unsafe or impossible."
-look_for = [
-  "Whether your county accepts texts to 911",
-  "Children who know how to call 911",
-  "Your address written by the phone for visitors and sitters",
-]
-avoid = [
-  "Texting when you could call",
-  "Assuming a text went through without a reply",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: knowledge." }
-quantity_rule = "once"
-citations = ["fcc_text_911"]
-hazard_extras = []
-
-[[item]]
-id = "comms_paper_map"
-name = "Keep a paper map of your area"
-category = "comms"
-unit = "action"
-buckets = ["evacuate", "get_home", "comms"]
-tier = "now"
-free = true
-spec = "Keep a printed or paper road map of your area in the car and the go-bag, with your evacuation routes and meeting places marked (Ready.gov lists local maps in its kit). Phone maps fail when the network or battery does."
-look_for = [
-  "A free state road map or a printed county map",
-  "Two routes marked from home and from work",
-  "Meeting places and shelters marked",
-]
-avoid = [
-  "Relying only on phone navigation",
-  "An old map that misses new roads",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: printed maps and many state road maps cost nothing." }
-quantity_rule = "once"
-citations = ["ready_gov_kit", "ready_gov_evacuation"]
+citations = ["ready_gov_plan", "ready_gov_family_comm_card", "ready_gov_low_cost", "ready_gov_earthquakes", "ready_gov_kit_2020", "fema_effak"]
 hazard_extras = []
 
 [[item]]

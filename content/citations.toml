@@ -721,6 +721,16 @@ quote = "Only take what you really need with you: cell phone, chargers, medicine
 license = "US Government Work (public domain)"
 
 [[citation]]
+id = "cdc_hot_weather_psa"
+title = "During Hot Weather, Watch for Heat Illness (natural disasters PSA toolkit)"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/natural-disasters/psa-toolkit/during-hot-weather.html"
+retrieved = "2026-09-26"
+quote = "If someone is experiencing heavy sweating, nausea, or fainting, you can help by moving them to a cool place, giving them water and putting cool wet cloths on their body."
+license = "US Government Work (public domain)"
+
+[[citation]]
 id = "cdc_potassium_iodide"
 title = "Potassium Iodide (KI)"
 publisher = "Centers for Disease Control and Prevention"
@@ -1061,6 +1071,16 @@ publisher = "U.S. Food and Drug Administration"
 year = 2023
 url = "https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023"
 retrieved = "2026-09-25"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "dailymed_epinephrine_autoinjector"
+title = "Epinephrine injection, USP auto-injector: patient information (FDA-approved labeling, revised November 2023)"
+publisher = "U.S. National Library of Medicine, DailyMed"
+year = 2023
+url = "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=b7a4171c-7934-4723-a140-bd93ea84aae1&audience=consumer"
+retrieved = "2026-09-26"
+quote = "Always carry 2 epinephrine injection, USP auto-injectors with you because sometimes a single dose of epinephrine may not be enough to treat a serious allergic reaction before seeking medical care."
 license = "US Government Work (public domain)"
 
 [[citation]]

@@ -4,73 +4,30 @@
 
 [[item]]
 id = "med_list_written"
-name = "Written medicine list for each person"
+name = "Keep medicines going: a written list, early refills, an emergency supply"
 category = "medical"
 unit = "action"
 buckets = ["medication", "medical_emergency"]
 tier = "now"
 free = true
-spec = "A paper list of each person's medicines with the dose their prescriber set, what each one is for, allergies, and the prescriber's and pharmacy's phone numbers. Keep one copy in the go-bag and one with your documents (Ready.gov)."
-look_for = [
-  "Every medicine, including over-the-counter ones and supplements",
-  "Allergies and medical conditions",
-  "Prescriber, pharmacy and insurance phone numbers",
-]
-avoid = [
-  "Keeping the only copy on your phone",
-  "Letting it fall out of date when a medicine changes",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: paper and a pen." }
-quantity_rule = "once"
-maintenance = { check_months = 6 }
-citations = ["ready_gov_disability", "fema_effak"]
-hazard_extras = []
-
-[[item]]
-id = "med_refill_at_seven"
-name = "Refill when 7 days of medicine remain"
-category = "medical"
-unit = "action"
-buckets = ["medication"]
-tier = "now"
-free = true
 life_safety = true
-spec = "Order each refill when a week of medicine is left, so you always hold at least 7 days on hand; CDC and the Red Cross both advise a week or more for emergencies. Ask whether your plan allows 90-day fills."
+spec = "Write a paper list of each person's medicines with the dose their prescriber set, allergies, and the prescriber's and pharmacy's numbers, and keep copies in the go-bag and with your documents (Ready.gov). If anyone takes a daily medicine, refill when a week is left and ask the prescriber and pharmacist how to build an emergency supply; some states allow emergency refills, and a federal program can help people without insurance after a disaster. Set up telehealth and pharmacy logins now, and put spare glasses in the go-bag (Ready.gov)."
 look_for = [
-  "Pharmacy refill reminders or automatic refills",
-  "A calendar note for each medicine's refill date",
-  "A 90-day supply where your plan and prescriber allow it",
+  "Every medicine on the list, including over-the-counter ones and supplements",
+  "Pharmacy refill reminders, and a 90-day supply where your plan and prescriber allow it",
+  "Your state's emergency refill rule (your pharmacist will know it), and a second pharmacy",
+  "Telehealth and pharmacy logins with your insurance member number, kept somewhere besides your phone",
+  "An old pair of glasses and lens solution in the go-bag",
 ]
 avoid = [
   "Waiting for the last pill",
-  "Mixing old and new bottles without checking dates: use the oldest first",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it changes when you refill, not what you pay." }
-quantity_rule = "once_if_daily_rx"
-citations = ["cdc_pregnancy_emergency", "redcross_survival_kit", "fda_expired_medicines"]
-hazard_extras = []
-
-[[item]]
-id = "med_emergency_supply_ask"
-name = "Ask your prescriber and pharmacist about an emergency supply"
-category = "medical"
-unit = "action"
-buckets = ["medication"]
-tier = "now"
-free = true
-spec = "Ask how to build an emergency supply of your medicines and what your state allows: in a declared emergency some states let pharmacists give up to a 30-day refill. If you have no insurance, the federal Emergency Prescription Assistance Program can help when it is activated after a disaster."
-look_for = [
-  "Your state's emergency refill rule (your pharmacist will know it)",
-  "Whether your plan waives 'refill too soon' limits in a disaster",
-  "A second pharmacy you could use if yours closes",
-]
-avoid = [
-  "Assuming you can refill during a storm",
   "Changing or stretching a medicine on your own: call your prescriber or pharmacist",
+  "Keeping the only copy of the list on your phone",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: two phone calls." }
-quantity_rule = "once_if_daily_rx"
-citations = ["ready_gov_disability", "healthcare_ready_refill_laws", "hhs_aspr_epap", "cdc_pregnancy_emergency"]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a list, reminders and phone calls." }
+quantity_rule = "once"
+maintenance = { check_months = 6 }
+citations = ["ready_gov_disability", "fema_effak", "cdc_pregnancy_emergency", "redcross_survival_kit", "fda_expired_medicines", "healthcare_ready_refill_laws", "hhs_aspr_epap", "mo_med_2026_antibiotic_kits", "ready_gov_kit"]
 hazard_extras = []
 
 [[item]]
@@ -152,118 +109,28 @@ citations = ["ready_gov_disability", "ready_gov_power_outages", "cdc_co_basics"]
 hazard_extras = []
 
 [[item]]
-id = "med_first_aid_training"
-name = "Learn bleeding control, first aid and hands-only CPR"
-category = "medical"
-unit = "action"
-buckets = ["medical_emergency"]
-tier = "now"
-free = true
-spec = "Take a free Stop the Bleed class, which teaches how to stop serious bleeding until help arrives, and learn basic first aid and hands-only CPR. People trained before an emergency act faster and cope better afterwards."
-look_for = [
-  "A free Stop the Bleed class near you",
-  "A first-aid and CPR class from a hospital, fire department or the Red Cross",
-  "A refresher when your certificate runs out",
-]
-avoid = [
-  "Waiting until the day you need the skill",
-  "Keeping supplies you do not know how to use",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Stop the Bleed classes are usually free; other classes may charge." }
-quantity_rule = "once"
-citations = ["dhs_stop_the_bleed", "gargano_2017_wtc_training", "redcross_first_aid_kit"]
-hazard_extras = []
-
-[[item]]
 id = "med_988_saved"
-name = "Save 988 and the Disaster Distress Helpline"
+name = "Mental health: save 988 and the distress helpline, and write a calm plan"
 category = "medical"
 unit = "action"
 buckets = ["medical_emergency"]
 tier = "now"
 free = true
-spec = "Save 988, the Suicide and Crisis Lifeline, and the Disaster Distress Helpline (call or text 1-800-985-5990) in every phone and on the paper contact card. Both are free and answer day and night, for anyone having a hard time, before or after a disaster."
+spec = "Save 988, the Suicide and Crisis Lifeline, and the Disaster Distress Helpline (call or text 1-800-985-5990) in every phone and on the paper contact card; both are free and answer day and night (SAMHSA). Write down what each person might feel after a disaster, what helps each of you settle, and who you will call. A plan made on a calm day makes it easier to ask for help."
 look_for = [
-  "Both numbers saved in every phone",
-  "Both numbers on the paper contact card",
+  "Both numbers saved in every phone and on the contact card",
   "Children and teens told they can call or text too",
+  "One or two things that help each person settle, such as a walk, music, prayer or a routine",
+  "Who each person can talk to",
 ]
 avoid = [
   "Waiting until things feel unbearable to reach out",
-  "Thinking these lines are only for a crisis: they help with any distress",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: both lines cost nothing to call or text." }
-quantity_rule = "once"
-citations = ["samhsa_988", "samhsa_disaster_distress"]
-hazard_extras = []
-
-[[item]]
-id = "med_calm_plan"
-name = "Write a short calm plan"
-category = "medical"
-unit = "action"
-buckets = ["medical_emergency"]
-tier = "now"
-free = true
-spec = "Write down what each person might feel after a disaster, what helps each of you settle, and who you will call. Stress, worry and poor sleep are common after a disaster, and a plan made on a calm day makes it easier to ask for help."
-look_for = [
-  "One or two things that help each person settle, such as a walk, music, prayer or a routine",
-  "Who each person can talk to",
-  "The 988 and Disaster Distress Helpline numbers",
-]
-avoid = [
   "Expecting everyone to feel fine right away",
   "Shutting down children's questions",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: paper and ten minutes." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: both lines cost nothing to call or text." }
 quantity_rule = "once"
-citations = ["samhsa_disaster_distress", "rr_research_prior_art"]
-hazard_extras = []
-
-[[item]]
-id = "med_telehealth_setup"
-name = "Set up telehealth and pharmacy accounts now"
-category = "medical"
-unit = "action"
-buckets = ["medication", "medical_emergency"]
-tier = "now"
-free = true
-spec = "Create your logins for your insurer's or clinic's telehealth service and your pharmacy's app or website while it is easy. In an emergency you can then reach your own clinician and move a prescription without traveling."
-look_for = [
-  "Your insurance member number saved with the logins",
-  "A second pharmacy you could move prescriptions to",
-  "Login details kept somewhere besides your phone",
-]
-avoid = [
-  "Setting it up during the emergency, when phones and websites are busy",
-  "Services that prescribe without asking about your history",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free to set up; visits cost what your plan charges." }
-quantity_rule = "once"
-citations = ["mo_med_2026_antibiotic_kits", "rr_research_supply_standards"]
-hazard_extras = []
-
-[[item]]
-id = "med_spare_glasses"
-name = "Put a spare pair of glasses in the go-bag"
-category = "medical"
-unit = "action"
-buckets = ["medical_emergency", "evacuate"]
-tier = "now"
-free = true
-spec = "Keep your last pair of prescription glasses, and contact lens solution if you wear contacts, in the go-bag. Ready.gov lists both in its emergency kit."
-look_for = [
-  "An old pair that still works well enough",
-  "A hard case",
-  "A small bottle of lens solution and a lens case",
-]
-avoid = [
-  "Relying on contact lenses alone when clean water is short",
-  "Leaving the spare pair in a drawer at home",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses an old pair." }
-quantity_rule = "once"
-citations = ["ready_gov_kit"]
+citations = ["samhsa_988", "samhsa_disaster_distress", "rr_research_prior_art"]
 hazard_extras = []
 
 [[item]]
@@ -391,4 +258,28 @@ price_band_usd = { low = 47.90, high = 94.95, per = "kit", note = "A tourniquet 
 retrieved = "2026-09-25"
 quantity_rule = "once"
 citations = ["dhs_stop_the_bleed", "wms_wound_2014", "mell_2017_ems_response", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "med_epinephrine_plan"
+name = "Epinephrine: carry two auto-injectors and keep them in date"
+category = "medical"
+unit = "person"
+buckets = ["medication", "medical_emergency"]
+tier = "now"
+free = true
+life_safety = true
+spec = "Anyone prescribed an epinephrine auto-injector should always carry two, because one dose may not be enough and a device set off by accident cannot be used (FDA-approved patient information). Check the expiry dates, replace a used one right away, and show family, caregivers and teachers where they are and how to use them. Ask the prescriber how many to keep at home, at school and in the go-bag."
+look_for = [
+  "Two auto-injectors with the person at all times, and a refill ordered before they expire",
+  "A calendar reminder a month before the expiry date",
+  "Family, caregivers and teachers who know where they are kept and how to use them",
+]
+avoid = [
+  "Leaving the auto-injectors in a hot car or at home",
+  "Waiting once a severe reaction starts: follow the prescriber's plan and call 911",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a habit and a talk with the prescriber; the auto-injectors themselves are a prescription." }
+quantity_rule = "epinephrine_check"
+citations = ["dailymed_epinephrine_autoinjector", "ready_gov_disability"]
 hazard_extras = []

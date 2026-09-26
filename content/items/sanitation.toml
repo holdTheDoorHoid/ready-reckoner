@@ -2,49 +2,27 @@
 # Rules: docs/CONTENT_STANDARDS.md §3. Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
 
 [[item]]
-id = "san_handwash_station"
-name = "Set up a hand-washing station from a water jug"
+id = "san_cover_material"
+name = "Get the toilet and hand washing ready: cover material and a wash station"
 category = "sanitation"
 unit = "action"
 buckets = ["water_out", "water_boil"]
 tier = "now"
 free = true
-spec = "Use a water jug with a spigot, a bucket to catch the water, and soap to make a hand-washing station, as CDC suggests. When there is no soap and water, use hand sanitizer with at least 60% alcohol."
+spec = "Keep a bag of dry, carbon-rich cover material for the toilet bucket, such as sawdust, shredded paper, dry leaves or pet bedding; a handful after each use controls smell (RDPO). Make a hand-washing station from a water jug with a spigot, a bucket underneath and soap (CDC). When there is no soap and water, use hand sanitizer with at least 60% alcohol (CDC)."
 look_for = [
-  "A jug with a spigot, raised so the water runs freely",
-  "Soap and a towel kept beside it",
-  "A bucket underneath for the used water",
-]
-avoid = [
-  "Dipping hands into the stored water",
-  "Skipping hand washing after using the toilet or before handling food",
-]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free: it uses the water jug and soap already in the plan." }
-quantity_rule = "once"
-citations = ["cdc_hygiene_emergency"]
-hazard_extras = []
-
-[[item]]
-id = "san_cover_material"
-name = "Collect cover material for the toilet"
-category = "sanitation"
-unit = "action"
-buckets = ["water_out"]
-tier = "now"
-free = true
-spec = "Keep a bag of dry, carbon-rich cover material for the toilet bucket, such as sawdust, shredded paper, dry leaves or pet bedding. A handful after each use controls smell and helps waste dry out (RDPO)."
-look_for = [
-  "Shredded paper or cardboard from your own recycling",
-  "Sawdust or pet bedding (not cedar)",
-  "A dry, covered bin to keep it in",
+  "Shredded paper or cardboard from your own recycling, or sawdust or pet bedding (not cedar)",
+  "A dry, covered bin for the cover material",
+  "A jug with a spigot, raised so the water runs freely, with soap and a towel beside it",
 ]
 avoid = [
   "Wet material, which does not control smell",
-  "Cedar chips",
+  "Dipping hands into the stored water",
+  "Skipping hand washing after using the toilet or before handling food",
 ]
-price_band_usd = { low = 0, high = 0, per = "action", note = "Free if you use shredded paper or leaves; pet bedding costs a few dollars a bag." }
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: recycling, a jug you own and soap." }
 quantity_rule = "once"
-citations = ["rdpo_emergency_toilet"]
+citations = ["rdpo_emergency_toilet", "cdc_hygiene_emergency"]
 hazard_extras = []
 
 [[item]]
