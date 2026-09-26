@@ -3419,6 +3419,19 @@ retrieved = "2026-09-26"
 quote = "To determine risk levels for U.S. counties, NAPB-90 employed the combined results of 12 \"most-likely\" wind patterns--one such pattern for each month of the year--and used the highest resulting radiation effect in each county as its potential risk level."
 license = "US Government Work (public domain)"
 
+# Added 2026-09-26 (hazards2c follow-up): the public precedent for the class A and C1 "Why here"
+# sentences. FEMA's address no longer serves the file, so the Internet Archive capture of that
+# address is cited (docs/CONTENT_STANDARDS.md §2, removed federal documents).
+[[citation]]
+id = "fema_slg101_nuclear_1996"
+title = "SLG 101: Guide for All-Hazard Emergency Operations Planning, Tab 2 to Attachment F: Nuclear Conflict"
+publisher = "FEMA (via Internet Archive)"
+year = 1996
+url = "https://web.archive.org/web/20090108212857/http://www.fema.gov/pdf/plan/6-ch-f-2.pdf"
+retrieved = "2026-09-26"
+quote = "Under the current international climate, it is unlikely that an organized attack on the United States would occur. However, if an attack did occur, areas potentially at risk might include:"
+license = "US Government Work (public domain)"
+
 [[citation]]
 id = "igrf14_coefficients"
 title = "International Geomagnetic Reference Field, 14th generation (IGRF-14): coefficients"

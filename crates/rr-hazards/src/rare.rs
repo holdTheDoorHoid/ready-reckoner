@@ -153,8 +153,10 @@ fn nuclear(ctx: &Ctx<'_>, notes: &mut Notes) -> Row {
                 &ctx.county_and_state(),
             );
             let mut src = vec![cite::STRATEGIC_SITES, cite::FEMA_NAPB90];
-            if c == StrategicClass::B {
-                src.push(cite::PHILIPPE_2023);
+            match c {
+                StrategicClass::A | StrategicClass::C1 => src.push(cite::FEMA_SLG101_NUCLEAR),
+                StrategicClass::B => src.push(cite::PHILIPPE_2023),
+                _ => {}
             }
             src.push(cite::RR_PRIORS);
             (def.f_s, why, c.as_str().to_owned(), src)

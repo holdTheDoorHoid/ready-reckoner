@@ -150,6 +150,12 @@ pub const STRATEGIC_SITES: &str = "rr_strategic_sites";
 /// county from blast and from fallout, the method precedent for the classes. It "merely
 /// identifies areas and populations which are at potential risk" (p. 2).
 pub const FEMA_NAPB90: &str = "fema_napb90";
+/// FEMA, SLG 101 (1996), Tab 2 to Attachment F, "Nuclear Conflict" (Internet Archive capture of
+/// FEMA's address): an organised attack is unlikely, but if one came the areas potentially at risk
+/// include the military installations behind the nation's nuclear retaliatory forces and large
+/// metros important to government or finance. The public precedent for the class A and C1 "Why
+/// here" sentences.
+pub const FEMA_SLG101_NUCLEAR: &str = "fema_slg101_nuclear_1996";
 /// Philippe (2023), Scientific American and Princeton's *The Missiles on our Land*: fallout from
 /// an attack on the missile silos, the calibration of the downwind class.
 pub const PHILIPPE_2023: &str = "philippe_2023_icbm_fallout";
@@ -317,6 +323,7 @@ pub const ALL: &[&str] = &[
     USGS_BAY_AREA_2016,
     STRATEGIC_SITES,
     FEMA_NAPB90,
+    FEMA_SLG101_NUCLEAR,
     PHILIPPE_2023,
     FEMA_UASI_FY2026,
     NERC_TPL007,

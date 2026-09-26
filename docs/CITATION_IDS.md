@@ -237,8 +237,9 @@ Remove the added ids from `NOT_CITATIONS` and from rr-plan's `AWAITING_CONTENT`.
 It **dropped** `fema_protection_nuclear_age_1985`: no federally hosted copy was found (the
 Homeland Security Digital Library, the National Archives catalog, GovInfo, fema.gov, the NTIS
 National Technical Reports Library and ERIC were searched; the Archives hold only the 1978 film of
-that name, with no digital copy), so the class A and C1 "Why here" cards now cite
-`rr_strategic_sites`, `fema_napb90` and `rr_risk_model_priors`, like the other classes. It
+that name, with no digital copy). In its place the class A and C1 "Why here" cards cite
+`fema_slg101_nuclear_1996` (FEMA's 1996 planning guide, below; added in the follow-up the owner
+approved), beside `rr_strategic_sites`, `fema_napb90` and `rr_risk_model_priors`. It
 **dropped** `riley_2012_carrington`: the solar-storm range cites `morina_2019_carrington` (which
 reports Riley's figure), `love_carrington` and `lloyds_2013_solar`. It **replaced** `epri_2019_hemp`
 with `powermag_epri_2019_hemp`, and cites `pry_2015_emp_testimony` beside it for the EMP note's
@@ -253,12 +254,7 @@ used, rr-hazards changed the figure or the sentence (docs/RISK_MODEL.md).
 | --- | --- |
 | `fema_napb90` | The NTIS record page's Download PDF button serves the report: 598 pages, an NTIS scan with a text layer, marked "Reproduced by National Technical Information Service". The quote is on page ix (executive summary) and was matched against the page image; the scan's text layer reads "u.S." for "U.S.". Page 2 adds that NAPB-90 "merely identifies areas and populations which are at potential risk". The Homeland Security Digital Library's record (docid 454613) is a one-page capture of the FAS index page, not the report |
 | `powermag_epri_2019_hemp` | Plain download of POWER's article (2 May 2019), paraphrased: EPRI found possible damage to large power transformers minimal, and its research did not support a crippling nationwide blackout lasting many months to years; a regional voltage collapse is possible. The EMP notes now say that, and no more |
-
-A lead for the content workstream, not added here: FEMA's SLG 101 (1996), Tab 2 to Attachment F,
-"Nuclear Conflict", captured by the Internet Archive at FEMA's own address on 2009-01-08, says an
-organised attack is unlikely and lists the areas potentially at risk if one came (missile fields,
-bomber bases, nuclear command sites, and large metros important to government or finance): a
-public federal precedent for the class A and C1 sentences, in place of the 1985 booklet.
+| `fema_slg101_nuclear_1996` | FEMA's SLG 101: Guide for All-Hazard Emergency Operations Planning (September 1996), Tab 2 to Attachment F, "Nuclear Conflict". FEMA's own address (fema.gov/pdf/plan/6-ch-f-2.pdf) answers 403 now, so the Internet Archive capture of that address (2009-01-08) was read as a plain download; the quote was matched in the PDF's own text layer (a Word-made PDF, not a scan). The tab says an organised attack on the United States is unlikely and lists two kinds of area potentially at risk if one came: military installations that support the nation's nuclear retaliatory forces (missile launch facilities, bomber bases, command and control) and large, densely populated metros important to government or finance. It backs the class A and C1 sentences ("places like this are treated as likely targets ... That does not mean an attack is likely"); it names no weapons plants, which class C1 also covers through `rr_strategic_sites` |
 
 The v0.2.0 hazard rows (REVIEW §2, DESIGN-DELTA §1.2) cite these. None is in the registry yet;
 the content workstream writes each entry and checks the figure. "Confirm" marks a figure read only
@@ -671,7 +667,7 @@ checked; "prior" marks an expert estimate.
 | Clean air (v0.2.0) | `epa_clean_room`, `epa_protect_lungs_2026`, `epa_diy_air_cleaners`, `epa_wildfire_indoor_air`, `epa_children_wildfire_smoke` |
 | New ranked hazards (v0.2.0) | `iii_water_damage`, `iii_water_damage_protect`, `fema_dam_residual_risk_2018`, `fema_living_with_levees`, `fema_nfip_levees_2021`, `usace_nld`, `mo_sema_dam_failure`, `fcc_att_outage_2024`, `fda_drug_shortages`, `fda_drug_shortages_faq`, `fda_besaferx`, `fema_hsgp_fy2026`, `nws_dust_storms`, `cdc_valley_fever`, `usgs_sinkholes`, `fl_dep_sinkhole_faq` |
 | Benefits, eviction and legal help (v0.2.0) | `me_dhhs_snap_2025`, `usda_hunger_hotline`, `dol_ucfe_furlough_2023`, `cfpb_shutdown_2013`, `cfpb_payday_loans`, `eviction_lab_national`, `cfpb_rent_help`, `cfpb_facing_eviction`, `lsc_get_legal_help`, `aclu_stopped_by_police`, `nlg_mass_defense`, `nia_affairs_checklist`, `fbi_cde_arrests` |
-| Rare families and strategic sites (v0.2.0) | `fema_napb90`, `missilesonourland_2023`, `dod_mirta_points`, `census_cbsa_pop_2024`, `usc_10_2674`, `nnsa_locations`, `eia_refinery_capacity_2026`, `fema_nuclear_72h_2023`, `swpc_power_grid`, `morina_2019_carrington`, `nerc_tpl007_gmd`, `nasa_tunguska_2019`, `eia_maria_2017`, `npr_maria_2018`, `powermag_epri_2019_hemp`, `pry_2015_emp_testimony`, `cisa_volt_typhoon_2024`, `start_poicn`, `ready_gov_biohazard`, `duke_2021_pandemics`, `cassidy_mani_2022`, `usgs_yvo`, `fdic_deposit_insurance`, `fdic_history_1930s`, `fbi_active_shooter_2024` |
+| Rare families and strategic sites (v0.2.0) | `fema_napb90`, `fema_slg101_nuclear_1996`, `missilesonourland_2023`, `dod_mirta_points`, `census_cbsa_pop_2024`, `usc_10_2674`, `nnsa_locations`, `eia_refinery_capacity_2026`, `fema_nuclear_72h_2023`, `swpc_power_grid`, `morina_2019_carrington`, `nerc_tpl007_gmd`, `nasa_tunguska_2019`, `eia_maria_2017`, `npr_maria_2018`, `powermag_epri_2019_hemp`, `pry_2015_emp_testimony`, `cisa_volt_typhoon_2024`, `start_poicn`, `ready_gov_biohazard`, `duke_2021_pandemics`, `cassidy_mani_2022`, `usgs_yvo`, `fdic_deposit_insurance`, `fdic_history_1930s`, `fbi_active_shooter_2024` |
 | Long horizon (v0.2.0) | `pnnl_2015_rainwater`, `cdc_rainwater_collection`, `vdh_storm_wells`, `wsc_wellcare_help_2025`, `lehi_fuel_storage`, `rdpo_emergency_toilet`, `cdc_botulism_home_canning`, `nchfp_home`, `cdc_managing_stress` |
 | Documents, identity and accounts (v0.2.0) | `state_dept_passport_card`, `state_dept_child_passport`, `cisa_data_backup_2012`, `ready_gov_cybersecurity`, `ftc_2008_locksmith`, `nia_affairs_checklist`, `ollam_2022_lawyer_passport_locksmith_gun` (principles only) |
 | Emergency refills by state (v0.2.0) | `healthcare_ready_refill_laws`, `nacds_2018_emergency_refills`, `fl_bop_emergency_refills`, `tx_pharmacy_disaster_2024`, `medicare_drugs_disaster` |
