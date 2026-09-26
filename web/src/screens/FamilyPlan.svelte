@@ -244,7 +244,7 @@
               />
             </div>
             <button type="button" class="button button--quiet button--small" onclick={() => dropNumber(i)}>
-              <Icon name="trash" /> Remove<span class="visually-hidden"> number {i + 1}</span>
+              <Icon name="trash" /> Remove<span class="visually-hidden">{' '}number {i + 1}</span>
             </button>
           </div>
         {/each}
@@ -413,7 +413,7 @@
               <div class="circle__head">
                 <h3>Person {i + 1}</h3>
                 <button type="button" class="button button--quiet button--small" onclick={() => dropPerson(i)}>
-                  <Icon name="trash" /> Remove<span class="visually-hidden"> person {i + 1} from your trusted circle</span>
+                  <Icon name="trash" /> Remove<span class="visually-hidden">{' '}person {i + 1} from your trusted circle</span>
                 </button>
               </div>
               <div class="pair">

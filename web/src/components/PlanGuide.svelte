@@ -20,7 +20,7 @@
   const html = $derived.by(() => {
     if (!block) return '';
     const text = blockText(block, householdFacts(app.engineInput, app.result.output));
-    return renderMarkdown(withSourceLinks(text, app.catalogue?.citations), { idPrefix: `guide-${id}`, headingOffset: 2 });
+    return renderMarkdown(withSourceLinks(text, app.catalogue?.citations), { idPrefix: `guide-${id}`, headingOffset: 2, notesLabel: `Notes: ${summary}` });
   });
 </script>
 

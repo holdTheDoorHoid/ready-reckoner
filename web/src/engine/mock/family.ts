@@ -9,7 +9,17 @@
  */
 import type { FamilyPlan, PlanInput } from '../types';
 import { hasAnimals, hasChildren, hasVehicle, tidyFamilyPlan } from '../../lib/family';
-import { ACCESS_NEED, AGE, HOLD } from '../../lib/labels';
+import { ACCESS_NEED, HOLD } from '../../lib/labels';
+
+/** A person on a card: household members have no names in the plan, only an age group. */
+const AGE_WORD: Record<PlanInput['people'][number]['age_band'], string> = {
+  infant: 'baby',
+  toddler: 'toddler',
+  child: 'child',
+  teen: 'teenager',
+  adult: 'adult',
+  senior: 'older adult',
+};
 
 /** A write-in line on paper. */
 const BLANK = '__________';
@@ -94,7 +104,7 @@ export function familyPlanSections(input: PlanInput, hazardLines: string[]): str
   out.push('## Wallet cards', '');
   out.push('Cut out one card for each person and keep it in a wallet or phone case.', '');
   input.people.forEach((person, i) => {
-    out.push(`> **Wallet card: person ${i + 1} (${AGE[person.age_band].label.toLowerCase()})**`, '>');
+    out.push(`> **Wallet card: person ${i + 1} (${AGE_WORD[person.age_band]})**`, '>');
     out.push(`> - Out-of-area contact: ${contactText(plan.out_of_area_contact) ?? BLANK}`);
     out.push(`> - Meet near home: ${plan.meeting_place_near ? md(plan.meeting_place_near) : BLANK}`);
     out.push(`> - Meet outside the neighbourhood: ${plan.meeting_place_far ? md(plan.meeting_place_far) : BLANK}`);

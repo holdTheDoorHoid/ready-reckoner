@@ -38,6 +38,7 @@ import type {
   Warning,
 } from '../types';
 import { BUCKET_IDS, ENGINE_API_VERSION, RETURN_PERIODS, TARGET_LADDER_DAYS, TIER_IDS } from '../types';
+import { allowsRare } from '../../lib/dials';
 import { chanceWithin, dayPhrase, frequencySentence, monthsPhrase } from '../../lib/format';
 import { citation } from './citations';
 import { catalogueItem } from './items';
@@ -785,8 +786,9 @@ function buildChunks(ctx: Ctx): Chunk[] {
   }
 
   // Rare catastrophes: $0 by default; opted in, a single item in a late month (real allocator
-  // caps this at 10% of the monthly budget, `Dials.rare_catastrophic_opt_in`).
-  if (ctx.input.dials.rare_catastrophic_opt_in) {
+  // caps this at 10% of the monthly budget). The allowance is by family since contract v2
+  // (`Dials.rare_opt_in`, the v1 switch meaning all): the meter answers the nuclear family.
+  if (allowsRare(ctx.input.dials, 'nuclear_attack')) {
     out.push(chunk(ctx, 'radiation_meter', 'm3', 1));
   }
   return out;

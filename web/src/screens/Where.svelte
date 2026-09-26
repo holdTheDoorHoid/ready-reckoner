@@ -1,7 +1,9 @@
 <!--
   Screen 1, Where you live: ZIP code (resolved to a county from the list built into the app, with
   a county picker when a ZIP code spans several and a county search as the fallback), the kind of
-  area, and the home: type, floor, tenure, water, sewer, heating, cooling and backup power.
+  area, and the home: type, floor, tenure, water, sewer, heating, cooling and backup power, and
+  (contract v2, all optional) a bedroom below street level, the water system's record, raw water
+  nearby to filter, and what the household cooks on.
   A small map confirms the county (or numbers the counties a ZIP code spans). The ZIP code list
   starts loading when someone starts typing one; a county found by name never needs it.
 -->
@@ -14,20 +16,23 @@
   import InterviewNav from '../components/InterviewNav.svelte';
   import NumberField from '../components/NumberField.svelte';
   import ProgressSteps from '../components/ProgressSteps.svelte';
-  import type { EngineError, HousingKind, LocationResolved, LocationSuggestions } from '../engine/types';
+  import type { EngineError, Housing, HousingKind, LocationResolved, LocationSuggestions, WaterSource } from '../engine/types';
   import {
     BACKUP_POWER_KINDS,
+    COOKING_FUELS,
     COOLING_KINDS,
     HEATING_KINDS,
     HOUSING_KINDS,
+    RAW_WATER_SOURCES,
     SETTINGS,
     TENURES,
     WASTEWATER_KINDS,
     WATER_SOURCES,
+    WATER_SYSTEM_RECORDS,
   } from '../engine/types';
   import { PLACEHOLDER_ZIP } from '../engine/data-files';
   import { useApp } from '../lib/app.svelte';
-  import { BACKUP, COOLING, HEATING, HOUSING_KIND, SETTING, SEWER, TENURE, WATER } from '../lib/labels';
+  import { BACKUP, COOKING, COOLING, HEATING, HOUSING_KIND, RAW_WATER, SETTING, SEWER, TENURE, WATER, WATER_RECORD } from '../lib/labels';
   import type { FieldProblem } from '../lib/ui-types';
 
   const app = useApp();
@@ -179,6 +184,23 @@
     h.kind = kind;
     if (kind !== 'apartment_high_rise' && kind !== 'apartment_low_rise') h.floor = 1;
     else h.basement = false;
+    keepBelowGradeAnswer(h);
+  }
+
+  /** Asked only where someone could sleep below street level: a basement, or a flat below ground. */
+  function belowGradeAsked(h: Housing): boolean {
+    const apartment = h.kind === 'apartment_high_rise' || h.kind === 'apartment_low_rise';
+    return apartment ? h.floor <= 0 : h.basement;
+  }
+
+  /** A hidden question keeps no answer: the plan never acts on something the screen no longer shows. */
+  function keepBelowGradeAnswer(h: Housing) {
+    if (!belowGradeAsked(h) && h.below_grade_bedroom) h.below_grade_bedroom = false;
+  }
+
+  function setWater(v: WaterSource) {
+    // The water system's record is asked only of households on public water.
+    if (v === 'well' && app.plan) delete app.plan.input.housing.water_system_record;
   }
 </script>
 
@@ -332,11 +354,27 @@
           max={127}
           example="3"
           onchange={(v) => {
-            if (app.plan && v !== undefined) app.plan.input.housing.floor = v;
+            if (app.plan && v !== undefined) {
+              app.plan.input.housing.floor = v;
+              keepBelowGradeAnswer(app.plan.input.housing);
+            }
           }}
         />
       {:else}
-        <CheckRow label="The home has a basement" help="Basements flood first, and can be a safe spot in a tornado." bind:checked={input.housing.basement} />
+        <CheckRow
+          label="The home has a basement"
+          help="Basements flood first, and can be a safe spot in a tornado."
+          bind:checked={input.housing.basement}
+          onchange={() => app.plan && keepBelowGradeAnswer(app.plan.input.housing)}
+        />
+      {/if}
+      {#if belowGradeAsked(input.housing)}
+        <CheckRow
+          label="Someone sleeps below street level"
+          help="A bedroom in the basement, or a flat below ground. Water can fill these rooms in minutes in a flash flood."
+          checked={input.housing.below_grade_bedroom ?? false}
+          onchange={(on) => (input.housing.below_grade_bedroom = on)}
+        />
       {/if}
       <ChoiceGroup legend="Do you own or rent?" name="tenure" help="Renters can't always change the building, so the plan leans on things you can take with you." options={TENURES.map((v) => ({ value: v, label: TENURE[v].label }))} bind:value={input.housing.tenure} columns={2} />
       <ChoiceGroup
@@ -345,6 +383,27 @@
         help="Decides whether a power cut also cuts your water."
         options={WATER_SOURCES.map((v) => ({ value: v, label: WATER[v].label, help: WATER[v].help }))}
         bind:value={input.housing.water}
+        onchange={setWater}
+        columns={2}
+      />
+      {#if input.housing.water === 'municipal'}
+        <ChoiceGroup
+          legend="Has your water system had problems?"
+          name="water-record"
+          help="Optional. Some systems have more boil-water notices and main breaks. Your answer is combined with EPA records for your county."
+          options={WATER_SYSTEM_RECORDS.map((v) => ({ value: v, label: WATER_RECORD[v].label, help: WATER_RECORD[v].help }))}
+          value={input.housing.water_system_record}
+          onchange={(v) => (input.housing.water_system_record = v)}
+          columns={2}
+        />
+      {/if}
+      <ChoiceGroup
+        legend="Is there water nearby you could filter if the taps stopped?"
+        name="raw-water"
+        help="Optional. A water filter only helps if there is water to filter."
+        options={RAW_WATER_SOURCES.map((v) => ({ value: v, label: RAW_WATER[v].label, help: RAW_WATER[v].help }))}
+        value={input.housing.raw_water_source}
+        onchange={(v) => (input.housing.raw_water_source = v)}
         columns={2}
       />
       <ChoiceGroup legend="Where does wastewater go?" name="sewer" help="Decides what to do when toilets can't flush." options={WASTEWATER_KINDS.map((v) => ({ value: v, label: SEWER[v].label }))} bind:value={input.housing.sewer} columns={2} />
@@ -355,6 +414,15 @@
           </select>
         {/snippet}
       </Field>
+      <ChoiceGroup
+        legend="What do you cook on?"
+        name="cooking"
+        help="Optional. Decides whether you can cook and boil water when the power is out."
+        options={COOKING_FUELS.map((v) => ({ value: v, label: COOKING[v].label, help: COOKING[v].help }))}
+        value={input.housing.cooking}
+        onchange={(v) => (input.housing.cooking = v)}
+        columns={2}
+      />
       <ChoiceGroup legend="Cooling" name="cooling" help="Air conditioning stops in a power cut; the plan adds a cooling plan either way." options={COOLING_KINDS.map((v) => ({ value: v, label: COOLING[v].label }))} bind:value={input.housing.cooling} columns={3} />
       <ChoiceGroup
         legend="Backup power at home"

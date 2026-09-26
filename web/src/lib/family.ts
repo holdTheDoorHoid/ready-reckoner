@@ -139,7 +139,11 @@ export function hasFamilyPlan(plan: FamilyPlan | undefined): boolean {
 // Editing the plan in a saved household (the form)
 // ---------------------------------------------------------------------------------------------
 
-/** The household's family plan, created empty if it has none yet. */
+/**
+ * The household's family plan, created empty if it has none yet. Every helper here reads a value
+ * back after creating it (never the object it just assigned): in the app the plan is reactive
+ * state, and only what is read back through it is watched.
+ */
 export function ensureFamilyPlan(input: PlanInput): FamilyPlan {
   input.family_plan ??= {};
   return input.family_plan;
@@ -179,7 +183,8 @@ export function tidyNote(input: PlanInput, key: FamilyNote): void {
 /** Set a contact's name or phone as typed; blank removes it. */
 export function setContactPart(input: PlanInput, key: FamilyContact, part: 'name' | 'phone', text: string): void {
   const plan = ensureFamilyPlan(input);
-  const contact = (plan[key] ??= {});
+  plan[key] ??= {};
+  const contact = plan[key]!;
   if (text === '') delete contact[part];
   else contact[part] = text;
   dropIfEmpty(input);
@@ -245,7 +250,8 @@ export function tidyRoute(input: PlanInput, index: number): void {
 /** Add an empty number to the list (at most five); false when the list is full. */
 export function addNumber(input: PlanInput): boolean {
   const plan = ensureFamilyPlan(input);
-  const numbers = (plan.numbers_by_heart ??= []);
+  plan.numbers_by_heart ??= [];
+  const numbers = plan.numbers_by_heart;
   if (numbers.length >= NUMBERS_BY_HEART_MAX) return false;
   numbers.push('');
   return true;
@@ -271,7 +277,8 @@ export function removeNumber(input: PlanInput, index: number): void {
 /** Add an empty person to the trusted circle (at most four); false when the circle is full. */
 export function addTrustedPerson(input: PlanInput): boolean {
   const plan = ensureFamilyPlan(input);
-  const circle = (plan.trusted_circle ??= []);
+  plan.trusted_circle ??= [];
+  const circle = plan.trusted_circle;
   if (circle.length >= TRUSTED_CIRCLE_MAX) return false;
   circle.push({});
   return true;
@@ -356,6 +363,8 @@ const STEP_SECTIONS: Record<string, FamilySection> = {
   // "Know and prepare your home: shut-offs, ..."
   fire_learn_shutoffs: 'home',
   utility_shutoffs: 'home',
+  // The mock catalogue's tornado-spot step.
+  safe_room_plan: 'shelter',
 };
 
 /** The family-plan section a plan step is written down in, if any. */
