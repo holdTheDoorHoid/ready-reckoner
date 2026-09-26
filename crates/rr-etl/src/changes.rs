@@ -3,7 +3,7 @@
 
 use crate::Result;
 use crate::jobs::RefreshSummary;
-use crate::manifest::Manifest;
+use crate::manifest::{Manifest, Rehashed};
 use std::io::Write;
 use std::path::Path;
 
@@ -53,6 +53,37 @@ pub fn append(data_dir: &Path, manifest: &Manifest, summary: &RefreshSummary) ->
         .create(true)
         .append(true)
         .open(&path)?;
+    f.write_all(text.as_bytes())?;
+    Ok(())
+}
+
+/// Append one dated section for `rr-etl manifest --rehash`: no job ran, and the listed entries
+/// were recomputed from the files on disk.
+pub fn append_rehash(data_dir: &Path, manifest: &Manifest, changed: &[Rehashed]) -> Result<()> {
+    let mut text = format!(
+        "\n## {} — pack version {}\n\nNo job run: `rr-etl manifest --rehash` recomputed the checksums, row counts and pack version from the files on disk.\n",
+        crate::timefmt::now_utc(),
+        manifest.pack_version
+    );
+    if !changed.is_empty() {
+        text.push_str(
+            "\n| File | Rows before | Rows after | sha256 before | sha256 after |\n|---|---:|---:|---|---|\n",
+        );
+        for c in changed {
+            text.push_str(&format!(
+                "| `{}` | {} | {} | `{}` | `{}` |\n",
+                c.path,
+                c.old_rows,
+                c.rows,
+                &c.old_sha256[..c.old_sha256.len().min(12)],
+                &c.sha256[..c.sha256.len().min(12)]
+            ));
+        }
+    }
+    let mut f = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(data_dir.join("CHANGES.md"))?;
     f.write_all(text.as_bytes())?;
     Ok(())
 }

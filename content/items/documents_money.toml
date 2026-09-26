@@ -1,6 +1,7 @@
 # Documents and money: the Emergency Financial First Aid Kit, insurance, cash and savings.
 # Rules: docs/CONTENT_STANDARDS.md §3. Money buckets are funded on the savings track, not the supplies
-# budget (DESIGN §4.7); these items are the free actions and small purchases around them.
+# budget (DESIGN §4.7); these items are the free actions and small purchases around them, and the
+# decisions (`decision = true`: insurance, ID, home repairs to weigh), which cost the budget nothing.
 
 [[item]]
 id = "docs_effak"
@@ -32,6 +33,7 @@ quantity_rule = "once"
 maintenance = { check_months = 12 }
 citations = ["fema_effak", "ready_gov_financial", "ready_gov_kit", "ready_gov_floods", "ready_gov_earthquakes", "fema_nfip_flood_insurance", "floodsmart_buy_policy", "fema_nhs_2024", "state_dept_passport_card", "state_dept_child_passport", "nia_affairs_checklist", "ready_gov_cybersecurity", "cisa_data_backup_2012", "ollam_2022_lawyer_passport_locksmith_gun"]
 hazard_extras = []
+readiness_share = 0.3
 
 [[item]]
 id = "docs_start_emergency_fund"
@@ -81,6 +83,7 @@ retrieved = "2026-09-26"
 quantity_rule = "once"
 citations = ["fema_effak", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.2
 
 [[item]]
 id = "docs_cash_reserve"
@@ -103,6 +106,327 @@ price_band_usd = { low = 1, high = 1, per = "dollar", note = "Cash is money set 
 quantity_rule = "cash_reserve_usd"
 citations = ["ready_gov_financial", "fema_effak", "rr_expert_prior"]
 hazard_extras = []
+readiness_share = 0.2
+
+[[item]]
+id = "decide_home_insurance"
+name = "Decide: homeowners, condo or renters insurance"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "A home, condominium or renters policy pays to repair or replace what a fire, storm or theft destroys, and most pay for somewhere to stay while the home is fixed (NAIC). If you have none, get a quote and decide; a renters policy covers your belongings and liability, not the building (Ready.gov)."
+look_for = [
+  "Replacement cost for belongings, not only their used value",
+  "Additional living expenses, for a place to stay",
+  "Liability cover",
+  "Photos or a video of each room, kept away from home",
+]
+avoid = [
+  "Assuming a landlord's policy covers your belongings",
+  "Letting a policy lapse to save money in a tight month",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. Premiums depend on the home and the place, so ask for a quote." }
+quantity_rule = "insurance_home_or_renters"
+citations = ["naic_home_insurance_guide", "ready_gov_financial", "fema_effak"]
+hazard_extras = []
+
+[[item]]
+id = "decide_flood_insurance"
+name = "Decide: flood insurance, even outside a flood zone"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "Home and renters policies do not cover floods, and about 3 in 10 flood insurance claims come from outside high-risk flood areas (FloodSmart). A quote costs nothing, and a new flood policy usually starts 30 days after you buy it, so decide before storm season (FEMA)."
+look_for = [
+  "Your flood zone, and a quote from your insurance agent",
+  "Cover for belongings, which renters can buy on its own",
+  "The 30-day wait counted before hurricane or snowmelt season",
+]
+avoid = [
+  "Waiting for a forecast to buy it",
+  "Assuming you are safe because you live outside the mapped zone",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. Premiums depend on the home and its flood risk, so ask for a quote." }
+quantity_rule = "insurance_flood"
+citations = ["floodsmart_flood_risk", "fema_nfip_flood_insurance", "floodsmart_buy_policy", "ready_gov_floods"]
+hazard_extras = []
+
+[[item]]
+id = "decide_earthquake_insurance"
+name = "Decide: earthquake insurance"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "A standard home policy does not cover earthquake damage (Ready.gov). Where earthquakes drive your risk, get a quote and weigh the premium and the deductible against what you could pay yourself (NAIC)."
+look_for = [
+  "A quote from your insurer, or your state's earthquake insurance program if it has one",
+  "The deductible, written down, and savings toward it",
+]
+avoid = [
+  "Assuming a home policy covers quake damage",
+  "Deciding without reading what the policy leaves out",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. Premiums depend on the home and the place, so ask for a quote." }
+quantity_rule = "insurance_earthquake"
+citations = ["ready_gov_earthquakes", "naic_home_insurance_guide"]
+hazard_extras = ["earthquake"]
+
+[[item]]
+id = "decide_wind_deductible"
+name = "Check your hurricane or windstorm deductible"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "Where hurricanes drive your home-loss risk, find the hurricane or windstorm deductible on your policy's declarations page: in some places it is a percentage of the home's insured value, not a dollar amount, and some coastal policies leave out wind altogether (NAIC). Add that amount to your savings goal."
+look_for = [
+  "The deductible worked out in dollars",
+  "Whether wind is covered, or needs a separate policy",
+  "Discounts for storm shutters or a stronger roof",
+]
+avoid = [
+  "Finding out the deductible after the storm",
+  "Assuming a coastal policy covers wind",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget." }
+quantity_rule = "insurance_wind_deductible"
+citations = ["naic_home_insurance_guide", "ibhs_fortified_incentives"]
+hazard_extras = ["hurricane"]
+
+[[item]]
+id = "decide_sewer_backup"
+name = "Decide: sewer and drain backup cover for a basement"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "Most home policies pay little or nothing for water that backs up through the drains or overflows from a sump pump: ask your insurer what a sewer and drain backup endorsement costs, and decide (NAIC). A backflow valve and a sump pump with a battery backup lower the chance of a backup (FEMA)."
+look_for = [
+  "A quote for a sewer and drain backup endorsement",
+  "The most it pays, compared with what your basement holds",
+  "A plumber's quote for a backflow valve",
+]
+avoid = [
+  "Keeping papers and valuables on the basement floor",
+  "Assuming your policy covers a backup without checking",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget." }
+quantity_rule = "insurance_sewer_backup"
+citations = ["naic_home_insurance_guide", "fema_flood_smart_protect"]
+hazard_extras = []
+
+[[item]]
+id = "decide_condo_policy"
+name = "Check your condominium unit-owners policy"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "If you own an apartment, check that your policy is a condominium unit-owners policy, which covers your belongings and your unit's own walls, floors and ceilings, and ask the association what its building policy leaves to you after a disaster (NAIC)."
+look_for = [
+  "The association's building policy: what it covers and its deductible",
+  "Cover for your share of a building-wide deductible or repair bill",
+  "Improvements you made to the unit, listed on your policy",
+]
+avoid = [
+  "Assuming the building's policy covers your unit's inside",
+  "Waiting for a disaster to read the association's rules",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget." }
+quantity_rule = "insurance_condo_unit"
+citations = ["naic_home_insurance_guide"]
+hazard_extras = []
+
+[[item]]
+id = "decide_life_disability"
+name = "Decide: disability and life insurance for the people who earn"
+category = "documents_money"
+unit = "decision"
+buckets = ["income"]
+tier = "now"
+free = true
+decision = true
+spec = "If your household relies on someone's pay, check whether a job offers disability insurance, and whether life insurance would carry the others through the years they would need; about 1 in 4 workers who start at 20 become disabled before retirement age (SSA). NAIC's buyer's guide helps you work out how much cover is enough, and who should get it."
+look_for = [
+  "Disability cover through work, and how much of your pay it replaces",
+  "Life insurance sized to the years your household would need",
+  "The people you want named as beneficiaries on each policy and account, checked after a birth, marriage or divorce",
+]
+avoid = [
+  "Signing up for cover you do not understand: ask for the policy in writing",
+  "Letting beneficiaries go out of date",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. Premiums depend on age, health and the cover, so ask for quotes." }
+quantity_rule = "insurance_life_disability"
+citations = ["ssa_disability_facts", "naic_life_insurance_guide", "ollam_2022_lawyer_passport_locksmith_gun"]
+hazard_extras = []
+
+[[item]]
+id = "decide_id_for_every_person"
+name = "Decide: ID for every person (passport book or card, or a state ID)"
+category = "documents_money"
+unit = "decision"
+buckets = ["evacuate", "home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "A passport book or card for each person, children included, proves who you are and your citizenship if other papers are lost, and the card shows no home address; get them before you need them. The federal fee schedule: a first adult book $165 and card $65 ($130 and $30 plus a $35 acceptance fee), for children under 16 a book $135 and card $50 (22 CFR 22.1)."
+look_for = [
+  "A passport book, a passport card, or both, for each person",
+  "A state ID card for a child, as another choice (your state sets its fee)",
+  "Renewal well before a passport expires: adults renewing by mail skip the acceptance fee",
+  "Copies and scans of each ID with your documents",
+]
+avoid = [
+  "Waiting for an emergency to apply",
+  "Keeping every ID in one wallet or one bag",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. The fees are paid when you apply." }
+quantity_rule = "once"
+citations = ["cfr_22_1_consular_fees", "ollam_2022_lawyer_passport_locksmith_gun", "fema_effak"]
+hazard_extras = []
+readiness_share = 0.1
+
+[[item]]
+id = "decide_fortified_roof"
+name = "Decide: a stronger roof when you re-roof (FORTIFIED)"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "When the roof needs replacing, ask a certified roofer to build it to the FORTIFIED Roof standard, which holds on better in high winds. Some states offer grants, such as Florida's Hurricane Loss Mitigation Retrofit Grant, and insurers in some states discount the wind part of the premium by as much as 55 percent (IBHS)."
+look_for = [
+  "A roofer certified for the FORTIFIED program, before you re-roof",
+  "Your state's grant program and your insurer's discount",
+  "The certificate after the inspection, sent to your insurer",
+]
+avoid = [
+  "Re-roofing to the minimum without asking the price difference",
+  "Paying in full before the work passes inspection",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. The cost is part of a roof you are replacing anyway; grants and discounts vary by state." }
+quantity_rule = "once_if_owned_house"
+citations = ["ibhs_fortified_incentives", "ready_gov_hurricanes"]
+hazard_extras = ["hurricane", "strong_wind", "hail", "tornado"]
+
+[[item]]
+id = "decide_safe_room"
+name = "Decide: a tornado or hurricane safe room"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "A safe room built to FEMA's guidance gives near-absolute protection from extreme winds and flying debris (FEMA P-320). Homeowners do not apply to FEMA for the money: ask your state or local emergency management office whether it runs a safe-room rebate or grant program (FEMA)."
+look_for = [
+  "FEMA P-320's plans, for a room built into a new or existing home",
+  "A contractor who has built to them, and a permit",
+  "Your state's or county's safe-room rebate list",
+  "A spot everyone can reach in seconds",
+]
+avoid = [
+  "A room with windows as your shelter",
+  "Waiting for a warning to decide where you will shelter",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. A contractor's quote shows the cost; rebates vary by state." }
+quantity_rule = "once_if_owned_house"
+citations = ["fema_p320_safe_room", "fema_safe_room_funding", "ready_gov_tornadoes"]
+hazard_extras = ["tornado", "hurricane"]
+
+[[item]]
+id = "decide_backflow_sump"
+name = "Decide: a backflow valve and a battery-backup sump pump"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "Have a plumber install a backflow valve that pushes sewer backup away from your home, and keep a sump pump with a battery backup in case the power fails (FEMA). Raise the furnace, water heater and electrical panel above the likely flood level where you can (FEMA)."
+look_for = [
+  "A licensed plumber's quote for a backflow valve",
+  "A sump pump with a battery backup, tested each spring",
+  "Sewer backup cover on your policy",
+]
+avoid = [
+  "A sump pump that stops when the power does",
+  "Keeping valuables on the basement floor",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. A plumber's quote shows the cost." }
+quantity_rule = "once_if_owned_basement"
+citations = ["fema_flood_smart_protect", "naic_home_insurance_guide"]
+hazard_extras = ["riverine_flooding", "coastal_flooding", "water_damage"]
+season = "spring"
+
+[[item]]
+id = "decide_seismic_retrofit"
+name = "Decide: bolt the house to its foundation (earthquake retrofit)"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "Bolting an older wood-frame house to its foundation, and bracing the short walls of a crawl space, helps keep it on its foundation in a strong quake; the work must be done by a licensed contractor (FEMA). In California, the Earthquake Brace + Bolt program pays up to $3,000 toward it for qualifying pre-1980 houses on raised foundations (CRMP)."
+look_for = [
+  "Your house's age and foundation: raised floors over a crawl space are the usual candidates",
+  "A licensed contractor and a permit",
+  "Your state's retrofit grants, such as California's",
+  "The water heater strapped and tall furniture anchored at the same time",
+]
+avoid = [
+  "Doing foundation work yourself",
+  "Counting on insurance in place of a retrofit",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. A contractor's quote shows the cost; grants vary by state." }
+quantity_rule = "once_if_owned_detached"
+citations = ["fema_sill_plate_bolting", "crmp_earthquake_brace_bolt", "fema_b526_eq_checklist"]
+hazard_extras = ["earthquake"]
+
+[[item]]
+id = "decide_wildfire_hardening"
+name = "Decide: harden the home against embers and wildfire"
+category = "documents_money"
+unit = "decision"
+buckets = ["home_loss"]
+tier = "now"
+free = true
+decision = true
+spec = "Keep a fire-resistant zone at least 30 feet around the house free of leaves and anything that burns (Ready.gov), with nothing that burns in the first 5 feet and fine metal mesh over the vents. In California, each such step qualifies for an insurance discount (California Department of Insurance)."
+look_for = [
+  "Gravel or stone instead of bark within 5 feet of the walls",
+  "Metal mesh over attic and crawl-space vents",
+  "Gutters, the roof and the space under decks kept clear",
+  "A fire-rated roof when you re-roof",
+  "Your insurer's discounts for these steps",
+]
+avoid = [
+  "Firewood or propane tanks against the house",
+  "Waiting for fire season to start",
+]
+price_band_usd = { low = 0, high = 0, per = "decision", note = "A decision, not a purchase from the supplies budget. Much of it is work, not money; contractors quote the rest." }
+quantity_rule = "once_if_owned_house"
+citations = ["ready_gov_wildfires", "cdi_safer_from_wildfires"]
+hazard_extras = ["wildfire"]
+season = "spring"
 
 [[item]]
 id = "docs_legal_readiness"
@@ -128,3 +452,4 @@ quantity_rule = "once"
 maintenance = { check_months = 12 }
 citations = ["ollam_2022_lawyer_passport_locksmith_gun", "lsc_get_legal_help", "nia_affairs_checklist", "aclu_stopped_by_police"]
 hazard_extras = []
+readiness_share = 0.1

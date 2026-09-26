@@ -13,6 +13,7 @@ spec = "If the heat goes off in winter, gather everyone in one small room: close
 look_for = [
   "A small interior room with few windows",
   "Blankets and towels you can use to seal gaps",
+  "Your nearest warming center: call 2-1-1 to find one (Ready.gov)",
   "A way to check on older relatives and neighbours",
 ]
 avoid = [
@@ -22,7 +23,7 @@ avoid = [
 ]
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: uses what you have." }
 quantity_rule = "warm_room_plan"
-citations = ["cdc_winter_safety", "cdc_co_basics"]
+citations = ["cdc_winter_safety", "cdc_co_basics", "ready_gov_stay_safe_warm"]
 hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
 
 [[item]]
@@ -73,6 +74,7 @@ retrieved = "2026-09-26"
 quantity_rule = "sleeping_bag_or_blanket"
 citations = ["ready_gov_kit", "cdc_winter_safety", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+season = "fall"
 
 [[item]]
 id = "thermal_battery_fan"
@@ -96,6 +98,7 @@ retrieved = "2026-09-25"
 quantity_rule = "once"
 citations = ["cdc_heat_health", "ready_gov_heat", "rr_price_observations_2026_09"]
 hazard_extras = ["heat_wave"]
+season = "summer"
 
 [[item]]
 id = "thermal_indoor_thermometer"
@@ -119,6 +122,7 @@ retrieved = "2026-09-25"
 quantity_rule = "room_thermometer"
 citations = ["cdc_heat_health", "cdc_winter_safety", "rr_price_observations_2026_09"]
 hazard_extras = ["heat_wave"]
+season = "summer"
 
 [[item]]
 id = "thermal_emergency_blankets"
@@ -142,6 +146,8 @@ retrieved = "2026-09-25"
 quantity_rule = "per_person"
 citations = ["redcross_first_aid_kit", "rr_price_observations_2026_09"]
 hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+requires = ["evac_go_bag", "gethome_bag", "gethome_car_kit"]
+readiness_share = 0.05
 
 [[item]]
 id = "thermal_blankets"
@@ -166,6 +172,7 @@ retrieved = "2026-09-26"
 quantity_rule = "blankets"
 citations = ["ready_gov_kit", "cdc_winter_safety", "usfa_heating_fires", "rr_price_observations_2026_09"]
 hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+season = "fall"
 
 [[item]]
 id = "thermal_warm_layers"
@@ -190,6 +197,8 @@ retrieved = "2026-09-26"
 quantity_rule = "warm_layers"
 citations = ["ready_gov_kit", "cdc_winter_safety", "rr_price_observations_2026_09"]
 hazard_extras = ["cold_wave", "winter_weather", "ice_storm"]
+readiness_share = 0.1
+season = "fall"
 
 [[item]]
 id = "thermal_cooling_towel"
@@ -214,3 +223,4 @@ retrieved = "2026-09-26"
 quantity_rule = "cooling_towel"
 citations = ["cdc_hot_weather_psa", "ready_gov_heat", "rr_price_observations_2026_09"]
 hazard_extras = ["heat_wave"]
+season = "summer"

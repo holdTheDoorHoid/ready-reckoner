@@ -6,7 +6,7 @@ use rr_types::{BackupPower, Housing, Per, Person};
 use super::Sizing;
 use crate::basis::Basis;
 use crate::constants::{constants, keys};
-use crate::format::{count, days as fmt_days, num, people};
+use crate::format::{count, day_adjective, days as fmt_days, num, people};
 
 /// Days of prescription medicine to keep on hand for everyone who takes daily or refrigerated
 /// medicine: the medication target clamped to 7–30 days, or 14 when there is no target.
@@ -78,6 +78,107 @@ pub fn medication_days(target_days: Option<f64>, people_list: &[Person]) -> Opti
         .per_day(days, n as f64)
         .math(math),
     )
+}
+
+/// The rest of a long medication target, beyond the reserve [`medication_days`] keeps on hand (at
+/// most 30 days): kept up by asking the drug plan for 60- to 90-day fills and refilling early,
+/// never by stockpiling more than a prescription allows (round-2 review P-04: "30 days of
+/// medicine adds 90 days"). A need only when the target is longer than the reserve; content's free
+/// step `med_90_day_fills` meets it. Rule `medication_fills`.
+pub fn medication_fills(target_days: Option<f64>, people_list: &[Person]) -> Option<Sizing> {
+    let n = people_list
+        .iter()
+        .filter(|p| p.medical.daily_rx || p.medical.refrigerated_rx)
+        .count();
+    let target = target_days?;
+    let reg = constants().constant(keys::RX_DAYS_ON_HAND);
+    let cap = reg.high.unwrap_or(reg.default);
+    if n == 0 || target.is_nan() || target <= cap {
+        return None;
+    }
+    let mut b = Basis::new();
+    let (_, cap) = b.range(keys::RX_DAYS_ON_HAND);
+    let (fill_lo, fill_hi) = b.range(keys::RX_FILL_DAYS);
+    let extra = target - cap;
+    let q = n as f64 * extra;
+    let text = format!(
+        "Your medication target is {}; the reserve at home covers the first {}. For the other {}, ask your drug plan whether it offers {} to {} day fills and which pharmacies give them, and refill as soon as the plan allows, so the supply at home stays ahead of each refill{}.",
+        fmt_days(target),
+        fmt_days(cap),
+        fmt_days(extra),
+        num(fill_lo, 0),
+        num(fill_hi, 0),
+        if n > 1 {
+            format!(" ({} person-days in all)", num(q, 1))
+        } else {
+            String::new()
+        }
+    );
+    Some(
+        Sizing::new(
+            &b,
+            "medication_fills",
+            "prescription_medicine",
+            q,
+            "person_day",
+            Per::Person,
+            text,
+        )
+        .per_day(extra, n as f64)
+        .math(vec![format!(
+            "{n} × ({} − {}) days = {} person-days",
+            num(target, 2),
+            num(cap, 0),
+            num(q, 1)
+        )]),
+    )
+}
+
+/// The item class of the 12-volt medicine fridge: the cold-storage part of the medication bucket,
+/// with the cooler bag and the power station.
+pub const RX_FRIDGE_CLASS: &str = "medicine_cooler";
+
+/// A small 12-volt compressor fridge for refrigerated medicine in a hot county (round-2 review P-01,
+/// item N-15): insulin keeps working up to 28 days between 59 °F and 86 °F (FDA), which a cool room
+/// manages in most places, but a home without power in a hot county passes 86 °F. A need when someone
+/// takes refrigerated medicine, the county is hot, the power target is at least `rx_fridge_min_days`
+/// (3, an estimate), and the household has no generator or solar battery that keeps the house
+/// fridge running (a power station of its own still needs a fridge to cool). Rule `rx_fridge_units`.
+pub fn rx_fridge_units(
+    power_days: Option<f64>,
+    people_list: &[Person],
+    housing: &Housing,
+    hot: bool,
+) -> Option<Sizing> {
+    let cold_rx = people_list.iter().any(|p| p.medical.refrigerated_rx);
+    let min = constants().value(keys::RX_FRIDGE_MIN_DAYS);
+    let runs_fridge = matches!(
+        housing.backup_power,
+        BackupPower::Generator | BackupPower::SolarBattery
+    );
+    let days = power_days.filter(|d| d.is_finite() && *d >= min)?;
+    if !cold_rx || !hot || runs_fridge {
+        return None;
+    }
+    let mut b = Basis::new();
+    b.k(keys::RX_FRIDGE_MIN_DAYS);
+    let high_f = b.k(keys::INSULIN_ROOM_TEMP_MAX_F);
+    b.k(keys::HOT_CLIMATE_DAYS_95F);
+    b.cite("cdc_co_basics");
+    let text = format!(
+        "A small 12-volt compressor fridge or cooler for the medicine: your county is hot, and in a {} power cut a room without power can pass {} °F, the most insulin can take. It runs from the battery power station (see its line), or from the car with the engine running outdoors only. Check its watts before you buy, and keep the medicine from freezing.",
+        day_adjective(days),
+        num(high_f, 0)
+    );
+    Some(Sizing::new(
+        &b,
+        "rx_fridge_units",
+        RX_FRIDGE_CLASS,
+        1.0,
+        "fridge",
+        Per::Household,
+        text,
+    ))
 }
 
 /// Whether refrigerated medicine needs a power source through the outage, not only a cooler bag:

@@ -8,7 +8,9 @@
 //!    `missing` reasons, and contains no county code outside the canonical list;
 //! 4. no pack uses an old Connecticut county code (`090xx`) except the crosswalk itself, and all
 //!    nine planning regions are present;
-//! 5. `zip_county.csv` points only at canonical counties and each ZIP's shares sum to at most 1.
+//! 5. `zip_county.csv` points only at canonical counties and each ZIP's shares sum to at most 1;
+//! 6. outage records agree with their own event curves, and are compared with EIA-861 SAIFI
+//!    (model review M-02).
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
@@ -314,6 +316,9 @@ pub fn verify(dir: &Path) -> Result<Report, String> {
         }
     }
 
+    // 6. Outage records against their own event curves and against EIA-861 (model review M-02).
+    outage_checks(dir, &mut rep);
+
     // 5. ZIP shares.
     if let Ok((h, rows)) = read_table(dir, ZIP_COUNTY) {
         let (iz, is) = (col(&h, "zip")?, col(&h, "land_share")?);
@@ -344,6 +349,94 @@ pub fn verify(dir: &Path) -> Result<Report, String> {
         ));
     }
     Ok(rep)
+}
+
+/// Model review M-02: (a) a county whose recorded event kept at least 1% of its customers out for
+/// a week (optional pack `opt/outage_events/county_events.csv`) must show customer outages of a
+/// week or more in `core/outages.csv`; (b) outages per customer-year more than three times the
+/// serving utilities' SAIFI (`core/reliability.csv`) point at reporting flicker and are listed.
+fn outage_checks(dir: &Path, rep: &mut Report) {
+    let Ok((oh, orows)) = read_table(dir, "core/outages.csv") else {
+        return;
+    };
+    let (Ok(i_f), Ok(i_7), Ok(i_e), Ok(i_b)) = (
+        col(&oh, "fips"),
+        col(&oh, "p_ge_7d"),
+        col(&oh, "events_per_customer_year"),
+        col(&oh, "duration_basis"),
+    ) else {
+        return;
+    };
+    let own: BTreeMap<&str, (&str, &str, &str)> = orows
+        .iter()
+        .map(|r| {
+            (
+                r[i_f].as_str(),
+                (r[i_7].as_str(), r[i_e].as_str(), r[i_b].as_str()),
+            )
+        })
+        .collect();
+    if let Ok((eh, erows)) = read_table(dir, "opt/outage_events/county_events.csv")
+        && let (Ok(e_f), Ok(e_p), Ok(e_7)) = (
+            col(&eh, "county_fips"),
+            col(&eh, "peak_share"),
+            col(&eh, "s_7d"),
+        )
+    {
+        rep.checks += 1;
+        let mut bad = BTreeSet::new();
+        for r in &erows {
+            let share = r[e_p].parse::<f64>().unwrap_or(0.0) * r[e_7].parse::<f64>().unwrap_or(0.0);
+            if share < 0.01 {
+                continue;
+            }
+            if let Some((p7, _, basis)) = own.get(r[e_f].as_str())
+                && *basis == "county"
+                && p7.parse::<f64>().unwrap_or(0.0) <= 0.0
+            {
+                bad.insert(r[e_f].clone());
+            }
+        }
+        if bad.is_empty() {
+            rep.lines.push("outages.csv: every county whose event kept 1% of customers out for a week shows week-long outages".into());
+        } else {
+            rep.problems.push(format!(
+                "outages.csv: {} counties had an event with at least 1% of customers out after a week but show no week-long customer outages, e.g. {:?}",
+                bad.len(),
+                bad.iter().take(8).collect::<Vec<_>>()
+            ));
+        }
+    }
+    if let Ok((rh, rrows)) = read_table(dir, "core/reliability.csv")
+        && let (Ok(r_f), Ok(r_s)) = (col(&rh, "fips"), col(&rh, "saifi_with_med"))
+    {
+        rep.checks += 1;
+        let mut flagged = Vec::new();
+        let mut compared = 0;
+        for r in &rrows {
+            let Ok(saifi) = r[r_s].parse::<f64>() else {
+                continue;
+            };
+            if let Some((_, e, basis)) = own.get(r[r_f].as_str())
+                && *basis == "county"
+                && let Ok(e) = e.parse::<f64>()
+            {
+                compared += 1;
+                if saifi > 0.0 && e > 3.0 * saifi {
+                    flagged.push(r[r_f].clone());
+                }
+            }
+        }
+        rep.lines.push(format!(
+            "outages.csv vs reliability.csv: {} of {compared} counties record more than three times their utilities' SAIFI (reporting flicker to look at){}",
+            flagged.len(),
+            if flagged.is_empty() {
+                String::new()
+            } else {
+                format!(": {}", flagged.iter().take(12).cloned().collect::<Vec<_>>().join(", "))
+            }
+        ));
+    }
 }
 
 #[cfg(test)]

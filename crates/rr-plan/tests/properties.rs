@@ -201,11 +201,14 @@ fn free_steps_are_at_most_eight_a_month_and_life_safety_first() {
             .filter(|i| i.kind == PlanItemKind::FreeAction)
             .map(|i| i.item_id.as_str())
             .collect();
-        let content = rr_content::content();
-        // Life-safety free steps come before the others in month 0.
+        // Life-safety free steps come before the others in month 0. An offered item is
+        // life-safety when its catalogue entry says so or it meets a life-safety line (the heat
+        // plan in a hot county with a power target, round-2 review P-09), as the allocator orders
+        // them.
+        let offers = common::run(&input).offers;
         let flags: Vec<bool> = first
             .iter()
-            .map(|id| content.item(id).is_some_and(|i| i.life_safety))
+            .map(|id| offers.get(id).is_some_and(|o| o.item.life_safety))
             .collect();
         let first_other = flags.iter().position(|f| !f).unwrap_or(flags.len());
         assert!(

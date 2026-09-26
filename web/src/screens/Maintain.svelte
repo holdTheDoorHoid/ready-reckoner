@@ -1,7 +1,9 @@
 <!--
-  Screen 9, Keep it up: what to use and replace, check and practise, and when, from the dates you
-  recorded; a calendar file for your own calendar (this app never contacts you); and your data:
-  save a copy, open a saved copy, or forget everything.
+  Screen 9, Keep it up: what to use and replace, check, test and practise, and when, from the dates
+  you recorded; the seasonal anchors month by month (have it before the season starts, or check it
+  then); a calendar file for your own calendar (this app never contacts you); and your data: save a
+  copy, open a saved copy, or forget everything. "Tested today" records the day an item was tried
+  (contract v2 `Owned.tested_on`), the same date the Have screen shows.
 -->
 <script lang="ts">
   import ConfirmDialog from '../components/ConfirmDialog.svelte';
@@ -9,8 +11,8 @@
   import type { Problem } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { addMonths, formatDate } from '../lib/format';
-  import { calendarFile, drillItems, intervalLabel, maintenanceTasks, type Task } from '../lib/maintenance';
-  import { engineInput, EXPORT_FILENAME, exportText, parseImport, type SavedPlan } from '../lib/persistence';
+  import { calendarFile, drillItems, intervalLabel, maintenanceTasks, SEASON_WORDS, seasonalAnchors, type Task } from '../lib/maintenance';
+  import { engineInput, EXPORT_FILENAME, exportText, parseImport, setTestedOn, type SavedPlan } from '../lib/persistence';
   import { useRouter } from '../lib/router.svelte';
 
   const app = useApp();
@@ -28,12 +30,29 @@
   const soon = $derived(tasks.filter((t) => t.due > today && t.due <= addMonths(today, 12)));
   const planIds = $derived(new Set(app.result.output?.plan.months.flatMap((m) => m.items.map((i) => i.item_id)) ?? []));
   const drills = $derived(app.catalogue ? drillItems(app.catalogue, planIds) : []);
+  /** What the household has and what its plan still holds, for the seasonal view. */
+  const heldOrPlanned = $derived(
+    new Set([
+      ...planIds,
+      ...(app.result.output?.plan.long_horizon ?? []).map((i) => i.item_id),
+      ...(app.plan?.input.existing ?? []).filter((o) => o.qty > 0).map((o) => o.item_id),
+    ]),
+  );
+  const seasons = $derived(app.catalogue ? seasonalAnchors(app.catalogue, heldOrPlanned) : []);
 
   function done(task: Task) {
     if (!app.plan) return;
     if (task.kind === 'review') app.plan.reviewed_on = today;
+    if (task.kind === 'test' && task.item_id) setTestedOn(app.plan, task.item_id, today);
     app.markDone(task.key, today);
-    message = `Marked as done today: ${task.title}.`;
+    message = task.kind === 'test' ? `Tested today: ${task.title.replace(/^Test: /, '')}.` : `Marked as done today: ${task.title}.`;
+  }
+
+  /** The line under a task: how often, and when it was last done or tested. */
+  function lastLine(t: Task): string {
+    if (t.kind === 'test') return t.last ? `Last tested ${formatDate(t.last)}.` : 'Not tested yet: try it and record the day.';
+    if (t.last) return `Last done ${formatDate(t.last)}.`;
+    return t.from_inventory ? 'You had this before the plan; check its date.' : '';
   }
 
   function practised(itemId: string, name: string) {
@@ -127,10 +146,12 @@
                 <p class="task__title">{t.title}</p>
                 <p class="small muted">
                   {intervalLabel(t.interval_months)}.
-                  {#if t.last}Last done {formatDate(t.last)}.{:else if t.from_inventory}You had this before the plan; check its date.{/if}
+                  {lastLine(t)}
                 </p>
               </div>
-              <button type="button" class="button button--small" onclick={() => done(t)}><Icon name="check" /> Done today<span class="visually-hidden">: {t.title}</span></button>
+              <button type="button" class="button button--small" onclick={() => done(t)}
+                ><Icon name="check" /> {t.kind === 'test' ? 'Tested today' : 'Done today'}<span class="visually-hidden">: {t.title}</span></button
+              >
             </li>
           {/each}
         </ul>
@@ -156,6 +177,23 @@
         </div>
       {/if}
     </section>
+
+    {#if seasons.length}
+      <section aria-labelledby="seasons-title">
+        <h2 id="seasons-title">Through the year</h2>
+        <p class="section-intro">Some things belong to a season: have them ready before it starts, or check them then.</p>
+        <ul class="seasons">
+          {#each seasons as s (s.season)}
+            <li class="card season">
+              <p class="season__when"><strong>{SEASON_WORDS[s.season].month}</strong> <span class="muted">before {SEASON_WORDS[s.season].name}</span></p>
+              <ul class="season__items">
+                {#each s.items as i (i.id)}<li>{i.name}</li>{/each}
+              </ul>
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
 
     {#if drills.length}
       <section aria-labelledby="drills-title">
@@ -258,6 +296,26 @@
   }
   .task__title {
     font-weight: 650;
+  }
+  .seasons {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--s2);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .seasons > li + li {
+    margin-top: 0;
+  }
+  .season {
+    padding: var(--s3) var(--s4);
+  }
+  .season__when {
+    margin: 0 0 var(--s1);
+  }
+  .season__items {
+    margin: 0;
+    padding-left: 1.2em;
   }
   .data {
     margin-top: var(--s7);

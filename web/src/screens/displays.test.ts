@@ -39,8 +39,9 @@ async function screenWith(Screen: typeof Risks, route: string, name = NAME, outp
   return { r: current, out };
 }
 
-/** What a matrix row's "How likely" cell should say for a hazard over `years`. */
+/** What a matrix row's "How likely" cell should say for a hazard over `years` (a range-only row: its range, and its range a year). */
 function likelyCell(h: PlanOutput['register'][number], years = 10): string {
+  if (h.range_only) return `${rangeOnly(h.rate_range[0], h.rate_range[1], years)}; ${rangeOnly(h.rate_range[0], h.rate_range[1], 1)} a year`;
   const p = chanceWithin(h.rate_per_year, years);
   const chance = h.confidence === 'prior' ? chanceShort(p, chanceWithin(h.rate_range[0], years), chanceWithin(h.rate_range[1], years)) : chanceShort(p);
   return `${chance}; ${perYearWords(h.rate_per_year, h.annual_probability)}`;
@@ -74,7 +75,8 @@ describe('the risk matrix (owner request)', () => {
     expect(rows).toHaveLength(ranked.length);
     rows.forEach((row, i) => {
       const h = ranked[i]!;
-      expect(text(row.querySelector('th')), h.id).toBe(`${i + 1}. ${h.name}`);
+      // The rank and the name (a row with named causes also has its "What it includes" disclosure).
+      expect(`${text(row.querySelector('th .rank'))} ${text(row.querySelector('th a'))}`, h.id).toBe(`${i + 1}. ${h.name}`);
       expect(row.querySelector('a')!.getAttribute('href')).toBe(`#hazard-${h.id}`);
       const cells = row.querySelectorAll('td');
       expect(cells, h.id).toHaveLength(3);
@@ -92,11 +94,14 @@ describe('the risk matrix (owner request)', () => {
     const cells = rareRows.slice(1).map((row) => text(row.querySelectorAll('td')[0]));
     expect(cells).toEqual(rare.map((h) => rangeOnly(h.rate_range[0], h.rate_range[1], 10)));
     for (const c of cells) expect(c).toMatch(/^(between 1 in [\d,]+ and 1 in [\d,]+|very unlikely: less than 1 in [\d,]+|about 1 in [\d,]+)$/);
-    for (const row of rareRows.slice(1)) {
-      expect(row.querySelector('a')!.getAttribute('href')).toBe('#rare-title');
+    // Each rare row links to its own row in the rare box (contract v2 families).
+    rareRows.slice(1).forEach((row, i) => {
+      expect(row.querySelector('a')!.getAttribute('href')).toBe(`#rare-${rare[i]!.id}`);
       expect(text(row.querySelector('th'))).not.toMatch(/^\d/);
-    }
-    expect(text(matrix)).toContain(NUCLEAR_NOTE);
+    });
+    // The worldwide nuclear note stays only while the nuclear row has no location term.
+    if (rare.some((h) => h.id === 'nuclear_attack' && !h.location_factor)) expect(text(matrix)).toContain(NUCLEAR_NOTE);
+    else expect(text(matrix)).not.toContain(NUCLEAR_NOTE);
   });
 
   it('jumps to a card folded away in "All N risks": opens it, moves focus to the heading, and leaves the address alone', async () => {
@@ -125,10 +130,10 @@ describe('the risk matrix (owner request)', () => {
     const link = r.target.querySelector(`#matrix-${folded.id}`)!;
     expect(document.activeElement).toBe(link);
     expect(link.hasAttribute('tabindex')).toBe(false);
-    // A rare row goes to the rare box.
+    // A rare row goes to its own row in the rare box, on the button that opens it.
     (r.target.querySelector('#matrix-nuclear_attack') as HTMLAnchorElement).click();
     flushSync();
-    expect(document.activeElement).toBe(r.target.querySelector('#rare-title'));
+    expect(document.activeElement).toBe(r.target.querySelector('#rare-nuclear_attack button.expander'));
   });
 
   it('follows the "Show chances over" setting', async () => {
@@ -150,13 +155,13 @@ describe('the rare box (H-02)', () => {
     const { r, out } = await screenWith(Risks, 'risks');
     const box = r.target.querySelector('section.rare')!;
     const header = text(box.querySelectorAll('thead th')[1]);
-    expect(header).toBe('How likely (in the next 10 years)');
-    const cells = [...box.querySelectorAll('tbody tr')].map((row) => text(row.querySelectorAll('td')[0]));
+    expect(header).toBe('How likely for you (in the next 10 years)');
+    const cells = [...box.querySelectorAll('tbody tr.family__row')].map((row) => text(row.querySelector('.likely')));
     const rare = out.register.filter((h) => h.display === 'rare_catastrophic');
     expect(cells).toEqual(rare.map((h) => rangeOnly(h.rate_range[0], h.rate_range[1], 10)));
     expect(text(box)).not.toContain('households like yours');
     expect(text(box)).not.toMatch(/about \d+ of 100/);
-    expect(text(box)).toContain(NUCLEAR_NOTE);
+    if (rare.some((h) => h.id === 'nuclear_attack' && !h.location_factor)) expect(text(box)).toContain(NUCLEAR_NOTE);
     expect(text(box)).toContain('Back to the table');
   });
 });
@@ -203,15 +208,29 @@ describe('the Risks cards and targets', () => {
     expect(text(r.target)).not.toMatch(/\bn95\b/);
     // Each card lists its first three, each with "free", a price, or "have it" / "done" when the
     // household already has it (the heat card's towels are an assumed everyday basic).
-    let owned = 0;
     for (const h of out.register.filter((x) => x.display === 'ranked')) {
       for (const i of helpsFor(out, cat, h.id).slice(0, 3)) {
         const note = i.done ? (i.kind === 'free_action' ? 'done' : 'have it') : i.kind === 'free_action' ? 'free' : usd(i.est_cost_usd);
         expect(helps(h.id), `${h.id}: ${i.item_id}`).toContain(`${lowerFirst(i.name)} (${note})`);
-        if (i.done) owned += 1;
       }
     }
-    expect(owned, 'at least one card offers something the household already has').toBeGreaterThan(0);
+    // What the household already has is never priced. Done items sort last, so the golden's own
+    // assumed basics rarely reach a card's first three (since the v0.2 catalogue): mark every step
+    // done and every card must say "have it" or "done", never a price.
+    current!.cleanup();
+    current = undefined;
+    const allDone = structuredClone(out);
+    for (const m of allDone.plan.months) for (const i of m.items) i.done = true;
+    const { r: r2 } = await screenWith(Risks, 'risks', NAME, allDone);
+    let owned = 0;
+    for (const h of allDone.register.filter((x) => x.display === 'ranked')) {
+      const words = text(r2.target.querySelector(`#hazard-${h.id} .helps`));
+      if (!words) continue;
+      expect(words, h.id).not.toMatch(/\(\$\d/);
+      expect(words, h.id).not.toMatch(/\(free\)/);
+      owned += (words.match(/\((have it|done)\)/g) ?? []).length;
+    }
+    expect(owned, 'cards offer what the household already has').toBeGreaterThan(0);
   });
 
   it('passes axe (jsdom; contrast is checked in a real browser)', async () => {

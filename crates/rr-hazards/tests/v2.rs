@@ -788,7 +788,9 @@ fn wasatch_san_andreas_and_seattle() {
     assert!(close(s.rate_per_year, -math::ln_1p(-0.19) / 30.0, 1e-9));
     assert!(s.on);
     // King County: the Seattle fault (on by Washington's guidance, though rarer than the
-    // yardstick) and Cascadia both apply; the earthquake card takes out both shares.
+    // yardstick) and Cascadia both apply; the earthquake card takes out both shares. The Seattle
+    // fault's rate is the only citable one, USGS's regional chance for any shallow-fault
+    // earthquake of magnitude 6.5 or more in the Puget Sound region: 17 in 100 in 50 years.
     let king = county_like("42101", "53033", "King", "WA", "Washington", json!({}));
     let a = run(&input, &king);
     let ids = scenario_ids(&a);
@@ -802,10 +804,12 @@ fn wasatch_san_andreas_and_seattle() {
         .find(|s| s.id == "seattle_fault_m7")
         .unwrap();
     assert!(sf.default_on && sf.rate_per_year < 0.005);
+    assert!(close(sf.rate_per_year, -math::ln_1p(-0.17) / 50.0, 1e-9));
     assert!(
         sf.applies_because
             .contains("Washington asks every household")
     );
+    assert!(sf.applies_because.contains("somewhere in the region"));
     let card = profile(&a, H::Earthquake).rate_per_year;
     let parent = rate(&a, H::Earthquake).rate_per_year;
     let scen: f64 = a

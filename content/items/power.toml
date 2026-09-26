@@ -22,8 +22,10 @@ avoid = [
 price_band_usd = { low = 3.32, high = 19.97, per = "headlamp", note = "Three home-center listings: basic headlamps in a three-pack ($3.32 each), a 300-lumen headlamp ($17.47) and a rechargeable one ($19.97)." }
 retrieved = "2026-09-26"
 quantity_rule = "per_person"
-citations = ["ready_gov_kit", "rr_price_observations_2026_09"]
+citations = ["ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.2
+test_interval_months = 6
 
 [[item]]
 id = "power_lantern"
@@ -48,6 +50,7 @@ quantity_rule = "once"
 maintenance = { check_months = 6 }
 citations = ["ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
+test_interval_months = 6
 
 [[item]]
 id = "power_batteries"
@@ -72,6 +75,7 @@ quantity_rule = "battery_packs"
 maintenance = { check_months = 12 }
 citations = ["ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
+requires = ["power_headlamp", "power_lantern", "comms_noaa_radio"]
 
 [[item]]
 id = "power_bank"
@@ -150,6 +154,8 @@ quantity_rule = "generator_units"
 maintenance = { check_months = 3 }
 citations = ["cdc_co_basics", "ready_gov_power_outages", "osha_portable_generators", "cpsc_generator_alert_2021", "rr_research_supply_standards", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
+season = "fall"
+test_interval_months = 3
 
 [[item]]
 id = "power_generator_fuel"
@@ -177,6 +183,7 @@ volume_l_per_unit = 3.785
 maintenance = { rotate_months = 6 }
 citations = ["lehi_fuel_storage", "ready_gov_power_outages", "bls_average_prices", "rr_research_supply_standards", "rr_price_observations_2026_09"]
 hazard_extras = []
+requires = ["power_fuel_cans"]
 
 [[item]]
 id = "power_solar_panel"
@@ -253,6 +260,7 @@ quantity_rule = "generator_connection_units"
 maintenance = { check_months = 12 }
 citations = ["osha_portable_generators", "cpsc_generator_alert_2021", "rr_price_observations_2026_09"]
 hazard_extras = []
+requires = ["power_generator"]
 
 [[item]]
 id = "power_fuel_cans"
@@ -279,3 +287,57 @@ quantity_rule = "fuel_cans"
 maintenance = { rotate_months = 6 }
 citations = ["cpsc_generator_alert_2021", "lehi_fuel_storage", "rr_price_observations_2026_09"]
 hazard_extras = []
+requires = ["power_generator"]
+
+[[item]]
+id = "power_car_charger_inverter"
+name = "Car charger or small inverter to recharge from the car"
+category = "power"
+unit = "charger"
+buckets = ["power", "comms", "medication"]
+tier = "h72"
+free = false
+spec = "A 12-volt car charger with USB ports, or a small inverter of about 150 watts for chargers that plug into the wall, so the car can top up phones, power banks, lights, a power station or a medical device's battery in a long outage. Run the engine only outdoors, never in a garage, even with the door open (CDC)."
+look_for = [
+  "USB ports that fit your phones' cables, or an inverter of about 150 watts",
+  "For a medical device: an inverter whose watts cover the device's charger, from its label",
+  "A cord long enough to reach where you will charge",
+]
+avoid = [
+  "Running the engine in a garage or near a window (carbon monoxide)",
+  "Running the car's battery down with the engine off",
+  "Plugging a heater or other high-watt appliance into a small inverter",
+]
+price_band_usd = { low = 6.99, high = 49.98, per = "charger", note = "Three home-center listings: a two-port USB car charger at $6.99, and small inverters at $40.49 (150 W) and $49.98 (140 W, with USB ports). A charger you already keep in the car costs nothing." }
+retrieved = "2026-09-26"
+quantity_rule = "recharge_capability"
+citations = ["cdc_co_basics", "sil_cpap_power", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "power_generator_upkeep"
+name = "Keep your generator ready: test runs, fresh fuel, a safe connection"
+category = "power"
+unit = "action"
+buckets = ["power"]
+tier = "now"
+free = true
+spec = "A generator that has sat for months may not start when you need it. Start it and run it with something plugged in every three months and before storm season (an estimate), keep its fuel fresh and stabilized, and connect it only by cords to appliances or through an interlock or transfer switch an electrician installed (OSHA)."
+look_for = [
+  "A test run every three months, with the date written down",
+  "Fuel used or replaced within about six months, with stabilizer added (Lehi, Utah)",
+  "The oil checked before each run and changed as the manual says",
+  "Heavy-duty outdoor cords long enough to keep it 20 feet from the house (CDC)",
+  "A carbon monoxide alarm inside the house",
+]
+avoid = [
+  "Test runs in a garage, even with the door open (CDC)",
+  "Plugging it into a wall outlet: backfeeding can electrocute utility workers (CPSC)",
+  "Refueling while it is hot",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a test run and a date on the fuel." }
+quantity_rule = "once_if_generator"
+maintenance = { check_months = 3 }
+citations = ["osha_portable_generators", "lehi_fuel_storage", "cdc_co_basics", "cpsc_generator_alert_2021", "rr_expert_prior"]
+hazard_extras = []
+season = "fall"

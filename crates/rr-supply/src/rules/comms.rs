@@ -1,11 +1,11 @@
 //! Communications, information and cash (research §7, §8.1).
 
-use rr_types::{Per, Person};
+use rr_types::{Finances, Per, Person};
 
 use super::Sizing;
 use crate::basis::Basis;
-use crate::constants::keys;
-use crate::format::{count, days as fmt_days, num, usd};
+use crate::constants::{constants, keys};
+use crate::format::{DAYS_PER_MONTH, count, days as fmt_days, num, usd};
 use crate::household::{is_4_plus, is_13_plus};
 
 /// A battery or hand-crank radio with NOAA Weather Radio. Rule `noaa_radio`.
@@ -32,7 +32,10 @@ pub fn noaa_radio() -> Sizing {
 }
 
 /// Power-bank capacity to keep phones charged through the outage target: one phone per person
-/// aged 13 and over at about 15 Wh a day (an estimate). Rule `phone_power_wh`.
+/// aged 13 and over at about 15 Wh a day (an estimate), for at most the two weeks of phone power the
+/// plan stores (`battery_pack_cap_days`); past that, a way to recharge (the power bucket's
+/// `recharge_capability`) keeps them going (round-2 review P-04: two power banks "completed" a
+/// 45-day goal). Rule `phone_power_wh`.
 pub fn phone_power_wh(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let phones = people_list.iter().filter(|p| is_13_plus(p)).count() as f64;
     if phones == 0.0 || days <= 0.0 {
@@ -43,16 +46,29 @@ pub fn phone_power_wh(days: f64, people_list: &[Person]) -> Option<Sizing> {
     let (lo, hi) = b.range(keys::PHONE_WH_PER_DAY);
     b.cite("ready_gov_kit");
     b.cite("ready_gov_earthquakes");
-    let q = phones * wh * days;
-    let text = format!(
+    let capped = days > constants().value(keys::BATTERY_PACK_CAP_DAYS);
+    let stored = if capped {
+        b.k(keys::BATTERY_PACK_CAP_DAYS)
+    } else {
+        days
+    };
+    let q = phones * wh * stored;
+    let mut text = format!(
         "Power banks: {} × about {} Wh a day ({} to {}) × {} without power = {} Wh. Text instead of calling to save battery.",
         count(phones, "phone", "phones"),
         num(wh, 0),
         num(lo, 0),
         num(hi, 0),
-        fmt_days(days),
+        fmt_days(stored),
         num(super::round_quantity("Wh", q), 0)
     );
+    if capped {
+        text.push_str(&format!(
+            " Your power target is {}: past the first {}, recharge the power banks from the car or a solar panel (see the recharge line) instead of storing more.",
+            fmt_days(days),
+            fmt_days(stored)
+        ));
+    }
     Some(
         Sizing::new(
             &b,
@@ -63,7 +79,7 @@ pub fn phone_power_wh(days: f64, people_list: &[Person]) -> Option<Sizing> {
             Per::Person,
             text,
         )
-        .per_day(days, phones * wh),
+        .per_day(stored, phones * wh),
     )
 }
 
@@ -129,31 +145,71 @@ pub fn local_map() -> Sizing {
     Sizing::new(&b, "local_map", "paper_map", q, "map", Per::Household, text)
 }
 
-/// Cash in small bills: $100 to start (an estimate; no agency gives a figure), or the household's
-/// own daily spending for the communications target clamped to 3–14 days. Rule
-/// `cash_reserve_usd`.
-pub fn cash_reserve_usd(target_days: f64) -> Sizing {
+/// Cash in small bills: half of three days of the household's own spending (estimates: the share
+/// that goes on essentials, and the days), rounded down to $20 and never less than $100; $100 until
+/// the household gives its monthly expenses (round-2 review P-18). No agency gives a dollar figure.
+/// Rule `cash_reserve_usd`.
+pub fn cash_reserve_usd(target_days: f64, finances: &Finances) -> Sizing {
     let mut b = Basis::new();
     let usd_default = b.k(keys::CASH_DEFAULT_USD);
-    let lo = b.k(keys::CASH_DAYS_MIN);
-    let hi = b.k(keys::CASH_DAYS_MAX);
     b.cite("fema_effak");
-    let d = target_days.clamp(lo, hi);
-    let text = format!(
-        "Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about {} to start, or enough for about {} of basics (food, fuel, medicine) at your own daily spending. No agency gives a dollar amount.",
-        usd(usd_default),
-        fmt_days(d)
-    );
+    let expenses = finances
+        .monthly_expenses_usd
+        .map(f64::from)
+        .filter(|e| e.is_finite() && *e > 0.0);
+    let (q, text) = match expenses {
+        Some(month) => {
+            let days = b.k(keys::CASH_EXPENSE_DAYS);
+            let share = b.k(keys::CASH_ESSENTIAL_SHARE);
+            let step = b.k(keys::CASH_ROUND_USD);
+            let raw = share * days * month / DAYS_PER_MONTH;
+            let rounded = (raw / step).floor() * step;
+            let q = rounded.max(usd_default);
+            let how = if rounded > usd_default {
+                format!(
+                    "about {}: half of {} of your usual spending ({} a month), the part that goes on food, fuel and medicine",
+                    usd(q),
+                    fmt_days(days),
+                    usd(month)
+                )
+            } else {
+                format!(
+                    "about {}, at least; half of {} of your usual spending ({} a month) is less than that",
+                    usd(q),
+                    fmt_days(days),
+                    usd(month)
+                )
+            };
+            (
+                q,
+                format!(
+                    "Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: {how}. No agency gives a dollar amount."
+                ),
+            )
+        }
+        None => {
+            let lo = b.k(keys::CASH_DAYS_MIN);
+            let hi = b.k(keys::CASH_DAYS_MAX);
+            let d = target_days.clamp(lo, hi);
+            (
+                usd_default,
+                format!(
+                    "Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about {} to start, or enough for about {} of basics (food, fuel, medicine) at your own daily spending. No agency gives a dollar amount.",
+                    usd(usd_default),
+                    fmt_days(d)
+                ),
+            )
+        }
+    };
     Sizing::new(
         &b,
         "cash_reserve_usd",
         "cash",
-        usd_default,
+        q,
         "usd",
         Per::Household,
         text,
     )
-    .days(d)
 }
 
 #[cfg(test)]
@@ -168,12 +224,31 @@ mod tests {
         let pb = phone_power_wh(3.0, &p.people).unwrap();
         assert_eq!(pb.quantity, 140.0); // 3 phones × 15 × 3 = 135
         assert!(pb.prior);
+        // A 45-day power target stores two weeks of phone power: 3 × 15 × 14 = 630 Wh.
+        let long = phone_power_wh(45.0, &p.people).unwrap();
+        assert_eq!(long.quantity, 630.0);
+        assert_eq!(long.days, Some(14.0));
+        assert!(long.plain.contains("recharge"), "{}", long.plain);
         assert_eq!(two_way_radios(&p.people).unwrap().quantity, 3.0);
         assert_eq!(contact_cards(&p.people).quantity, 4.0);
-        let cash = cash_reserve_usd(1.4);
+        // $4,200 a month: half of 3 days is $210, rounded down to $200 (round-2 review P-18).
+        let cash = cash_reserve_usd(1.4, &p.finances);
+        assert_eq!(cash.quantity, 200.0);
+        assert!(cash.prior && cash.plain.contains("$200") && cash.plain.contains("$4,200"));
+        // Without expenses: $100 to start, and the days of basics the target suggests.
+        let mut none = p.finances.clone();
+        none.monthly_expenses_usd = None;
+        let cash = cash_reserve_usd(1.4, &none);
         assert_eq!(cash.quantity, 100.0);
-        assert!(cash.prior && cash.plain.contains("$100") && cash.plain.contains("3 days"));
-        assert!(cash_reserve_usd(60.0).plain.contains("14 days"));
+        assert!(cash.plain.contains("$100") && cash.plain.contains("3 days"));
+        assert!(cash_reserve_usd(60.0, &none).plain.contains("14 days"));
+        // Sugar Land ($7,000) gets $340; the Chicago student ($1,400) keeps the $100 floor.
+        let sl = fixtures::get("sugar-land-ev-household-3").unwrap();
+        assert_eq!(cash_reserve_usd(3.0, &sl.finances).quantity, 340.0);
+        let chicago = fixtures::get("chicago-student-zero-budget-1").unwrap();
+        let c = cash_reserve_usd(3.0, &chicago.finances);
+        assert_eq!(c.quantity, 100.0);
+        assert!(c.plain.contains("at least"), "{}", c.plain);
     }
 
     #[test]

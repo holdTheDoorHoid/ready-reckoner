@@ -100,7 +100,12 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         "USDA Forest Service data; free to use, citation requested",
         "Cite: USDA Forest Service. 2026. Wildfire Risk to Communities. https://wildfirerisk.org [date accessed].",
     ));
-    let rows = crate::xlsx::read_sheet(&wb.bytes, "Communities")?;
+    // The reader keeps sheet row numbers (a row the file leaves out comes back empty); drop
+    // empty rows so the header is the first row, as `parse_places` expects.
+    let rows: Vec<Vec<String>> = crate::xlsx::read_sheet(&wb.bytes, "Communities")?
+        .into_iter()
+        .filter(|r| r.iter().any(|c| !c.is_empty()))
+        .collect();
     let places = parse_places(&rows)?;
     out.rows_in += places.len() as u64;
     if places.len() < 25_000 {

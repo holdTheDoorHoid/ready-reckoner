@@ -3,26 +3,42 @@
   so the whole register reads at a glance before the cards. One row each: rank and name (a link to
   the hazard's card, which opens "All N risks" first when the card is folded away there), how likely
   (the chance over the chosen years, worded as the card words it, with how often a year below), how
-  bad and how sure. The rare-but-severe rows follow under a divider: a range only, never ranked,
-  each linking to the rare box. Four columns at every width; long names wrap.
+  bad and how sure. A row whose chance rests on stacked expert estimates (`range_only`) shows its
+  range only. A row with named causes inside it opens to list them. The rare-but-severe rows follow
+  under a divider in the rare box's order (most likely here first), a range only and never ranked,
+  each linking to its own row in the box. Under the table, "Also checked": everything checked and
+  found too rare here to list. Four columns at every width; long names wrap.
 -->
 <script lang="ts">
   import type { HazardProfile } from '../engine/types';
   import { jumpTo } from '../lib/anchors';
   import { chanceShort, chanceWithin, CONFIDENCE_LABELS, perYearWords, rangeOnly } from '../lib/format';
   import { NUCLEAR_NOTE } from '../lib/labels';
+  import type { AlsoChecked } from '../lib/rare';
   import Chance from './Chance.svelte';
   import SeveritySwatch from './SeveritySwatch.svelte';
 
-  let { ranked, rare, years }: { ranked: HazardProfile[]; rare: HazardProfile[]; years: number } = $props();
+  let {
+    ranked,
+    rare,
+    years,
+    alsoChecked = null,
+  }: { ranked: HazardProfile[]; rare: HazardProfile[]; years: number; alsoChecked?: AlsoChecked | null } = $props();
 
   const span = $derived(years === 1 ? '1 year' : `${years} years`);
 
-  /** Expert estimates carry their range, as the card's sentence does (CONTENT_STANDARDS §6). */
+  /** Expert estimates carry their range, as the card's sentence does (CONTENT_STANDARDS §6); a range-only row shows only the range. */
   function likely(h: HazardProfile): string {
+    if (h.range_only) return rangeOnly(h.rate_range[0], h.rate_range[1], years);
     const p = chanceWithin(h.rate_per_year, years);
     if (h.confidence !== 'prior') return chanceShort(p);
     return chanceShort(p, chanceWithin(h.rate_range[0], years), chanceWithin(h.rate_range[1], years));
+  }
+
+  /** How often a year; for a range-only row, the range in any one year. */
+  function perYear(h: HazardProfile): string {
+    if (h.range_only) return `${rangeOnly(h.rate_range[0], h.rate_range[1], 1)} a year`;
+    return perYearWords(h.rate_per_year, h.annual_probability);
   }
 
   function go(e: MouseEvent, id: string, focus?: string) {
@@ -52,10 +68,18 @@
           <th scope="row">
             <span class="rank">{i + 1}.</span>
             <a id="matrix-{h.id}" href="#hazard-{h.id}" onclick={(e) => go(e, `hazard-${h.id}`, 'h3')}>{h.name}</a>
+            {#if h.sub_causes?.length}
+              <details class="includes">
+                <summary>What it includes ({h.sub_causes.length})</summary>
+                <ul>
+                  {#each h.sub_causes as c (c.id)}<li>{c.name}</li>{/each}
+                </ul>
+              </details>
+            {/if}
           </th>
           <td>
             <Chance text={likely(h)} /><span class="per-year"
-              ><span class="visually-hidden">{'; '}</span><Chance text={perYearWords(h.rate_per_year, h.annual_probability)} /></span
+              ><span class="visually-hidden">{'; '}</span><Chance text={perYear(h)} /></span
             >
           </td>
           <td><SeveritySwatch severity={h.severity} /></td>
@@ -66,11 +90,11 @@
     {#if rare.length}
       <tbody class="rare">
         <tr>
-          <th scope="rowgroup" colspan="4" class="divider">Rare but severe: expert estimates, shown as a range and never ranked</th>
+          <th scope="rowgroup" colspan="4" class="divider">Rare but severe: sorted by how likely here, shown as a range, never ranked</th>
         </tr>
         {#each rare as h (h.id)}
           <tr>
-            <th scope="row"><a id="matrix-{h.id}" href="#rare-title" onclick={(e) => go(e, 'rare-title')}>{h.name}</a></th>
+            <th scope="row"><a id="matrix-{h.id}" href="#rare-{h.id}" onclick={(e) => go(e, `rare-${h.id}`, 'button.expander')}>{h.name}</a></th>
             <td><Chance text={rangeOnly(h.rate_range[0], h.rate_range[1], years)} /></td>
             <td><SeveritySwatch severity={h.severity} /></td>
             <td>{CONFIDENCE_LABELS[h.confidence]}</td>
@@ -79,8 +103,19 @@
       </tbody>
     {/if}
   </table>
-  {#if rare.some((h) => h.id === 'nuclear_attack')}
+  {#if rare.some((h) => h.id === 'nuclear_attack' && !h.location_factor)}
     <p class="small muted note">{NUCLEAR_NOTE}</p>
+  {/if}
+  {#if alsoChecked && alsoChecked.items.length}
+    <details class="also">
+      <summary>Also checked: {alsoChecked.items.length} more, too rare here to list</summary>
+      <p class="small">{alsoChecked.lead}:</p>
+      <ul class="also__list small">
+        {#each alsoChecked.items as a, i (i)}
+          <li>{a.name}{#if a.rate}<span class="muted">: <Chance text={a.rate} /></span>{/if}</li>
+        {/each}
+      </ul>
+    </details>
   {/if}
 </section>
 
@@ -131,6 +166,38 @@
   }
   .note {
     margin-top: var(--s2);
+  }
+  .includes {
+    font-weight: 400;
+    font-size: var(--text-sm);
+  }
+  .includes summary {
+    color: var(--text-muted);
+    min-height: 0;
+    padding: var(--s1) 0 0;
+    cursor: pointer;
+  }
+  .includes ul {
+    margin: var(--s1) 0 0;
+    padding-left: 1.2em;
+  }
+  .includes li + li {
+    margin-top: 0;
+  }
+  .also {
+    margin-top: var(--s3);
+  }
+  .also summary {
+    color: var(--accent);
+    min-height: 36px;
+    font-size: var(--text-sm);
+  }
+  .also__list {
+    columns: 2 16rem;
+    margin: 0;
+  }
+  .also__list li {
+    break-inside: avoid;
   }
   /* Phones: four columns still, with tighter cells and the severity swatch above its word. */
   @media (max-width: 30rem) {

@@ -113,6 +113,24 @@ const extras = [
 ];
 shots.push(...extras);
 
+// v0.2.0 (web-interview): the family plan, the new questions, the settings' rare families and the
+// packet's wallet cards, for a household with its family plan filled in.
+const detroit = fixture('pending/detroit-snap-3');
+const detroitTested = saved({ ...structuredClone(detroit), existing: [{ item_id: 'flashlights_headlamps', qty: 3, tested_on: '2026-09-20' }] });
+shots.push(
+  { name: '12-family--detroit--desktop', route: 'family', plan: saved(detroit), viewport: DESKTOP },
+  { name: '12-family--detroit--phone', route: 'family', plan: saved(detroit), viewport: PHONE },
+  { name: '12-family--detroit-guides-open--desktop', route: 'family', plan: saved(detroit), viewport: DESKTOP, openDetails: '.plan-guide' },
+  { name: '12-family--philadelphia-empty--phone', route: 'family', plan: saved(philly), viewport: PHONE },
+  { name: '12-family--detroit-dark--desktop', route: 'family', plan: saved(detroit), viewport: DESKTOP, theme: 'dark' },
+  { name: '08-packet-wallet-cards--detroit--desktop', route: 'packet/wallet-cards', plan: saved(detroit), viewport: DESKTOP, cardsPrint: true },
+  { name: '02-who-help-in-an-emergency--detroit--phone', route: 'who', plan: saved(detroit), viewport: PHONE },
+  { name: '01-where-v2--detroit--desktop', route: 'where', plan: saved(detroit), viewport: DESKTOP },
+  { name: '04-money-v2--detroit--desktop', route: 'money', plan: saved(detroit), viewport: DESKTOP },
+  { name: '05-have-tested--detroit--desktop', route: 'have', plan: detroitTested, viewport: DESKTOP },
+  { name: '06-risks-settings-v2--detroit--desktop', route: 'risks', plan: saved(detroit), viewport: DESKTOP, click: 'button[aria-controls="settings-panel"]' },
+);
+
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--no-sandbox', '--font-render-hinting=none'] });
 const axeReport = [];
 const consoleErrors = [];
@@ -143,6 +161,10 @@ try {
       await page.click(shot.click);
       await new Promise((r) => setTimeout(r, 300));
     }
+    if (shot.openDetails) {
+      await page.evaluate((sel) => document.querySelectorAll(sel).forEach((d) => (d.open = true)), shot.openDetails);
+      await new Promise((r) => setTimeout(r, 200));
+    }
     const file = join(outDir, `${shot.name}.png`);
     await page.screenshot({ path: file, fullPage: true });
     await page.addScriptTag({ path: axePath });
@@ -153,6 +175,15 @@ try {
     });
     axeReport.push({ shot: shot.name, violations: result });
     console.log(`${shot.name}: ${result.length ? result.map((v) => `${v.id}(${v.nodes})`).join(', ') : 'axe clean'}`);
+    if (shot.cardsPrint) {
+      // What "Print only the wallet cards" sends to the printer: the cards section alone.
+      await page.evaluate(() => document.querySelector('.packet-page')?.classList.add('cards-only'));
+      await page.emulateMediaType('print');
+      await page.screenshot({ path: join(outDir, `${shot.name.replace('--desktop', '')}--print-cards-only.png`), fullPage: true });
+      await page.pdf({ path: join(outDir, `${shot.name.replace('--desktop', '')}--cards-only--letter.pdf`), format: 'Letter', printBackground: false });
+      await page.emulateMediaType(null);
+      console.log('wallet cards printed alone (PNG, Letter PDF)');
+    }
     if (shot.name === '08-packet--philadelphia--desktop') {
       await page.emulateMediaType('print');
       await page.screenshot({ path: join(outDir, '08-packet-print-view--philadelphia.png'), fullPage: true });

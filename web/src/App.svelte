@@ -15,6 +15,7 @@
   import { provideApp } from './lib/app.svelte';
   import { formatHash, provideRouter, ROUTES, type RouteId, type Router } from './lib/router.svelte';
   import About from './screens/About.svelte';
+  import FamilyPlan from './screens/FamilyPlan.svelte';
   import Have from './screens/Have.svelte';
   import Learn from './screens/Learn.svelte';
   import Maintain from './screens/Maintain.svelte';
@@ -25,6 +26,7 @@
   import Risks from './screens/Risks.svelte';
   import Start from './screens/Start.svelte';
   import Travel from './screens/Travel.svelte';
+  import Validation from './screens/Validation.svelte';
   import Where from './screens/Where.svelte';
   import Who from './screens/Who.svelte';
   import { article } from './learn/articles';
@@ -48,7 +50,9 @@
     packet: Packet,
     maintain: Maintain,
     learn: Learn,
+    validation: Validation,
     about: About,
+    family: FamilyPlan,
     missing: NotFound,
   };
 

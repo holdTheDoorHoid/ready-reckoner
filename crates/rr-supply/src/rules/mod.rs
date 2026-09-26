@@ -5,6 +5,7 @@
 //! the citations of the numbers it used, and a plain-language sentence that shows the arithmetic.
 //! [`crate::sized_requirements`] turns sizings into requirement lines for each bucket.
 
+pub mod clean_air;
 pub mod comms;
 pub mod evacuate;
 pub mod fire;

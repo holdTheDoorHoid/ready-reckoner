@@ -1110,10 +1110,12 @@ sources = ["redcross_first_aid_kit"]
 
 [[constant]]
 key = "otc_kinds"
-label = "Kinds of non-prescription medicine (pain reliever, anti-diarrhea, antacid, laxative)"
+label = "Kinds of non-prescription medicine (pain reliever, anti-diarrhea, antacid, allergy medicine)"
 unit = "kind"
 default = 4.0
-sources = ["ready_gov_kit"]
+sources = ["ready_gov_kit", "cdc_yellow_book_travel_kits"]
+note = "Ready.gov's kit lists pain relievers, anti-diarrhea medicine, antacids or laxatives; CDC's travel health kit adds an antihistamine for allergies. The plan counts allergy medicine in place of the laxative, as the catalogue item does (round-2 review P-22)."
+note_sources = ["ready_gov_kit", "cdc_yellow_book_travel_kits"]
 
 [[constant]]
 key = "otc_days_per_package"
@@ -1545,6 +1547,324 @@ label = "Transport plan per person who needs help to leave"
 unit = "plan per person"
 default = 1.0
 sources = ["ready_gov_older_adults", "ready_gov_disability"]
+
+# ---------------------------------------------------------------------------------------------
+# Round 2, v0.2.0: capabilities before consumables, cooking, clean air, the long horizon and
+# household decisions (round-2 practitioner review P-01 to P-23, professional review RR-P09 to
+# RR-P11)
+# ---------------------------------------------------------------------------------------------
+
+[[constant]]
+key = "battery_pack_cap_days"
+label = "Days of batteries and phone power the plan stores; beyond this, a way to recharge"
+unit = "day"
+default = 14.0
+prior = true
+sources = ["rr_expert_prior", "oregon_2_weeks_ready"]
+note = "The round-2 review found long power targets met with piles of batteries (26 packs for a 180-day target). Past the two weeks a household stores (Oregon's 2 Weeks Ready), the plan asks for a way to recharge instead: a car charger, a solar panel, or a generator or solar battery the household owns."
+note_sources = ["oregon_2_weeks_ready"]
+
+[[constant]]
+key = "generator_rationed_hours_per_day"
+label = "Hours a day a generator runs when its fuel is rationed"
+unit = "hour per day"
+default = 4.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "rain_catchment_sqft_per_barrel"
+label = "Roof area that drains to one downspout and its rain barrel"
+unit = "square foot"
+default = 250.0
+low = 150.0
+high = 500.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "An inch of rain on a square foot of roof is about 0.62 gallons (144 cubic inches over 231 cubic inches a gallon), so 250 square feet gives about 156 gallons an inch."
+
+[[constant]]
+key = "rain_barrel_gal"
+label = "Water one rain barrel holds"
+unit = "gallon"
+default = 50.0
+sources = ["rr_price_observations_2026_09"]
+
+[[constant]]
+key = "rain_barrels_max"
+label = "Most rain barrels the plan suggests (one per downspout)"
+unit = "barrel"
+default = 4.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "rain_dry_season_min_share"
+label = "Share of the household's monthly water the driest months' rain must bring in for barrels to count"
+unit = "fraction"
+default = 0.25
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "water_carriers_per_household"
+label = "Water carriers for hauling, for a household of up to three"
+unit = "carrier"
+default = 2.0
+prior = true
+sources = ["rr_expert_prior", "epa_asheville_boil_notice_2024"]
+note = "After Hurricane Helene, Asheville's water stayed unsafe for weeks and households hauled water from distribution points and springs; a carrier you can lift is what makes a source usable."
+
+[[constant]]
+key = "water_carriers_large_household"
+label = "Water carriers for a household of four or more"
+unit = "carrier"
+default = 4.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "water_carrier_gal"
+label = "Water one carrier holds"
+unit = "gallon"
+default = 5.0
+sources = ["rr_price_observations_2026_09"]
+
+[[constant]]
+key = "livestock_haul_tank_gal"
+label = "Water one haulable tote holds"
+unit = "gallon"
+default = 275.0
+sources = ["rr_price_observations_2026_09"]
+
+[[constant]]
+key = "hand_pump_min_days"
+label = "No-water target from which a hand pump for the well is offered"
+unit = "day"
+default = 30.0
+prior = true
+sources = ["rr_expert_prior", "rr_research_risk_model"]
+
+[[constant]]
+key = "toilet_supplies_cap_days"
+label = "Days of toilet bags and cover material the plan stores, unless an earthquake drives the no-water target"
+unit = "day"
+default = 30.0
+prior = true
+sources = ["rr_expert_prior", "rdpo_emergency_toilet"]
+note = "The round-2 review found toilet bags sized to year-long no-water targets (329 bags). A working sewer or septic system is one of the toilet options RDPO lists, and it usually outlasts the tap water, so bags are sized for the first month; an earthquake can break the sewer itself, so then they follow the whole target."
+
+[[constant]]
+key = "cooking_capability_min_days"
+label = "Can't-get-to-a-store target from which a way to cook without power is needed"
+unit = "day"
+default = 14.0
+prior = true
+sources = ["rr_expert_prior", "oregon_2_weeks_ready"]
+note = "Oregon's 2 Weeks Ready asks households to keep two weeks of non-perishable food and to know how to prepare it without electricity or gas."
+note_sources = ["oregon_2_weeks_ready"]
+
+[[constant]]
+key = "staples_fuel_lb_per_2000kcal"
+label = "Propane to cook 2,000 kcal of dry staples such as rice and beans"
+unit = "pound per 2,000 kcal"
+default = 0.3
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "propane_cylinder_lb"
+label = "Propane in one small camp-stove cylinder"
+unit = "pound"
+default = 1.0
+sources = ["rr_price_observations_2026_09"]
+
+[[constant]]
+key = "butane_boil_f"
+label = "Temperature below which butane stops turning to gas (a butane stove falters near it)"
+unit = "degree Fahrenheit"
+default = 31.7
+sources = ["nist_butane"]
+note = "NIST gives n-butane's normal boiling point as 273 K."
+
+[[constant]]
+key = "propane_boil_f"
+label = "Temperature below which propane stops turning to gas"
+unit = "degree Fahrenheit"
+default = -43.7
+sources = ["nist_propane"]
+note = "NIST gives propane's normal boiling point as 231.1 K."
+
+[[constant]]
+key = "cash_expense_days"
+label = "Days of the household's own spending to keep in cash"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_financial"]
+
+[[constant]]
+key = "cash_essential_share"
+label = "Share of ordinary spending that goes on essentials in an emergency"
+unit = "fraction"
+default = 0.5
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "cash_round_usd"
+label = "Cash amounts are rounded down to a multiple of this"
+unit = "US dollar"
+default = 20.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "wound_addon_min_days"
+label = "Can't-get-to-a-store target from which the wound-care add-on is suggested outside rural areas"
+unit = "day"
+default = 14.0
+prior = true
+sources = ["rr_expert_prior", "wms_wound_2014"]
+
+[[constant]]
+key = "respirator_days_max"
+label = "Most days of respirators the plan stores for smoke or dust"
+unit = "day"
+default = 30.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "air_cleaner_cadr_per_sqft"
+label = "Clean air delivery rate a portable air cleaner needs per square foot of room (8-foot ceiling)"
+unit = "cubic foot per minute per square foot"
+default = 0.65
+sources = ["epa_air_cleaner_guide"]
+note = "EPA's sizing table: 65 cubic feet a minute for 100 square feet, 130 for 200, 195 for 300; more with higher ceilings."
+
+[[constant]]
+key = "clean_room_sqft"
+label = "Floor area of the clean room (a bedroom)"
+unit = "square foot"
+default = 200.0
+low = 100.0
+high = 300.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "rx_fridge_min_days"
+label = "Power target from which a 12-volt fridge for refrigerated medicine is needed in a hot county"
+unit = "day"
+default = 3.0
+prior = true
+sources = ["rr_expert_prior", "fda_insulin_emergency"]
+note = "Insulin keeps working up to 28 days between 59 °F and 86 °F (FDA), so a cool room is enough in most places; in a hot county a room without power passes 86 °F, and the medicine needs active cooling."
+note_sources = ["fda_insulin_emergency"]
+
+[[constant]]
+key = "rx_fill_days"
+label = "Longest prescription fill many drug plans allow"
+unit = "day"
+default = 90.0
+low = 60.0
+high = 90.0
+sources = ["medicare_drugs_disaster"]
+
+[[constant]]
+key = "nfip_claims_outside_high_risk_share"
+label = "Share of flood insurance claims that came from outside high-risk flood areas, 2014 to 2024"
+unit = "fraction"
+default = 0.29
+sources = ["floodsmart_flood_risk"]
+
+[[constant]]
+key = "disability_before_retirement_share"
+label = "Chance a 20-year-old worker develops a disability before full retirement age"
+unit = "fraction"
+default = 0.25
+sources = ["ssa_disability_facts"]
+
+[[constant]]
+key = "household_ops_kit_days"
+label = "Days one kit of paper tableware, garbage bags and matches lasts a household"
+unit = "day"
+default = 14.0
+prior = true
+sources = ["rr_expert_prior", "ready_gov_kit"]
+
+[[constant]]
+key = "household_ops_cap_days"
+label = "Days of a no-water target the household kits cover (paper tableware and trash bags)"
+unit = "day"
+default = 30.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "Paper plates and cups save the water that washing dishes takes while stored water is all there is. A target longer than the stored water also asks for a raw-water source and a way to treat it, so after the first month dishes are washed with treated water: at most three kits (30 days at one kit per 14), never 27 kits for a year."
+
+[[constant]]
+key = "food_storage_l_per_2000kcal"
+label = "Shelf space for 2,000 kcal of stored food (cans, jars, boxes and bags)"
+unit = "litre per 2,000 kcal"
+default = 1.9
+low = 1.7
+high = 2.1
+prior = true
+sources = ["rr_expert_prior"]
+note = "The round-2 practitioner review's estimate: 58,000 kcal of everyday stored food takes about 50 to 60 litres and weighs 45 to 60 pounds."
+
+[[constant]]
+key = "food_storage_kg_per_2000kcal"
+label = "Weight of 2,000 kcal of stored food, packaging included"
+unit = "kilogram per 2,000 kcal"
+default = 0.8
+low = 0.7
+high = 0.94
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "pet_food_l_per_lb"
+label = "Space one pound of dry pet food takes"
+unit = "litre per pound"
+default = 1.0
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "toilet_paper_l_per_roll"
+label = "Space one roll of toilet paper takes"
+unit = "litre per roll"
+default = 1.3
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "toilet_paper_kg_per_roll"
+label = "Weight of one roll of toilet paper"
+unit = "kilogram per roll"
+default = 0.1
+prior = true
+sources = ["rr_expert_prior"]
+
+[[constant]]
+key = "long_horizon_min_days"
+label = "A duration target at least this long brings in the long-horizon section and its items"
+unit = "day"
+default = 30.0
+prior = true
+sources = ["rr_expert_prior"]
+note = "The design threshold for the long-horizon section (DESIGN-DELTA section 1.3; ENGINE-API Plan.long_horizon): rain catchment, hauling, a well hand pump, sanitation and food for months, shown when any duration target reaches 30 days or the household turns the section on."
+
+[[constant]]
+key = "clean_air_min_p10"
+label = "Ten-year chance of unhealthy air indoors below which the clean-air lines are left out"
+unit = "probability"
+default = 0.02
+prior = true
+sources = ["rr_expert_prior"]
+note = "The bar DESIGN section 4.4 sets for readiness capabilities (2 in 100 households in ten years, the allocator's rarely-needed threshold), applied to the clean-air bucket so that a county with no smoke, dust or chemical-air risk to speak of gets no respirators, air cleaner or clean-room plan."
 
 # ---------------------------------------------------------------------------------------------
 # Tables
@@ -2040,6 +2360,426 @@ city = "Minneapolis, MN"
 lat = [46.0, 90.0]
 dec_wh_per_100w = 121.0
 city = "Seattle, WA"
+
+# Rain barrels by state (round 2, v0.2.0). `dry_in` is the normal (1991-2020) rain in inches in the
+# driest three months in a row between April and October, the months a barrel does not freeze (NOAA
+# nClimDiv statewide monthly precipitation, file climdiv-pcpnst-v1.0.0-20260904, sha256
+# 56b67e12075a65213d7a2cbaf39ef3ba0cee25dd84f562cd767e27bdcd39c60b; the District of Columbia and the
+# territories have no figure). `rule` is how NCSL's map (updated 2025-09-08, from DOE's Rainwater
+# Harvesting Tool) classes the state: `none` (no statewide law), `encourages` (incentives),
+# `restricts` or `unknown`. `drinking` says whether the rule, as NCSL summarises it, lets a household
+# use the water in the house or for drinking; `max_gal` and `max_barrels` are the state's limits
+# without a permit or registration; `note` is the restriction in plain words.
+[rain]
+sources = ["noaa_nclimdiv", "ncsl_rainwater"]
+note = "State averages hide a lot: the wet side of a state can get several times the rain of the dry side, and a statewide rule can sit under stricter local ones. The plan shows the figure and the rule, and says to check locally."
+
+[[rain.row]]
+fips = 1
+state = "AL"
+dry_in = 12.12
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 2
+state = "AK"
+dry_in = 6.43
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 4
+state = "AZ"
+dry_in = 0.96
+rule = "encourages"
+drinking = true
+
+[[rain.row]]
+fips = 5
+state = "AR"
+dry_in = 11.16
+rule = "restricts"
+drinking = false
+note = "rainwater for drinking must meet strict treatment standards"
+
+[[rain.row]]
+fips = 6
+state = "CA"
+dry_in = 0.64
+rule = "restricts"
+drinking = false
+max_gal = 359.0
+note = "rooftop rainwater for outdoor uses that are not drinking, in barrels or cisterns under 360 gallons in all"
+
+[[rain.row]]
+fips = 8
+state = "CO"
+dry_in = 4.99
+rule = "restricts"
+drinking = false
+max_gal = 110.0
+max_barrels = 2.0
+note = "two barrels, 110 gallons in all, used outdoors on the same property"
+
+[[rain.row]]
+fips = 9
+state = "CT"
+dry_in = 12.19
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 10
+state = "DE"
+dry_in = 11.15
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 11
+state = "DC"
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 12
+state = "FL"
+dry_in = 14.43
+rule = "encourages"
+drinking = true
+
+[[rain.row]]
+fips = 13
+state = "GA"
+dry_in = 12.02
+rule = "restricts"
+drinking = false
+note = "rainwater systems for uses other than drinking"
+
+[[rain.row]]
+fips = 15
+state = "HI"
+dry_in = 12.32
+rule = "restricts"
+drinking = false
+note = "permits set by region: ask your county"
+
+[[rain.row]]
+fips = 16
+state = "ID"
+dry_in = 2.52
+rule = "restricts"
+drinking = true
+note = "rainwater must go to a beneficial use without harming anyone else's water rights"
+
+[[rain.row]]
+fips = 17
+state = "IL"
+dry_in = 10.17
+rule = "restricts"
+drinking = false
+note = "rainwater for drinking must meet strict treatment standards"
+
+[[rain.row]]
+fips = 18
+state = "IN"
+dry_in = 10.22
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 19
+state = "IA"
+dry_in = 10.29
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 20
+state = "KS"
+dry_in = 8.35
+rule = "restricts"
+drinking = true
+note = "a water permit for every use except household (domestic) use"
+
+[[rain.row]]
+fips = 21
+state = "KY"
+dry_in = 10.72
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 22
+state = "LA"
+dry_in = 14.06
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 23
+state = "ME"
+dry_in = 11.48
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 24
+state = "MD"
+dry_in = 11.76
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 25
+state = "MA"
+dry_in = 11.81
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 26
+state = "MI"
+dry_in = 9.92
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 27
+state = "MN"
+dry_in = 9.18
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 28
+state = "MS"
+dry_in = 12.16
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 29
+state = "MO"
+dry_in = 11.08
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 30
+state = "MT"
+dry_in = 4.14
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 31
+state = "NE"
+dry_in = 6.83
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 32
+state = "NV"
+dry_in = 1.49
+rule = "restricts"
+drinking = false
+note = "rooftop rainwater at a single-family home for household uses such as a garden, not for drinking"
+
+[[rain.row]]
+fips = 33
+state = "NH"
+dry_in = 12.37
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 34
+state = "NJ"
+dry_in = 11.74
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 35
+state = "NM"
+dry_in = 2.55
+rule = "restricts"
+drinking = true
+note = "rooftop rainwater for watering the yard and other household uses on the property"
+
+[[rain.row]]
+fips = 36
+state = "NY"
+dry_in = 11.56
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 37
+state = "NC"
+dry_in = 12.6
+rule = "encourages"
+drinking = true
+
+[[rain.row]]
+fips = 38
+state = "ND"
+dry_in = 5.54
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 39
+state = "OH"
+dry_in = 9.84
+rule = "restricts"
+drinking = false
+note = "rainwater for drinking must meet strict treatment standards"
+
+[[rain.row]]
+fips = 40
+state = "OK"
+dry_in = 9.75
+rule = "encourages"
+drinking = true
+
+[[rain.row]]
+fips = 41
+state = "OR"
+dry_in = 1.91
+rule = "restricts"
+drinking = false
+note = "a permit may be needed for drinking water or large systems; up to 5,000 gallons for outdoor watering needs none"
+
+[[rain.row]]
+fips = 42
+state = "PA"
+dry_in = 12.18
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 44
+state = "RI"
+dry_in = 10.88
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 45
+state = "SC"
+dry_in = 11.74
+rule = "restricts"
+drinking = false
+note = "rooftop rainwater only, and not for drinking"
+
+[[rain.row]]
+fips = 46
+state = "SD"
+dry_in = 6.02
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 47
+state = "TN"
+dry_in = 11.3
+rule = "restricts"
+drinking = false
+note = "rainwater for household uses other than drinking"
+
+[[rain.row]]
+fips = 48
+state = "TX"
+dry_in = 7.94
+rule = "encourages"
+drinking = true
+
+[[rain.row]]
+fips = 49
+state = "UT"
+dry_in = 2.65
+rule = "restricts"
+drinking = true
+max_barrels = 2.0
+note = "more than two containers, or one over 100 gallons, must be registered, up to 2,500 gallons in all"
+
+[[rain.row]]
+fips = 50
+state = "VT"
+dry_in = 12.32
+rule = "restricts"
+drinking = false
+note = "rainwater for outdoor uses other than drinking"
+
+[[rain.row]]
+fips = 51
+state = "VA"
+dry_in = 11.95
+rule = "encourages"
+drinking = true
+
+[[rain.row]]
+fips = 53
+state = "WA"
+dry_in = 3.42
+rule = "restricts"
+drinking = false
+note = "rooftop rainwater for uses other than drinking, such as gardening and washing; systems installed by a certified plumber"
+
+[[rain.row]]
+fips = 54
+state = "WV"
+dry_in = 10.8
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 55
+state = "WI"
+dry_in = 10.5
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 56
+state = "WY"
+dry_in = 3.46
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 60
+state = "AS"
+rule = "unknown"
+drinking = false
+
+[[rain.row]]
+fips = 66
+state = "GU"
+rule = "unknown"
+drinking = false
+
+[[rain.row]]
+fips = 69
+state = "MP"
+rule = "unknown"
+drinking = false
+
+[[rain.row]]
+fips = 72
+state = "PR"
+rule = "none"
+drinking = true
+
+[[rain.row]]
+fips = 78
+state = "VI"
+rule = "encourages"
+drinking = true
 
 # Where authorities disagree on something that is not a single number the rules use
 # (research §13). Numeric disagreements are notes on the constants above.
@@ -2765,3 +3505,124 @@ short = "JAMA Surgery"
 title = "Emergency Medical Services Response Times in Rural, Suburban, and Urban Areas (JAMA Surgery)"
 publisher = "Mell H.K. et al."
 url = "https://doi.org/10.1001/jamasurg.2017.2230"
+
+# Round 2, v0.2.0 (supply2): sources behind the new lines.
+
+[[source]]
+id = "noaa_nclimdiv"
+short = "NOAA"
+title = "nClimDiv statewide monthly precipitation (climdiv-pcpnst-v1.0.0-20260904)"
+publisher = "NOAA National Centers for Environmental Information"
+url = "https://www.ncei.noaa.gov/pub/data/cirs/climdiv/"
+
+[[source]]
+id = "ncsl_rainwater"
+short = "NCSL"
+title = "Map Monday: Is Catching Rainwater Legal in Your State? (updated September 8, 2025)"
+publisher = "National Conference of State Legislatures"
+url = "https://www.ncsl.org/resources/map-monday-is-catching-rainwater-legal-in-your-state"
+
+[[source]]
+id = "nist_butane"
+short = "NIST"
+title = "Butane: phase change data (NIST Chemistry WebBook, SRD 69)"
+publisher = "National Institute of Standards and Technology"
+url = "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106978&Mask=4"
+
+[[source]]
+id = "nist_propane"
+short = "NIST"
+title = "Propane: phase change data (NIST Chemistry WebBook, SRD 69)"
+publisher = "National Institute of Standards and Technology"
+url = "https://webbook.nist.gov/cgi/cbook.cgi?ID=C74986&Mask=4"
+
+[[source]]
+id = "epa_air_cleaner_guide"
+short = "EPA"
+title = "Guide to Air Cleaners in the Home"
+publisher = "U.S. Environmental Protection Agency"
+url = "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home"
+
+[[source]]
+id = "epa_diy_air_cleaners"
+short = "EPA"
+title = "Research on DIY Air Cleaners to Reduce Wildfire Smoke Indoors"
+publisher = "U.S. Environmental Protection Agency"
+url = "https://www.epa.gov/air-research/research-diy-air-cleaners-reduce-wildfire-smoke-indoors"
+
+[[source]]
+id = "epa_wildfire_indoor_air"
+short = "EPA"
+title = "Wildfires and Indoor Air Quality"
+publisher = "U.S. Environmental Protection Agency"
+url = "https://www.epa.gov/indoor-air-quality-iaq/wildfires-and-indoor-air-quality-iaq"
+
+[[source]]
+id = "epa_children_wildfire_smoke"
+short = "EPA"
+title = "Protect Children from Wildfires, Smoke, and Volcanic Ash"
+publisher = "U.S. Environmental Protection Agency"
+url = "https://www.epa.gov/children/protect-children-wildfires-smoke-and-volcanic-ash"
+
+[[source]]
+id = "cdc_wildfire_smoke"
+short = "CDC"
+title = "Wildfire Smoke: Risk Factors and Protection"
+publisher = "Centers for Disease Control and Prevention"
+url = "https://www.cdc.gov/wildfires/risk-factors/index.html"
+
+[[source]]
+id = "epa_asheville_boil_notice_2024"
+short = "EPA"
+title = "City of Asheville lifts systemwide boil water notice issued after Hurricane Helene"
+publisher = "U.S. Environmental Protection Agency"
+url = "https://www.epa.gov/newsreleases/city-asheville-lifts-systemwide-boil-water-notice-issued-after-hurricane-helene"
+
+[[source]]
+id = "stone_2023_heat_blackout"
+short = "Stone et al."
+title = "How Blackouts during Heat Waves Amplify Mortality and Morbidity Risk (Environmental Science and Technology 57(22):8245–8255)"
+publisher = "Stone B. Jr. et al."
+url = "https://doi.org/10.1021/acs.est.2c09588"
+
+[[source]]
+id = "medicare_drugs_disaster"
+short = "Medicare"
+title = "Getting drugs in a disaster or emergency"
+publisher = "CMS / Medicare.gov"
+url = "https://www.medicare.gov/health-drug-plans/part-d/using-drug-coverage/drugs-disaster-emergency"
+
+[[source]]
+id = "floodsmart_flood_risk"
+short = "FloodSmart"
+title = "What Is My Flood Risk?"
+publisher = "FEMA National Flood Insurance Program (FloodSmart)"
+url = "https://www.floodsmart.gov/flood-zones-and-maps/what-is-my-flood-risk"
+
+[[source]]
+id = "naic_home_insurance_guide"
+short = "NAIC"
+title = "A Consumer's Guide to Home Insurance"
+publisher = "National Association of Insurance Commissioners"
+url = "https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf"
+
+[[source]]
+id = "naic_life_insurance_guide"
+short = "NAIC"
+title = "Life Insurance Buyer's Guide"
+publisher = "National Association of Insurance Commissioners"
+url = "https://content.naic.org/sites/default/files/publication-lig-lp-consumer-life.pdf"
+
+[[source]]
+id = "ready_gov_stay_safe_warm"
+short = "Ready.gov"
+title = "Stay Safe and Warm Toolkit (FEMA Advisory)"
+publisher = "FEMA / Ready.gov"
+url = "https://www.ready.gov/sites/default/files/2026-01/ready_toolkit_stay-safe-and-warm_01272026.pdf"
+
+[[source]]
+id = "ssa_disability_facts"
+short = "SSA"
+title = "Disability Benefits (publication 05-10029)"
+publisher = "Social Security Administration"
+url = "https://www.ssa.gov/pubs/EN-05-10029.pdf"

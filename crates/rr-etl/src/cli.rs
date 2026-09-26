@@ -8,8 +8,9 @@ pub const USAGE: &str = "\
 rr-etl — build Ready Reckoner's data packs from public sources
 
 USAGE:
-    rr-etl refresh --out <DIR> [--only <JOB>[,<JOB>...]] [--optional] [--keep-raw]
+    rr-etl refresh --out <DIR> [--only <JOB>[,<JOB>...]] [--optional] [--keep-raw] [--keep-intermediate]
     rr-etl verify --data <DIR>
+    rr-etl manifest --rehash --data <DIR>
     rr-etl jobs
 
 COMMANDS:
@@ -19,6 +20,10 @@ COMMANDS:
               <DIR>/raw/, which git ignores).
     verify    Recompute every pack file's checksum and row count against the manifest and check
               that every county joins across every pack.
+    manifest  With --rehash: recompute every listed file's sha256, size and row count, each
+              job's rows_out and the pack version from the files in <DIR>, and note the change
+              in <DIR>/CHANGES.md. Downloads nothing and runs no job: for merging two data
+              branches (a file both rebuilt matches neither manifest) or a hand-edited file.
     jobs      List the jobs in run order (optional jobs are marked).
 
 OPTIONS:
@@ -27,7 +32,10 @@ OPTIONS:
                           (heavy one-off builds of optional packs) run only when named here
                           or with --optional.
     --optional            With no --only: run every job, the optional ones included.
-    --keep-raw            Keep raw downloads under <DIR>/raw/.
+    --keep-raw            Keep raw downloads under <DIR>/raw/ (implies --keep-intermediate).
+    --keep-intermediate   Keep the files jobs hand to later jobs (<DIR>/raw/intermediate/, a few
+                          tens of MB) so a later `--only` run of a downstream job can use them.
+    --rehash              With `manifest`: recompute checksums, row counts and the pack version.
 ";
 
 /// A parsed command.
@@ -43,9 +51,16 @@ pub enum Command {
         optional: bool,
         /// Keep raw downloads.
         keep_raw: bool,
+        /// Keep the intermediate files handed between jobs.
+        keep_intermediate: bool,
     },
     /// `verify`.
     Verify {
+        /// Data directory.
+        data: PathBuf,
+    },
+    /// `manifest --rehash`.
+    Rehash {
         /// Data directory.
         data: PathBuf,
     },
@@ -64,6 +79,8 @@ pub fn parse(args: &[String]) -> Result<Command> {
     let mut only = Vec::new();
     let mut keep_raw = false;
     let mut optional = false;
+    let mut keep_intermediate = false;
+    let mut rehash = false;
     let mut i = 1;
     while i < args.len() {
         let a = args[i].as_str();
@@ -90,10 +107,17 @@ pub fn parse(args: &[String]) -> Result<Command> {
             ),
             "--keep-raw" => keep_raw = true,
             "--optional" => optional = true,
+            "--keep-intermediate" => keep_intermediate = true,
+            "--rehash" => rehash = true,
             "-h" | "--help" => return Ok(Command::Help),
             other => return Err(data_err(format!("unknown option {other}\n\n{USAGE}"))),
         }
         i += 1;
+    }
+    if rehash && cmd != "manifest" {
+        return Err(data_err(format!(
+            "--rehash goes with the manifest command\n\n{USAGE}"
+        )));
     }
     match cmd.as_str() {
         "refresh" => Ok(Command::Refresh {
@@ -101,10 +125,15 @@ pub fn parse(args: &[String]) -> Result<Command> {
             only,
             optional,
             keep_raw,
+            keep_intermediate,
         }),
         "verify" => Ok(Command::Verify {
             data: dir.ok_or_else(|| data_err("verify needs --data <DIR>"))?,
         }),
+        "manifest" if rehash => Ok(Command::Rehash {
+            data: dir.ok_or_else(|| data_err("manifest --rehash needs --data <DIR>"))?,
+        }),
+        "manifest" => Err(data_err(format!("manifest needs --rehash\n\n{USAGE}"))),
         "jobs" => Ok(Command::Jobs),
         "help" | "-h" | "--help" => Ok(Command::Help),
         other => Err(data_err(format!("unknown command {other}\n\n{USAGE}"))),
@@ -136,7 +165,8 @@ mod tests {
                 out: "data".into(),
                 only: vec!["nri".into(), "geography".into()],
                 optional: false,
-                keep_raw: true
+                keep_raw: true,
+                keep_intermediate: false
             }
         );
         let c = parse(&s(&[
@@ -153,7 +183,8 @@ mod tests {
                 out: "data".into(),
                 only: vec!["nri".into(), "flood".into()],
                 optional: false,
-                keep_raw: false
+                keep_raw: false,
+                keep_intermediate: false
             }
         );
     }
@@ -162,6 +193,17 @@ mod tests {
     fn parses_optional() {
         let c = parse(&s(&["refresh", "--out", "data", "--optional"])).unwrap();
         assert!(matches!(c, Command::Refresh { optional: true, .. }));
+    }
+
+    #[test]
+    fn parses_manifest_rehash() {
+        assert_eq!(
+            parse(&s(&["manifest", "--rehash", "--data", "d"])).unwrap(),
+            Command::Rehash { data: "d".into() }
+        );
+        assert!(parse(&s(&["manifest", "--data", "d"])).is_err());
+        assert!(parse(&s(&["manifest", "--rehash"])).is_err());
+        assert!(parse(&s(&["verify", "--data", "d", "--rehash"])).is_err());
     }
 
     #[test]

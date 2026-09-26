@@ -16,6 +16,7 @@
 
   const links = $derived<{ id: RouteId; label: string; current: boolean }[]>([
     { id: app.plan ? answersTarget : 'start', label: app.plan ? 'Your answers' : 'Start', current: isStep(router.current.id) || router.current.id === 'start' },
+    { id: 'family', label: 'Family plan', current: router.current.id === 'family' },
     { id: 'risks', label: 'Risks', current: router.current.id === 'risks' },
     { id: 'plan', label: 'Plan', current: router.current.id === 'plan' },
     { id: 'packet', label: 'Packet', current: router.current.id === 'packet' },

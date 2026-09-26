@@ -1,4 +1,4 @@
-# House fire, carbon monoxide, utilities and wildfire smoke. Rules: docs/CONTENT_STANDARDS.md §3.
+# House fire, carbon monoxide, utilities, clean air indoors and covering damage. Rules: docs/CONTENT_STANDARDS.md §3.
 # Prices: docs/PRICE_OBSERVATIONS.md (observed 2026-09-25).
 
 [[item]]
@@ -18,6 +18,7 @@ look_for = [
   "Two ways out of every room, windows that open, and a meeting spot in front of the home",
   "A pan lid or baking sheet within reach of the stove",
   "Space heaters with automatic shut-off, turned off when you leave the room or go to bed",
+  "Wood, oil, gas or propane heat: the heater, chimney and vents inspected and cleaned by a professional each year (EPA, USFA)",
   "Children who know not to hide from firefighters",
 ]
 avoid = [
@@ -29,8 +30,9 @@ avoid = [
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: monthly checks and a plan." }
 quantity_rule = "once"
 maintenance = { check_months = 1 }
-citations = ["usfa_smoke_alarms", "redcross_sound_the_alarm", "cdc_co_basics", "ready_gov_home_fires", "usfa_cooking_fires", "usfa_heating_fires", "cdc_winter_safety"]
+citations = ["usfa_smoke_alarms", "redcross_sound_the_alarm", "cdc_co_basics", "ready_gov_home_fires", "usfa_cooking_fires", "usfa_heating_fires", "cdc_winter_safety", "epa_burnwise_faq"]
 hazard_extras = []
+readiness_share = 1.0
 
 [[item]]
 id = "fire_learn_shutoffs"
@@ -45,6 +47,7 @@ look_for = [
   "Labels on the main breaker and water valve, and everyone old enough knowing where they are",
   "Pipes in unheated spaces insulated, and a tool to shut the main water valve",
   "A water heater strap kit and anti-tip straps for tall furniture",
+  "Propane heat: how to close the tank valve, and what to do if you smell gas (leave, then call the gas company from outside)",
   "Wildfire areas: clean gutters and nothing that burns within 30 feet of the walls",
   "Hurricane areas: window sizes measured, and shutters or boards stored where you can reach them",
 ]
@@ -56,8 +59,9 @@ avoid = [
 ]
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: learning your home, plus straps or materials you may already have." }
 quantity_rule = "once"
-citations = ["ready_gov_kit", "cdc_find_clean_water", "ready_gov_earthquakes", "ready_gov_winter", "doe_water_heaters", "ready_gov_wildfires", "ready_gov_hurricanes"]
+citations = ["ready_gov_kit", "cdc_find_clean_water", "ready_gov_earthquakes", "ready_gov_winter", "doe_water_heaters", "ready_gov_wildfires", "ready_gov_hurricanes", "pa_puc_gas_emergencies", "ready_gov_safety_skills"]
 hazard_extras = []
+readiness_share = 0.3
 
 [[item]]
 id = "fire_smoke_alarm"
@@ -85,6 +89,7 @@ quantity_rule = "smoke_alarm_count"
 maintenance = { rotate_months = 120, check_months = 1 }
 citations = ["usfa_smoke_alarms", "redcross_sound_the_alarm", "ready_gov_home_fires", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 1.0
 
 [[item]]
 id = "fire_co_alarm"
@@ -111,6 +116,8 @@ quantity_rule = "co_alarm_count"
 maintenance = { rotate_months = 60, check_months = 1 }
 citations = ["cdc_co_basics", "ready_gov_power_outages", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.5
+season = "fall"
 
 [[item]]
 id = "fire_extinguisher"
@@ -137,6 +144,7 @@ quantity_rule = "extinguisher_count"
 maintenance = { check_months = 1 }
 citations = ["usfa_extinguishers", "cpsc_unreported_fires_2009", "ready_gov_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "fire_escape_ladder"
@@ -161,6 +169,7 @@ retrieved = "2026-09-26"
 quantity_rule = "escape_ladder_count"
 citations = ["ready_gov_home_fires", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "fire_utility_wrench"
@@ -184,27 +193,84 @@ retrieved = "2026-09-26"
 quantity_rule = "once_if_house"
 citations = ["ready_gov_kit", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.2
 
 [[item]]
 id = "fire_clean_air_room"
-name = "Clean-air room for wildfire smoke"
+name = "Air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter)"
 category = "fire"
 unit = "air cleaner"
-buckets = ["supplies", "medical_emergency"]
+buckets = ["clean_air"]
 tier = "w2"
 free = false
-spec = "A portable air cleaner with a HEPA filter for one room you can close off from smoke (EPA, Ready.gov). EPA says a box fan with a MERV 13 filter attached is a cost-effective alternative; use a newer fan with safety features."
+spec = "A portable air cleaner with a HEPA filter for one room you can close off, with a clean air delivery rate (CADR) big enough for the room: about 130 for a 200-square-foot bedroom (EPA). A 20-inch box fan with a MERV 13 filter taped over the side that pulls air in does the job for less, which EPA calls cost-effective; use a newer fan with safety features, and do not leave it running while no one is home (EPA)."
 look_for = [
-  "A room size rating that matches your clean room",
-  "True HEPA filter and spare filters",
-  "For a box-fan filter: a MERV 13 filter and a 2012 or newer fan",
+  "An air cleaner with a smoke CADR of at least two-thirds of the room's floor area in square feet, and a true HEPA filter (EPA)",
+  "Or a 20-inch box fan made in 2012 or later with a safety listing mark, and a matching MERV 13 filter with its airflow arrow toward the fan",
+  "Spare filters, and tape to seal a filter box's edges",
+  "Quiet enough to run all night in a bedroom",
 ]
 avoid = [
-  "Air cleaners that make ozone",
+  "Air cleaners that make ozone (EPA)",
+  "Old fans with frayed cords or no safety listing",
   "Leaving windows open or running a whole-house fan in smoke",
 ]
-price_band_usd = { low = 99.99, high = 149, per = "air cleaner", note = "Two home-center listings for room air cleaners with HEPA filters: $99.99 and $149. A box fan with a MERV 13 filter costs less (EPA)." }
+price_band_usd = { low = 34.97, high = 149, per = "air cleaner", note = "Four home-center listings: a box fan with one MERV 13 filter at $34.97 or $60.95, the cheaper line EPA calls cost-effective, or a room air cleaner with a HEPA filter at $99.99 or $149." }
 retrieved = "2026-09-26"
-quantity_rule = "once"
-citations = ["epa_diy_air_cleaners", "epa_wildfire_indoor_air", "ready_gov_wildfires", "rr_price_observations_2026_09"]
-hazard_extras = ["wildfire"]
+quantity_rule = "air_cleaner_units"
+maintenance = { check_months = 3 }
+citations = ["epa_air_cleaner_guide", "epa_wildfire_indoor_air", "epa_diy_air_cleaners", "ready_gov_wildfires", "rr_price_observations_2026_09"]
+hazard_extras = []
+readiness_share = 1.0
+season = "summer"
+
+[[item]]
+id = "fire_clean_room_plan"
+name = "Clean-room plan for smoky, dusty or chemical air"
+category = "fire"
+unit = "plan"
+buckets = ["clean_air"]
+tier = "now"
+free = true
+spec = "Pick one room with few windows and doors where everyone can sleep; on bad-air days keep it closed, run the air cleaner there, and set the heating or cooling to recirculate or turn off fans that pull in outside air (EPA). Children stay in the clean room, because respirators are not made to fit them (EPA)."
+look_for = [
+  "The room chosen, with the air cleaner or filter box kept in it",
+  "Windows and doors that close tightly, and a way to cover gaps",
+  "No frying, candles, smoking or vacuuming on bad-air days",
+  "Air quality alerts for your area turned on",
+  "Chemical release: seal the room's windows and vents with plastic sheeting and tape, and turn off the heating and cooling (Ready.gov)",
+]
+avoid = [
+  "Opening windows while smoke or dust is outside",
+  "A whole-house fan or an air conditioner that pulls in outdoor air",
+]
+price_band_usd = { low = 0, high = 0, per = "plan", note = "Free: a room you already have." }
+quantity_rule = "clean_room_plan"
+citations = ["epa_wildfire_indoor_air", "cdc_wildfire_smoke", "epa_children_wildfire_smoke", "ready_gov_shelter"]
+hazard_extras = []
+readiness_share = 0.5
+
+[[item]]
+id = "fire_home_tarp_kit"
+name = "Tarp kit to cover a broken window or roof: heavy tarp, rope and duct tape"
+category = "fire"
+unit = "kit"
+buckets = ["home_loss"]
+tier = "w2"
+free = false
+spec = "A heavy tarp with rope and duct tape to cover a broken window or a damaged roof until it is repaired, the same kind of temporary cover FEMA's Operation Blue Roof puts on homes after hurricanes. Stay off a wet or storm-damaged roof: cover what you can reach safely, or wait for help."
+look_for = [
+  "A heavy-duty tarp of about 10 by 12 feet, with metal grommets",
+  "About 100 feet of rope or cord",
+  "A roll of duct tape, and wood strips and screws to fasten the tarp properly",
+]
+avoid = [
+  "Climbing on a roof in wind, rain or the dark",
+  "Thin tarps that tear in the first storm",
+]
+price_band_usd = { low = 39.51, high = 67.68, per = "kit", note = "Two home-center sets: a 10 by 12 foot heavy-duty tarp ($25.95), 100 feet of 3/8-inch rope ($6.58) and duct tape ($6.98), or a thicker 14-mil tarp ($38.48), half-inch rope ($19.26) and heavier tape ($9.94)." }
+retrieved = "2026-09-26"
+quantity_rule = "once_if_house"
+citations = ["fema_operation_blue_roof", "ready_gov_kit", "rr_price_observations_2026_09"]
+hazard_extras = ["hurricane", "tornado", "strong_wind", "hail"]
+season = "summer"

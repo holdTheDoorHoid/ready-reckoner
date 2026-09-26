@@ -29,10 +29,11 @@ quantity_rule = "once"
 maintenance = { check_months = 6 }
 citations = ["ready_gov_disability", "fema_effak", "cdc_pregnancy_emergency", "redcross_survival_kit", "fda_expired_medicines", "healthcare_ready_refill_laws", "hhs_aspr_epap", "mo_med_2026_antibiotic_kits", "ready_gov_kit"]
 hazard_extras = []
+readiness_share = 0.3
 
 [[item]]
 id = "med_reserve_supply"
-name = "Extra supply of daily prescription medicine (toward 14 days)"
+name = "Extra supply of daily prescription medicine"
 category = "medical"
 unit = "day of one person's medicine"
 buckets = ["medication"]
@@ -82,6 +83,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a conversati
 quantity_rule = "once"
 citations = ["cdc_antibiotic_use", "usc_21_353", "cdc_yellow_book_travel_kits", "fda_fish_antibiotics_warning_2023", "bishop_2020_fish_antibiotics", "fda_expired_medicines", "mo_med_2026_antibiotic_kits", "wms_wound_2014"]
 hazard_extras = []
+readiness_share = 0.0
 
 [[item]]
 id = "med_device_power_plan"
@@ -107,6 +109,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: calls to you
 quantity_rule = "once_if_powered_device"
 citations = ["ready_gov_disability", "ready_gov_power_outages", "cdc_co_basics"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "med_988_saved"
@@ -132,6 +135,7 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: both lines c
 quantity_rule = "once"
 citations = ["samhsa_988", "samhsa_disaster_distress", "rr_research_prior_art"]
 hazard_extras = []
+readiness_share = 0.1
 
 [[item]]
 id = "med_first_aid_kit"
@@ -157,6 +161,7 @@ quantity_rule = "first_aid_kit"
 maintenance = { check_months = 6 }
 citations = ["redcross_first_aid_kit", "rr_expert_prior", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 1.0
 
 [[item]]
 id = "med_otc_basics"
@@ -183,31 +188,33 @@ quantity_rule = "once"
 maintenance = { check_months = 12 }
 citations = ["ready_gov_kit", "cdc_yellow_book_travel_kits", "cdc_cholera_treatment", "fda_expired_medicines", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.2
 
 [[item]]
 id = "med_n95_respirators"
-name = "N95 respirators"
+name = "N95 respirators for teens and adults"
 category = "medical"
 unit = "respirator"
-buckets = ["medical_emergency", "supplies"]
+buckets = ["clean_air", "supplies"]
 tier = "h72"
 free = false
-spec = "NIOSH-approved N95 respirators, the most protective kind CDC describes, for wildfire smoke, volcanic ash and illness. They work only when they seal around the nose and mouth."
+spec = "NIOSH-approved N95 respirators for smoke, ash or dust, one a day for each person aged 13 and over on bad-air days; the plan counts your county's days of unhealthy smoke (CDC). They work only when they seal around the nose and mouth, and they are not made to fit young children, whose protection is the clean room (EPA)."
 look_for = [
   "NIOSH approval printed on the respirator",
   "Sizes that fit each adult and teen",
   "A box of 10 or 20",
 ]
 avoid = [
-  "Cloth masks, which protect least (CDC)",
+  "Cloth or surgical masks for smoke, which protect far less (CDC)",
   "Gaps at the edges or a beard under the seal",
-  "Masks on children under 2",
+  "Respirators on young children: keep them in the clean room instead (EPA)",
 ]
 price_band_usd = { low = 0.72, high = 1.30, per = "respirator", note = "Two restaurant-supply listings for 20-packs: $0.72 and $1.30 each." }
 retrieved = "2026-09-25"
 quantity_rule = "n95_masks"
-citations = ["cdc_masks", "ready_gov_wildfires", "ready_gov_volcanoes", "rr_price_observations_2026_09"]
-hazard_extras = ["wildfire", "pandemic", "volcanic_activity"]
+citations = ["cdc_masks", "ready_gov_wildfires", "ready_gov_volcanoes", "cdc_wildfire_smoke", "epa_children_wildfire_smoke", "rr_price_observations_2026_09"]
+hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "med_cooler_refrigerated_rx"
@@ -263,6 +270,7 @@ retrieved = "2026-09-25"
 quantity_rule = "bleeding_control_kit"
 citations = ["dhs_stop_the_bleed", "dhs_saver_trauma_kits_2015", "wms_wound_2014", "mell_2017_ems_response", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "med_epinephrine_plan"
@@ -287,10 +295,11 @@ price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a habit and 
 quantity_rule = "epinephrine_check"
 citations = ["dailymed_epinephrine_autoinjector", "ready_gov_disability"]
 hazard_extras = []
+readiness_share = 0.5
 
 [[item]]
 id = "med_thermometer"
-name = "Thermometers: one for the family, and one for a baby"
+name = "Digital thermometer (and one for a baby, if you have one)"
 category = "medical"
 unit = "thermometer"
 buckets = ["medical_emergency"]
@@ -311,3 +320,133 @@ retrieved = "2026-09-26"
 quantity_rule = "thermometer"
 citations = ["redcross_first_aid_kit", "cdc_infant_checklist", "rr_price_observations_2026_09"]
 hazard_extras = []
+readiness_share = 0.1
+
+[[item]]
+id = "med_wound_splint_addon"
+name = "Wound-care and splint add-on for the first-aid kit"
+category = "medical"
+unit = "kit"
+buckets = ["medical_emergency"]
+tier = "h72"
+free = false
+spec = "Extra supplies for a wound or a sprain when help is far away: an irrigation syringe to wash a wound out with plenty of clean water, the key step (Wilderness Medical Society), wound-closure strips, an elastic wrap, a padded splint, shears, blister dressings and gauze for packing a deep wound. The plan adds it for rural homes, which ambulances take longer to reach (JAMA Surgery), or for a plan of two weeks or more without a store."
+look_for = [
+  "A small irrigation syringe",
+  "Wound-closure strips, and gauze that can pack a deep wound",
+  "A padded, bendable splint and an elastic wrap",
+  "Shears that cut through clothing",
+  "Blister dressings or moleskin for a long walk",
+]
+avoid = [
+  "Closing a dirty or deep wound yourself: get medical care",
+  "Loose supplies with no case, which get lost",
+]
+price_band_usd = { low = 38.09, high = 58.83, per = "kit", note = "Two sets from a medical-supply store: syringe, closure strips, padded splint with wraps, shears, moleskin and gauze at $38.09, or sturdier versions of each at $58.83." }
+retrieved = "2026-09-26"
+quantity_rule = "wound_care_addon"
+maintenance = { check_months = 12 }
+citations = ["wms_wound_2014", "redcross_first_aid_kit", "mell_2017_ems_response", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+requires = ["med_first_aid_kit"]
+readiness_share = 0.3
+
+[[item]]
+id = "med_rx_12v_fridge"
+name = "Small 12-volt fridge for refrigerated medicine in hot places"
+category = "medical"
+unit = "fridge"
+buckets = ["medication", "power"]
+tier = "w2"
+free = false
+life_safety = true
+spec = "A small compressor cooler-fridge that runs from a car's 12-volt socket or a battery power station, for medicine such as insulin in a hot place, where a home without power can pass 86 °F, the most insulin can take (FDA). Insulin in its vial or pen keeps working up to 28 days between 59 °F and 86 °F (FDA), so keep it cool in the fridge and never let it freeze."
+look_for = [
+  "A compressor fridge that holds the temperature you set",
+  "Its power use in watts, to check how long your power station can run it",
+  "A thermometer inside, or a display that shows the temperature",
+]
+avoid = [
+  "Running the car's engine in a garage to power it (carbon monoxide, CDC)",
+  "Letting the medicine freeze: frozen insulin must not be used (FDA)",
+  "Leaving it in a car in the sun",
+]
+price_band_usd = { low = 179.99, high = 209.88, per = "fridge", note = "Two home-center listings for 12-volt compressor fridges of about 23 and 32 quarts: $179.99 and $209.88." }
+retrieved = "2026-09-26"
+quantity_rule = "rx_fridge_units"
+citations = ["fda_insulin_emergency", "cdc_co_basics", "rr_expert_prior", "rr_price_observations_2026_09"]
+hazard_extras = []
+
+[[item]]
+id = "med_90_day_fills"
+name = "Ask for 60- to 90-day fills of daily medicine"
+category = "medical"
+unit = "person-day"
+buckets = ["medication"]
+tier = "now"
+free = true
+spec = "For a long plan, the reserve at home covers the first weeks, and longer fills keep the supply ahead of each refill: ask your drug plan whether it offers 60- to 90-day supplies and which pharmacies give them (Medicare), then refill as soon as the plan allows. Never stretch or skip medicine to make it last: ask your prescriber."
+look_for = [
+  "A call to your drug plan, or its website, about 90-day and mail-order fills",
+  "Refill reminders set for the first day a refill is allowed",
+  "Your state's emergency refill rule, which your pharmacist knows",
+]
+avoid = [
+  "Waiting for the last pill to refill",
+  "Keeping medicine past its expiry date (FDA)",
+]
+price_band_usd = { low = 0, high = 0, per = "person-day", note = "Free: calls to your drug plan and pharmacy; the medicine costs your usual copay." }
+quantity_rule = "medication_fills"
+citations = ["medicare_drugs_disaster", "healthcare_ready_refill_laws", "fda_expired_medicines"]
+hazard_extras = []
+
+[[item]]
+id = "med_cleanup_ppe"
+name = "Cleanup gear for each teen and adult: P100 respirator, goggles, work gloves"
+category = "medical"
+unit = "set"
+buckets = ["clean_air", "home_loss"]
+tier = "w2"
+free = false
+spec = "For cleaning up ash, mold or dust after a fire, flood or earthquake: a close-fitting reusable respirator marked NIOSH and P100 (or N95), goggles, and sturdy work gloves, with long sleeves and long pants (EPA). Surgical masks and one-strap dust masks do not protect your lungs (EPA)."
+look_for = [
+  "NIOSH and P100 printed on the respirator or its filters, in a size that seals on your face",
+  "Goggles that seal around the eyes, with an anti-fog lens",
+  "Leather or heavy work gloves",
+]
+avoid = [
+  "One-strap dust masks or surgical masks for ash or mold (EPA)",
+  "A beard or gaps under the respirator's seal",
+  "Children doing ash or mold cleanup",
+]
+price_band_usd = { low = 47.54, high = 73.52, per = "set", note = "Two home-center sets: a reusable P100 respirator ($29.98), anti-fog goggles ($12.59) and suede work gloves ($4.97), or a respirator-and-goggles bundle ($64.96) with leather gloves ($8.56)." }
+retrieved = "2026-09-26"
+quantity_rule = "per_person_13_plus"
+citations = ["epa_protect_from_ash", "ready_gov_kit", "rr_price_observations_2026_09"]
+hazard_extras = ["riverine_flooding", "coastal_flooding", "wildfire", "earthquake", "hurricane", "tornado"]
+readiness_share = 0.2
+
+[[item]]
+id = "med_insect_repellent"
+name = "Insect repellent for the weeks after a flood or hurricane"
+category = "medical"
+unit = "can"
+buckets = ["supplies"]
+tier = "w2"
+free = false
+spec = "An EPA-registered insect repellent, because floodwater mosquitoes increase in the weeks after a flood or hurricane (CDC). Look for the EPA registration number on the label and use it as the label says (CDC)."
+look_for = [
+  "An EPA registration number on the label",
+  "An active ingredient CDC lists, such as DEET, picaridin, IR3535 or oil of lemon eucalyptus",
+  "Long sleeves and pants as well, when mosquitoes are out",
+]
+avoid = [
+  "Spraying it under clothing or on cuts",
+  "Using it on a baby without checking the label's age limit",
+]
+price_band_usd = { low = 7.99, high = 10.49, per = "can", note = "Two supermarket listings for 6-ounce aerosol repellents: $7.99 and $10.49." }
+retrieved = "2026-09-26"
+quantity_rule = "once"
+citations = ["cdc_mosquitoes_after_flood", "cdc_preventing_mosquito_bites", "rr_price_observations_2026_09"]
+hazard_extras = ["hurricane", "riverine_flooding", "coastal_flooding"]
+season = "summer"

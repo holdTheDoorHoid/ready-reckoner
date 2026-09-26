@@ -1,15 +1,19 @@
 <!--
-  A duration bucket: the target with its range ("about 3 days (2–5)"), a meter with what the
+  A duration bucket: the target with its range ("about 3 days (2–5)") and a badge for how much of
+  it rests on records ("From records", "Partly estimates", "Estimates"), a meter with what the
   household has now (`covered_today`: what it owns and has checked off) and, lighter and striped,
   where the plan takes it once every step is done (`covered`), with both in words beside it, the
-  relief rating, and what drives it. A target of 0 days means the bucket does not apply at these
-  settings, and says so instead of drawing an empty meter.
+  relief rating, the stress line (the worst event in the region's record and whether a target this
+  long would have covered it), and what drives it: in words under the meter, and as bars at the top
+  of the "Why?" drawer. A target of 0 days means the bucket does not apply at these settings, and
+  says so instead of drawing an empty meter.
 -->
 <script lang="ts">
   import type { BucketAssessment, Target } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { dayPhrase, targetDays } from '../lib/format';
   import { hazardName, lowerFirst } from '../lib/lookup';
+  import { CONFIDENCE_BADGE, confidenceOf, drivers, shareWords, stressLine } from '../lib/targets';
   import ExplainButton from './ExplainButton.svelte';
   import Icon from './Icon.svelte';
   import Sources from './Sources.svelte';
@@ -46,6 +50,9 @@
   });
   const targetText = $derived(target ? targetDays(target.value, target.low, target.high) : '');
   const mainText = $derived(target ? `about ${dayPhrase(target.value)}` : '');
+  const driverList = $derived(drivers(bucket, app.result.output?.register ?? [], app.catalogue));
+  const confidence = $derived(target && !notNeeded ? confidenceOf(driverList) : null);
+  const stress = $derived(target && !notNeeded && bucket.stress_test ? stressLine(bucket.stress_test, bucket.id, target.value) : null);
 </script>
 
 {#if target}
@@ -60,6 +67,9 @@
           <span class="visually-hidden">Be ready for </span>
           <span class="big">{mainText}</span>
           <span class="range">{targetText.slice(mainText.length).trim()}</span>
+          {#if confidence}
+            <span class="badge badge--{confidence}"><span class="visually-hidden">How sure:</span> {CONFIDENCE_BADGE[confidence]}</span>
+          {/if}
         </p>
       {/if}
       <div
@@ -95,11 +105,35 @@
           <span>Help likely arrives in about {dayPhrase(bucket.relief.help_arrives_days)}; service mostly back in about {dayPhrase(bucket.relief.mostly_restored_days)}.</span>
         </p>
       {/if}
+      {#if stress && bucket.stress_test}
+        <p class="gauge__stress small" class:is-short={!stress.covered}>
+          <span class="gauge__stress-mark" aria-hidden="true"><Icon name={stress.covered ? 'check' : 'alert'} /></span>
+          <span>
+            {stress.text}
+            <Sources ids={bucket.stress_test.sources} variant="inline" what="the worst event on record" />
+          </span>
+        </p>
+      {/if}
       {#if bucket.contributions.length}
         <p class="small muted">Mostly from: {bucket.contributions.slice(0, 3).map((c) => lowerFirst(hazardName(app.catalogue, c.hazard))).join(', ')}.</p>
       {/if}
       <footer class="gauge__foot">
-        <ExplainButton kind="bucket" id={bucket.id} />
+        <ExplainButton kind="bucket" id={bucket.id}>
+          {#if driverList.length}
+            <div class="drivers">
+              <p class="drivers__title">What drives this target</p>
+              <ul class="drivers__list">
+                {#each driverList as d (d.hazard)}
+                  <li>
+                    <span class="drivers__name">{d.name}</span>
+                    <span class="drivers__bar" aria-hidden="true"><span class="drivers__fill" class:is-estimate={d.evidence === 'estimate'} style:width="{Math.max(2, d.share * 100)}%"></span></span>
+                    <span class="drivers__share">{shareWords(d.share)}, {d.evidence === 'records' ? 'from records' : 'an estimate'}</span>
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          {/if}
+        </ExplainButton>
         <Sources ids={[...bucket.sources, ...(bucket.relief?.sources ?? [])]} what={bucket.name} />
       </footer>
     {/if}
@@ -191,6 +225,90 @@
     padding: var(--s2) var(--s3);
     background: var(--surface-2);
     border-radius: var(--r1);
+  }
+  .badge {
+    align-self: center;
+    padding: 0.1em 0.6em;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--text-muted);
+    background: var(--surface);
+  }
+  .badge--records {
+    border-style: solid;
+  }
+  .badge--partly {
+    border-style: dashed;
+  }
+  .badge--estimates {
+    border-style: dotted;
+  }
+  .gauge__stress {
+    display: flex;
+    gap: var(--s2);
+    align-items: flex-start;
+    margin: 0;
+    padding: var(--s2) var(--s3);
+    border-left: 3px solid var(--good);
+    background: var(--surface-2);
+    border-radius: var(--r1);
+  }
+  .gauge__stress.is-short {
+    border-left-color: var(--warn-edge);
+  }
+  .gauge__stress-mark {
+    display: inline-flex;
+    flex: none;
+    color: var(--good);
+  }
+  .is-short .gauge__stress-mark {
+    color: var(--warn);
+  }
+  .drivers {
+    margin-bottom: var(--s3);
+  }
+  .drivers__title {
+    font-weight: 650;
+    margin: 0 0 var(--s1);
+  }
+  .drivers__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s1);
+  }
+  .drivers__list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(4rem, 7rem);
+    gap: 0 var(--s2);
+    align-items: center;
+  }
+  .drivers__list li + li {
+    margin-top: 0;
+  }
+  .drivers__share {
+    grid-column: 1 / -1;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+  }
+  .drivers__bar {
+    height: 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--gauge-track);
+    overflow: hidden;
+  }
+  .drivers__fill {
+    display: block;
+    height: 100%;
+    background: var(--gauge-fill);
+  }
+  /* Estimates are striped, so the difference reads without colour. */
+  .drivers__fill.is-estimate {
+    background: repeating-linear-gradient(135deg, var(--gauge-plan) 0 3px, transparent 3px 6px);
   }
   .gauge__foot {
     display: flex;

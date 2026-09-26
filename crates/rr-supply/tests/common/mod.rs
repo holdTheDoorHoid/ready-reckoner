@@ -104,6 +104,7 @@ pub fn philadelphia() -> Vec<BucketAssessment> {
         readiness(BucketId::MedicalEmergency, 0.9),
         readiness(BucketId::Fire, 0.05),
         readiness(BucketId::Security, 0.1),
+        readiness(BucketId::CleanAir, 0.04),
         months(3.8),
         driven_by(
             readiness(BucketId::HomeLoss, 0.05),
@@ -131,6 +132,7 @@ pub fn coos_bay() -> Vec<BucketAssessment> {
         readiness(BucketId::MedicalEmergency, 0.9),
         readiness(BucketId::Fire, 0.03),
         readiness(BucketId::Security, 0.1),
+        readiness(BucketId::CleanAir, 0.1),
         months(5.8),
         driven_by(
             readiness(BucketId::HomeLoss, 0.1),
@@ -158,6 +160,7 @@ pub fn generic() -> Vec<BucketAssessment> {
         readiness(BucketId::MedicalEmergency, 0.9),
         readiness(BucketId::Fire, 0.05),
         readiness(BucketId::Security, 0.1),
+        readiness(BucketId::CleanAir, 0.05),
         months(4.0),
         readiness(BucketId::HomeLoss, 0.05),
     ]

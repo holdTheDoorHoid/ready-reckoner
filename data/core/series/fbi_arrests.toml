@@ -1,0 +1,726 @@
+# Arrests per 100,000 people by sex and age, United States (FBI Crime in the United States). Written by rr-etl (job `series`); see docs/DATA_SOURCES.md.
+
+id = "fbi_arrests"
+title = "Arrests per 100,000 people by sex and age, United States (FBI Crime in the United States)"
+publisher = "Federal Bureau of Investigation, Uniform Crime Reporting Program (Crime Data Explorer)"
+url = "https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads"
+licence = "US Government work, public domain (17 U.S.C. 105)"
+attribution = ""
+source = "fbi_cde_arrests"
+retrieved = "2026-09-26"
+how = "fetched"
+notes = [
+  "Tables 39 and 40 count arrests reported by agencies that sent all twelve months of data (87-92% of the population in 2023-2025); Table 29 estimates all arrests nationally. National figures by band are the band's reported share of the Table 29 estimate, a derivation: the FBI publishes no national estimate by age or sex.",
+  "Arrests are events: one person arrested twice counts twice. The 10 to 17 band leaves out children under 10 (almost no arrests), so it is the better juvenile rate.",
+  "Population: https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/national/asrh/nc-est2025-agesex-res.csv.",
+]
+
+[[rate]]
+id = "arrests_per_100k_female_10_17"
+value = 948.5
+unit = "arrests per 100,000 females aged 10 to 17 per year"
+low = 880.8
+high = 1006
+year = 2025
+period = "2023-2025"
+figure = "2023: 1006; 2024: 959; 2025: 881"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_female_18_24"
+value = 2122
+unit = "arrests per 100,000 females aged 18 to 24 per year"
+low = 2051
+high = 2202
+year = 2025
+period = "2023-2025"
+figure = "2023: 2202; 2024: 2113; 2025: 2051"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_female_25_34"
+value = 2647
+unit = "arrests per 100,000 females aged 25 to 34 per year"
+low = 2534
+high = 2758
+year = 2025
+period = "2023-2025"
+figure = "2023: 2758; 2024: 2650; 2025: 2534"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_female_35_44"
+value = 2400
+unit = "arrests per 100,000 females aged 35 to 44 per year"
+low = 2353
+high = 2450
+year = 2025
+period = "2023-2025"
+figure = "2023: 2353; 2024: 2397; 2025: 2450"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_female_45_54"
+value = 1295
+unit = "arrests per 100,000 females aged 45 to 54 per year"
+low = 1221
+high = 1375
+year = 2025
+period = "2023-2025"
+figure = "2023: 1221; 2024: 1288; 2025: 1375"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_female_55_64"
+value = 584
+unit = "arrests per 100,000 females aged 55 to 64 per year"
+low = 538
+high = 630.8
+year = 2025
+period = "2023-2025"
+figure = "2023: 538; 2024: 583; 2025: 631"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_female_65_plus"
+value = 115.3
+unit = "arrests per 100,000 females aged 65 and over per year"
+low = 99.29
+high = 132
+year = 2025
+period = "2023-2025"
+figure = "2023: 99; 2024: 115; 2025: 132"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_female_all"
+value = 1194
+unit = "arrests per 100,000 females of all ages per year"
+low = 1190
+high = 1198
+year = 2025
+period = "2023-2025"
+figure = "2023: 1198; 2024: 1194; 2025: 1190"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_male_10_17"
+value = 1992
+unit = "arrests per 100,000 males aged 10 to 17 per year"
+low = 1894
+high = 2079
+year = 2025
+period = "2023-2025"
+figure = "2023: 2079; 2024: 2005; 2025: 1894"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_male_18_24"
+value = 5390
+unit = "arrests per 100,000 males aged 18 to 24 per year"
+low = 5243
+high = 5603
+year = 2025
+period = "2023-2025"
+figure = "2023: 5603; 2024: 5325; 2025: 5243"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_male_25_34"
+value = 6816
+unit = "arrests per 100,000 males aged 25 to 34 per year"
+low = 6500
+high = 7168
+year = 2025
+period = "2023-2025"
+figure = "2023: 7168; 2024: 6779; 2025: 6500"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_male_35_44"
+value = 6198
+unit = "arrests per 100,000 males aged 35 to 44 per year"
+low = 6150
+high = 6247
+year = 2025
+period = "2023-2025"
+figure = "2023: 6196; 2024: 6150; 2025: 6247"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_male_45_54"
+value = 3784
+unit = "arrests per 100,000 males aged 45 to 54 per year"
+low = 3643
+high = 3964
+year = 2025
+period = "2023-2025"
+figure = "2023: 3643; 2024: 3744; 2025: 3964"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_male_55_64"
+value = 2093
+unit = "arrests per 100,000 males aged 55 to 64 per year"
+low = 1989
+high = 2221
+year = 2025
+period = "2023-2025"
+figure = "2023: 1989; 2024: 2069; 2025: 2221"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_male_65_plus"
+value = 495.3
+unit = "arrests per 100,000 males aged 65 and over per year"
+low = 445.3
+high = 549.9
+year = 2025
+period = "2023-2025"
+figure = "2023: 445; 2024: 491; 2025: 550"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[rate]]
+id = "arrests_per_100k_male_all"
+value = 3292
+unit = "arrests per 100,000 males of all ages per year"
+low = 3270
+high = 3329
+year = 2025
+period = "2023-2025"
+figure = "2023: 3329; 2024: 3270; 2025: 3278"
+derivation = "band count in Tables 39/40 x (Table 29 national estimate / Tables 39+40 total) / Census population in the band x 100,000; mean of the years, range = lowest and highest year"
+note = "Counts arrests, not people or convictions."
+unverified = false
+
+[[row]]
+table = "year"
+year = 2023
+national_estimate = 7556000
+reported_by_age_tables = 6503000
+population_covered = 291400000
+
+[[row]]
+table = "band"
+year = 2023
+sex = "male"
+band = "10_17"
+reported_arrests = 311600
+estimated_arrests = 362000
+population = 17410000
+per_100k = 2079
+
+[[row]]
+table = "band"
+year = 2023
+sex = "male"
+band = "18_24"
+reported_arrests = 783400
+estimated_arrests = 910200
+population = 16250000
+per_100k = 5603
+
+[[row]]
+table = "band"
+year = 2023
+sex = "male"
+band = "25_34"
+reported_arrests = 1410000
+estimated_arrests = 1638000
+population = 22850000
+per_100k = 7168
+
+[[row]]
+table = "band"
+year = 2023
+sex = "male"
+band = "35_44"
+reported_arrests = 1163000
+estimated_arrests = 1351000
+population = 21800000
+per_100k = 6196
+
+[[row]]
+table = "band"
+year = 2023
+sex = "male"
+band = "45_54"
+reported_arrests = 615700
+estimated_arrests = 715300
+population = 19640000
+per_100k = 3643
+
+[[row]]
+table = "band"
+year = 2023
+sex = "male"
+band = "55_64"
+reported_arrests = 345800
+estimated_arrests = 401800
+population = 20200000
+per_100k = 1989
+
+[[row]]
+table = "band"
+year = 2023
+sex = "male"
+band = "65_plus"
+reported_arrests = 104800
+estimated_arrests = 121800
+population = 27350000
+per_100k = 445.3
+
+[[row]]
+table = "band"
+year = 2023
+sex = "male"
+band = "all"
+reported_arrests = 4735000
+estimated_arrests = 5501000
+population = 165200000
+per_100k = 3329
+
+[[row]]
+table = "band"
+year = 2023
+sex = "female"
+band = "10_17"
+reported_arrests = 143900
+estimated_arrests = 167200
+population = 16620000
+per_100k = 1006
+
+[[row]]
+table = "band"
+year = 2023
+sex = "female"
+band = "18_24"
+reported_arrests = 296300
+estimated_arrests = 344200
+population = 15630000
+per_100k = 2202
+
+[[row]]
+table = "band"
+year = 2023
+sex = "female"
+band = "25_34"
+reported_arrests = 535700
+estimated_arrests = 622400
+population = 22570000
+per_100k = 2758
+
+[[row]]
+table = "band"
+year = 2023
+sex = "female"
+band = "35_44"
+reported_arrests = 449000
+estimated_arrests = 521600
+population = 22170000
+per_100k = 2353
+
+[[row]]
+table = "band"
+year = 2023
+sex = "female"
+band = "45_54"
+reported_arrests = 214300
+estimated_arrests = 248900
+population = 20390000
+per_100k = 1221
+
+[[row]]
+table = "band"
+year = 2023
+sex = "female"
+band = "55_64"
+reported_arrests = 100300
+estimated_arrests = 116500
+population = 21650000
+per_100k = 538
+
+[[row]]
+table = "band"
+year = 2023
+sex = "female"
+band = "65_plus"
+reported_arrests = 28720
+estimated_arrests = 33360
+population = 33600000
+per_100k = 99.29
+
+[[row]]
+table = "band"
+year = 2023
+sex = "female"
+band = "all"
+reported_arrests = 1768000
+estimated_arrests = 2055000
+population = 171500000
+per_100k = 1198
+
+[[row]]
+table = "year"
+year = 2024
+national_estimate = 7523000
+reported_by_age_tables = 6624000
+population_covered = 300800000
+
+[[row]]
+table = "band"
+year = 2024
+sex = "male"
+band = "10_17"
+reported_arrests = 306900
+estimated_arrests = 348500
+population = 17380000
+per_100k = 2005
+
+[[row]]
+table = "band"
+year = 2024
+sex = "male"
+band = "18_24"
+reported_arrests = 768400
+estimated_arrests = 872600
+population = 16390000
+per_100k = 5325
+
+[[row]]
+table = "band"
+year = 2024
+sex = "male"
+band = "25_34"
+reported_arrests = 1388000
+estimated_arrests = 1577000
+population = 23260000
+per_100k = 6779
+
+[[row]]
+table = "band"
+year = 2024
+sex = "male"
+band = "35_44"
+reported_arrests = 1204000
+estimated_arrests = 1367000
+population = 22230000
+per_100k = 6150
+
+[[row]]
+table = "band"
+year = 2024
+sex = "male"
+band = "45_54"
+reported_arrests = 648600
+estimated_arrests = 736600
+population = 19670000
+per_100k = 3744
+
+[[row]]
+table = "band"
+year = 2024
+sex = "male"
+band = "55_64"
+reported_arrests = 365000
+estimated_arrests = 414600
+population = 20030000
+per_100k = 2069
+
+[[row]]
+table = "band"
+year = 2024
+sex = "male"
+band = "65_plus"
+reported_arrests = 121900
+estimated_arrests = 138400
+population = 28210000
+per_100k = 490.7
+
+[[row]]
+table = "band"
+year = 2024
+sex = "male"
+band = "all"
+reported_arrests = 4804000
+estimated_arrests = 5456000
+population = 166900000
+per_100k = 3270
+
+[[row]]
+table = "band"
+year = 2024
+sex = "female"
+band = "10_17"
+reported_arrests = 140200
+estimated_arrests = 159200
+population = 16600000
+per_100k = 959
+
+[[row]]
+table = "band"
+year = 2024
+sex = "female"
+band = "18_24"
+reported_arrests = 292300
+estimated_arrests = 331900
+population = 15710000
+per_100k = 2113
+
+[[row]]
+table = "band"
+year = 2024
+sex = "female"
+band = "25_34"
+reported_arrests = 534600
+estimated_arrests = 607100
+population = 22910000
+per_100k = 2650
+
+[[row]]
+table = "band"
+year = 2024
+sex = "female"
+band = "35_44"
+reported_arrests = 475900
+estimated_arrests = 540400
+population = 22550000
+per_100k = 2397
+
+[[row]]
+table = "band"
+year = 2024
+sex = "female"
+band = "45_54"
+reported_arrests = 231600
+estimated_arrests = 263100
+population = 20430000
+per_100k = 1288
+
+[[row]]
+table = "band"
+year = 2024
+sex = "female"
+band = "55_64"
+reported_arrests = 110200
+estimated_arrests = 125200
+population = 21470000
+per_100k = 583.1
+
+[[row]]
+table = "band"
+year = 2024
+sex = "female"
+band = "65_plus"
+reported_arrests = 34960
+estimated_arrests = 39700
+population = 34610000
+per_100k = 114.7
+
+[[row]]
+table = "band"
+year = 2024
+sex = "female"
+band = "all"
+reported_arrests = 1820000
+estimated_arrests = 2067000
+population = 173100000
+per_100k = 1194
+
+[[row]]
+table = "year"
+year = 2025
+national_estimate = 7570000
+reported_by_age_tables = 6881000
+population_covered = 313200000
+
+[[row]]
+table = "band"
+year = 2025
+sex = "male"
+band = "10_17"
+reported_arrests = 296900
+estimated_arrests = 326700
+population = 17250000
+per_100k = 1894
+
+[[row]]
+table = "band"
+year = 2025
+sex = "male"
+band = "18_24"
+reported_arrests = 778400
+estimated_arrests = 856400
+population = 16330000
+per_100k = 5243
+
+[[row]]
+table = "band"
+year = 2025
+sex = "male"
+band = "25_34"
+reported_arrests = 1387000
+estimated_arrests = 1526000
+population = 23480000
+per_100k = 6500
+
+[[row]]
+table = "band"
+year = 2025
+sex = "male"
+band = "35_44"
+reported_arrests = 1278000
+estimated_arrests = 1407000
+population = 22520000
+per_100k = 6247
+
+[[row]]
+table = "band"
+year = 2025
+sex = "male"
+band = "45_54"
+reported_arrests = 709400
+estimated_arrests = 780500
+population = 19690000
+per_100k = 3964
+
+[[row]]
+table = "band"
+year = 2025
+sex = "male"
+band = "55_64"
+reported_arrests = 401500
+estimated_arrests = 441700
+population = 19890000
+per_100k = 2221
+
+[[row]]
+table = "band"
+year = 2025
+sex = "male"
+band = "65_plus"
+reported_arrests = 145100
+estimated_arrests = 159700
+population = 29030000
+per_100k = 549.9
+
+[[row]]
+table = "band"
+year = 2025
+sex = "male"
+band = "all"
+reported_arrests = 4998000
+estimated_arrests = 5499000
+population = 167700000
+per_100k = 3278
+
+[[row]]
+table = "band"
+year = 2025
+sex = "female"
+band = "10_17"
+reported_arrests = 132000
+estimated_arrests = 145200
+population = 16490000
+per_100k = 880.8
+
+[[row]]
+table = "band"
+year = 2025
+sex = "female"
+band = "18_24"
+reported_arrests = 290800
+estimated_arrests = 320000
+population = 15600000
+per_100k = 2051
+
+[[row]]
+table = "band"
+year = 2025
+sex = "female"
+band = "25_34"
+reported_arrests = 531800
+estimated_arrests = 585000
+population = 23090000
+per_100k = 2534
+
+[[row]]
+table = "band"
+year = 2025
+sex = "female"
+band = "35_44"
+reported_arrests = 507800
+estimated_arrests = 558700
+population = 22800000
+per_100k = 2450
+
+[[row]]
+table = "band"
+year = 2025
+sex = "female"
+band = "45_54"
+reported_arrests = 255500
+estimated_arrests = 281100
+population = 20450000
+per_100k = 1375
+
+[[row]]
+table = "band"
+year = 2025
+sex = "female"
+band = "55_64"
+reported_arrests = 122200
+estimated_arrests = 134400
+population = 21300000
+per_100k = 630.8
+
+[[row]]
+table = "band"
+year = 2025
+sex = "female"
+band = "65_plus"
+reported_arrests = 42700
+estimated_arrests = 46980
+population = 35580000
+per_100k = 132
+
+[[row]]
+table = "band"
+year = 2025
+sex = "female"
+band = "all"
+reported_arrests = 1883000
+estimated_arrests = 2072000
+population = 174000000
+per_100k = 1190
+

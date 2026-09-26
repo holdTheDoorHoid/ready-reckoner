@@ -5,7 +5,9 @@
  * the print stylesheet are exercised the way the real packet will exercise them.
  */
 import type { BucketId, PlanInput, PlanItem, TierId } from '../types';
-import { band, dayPhrase, formatDate, addMonths, monthsPhrase, naturalFrequency, noticeRange, quantity, severityBand, targetDays, targetMonths, usd, CONFIDENCE_LABELS } from '../../lib/format';
+import { band, dayPhrase, formatDate, addMonths, monthsPhrase, naturalFrequency, noticeRange, quantity, rangeOnly, severityBand, targetDays, targetMonths, usd, CONFIDENCE_LABELS } from '../../lib/format';
+import { accessNeedsLine, familyPlanSections } from './family';
+import { alsoCheckedNote } from './v2';
 import { catalogueItem } from './items';
 import type { ModelResult } from './model';
 import { TIERS } from './names';
@@ -117,6 +119,19 @@ export function buildPacket(input: PlanInput, r: ModelResult): string {
   const reached = o.tier_reached === 'now' ? 'getting started' : tierName(o.tier_reached).toLowerCase();
   out.push(`**Where you are:** ${reached}. **Where your risks point:** ${tierName(o.tier_recommended).toLowerCase()} of supplies.`, '');
 
+  // The family plan and wallet cards follow the summary (packet v2): it is what goes on the fridge.
+  const whenWeLeave = ['**When we leave.** If an evacuation warning covers our zone, we leave within 30 minutes. The bags are by the door. We meet at the place above.', ''];
+  if (r.register.some((h) => h.seed.id === 'tsunami')) {
+    whenWeLeave.push('**Tsunami.** If we feel strong or long shaking near the coast, we walk uphill at once. We do not wait for an alert and we do not drive.', '');
+  }
+  if (r.register.some((h) => h.seed.id === 'tornado' && h.rate >= 0.005)) {
+    whenWeLeave.push('**Tornado.** On a warning we go to our shelter spot (basement or inner room on the lowest floor) and stay until it passes.', '');
+  }
+  if (r.register.some((h) => h.seed.id === 'hurricane' && h.rate >= 0.05)) {
+    whenWeLeave.push('**Hurricane.** We know our evacuation zone. If it is ordered to leave, we go early, to the place above.', '');
+  }
+  out.push(...familyPlanSections(input, whenWeLeave));
+
   // 2. Risks -----------------------------------------------------------------------------------
   out.push('## Your risks', '');
   out.push(`Chances are for households like yours in ${md(place)}, over the next ${years} ${years === 1 ? 'year' : 'years'}. They are for your county, not your street.[^mock_nri_county]`, '');
@@ -129,15 +144,19 @@ export function buildPacket(input: PlanInput, r: ModelResult): string {
   out.push('');
   const rare = o.register.filter((h) => h.display === 'rare_catastrophic');
   if (rare.length) {
+    // The collapsed table only (hazard-expansion C.1): the packet does not grow with the sub-rows.
     out.push('### Rare but severe', '');
-    out.push('These are shown apart because a tiny chance times a huge loss would otherwise crowd out everything else.', '');
-    out.push('| What | How likely | How bad |', '| --- | --- | --- |');
+    out.push('Sorted by how likely here, not by how bad. Expert estimates, so each is a range.', '');
+    out.push('| What | How likely for you | If it reaches you | What it changes in your plan |', '| --- | --- | --- | --- |');
     for (const h of rare) {
-      out.push(`| ${md(h.name)} | ${naturalFrequency(1 - Math.exp(-h.rate_per_year * years))} | ${severityBand(h.severity).label} |`);
+      out.push(`| ${md(h.name)} | ${md(rangeOnly(h.rate_range[0], h.rate_range[1], years))} | ${md(h.if_it_reaches_you ?? '')} | ${md(h.what_it_changes ?? '')} |`);
     }
     out.push('');
     out.push('Your three-day supplies already cover the first days of sheltering: get inside, stay inside, stay tuned.[^mock_nuclear_guidance]', '');
   }
+  out.push('### Notes on these numbers', '');
+  out.push(`- These chances are for ${md(place)} as a whole. A home near a river, the coast or a steep slope can face more.`);
+  out.push(`- ${md(alsoCheckedNote(r.register))}`, '');
   out.push('*County map: a map of your county will appear here in a later version.*', '');
 
   // 3. Targets ---------------------------------------------------------------------------------
@@ -222,26 +241,7 @@ export function buildPacket(input: PlanInput, r: ModelResult): string {
     out.push('');
   }
 
-  // 6. Family plan -----------------------------------------------------------------------------
-  out.push('## Family plan', '');
-  out.push('Fill this in together. Keep a copy in each go-bag and one on the fridge.', '');
-  out.push('| Plan | Your answer |', '| --- | --- |');
-  const rows = ['Meeting place near home', 'Meeting place outside the neighbourhood', 'Out-of-area contact (name and phone)'];
-  if (f.children > 0 || f.infants > 0) rows.push('Who picks up the children, and from where');
-  rows.push('Work and school plans', 'Where we would stay if we had to leave', 'Neighbours who check on us (names and phones)');
-  if (f.pets > 0 || f.large > 0) rows.push('Who takes the animals if we cannot');
-  for (const row of rows) out.push(`| ${row} | |`);
-  out.push('');
-  out.push('**When we leave.** If an evacuation warning covers our zone, we leave within 30 minutes. The bags are by the door. We meet at the place above.', '');
-  if (r.register.some((h) => h.seed.id === 'tsunami')) {
-    out.push('**Tsunami.** If we feel strong or long shaking near the coast, we walk uphill at once. We do not wait for an alert and we do not drive.', '');
-  }
-  if (r.register.some((h) => h.seed.id === 'tornado' && h.rate >= 0.005)) {
-    out.push('**Tornado.** On a warning we go to our shelter spot (basement or inner room on the lowest floor) and stay until it passes.', '');
-  }
-  if (r.register.some((h) => h.seed.id === 'hurricane' && h.rate >= 0.05)) {
-    out.push('**Hurricane.** We know our evacuation zone. If it is ordered to leave, we go early, to the place above.', '');
-  }
+  // 6. Family plan: printed after the summary (above), then the wallet cards.
 
   // 7. Documents and money ---------------------------------------------------------------------
   out.push('## Documents and money', '');
@@ -269,6 +269,8 @@ export function buildPacket(input: PlanInput, r: ModelResult): string {
   if (input.people.some((p) => p.pregnant_or_nursing)) needs.push('**Pregnancy or nursing:** keep prenatal records with your papers and extra water and food for the extra need.');
   if (input.people.some((p) => p.medical.epinephrine)) needs.push('**Epinephrine:** keep a spare auto-injector in the go-bag and check its date.');
   if (f.pets > 0 || f.large > 0) needs.push('**Animals:** food, water, a carrier or leash, and records; know which shelters and hotels on your route take pets.');
+  const access = accessNeedsLine(input);
+  if (access) needs.push(access);
   if (needs.length === 0) needs.push('Nobody in the household listed medical needs. Keep the medicine list current anyway.');
   needs.forEach((n) => out.push(`- ${n}`));
   out.push('');

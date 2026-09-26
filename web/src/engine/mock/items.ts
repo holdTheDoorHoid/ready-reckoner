@@ -5,6 +5,7 @@
  * as the one permitted free action (docs/CONTENT_STANDARDS.md §5).
  */
 import type { BucketId, HazardId, Item, TierId } from '../types';
+import { withV2 } from './items-v2';
 
 const RETRIEVED = '2026-09-25';
 
@@ -27,6 +28,8 @@ interface Def {
   extras?: HazardId[];
   kcal?: number;
   litres?: number;
+  /** Try it every this many months (contract v2 `Item.test_interval_months`). */
+  test?: number;
 }
 
 function item(d: Def): Item {
@@ -58,10 +61,11 @@ function item(d: Def): Item {
   }
   if (d.kcal !== undefined) out.energy_kcal_per_unit = d.kcal;
   if (d.litres !== undefined) out.volume_l_per_unit = d.litres;
+  if (d.test !== undefined) out.test_interval_months = d.test;
   return out;
 }
 
-export const ITEMS: Item[] = [
+export const ITEMS: Item[] = withV2([
   // ------------------------------------------------------------------------------------------
   // Free actions (month 0, always first)
   // ------------------------------------------------------------------------------------------
@@ -582,6 +586,7 @@ export const ITEMS: Item[] = [
     look_for: ['LED lights', 'A battery size you can share across devices'],
     avoid: ['Candles (a fire risk)'],
     price: [5, 15, 'light'],
+    test: 6,
     citations: ['mock_ready_gov_kit', 'mock_fire_safety'],
   }),
   item({
@@ -850,6 +855,7 @@ export const ITEMS: Item[] = [
     avoid: ['Buying more capacity than your target needs'],
     price: [250, 600, 'unit'],
     check: 3,
+    test: 3,
     citations: ['mock_price_survey'],
   }),
   item({
@@ -864,6 +870,7 @@ export const ITEMS: Item[] = [
     avoid: ['Running it in a garage, porch or near windows', 'Plugging it into a wall outlet'],
     price: [500, 1000, 'unit'],
     check: 3,
+    test: 1,
     citations: ['mock_fire_safety', 'mock_price_survey'],
   }),
   item({
@@ -894,7 +901,7 @@ export const ITEMS: Item[] = [
     extras: ['nuclear_attack', 'nuclear_plant_incident'],
     rare_catastrophic: true,
   }),
-];
+]);
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));
 

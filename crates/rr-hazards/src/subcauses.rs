@@ -480,8 +480,9 @@ const DEFS: &[Def] = &[
         parent: H::DrugShortage,
         id: "medical_supply_shock",
         name: "Hospital supply shock",
-        note: "A key hospital supply runs short (IV fluids after Hurricane Helene closed a plant \
-               making about 60 % of the US supply in 2024) and planned care is delayed.",
+        note: "A key hospital supply runs short (IV fluids in 2024, after Hurricane Helene closed \
+               a plant that makes a large share of the country's supply) and planned care is \
+               delayed.",
         rate: None,
         sources: &[cite::IV_FLUIDS_2024],
         when: Where::Always,
