@@ -6,9 +6,12 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-description = "Ready Reckoner: supply"
+description = "Ready Reckoner: quantity rules that turn a household and its bucket targets into cited requirement lines"
 
 [dependencies]
+rr-types = { path = "../rr-types" }
 serde.workspace = true
+toml.workspace = true
+
+[dev-dependencies]
 serde_json.workspace = true
-thiserror.workspace = true
