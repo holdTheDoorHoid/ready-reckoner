@@ -2759,7 +2759,7 @@ requires = "commuter"
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
-# v0.2.0: the three fault scenarios rr-hazards offers on agent/hazards2 (awaiting: hazards).
+# v0.2.0: the three fault scenarios rr-hazards offers (agent/hazards2, merged).
 # No restoration study for these faults is registered, so they take the New Madrid and Hayward
 # priors for a major urban earthquake (expert estimate; the ShakeOut magnitude 7.8 would likely
 # be longer). Heat and cold shares follow the nearest existing scenario: Seattle as Cascadia
@@ -3085,8 +3085,8 @@ requires = "commuter"
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
-# v0.2.0: a blackout during a heat wave (rr-hazards' `heat_blackout` scenario on agent/hazards2,
-# awaiting: hazards). This is the model's heat-plus-outage compound class (model review M-11): the
+# v0.2.0: a blackout during a heat wave (rr-hazards' `heat_blackout` scenario, from
+# agent/hazards2). This is the model's heat-plus-outage compound class (model review M-11): the
 # power row carries every dangerous-heat hour (heat_share 1), so an air-conditioned home's heat
 # need lasts as long as the power cut, and wells, high-rise pumps, refrigerated medicine and
 # public water follow through the usual links. Ordinary power cuts on hot days stay in the
@@ -3246,7 +3246,7 @@ unemployment_insurance = true
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
 
-# awaiting: hazards — the three fault scenarios of agent/hazards2, as Hayward and New Madrid.
+# v0.2.0: the three fault scenarios of agent/hazards2, as Hayward and New Madrid.
 [[income]]
 hazard = "earthquake"
 scenario = "wasatch_m7"

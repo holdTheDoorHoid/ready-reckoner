@@ -1,6 +1,6 @@
-//! Data-pack v2 records this crate reads: the regional outage model, the worst-event stress line,
-//! the pooled restoration curves and the temperature shares (the `data-model` workstream), and the
-//! drinking-water and smoke columns of the exposure record (the `data-hazard` workstream).
+//! Data-pack v2 records this crate reads from the `data-model` workstream: the regional outage
+//! model, the worst-event stress line, the pooled restoration curves and the temperature shares.
+//! (The drinking-water and smoke columns come from `CountyRecord::exposure`, already merged.)
 //!
 //! awaiting: data-model — these structs mirror `rr_types::calibration` on `agent/data-model`
 //! (`OutageModel`, `PoolBasis`, `StressEvent`, `RestorationCurve`, `TemperatureProfile`) field for

@@ -539,10 +539,11 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   shortfall as windstorms; it reads data-model's `OutageModel::causes` (awaiting: data-model), so
   the v0.1 rule runs until then. The hurricane double count M-10 is `rr-consequence`'s (county curve
   plus hurricane rows); `rr-hazards` already subtracts modelled hurricane outages in the floor.
-- **New scenarios need effects rows.** `wasatch_m7`, `san_andreas_south_m78`, `seattle_fault_m7`
-  and `heat_blackout` are offered with their rates and defaults; `rr-consequence` plans them once it
-  has effects rows (awaiting: consequence). `heat_blackout` overlaps the compound heat-and-outage
-  class `rr-consequence` is building; one of the two should own it.
+- **New scenarios have effects rows** (rr-consequence, v0.2.0). `wasatch_m7`,
+  `san_andreas_south_m78` and `seattle_fault_m7` take the New Madrid and Hayward priors;
+  `heat_blackout` is rr-consequence's heat-plus-outage class and owns its durations and effects
+  (see "Blackouts during heat waves" under Consequences), so there is no second, overlapping
+  class.
 - **Figures to confirm** (hazard-expansion "UNVERIFIED items"): III's 1 in 67 and $15,400, Eviction
   Lab's 2.3 in 100 and the 0.4 judgment share, the CSIS count of metro-wide closures, Riley 2012's
   12 % a decade, the Wasatch 43 %, southern San Andreas 19 % and Seattle fault 5 % figures, and the
@@ -582,8 +583,9 @@ absent until its branch merges (the county-only model of v0.1 runs without them 
 region's worst event; `agent/data-model`), `temperature` (outage hours on hot and cold days),
 `curves` (pooled restoration curves by region and cause, handed in with
 `CountyData::with_curves(store.restoration_curves())` because they are not per county),
-`sdwis_violation_share` and `smoke_days` (`agent/data-hazard`). Until those merge,
-`crates/rr-consequence/src/pack.rs` mirrors the loader types field for field.
+`sdwis_violation_share` and `smoke_days` (read from `CountyRecord::exposure`, data-hazard's
+`sdwis_violation_pop_share` and `smoke_days_35`, merged in v0.2). Until agent/data-model merges,
+`crates/rr-consequence/src/pack.rs` mirrors its loader types field for field.
 
 `ConsequenceAssessment` carries the 15 `BucketAssessment`s (in `BucketId::ALL` order), the
 `ScenarioInfo`s, cliff `Warning`s, the self-sufficiency statement, and the numbers behind every
@@ -1099,8 +1101,8 @@ tail leaves these outages out, so they are counted once.
 
 ### Blackouts during heat waves (v0.2.0)
 
-The heat-plus-outage class of M-11 is rr-hazards' named scenario `heat_blackout` (awaiting:
-hazards, agent/hazards2): a power cut of a day or more that starts during a heat wave, offered
+The heat-plus-outage class of M-11 is rr-hazards' named scenario `heat_blackout` (from
+agent/hazards2): a power cut of a day or more that starts during a heat wave, offered
 and on by default in the 44 counties with 60 or more days a year over 95 °F (Maricopa, Pima,
 Clark ...), at the county's heat-wave rate times the chance a day-long outage overlaps a
 three-day episode. Its rows here: power for two days, back over the next three (median 2 d, 90th
@@ -1262,7 +1264,7 @@ Rows keyed by scenario id (and `coast`/`valley` for Cascadia, from the candidate
 (ORNL Michael restoration; Asheville water), `new_madrid_m7` and `hayward_m7` (Hazus- and
 Tohoku-based priors; no regional restoration study was at hand), `local_tsunami` (15–20 minutes'
 warning; rr-hazards' rate already counts only households in the zone). v0.2.0 adds rows for the
-four scenarios rr-hazards offers on agent/hazards2 (awaiting: hazards): `wasatch_m7`,
+four scenarios rr-hazards offers since agent/hazards2 merged: `wasatch_m7`,
 `seattle_fault_m7` and `san_andreas_south_m78` take the New Madrid and Hayward priors for a major
 urban earthquake with their own labels (no restoration study for those faults is registered; the
 ShakeOut magnitude 7.8 would likely run longer), each with an `[[overlap]]` so the county

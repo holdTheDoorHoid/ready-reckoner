@@ -53,9 +53,11 @@ third and fourth runs give the answers a household there would have given before
 | `helene-asheville-3` | water system: frequent problems | the December 2022 freeze left more than 38,000 customers without water for about 10 days (the city's Independent Review Committee, June 2023): the review's "out for more than a week in ten years" |
 | `maria-sanjuan-3`, `maria-utuado-3` | water system: frequent problems | the island's system had chronic problems before 2017 (as the `san-juan-2` fixture answers) |
 
-Those runs also carry stand-in rates for the new ranked hazards that `rr-hazards` does not emit
-yet (medicine shortage 5 in 100 per person on a daily prescription, benefit lapse 1 in 13 a year,
-from `round2/reports/hazard-candidates.csv`); its own rates replace them when it does.
+Since agent/hazards2 merged, `rr-hazards` emits the new ranked hazards itself (medicine shortage,
+benefit lapse, phone and internet outages, water damage, eviction, arrest), in every run. The
+only stand-in left is wildfire smoke for the runs with the v2 answers (Butte and Philadelphia):
+the frozen county records predate the smoke-day column `rr-hazards` reads, so the frozen
+`regional.json` smoke days divided by three stand in (`round2/reports/hazard-candidates.csv`).
 
 ## The events
 
@@ -94,14 +96,15 @@ from `round2/reports/hazard-candidates.csv`); its own rates replace them when it
 | --- | --- | --- | --- | --- |
 | v0.1.0, as the review scored it | 6 | 5 | 10 | 1 |
 | v0.2 as merged before tier 1 (`3c46b9b`), this rule | 6 | 5 | 10 | 1 |
-| This version, today's data pack (county-only model) | 7 | 5 | 9 | 1 |
-| This version, with the data pack v2 tables | 4 | 9 | 8 | 1 |
+| This version, today's data pack (county-only model) | 8 | 4 | 9 | 1 |
+| This version, with the data pack v2 tables | 5 | 8 | 8 | 1 |
 | This version, with the tables and the v2 answers | 6 | 9 | 6 | 1 |
 | The same, with Buncombe's pre-Helene water record | 6 | 9 | 6 | 1 |
 
 The data pack v2 tables are the regional outage model and restoration curves (`agent/data-model`)
-and the drinking-water violations and smoke days (`agent/data-hazard`), frozen in
-`crates/rr-consequence/tests/data/backtest/regional.json` until those branches merge. The
+and the drinking-water violations and smoke days (data-hazard's exposure columns, now merged),
+frozen in `crates/rr-consequence/tests/data/backtest/regional.json` so the verdicts do not move
+with a data refresh. The
 covered count falls with them on purpose: power verdicts that were covered only because the storm
 was in the county's own record (Oklahoma City, Linn) lose that luck when the region's records are
 pooled, and Uri's rolling blackouts in Austin now follow the region's record of such emergencies,
@@ -123,15 +126,15 @@ and the v2 answers; the county-only and pre-event runs are in `target/backtest.m
 | 9 | Jackson\* | short: no tap water 3 d, boil 7 d | short: no tap water 21 d (covered), boil 30 d (short) | as Asheville; the boil notice ran 48 days |
 | 10 | East Palestine | partial: away 2 d vs 5 | partial | |
 | 11 | Colonial Pipeline | not modelled | not modelled | fuel is still a gap (a free step covers it) |
-| 12 | Change and CrowdStrike | partial: medicine 14 d vs 7 / 15 | covered: medicine 30 d | the medicine-shortage hazard (stand-in rate until rr-hazards emits it) |
+| 12 | Change and CrowdStrike | partial: medicine 14 d vs 7 / 15 | covered: medicine 30 d | the medicine-shortage hazard, at rr-hazards' own rate since agent/hazards2 merged (so every run is covered) |
 | 13 | Maria, San Juan\* | short: power 30 d, water 7 d | partial: power 90 d; no tap water 180 d (covered) | Maria's own restoration curve for the island grid (M-10); public water fails with long power cuts (M-03) |
 | 14 | Maria, Utuado\* | short: power 30 d, water 5 d | short: power 45 d, no tap water 60 d | inland, no major-hurricane scenario: the fixed 6 % major share, until rr-hazards passes the county's (about 17 %) |
-| 15 | SNAP lapse | short: food 10 d vs 12 | covered: food 30 d | the benefit-lapse hazard (M-12; stand-in rate) |
+| 15 | SNAP lapse | short: food 10 d vs 12 | covered: food 21 d | the benefit-lapse hazard (M-12), at rr-hazards' own rate |
 | 16 | Sandy, Staten Island | partial: power 5 d | partial: power 5 d | |
 | 17 | Sandy, Long Beach | short: power 7 d, water 3 d | short: power 5 d, water 5 d | a barrier-island city averaged with its county: needs ZIP-level surge exposure (M-09) |
 | 18 | 2003, Cleveland | covered | covered | |
 | 19 | 2003, Manhattan | covered | covered (water over) | New York City's violation record (one reservoir-cover case) raises the water rows |
-| 20 | Ice storm, Oklahoma City\* | covered: power 10 d | partial: power 7 d | pooling: the storm no longer sets the county's tail alone (M-01) |
+| 20 | Ice storm, Oklahoma City\* | covered: power 10 d | partial: power 5 d | pooling: the storm no longer sets the county's tail alone (M-01) |
 | 21 | Ice storm, Austin\* | partial: power 5 d | partial: power 5 d | |
 | 22 | Derecho, Linn\* | covered: power 10 d | partial: power 5 d | pooling: without its own derecho Linn looks like its neighbours (M-01; the review's out-of-sample run gave 3 d) |
 

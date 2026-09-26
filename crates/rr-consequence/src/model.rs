@@ -48,10 +48,10 @@ pub struct CountyData<'a> {
     /// `rr_data::DataStore::restoration_curves()`. awaiting: data-model, plan
     pub curves: &'a [RestorationCurve],
     /// Share of the county's public-water customers served by a system with a health-based
-    /// violation in the last five years (EPA SDWIS; data pack v2). awaiting: data-hazard
+    /// violation in the last five years (EPA SDWIS, `CountyExposure::sdwis_violation_pop_share`).
     pub sdwis_violation_share: Option<f64>,
-    /// Days a year with wildfire smoke and PM2.5 of 35.5 µg/m³ or more (data pack v2).
-    /// awaiting: data-hazard
+    /// Days a year with wildfire smoke and PM2.5 of 35.5 µg/m³ or more
+    /// (`CountyExposure::smoke_days_35`).
     pub smoke_days: Option<f64>,
 }
 
@@ -70,11 +70,16 @@ impl<'a> CountyData<'a> {
             outage_model: None,
             temperature: None,
             curves: &[],
-            // awaiting: data-hazard — `sdwis_violation_share: record.exposure
-            // .sdwis_violation_pop_share.map(f64::from),` and `smoke_days: record.exposure
-            // .smoke_days_35.map(f64::from),` once `CountyRecord::exposure` is merged.
-            sdwis_violation_share: None,
-            smoke_days: None,
+            sdwis_violation_share: record
+                .exposure
+                .sdwis_violation_pop_share
+                .map(f64::from)
+                .filter(|x| x.is_finite() && (0.0..=1.0).contains(x)),
+            smoke_days: record
+                .exposure
+                .smoke_days_35
+                .map(f64::from)
+                .filter(|x| x.is_finite() && *x >= 0.0),
         }
     }
 

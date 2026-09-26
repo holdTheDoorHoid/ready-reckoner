@@ -149,9 +149,11 @@ struct Event {
 /// notice) and Puerto Rico's came first.
 const PRE_EVENT_WATER_RECORD: &[(&str, f64)] = &[("37021", 0.0)];
 
-/// Stand-in rates for the contract v2 ranked hazards that `rr-hazards` does not emit yet
+/// Stand-in rates for the contract v2 ranked hazards that `rr-hazards` does not emit
 /// (hazard-candidates.csv, typical values), for the runs with the v2 answers, so the new effects
-/// rows show in the table. awaiting: hazards — its own rates replace these when it emits them.
+/// rows show in the table. Since agent/hazards2 merged, `rr-hazards` emits all of them itself and
+/// each stand-in is dropped when it does; only wildfire smoke is still stood in (Butte and
+/// Philadelphia), because the frozen county records predate the smoke-day column it reads.
 fn stand_in_rates(
     input: &PlanInput,
     have: &[HouseholdEventRate],
@@ -416,7 +418,9 @@ const EVENTS: &[Event] = &[
         not_modelled: false,
         answers: none,
         in_sample: "",
-        expected: [Partial, Partial, Covered, Covered],
+        // rr-hazards emits the medicine-shortage rate itself since agent/hazards2 merged, so
+        // every run has it (before, only the runs with the v2 answers had the stand-in).
+        expected: [Covered, Covered, Covered, Covered],
     },
     Event {
         id: "maria_san_juan",
