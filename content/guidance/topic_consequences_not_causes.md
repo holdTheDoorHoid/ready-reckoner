@@ -1,6 +1,7 @@
 ---
 id: topic_consequences_not_causes
 title: Why the plan starts from what happens, not what causes it
+kind: topic
 applies_to: [topic:consequences_not_causes]
 citations: [fema_nhs_2024, fema_cpg201_thira, rr_research_risk_model, ready_gov_earthquakes, ready_gov_wildfires]
 ---

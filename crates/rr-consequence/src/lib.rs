@@ -53,6 +53,7 @@ pub mod curve;
 pub mod effects;
 pub mod income;
 pub mod model;
+pub mod pack;
 pub mod ranges;
 pub mod survival;
 pub mod words;
@@ -66,17 +67,24 @@ pub use curve::{
     CurveTerm, DialPoint, ExceedanceCurve, LADDER_TOLERANCE, ONE_IN_100_RATE, dial_rate,
     round_up_to_ladder,
 };
-pub use effects::{EffectRow, EffectsTable, IncomeRow, OverlapRow, PartRow, table};
+pub use effects::{EffectRow, EffectsTable, IncomeRow, OverlapRow, PartRow, WaterEvent, table};
 pub use income::{GapRule, IncomeCurve, MONTHS_LADDER, round_up_months};
-pub use model::{CountyData, CouplingApplied, OverrideApplied, ScenarioCandidate};
+pub use model::{
+    COLD_GRID_STATES, CountyData, CouplingApplied, Fragility, OverrideApplied, ScenarioCandidate,
+};
+pub use pack::{OutageModel, PoolBasis, RestorationCurve, StressEvent, TemperatureProfile};
 pub use ranges::DRAWS;
 pub use survival::{Survival, probit};
 
 /// Citation ids this crate emits from code rather than from `effects.toml` (county records, the
-/// rural-EMS note, coupling and displacement notes).
-pub const CODE_CITATIONS: [&str; 6] = [
+/// rural-EMS note, coupling and displacement notes, the regional outage records and historic
+/// restoration curves, the drinking-water violations and the smoke days).
+pub const CODE_CITATIONS: [&str; 9] = [
     "census_pulse_displacement",
     "county_boil_water_records",
+    "doe_maria_situation_reports",
+    "epa_aqs_daily_pm25",
+    "epa_echo_sdwa",
     "mell_2017_ems_response",
     "noaa_storm_events",
     "ornl_eagle_i_outages",

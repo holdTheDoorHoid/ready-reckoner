@@ -1,6 +1,7 @@
 ---
 id: bucket_water_out
 title: No tap water at all
+kind: bucket
 applies_to: [bucket:water_out]
 citations: [epa_asheville_boil_notice_2024, rr_research_risk_model, ready_gov_water, cdc_water_storage, sphere_2018, doe_water_heaters, cdc_find_clean_water, cdc_water_disinfection, rdpo_emergency_toilet, church_emergency_prep_manual, cdc_well_disinfection]
 ---

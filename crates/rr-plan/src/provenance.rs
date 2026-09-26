@@ -18,7 +18,16 @@ use crate::pipeline::Assessment;
 /// Ids requested in `docs/CITATION_IDS.md` that `content/citations.toml` does not define yet:
 /// tolerated with a placeholder, even in debug builds. A test fails once content defines one, so
 /// the list only shrinks. // awaiting: rr-content
-pub const AWAITING_CONTENT: &[&str] = &["county_boil_water_records"];
+pub const AWAITING_CONTENT: &[&str] = &[
+    "county_boil_water_records",
+    // Requested by rr-hazards for v0.2.0 (docs/CITATION_IDS.md, "Not added"): no copy could be
+    // read that docs/CONTENT_STANDARDS.md §2 allows. The other 42 requested ids are in the
+    // registry since the v0.2.0 content merge.
+    "fema_protection_nuclear_age_1985",
+    "fema_napb90",
+    "epri_2019_hemp",
+    "riley_2012_carrington",
+];
 
 /// Where a placeholder source points: the index where requested ids wait for their entry.
 const PLACEHOLDER_URL: &str =

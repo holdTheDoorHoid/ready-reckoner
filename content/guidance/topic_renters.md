@@ -1,6 +1,7 @@
 ---
 id: topic_renters
 title: Preparing when you rent
+kind: topic
 applies_to: [topic:renters]
 citations: [fema_nhs_2024, census_pulse_displacement, ready_gov_financial, fema_effak, floodsmart_buy_policy, usfa_smoke_alarm_renters, cdc_co_basics]
 ---

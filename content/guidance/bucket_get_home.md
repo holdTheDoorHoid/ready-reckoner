@@ -1,6 +1,7 @@
 ---
 id: bucket_get_home
 title: Stranded away from home
+kind: bucket
 applies_to: [bucket:get_home]
 citations: [ready_gov_kit_2020, ready_gov_kit, fhwa_mutcd_walking_speed, cdc_niosh_heat_hydration, ready_gov_plan, cdc_yellow_book_heat_cold, cdc_winter_safety]
 ---

@@ -1,6 +1,7 @@
 ---
 id: topic_talking_with_children
 title: Talking with children about emergencies
+kind: topic
 applies_to: [topic:talking_with_children]
 citations: [aap_talking_to_children, ready_gov_kids_families, ready_gov_plan, ready_gov_home_fires]
 ---

@@ -139,6 +139,17 @@ fn the_free_actions_named_in_the_brief_exist() {
         ("thermal_cool_room_plan", "cooling center"),        // cooling centre location
         ("med_988_saved", "988"),                            // 988 saved
         ("water_reused_bottles", "tap water"),               // water in containers already owned
+        // The Deviant Ollam lessons (content brief, added 2026-09-26).
+        ("community_trusted_circle", "backup codes"),
+        ("community_trusted_circle", "waiting period"),
+        ("docs_legal_readiness", "power of attorney"),
+        ("docs_legal_readiness", "Legal aid"),
+        ("security_lockout_plan", "locksmith"),
+        ("docs_effak", "passport book or card"),
+        ("docs_effak", "certified copies of birth certificates"),
+        ("docs_effak", "advance directive"),
+        ("docs_effak", "encrypted password vault"),
+        ("docs_effak", "backed up away from home"),
     ] {
         let i = item(id);
         assert!(i.free, "{id} must be free");
@@ -162,18 +173,60 @@ fn free_actions_are_grouped_into_at_most_thirty_parents() {
         .collect();
     // The polish round (2026-09-26) grouped the 78 free actions into 28 parents and added four
     // for need lines nothing met (a ride plan, epinephrine, and the pet go-kit's water and food),
-    // plus the phone, an assumed basic the plan never buys.
+    // plus the phone, an assumed basic the plan never buys. The owner's Deviant Ollam request
+    // (2026-09-26, DESIGN-DELTA §4a) added three steps of their own: the trusted circle, legal
+    // readiness and the lockout plan (docs/CONTENT_STANDARDS.md §3).
     let added = [
         "evac_ride_plan",
         "med_epinephrine_plan",
         "special_pet_go_water",
         "special_pet_go_food",
         "comms_phone_basic",
+        "community_trusted_circle",
+        "docs_legal_readiness",
+        "security_lockout_plan",
     ];
     let grouped = free.iter().filter(|id| !added.contains(id)).count();
     assert!(grouped <= 30, "{grouped} grouped free actions: {free:?}");
     for i in content().items.iter().filter(|i| i.free) {
         assert!(i.look_for.len() <= 8, "{}: at most eight steps", i.id);
+    }
+}
+
+/// Words a reader sees in an item: name, spec, what to look for and what to avoid.
+fn item_words(i: &Item) -> usize {
+    let mut parts = vec![i.name.clone(), i.spec.clone()];
+    parts.extend(i.look_for.iter().cloned());
+    parts.extend(i.avoid.iter().cloned());
+    rr_content::readability::words(&parts.join("\n")).len()
+}
+
+#[test]
+fn the_ollam_steps_stay_short_and_cited() {
+    // Content brief, "Added 2026-09-26": each of the three new free steps is at most 120 words
+    // and cites the talk only for its principle, beside an agency or legal-aid source.
+    for id in [
+        "community_trusted_circle",
+        "docs_legal_readiness",
+        "security_lockout_plan",
+    ] {
+        let i = item(id);
+        let n = item_words(i);
+        println!("{id}: {n} words");
+        assert!(n <= 120, "{id} has {n} words; the brief allows 120");
+        assert!(i.free && i.tier == TierId::Now && i.price_band_usd.high == 0.0);
+        assert!(
+            i.citations
+                .iter()
+                .any(|c| c.as_str() == "ollam_2022_lawyer_passport_locksmith_gun"),
+            "{id} credits the talk"
+        );
+        assert!(
+            i.citations
+                .iter()
+                .any(|c| c.as_str() != "ollam_2022_lawyer_passport_locksmith_gun"),
+            "{id} cites a source beyond the talk"
+        );
     }
 }
 

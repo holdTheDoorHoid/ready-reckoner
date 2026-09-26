@@ -5,6 +5,8 @@ use rr_types::{
     NriHazard, PlanInput, Setting, WaterSource, math,
 };
 
+use crate::exposure::Exposure;
+
 /// Notes collected while computing, in the order they arose.
 #[derive(Debug, Default)]
 pub(crate) struct Notes(pub Vec<String>);
@@ -173,5 +175,15 @@ impl<'a> Ctx<'a> {
     /// The home draws water from a private well.
     pub fn well(&self) -> bool {
         self.input.housing.water == WaterSource::Well
+    }
+
+    /// The data pack's v2 exposure columns for this county and ZIP code.
+    pub fn exposure(&self) -> Exposure<'a> {
+        Exposure::new(self.county, self.location)
+    }
+
+    /// The county's plain name with its state ("Jefferson County, Texas").
+    pub fn county_and_state(&self) -> String {
+        format!("{}, {}", self.county_label(), self.county.state_name)
     }
 }

@@ -28,3 +28,5 @@ flate2 = "1.1"
 sha2 = "0.10"
 zip = { version = "8", default-features = false, features = ["deflate-flate2"] }
 reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls", "form"] }
+# GeoTIFF rasters for the optional storm-surge pack (NOAA/NHC SLOSH MOM maps): pure Rust, LZW.
+tiff = { version = "0.11", default-features = false, features = ["lzw", "deflate"] }

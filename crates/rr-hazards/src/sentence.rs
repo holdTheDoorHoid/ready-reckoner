@@ -126,7 +126,8 @@ fn per_1000_word(per1000: f64) -> String {
 
 /// "1 in 2,500" for a chance `p`.
 fn one_in(p: f64) -> String {
-    if p < 1.0e-6 {
+    // 0.95 in a million rounds to "1 in 1,000,000" (two significant figures).
+    if p < 0.95e-6 {
         "fewer than 1 in 1,000,000".to_owned()
     } else {
         format!("1 in {}", thousands(round_sig2(1.0 / p) as u64))
@@ -271,12 +272,105 @@ pub(crate) fn about_times_a_year(rate: f64) -> String {
 }
 
 /// A range-only sentence for a rare catastrophe (research §6.3): never a point estimate.
+#[allow(dead_code)] // kept for sentences that quote a published yearly range
 pub(crate) fn range_only(lead: &str, low: f64, high: f64, tail: &str) -> String {
     format!(
         "{lead} about {} to about {} a year.{tail}",
         one_in(low),
         one_in(high)
     )
+}
+
+/// Ranges wider than this (low to high) are said in words, not numbers (REVIEW §2.4).
+pub(crate) const RANGE_IN_WORDS_ABOVE: f64 = 1000.0;
+
+/// The range-only sentence of a rare row or a stacked-prior rate (REVIEW §2.4, H-02): "Between
+/// 1 in 1,700 and 1 in 26 households like yours would … in the next ten years." Never a point
+/// estimate. A range spanning more than a thousandfold is said in words.
+pub(crate) fn range_sentence(verb: &str, low: f64, high: f64, years: u8) -> String {
+    let when = horizon_phrase(years, false);
+    let (pl, ph) = (chance_within(low, years), chance_within(high, years));
+    if ph <= 0.0 {
+        return format!("No household like yours is expected to {verb} {when}.");
+    }
+    if low <= 0.0 || high / low > RANGE_IN_WORDS_ABOVE {
+        return format!(
+            "Expert estimates for this span more than a thousandfold. At most about {} \
+             households like yours would {verb} {when}.",
+            one_in(ph)
+        );
+    }
+    if pl < 0.95e-6 {
+        return format!(
+            "At most about {} households like yours would {verb} {when}, and perhaps fewer than \
+             1 in 1,000,000.",
+            one_in(ph)
+        );
+    }
+    format!(
+        "Between {} and {} households like yours would {verb} {when}.",
+        one_in(pl),
+        one_in(ph)
+    )
+}
+
+/// A chance over the horizon in words, for the anchor: "about 5 in 100", "about 3 in 1,000",
+/// "about 1 in 2,500", "nearly certain".
+pub(crate) fn chance_words(p: f64) -> String {
+    if p >= 0.995 {
+        "nearly certain".to_owned()
+    } else if p * 100.0 >= 0.95 {
+        format!("about {} in 100", per_100_word(p * 100.0))
+    } else if p * 1000.0 >= 0.95 {
+        format!("about {} in 1,000", per_1000_word(p * 1000.0))
+    } else if p >= 1.0e-6 {
+        format!("about {}", one_in(p))
+    } else {
+        "fewer than 1 in 1,000,000".to_owned()
+    }
+}
+
+/// The anchor of a rare row: "Less likely than a house fire (about 5 in 100 for you in the next
+/// ten years)."
+pub(crate) fn anchor(phrase: &str, rate: f64, years: u8) -> String {
+    format!(
+        "Less likely than {phrase} ({} for you {}).",
+        chance_words(chance_within(rate, years)),
+        horizon_phrase(years, false)
+    )
+}
+
+/// A yearly rate in words for the "Also checked" line: "about 1 in 110,000 a year", "fewer than
+/// 1 in 1,000,000 a year", "none recorded here".
+pub(crate) fn per_year_words(rate: f64) -> String {
+    if rate <= 0.0 {
+        "none recorded here".to_owned()
+    } else if rate >= 1.0e-6 {
+        format!("about {} a year", one_in(rate))
+    } else {
+        "fewer than 1 in 1,000,000 a year".to_owned()
+    }
+}
+
+/// Arrests for every 100 (or 1,000) households a year, in whole numbers: "about 7 arrests for
+/// every 100 households", "about 3 arrests for every 1,000 households".
+pub(crate) fn arrests_per_households(rate: f64) -> String {
+    let per100 = rate * 100.0;
+    if per100 >= 1.5 {
+        format!(
+            "about {:.0} arrests for every 100 households",
+            per100.round()
+        )
+    } else if per100 >= 0.95 {
+        "about 1 arrest for every 100 households".to_owned()
+    } else if rate * 1000.0 >= 0.95 {
+        format!(
+            "about {:.0} arrests for every 1,000 households",
+            (rate * 1000.0).round()
+        )
+    } else {
+        "fewer than 1 arrest for every 1,000 households".to_owned()
+    }
 }
 
 #[cfg(test)]

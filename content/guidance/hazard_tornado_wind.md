@@ -1,6 +1,7 @@
 ---
 id: hazard_tornado_wind
 title: Tornadoes, strong wind, hail and lightning
+kind: hazard
 applies_to: [hazard:tornado, hazard:strong_wind, hazard:hail, hazard:lightning]
 citations: [ready_gov_severe_weather, ready_gov_tornadoes, ready_gov_thunderstorms_lightning, noaa_spc_tornado_safety, ready_gov_tornadoes_2014]
 ---

@@ -16,10 +16,10 @@ fn r(h: HazardId, rate: f64) -> HouseholdEventRate {
     }
 }
 
-/// Every hazard at a plausible household rate (per-person and per-earner hazards scaled).
-// awaiting: consequence — the retired `terrorism` row stays so its effects rows are still
-// exercised until they are replaced by `attack_disruption` and `mass_violence`.
-#[allow(deprecated)]
+/// Every ranked hazard at a plausible household rate (per-person and per-earner hazards
+/// scaled), plus the rare families at their published middle rates so the tests can check that
+/// they never reach a bucket. The retired `terrorism` id is gone: `attack_disruption` (ranked)
+/// and `mass_violence` (rare) replace it.
 pub fn rates(input: &PlanInput) -> Vec<HouseholdEventRate> {
     use HazardId::*;
     let people = input.people.len() as f64;
@@ -52,7 +52,6 @@ pub fn rates(input: &PlanInput) -> Vec<HouseholdEventRate> {
         r(HazmatRelease, 0.02),
         r(NuclearPlantIncident, 0.0001),
         r(NuclearAttack, 0.0005),
-        r(Terrorism, 0.0005),
         r(HouseFire, 0.0026),
         r(MedicalEmergency, 0.473 * people),
         r(VehicleStranding, 0.05 * vehicles),
@@ -60,6 +59,38 @@ pub fn rates(input: &PlanInput) -> Vec<HouseholdEventRate> {
         r(Burglary, 0.02),
         r(ExtendedHouseholdIllness, 0.02),
     ];
+    // Contract v2 ranked hazards (hazard-candidates.csv typical rates; rr-hazards gates the
+    // conditional ones, which the effects rows gate again by household).
+    let daily_rx = input.people.iter().filter(|p| p.medical.daily_rx).count() as f64;
+    v.extend([
+        r(WildfireSmoke, 0.5),
+        r(DustStorm, 0.05),
+        r(Sinkhole, 0.0002),
+        r(DamFailure, 0.00001),
+        r(NetworkOutage, 0.3),
+        r(AttackDisruption, 0.0009),
+        r(WaterDamage, 0.015),
+        r(ArrestOrDetention, 0.02 * people),
+    ]);
+    if daily_rx > 0.0 {
+        v.push(r(DrugShortage, 0.05 * daily_rx));
+    }
+    if !input.finances.benefits.is_empty() {
+        v.push(r(BenefitInterruption, 0.077));
+    }
+    if input.housing.tenure == rr_types::Tenure::Rent {
+        v.push(r(Eviction, 0.023));
+    }
+    // Rare families: never in a bucket's curve.
+    v.extend([
+        r(GeomagneticStorm, 0.00027),
+        r(Vei7Eruption, 0.0018),
+        r(WarInfrastructure, 0.0025),
+        r(CbrnAttack, 0.00015),
+        r(SeverePandemic, 0.0015),
+        r(FinancialCrisis, 0.002),
+        r(MassViolence, 0.000001),
+    ]);
     if earners > 0.0 {
         v.push(r(JobLoss, 0.083 * earners));
         v.push(r(EarnerDeathOrDisability, 0.004 * earners));

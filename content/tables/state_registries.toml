@@ -1,0 +1,503 @@
+# State table: evacuation-zone lookups, registries for people who may need help in a disaster,
+# alert sign-ups and emergency prescription-refill rules, one row per state, DC and Puerto Rico.
+# Rules: docs/CONTENT_STANDARDS.md §10. Checked 2026-09-26; how each address was read is in
+# docs/CITATION_IDS.md ("State table"). A zone, registry or alert entry is listed only where a
+# state-level tool was confirmed on the page itself. Every other row sends the household to its
+# local office through the state agency, whose site is the source for that line. Refill rules come
+# from Healthcare Ready's 2022 review (all 50 states and DC), with a second source where one was
+# read: where two sources disagree, the row says so and asks the household to ask a pharmacist.
+
+[[state]]
+code = "AL"
+name = "Alabama"
+checked = "2026-09-26"
+em_agency = "Alabama Emergency Management Agency"
+em_url = "https://ema.alabama.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "AK"
+name = "Alaska"
+checked = "2026-09-26"
+em_agency = "Alaska Division of Homeland Security and Emergency Management"
+em_url = "https://ready.alaska.gov/"
+local_office = "borough or city emergency management office"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "AZ"
+name = "Arizona"
+checked = "2026-09-26"
+em_agency = "Arizona Department of Emergency and Military Affairs"
+em_url = "https://dema.az.gov/"
+refill = "When the governor declares an emergency, a pharmacist may give up to a 30-day supply if your prescriber cannot be reached."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "AR"
+name = "Arkansas"
+checked = "2026-09-26"
+em_agency = "Arkansas Division of Emergency Management"
+em_url = "https://www.dps.arkansas.gov/emergency-management/"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "CA"
+name = "California"
+checked = "2026-09-26"
+em_agency = "California Governor's Office of Emergency Services"
+em_url = "https://www.caloes.ca.gov/"
+refill = "When the governor declares an emergency, a pharmacist may give a reasonable supply if your prescriber cannot be reached."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "CO"
+name = "Colorado"
+checked = "2026-09-26"
+em_agency = "Colorado Division of Homeland Security and Emergency Management"
+em_url = "https://dhsem.colorado.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "CT"
+name = "Connecticut"
+checked = "2026-09-26"
+em_agency = "Connecticut Division of Emergency Management and Homeland Security"
+em_url = "https://portal.ct.gov/demhs/emergency-management/emergency-management-home"
+local_office = "city or town emergency management office"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "DE"
+name = "Delaware"
+checked = "2026-09-26"
+em_agency = "Delaware Emergency Management Agency"
+em_url = "https://dema.delaware.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give enough to last until they can be. The pharmacist decides how much."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "FL"
+name = "Florida"
+checked = "2026-09-26"
+em_agency = "Florida Division of Emergency Management"
+em_url = "https://www.floridadisaster.org/"
+zone = { name = "Know Your Zone, Know Your Home", url = "https://www.floridadisaster.org/knowyourzone/" }
+registry = { name = "Florida Special Needs Registry", url = "https://www.floridadisaster.org/snr/", note = "Registering does not guarantee help or a place in a special-needs shelter." }
+refill = "In a declared state of emergency, a pharmacist may give up to a 30-day supply if your prescriber cannot be reached, and insurers must allow early refills. At other times the limit is a one-time 72-hour supply."
+refill_sources = ["healthcare_ready_refill_laws", "fl_bop_emergency_refills"]
+
+[[state]]
+code = "GA"
+name = "Georgia"
+checked = "2026-09-26"
+em_agency = "Georgia Emergency Management and Homeland Security Agency"
+em_url = "https://gema.georgia.gov/"
+zone = { name = "Hurricane Evacuation Zone map", url = "https://gema.georgia.gov/plan-prepare/hurricane-evacuation-zone", note = "Search by address." }
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "HI"
+name = "Hawaii"
+checked = "2026-09-26"
+em_agency = "Hawaii Emergency Management Agency"
+em_url = "https://dod.hawaii.gov/hiema/"
+zone = { name = "Tsunami Evacuation Zones", url = "https://dod.hawaii.gov/hiema/tsunami-evacuation-zones/", note = "These maps do not cover a tsunami from a nearby earthquake: if you feel shaking near the coast, move inland at once." }
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "ID"
+name = "Idaho"
+checked = "2026-09-26"
+em_agency = "Idaho Office of Emergency Management"
+em_url = "https://ioem.idaho.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give enough to last until they can be. The pharmacist decides how much."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "IL"
+name = "Illinois"
+checked = "2026-09-26"
+em_agency = "Illinois Emergency Management Agency and Office of Homeland Security"
+em_url = "https://iemaohs.illinois.gov/"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "IN"
+name = "Indiana"
+checked = "2026-09-26"
+em_agency = "Indiana Department of Homeland Security"
+em_url = "https://www.in.gov/dhs/"
+refill = "If your prescriber cannot be reached, a pharmacist may give enough to last until they can be. The pharmacist decides how much."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "IA"
+name = "Iowa"
+checked = "2026-09-26"
+em_agency = "Iowa Homeland Security and Emergency Management"
+em_url = "https://homelandsecurity.iowa.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give enough to last until they can be. The pharmacist decides how much."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "KS"
+name = "Kansas"
+checked = "2026-09-26"
+em_agency = "Kansas Division of Emergency Management"
+em_url = "https://www.kansastag.gov/101/KDEM"
+refill = "If your prescriber cannot be reached, a pharmacist may give an emergency supply of 7 to 15 days."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "KY"
+name = "Kentucky"
+checked = "2026-09-26"
+em_agency = "Kentucky Emergency Management"
+em_url = "https://www.kyem.ky.gov/"
+refill = "When the governor declares an emergency, a pharmacist may give up to a 30-day supply if your prescriber cannot be reached."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "LA"
+name = "Louisiana"
+checked = "2026-09-26"
+em_agency = "Governor's Office of Homeland Security and Emergency Preparedness"
+em_url = "https://gohsep.la.gov/about/contact-us/parish-ohsep-contacts/"
+local_office = "parish office of homeland security and emergency preparedness"
+refill = "When the governor declares an emergency, a pharmacist may give up to a 30-day supply if your prescriber cannot be reached."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "ME"
+name = "Maine"
+checked = "2026-09-26"
+em_agency = "Maine Emergency Management Agency"
+em_url = "https://www.maine.gov/mema/"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "MD"
+name = "Maryland"
+checked = "2026-09-26"
+em_agency = "Maryland Department of Emergency Management"
+em_url = "https://mdem.maryland.gov/"
+zone = { name = "Know Your Zone Maryland", url = "https://mdem.maryland.gov/action/Pages/know-your-zone-md.aspx", note = "For coastal counties and Prince George's County." }
+refill = "If your prescriber cannot be reached, a pharmacist may give one emergency refill of up to 14 days, including in a declared emergency."
+refill_sources = ["healthcare_ready_refill_laws", "nacds_2018_emergency_refills"]
+
+[[state]]
+code = "MA"
+name = "Massachusetts"
+checked = "2026-09-26"
+em_agency = "Massachusetts Emergency Management Agency"
+em_url = "https://www.mass.gov/orgs/massachusetts-emergency-management-agency"
+local_office = "city or town emergency management office"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "MI"
+name = "Michigan"
+checked = "2026-09-26"
+em_agency = "Michigan State Police, Emergency Management and Homeland Security Division"
+em_url = "https://www.michigan.gov/msp/divisions/emhsd"
+alerts = { name = "MI Ready: Emergency Alerts", url = "https://www.michigan.gov/miready/be-informed/emergency-alerts", note = "Links to local text alert sign-ups where your community has one." }
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "MN"
+name = "Minnesota"
+checked = "2026-09-26"
+em_agency = "Minnesota Homeland Security and Emergency Management"
+em_url = "https://dps.mn.gov/divisions/hsem"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "MS"
+name = "Mississippi"
+checked = "2026-09-26"
+em_agency = "Mississippi Emergency Management Agency"
+em_url = "https://www.msema.org/"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "MO"
+name = "Missouri"
+checked = "2026-09-26"
+em_agency = "Missouri State Emergency Management Agency"
+em_url = "https://sema.dps.mo.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give an emergency supply of 7 to 15 days."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "MT"
+name = "Montana"
+checked = "2026-09-26"
+em_agency = "Montana Disaster and Emergency Services"
+em_url = "https://des.mt.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give enough to last until they can be. The pharmacist decides how much."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "NE"
+name = "Nebraska"
+checked = "2026-09-26"
+em_agency = "Nebraska Emergency Management Agency"
+em_url = "https://nema.nebraska.gov/"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "NV"
+name = "Nevada"
+checked = "2026-09-26"
+em_agency = "Nevada Office of Emergency Management and Homeland Security"
+em_url = "https://www.oem.nv.gov/"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "NH"
+name = "New Hampshire"
+checked = "2026-09-26"
+em_agency = "New Hampshire Homeland Security and Emergency Management (ReadyNH)"
+em_url = "https://www.readynh.gov/"
+local_office = "city or town emergency management office"
+alerts = { name = "NH Alerts, through ReadyNH", url = "https://www.readynh.gov/", note = "The state's own alert sign-up." }
+refill = "When a disaster keeps a pharmacist from reaching your prescriber, they may give up to a 72-hour supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "NJ"
+name = "New Jersey"
+checked = "2026-09-26"
+em_agency = "New Jersey Office of Emergency Management"
+em_url = "https://www.nj.gov/njoem/"
+registry = { name = "Register Ready, New Jersey's Special Needs Registry for Disasters", url = "https://nj.gov/njoem/plan-prepare/registerready.shtml", note = "For people with disabilities or access and functional needs. Call 2-1-1 for help registering." }
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "NM"
+name = "New Mexico"
+checked = "2026-09-26"
+em_agency = "New Mexico Department of Homeland Security and Emergency Management"
+em_url = "https://www.dhsem.nm.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "NY"
+name = "New York"
+checked = "2026-09-26"
+em_agency = "New York State Division of Homeland Security and Emergency Services"
+em_url = "https://www.dhses.ny.gov/"
+alerts = { name = "NY-Alert", url = "https://alert.ny.gov/sign-up-ny-alert", note = "The state's own warnings by cell phone and email." }
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "NC"
+name = "North Carolina"
+checked = "2026-09-26"
+em_agency = "North Carolina Emergency Management"
+em_url = "https://www.ncdps.gov/our-organization/emergency-management"
+zone = { name = "Know Your Zone", url = "https://www.ncdps.gov/our-organization/emergency-management/emergency-preparedness/know-your-zone", note = "For the 21 coastal counties: enter your address." }
+refill = "Rules differ between sources: a pharmacist may give up to a 30-day emergency refill, and up to 90 days when medical services are interrupted. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws", "nacds_2018_emergency_refills"]
+
+[[state]]
+code = "ND"
+name = "North Dakota"
+checked = "2026-09-26"
+em_agency = "North Dakota Department of Emergency Services"
+em_url = "https://www.des.nd.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "OH"
+name = "Ohio"
+checked = "2026-09-26"
+em_agency = "Ohio Emergency Management Agency"
+em_url = "https://ema.ohio.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "OK"
+name = "Oklahoma"
+checked = "2026-09-26"
+em_agency = "Oklahoma Department of Emergency Management"
+em_url = "https://oklahoma.gov/oem.html"
+refill = "When the governor declares an emergency, a pharmacist may give up to a 30-day supply if your prescriber cannot be reached."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "OR"
+name = "Oregon"
+checked = "2026-09-26"
+em_agency = "Oregon Department of Emergency Management"
+em_url = "https://www.oregon.gov/oem/"
+refill = "When the governor declares an emergency, a pharmacist may give up to a 30-day supply if your prescriber cannot be reached."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "PA"
+name = "Pennsylvania"
+checked = "2026-09-26"
+em_agency = "Pennsylvania Emergency Management Agency"
+em_url = "https://www.pa.gov/agencies/pema"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "RI"
+name = "Rhode Island"
+checked = "2026-09-26"
+em_agency = "Rhode Island Emergency Management Agency"
+em_url = "https://riema.ri.gov/"
+local_office = "city or town emergency management office"
+registry = { name = "Rhode Island Special Needs Emergency Registry", url = "https://health.ri.gov/emergencies/rhode-island-special-needs-emergency-registry", note = "Enrolling does not guarantee help, but it tells first responders what you may need." }
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "SC"
+name = "South Carolina"
+checked = "2026-09-26"
+em_agency = "South Carolina Emergency Management Division"
+em_url = "https://www.scemd.org/"
+zone = { name = "Know Your Zone", url = "https://www.scemd.org/prepare/know-your-zone/", note = "Use the zone finder." }
+refill = "When the governor declares a state of emergency, a pharmacist may give up to a 30-day refill of a medicine that is not a controlled substance. One review lists a shorter limit, so ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws", "nacds_2018_emergency_refills"]
+
+[[state]]
+code = "SD"
+name = "South Dakota"
+checked = "2026-09-26"
+em_agency = "South Dakota Office of Emergency Management"
+em_url = "https://oem.sd.gov/"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "TN"
+name = "Tennessee"
+checked = "2026-09-26"
+em_agency = "Tennessee Emergency Management Authority"
+em_url = "https://www.tn.gov/tema.html"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "TX"
+name = "Texas"
+checked = "2026-09-26"
+em_agency = "Texas Division of Emergency Management"
+em_url = "https://tdem.texas.gov/"
+registry = { name = "State of Texas Emergency Assistance Registry (STEAR)", url = "https://www.tdem.texas.gov/response/state-of-texas-emergency-assistance-registry", note = "Free: register online or by calling 2-1-1. Registering does not guarantee help." }
+refill = "Usually a pharmacist may give up to a 72-hour emergency supply. After the governor declares a disaster and the state pharmacy board says so, the limit is 30 days, except for the most tightly controlled medicines."
+refill_sources = ["healthcare_ready_refill_laws", "tx_pharmacy_disaster_2024"]
+
+[[state]]
+code = "UT"
+name = "Utah"
+checked = "2026-09-26"
+em_agency = "Utah Division of Emergency Management"
+em_url = "https://dem.utah.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "VT"
+name = "Vermont"
+checked = "2026-09-26"
+em_agency = "Vermont Emergency Management"
+em_url = "https://vem.vermont.gov/"
+local_office = "city or town emergency management office"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "VA"
+name = "Virginia"
+checked = "2026-09-26"
+em_agency = "Virginia Department of Emergency Management"
+em_url = "https://www.vdem.virginia.gov/"
+local_office = "county or city emergency management office"
+zone = { name = "Know Your Zone", url = "https://www.vdem.virginia.gov/know-your-zone/", note = "For coastal Virginia." }
+refill = "Rules differ between sources: one review found no emergency-refill law, and another says the state pharmacy board may waive refill rules after the governor declares an emergency. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws", "nacds_2018_emergency_refills"]
+
+[[state]]
+code = "WA"
+name = "Washington"
+checked = "2026-09-26"
+em_agency = "Washington Emergency Management Division"
+em_url = "https://mil.wa.gov/emergency-management-division"
+alerts = { name = "Washington alert sign-up list", url = "https://mil.wa.gov/alerts", note = "Links to the local text and email alert sign-up for each part of the state." }
+refill = "If your prescriber cannot be reached, a pharmacist may give up to a 72-hour emergency supply."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "WV"
+name = "West Virginia"
+checked = "2026-09-26"
+em_agency = "West Virginia Emergency Management Division"
+em_url = "https://emd.wv.gov/"
+refill = "If your prescriber cannot be reached, a pharmacist may give an emergency supply of 7 to 15 days."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "WI"
+name = "Wisconsin"
+checked = "2026-09-26"
+em_agency = "Wisconsin Emergency Management"
+em_url = "https://wem.wi.gov/"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "WY"
+name = "Wyoming"
+checked = "2026-09-26"
+em_agency = "Wyoming Office of Homeland Security"
+em_url = "https://hls.wyo.gov/"
+refill = "No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws"]
+
+[[state]]
+code = "DC"
+name = "District of Columbia"
+checked = "2026-09-26"
+em_agency = "DC Homeland Security and Emergency Management Agency"
+em_url = "https://hsema.dc.gov/"
+local_office = ""
+alerts = { name = "AlertDC", url = "https://hsema.dc.gov/page/alertdc-stay-informed-stay-safe", note = "The District's official alerts by text or email; anyone can sign up." }
+refill = "Two reviews (2018 and 2022) found no District rule allowing emergency refills. Ask your pharmacist."
+refill_sources = ["healthcare_ready_refill_laws", "nacds_2018_emergency_refills"]
+
+[[state]]
+code = "PR"
+name = "Puerto Rico"
+checked = "2026-09-26"
+em_agency = "Puerto Rico Emergency Management and Disaster Administration Bureau"
+em_url = "https://manejodeemergencias.pr.gov/"
+local_office = "municipio's emergency management office"
+none_found = true
+refill = "No emergency refill rule was confirmed for Puerto Rico, which the 2022 review of states did not cover. Ask your pharmacist, and ask your drug plan about replacing lost medicine or a larger supply."
+refill_sources = ["healthcare_ready_refill_laws", "medicare_drugs_disaster"]

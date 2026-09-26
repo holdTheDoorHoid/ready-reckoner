@@ -151,6 +151,25 @@ impl Estimate {
         self.times(&Estimate::exact(k))
     }
 
+    /// The product whose range spans every combination of the two ranges: low × low to
+    /// high × high. Used for the rare families, where every factor is expert judgement stacked
+    /// on expert judgement and only the range is ever shown (REVIEW §2.3 computes its ranges
+    /// this way); the ranked rates use [`Estimate::times`].
+    pub fn times_span(&self, other: &Estimate) -> Estimate {
+        let mut out = Estimate {
+            value: self.value * other.value,
+            low: self.low * other.low,
+            high: self.high * other.high,
+            evidence: combine_evidence(self, other),
+            sources: Vec::new(),
+        };
+        out.low = out.low.min(out.value);
+        out.high = out.high.max(out.value);
+        out.cite_all(&self.sources);
+        out.cite_all(&other.sources);
+        out
+    }
+
     /// max(high/value, value/low): how many times the range reaches away from the value.
     /// 1 for an exact number; infinite when the low end is zero but the value is not.
     pub fn range_factor(&self) -> f64 {

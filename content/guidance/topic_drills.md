@@ -1,6 +1,7 @@
 ---
 id: topic_drills
 title: Drills and if-then plans
+kind: topic
 applies_to: [topic:drills]
 citations: [gollwitzer_sheeran_2006, wood_2018_milling, ready_gov_plan, vinnell_2020_shakeout, gargano_2017_wtc_training, ready_gov_home_fires, rr_research_prior_art]
 ---

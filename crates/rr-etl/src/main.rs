@@ -25,18 +25,20 @@ fn run(args: &[String]) -> rr_etl::Result<i32> {
         }
         Command::Jobs => {
             for j in JOBS {
-                println!("{:<14} {}", j.id, j.title);
+                let mark = if j.default { "" } else { " (optional)" };
+                println!("{:<16} {}{mark}", j.id, j.title);
             }
             Ok(0)
         }
         Command::Refresh {
             out,
             only,
+            optional,
             keep_raw,
         } => {
             let http = Http::new(out.join("raw"), keep_raw)?;
             let ctx = Ctx { data: out, http };
-            let summary = refresh(&ctx, &only)?;
+            let summary = refresh(&ctx, &only, optional)?;
             println!(
                 "refresh finished: {} job(s) ok, {} failed",
                 summary.ok.len(),

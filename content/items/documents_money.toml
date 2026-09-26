@@ -12,8 +12,11 @@ tier = "now"
 free = true
 spec = "Use FEMA's Emergency Financial First Aid Kit to gather IDs, financial and legal papers, insurance, medical information and contacts, and photograph or video every room and valuable item. Keep paper copies in a waterproof bag and another copy with someone you trust or in secure online storage (FEMA). Check what your insurance covers: standard home and renters policies do not cover flood or earthquake damage, a new flood policy usually takes 30 days to start, and renters can buy their own policy and contents-only flood cover (Ready.gov, FEMA)."
 look_for = [
-  "IDs, birth certificates, lease or deed, insurance policies and bank details",
+  "IDs, certified copies of birth certificates, lease or deed, insurance policies and bank details",
+  "A passport book or card for each person, children included",
+  "Copies of your will, advance directive and powers of attorney for health care and for money",
   "Medicine lists, medical records and pet records",
+  "Scans in an encrypted password vault, one folder of key files backed up away from home, and account backup codes on paper",
   "A walk-through video of every room, closets included, with a copy stored away from the house",
   "Flood cover if you are near water, and additional living expenses cover for a place to stay",
   "Renters: a renters-insurance quote with contents, living expenses and liability cover",
@@ -27,7 +30,7 @@ avoid = [
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free: copies, photos and a call to your insurer." }
 quantity_rule = "once"
 maintenance = { check_months = 12 }
-citations = ["fema_effak", "ready_gov_financial", "ready_gov_kit", "ready_gov_floods", "ready_gov_earthquakes", "fema_nfip_flood_insurance", "floodsmart_buy_policy", "fema_nhs_2024"]
+citations = ["fema_effak", "ready_gov_financial", "ready_gov_kit", "ready_gov_floods", "ready_gov_earthquakes", "fema_nfip_flood_insurance", "floodsmart_buy_policy", "fema_nhs_2024", "state_dept_passport_card", "state_dept_child_passport", "nia_affairs_checklist", "ready_gov_cybersecurity", "cisa_data_backup_2012", "ollam_2022_lawyer_passport_locksmith_gun"]
 hazard_extras = []
 
 [[item]]
@@ -99,4 +102,29 @@ avoid = [
 price_band_usd = { low = 1, high = 1, per = "dollar", note = "Cash is money set aside, not spent. No authority gives an amount: the plan starts at $100 until you enter a few days of your own spending on food, fuel and daily needs." }
 quantity_rule = "cash_reserve_usd"
 citations = ["ready_gov_financial", "fema_effak", "rr_expert_prior"]
+hazard_extras = []
+
+[[item]]
+id = "docs_legal_readiness"
+name = "Legal readiness: a lawyer's number, a will and powers of attorney"
+category = "documents_money"
+unit = "action"
+buckets = ["income", "home_loss", "medical_emergency"]
+tier = "now"
+free = true
+spec = "Find a lawyer before you need one, perhaps through a lawyer you already know, and keep the number on paper. Legal aid helps people with low incomes with civil problems such as eviction (LSC). A will and powers of attorney let people you choose act for you (National Institute on Aging)."
+look_for = [
+  "The lawyer's number on your wallet card",
+  "A will that names who would care for children and pets",
+  "A health care power of attorney, separate from the one for money",
+  "Copies with the people you name",
+]
+avoid = [
+  "Answering police questions or signing papers without a lawyer",
+  "Looking for a lawyer only after an arrest or eviction notice",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free to start: finding a lawyer and legal aid costs nothing; legal fees vary." }
+quantity_rule = "once"
+maintenance = { check_months = 12 }
+citations = ["ollam_2022_lawyer_passport_locksmith_gun", "lsc_get_legal_help", "nia_affairs_checklist", "aclu_stopped_by_police"]
 hazard_extras = []

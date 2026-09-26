@@ -116,10 +116,9 @@ pub fn why_we_think_this(hazard: HazardId) -> &'static str {
              several thousand years of reactor operation. Near a plant the chance is very small."
         }
         NuclearAttack => {
-            "Experts asked in 2024 put the chance of a nuclear catastrophe anywhere in the world \
-             by 2045 at about 5 in 100; forecasters with strong track records said about 1 in 100. \
-             That is the world's chance, not your household's: no one can say what it would mean \
-             where you live."
+            "Published forecasts of a nuclear attack on the US, times the chance your county would \
+             be in a blast or heavy-fallout zone given where likely targets and missile fields \
+             are. Expert estimates stacked together, so only the range is shown."
         }
         Terrorism => {
             "Attacks that close down the area where people live for half a day to two days are \
@@ -159,13 +158,95 @@ pub fn why_we_think_this(hazard: HazardId) -> &'static str {
             "An illness that keeps someone home for weeks: an expert estimate of about 1 in 100 per \
              person a year."
         }
-        // awaiting: hazards — the reason for each contract v2 hazard arrives with its rate; none
-        // is emitted yet.
-        WildfireSmoke | DustStorm | Sinkhole | GeomagneticStorm | Vei7Eruption | DamFailure
-        | NetworkOutage | DrugShortage | BenefitInterruption | AttackDisruption
-        | MultiMonthBlackout | WarInfrastructure | CbrnAttack | SeverePandemic
-        | FinancialCrisis | MassViolence | WaterDamage | Eviction | ArrestOrDetention => {
-            "We do not estimate this hazard yet."
+        WildfireSmoke => {
+            "Satellite smoke maps and air monitors count the days a year your county breathed \
+             smoke at levels unhealthy for sensitive groups (2016 to 2023). A smoke episode lasts \
+             about three days."
+        }
+        DustStorm => {
+            "The National Weather Service records dust storms by forecast area. We estimate about \
+             1 in 3 of your area's dust storms reaches a given household."
+        }
+        Sinkhole => {
+            "USGS maps show how much of your county sits on karst, rock that dissolves into caves \
+             and sinkholes. How often a home there is damaged is an expert estimate from Florida \
+             records."
+        }
+        GeomagneticStorm => {
+            "Five studies put a storm like the 1859 Carrington event at about once in 100 to 2,000 \
+             years. Power grids nearer the magnetic pole take stronger currents, so your latitude \
+             scales the chance of a long outage."
+        }
+        Vei7Eruption => {
+            "Ice cores and geology suggest about a 1 in 6 chance of a very large eruption somewhere \
+             in the world this century (Cassidy and Mani, 2022). It would raise food prices for a \
+             year or two."
+        }
+        DamFailure => {
+            "The national dam inventory lists high-hazard dams and the towns below them; about 2 in \
+             10,000 dams fail each year. Levees add a small chance for homes behind them. Expert \
+             estimates stacked together, so only the range is shown."
+        }
+        NetworkOutage => {
+            "A carrier-wide phone outage of several hours happens about once a year (AT&T, \
+             February 2024, blocked more than 92 million calls). About a third of households are \
+             on the carrier that fails."
+        }
+        DrugShortage => {
+            "Hundreds of medicines run short each year (323 at the peak in early 2024). For one \
+             person's daily medicine this is an expert estimate of about 1 in 20 a year, more for \
+             medicines that must stay cold."
+        }
+        BenefitInterruption => {
+            "Federal funding gaps of two weeks or more came in 4 of the last 45 years, and one, in \
+             November 2025, stopped SNAP payments. Social Security and VA payments have kept \
+             coming through every shutdown."
+        }
+        AttackDisruption => {
+            "About three or four attacks in 31 years closed a whole US metro area for half a day or \
+             more. We weigh your area by its share of FEMA's terrorism-preparedness money. Expert \
+             estimates stacked together, so only the range is shown."
+        }
+        MultiMonthBlackout => {
+            "Your county's own outage record, plus the long tails of a severe solar storm, an EMP \
+             and wartime attacks on the grid. Puerto Rico's outage after Hurricane Maria lasted \
+             328 days for the last customers."
+        }
+        WarInfrastructure => {
+            "Forecasters put a war between the US and Russia by 2030 at about 2 to 5 in 100. Given \
+             a war, attacks on US power, water or phones are an expert estimate, lower far from \
+             military sites and cities."
+        }
+        CbrnAttack => {
+            "About 500 chemical, biological or radiological attacks, attempts and plots were \
+             recorded worldwide from 1990 to 2017, most of them chemical. We weigh your area by \
+             its share of FEMA's terrorism-preparedness money."
+        }
+        SeverePandemic => {
+            "Records of epidemics over four centuries put a pandemic as deadly as COVID-19 at \
+             about once in 200 years (Marani et al., 2021). One far deadlier is rarer: an expert \
+             range."
+        }
+        FinancialCrisis => {
+            "Banks closed nationwide once in the last century (1933), before deposit insurance. \
+             Single banks fail about 23 times a year, and insured deposits move within days."
+        }
+        MassViolence => {
+            "The FBI counted 23 people killed and 83 wounded in active-shooter attacks in 2024, \
+             among about 336 million people: about 3 in 10 million a year."
+        }
+        WaterDamage => {
+            "Insurers record water damage and freezing at about 1 in 67 insured homes a year. \
+             Freezing weather and a basement raise the chance; renters report fewer claims."
+        }
+        Eviction => {
+            "Courts order about 2 in 100 renting households to leave each year (Eviction Lab). \
+             Savings and steadier income lower the chance."
+        }
+        ArrestOrDetention => {
+            "The FBI counts about 7 million arrests a year, by age and sex. We add up the rates for \
+             the ages in your household. It counts arrests, not guilt, and one person arrested \
+             twice counts twice."
         }
     }
 }

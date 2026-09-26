@@ -27,3 +27,28 @@ quantity_rule = "once"
 maintenance = { check_months = 12 }
 citations = ["aldrich_sawada_2015", "ye_aldrich_2019", "fema_nhs_2024", "semenza_1996_heat_deaths", "ready_gov_older_adults", "cdc_heat_health", "listos_california", "ready_gov_cert", "dhs_stop_the_bleed", "gargano_2017_wtc_training", "redcross_first_aid_kit"]
 hazard_extras = []
+
+[[item]]
+id = "community_trusted_circle"
+name = "Your trusted circle: agree who helps whom"
+category = "community"
+unit = "action"
+buckets = ["security", "comms", "evacuate", "home_loss"]
+tier = "now"
+free = true
+spec = "Agree with a few people you trust that you will help each other in a crisis, and say how: a bed for a night, a ride, care for children or pets, a call to a lawyer. Tell one of them where your important papers are."
+look_for = [
+  "Each person's phone number, lasting email and birthdate, on paper",
+  "A regular day to check in",
+  "Account backup codes on paper, kept by one of them",
+  "Emergency access to your password vault for one of them, after a waiting period",
+]
+avoid = [
+  "Deciding who to call in the middle of a crisis",
+  "Keeping everyone's details in one phone only",
+]
+price_band_usd = { low = 0, high = 0, per = "action", note = "Free: a conversation and a shared list." }
+quantity_rule = "once"
+maintenance = { check_months = 12 }
+citations = ["ollam_2022_lawyer_passport_locksmith_gun", "nia_affairs_checklist"]
+hazard_extras = []

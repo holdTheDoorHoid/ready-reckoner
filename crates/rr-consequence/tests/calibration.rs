@@ -22,6 +22,12 @@ const KNOWN_DEVIATIONS: &[(&str, &str)] = &[
     ),
     ("Philadelphia Heat or cold at 1 in 95", "as above"),
     ("Philadelphia Heat or cold at 1 in 500", "as above"),
+    (
+        "Philadelphia Boil-water notice at 1 in 50",
+        "model review M-03 (v0.2.0): a major water-system failure is followed by a boil notice of weeks (Asheville, 7 weeks after Helene; Jackson, nearly 7 in 2022), a class the research prototype did not have",
+    ),
+    ("Philadelphia Boil-water notice at 1 in 95", "as above"),
+    ("Philadelphia Boil-water notice at 1 in 500", "as above"),
 ];
 
 #[test]

@@ -186,6 +186,50 @@
    "nearest_nuclear_km": 330.0,
    "tri_facilities": 5,
    "high_hazard_dams": 1
+  },
+  "exposure": {
+   "strategic_class": "B",
+   "strategic_site_ids": [
+    "warren_field"
+   ],
+   "strategic_places": [
+    {
+     "id": "warren_field",
+     "name": "F.E. Warren AFB missile field (90th Missile Wing)",
+     "kind": "icbm_field",
+     "role_plain": "a field of underground nuclear missile silos",
+     "state": "WY, NE, CO",
+     "sources": [
+      "ap_sentinel_counties",
+      "sentinel_feis_summary",
+      "sentinel_feis_vol1",
+      "fas_2025",
+      "defensenews_new_silos"
+     ],
+     "unverified": [
+      "ap_sentinel_counties: search_summary",
+      "defensenews_new_silos: search_summary"
+     ]
+    }
+   ],
+   "strategic_km": 381.1,
+   "strategic_bearing": 304.0,
+   "uasi_share": 0.0,
+   "uasi_area_share": 0.0,
+   "geomag_lat": 47.0,
+   "geomag_factor": 0.22,
+   "smoke_days_35": 0.843,
+   "smoke_days_55": 0.14,
+   "smoke_trend": 0.171,
+   "hms_smoke_days": 22.8,
+   "smoke_basis": "imputed",
+   "karst_share": 0.368,
+   "landslide_susceptible_share": 0.265,
+   "leveed_pop_share": 0.282,
+   "levee_risk_high_share": 0.0,
+   "dams_high_total": 1,
+   "sdwis_violation_pop_share": 0.00376,
+   "cws_pop_share": 0.901
   }
  },
  "location": {

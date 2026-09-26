@@ -210,6 +210,40 @@
    "nearest_nuclear_km": 85.0,
    "tri_facilities": 50,
    "high_hazard_dams": 3
+  },
+  "exposure": {
+   "strategic_class": "C1",
+   "strategic_site_ids": [
+    "metro_26420"
+   ],
+   "strategic_places": [
+    {
+     "id": "metro_26420",
+     "name": "Houston-Pasadena-The Woodlands, TX",
+     "kind": "metro",
+     "sources": [
+      "census_cbsa_pop_2024",
+      "census_delineation_2023"
+     ]
+    }
+   ],
+   "uasi_share": 0.004602,
+   "uasi_area_share": 0.03996,
+   "uasi_area": "Houston-The Woodlands-Sugar Land, TX",
+   "geomag_lat": 37.9,
+   "geomag_factor": 0.1,
+   "smoke_days_35": 0.0,
+   "smoke_days_55": 0.0,
+   "smoke_trend": 0.0,
+   "hms_smoke_days": 11.4,
+   "smoke_basis": "imputed",
+   "karst_share": 0.0,
+   "landslide_susceptible_share": 0.0587,
+   "leveed_pop_share": 0.248,
+   "levee_risk_high_share": 0.0,
+   "dams_high_total": 3,
+   "sdwis_violation_pop_share": 0.0372,
+   "cws_pop_share": 1.0
   }
  },
  "location": {

@@ -1,6 +1,7 @@
 ---
 id: hazard_nuclear
 title: Nuclear emergencies
+kind: hazard
 applies_to: [hazard:nuclear_plant_incident, hazard:nuclear_attack]
 citations: [fri_nuclear_risk_2024, ready_gov_nuclear, ready_gov_radiation, fema_nuclear_sites, cdc_potassium_iodide, nrc_potassium_iodide, rr_research_risk_model]
 ---

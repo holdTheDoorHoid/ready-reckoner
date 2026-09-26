@@ -1,6 +1,7 @@
 ---
 id: topic_disaster_myths
 title: Disaster myths and what really happens
+kind: topic
 applies_to: [topic:disaster_myths]
 citations: [clarke_2002_panic, drury_2009_shared_identity, tierney_2006_disaster_myths, aldrich_sawada_2015, semenza_1996_heat_deaths, fema_nhs_2024]
 ---
