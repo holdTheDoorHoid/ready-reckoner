@@ -477,7 +477,8 @@ pub fn historic_event(class: &str) -> &'static str {
     }
 }
 
-/// Citation id for a hand-copied historic restoration curve.
+/// Citation id for a hand-copied historic restoration curve (the data pack's historic table reads
+/// Maria from the Department of Energy's situation reports).
 pub fn historic_source(class: &str) -> &'static str {
     match class {
         "historic:maria_2017_pr" | "historic:irma_maria_2017_vi" => "doe_maria_situation_reports",

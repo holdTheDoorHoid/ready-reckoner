@@ -741,8 +741,7 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
             };
             let mut term = table_term(row, rate, rparam, None, inp, &mut ps, &mut overrides);
             if row.fragile {
-                term.q = (term.q * fragility.multiplier).min(1.0);
-                term.frag_param = frag_param;
+                fragile(&mut term, &fragility, frag_param);
             }
             if row.bucket == BucketId::Power {
                 restoration(&mut term, row, inp, &mut ps, &mut overrides);
@@ -809,8 +808,7 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
         };
         let mut term = table_term(row, rate, rparam, scenario, inp, &mut ps, &mut overrides);
         if row.fragile {
-            term.q = (term.q * fragility.multiplier).min(1.0);
-            term.frag_param = frag_param;
+            fragile(&mut term, &fragility, frag_param);
         }
         if row.bucket == BucketId::Power {
             restoration(&mut term, row, inp, &mut ps, &mut overrides);
@@ -867,6 +865,16 @@ pub(crate) fn build(inp: &BuildInput<'_>) -> Model {
         fragility,
         bucket_notes,
         gaps,
+    }
+}
+
+/// A fragile row: its share scaled by how easily the public water system breaks, with the shared
+/// draw, and the county's violation record among its sources when the pack has it.
+fn fragile(term: &mut Term, f: &Fragility, frag_param: Option<usize>) {
+    term.q = (term.q * f.multiplier).min(1.0);
+    term.frag_param = frag_param;
+    if f.violation_share.is_some() {
+        term.sources.push(CitationId::from("epa_echo_sdwa"));
     }
 }
 

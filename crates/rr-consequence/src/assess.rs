@@ -1188,7 +1188,7 @@ fn clean_air_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, CleanAirDetail) {
     };
     let (smoke, from_record) = match ctx.county.smoke_days.filter(|d| d.is_finite() && *d >= 0.0) {
         Some(d) => {
-            sources.push(CitationId::from("hms_aqs_smoke_days"));
+            sources.push(CitationId::from("epa_aqs_daily_pm25"));
             (d, true)
         }
         None => (days_of(true), false),

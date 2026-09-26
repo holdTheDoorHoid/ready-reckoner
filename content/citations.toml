@@ -2573,3 +2573,110 @@ url = "https://www.dhs.gov/sites/default/files/publications/Trauma-Kits-TN_1015-
 retrieved = "2026-09-26"
 quote = "the counterfeit tourniquets have been shown to fail before the necessary force to stop bleeding can be applied, possibly leading to catastrophic results."
 license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
+# Added by the consequence workstream for v0.2.0 (agent/consequence2): the documented water
+# failures behind the water buckets' stress line and the backtest (docs/VALIDATION.md), and the
+# Department of Energy reports behind the data pack's historic restoration curves; and the two
+# data-pack v2 sources the consequence model reads, with the ids and titles agent/data-hazard
+# requested (docs/DATA_SOURCES.md 13.13 on that branch): keep one copy if content adds them too.
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "avl_watchdog_water_2024"
+title = "Water back to majority of Asheville customers, but higher elevations still waiting"
+publisher = "Asheville Watchdog"
+year = 2024
+url = "https://avlwatchdog.org/water-back-to-majority-of-asheville-customers-but-higher-elevations-still-waiting/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "nchn_asheville_water_2024"
+title = "With Asheville water nearly restored, workers focus on stabilizing leaks, breaks in system"
+publisher = "North Carolina Health News"
+year = 2024
+url = "https://www.northcarolinahealthnews.org/2024/10/19/asheville-water-nearly-restored-focus-turns-to-leaks-breaks/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "npr_jackson_boil_2022"
+title = "A boil-water notice has been lifted in Jackson, Miss., after nearly 7 weeks"
+publisher = "NPR"
+year = 2022
+url = "https://www.npr.org/2022/09/15/1123264927/jackson-miss-boil-water-lifted"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "npr_jackson_water_restored_2022"
+title = "Running water is restored to Jackson but when will the boil order be lifted?"
+publisher = "NPR"
+year = 2022
+url = "https://www.npr.org/2022/09/07/1121427470/running-water-is-restored-to-jackson-but-when-will-the-boil-order-be-lifted"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cbs_long_beach_water_2012"
+title = "Water, sewers coming back in Long Beach; LIRR, bus service also available"
+publisher = "CBS New York"
+year = 2012
+url = "https://www.cbsnews.com/newyork/news/water-sewers-coming-back-in-long-beach-lirr-bus-service-also-available/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "kut_austin_boil_2021"
+title = "Austin Water lifts boil notice, says water is safe to drink"
+publisher = "KUT Radio, Austin's NPR station"
+year = 2021
+url = "https://www.kut.org/energy-environment/2021-02-23/austins-boil-water-notice-has-been-lifted-for-all-customers"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "kishore_2018_maria"
+title = "Mortality in Puerto Rico after Hurricane Maria"
+publisher = "Kishore N. and others, New England Journal of Medicine 379:162-170"
+year = 2018
+url = "https://doi.org/10.1056/NEJMsa1803972"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cleveland19_blackout_2003"
+title = "15 years later: the 2003 blackout that impacted 50 million people"
+publisher = "Cleveland 19 News"
+year = 2018
+url = "https://www.cleveland19.com/story/38878620/15-years-later-the-2003-blackout-that-impacted-50-million-people/"
+retrieved = "2026-09-26"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "doe_maria_situation_reports"
+title = "Hurricanes Maria and Irma event summaries (situation reports, September 2017 to April 2018)"
+publisher = "U.S. Department of Energy, Office of Cybersecurity, Energy Security, and Emergency Response"
+year = 2018
+url = "https://www.energy.gov/sites/default/files/2017/09/f37/Hurricanes%20Maria%20Irma%20Harvey%20Event%20Summary%20September%2027.pdf"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_echo_sdwa"
+title = "ECHO Safe Drinking Water Act data downloads"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://echo.epa.gov/tools/data-downloads/sdwa-download-summary"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_aqs_daily_pm25"
+title = "Air Quality System pre-generated daily PM2.5 data (FRM/FEM, parameter 88101), with NOAA HMS smoke polygons for smoke days"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://aqs.epa.gov/aqsweb/airdata/download_files.html"
+retrieved = "2026-09-26"
+license = "US Government Work (public domain)"

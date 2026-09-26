@@ -77,10 +77,14 @@ pub use ranges::DRAWS;
 pub use survival::{Survival, probit};
 
 /// Citation ids this crate emits from code rather than from `effects.toml` (county records, the
-/// rural-EMS note, coupling and displacement notes).
-pub const CODE_CITATIONS: [&str; 6] = [
+/// rural-EMS note, coupling and displacement notes, the regional outage records and historic
+/// restoration curves, the drinking-water violations and the smoke days).
+pub const CODE_CITATIONS: [&str; 9] = [
     "census_pulse_displacement",
     "county_boil_water_records",
+    "doe_maria_situation_reports",
+    "epa_aqs_daily_pm25",
+    "epa_echo_sdwa",
     "mell_2017_ems_response",
     "noaa_storm_events",
     "ornl_eagle_i_outages",

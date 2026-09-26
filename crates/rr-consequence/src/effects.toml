@@ -2916,10 +2916,10 @@ place = "Asheville, North Carolina"
 states = ["NC"]
 date = "2024-09-27"
 bucket = "water_out"
-median_days = 21.0
-p90_days = 35.0
-sources = ["spectrum_asheville_water_2024", "epa_asheville_boil_notice_2024"]
-note = "Running water back to most users only by the end of October 2024 (3 to 5 weeks); the median and 90th percentile are read from that, not from a customer count."
+median_days = 18.0
+p90_days = 21.0
+sources = ["avl_watchdog_water_2024", "nchn_asheville_water_2024"]
+note = "About 20 percent of customers kept or regained water early; water began returning to the other 80 percent about 17 days after landfall, 75 to 80 percent of all customers had it on 16 October (day 19) and 90 to 95 percent on 18 October (day 21). The median is read from those figures, not from a customer count."
 
 [[water_event]]
 id = "helene_asheville_2024_boil"
@@ -2935,7 +2935,7 @@ note = "The system-wide boil notice was lifted on 18 November 2024."
 
 [[water_event]]
 id = "jackson_2022"
-event = "Jackson water crisis"
+event = "the Jackson water crisis"
 place = "Jackson, Mississippi"
 states = ["MS"]
 date = "2022-07-29"
@@ -2943,19 +2943,19 @@ bucket = "water_boil"
 median_days = 48.0
 p90_days = 48.0
 sources = ["npr_jackson_boil_2022"]
-note = "Boil notice from late July to 15 September 2022; service virtually stopped from late August to about 5 September."
+note = "A city-wide boil notice from late July to 15 September 2022 (nearly 7 weeks)."
 
 [[water_event]]
 id = "jackson_2022_out"
-event = "Jackson water crisis"
+event = "the Jackson water crisis"
 place = "Jackson, Mississippi"
 states = ["MS"]
 date = "2022-08-29"
 bucket = "water_out"
 median_days = 7.0
 p90_days = 10.0
-sources = ["cnn_jackson_water_2022"]
-note = "Service virtually stopped from 29 August until about 5 September 2022; the 90th percentile is not in the source (UNVERIFIED, set at 10 days)."
+sources = ["npr_jackson_water_restored_2022"]
+note = "Most customers lost service for several days from 29 August; running water was restored by 7 September. The 90th percentile is not in the source (set at 10 days, UNVERIFIED)."
 
 [[water_event]]
 id = "sandy_long_beach_2012"
@@ -2995,7 +2995,7 @@ note = "Households averaged 68 days without water (Kishore et al. 2018, read fro
 
 [[water_event]]
 id = "blackout_cleveland_2003"
-event = "The August 2003 Northeast blackout"
+event = "the August 2003 Northeast blackout"
 place = "Cleveland, Ohio"
 states = ["OH"]
 date = "2003-08-14"

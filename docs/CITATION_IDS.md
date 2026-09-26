@@ -158,6 +158,42 @@ source; it has no URL yet, so it cannot be a registry entry.
 | `inquirer_peco_outages` | Power outages in Philadelphia history: Peco's biggest storms | The Philadelphia Inquirer, 2025 | https://www.inquirer.com/weather/power-outages-peco-most-history-20250626.html | two of PECO's five largest outages were ice storms (1994, 2014), outside the 2018–2025 records (big ice storm class) |
 | `county_boil_water_records` | a county's boil-water notice records, when a data pack provides them (none does yet; the id is a placeholder for the source the data workstream adds) | — | — | replacing the default boil-water duration with the county's median and 90th percentile |
 
+### Added for v0.2.0 (agent/consequence2)
+
+In `content/citations.toml` on this branch (the water failures behind the water buckets' stress
+line and the backtest in `docs/VALIDATION.md`, the reports behind the historic restoration
+curves, and the two data-pack v2 sources the model reads, with the ids agent/data-hazard chose):
+
+| id | What rr-consequence uses it for |
+| --- | --- |
+| `avl_watchdog_water_2024` | Asheville after Helene: 75 to 80 % of customers had water on 16 October 2024 (day 19); water began returning to the 80 % who lost it that week |
+| `nchn_asheville_water_2024` | Asheville after Helene: 90 to 95 % had water on 18 October 2024 (day 21) |
+| `npr_jackson_boil_2022` | Jackson's boil notice lifted after nearly 7 weeks (15 September 2022) |
+| `npr_jackson_water_restored_2022` | Jackson: running water restored by 7 September 2022 after several days without service |
+| `cbs_long_beach_water_2012` | Long Beach NY after Sandy: water safe and sewers back 13 days after landfall |
+| `kut_austin_boil_2021` | Austin's citywide boil notice, 17 to 23 February 2021 |
+| `kishore_2018_maria` | Puerto Rico after Maria: households averaged 68 days without water (read from a summary, UNVERIFIED) |
+| `cleveland19_blackout_2003` | Cleveland's three-day boil advisories after the August 2003 blackout |
+| `doe_maria_situation_reports` | the data pack's historic restoration curves for Puerto Rico (Maria) and the US Virgin Islands (Irma and Maria), used for the island grids' major-hurricane rows and stress line |
+| `epa_echo_sdwa` | the county's share of public-water customers on a system with a health-based violation in five years (water-system fragility, model review M-03); requested by agent/data-hazard |
+| `epa_aqs_daily_pm25` | the county's smoke days for the clean-air sentence; requested by agent/data-hazard |
+
+Used by the new effects rows and added by agent/content2 (not in this branch's registry; they
+resolve when that branch merges, and rr-plan's registry test waits for it):
+
+| id | What rr-consequence uses it for |
+| --- | --- |
+| `fcc_network_outage_2024` | phone and internet outages last hours (network_outage) |
+| `fda_drug_shortages` | medicine shortages (drug_shortage) |
+| `eviction_lab_national` | evictions (eviction) |
+| `fbi_cde_arrests_2024` | arrests (arrest_or_detention income stream) |
+| `usgs_sinkholes` | sinkholes (sinkhole) |
+| `nws_dust_storms` | dust storms (dust_storm) |
+| `fema_dam_residual_risk_2018` | dam and levee failures (dam_failure) |
+| `iii_water_damage_protect` | burst pipes and leaks (water_damage) |
+| `cfpb_shutdown_2013` | pay or benefits that stop in a funding gap (benefit_interruption income stream) |
+| `me_dhhs_snap_2025` | the November 2025 SNAP lapse (benefit_interruption food row) |
+
 ## Added for the v0.1.1 guidance on 2026-09-26
 
 Life-safety sentences from the round-2 review (S1, S7, RR-P04, RR-P07, RR-P16, RR-P17, P-22). Each
