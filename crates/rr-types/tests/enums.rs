@@ -90,6 +90,14 @@ fn every_enum_round_trips_through_its_string() {
         ErrorCode,
         ExplainKind,
         AfreqKind,
+        AccessNeed,
+        CookingFuel,
+        RawWaterSource,
+        WaterSystemRecord,
+        Benefit,
+        Holds,
+        Season,
+        GuidanceKind,
     );
 }
 

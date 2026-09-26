@@ -12,6 +12,9 @@
 //!   this crate compares the two.
 //! - **Inputs fail loudly.** Every struct denies unknown fields, so a typo in the app, a fixture
 //!   or a content file is an error, not a silently ignored value.
+//! - **Old plans still load.** Every field added since contract v1 is optional or defaults when
+//!   absent, and retired ids stay parseable ([`HazardId::is_retired`]); engine crates build output
+//!   from [`HazardId::ACTIVE`], never from `ALL`.
 //! - **Units.** Money is `f32` US dollars and days are `f32` in outputs; probabilities, severity
 //!   and coordinates are `f64`.
 //! - **Determinism.** No clock, no OS entropy, no `rand`. Use [`math`] for transcendental
@@ -61,7 +64,11 @@ pub use validate::*;
 /// Version of the engine contract in `docs/ENGINE-API.md`. Bump it whenever a type, id or function
 /// changes shape, and update `docs/ENGINE-API.md` and `web/src/engine/types.ts` in the same
 /// commit.
-pub const ENGINE_API_VERSION: u32 = 1;
+///
+/// Version 2 (v0.2.0): additive input and output fields with defaults, 19 new hazard ids, the
+/// `clean_air` bucket, and one breaking change, the retired `terrorism` id (kept so v1 plans
+/// parse, never emitted). `docs/ENGINE-API.md` § "Changes from v1" lists every change.
+pub const ENGINE_API_VERSION: u32 = 2;
 
 /// Crate name, used by the CLI's `--version` and by the about screen.
 pub const CRATE: &str = "rr-types";

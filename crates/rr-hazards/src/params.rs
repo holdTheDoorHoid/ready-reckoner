@@ -297,6 +297,7 @@ pub(crate) const NUCLEAR_PLANT_INGESTION: Triple = (5.0e-5, 1.0e-5, 2.0e-4);
 pub(crate) const NUCLEAR_ATTACK_RANGE: (f64, f64) = (1.0 / 2000.0, 1.0 / 400.0);
 /// PRIOR. An attack that disrupts daily life where a city household lives: 1 in 10,000 to 1 in
 /// 1,000 a year. Never shown as a point estimate.
+#[allow(dead_code)] // awaiting: hazards — used only by the retired `terrorism` row.
 pub(crate) const TERRORISM_RANGE: (f64, f64) = (1.0e-4, 1.0e-3);
 
 // ---------------------------------------------------------------------------------------------

@@ -220,6 +220,7 @@ fn recorded_prices_and_existing_inventory() {
         item_id: ItemId::from("food"),
         qty: 4.0,
         paid_usd: Some(6.0),
+        tested_on: None,
     }];
     let r = s.run();
     // Four person-days already owned: one day of food for four people, then bought up to three.
@@ -263,6 +264,7 @@ fn partly_owned_sets_are_completed() {
         item_id: ItemId::from("headlamp"),
         qty: 1.0,
         paid_usd: None,
+        tested_on: None,
     }];
     let r = s.run();
     assert_eq!(r.sequence.len(), 1);

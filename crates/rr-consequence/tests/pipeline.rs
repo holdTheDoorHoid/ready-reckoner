@@ -69,7 +69,7 @@ fn fixtures_end_to_end_with_rr_hazards() {
             serde_json::to_string(&again.buckets).unwrap(),
             "{name}: not deterministic"
         );
-        assert_eq!(a.buckets.len(), 14);
+        assert_eq!(a.buckets.len(), 15); // contract v2: + clean_air
         for b in &a.buckets {
             assert!(!b.frequency_sentences.is_empty(), "{name} {}", b.id);
             if let Target::Days { value, low, high } = b.target {

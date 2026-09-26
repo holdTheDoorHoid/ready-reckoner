@@ -5,6 +5,7 @@
 use rr_types::{BucketId, HazardId};
 
 /// The buckets `hazard` feeds, in `BucketId` order.
+#[allow(deprecated)] // the retired `terrorism` still needs an arm while the id exists
 pub(crate) fn for_hazard(hazard: HazardId) -> Vec<BucketId> {
     use BucketId::*;
     use HazardId as H;
@@ -54,6 +55,27 @@ pub(crate) fn for_hazard(hazard: HazardId) -> Vec<BucketId> {
         H::Burglary => vec![Security],
         H::EarnerDeathOrDisability => vec![Income],
         H::ExtendedHouseholdIllness => vec![Supplies, Medication, Income],
+        // awaiting: hazards — the buckets of the contract v2 hazards (REVIEW §2.2, §2.3); none
+        // is emitted yet.
+        H::WildfireSmoke
+        | H::DustStorm
+        | H::Sinkhole
+        | H::GeomagneticStorm
+        | H::Vei7Eruption
+        | H::DamFailure
+        | H::NetworkOutage
+        | H::DrugShortage
+        | H::BenefitInterruption
+        | H::AttackDisruption
+        | H::MultiMonthBlackout
+        | H::WarInfrastructure
+        | H::CbrnAttack
+        | H::SeverePandemic
+        | H::FinancialCrisis
+        | H::MassViolence
+        | H::WaterDamage
+        | H::Eviction
+        | H::ArrestOrDetention => vec![],
     };
     v.sort();
     v.dedup();
@@ -64,10 +86,36 @@ pub(crate) fn for_hazard(hazard: HazardId) -> Vec<BucketId> {
 mod tests {
     use super::*;
 
+    /// awaiting: hazards — the contract v2 hazards, whose buckets arrive with their rates.
+    const AWAITING: &[HazardId] = &[
+        HazardId::WildfireSmoke,
+        HazardId::DustStorm,
+        HazardId::Sinkhole,
+        HazardId::GeomagneticStorm,
+        HazardId::Vei7Eruption,
+        HazardId::DamFailure,
+        HazardId::NetworkOutage,
+        HazardId::DrugShortage,
+        HazardId::BenefitInterruption,
+        HazardId::AttackDisruption,
+        HazardId::MultiMonthBlackout,
+        HazardId::WarInfrastructure,
+        HazardId::CbrnAttack,
+        HazardId::SeverePandemic,
+        HazardId::FinancialCrisis,
+        HazardId::MassViolence,
+        HazardId::WaterDamage,
+        HazardId::Eviction,
+        HazardId::ArrestOrDetention,
+    ];
+
     #[test]
     fn every_hazard_feeds_at_least_one_bucket_in_order() {
         for h in HazardId::ALL {
             let b = for_hazard(*h);
+            if AWAITING.contains(h) {
+                continue;
+            }
             assert!(!b.is_empty(), "{h}");
             assert!(b.windows(2).all(|w| w[0] < w[1]), "{h}");
         }

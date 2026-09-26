@@ -378,6 +378,10 @@ pub fn assess_full(
         BucketId::MedicalEmergency,
         BucketId::Fire,
         BucketId::Security,
+        // awaiting: consequence — `clean_air` takes the generic readiness path until it gets its
+        // own need from smoke and dust episodes (DESIGN-DELTA §1.2, §3); with no effects rows yet
+        // its chance is zero.
+        BucketId::CleanAir,
     ] {
         by_bucket.insert(b, readiness_bucket(&ctx, b));
     }
@@ -697,6 +701,8 @@ fn duration_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> (BucketAssessment, Bucket
             sorted_sources(s)
         },
         relief,
+        // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
+        stress_test: None,
     };
     let detail = BucketDetail {
         bucket,
@@ -834,6 +840,8 @@ fn readiness_bucket(ctx: &Ctx<'_>, bucket: BucketId) -> BucketAssessment {
         frequency_sentences: sentences,
         sources,
         relief: None,
+        // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
+        stress_test: None,
     }
 }
 
@@ -906,6 +914,8 @@ fn evacuate_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, EvacuateDetail) {
         frequency_sentences: sentences,
         sources,
         relief: None,
+        // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
+        stress_test: None,
     };
     let detail = EvacuateDetail {
         p_need_10yr: p,
@@ -996,6 +1006,8 @@ fn get_home_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, GetHomeDetail) {
             frequency_sentences: sentences,
             sources,
             relief: None,
+            // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
+            stress_test: None,
         },
         GetHomeDetail {
             p_need_10yr: p,
@@ -1066,6 +1078,8 @@ fn home_loss_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, HomeLossDetail) {
             frequency_sentences: sentences,
             sources: sorted_sources(sources),
             relief: None,
+            // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
+            stress_test: None,
         },
         HomeLossDetail {
             p_displaced_10yr: p,
@@ -1224,6 +1238,8 @@ fn income_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, IncomeDetail) {
         frequency_sentences: sentences,
         sources,
         relief: None,
+        // awaiting: consequence — the worst-event stress line (DESIGN-DELTA §1.3).
+        stress_test: None,
     };
     let detail = IncomeDetail {
         target_months: target_c,

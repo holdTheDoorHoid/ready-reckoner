@@ -233,8 +233,8 @@ fn county_search_catalogue_defaults_and_explain_answer() {
 
     let catalogue: Catalogue = value(&api::catalogue());
     assert!(catalogue.items.len() > 50 && catalogue.citations.len() > 50);
-    assert_eq!(catalogue.buckets.len(), 14);
-    assert_eq!(catalogue.hazards.len(), 35);
+    assert_eq!(catalogue.buckets.len(), 15); // contract v2: + clean_air
+    assert_eq!(catalogue.hazards.len(), 53); // contract v2: the active ids
 
     let defaults: PlanInput = value(&api::defaults());
     assert!(defaults.validate().is_empty());

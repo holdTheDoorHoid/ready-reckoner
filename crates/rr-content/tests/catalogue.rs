@@ -373,8 +373,8 @@ fn life_safety_items_include_alarms_water_medicine_and_device_power() {
 fn catalogue_includes_name_tables_and_every_item() {
     let c = rr_content::catalogue();
     assert_eq!(c.items.len(), content().items.len());
-    assert_eq!(c.hazards.len(), 35);
-    assert_eq!(c.buckets.len(), 14);
+    assert_eq!(c.hazards.len(), 53); // contract v2: the active ids
+    assert_eq!(c.buckets.len(), 15); // contract v2: + clean_air
     assert_eq!(c.tiers.len(), 7);
     let json = serde_json::to_string(&c).expect("catalogue serialises");
     let back: rr_types::Catalogue = serde_json::from_str(&json).expect("and parses back");

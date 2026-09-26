@@ -17,6 +17,9 @@ fn r(h: HazardId, rate: f64) -> HouseholdEventRate {
 }
 
 /// Every hazard at a plausible household rate (per-person and per-earner hazards scaled).
+// awaiting: consequence — the retired `terrorism` row stays so its effects rows are still
+// exercised until they are replaced by `attack_disruption` and `mass_violence`.
+#[allow(deprecated)]
 pub fn rates(input: &PlanInput) -> Vec<HouseholdEventRate> {
     use HazardId::*;
     let people = input.people.len() as f64;

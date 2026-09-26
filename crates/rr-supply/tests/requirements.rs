@@ -335,6 +335,8 @@ fn every_duration_and_readiness_bucket_gets_lines() {
             let expect = match (name, b) {
                 // Coos Bay: the wood stove covers cold and a well has no boil-water notices.
                 ("coos-bay-well-owner-2", BucketId::Thermal | BucketId::WaterBoil) => false,
+                // awaiting: supply — the clean-air lines (contract v2).
+                (_, BucketId::CleanAir) => false,
                 _ => true,
             };
             assert_eq!(lines.iter().any(|l| l.bucket == *b), expect, "{name}: {b}");
@@ -468,6 +470,7 @@ fn livestock_on_a_well_store_two_weeks_until_pump_power_exists() {
         item_id: rr_types::ItemId::from(rr_supply::TRANSFER_INTERLOCK_ITEM),
         qty: 1.0,
         paid_usd: None,
+        tested_on: None,
     });
     let lines = requirements(&owns, &targets(3.0));
     let l = line(&lines, "water_out.livestock_water");

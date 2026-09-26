@@ -7,7 +7,10 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::{EngineError, PlanInput, PoweredDevice, is_well_formed_id};
+use crate::{
+    EngineError, HazardId, PlanInput, PoweredDevice, RARE_FAMILY_ALL, is_well_formed_id,
+    rare_family_ids,
+};
 
 /// The longest planning horizon `validate` accepts, in years.
 pub const MAX_HORIZON_YEARS: u8 = 50;
@@ -36,10 +39,14 @@ string_enum! {
         OutOfRange = "out_of_range",
         /// `finances.income.earners` differs from the number of people marked `earner`.
         EarnersMismatch = "earners_mismatch",
-        /// An id in `existing` or `dials.scenario_overrides` is not a well-formed id.
+        /// An id in `existing`, `dials.scenario_overrides` or `dials.rare_opt_in` is not a
+        /// well-formed id.
         IdFormat = "id_format",
         /// The same scenario appears twice in `dials.scenario_overrides`.
         DuplicateId = "duplicate_id",
+        /// An entry in `dials.rare_opt_in` names no rare-event family and is not `all` (contract
+        /// v2).
+        UnknownId = "unknown_id",
     }
 }
 
@@ -280,6 +287,29 @@ impl PlanInput {
                 );
             }
         }
+        for (i, family) in self.dials.rare_opt_in.iter().enumerate() {
+            let field = format!("dials.rare_opt_in[{i}]");
+            if !is_well_formed_id(family) {
+                c.push(
+                    ProblemCode::IdFormat,
+                    field,
+                    format!(
+                        "\"{family}\" is not a family code. Family codes use lowercase letters, \
+                         digits and underscores, like nuclear_attack."
+                    ),
+                );
+            } else if family != RARE_FAMILY_ALL && HazardId::from_family(family).is_none() {
+                let known: Vec<&str> = rare_family_ids().collect();
+                c.push(
+                    ProblemCode::UnknownId,
+                    field,
+                    format!(
+                        "\"{family}\" is not a rare-event family. Use {} or all.",
+                        known.join(", ")
+                    ),
+                );
+            }
+        }
         if !(1..=MAX_HORIZON_YEARS).contains(&self.dials.horizon_years) {
             c.push(
                 ProblemCode::OutOfRange,
@@ -300,11 +330,13 @@ impl PlanInput {
         c.problems
     }
 
-    /// Parses and validates a plan from JSON: the single entry point `rr-wasm` and `rr-cli` use,
-    /// so both reject bad input the same way. Schema errors and validation problems both come
+    /// Parses, tidies and validates a plan from JSON: the single entry point `rr-wasm` and
+    /// `rr-cli` use, so both treat input the same way. Tidying only trims and caps the free text
+    /// the engine echoes ([`PlanInput::tidy`]). Schema errors and validation problems both come
     /// back as a `bad_input` error whose details list the problems.
     pub fn from_json(json: &str) -> Result<PlanInput, EngineError> {
-        let input: PlanInput = crate::api::parse_json(json)?;
+        let mut input: PlanInput = crate::api::parse_json(json)?;
+        input.tidy();
         let problems = input.validate();
         if problems.is_empty() {
             Ok(input)
@@ -465,6 +497,7 @@ mod tests {
             item_id: "Water Stored".into(),
             qty: 1.0,
             paid_usd: None,
+            tested_on: None,
         });
         one(&x, ProblemCode::IdFormat, "existing[0].item_id");
 
@@ -489,10 +522,20 @@ mod tests {
         );
 
         let mut x = base();
+        x.dials.rare_opt_in = vec!["Nuclear Attack".into()];
+        one(&x, ProblemCode::IdFormat, "dials.rare_opt_in[0]");
+
+        let mut x = base();
+        x.dials.rare_opt_in = vec!["nuclear_attack".into(), "house_fire".into()];
+        one(&x, ProblemCode::UnknownId, "dials.rare_opt_in[1]");
+        assert!(x.validate()[0].message.contains("geomagnetic_storm"));
+
+        let mut x = base();
         x.existing.push(Owned {
             item_id: "water_stored".into(),
             qty: -1.0,
             paid_usd: None,
+            tested_on: None,
         });
         one(&x, ProblemCode::NegativeValue, "existing[0].qty");
 
@@ -501,6 +544,7 @@ mod tests {
             item_id: "water_stored".into(),
             qty: 4.0,
             paid_usd: Some(-2.0),
+            tested_on: None,
         });
         one(&x, ProblemCode::NegativeValue, "existing[0].paid_usd");
     }
@@ -529,6 +573,7 @@ mod tests {
             item_id: "generator_portable".into(),
             qty: 0.0,
             paid_usd: Some(0.0),
+            tested_on: None,
         });
         x.dials.scenario_overrides = vec![
             ScenarioToggle {
@@ -543,6 +588,11 @@ mod tests {
         assert_eq!(x.validate(), vec![]);
         x.dials.horizon_years = MAX_HORIZON_YEARS;
         x.confidence_1to5 = Some(1);
+        assert_eq!(x.validate(), vec![]);
+        // Every family id, "all", and repeats are fine: the list is a set.
+        x.dials.rare_opt_in = crate::rare_family_ids().map(str::to_owned).collect();
+        x.dials.rare_opt_in.push("all".into());
+        x.dials.rare_opt_in.push("mass_violence".into());
         assert_eq!(x.validate(), vec![]);
     }
 
@@ -579,6 +629,18 @@ mod tests {
         assert_eq!(err.message, "The monthly budget can't be less than zero.");
         let problems = err.problems().unwrap();
         assert_eq!(problems[0].field, "finances.monthly_budget_usd");
+
+        // The family plan is tidied on the way in, never rejected.
+        let mut messy = PlanInput::defaults();
+        messy.family_plan = Some(crate::FamilyPlan {
+            shutoff_water: Some("  basement, blue handle  ".into()),
+            meeting_place_far: Some(" ".into()),
+            ..crate::FamilyPlan::default()
+        });
+        let tidy = PlanInput::from_json(&serde_json::to_string(&messy).unwrap()).unwrap();
+        let plan = tidy.family_plan.unwrap();
+        assert_eq!(plan.shutoff_water.as_deref(), Some("basement, blue handle"));
+        assert_eq!(plan.meeting_place_far, None);
 
         let typo = json.replace("\"setting\"", "\"setings\"");
         let err = PlanInput::from_json(&typo).unwrap_err();

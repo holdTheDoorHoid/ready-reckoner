@@ -131,6 +131,8 @@ impl<S: CountySource> Engine<S> {
             content_version: rr_content::CONTENT_VERSION.to_owned(),
             packs_loaded: self.store.packs_loaded(),
             attributions: self.store.attributions(),
+            // awaiting: plan — the bundled validation table (DESIGN-DELTA §1.3, docs/VALIDATION.md).
+            validation: rr_types::ValidationSummary::default(),
         }
     }
 
@@ -208,6 +210,8 @@ impl<S: CountySource> Engine<S> {
             warnings,
             packet_markdown,
             provenance: citations,
+            // awaiting: plan — the recovery page's facts (county declarations from data-model).
+            recovery: rr_types::RecoveryInfo::default(),
         }
     }
 
