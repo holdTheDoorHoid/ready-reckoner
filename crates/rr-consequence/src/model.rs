@@ -1371,6 +1371,17 @@ fn income_terms(
                     fallback = true;
                     let p = &table.params;
                     let factor = match inp.plan.finances.income.stability {
+                        // awaiting: rr-consequence / content — `effects.toml` has no calibration
+                        // `Param` for `very_stable` yet (that file is owned by the
+                        // consequence/content workstream). This branch only runs when rr-hazards
+                        // reports no `JobLoss` rate for a household with earners (rr-hazards
+                        // always emits one once `earners > 0`, so in practice this is a
+                        // calibration/test fallback, not the production path); falling back to
+                        // `stable`'s Param here keeps the match exhaustive without guessing a
+                        // number that crate does not own. rr-hazards' own `income_stability`
+                        // (crates/rr-hazards/src/params.rs) already applies the real ×0.5 factor
+                        // whenever a rate is supplied.
+                        rr_types::IncomeStability::VeryStable => &p.stability_stable,
                         rr_types::IncomeStability::Stable => &p.stability_stable,
                         rr_types::IncomeStability::Variable => &p.stability_variable,
                         rr_types::IncomeStability::Seasonal => &p.stability_seasonal,

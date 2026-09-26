@@ -64,7 +64,11 @@ fn every_fixture_parses_round_trips_and_validates() {
         // fields that default when absent.
         let file: Value = serde_json::from_str(raw).unwrap();
         let mut canon: Value = serde_json::from_str(&canonical).unwrap();
-        for key in ["water_level", "scenario_overrides"] {
+        for key in [
+            "water_level",
+            "scenario_overrides",
+            "rare_catastrophic_opt_in",
+        ] {
             if file["dials"].get(key).is_none() {
                 canon["dials"].as_object_mut().unwrap().remove(key);
             }

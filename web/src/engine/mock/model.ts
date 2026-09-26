@@ -103,7 +103,9 @@ function roundHalf(x: number): number {
 
 const KCAL: Record<AgeBand, number> = { infant: 0, toddler: 1100, child: 1600, teen: 2400, adult: 2100, senior: 1900 };
 const WATER_GAL = { survival: 0.8, basic: 1, comfortable: 4 } as const;
-const STABILITY = { stable: 0.7, variable: 1, seasonal: 1.4, gig: 1.5 } as const;
+// very_stable halves the stable factor, mirroring rr-hazards' ×0.5 research prior (see
+// crates/rr-hazards/src/params.rs::income_stability).
+const STABILITY = { very_stable: 0.35, stable: 0.7, variable: 1, seasonal: 1.4, gig: 1.5 } as const;
 const DEVICE_WATTS = { cpap: 50, oxygen: 300 } as const;
 
 export interface Facts {

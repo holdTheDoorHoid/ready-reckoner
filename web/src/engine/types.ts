@@ -171,7 +171,7 @@ export type CommuteMode = (typeof COMMUTE_MODES)[number];
 export const FUELS = ['gas', 'diesel', 'hybrid', 'ev'] as const;
 export type Fuel = (typeof FUELS)[number];
 
-export const INCOME_STABILITIES = ['stable', 'variable', 'seasonal', 'gig'] as const;
+export const INCOME_STABILITIES = ['very_stable', 'stable', 'variable', 'seasonal', 'gig'] as const;
 export type IncomeStability = (typeof INCOME_STABILITIES)[number];
 
 /**
@@ -345,6 +345,12 @@ export interface Dials {
   water_level?: WaterLevel;
   /** On/off choices for named scenarios; empty when absent. */
   scenario_overrides?: ScenarioToggle[];
+  /**
+   * Allow up to 10% of the monthly budget for rare-catastrophe items (a radiation meter,
+   * potassium iodide only on official instruction, Faraday storage). Defaults to false when
+   * absent: those items otherwise get $0 (`Item.rare_catastrophic`).
+   */
+  rare_catastrophic_opt_in?: boolean;
 }
 
 export interface ScenarioToggle {

@@ -148,7 +148,7 @@ Natural hazards under 1 in 100,000 a year are left out of the register and named
 
 | Hazard | One household event | Base rate | Household modifier | Evidence |
 | --- | --- | --- | --- | --- |
-| Job loss | a spell of unemployment for any earner | 0.083 per earner-year (BLS: 8.3 % of labour-force participants unemployed at some point in 2024); range 0.06–0.135, the top being the JOLTS 1.117 %/month as a yearly rate, −12·ln(1 − 0.01117) | × earners; stability: stable ×1 (typical salaried job), variable ×1.5 (1–2), seasonal ×1.75 (1.5–2), gig ×1.75 (1.5–2) | DATA + PRIOR (research §2.7, §3.5) |
+| Job loss | a spell of unemployment for any earner | 0.083 per earner-year (BLS: 8.3 % of labour-force participants unemployed at some point in 2024); range 0.06–0.135, the top being the JOLTS 1.117 %/month as a yearly rate, −12·ln(1 − 0.01117) | × earners; stability: very_stable ×0.5 (0.3–0.7; tenured, public sector, pension), stable ×1 (typical salaried job), variable ×1.5 (1–2), seasonal ×1.75 (1.5–2), gig ×1.75 (1.5–2) | DATA + PRIOR (research §2.7, §3.5) |
 | House fire | a reported fire in the home (or next door) | 344,600 fires ÷ 131,434,000 households = 0.262 % a year (0.2–0.35 %) | rowhouse or low-rise apartment ×2 (1.5–3; research §2.7), high-rise ×1.5 (1–2) | DERIVED + PRIOR |
 | Medical emergency | an emergency department visit | 0.473 per person-year (NHAMCS 2022; 0.35–0.65) | × people; rural addresses get a note on slower ambulances (Mell 2017) | DATA |
 | Stranded in a vehicle | a crash or breakdown away from home | 0.15 per vehicle-year (0.05–0.4); no vehicle: 0.03 per non-car commuter (0.01–0.1) | × vehicles | PRIOR (crashes: NHTSA 6.14 million a year) |
@@ -272,9 +272,11 @@ earthquake 0.026 (with `cascadia_m9` on by default at 1.02 %/yr), tsunami 0.0092
   missing `major_hurricane_passage` row is read as "unknown" (the national one-third major
   share), not "zero", which errs toward preparing; a recorded share near zero drops the
   major-hurricane scenario.
-- **Income stability.** The v1 input has no "tenured or public" choice, so the research's ×0.5
-  step cannot be selected; `stable` means the typical salaried job (×1), as in the Philadelphia
-  example.
+- **Income stability.** The research's ×0.5 step is `IncomeStability::very_stable` (tenured, public
+  sector, pension); `stable` still means the typical salaried job (×1), as in the Philadelphia
+  example. The research report gives only the ×0.5 point estimate for that step; its 0.3–0.7 range
+  is this crate's own prior (`docs/RISK_MODEL.md` §"Hazard rates" / `rr_risk_model_priors`), not a
+  cited figure.
 - **Figures to confirm** against the source when the citations are written: UCERF3's 33 % for
   the Hayward fault, USGS's 7–10 % for New Madrid, the SSA "more than 1 in 4" disability figure,
   the one-third major share of landfalling hurricanes, and the 1 % burglary prior.

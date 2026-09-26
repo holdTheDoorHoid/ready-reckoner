@@ -113,13 +113,14 @@ Commute { distance_km: f32, mode: car|transit|walk|bike, remote_possible }
 Pets { dogs, cats, small, large_animals }                      # u8 counts
 HouseholdMobility { vehicles: [{ fuel: gas|diesel|hybrid|ev }] }   # JSON field `mobility`
 Finances { monthly_budget_usd, one_off_budget_usd, emergency_fund_months, monthly_expenses_usd?,
-           income: { earners: u8, stability: stable|variable|seasonal|gig },
+           income: { earners: u8, stability: very_stable|stable|variable|seasonal|gig },
            insurance: { home_or_renters, flood, earthquake } }
 Owned { item_id, qty: f32, paid_usd? }
 Dials { return_period: one_in_10|one_in_50|one_in_100|one_in_500,
         climate: today|y2050, horizon_years: u8,
         water_level: survival|basic|comfortable,               # defaults to basic when absent
-        scenario_overrides: [{ id, on }] }                     # defaults to [] when absent
+        scenario_overrides: [{ id, on }],                      # defaults to [] when absent
+        rare_catastrophic_opt_in: bool }                       # defaults to false when absent
 ```
 
 `existing` is the baseline inventory. A free action counts as done when it appears there with `qty`
@@ -212,8 +213,9 @@ GuidanceMeta { id, title, applies_to: [string], citations: [CitationId] }
   as an estimate ("tagged Prior").
 - `Item.life_safety`: the allocator orders it first within its tier (smoke and CO alarms, water, a
   dependent's medication, powered-device backup). `Item.rare_catastrophic`: the allocator gives it
-  $0 by default and at most 10% of the monthly budget on opt-in (radiation meter, potassium iodide,
-  Faraday storage).
+  $0 by default and, when the household turns on `Dials.rare_catastrophic_opt_in`, at most 10% of
+  the monthly budget (a radiation meter, potassium iodide only on official instruction, Faraday
+  storage); off by default.
 - `energy_kcal_per_unit` and `volume_l_per_unit` let the app show cost per 2,000 kcal and per litre or
   gallon.
 

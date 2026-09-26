@@ -406,6 +406,8 @@ pub struct Income {
 string_enum! {
     /// How steady the household's income is.
     pub enum IncomeStability: "income stability" {
+        /// Tenured, public sector or a pension: the most protected from job loss.
+        VeryStable = "very_stable",
         /// A regular salary or pension.
         Stable = "stable",
         /// Changes from month to month.
@@ -464,6 +466,11 @@ pub struct Dials {
     /// [`crate::PlanOutput::scenarios`]; a toggle here overrides its default. Empty when absent.
     #[serde(default)]
     pub scenario_overrides: Vec<ScenarioToggle>,
+    /// Allow up to 10% of the monthly budget for rare-catastrophe items (a radiation meter,
+    /// potassium iodide only on official instruction, Faraday storage). Off by default: those
+    /// items otherwise get $0 (`Item.rare_catastrophic`).
+    #[serde(default)]
+    pub rare_catastrophic_opt_in: bool,
 }
 
 string_enum! {
@@ -621,6 +628,7 @@ impl PlanInput {
                 horizon_years: 10,
                 water_level: WaterLevel::Basic,
                 scenario_overrides: Vec::new(),
+                rare_catastrophic_opt_in: false,
             },
             stage: None,
             confidence_1to5: None,
@@ -658,6 +666,7 @@ mod tests {
         assert_eq!(v["dials"]["water_level"], "basic");
         assert_eq!(v["dials"]["return_period"], "one_in_100");
         assert_eq!(v["dials"]["scenario_overrides"], serde_json::json!([]));
+        assert_eq!(v["dials"]["rare_catastrophic_opt_in"], false);
         assert_eq!(v["location"]["zip"], PLACEHOLDER_ZIP);
         assert_eq!(v["planning_date"], "2026-10-01");
         assert!(v.get("stage").is_none() && v.get("confidence_1to5").is_none());
@@ -695,9 +704,10 @@ mod tests {
         .unwrap();
         assert_eq!(dials.water_level, WaterLevel::Basic);
         assert!(dials.scenario_overrides.is_empty());
+        assert!(!dials.rare_catastrophic_opt_in);
         let dials: Dials = serde_json::from_str(
             r#"{"return_period":"one_in_500","climate":"y2050","horizon_years":10,"water_level":"survival",
-                "scenario_overrides":[{"id":"cascadia_m9","on":false}]}"#,
+                "scenario_overrides":[{"id":"cascadia_m9","on":false}],"rare_catastrophic_opt_in":true}"#,
         )
         .unwrap();
         assert_eq!(dials.water_level, WaterLevel::Survival);
@@ -709,6 +719,7 @@ mod tests {
                 on: false
             }]
         );
+        assert!(dials.rare_catastrophic_opt_in);
         for bad in [
             r#"{"return_period":"one_in_100","climate":"today","horizon_years":10,"water_level":"lots"}"#,
             r#"{"climate":"today","horizon_years":10}"#,
@@ -754,5 +765,21 @@ mod tests {
         );
         assert_eq!(ReturnPeriod::default(), ReturnPeriod::OneIn100);
         assert_eq!(ReturnPeriod::OneIn10.as_str(), "one_in_10");
+    }
+
+    #[test]
+    fn very_stable_income_is_first_and_defaults_are_unchanged() {
+        // `very_stable` (tenured, public sector, pension) is the newest, most-protected option and
+        // sorts before `stable`; `defaults()` still starts a household at the ordinary `stable`.
+        assert_eq!(IncomeStability::ALL[0], IncomeStability::VeryStable);
+        assert_eq!(IncomeStability::VeryStable.as_str(), "very_stable");
+        assert_eq!(
+            PlanInput::defaults().finances.income.stability,
+            IncomeStability::Stable
+        );
+        assert_eq!(
+            "very_stable".parse::<IncomeStability>().unwrap(),
+            IncomeStability::VeryStable
+        );
     }
 }
