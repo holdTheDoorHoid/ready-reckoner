@@ -32,12 +32,28 @@ fn water_bottles() -> (rr_types::Item, ItemMeta) {
     )
 }
 
-/// A plan with water, so only the guardrail under test fires.
+/// A water jug that stores drinking water (the stored-water guardrail's role).
+fn jug(price: f32) -> (rr_types::Item, ItemMeta) {
+    let mut m = set("jug", BucketId::WaterOut, 3.0);
+    m.roles = vec![ItemRole::StoredWater];
+    (buy("jug", BucketId::WaterOut, TierId::H72, price), m)
+}
+
+/// A plan with water (refilled bottles and a jug the household owns), so only the guardrail
+/// under test fires.
 fn base(fixture: &str, monthly: f32) -> Setup {
     let (b, m) = water_bottles();
-    Setup::new(fixture, monthly, 0.0)
+    let (j, jm) = jug(20.0);
+    let mut s = Setup::new(fixture, monthly, 0.0)
         .flat(BucketId::WaterOut, 0.1, 3.0)
         .add(b, m)
+        .add(j, jm);
+    s.household.existing = vec![rr_types::Owned {
+        item_id: rr_types::ItemId::from("jug"),
+        qty: 1.0,
+        paid_usd: None,
+    }];
+    s
 }
 
 #[test]
@@ -115,20 +131,49 @@ fn refrigerated_medicine_without_a_cooling_plan() {
     assert!(!ids(&fixed).contains(&"cold_chain_plan".to_owned()));
 }
 
+/// Refilled bottles are a start, not a supply. When they leave the no-water target short and no
+/// stored water is owned or bought by month 3, the plan warns (verification V-16: the old "no
+/// water after month 1" could never fire, because the free step always gave some water).
 #[test]
-fn no_water_after_the_first_month() {
-    let dry = Setup::new("philadelphia-renters-4", 60.0, 0.0).flat(BucketId::WaterOut, 0.1, 3.0);
-    let r = dry.run();
-    let w = r
-        .warnings
-        .iter()
-        .find(|w| w.id == "no_water_after_month_1")
-        .expect("warns");
+fn no_stored_water_beyond_refilled_bottles_by_month_3() {
+    let id = "no_stored_water_by_month_3";
+    let bottles_only = |monthly: f32, target: f64| {
+        let (b, m) = water_bottles();
+        Setup::new("philadelphia-renters-4", monthly, 0.0)
+            .flat(BucketId::WaterOut, 0.1, target)
+            .add(b, m)
+    };
+    // Refilled bottles give 1.5 of 3 days, and nothing stores water: warns.
+    let r = bottles_only(60.0, 3.0).run();
+    let w = r.warnings.iter().find(|w| w.id == id).expect("warns");
     assert_eq!(w.severity, WarningSeverity::Warn);
     assert_eq!(w.related, ["water_out"]);
+    assert!(w.message.contains("refilled bottles by month 3"));
+    // A jug bought by month 3: quiet.
+    let (j, jm) = jug(20.0);
+    let r = bottles_only(60.0, 3.0).add(j, jm).run();
     assert!(
-        !ids(&base("philadelphia-renters-4", 60.0)).contains(&"no_water_after_month_1".to_owned())
+        r.sequence
+            .iter()
+            .any(|p| p.item_id == "jug" && p.month <= 3),
+        "{:?}",
+        r.sequence
     );
+    assert!(!r.warnings.iter().any(|w| w.id == id));
+    // A jug the household already owns: quiet.
+    assert!(!ids(&base("philadelphia-renters-4", 60.0)).contains(&id.to_owned()));
+    // A jug that arrives only after month 3 ($3 a month toward $20): warns.
+    let (j, jm) = jug(20.0);
+    let r = bottles_only(3.0, 3.0).add(j, jm).run();
+    assert!(r.sequence.iter().any(|p| p.item_id == "jug" && p.month > 3));
+    assert!(r.warnings.iter().any(|w| w.id == id));
+    // Refilled bottles that cover the whole target leave nothing to store: quiet.
+    let (j, jm) = jug(20.0);
+    assert!(!ids(&bottles_only(60.0, 1.0).add(j, jm)).contains(&id.to_owned()));
+    // No no-water target: quiet.
+    let (b, m) = water_bottles();
+    let dry_land = Setup::new("philadelphia-renters-4", 0.0, 0.0).add(b, m);
+    assert!(!ids(&dry_land).contains(&id.to_owned()));
 }
 
 #[test]
@@ -237,7 +282,7 @@ fn warnings_never_block_the_plan() {
             "zero_budget",
             "device_power_plan",
             "cold_chain_plan",
-            "no_water_after_month_1",
+            "no_stored_water_by_month_3",
             "insurance_flood",
             "uncovered_water_out"
         ]

@@ -984,5 +984,10 @@ fn free_actions_beyond_eight_move_to_later_months_and_count_from_then() {
     // unnecessary.
     assert_eq!(month_of(&r, "lights"), Some(0));
     assert_eq!(month_of(&r, "containers"), None);
-    assert!(!r.warnings.iter().any(|w| w.id == "no_water_after_month_1"));
+    // The free step covers the 1-day no-water target, so there is nothing more to store.
+    assert!(
+        !r.warnings
+            .iter()
+            .any(|w| w.id == "no_stored_water_by_month_3")
+    );
 }

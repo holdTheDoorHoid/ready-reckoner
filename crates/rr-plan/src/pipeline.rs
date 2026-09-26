@@ -380,26 +380,9 @@ pub fn run<S: CountySource + ?Sized>(
     }
 
     // Warnings: the consequence crate's cliff warnings are canonical; drop the budget's duplicate
-    // ids. The budget's "no stored water" check reads the whole no-water bucket (its weakest
-    // part, often the toilet); drop it when the stored-water part itself has water by month 1.
-    let stored_by_month_1 = {
-        let mut early: Vec<(ItemId, f64)> = Vec::new();
-        for m in budget.plan.months.iter().take_while(|m| m.index <= 1) {
-            for it in &m.items {
-                if it.kind != PlanItemKind::Reserve {
-                    early.push((it.item_id.clone(), f64::from(it.quantity)));
-                }
-            }
-        }
-        offers
-            .rule
-            .part_days(BucketId::WaterOut, coverage::STORED_WATER_PART, &early)
-    };
+    // ids.
     let mut warnings: Vec<Warning> = consequence.warnings.clone();
     for w in &budget.warnings {
-        if w.id == "no_water_after_month_1" && stored_by_month_1 > 0.0 {
-            continue;
-        }
         if !warnings.iter().any(|x| x.id == w.id) {
             warnings.push(w.clone());
         }

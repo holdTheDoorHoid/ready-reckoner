@@ -1673,14 +1673,17 @@ function buildWarnings(
   const firstWater = Math.min(
     ...chunks.filter((c) => c.resource === 'water').map((c) => (c.done ? -1 : (schedule.get(`${c.item.id}:${c.tier}`) ?? Infinity))),
   );
-  const freeWaterDays = (FREE_BOTTLE_GALLONS + heaterGallons(f)) / Math.max(0.1, f.galPerDay);
-  if (freeWaterDays < 1 && firstWater > 1) {
+  // As the engine's guardrail: refilled bottles (and the water heater) leave the stored-water
+  // need short, and no stored water is owned or bought by month 3.
+  const freeGallons = FREE_BOTTLE_GALLONS + heaterGallons(f);
+  const storedNeed = Math.min(targets.days.water_out.value, 14) * f.galPerDay;
+  if (freeGallons < storedNeed && firstWater > 3) {
     out.push({
-      id: 'no_water_after_month1',
+      id: 'no_stored_water_by_month_3',
       severity: 'warn',
-      message: 'Stored water comes late in this plan.',
-      why: `${firstSentence(buckets, 'water_out')} Filling clean bottles you already have is free and covers the first day.`,
-      related: ['water_out', 'water_reused_bottles'],
+      message: 'No stored water beyond refilled bottles by month 3.',
+      why: 'Refilled drink bottles are a good start, but they hold only a little. Water is the one supply you cannot go long without: a few gallons of bottled water or a water jug is the next step, and costs little.',
+      related: ['water_out'],
     });
   }
   const evac = buckets.find((b) => b.id === 'evacuate')!.target;

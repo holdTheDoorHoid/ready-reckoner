@@ -143,6 +143,9 @@ pub enum ItemRole {
     ColdChain,
     /// A go-bag (or the bag part of one).
     GoBag,
+    /// Stored drinking water the household owns or buys (bottled water, a jug, a drum), not a free
+    /// step such as refilling drink bottles.
+    StoredWater,
 }
 
 /// Everything the allocator needs to know about a catalogue item beyond `rr_types::Item`.
