@@ -4119,3 +4119,32 @@ url = "https://bjs.ojp.gov/content/pub/pdf/fdluc09.pdf"
 retrieved = "2026-09-26"
 quote = "Overall, detained defendants had a median bail amount of $25,000, compared to $6,000 for released defendants."
 license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nws_high_wind_during"
+title = "During a High Wind Event"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/wind-during"
+retrieved = "2026-09-26"
+quote = "Immediately go inside a sturdy building during a high wind warning or severe thunderstorm warning and move to an interior room or basement."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nws_severe_weather_during"
+title = "What to Do During Severe Weather"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/thunderstorm-during"
+retrieved = "2026-09-26"
+quote = "Stay away from windows if you are in a severe thunderstorm warning and damaging wind or large hail is approaching."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "rr_validation_2026"
+title = "How well do these numbers hold up? The frozen backtest (docs/VALIDATION.md): 22 past disasters, the scoring rule and the verdicts for each engine version"
+publisher = "Ready Reckoner contributors"
+year = 2026
+url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/VALIDATION.md"
+retrieved = "2026-09-26"
+license = "CC BY-SA 4.0"
