@@ -20,7 +20,7 @@
  *   (https://operations.osmfoundation.org/policies/tiles/, read 2026-09-27) requires: exactly that
  *   URL over HTTPS; visible attribution; a valid User-Agent (a browser's own is fine); **from web
  *   pages, a valid Referer, and no Referrer-Policy that prevents it** (this site's page-wide
- *   `no-referrer` would, so tile requests alone carry `strict-origin-when-cross-origin`, which
+ *   `no-referrer` would, so the map requests carry `strict-origin-when-cross-origin`, which
  *   sends only the site's address, never the page or its `#/…` route); caching by the HTTP headers
  *   (no `no-cache` request headers); **no bulk downloading, no prefetching, no "download for
  *   offline" or "save area for later" features**, and it says offline use is not permitted on
@@ -42,14 +42,23 @@
  *   from 1:42,000 (zoom 14), water at every zoom. (`tigerWMS_Current` holds only boundaries.)
  * - **Overpass API** (`https://overpass-api.de/api/interpreter`): the first try answered 504
  *   ("the server is probably too busy") after 14 s, a retry 200 in 1.9 s with JSON and
- *   `Access-Control-Allow-Origin: *`. The fallback `https://overpass.kumi.systems/api/interpreter`
- *   answered 200 after 54 s, with data as of 2026-07-15. The public instances' guidance
- *   (https://dev.overpass-api.de/overpass-doc/en/preface/commons.html) asks for at most about
- *   10,000 requests and 1 GB a day per user, says the servers shed load from heavy users first, and
- *   names "an app for more than just OSM mappers relying on the public instances as backend" as
- *   problematic. What the app does: one query a press covering both map boxes, the second
- *   instance only if the first fails (so at most two a press), `[timeout:25]`, and a 30 s limit
- *   in the browser.
+ *   `Access-Control-Allow-Origin: *`; the app's own query for a Philadelphia household later took
+ *   9.2 s (83 kB). Its entry in the OSM wiki's list of public instances
+ *   (https://wiki.openstreetmap.org/wiki/Overpass_API, read 2026-09-27) says: "Nowadays this server
+ *   is overloaded … do not expect high reliability"; under 10,000 queries and 1 GB a day is fine
+ *   for one-off use, and regular use should divide that by 100; **an app's usage counts as the sum
+ *   of all its users' requests**; requests should carry a User-Agent or Referer identifying the
+ *   app; after a 429 or 406, pause 30 seconds before asking again; commercial use should pay or
+ *   self-host. The FOSSGIS manual
+ *   (https://dev.overpass-api.de/overpass-doc/en/preface/commons.html) also names "an app for more
+ *   than just OSM mappers relying on the public instances as backend" as problematic. The
+ *   fallback the delta names, `overpass.kumi.systems`, answered 200 after 54 s (data as of
+ *   2026-07-15) in the morning and nothing at all in 90 s in the afternoon; the wiki lists it as
+ *   **renamed to `overpass.private.coffee`** ("feel free to use our service in any project, there
+ *   is no rate limit"), which was also not answering (even `/api/status`) when checked. What the
+ *   app does: one query a press covering both map boxes, the second instance only if the first
+ *   fails (so at most two a press), `[timeout:25]`, 45 s in the browser for each, and a server
+ *   that answered 429, 406 or 504 is not asked again for 30 seconds.
  * - **FEMA National Flood Hazard Layer**: `https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer`
  *   is the address FEMA documents (hazards.fema.gov/femaportal/wps/portal/NFHLWMS, "NFHL
  *   (effective data only)"); the older `/gis/nfhl/` path answers 404. Layer **28, "Flood Hazard
@@ -83,13 +92,19 @@
  *   site's address as the Referer, and the credit beside the results.
  *
  * Every request is made with `credentials: 'omit'` (no cookies) and the default cache mode (the
- * HTTP cache is honoured, never bypassed).
+ * HTTP cache is honoured, never bypassed), and carries the site's address (the `Origin` header of
+ * a CORS request, and an origin-only Referer), never the page's path.
  */
 
 /** The date the endpoints and policies above were last checked. */
 export const CHECKED_ON = '2026-09-27';
 
-/** How a request identifies the site: only the OSMF services require a Referer; everyone else gets none. */
+/**
+ * How a request identifies the site. Every request here is a CORS request, which carries the site's
+ * address in its `Origin` header whatever the referrer policy, so `no-referrer` would hide nothing
+ * from these services. They all get `strict-origin-when-cross-origin`: the site's address as the
+ * Referer (which the OSMF and Overpass rules ask for), never the page's path or its `#/…` route.
+ */
 export type ReferrerPolicyValue = 'no-referrer' | 'strict-origin-when-cross-origin';
 
 export interface TileSource {
@@ -122,6 +137,8 @@ export interface OverpassSource {
   clientTimeoutMs: number;
   /** At most this many queries a press, counting a retry on the second instance. */
   maxQueries: number;
+  /** A server that answered 429, 406 or 504 is not asked again for this long (the main instance's rule for 429 and 406). */
+  busyPauseMs: number;
   credit: string;
 }
 
@@ -150,7 +167,7 @@ export const OSM_TILES: TileSource = {
 /** The public-domain fallback base map (D5): one export image per map instead of tiles. */
 export const CENSUS_BASE: ExportSource & { layers: string; layersNearby: string } = {
   url: 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_PhysicalFeatures/MapServer/export',
-  referrerPolicy: 'no-referrer',
+  referrerPolicy: 'strict-origin-when-cross-origin',
   credit: 'Base map: U.S. Census Bureau TIGERweb',
   // Roads and their labels, rail, and water (lines, areas, labels). Each layer draws only at the
   // scales the service allows, so one list serves every zoom from 9 to 16.
@@ -160,18 +177,19 @@ export const CENSUS_BASE: ExportSource & { layers: string; layersNearby: string 
 
 /** OpenStreetMap places (pharmacies, fire stations…) for the legend. */
 export const OVERPASS: OverpassSource = {
-  urls: ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'],
-  referrerPolicy: 'no-referrer',
+  urls: ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter'],
+  referrerPolicy: 'strict-origin-when-cross-origin',
   timeoutS: 25,
-  clientTimeoutMs: 30_000,
+  clientTimeoutMs: 45_000,
   maxQueries: 2,
+  busyPauseMs: 30_000,
   credit: 'Places © OpenStreetMap contributors, openstreetmap.org/copyright',
 };
 
 /** FEMA flood zones, layer 28 of the National Flood Hazard Layer. */
 export const FLOOD: ExportSource & { layer: number; maxScale: number } = {
   url: 'https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/export',
-  referrerPolicy: 'no-referrer',
+  referrerPolicy: 'strict-origin-when-cross-origin',
   credit: 'Flood zones: FEMA National Flood Hazard Layer',
   layer: 28,
   /** The layer draws only at this scale or closer (1:36,112). */
@@ -181,7 +199,7 @@ export const FLOOD: ExportSource & { layer: number; maxScale: number } = {
 /** USDA Forest Service Wildfire Hazard Potential, 2023, classified. */
 export const WILDFIRE: ExportSource & { high: number; veryHigh: number } = {
   url: 'https://imagery.geoplatform.gov/iipp/rest/services/Fire_Aviation/USFS_EDW_RMRS_WildfireHazardPotentialClassified/ImageServer/exportImage',
-  referrerPolicy: 'no-referrer',
+  referrerPolicy: 'strict-origin-when-cross-origin',
   credit: 'Wildfire hazard: USDA Forest Service Wildfire Hazard Potential (2023)',
   high: 4,
   veryHigh: 5,
@@ -268,7 +286,7 @@ export const RECIPIENTS: readonly Recipient[] = [
   {
     id: 'places',
     layer: 'Nearby places (pharmacies, grocery stores, fire stations, hospitals…)',
-    who: 'The Overpass service (FOSSGIS e.V., Germany), which searches OpenStreetMap. If it is busy, a second Overpass server (kumi.systems) instead.',
+    who: 'The Overpass service (FOSSGIS e.V., Germany), which searches OpenStreetMap. If it is busy, a second Overpass server (Private.coffee, formerly kumi.systems) instead.',
     receives: 'Boxes on the map around your home, from your neighbourhood out to your city or county. Never your home’s exact spot.',
     origins: OVERPASS.urls.map(originOf),
   },
@@ -290,7 +308,7 @@ export const RECIPIENTS: readonly Recipient[] = [
 
 /** What every recipient also learns, as any website would. */
 export const EVERY_RECIPIENT_SEES =
-  'Each of these also sees your internet (IP) address and what browser you use, as any website does. The OpenStreetMap servers are also told this site’s address, which their rules require. None of them is sent your name, your household or your answers.';
+  'Each of these also sees your internet (IP) address, what browser you use and this site’s address, as any website does. None of them is sent your name, your household or your answers.';
 
 /** The address search's recipient (D6). */
 export const SEARCH_RECIPIENT = {

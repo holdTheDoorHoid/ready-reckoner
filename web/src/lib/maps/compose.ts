@@ -136,6 +136,8 @@ export interface ComposeEnv {
   pixelRatio?: number;
   onProgress?(done: number, total: number): void;
   signal?: AbortSignal;
+  /** The clock, for the pause after a busy answer (tests pass their own). */
+  now?: () => number;
 }
 
 /** The browser's own environment. */
@@ -296,29 +298,51 @@ async function fetchBases(frames: Record<MapSlotKind, Frame>, fetcher: Fetcher, 
   return { bases, tiles: requested };
 }
 
-async function fetchPlaces(frames: Record<MapSlotKind, Frame>, children: boolean, fetcher: Fetcher): Promise<Place[] | null> {
+/** Overpass servers that answered "busy" (429, 406, 504), and until when they are left alone. */
+const overpassBusyUntil = new Map<string, number>();
+
+/** Forget every "busy" answer (tests). */
+export function resetOverpassPauses(): void {
+  overpassBusyUntil.clear();
+}
+
+type PlacesResult = { places: Place[] } | { failed: 'busy' | 'error' };
+
+async function fetchPlaces(frames: Record<MapSlotKind, Frame>, children: boolean, fetcher: Fetcher, now: () => number): Promise<PlacesResult> {
   const area = frames.area;
   const query = overpassQuery(
     { neighbourhood: frameBox(frames.neighbourhood), nearby: frameBox({ ...area, zoom: area.zoom + 1 }), area: frameBox(area) },
     { children, timeoutS: OVERPASS.timeoutS },
   );
+  let busy = false;
   for (const url of OVERPASS.urls.slice(0, OVERPASS.maxQueries)) {
+    // The main instance asks for a 30-second pause after a 429 or 406: a server that said it was
+    // busy is not asked again until then (the next one is tried instead).
+    if ((overpassBusyUntil.get(url) ?? 0) > now()) {
+      busy = true;
+      continue;
+    }
     try {
       const response = await fetcher.get(url, OVERPASS.referrerPolicy, OVERPASS.clientTimeoutMs, {
         method: 'POST',
         body: new URLSearchParams({ data: query }),
       });
+      if ([429, 406, 504].includes(response.status)) {
+        overpassBusyUntil.set(url, now() + OVERPASS.busyPauseMs);
+        busy = true;
+        continue;
+      }
       if (!response.ok) continue;
       const json = (await response.json()) as { elements?: unknown; remark?: string };
       // A timed-out or refused query still answers 200, with a remark instead of the data.
       if (!Array.isArray(json.elements) || /error|timed out/i.test(json.remark ?? '')) continue;
       fetcher.succeeded += 1;
-      return parseOverpass(json);
+      return { places: parseOverpass(json) };
     } catch {
-      // Try the next instance, if the press allows one more query.
+      // Unreachable or too slow: try the next instance, if the press allows one more query.
     }
   }
-  return null;
+  return { failed: busy ? 'busy' : 'error' };
 }
 
 async function fetchOverlay(url: string, referrerPolicy: ReferrerPolicy, frame: Frame, fetcher: Fetcher, env: ComposeEnv): Promise<Overlay> {
@@ -368,7 +392,7 @@ interface DrawInput {
   slot: MapSlotKind;
   frame: Frame;
   base: Base;
-  places: Place[] | null;
+  places: PlacesResult | null;
   flood: Overlay | null;
   wildfire: Overlay | null;
   input: ComposeInput;
@@ -493,10 +517,12 @@ function drawMap(d: DrawInput, env: ComposeEnv, ratio: number): ComposedMap {
   }
   if (home.basis !== 'pin' && slot !== 'region') notes.push(HOME_NOTE[home.basis]);
   if (slot !== 'region') {
-    if (!input.layers.places) statuses.push({ layer: 'places', state: 'off', text: 'Nearby places were left off.' });
-    else if (d.places === null) statuses.push({ layer: 'places', state: 'failed', text: `Nearby places could not be fetched on ${date}.` });
-    else {
-      const picked = pickPlaces(d.places, slot === 'neighbourhood' ? NEIGHBOURHOOD_QUOTAS : AREA_QUOTAS, frame, home.at, { children: input.children });
+    if (!input.layers.places || d.places === null) statuses.push({ layer: 'places', state: 'off', text: 'Nearby places were left off.' });
+    else if ('failed' in d.places) {
+      const why = d.places.failed === 'busy' ? ': the places service was busy. Refresh the maps later to add them' : '';
+      statuses.push({ layer: 'places', state: 'failed', text: `Nearby places could not be fetched on ${date}${why}.` });
+    } else {
+      const picked = pickPlaces(d.places.places, slot === 'neighbourhood' ? NEIGHBOURHOOD_QUOTAS : AREA_QUOTAS, frame, home.at, { children: input.children });
       picked.forEach((p, i) => {
         const row: LegendRow = { mark: String(i + 1), name: p.name ?? `${KIND_LABELS[p.kind]} (no name listed)`, kind: KIND_LABELS[p.kind] };
         if (p.address) row.address = p.address;
@@ -579,7 +605,7 @@ export async function composeMaps(input: ComposeInput, env: ComposeEnv): Promise
     input.layers.base !== false
       ? fetchBases(frames, fetcher, env, progress)
       : Promise.resolve({ bases: { neighbourhood: { source: 'none' }, area: { source: 'none' }, region: { source: 'none' } } as Record<MapSlotKind, Base>, tiles: 0 }),
-    input.layers.places ? fetchPlaces(frames, input.children, fetcher).finally(progress) : Promise.resolve(null),
+    input.layers.places ? fetchPlaces(frames, input.children, fetcher, env.now ?? Date.now).finally(progress) : Promise.resolve(null),
     input.layers.flood ? fetchOverlay(floodExportUrl(frames.neighbourhood), FLOOD.referrerPolicy, frames.neighbourhood, fetcher, env).finally(progress) : Promise.resolve(null),
     input.layers.wildfire ? fetchOverlay(wildfireExportUrl(frames.area), WILDFIRE.referrerPolicy, frames.area, fetcher, env).finally(progress) : Promise.resolve(null),
   ]);
