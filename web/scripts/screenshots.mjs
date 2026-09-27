@@ -155,6 +155,8 @@ shots.push(
   { name: '16-family--minot--desktop', route: 'family', plan: saved(minot), viewport: DESKTOP },
   { name: '17-packet--minot--desktop', route: 'packet', plan: saved(minot), viewport: DESKTOP },
   { name: '18-maintain--minot-dark--phone', route: 'maintain', plan: saved(minot), viewport: PHONE, theme: 'dark' },
+  { name: '10-learn-before-you-need-them--philadelphia--desktop', route: 'learn/before-you-need-them', plan: saved(philly), viewport: DESKTOP },
+  { name: '10-learn-strategic-sites--minot--phone', route: 'learn/strategic-sites', plan: saved(minot), viewport: PHONE },
 );
 
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--no-sandbox', '--font-render-hinting=none'] });
