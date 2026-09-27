@@ -244,7 +244,9 @@ fn words(markdown: &str) -> usize {
 /// v0.1.0 and 14,100 before packet v2).
 #[test]
 fn the_packet_stays_short() {
-    const MAX_WORDS: usize = 12_500;
+    // Transitional (v0.3): the three data credits data3 made unconditional add ~150 words to
+    // every packet; the binder retires this cap when it lands (DESIGN-DELTA-v3 §4).
+    const MAX_WORDS: usize = 12_700;
     for (name, _, out) in outputs() {
         let p = &out.prepare_markdown;
         let n = words(p);
