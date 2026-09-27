@@ -1331,7 +1331,8 @@ least a day** are over (`RELIEF_FROM_DAYS`, v0.1.1). Over all outages, most of t
 two, the 90th percentile described ordinary outages, not the design event: Asheville read "mostly
 back in about half a day" beside a two-week target (model review M-13). Now Asheville's power is
 mostly back in about 6 days, Philadelphia's in 6 (the hurricane curve: median 1.5 days, 5 days to
-90 %), Utuado's in 11 beside a month; Cascadia's own rating is unchanged. A rating whose "mostly
+90 %; 5.2 on the pack's pooled curves, which real plans read since v0.2.0), Utuado's in 11 beside a
+month; Cascadia's own rating is unchanged. A rating whose "mostly
 restored" still comes out under a third of its target describes some smaller event, so it is
 dropped (`None`, "not known"): no screen may print a relief time that short without naming the
 event. `None` for expert-estimated durations.
@@ -1402,6 +1403,35 @@ deviation), and its no-tap-water raw target is 3.3 days against 2.8 (within the 
 past the 3-day step, so 5 days on the ladder). With the pack's record for Philadelphia (no
 violations, ×0.5) no tap water is 2.6 days (3 on the ladder, as in the research) and boil water
 3.3 days (5 on the ladder, as the research's 4 days).
+
+**The worked example on the data pack (v0.2.0, with the restoration curves).** Since v0.2.0 the
+engine passes the core pack's pooled restoration curves to the model
+(`CountyData::from_record(&c).with_curves(store.restoration_curves())` in `rr-plan`'s pipeline),
+so a real plan reads the regional restoration stretch and the Puerto Rico and Virgin Islands
+Maria curves as the backtest does. Philadelphia (the reference household: four people, a dog, a
+senior on a daily prescription, a rented rowhouse) at the default dial on the data pack
+(`fixtures.rs`, `philadelphia_targets_match_the_risk_model_report`):
+
+| Need | Target (10th–90th percentile) | Where it comes from |
+| --- | --- | --- |
+| No grid power | 3 days (3–5) | 3.08 days before the ladder, the research's 2.8; 5 days (3–7) without the pooled curves; driven by hurricanes 46 %, strong wind 29 %, heat waves 10 %, cold waves 5 % |
+| Tap water must be treated | 5 days (1 day–2 weeks) | 4.58 days before the ladder, boil notices from local water problems; water-system failures at ×0.5 (no violations on record) |
+| No tap water | 5 days (3–10) | 3.21 days before the ladder, just past the 3-day step; mostly chemical spills and releases |
+| Can't get to a store | 2 weeks (10 days–1 month) | 10.4 days before the ladder, mostly pandemics |
+| Heat or cold indoors | 3 days (2–5) | 2.25 days before the ladder, mostly power cuts in heat waves |
+| Medicine | 3 weeks (up to 1½ months) | 20.8 days before the ladder, a shortage of a daily prescription (2 weeks before v0.2.0) |
+| Phone, internet, card payments | 3 days (2–7) | 2.63 days before the ladder, network outages (0.3 a year) |
+| Income | 4 months (2½–7) | |
+
+One month is the step that is enough. The relief for the power target is help in about 3 days and
+mostly back in about 5.2 (the pack's EAGLE-I curves for the region; 6.1 on the built-in hurricane
+curve before). At this setting about 1 in 10 households like Philadelphia's face a longer power
+cut in ten years, and about 3 in 10 face at least one need running past its target. Stored water
+is 21.6 gallons for the five days (4.32 a day for four people and a dog), 6 of it from reused
+bottles. Elsewhere the curves move the months-long power curve most: San Juan's 60-day rate is
+0.013 a year (Maria's curves) and Coos Bay's 0.008 (Cascadia leaves about 77 in 100 of the homes it
+reaches without power past two months), where rr-hazards' fallback had both near 1 in 10,000 over
+ten years.
 
 ### Decisions and open questions
 
@@ -1619,14 +1649,18 @@ allowance purchase). Each allowance purchase says which ticked family it is for 
 here passes 1 in 1,000 (no point estimate: rare rows show ranges only). Rare items are on no
 readiness checklist. The dosimeter card goes with the nuclear family and Faraday storage with the
 months-long blackout family (`multi_month_blackout`, whose block carries the EMP paragraph). That
-family's central estimate is not the same everywhere (it is built from the county's power curve and
-the latitude-scaled solar-storm row): from about 0.5 in 1,000 (Cameron Parish) to 1.5 in 1,000
-(Minot) over ten years, above 1 in 1,000 in Minot, Detroit, Chicago and Philadelphia only.
-Fixtures: Minot (class A; nuclear and solar storm ticked) buys the dosimeter card in month 4 and no
-Faraday storage, because the blackout family is not ticked (ticking it would add the bag in month
-12); Philadelphia with every family buys the card in month 10 and Faraday storage in month 21 (the
-blackout family at about 1.07 in 1,000, just over the line); Coos Bay with every family buys nothing
-(nuclear about 1.2 in 10,000, blackout about 6.9 in 10,000).
+family's central estimate is not the same everywhere (it is built from the household's own power
+curve at 60 days, which `rr-plan` passes to `rr-hazards` after the consequence model has run, and
+the latitude-scaled solar-storm row): from about 0.7 in 1,000 (Hays) to 12.5 in 100 (San Juan, on
+Maria's restoration curves) over ten years; Coos Bay reads 7.7 in 100 (Cascadia). It is above 1 in
+1,000 in ten of the fourteen fixtures, all but Hays, Phoenix, Missoula and Sacramento (Cameron
+Parish only just, 1.02 in 1,000). Fixtures: Minot (class A; nuclear and solar storm ticked) buys the
+dosimeter card in month 4 and no Faraday storage, because the blackout family is not ticked;
+Philadelphia with every family buys the card in month 10 and Faraday storage in month 21 (the
+blackout family at about 1.12 in 1,000, just over the line); Coos Bay with every family buys the
+Faraday storage in month 5 (the blackout family, driven by Cascadia) and no dosimeter card (nuclear
+about 1.2 in 10,000). The Faraday bag answers a pulse, not an earthquake, so for Coos Bay the family
+buys an item its main cause does not call for (a question for the planner).
 
 ### Savings
 
