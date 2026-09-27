@@ -26,7 +26,7 @@ The ground starts to shake, or your phone warns that shaking is coming.
 1. **Expect aftershocks.** Drop, cover and hold on each time.[^ready_gov_earthquakes]
 2. **Check for injuries.** Help others if you have training.[^ready_gov_earthquakes]
 3. **Trapped?** Send a text, or bang on a pipe or wall. Use a whistle instead of shouting. Cover your mouth with your shirt.[^ready_gov_earthquakes]
-4. **Smell gas or hear hissing?** Get everyone out. Call the gas company from a neighbor's home.[^ready_gov_safety_skills]
+4. **Smell gas or hear hissing?** Open a window and get everyone out. Turn off the gas at the outside main valve if you can. Call the gas company from a neighbor's home.[^ready_gov_safety_skills]
 5. **Get news** from a battery radio or phone alerts. Text instead of calling.[^ready_gov_earthquakes]
 6. **Clean up** in long sleeves, work gloves and thick-soled shoes. Leave heavy debris for help.[^ready_gov_earthquakes]
 
