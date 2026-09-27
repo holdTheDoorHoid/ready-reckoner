@@ -14,27 +14,26 @@ An attack releases a chemical, a germ or radioactive material, or officials warn
 
 ## Do first
 
-1. **Get away** from the area, upwind, if you see a cloud or a strange substance.[^ready_gov_chemical][^ready_gov_biohazard]
-2. **Cover your nose and mouth** with two or three layers of cotton, such as a T-shirt or towel.[^ready_gov_biohazard]
-3. **Get inside** the nearest building. Close the windows, doors and vents.[^ready_gov_chemical][^cdc_radiation_get_inside]
+1. **Get away** upwind if you see a cloud or a strange substance.[^ready_gov_chemical][^ready_gov_biohazard]
+2. **Cover your nose and mouth** with layers of cotton, like a T-shirt.[^ready_gov_biohazard]
+3. **Get inside** the nearest building. Close windows, doors and vents.[^ready_gov_chemical][^cdc_radiation_get_inside]
 4. **Turn off** fans, heating and air conditioning.[^ready_gov_chemical]
 5. **Exposed?** Take off your clothes and seal them in a bag.[^ready_gov_chemical][^ready_gov_biohazard]
-6. **Wash** with soap and water, flush your eyes, and put on clean clothes.[^ready_gov_chemical][^ready_gov_biohazard]
+6. **Wash** with soap and water, flush your eyes and change clothes.[^ready_gov_chemical][^ready_gov_biohazard]
 
 ## Then
 
-1. **Listen** to local radio, TV or alerts for what to do.[^ready_gov_chemical][^ready_gov_biohazard]
-2. **Chemical attack?** Go to an inside room above ground. Seal it with plastic and tape if told to.[^ready_gov_chemical]
-3. **Radioactive ("dirty") bomb?** Go to the basement or the middle of the building. Stay in at least 24 hours.[^cdc_radiation_get_inside]
-4. **Germ attack?** Follow what doctors and health officials say. Avoid crowds. Wash your hands often.[^ready_gov_biohazard]
-5. **Exposed to a germ?** Tell the authorities and get medical care.[^ready_gov_biohazard]
-6. **Symptoms match what officials describe?** Get emergency care right away.[^ready_gov_biohazard]
-7. **Chemical on you?** Get checked at a medical facility as soon as it is safe.[^ready_gov_chemical]
+1. **Listen** to local radio, TV or alerts.[^ready_gov_chemical][^ready_gov_biohazard]
+2. **Chemical attack?** Go to an inside room above ground. Seal it if told to.[^ready_gov_chemical]
+3. **Radioactive ("dirty") bomb?** Go to the basement or middle of the building for at least 24 hours.[^cdc_radiation_get_inside]
+4. **Germ attack?** Follow doctors and health officials. Avoid crowds. Wash your hands often.[^ready_gov_biohazard]
+5. **Exposed to a germ, or sick as officials describe?** Tell the authorities and get medical care right away.[^ready_gov_biohazard]
+6. **Chemical on you?** Get checked at a clinic or hospital once it is safe.[^ready_gov_chemical]
 
 ## Leave or stay
 
 - **Leave if** officials tell you to.[^ready_gov_chemical] Go to {where_go}. {ref:getting_out}
-- **Stay if** you are told to, or you cannot reach clean air without passing through the danger.[^ready_gov_chemical] {ref:home}
+- **Stay if** you are told to, or cannot reach clean air safely.[^ready_gov_chemical] {ref:home}
 
 ## Where and who
 
@@ -44,15 +43,14 @@ An attack releases a chemical, a germ or radioactive material, or officials warn
 
 ## Do not
 
-- Do not leave your shelter, even to help others, until officials say it is safe.[^ready_gov_chemical]
-- Do not go out to get family. Schools and care centers have plans.[^cdc_radiation_get_inside]
+- Do not leave shelter, even to help others, until officials say it is safe.[^ready_gov_chemical]
+- Do not go out to get family. Schools have plans.[^cdc_radiation_get_inside]
 - Do not eat or drink anything that may be contaminated.[^ready_gov_chemical]
 - Do not share food or utensils during a germ attack.[^ready_gov_biohazard]
 
 ## When it is over
 
 - Go home only when officials say it is safe.[^ready_gov_chemical]
-- Follow official instructions for throwing away exposed clothes.[^ready_gov_biohazard]
 - For stress, call or text the Disaster Distress Helpline, 1-800-985-5990.[^samhsa_disaster_distress]
 - For the weeks ahead, see {ref:after}.[^ready_gov_recovering]
 

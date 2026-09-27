@@ -25,9 +25,8 @@ After an attack, a bomb threat or another threat, police close streets or transi
 1. **Threat by phone?** Stay calm and keep the caller on the line. Write down the exact words. Report it to police.[^cisa_bomb_threats]
 2. **Threat by text, email or social media?** Leave the message open, take a screenshot and report it.[^cisa_bomb_threats]
 3. **Children at school or child care?** Follow official directions on where to pick them up.[^fema_back_to_school_2026]
-4. **Cannot get home?** Go to your meeting place outside the neighborhood.[^ready_gov_plan]
-5. **Check alerts and local news** for road and transit closures.[^ready_gov_explosions]
-6. **Help others get to safety** if it is safe to do so.[^ready_gov_explosions]
+4. **Check alerts and local news** for road and transit closures.[^ready_gov_explosions]
+5. **Help others get to safety** if it is safe to do so.[^ready_gov_explosions]
 
 ## Leave or stay
 
@@ -45,12 +44,10 @@ After an attack, a bomb threat or another threat, police close streets or transi
 
 - Do not go toward the scene to look.[^ready_gov_explosions]
 - Do not use a phone or two-way radio near a suspicious item.[^cisa_bomb_threat_guide_2025]
-- Do not try to dig out people who are trapped. Tell responders where they are.[^ready_gov_explosions]
 - Do not treat anyone as suspicious because of their race, religion or looks.[^cisa_suspicious_items]
 
 ## When it is over
 
-- Let family and friends know how you are.[^ready_gov_public_spaces]
 - For stress or shock, call or text the Disaster Distress Helpline, 1-800-985-5990.[^ready_gov_public_spaces][^samhsa_disaster_distress]
 
 ## Sources

@@ -14,25 +14,25 @@ Officials announce an emergency at a nuclear power plant near you, or tell peopl
 
 ## Do first
 
-1. **Tune in** to local radio, TV or alerts, and follow what officials say.[^ready_gov_radiation][^nrc_ep_backgrounder]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
+1. **Tune in** to local radio, TV or alerts, and follow officials.[^ready_gov_radiation][^nrc_ep_backgrounder]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
 2. **Told to leave?** Leave by the route officials give.[^ready_gov_radiation]
-3. **Told to stay inside?** Get inside. Close and lock the windows and doors.[^cdc_radiation_get_inside]
-4. **Turn off** fans, air conditioning and heating that bring in outside air. Close fireplace dampers.[^ready_gov_radiation]
-5. **Go to the basement or the middle** of the building, away from outer walls and the roof.[^cdc_radiation_get_inside]
-6. **Were you outside?** Take off your outer layer of clothes, seal it in a bag and wash.[^cdc_radiation_self_decon]
+3. **Told to stay inside?** Get inside and lock the windows and doors.[^cdc_radiation_get_inside]
+4. **Turn off** fans and heating or cooling that bring in outside air. Close fireplace dampers.[^ready_gov_radiation]
+5. **Go to the basement or the middle** of the building.[^cdc_radiation_get_inside]
+6. **Were you outside?** Take off your outer clothes, bag them and wash.[^cdc_radiation_self_decon]
 
 ## Then
 
-1. **Stay inside** until officials say it is safe. It usually lasts at least 24 hours.[^ready_gov_radiation]
-2. **Wash** with lots of soap and water, and shampoo your hair. No shower? Wipe uncovered skin with a wet cloth.[^cdc_radiation_self_decon]
-3. **Eat and drink what was inside.** Wipe sealed containers from outside with a damp cloth.[^ready_gov_radiation]
+1. **Stay inside** until officials say it is safe, usually at least 24 hours.[^ready_gov_radiation]
+2. **Wash** with soap and water, and shampoo your hair. No shower? Wipe skin with a wet cloth.[^cdc_radiation_self_decon]
+3. **Eat and drink what was inside.** Wipe sealed containers from outside first.[^ready_gov_radiation]
 4. **Use tap water for washing.** Drink bottled water if officials say the tap is unsafe.[^cdc_radiation_self_decon]
 5. **If you leave,** take your phone, chargers, medicines, ID and cash.[^cdc_evacuation_psa]
 
 ## Leave or stay
 
 - **Leave if** officials tell your area to leave.[^nrc_ep_backgrounder] Go to {where_go}.{if:pets} Take your pets.[^ready_gov_pets]{/if} {ref:getting_out}
-- **Stay if** officials tell you to stay inside. Go to {shelter_home}.[^nrc_ep_backgrounder] {ref:home}
+- **Stay if** officials tell you to. Go to {shelter_home}.[^nrc_ep_backgrounder] {ref:home}
 
 ## Where and who
 
@@ -42,14 +42,14 @@ Officials announce an emergency at a nuclear power plant near you, or tell peopl
 
 ## Do not
 
-- Do not take potassium iodide unless state or local officials tell you to. It protects only the thyroid.[^cdc_potassium_iodide][^nrc_ep_backgrounder]
-- Do not go out to pick up family. Schools and care centers have plans to keep people safe.[^cdc_radiation_get_inside]
+- Do not take potassium iodide unless officials tell you to. It protects only the thyroid.[^cdc_potassium_iodide][^nrc_ep_backgrounder]
+- Do not go out to pick up family. Schools and care centers have plans.[^cdc_radiation_get_inside]
 - Do not eat garden food, or anything left outside uncovered, until officials say it is safe.[^ready_gov_radiation]
 
 ## When it is over
 
 - Go home only when officials say it is safe.[^ready_gov_radiation]
-- Talk to someone if you feel upset. Call or text the Disaster Distress Helpline, 1-800-985-5990.[^ready_gov_radiation][^samhsa_disaster_distress]
+- For stress, call or text the Disaster Distress Helpline, 1-800-985-5990.[^ready_gov_radiation][^samhsa_disaster_distress]
 - For the weeks ahead, see {ref:after}.[^ready_gov_recovering]
 
 ## Sources
