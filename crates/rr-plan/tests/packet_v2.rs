@@ -324,3 +324,30 @@ fn the_wind_shelter_advice_prints_once() {
         }
     }
 }
+
+/// The get-home bag line prints once, for each person, when every commuter's line is the same
+/// (Sugar Land: both keep theirs in the car), and per person when they differ (Philadelphia: one
+/// in the car, one at work); each commuter keeps their own trip and walk supplies.
+#[test]
+fn a_shared_get_home_bag_line_prints_once() {
+    let sugar = section(
+        &fixture("sugar-land-ev-household-3").2.packet_markdown,
+        "## Checklists",
+    )
+    .unwrap();
+    assert_eq!(
+        sugar.matches("get-home bag in the car").count(),
+        1,
+        "{sugar}"
+    );
+    assert!(sugar.contains("- [ ] For each person: keep a get-home bag in the car"));
+    assert_eq!(sugar.matches("- [ ] For the walk, from home: ").count(), 2);
+    let phl = section(
+        &fixture("philadelphia-renters-4").2.packet_markdown,
+        "## Checklists",
+    )
+    .unwrap();
+    assert!(phl.contains("- [ ] Keep a get-home bag in the car"));
+    assert!(phl.contains("- [ ] Keep a get-home bag at work or in your daily bag"));
+    assert!(!phl.contains("For each person: keep a get-home bag"));
+}

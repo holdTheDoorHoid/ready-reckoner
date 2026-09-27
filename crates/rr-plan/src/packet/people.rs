@@ -55,9 +55,11 @@ fn lines(cx: &Ctx<'_>, rules: &[&str], out: &mut Vec<String>) -> usize {
 }
 
 /// A topic block under its own small heading, without its opening paragraph.
+/// A topic block as its own subsection: the block's title as the `###` heading (one heading, not
+/// a section heading over a topic heading that says the same), then its paragraphs.
 fn block(cx: &Ctx<'_>, target: &str, out: &mut Vec<String>) {
     if let Some(g) = cx.blocks_for(target).first() {
-        out.push(format!("#### {}", md(&g.meta.title)));
+        out.push(format!("### {}", md(&g.meta.title)));
         out.push(String::new());
         for para in super::topic_paragraphs(&cx.guidance(g, None, None)) {
             out.push(para);
@@ -334,7 +336,6 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
         );
         out.push(String::new());
     }
-    out.push("### Stress and mental health".to_owned());
-    out.push(String::new());
+    // "Stress, mental health and the 988 line" (`topic:mental_health`), always.
     block(cx, "topic:mental_health", out);
 }

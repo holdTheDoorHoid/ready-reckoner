@@ -46,50 +46,12 @@ pub(crate) fn target_phrase(t: &Target) -> String {
 }
 
 /// What the dial means (model review M-04, DESIGN-DELTA §3): the consequence model's own
-/// sentence, computed from its event list (`ConsequenceAssessment::dial_sentence`: about 1 in 10
-/// for any one kind of disruption, and the share that runs past at least one target, from the
-/// joint rate), then [`COPE_SENTENCE`].
-///
-/// The model's sentence counts in tens and never says fewer than 1 in 10, which is right for
-/// every dial but the rarest: at 1 in 500 the chance for one need is about 2 in 100 in ten years,
-/// and "about 1 in 10" would overstate it five times. When either chance is under 1 in 10, the
-/// same sentence is written here from the model's two rates with that chance out of 100
-/// ([`dial_share`]).
+/// sentence, computed from its event list (`ConsequenceAssessment::dial_sentence`: the chance of
+/// a longer disruption of any one kind, and the higher chance that at least one kind runs past its
+/// target, from the joint rate, both on one scale, so the rarer settings read "about 2 in 100"),
+/// then [`COPE_SENTENCE`].
 pub fn dial_sentence(c: &ConsequenceAssessment) -> String {
-    let years = c.horizon_years.max(1.0);
-    let one = per_100(c.dial_rate, years);
-    let all = per_100(c.joint_rate(), years).max(one);
-    let model = if one >= 9.5 && all >= 9.5 {
-        c.dial_sentence()
-    } else {
-        format!(
-            "At this setting, about {} households like yours will face a longer disruption of \
-             any one kind in {}; about {} will face at least one kind that runs past its target.",
-            dial_share(one),
-            rr_consequence::words::horizon_phrase(years as u8),
-            dial_share(all)
-        )
-    };
-    format!("{model} {COPE_SENTENCE}")
-}
-
-/// Out of 100 households, how many see at least one event at `rate` a year in `years` years:
-/// 100 · (1 − e^(−years · rate)), as the consequence model counts it.
-fn per_100(rate: f64, years: f64) -> f64 {
-    (-100.0 * rr_types::math::exp_m1(-years * rate)).clamp(0.0, 100.0)
-}
-
-/// A chance out of 100 in the dial sentence's words: in tens from 1 in 10 up (as the model's
-/// sentence has it), out of 100 below ("2 in 100").
-fn dial_share(n: f64) -> String {
-    if n >= 9.5 {
-        format!(
-            "{} in 10",
-            ((n / 10.0 + 0.5).floor()).clamp(1.0, 10.0) as i64
-        )
-    } else {
-        format!("{} in 100", (n + 0.5).floor().max(1.0) as i64)
-    }
+    format!("{} {COPE_SENTENCE}", c.dial_sentence())
 }
 
 fn relief_cell(days: Option<f32>) -> String {
@@ -272,12 +234,12 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push(String::new());
     out.push(format!(
         "Brackets show how uncertain a target is. \"Not known\": no restoration records for the \
-         event behind that target.{}",
+         event behind that target{}",
         if fallback_any {
-            " \"Worst on record\": the target rests on an estimate, so the worst event on record \
-             stands in (named below)."
+            "; \"worst on record\": no such records either, so the worst event on record stands \
+             in (named below)."
         } else {
-            ""
+            "."
         }
     ));
     out.push(String::new());
