@@ -80,7 +80,7 @@ pub const TWO_PAGE_CHECKLISTS: [&str; 2] = ["check_hurricane", "check_nuclear_at
 
 /// The placeholders a checklist may use (DESIGN-DELTA-v3 §5.4), each with the width of the blank
 /// that stands in when the household has not answered, in characters.
-pub const PLACEHOLDERS: [(&str, u8); 16] = [
+pub const PLACEHOLDERS: [(&str, u8); 17] = [
     ("meeting_near", 30),
     ("meeting_far", 30),
     ("shelter_home", 30),
@@ -97,17 +97,22 @@ pub const PLACEHOLDERS: [(&str, u8); 16] = [
     ("pharmacy", 24),
     ("alerts", 30),
     ("county", 20),
+    // The community warming, cooling or emergency shelter the household named
+    // (`FamilyPlan.neighbourhood.shelter`; suggested by the tab-8 checklists).
+    ("shelter", 28),
 ];
 
 /// The pages a `{ref:<page>}` cross-reference may name: page ids of the binder
 /// (DESIGN-DELTA-v3 §4.2, §5.4).
-pub const REF_TARGETS: [&str; 6] = [
+pub const REF_TARGETS: [&str; 7] = [
     "home",
     "getting_out",
     "neighbourhood",
     "contacts",
     "after",
     "documents",
+    // The People part's opening page (who is in this binder, with a link to each person).
+    "people",
 ];
 
 /// Opens a cross-reference: `{ref:home}`.

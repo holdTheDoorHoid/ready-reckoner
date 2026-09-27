@@ -4291,6 +4291,78 @@ title = "Get Prepared: Home Protection"
 publisher = "Indiana Department of Homeland Security"
 year = 2026
 url = "https://www.in.gov/dhs/get-prepared/general-safety/home-protection/"
+retrieved = "2026-09-27"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "cdc_electrical_hazards"
+title = "What to Do to Protect Yourself From Electrical Hazards"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-from-electrical-hazards.html"
+retrieved = "2026-09-27"
+quote = "Do not enter standing water to access the main power switch."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_mold_moisture_guide"
+title = "A Brief Guide to Mold, Moisture and Your Home"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/mold/brief-guide-mold-moisture-and-your-home"
+retrieved = "2026-09-27"
+quote = "It is important to dry water-damaged areas and items within 24-48 hours to prevent mold growth."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "adot_severe_weather"
+title = "Severe Weather (driving in extreme heat, dust storms and monsoons)"
+publisher = "Arizona Department of Transportation"
+year = 2026
+url = "https://azdot.gov/about/transportation-safety/severe-weather"
+retrieved = "2026-09-27"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "nws_lightning_safety"
+title = "Overview: Lightning Safety"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/lightning-safety-overview"
+retrieved = "2026-09-27"
+quote = "Finally, wait 30 minutes after the last lightning or thunder before going back outside."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nws_nwr_deaf"
+title = "NOAA Weather Radio for the Deaf and Hard of Hearing"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/nwr/special_needs"
+retrieved = "2026-09-27"
+quote = "Some receivers are equipped with special output connectors that activate alerting devices such as vibrators, bed shakers, pillow vibrators, strobe lights and other alerting systems."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nac_perform_rescue"
+title = "Avalanche Safety: Perform a Rescue"
+publisher = "National Avalanche Center (avalanche.org)"
+year = 2026
+url = "https://avalanche.org/avalanche-tutorial/avalanche-rescue.php"
+retrieved = "2026-09-27"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "usfs_avalanche_safety"
+title = "Avalanches (Know Before You Go)"
+publisher = "USDA Forest Service"
+year = 2026
+url = "https://www.fs.usda.gov/visit/know-before-you-go/avalanches"
+retrieved = "2026-09-27"
+quote = "Take a certified avalanche course."
+license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
 # added by checklists-a2 (v0.3.0 incident checklists, tab 6: large fast hazards)
 #
 # Every entry below was read on 2026-09-27. How each was read, and what the checklists rely on:
@@ -4372,71 +4444,6 @@ retrieved = "2026-09-27"
 license = "State government publication (paraphrased, not quoted)"
 
 [[citation]]
-id = "cdc_electrical_hazards"
-title = "What to Do to Protect Yourself From Electrical Hazards"
-publisher = "Centers for Disease Control and Prevention"
-year = 2026
-url = "https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-from-electrical-hazards.html"
-retrieved = "2026-09-27"
-quote = "Do not enter standing water to access the main power switch."
-license = "US Government Work (public domain)"
-
-[[citation]]
-id = "epa_mold_moisture_guide"
-title = "A Brief Guide to Mold, Moisture and Your Home"
-publisher = "U.S. Environmental Protection Agency"
-year = 2026
-url = "https://www.epa.gov/mold/brief-guide-mold-moisture-and-your-home"
-retrieved = "2026-09-27"
-quote = "It is important to dry water-damaged areas and items within 24-48 hours to prevent mold growth."
-license = "US Government Work (public domain)"
-
-[[citation]]
-id = "adot_severe_weather"
-title = "Severe Weather (driving in extreme heat, dust storms and monsoons)"
-publisher = "Arizona Department of Transportation"
-year = 2026
-url = "https://azdot.gov/about/transportation-safety/severe-weather"
-retrieved = "2026-09-27"
-license = "State government publication (paraphrased, not quoted)"
-
-[[citation]]
-id = "nws_lightning_safety"
-title = "Overview: Lightning Safety"
-publisher = "NOAA National Weather Service"
-year = 2026
-url = "https://www.weather.gov/safety/lightning-safety-overview"
-retrieved = "2026-09-27"
-quote = "Finally, wait 30 minutes after the last lightning or thunder before going back outside."
-license = "US Government Work (public domain)"
-
-[[citation]]
-id = "nws_nwr_deaf"
-title = "NOAA Weather Radio for the Deaf and Hard of Hearing"
-publisher = "NOAA National Weather Service"
-year = 2026
-url = "https://www.weather.gov/nwr/special_needs"
-retrieved = "2026-09-27"
-quote = "Some receivers are equipped with special output connectors that activate alerting devices such as vibrators, bed shakers, pillow vibrators, strobe lights and other alerting systems."
-license = "US Government Work (public domain)"
-
-[[citation]]
-id = "nac_perform_rescue"
-title = "Avalanche Safety: Perform a Rescue"
-publisher = "National Avalanche Center (avalanche.org)"
-year = 2026
-url = "https://avalanche.org/avalanche-tutorial/avalanche-rescue.php"
-retrieved = "2026-09-27"
-license = "All rights reserved (paraphrased, not quoted)"
-
-[[citation]]
-id = "usfs_avalanche_safety"
-title = "Avalanches (Know Before You Go)"
-publisher = "USDA Forest Service"
-year = 2026
-url = "https://www.fs.usda.gov/visit/know-before-you-go/avalanches"
-retrieved = "2026-09-27"
-quote = "Take a certified avalanche course."
 id = "nrc_ep_backgrounder"
 title = "Backgrounder on Emergency Preparedness at Nuclear Power Plants"
 publisher = "U.S. Nuclear Regulatory Commission"
@@ -4490,6 +4497,9 @@ year = 2025
 url = "https://www.cisa.gov/sites/default/files/2025-08/Bomb_Threat_Guide_082025_508.pdf"
 retrieved = "2026-09-27"
 quote = "Radio signals have the potential to detonate a bomb."
+license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
 # added by checklists-b (v0.3.0 checklists, tab 7 "it is coming"). Read 2026-09-27; the wording each
 # checklist step relies on was checked against the page. How each page was read is noted above it.
 # ---------------------------------------------------------------------------------------------
@@ -4603,6 +4613,9 @@ year = 2026
 url = "https://www.nhc.noaa.gov/surge/"
 retrieved = "2026-09-27"
 quote = "Storm surge can even travel up rivers and canals, reaching well inland from the coastline."
+license = "US Government Work (public domain)"
+
+# ---------------------------------------------------------------------------------------------
 # added by checklists-c (v0.3.0 tab 8 checklists: "it goes on"). Every page below was read on
 # 2026-09-27 in a browser page (these sites refuse plain HTTP clients); each stored quote was
 # matched in the page's own text. Non-federal sources are paraphrased and carry no quote.
