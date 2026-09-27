@@ -198,7 +198,8 @@ pub struct GuidanceMeta {
     pub id: String,
     /// Heading shown to the user.
     pub title: String,
-    /// Bucket, hazard, tier, topic or family ids the block applies to.
+    /// Bucket, hazard, tier, topic, family or (for a checklist) event targets the block applies
+    /// to, each `kind:id`.
     pub applies_to: Vec<String>,
     /// Sources for the block.
     pub citations: Vec<CitationId>,
@@ -226,5 +227,8 @@ string_enum! {
         Topic = "topic",
         /// About one rare-event family, with its "what it changes in your plan" paragraph.
         Family = "family",
+        /// An incident checklist for the binder (`content/checklists/`; contract v3,
+        /// DESIGN-DELTA-v3 §5.4). Its `applies_to` names `hazard:` and `event:` targets.
+        Checklist = "checklist",
     }
 }

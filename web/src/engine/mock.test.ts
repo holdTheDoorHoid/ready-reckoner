@@ -92,9 +92,9 @@ describe('mock engine: shape of every fixture', () => {
         expect(h.probability_range[0]).toBeLessThanOrEqual(h.annual_probability);
         expect(h.probability_range[1]).toBeGreaterThanOrEqual(h.annual_probability);
       }
-      expect(o.packet_markdown).toContain('# Your preparedness packet');
+      expect(o.prepare_markdown).toContain('# Your preparedness packet');
       for (const section of ['Your family plan', 'Wallet cards', 'Your risks', 'Your targets', 'Your plan', 'Checklists', 'Documents and money', 'Special needs', 'Maintenance calendar', 'Sources']) {
-        expect(o.packet_markdown).toContain(`## ${section}`);
+        expect(o.prepare_markdown).toContain(`## ${section}`);
       }
     });
   }

@@ -17,6 +17,7 @@
 mod calibration;
 mod climate;
 mod exposure;
+mod hospitals;
 mod location;
 pub mod manifest;
 mod search;
@@ -33,6 +34,7 @@ pub use exposure::{
     EXPOSURE_SOURCES, StrategicArea, StrategicClassDef, StrategicSite, StrategicSites,
     StrategicSource, UasiArea, exposure_source,
 };
+pub use hospitals::Hospital;
 pub use location::AMBIGUOUS_ZIP_SHARE;
 pub use manifest::Manifest;
 pub use search::MAX_RESULTS;
@@ -58,6 +60,10 @@ pub const PACK_FILES: &[&str] = &[
     "core/states.csv",
     "core/ct_crosswalk.csv",
     "core/zip_county.csv",
+    // The ZIP's centre, for the pin map to start from (DESIGN-DELTA-v3 §3.3, §8); loaded lazily
+    // with the other ZIP tables. Restored 2026-09-27 (removed 2026-09-26 in 3c6e25e, when nothing
+    // read it).
+    "core/zip_centroids.csv",
     "core/nri_counties.csv",
     "core/nri_hazards.csv",
     "core/nri_semantics.toml",
@@ -81,15 +87,21 @@ pub const PACK_FILES: &[&str] = &[
     "core/water_systems.csv",
     "core/surge_proxy.csv",
     "core/eviction.csv",
+    // Bundled into the core pack from the optional packs of issue #15 (DESIGN-DELTA-v3 §8,
+    // 2026-09-27): `zip_surge.csv` still loads lazily with the other ZIP tables
+    // (`rr_wasm::source::ZIP_FILES`), the other two eagerly with the rest of core.
+    "core/zip_surge.csv",
+    "core/wildfire_places.csv",
+    "core/zip_wildfire_places.csv",
     "geo/counties.json",
-    // Optional packs (issue #15), loaded only when a feature asks for them.
-    "opt/surge/zip_surge.csv",
-    "opt/wildfire_places/places.csv",
-    "opt/wildfire_places/zip_places.csv",
+    // The county's emergency-services hospitals (DESIGN-DELTA-v3 §8): its own pack, `places`
+    // (like `geo`), loaded lazily only when the binder's Neighbourhood page is shown.
+    "places/hospitals.csv",
 ];
 
 /// Data-pack v2 calibration files (outage model, stress table, restoration curves, temperature,
-/// reliability, declarations, national series, and the optional `outage_events` pack).
+/// reliability, declarations, national series, and the per-event outage tables bundled from the
+/// optional `outage_events` pack, DESIGN-DELTA-v3 §8).
 pub const CALIBRATION_FILES: &[&str] = calibration::FILES;
 
 /// What the store keeps per county from `counties.csv`.
@@ -262,7 +274,9 @@ pub struct DataStore {
     facilities: BTreeMap<String, (Facilities, CountyFacilityFlags)>,
     vulnerability: BTreeMap<String, (Vulnerability, Option<u32>)>,
     zip_county: BTreeMap<String, Vec<(String, f32)>>,
+    zip_points: BTreeMap<String, LatLon>,
     zip_facilities: BTreeMap<String, ZipFacilities>,
+    hospitals: BTreeMap<String, Vec<Hospital>>,
     base_rates: Vec<BaseRate>,
     base_rate_entries: Vec<BaseRateEntry>,
     publications: Vec<Publication>,
@@ -492,6 +506,10 @@ impl DataStore {
                 self.zip_places = exposure::zip_places(&t)?;
                 return Ok(n);
             }
+            hospitals::FILE => {
+                self.hospitals = hospitals::parse(&t)?;
+                return Ok(n);
+            }
             _ => {}
         }
         match name {
@@ -569,6 +587,22 @@ impl DataStore {
                 for v in self.zip_county.values_mut() {
                     v.sort_by(|a, b| b.1.total_cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
                 }
+            }
+            "core/zip_centroids.csv" => {
+                let (i_z, i_lat, i_lon) = (t.col("zip")?, t.col("lat")?, t.col("lon")?);
+                self.zip_points = t
+                    .rows
+                    .iter()
+                    .filter_map(|r| {
+                        Some((
+                            r[i_z].clone(),
+                            LatLon {
+                                lat: f(&r[i_lat])?,
+                                lon: f(&r[i_lon])?,
+                            },
+                        ))
+                    })
+                    .collect();
             }
             "core/nri_counties.csv" => {
                 let (i_f, i_p, i_b, i_c, i_t) = (
@@ -1010,6 +1044,13 @@ impl DataStore {
         self.zip_county.len()
     }
 
+    /// The ZIP code's centre (`core/zip_centroids.csv`), if known: where the pin map starts
+    /// (`LocationResolved.zip_centroid`, DESIGN-DELTA-v3 §3.3). `None` before the file loads or
+    /// for a ZIP it does not list.
+    pub fn zip_centroid(&self, zip: &str) -> Option<LatLon> {
+        self.zip_points.get(zip.trim()).copied()
+    }
+
     /// Facility data for a ZIP, if known.
     pub fn zip_facilities(&self, zip: &str) -> Option<ZipFacilities> {
         self.zip_facilities.get(zip.trim()).copied()
@@ -1178,15 +1219,26 @@ impl DataStore {
         self.calibration.all_series()
     }
 
-    /// A county's recorded outages of a day or more with their restoration curves (optional pack
-    /// `outage_events`; empty until it is loaded).
+    /// A county's recorded outages of a day or more with their restoration curves
+    /// (`core/outage_events.csv`; empty until it is loaded). A core file loaded eagerly with the
+    /// rest of the pack (DESIGN-DELTA-v3 §8), even though only the expert views and the
+    /// validation page read it.
     pub fn county_outage_events(&self, fips: &str) -> &[CountyOutageEvent] {
         self.calibration.county_events(fips)
     }
 
-    /// The outage model's held-out test (optional pack `outage_events`), for the validation page.
+    /// The outage model's held-out test (`core/outage_holdout.csv`), for the validation page.
     pub fn outage_holdout(&self) -> &[HoldoutRow] {
         self.calibration.holdout()
+    }
+
+    /// The county's hospitals with emergency services (`places/hospitals.csv`, its own `places`
+    /// pack; empty until it is loaded, and for most rural counties, which have none). For the
+    /// binder's Neighbourhood page.
+    pub fn county_hospitals(&self, fips: &str) -> &[Hospital] {
+        self.hospitals
+            .get(fips.trim())
+            .map_or(&[], |v| v.as_slice())
     }
 
     /// Credit lines and disclaimers the app must show (from the manifest): the FEMA National Risk
@@ -1291,21 +1343,26 @@ mod tests {
 
     #[test]
     fn optional_pack_credit_lines_wait_for_their_pack() {
-        let places = b"place,name,buildings_direct,buildings_indirect,risk_national_rank\n0655520,\"Paradise, CA\",0.9,0.1,0.99\n";
+        // No file the shipped v0.3.0 pack lists is gated behind a pack of its own any more
+        // (`surge` and `wildfire_places` were bundled into `core`, DESIGN-DELTA-v3 §8); this
+        // exercises `attributions()`'s general "a pack's credit line waits for one of its files"
+        // rule (`Manifest::attribution_packs`) against a hypothetical future optional pack, using
+        // a real core file (`core/eviction.csv`) so `load_pack` genuinely dispatches it.
+        let eviction = b"fips,eviction_filing_rate\n01001,0.05\n";
         let manifest = serde_json::json!({
             "pack_version": "abc",
             "generated": "2026-09-26T00:00:00Z",
             "packs": {
-                "wildfire_places": { "files": [ {
-                    "path": "opt/wildfire_places/places.csv",
-                    "sha256": sha256_hex(places), "rows": 1
+                "future_pack": { "files": [ {
+                    "path": "core/eviction.csv",
+                    "sha256": sha256_hex(eviction), "rows": 1
                 } ] }
             },
             "attributions": [
                 { "source": "FEMA National Risk Index", "text": "NRI", "accessed": "2026-09-01" },
-                { "source": "Wildfire", "text": "USFS", "accessed": "2026-09-01" }
+                { "source": "Eviction Lab", "text": "Gromis et al.", "accessed": "2026-09-01" }
             ],
-            "attribution_packs": { "Wildfire": "wildfire_places" }
+            "attribution_packs": { "Eviction Lab": "future_pack" }
         });
         let mut s = DataStore::new();
         s.load_pack("manifest.json", manifest.to_string().as_bytes())
@@ -1317,8 +1374,10 @@ mod tests {
                 .collect::<Vec<_>>()
         };
         assert_eq!(sources(&s), vec!["FEMA National Risk Index"]);
-        s.load_pack("opt/wildfire_places/places.csv", places)
-            .unwrap();
-        assert_eq!(sources(&s), vec!["FEMA National Risk Index", "Wildfire"]);
+        s.load_pack("core/eviction.csv", eviction).unwrap();
+        assert_eq!(
+            sources(&s),
+            vec!["FEMA National Risk Index", "Eviction Lab"]
+        );
     }
 }

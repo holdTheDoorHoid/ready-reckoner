@@ -301,3 +301,47 @@ No job run: `rr-etl manifest --rehash` recomputed the checksums, row counts and 
 | File | Rows before | Rows after | sha256 before | sha256 after |
 |---|---:|---:|---|---|
 | `core/events.csv` | 44057 | 44397 | `842d6c2dae85` | `1366f4179fc6` |
+
+## 2026-09-27T14:43:47Z — pack version 3f0b02d0e6ec
+
+Jobs run: eviction.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/eviction.csv` | 0 | 3144 | 0 | 0 | 0 | new |
+
+## 2026-09-27T14:49:03Z — pack version 0069ccc6a0c5
+
+Jobs run: geography, facilities.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/counties.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/ct_crosswalk.csv` | 19 | 19 | 0 | 0 | 0 | unchanged |
+| `core/facilities.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/states.csv` | 56 | 56 | 0 | 0 | 0 | unchanged |
+| `core/zip_centroids.csv` | 0 | 33791 | 0 | 0 | 0 | new |
+| `core/zip_county.csv` | 46772 | 46772 | 0 | 0 | 0 | unchanged |
+| `core/zip_facilities.csv` | 33791 | 33791 | 0 | 0 | 0 | unchanged |
+| `geo/counties.json` | 3222 | 3222 | 0 | 0 | 0 | unchanged |
+
+## 2026-09-27T14:52:43Z — pack version be74b9e97213
+
+No job run: `rr-etl manifest --rehash` recomputed the checksums, row counts and pack version from the files on disk. This rehash follows a hand edit, not a refresh: `surge`, `wildfire_places` and `outage_events` moved from their own optional packs into `packs.core.files` (DESIGN-DELTA-v3 §8), each file's bytes and checksum unchanged, only its path and pack —
+`opt/surge/zip_surge.csv` -> `core/zip_surge.csv`, `opt/wildfire_places/places.csv` -> `core/wildfire_places.csv`, `opt/wildfire_places/zip_places.csv` -> `core/zip_wildfire_places.csv`, `opt/outage_events/county_events.csv` -> `core/outage_events.csv`, `opt/outage_events/holdout.csv` -> `core/outage_holdout.csv`. A pure rename changes no file's sha256, so the table below is empty; the pack version still moves because it hashes each file's path together with its checksum.
+
+## 2026-09-27T15:09:28Z — pack version 13d6f99df7dc
+
+Jobs run: hospitals.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `places/hospitals.csv` | 0 | 4483 | 0 | 0 | 0 | new |
+
+## 2026-09-27T15:11:07Z — pack version 13d6f99df7dc
+
+Jobs run: hospitals.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `places/hospitals.csv` | 4483 | 4483 | 0 | 0 | 0 | unchanged |

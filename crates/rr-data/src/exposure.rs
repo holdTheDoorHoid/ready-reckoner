@@ -1,5 +1,6 @@
 //! Data pack v2 exposure files: the county columns for the v0.2.0 hazards, the strategic-site
-//! table, and the ZIP-level columns (including the optional `surge` and `wildfire_places` packs).
+//! table, and the ZIP-level columns (including the storm-surge and wildfire-by-place columns
+//! bundled into the core pack from the optional `surge` and `wildfire_places` packs, DESIGN-DELTA-v3 §8).
 //!
 //! Every county file here is keyed by `fips` and sets its own [`CountyExposure`] fields; columns
 //! this engine does not know are ignored (a newer pack still loads). The parts are merged into
@@ -65,12 +66,16 @@ pub fn exposure_source(field: &str) -> &'static str {
 pub fn clean_f64(x: f32) -> f64 {
     x.to_string().parse::<f64>().unwrap_or(f64::from(x))
 }
-/// Optional pack `surge`: NOAA/NHC surge-area shares by ZIP.
-pub const ZIP_SURGE: &str = "opt/surge/zip_surge.csv";
-/// Optional pack `wildfire_places`: Wildfire Risk to Communities by Census place.
-pub const WILDFIRE_PLACES: &str = "opt/wildfire_places/places.csv";
-/// Optional pack `wildfire_places`: which places each ZIP overlaps.
-pub const ZIP_PLACES: &str = "opt/wildfire_places/zip_places.csv";
+/// NOAA/NHC surge-area shares by ZIP. A core file, but ZIP-keyed like `zip_county.csv`, so the
+/// web app loads it lazily with the rest of the ZIP tables (bundled from the optional `surge`
+/// pack, DESIGN-DELTA-v3 §8, 2026-09-27).
+pub const ZIP_SURGE: &str = "core/zip_surge.csv";
+/// Wildfire Risk to Communities by Census place. A core file, loaded eagerly (bundled from the
+/// optional `wildfire_places` pack, DESIGN-DELTA-v3 §8, 2026-09-27).
+pub const WILDFIRE_PLACES: &str = "core/wildfire_places.csv";
+/// Which places each ZIP overlaps. A core file, loaded eagerly: unlike `ZIP_SURGE` this does not
+/// join the lazy ZIP group (DESIGN-DELTA-v3 §8).
+pub const ZIP_PLACES: &str = "core/zip_wildfire_places.csv";
 
 fn u16c(cell: &str) -> Option<u16> {
     f(cell).map(|v| v.round().clamp(0.0, u16::MAX as f64) as u16)
@@ -440,7 +445,7 @@ pub(crate) fn zip_extras(t: &Csv) -> Result<BTreeMap<String, ZipRecord>, EngineE
 /// Category 1 and Category 3 surge-area shares of a ZIP code.
 pub(crate) type SurgeShares = (Option<f32>, Option<f32>);
 
-/// `opt/surge/zip_surge.csv`: (Category 1 share, Category 3 share) by ZIP.
+/// `core/zip_surge.csv`: (Category 1 share, Category 3 share) by ZIP.
 pub(crate) fn zip_surge(t: &Csv) -> Result<BTreeMap<String, SurgeShares>, EngineError> {
     let (i_z, i_1, i_3) = (
         t.col("zip")?,
@@ -453,7 +458,7 @@ pub(crate) fn zip_surge(t: &Csv) -> Result<BTreeMap<String, SurgeShares>, Engine
         .collect())
 }
 
-/// `opt/wildfire_places/places.csv`: exposure by Census place (land share left at 0; filled per
+/// `core/wildfire_places.csv`: exposure by Census place (land share left at 0; filled per
 /// ZIP from `zip_places.csv`).
 pub(crate) fn places(t: &Csv) -> Result<BTreeMap<String, PlaceWildfire>, EngineError> {
     let (i_p, i_n) = (t.col("place")?, t.col("name")?);
@@ -480,7 +485,7 @@ pub(crate) fn places(t: &Csv) -> Result<BTreeMap<String, PlaceWildfire>, EngineE
         .collect())
 }
 
-/// `opt/wildfire_places/zip_places.csv`: places per ZIP with the ZIP's land share, largest first.
+/// `core/zip_wildfire_places.csv`: places per ZIP with the ZIP's land share, largest first.
 pub(crate) fn zip_places(t: &Csv) -> Result<BTreeMap<String, Vec<(String, f32)>>, EngineError> {
     let (i_z, i_p, i_s) = (t.col("zip")?, t.col("place")?, t.col("zip_land_share")?);
     let mut out: BTreeMap<String, Vec<(String, f32)>> = BTreeMap::new();

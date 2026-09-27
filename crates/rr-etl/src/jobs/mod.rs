@@ -18,6 +18,7 @@ pub mod flood;
 pub mod geography;
 pub mod geomag;
 pub mod ground;
+pub mod hospitals;
 pub mod levees;
 pub mod nri;
 pub mod outage_model;
@@ -200,14 +201,20 @@ pub const JOBS: &[JobSpec] = &[
         default: true,
     },
     JobSpec {
+        id: "hospitals",
+        title: "Hospitals with emergency services by county (CMS Hospital General Information)",
+        run: hospitals::run,
+        default: true,
+    },
+    JobSpec {
         id: "surge",
-        title: "NOAA/NHC storm-surge area shares by ZIP (optional pack; large rasters)",
+        title: "NOAA/NHC storm-surge area shares by ZIP (large rasters; built by hand, not in the quarterly refresh)",
         run: surge::run,
         default: false,
     },
     JobSpec {
         id: "wildfire_places",
-        title: "USFS Wildfire Risk to Communities by Census place, with ZIP-to-place shares (optional pack)",
+        title: "USFS Wildfire Risk to Communities by Census place, with ZIP-to-place shares",
         run: wildfire_places::run,
         default: false,
     },
@@ -261,6 +268,8 @@ pub const JOBS: &[JobSpec] = &[
 pub fn pack_of(path: &str) -> String {
     if path.starts_with("geo/") {
         "geo".to_string()
+    } else if path.starts_with("places/") {
+        "places".to_string()
     } else if let Some(rest) = path.strip_prefix("opt/") {
         rest.split('/').next().unwrap_or("opt").to_string()
     } else {
@@ -275,14 +284,8 @@ pub fn pack_description(name: &str) -> &'static str {
         "core" => {
             "Everything the engine needs for county-level planning. Loaded at start; works offline."
         }
-        "wildfire_places" => {
-            "Optional: USFS Wildfire Risk to Communities by Census place, with the ZIP-to-place shares to use it. Not needed to plan; loaded only when the wildfire detail is shown."
-        }
-        "surge" => {
-            "Optional: share of each ZIP code's land inside NOAA/NHC's Category 1 and Category 3 storm-surge areas. Built by hand (rr-etl refresh --only surge), not in the quarterly refresh. Not needed to plan."
-        }
-        "outage_events" => {
-            "Optional: every county power outage of a day or more since 2014 with its restoration curve and cause, and the held-out test of the outage model. Loaded only by the expert views and the validation page."
+        "places" => {
+            "County reference places (hospitals with emergency services). Not needed to plan; loaded only when the binder's Neighbourhood page is shown."
         }
         _ => "Optional pack (not needed to plan; loaded only when a feature asks for it).",
     }

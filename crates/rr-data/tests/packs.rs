@@ -314,6 +314,28 @@ fn philadelphia_record_has_the_expected_shape() {
     assert!(c.flood.is_some() && c.facilities.is_some() && c.vulnerability.is_some());
 }
 
+/// Philadelphia's hospitals with emergency services (CMS Hospital General Information) include
+/// two well-known teaching hospitals; a rural county with none (Blount, AL) answers empty, not
+/// an error.
+#[test]
+fn county_hospitals_lists_emergency_rooms_and_is_empty_where_there_are_none() {
+    let s = store();
+    let phl = s.county_hospitals("42101");
+    assert!(phl.len() > 5, "{}", phl.len());
+    assert!(phl.iter().all(|h| h.emergency_services));
+    assert!(
+        phl.iter()
+            .any(|h| h.name.contains("TEMPLE UNIVERSITY HOSPITAL") && h.ccn == "390027"),
+        "{phl:?}"
+    );
+    assert!(
+        phl.iter()
+            .any(|h| h.name.contains("HOSPITAL OF UNIV OF PENNSYLVANIA")),
+        "{phl:?}"
+    );
+    assert!(s.county_hospitals("01009").is_empty());
+}
+
 /// A county with no outage record of its own takes its state's pooled series (verification
 /// V-15): Juneau carries Alaska's row of `outages_state.csv`, and the years its counties' records
 /// span. A territory with no state row keeps none.

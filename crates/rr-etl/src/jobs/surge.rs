@@ -1,7 +1,8 @@
-//! Optional job `surge` — share of each ZIP code's land inside NOAA/NHC's storm-surge areas
-//! (National Storm Surge Risk Maps, SLOSH Maximum of Maximums at high tide), for the optional
-//! `surge` pack. Not in the quarterly refresh (`default: false`): the inputs are large and change
-//! only when NHC publishes a new version. Run it with `rr-etl refresh --out data --only surge`.
+//! Job `surge` — share of each ZIP code's land inside NOAA/NHC's storm-surge areas (National
+//! Storm Surge Risk Maps, SLOSH Maximum of Maximums at high tide). Bundled into the core pack
+//! (DESIGN-DELTA-v3 §8, 2026-09-27; formerly the optional `surge` pack, issue #15). Not in the
+//! quarterly refresh (`default: false`): the inputs are large and change only when NHC publishes
+//! a new version. Run it with `rr-etl refresh --out data --only surge`.
 //!
 //! For each map region (Texas to Maine, Southern California, Hawaii, Puerto Rico, the US Virgin
 //! Islands, Guam, American Samoa; versions in [`REGIONS`]) the archive goes to `data/raw/surge/`,
@@ -34,8 +35,9 @@ use std::fs::File;
 use std::io::{BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 
-/// ZIP surge shares (optional pack `surge`).
-pub const ZIP_SURGE: &str = "opt/surge/zip_surge.csv";
+/// ZIP surge shares. A core file, but ZIP-keyed like `zip_county.csv` and `zip_facilities.csv`,
+/// so the web app loads it lazily with the rest of the ZIP tables (`rr_wasm::source::ZIP_FILES`).
+pub const ZIP_SURGE: &str = "core/zip_surge.csv";
 
 const BASE: &str = "https://www.nhc.noaa.gov/gis/hazardmaps/";
 const ZCTA_OUTLINES: &str =

@@ -55,7 +55,7 @@ fn packet(name: &str) -> &'static str {
         .find(|(n, _, _)| n == name)
         .unwrap_or_else(|| panic!("no household {name}"))
         .2
-        .packet_markdown
+        .prepare_markdown
 }
 
 fn input(name: &str) -> &'static PlanInput {
@@ -106,11 +106,11 @@ fn card<'a>(p: &'a str, name: &str) -> &'a str {
 #[test]
 fn every_packet_has_a_house_fire_card() {
     for (name, _, out) in all() {
-        let c = cards(&out.packet_markdown);
+        let c = cards(&out.prepare_markdown);
         assert!(c.contains(&"House fire"), "{name}: {c:?}");
         // Its escape steps reach paper (RR-P03: "crawl low" was in 0 of 7 packets).
         assert!(
-            out.packet_markdown.contains("crawl low"),
+            out.prepare_markdown.contains("crawl low"),
             "{name}: the house-fire card's advice"
         );
     }
@@ -203,10 +203,10 @@ const ANY_MAX_PAGES: f64 = 28.0;
 #[test]
 fn philadelphia_stays_within_25_printed_pages() {
     for (name, _, out) in all() {
-        let pages = printed_pages(&out.packet_markdown);
+        let pages = printed_pages(&out.prepare_markdown);
         eprintln!(
             "{name}: {pages:.2} printed pages, {} words",
-            words(&out.packet_markdown)
+            words(&out.prepare_markdown)
         );
         assert!(
             pages <= ANY_MAX_PAGES,
@@ -227,7 +227,7 @@ fn philadelphia_stays_within_25_printed_pages() {
 #[test]
 fn every_packet_prints_the_life_safety_rules() {
     for (name, _, out) in all() {
-        let plan = section(&out.packet_markdown, "## Your plan");
+        let plan = section(&out.prepare_markdown, "## Your plan");
         for r in &rr_plan::packet::SAFETY_RULES {
             assert!(
                 plan.contains(&format!("- **{}:** {}", r.label, r.text)),
@@ -287,7 +287,7 @@ fn rare_catastrophe_gear_prints_only_with_the_opt_in() {
     assert!(!rare.is_empty());
     for (name, input, out) in all() {
         assert!(!input.dials.rare_catastrophic_opt_in, "{name}");
-        let lists = section(&out.packet_markdown, "## Checklists");
+        let lists = section(&out.prepare_markdown, "## Checklists");
         for r in &rare {
             assert!(!lists.contains(r), "{name}: {r} without the opt-in");
         }
@@ -297,7 +297,7 @@ fn rare_catastrophe_gear_prints_only_with_the_opt_in() {
     let mut opted = input("philadelphia-renters-4").clone();
     opted.dials.rare_catastrophic_opt_in = true;
     let out = engine().assess(&opted).expect("assess");
-    let lower = out.packet_markdown.to_lowercase();
+    let lower = out.prepare_markdown.to_lowercase();
     assert!(
         rare.iter().any(|r| lower.contains(&r.to_lowercase())),
         "the opt-in shows the rare gear"
@@ -347,7 +347,7 @@ fn leaving_comes_first_where_it_matters() {
                 .map_or(0.0, |p| p.rate_per_year);
             -rr_types::math::exp_m1(-10.0 * rate) >= rr_plan::packet::CARD_MIN_P10
         });
-        let things = three_things(&out.packet_markdown);
+        let things = three_things(&out.prepare_markdown);
         let first_is_leaving = things.first().is_some_and(|t| t.contains(LEAVE));
         assert_eq!(
             first_is_leaving,
@@ -440,7 +440,7 @@ fn shelter_advice_fits_the_home() {
 #[test]
 fn page_one_carries_the_status_line() {
     for (name, _, out) in all() {
-        let p = &out.packet_markdown;
+        let p = &out.prepare_markdown;
         let at = p
             .find(rr_plan::packet::STATUS_LINE)
             .unwrap_or_else(|| panic!("{name}: no status line"));
@@ -459,7 +459,7 @@ fn the_dial_sentence_is_per_need() {
     // the higher chance that at least one of them runs past its target.
     let cope = "That is why the plan also gives you ways to cope when a target runs out.";
     for (name, input, out) in all() {
-        let targets = section(&out.packet_markdown, "## Your targets");
+        let targets = section(&out.prepare_markdown, "## Your targets");
         assert!(
             !targets.contains("Something worse than these targets"),
             "{name}: the old sentence"
