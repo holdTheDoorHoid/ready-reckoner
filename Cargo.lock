@@ -1215,7 +1215,7 @@ dependencies = [
 
 [[package]]
 name = "rr-budget"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "rr-types",
  "serde",
@@ -1225,7 +1225,7 @@ dependencies = [
 
 [[package]]
 name = "rr-cli"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "assert_cmd",
  "clap",
@@ -1245,7 +1245,7 @@ dependencies = [
 
 [[package]]
 name = "rr-consequence"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "rr-data",
  "rr-hazards",
@@ -1258,7 +1258,7 @@ dependencies = [
 
 [[package]]
 name = "rr-content"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "rr-types",
  "serde",
@@ -1269,7 +1269,7 @@ dependencies = [
 
 [[package]]
 name = "rr-data"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "csv",
  "rr-types",
@@ -1282,7 +1282,7 @@ dependencies = [
 
 [[package]]
 name = "rr-etl"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "csv",
  "flate2",
@@ -1300,7 +1300,7 @@ dependencies = [
 
 [[package]]
 name = "rr-hazards"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "rr-data",
  "rr-types",
@@ -1310,7 +1310,7 @@ dependencies = [
 
 [[package]]
 name = "rr-plan"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "rr-budget",
  "rr-consequence",
@@ -1326,7 +1326,7 @@ dependencies = [
 
 [[package]]
 name = "rr-supply"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "rr-types",
  "serde",
@@ -1336,7 +1336,7 @@ dependencies = [
 
 [[package]]
 name = "rr-types"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "libm",
  "serde",
@@ -1346,7 +1346,7 @@ dependencies = [
 
 [[package]]
 name = "rr-wasm"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "rr-data",
  "rr-plan",
