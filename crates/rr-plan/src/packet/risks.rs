@@ -483,8 +483,11 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(String::new());
     }
     if !rows.is_empty() {
+        // A short heading keeps every row on one line in print ("Expert estimate" and "Very
+        // severe" wrapped under "Households like yours, the next 10 years"; R3-15).
         out.push(format!(
-            "| What could happen | Households like yours, {horizon} | How bad | How sure |"
+            "| What could happen | Households like yours, {years} year{} | How bad | How sure |",
+            if years == 1 { "" } else { "s" }
         ));
         out.push("| --- | --- | --- | --- |".to_owned());
         for p in &rows {

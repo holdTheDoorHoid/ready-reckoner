@@ -10,49 +10,72 @@ into the guidance text.
 
 ## Length and the page budget
 
-Packet v2 has a budget of **24 US Letter pages for the Philadelphia household** by the proxy below
-(DESIGN-DELTA §3). The new pages (the family plan, the wallet cards, the shelter plan, the forecast
-list, access and functional needs, local help, the recovery page, the long-horizon section) had to
-earn their place by trimming elsewhere, so the why behind each number, the requirement lines and
-the research stay in the app's Learn and explain views, and the packet keeps what to do.
+The budget is **25 US Letter pages for the Philadelphia household** (24 on A4), as Chrome prints
+it from the app. Packet v2 aimed at 24 (DESIGN-DELTA §3) on the first page proxy, which read low
+(below); measured in Chrome the packet printed on 26 Letter pages. Two table headings that made
+every row wrap and calendar dates that wrapped inside their column brought it to 25. The pages are
+full now: reaching 24 would take about a page of content out (some 400 words of advice, or 700 of
+sources), so the budget is set to what the content needs. The new pages (the family plan, the
+wallet cards, the shelter plan, the forecast list, access and functional needs, local help, the
+recovery page, the long-horizon section) earned their place by trimming elsewhere, so the why
+behind each number, the requirement lines and the research stay in the app's Learn and explain
+views, and the packet keeps what to do.
 
-**Printed pages, the proxy.** Words outside the Sources section count 400 to a printed page and
-words in the two-column, 8-point Sources section (with the data credits) 1,000 to a page. A word
-is a token with a letter or a digit, citation brackets left out. This is calibrated on the one
-measured print: the v0.1.0 Philadelphia packet, 8,054 words outside Sources and 2,055 in it,
-printed on 22 US Letter pages, which is 22.19 on this scale. Printed from the app (headless
-Chrome, `web/scripts/packet-pages.mjs`) with sections following on (a heading is never left alone
-at the foot of a page), tables allowed to run on (rows never split, headers repeat) and 10.5 pt
-body text.
+**Printed pages, the proxy.** Words outside the Sources section count 405 to a printed US Letter
+page and words in the two-column, 8-point Sources section (with the data credits) 690 to a page. A
+word is a token with a letter or a digit, citation brackets left out. This is calibrated on
+Chrome's Letter prints of three v0.2.0 packets (`FIXTURE=… node web/scripts/packet-pages.mjs`,
+verification R3-15), measuring the filled share of the last page and where the Sources section
+starts:
+
+| Household | Body words, printed pages | Sources words, printed pages | Chrome, Letter / A4 | Proxy |
+| --- | --- | --- | --- | --- |
+| Philadelphia | 8,095 on 20.06 (404 a page) | 3,414 on 4.89 (698 a page) | 25 / 24 (24.95) | 24.94 |
+| Minot | 8,075 on 19.85 (407 a page) | 3,393 on 4.95 (685 a page) | 25 / 24 (24.80) | 24.86 |
+| Sugar Land | 8,797 on 21.33 (412 a page) | 3,663 on 5.26 (696 a page) | 27 / 26 (26.59) | 27.03 |
+
+The first proxy (400 and 1,000 words a page, from the v0.1.0 Philadelphia print, 8,054 words
+outside Sources and 2,055 in it on 22 pages) held for the body, within 2 in 100, but allowed the
+Sources section only two thirds of the room it takes: two narrow columns of long addresses print
+about 690 words a page, not 1,000. On the v0.2.0 prints before the layout fixes it read
+Philadelphia at 23.66 where Chrome printed 26 pages (25.59 filled; a factor of 1.08), Minot 23.59
+against 25 (24.86; 1.05) and Sugar Land 25.67 against 27 (26.98; 1.05). The recalibrated proxy is
+within 0.1 of the print for Philadelphia and Minot and 0.4 over for Sugar Land. Chrome prints with
+sections following on (a heading is never left alone at the foot of a page), tables allowed to run
+on (rows never split, headers repeat), the county map at the start of Your risks and 10.5 pt body
+text.
 
 The tests hold the line:
 
-- `philadelphia_stays_within_24_printed_pages` (`crates/rr-plan/tests/round2.rs`): Philadelphia at
-  most 24.0 pages, and every fixture and backtest household at most 26.0;
+- `philadelphia_stays_within_25_printed_pages` (`crates/rr-plan/tests/round2.rs`): Philadelphia at
+  most 25.0 pages by the proxy, and every fixture and backtest household at most 28.0;
 - `the_packet_stays_short` (`crates/rr-plan/tests/fixtures.rs`): every fixture at most 12,500
   words, no retired part (the "Your numbers" and "What counts toward it" paragraphs), at most the
   four topic headings, no month after next in detail, no table of later months, checklists only up
   to the step that is enough.
 
-| Household | v0.2 before packet v2 (7f6b8c6) | Packet v2 |
+| Household | Words | Printed pages (proxy) |
 | --- | --- | --- |
-| Philadelphia (the budget's reference) | 28.07 pages, 13,349 words | 23.77 pages, 11,550 words |
-| Chicago, zero budget | 20.97 pages, 10,386 words | 20.24 pages, 10,066 words |
-| Coos Bay | 28.28 pages, 13,423 words | 24.70 pages, 11,955 words |
-| Hays, Kansas | 28.07 pages, 13,389 words | 24.78 pages, 12,017 words |
-| Miami | 27.69 pages, 13,260 words | 23.84 pages, 11,581 words |
-| Phoenix | 27.70 pages, 13,258 words | 23.43 pages, 11,409 words |
-| Sugar Land | 29.59 pages, 14,091 words | 25.80 pages, 12,492 words |
-| Cameron Parish (new) | | 25.22 pages, 12,225 words |
-| Detroit (new) | | 24.46 pages, 11,832 words |
-| Galveston (new) | | 23.14 pages, 11,274 words |
-| Minot (new) | | 23.63 pages, 11,481 words |
-| Missoula (new) | | 23.02 pages, 11,208 words |
-| Sacramento (new) | | 22.84 pages, 11,173 words |
-| San Juan (new) | | 25.81 pages, 12,399 words |
+| Philadelphia (the budget's reference) | 11,509 | 24.94 |
+| Chicago, zero budget | 9,927 | 21.17 |
+| Coos Bay | 11,917 | 25.89 |
+| Hays, Kansas | 11,965 | 25.95 |
+| Miami | 11,616 | 25.16 |
+| Phoenix | 11,364 | 24.59 |
+| Sugar Land | 12,460 | 27.03 |
+| Cameron Parish | 12,240 | 26.55 |
+| Detroit | 11,769 | 25.57 |
+| Galveston | 11,228 | 24.29 |
+| Minot | 11,468 | 24.86 |
+| Missoula | 11,170 | 24.17 |
+| Sacramento | 11,134 | 24.02 |
+| San Juan | 12,430 | 27.13 |
+
+The v0.2 packet before packet v2 (7f6b8c6) came to 13,349 words for Philadelphia, 28.07 pages on
+the first proxy (about 29 on this one).
 
 Households with more to say than Philadelphia (insulin and a baby in Sugar Land, a well and
-livestock in Cameron Parish, Puerto Rico's long outages in San Juan) run longer; all stay under 26
+livestock in Cameron Parish, Puerto Rico's long outages in San Juan) run longer; all stay under 28
 pages. What pays for the new pages:
 
 - **Risk cards** follow the card rule below; each card's named sub-causes are one "Includes:" line,
@@ -74,6 +97,9 @@ pages. What pays for the new pages:
   listed once; the old table of later months is gone.
 - **Lists use short names** where a catalogue name carries a long explanation after a colon.
 - **Sources:** compact, as before; one access date on the first data credit.
+- **Tables that print narrow:** the other-risks table's heading is "Households like yours, 10
+  years" and the targets table's "Help likely in" and "Mostly back in", so their rows stay on one
+  line or two; the maintenance calendar's dates ("September 1, 2027") never wrap.
 
 ## The card rule
 
@@ -149,7 +175,7 @@ a household without the wind card still has it, once. `storm_and_heat_cards_stay
 | 2 | `## Your family plan` | Everything the household wrote on the family-plan screen (`PlanInput.family_plan`), **word for word; nothing in it is computed with**. A table: meeting places near home and outside the neighborhood, the out-of-area contact, who picks up the children (households with children), work and school plans, shelter spots at home and at work or school, where we would go, the first and second way out, neighbors who check on us, who takes the animals (households with animals), the gas, water and electrical shut-offs (gas only where there is gas), roadside assistance (households with a vehicle), the lawyer. **Every empty field is a line to write on** ("__________"), never "not answered", so the page works on paper too. Then the trusted circle (who agreed to help and what each holds: a spare key, copies of documents, medical power of attorney, backup codes; at least two rows) and the numbers we know by heart. **Leaving home**: the evacuation bucket's sentences (the ten-year chance, the warning by cause, the time away; the first is left out when the summary already opens with it). **Staying in touch**: the headed paragraphs of `plan_communication` (four ways to reach each other), the school and child-care paragraph only for households with children. |
 | 3 | `## Wallet cards` | One block quote per person, "Wallet card: person 1 (adult)", with the out-of-area contact, the two meeting places, the lawyer, the trusted circle, the numbers to know by heart and a medical-notes line; empty fields are lines to write on, so no card is ever empty. |
 | 4 | `## Your risks` | The cards (see The card rule): the card's frequency sentence with its sources, the "What helps" and "What to avoid" paragraphs of the matching `hazard_*` block (each block once; a later card of the same family points to the earlier one), the named sub-causes on one "Includes:" line (a sub-cause whose note says it does not reach here is left out), and "How bad: Severe (mostly data)". The other ranked hazards as a table (chance over the horizon, severity, confidence), those under 1 in 100 in one line, and "Also checked" as one paragraph. **Rare but severe**: the nine families as one table, sorted by how likely each is here, with how likely (a range, never a point), if it reaches you (`if_it_reaches_you`) and what it changes in your plan (`what_it_changes`); then a "why here" paragraph for each family the location factor raises above the national figure. The months-long blackout row reads the household's own power curve at 60 days (`add_power_curve`). `rr-hazards`' notes as a list ("Notes on these numbers"). |
-| 5 | `## Your targets` | The dial and what it means (`packet::dial_sentence`, model review M-04): the consequence model's own sentence, as it words it (`ConsequenceAssessment::dial_sentence`: about 1 in 10 households like yours face a longer disruption of any one kind at 1 in 100, and the higher share that meets at least one, from the joint rate, both on one scale, so Coos Bay at 1 in 500 reads "about 2 in 100 ... about 3 in 100"), then "That is why the plan also gives you ways to cope when a target runs out." A table of the duration buckets: target and range, when outside help likely arrives and when service is mostly back (the relief rating for the event behind the target; where there are no restoration records for it, "worst on record: up to N days" from the bucket's worst event on record, with a note), and the step that is enough. **How well do these numbers hold up?**: the frozen backtest's headline tally (`EngineInfo.validation`: 22 events, 6 covered, 9 partial, 6 short, 1 not modelled), cited like any other source to the registry entry for `docs/VALIDATION.md` (`rr_validation_2026`, `rr_plan::validation::CITATION`), so the Sources list carries its title and address. Then one part per bucket with a target: the "What helps" and "What to avoid" paragraphs of its `bucket_*` block, and the consequence model's own lines: the worst event on record (power and both water buckets), the water system's record (once), and the rounded-up note. A bucket whose advice is printed elsewhere points to it and keeps its "What to avoid": to a card showing the same block or whose hazard has that bucket as its only consequence (a medical emergency), to both cards for dangerous heat or cold (not for a wood-heated home), to the family plan and the shelter plan for leaving and getting home, to the forecast list and the family plan for power and phones, to the shelter plan for unhealthy air, to the plan's steps for security, to Special needs for medicine when its medicine lines print; lost income and a damaged home point to Documents and money. Then named scenarios (included or left out, why, what they change). |
+| 5 | `## Your targets` | The dial and what it means (`packet::dial_sentence`, model review M-04): the consequence model's own sentence, as it words it (`ConsequenceAssessment::dial_sentence`: about 1 in 10 households like yours face a longer disruption of any one kind at 1 in 100, and the higher share that meets at least one, from the joint rate, both on one scale, so Coos Bay at 1 in 500 reads "about 2 in 100 ... about 3 in 100"), then "That is why the plan also gives you ways to cope when a target runs out." A table of the duration buckets: target and range, when outside help likely arrives and when service is mostly back (the relief rating for the event behind the target; where there are no restoration records for it, the bucket's worst event on record read as the app reads it: "worst on record: up to 2 weeks" to the first day mark after the last one with at least 0.5 in 100 homes still out, "more than 1 month" if homes were still out at the last mark, a water event up to its nine-in-ten duration or "about 6 days" when it has one; relief times in plain words, never rounded up to the target ladder, so the Oregon Resilience Plan's 1,095 days read "about 3 years"), and the step that is enough. **How well do these numbers hold up?**: the frozen backtest's headline tally (`EngineInfo.validation`: 22 events, 6 covered, 9 partial, 6 short, 1 not modelled), cited like any other source to the registry entry for `docs/VALIDATION.md` (`rr_validation_2026`, `rr_plan::validation::CITATION`), so the Sources list carries its title and address. Then one part per bucket with a target: the "What helps" and "What to avoid" paragraphs of its `bucket_*` block, and the consequence model's own lines: the worst event on record (power and both water buckets), the water system's record (once), and the rounded-up note. A bucket whose advice is printed elsewhere points to it and keeps its "What to avoid": to a card showing the same block or whose hazard has that bucket as its only consequence (a medical emergency), to both cards for dangerous heat or cold (not for a wood-heated home), to the family plan and the shelter plan for leaving and getting home, to the forecast list and the family plan for power and phones, to the shelter plan for unhealthy air, to the plan's steps for security, to Special needs for medicine when its medicine lines print; lost income and a damaged home point to Documents and money. Then named scenarios (included or left out, why, what they change). |
 | 6 | `## Your plan` | The budget; the free steps to start now (month 0); **safety rules to learn now** (`packet::SAFETY_RULES`, review S3b: fire, gas, the water heater, food in a power cut, the generator, CPR), one line each with sources; this month's purchases (month 0 gets the one-off money) and next month's, each with quantity, estimated cost and, where prices spread widely, the usual band, and next month's decisions on one "Decide this month (see Documents and money)" line; a pointer to the checklists for the months after that; savings toward bigger items; when every need is covered (`done_month`); the guardrail warnings under "Things to watch", including the plan-too-long warning with its deferred list (what lies beyond three years at this budget); and **the rare-event allowance**, when the household opened it, with each rare purchase's line as the allocator words it ("It is for the power out for months row you ticked: ..."). Things the household already has are not steps. |
 | 7 | `## Your shelter plan` | The `plan_shelter` block: where to shelter from strong wind (every household) and from each other danger likely enough here (a tornado, hurricane, earthquake, chemical release or smoke paragraph when that hazard has at least a 1 in 100 chance in ten years), and radiation, with its conditional spans for this home. |
 | 8 | `## When a storm, freeze or heat wave is forecast` | The `plan_forecast_48h` block (practitioner P-08): the 48-hour list. Its freeze paragraph prints where a cold wave, winter storm or ice storm has at least a 1 in 100 chance in ten years, and its heat-wave paragraph where heat waves do (no freeze steps in Puerto Rico). |

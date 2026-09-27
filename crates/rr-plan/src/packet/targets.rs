@@ -268,8 +268,9 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     ));
     out.push(String::new());
     out.push(
-        "| If this happens | Be ready for | Outside help likely arrives | Mostly back to normal | \
-         Enough at |"
+        // Headings that read on into their cells ("Help likely in about 3 days") and leave the
+        // columns room, so fewer rows wrap in print (R3-15).
+        "| If this happens | Be ready for | Help likely in | Mostly back in | Enough at |"
             .to_owned(),
     );
     out.push("| --- | --- | --- | --- | --- |".to_owned());

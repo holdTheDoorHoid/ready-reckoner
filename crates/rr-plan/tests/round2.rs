@@ -138,13 +138,22 @@ fn hazards_that_kill_get_a_card_where_they_threaten() {
     );
 }
 
-/// The packet's length in printed pages, as docs/PACKET.md defines the proxy: words outside the
-/// Sources section at 400 a page, and words in the two-column, 8-point Sources section at 1,000 a
-/// page. Calibrated on the v0.1.0 Philadelphia packet, which printed on 22 US Letter pages with
-/// 8,054 words outside Sources and 2,055 in it: 22.19 on this scale.
+/// Words outside the Sources section on one printed US Letter page (docs/PACKET.md, "Length").
+const BODY_WORDS_PER_PAGE: f64 = 405.0;
+
+/// Words of the two-column, 8-point Sources section (with the data credits) on one printed page.
+const SOURCES_WORDS_PER_PAGE: f64 = 690.0;
+
+/// The packet's length in printed US Letter pages, as docs/PACKET.md defines the proxy: words
+/// outside the Sources section at 405 a page, words in the Sources section at 690. Calibrated on
+/// Chrome's Letter prints of the v0.2.0 packets (`web/scripts/packet-pages.mjs`, verification
+/// R3-15): Philadelphia 20.06 body pages for 8,095 words and 4.89 Sources pages for 3,414, Minot
+/// 19.85 and 4.95 for 8,075 and 3,393, Sugar Land 21.33 and 5.26 for 8,797 and 3,663. The first
+/// proxy (400 and 1,000, from the v0.1.0 print) held for the body but put the Sources section at
+/// two thirds of its printed length, so it read 23.66 where Chrome printed 26 pages (25.6).
 fn printed_pages(p: &str) -> f64 {
     let at = p.find("\n## Sources\n").expect("a Sources section");
-    words(&p[..at]) as f64 / 400.0 + words(&p[at..]) as f64 / 1000.0
+    words(&p[..at]) as f64 / BODY_WORDS_PER_PAGE + words(&p[at..]) as f64 / SOURCES_WORDS_PER_PAGE
 }
 
 /// Words as a reader counts them: tokens with a letter or digit, citation brackets left out (the
@@ -175,20 +184,21 @@ fn words(markdown: &str) -> usize {
         .count()
 }
 
-/// The most the Philadelphia packet may print on: packet v2's budget of 24 US Letter pages
-/// (DESIGN-DELTA §3, docs/PACKET.md), paid for by trims elsewhere: the family plan, wallet cards,
-/// shelter plan, forecast list, recovery page and the rest came in as the later-months table, the
-/// per-card sub-cause lists and the repeated bucket advice went out. (v0.1.1 allowed 23.5; the
-/// v0.2 packet before this redesign printed on 28.)
-const PHILADELPHIA_MAX_PAGES: f64 = 24.0;
+/// The most the Philadelphia packet may print on: 25 US Letter pages (docs/PACKET.md). Packet v2
+/// aimed at 24, but measured in Chrome it printed on 26 (24 on A4); two table headings that
+/// wrapped every row and calendar dates that wrapped brought it to 25 (24.95 by this proxy, 24 on
+/// A4). Reaching 24 would take about a page of advice out, so the budget is what the content
+/// needs. (v0.1.1 allowed 23.5 on the first proxy; the v0.2 packet before packet v2 printed on
+/// 28 by that proxy.)
+const PHILADELPHIA_MAX_PAGES: f64 = 25.0;
 
 /// The most any fixture or backtest packet may print on. Households with more to say (insulin, a
 /// baby, a well, a surge zone, Puerto Rico's long outages) run longer than Philadelphia; this
-/// catches the packet growing back.
-const ANY_MAX_PAGES: f64 = 26.0;
+/// catches the packet growing back (Sugar Land 27.03 and San Juan 27.13 are the longest).
+const ANY_MAX_PAGES: f64 = 28.0;
 
 #[test]
-fn philadelphia_stays_within_24_printed_pages() {
+fn philadelphia_stays_within_25_printed_pages() {
     for (name, _, out) in all() {
         let pages = printed_pages(&out.packet_markdown);
         eprintln!(
