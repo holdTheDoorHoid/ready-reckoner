@@ -14,7 +14,7 @@ import sanJuan from '../../../fixtures/households/san-juan-2.json';
 
 const engine = createMockEngine();
 
-/** The households staged for contract v2 (fixtures/households/pending), every v2 input among them. */
+/** The seven households contract v2 added in v0.2.0 (fixtures/households/), every v2 input among them. */
 const PENDING: Record<string, PlanInput> = {
   cameron: cameron as unknown as PlanInput,
   detroit: detroit as unknown as PlanInput,

@@ -583,3 +583,11 @@ fn a_file_that_does_not_match_the_manifest_is_pack_corrupt_and_nothing_plans_fro
     let e = error(&api::assess(&fixture_json("philadelphia-renters-4")));
     assert_eq!(e.code, ErrorCode::PackMissing);
 }
+
+// The `internal` error code (a panic inside a call) is exercised as a unit test in
+// `src/api.rs` instead of here: reproducing it faithfully needs the engine's `RefCell` actually
+// stuck mid-borrow (what a wasm32 trap leaves behind, since aborting skips the guard's `Drop`),
+// not a real panic. A `std::panic::catch_unwind`-based version of this test, tried first, could
+// not reproduce it: native unwind (unlike a wasm32 trap) runs the guard's `Drop` on the way out,
+// so the `RefCell` is never left borrowed and every later call answers `ok` as if nothing
+// happened. See `stopped_answers_internal_when_the_engine_is_already_borrowed` in `src/api.rs`.

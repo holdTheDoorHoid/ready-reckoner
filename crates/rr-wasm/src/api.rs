@@ -180,3 +180,48 @@ pub fn catalogue() -> String {
 pub fn defaults() -> String {
     with_engine(|e| Ok(e.defaults()))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn error_code(envelope: &str) -> ErrorCode {
+        match serde_json::from_str::<Envelope<serde_json::Value>>(envelope).unwrap() {
+            Envelope::Error(e) => e.code,
+            Envelope::Value(_) => panic!("expected an error envelope: {envelope:.200}"),
+        }
+    }
+
+    /// `docs/ENGINE-API.md`, "Errors": "A panic inside the engine is a bug. The call traps, ...
+    /// and every later call answers `internal` ... rather than trapping again." A wasm32 trap
+    /// aborts rather than unwinds, so it never runs the `RefMut` guard's `Drop`, leaving `ENGINE`
+    /// borrowed for the rest of that instance's life; a real `panic!` wrapped in
+    /// `std::panic::catch_unwind` does not reproduce that (unwinding runs the guard's `Drop` on
+    /// the way out, so a later call finds the cell free again, as if nothing had happened — tried
+    /// first, in `tests/native.rs`, and it did not catch this). Holding the borrow open directly
+    /// reproduces the one thing that matters here regardless of platform: `with_engine` and
+    /// `with_engine_mut` must answer `internal` instead of running their closure while the engine
+    /// is unreachable, exactly as they would with a genuinely stuck instance.
+    #[test]
+    fn a_borrow_left_open_answers_internal_instead_of_touching_the_engine() {
+        ENGINE.with(|cell| {
+            ensure_engine(cell).unwrap();
+            let _stuck = cell.borrow_mut();
+            assert_eq!(error_code(&engine_info()), ErrorCode::Internal);
+            assert_eq!(error_code(&assess("{}")), ErrorCode::Internal);
+            assert_eq!(error_code(&catalogue()), ErrorCode::Internal);
+            assert_eq!(error_code(&defaults()), ErrorCode::Internal);
+            assert_eq!(error_code(&county_search("phila")), ErrorCode::Internal);
+            assert_eq!(
+                error_code(&load_pack("manifest.json", b"{}")),
+                ErrorCode::Internal
+            );
+            let message =
+                match serde_json::from_str::<Envelope<serde_json::Value>>(&assess("{}")).unwrap() {
+                    Envelope::Error(e) => e.message,
+                    Envelope::Value(_) => unreachable!(),
+                };
+            assert!(message.contains("Reload the page"), "{message}");
+        });
+    }
+}
