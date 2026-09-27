@@ -147,10 +147,11 @@ const SOURCES_WORDS_PER_PAGE: f64 = 690.0;
 /// The packet's length in printed US Letter pages, as docs/PACKET.md defines the proxy: words
 /// outside the Sources section at 405 a page, words in the Sources section at 690. Calibrated on
 /// Chrome's Letter prints of the v0.2.0 packets (`web/scripts/packet-pages.mjs`, verification
-/// R3-15): Philadelphia 20.06 body pages for 8,095 words and 4.89 Sources pages for 3,414, Minot
-/// 19.85 and 4.95 for 8,075 and 3,393, Sugar Land 21.33 and 5.26 for 8,797 and 3,663. The first
-/// proxy (400 and 1,000, from the v0.1.0 print) held for the body but put the Sources section at
-/// two thirds of its printed length, so it read 23.66 where Chrome printed 26 pages (25.6).
+/// R3-15): Philadelphia 19.90 body pages for 8,089 words and 4.90 Sources pages for 3,421 (24.80
+/// in all against 24.93 here), Minot 19.85 and 4.95 for 8,073 and 3,400, Sugar Land 21.33 and
+/// 5.29 for 8,780 and 3,670, San Juan 21.28 and 5.05 for 8,950 and 3,532. The first proxy (400
+/// and 1,000, from the v0.1.0 print) held for the body but put the Sources section at two thirds
+/// of its printed length, so it read 23.66 where Chrome printed 26 pages (25.59).
 fn printed_pages(p: &str) -> f64 {
     let at = p.find("\n## Sources\n").expect("a Sources section");
     words(&p[..at]) as f64 / BODY_WORDS_PER_PAGE + words(&p[at..]) as f64 / SOURCES_WORDS_PER_PAGE
@@ -186,15 +187,17 @@ fn words(markdown: &str) -> usize {
 
 /// The most the Philadelphia packet may print on: 25 US Letter pages (docs/PACKET.md). Packet v2
 /// aimed at 24, but measured in Chrome it printed on 26 (24 on A4); two table headings that
-/// wrapped every row and calendar dates that wrapped brought it to 25 (24.95 by this proxy, 24 on
-/// A4). Reaching 24 would take about a page of advice out, so the budget is what the content
-/// needs. (v0.1.1 allowed 23.5 on the first proxy; the v0.2 packet before packet v2 printed on
-/// 28 by that proxy.)
+/// wrapped every row, calendar dates that wrapped and the source names repeated before each supply
+/// line's bracket brought it to 25 (24.80 filled, 24.93 by this proxy, 24 on A4). Reaching 24
+/// would take about a page of advice out, so the budget is what the content needs. (v0.1.1
+/// allowed 23.5 on the first proxy; the v0.2 packet before packet v2 printed on 28 by that
+/// proxy.)
 const PHILADELPHIA_MAX_PAGES: f64 = 25.0;
 
 /// The most any fixture or backtest packet may print on. Households with more to say (insulin, a
 /// baby, a well, a surge zone, Puerto Rico's long outages) run longer than Philadelphia; this
-/// catches the packet growing back (Sugar Land 27.03 and San Juan 27.13 are the longest).
+/// catches the packet growing back (Sugar Land 27.00 and San Juan 27.22 are the longest; Chrome
+/// prints both on 27 Letter pages).
 const ANY_MAX_PAGES: f64 = 28.0;
 
 #[test]

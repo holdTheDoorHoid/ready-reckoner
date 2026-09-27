@@ -13,8 +13,9 @@ into the guidance text.
 The budget is **25 US Letter pages for the Philadelphia household** (24 on A4), as Chrome prints
 it from the app. Packet v2 aimed at 24 (DESIGN-DELTA §3) on the first page proxy, which read low
 (below); measured in Chrome the packet printed on 26 Letter pages. Two table headings that made
-every row wrap and calendar dates that wrapped inside their column brought it to 25. The pages are
-full now: reaching 24 would take about a page of content out (some 400 words of advice, or 700 of
+every row wrap, calendar dates that wrapped inside their column and the source names repeated
+before each supply line's bracket brought it to 25 (24.80 pages filled). The pages are full now:
+reaching 24 would take about a page of content out (some 400 words of advice, or 700 of
 sources), so the budget is set to what the content needs. The new pages (the family plan, the
 wallet cards, the shelter plan, the forecast list, access and functional needs, local help, the
 recovery page, the long-horizon section) earned their place by trimming elsewhere, so the why
@@ -24,26 +25,27 @@ views, and the packet keeps what to do.
 **Printed pages, the proxy.** Words outside the Sources section count 405 to a printed US Letter
 page and words in the two-column, 8-point Sources section (with the data credits) 690 to a page. A
 word is a token with a letter or a digit, citation brackets left out. This is calibrated on
-Chrome's Letter prints of three v0.2.0 packets (`FIXTURE=… node web/scripts/packet-pages.mjs`,
+Chrome's Letter prints of four v0.2.0 packets (`FIXTURE=… node web/scripts/packet-pages.mjs`,
 verification R3-15), measuring the filled share of the last page and where the Sources section
 starts:
 
 | Household | Body words, printed pages | Sources words, printed pages | Chrome, Letter / A4 | Proxy |
 | --- | --- | --- | --- | --- |
-| Philadelphia | 8,095 on 20.06 (404 a page) | 3,414 on 4.89 (698 a page) | 25 / 24 (24.95) | 24.94 |
-| Minot | 8,075 on 19.85 (407 a page) | 3,393 on 4.95 (685 a page) | 25 / 24 (24.80) | 24.86 |
-| Sugar Land | 8,797 on 21.33 (412 a page) | 3,663 on 5.26 (696 a page) | 27 / 26 (26.59) | 27.03 |
+| Philadelphia | 8,089 on 19.90 (406 a page) | 3,421 on 4.90 (698 a page) | 25 / 24 (24.80) | 24.93 |
+| Minot | 8,073 on 19.85 (407 a page) | 3,400 on 4.95 (687 a page) | 25 / 24 (24.80) | 24.86 |
+| Sugar Land | 8,780 on 21.33 (412 a page) | 3,670 on 5.29 (694 a page) | 27 / 26 (26.61) | 27.00 |
+| San Juan | 8,950 on 21.28 (421 a page) | 3,532 on 5.05 (699 a page) | 27 / 26 (26.33) | 27.22 |
 
-The first proxy (400 and 1,000 words a page, from the v0.1.0 Philadelphia print, 8,054 words
-outside Sources and 2,055 in it on 22 pages) held for the body, within 2 in 100, but allowed the
-Sources section only two thirds of the room it takes: two narrow columns of long addresses print
-about 690 words a page, not 1,000. On the v0.2.0 prints before the layout fixes it read
-Philadelphia at 23.66 where Chrome printed 26 pages (25.59 filled; a factor of 1.08), Minot 23.59
-against 25 (24.86; 1.05) and Sugar Land 25.67 against 27 (26.98; 1.05). The recalibrated proxy is
-within 0.1 of the print for Philadelphia and Minot and 0.4 over for Sugar Land. Chrome prints with
-sections following on (a heading is never left alone at the foot of a page), tables allowed to run
-on (rows never split, headers repeat), the county map at the start of Your risks and 10.5 pt body
-text.
+The body figure is set by Philadelphia, the budget's reference, so the proxy reads its print
+within 0.2 of a page and the other households a little high. The first proxy (400 and 1,000 words
+a page, from the v0.1.0 Philadelphia print, 8,054 words outside Sources and 2,055 in it on 22
+pages) held for the body but allowed the Sources section only two thirds of the room it takes:
+two narrow columns of long addresses print about 690 words a page, not 1,000. On the v0.2.0 prints
+before the fixes it read Philadelphia at 23.66 where Chrome printed 26 pages (25.59 filled; a
+factor of 1.08), Minot 23.59 against 25 (24.86; 1.05) and Sugar Land 25.67 against 27 (26.98;
+1.05). Chrome prints with sections following on (a heading is never left alone at the foot of a
+page), tables allowed to run on (rows never split, headers repeat), the county map at the start of
+Your risks and 10.5 pt body text.
 
 The tests hold the line:
 
@@ -56,20 +58,20 @@ The tests hold the line:
 
 | Household | Words | Printed pages (proxy) |
 | --- | --- | --- |
-| Philadelphia (the budget's reference) | 11,509 | 24.94 |
-| Chicago, zero budget | 9,927 | 21.17 |
-| Coos Bay | 11,917 | 25.89 |
-| Hays, Kansas | 11,965 | 25.95 |
-| Miami | 11,616 | 25.16 |
-| Phoenix | 11,364 | 24.59 |
-| Sugar Land | 12,460 | 27.03 |
-| Cameron Parish | 12,240 | 26.55 |
-| Detroit | 11,769 | 25.57 |
-| Galveston | 11,228 | 24.29 |
-| Minot | 11,468 | 24.86 |
-| Missoula | 11,170 | 24.17 |
-| Sacramento | 11,134 | 24.02 |
-| San Juan | 12,430 | 27.13 |
+| Philadelphia (the budget's reference) | 11,510 | 24.93 |
+| Chicago, zero budget | 9,953 | 21.19 |
+| Coos Bay | 11,920 | 25.89 |
+| Hays, Kansas | 11,976 | 25.94 |
+| Miami | 11,620 | 25.17 |
+| Phoenix | 11,365 | 24.58 |
+| Sugar Land | 12,450 | 27.00 |
+| Cameron Parish | 12,288 | 26.63 |
+| Detroit | 11,824 | 25.67 |
+| Galveston | 11,232 | 24.29 |
+| Minot | 11,473 | 24.86 |
+| Missoula | 11,175 | 24.17 |
+| Sacramento | 11,137 | 24.02 |
+| San Juan | 12,482 | 27.22 |
 
 The v0.2 packet before packet v2 (7f6b8c6) came to 13,349 words for Philadelphia, 28.07 pages on
 the first proxy (about 29 on this one).
@@ -100,6 +102,9 @@ pages. What pays for the new pages:
 - **Tables that print narrow:** the other-risks table's heading is "Households like yours, 10
   years" and the targets table's "Help likely in" and "Mostly back in", so their rows stay on one
   line or two; the maintenance calendar's dates ("September 1, 2027") never wrap.
+- **Supply lines without the repeated source names:** rr-supply ends each sentence with its
+  sources' short names ("(Ready.gov, FEMA)"); the packet leaves them out because the numbered
+  bracket after the line cites the same sources, and keeps "(some amounts are estimates)".
 
 ## The card rule
 
