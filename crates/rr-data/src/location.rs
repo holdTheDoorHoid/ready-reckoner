@@ -56,6 +56,13 @@ impl DataStore {
             "Hazards and facility counts describe your whole county. Tract-level data is not loaded yet."
         };
         let exposure = self.location_exposure(c, zip.as_deref());
+        // The ZIP code's centre (core/zip_centroids.csv), where the pin map starts (DESIGN-DELTA-v3
+        // §3.3): only for a location that came from a ZIP code, and None before the ZIP tables load.
+        let zip_centroid = if share.is_some() {
+            zip.as_deref().and_then(|z| self.zip_centroid(z))
+        } else {
+            None
+        };
         Some(LocationResolved {
             country: "US".to_string(),
             county_fips: c.fips.clone(),
@@ -64,14 +71,8 @@ impl DataStore {
             state_name: c.state_name.clone(),
             zip: if share.is_some() { zip } else { None },
             zip_county_share: share,
-            // awaiting: types3 — once `LocationResolved.zip_centroid: Option<LatLon>` exists
-            // (DESIGN-DELTA-v3 §3.3), set it here:
-            // `zip_centroid: zip.as_deref().and_then(|z| self.zip_centroid(z)),`
-            // (`DataStore::zip_centroid` is ready: crates/rr-data/src/lib.rs.)
             centroid: c.centroid,
-            // awaiting: data3 (the ZIP code's centre from core/zip_centroids.csv, DESIGN-DELTA-v3
-            // §3.3, §8)
-            zip_centroid: None,
+            zip_centroid,
             nca_region: c.nca_region.clone(),
             coastal: c.coastal,
             tsunami_zone: c.tsunami_zone,
