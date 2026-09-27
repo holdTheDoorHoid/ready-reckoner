@@ -12,7 +12,7 @@ use rr_consequence::ConsequenceAssessment;
 use rr_types::{BucketAssessment, BucketId, BucketKind, StressTest, Target, TierId};
 
 use super::text::{self, md};
-use super::{Ctx, cite_all};
+use super::{Ctx, cite, cite_all};
 
 /// What the dial means, after the model's own sentence (model review Part 3.4): each target holds
 /// for its own need, so the plan also gives ways to cope when one runs out.
@@ -181,8 +181,9 @@ fn dedupe_year(sentence: &str, st: Option<&StressTest>) -> String {
 }
 
 /// "How well do these numbers hold up?" (model review Part 3.1): the frozen backtest's tally
-/// for this version, from the table bundled with the engine (`EngineInfo::validation`), and what
-/// it means for the household (`topic:validation`).
+/// for this version, from the table bundled with the engine (`EngineInfo::validation`), cited to
+/// the published table's registry entry ([`crate::validation::CITATION`]), and what it means for
+/// the household (`topic:validation`).
 fn validation(cx: &Ctx<'_>, out: &mut Vec<String>) {
     let v = crate::validation::summary();
     if v.events_tested == 0 {
@@ -199,7 +200,7 @@ fn validation(cx: &Ctx<'_>, out: &mut Vec<String>) {
         })
         .map(|p| {
             // Its first two sentences: a floor, not a promise; plan for anything longer your area
-            // has lived through. (The table is the address in brackets.)
+            // has lived through. (The table is the source the bracket points to.)
             let body = p.trim_start_matches("**What it means for you.**").trim();
             let mut end = 0;
             for (n, (i, _)) in body.match_indices(". ").enumerate() {
@@ -217,14 +218,13 @@ fn validation(cx: &Ctx<'_>, out: &mut Vec<String>) {
         .unwrap_or_default();
     out.push(format!(
         "**How well do these numbers hold up?** Tested against {} real disasters, this version \
-         covered {}, partly covered {}, fell short on {} and could not model {} (results: {}). \
-         {meaning}",
+         covered {}, partly covered {}, fell short on {} and could not model {}.{} {meaning}",
         v.events_tested,
         v.covered,
         v.partial,
         v.short,
         v.not_modelled,
-        crate::validation::DOC_URL
+        cite(crate::validation::CITATION)
     ));
     out.push(String::new());
 }
