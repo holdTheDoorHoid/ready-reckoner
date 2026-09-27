@@ -43,7 +43,7 @@ A severe thunderstorm or high wind warning is issued, you hear thunder, or damag
 
 - Do not shelter under a tree, in a shed or in a rain shelter.[^nws_severe_weather_during][^nws_lightning_safety]
 - Do not lie on a garage floor.[^nws_lightning_safety]
-- Do not go into big open rooms at work or school, such as a gym or cafeteria.[^nws_severe_weather_during]
+- Do not go into big open rooms, such as a gym or cafeteria.[^nws_severe_weather_during]
 - Do not drive through flooded roads.[^ready_gov_thunderstorms_lightning]
 - Do not go near fallen power lines. They may be live.[^nws_high_wind_during]
 

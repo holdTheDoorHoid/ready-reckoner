@@ -49,7 +49,7 @@ Your vehicle breaks down or is stuck in snow, rising water or extreme heat.
 ## When it is over
 
 - Watch for hypothermia: shivering, confusion, slurred speech, drowsiness. Below 95°F, get medical help right away.[^cdc_winter_safety]
-- Heavy sweating, nausea or fainting in the heat? Move to a cool place, sip water and put cool wet cloths on the body.[^cdc_hot_weather_psa]
+- Heavy sweating, nausea or fainting in heat? Get to a cool place, sip water and use cool wet cloths.[^cdc_hot_weather_psa]
 - Restock the car kit and keep the gas tank at least half full.[^ready_gov_winter][^ready_gov_evacuation]
 
 ## Sources

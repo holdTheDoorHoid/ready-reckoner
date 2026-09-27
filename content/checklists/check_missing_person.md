@@ -49,7 +49,7 @@ A child, or an adult who needs someone with them, is missing and you cannot find
 
 ## When it is over
 
-- Ask police to arrange a full medical check for a child who has been found.[^ojjdp_missing_child_guide]
+- Ask police to arrange a full medical check for a found child.[^ojjdp_missing_child_guide]
 - Keep a recent photo of the person to help police another time.[^nia_wandering] {if:need:cognitive|supervision}Tell neighbours and police that they tend to wander.[^nia_wandering]{/if}
 - For support, call or text 988, or ask the National Center for Missing & Exploited Children.[^ojjdp_missing_child_guide]
 
