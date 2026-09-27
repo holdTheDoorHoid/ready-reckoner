@@ -192,6 +192,12 @@ fn every_ts_id_list_matches_the_rust_enum() {
         ("HOLDS", Holds::STRS),
         ("SEASONS", Season::STRS),
         ("GUIDANCE_KINDS", GuidanceKind::STRS),
+        // Contract v3.
+        ("PLACE_KINDS", PlaceKind::STRS),
+        ("PAGE_KINDS", binder::PageKind::STRS),
+        ("PAGE_FITS", binder::Fit::STRS),
+        ("CALLOUT_KINDS", binder::CalloutKind::STRS),
+        ("MAP_SLOT_KINDS", binder::MapSlotKind::STRS),
     ];
     let strings = |name: &str| -> Vec<String> {
         file.arrays
@@ -253,13 +259,30 @@ fn contract_version_agrees_everywhere() {
         file.numbers.get("ENGINE_API_VERSION"),
         Some(&f64::from(ENGINE_API_VERSION))
     );
-    // The family-plan limits the engine applies, so the web form can use the same maxlength.
+    // The family-plan limits the engine applies, so the web form can use the same maxlength; the
+    // contract v3 caps of the optional steps' answers; the binder's tab limits.
     let limits = [
         ("FAMILY_PLAN_TEXT_MAX", FAMILY_PLAN_TEXT_MAX),
         ("FAMILY_PLAN_SHORT_MAX", FAMILY_PLAN_SHORT_MAX),
         ("TRUSTED_CIRCLE_MAX", TRUSTED_CIRCLE_MAX),
         ("ROUTES_MAX", ROUTES_MAX),
         ("NUMBERS_BY_HEART_MAX", NUMBERS_BY_HEART_MAX),
+        ("LAST4_LEN", LAST4_LEN),
+        ("BLOOD_TYPE_MAX", BLOOD_TYPE_MAX),
+        ("PLATE_MAX", PLATE_MAX),
+        ("SHORT_TEXT_MAX", SHORT_TEXT_MAX),
+        ("MEDIUM_TEXT_MAX", MEDIUM_TEXT_MAX),
+        ("LABEL_TEXT_MAX", LABEL_TEXT_MAX),
+        ("DESCRIPTION_MAX", DESCRIPTION_MAX),
+        ("LONG_TEXT_MAX", LONG_TEXT_MAX),
+        ("NOTE_MAX", NOTE_MAX),
+        ("MEDICATIONS_MAX", MEDICATIONS_MAX),
+        ("PETS_MAX", PETS_MAX),
+        ("VEHICLES_MAX", VEHICLES_MAX),
+        ("ACCOUNTS_MAX", ACCOUNTS_MAX),
+        ("POLICIES_MAX", POLICIES_MAX),
+        ("MAX_TABS", usize::from(binder::MAX_TABS)),
+        ("SHORT_TITLE_MAX", binder::SHORT_TITLE_MAX),
     ];
     for (name, value) in limits {
         assert_eq!(

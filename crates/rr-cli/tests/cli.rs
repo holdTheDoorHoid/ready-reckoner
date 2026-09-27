@@ -88,7 +88,7 @@ fn plan_prints_the_packet_and_the_json_the_engine_makes() {
         .output()
         .unwrap();
     assert!(out.status.success(), "{}", stderr(&out));
-    assert_eq!(stdout(&out), expected.packet_markdown);
+    assert_eq!(stdout(&out), expected.prepare_markdown);
     for heading in rr_plan::packet::SECTION_HEADINGS {
         assert!(stdout(&out).contains(heading), "{heading}");
     }
@@ -120,7 +120,7 @@ fn plan_writes_both_files_into_out() {
     let md = std::fs::read_to_string(dir.join("miami-condo-retiree-1.md")).unwrap();
     let json = std::fs::read_to_string(dir.join("miami-condo-retiree-1.json")).unwrap();
     let parsed: PlanOutput = serde_json::from_str(&json).unwrap();
-    assert_eq!(md, parsed.packet_markdown);
+    assert_eq!(md, parsed.prepare_markdown);
     assert_eq!(parsed.location.county_fips, "12086");
     // Both needs somewhere to put two files.
     fixtures()
@@ -147,7 +147,7 @@ fn plan_reads_standard_input() {
         .write_stdin(json)
         .assert()
         .success()
-        .stdout(expected.packet_markdown);
+        .stdout(expected.prepare_markdown);
 }
 
 #[test]
@@ -311,7 +311,7 @@ fn plan_runs_on_the_data_pack() {
     assert_eq!(o.data_pack_version, manifest_pack_version());
     assert_eq!(o.location.county_fips, "42101");
     assert_eq!(o.location.zip.as_deref(), Some("19147"));
-    assert!(!o.register.is_empty() && !o.packet_markdown.is_empty());
+    assert!(!o.register.is_empty() && !o.prepare_markdown.is_empty());
 }
 
 #[test]

@@ -183,7 +183,7 @@ export function parseAlsoChecked(packet: string | undefined): AlsoChecked | null
  * otherwise every hazard the engine can check that is not on this household's list, by name only.
  */
 export function alsoCheckedFor(output: PlanOutput, cat: Catalogue | null): AlsoChecked | null {
-  const note = parseAlsoChecked(output.packet_markdown);
+  const note = parseAlsoChecked(output.prepare_markdown);
   if (note) return note;
   const listed = new Set<string>(output.register.map((h) => h.id));
   const rest = (cat?.hazards ?? []).filter((h) => !listed.has(h.id));

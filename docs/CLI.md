@@ -21,13 +21,16 @@ release build takes about 0.8 seconds and 15–30 milliseconds.
 | nothing | the core pack in `./data` when it has a `manifest.json` (run from the repository root) |
 | nothing, and there is no `./data/manifest.json` | the fourteen built-in sample counties, with a note on standard error |
 | `--data <dir>` | the core pack in `<dir>`; an error (exit 2) if it has no `manifest.json` |
-| `--optional <pack>` | the core pack plus this optional pack (repeat for several): `surge` (the ZIP code's storm-surge share), `wildfire_places`, `outage_events`; an unknown name is an error (exit 2) listing the packs the manifest has |
+| `--optional <pack>` | the core pack plus this optional pack (repeat for several): `places` (county hospitals, DESIGN-DELTA-v3 §8; `surge`, `wildfire_places` and `outage_events` are core files now and load with the core pack, no flag needed); an unknown name is an error (exit 2) listing the packs the manifest has |
 | `--all-packs` | every pack the manifest lists, optional ones included |
 | `--fixtures` | the fourteen sample counties: Maricopa AZ, Miami-Dade FL, Cook IL, Ellis KS, Coos OR, Philadelphia PA, Fort Bend TX (hand-built, in `crates/rr-hazards/tests/data/counties/`), and Sacramento CA, Cameron LA, Wayne MI, Missoula MT, Ward ND, Galveston TX, San Juan PR (the core pack's own records, in `fixtures/sample-counties/`) |
 
 By default `rr` loads only the core pack, as the web app does, so it plans exactly what the site
-and the goldens show; the optional packs change some numbers (the surge share, the wildfire-place
-and outage-event credit lines) and come in only when asked for. `rr data verify` and `rr data info`
+and the goldens show; the core pack now includes the eviction column and the storm-surge,
+wildfire-place and outage-event tables that used to be optional packs (bundled 2026-09-27,
+DESIGN-DELTA-v3 §8). Only `places` (county hospitals, read by the binder, not by the plan) is
+still a separate pack, and comes in only when asked for with `--optional places` or `--all-packs`.
+`rr data verify` and `rr data info`
 always read every pack. A pack is loaded exactly as the web app loads it: `manifest.json` first,
 then every file the manifest lists for the chosen packs, by its manifest path, each checked
 against its sha256. A file that fails its checksum stops the command (exit 1) and names the file.

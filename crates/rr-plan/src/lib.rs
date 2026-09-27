@@ -183,7 +183,8 @@ impl<S: CountySource> Engine<S> {
         Ok(self.output(&a))
     }
 
-    /// The [`PlanOutput`] for an assessment: provenance, warnings and the packet.
+    /// The [`PlanOutput`] for an assessment: provenance, warnings, the binder and the Prepare
+    /// sheet.
     pub fn output(&self, a: &Assessment) -> PlanOutput {
         let marked = packet::render(a, self.content);
         let first = packet::cited_ids(&marked);
@@ -192,7 +193,10 @@ impl<S: CountySource> Engine<S> {
         let (citations, unknown) = provenance::resolve(&order, self.content);
         let mut warnings = a.warnings.clone();
         warnings.extend(provenance::missing_warning(&unknown));
-        let packet_markdown = packet::finish(&marked, a, &citations);
+        // Until the binder workstream lands, the Prepare sheet is the whole v2 packet and the
+        // binder a transitional one built from it (DESIGN-DELTA-v3 §4, §11).
+        let prepare_markdown = packet::finish(&marked, a, &citations);
+        let binder = packet::shim::binder(&prepare_markdown, a, self.content, &citations);
         PlanOutput {
             engine_version: ENGINE_VERSION.to_owned(),
             api_version: rr_types::ENGINE_API_VERSION,
@@ -210,7 +214,8 @@ impl<S: CountySource> Engine<S> {
             plan: a.budget.plan.clone(),
             requirements: a.lines.iter().map(|l| l.line.clone()).collect(),
             warnings,
-            packet_markdown,
+            binder,
+            prepare_markdown,
             provenance: citations,
             // The recovery page's facts: the county's federal disaster declarations (OpenFEMA).
             recovery: packet::recovery_info(&a.county),

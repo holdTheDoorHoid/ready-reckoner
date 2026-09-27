@@ -1,11 +1,13 @@
 /**
- * Getting the data to the WebAssembly engine, in three parts that load at different times
+ * Getting the data to the WebAssembly engine, in four parts that load at different times
  * (docs/ENGINE-API.md, "Loading"):
  *
  * - `core()`: `data/manifest.json`, then every core file except the ZIP tables, fetched at once and
  *   handed over one by one with the county list last. Started as soon as the engine is up.
  * - `zip()`: the ZIP tables, when a ZIP code is typed or a saved plan has one.
  * - `map()`: the county outlines, when a map is shown.
+ * - `places()`: the county's emergency-services hospitals, when the binder's Neighbourhood page
+ *   is shown.
  *
  * Each part is fetched from the site's own origin with `?v=<pack_version>`, handed to the engine
  * (which checks every file against the manifest's sha256), and loaded once; a second call returns
@@ -17,9 +19,9 @@
  */
 import type { Engine } from './index';
 import type { Manifest } from './data-files';
-import { dataUrl, MANIFEST_PATH, MAP_FILE, startupFiles, zipFiles } from './data-files';
+import { dataUrl, MANIFEST_PATH, MAP_FILE, PLACES_FILE, startupFiles, zipFiles } from './data-files';
 
-export type PartName = 'core' | 'zip' | 'map';
+export type PartName = 'core' | 'zip' | 'map' | 'places';
 /** `none`: the site has no data files, so there is nothing to load. */
 export type Phase = 'idle' | 'loading' | 'ready' | 'failed' | 'none';
 
@@ -36,6 +38,7 @@ export interface LoaderStatus {
   core: PartStatus;
   zip: PartStatus;
   map: PartStatus;
+  places: PartStatus;
   /** The loaded manifest's `pack_version`. */
   packVersion?: string;
 }
@@ -96,7 +99,7 @@ export class PackLoader {
   #parts: Partial<Record<PartName, Promise<unknown>>> = {};
   /** Data URLs fetched so far (for warming the service worker's cache after it takes over). */
   readonly fetched: string[] = [];
-  status: LoaderStatus = { core: idle(), zip: idle(), map: idle() };
+  status: LoaderStatus = { core: idle(), zip: idle(), map: idle(), places: idle() };
 
   constructor(engine: Engine, base: string, options: LoaderOptions = {}) {
     this.#engine = engine;
@@ -180,13 +183,23 @@ export class PackLoader {
     });
   }
 
+  /** The county's emergency-services hospitals, for the binder's Neighbourhood page (its own
+   * pack, `places`, like `map`'s `geo`): handed to the engine, which answers queries about them. */
+  places(): Promise<void> {
+    return this.#part('places', async (manifest) => {
+      const files = manifest.packs.places?.files.some((f) => f.path === PLACES_FILE) ? [PLACES_FILE] : [];
+      if (files.length === 0) return;
+      await this.#files('places', manifest, files, () => this.core());
+    }) as Promise<void>;
+  }
+
   /** Forget failed parts (and a failed manifest), so the next call tries again. */
   retry(): void {
     if (this.#manifestFailed) {
       this.#manifest = undefined;
       this.#manifestFailed = false;
     }
-    for (const part of ['core', 'zip', 'map'] as const) {
+    for (const part of ['core', 'zip', 'map', 'places'] as const) {
       if (this.status[part].phase === 'failed') {
         delete this.#parts[part];
         this.#set(part, { phase: 'idle', bytesLoaded: 0 });

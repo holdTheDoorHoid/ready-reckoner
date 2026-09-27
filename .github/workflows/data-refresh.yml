@@ -8,9 +8,10 @@ name: Refresh data packs
 #
 # Default jobs (run order, see `rr-etl jobs`): geography, nri, outages, events, seismic, climate,
 # flood, strategic, geomag, ground, levees, water_systems, smoke, facilities, surge_proxy,
-# eviction (writes nothing until the owner's sign-off in data/manifest.json), vulnerability,
-# base_rates. The optional jobs `surge` (0.25 GB of NHC map archives) and `wildfire_places` build
-# optional packs and are not run here; name them in `only` to run them on demand.
+# eviction (writes nothing until the owner's sign-off in data/manifest.json), hospitals,
+# vulnerability, base_rates. The jobs `surge` (0.25 GB of NHC map archives) and `wildfire_places`
+# write core-pack files (bundled 2026-09-27) but are not run here, since their sources change only
+# every few years; name them in `only` to run them on demand.
 # `rr-etl verify` also fails the run if the core pack grows past its 5 MB gzipped budget.
 on:
   schedule:

@@ -240,8 +240,9 @@ pub fn why_we_think_this(hazard: HazardId) -> &'static str {
              Freezing weather and a basement raise the chance; renters report fewer claims."
         }
         Eviction => {
-            "Courts order about 2 in 100 renting households to leave each year (Eviction Lab). \
-             Savings and steadier income lower the chance."
+            "Eviction Lab counts eviction filings per renting household in your county, when it has \
+             a figure for it; counties it does not cover use the national rate, about 2 in 100 \
+             renting households a year. Savings and steadier income lower the chance."
         }
         ArrestOrDetention => {
             "The FBI counts about 7 million arrests a year, by age and sex. We add up the rates for \
