@@ -4160,3 +4160,119 @@ year = 2026
 url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/VALIDATION.md"
 retrieved = "2026-09-26"
 license = "CC BY-SA 4.0"
+
+# ---------------------------------------------------------------------------------------------
+# added by checklists-b (v0.3.0 checklists, tab 7 "it is coming"). Read 2026-09-27; the wording each
+# checklist step relies on was checked against the page. How each page was read is noted above it.
+# ---------------------------------------------------------------------------------------------
+
+# Read in a browser page (ready.gov refuses scripted clients); quote matched in the page text.
+[[citation]]
+id = "ready_gov_space_weather"
+title = "Space Weather"
+publisher = "FEMA / Ready.gov"
+year = 2026
+url = "https://www.ready.gov/space-weather"
+retrieved = "2026-09-27"
+quote = "Disconnect electrical appliances if instructed to do so by local officials."
+license = "US Government Work (public domain)"
+
+# CDC removed the page in 2022 (the address now opens a landing page). Read from the Internet
+# Archive capture of 2022-03-05 as a plain download; quote matched in the capture's text.
+[[citation]]
+id = "cdc_shelter_in_place_chemical_2018"
+title = "Chemical Agents: Facts About Sheltering in Place"
+publisher = "Centers for Disease Control and Prevention (via Internet Archive)"
+year = 2018
+url = "https://web.archive.org/web/20220305164057/https://emergency.cdc.gov/planning/shelteringfacts.asp"
+retrieved = "2026-09-27"
+quote = "Most likely you will only need to shelter for a few hours."
+license = "US Government Work (public domain)"
+
+# Plain download; quote matched in the page's HTML.
+[[citation]]
+id = "nws_winter_storm_during"
+title = "What To Do If You're Caught in a Winter Storm"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/winter-during"
+retrieved = "2026-09-27"
+quote = "Close off unneeded rooms to avoid wasting heat."
+license = "US Government Work (public domain)"
+
+# Plain download; quote matched in the page's HTML.
+[[citation]]
+id = "nws_ice_storms"
+title = "Ice Storms"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/winter-ice-frost"
+retrieved = "2026-09-27"
+quote = "Bridges and overpasses are particularly dangerous because they freeze before other surfaces."
+license = "US Government Work (public domain)"
+
+# Plain download; quote matched in the page's HTML.
+[[citation]]
+id = "nws_cold_during"
+title = "During Extremely Cold Weather"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/cold-during"
+retrieved = "2026-09-27"
+quote = "Once inside again, change into dry clothing immediately if you are wet."
+license = "US Government Work (public domain)"
+
+# Plain download of the PDF (dated 11/18). A state health department's sheet, used for the steps
+# after a boil-water notice ends, which the CDC and EPA pages read today do not give. Paraphrased.
+[[citation]]
+id = "nydoh_boil_water_checklist"
+title = "Boil Water Notices: Checklist for Residents and Homeowners"
+publisher = "New York State Department of Health"
+year = 2018
+url = "https://www.health.ny.gov/environmental/water/drinking/boilwater/docs/checklist_residents_and_homeowners.pdf"
+retrieved = "2026-09-27"
+license = "State government publication (paraphrased, not quoted)"
+
+# Read in a browser page (cdc.gov refuses scripted clients); quote matched in the page text.
+[[citation]]
+id = "cdc_mmwr_community_mitigation_2017"
+title = "Community Mitigation Guidelines to Prevent Pandemic Influenza — United States, 2017 (MMWR Recommendations and Reports 66(1))"
+publisher = "Centers for Disease Control and Prevention"
+year = 2017
+url = "https://www.cdc.gov/mmwr/volumes/66/rr/rr6601a1.htm"
+retrieved = "2026-09-27"
+quote = "CDC might recommend voluntary home quarantine of exposed household members as a personal protective measure during severe, very severe, or extreme influenza pandemics in combination with other personal protective measures such as respiratory etiquette and hand hygiene."
+license = "US Government Work (public domain)"
+
+# Read in a browser page (cdc.gov refuses scripted clients); quote matched in the page text.
+[[citation]]
+id = "cdc_respiratory_when_sick"
+title = "Preventing Spread of Respiratory Viruses When You're Sick"
+publisher = "Centers for Disease Control and Prevention"
+year = 2025
+url = "https://www.cdc.gov/respiratory-viruses/prevention/precautions-when-sick.html"
+retrieved = "2026-09-27"
+quote = "If you have an emergency warning sign (like trouble breathing or chest pain), seek emergency medical care immediately."
+license = "US Government Work (public domain)"
+
+# Read in a browser page (cdc.gov refuses scripted clients); quote matched in the page text.
+[[citation]]
+id = "cdc_valley_fever_prevention"
+title = "Reducing Risk for Valley Fever"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/valley-fever/prevention/index.html"
+retrieved = "2026-09-27"
+quote = "Stay inside during dust storms and close your windows."
+license = "US Government Work (public domain)"
+
+# Plain download; quote matched in the page's HTML.
+[[citation]]
+id = "nhc_storm_surge_overview"
+title = "Storm Surge Overview"
+publisher = "NOAA National Hurricane Center"
+year = 2026
+url = "https://www.nhc.noaa.gov/surge/"
+retrieved = "2026-09-27"
+quote = "Storm surge can even travel up rivers and canals, reaching well inland from the coastline."
+license = "US Government Work (public domain)"
