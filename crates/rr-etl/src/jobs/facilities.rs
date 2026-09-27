@@ -14,8 +14,9 @@
 //! - **Strategic sites** (`core/strategic_sites.toml`, written by the `strategic` job): per ZIP,
 //!   the nearest class A or C1 point site within 150 km, its distance and bearing.
 //!
-//! County boundaries: Census 2024 cartographic 1:500,000 counties. ZIP points: the Census 2024
-//! Gazetteer's ZCTA internal points, rounded to 3 decimals (`geography::zcta_points`).
+//! County boundaries: Census 2024 cartographic 1:500,000 counties. ZIP points: `core/zip_centroids.csv`
+//! (written by the `geography` job, which runs first), the Census 2024 Gazetteer's ZCTA internal
+//! points rounded to 3 decimals.
 
 use super::{Ctx, JobOutput, arcgis_query, attr_f64, load_counties};
 use crate::csvout::{Table, col, parse_delimited};
@@ -428,10 +429,22 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     }
     out.table(ctx, FACILITIES, &mut table)?;
 
-    // ZIP table, measured from each ZIP's internal point (Census Gazetteer).
-    let zcta = super::geography::zcta_points(ctx)?;
-    out.source(zcta.source);
-    out.rows_in += zcta.rows_in;
+    // ZIP table, measured from each ZIP's internal point (Census Gazetteer, via the geography
+    // job's own `core/zip_centroids.csv`; no separate download, and its source is already on the
+    // manifest under that job).
+    let (zch, zcrows) = crate::csvout::read_table(&ctx.data, super::geography::ZIP_CENTROIDS)?;
+    let (zc_zip, zc_lat, zc_lon) = (col(&zch, "zip")?, col(&zch, "lat")?, col(&zch, "lon")?);
+    let zcta_points: Vec<(String, f64, f64)> = zcrows
+        .iter()
+        .filter_map(|r| {
+            Some((
+                r[zc_zip].clone(),
+                r[zc_lat].parse::<f64>().ok()?,
+                r[zc_lon].parse::<f64>().ok()?,
+            ))
+        })
+        .collect();
+    out.rows_in += zcrows.len() as u64;
 
     // Dams whose named downstream town the ZIP overlaps: Census 2020 ZCTA-to-place file.
     let rel = ctx.http.get(
@@ -491,8 +504,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         }
     }
     out.rows_in += rrows.len() as u64;
-    let zip_point: BTreeMap<&str, (f64, f64)> = zcta
-        .points
+    let zip_point: BTreeMap<&str, (f64, f64)> = zcta_points
         .iter()
         .map(|(z, la, lo)| (z.as_str(), (*la, *lo)))
         .collect();
@@ -555,7 +567,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         1,
     );
     let mut strategic_rows = 0usize;
-    for (zip, lat, lon) in &zcta.points {
+    for (zip, lat, lon) in &zcta_points {
         let (lat, lon) = (*lat, *lon);
         let nearest = sites
             .iter()

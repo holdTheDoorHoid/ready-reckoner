@@ -2,6 +2,10 @@
 //! guidance blocks, with the household's own numbers substituted. See `docs/PACKET.md` for the
 //! sections, what feeds each, and the placeholders.
 //!
+//! Contract v3 (DESIGN-DELTA-v3 §4): until the binder workstream lands, this v2 packet is
+//! `PlanOutput.prepare_markdown`, unchanged, and [`shim`] builds a transitional
+//! `PlanOutput.binder` from it.
+//!
 //! Citations are written as markers while the packet is assembled; once the provenance list is
 //! known they become numbers that point into the packet's numbered Sources section ("[3]",
 //! "[3, 7]"), so the packet reads the same on paper as on screen.
@@ -14,6 +18,8 @@ mod people;
 mod plan;
 mod risks;
 mod safety;
+// transitional: replaced by the binder workstream (DESIGN-DELTA-v3 §4, §11).
+pub mod shim;
 mod sources;
 mod summary;
 mod targets;
@@ -199,7 +205,9 @@ impl<'a> Ctx<'a> {
     /// ([`Ctx::hazard_relevant`]); a span about a kind of home (`{if:home:apartment_high_rise}`,
     /// `{if:not_home:…}`) when the household's home is (or is not) of that kind; an access need
     /// (`{if:need:hearing}`), an item (`{if:has:power_generator}`: owned, or in the plan) or a
-    /// benefit (`{if:benefit:snap_wic}`) when the household has it.
+    /// benefit (`{if:benefit:snap_wic}`) when the household has it; `{if:children}`,
+    /// `{if:pets}`, `{if:vehicle}` and `{if:powered_device}` (contract v3) from the household's
+    /// own answers.
     pub fn condition_holds(&self, id: &str) -> bool {
         match rr_content::policy::Condition::parse(id) {
             Ok(c) => c.holds(self),
@@ -300,6 +308,35 @@ impl rr_content::policy::HouseholdFacts for Ctx<'_> {
             .benefits
             .iter()
             .any(|b| b.as_str() == benefit)
+    }
+
+    fn has_children(&self) -> bool {
+        self.a.input.people.iter().any(|p| {
+            matches!(
+                p.age_band,
+                rr_types::AgeBand::Infant
+                    | rr_types::AgeBand::Toddler
+                    | rr_types::AgeBand::Child
+                    | rr_types::AgeBand::Teen
+            )
+        })
+    }
+
+    fn has_pets(&self) -> bool {
+        let p = &self.a.input.pets;
+        u16::from(p.dogs) + u16::from(p.cats) + u16::from(p.small) + u16::from(p.large_animals) > 0
+    }
+
+    fn has_vehicle(&self) -> bool {
+        !self.a.input.mobility.vehicles.is_empty()
+    }
+
+    fn has_powered_device(&self) -> bool {
+        self.a
+            .input
+            .people
+            .iter()
+            .any(|p| p.medical.powered_device != rr_types::PoweredDevice::None)
     }
 }
 

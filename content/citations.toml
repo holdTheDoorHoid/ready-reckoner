@@ -3493,7 +3493,7 @@ publisher = "Gromis A. et al., Princeton University Eviction Lab"
 year = 2022
 url = "https://data-downloads.evictionlab.org/"
 retrieved = "2026-09-26"
-license = "Open Data Commons Attribution License (ODC-BY 1.0): credit line required; the owner's sign-off on the attribution is pending (data audit section 7)"
+license = "Open Data Commons Attribution License (ODC-BY 1.0): credit line required; approved by the owner, 2026-09-27 (DESIGN-DELTA-v3 section 0)"
 
 [[citation]]
 id = "ashp_shortages"

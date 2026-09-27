@@ -14,13 +14,14 @@ fn embedded_content_parses_and_passes_the_validator() {
     }
     let s = summary(content);
     println!(
-        "content {}: {} items ({} free), {} citations ({} priors), {} guidance blocks, {} glossary terms; {} warnings",
+        "content {}: {} items ({} free), {} citations ({} priors), {} guidance blocks, {} checklists, {} glossary terms; {} warnings",
         rr_content::CONTENT_VERSION,
         s.items,
         s.free_items,
         s.citations,
         s.prior_citations,
         s.guidance,
+        s.checklists,
         s.glossary,
         report.warnings().count()
     );

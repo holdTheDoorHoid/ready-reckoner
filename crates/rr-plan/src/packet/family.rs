@@ -91,6 +91,20 @@ fn holds_words(h: Holds) -> &'static str {
     }
 }
 
+/// Whether a family plan holds a v2 answer, anything besides the contract v3 groups.
+// transitional: replaced by the binder workstream
+fn has_v2_answers(plan: &FamilyPlan) -> bool {
+    let v2 = FamilyPlan {
+        home: None,
+        neighbourhood: None,
+        pets: Vec::new(),
+        vehicles: Vec::new(),
+        documents: None,
+        ..plan.clone()
+    };
+    !v2.is_empty()
+}
+
 fn has_children(input: &PlanInput) -> bool {
     input.people.iter().any(|p| {
         matches!(
@@ -128,7 +142,10 @@ pub(super) fn plan(cx: &Ctx<'_>, out: &mut Vec<String>) {
     let a = cx.a;
     let input = &a.input;
     let empty = FamilyPlan::default();
-    let written = input.family_plan.as_ref();
+    // transitional: replaced by the binder workstream. The v2 packet prints only the v2 fields,
+    // so a plan holding nothing but the contract v3 groups (home, neighbourhood, pets, vehicles,
+    // documents: DESIGN-DELTA-v3 §3.2) reads as not yet written here.
+    let written = input.family_plan.as_ref().filter(|p| has_v2_answers(p));
     let p = written.unwrap_or(&empty);
     out.push("## Your family plan".to_owned());
     out.push(String::new());

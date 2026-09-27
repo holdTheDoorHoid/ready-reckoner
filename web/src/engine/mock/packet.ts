@@ -1,5 +1,6 @@
 /**
- * The mock packet: `packet_markdown` with the ten sections of docs/DESIGN.md §9. The app renders
+ * The mock packet: `prepare_markdown` (contract v3; the v2 `packet_markdown`) with the ten sections
+ * of docs/DESIGN.md §9, from which `binder-shim.ts` builds the transitional binder. The app renders
  * it with a sanitising Markdown renderer and prints each `##` section on its own page. It uses
  * headings, paragraphs, lists, task lists, tables, block quotes and footnotes, so the renderer and
  * the print stylesheet are exercised the way the real packet will exercise them.

@@ -1,8 +1,10 @@
-//! Contract v2 keeps every v1 file readable (DESIGN-DELTA §1): the seven v0.1 fixture households
-//! that the goldens were planned from, the other v1 households in the repository, and the golden
-//! `PlanOutput` files themselves. Inputs parse unchanged and default every v2 field; outputs
-//! round-trip byte for byte, because every v2 output field is left out when empty. A v2 output
-//! never names a retired hazard.
+//! Contract v2 kept every v1 file readable (DESIGN-DELTA §1), and contract v3 keeps every v1 and
+//! v2 input readable (DESIGN-DELTA-v3 §3): the seven v0.1 fixture households that the goldens were
+//! planned from, the other v1 households in the repository, and the v2 households. Inputs parse
+//! unchanged and default every newer field. Outputs are recomputed on load, and contract v3
+//! removed `packet_markdown` (the binder replaces it), so a golden `PlanOutput` of the current
+//! contract round-trips byte for byte and an older one is only checked for retired ids. No output
+//! names a retired hazard.
 
 mod common;
 
@@ -37,6 +39,62 @@ fn json_files(dir: &Path) -> Vec<PathBuf> {
 /// the contract v2 fixtures).
 const V1_ROUND2: [&str; 1] = ["cameron-insulin-well-farm-2"];
 
+/// Fixture households that gained contract v3 sample answers in v0.3.0 (DESIGN-DELTA-v3 §10):
+/// people's `profile` and a `family_plan` holding only the v3 groups. Their older fields are
+/// untouched, so with those additions taken out each is still the household it was.
+const V3_SAMPLES: [&str; 2] = ["philadelphia-renters-4", "minot-missile-field-3"];
+
+/// The family-plan groups contract v3 adds.
+const V3_FAMILY_GROUPS: [&str; 5] = ["home", "neighbourhood", "pets", "vehicles", "documents"];
+
+/// `raw` without its contract v3 additions: each person's `profile`, the v3 family-plan groups,
+/// and the family plan itself when nothing older is left in it.
+fn without_v3_answers(raw: &str) -> String {
+    let mut v: Value = serde_json::from_str(raw).unwrap();
+    for p in v["people"].as_array_mut().unwrap() {
+        p.as_object_mut().unwrap().remove("profile");
+    }
+    let root = v.as_object_mut().unwrap();
+    if let Some(plan) = root.get_mut("family_plan").and_then(Value::as_object_mut) {
+        for key in V3_FAMILY_GROUPS {
+            plan.remove(key);
+        }
+        if plan.is_empty() {
+            root.remove("family_plan");
+        }
+    }
+    serde_json::to_string(&v).unwrap()
+}
+
+#[test]
+fn the_v3_samples_differ_from_their_older_selves_only_by_v3_answers() {
+    for name in V3_SAMPLES {
+        let raw = std::fs::read_to_string(repo_path(&format!("fixtures/households/{name}.json")))
+            .unwrap();
+        let input = PlanInput::from_json(&raw).unwrap();
+        assert!(
+            input.people.iter().any(|p| p.profile.is_some()),
+            "{name} has no profile"
+        );
+        let plan = input.family_plan.as_ref().expect("a family plan");
+        assert!(plan.home.is_some(), "{name} has no home");
+        let older = PlanInput::from_json(&without_v3_answers(&raw)).unwrap();
+        let mut stripped = input.clone();
+        for p in &mut stripped.people {
+            p.profile = None;
+        }
+        if let Some(plan) = stripped.family_plan.as_mut() {
+            plan.home = None;
+            plan.neighbourhood = None;
+            plan.pets.clear();
+            plan.vehicles.clear();
+            plan.documents = None;
+        }
+        stripped.tidy();
+        assert_eq!(stripped, older, "{name}");
+    }
+}
+
 /// Every v1 household in the repository: the seven v0.1 fixtures, the v0.1.1 one, and rr-plan's
 /// backtest households.
 fn v1_inputs() -> Vec<(String, String)> {
@@ -55,6 +113,12 @@ fn v1_inputs() -> Vec<(String, String)> {
         .map(|p| {
             let text =
                 std::fs::read_to_string(&p).unwrap_or_else(|e| panic!("{}: {e}", p.display()));
+            let stem = p.file_stem().unwrap().to_string_lossy();
+            let text = if V3_SAMPLES.contains(&stem.as_ref()) {
+                without_v3_answers(&text)
+            } else {
+                text
+            };
             (p.display().to_string(), text)
         })
         .collect()
@@ -171,6 +235,56 @@ fn every_v1_household_parses_unchanged_and_defaults_every_v2_field() {
     }
 }
 
+/// The six households written against contract v2 (v0.2.0).
+const V2_FIXTURES: [&str; 6] = [
+    "detroit-snap-3",
+    "galveston-highrise-1",
+    "minot-missile-field-3",
+    "missoula-smoke-2",
+    "sacramento-leveed-2",
+    "san-juan-2",
+];
+
+#[test]
+fn every_v2_household_parses_unchanged_and_gains_no_v3_field() {
+    for name in V2_FIXTURES {
+        let raw = std::fs::read_to_string(repo_path(&format!("fixtures/households/{name}.json")))
+            .unwrap();
+        // Minot carries v3 sample answers since v0.3.0; without them it is the v2 file.
+        let raw = if V3_SAMPLES.contains(&name) {
+            without_v3_answers(&raw)
+        } else {
+            raw
+        };
+        // As keys (`"vehicles":` is also the v1 `mobility` field, checked below on the plan).
+        for key in ["profile", "home", "neighbourhood", "documents", "address"] {
+            assert!(
+                !raw.contains(&format!("\"{key}\":")),
+                "{name} already has {key}"
+            );
+        }
+        let input =
+            PlanInput::from_json(&raw).unwrap_or_else(|e| panic!("{name} does not parse: {e}"));
+        assert!(input.people.iter().all(|p| p.profile.is_none()), "{name}");
+        if let Some(plan) = &input.family_plan {
+            assert!(
+                plan.home.is_none() && plan.neighbourhood.is_none(),
+                "{name}"
+            );
+            assert!(plan.pets.is_empty() && plan.vehicles.is_empty(), "{name}");
+            assert!(plan.documents.is_none(), "{name}");
+        }
+        // Read and written again, nothing is invented: the JSON holds no v3 key.
+        let again = serde_json::to_string(&input).unwrap();
+        for key in ["profile", "home", "neighbourhood", "documents", "address"] {
+            assert!(
+                !again.contains(&format!("\"{key}\":")),
+                "{name} gained {key}"
+            );
+        }
+    }
+}
+
 /// The golden outputs (`fixtures/golden/*.json`), by fixture name.
 fn goldens() -> Vec<(String, String)> {
     json_files(&repo_path("fixtures/golden"))
@@ -180,6 +294,12 @@ fn goldens() -> Vec<(String, String)> {
             (name, std::fs::read_to_string(&p).unwrap())
         })
         .collect()
+}
+
+/// The contract a golden output was written under (`api_version`).
+fn api_version(raw: &str) -> u64 {
+    let v: Value = serde_json::from_str(raw).unwrap();
+    v["api_version"].as_u64().expect("an api_version")
 }
 
 #[test]
@@ -193,6 +313,15 @@ fn every_golden_output_round_trips_byte_for_byte() {
         );
     }
     for (name, raw) in &goldens {
+        if api_version(raw) < u64::from(ENGINE_API_VERSION) {
+            // Written under an older contract: contract v3 removed its `packet_markdown` (the
+            // binder and the Prepare sheet replace it), so it no longer parses. rr-plan's golden
+            // test fails until the planner regenerates it.
+            let v: Value = serde_json::from_str(raw).unwrap();
+            assert!(v.get("packet_markdown").is_some(), "{name}");
+            assert!(serde_json::from_str::<PlanOutput>(raw).is_err(), "{name}");
+            continue;
+        }
         let out: PlanOutput = serde_json::from_str(raw)
             .unwrap_or_else(|e| panic!("golden {name} does not parse: {e}"));
         // The bytes rr-plan writes (`rr_plan::to_json`): pretty JSON and a newline.
@@ -201,24 +330,38 @@ fn every_golden_output_round_trips_byte_for_byte() {
             again == *raw,
             "golden {name} changes when read and written again"
         );
-        if out.api_version == 1 {
-            // A v1 output holds none of the v2 fields, so it reads back with them empty.
-            assert!(out.location.exposure.is_empty(), "{name}");
-            assert!(out.recovery.is_empty(), "{name}");
-            assert!(out.buckets.iter().all(|b| b.stress_test.is_none()));
-            assert!(out.register.iter().all(|h| h.family.is_none()
-                && h.sub_causes.is_empty()
-                && h.location_factor.is_none()
-                && !h.range_only
-                && h.anchor_sentence.is_none()
-                && h.if_it_reaches_you.is_none()
-                && h.what_it_changes.is_none()));
-            let p = &out.plan;
-            assert!(p.first_milestone.is_none() && !p.minimum_kit && p.long_horizon.is_empty());
-            let items = p.months.iter().flat_map(|m| &m.items);
-            assert!(items.clone().all(|i| i.requires.is_empty() && !i.decision));
-        }
+        assert_eq!(out.binder.check(), Vec::<String>::new(), "golden {name}");
     }
+}
+
+/// Every hazard id a plan output mentions: the register, the bucket contributions and the plan's
+/// items. Read from the JSON, so it works on an output of any contract.
+fn hazards_named_in(out: &Value) -> Vec<HazardId> {
+    let id = |v: &Value| -> HazardId { v.as_str().unwrap().parse().unwrap() };
+    let mut ids: Vec<HazardId> = out["register"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|h| id(&h["id"]))
+        .collect();
+    for b in out["buckets"].as_array().unwrap() {
+        ids.extend(
+            b["contributions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|c| id(&c["hazard"])),
+        );
+    }
+    let months = out["plan"]["months"].as_array().unwrap();
+    let items = months
+        .iter()
+        .flat_map(|m| m["items"].as_array().unwrap())
+        .chain(out["plan"]["long_horizon"].as_array().into_iter().flatten());
+    for item in items {
+        ids.extend(item["hazards"].as_array().unwrap().iter().map(id));
+    }
+    ids
 }
 
 /// Every hazard id a plan output mentions: the register, the bucket contributions and the plan's
@@ -247,21 +390,21 @@ fn hazards_named(out: &PlanOutput) -> Vec<HazardId> {
 #[test]
 fn no_v2_output_names_a_retired_hazard() {
     for (name, raw) in goldens() {
-        let out: PlanOutput = serde_json::from_str(&raw).unwrap();
-        if out.api_version < 2 {
+        let out: Value = serde_json::from_str(&raw).unwrap();
+        if api_version(&raw) < 2 {
             continue;
         }
-        let retired: Vec<HazardId> = hazards_named(&out)
+        let retired: Vec<HazardId> = hazards_named_in(&out)
             .into_iter()
             .filter(|h| h.is_retired())
             .collect();
         assert!(retired.is_empty(), "golden {name} names {retired:?}");
-        for h in &out.register {
+        for h in out["register"].as_array().unwrap() {
+            let id: HazardId = h["id"].as_str().unwrap().parse().unwrap();
             assert!(
-                h.family.as_deref() == h.id.family(),
-                "golden {name}: {} carries family {:?}",
-                h.id,
-                h.family
+                h["family"].as_str() == id.family(),
+                "golden {name}: {id} carries family {:?}",
+                h["family"]
             );
         }
     }

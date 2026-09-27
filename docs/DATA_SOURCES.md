@@ -10,7 +10,8 @@ Contents: 1 building and loading · 2 the packs · 3 Connecticut · 4 ZIP codes 
 event definition · 6 NRI terms and disclaimer · 7 attributions · 8 privacy · 9 optional lookups ·
 10 limitations and data-quality findings · 11 sources not used · 12 refresh · 13 data pack v2:
 exposure columns (strategic sites, UASI, geomagnetic, smoke, karst and landslide, levees, dams,
-water systems, storm surge, eviction, dust storms, optional packs).
+water systems, storm surge, eviction, dust storms, ZIP centroids, hospitals, the pack bundled into
+core in v0.3.0).
 
 ## 1. Building and loading
 
@@ -21,21 +22,23 @@ cargo run -p rr-etl -- manifest --rehash --data data
 cargo run -p rr-etl -- jobs
 ```
 
-- **Jobs** (run order): `geography`, `nri`, `outages`, `events`, `seismic`, `climate`, `flood`,
-  `strategic`, `geomag`, `ground`, `levees`, `water_systems`, `smoke`, `facilities`,
-  `surge_proxy`, `eviction`, `surge` (optional), `wildfire_places` (optional), `vulnerability`,
-  `base_rates`, `series`, `outage_model`, `climate_daily`, `reliability`, `displacement`. Later
-  jobs read the county list and the Connecticut crosswalk written by `geography`; `facilities`
-  reads `core/strategic_sites.toml` (written by `strategic`) and `surge_proxy` reads the NRI and
-  events packs.
-- **Optional jobs** (`default: false`) build optional packs under `data/opt/<pack>/` and are left
-  out of a plain `refresh` (and so of the quarterly Action): name them with `--only`, or add
-  `--optional` to a full run. `surge` downloads 0.25 GB of NHC map archives, one at a time, and
-  takes about three minutes; `wildfire_places` builds a pack the core does not need (§13).
-  `outage_model` is a default job: it writes core files and the optional pack `outage_events`.
+- **Jobs** (run order): `geography` (also writes `core/zip_centroids.csv`), `nri`, `outages`,
+  `events`, `seismic`, `climate`, `flood`, `strategic`, `geomag`, `ground`, `levees`,
+  `water_systems`, `smoke`, `facilities`, `surge_proxy`, `eviction`, `hospitals`, `surge`
+  (`default: false`), `wildfire_places` (`default: false`), `vulnerability`, `base_rates`,
+  `series`, `outage_model`, `climate_daily`, `reliability`, `displacement`. Later jobs read the
+  county list and the Connecticut crosswalk written by `geography`; `facilities` reads
+  `core/zip_centroids.csv` and `core/strategic_sites.toml` (written by `strategic`); `surge_proxy`
+  reads the NRI and events packs; `hospitals` reads `core/zip_county.csv`.
+- **`surge` and `wildfire_places`** (`default: false`) are left out of a plain `refresh` (and so of
+  the quarterly Action) because their sources are large and change only every few years, not
+  because their output is optional any more: since 2026-09-27 (§13.12) their files are core files,
+  named with `--only` to rebuild on demand. `surge` downloads 0.25 GB of NHC map archives, one at a
+  time, and takes about three minutes. `outage_model` is a default job; its per-event tables are
+  core files too (§13.12).
 - **Owner sign-offs.** `manifest.json` has a `sign_offs` section that refreshes keep as they are.
-  A job gated on a key writes its output only when `approved` is true (today: `eviction`, key
-  `eviction_lab_odc_by`, §13.10). Only a person flips it.
+  A job gated on a key writes its output only when `approved` is true (`eviction`, key
+  `eviction_lab_odc_by`: approved by the owner 2026-09-27, §13.10). Only a person flips it.
 - **Intermediate files.** `outages` hands every repaired outage event, each unit's months of data
   and the outage customer-hours per local day to `outage_model` and `climate_daily`; `events` hands
   the 2014+ Storm Events county-episodes (UTC) and the HURDAT2 fixes with their times to
@@ -68,7 +71,8 @@ cargo run -p rr-etl -- jobs
   `packs.core.files` (same origin), and passes the bytes to `load_pack(path, bytes)` with the
   path exactly as the manifest lists it (for example `core/nri_hazards.csv`). The engine checks
   each file against its sha256 and answers `pack_corrupt` on a mismatch. `geo/counties.json` is
-  only needed for the map. Note for the planner: `docs/ENGINE-API.md` describes `load_pack(name,
+  only needed for the map, and `places/hospitals.csv` only for the binder's Neighbourhood page
+  (§13.12); both are separate packs the app fetches on demand. Note for the planner: `docs/ENGINE-API.md` describes `load_pack(name,
   bytes)` with a pack name like `core`; the core pack is several files, so the name is the file's
   manifest path. A single-file bundle can be added later without changing the files.
 
@@ -413,14 +417,16 @@ figures not re-checked) and `[[row]]` entries holding the table behind the rates
 | `ihp_displacement.toml` | 22 | 1.8 KB | Federal Emergency Management Agency (OpenFEMA) (OpenFEMA Terms and Conditions (public data; citation and statement required)) | fetched | `ihp_rental_assistance_per_approved_usd_earthquake`, `ihp_rental_assistance_per_approved_usd_fire`, `ihp_rental_assistance_per_approved_usd_flood`, `ihp_rental_assistance_per_approved_usd_hurricane`, `ihp_rental_assistance_per_approved_usd_landslide`, `ihp_rental_assistance_per_approved_usd_other` and 3 more |
 | `oe417.toml` | 288 | 2.7 KB | Pacific Northwest National Laboratory (from DOE OE-417 reports and ORNL EAGLE-I) (CC BY 4.0) | fetched | `grid_weather_reports_per_year`, `grid_operations_reports_per_year`, `grid_physical_attack_reports_per_year`, `grid_suspicious_activity_reports_per_year`, `grid_cyber_reports_per_year`, `grid_fuel_supply_reports_per_year` |
 
-**Optional pack `outage_events`** (issue #15; `opt/outage_events/`, loaded only by the expert views
-and the validation page): `county_events.csv` — every county event that left at least 0.25% of the
+**`core/outage_events.csv` and `core/outage_holdout.csv`** (core files since 2026-09-27, §13.12;
+formerly the optional pack `outage_events`, issue #15; read only by the expert views and the
+validation page): `outage_events.csv` — every county event that left at least 0.25% of the
 county's customers (and at least 5) out for a day or more: `county_fips`, `start` (UTC), `class`,
 `cause` (storm id or Storm Events type), `peak_share`, `s_1d` … `s_30d`, `ge_1d_share` and
 `ge_7d_share` (customer outages of a day / a week or more, per county customer); Puerto Rico's
 island-wide series is filed once under San Juan (72127) and `rr-data` serves it for every municipio.
-`holdout.csv` — the held-out test of §5.4 (split, length, estimator, measure, reliability bin,
-predicted, observed, n). Sizes: `county_events.csv` 29,878 rows, 356 KB gzipped; `holdout.csv` 130 rows, 1.6 KB gzipped.
+`outage_holdout.csv` — the held-out test of §5.4 (split, length, estimator, measure, reliability
+bin, predicted, observed, n). Sizes: `outage_events.csv` 29,878 rows, 356 KB gzipped;
+`outage_holdout.csv` 130 rows, 1.6 KB gzipped.
 
 ### geo/counties.json (3,222 features)
 
@@ -643,7 +649,7 @@ customer outages agree within about 10% at one to seven days. The 2014–2019 fi
 2020–2025 at every length and for every estimator, by 1.5–1.6 times at one day and 1.9–5.4 times at
 three days and longer: EAGLE-I covered fewer utilities before 2018, and 2020–2025 held the derecho,
 Uri, Ida, Ian, Helene and Beryl.
-The reliability rows in `opt/outage_events/holdout.csv` (predicted yearly chance of a qualifying
+The reliability rows in `core/outage_holdout.csv` (predicted yearly chance of a qualifying
 event against the share of county-years that had one) show the same (even → odd years; bins with
 at least 500 county-years):
 
@@ -721,12 +727,15 @@ EAGLE-I (CC BY 4.0 credit), NCA5 Atlas and LOCA2 (CC BY 4.0 credit), NCA5 Atlas 
 CMRA, USGS National Seismic Hazard Model, CDC/ATSDR SVI 2022 (requested citation), and EPA TRI /
 USACE NID / FEMA nuclear sites. Data pack v2 adds: Strategic sites (the compilation and its
 sources), IGRF-14 and NERC TPL-007, NOAA HMS and EPA AQS, USGS karst and landslide maps, USACE
-National Levee Database, EPA ECHO SDWA, the storm-surge proxy, and for the optional packs NOAA
-NHC storm surge maps (with Zachry et al. 2015) and USDA Forest Service Wildfire Risk to
-Communities (requested citation). An optional pack's credit line is shown only once one of that
-pack's files is loaded (the manifest's `attribution_packs` names the pack for each such source),
-so a packet never credits data it did not read. The Eviction Lab credit line (ODC-BY 1.0) joins
-them only once the owner approves the source (§13.10).
+National Levee Database, EPA ECHO SDWA, the storm-surge proxy, NOAA NHC storm surge maps (with
+Zachry et al. 2015), USDA Forest Service Wildfire Risk to Communities (requested citation) and,
+since 2026-09-27, the Eviction Lab credit line (ODC-BY 1.0, approved by the owner, §13.10). The
+surge and wildfire credit lines used to show only once a household loaded that optional pack
+(the manifest's `attribution_packs` names the pack for each such gated source); bundling them
+into core (§13.12) makes both unconditional, the same as every other core-pack source, so a
+packet still never credits data outside the pack it shipped with, just a pack that is now always
+the core one. `attribution_packs` is empty in the shipped v0.3.0 manifest — nothing left is gated
+this way — but the mechanism stays for a future optional pack.
 
 The v2 calibration files (§2, "Data-pack v2 calibration files") add: the PNNL Event-correlated
 Outage Dataset (**CC BY 4.0: the credit line must be shown**, like EAGLE-I's), NOAA
@@ -898,7 +907,7 @@ Added 2026-09-26 for the v0.2.0 hazards (DESIGN-DELTA §2; research: `data-audit
 `strategic-sites.md`). Each column is loaded into `CountyRecord.exposure` (a
 `rr_types::CountyExposure`) or `rr_types::ZipRecord` (`DataStore::zip_record`), and
 `DataStore::location` copies the values the app shows into `LocationResolved.exposure`, each with
-a citation id (`rr_data::EXPOSURE_SOURCES`, §13.13). Sizes are gzip -9 of the file (or of the
+a citation id (`rr_data::EXPOSURE_SOURCES`, §13.16). Sizes are gzip -9 of the file (or of the
 columns added to an existing file).
 
 | File (job) | Columns | Rows | Size (gz) |
@@ -915,7 +924,20 @@ columns added to an existing file).
 | `core/zip_facilities.csv` (`facilities`) | + `dams_high_within_10km_naming_town`, `strategic_km`, `strategic_bearing`, `strategic_site` | 33,791 | +43.6 KB |
 | `core/events.csv` (`events`) | + `dust_storm` rows | 340 | +3.4 KB |
 | **core total added** | | | **180 KB** (2.37 → 2.55 MB) |
-| `core/eviction.csv` (`eviction`, gated) | `eviction_filing_rate` | 3,144 | 13.6 KB, not shipped until approved |
+| `core/eviction.csv` (`eviction`) | `eviction_filing_rate` | 3,144 | 13.6 KB |
+
+**v0.3.0 additions (2026-09-27, DESIGN-DELTA-v3 §8):**
+
+| File (job) | Columns | Rows | Size (gz) |
+| --- | --- | ---: | ---: |
+| `core/zip_centroids.csv` (`geography`) | `zip`, `lat`, `lon` | 33,791 | 251.5 KB |
+| `core/zip_surge.csv` (`surge`) | `surge_cat1_share`, `surge_cat3_share` (bundled from the optional `surge` pack) | 26,459 | 80.9 KB |
+| `core/wildfire_places.csv` (`wildfire_places`) | `place`, `name`, `buildings_direct`, `buildings_indirect`, `risk_national_rank` (bundled from the optional `wildfire_places` pack) | 32,038 | 463.5 KB |
+| `core/zip_wildfire_places.csv` (`wildfire_places`) | `zip`, `place`, `zip_land_share` (bundled from the optional `wildfire_places` pack) | 35,568 | 223.2 KB |
+| `core/outage_events.csv` (`outage_model`) | per-event outage table (bundled from the optional `outage_events` pack) | 29,878 | 356.0 KB |
+| `core/outage_holdout.csv` (`outage_model`) | held-out test rows (bundled from the optional `outage_events` pack) | 130 | 1.6 KB |
+| **core total added (v0.3.0)** | | | **1.39 MB** (core: 2.86 → 4.25 MB gzipped) |
+| `places/hospitals.csv` (`hospitals`; own pack `places`, not core) | `fips`, `ccn`, `name`, `city`, `state`, `zip`, `phone`, `emergency_services`, `type` | 4,483 | 122.4 KB |
 
 Approximate cost of each column on its own (gzip -9 of the key plus that column, minus the key
 alone; a file compresses a little better than the sum of its columns):
@@ -1105,7 +1127,7 @@ least one (Oroville's ZIPs are checked on every run). The named town is chosen b
 states; it is not an inundation boundary (inundation maps are restricted), and hazard potential
 rates the consequence of a failure, not its chance.
 
-### 13.8 Storm-surge proxy (`surge_proxy`) and the optional surge pack (`surge`)
+### 13.8 Storm-surge proxy (`surge_proxy`) and the ZIP surge shares (`surge`)
 
 The core pack's county **proxy** (the brief's decision; data audit §5): `coastal_flood_pop_share`
 = people in NRI v1.20 coastal-flood exposure areas / population, and `surge_proxy_class`:
@@ -1121,7 +1143,8 @@ out). Result: high 137 counties (9.0% of people), moderate 182 (13.3%), low 86 (
 out of a zone, and NRI's coastal-flood areas are smaller than NHC's Category 3 extent. No
 elevation is used (§11).
 
-The **optional pack** `surge` (job `surge`, `default: false`): NOAA/NHC National Storm Surge Risk
+**`core/zip_surge.csv`** (job `surge`, `default: false`; a core file since 2026-09-27, §13.12, but
+still built by hand — its sources are large and change only every few years): NOAA/NHC National Storm Surge Risk
 Maps (SLOSH Maximum of Maximums at high tide): Texas to Maine **version 2** (2016, 30 m cells),
 Southern California v3 (mapped for Categories 1 and 2 only, so Category 2 stands in for 3 there),
 Hawaii, Puerto Rico, the US Virgin Islands, Guam v3 and American Samoa v3. Version 4 for Texas to
@@ -1136,9 +1159,10 @@ the ZIP's **land** area (Census 2024 Gazetteer), capped at 1: ZIP outlines inclu
 which the maps leave blank, so a share of all lattice points understated coastal ZIPs by half
 (Miami Beach read 0.40 that way). Guam's map lies east of the antimeridian; its world file is
 moved to the outlines' west-longitude convention so Guam's ZIPs meet it.
-`opt/surge/zip_surge.csv`: `zip`, `surge_cat1_share`, `surge_cat3_share` (the Category 3 area
+`core/zip_surge.csv`: `zip`, `surge_cat1_share`, `surge_cat3_share` (the Category 3 area
 contains the Category 1 and 2 areas): 26,459 ZIPs whose outline meets a map, 3,252 with some
-Category 3 area; 80.9 KB gzipped. ZIPs meeting no raster have no row: outside the mapped area,
+Category 3 area; 80.9 KB gzipped, loaded lazily with the other ZIP tables (`ZIP_FILES`), not at
+start. ZIPs meeting no raster have no row: outside the mapped area,
 not "no risk"; a row of zeros means the ZIP lies inside a map's rectangular extent (Texas to
 Maine reaches far inland) and none of its land is in a surge area.
 Examples (Category 3 / Category 1): Battery Park City 10280 0.99 / 0.40, Charleston 29401
@@ -1159,18 +1183,19 @@ The Storm Events job now also counts `Dust Storm` (zone-based; `Dust Devil` is a
 and not counted) as `dust_storm` rows in `events.csv`, by the same rules as the other Storm Events
 types: 340 counties in 1996-2025 (Pinal AZ 4.0 a year, Maricopa 2.3, Riverside CA 1.4).
 
-### 13.10 Eviction filings (`eviction`, gated)
+### 13.10 Eviction filings (`eviction`)
 
 Princeton University Eviction Lab, *Estimating Eviction Prevalence across the United States*,
 county estimates 2000-2018 (deposited May 13, 2022). Licence: "This data is shared under the
 terms of the Open Data Commons Attribution License (ODC-BY 1.0)" (data-downloads.evictionlab.org).
-ODC-BY allows redistribution with attribution, but CLAUDE.md rule 5 asks for the owner's approval
-first, so the job writes `core/eviction.csv` **only when** `manifest.json` has
-`sign_offs.eviction_lab_odc_by.approved = true` (present, false, today). Until then it downloads
-nothing and records why. To ship it: set `approved` to true and `by` to who approved and when,
-then run `cargo run -p rr-etl -- refresh --out data --only eviction`. The credit line (also stored
-in the manifest as `jobs.eviction.definitions.attribution_if_approved`), from the Lab's own "How
-to cite":
+ODC-BY allows redistribution with attribution, so CLAUDE.md rule 5 asked for the owner's approval
+first: the job writes `core/eviction.csv` **only when** `manifest.json` has
+`sign_offs.eviction_lab_odc_by.approved = true`, which the owner set 2026-09-27 (DESIGN-DELTA-v3
+§0), so the column now ships. Before that the job downloaded nothing and recorded why; a manifest
+with `approved = false` still builds a pack, just without this column, so a fork that has not
+sought its own approval is unaffected. The credit line (also stored in the manifest as
+`jobs.eviction.definitions.attribution_if_approved`, and unconditionally in `attributions` now
+that it ships) is the Lab's own "How to cite":
 
 > Eviction filing rates derived by Ready Reckoner from: Ashley Gromis, Ian Fellows, James R.
 > Hendrickson, Lavar Edmonds, Lillian Leung, Adam Porton, and Matthew Desmond. Estimating Eviction
@@ -1180,10 +1205,16 @@ to cite":
 > (ODC-BY 1.0).
 
 `eviction_filing_rate` = mean over 2014-2018 of the Lab's `filings_estimate / renting_hh`
-(Connecticut converted by land share). Tested in a scratch copy: 3,144 counties, 13.6 KB gzipped;
-county mean 0.048; Baltimore County, MD 1.37 (filings can exceed one per renter household where
+(Connecticut converted by land share). Shipped: 3,144 counties, 13.6 KB gzipped; county mean
+0.0478; Baltimore County, MD 1.37, the highest (filings can exceed one per renter household where
 landlords file again and again). Most county-years are model estimates; filings are not completed
-evictions; the data end in 2018.
+evictions; the data end in 2018. The 88 counties without a figure (mostly small or independent
+cities the Lab's file does not cover) keep `rr-hazards`' national fallback prior, about 2.3 per
+100 renter households a year (`rr-hazards`' `personal.rs::eviction`); `why.rs`'s "why we think this"
+text for the Eviction hazard says both paths plainly. This moves `HazardId::Eviction`'s rate (and
+so the packet's eviction line and its share of the "loss of the home" bucket) for every renting
+fixture household whose real county has a figure; see the `agent/data3` report for exactly which
+fixtures moved and by how much (golden regeneration is the planner's step).
 
 ### 13.11 What is not done
 
@@ -1191,36 +1222,55 @@ No boil-water notice column (no bulk source); no NERC beta; no elevation in the 
 population-weighted surge shares (block data would be 3-4 GB); UASI footprints unverified; the
 2026 revised NSHM grids and tract-level wildfire exposure are as before (§10, §11).
 
-### 13.12 Optional packs (issue #15)
+### 13.12 Bundled into core in v0.3.0 (formerly optional packs, issue #15)
 
-Files under `data/opt/<pack>/` belong to the pack `<pack>` in the manifest (`pack_of`); the web app
-loads only `packs.core`, so optional packs cost nothing until a feature asks for them, and the core
-budget counts `core/` only. `rr-data` accepts them (`DataStore::zip_record` merges `surge` and
-`wildfire_places` into the ZIP record when loaded; `outage_events` answers
-`DataStore::county_outage_events` and `DataStore::outage_holdout`).
+DESIGN-DELTA-v3 §8 (2026-09-27, owner decision): `surge`, `wildfire_places` and `outage_events`
+moved from their own manifest packs under `data/opt/<pack>/` into `packs.core.files`, so the CLI's
+core-only default now includes them and their credit lines show unconditionally. Nothing about
+the columns, the ETL jobs that write them or the way `rr-data` parses them changed — only the
+file's path (which pack it belongs to, `pack_of`) and, for `zip_surge.csv`, whether the loader
+fetches it with the rest of core or lazily with the ZIP tables. Moved with `rr-etl manifest
+--rehash` (a manifest and path edit, not a rebuild: every file's bytes and checksum are unchanged
+from the optional-pack versions below).
 
-| Pack | File | Rows | Size (gz) |
-| --- | --- | ---: | ---: |
-| `surge` | `opt/surge/zip_surge.csv` | 26,459 | 80.9 KB |
-| `wildfire_places` | `opt/wildfire_places/places.csv` | 32,038 | 463.5 KB |
-| `wildfire_places` | `opt/wildfire_places/zip_places.csv` | 35,568 | 223.2 KB |
-| `outage_events` | `opt/outage_events/county_events.csv` | 29,878 | 356.0 KB |
-| `outage_events` | `opt/outage_events/holdout.csv` | 130 | 1.6 KB |
+| Was (optional pack) | Now (core file) | Rows | Size (gz) | Loaded |
+| --- | --- | ---: | ---: | --- |
+| `opt/surge/zip_surge.csv` | `core/zip_surge.csv` | 26,459 | 80.9 KB | lazily, with the ZIP tables (§13.8) |
+| `opt/wildfire_places/places.csv` | `core/wildfire_places.csv` | 32,038 | 463.5 KB | eagerly, with the rest of core |
+| `opt/wildfire_places/zip_places.csv` | `core/zip_wildfire_places.csv` | 35,568 | 223.2 KB | eagerly, with the rest of core |
+| `opt/outage_events/county_events.csv` | `core/outage_events.csv` | 29,878 | 356.0 KB | eagerly, with the rest of core |
+| `opt/outage_events/holdout.csv` | `core/outage_holdout.csv` | 130 | 1.6 KB | eagerly, with the rest of core |
 
-An optional pack's credit line (NOAA NHC storm surge maps; USDA Forest Service Wildfire Risk to
-Communities) is listed by `DataStore::attributions()` only once a file of that pack is loaded
-(§7). Note that `rr plan` in the CLI loads every file the manifest lists, optional packs
-included, while the web app and the goldens (`rr_plan::source::load_data_dir`) load the core
-pack only.
+`rr-data`'s readers are unchanged: `DataStore::zip_record` still merges the surge and wildfire
+columns into the ZIP record; `DataStore::county_outage_events` and `DataStore::outage_holdout`
+still answer only the expert views and the validation page (loading the file eagerly does not
+make the plan pipeline read it). The credit lines (NOAA NHC storm surge maps; USDA Forest Service
+Wildfire Risk to Communities) move from `attribution_packs` (gated on a pack being loaded) into
+`attributions` unconditionally — the same rule that already ungates a source once every file of
+its job sits in `core` (`rr-etl`'s `record()`; tested in `crates/rr-etl/src/jobs/mod.rs`).
 
-- `surge`: `opt/surge/zip_surge.csv` (§13.8).
-- `wildfire_places` (job `wildfire_places`, `default: false`): USDA Forest Service *Wildfire Risk to
-  Communities* (2nd edition, tabular download of 2026-04-15; "can be used without additional
+Two consequences worth knowing: the core pack grows from 2.86 to 4.25 MB gzipped file by file,
+against the 5 MB budget (still checked by `rr-etl verify`; headroom is now about 0.75 MB); and the
+goldens (`rr_plan::source::load_data_dir`, which loads `packs.core` only) now see `zip_surge.csv`
+for the first time, so a fixture household whose ZIP has a real Category 3 share can pick up the
+guardrail warning `Warning::SURGE_ZONE_STAY_HOME` from the ZIP figure instead of the county's
+`surge_proxy_class` fallback (`rr-budget`'s `is_surge_zone`); the warning's wording is the same
+either way, so this only matters if the more precise ZIP number crosses the guardrail's threshold
+where the county class did not, or the reverse.
+
+`surge` and `wildfire_places` stay `default: false` (large, slow-changing sources; §1) — bundling
+is about which pack a file's *output* belongs to, not whether the job runs in the quarterly
+refresh. `outage_model` was already `default: true`, so its bundled files need no scheduling
+change.
+
+- `surge`: `core/zip_surge.csv` (§13.8).
+- `wildfire_places` (job `wildfire_places`, `default: false`): USDA Forest Service *Wildfire Risk
+  to Communities* (2nd edition, tabular download of 2026-04-15; "can be used without additional
   permissions or fees", citation requested: "USDA Forest Service. 2026. Wildfire Risk to
-  Communities. https://wildfirerisk.org"). `opt/wildfire_places/places.csv`: `place` (GEOID),
+  Communities. https://wildfirerisk.org"). `core/wildfire_places.csv`: `place` (GEOID),
   `name`, `buildings_direct` / `buildings_indirect` (share of buildings directly / indirectly
   exposed), `risk_national_rank` (places marked insufficient data keep only their name);
-  `opt/wildfire_places/zip_places.csv`: `zip`, `place`, `zip_land_share` (Census 2020 ZCTA-to-place,
+  `core/zip_wildfire_places.csv`: `zip`, `place`, `zip_land_share` (Census 2020 ZCTA-to-place,
   parts under 1% dropped). ZIP land outside every place has no place value. Checked on every build:
   Paradise, CA mostly directly exposed; New York City about 0.
 - `outage_events` (written by the default job `outage_model` alongside its core files, so it is
@@ -1229,7 +1279,55 @@ pack only.
   no credit line of its own: it is built from EAGLE-I outage records matched to NOAA storm records
   and the PNNL OE-417 linkage, all credited with the core pack (§7).
 
-### 13.13 Citation ids for the exposure values
+### 13.14 ZIP centroids (`geography`)
+
+`core/zip_centroids.csv`: `zip`, `lat`, `lon`, each ZIP (ZCTA)'s internal point from the Census
+2024 Gazetteer, rounded to 3 decimals (about 110 m) — the same file the `facilities` job has
+always read for its own distances (`geography::zcta_points` until this restore; now
+`facilities` reads this pack file back instead of fetching the Gazetteer a second time). 33,791
+rows, 251.5 KB gzipped, loaded lazily with the other ZIP tables. It shipped in v0.2.0, was removed
+2026-09-26 (`3c6e25e`) because nothing read it, and is restored for v0.3.0's pin map, which starts
+centred on the household's ZIP (`LocationResolved.zip_centroid`, §3.3, §9.4 of DESIGN-DELTA-v3;
+the field itself is the types3 workstream's — `rr_data::DataStore::zip_centroid(zip) ->
+Option<LatLon>` is ready and `crates/rr-data/src/location.rs` has an `awaiting: types3` comment
+at the exact line to set it once the field lands on `v0.3`).
+
+### 13.15 Hospitals with emergency services (`hospitals`)
+
+`places/hospitals.csv`: CMS's *Hospital General Information* dataset (data.cms.gov Provider Data
+Catalog, dataset `xubh-q36u`, public domain), filtered to the `Emergency Services = Yes` rows:
+`fips`, `ccn`, `name`, `city`, `state`, `zip`, `phone`, `emergency_services` (always `true` in this
+pack), `type`. `ccn` (CMS's Medicare provider number) is not in DESIGN-DELTA-v3's column list but
+is added because it is the row's only guaranteed-unique field: seven hospitals nationwide have a
+second CMS record under the same name, city and county (most often a re-designation to Critical
+Access Hospital status under a new CCN), so `(fips, name)` collides and the pack's duplicate-key
+check would fail without it. 4,483 rows, 122.4 KB gzipped.
+
+The job resolves each row's county from the dataset's own `State` and `County/Parish` columns
+(matched against the canonical list, a light suffix strip handling "County"/"Parish"/"Borough"/
+"Census Area"/"Municipio"/"Municipality"/"City and Borough"); a name that still does not match —
+Connecticut's old counties, a few typos ("NORTH SLOPE BOROUH", "NORTHWEST ARTIC BOROUGH"), Valdez-
+Cordova (split into two Alaska boroughs in 2019), DC's "The District" — falls back to the
+hospital's ZIP code through `zip_county.csv`'s largest-share county. Of 4,495 rows with emergency
+services, 4,322 matched by name directly, 4 after the suffix strip, 157 by ZIP; 12 could not be
+placed at all (a ZIP with no ZCTA in `zip_county.csv`, mostly large teaching hospitals and VA
+medical centers on their own dedicated ZIP code: Waterbury, Stamford, Yale-New Haven, Hartford,
+Norwalk and Central Connecticut Hospitals in CT; Bella Vista and Perea in Mayagüez, PR; Starr
+Regional Medical Center Athens, TN; the Schneider Hospital, USVI; two VA facilities in Richmond
+and Staunton, VA) and are dropped, named in the manifest's `jobs.hospitals.notes`. The dataset's own `released` date (CMS's
+metastore record for the dataset id, fetched fresh each run since the download link itself is
+re-hashed on every CMS refresh) is recorded in `jobs.hospitals.definitions.released`, so the
+binder can print "hospital list current as of \<date\>".
+
+846 of 3,232 counties have no row (most rural counties genuinely have none); each is listed under
+`jobs.hospitals.missing` with the reason "No hospital with emergency services in this county", so
+`rr-etl verify`'s per-county coverage check passes without treating an empty rural county as a
+data gap. `places/hospitals.csv` is its own manifest pack, `places` (like `geo`): the web app
+fetches it only when the binder's Neighbourhood page is shown, so a first visit and a household
+that never opens that page pay nothing for it. `rr_data::DataStore::county_hospitals(fips) ->
+&[Hospital]` is the accessor the binder workstream (tier 2) reads.
+
+### 13.16 Citation ids for the exposure values
 
 `LocationResolved.exposure` carries these ids (`rr_data::EXPOSURE_SOURCES`). `usace_nld` and
 `fema_hsgp_fy2026` are in `content/citations.toml`; the others are requested from the content

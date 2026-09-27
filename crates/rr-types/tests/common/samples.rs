@@ -56,6 +56,7 @@ pub fn plan_input() -> PlanInput {
                     remote_possible: true,
                 }),
                 access_needs: vec![AccessNeed::Hearing, AccessNeed::ServiceAnimal],
+                profile: Some(person_profile()),
             },
             Person {
                 age_band: AgeBand::Child,
@@ -71,6 +72,7 @@ pub fn plan_input() -> PlanInput {
                 earner: false,
                 commute: None,
                 access_needs: vec![AccessNeed::Cognitive],
+                profile: None,
             },
         ],
         pets: Pets {
@@ -132,6 +134,55 @@ pub fn contact(name: &str, phone: &str) -> Contact {
     Contact {
         name: Some(name.into()),
         phone: Some(phone.into()),
+        address: None,
+    }
+}
+
+/// A contact with an address too (contract v3).
+pub fn contact_at(name: &str, phone: &str, address: &str) -> Contact {
+    Contact {
+        address: Some(address.into()),
+        ..contact(name, phone)
+    }
+}
+
+/// A person's profile with every field filled in, already tidy (contract v3). Sample data only:
+/// 555-01xx numbers, a made-up street.
+pub fn person_profile() -> PersonProfile {
+    PersonProfile {
+        name: Some("Ana".into()),
+        date_of_birth: Some("March 3, 1988".into()),
+        phone: Some("555-0110".into()),
+        email: Some("ana@example.org".into()),
+        place: Some(Place {
+            kind: PlaceKind::Work,
+            name: Some("Riverside Clinic".into()),
+            address: Some("100 Sample Lane, Philadelphia".into()),
+            phone: Some("555-0111".into()),
+            plan: Some("Staff stay until relieved; the clinic has a generator".into()),
+            pickup: Some("Not applicable".into()),
+            safest_spot: Some("The records room, ground floor".into()),
+        }),
+        doctor: Some(contact_at("Dr. Lee", "555-0112", "200 Sample Lane")),
+        pharmacy: Some(contact("Corner pharmacy", "555-0113")),
+        conditions: Some("Asthma".into()),
+        medications: vec![Medication {
+            name: Some("Inhaler".into()),
+            dose: Some("As prescribed".into()),
+            schedule: Some("Morning and night".into()),
+            purpose: Some("Asthma".into()),
+        }],
+        allergies: Some("Penicillin".into()),
+        blood_type: Some("O+".into()),
+        insurance: Some(HealthInsurance {
+            carrier: Some("Sample Health".into()),
+            plan_name: Some("Silver".into()),
+            member_id: Some("XJ-000-111".into()),
+            group_number: Some("G-222".into()),
+            phone: Some("555-0114".into()),
+        }),
+        id_notes: Some("Passport in the document box".into()),
+        notes: Some("Keeps a spare inhaler in the car".into()),
     }
 }
 
@@ -164,9 +215,63 @@ pub fn family_plan() -> FamilyPlan {
                 holds: vec![Holds::MedicalPoa, Holds::BackupCodes],
             },
         ],
-        lawyer: Some(contact("J. Ortiz", "555-0102")),
+        lawyer: Some(contact_at("J. Ortiz", "555-0102", "1 Court Street")),
         roadside_assistance: Some("555-0103".into()),
         numbers_by_heart: vec!["555-0100".into(), "555-0104".into()],
+        home: Some(HomeInfo {
+            address: Some("12 Sample Street, Philadelphia".into()),
+            electric_utility: Some(contact("City Electric", "555-0120")),
+            gas_utility: Some(contact("City Gas", "555-0121")),
+            water_utility: Some(contact("Water Department", "555-0122")),
+            insurer: Some(contact("Sample Mutual", "555-0123")),
+            policy_number: Some("HO-12345".into()),
+            landlord_or_mortgage: Some(contact("Pine Street Rentals", "555-0124")),
+            where_kit: Some("Hall closet".into()),
+            where_documents: Some("Fireproof box under the bed".into()),
+            where_cash: Some("Envelope in the document box".into()),
+            where_keys: Some("With Rosa".into()),
+        }),
+        neighbourhood: Some(Neighbourhood {
+            hospital: Some(contact_at("General Hospital", "555-0130", "300 Sample Avenue")),
+            urgent_care: Some(contact("Walk-in clinic", "555-0131")),
+            pharmacy: Some(contact("Corner pharmacy", "555-0113")),
+            shelter: Some(contact_at("Rec center", "555-0132", "400 Sample Avenue")),
+            county_emergency_office: Some(contact("Office of Emergency Management", "555-0133")),
+            alerts: Some("The city's text alerts; the news radio station".into()),
+        }),
+        pets: vec![PetInfo {
+            name: Some("Biscuit".into()),
+            kind: Some("Dog".into()),
+            description: Some("Brown terrier, red collar".into()),
+            medications: Some("Ear drops".into()),
+            vet: Some(contact("Sample Vet", "555-0140")),
+            microchip: Some("985-000-000".into()),
+            records_where: Some("Document box".into()),
+        }],
+        vehicles: vec![VehicleInfo {
+            description: Some("Blue 2016 hatchback".into()),
+            plate: Some("ABC-1234".into()),
+            insurer: Some(contact("Sample Auto", "555-0150")),
+            policy_number: Some("AU-555".into()),
+            kept_in_car: Some("Blanket, water, a phone charger".into()),
+        }],
+        documents: Some(DocumentsInfo {
+            accounts: vec![AccountInfo {
+                institution: Some("Sample Credit Union".into()),
+                kind: Some("Checking".into()),
+                phone: Some("555-0160".into()),
+                last4: Some("4821".into()),
+            }],
+            policies: vec![PolicyInfo {
+                insurer: Some("Sample Life".into()),
+                kind: Some("Life".into()),
+                policy_number: Some("LF-777".into()),
+                phone: Some("555-0161".into()),
+            }],
+            where_originals: Some("Fireproof box under the bed".into()),
+            where_copies: Some("With Rosa".into()),
+            digital_backup: Some("Encrypted drive in the go-bag".into()),
+        }),
     }
 }
 
@@ -183,6 +288,10 @@ pub fn location() -> LocationResolved {
             lat: 40.0094,
             lon: -75.1333,
         },
+        zip_centroid: Some(LatLon {
+            lat: 39.9364,
+            lon: -75.1525,
+        }),
         nca_region: "northeast".into(),
         coastal: false,
         tsunami_zone: false,
@@ -445,12 +554,156 @@ pub fn plan_output() -> PlanOutput {
             why: "It pays for a place to stay if a fire makes your home unlivable.".into(),
             related: vec!["home_loss".into()],
         }],
-        packet_markdown: "# Your plan\n".into(),
+        binder: binder(),
+        prepare_markdown: "# Prepare\n".into(),
         provenance: vec![citation()],
         recovery: RecoveryInfo {
             county_declarations_5yr: Some(3),
             sources: vec!["openfema_declarations".into()],
         },
+    }
+}
+
+fn t(text: &str) -> binder::Inline {
+    binder::Inline::T(text.into())
+}
+
+/// A binder that uses every block and inline variant and fills every optional field, and passes
+/// [`Binder::check`] (contract v3).
+pub fn binder() -> Binder {
+    use binder::*;
+    let home = Page {
+        id: "home".into(),
+        title: "Home".into(),
+        kind: PageKind::Home,
+        fit: Fit::One,
+        blocks: vec![
+            Block::Heading(Heading {
+                level: 2,
+                text: "Shut-offs".into(),
+            }),
+            Block::Fields(vec![
+                FieldRow {
+                    label: "Gas shut-off".into(),
+                    value: Some("Beside the meter at the back".into()),
+                    lines: 1,
+                },
+                FieldRow {
+                    label: "Water shut-off".into(),
+                    value: None,
+                    lines: 2,
+                },
+            ]),
+            Block::MapSlot(MapSlot {
+                id: "neighbourhood".into(),
+                kind: MapSlotKind::Neighbourhood,
+                caption: "Your neighbourhood".into(),
+            }),
+        ],
+    };
+    let fire = Page {
+        id: "check_house_fire".into(),
+        title: "House fire".into(),
+        kind: PageKind::Checklist,
+        fit: Fit::One,
+        blocks: vec![
+            Block::Para(vec![
+                t("Here: about 5 in 100 households like yours over ten years."),
+                Inline::Cite(vec![1]),
+            ]),
+            Block::Steps(vec![Step {
+                text: vec![
+                    Inline::B("Get out.".into()),
+                    t(" Leave by the nearest safe way."),
+                    Inline::Cite(vec![1]),
+                ],
+                memory: true,
+            }]),
+            Block::Decision(Decision {
+                question: "Leave or stay?".into(),
+                branches: vec![Branch {
+                    when: vec![t("Leave if the way out is clear.")],
+                    then: vec![
+                        t("Meet at "),
+                        Inline::Blank(24),
+                        t(". "),
+                        Inline::Link(Link {
+                            to: "home".into(),
+                            text: "Tab 3, Home".into(),
+                        }),
+                    ],
+                    go_to: Some("home".into()),
+                }],
+            }),
+            Block::Bullets(vec![vec![t("Do not go back inside.")]]),
+            Block::Numbered(vec![vec![t("Call 911 from outside.")]]),
+            Block::Callout(Callout {
+                kind: CalloutKind::Stop,
+                title: Some("Never".into()),
+                blocks: vec![Block::Para(vec![t("Do not hide from firefighters.")])],
+            }),
+            Block::page_break(),
+        ],
+    };
+    let cards = Page {
+        id: "wallet_cards".into(),
+        title: "Wallet cards".into(),
+        kind: PageKind::WalletCards,
+        fit: Fit::Flow,
+        blocks: vec![
+            Block::Cards(vec![Card {
+                title: "Ana".into(),
+                lines: vec![vec![t("Out-of-area contact: Rosa, 555-0100")]],
+            }]),
+            Block::Table(Table {
+                header: vec!["Name".into(), "Phone".into()],
+                rows: vec![vec![vec![t("Rosa")], vec![t("555-0100")]]],
+            }),
+            Block::Log(Log {
+                columns: vec!["Date".into(), "Who".into()],
+                rows: 12,
+            }),
+        ],
+    };
+    Binder {
+        title: "Your emergency binder".into(),
+        generated_on: date(2026, 10, 1),
+        household: "2 adults".into(),
+        location: "Philadelphia County, Pennsylvania (ZIP code 19147)".into(),
+        status_line: "Ready Reckoner is an independent, open-source planning aid.".into(),
+        review_by: date(2027, 10, 1),
+        parts: vec![
+            Part {
+                id: "people".into(),
+                tab: 2,
+                title: "People".into(),
+                short_title: "People".into(),
+                pages: vec![cards],
+            },
+            Part {
+                id: "home_places".into(),
+                tab: 3,
+                title: "Home and places".into(),
+                short_title: "Home, places".into(),
+                pages: vec![home],
+            },
+            Part {
+                id: "check_now".into(),
+                tab: 6,
+                title: "Checklists: happening now".into(),
+                short_title: "Now".into(),
+                pages: vec![fire],
+            },
+        ],
+        sources: vec![SourceEntry {
+            n: 1,
+            title: "Home Fires".into(),
+            publisher: "FEMA / Ready.gov".into(),
+            year: Some(2026),
+            url: Some("https://www.ready.gov/home-fires".into()),
+            expert: false,
+        }],
+        credits: vec!["Uses National Risk Index data; not endorsed by FEMA.".into()],
     }
 }
 
