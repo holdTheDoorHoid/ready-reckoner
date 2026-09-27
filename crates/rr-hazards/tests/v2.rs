@@ -1205,3 +1205,28 @@ fn with_no_windstorm_on_record_unmatched_weather_outages_still_count_as_windstor
             .any(|n| n.contains("hold almost no windstorms to match"))
     );
 }
+
+#[test]
+fn going_into_labour_is_named_only_for_a_household_with_someone_pregnant() {
+    let f = county("42101");
+    let mut input = household("philadelphia-renters-4");
+    for p in &mut input.people {
+        p.pregnant_or_nursing = false;
+    }
+    let names = |a: &rr_hazards::HazardAssessment| -> Vec<String> {
+        profile(a, H::MedicalEmergency)
+            .sub_causes
+            .iter()
+            .map(|s| s.id.clone())
+            .collect()
+    };
+    let none = run(&input, &f);
+    assert!(
+        !names(&none).contains(&"birth_during_disaster".to_owned()),
+        "{:?}",
+        names(&none)
+    );
+    input.people[0].pregnant_or_nursing = true;
+    let one = run(&input, &f);
+    assert!(names(&one).contains(&"birth_during_disaster".to_owned()));
+}
