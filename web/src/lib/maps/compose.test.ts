@@ -76,6 +76,7 @@ describe('Composing the three maps for a Philadelphia household', () => {
     const expectedTiles = tilesFor(frames.neighbourhood).length + tilesFor(frames.area).length + tilesFor(frames.region).length;
     expect(result.tiles).toBe(expectedTiles);
     expect(result.tiles).toBeLessThanOrEqual(60);
+    expect(result.succeeded).toBe(expectedTiles + 2);
     expect(result.requests).toEqual({
       'https://tile.openstreetmap.org': expectedTiles,
       'https://overpass-api.de': 1,
@@ -234,6 +235,10 @@ describe('When a source fails, its layer is left out and the map says so', () =>
     const { env } = fakeEnv((url, init) => (/tile\.openstreetmap|tigerweb/.test(url) ? new Error('offline') : allGood(url, init)), pixels);
     const result = await composeMaps(input(), env);
     for (const map of result.maps) expect(map.statuses).toContainEqual({ layer: 'base', state: 'failed', text: 'The street map could not be fetched on October 1, 2026.' });
+    expect(result.succeeded).toBe(2);
+    // Nothing at all answers: a failed press.
+    const dead = fakeEnv(() => new Error('offline'), pixels);
+    expect((await composeMaps(input(), dead.env)).succeeded).toBe(0);
     expect(result.maps[1]!.keys.some((k) => k.pattern === 'county')).toBe(true);
   });
 });

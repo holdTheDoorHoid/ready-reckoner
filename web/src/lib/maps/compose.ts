@@ -84,6 +84,8 @@ export interface ComposeResult {
   requests: RequestTally;
   /** Tiles requested from the tile server. */
   tiles: number;
+  /** Requests that brought back something usable. None, with requests made, is a failed press. */
+  succeeded: number;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -203,6 +205,7 @@ const EXPORT_TIMEOUT_MS = 30_000;
 
 class Fetcher {
   tally: RequestTally = {};
+  succeeded = 0;
   constructor(private env: ComposeEnv) {}
 
   async get(url: string, referrerPolicy: ReferrerPolicy, timeoutMs: number, init: RequestInit = {}): Promise<Response> {
@@ -228,7 +231,9 @@ class Fetcher {
       if (!response.ok) return { image: null, refused: [403, 418, 429].includes(response.status) };
       const type = response.headers.get('content-type') ?? '';
       if (!type.startsWith('image/')) return { image: null, refused: false };
-      return { image: await this.env.decode(await response.blob()), refused: false };
+      const image = await this.env.decode(await response.blob());
+      this.succeeded += 1;
+      return { image, refused: false };
     } catch {
       return { image: null, refused: false };
     }
@@ -306,6 +311,7 @@ async function fetchPlaces(frames: Record<MapSlotKind, Frame>, children: boolean
       const json = (await response.json()) as { elements?: unknown; remark?: string };
       // A timed-out or refused query still answers 200, with a remark instead of the data.
       if (!Array.isArray(json.elements) || /error|timed out/i.test(json.remark ?? '')) continue;
+      fetcher.succeeded += 1;
       return parseOverpass(json);
     } catch {
       // Try the next instance, if the press allows one more query.
@@ -583,5 +589,5 @@ export async function composeMaps(input: ComposeInput, env: ComposeEnv): Promise
     if (b.source === 'osm') for (const { image } of b.tiles) image.close?.();
     else if (b.source === 'census') b.image.close?.();
   }
-  return { maps, requests: fetcher.tally, tiles: base.tiles };
+  return { maps, requests: fetcher.tally, tiles: base.tiles, succeeded: fetcher.succeeded };
 }
