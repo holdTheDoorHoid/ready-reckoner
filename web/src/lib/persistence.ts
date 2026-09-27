@@ -45,34 +45,91 @@ export function isOptionalStep(step: string): step is OptionalStepId {
 }
 
 /**
- * The IndexedDB database that holds the map images (name agreed with web-maps; DESIGN-DELTA-v3
- * §9.5). "Forget everything" deletes it with the rest.
+ * The IndexedDB database that holds the map images (web-maps' `MAPS_DB`; DESIGN-DELTA-v3 §9.5).
+ * "Forget everything" deletes it with the rest.
  */
 export const MAPS_DB_NAME = 'rr-maps';
 
-/**
- * The maps' pins, routes and layer choices (DESIGN-DELTA-v3 §9.5). Web-only: the engine never
- * sees it, and the images it describes stay in the `rr-maps` store.
- *
- * awaiting: web-maps — declared here with §9.5's shape until `web/src/lib/maps/state.ts` exports
- * `MapsState`; then import the type from there and delete this declaration.
- */
+// ---------------------------------------------------------------------------------------------
+// The maps' pins and choices (DESIGN-DELTA-v3 §9.5)
+//
+// awaiting: web-maps — `web/src/lib/maps/state.ts` (on agent/web-maps, not yet on v0.3) exports
+// `MapLayers`, `MapsState`, `checkMapsState` and `mapsHoldLocation`. The four below copy them
+// exactly (names, shapes and rules, checked against agent/web-maps aa4e6c0); when web-maps is
+// merged, delete them and import from './maps/state' instead.
+// ---------------------------------------------------------------------------------------------
+
+/** Which layers the household chose on its last "Fetch maps"; `base` (the street map) absent means on. */
+export interface MapLayers {
+  base?: boolean;
+  places: boolean;
+  flood: boolean;
+  surge: boolean;
+  wildfire: boolean;
+}
+
+/** `SavedPlan.maps`: web-only, outside `input`; the images it describes stay in the `rr-maps` store. */
 export interface MapsState {
   home?: LatLon;
   meeting_near?: LatLon;
   meeting_far?: LatLon;
   where_go?: LatLon;
-  /** The two ways out as the household drew them, each a line of points. */
+  /** The ways out as the household drew them (at most 2, each at most 60 points). */
   routes: LatLon[][];
-  layers: MapsLayers;
+  layers: MapLayers;
+  /** The day the images now in the maps store were fetched. */
   fetched_on?: IsoDate;
 }
 
-export interface MapsLayers {
-  places: boolean;
-  flood: boolean;
-  surge: boolean;
-  wildfire: boolean;
+const MAX_ROUTES = 2;
+const MAX_ROUTE_POINTS = 60;
+const PIN_IDS = ['home', 'meeting_near', 'meeting_far', 'where_go'] as const;
+
+/** A point rounded to about a metre (five decimal places), or undefined when it is not a real latitude and longitude. */
+function checkLatLon(x: unknown): LatLon | undefined {
+  if (typeof x !== 'object' || x === null || Array.isArray(x)) return undefined;
+  const { lat, lon } = x as Record<string, unknown>;
+  if (typeof lat !== 'number' || typeof lon !== 'number' || !Number.isFinite(lat) || !Number.isFinite(lon)) return undefined;
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return undefined;
+  const round = (v: number) => Math.round(v * 1e5) / 1e5;
+  return { lat: round(lat), lon: round(lon) };
+}
+
+/**
+ * Read `SavedPlan.maps` back from storage or a file: undefined when it is missing or not an
+ * object; otherwise a clean state with bad points, extra routes and extra points dropped (a route
+ * needs two points) and each layer choice a boolean (base map and places on unless turned off).
+ */
+export function checkMapsState(x: unknown): MapsState | undefined {
+  if (typeof x !== 'object' || x === null || Array.isArray(x)) return undefined;
+  const m = x as Record<string, unknown>;
+  const out: MapsState = { routes: [], layers: { base: true, places: true, flood: false, surge: false, wildfire: false } };
+  for (const id of PIN_IDS) {
+    const p = checkLatLon(m[id]);
+    if (p) out[id] = p;
+  }
+  if (Array.isArray(m.routes)) {
+    out.routes = m.routes
+      .filter(Array.isArray)
+      .map((r) => (r as unknown[]).map(checkLatLon).filter((p): p is LatLon => !!p).slice(0, MAX_ROUTE_POINTS))
+      .filter((r) => r.length >= 2)
+      .slice(0, MAX_ROUTES);
+  }
+  const layers = typeof m.layers === 'object' && m.layers !== null && !Array.isArray(m.layers) ? (m.layers as Record<string, unknown>) : {};
+  out.layers = {
+    base: layers.base !== false,
+    places: layers.places !== false,
+    flood: layers.flood === true,
+    surge: layers.surge === true,
+    wildfire: layers.wildfire === true,
+  };
+  if (typeof m.fetched_on === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(m.fetched_on)) out.fetched_on = m.fetched_on;
+  return out;
+}
+
+/** The saved maps hold where the household lives (the home pin, or a drawn route, which usually starts there). */
+export function mapsHoldLocation(maps: MapsState | undefined): boolean {
+  return !!maps && (maps.home !== undefined || maps.routes.length > 0);
 }
 
 /** Something bought or done from the plan, with the day it was recorded (for the maintenance calendar). */
@@ -254,28 +311,6 @@ const KNOWN_KEYS: ReadonlySet<string> = new Set([
   'maps',
 ]);
 
-const isLatLon = (x: unknown): x is LatLon =>
-  isObject(x) && isNum(x.lat) && isNum(x.lon) && Math.abs(x.lat) <= 90 && Math.abs(x.lon) <= 180;
-
-/**
- * The maps' pins and choices, keeping what is well formed (a pin with a latitude and longitude, a
- * route of such points, a yes or no per layer) and dropping the rest rather than the whole plan.
- */
-export function checkMaps(x: unknown): MapsState | undefined {
-  if (!isObject(x)) return undefined;
-  const layers = isObject(x.layers) ? x.layers : {};
-  const out: MapsState = {
-    routes: Array.isArray(x.routes) ? x.routes.filter(Array.isArray).map((r) => (r as unknown[]).filter(isLatLon).map((p) => ({ lat: p.lat, lon: p.lon }))) : [],
-    layers: { places: layers.places === true, flood: layers.flood === true, surge: layers.surge === true, wildfire: layers.wildfire === true },
-  };
-  for (const key of ['home', 'meeting_near', 'meeting_far', 'where_go'] as const) {
-    const pin = x[key];
-    if (isLatLon(pin)) out[key] = { lat: pin.lat, lon: pin.lon };
-  }
-  if (isDate(x.fetched_on)) out.fetched_on = x.fetched_on;
-  return out;
-}
-
 /**
  * Check a saved plan from storage or a file, and bring it to the current version. Version 1
  * (v0.1.0–v0.2.0) needs no change beyond the version number: every field kept its name.
@@ -328,7 +363,7 @@ export function checkSavedPlan(x: unknown): Check {
   if (before !== undefined) plan.confidence.before = before;
   if (after !== undefined) plan.confidence.after = after;
   if (isDate(x.reviewed_on)) plan.reviewed_on = x.reviewed_on;
-  const maps = checkMaps(x.maps);
+  const maps = checkMapsState(x.maps);
   if (maps) plan.maps = maps;
   // Keys a later version wrote are carried along untouched, so opening and saving never loses them.
   for (const [key, value] of Object.entries(x)) {

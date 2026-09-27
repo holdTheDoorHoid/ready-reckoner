@@ -18,7 +18,7 @@
  * printed binder is the household's backup. The passphrase is never stored or kept.
  */
 import type { SavedPlan } from './persistence';
-import { exportText, parseImport } from './persistence';
+import { exportText, mapsHoldLocation, parseImport } from './persistence';
 import { tidyProfile } from './profile';
 import { tidyText } from './tidy';
 
@@ -45,10 +45,12 @@ export interface EncryptedPlanFile {
 /**
  * True when the plan holds any answer §7 counts as sensitive: anything in a person's profile
  * beyond their name and phone, the home's address, anything under documents and money, a vehicle's
- * plate, or a pet's microchip or tag number. Blank or whitespace answers do not count (the engine
- * drops them), and neither does a place's kind on its own.
+ * plate, or a pet's microchip or tag number; and the maps' home pin or a drawn route, which say
+ * where the household lives as plainly as the address (web-maps' `mapsHoldLocation`). Blank or
+ * whitespace answers do not count (the engine drops them), and neither does a place's kind alone.
  */
 export function hasSensitiveAnswers(plan: SavedPlan): boolean {
+  if (mapsHoldLocation(plan.maps)) return true;
   const input = plan.input;
   for (const person of input.people ?? []) {
     const profile = tidyProfile(person.profile);

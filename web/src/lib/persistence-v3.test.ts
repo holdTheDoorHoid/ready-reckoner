@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { FIXTURES } from '../engine/fixtures';
 import { clone, MemoryStorage, savedFor } from '../test/helpers';
 import {
-  checkMaps,
+  checkMapsState,
   checkSavedPlan,
   exportText,
   forgetEverything,
@@ -44,7 +44,7 @@ const MAPS: MapsState = {
       { lat: 40.0, lon: -75.3 },
     ],
   ],
-  layers: { places: true, flood: true, surge: false, wildfire: false },
+  layers: { base: true, places: true, flood: true, surge: false, wildfire: false },
   fetched_on: '2026-10-02',
 };
 
@@ -138,14 +138,14 @@ describe('the maps (web-only, outside the household)', () => {
     expect(JSON.stringify(plan.input)).not.toContain('meeting_near');
   });
 
-  it('keep what is well formed and drop the rest, never the whole plan', () => {
-    const maps = checkMaps({
+  it('keep what is well formed and drop the rest, never the whole plan (web-maps’ rules)', () => {
+    const maps = checkMapsState({
       home: { lat: 39.93, lon: -75.15 },
       meeting_near: { lat: 'north', lon: -75.15 },
       meeting_far: { lat: 95, lon: 0 },
       where_go: null,
-      routes: [[{ lat: 39.9, lon: -75.1 }, { lat: 'x' }, { lat: 40, lon: -75.2 }], 'not a route'],
-      layers: { places: true, flood: 'yes', wildfire: true },
+      routes: [[{ lat: 39.9, lon: -75.1 }, { lat: 'x' }, { lat: 40, lon: -75.2 }], 'not a route', [{ lat: 39.9, lon: -75.1 }], [{ lat: 1, lon: 1 }, { lat: 2, lon: 2 }], [{ lat: 3, lon: 3 }, { lat: 4, lon: 4 }]],
+      layers: { flood: 'yes', wildfire: true },
       fetched_on: 'yesterday',
       extra: 1,
     });
@@ -157,9 +157,13 @@ describe('the maps (web-only, outside the household)', () => {
           { lat: 40, lon: -75.2 },
         ],
       ],
-      layers: { places: true, flood: false, surge: false, wildfire: true },
+      layers: { base: true, places: true, flood: false, surge: false, wildfire: true },
     });
-    expect(checkMaps('pins')).toBeUndefined();
+    // Two ways out at most, a route needs two points, a pin is kept to about a metre.
+    expect(maps?.routes).toHaveLength(2);
+    expect(checkMapsState({ home: { lat: 39.123456789, lon: -75.987654321 } })?.home).toEqual({ lat: 39.12346, lon: -75.98765 });
+    expect(checkMapsState({ layers: { base: false, places: false } })?.layers).toEqual({ base: false, places: false, flood: false, surge: false, wildfire: false });
+    expect(checkMapsState('pins')).toBeUndefined();
     const r = checkSavedPlan({ ...v1(), maps: 'damaged' });
     expect(r.ok && r.plan.maps).toBeUndefined();
   });

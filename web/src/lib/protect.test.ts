@@ -67,6 +67,13 @@ describe('which saved plans are sensitive (§7)', () => {
     }
   });
 
+  it('the maps’ home pin or a drawn route is, as plainly as the address; a meeting-place pin alone is not', () => {
+    const layers = { base: true, places: true, flood: false, surge: false, wildfire: false };
+    expect(hasSensitiveAnswers(withAnswers((p) => (p.maps = { home: { lat: 39.93, lon: -75.15 }, routes: [], layers })))).toBe(true);
+    expect(hasSensitiveAnswers(withAnswers((p) => (p.maps = { routes: [[{ lat: 39.9, lon: -75.1 }, { lat: 40, lon: -75.2 }]], layers })))).toBe(true);
+    expect(hasSensitiveAnswers(withAnswers((p) => (p.maps = { meeting_far: { lat: 40.27, lon: -76.88 }, routes: [], layers })))).toBe(false);
+  });
+
   it("the home's address, documents and money, a vehicle's plate and a pet's microchip are", () => {
     expect(hasSensitiveAnswers(withAnswers((p) => (p.input.family_plan = { home: { address: '12 Sample St' } })))).toBe(true);
     expect(hasSensitiveAnswers(withAnswers((p) => (p.input.family_plan = { documents: { where_copies: 'With Rosa' } })))).toBe(true);
@@ -107,7 +114,7 @@ describe('the protected file', () => {
     const plan = withAnswers((p) => {
       p.input.people[0]!.profile = { name: 'Ana Sample', medications: [{ name: 'Blood pressure tablet', dose: '10 mg', schedule: 'Mornings', purpose: 'Blood pressure' }], blood_type: 'A-' };
       p.input.family_plan = { home: { address: '12 Sample St, Philadelphia' }, documents: { accounts: [{ institution: 'First Sample Bank', last4: '0042' }] } };
-      p.maps = { home: { lat: 39.93, lon: -75.15 }, routes: [], layers: { places: true, flood: false, surge: false, wildfire: false } };
+      p.maps = { home: { lat: 39.93, lon: -75.15 }, routes: [], layers: { base: true, places: true, flood: false, surge: false, wildfire: false } };
       p.purchases = [{ item_id: 'water_stored', tier: 'h72', qty: 3, date: '2026-10-05' }];
     });
     const text = await protectedExportText(plan, PASS, new Date('2026-10-06T12:00:00Z'));
