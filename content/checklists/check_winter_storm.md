@@ -12,7 +12,7 @@ A winter storm watch or warning covers your area.[^ready_gov_winter]
 
 ## Do first
 
-1. **Stay home.** Stay off the roads.[^ready_gov_winter]
+1. **Stay home.** Stay off the roads if you can.[^ready_gov_winter]
 2. **Stock up.** Have several days of food, water and medicine.[^ready_gov_winter]
 3. **Lights.** Have a flashlight for each person.[^ready_gov_power_outages] {if:powered_device}Charge any medical device, and follow its power plan.[^ready_gov_power_outages]{/if}
 4. **Protect pipes.** Let taps drip. Open the cabinets under sinks.[^cdc_winter_safety]

@@ -15,13 +15,13 @@ Extreme cold or a hard freeze is forecast. Frostbite can happen in minutes on ba
 1. **Stay inside.** Keep trips outside short.[^cdc_winter_safety] {if:pets}Bring pets inside, and keep salt off their paws.[^nws_aly_cold_safety]{/if}
 2. **Cover up outside.** Wear a hat, a face scarf, mittens and layers.[^cdc_winter_safety]
 3. **Protect pipes.** Let taps drip. Open cabinets under sinks. Keep the heat at 55°F or more.[^nws_aly_cold_safety]
-4. **Heat safely.** Never heat with a gas stove or oven.[^nws_aly_cold_safety]
+4. **Heat safely.** Never heat with a gas stove or oven.[^nws_aly_cold_safety][^ready_gov_winter]
 5. **Check on others.** Check daily on older neighbors and anyone living alone.[^cdc_winter_safety][^nws_cold_during]
 
 ## Then
 
 1. **Stay dry.** Change out of wet clothes right away.[^nws_cold_during]
-2. **Eat and drink warm.** Skip alcohol and caffeine.[^cdc_winter_safety]
+2. **Eat and drink warm.** Skip alcohol and caffeine.[^cdc_winter_safety][^nws_cold_during]
 3. **Space heaters.** Keep them 3 feet from anything that can burn.[^cdc_winter_safety]
 4. **If the heat fails,** close off unused rooms and stuff towels under doors.[^cdc_winter_safety] {if:children}Never let a baby sleep in a cold room.[^cdc_winter_safety]{/if}
 5. **Frostbite.** Numb, white or waxy skin. Go inside. Warm it with warm, not hot, water or body heat.[^cdc_winter_safety][^nws_cold_during]

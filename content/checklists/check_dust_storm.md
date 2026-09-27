@@ -22,7 +22,6 @@ A dust storm warning is out, or a wall of dust is coming. Most dust storms pass 
 
 1. **Cannot pull off?** Slow down, turn on your lights and sound the horn now and then. Follow the painted center line, and look for a safe place to pull off.[^nws_dust_storms]
 2. **Caught outside?** Wear a fitted N95 respirator if you cannot get out of the dust.[^cdc_valley_fever_prevention]
-3. **Stay off dusty ground.** Skip gardening and digging while the dust settles.[^cdc_valley_fever_prevention]
 
 ## Leave or stay
 

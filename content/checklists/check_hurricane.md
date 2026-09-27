@@ -15,7 +15,7 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 
 1. **Check your zone.** If officials tell your zone to leave, go right away.[^ready_gov_hurricanes]
 2. **Keep alerts on.** Keep a radio or phone on for official updates.[^nws_hurricane_safety_brochure] {if:need:hearing}Use a weather radio with a text display and a flashing alert.[^ready_gov_disability]{/if}
-3. **Charge up.** Charge phones and backup batteries.[^ready_gov_hurricanes] {if:powered_device}Charge any medical device, and follow the power plan you made with your medical provider.[^ready_gov_power_outages]{/if} {if:vehicle}Fill the car's gas tank.[^nws_hurricane_safety_brochure]{/if}
+3. **Charge up.** Charge phones and backup batteries.[^ready_gov_hurricanes] {if:powered_device}Charge any medical device, and follow the power plan you made with your medical provider.[^ready_gov_power_outages]{/if} {if:has:power_generator}Fuel the generator and check that it works.[^texasready_hurricanes]{/if} {if:has:power_station}Charge the power station.[^texasready_hurricanes]{/if} {if:vehicle}Fill the car's gas tank.[^nws_hurricane_safety_brochure]{/if}
 4. **Store water.** Fill the bathtub and large containers for flushing and cleaning.[^nws_hurricane_safety_brochure]
 5. **Refill medicines.** Refill prescriptions if you can.[^texasready_hurricanes]
 6. **Pack a go-bag.** Pack medicines, ID, cash and phone chargers. Cash machines may not work without power.[^cdc_evacuation_psa][^nws_hurricane_safety_brochure] {if:pets}Add your pets' food, water and medicine.[^ready_gov_hurricanes]{/if}
@@ -45,7 +45,7 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 
 ## Do not
 
-- Do not go outside when the storm turns calm. The eye passes, and the wind comes back fast from the other side.[^nws_hurricane_safety_brochure]
+- Do not leave shelter when the storm turns calm. It may be the eye, and the wind will return fast from the other side.[^nws_hurricane_safety_brochure]
 - Do not walk, swim or drive through floodwater. Six inches of moving water can knock you down.[^ready_gov_hurricanes]
 - Do not drink the water stored in the bathtub.[^nws_hurricane_safety_brochure]
 - Never use a generator, grill or camp stove inside the home or garage.[^cdc_co_basics][^ready_gov_power_outages]
