@@ -584,7 +584,7 @@ Of 100 households like yours, about 15 (7–30) will have an income gap of more 
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 4 months; living elsewhere that long costs about $4600 at 30 % of your monthly spending, which loss-of-use insurance pays for.[5, 6, 7, 8, 9, 34, 35, 36, 54, 150, 151]
+If damage forced you out, 9 in 10 households like yours would be home again within about 4 months; living elsewhere that long costs about $4,600 at 30 % of your monthly spending, which loss-of-use insurance pays for.[5, 6, 7, 8, 9, 34, 35, 36, 54, 150, 151]
 
 ## After a disaster: the first 30 days
 

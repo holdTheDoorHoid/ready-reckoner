@@ -265,7 +265,7 @@ Brackets show how uncertain a target is. "Not known": no restoration records for
 
 **What to avoid.** Never run a generator inside your home or garage, even with the doors and windows open. Keep it outside, more than 20 feet from windows, doors and vents.[89] Put a carbon monoxide alarm on every level of your home.[90] Headache, dizziness, nausea or confusion can mean carbon monoxide poisoning. Get everyone outside to fresh air, then call 911.[91] Never heat your home with a gas stove or oven. Unplug electronics, because the power can come back with a surge that damages them.[90] Treat every downed power line as live: stay at least 30 feet from it and anything it touches, and call 911.[92] If one falls on your car, stay inside unless the car is on fire.[93]
 
-The worst power cut in your region's records (where it was worst, about 85 miles (137 km) away) was November 2018 Camp Fire (2018); being ready for 3 days would have left some homes that lost power still waiting (about 25 in 100 of all customers there were still out).[4, 8, 10, 11, 12, 22, 42, 50, 51, 94, 95, 96]
+The worst power cut in your region's records (where it was worst, about 85 miles (137 km) away) was November 2018 Camp Fire; being ready for 3 days would have left some homes that lost power still waiting (about 25 in 100 of all customers there were still out).[4, 8, 10, 11, 12, 22, 42, 50, 51, 94, 95, 96]
 
 ### Tap water must be treated: about 3 days (0–10)
 
@@ -542,7 +542,7 @@ Of 100 households like yours, about 15 (8–25) will have an income gap of more 
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 8 months; living elsewhere that long costs about $13000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[4, 7, 8, 9, 10, 11, 12, 13, 35, 36, 42, 151]
+If damage forced you out, 9 in 10 households like yours would be home again within about 8 months; living elsewhere that long costs about $13,000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[4, 7, 8, 9, 10, 11, 12, 13, 35, 36, 42, 151]
 
 ## After a disaster: the first 30 days
 
