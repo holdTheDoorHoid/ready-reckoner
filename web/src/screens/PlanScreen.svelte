@@ -7,8 +7,10 @@
 
   Contract v2: in bare-minimum mode (`Plan.minimum_kit`) a banner says the smallest three-day kit
   comes first and lists what falls beyond three years (the `plan_too_long` warning's `related`
-  items); decisions show as decisions; the long-horizon section (`Plan.long_horizon`) follows the
-  whole plan.
+  items); decisions show as decisions, grouped the way the packet groups them (one "Decide this
+  month" block with the decisions named on one line, each still ticked off on its own card, and
+  one line in the month lists), so a month with many decisions stays short; the long-horizon
+  section (`Plan.long_horizon`) follows the whole plan.
 -->
 <script lang="ts">
   import BucketGauge from '../components/BucketGauge.svelte';
@@ -23,7 +25,7 @@
   import { useApp } from '../lib/app.svelte';
   import { addMonths, formatDate, formatMonth, monthsBetween, quantity, usd } from '../lib/format';
   import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, stageLine } from '../lib/labels';
-  import { allPlanItems, bucketName, catalogueItem, itemSourceIds, keyedItems, tierName } from '../lib/lookup';
+  import { allPlanItems, bucketName, catalogueItem, decisionList, itemSourceIds, keyedItems, tierName } from '../lib/lookup';
   import { href } from '../lib/router.svelte';
 
   const app = useApp();
@@ -98,6 +100,22 @@
     return output.buckets.some((b) => b.target.kind === 'days' && b.target.value >= 30);
   }
 </script>
+
+<!--
+  Decisions (insurance, ID papers, home repairs) in one block, as the packet's "Decide this month"
+  line: named on one line, each still on its own card to tick off, folded so a month with many
+  decisions stays short.
+-->
+{#snippet decide(decisions: PlanItem[], heading: string, headingId: string)}
+  <h3 id={headingId}>{heading} ({decisions.length})</h3>
+  <p class="section-intro">
+    Choices about insurance, papers and your home. They cost nothing from your supplies budget: {decisionList(decisions)}.
+  </p>
+  <details class="decisions">
+    <summary>See each one, and tick it off when you have decided</summary>
+    {#each keyedItems(decisions) as { key, item } (key)}<ItemCard {item} compact />{/each}
+  </details>
+{/snippet}
 
 <div class="page">
   <h1 id="page-title" tabindex="-1">Your plan</h1>
@@ -176,10 +194,12 @@
       {/if}
 
       {#if earlier.length}
+        {@const earlierDecisions = earlier.filter((i) => i.decision)}
         <section aria-labelledby="earlier-title">
           <h2 id="earlier-title">Still to do from earlier months</h2>
           <p class="section-intro">Plans slip; that is normal. These still help, in this order.</p>
-          {#each keyedItems(earlier) as { key, item } (key)}<ItemCard {item} />{/each}
+          {#each keyedItems(earlier.filter((i) => !i.decision)) as { key, item } (key)}<ItemCard {item} />{/each}
+          {#if earlierDecisions.length}{@render decide(earlierDecisions, 'Still to decide', 'earlier-decide-title')}{/if}
         </section>
       {/if}
 
@@ -188,8 +208,9 @@
         {#if thisItems.length === 0}
           <p class="card">Nothing new to do this month{output.plan.envelopes.length ? '; your budget is saving toward a bigger item below' : ''}. {nextMonth ? 'The next step is shown below.' : ''}</p>
         {:else}
-          {@const free = thisItems.filter((i) => i.kind === 'free_action')}
-          {@const buy = thisItems.filter((i) => i.kind !== 'free_action')}
+          {@const decisions = thisItems.filter((i) => i.decision)}
+          {@const free = thisItems.filter((i) => i.kind === 'free_action' && !i.decision)}
+          {@const buy = thisItems.filter((i) => i.kind !== 'free_action' && !i.decision)}
           {#if free.length}
             <h3>Free steps ({free.length})</h3>
             <p class="section-intro">These cost nothing and cover more than you might expect. Do them in any order.</p>
@@ -198,6 +219,7 @@
               {#each keyedItems(group.items) as { key, item } (key)}<ItemCard {item} compact />{/each}
             {/each}
           {/if}
+          {#if decisions.length}{@render decide(decisions, 'Decide this month', 'decide-title')}{/if}
           {#if buy.length}
             <h3>To get <span class="muted h-note">about {usd(spend(buy))} of {usd(thisMonth?.budget_usd ?? 0)}</span></h3>
             {#each keyedItems(buy) as { key, item } (key)}<ItemCard {item} />{/each}
@@ -206,15 +228,20 @@
       </section>
 
       {#if nextMonth && nextMonth.index !== currentMonth}
+        {@const nextOpen = nextMonth.items.filter((i) => !i.done)}
+        {@const nextDecisions = nextOpen.filter((i) => i.decision)}
         <section aria-labelledby="next-title">
           <h2 id="next-title">{monthLabel(nextMonth.index)} <span class="muted h-note">from {formatDate(addMonths(planningDate, nextMonth.index))}</span></h2>
           <ul class="preview">
-            {#each keyedItems(nextMonth.items.filter((i) => !i.done)) as { key, item } (key)}
+            {#each keyedItems(nextOpen.filter((i) => !i.decision)) as { key, item } (key)}
               <li>
                 {item.name}: {item.kind === 'free_action' ? 'free' : `${quantity(item.quantity, item.unit)}, about ${usd(item.est_cost_usd)}`}
                 <Sources ids={sourcesOf(output, item)} variant="inline" what={item.name} />
               </li>
             {/each}
+            {#if nextDecisions.length}
+              <li class="decide-line"><strong>Decide</strong> ({nextDecisions.length}): {decisionList(nextDecisions)}. <span class="muted">No cost to your supplies budget.</span></li>
+            {/if}
           </ul>
         </section>
       {/if}
@@ -258,13 +285,14 @@
         {#each months as m (m.index)}
           {@const open = m.items.filter((i) => !i.done)}
           {#if open.length}
+            {@const monthDecisions = open.filter((i) => i.decision)}
             <details class="month">
               <summary>
                 <span>{monthLabel(m.index)}</span>
                 <span class="muted small">{open.length} {open.length === 1 ? 'step' : 'steps'}{spend(open) > 0 ? `, about ${usd(spend(open))}` : ''}</span>
               </summary>
               <ul class="month__list">
-                {#each keyedItems(open) as { key, item } (key)}
+                {#each keyedItems(open.filter((i) => !i.decision)) as { key, item } (key)}
                   <li>
                     <span>{item.name}</span>
                     <span class="muted">{item.kind === 'free_action' ? 'free' : `${quantity(item.quantity, item.unit)}, about ${usd(item.est_cost_usd)}`}</span>
@@ -272,6 +300,13 @@
                     <Sources ids={sourcesOf(output, item)} variant="inline" what={item.name} />
                   </li>
                 {/each}
+                {#if monthDecisions.length}
+                  <li class="decide-line">
+                    <span><strong>Decide</strong> ({monthDecisions.length}): {decisionList(monthDecisions)}</span>
+                    <span class="muted">free</span>
+                    <span class="chip">Decisions</span>
+                  </li>
+                {/if}
               </ul>
             </details>
           {/if}
@@ -513,9 +548,13 @@
     margin-top: 0;
     font-size: var(--text-lg);
   }
-  .deferred summary {
+  .deferred summary,
+  .decisions summary {
     color: var(--accent);
     min-height: 36px;
     font-weight: 600;
+  }
+  .decisions {
+    margin-bottom: var(--s4);
   }
 </style>

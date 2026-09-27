@@ -141,6 +141,46 @@ describe('the legal-emergency switch (Dials.legal_opt_in)', () => {
   });
 });
 
+describe('decisions on the Plan screen, grouped as the packet groups them', () => {
+  const hays = 'hays-kansas-farm-5';
+  /** The packet's own one-line list of month 1's decisions. */
+  function packetLine(name: string): string {
+    const md = readFileSync(join(repoRoot(), 'fixtures', 'golden', `${name}.md`), 'utf8');
+    return /\*\*Decide this month\*\* \(see Documents and money\): (.*)\.$/m.exec(md)![1]!;
+  }
+
+  it('lists next month’s decisions on one line (Hays: eight), not one line each', async () => {
+    const out = golden(hays);
+    const decisions = out.plan.months[1]!.items.filter((i) => i.decision);
+    expect(decisions).toHaveLength(8);
+    current = await render(PlanScreen, { plan: savedFor(FIXTURES[hays]), route: 'plan', engine: answering(out) });
+    const lines = [...current.target.querySelector('#next-title')!.closest('section')!.querySelectorAll('ul.preview > li')].map(text);
+    expect(lines.filter((l) => l.startsWith('Decide'))).toEqual([`Decide (8): ${packetLine(hays)}. No cost to your supplies budget.`]);
+    expect(lines).toHaveLength(out.plan.months[1]!.items.filter((i) => !i.done).length - 8 + 1);
+    // The whole plan's month 2 also gives them one line.
+    const month = [...current.target.querySelectorAll('details.month')].find((d) => text(d.querySelector('summary')).startsWith('Next month'))!;
+    const decideLines = [...month.querySelectorAll('.month__list > li')].map(text).filter((l) => l.startsWith('Decide'));
+    expect(decideLines).toEqual([`Decide (8): ${packetLine(hays)} free Decisions`]);
+  });
+
+  it('gives this month’s decisions one block, each still on its own card to tick off', async () => {
+    const out = golden(hays);
+    // A month into the plan, month 1 is this month.
+    current = await render(PlanScreen, { plan: savedFor(FIXTURES[hays]), route: 'plan', engine: answering(out), today: '2026-11-01' });
+    const section = current.target.querySelector('#this-title')!.closest('section')!;
+    expect(text(section.querySelector('#decide-title'))).toBe('Decide this month (8)');
+    expect(text(section.querySelector('#decide-title + p'))).toBe(
+      `Choices about insurance, papers and your home. They cost nothing from your supplies budget: ${packetLine(hays)}.`,
+    );
+    const cards = [...section.querySelectorAll('details.decisions article.item')];
+    expect(cards).toHaveLength(8);
+    for (const c of cards) expect(text(c.querySelector('.item__check label'))).toMatch(/^Decided: Decide: /);
+    // The free steps above no longer count them.
+    const free = out.plan.months[1]!.items.filter((i) => i.kind === 'free_action' && !i.decision && !i.done).length;
+    expect(text([...section.querySelectorAll('h3')].find((h) => text(h).startsWith('Free steps')))).toBe(`Free steps (${free})`);
+  });
+});
+
 describe('web copy keeps to the content policy', () => {
   /** rr-content's list of pressure phrases (docs/CONTENT_STANDARDS.md §4), read from the Rust source. */
   function bannedPhrases(): string[] {
