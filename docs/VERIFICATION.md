@@ -40,7 +40,7 @@ harnesses added on this branch:
 | V-16 | The `no_water_after_month_1` guardrail cannot fire: the free reused-bottles step always gives water in month 0 | Low | Retargeted `08c44ce` (agent/followups) |
 | V-17 | "Do not wait …" appears three times in guidance; the pressure-phrase check only catches "don't wait" | Low | Fixed `ff049b1` (agent/followups) |
 | V-18 | The packet's "Spend" column adds a sinking-fund deposit and the full price in the purchase month ($130 in a $60 month) | Low | Fixed `42a085a` (agent/followups) |
-| V-19 | localStorage also holds `rr.prefs.v1` (display preferences); the docs name only `rr.plan.v1` | Low | Proposed (docs) |
+| V-19 | localStorage also holds `rr.prefs.v1` (display preferences); the docs name only `rr.plan.v1` | Low | Fixed (docs/UI.md, docs/PRIVACY.md and the About screen name it; checked in round 3) |
 | V-20 | The CSP is a `<meta>` tag (no `frame-ancestors`), with `'unsafe-inline'` styles | Low | Noted |
 | V-21 | Citation hygiene: JOLTS cited by its home page, the FEMA survey deck by a third-party mirror, the Hazus manual by a university copy, two price bands by one search-results URL, bottled-water prices from a wholesale case listing | Low | Proposed |
 | V-22 | Constants note: the highest Thrifty Food Plan cost per person is $10.76 (a boy 14–19), not $10.51 | Low | Fixed `688318b` |
@@ -494,3 +494,153 @@ households (Paradise, a Queens basement flat, Lahaina, Utuado, Asheville; copied
 the joint chance; `RR_UPDATE_GOLDENS=1 cargo test -p rr-plan --test goldens` shows the golden
 changes (targets and plans are unchanged in all seven fixtures; cards, the summary, the safety
 rules, evacuation chances and relief times move).
+
+## Round 3: v0.2.0 release verification (agent/verify2, 2026-09-26)
+
+Run on `agent/verify2` from `v0.2` at `7914219` (every workstream merged; data pack
+`01a46abb2d5d`, content `2026.09.26+48141213`, contract 2). The browser bundle was rebuilt first
+(`bash crates/rr-wasm/build-web.sh`), so every screen below ran the real engine on the real core
+pack; the stand-in engine appears only inside the web unit tests. Web fixes were made on this
+branch (commits named in the table); engine and content findings are handed back with a proposed
+fix, since this pass changes no engine output and regenerates no golden.
+
+### Checks and counts
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Format, lints | `cargo fmt --all --check`; `cargo clippy --workspace --all-targets -- -D warnings` | clean, clean |
+| Rust tests | `cargo test --workspace --no-fail-fast` | 942 passed, 0 failed, 3 ignored, 78 targets |
+| WebAssembly | `cargo build --target wasm32-unknown-unknown --workspace --exclude rr-cli --exclude rr-etl`; `wasm-pack test --node crates/rr-wasm` | builds; 3 passed (all 14 fixtures equal their goldens inside WebAssembly) |
+| Goldens | `rr golden` | 28 of 28 files match |
+| Doctor | `rr doctor`; `rr --fixtures doctor`; `cargo run --release -p rr-cli -- doctor` | OK on both sources: 14 households plan, repeat byte for byte, 0 uncited items, content 0 errors / 0 warnings, 146 items; release build median 18–33 ms (every household under 50 ms) |
+| Citations | `rr citations --missing` | 406 ids referred to; one undefined and formally awaited (`county_boil_water_records`) |
+| Data | `rr data verify` | everything checks out (45 files; 30 counties flagged for utility reporting flicker, as designed) |
+| Backtest | `rr validate --details` | all 88 recorded verdicts reproduced; 6 covered, 9 partial, 6 short, 1 not modelled |
+| Bundle | `bash crates/rr-wasm/build-web.sh` | engine 4.40 MB raw, 1.40 MB gzipped (budget 1.5 MB); core pack 2.85 MB, map 0.30 MB gzipped |
+| Web, at the tip | `npm ci`, `npm test -- --run --maxWorkers=2`, `npm run check`, `npm run build` | 31 files, 317 passed, 1 skipped (the CI-only parity stub; the five real parity tests ran on all 14 fixtures in both WebAssembly modes); 446 files 0 errors 0 warnings; build OK |
+| Web, after the fixes | same | 32 files, 329 passed, 1 skipped; 447 files 0 / 0; build OK |
+| Screens | `SHOTS_DIR=… node web/scripts/screenshots.mjs` | 66 pages (desktop, phone, dark), axe clean on every one (WCAG 2.0/2.1/2.2 AA and best practice), 0 console errors |
+| Site as Pages serves it | `BASE_PATH=/ready-reckoner/ vite build`, `node web/scripts/e2e.mjs` | 18 of 18: start screen before the data (1.8 s on 10 Mbps), 4.2 MB first visit, content security policy in force, targets on screen equal the golden, `assess` 38.5 ms median in Chrome (161 ms at 4× slower CPU), offline reload, no console errors |
+| Print | `FIXTURE=… node web/scripts/packet-pages.mjs` | Chrome print, Letter / A4: Philadelphia 26 / 24 pages, Minot 25 / 24, Sugar Land 27 / 26 (R3-15) |
+
+The web suite never ran while a Rust suite was running (checked with `pgrep` before each run).
+
+### Findings
+
+| # | Finding | Severity | Status |
+| --- | --- | --- | --- |
+| R3-01 | Plan screen and item cards garbled catalogue units: "3 day of one person's medicines", "8 2,000 kcals", "1 24-pack", "5 pound of dry foods", "2 cycle's supplies" (every household with those items) | Medium | Fixed `23b36fb` (`web/src/lib/format.ts` follows the packet's `plural`/`quantity`) |
+| R3-02 | Rare box, real engine: "What the plan spends on these" listed every month of saving toward a rare item as a purchase ("buys save toward: Personal radiation dosimeter card ($8, around November 2026) …", 13 entries for Minot) | Medium | Fixed `50dbf0a` (`web/src/lib/rare.ts` skips reserve lines) |
+| R3-03 | Rare box said "The same everywhere: this chance does not depend on where you live" for "Power out for months (any cause)", whose range comes partly from the county's own power curve (Coos Bay 8 in 1,000 a year, Philadelphia about 1 in 9,000) | Medium | Fixed in the web `23b36fb`; engine follow-up proposed (a `location_factor` for the row) |
+| R3-04 | Savings sentence mixes two starting points: "reaching the goal in about 20 years" counts from the end of the supplies plan, "Three months of expenses, about $12,600, in about 18 years" from today (Philadelphia; six of fourteen goldens) | Medium | Proposed (engine, `crates/rr-budget/src/savings.rs:187` vs `:238`) |
+| R3-05 | Packet "worst on record: up to N days" reads the last day mark with anyone still out, a lower bound, and disagrees with the app (Hays "up to 7 days" in print, "up to 2 weeks" on screen, 3.5 in 100 still out on day 7; Phoenix 3 vs 7) | Medium | Proposed (engine, `crates/rr-plan/src/packet/targets.rs:77`) |
+| R3-06 | Arrest row: "about 50 of 100 households like yours" will have a member arrested or detained in ten years (Philadelphia, Minot); the rate counts arrest events, so repeat arrests of the same people inflate a per-household chance | Medium | Proposed (hazards, `crates/rr-hazards/src/personal.rs:330`) |
+| R3-07 | The legal-emergency dial had no switch in the app | — | Built `439c8a5` (Your settings, off by default; the bail figures' source joins the savings card) |
+| R3-08 | Decisions (up to 8 in month 1, Hays) listed one line each on the Plan screen, unlike the packet's single "Decide this month" line | Low | Fixed `7cf762d` |
+| R3-09 | Screen readers heard "sourcesfor heat wave (8)" and "…EAGLE-I(opens in a new tab)": Svelte trims a hidden span's leading space (Sources, About's four new-tab links, field-error "Problem:" prefixes) | Low | Fixed `23b36fb` (the interview steps rendered correctly; made robust) |
+| R3-10 | "seven sample counties" on About and the banner (fourteen since v0.2.0) | Low | Fixed `23b36fb` |
+| R3-11 | "Service mostly back in about 5.2 days" | Low | Fixed `23b36fb` (whole days) |
+| R3-12 | Pressure word "leave in a hurry" on the travel screen; "don't wait" twice in the stand-in engine | Low | Fixed `23b36fb`; a web test now reads rr-content's `BANNED_PHRASES` |
+| R3-13 | Saved-file warnings did not say the file can hold other people's names and numbers (family plan) | Low | Fixed `23b36fb` (Keep it up, About); `docs/PRIVACY.md` still to say it (release-docs2) |
+| R3-14 | `web/scripts/screenshots.mjs` still read `fixtures/households/pending/`, so it stopped before any screenshot | Low | Fixed `68d3731` (and v0.2 pages added) |
+| R3-15 | Chrome prints the Philadelphia packet on 26 Letter pages (24 A4); the proxy says 23.66 against the 24-page budget. The v2 tables and wallet cards take more room per word than the prose the proxy was calibrated on | Low | Proposed (recalibrate the proxy on a v2 print, `docs/PACKET.md` "Length", or trim) |
+| R3-16 | Plan months numbered from 0 in the packet ("month 4 (February 2027)", "Next month: Month 1") and from 1 on screen ("Month 5: February 2027") | Low | Proposed (one convention; decision) |
+| R3-17 | "The worst power cut … was Winter storm, March 2018" (capital mid-sentence), 9 of 14 packets | Low | Proposed (`crates/rr-consequence/src/assess.rs:827`) |
+| R3-18 | "30 %", "6 to 8 % more often" beside "6% bleach" | Low | Proposed (`crates/rr-consequence/src/assess.rs:1761`, `crates/rr-hazards/src/climate.rs:136,151`) |
+| R3-19 | "58 fl ozs" (Sugar Land formula) | Low | Proposed (`crates/rr-plan/src/packet/text.rs:88`: add "fl oz" to the invariant units) |
+| R3-20 | "Mostly back to normal: about 1 year" where the source says 1,095 days (Coos Bay supplies and medicine): the relief rounding stops at the ladder's top | Low | Proposed (`crates/rr-plan/src/packet/targets.rs:65`) |
+| R3-21 | Daily-medicine item spec says "toward 14 days on hand" (Have screen, item cards) while the target is 3 weeks; the one-month note ("No agency sets a one-month amount … the Church's three-month pantry") sits under a 21-day line | Low | Proposed (`content/items/medical.toml:43`, `crates/rr-supply/src/tiers.rs:62`) |
+| R3-22 | A household with no phone gets "a charged mobile phone" as a free step in month 3 and nothing else changes (weather radio still month 13 in Philadelphia) | Low | Proposed (supply/budget: treat it as missing alert capability) |
+| R3-23 | British and American spellings mixed in packets and screens (neighbour 63, neighbor 136; litre and liter; practise; labour) | Low | Proposed (one US-spelling pass over content, engine strings and web copy) |
+| R3-24 | Rare rows sort by the hidden middle, so a row can sit above one whose range is higher at both ends (Philadelphia: war 1 in 250–1 in 13 above financial crisis 1 in 200–1 in 11) | Low | Noted (documented in the drawer; consider the geometric middle of the shown range) |
+| R3-25 | The app's dial text says "roughly 1 in 3" for every household; the packet computes it (Minot "about 4 in 10") | Low | Noted (`web/src/lib/labels.ts:248`; needs the joint rate in the contract) |
+| R3-26 | "Tap water must be treated: about 2 days (0–7)" (Minot): a range that starts at 0 | Low | Noted (read as "up to 7 days" when the low end is 0) |
+| R3-27 | `rr_validation_2026` and the validation page link to `docs/VALIDATION.md` on `main`, which has it only once v0.2 merges | Low | Resolves at release (as the other `main` addresses) |
+| R3-28 | The two v0.2.0 Learn articles, "Before you need them" (the Deviant Ollam lessons, crediting the talk) and "Why we say you are near a strategic site", were written and reviewed but reachable nowhere in the app | Medium | Fixed `d449c5e` (Learn articles 6 and 7) |
+
+### What was checked, and how
+
+**The Philadelphia walk-through (real engine, dev server).** Typed in from the fixture: ZIP 19147,
+city, rented rowhouse with a basement, city water, gas heat, window air conditioning; two earning
+adults (car 11.8 miles, transit 3.7 miles, one can work from home), a child, an older adult with a
+daily prescription and limited mobility; one dog; one gas car; $60 a month, 0.5 months saved,
+$4,200 expenses; no insurance; a smoke alarm. The saved input matched the fixture except the
+planning date (today) and the commute distances (typed in miles). Risks: the matrix is the first
+thing under Your settings, most likely first, each name a jump link (checked for a top card, a
+card inside the folded "All 35 risks, ranked" list, which opens and scrolls, and a rare row, which scrolls
+to its row and focuses its button). The rare box has nine families sorted by local likelihood,
+ranges only, "Why here" sentences and what each changes. Targets show the badge, the stress line
+and the drivers. Every request went to the page's own origin (203 requests, one origin); no console
+errors. The family plan saved an out-of-area contact, two meeting places, a number by heart, a
+shelter spot, a trusted-circle member and a lawyer; the packet's four wallet cards carried them
+with unbreakable phone numbers. The printed packet (Chrome, Letter) runs in the documented order:
+summary, family plan, wallet cards, risks, targets, plan, shelter plan, forecast list, checklists,
+local help, documents and money, the first 30 days, special needs, calendar, sources.
+
+**Minot (a missile-field county that ticks the nuclear row).** Loaded with the rare allowance off,
+then "Nuclear attack or EMP" and "Severe solar storm" ticked from the rare box's "Choose what the
+plan may spend on". "Why here" names Minot Air Force Base and the missile field; the drawer shows the
+class and chance of blast or fallout; the allowance line (after R3-02) buys the dosimeter card in
+February 2027 and the shielded bag in October 2027, the packet's months 4 and 12; the solar-storm
+row buys nothing. With the legal switch on, the savings track adds the BJS 2009 bail sentence and
+the packet cites `bjs_felony_defendants_2009`. The Plan screen shows next month's five decisions on
+one line.
+
+**Two packets read end to end** (`cargo run -p rr-cli -- plan --household
+fixtures/households/{philadelphia-renters-4,minot-missile-field-3}.json`, identical to the goldens).
+Every bracket resolves to the source list (all 14 goldens: 170–197 sources, none missing, none
+unused); no double spaces, repeated years or stray markers; money has separators; no brand names;
+firearms only in the "if you own firearms" free step; potassium iodide only in the 10-mile-zone
+note; insulin lines only where someone keeps medicine cold; "going into labour" only for the
+pregnant household. Flesch-Kincaid grade of the prose (the validator's formula, tables and headings
+left out): 5.7–6.4 across the fourteen, Philadelphia and Minot 6.1. "Not known" appears only where
+no restoration record exists; where the region has a worst event, "Mostly back" uses it (six
+rows). Page proxy 23.66 (Philadelphia) and 23.59 (Minot), within the tests' 24 and 26 (the largest, San Juan, 25.84). Defects:
+R3-04, R3-05, R3-06, R3-16 to R3-21, R3-26.
+
+**Adversarial households** (release CLI; the script, its summary and the ten packets are in the round's notes, `~/Desktop/ready-reckoner-briefs/round2/phase2/shots/verify2/adversarial/`): a missile-field
+county with a baby; a leveed-county renter on SNAP; a Puerto Rico apartment on floor 12; a Phoenix
+household with dialysis; Missoula with two children on daily medicine; a zero-budget student with
+`minimum_kit`; Cameron (well, insulin, livestock); Philadelphia with every rare family and $150 a
+month; Philadelphia with every access need; Philadelphia without a phone. All plan; every rate is
+finite and every expert-estimate or rare row carries a range that brackets it; no rare family
+drives any target (every household's targets equal its base household's with the allowance on or
+off); every section that should print prints (access and functional needs exactly for the
+households with an access need, "If it lasts for months" exactly for long targets); one wallet card
+per person; the validation line everywhere; page proxy 19.9–26.1. The high-rise leads with leaving
+and gets the tenth-floor and elevator lines; the dialysis household gets "know more than one place
+that can give your treatment". Finding: R3-22.
+
+**Determinism and parity.** `rr doctor`: every fixture repeats byte for byte. WebAssembly equals
+native for all 14 fixtures (`wasm-pack test --node`, and the web parity suite in both modes).
+
+**Accessibility.** axe on 66 pages, 0 violations. Keyboard: the family-plan screen reaches every
+field, disclosure and button in order with a visible 3 px focus ring; in the rare box, Enter opens
+a family, Tab reaches "How this number is made", "What to do if it happens" and "Back to the table
+of risks", then the next family. The matrix and the rare box have captions; the drawers are
+`details`/`summary`. Print from the browser: Letter and A4 PDFs for Philadelphia and Minot, and the
+wallet cards alone on one Letter page.
+
+**Data licences.** All 45 pack files carry a checksum; every job source has a URL, a licence and a
+date except the hand-copied `historic_outages.toml` entry (a compiled file, no retrieval date). No
+share-alike licence in the pack (CC BY 4.0, CC0, US Government works, OpenFEMA and NRI terms, USDA
+Forest Service). The CC BY sources (ORNL EAGLE-I, the PNNL outage linkage, the NCA5 atlas) are
+credited on About with their licence; Eviction Lab is not shipped (its sign-off is off).
+
+**Backtest against the round-2 table** (`rr validate`; before → now): shorts 10 → 6. Worse: two
+in-sample events, the Oklahoma City ice storm and the Linn County derecho, covered → partial (power
+10 → 5 days), because their own storm no longer dominates their record under regional pooling, which
+the held-out test favours at every length (docs/DATA_SOURCES.md §5.3). Better: Uri Austin, the Queens
+basement, the Change and CrowdStrike outages, Maria San Juan and the SNAP lapse.
+
+**Proposed fixes, in brief.** R3-04: count both savings dates from today
+(`duration_text(f64::from(month) + months_needed)` at `savings.rs:188`) and say so ("about 24 years
+from now"). R3-05: return the first mark after the last mark with at least 0.5 in 100 still out, the
+app's rule (`web/src/lib/targets.ts:102-110`), or say "more than N days"; Hays → 2 weeks, Phoenix
+→ 1 week. R3-06: turn arrests into people arrested before the ten-year chance (a repeat-arrest
+factor from a cited source), or show the row as the engine's own count ("about N arrests for every
+100 households a year", `sentence::arrests_per_households`) instead of a share of households.
+R3-03 (engine side): give `multi_month_blackout` a `location_factor` label so the packet can say why
+here too. R3-15: measure the v2 Philadelphia print with `packet-pages.mjs` and recalibrate the
+400-words-a-page figure, or trim two pages. R3-16: print months from 1 in the packet, or print
+dates only on both surfaces.
