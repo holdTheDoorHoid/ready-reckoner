@@ -23,7 +23,7 @@ Your water utility or health department issues a boil-water notice. The water st
 ## Then
 
 1. **Bathe carefully.** Do not swallow the water. Give babies and young children a sponge bath.[^cdc_water_advisories]
-2. **Wash dishes safely.** Use a dishwasher with a sanitize cycle. Or soak rinsed dishes for a minute in 1 teaspoon of unscented bleach per gallon of warm water, then air-dry.[^cdc_water_advisories]
+2. **Wash dishes safely.** Use a dishwasher's sanitize cycle, or soak rinsed dishes for a minute in 1 teaspoon of unscented bleach per gallon of warm water. Let them air-dry.[^cdc_water_advisories]
 3. **Wash hands** with soap and tap water, unless local officials say not to.[^cdc_water_advisories]
 4. **Boil filtered water too.** A home or pitcher filter does not make it safe.[^cdc_water_advisories]
 5. **Cannot boil?** Add 8 drops of plain, unscented 6% bleach per gallon. Stir, and wait 30 minutes.[^epa_emergency_disinfection] {if:has:food_camp_stove}A camp stove works, but only outdoors.[^cdc_co_basics]{/if}
@@ -32,7 +32,7 @@ Your water utility or health department issues a boil-water notice. The water st
 ## Leave or stay
 
 - **Use only bottled water if** the notice says do not drink or do not use. Boiling does not remove chemicals.[^cdc_water_advisories]
-- **Follow** {water_utility} and local officials for updates, and for when the notice ends.[^cdc_water_advisories]
+- **Follow** {water_utility} and local officials to learn when the notice ends.[^cdc_water_advisories]
 
 ## Where and who
 
@@ -45,7 +45,7 @@ Your water utility or health department issues a boil-water notice. The water st
 
 - **Flush the pipes.** Run each tap for at least 5 minutes.[^nydoh_boil_water_checklist]
 - **Reset the ice maker.** Make and throw away three batches of ice, then wipe the bin.[^nydoh_boil_water_checklist]
-- **Flush appliances** that use water, such as the coffee maker and the fridge's water tap.[^nydoh_boil_water_checklist]
+- **Flush appliances** that use water, like the coffee maker and fridge tap.[^nydoh_boil_water_checklist]
 - **Replace water filters** as their maker says.[^nydoh_boil_water_checklist]
 - **Refresh the water heater.** Run enough hot water to empty and refill its tank once.[^nydoh_boil_water_checklist]
 

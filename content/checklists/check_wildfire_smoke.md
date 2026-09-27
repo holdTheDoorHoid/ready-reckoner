@@ -29,7 +29,7 @@ Smoke is forecast, or AirNow or the local news says the air is unhealthy.[^epa_w
 
 ## Leave or stay
 
-- **Stay if** you can keep the air inside cleaner, and stay cool with fans or air conditioning.[^epa_wildfire_indoor_air] {ref:home}
+- **Stay if** you can keep the air inside cleaner and stay cool with fans or air conditioning.[^epa_wildfire_indoor_air] {ref:home}
 - **Leave if** the home is too hot or smoky inside. Go to a friend's home out of the smoke, or a cleaner-air shelter.[^epa_clean_room] {ref:neighbourhood}
 - **Leave if** officials tell you to because a fire is near.[^epa_wildfire_indoor_air] {ref:getting_out}
 
@@ -49,7 +49,7 @@ Smoke is forecast, or AirNow or the local news says the air is unhealthy.[^epa_w
 
 - **Air out the home.** Open windows, and run the kitchen and bathroom fans.[^epa_wildfire_indoor_air]
 - **Change** dirty filters in the air cleaner and the heating system.[^epa_wildfire_indoor_air]
-- **Clean up ash** in gloves, long sleeves and an N95. Mist it with water and wet-mop; do not dry-sweep. Children, older adults and people with heart or lung disease should not help.[^epa_wildfire_indoor_air]
+- **Clean up ash** in gloves, long sleeves and an N95. Wet it down and mop; do not dry-sweep. Children, older adults and people with heart or lung disease should not help.[^epa_wildfire_indoor_air]
 
 ## Sources
 

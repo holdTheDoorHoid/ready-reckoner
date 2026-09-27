@@ -34,7 +34,7 @@ An ice storm is forecast. Heavy ice can bring down trees and power lines, and cu
 
 - **Stay if** you can keep one room warm.[^cdc_winter_safety] {ref:home}
 - **Leave if** the home gets too cold. Go to a warming center; dial 2-1-1 to find one.[^ready_gov_stay_safe_warm] {ref:getting_out}
-- **Call** 911 for a downed line, or if a person's body temperature is below 95°F.[^pa_puc_power_line_safety][^ready_gov_winter]
+- **Call** 911 for a downed line, or a body temperature below 95°F.[^pa_puc_power_line_safety][^ready_gov_winter]
 
 ## Where and who
 
@@ -43,7 +43,7 @@ An ice storm is forecast. Heavy ice can bring down trees and power lines, and cu
 ## Do not
 
 - Do not touch a downed line, or anything it touches.[^pa_puc_power_line_safety]
-- Do not get out of a car that a line has fallen on, unless the car is on fire.[^osha_downed_wires]
+- Do not leave a car that a line has fallen on, unless the car is on fire.[^osha_downed_wires]
 - Never run a generator, grill or camp stove inside the home or garage.[^cdc_co_basics][^cdc_winter_safety]
 - Do not plug a generator into a wall outlet.[^cpsc_generator_alert_2021]
 - Do not use candles. Use flashlights.[^cdc_winter_safety]
