@@ -11,7 +11,7 @@ import SiteHeader from '../components/SiteHeader.svelte';
 import { FIXTURES, type FixtureName } from '../engine/fixtures';
 import type { PlanInput } from '../engine/types';
 import { RARE_HAZARD_IDS } from '../engine/types';
-import detroitJson from '../../../fixtures/households/pending/detroit-snap-3.json';
+import detroitJson from '../../../fixtures/households/detroit-snap-3.json';
 import { STORAGE_KEY, type SavedPlan } from '../lib/persistence';
 import { render, savedFor, until, type Rendered } from '../test/helpers';
 import FamilyPlan from './FamilyPlan.svelte';

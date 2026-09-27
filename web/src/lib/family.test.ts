@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { FIXTURES } from '../engine/fixtures';
 import type { FamilyPlan, PlanInput } from '../engine/types';
 import { FAMILY_PLAN_SHORT_MAX, FAMILY_PLAN_TEXT_MAX, NUMBERS_BY_HEART_MAX, TRUSTED_CIRCLE_MAX } from '../engine/types';
-import detroitJson from '../../../fixtures/households/pending/detroit-snap-3.json';
+import detroitJson from '../../../fixtures/households/detroit-snap-3.json';
 import { clone } from '../test/helpers';
 import {
   addNumber,

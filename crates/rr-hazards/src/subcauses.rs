@@ -24,6 +24,9 @@ enum Where {
     States(&'static [&'static str]),
     /// Only in these counties.
     Counties(&'static [&'static str]),
+    /// Only for a household with someone pregnant (the form's `pregnant_or_nursing`, which also
+    /// covers nursing: the contract has no separate pregnancy answer).
+    Pregnancy,
 }
 
 /// One row of the table.
@@ -451,7 +454,7 @@ const DEFS: &[Def] = &[
                hospital and pack the go-bag early.",
         rate: None,
         sources: &[cite::CDC_PREGNANCY],
-        when: Where::Always,
+        when: Where::Pregnancy,
     },
     // The grid (2).
     Def {
@@ -599,6 +602,7 @@ fn applies(ctx: &Ctx<'_>, w: Where) -> bool {
         Where::Always => true,
         Where::States(list) => list.contains(&ctx.county.state_abbr.as_str()),
         Where::Counties(list) => list.contains(&ctx.county.fips.as_str()),
+        Where::Pregnancy => ctx.input.people.iter().any(|p| p.pregnant_or_nursing),
     }
 }
 

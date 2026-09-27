@@ -1028,10 +1028,12 @@ fn water_notes(
             "no public-water customer in your county is".to_owned()
         } else if s < 0.01 {
             "fewer than 1 of 100 public-water customers in your county are".to_owned()
+        } else if 100.0 * s >= words::NEARLY_ALL_PER_100 {
+            "nearly all public-water customers in your county are".to_owned()
         } else {
             format!(
-                "about {} of 100 public-water customers in your county are",
-                words::per_100(100.0 * s)
+                "{} public-water customers in your county are",
+                words::count_of_100(100.0 * s)
             )
         };
         parts.push(format!(

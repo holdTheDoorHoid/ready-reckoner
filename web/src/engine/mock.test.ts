@@ -261,10 +261,14 @@ describe('mock engine: invariants', () => {
     }
   });
 
-  it('never puts rare-catastrophe items in the plan', async () => {
+  it('puts a rare-catastrophe item in the plan only where the household opted into its family', async () => {
     for (const name of FIXTURE_NAMES) {
-      const o = await assess(withBudget(FIXTURES[name], 5000, 5000));
-      expect(o.plan.months.flatMap((m) => m.items).some((i) => i.item_id === 'radiation_meter')).toBe(false);
+      const input = withBudget(FIXTURES[name], 5000, 5000);
+      const optedIn = (input.dials?.rare_opt_in ?? []).length > 0;
+      const o = await assess(input);
+      const bought = o.plan.months.flatMap((m) => m.items).some((i) => i.item_id === 'radiation_meter');
+      // Minot ticks the nuclear row and may be offered the meter; nobody else may.
+      if (!optedIn) expect(bought, name).toBe(false);
     }
   });
 

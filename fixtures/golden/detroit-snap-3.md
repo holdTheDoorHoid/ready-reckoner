@@ -111,7 +111,7 @@ What could reach a household like yours in Wayne County, Michigan over the next 
 
 Nearly every household like yours will have someone need emergency care in the next ten years (about 1.4 times a year).[15]
 
-**Includes:** far from emergency care; falls; going into labour during a disaster.
+**Includes:** far from emergency care; falls.
 
 **What helps.** Take a first-aid and bleeding-control class. You may be able to save a life by acting right after an injury, before help arrives.[16] If a teen or adult collapses and their heart stops, call 911 and push hard and fast in the center of the chest. This hands-only CPR needs no training. Note where the nearest heart defibrillator (AED) is; it talks you through each step.[17] Keep a stocked first-aid kit. Check it regularly and replace anything used or out of date.[18] Keep a list of each person's medicines, doses and allergies with your emergency supplies.[19] Know how to reach 911. Call if you can, and text where that service works.[20]
 
@@ -242,7 +242,7 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Severe pandemic | Between 1 in 200 and 1 in 21[10, 60, 61] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
 | Severe solar storm | Between 1 in 2,100 and 1 in 40[10, 78, 79, 80, 81, 82] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
 | Nuclear attack | Between 1 in 10,000 and 1 in 42[10, 66, 74, 75, 83, 84, 85, 86, 87, 88] | Serious disruption: sheltering inside for a day or more against fallout, then shortages and outages. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
-| Power out for months (any cause) | Between 1 in 18,000 and 1 in 39[10, 50, 74, 75, 78, 79, 80, 81, 82, 83, 89, 90] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. The long-horizon section lists what helps instead: a water filter with a water source, a way to cook, sanitation. |
+| Power out for months (any cause) | Between 1 in 18,000 and 1 in 39[10, 50, 74, 75, 78, 79, 80, 81, 82, 83, 89, 90] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Chemical, biological or radiological attack | Between 1 in 81,000 and 1 in 410[10, 66, 91] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
 | Mass shooting or bombing | Between 1 in 330,000 and 1 in 33,000[10, 92] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
 
@@ -312,7 +312,7 @@ Water-system failures are counted about one and a half times as often as the nat
 
 **What helps.** See Medicine under Special needs.
 
-**What to avoid.** Do not throw insulin away after a day without power. If it gets hotter than 86°F and you have nothing else, use it, and replace it as soon as you can.[117] Never use insulin that has frozen or looks unusual, with particles, clumps, crystals or a changed color.[117, 118] Do not use expired medicines. Weak antibiotics can fail to treat an infection.[22] Do not share antibiotics or save them for later.[21]
+**What to avoid.** Do not use expired medicines. Weak antibiotics can fail to treat an infection.[22] Do not share antibiotics or save them for later.[21]
 
 ### No phone, internet or card payments: about 3 days (2–7)
 
@@ -324,13 +324,13 @@ Water-system failures are counted about one and a half times as often as the nat
 
 **What helps.** See Your family plan and Your shelter plan.
 
-**What to avoid.** Many people wait to check with others before they act on a warning.[119] Always follow the instructions of local officials, and leave early enough to avoid being trapped by bad weather.[120] Never walk or drive through floodwater. Six inches of moving water can knock you down.[40]
+**What to avoid.** Many people wait to check with others before they act on a warning.[117] Always follow the instructions of local officials, and leave early enough to avoid being trapped by bad weather.[118] Never walk or drive through floodwater. Six inches of moving water can knock you down.[40]
 
 ### Stranded away from home
 
 **What helps.** See Your family plan and Your shelter plan.
 
-**What to avoid.** Do not force down water when you are not thirsty. Too much water can be harmful.[121] In heat, do not drink more than 6 cups an hour.[122] If you are stuck in a car in a snowstorm, staying in the car is often safest. Run the engine about 10 minutes an hour with a window cracked, and keep the exhaust pipe clear of snow.[24]
+**What to avoid.** Do not force down water when you are not thirsty. Too much water can be harmful.[119] In heat, do not drink more than 6 cups an hour.[120] If you are stuck in a car in a snowstorm, staying in the car is often safest. Run the engine about 10 minutes an hour with a window cracked, and keep the exhaust pipe clear of snow.[24]
 
 ### Medical emergency when help is slow
 
@@ -340,13 +340,13 @@ Water-system failures are counted about one and a half times as often as the nat
 
 **What helps.** See "House fire" under Your risks and the safety rules under Your plan.
 
-**What to avoid.** If a person or pet is still inside, get out, call 911, and tell firefighters where they are.[44] Never heat your home with an oven.[27] Turn off space heaters when you leave the room or go to bed.[27] Replace 9-volt alarm batteries at least once a year.[43] If you smell gas or hear hissing, get everyone out without touching switches or phones, then call 911 and the gas company from a safe distance.[123, 124] Only a professional should turn the gas back on.[124]
+**What to avoid.** If a person or pet is still inside, get out, call 911, and tell firefighters where they are.[44] Never heat your home with an oven.[27] Turn off space heaters when you leave the room or go to bed.[27] Replace 9-volt alarm batteries at least once a year.[43] If you smell gas or hear hissing, get everyone out without touching switches or phones, then call 911 and the gas company from a safe distance.[121, 122] Only a professional should turn the gas back on.[122]
 
 ### Home and personal security
 
 **What helps.** See the home-security and trusted-circle steps in Your plan.
 
-**What to avoid.** After a disaster, be careful with people who show up offering fast repairs or help for a fee. Report scams at ReportFraud.ftc.gov.[125] Do not hide a spare key under the doormat or a planter. Leave it with a trusted neighbour.[126]
+**What to avoid.** After a disaster, be careful with people who show up offering fast repairs or help for a fee. Report scams at ReportFraud.ftc.gov.[123] Do not hide a spare key under the doormat or a planter. Leave it with a trusted neighbour.[124]
 
 ### Unhealthy air indoors
 
@@ -358,7 +358,7 @@ What to do about lost income and a damaged home is under Documents and money.
 
 ## Your plan
 
-Your budget is $10 a month. Free steps come first, then what protects you most for each dollar, water, medicine and safety first, until each need reaches the step that is enough for it.[127]
+Your budget is $10 a month. Free steps come first, then what protects you most for each dollar, water, medicine and safety first, until each need reaches the step that is enough for it.[125]
 
 ### Start now: free steps (from October 1, 2026)
 
@@ -373,12 +373,12 @@ Your budget is $10 a month. Free steps come first, then what protects you most f
 
 ### Safety rules to learn now
 
-- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[44, 128]
-- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[129]
-- **Water heater:** Turn off its power or gas before you drain it for water.[129]
+- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[44, 126]
+- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[127]
+- **Water heater:** Turn off its power or gas before you drain it for water.[127]
 - **Food:** In a power cut, throw out food that has been at 40°F or warmer for 2 hours.[95]
-- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[95, 130]
-- **CPR:** Take a first-aid and CPR class.[124]
+- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[95, 128]
+- **CPR:** Take a first-aid and CPR class.[122]
 
 ### This month
 
@@ -415,13 +415,15 @@ At this budget the plan runs past ten years. The early months do the most good, 
 
 ## Your shelter plan
 
-In FEMA's 2024 survey, where to shelter safely was the information people most wanted.[131] Pick a spot for each danger below, at home and at work, and practice going there.[2]
+Pick a spot for each danger below, at home and at work, and practice going there.[2]
 
-**Tornado.** The best place is a safe room or storm shelter. Next best is a small inside room with no windows, or a basement, on the lowest floor of a sturdy building.[46] Most tornadoes can destroy even a tied-down mobile home, so plan to go to a sturdy building nearby.[47]
+**Strong wind.** In a high wind or severe thunderstorm warning, go inside a sturdy building, to an inside room or basement.[129] Stay away from windows while damaging wind is near.[130]
 
-**Hurricane.** If you live in an evacuation zone and officials tell you to leave, go right away. If you stay, use an inside room away from windows.[132]
+**Tornado.** A safe room or storm shelter is best; next is a small inside room with no windows on the lowest floor.[46] Even a tied-down mobile home is not safe.[47]
 
-**Chemical release.** Pick an above-ground room with as few openings as possible. If you are told to stay inside, close the windows, doors and vents, turn off air conditioning and fans, and seal the room with plastic sheeting and duct tape.[133]
+**Hurricane.** If officials tell your evacuation zone to leave, go right away. If you stay, use an inside room away from windows.[131]
+
+**Chemical release.** If told to stay inside, go to an above-ground room with few openings. Close the windows, doors and vents, turn off fans and air conditioning, and seal the room with plastic sheeting and duct tape.[132]
 
 **Smoke.** Make one room a clean room: close its windows and doors, and run an air cleaner that does not make ozone.[31]
 
@@ -429,18 +431,18 @@ In FEMA's 2024 survey, where to shelter safely was the information people most w
 
 ## When a storm, freeze or heat wave is forecast
 
-Hurricanes, winter storms and heat waves usually come with warning. Keep your phone charged when one is forecast, and use the time the same way each time.[132]
+Hurricanes, winter storms and heat waves usually come with warning. Keep your phone charged when one is forecast, and use the time the same way each time.[131]
 
 **Before any storm**
 
-- Charge phones, power banks and other batteries.[134] 
-- Fill the car's tank and get some cash, since card readers and cash machines need power.[134] If you would leave in an electric car, charge it fully.[135]
-- Refill prescriptions if you can.[134]
-- Fill the bathtub and other large containers with water for flushing and cleaning.[134]
-- Turn the fridge to its coldest setting and keep the doors shut.[134] A full freezer keeps food cold for about 48 hours, a fridge for about four.[95]
-- Bring in or tie down outdoor furniture and grills.[132]
-- Check your evacuation zone and your plan to leave.[132]
-- Check with neighbors, older adults and anyone who may need help.[132]
+- Charge phones, power banks and other batteries.[133] 
+- Fill the car's tank and get some cash, since card readers and cash machines need power.[133] If you would leave in an electric car, charge it fully.[134]
+- Refill prescriptions if you can.[133]
+- Fill the bathtub and other large containers with water for flushing and cleaning.[133]
+- Turn the fridge to its coldest setting and keep the doors shut.[133] A full freezer keeps food cold for about 48 hours, a fridge for about four.[95]
+- Bring in or tie down outdoor furniture and grills.[131]
+- Check your evacuation zone and your plan to leave.[131]
+- Check with neighbors, older adults and anyone who may need help.[131]
 
 **Before a hard freeze.** Let hot and cold water drip from a faucet at night, open the cabinet doors under sinks on outside walls, and keep the heat at 55°F or higher. Make sure everyone knows how to shut off the water in case a pipe bursts.[39]
 
@@ -506,29 +508,29 @@ One list per step, up to the one your risks need, with each thing's month. This 
 
 **Person 1**: a 7-mile (11 km) trip, about 2 hours on foot.
 
-- [ ] Keep a get-home bag at work or in your daily bag: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (FHWA, Ready.gov; some amounts are estimates)[136, 137, 138, 139]
-- [ ] For the walk, from home: 1.1 litres of water and 200 kcal of snacks.[136, 137, 140]
+- [ ] Keep a get-home bag at work or in your daily bag: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (FHWA, Ready.gov; some amounts are estimates)[135, 136, 137, 138]
+- [ ] For the walk, from home: 1.1 litres of water and 200 kcal of snacks.[135, 136, 139]
 
 ### Extras for the hazards you face
 
 These help with one hazard, not a whole need, so they sit outside the budget.
 
-- Tarp kit to cover a broken window or roof: heavy tarp, rope and duct tape (usually $40–68 per kit)[139, 141, 142]
-- Insect repellent for the weeks after a flood or hurricane (usually $8–10 per can)[142, 143, 144]
+- Tarp kit to cover a broken window or roof: heavy tarp, rope and duct tape (usually $40–68 per kit)[138, 140, 141]
+- Insect repellent for the weeks after a flood or hurricane (usually $8–10 per can)[141, 142, 143]
 
 ## Access and functional needs
 
 **In your household:** person 3 (older adult): deaf or hard of hearing.
 
-Planners group the needs a disaster makes harder under five headings, called CMIST: communication, maintaining health, independence, support and safety, and transportation.[145]
+Planners group the needs a disaster makes harder under five headings, called CMIST: communication, maintaining health, independence, support and safety, and transportation.[144]
 
-**Communication.** If speech, hearing or understanding is affected, carry cards that tell responders how to talk with you.[19] For someone who is deaf or hard of hearing, add smoke alarms with a vibrating pad or a strobe light.[146]
+**Communication.** If speech, hearing or understanding is affected, carry cards that tell responders how to talk with you.[19] For someone who is deaf or hard of hearing, add smoke alarms with a vibrating pad or a strobe light.[145]
 
-**Maintaining health.** Ask your doctor about an emergency supply of medicine, and plan backup power for equipment.[19] A power company's medical program may warn you of outages but does not promise faster repairs.[147]
+**Maintaining health.** Ask your doctor about an emergency supply of medicine, and plan backup power for equipment.[19] A power company's medical program may warn you of outages but does not promise faster repairs.[146]
 
-**Independence.** Keep mobility aids, devices and service animals with you, so you stay independent.[145]
+**Independence.** Keep mobility aids, devices and service animals with you, so you stay independent.[144]
 
-**Support and safety.** Make sure someone in your support network has a key to your home and knows how to use your equipment.[148] Many local emergency offices keep voluntary registries of people who may need help; your state's entry in this plan shows where to start.[19] Signing up does not guarantee help, so keep your own plan too.[149]
+**Support and safety.** Make sure someone in your support network has a key to your home and knows how to use your equipment.[147] Many local emergency offices keep voluntary registries of people who may need help; your state's entry in this plan shows where to start.[19] Signing up does not guarantee help, so keep your own plan too.[148]
 
 **Transportation.** Arrange accessible transportation ahead of time with your transit provider or emergency office.[19]
 
@@ -536,9 +538,9 @@ Planners group the needs a disaster makes harder under five headings, called CMI
 
 Where to start in Michigan, checked September 26, 2026:
 
-- **Evacuation zones and registry:** Your county emergency management office handles evacuation zones and any registry for people who may need help in a disaster. Find yours through the state agency: Michigan State Police, Emergency Management and Homeland Security Division (https://www.michigan.gov/msp/divisions/emhsd).[19, 120]
-- **Alerts:** MI Ready: Emergency Alerts (https://www.michigan.gov/miready/be-informed/emergency-alerts). Links to local text alert sign-ups where your community has one. Emergency alerts also reach phones with no sign-up.[150]
-- **Prescription refills:** No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist.[151]
+- **Evacuation zones and registry:** Your county emergency management office handles evacuation zones and any registry for people who may need help in a disaster. Find yours through the state agency: Michigan State Police, Emergency Management and Homeland Security Division (https://www.michigan.gov/msp/divisions/emhsd).[19, 118]
+- **Alerts:** MI Ready: Emergency Alerts (https://www.michigan.gov/miready/be-informed/emergency-alerts). Links to local text alert sign-ups where your community has one. Emergency alerts also reach phones with no sign-up.[149]
+- **Prescription refills:** No state law allowing emergency refills was found in a 2022 review; in past disasters some governors allowed them by order. Ask your pharmacist.[150]
 
 ## Documents and money
 
@@ -551,14 +553,14 @@ Keep paper copies in a waterproof pouch and photos you can reach from any phone.
 
 ### Decisions
 
-- [ ] **Decide: ID for every person (passport book or card, or a state ID).** A passport book or card for each person, children included, proves who you are and your citizenship if other papers are lost, and the card shows no home address; get them before you need them. The federal fee schedule: a first adult book $165 and card $65 ($130 and $30 plus a $35 acceptance fee), for children under 16 a book $135 and card $50 (22 CFR 22.1).[45, 152, 153]
-- [ ] **Decide: homeowners, condo or renters insurance.** You have no renters insurance yet: get a quote and decide. Check what it pays if you have to live somewhere else for a while. (FEMA, Ready.gov)[45, 154]
-- [ ] **Decide: flood insurance, even outside a flood zone.** Home and renters policies usually don't cover floods. Decide on flood insurance before you need it: Most homes in your county are outside the mapped high-risk flood zone, and that is where many uninsured floods happen: about 3 in 10 flood insurance claims come from outside high-risk flood areas. A quote costs nothing, and a new policy usually starts 30 days after you buy it. It pays up to $250,000 for the building and $100,000 for belongings, and renters can buy cover for belongings only. (FEMA, FloodSmart, Ready.gov)[9, 41, 154, 155, 156]
-- [ ] **Decide: disability and life insurance for the people who earn.** Someone in your household earns money the others rely on: check whether your job offers disability insurance, and whether life insurance would carry the others through the years they would need. About 1 in 4 workers who start at 20 become disabled before retirement age. NAIC's buyer's guide helps you work out how much cover is enough. (SSA, NAIC)[62, 157]
+- [ ] **Decide: ID for every person (passport book or card, or a state ID).** A passport book or card for each person, children included, proves who you are and your citizenship if other papers are lost, and the card shows no home address; get them before you need them. The federal fee schedule: a first adult book $165 and card $65 ($130 and $30 plus a $35 acceptance fee), for children under 16 a book $135 and card $50 (22 CFR 22.1).[45, 151, 152]
+- [ ] **Decide: homeowners, condo or renters insurance.** You have no renters insurance yet: get a quote and decide. Check what it pays if you have to live somewhere else for a while. (FEMA, Ready.gov)[45, 153]
+- [ ] **Decide: flood insurance, even outside a flood zone.** Home and renters policies usually don't cover floods. Decide on flood insurance before you need it: Most homes in your county are outside the mapped high-risk flood zone, and that is where many uninsured floods happen: about 3 in 10 flood insurance claims come from outside high-risk flood areas. A quote costs nothing, and a new policy usually starts 30 days after you buy it. It pays up to $250,000 for the building and $100,000 for belongings, and renters can buy cover for belongings only. (FEMA, FloodSmart, Ready.gov)[9, 41, 153, 154, 155]
+- [ ] **Decide: disability and life insurance for the people who earn.** Someone in your household earns money the others rely on: check whether your job offers disability insurance, and whether life insurance would carry the others through the years they would need. About 1 in 4 workers who start at 20 become disabled before retirement age. NAIC's buyer's guide helps you work out how much cover is enough. (SSA, NAIC)[62, 156]
 
 ### Cash
 
-- Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about $120: half of 3 days of your usual spending ($2,400 a month), the part that goes on food, fuel and medicine. No agency gives a dollar amount. (Ready.gov, FEMA; some amounts are estimates)[6, 7, 10, 23, 45, 49, 50, 136, 154]
+- Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about $120: half of 3 days of your usual spending ($2,400 a month), the part that goes on food, fuel and medicine. No agency gives a dollar amount. (Ready.gov, FEMA; some amounts are estimates)[6, 7, 10, 23, 45, 49, 50, 135, 153]
 
 ### Savings
 
@@ -566,51 +568,51 @@ Of 100 households like yours, about 25 (10–40) will have an income gap of more
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $2300 at 30 % of your monthly spending, which loss-of-use insurance pays for.[6, 9, 10, 11, 36, 37, 38, 55, 158, 159]
+If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $2300 at 30 % of your monthly spending, which loss-of-use insurance pays for.[6, 9, 10, 11, 36, 37, 38, 55, 157, 158]
 
 ## After a disaster: the first 30 days
 
-**Your county.** Wayne County, Michigan had 2 federal major-disaster declarations in the last five full years.[160]
+**Your county.** Wayne County, Michigan had 2 federal major-disaster declarations in the last five full years.[159]
 
 Recovery takes weeks. These steps come in rough order.
 
-**Going home.** Go back only when local officials say it is safe. Do not go inside if you smell gas or the building looks damaged.[161] Run a generator only outside, more than 20 feet from windows, doors and vents.[94]
+**Going home.** Go back only when local officials say it is safe. Do not go inside if you smell gas or the building looks damaged.[160] Run a generator only outside, more than 20 feet from windows, doors and vents.[94]
 
-**Insurance and records.** Before you clean up, take photos and videos and make a list of the damage.[161] Keep every receipt.[162] Call your insurer as soon as you can, and an adjuster will come to inspect. Check the adjuster's estimate, and talk to them before you sign a repair contract.[163]
+**Insurance and records.** Before you clean up, take photos and videos and make a list of the damage.[160] Keep every receipt.[161] Call your insurer as soon as you can, and an adjuster will come to inspect. Check the adjuster's estimate, and talk to them before you sign a repair contract.[162]
 
-**Help from FEMA.** If a federal disaster declaration covers your county, apply at DisasterAssistance.gov or call 1-800-621-3362.[164] FEMA help does not replace insurance.[165]
+**Help from FEMA.** If a federal disaster declaration covers your county, apply at DisasterAssistance.gov or call 1-800-621-3362.[163] FEMA help does not replace insurance.[164]
 
-**Scams.** FEMA never charges to apply or to inspect.[166] Its inspectors carry an official photo ID and never ask for your bank details; a FEMA shirt is not an ID.[162] Never sign your insurance check over to a contractor, and walk away from anyone who wants cash up front.[167]
+**Scams.** FEMA never charges to apply or to inspect.[165] Its inspectors carry an official photo ID and never ask for your bank details; a FEMA shirt is not an ID.[161] Never sign your insurance check over to a contractor, and walk away from anyone who wants cash up front.[166]
 
-**Medicine.** In a declared disaster, Medicare drug plans can help you find a pharmacy and replace lost medicine.[168] Many states let a pharmacist give an emergency supply when your prescriber cannot be reached, and the rules differ by state.[151] Healthcare Ready's Rx Open map shows which pharmacies are open in a disaster area.[169]
+**Medicine.** In a declared disaster, Medicare drug plans can help you find a pharmacy and replace lost medicine.[167] Many states let a pharmacist give an emergency supply when your prescriber cannot be reached, and the rules differ by state.[150] Healthcare Ready's Rx Open map shows which pharmacies are open in a disaster area.[168]
 
-**Papers.** To replace lost IDs, start with your birth certificate, from the vital records office of the state where you were born.[170]
+**Papers.** To replace lost IDs, start with your birth certificate, from the vital records office of the state where you were born.[169]
 
 ## Special needs
 
 ### Medicine
 
-- 1 person takes prescription medicine every day: keep 21 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[3, 9, 10, 11, 53, 54, 60, 61, 151, 171, 172, 173, 174, 175]
+- 1 person takes prescription medicine every day: keep 21 days of it on hand. Keep a written list of each medicine, what it is for and the dose. After a disaster declaration some states let pharmacies give an emergency refill of up to 30 days, and many allow only a few days; ask your pharmacist what yours allows. (Florida DEM, CDC, Red Cross, Healthcare Ready)[3, 9, 10, 11, 53, 54, 60, 61, 150, 170, 171, 172, 173, 174]
 
 ### Antibiotics
 
-- No antibiotics are included in this plan. If you have a specific, foreseeable need, such as remote travel, talk to your own clinician about a standby prescription with written instructions. Never use fish or pet antibiotics, never share prescriptions, and don't use expired ones. (CDC, FDA)[21, 22, 176, 177]
+- No antibiotics are included in this plan. If you have a specific, foreseeable need, such as remote travel, talk to your own clinician about a standby prescription with written instructions. Never use fish or pet antibiotics, never share prescriptions, and don't use expired ones. (CDC, FDA)[21, 22, 175, 176]
 
 ### Getting around
 
-- 1 person may need help to leave quickly: arrange a ride and a helper now, and show them where the medicines and equipment are. (Ready.gov)[19, 148]
+- 1 person may need help to leave quickly: arrange a ride and a helper now, and show them where the medicines and equipment are. (Ready.gov)[19, 147]
 
 ### Stress and mental health
 
 #### Stress, mental health and the 988 line
 
-**What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[178] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[179] Write a short calm plan: what you might feel, what helps you, and who you will call.[180] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[181]
+**What helps.** Save 988 in every phone. It offers free, judgment-free support 24/7 for mental health, substance use and more, by call, text or chat.[177] After a disaster, the Disaster Distress Helpline offers crisis counseling 24/7 to anyone in emotional distress. Call or text 1-800-985-5990.[178] Write a short calm plan: what you might feel, what helps you, and who you will call.[179] Oregon's 2 Weeks Ready program even includes practicing mindfulness as a step in getting prepared.[180]
 
-**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[182] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[178]
+**What to avoid.** Do not keep the news on all day. No one, adult or child, benefits from graphic details or disturbing images.[181] Reach out before things feel unbearable. The 988 line supports people in emotional distress as well as in crisis.[177]
 
 ## Maintenance calendar
 
-Dates count from when each item enters your plan; move them if you buy earlier or later.[139]
+Dates count from when each item enters your plan; move them if you buy earlier or later.[138]
 
 | When | What |
 | --- | --- |
@@ -662,23 +664,23 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 **101** RePOWRD: Restoration of Power Outage from Wide-area Severe Weather Disruptions. Kar B. et al., Oak Ridge National Laboratory, 2022. https://info.ornl.gov/sites/publications/Files/Pub183672.pdf **102** Emergency Disinfection of Drinking Water. U.S. Environmental Protection Agency, 2026. https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water **103** Drinking Water Advisories: An Overview. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/about/drinking-water-advisories-an-overview.html **104** How to Make Water Safe in an Emergency. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/about/index.html **105** City of Asheville lifts systemwide boil water notice issued after Hurricane Helene. U.S. Environmental Protection Agency, 2024. https://www.epa.gov/newsreleases/city-asheville-lifts-systemwide-boil-water-notice-issued-after-hurricane-helene **106** ECHO Safe Drinking Water Act data downloads. U.S. Environmental Protection Agency, Enforcement and Compliance History Online, 2026. https://echo.epa.gov/tools/data-downloads/sdwa-download-summary **107** Evaluating the Resilience of Drinking Water Systems to Severe Weather Events Using Boil Water Notices and Bottled Water Sales. Shaffer M., Awad N., Davenport F. and Fakhreddine S., 2026. https://doi.org/10.1021/acs.est.5c18579 **108** Public Water Service Disruptions: A Descriptive Analysis of Boil Water Advisories. MDPI Water, 2024. https://doi.org/10.3390/w16030443 **109** How to Create an Emergency Water Supply. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/water-emergency/about/how-to-create-and-store-an-emergency-water-supply.html **110** The Sphere Handbook: Humanitarian Charter and Minimum Standards in Humanitarian Response, 4th edition. Sphere Association, 2018. https://spherestandards.org/handbook/
 
-**111** Storage Water Heaters. U.S. Department of Energy, Energy Saver (via Internet Archive), 2026. https://web.archive.org/web/20260501030607/https://www.energy.gov/energysaver/storage-water-heaters **112** How to Find Clean Water in an Emergency. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/about/how-to-find-clean-water-in-an-emergency.html **113** Emergency Toilet Guidebook. Regional Disaster Preparedness Organization, Portland Metro Region, 2024. https://www.rdpo.net/emergency-toilet **114** Emergency Preparedness manual: guidelines on emergency water storage and purification. The Church of Jesus Christ of Latter-day Saints, 2023. https://www.churchofjesuschrist.org/study/manual/emergency-preparedness/01-food-and-water-storage/02-guidelines-on-emergency-water-storage-and-purification?lang=eng **115** How to Disinfect Wells After an Emergency. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/water-emergency/about/how-to-disinfect-wells-after-an-emergency.html **116** Shelf-Stable Food Safety. USDA Food Safety and Inspection Service, 2024. https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/shelf-stable-food **117** Information Regarding Insulin Storage and Switching Between Products in an Emergency. U.S. Food and Drug Administration, 2017. https://www.fda.gov/drugs/emergency-preparedness-drugs/information-regarding-insulin-storage-and-switching-between-products-emergency **118** Insulin Storage and Syringe Safety. American Diabetes Association, 2026. https://diabetes.org/health-wellness/medication/insulin-storage-and-syringe-safety **119** Milling and Public Warnings. Wood M.M., Mileti D.S., Bean H., Liu B.F. et al., 2018. https://doi.org/10.1177/0013916517709561 **120** Evacuation. FEMA / Ready.gov, 2026. https://www.ready.gov/evacuation
+**111** Storage Water Heaters. U.S. Department of Energy, Energy Saver (via Internet Archive), 2026. https://web.archive.org/web/20260501030607/https://www.energy.gov/energysaver/storage-water-heaters **112** How to Find Clean Water in an Emergency. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/about/how-to-find-clean-water-in-an-emergency.html **113** Emergency Toilet Guidebook. Regional Disaster Preparedness Organization, Portland Metro Region, 2024. https://www.rdpo.net/emergency-toilet **114** Emergency Preparedness manual: guidelines on emergency water storage and purification. The Church of Jesus Christ of Latter-day Saints, 2023. https://www.churchofjesuschrist.org/study/manual/emergency-preparedness/01-food-and-water-storage/02-guidelines-on-emergency-water-storage-and-purification?lang=eng **115** How to Disinfect Wells After an Emergency. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/water-emergency/about/how-to-disinfect-wells-after-an-emergency.html **116** Shelf-Stable Food Safety. USDA Food Safety and Inspection Service, 2024. https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/shelf-stable-food **117** Milling and Public Warnings. Wood M.M., Mileti D.S., Bean H., Liu B.F. et al., 2018. https://doi.org/10.1177/0013916517709561 **118** Evacuation. FEMA / Ready.gov, 2026. https://www.ready.gov/evacuation **119** CDC Yellow Book 2026: Heat and Cold Illness in Travelers. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/environmental-hazards-risks/heat-and-cold-illness-in-travelers.html **120** Heat Stress: Recommendations. CDC National Institute for Occupational Safety and Health, 2026. https://www.cdc.gov/niosh/heat-stress/recommendations/index.html
 
-**121** CDC Yellow Book 2026: Heat and Cold Illness in Travelers. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/environmental-hazards-risks/heat-and-cold-illness-in-travelers.html **122** Heat Stress: Recommendations. CDC National Institute for Occupational Safety and Health, 2026. https://www.cdc.gov/niosh/heat-stress/recommendations/index.html **123** Gas Emergencies. Pennsylvania Public Utility Commission, 2026. https://www.puc.pa.gov/pipeline-safety/gas-emergencies/ **124** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills **125** Dealing with Weather Emergencies. Federal Trade Commission, 2026. https://consumer.ftc.gov/features/dealing-weather-emergencies **126** Home and Neighborhood Safety. National Crime Prevention Council, 2026. https://www.ncpc.org/resources/home-neighborhood-safety/ **127** Harm weights used by the allocator. Ready Reckoner, 2026. Same page as 10. Expert estimate. **128** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **129** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **130** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf
+**121** Gas Emergencies. Pennsylvania Public Utility Commission, 2026. https://www.puc.pa.gov/pipeline-safety/gas-emergencies/ **122** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills **123** Dealing with Weather Emergencies. Federal Trade Commission, 2026. https://consumer.ftc.gov/features/dealing-weather-emergencies **124** Home and Neighborhood Safety. National Crime Prevention Council, 2026. https://www.ncpc.org/resources/home-neighborhood-safety/ **125** Harm weights used by the allocator. Ready Reckoner, 2026. Same page as 10. Expert estimate. **126** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **127** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **128** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf **129** During a High Wind Event. NOAA National Weather Service, 2026. https://www.weather.gov/safety/wind-during **130** What to Do During Severe Weather. NOAA National Weather Service, 2026. https://www.weather.gov/safety/thunderstorm-during
 
-**131** 2024 National Household Survey on Disaster Preparedness: Findings. FEMA (via Internet Archive), 2025. https://web.archive.org/web/20250507154704/https://www.fema.gov/sites/default/files/documents/fema_icpd_2024-national-household-survey-on-disaster-preparedness-findings_05072025.pdf **132** Hurricanes. FEMA / Ready.gov, 2026. https://www.ready.gov/hurricanes **133** Chemicals and Hazardous Materials Incidents. FEMA / Ready.gov, 2026. https://www.ready.gov/chemical **134** Hurricanes: what to do before, during and after. Texas Department of State Health Services (TexasReady), 2026. https://texasready.gov/be-informed/natural-disasters/hurricanes.html **135** Staying Safe with Electric Vehicles. Hillsborough County, Florida, 2025. https://hcfl.gov/residents/sustainability-and-green/green-hillsborough/staying-safe-with-electric-vehicles **136** Ready Reckoner expert estimates for supply sizing and upkeep. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md Expert estimate. **137** Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds. Federal Highway Administration, 2009. https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm **138** Build A Kit. FEMA / Ready.gov (via Internet Archive), 2020. https://web.archive.org/web/20200101090440/https://www.ready.gov/kit **139** Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit **140** Dietary Guidelines for Americans, 2020–2025, Appendix 2: Estimated Calorie Needs. U.S. Department of Agriculture and U.S. Department of Health and Human Services, 2020. https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf
+**131** Hurricanes. FEMA / Ready.gov, 2026. https://www.ready.gov/hurricanes **132** Chemicals and Hazardous Materials Incidents. FEMA / Ready.gov, 2026. https://www.ready.gov/chemical **133** Hurricanes: what to do before, during and after. Texas Department of State Health Services (TexasReady), 2026. https://texasready.gov/be-informed/natural-disasters/hurricanes.html **134** Staying Safe with Electric Vehicles. Hillsborough County, Florida, 2025. https://hcfl.gov/residents/sustainability-and-green/green-hillsborough/staying-safe-with-electric-vehicles **135** Ready Reckoner expert estimates for supply sizing and upkeep. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md Expert estimate. **136** Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds. Federal Highway Administration, 2009. https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm **137** Build A Kit. FEMA / Ready.gov (via Internet Archive), 2020. https://web.archive.org/web/20200101090440/https://www.ready.gov/kit **138** Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit **139** Dietary Guidelines for Americans, 2020–2025, Appendix 2: Estimated Calorie Needs. U.S. Department of Agriculture and U.S. Department of Health and Human Services, 2020. https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf **140** U.S. Army Corps of Engineers and FEMA begin Operation Blue Roof in Florida. FEMA, 2018. https://www.fema.gov/press-release/20250121/us-army-corps-engineers-and-fema-begin-operation-blue-roof-florida
 
-**141** U.S. Army Corps of Engineers and FEMA begin Operation Blue Roof in Florida. FEMA, 2018. https://www.fema.gov/press-release/20250121/us-army-corps-engineers-and-fema-begin-operation-blue-roof-florida **142** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **143** What to Do After a Hurricane or Flood. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/mosquitoes/response/index.html **144** Preventing Mosquito Bites. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mosquitoes/prevention/index.html **145** At-Risk Individuals with Access and Functional Needs. HHS Administration for Strategic Preparedness and Response (ASPR), 2026. https://www.aspr.gov/readiness-response/response-operations/risk-individuals/access-functional-needs-cross-cutting-resources/risk-individuals-access-functional-needs **146** Fire Safety for People with Disabilities. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/at-risk-audiences/people-with-disabilities/index.html **147** Protect Your Health During Power Outages. PSEG Long Island, 2026. https://www.psegliny.com/outages/stormprepandrestoration/criticalcareprogram **148** Older Adults. FEMA / Ready.gov, 2026. https://www.ready.gov/older-adults **149** State of Texas Emergency Assistance Registry. Texas Division of Emergency Management, 2026. https://www.tdem.texas.gov/response/state-of-texas-emergency-assistance-registry **150** Emergency Alerts. FEMA / Ready.gov, 2026. https://www.ready.gov/alerts
+**141** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **142** What to Do After a Hurricane or Flood. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/mosquitoes/response/index.html **143** Preventing Mosquito Bites. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mosquitoes/prevention/index.html **144** At-Risk Individuals with Access and Functional Needs. HHS Administration for Strategic Preparedness and Response (ASPR), 2026. https://www.aspr.gov/readiness-response/response-operations/risk-individuals/access-functional-needs-cross-cutting-resources/risk-individuals-access-functional-needs **145** Fire Safety for People with Disabilities. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/at-risk-audiences/people-with-disabilities/index.html **146** Protect Your Health During Power Outages. PSEG Long Island, 2026. https://www.psegliny.com/outages/stormprepandrestoration/criticalcareprogram **147** Older Adults. FEMA / Ready.gov, 2026. https://www.ready.gov/older-adults **148** State of Texas Emergency Assistance Registry. Texas Division of Emergency Management, 2026. https://www.tdem.texas.gov/response/state-of-texas-emergency-assistance-registry **149** Emergency Alerts. FEMA / Ready.gov, 2026. https://www.ready.gov/alerts **150** A Review of State Emergency Prescription Protocols. Healthcare Ready, 2023. https://healthcareready.org/a-review-of-state-emergency-prescription-protocols/
 
-**151** A Review of State Emergency Prescription Protocols. Healthcare Ready, 2023. https://healthcareready.org/a-review-of-state-emergency-prescription-protocols/ **152** 22 CFR 22.1, Schedule of Fees for Consular Services (passport book, card and execution fees), 2025 edition. U.S. Government Publishing Office (Code of Federal Regulations), 2025. https://www.govinfo.gov/content/pkg/CFR-2025-title22-vol1/pdf/CFR-2025-title22-vol1-sec22-1.pdf **153** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **154** Financial Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/financial-preparedness **155** Flood Insurance. FEMA, 2026. https://www.fema.gov/flood-insurance **156** What Is My Flood Risk?. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/flood-zones-and-maps/what-is-my-flood-risk **157** Life Insurance Buyer's Guide. National Association of Insurance Commissioners, 2019. https://content.naic.org/sites/default/files/publication-lig-lp-consumer-life.pdf **158** Household Pulse Survey: adults displaced by natural disasters. U.S. Census Bureau data, reported by the National Low Income Housing Coalition, 2023. https://nlihc.org/resource/new-data-household-pulse-survey-suggest-disparities-among-households-displaced-disasters **159** National Estimates: Eviction in America. Eviction Lab, Princeton University, 2026. https://evictionlab.org/national-estimates/ **160** OpenFEMA: Disaster Declarations Summaries. FEMA, 2026. https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2
+**151** 22 CFR 22.1, Schedule of Fees for Consular Services (passport book, card and execution fees), 2025 edition. U.S. Government Publishing Office (Code of Federal Regulations), 2025. https://www.govinfo.gov/content/pkg/CFR-2025-title22-vol1/pdf/CFR-2025-title22-vol1-sec22-1.pdf **152** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **153** Financial Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/financial-preparedness **154** Flood Insurance. FEMA, 2026. https://www.fema.gov/flood-insurance **155** What Is My Flood Risk?. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/flood-zones-and-maps/what-is-my-flood-risk **156** Life Insurance Buyer's Guide. National Association of Insurance Commissioners, 2019. https://content.naic.org/sites/default/files/publication-lig-lp-consumer-life.pdf **157** Household Pulse Survey: adults displaced by natural disasters. U.S. Census Bureau data, reported by the National Low Income Housing Coalition, 2023. https://nlihc.org/resource/new-data-household-pulse-survey-suggest-disparities-among-households-displaced-disasters **158** National Estimates: Eviction in America. Eviction Lab, Princeton University, 2026. https://evictionlab.org/national-estimates/ **159** OpenFEMA: Disaster Declarations Summaries. FEMA, 2026. https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2 **160** Recovering from Disaster. FEMA / Ready.gov, 2026. https://www.ready.gov/recovering-disaster
 
-**161** Recovering from Disaster. FEMA / Ready.gov, 2026. https://www.ready.gov/recovering-disaster **162** Home Inspections. FEMA, 2026. https://www.fema.gov/assistance/individual/after-applying/home-inspections **163** Start a Claim. FEMA, National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/recover/start-a-claim **164** DisasterAssistance.gov: apply for disaster assistance. U.S. Department of Homeland Security, 2026. https://www.disasterassistance.gov/ **165** Individuals and Households Program. FEMA, 2026. https://www.fema.gov/assistance/individual/program **166** Disaster Fraud. FEMA, 2026. https://www.fema.gov/about/offices/security/disaster-fraud **167** How To Avoid Scams After Weather Emergencies and Natural Disasters. Federal Trade Commission, 2026. https://consumer.ftc.gov/articles/how-avoid-scams-after-weather-emergencies-and-natural-disasters **168** Getting drugs in a disaster or emergency. CMS / Medicare.gov, 2026. https://www.medicare.gov/health-drug-plans/part-d/using-drug-coverage/drugs-disaster-emergency **169** Rx Open: open pharmacies in disaster areas. Healthcare Ready, 2026. https://healthcareready.org/rxopen/ **170** How to replace lost or stolen ID cards. USAGov, 2026. https://www.usa.gov/replace-vital-documents
+**161** Home Inspections. FEMA, 2026. https://www.fema.gov/assistance/individual/after-applying/home-inspections **162** Start a Claim. FEMA, National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/recover/start-a-claim **163** DisasterAssistance.gov: apply for disaster assistance. U.S. Department of Homeland Security, 2026. https://www.disasterassistance.gov/ **164** Individuals and Households Program. FEMA, 2026. https://www.fema.gov/assistance/individual/program **165** Disaster Fraud. FEMA, 2026. https://www.fema.gov/about/offices/security/disaster-fraud **166** How To Avoid Scams After Weather Emergencies and Natural Disasters. Federal Trade Commission, 2026. https://consumer.ftc.gov/articles/how-avoid-scams-after-weather-emergencies-and-natural-disasters **167** Getting drugs in a disaster or emergency. CMS / Medicare.gov, 2026. https://www.medicare.gov/health-drug-plans/part-d/using-drug-coverage/drugs-disaster-emergency **168** Rx Open: open pharmacies in disaster areas. Healthcare Ready, 2026. https://healthcareready.org/rxopen/ **169** How to replace lost or stolen ID cards. USAGov, 2026. https://www.usa.gov/replace-vital-documents **170** Medication. Florida Division of Emergency Management, 2026. https://www.floridadisaster.org/planprepare/disability/personal-and-family-plans/medication/
 
-**171** Medication. Florida Division of Emergency Management, 2026. https://www.floridadisaster.org/planprepare/disability/personal-and-family-plans/medication/ **172** Diabetes Care During Emergencies. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/diabetes/articles/diabetes-care-emergencies.html **173** Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/reproductive-health/emergency-preparation-response/safety-messages.html **174** Survival Kit Supplies. American Red Cross, 2026. https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html **175** Drug Shortages. U.S. Food and Drug Administration, 2026. https://www.fda.gov/drugs/drug-safety-and-availability/drug-shortages **176** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023 **177** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **178** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **179** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **180** Prior art and behavioural science for a household preparedness planner. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/prior-art-and-psychology.md
+**171** Diabetes Care During Emergencies. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/diabetes/articles/diabetes-care-emergencies.html **172** Safety Messages for Pregnant, Postpartum, and Breastfeeding People During Emergencies. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/reproductive-health/emergency-preparation-response/safety-messages.html **173** Survival Kit Supplies. American Red Cross, 2026. https://www.redcross.org/get-help/how-to-prepare-for-emergencies/survival-kit-supplies.html **174** Drug Shortages. U.S. Food and Drug Administration, 2026. https://www.fda.gov/drugs/drug-safety-and-availability/drug-shortages **175** Warning letter on unapproved aquarium and bird antibiotic products. U.S. Food and Drug Administration, 2023. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/chewy-inc-664707-11302023 **176** CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html **177** 988 Suicide and Crisis Lifeline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/988 **178** Disaster Distress Helpline. Substance Abuse and Mental Health Services Administration, 2026. https://www.samhsa.gov/find-help/helplines/disaster-distress-helpline **179** Prior art and behavioural science for a household preparedness planner. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/prior-art-and-psychology.md **180** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx
 
-**181** 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx **182** Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
+**181** Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
 
-88 more sources behind the plan's quantities and prices are listed in the app, next to each number.
+89 more sources behind the plan's quantities and prices are listed in the app, next to each number.
 
 ### Data credits
 

@@ -222,7 +222,9 @@ prints for every household it concerns, and you confirm it in the regenerated pa
 (`docs/PACKET.md`). The packet prints the "What helps" and "What to avoid" paragraphs of every
 active bucket block and of each hazard card. When a bucket's only hazard has a card (medical
 emergency), the bucket prints a pointer to the card instead, so its life-safety lines also go in
-the hazard block (`hazard_medical`). Every printed sentence costs space in every packet, and so
+the hazard block (`hazard_medical`). A need may also keep its "What to avoid" and replace its
+"What helps" with a pointer to where that advice is already printed in the same packet (the plan
+does this to stay within 24 pages). Every printed sentence costs space in every packet, and so
 does each new source line, so reuse a source the block already cites when it says the same thing.
 
 ## 5. Sensitive topics (mechanical enforcement of PRINCIPLES §9)

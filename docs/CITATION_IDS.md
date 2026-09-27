@@ -635,6 +635,14 @@ matched in the page's own text.
 | --- | --- | --- | --- |
 | `bjs_felony_defendants_2009` | BJS, *Felony Defendants in Large Urban Counties, 2009: Statistical Tables* (NCJ 243777, Reaves, December 2013) | the savings track's optional legal-emergency line: a typical bail amount | PDF downloaded from bjs.ojp.gov and read in its extracted text. **The $10,000 figure is right**: Table 16 gives a median bail amount of $10,000 for all felony defendants in the 75 largest counties whose bail was set in 2009 (mean $55,400); $6,000 for those released and $25,000 for those detained (the stored quote is the report's own sentence on those two). Table 15 gives the spread: 28% under $5,000, 15% $5,000–9,999, 21% $10,000–24,999, 12% $25,000–49,999 and 25% $50,000 or more. The glossary says a bail bond company usually charges a fee of 10% of the full bail amount, often with collateral. Scope: felony cases only, the 75 largest counties, 2009, and defendants given nonfinancial release are left out. BJS has published nothing newer for state courts: the SCPS series ended with 2009, and the National Pretrial Reporting Program relaunched in 2021 has no published results listed on BJS's pretrial pages (checked 2026-09-26), so this remains the figure to use |
 
+## Requested by the plan merge (2026-09-26)
+
+| id | Source | Used in | How it was read and checked |
+| --- | --- | --- | --- |
+| `nws_high_wind_during` | NWS, During a High Wind Event | plan_shelter (the strong-wind paragraph, printed for every household now that a Serious card can displace the Minor wind card) | page downloaded; quote: go inside a sturdy building in a high wind or severe thunderstorm warning, to an interior room or basement; from a mobile home, go to a sturdy building before the wind picks up |
+| `nws_severe_weather_during` | NWS, What to Do During Severe Weather | plan_shelter | page downloaded; quote: stay away from windows when damaging wind or large hail is approaching. NWS's wind pages say "interior room or basement", not "lowest floor", so the paragraph says that; the tornado paragraph keeps the lowest-floor wording from Ready.gov |
+| `rr_validation_2026` | Ready Reckoner, `docs/VALIDATION.md` (the frozen backtest: events, households, the scoring rule and the verdicts for each version) | the packet's targets section; topic_validation (its covered / partly covered / short wording now follows the file's scoring rule) | read on the `v0.2` branch (32510a6); the file reaches main with the v0.2.0 release, which the URL points at, so no quote is stored |
+
 ## Registry index for the other workstreams
 
 Every id below is in `content/citations.toml`. Federal entries carry an exact quote where one was
@@ -683,9 +691,10 @@ checked; "prior" marks an expert estimate.
 | Long horizon (v0.2.0) | `pnnl_2015_rainwater`, `cdc_rainwater_collection`, `vdh_storm_wells`, `wsc_wellcare_help_2025`, `lehi_fuel_storage`, `rdpo_emergency_toilet`, `cdc_botulism_home_canning`, `nchfp_home`, `cdc_managing_stress` |
 | Documents, identity and accounts (v0.2.0) | `state_dept_passport_card`, `state_dept_child_passport`, `cisa_data_backup_2012`, `ready_gov_cybersecurity`, `ftc_2008_locksmith`, `nia_affairs_checklist`, `ollam_2022_lawyer_passport_locksmith_gun` (principles only) |
 | Emergency refills by state (v0.2.0) | `healthcare_ready_refill_laws`, `nacds_2018_emergency_refills`, `fl_bop_emergency_refills`, `tx_pharmacy_disaster_2024`, `medicare_drugs_disaster` |
-| Our own documents | `rr_design_decision_log_2026` (the backtest and the nuclear-wording decisions) |
+| Our own documents | `rr_design_decision_log_2026` (the backtest and the nuclear-wording decisions), `rr_validation_2026` (the frozen backtest and its verdicts) |
 | Data pack v2 county and national files (data-model) | `noaa_nclimgrid_daily`, `eia_861_reliability`, `openfema_declarations`, `openfema_housing_assistance`, `fcc_dirs_reports`, `pnnl_oe417_linkage`, `openfda_drug_shortages`, `fdic_failed_banks`, `crs_rs20348_funding_gaps`, `fbi_cde_arrests` |
 | Legal emergencies (budget) | `bjs_felony_defendants_2009`, `lsc_get_legal_help`, `aclu_stopped_by_police`, `fbi_cde_arrests` |
+| Wind and severe-thunderstorm shelter | `nws_high_wind_during`, `nws_severe_weather_during`, `ready_gov_tornadoes`, `noaa_spc_tornado_safety` |
 
 ## Requested
 
