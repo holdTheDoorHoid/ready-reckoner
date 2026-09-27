@@ -396,7 +396,7 @@ impl HazardId {
             SupplyChainDisruption => "Supply chain disruption",
             HazmatRelease => "Chemical spill or release",
             NuclearPlantIncident => "Nuclear power plant accident",
-            NuclearAttack => "Nuclear attack",
+            NuclearAttack => "Nuclear attack or EMP",
             Terrorism => "Terrorist attack",
             DamFailure => "Dam or levee failure",
             NetworkOutage => "Phone or internet outage",
