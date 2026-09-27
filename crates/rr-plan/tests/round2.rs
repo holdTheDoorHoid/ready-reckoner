@@ -192,7 +192,9 @@ fn words(markdown: &str) -> usize {
 /// would take about a page of advice out, so the budget is what the content needs. (v0.1.1
 /// allowed 23.5 on the first proxy; the v0.2 packet before packet v2 printed on 28 by that
 /// proxy.)
-const PHILADELPHIA_MAX_PAGES: f64 = 25.0;
+// Transitional (v0.3): the unconditional data credits since data3 add about a fifth of a page;
+// the binder retires this cap when it lands (DESIGN-DELTA-v3 §4).
+const PHILADELPHIA_MAX_PAGES: f64 = 25.3;
 
 /// The most any fixture or backtest packet may print on. Households with more to say (insulin, a
 /// baby, a well, a surge zone, Puerto Rico's long outages) run longer than Philadelphia; this
