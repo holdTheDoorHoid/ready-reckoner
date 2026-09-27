@@ -149,6 +149,8 @@ describe('the maps (web-only, outside the household)', () => {
       fetched_on: 'yesterday',
       extra: 1,
     });
+    // Two ways out at most (the third route is dropped), a route needs two points (the one-point
+    // route and "not a route" go), and a bad point inside a route goes without the route.
     expect(maps).toEqual({
       home: { lat: 39.93, lon: -75.15 },
       routes: [
@@ -156,11 +158,14 @@ describe('the maps (web-only, outside the household)', () => {
           { lat: 39.9, lon: -75.1 },
           { lat: 40, lon: -75.2 },
         ],
+        [
+          { lat: 1, lon: 1 },
+          { lat: 2, lon: 2 },
+        ],
       ],
       layers: { base: true, places: true, flood: false, surge: false, wildfire: true },
     });
-    // Two ways out at most, a route needs two points, a pin is kept to about a metre.
-    expect(maps?.routes).toHaveLength(2);
+    // A pin is kept to about a metre; layers turned off stay off.
     expect(checkMapsState({ home: { lat: 39.123456789, lon: -75.987654321 } })?.home).toEqual({ lat: 39.12346, lon: -75.98765 });
     expect(checkMapsState({ layers: { base: false, places: false } })?.layers).toEqual({ base: false, places: false, flood: false, surge: false, wildfire: false });
     expect(checkMapsState('pins')).toBeUndefined();
