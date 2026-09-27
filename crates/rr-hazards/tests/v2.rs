@@ -688,30 +688,27 @@ fn without_the_area_share_the_metro_weight_falls_back_to_zero_with_a_note() {
 
 #[test]
 fn arrests_are_summed_over_the_household_by_age() {
-    // FBI 2023–2025, per 100,000 a year, men's and women's rates averaged; adults 18–64 weighted
-    // by the years each band covers (7, 10, 10, 10, 10).
-    let adult = (7.0 * (5390.0 + 2122.0) / 2.0
-        + 10.0 * (6816.0 + 2647.0) / 2.0
-        + 10.0 * (6198.0 + 2400.0) / 2.0
-        + 10.0 * (3784.0 + 1295.0) / 2.0
-        + 10.0 * (2093.0 + 584.0) / 2.0)
+    // People arrested at least once a year (NSDUH 2022–2024), per 100,000, men's and women's
+    // averaged; adults 18–64 weighted by the years each band covers (8, 9, 15, 15). People, not
+    // arrests, so repeat arrests do not count as more households (verification R3-06).
+    let adult = (8.0 * (2590.0 + 953.7) / 2.0
+        + 9.0 * (2764.0 + 1542.0) / 2.0
+        + 15.0 * (2264.0 + 1054.0) / 2.0
+        + 15.0 * (1221.0 + 544.6) / 2.0)
         / 47.0
         / 1e5;
-    let senior = (495.3 + 115.3) / 2.0 / 1e5;
-    let teen = (1992.0 + 948.5) / 2.0 / 1e5;
+    let senior = (522.0 + 78.97) / 2.0 / 1e5;
+    let teen = (883.6 + 416.9) / 2.0 / 1e5;
     // Philadelphia: two adults, a child (not counted) and a senior.
     let a = assess("philadelphia-renters-4", "42101");
     let p = profile(&a, H::ArrestOrDetention);
     assert!(close(p.rate_per_year, 2.0 * adult + senior, 1e-9));
     assert!(
         p.frequency_sentence
-            .contains("about 7 arrests for every 100 households a year")
+            .contains("about 3 in 100 have someone arrested in a year")
     );
+    assert!(p.frequency_sentence.contains("often arrested again"));
     assert!(p.frequency_sentence.contains("not guilt"));
-    assert!(
-        p.frequency_sentence
-            .contains("one person arrested twice counts twice")
-    );
     assert_eq!(p.confidence, rr_types::DataConfidence::Medium);
     assert_eq!(
         p.buckets,
@@ -724,20 +721,30 @@ fn arrests_are_summed_over_the_household_by_age() {
         2.0 * adult + teen,
         1e-9
     ));
-    // The range runs from women's lowest year to men's highest.
+    // The range runs from the survey's lowest year for women to the FBI's counts for men's
+    // highest year, turned into people (1.381 bookings per person arrested), where that is higher.
+    let fbi_adult_high =
+        (7.0 * 5603.0 + 10.0 * 7168.0 + 10.0 * 6247.0 + 10.0 * 3964.0 + 10.0 * 2221.0)
+            / 47.0
+            / 1e5
+            / 1.381;
+    let senior_high = f64::max(851.4e-5, 549.9e-5 / 1.381);
     let [lo, hi] = p.rate_range;
     assert!(lo < p.rate_per_year && hi > p.rate_per_year);
+    assert!(close(hi, 2.0 * fbi_adult_high + senior_high, 1e-9), "{hi}");
 }
 
 #[test]
-fn a_pack_base_rate_replaces_the_built_in_arrest_table() {
+fn a_pack_fbi_series_sets_only_the_high_end_of_the_arrest_range() {
+    // The pack's FBI arrest series (arrests per 100,000) replaces the built-in FBI table, which
+    // now sets only the high end, in people; the value stays the survey's people arrested.
     let f = county("42101");
     let input = household("miami-condo-retiree-1");
     let mut rates = base_rates();
     for sex in ["male", "female"] {
         rates.push(rr_types::BaseRate {
             id: format!("arrests_per_100k_{sex}_65_plus"),
-            value: 1000.0,
+            value: 5000.0,
             unit: "arrests per 100,000 a year".into(),
             low: None,
             high: None,
@@ -747,11 +754,10 @@ fn a_pack_base_rate_replaces_the_built_in_arrest_table() {
         });
     }
     let a = rr_hazards::assess(&input, &f.county, &rates, &f.location);
-    assert!(close(
-        profile(&a, H::ArrestOrDetention).rate_per_year,
-        0.01,
-        1e-12
-    ));
+    let p = profile(&a, H::ArrestOrDetention);
+    assert!(close(p.rate_per_year, (522.0 + 78.97) / 2.0 / 1e5, 1e-9));
+    assert!(close(p.rate_range[1], 0.05 / 1.381, 1e-9));
+    assert!(p.sources.iter().any(|s| s == "fbi_cde_arrests"));
 }
 
 // ------------------------------------------------------------------------------------------

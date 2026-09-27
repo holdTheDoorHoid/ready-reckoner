@@ -224,16 +224,20 @@ the terrorism row (retired in contract v2, H-02) are replaced by the rare famili
 | Long illness in the household | someone sick at home for weeks | 1 % per person-year (0.5–3 %) | × people | PRIOR |
 | Burst pipe or water leak (v2) | a burst, frozen or leaking pipe or appliance floods part of the home | 1.5 % per home-year (1–2 %; III/ISO water damage and freezing, about 1 in 67 insured homes a year, 2019–2023) | ×1.3 (1.1–1.6) where 5 or more days a year stay below freezing (CMRA `icing_days_hist`); basement ×1.2 (1–1.5); renters ×0.8 (0.6–1); no housing-age column exists yet, so age is not a modifier | DATA + PRIOR (confidence medium: read through the publisher's summary) |
 | Eviction (v2) | a renting household is taken to court and ordered to leave | the county's eviction filings per renter household × 0.4 (0.3–0.55) that end in a judgment, when the pack has the column; otherwise 2.3 per 100 renter households a year (1–5; Eviction Lab 2016, confirm) | renters only; income stability as for job loss; ×0.5 (0.3–0.8) with three months of savings | PRIOR |
-| Arrest or detention (v2, owner decision 2026-09-26) | a household member is arrested | FBI arrests per 100,000 a year by age band, 2023–2025 (Crime in the United States, the 2023, 2024 and 2025 editions, Tables 29, 39 and 40, over the Census Bureau's Vintage 2025 population by age and sex; the data-model series `fbi_arrests`): the men's and women's rates averaged, since the form does not ask sex. Adults 18–64 are the five FBI bands weighted by the years each covers (7, 10, 10, 10, 10): 3.31 per 100 a year; teens the 10–17 band, 1.47; 65 and over 0.31; children under 13 are not counted | summed over the household (events, not people); the range runs from the women's lowest year to the men's highest | DATA (confidence medium) |
+| Arrest or detention (v2, owner decision 2026-09-26; people, not arrests, since verification R3-06) | a household member is arrested | people arrested and booked at least once a year, by age band (SAMHSA, National Survey on Drug Use and Health 2022–2024, `samhsa_nsduh_arrests_2022_2024`: people in households, self-reported), the men's and women's rates averaged since the form does not ask sex. Adults 18–64 are the four survey bands weighted by the years each covers (8, 9, 15, 15): 1.53 per 100 a year; teens (13–17) the survey's 12–17 band, 0.65; 65 and over 0.30; children under 13 are not counted. The FBI counts arrests (7.5 million a year, Crime in the United States 2023–2025), and 24–35 % of people arrested in a year are booked more than once (1.381 bookings each), so the FBI's counts divided by 1.381 give the high end (adults 3.62 per 100) | summed over the household (people arrested, so repeat arrests are not more households); the range runs from the women's lowest survey year to the FBI's men's highest year in people | DATA (confidence medium) |
 
 Job loss and earner loss are left out (with a note) when no one is marked as earning; vehicle
 stranding when there is no vehicle and no commute; medicine shortages when no one takes a daily
 prescription; eviction for owners; pay or benefits stopping without `finances.benefits`.
 
-The arrest sentence counts events: "For households with people the ages of yours, the FBI's
-counts come to about 7 arrests for every 100 households a year (2023–2025). This counts arrests,
-not guilt or convictions, and one person arrested twice counts twice." Its buckets are income and
-home loss (the legal-readiness checklist); `rr-consequence` owns the effects.
+The arrest sentence counts people in a year: "For households with people the ages of yours,
+about 3 in 100 have someone arrested in a year, going by what people tell a national survey
+(2022–2024); police records suggest up to about 8 in 100. People arrested once are often arrested
+again, so over ten years fewer households are affected than a year-by-year count suggests. This
+counts arrests, not guilt or convictions." Before verification R3-06 the row counted arrests, and
+the packet's ten-year column read "about 50 of 100" for Philadelphia and Minot (now about 30 and
+25). Its buckets are income and home loss (the legal-readiness checklist); `rr-consequence` owns
+the effects.
 
 ### The rare families
 
@@ -526,10 +530,12 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
 - **Levee residual behind high-risk levees.** 0.2 % a year (0.05–1 %) ×2 behind levees rated High or
   Very High puts the most exposed parishes (Concordia, Louisiana) at 4 in 1,000 a year (up to 2 in
   100): a prior with a range-only card, flagged for the owner.
-- **Arrests are sex-averaged.** The household form does not ask sex; the range runs from the women's
-  lowest year to the men's highest, and confidence is fixed at `medium`. Arrests are events: the
-  chance that anyone in a household is arrested at least once is lower than the event rate implies,
-  which the sentence says.
+- **Arrests are sex-averaged and count people.** The household form does not ask sex; the range
+  runs from the women's lowest survey year to the men's highest FBI year in people, and confidence
+  is fixed at `medium`. The rate counts people arrested in a year (the survey), not arrests (the FBI),
+  so a person's repeat arrests in a year are one household event. People arrested in one year are
+  often arrested in others too, so the ten-year chance the packet compounds from the yearly rate
+  still runs high; the sentence says so.
 - **Eviction uses the national rate** until the owner approves Eviction Lab's ODC-BY licence; the
   county column then takes over with filings × 0.4 to judgments. Income stability (the job-loss
   modifier) and savings scale it, as the hazard-expansion CSV proposed.
