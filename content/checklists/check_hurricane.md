@@ -14,11 +14,11 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 ## Do first
 
 1. **Check your zone.** If officials tell your zone to leave, go right away.[^ready_gov_hurricanes]
-2. **Keep alerts on.** Keep a radio or phone on for official updates.[^nws_hurricane_safety_brochure]
-3. **Charge up.** Charge phones and backup batteries.[^ready_gov_hurricanes] {if:vehicle}Fill the car's gas tank.[^nws_hurricane_safety_brochure]{/if}
+2. **Keep alerts on.** Keep a radio or phone on for official updates.[^nws_hurricane_safety_brochure] {if:need:hearing}Use a weather radio with a text display and a flashing alert.[^ready_gov_disability]{/if}
+3. **Charge up.** Charge phones and backup batteries.[^ready_gov_hurricanes] {if:powered_device}Charge any medical device, and follow the power plan you made with your medical provider.[^ready_gov_power_outages]{/if} {if:vehicle}Fill the car's gas tank.[^nws_hurricane_safety_brochure]{/if}
 4. **Store water.** Fill the bathtub and large containers for flushing and cleaning.[^nws_hurricane_safety_brochure]
 5. **Refill medicines.** Refill prescriptions if you can.[^texasready_hurricanes]
-6. **Pack a go-bag.** Pack medicines, ID, cash and phone chargers. Cash machines may not work without power.[^cdc_evacuation_psa][^nws_hurricane_safety_brochure]
+6. **Pack a go-bag.** Pack medicines, ID, cash and phone chargers. Cash machines may not work without power.[^cdc_evacuation_psa][^nws_hurricane_safety_brochure] {if:pets}Add your pets' food, water and medicine.[^ready_gov_hurricanes]{/if}
 
 ## Then
 
@@ -27,15 +27,14 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 3. **Set the fridge cold.** Turn it to its coldest setting and keep it shut. Unplug small appliances, and turn off propane tanks.[^nws_hurricane_safety_brochure]
 4. **Tell someone.** Tell neighbors and {out_of_area_contact} your plan.[^nws_hurricane_safety_brochure]
 5. **Check on neighbors.** Ask older neighbors and others if they need help.[^ready_gov_hurricanes]
-6. {if:pets}**Pets.** Pack their food, water and medicine. If you leave, take them with you.[^ready_gov_hurricanes][^ready_gov_pets]{/if}
-7. {if:powered_device}**Medical device.** Charge its batteries. Follow the power plan you made with your medical provider.[^ready_gov_power_outages]{/if}
-8. {if:need:hearing}**Hearing.** Keep a weather radio with a text display and a flashing alert. Pack spare hearing-aid batteries.[^ready_gov_disability]{/if}
-9. **When the wind rises,** go to {shelter_home}. Use a small inside room, closet or hallway on the lowest floor that will not flood. Close the inside doors and stay away from windows.[^nws_hurricane_safety_brochure][^ready_gov_hurricanes]
-10. **If the wind gets very strong,** lie on the floor under a sturdy table.[^nws_hurricane_safety_brochure]
+6. **When the wind rises,** go to {shelter_home}. Use a small inside room, closet or hallway on the lowest floor that will not flood. Close the inside doors and stay away from windows.[^nws_hurricane_safety_brochure][^ready_gov_hurricanes]
+7. **If the wind gets very strong,** lie on the floor under a sturdy table.[^nws_hurricane_safety_brochure]
+8. **Watch for tornadoes.** Hurricanes often bring them.[^nws_hurricane_safety_brochure]
+9. **Text, do not call.** Keep phone calls for emergencies.[^ready_gov_hurricanes]
 
 ## Leave or stay
 
-- **Leave if** officials order your zone to leave{if:home:mobile_home}, or if you live in a mobile home. It is not safe in hurricane winds, even tied down{/if}. Go to {where_go}. Turn off the power, gas and water only if officials tell you to.[^ready_gov_hurricanes][^nws_hurricane_safety_brochure] {ref:getting_out}
+- **Leave if** officials order your zone to leave{if:home:mobile_home}, or if you live in a mobile home. It is not safe in hurricane winds, even tied down{/if}. Go to {where_go}. {if:pets}Take your pets.[^ready_gov_pets]{/if} Turn off the power, gas and water only if officials tell you to.[^ready_gov_hurricanes][^nws_hurricane_safety_brochure] {ref:getting_out}
 - **Stay if** you are not told to leave and your home is out of the flood zone.[^nws_hurricane_safety_brochure] {if:home:apartment_high_rise}In a tall building, stay on or below the 10th floor.[^fema_hurricane_safety_tips_2012]{/if} {ref:home}
 - **Go to** a public shelter if you have nowhere else. Text SHELTER and your ZIP code to 43362, and bring your go-bag.[^ready_gov_shelter]
 - **Go to** the highest floor if floodwater traps you. Do not climb into a closed attic.[^ready_gov_hurricanes]
