@@ -237,10 +237,11 @@ fn words(markdown: &str) -> usize {
         .count()
 }
 
-/// The packet is the short version (POLISH_ROUND, docs/PACKET.md): hazard cards only for the
-/// likeliest hazards, one what-to-do part per bucket, checklists up to the recommended step, four
-/// topics, the first year in detail and the rest as a table, compact sources. The goal is about
-/// 8,000 words; this cap catches the packet growing back (it was 26,000 words).
+/// The packet is the short version (POLISH_ROUND, packet v2, docs/PACKET.md): hazard cards only
+/// for the hazards that most need one, one what-to-do part per bucket, checklists up to the
+/// recommended step with each line's month, four topics at most, this month and next month in
+/// detail, compact sources. This cap catches the packet growing back (it was 26,000 words in
+/// v0.1.0 and 14,100 before packet v2).
 #[test]
 fn the_packet_stays_short() {
     const MAX_WORDS: usize = 12_500;
@@ -275,13 +276,15 @@ fn the_packet_stays_short() {
                 "{name}: topic {t}"
             );
         }
-        // The first six months in detail; later months with a step in them in the table.
+        // This month and next month in detail; later months are the checklists, each line with
+        // its month, so the plan lists each purchase once (no table of later months).
         for m in rr_plan::packet::DETAIL_MONTHS..=120 {
             assert!(
                 !p.contains(&format!("**Month {m} (from ")),
                 "{name}: month {m} in detail"
             );
         }
+        assert!(!p.contains("### Later months"), "{name}: the old table");
         let later = out.plan.months.iter().any(|m| {
             m.index >= rr_plan::packet::DETAIL_MONTHS
                 && m.items
@@ -289,9 +292,9 @@ fn the_packet_stays_short() {
                     .any(|i| !i.done && i.kind != rr_types::PlanItemKind::Reserve)
         });
         assert_eq!(
-            p.contains("### Later months"),
+            p.contains("### After that"),
             later,
-            "{name}: the table of later months"
+            "{name}: the pointer to the checklists"
         );
         // Checklists stop at the recommended step.
         let beyond: Vec<&str> = rr_types::TierId::ALL
@@ -299,23 +302,36 @@ fn the_packet_stays_short() {
             .filter(|t| **t > out.tier_recommended)
             .map(|t| t.name())
             .collect();
-        let lists = &p[p.find("\n## Checklists\n").unwrap()..p.find("\n## Family plan\n").unwrap()];
+        let start = p.find("\n## Checklists\n").unwrap();
+        let end = p[start + 1..]
+            .find("\n## ")
+            .map_or(p.len(), |e| start + 1 + e);
+        let lists = &p[start..end];
         for t in beyond {
             assert!(
                 !lists.contains(&format!("\n### {t}\n")),
                 "{name}: {t} checklist"
             );
         }
+        if later {
+            assert!(
+                lists.contains(" (month ") || lists.contains("\n- [ ] Month "),
+                "{name}: checklist lines carry their month"
+            );
+        }
     }
 }
 
-/// Hazard cards (review S3): the likeliest hazards, house fire always, every hazard that can kill
-/// (Severe or worse, fast, or meeting this home) from a 1 in 100 chance in ten years, and the
-/// hazard of a named scenario the plan includes; at most nine, most likely first.
+/// Hazard cards (review S3, packet v2): the likeliest hazards, house fire always, every hazard
+/// that can kill (Severe or worse, fast, or meeting this home) from a 1 in 100 chance in ten years,
+/// the hazard of a named scenario the plan includes, and the likeliest wind hazard; none for a
+/// hazard whose only consequence is lost income; at most eight unless the protected ones need
+/// more; a Minor card never displaces a Serious or Severe one; most likely first.
 #[test]
 fn hazard_cards_follow_the_life_safety_rule() {
     use rr_plan::packet::{
-        CARD_MIN_P10, FREQUENT_CARDS, HAZARD_CARDS, LIFE_SAFETY_MIN_P10, SEVERE,
+        CARD_MIN_P10, FREQUENT_CARDS, HAZARD_CARDS, LIFE_SAFETY_MIN_P10, MINOR, SEVERE,
+        WIND_HAZARDS,
     };
     for (name, input, out) in outputs() {
         let a = common::run(input);
@@ -335,6 +351,9 @@ fn hazard_cards_follow_the_life_safety_rule() {
             })
             .collect();
         let p10 = |p: &rr_types::HazardProfile| -rr_types::math::exp_m1(-10.0 * p.rate_per_year);
+        let income_only = |p: &rr_types::HazardProfile| {
+            p.buckets.iter().all(|b| *b == rr_types::BucketId::Income)
+        };
         let scenario: Vec<rr_types::HazardId> = a
             .hazards
             .scenarios
@@ -342,13 +361,16 @@ fn hazard_cards_follow_the_life_safety_rule() {
             .filter(|s| s.on)
             .map(|s| s.hazard)
             .collect();
+        // Kept above the cap: house fire, scenario hazards, Severe hazards, and a medical
+        // emergency (its advice would otherwise print in full under Your targets). Compound
+        // drivers are kept too; `storm_and_heat_cards_stay_where_they_matter` checks Sugar Land's.
         let protected = |p: &rr_types::HazardProfile| {
-            p.id == rr_types::HazardId::HouseFire
-                || scenario.contains(&p.id)
-                || (p10(p) >= LIFE_SAFETY_MIN_P10 && p.severity >= SEVERE)
+            !income_only(p)
+                && (p.id == rr_types::HazardId::HouseFire
+                    || p.id == rr_types::HazardId::MedicalEmergency
+                    || scenario.contains(&p.id)
+                    || (p10(p) >= LIFE_SAFETY_MIN_P10 && p.severity >= SEVERE))
         };
-        assert!(cards.len() <= HAZARD_CARDS, "{name}: {} cards", cards.len());
-        // Every card has a reason; house fire, Severe hazards and scenario hazards always do.
         let ranked: Vec<&rr_types::HazardProfile> = {
             let mut v: Vec<&rr_types::HazardProfile> = a
                 .hazards
@@ -365,9 +387,22 @@ fn hazard_cards_follow_the_life_safety_rule() {
             .take(FREQUENT_CARDS)
             .map(|p| p.id)
             .collect();
-        for c in &cards {
+        let wind =
+            |p: &rr_types::HazardProfile| WIND_HAZARDS.contains(&p.id) && p10(p) >= CARD_MIN_P10;
+        if cards.len() > HAZARD_CARDS {
             assert!(
-                protected(c) || frequent.contains(&c.id) || (p10(c) >= LIFE_SAFETY_MIN_P10),
+                cards.iter().all(|c| protected(c)),
+                "{name}: {} cards, not all of them protected",
+                cards.len()
+            );
+        }
+        for c in &cards {
+            assert!(!income_only(c), "{name}: {} is income only", c.name);
+            assert!(
+                protected(c)
+                    || frequent.contains(&c.id)
+                    || wind(c)
+                    || p10(c) >= LIFE_SAFETY_MIN_P10,
                 "{name}: {} has no reason for a card",
                 c.name
             );
@@ -380,11 +415,83 @@ fn hazard_cards_follow_the_life_safety_rule() {
                 p.severity
             );
         }
+        // A Minor card never displaces a Serious or Severe one: while any Minor card is shown
+        // (other than a named scenario's hazard, which always keeps its card), every likeliest
+        // hazard rated Serious or worse (that is not income only) has a card.
+        if cards
+            .iter()
+            .any(|c| c.severity < MINOR && !scenario.contains(&c.id))
+        {
+            for p in ranked
+                .iter()
+                .filter(|p| frequent.contains(&p.id) && p.severity >= 0.4 && !income_only(p))
+            {
+                assert!(
+                    cards.iter().any(|c| c.id == p.id),
+                    "{name}: {} ({}) displaced by a Minor card",
+                    p.name,
+                    p.severity
+                );
+            }
+        }
         // Most likely first.
         for w in cards.windows(2) {
             assert!(w[0].rate_per_year >= w[1].rate_per_year, "{name}: order");
         }
     }
+}
+
+/// The cases the packet v2 card rule was written for (brief: plan2; merge-data-model's note).
+/// The frequent-but-minor rows (phone and internet outages, arrests) never take a card, so they
+/// cannot push the storm cards out; the likeliest wind hazard keeps its card against Minor and
+/// Moderate rows (Chicago, Coos Bay) but, as a Minor card, yields to a Serious or Severe one of
+/// the household's own: Philadelphia's wildfire smoke (Serious for its older adult) and Miami's
+/// cold wave (Serious for its retiree). Sugar Land keeps its heat wave, which drives the
+/// blackout-in-a-heat-wave class behind its targets, though the medical-emergency card is a hair
+/// likelier; Galveston keeps its heat wave (Serious) over a Minor wind card.
+#[test]
+fn storm_and_heat_cards_stay_where_they_matter() {
+    let cards = |name: &str| -> Vec<String> {
+        let (_, _, out) = outputs().iter().find(|(n, _, _)| *n == name).unwrap();
+        let p = &out.packet_markdown;
+        let risks =
+            &p[p.find("\n## Your risks\n").unwrap()..p.find("\n## Your targets\n").unwrap()];
+        risks
+            .lines()
+            .filter_map(|l| l.strip_prefix("#### "))
+            .filter_map(|l| l.split_once(". ").map(|(_, t)| t.to_owned()))
+            .collect()
+    };
+    for (name, _, _) in outputs() {
+        let c = cards(name);
+        for minor in [
+            "Phone or internet outage",
+            "A household member is arrested or detained",
+        ] {
+            assert!(!c.iter().any(|t| t == minor), "{name}: {c:?}");
+        }
+    }
+    for name in ["chicago-student-zero-budget-1", "coos-bay-well-owner-2"] {
+        let c = cards(name);
+        assert!(c.iter().any(|t| t == "Strong wind"), "{name}: {c:?}");
+    }
+    for (name, serious) in [
+        ("philadelphia-renters-4", "Wildfire smoke"),
+        ("miami-condo-retiree-1", "Cold wave"),
+    ] {
+        let c = cards(name);
+        assert!(c.iter().any(|t| t == serious), "{name}: {c:?}");
+        assert!(!c.iter().any(|t| t == "Strong wind"), "{name}: {c:?}");
+        assert!(c.len() <= rr_plan::packet::HAZARD_CARDS, "{name}: {c:?}");
+    }
+    let c = cards("sugar-land-ev-household-3");
+    assert!(c.iter().any(|t| t == "Heat wave"), "Sugar Land: {c:?}");
+    assert!(
+        c.iter().any(|t| t == "Medical emergency"),
+        "Sugar Land: {c:?}"
+    );
+    let c = cards("galveston-highrise-1");
+    assert!(c.iter().any(|t| t == "Heat wave"), "Galveston: {c:?}");
 }
 
 #[test]
@@ -449,9 +556,10 @@ fn targets_come_from_consequence_and_tiers_from_supply() {
 }
 
 /// `docs/RISK_MODEL.md` § "End to end with rr-hazards' rates": Philadelphia at the default dial
-/// gets power 3 d (the research's 2.8; 5 before the major-hurricane share was taken against
-/// tropical-storm passages, verification V-02), boil-water 7 d, no tap water 3 d, food 10 d, heat
-/// or cold 3 d, medicine 14 d, phone 2 d, income 4 months; two weeks is enough.
+/// gets power 3 d (the research's 2.8; the pack's pooled restoration curves, passed to the model
+/// since v0.2.0, bring it back from 5), boil-water 5 d, no tap water 5 d, food 14 d, heat or cold
+/// 3 d, medicine 3 weeks (a daily prescription, v0.2.0), phone 3 d, income 4 months; one month is
+/// the step that is enough.
 #[test]
 fn philadelphia_targets_match_the_risk_model_report() {
     let (_, _, out) = outputs()
@@ -464,22 +572,23 @@ fn philadelphia_targets_match_the_risk_model_report() {
         _ => f32::NAN,
     };
     assert_eq!(days(BucketId::Power), 3.0);
-    assert_eq!(days(BucketId::WaterBoil), 7.0);
-    assert_eq!(days(BucketId::WaterOut), 3.0);
-    assert_eq!(days(BucketId::Supplies), 10.0);
+    assert_eq!(days(BucketId::WaterBoil), 5.0);
+    assert_eq!(days(BucketId::WaterOut), 5.0);
+    assert_eq!(days(BucketId::Supplies), 14.0);
     assert_eq!(days(BucketId::Thermal), 3.0);
-    assert_eq!(days(BucketId::Medication), 14.0);
-    assert_eq!(days(BucketId::Comms), 2.0);
+    assert_eq!(days(BucketId::Medication), 21.0);
+    assert_eq!(days(BucketId::Comms), 3.0);
     assert_eq!(days(BucketId::Income), 4.0);
-    assert_eq!(out.tier_recommended, rr_types::TierId::W2);
-    // Water: 12.9 gallons for four people and a dog over 3 days (docs/RISK_MODEL.md, Supply
-    // sizing), met by the free reused bottles and bottled water.
+    assert_eq!(out.tier_recommended, rr_types::TierId::M1);
+    // Water: 21.6 gallons for four people and a dog over 5 days (4.32 a day, as the 12.9 over 3
+    // days of v0.1.1; docs/RISK_MODEL.md, Supply sizing), met by the free reused bottles and
+    // bottled water.
     let water = out
         .requirements
         .iter()
         .find(|l| l.id == "water_out.water_gallons")
         .unwrap();
-    assert!((water.quantity - 12.9).abs() < 0.05, "{}", water.quantity);
+    assert!((water.quantity - 21.6).abs() < 0.05, "{}", water.quantity);
 }
 
 #[test]

@@ -28,6 +28,7 @@ pub use risks::{
 };
 pub use safety::{SAFETY_RULES, SafetyRule};
 pub use summary::{LEAVE_FIRST_FAST_HAZARDS, LEAVE_FIRST_P10, LEAVE_FIRST_SCENARIOS};
+pub(crate) use targets::relief_fallback_days;
 pub use targets::{COPE_SENTENCE, dial_sentence};
 
 use std::collections::BTreeMap;

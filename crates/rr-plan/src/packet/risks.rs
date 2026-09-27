@@ -52,8 +52,8 @@ pub const FAST_HAZARDS: [HazardId; 8] = [
 /// hail and lightning block). The likeliest of them keeps its card from [`CARD_MIN_P10`] up,
 /// unless one of them rated Severe already has a card (it shows the same block): storms are the
 /// likeliest dangerous weather for most homes, and the shelter-spot advice is on that card (the
-/// frequent-but-minor rows of v0.2, phone outages and arrests, had pushed it out in Philadelphia
-/// and Miami).
+/// frequent-but-minor rows of v0.2, such as phone outages, had pushed it out). A Minor or Moderate
+/// wind card still yields to a Serious or Severe card ([`cards`]).
 pub const WIND_HAZARDS: [HazardId; 4] = [
     HazardId::Tornado,
     HazardId::StrongWind,
@@ -280,11 +280,12 @@ fn severity_class(s: f64) -> u8 {
 /// [`CARDS`], the less severe cards make room first, so a Minor hazard never displaces a Serious
 /// or Severe one; among cards of one severity, the likeliest-hazard cards before the fast or
 /// exposed ones, and the least likely first. House fire, Severe hazards, scenario and compound
-/// hazards and the wind card always stay.
+/// hazards always stay; the wind card stays unless a Serious or Severe card would make room for
+/// it (a Minor or Moderate wind card yields to it).
 pub(crate) fn cards<'a>(cx: &Ctx<'a>) -> Vec<(&'a HazardProfile, Option<&'a Guidance>)> {
     let mut chosen = card_reasons(cx);
     while chosen.len() > CARDS {
-        let drop = chosen
+        let unprotected = chosen
             .iter()
             .enumerate()
             .filter(|(_, (_, w))| !w.protected())
@@ -294,17 +295,22 @@ pub(crate) fn cards<'a>(cx: &Ctx<'a>) -> Vec<(&'a HazardProfile, Option<&'a Guid
                     .then(wa.cmp(wb))
                     .then(a.rate_per_year.total_cmp(&b.rate_per_year))
             })
-            .map(|(i, _)| i);
-        // With only protected cards left above the cap, the wind card (the one protected card
-        // that can be Minor) makes room: it never displaces a Serious or Severe card.
-        let drop = drop.or_else(|| {
-            chosen
-                .iter()
-                .enumerate()
-                .filter(|(_, (_, w))| *w == Why::Wind)
-                .min_by(|(_, (a, _)), (_, (b, _))| a.rate_per_year.total_cmp(&b.rate_per_year))
-                .map(|(i, _)| i)
-        });
+            .map(|(i, (p, _))| (i, severity_class(p.severity)));
+        // The wind card is the one kept card that can be Minor: it yields to a Serious or Severe
+        // card that would otherwise make room, so it never displaces one, and it makes room last
+        // when only kept cards are left above the cap.
+        let wind = chosen
+            .iter()
+            .position(|(_, w)| *w == Why::Wind)
+            .map(|i| (i, severity_class(chosen[i].0.severity)));
+        let drop = match (unprotected, wind) {
+            (Some((_, class)), Some((w, wind_class))) if class >= 2 && wind_class < class => {
+                Some(w)
+            }
+            (Some((i, _)), _) => Some(i),
+            (None, Some((w, _))) => Some(w),
+            (None, None) => None,
+        };
         match drop {
             Some(i) => {
                 chosen.remove(i);

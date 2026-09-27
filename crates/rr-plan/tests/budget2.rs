@@ -214,9 +214,13 @@ fn fans_arrive_before_summer_where_the_cost_order_allows() {
 /// electromagnetic pulse reaches far beyond any blast zone; planner, 2026-09-26). Minot (a missile
 /// field, class A) ticked the nuclear and solar-storm families: the card comes after the three-day
 /// life-safety purchases and says what it is for, and there is no Faraday storage (the blackout
-/// family is not ticked). Coos Bay ticking every family buys nothing (the nuclear family about 1.2
-/// and the blackout family about 6.9 in 10,000 over ten years). Philadelphia ticking every family
-/// buys both (the blackout family about 1.07 in 1,000).
+/// family is not ticked). Coos Bay ticking every family buys no dosimeter (the nuclear family,
+/// class E, about 1.2 in 10,000 over ten years) but does buy the Faraday storage: the months-long
+/// blackout row now reads the plan's own power curve at 60 days (DESIGN-DELTA §3), and a Cascadia
+/// earthquake (0.0102 a year here) leaves about 77 in 100 of the homes it reaches without power
+/// for more than two months, about 7.6 in 100 over ten years (it read 6.9 in 10,000 on
+/// rr-hazards' fallback). Philadelphia ticking every family buys both (the blackout family about
+/// 1.07 in 1,000).
 #[test]
 fn the_rare_allowance_by_family_on_the_fixtures() {
     let (_, _, a, minot) = every_household()
@@ -261,13 +265,19 @@ fn the_rare_allowance_by_family_on_the_fixtures() {
     let mut coos = household("coos-bay-well-owner-2");
     coos.dials.rare_opt_in = vec!["all".into()];
     let out = assess(&coos);
-    assert!(
-        !out.plan.months.iter().flat_map(|m| &m.items).any(|i| i
-            .item_id
-            .as_str()
-            .starts_with("rare_")
-            && i.kind == PlanItemKind::Purchase),
-        "class E: the nuclear family is under 1 in 1,000 over ten years"
+    let rare: Vec<&str> = out
+        .plan
+        .months
+        .iter()
+        .flat_map(|m| &m.items)
+        .filter(|i| i.item_id.as_str().starts_with("rare_") && i.kind == PlanItemKind::Purchase)
+        .map(|i| i.item_id.as_str())
+        .collect();
+    assert_eq!(
+        rare,
+        ["rare_faraday_storage"],
+        "class E: the nuclear family is under 1 in 1,000 over ten years; the months-long \
+         blackout family (Cascadia) is not"
     );
 
     assert_eq!(first_month(minot, "rare_faraday_storage"), None);

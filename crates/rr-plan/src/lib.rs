@@ -7,8 +7,8 @@
 //! ```
 //!
 //! [`Engine`] owns a county data source ([`CountySource`]: `rr-data`'s `DataStore` with the data
-//! packs, or [`FixtureSource`]'s seven sample counties) and the embedded content, and answers every
-//! engine function in
+//! packs, or [`FixtureSource`]'s fourteen sample counties) and the embedded content, and answers
+//! every engine function in
 //! `docs/ENGINE-API.md`: [`Engine::assess`], [`Engine::explain`], [`Engine::county_search`],
 //! [`Engine::resolve_location`], [`Engine::catalogue`], [`Engine::defaults`] and
 //! [`Engine::engine_info`]. `rr-wasm` and `rr-cli` wrap it.
@@ -66,7 +66,7 @@ pub struct Engine<S: CountySource = FixtureSource> {
 }
 
 impl Engine<FixtureSource> {
-    /// An engine on the seven fixture counties (see [`FixtureSource`]): for tests, and for an
+    /// An engine on the fourteen fixture counties (see [`FixtureSource`]): for tests, and for an
     /// engine with no data packs (its locations say "sample data").
     ///
     /// # Errors

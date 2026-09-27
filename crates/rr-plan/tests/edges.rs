@@ -61,12 +61,23 @@ fn owned_items_count_and_recorded_prices_replace_the_band() {
         .find(|i| i.item_id == "water_stored_bottled" && i.done)
         .expect("the owned water is listed as done");
     assert_eq!(owned_water.paid_usd, Some(10.0));
-    assert!(
-        !items.iter().any(|i| i.item_id == "water_stored_bottled"
-            && !i.done
-            && i.kind == PlanItemKind::Purchase),
-        "no more bottled water to buy"
-    );
+    // Philadelphia's five days without tap water (three before the v0.2.0 consequence model)
+    // need 21.6 gallons, 6 of them from reused bottles (free): 16 gallons to buy. The 13 owned
+    // gallons count, so 3 are left to buy.
+    let to_buy = |items: &[&rr_types::PlanItem]| -> f32 {
+        items
+            .iter()
+            .filter(|i| {
+                i.item_id == "water_stored_bottled" && !i.done && i.kind == PlanItemKind::Purchase
+            })
+            .map(|i| i.quantity)
+            .sum()
+    };
+    assert_eq!(to_buy(&items), 3.0, "16 gallons to buy, less the 13 owned");
+    let plain = assess(&household("philadelphia-renters-4"));
+    let plain_items: Vec<&rr_types::PlanItem> =
+        plain.plan.months.iter().flat_map(|m| &m.items).collect();
+    assert_eq!(to_buy(&plain_items), 16.0, "with nothing owned");
     assert!(
         items
             .iter()
