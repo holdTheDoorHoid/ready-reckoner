@@ -61,6 +61,10 @@ one is not started.
 
 ## Round 2 — Review, v0.1.1 and the v0.2.0 programme (2026-09-26)
 
+**Status: done, shipped as v0.2.0 (September 2026).** See [CHANGELOG.md](../CHANGELOG.md) for the
+full release notes and `docs/DESIGN.md` §14 for the decision log of how the programme below was
+built (many parallel workstreams, merged and verified together against contract v2).
+
 A walk through the live site and four review panels (emergency management, practitioner,
 catastrophe model with a 22-event backtest, hazard data) produced a merged review (kept in the
 project's briefs folder, `round2/REVIEW.md`, with the panel reports beside it). **v0.1.1** shipped
@@ -84,18 +88,18 @@ tracked as GitHub issues; the list here is the standing summary. See
 [CHANGELOG.md](../CHANGELOG.md)'s "Known limitations" for how each of these reads to a user today.
 
 - Do the screen-reader pass and a review with real users.
-- Give the 79 counties without their own outage history a state-level fallback instead of today's
-  simpler estimate.
 - Re-check the earthquake and outage numbers for Pacific coast counties reading unexpectedly high
-  (Coos Bay, Oregon is the known example).
-- Keep each hazard card's guidance specific to that hazard (stop a cold-wave card from showing
-  avalanche advice, and similar cases).
+  (Coos Bay, Oregon is the known example; its numbers moved higher still in v0.2.0 as the outage
+  model improved, so this is more pressing, not less).
 - Add a household-vulnerability factor to heat-wave and cold-wave severity, not just dollar cost, so
-  a household with a baby, an older adult, or no cooling/heating is rated correctly.
-- Re-size livestock water on a well where a generator is already planned to keep the pump running.
+  a household with a baby, an older adult, or no cooling/heating is rated correctly. (v0.2.0 made sure
+  such a household's severity label never reads better than "Serious"; the underlying budget priority
+  still doesn't weigh who is in the household, only typical dollar cost.)
+- Re-size livestock water on a well where a generator is already planned to keep the pump running
+  (today the household must already own the generator and its interlock; a generator the plan intends
+  to buy doesn't count yet).
 - Fix the printed packet's month-by-month spending so a completed sinking fund and its purchase
   don't both count toward the same month's total.
-- Lay out the packet's source list in columns and stop a section splitting across a printed page.
 - Replace source links that point to a mirror or a search results page with direct links.
 - Recheck price bands that are running high against current prices.
 - Show the first several steps of a long checklist with a way to see the rest, instead of every step
@@ -107,8 +111,27 @@ tracked as GitHub issues; the list here is the standing summary. See
 - Trim four unused hazard-data columns and one unused ZIP file from the data pack (roughly 0.65 MB
   smaller first load).
 - Confirm offline use (the service worker) across more browsers.
-- Decide on a dedicated hosting address, separate from the owner's other projects (see
+- Decide on a dedicated hosting address, separate from the owner's other projects — more pressing
+  now that a saved plan can hold a family's trusted circle, names and phone numbers (see
   [PRIVACY.md](PRIVACY.md)).
+- **From the v0.2.0 build**, carried into this list:
+  - Close the gap in how the events job matches storm records to counties: 77 counties, mostly in
+    western Washington and coastal Alaska, run their windstorm number on a thin-record fallback until
+    it's fixed.
+  - Recalibrate the National Risk Index base rates that still sit well above their own county's
+    episode record for ice storms, winter storms and hurricanes (491, 31 and 472 counties
+    respectively) — a later, dedicated calibration pass.
+  - Put `Item.alternative_group` (built for v0.2.0 but not yet used by any catalogue item) to work —
+    two different ways to recharge a battery is the obvious first candidate.
+  - Add an interview question about owning a gas grill, so the spare-propane-tank accessory (built,
+    but never offered today) has a way to be recommended.
+  - Give the website's stand-in engine (used before the real data loads) real sample data for the
+    seven newer fixture counties; it currently falls back to a generic per-state entry for them,
+    which is fine for development but not a place to add more.
+  - Keep an eye on the two figures closest to their ceilings: the WebAssembly download (1.40 MB of a
+    1.5 MB compressed budget) and the time to work out a full plan (about 46 ms in a command-line
+    JavaScript engine, 38 ms in a real browser, against a 50 ms target). Both are comfortable today,
+    and both have been trending toward their limits as hazards and data are added each round.
 
 ## Later
 

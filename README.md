@@ -42,11 +42,12 @@ the plan; every dial behind it is there if you want it.
 
 ## Status
 
-**v0.1.1 (September 2026): working end to end on national data, with the round-2 safety fixes.** The engine, the website and the
-printable packet all work together, for every county in the country. See
-[docs/DESIGN.md](docs/DESIGN.md) for the design, [docs/ROADMAP.md](docs/ROADMAP.md) for what's built
-and what's next, [CHANGELOG.md](CHANGELOG.md) for what shipped in this version, and the GitHub
-issues for the day-to-day work list.
+**v0.2.0 (September 2026): the full hazard taxonomy, a family plan, and a public validation page.**
+The engine, the website and the printable packet cover 53 ranked and rare hazards for every county
+in the country, sized and priced from 432 cited sources, and checked end to end against 14 golden
+households and a 22-disaster backtest. See [docs/DESIGN.md](docs/DESIGN.md) for the design,
+[docs/ROADMAP.md](docs/ROADMAP.md) for what's built and what's next, [CHANGELOG.md](CHANGELOG.md)
+for what shipped in this version, and the GitHub issues for the day-to-day work list.
 
 ## Try it
 
