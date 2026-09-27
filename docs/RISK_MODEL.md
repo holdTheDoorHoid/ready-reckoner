@@ -1641,28 +1641,29 @@ rr-plan's readiness harm estimates):
 | Item | Harm-days | Why |
 | --- | --- | --- |
 | `rare_radiation_meter` (dosimeter card) | 2 | tells a sheltering household when it is safe to go outside, the main decision after fallout (like the go-bag's 2) |
-| `rare_faraday_storage` | 0.5 | keeps a spare radio or phone working after an electromagnetic pulse, a supporting item (like the get-home bag's 0.5); gated on the EMP part of the months-long blackout family, not the family total (`rr_budget::rare::RARE_CAUSES`) |
+| `rare_faraday_storage` | 0.5 | keeps a spare radio or phone working after an electromagnetic pulse, a supporting item (like the get-home bag's 0.5); gated on the nuclear family's EMP sub-cause, not the family's local total (`rr_budget::rare::RARE_CAUSES`) |
 | any other specialised item | 0.5 | a supporting item |
 
 Potassium iodide is free and keeps rr-supply's planning-zone rule (a free step near a plant, not an
 allowance purchase). Each allowance purchase says which ticked family it is for and that the chance
 here passes 1 in 1,000 (no point estimate: rare rows show ranges only). Rare items are on no
-readiness checklist. The dosimeter card goes with the nuclear family. Faraday storage protects
-small electronics from an electromagnetic pulse, so it is gated on the cause it protects against,
-not on its family's total (planner, 2026-09-26): the `emp` sub-cause of the months-long blackout
-family (`multi_month_blackout`, whose block carries the EMP paragraph), against the same 1-in-1,000
-line. Sub-causes publish a range only, so its central value is the geometric middle of the range.
-That family's total now reads the household's own power curve at 60 days (7.7 in 100 over ten years
-in Coos Bay with Cascadia, 12.5 in 100 in San Juan on Maria's restoration curves), while its EMP
-part is the EMP rate times the share of EMP outages lasting two months or more: 4.4e-7 to 1.035e-3
-a year in the lower 48 (middle 2.1e-5, about 0.21 in 1,000 over ten years) and 0 outside it. It is
-under the line everywhere, so no household buys the bag, and the rare box already says there is
-nothing to stockpile for months. Fixtures: Minot (class A; nuclear and solar storm ticked) buys the
-dosimeter card in month 4; Philadelphia and San Juan with every family ticked buy the card (months
-10 and 29); Coos Bay with every family ticked buys nothing (nuclear about 1.2 in 10,000). The
-nuclear family's own EMP sub-cause, a pulse at all rather than one that cuts power for months, is
-about 2.7 in 1,000 over ten years (the middle of 2.2e-5 to 3.45e-3 a year); gating the bag on it
-would make it eligible nearly everywhere (an owner question).
+readiness checklist. Both specialised items belong to the nuclear family, the row a household
+ticks as "Nuclear attack or EMP" (the purchase sentence's words; the register names it "Nuclear
+attack"). The dosimeter card is gated on the family's total, the chance of blast or fallout where
+you live. A shielded (Faraday) bag protects small electronics from any electromagnetic pulse,
+whether or not the grid stays down for months, so it is gated, and valued, on the cause it answers,
+not the family total: the family's `emp` sub-cause, a pulse at all (`rr_budget::rare::RARE_CAUSES`;
+planner, 2026-09-26). Sub-causes publish a range only, so its central value is the geometric middle
+of 2.2e-5 to 3.45e-3 a year, about 2.7 in 1,000 over ten years, the same everywhere: the card
+depends on where you live and the bag does not. rr-hazards publishes that range outside the lower
+48 as well (only its note changes there: the effect depends on where the burst is), so San Juan's
+households are offered the bag too. The months-long blackout family's own EMP part, a pulse that
+keeps the power off for two months or more (about 0.21 in 1,000), is not used. Fixtures: Minot
+(class A; nuclear and solar storm ticked) buys the card in month 4 and the bag in month 12; with
+every family ticked, Philadelphia buys them in months 10 and 21, Hays in 6 and 14, San Juan in 29
+and 43, and Coos Bay (class E, about 1.2 in 10,000 locally) buys the bag only, in month 5. Together
+the two cost $92.92 (the card $24.97, the bag $67.95), 19 to 31 in 100 of the nuclear family's
+half of the allowance over ten years.
 
 ### Savings
 

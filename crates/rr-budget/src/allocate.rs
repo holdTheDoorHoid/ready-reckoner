@@ -1249,7 +1249,7 @@ fn rare_queue(
         }
         // The local ten-year chance behind the item in family `f`: the family's, or, for an item
         // that protects against one cause inside it, that cause's (0 when the family does not list
-        // the cause), with the cause's name.
+        // the cause), with the words that name the cause in its sentence.
         let cause = rare::cause_of(o.item.id.as_str());
         let chance_in = |f: &HazardId| -> (f64, Option<String>) {
             match cause {
@@ -1257,16 +1257,14 @@ fn rare_queue(
                     rare::p10_from_rate(risks.register.get(f).copied().unwrap_or(0.0)),
                     None,
                 ),
-                Some(id) => risks
-                    .sub_causes
-                    .get(f)
-                    .and_then(|subs| subs.iter().find(|s| s.id == id))
-                    .map_or((0.0, None), |s| {
-                        (
-                            rare::p10_from_rate(rare::sub_cause_rate(s)),
-                            Some(s.name.clone()),
-                        )
-                    }),
+                Some((id, words)) => (
+                    risks
+                        .sub_causes
+                        .get(f)
+                        .and_then(|subs| subs.iter().find(|s| s.id == id))
+                        .map_or(0.0, |s| rare::p10_from_rate(rare::sub_cause_rate(s))),
+                    Some(words.to_owned()),
+                ),
             }
         };
         let eligible: Vec<(HazardId, f64, Option<String>)> = o

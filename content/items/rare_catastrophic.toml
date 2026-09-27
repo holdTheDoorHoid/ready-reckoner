@@ -73,6 +73,7 @@ price_band_usd = { low = 37.95, high = 97.95, per = "bag", note = "Two retail li
 retrieved = "2026-09-25"
 quantity_rule = "once"
 citations = ["rr_research_risk_model", "fri_nuclear_risk_2024", "rr_price_observations_2026_09"]
-# The months-long blackout family, not the nuclear one: an electromagnetic pulse reaches far beyond
-# any blast or fallout zone, and that family's block carries the EMP paragraph (planner, 2026-09-26).
-hazard_extras = ["multi_month_blackout"]
+# The nuclear family ("Nuclear attack or EMP"). rr-budget gates it on that family's EMP sub-cause, a
+# pulse at all, not on the family's local blast-or-fallout total: a pulse reaches far beyond any
+# blast zone (rr_budget::rare::RARE_CAUSES; planner, 2026-09-26).
+hazard_extras = ["nuclear_attack"]
