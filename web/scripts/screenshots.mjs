@@ -115,7 +115,7 @@ shots.push(...extras);
 
 // v0.2.0 (web-interview): the family plan, the new questions, the settings' rare families and the
 // packet's wallet cards, for a household with its family plan filled in.
-const detroit = fixture('pending/detroit-snap-3');
+const detroit = fixture('detroit-snap-3');
 const detroitTested = saved({ ...structuredClone(detroit), existing: [{ item_id: 'flashlights_headlamps', qty: 3, tested_on: '2026-09-20' }] });
 shots.push(
   { name: '12-family--detroit--desktop', route: 'family', plan: saved(detroit), viewport: DESKTOP },
@@ -129,6 +129,32 @@ shots.push(
   { name: '04-money-v2--detroit--desktop', route: 'money', plan: saved(detroit), viewport: DESKTOP },
   { name: '05-have-tested--detroit--desktop', route: 'have', plan: detroitTested, viewport: DESKTOP },
   { name: '06-risks-settings-v2--detroit--desktop', route: 'risks', plan: saved(detroit), viewport: DESKTOP, click: 'button[aria-controls="settings-panel"]' },
+);
+
+// v0.2.0 (verify2): the validation page, the rare box for a household that ticks the nuclear row
+// near a missile field (Minot), the Plan screen's grouped decisions and rare-allowance lines (Minot,
+// and Hays with eight decisions), the legal-emergency switch in the settings, and dark and phone
+// views of each.
+const minot = fixture('minot-missile-field-3');
+const minotLegal = structuredClone(minot);
+minotLegal.dials.legal_opt_in = true;
+const hays = fixture('hays-kansas-farm-5');
+shots.push(
+  { name: '13-validation--philadelphia--desktop', route: 'validation', plan: saved(philly), viewport: DESKTOP },
+  { name: '13-validation--philadelphia--phone', route: 'validation', plan: saved(philly), viewport: PHONE },
+  { name: '13-validation--philadelphia-dark--desktop', route: 'validation', plan: saved(philly), viewport: DESKTOP, theme: 'dark' },
+  { name: '14-risks--minot--desktop', route: 'risks', plan: saved(minot), viewport: DESKTOP },
+  { name: '14-risks--minot--phone', route: 'risks', plan: saved(minot), viewport: PHONE },
+  { name: '14-risks--minot-dark--desktop', route: 'risks', plan: saved(minot), viewport: DESKTOP, theme: 'dark' },
+  { name: '14-risks-rare-nuclear-open--minot--desktop', route: 'risks', plan: saved(minot), viewport: DESKTOP, click: '#rare-nuclear_attack button.expander', openDetails: '#rare-nuclear_attack details' },
+  { name: '14-risks-settings-legal-on--minot--desktop', route: 'risks', plan: saved(minotLegal), viewport: DESKTOP, click: 'button[aria-controls="settings-panel"]' },
+  { name: '15-plan--minot--desktop', route: 'plan', plan: saved(minot), viewport: DESKTOP, openDetails: 'details.decisions' },
+  { name: '15-plan--minot--phone', route: 'plan', plan: saved(minot), viewport: PHONE },
+  { name: '15-plan--minot-legal-dark--desktop', route: 'plan', plan: saved(minotLegal), viewport: DESKTOP, theme: 'dark' },
+  { name: '15-plan--hays-decisions--desktop', route: 'plan', plan: saved(hays), viewport: DESKTOP },
+  { name: '16-family--minot--desktop', route: 'family', plan: saved(minot), viewport: DESKTOP },
+  { name: '17-packet--minot--desktop', route: 'packet', plan: saved(minot), viewport: DESKTOP },
+  { name: '18-maintain--minot-dark--phone', route: 'maintain', plan: saved(minot), viewport: PHONE, theme: 'dark' },
 );
 
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true, args: ['--no-sandbox', '--font-render-hinting=none'] });
@@ -183,6 +209,12 @@ try {
       await page.pdf({ path: join(outDir, `${shot.name.replace('--desktop', '')}--cards-only--letter.pdf`), format: 'Letter', printBackground: false });
       await page.emulateMediaType(null);
       console.log('wallet cards printed alone (PNG, Letter PDF)');
+    }
+    if (shot.name === '17-packet--minot--desktop') {
+      await page.emulateMediaType('print');
+      await page.pdf({ path: join(outDir, '17-packet--minot--letter.pdf'), format: 'Letter', printBackground: false });
+      await page.pdf({ path: join(outDir, '17-packet--minot--a4.pdf'), format: 'A4', printBackground: false });
+      console.log('Minot packet PDFs written (Letter, A4)');
     }
     if (shot.name === '08-packet--philadelphia--desktop') {
       await page.emulateMediaType('print');
