@@ -32,6 +32,8 @@ Banks close or limit withdrawals, or a bank you use fails. No one has lost a pen
 
 ## Where and who
 
+- Bank phone numbers:
+
 ## Do not
 
 - Do not give account numbers, PINs or passwords to anyone who calls, texts or emails you.[^ready_gov_cybersecurity]

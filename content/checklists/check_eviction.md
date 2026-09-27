@@ -34,6 +34,10 @@ Your landlord gives you a notice to pay or leave, or you get court papers for an
 
 ## Where and who
 
+- Court date, time and courtroom:
+- Deadline to file an answer:
+- Legal aid office:
+
 ## Do not
 
 - Do not ignore court papers. Too many renters give up before they have a chance to go to court.[^cfpb_facing_eviction]

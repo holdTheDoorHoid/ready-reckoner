@@ -38,6 +38,7 @@ The power goes out at home and stays out for hours or days, from a storm, a faul
 ## Where and who
 
 - Power company outage line: {electric_utility}
+- Nearest warming or cooling center:
 
 ## Do not
 

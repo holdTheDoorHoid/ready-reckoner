@@ -30,6 +30,10 @@ Someone in your household is arrested, or held by the police or another agency.
 
 ## Where and who
 
+- Where they are held:
+- Booking or case number:
+- Next court date:
+
 ## Do not
 
 - Do not talk about what happened on calls from custody. Police can listen to them, except calls with a lawyer.[^aclu_stopped_by_police]

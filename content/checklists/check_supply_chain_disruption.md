@@ -31,6 +31,7 @@ Stores run short of food, fuel, medicine or other basics for days or weeks, or p
 ## Where and who
 
 - Pharmacy: {pharmacy}
+- Nearest food bank:
 
 ## Do not
 

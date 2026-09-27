@@ -42,7 +42,7 @@ The power is out across your town or region and could stay out for days. Stores,
 ## Where and who
 
 - Power company outage line: {electric_utility}
-- Local alerts: {alerts}
+- Nearest warming or cooling center:
 
 ## Do not
 

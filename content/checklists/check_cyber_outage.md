@@ -37,6 +37,8 @@ Card payments, a bank, a pharmacy, a hospital or a utility stops working because
 
 ## Where and who
 
+- Bank and card fraud phone numbers:
+
 ## Do not
 
 - Do not click links in texts or emails from people you do not know.[^ready_gov_cybersecurity]

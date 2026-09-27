@@ -29,6 +29,9 @@ You or another earner in the household loses a job, or most of their hours.
 
 ## Where and who
 
+- State unemployment office:
+- Date the job's health coverage ends:
+
 ## Do not
 
 - Do not take a payday loan. A typical two-week loan costs as much as almost 400 percent a year.[^cfpb_payday_loans]

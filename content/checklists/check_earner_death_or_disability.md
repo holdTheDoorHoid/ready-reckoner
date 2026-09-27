@@ -34,6 +34,9 @@ Someone whose income the household relies on dies, or becomes unable to work for
 
 ## Where and who
 
+- Funeral home:
+- Employer's benefits office:
+
 ## Do not
 
 - Do not take a payday loan. A typical two-week loan costs as much as almost 400 percent a year.[^cfpb_payday_loans]
