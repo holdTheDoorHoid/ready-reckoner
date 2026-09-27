@@ -494,9 +494,10 @@ How the web app gets the engine and its data (`crates/rr-wasm`, `web/src/engine/
 **Build.** `bash crates/rr-wasm/build-web.sh` compiles `rr-wasm` with wasm-pack (`--target web`,
 the release profile at opt-level `s` unless `CARGO_PROFILE_RELEASE_OPT_LEVEL` says otherwise, then
 `wasm-opt -Os`; never `--profile`) into `web/public/pkg/` (`rr_wasm.js`, `rr_wasm_bg.wasm`) and
-copies `data/manifest.json`, `data/core/` and `data/geo/` into `web/public/data/` (both
-git-ignored). It prints the raw and gzipped size of the `.wasm`; the budget is 1.5 MB gzipped,
-content included. The Pages workflow runs it before `npm run build`. The site talks to the
+copies `data/manifest.json`, `data/core/`, `data/geo/` and `data/places/` into `web/public/data/`
+(all git-ignored). It prints the raw and gzipped size of the `.wasm`; the budget is 1.5 MB gzipped,
+content included (DESIGN-DELTA-v3 §10 raises the shipped budget to 1.75 MB; this script's constant
+is unchanged). The Pages workflow runs it before `npm run build`. The site talks to the
 WebAssembly engine when `web/public/pkg/rr_wasm.js` exists at build time or `VITE_ENGINE=wasm`,
 otherwise to the mock (`VITE_ENGINE=mock` forces it).
 
@@ -515,17 +516,23 @@ comes back at once.
 
 1. `manifest.json` first. The engine checks every later file against the sha256 it records (a file
    loaded before the manifest is checked when the manifest arrives).
-2. Every file listed under `packs.core.files` except the two ZIP tables, fetched at once and
+2. Every file listed under `packs.core.files` except the ZIP tables, fetched at once and
    loaded one by one with `core/counties.csv` last. The engine reassembles the county records
    after each file, which is only real work once the county list is in, so this order is the
-   fastest; any order gives the same answers.
-3. The ZIP tables (`core/zip_county.csv`, `core/zip_facilities.csv`; `ZIP_FILES` in
-   `crates/rr-wasm/src/source.rs`) when a location has a real ZIP code: the app starts fetching
-   them when someone starts typing one, or when a saved plan has one. Only ZIP lookups read them,
-   so a first visit is about 0.38 MB lighter, and someone who finds their county by name never
-   downloads them.
+   fastest; any order gives the same answers. Since v0.3.0 this includes the eviction column and
+   the wildfire-by-place and per-event outage tables bundled from their optional packs
+   (DESIGN-DELTA-v3 §8); a first visit is correspondingly larger (about 3.5 MB gzipped, up from
+   2.4 MB in v0.2.0).
+3. The ZIP tables (`core/zip_county.csv`, `core/zip_facilities.csv`, `core/zip_surge.csv`,
+   `core/zip_centroids.csv`; `ZIP_FILES` in `crates/rr-wasm/src/source.rs`) when a location has a
+   real ZIP code: the app starts fetching them when someone starts typing one, or when a saved
+   plan has one. Only ZIP lookups read them, so a first visit is about 0.76 MB lighter, and someone
+   who finds their county by name never downloads them.
 4. `geo/counties.json` (county outlines for the map) only when a map is shown; nothing else needs
    it.
+5. `places/hospitals.csv` (county hospitals with emergency services) only when the binder's
+   Neighbourhood page is shown (`PackLoader.places()`); nothing else needs it. Like `geo`, it is
+   its own manifest pack, not part of `packs.core`.
 
 File URLs carry `?v=<pack_version>`, so a cached manifest is always paired with the files it
 describes. The service worker precaches `data/manifest.json` with the app (each installed version
@@ -540,7 +547,7 @@ are cached the first time they are fetched. After one visit the app works offlin
 | No pack file loaded | `[]` | absent | The seven built-in sample counties, the fixture households' counties; any other place is `unknown_zip` or `unknown_county`. Plans carry `data_pack_version` `fixtures+…`, as the goldens do. The app shows "Sample counties only". |
 | Part-way: the manifest and some core files | the loaded files' paths | the manifest's `pack_version` | `pack_missing`, naming how many of the county files are in: the engine never plans from part of the core pack |
 | The manifest and every core file except the ZIP tables | the loaded files' paths | the manifest's `pack_version` | Counties answer from the national data, exactly as with the whole pack (`county_search`, a location or plan by county code). Any location with a ZIP code answers `pack_missing` ("The list of ZIP codes has not loaded yet") until the ZIP tables are in: a ZIP code decides the county and the facility distances. |
-| The manifest and every core file | `["core"]`, then `["core", "geo"]` | the manifest's `pack_version` | The national data. Attributions come from the manifest, the National Risk Index statement first. |
+| The manifest and every core file | `["core"]`, then `["core", "geo"]` and/or `["core", "places"]` as those load | the manifest's `pack_version` | The national data. Attributions come from the manifest, the National Risk Index statement first. |
 
 Once any pack file is loaded the packs decide, and the sample counties no longer answer.
 
