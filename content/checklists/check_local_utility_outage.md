@@ -4,7 +4,7 @@ title: No tap water, or a local water or gas outage
 kind: checklist
 onset: ongoing
 applies_to: [hazard:local_utility_outage]
-citations: [ready_gov_safety_skills, pa_puc_gas_emergencies, cdc_water_advisories, ready_gov_water, cdc_hygiene_emergency, rdpo_emergency_toilet, cdc_find_clean_water, redcross_power_outage, cdc_winter_safety, usfa_heating_fires, ready_gov_disability, ready_gov_stay_safe_warm, cdc_water_storage]
+citations: [ready_gov_safety_skills, pa_puc_gas_emergencies, cdc_water_advisories, ready_gov_water, cdc_hygiene_emergency, rdpo_emergency_toilet, redcross_power_outage, cdc_winter_safety, usfa_heating_fires, ready_gov_disability, ready_gov_stay_safe_warm, cdc_water_storage]
 pages: 1
 ---
 ## Use this when
@@ -21,14 +21,13 @@ No water comes from the tap, or a notice says not to drink or use it. Or the gas
 
 ## Then
 
-1. **Use the water heater tank** for clean water if you need more.[^cdc_find_clean_water]
-2. **Heat safely.** Use electric space heaters with automatic shut-off, 3 feet from anything that can burn.[^cdc_winter_safety][^usfa_heating_fires]
-3. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
+1. **Heat safely.** Use electric space heaters with automatic shut-off, 3 feet from anything that can burn.[^cdc_winter_safety][^usfa_heating_fires]
+2. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
 
 ## Leave or stay
 
 - **Leave if** you smell gas or hear hissing. Go outside and away from the building.[^ready_gov_safety_skills]
-- **Leave if** you cannot keep the home warm. Go to a warming center (dial 2-1-1 to find one), or {where_go}.[^ready_gov_stay_safe_warm] {ref:getting_out}
+- **Leave if** you cannot keep the home warm. Go to a warming center (call 211 to find one), or {where_go}.[^ready_gov_stay_safe_warm] {ref:getting_out}
 
 ## Where and who
 
@@ -56,7 +55,6 @@ No water comes from the tap, or a notice says not to drink or use it. Or the gas
 [^ready_gov_water]: FEMA / Ready.gov, Water (2021).
 [^cdc_hygiene_emergency]: Centers for Disease Control and Prevention, Guidelines for Personal Hygiene During an Emergency (2024).
 [^rdpo_emergency_toilet]: Regional Disaster Preparedness Organization, Portland Metro Region, Emergency Toilet Guidebook (twin-bucket toilet) (2024).
-[^cdc_find_clean_water]: Centers for Disease Control and Prevention, How to Find Clean Water in an Emergency (2024).
 [^redcross_power_outage]: American Red Cross, Power Outage Safety (2026).
 [^cdc_winter_safety]: Centers for Disease Control and Prevention, Safety Guidelines: During and After a Winter Storm (2026).
 [^usfa_heating_fires]: U.S. Fire Administration, Heating fire safety (2026).

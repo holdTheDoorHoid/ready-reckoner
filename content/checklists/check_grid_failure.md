@@ -30,6 +30,7 @@ The power is out across your town or region, not just your street, and could sta
 6. {if:has:power_generator}**Run the generator outdoors only,** at least 20 feet from windows, doors and attached garages.[^ready_gov_power_outages]{/if}
 7. {if:has:med_cooler_refrigerated_rx}**Keep insulin below 86°F,** out of the sun and never frozen.[^fda_insulin_emergency]{/if}
 8. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
+9. {if:need:hearing}**If someone cannot hear the radio,** watch phone alerts and texts for warnings.[^fcc_emergency_calling_tips]{/if}
 
 ## Leave or stay
 

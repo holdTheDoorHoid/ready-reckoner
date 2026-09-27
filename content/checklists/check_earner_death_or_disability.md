@@ -23,7 +23,7 @@ Someone whose income the household relies on dies, or becomes unable to work for
 ## Then
 
 1. **Tell the other programs and businesses the person used,** and close or transfer accounts.[^usagov_report_death]
-2. **If the earner is alive but cannot act,** the person named in their power of attorney can handle money and health care.[^nia_affairs_checklist]
+2. **If the earner is alive but cannot act,** ask the person named in their power of attorney to handle money and health care.[^nia_affairs_checklist]
 3. **Get legal help** with the will and accounts. Legal aid helps people with low incomes.[^lsc_get_legal_help]
 4. **Call or text 988** for support when grief or stress is too much.[^samhsa_988]
 

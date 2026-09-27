@@ -20,7 +20,7 @@ Stores run short of food, fuel, medicine or other basics for days or weeks, or p
 
 ## Then
 
-1. **Try other pharmacies** if a medicine is out, and ask about an alternative.[^fda_drug_shortages_faq]
+1. **Try other pharmacies** if a medicine is out.[^fda_drug_shortages_faq]
 2. **Store food somewhere cool and dry,** below 85°F if you can.[^fsis_shelf_stable]
 
 ## Leave or stay
@@ -34,7 +34,6 @@ Stores run short of food, fuel, medicine or other basics for days or weeks, or p
 
 ## Do not
 
-- Do not buy everything at once.[^ready_gov_pandemic]
 - Do not buy or eat from cans that bulge, leak, are rusted or are deeply dented.[^fsis_shelf_stable]
 - {if:has:food_infant_formula|food_infant_formula_rtf}Do not make homemade baby formula.[^fda_infant_formula_dos_donts]{/if}
 - Do not buy medicine from a website that is not a state-licensed pharmacy.[^fda_besaferx]

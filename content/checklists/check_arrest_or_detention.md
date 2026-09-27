@@ -19,12 +19,12 @@ Someone in your household is arrested, or held by the police or another agency.
 
 ## Then
 
-1. **If they cannot afford a lawyer,** they have the right to one the government provides.[^aclu_stopped_by_police]
-2. **If they gave you power of attorney,** use it to handle their bills and health care while they cannot.[^nia_affairs_checklist]
-3. **Call or text 988** if the stress is too much.[^samhsa_988]
+1. **If they gave you power of attorney,** use it to handle their bills and health care while they cannot.[^nia_affairs_checklist]
+2. **Call or text 988** if the stress is too much.[^samhsa_988]
 
 ## Leave or stay
 
+- **Do this if** they cannot afford a lawyer: they have the right to one the government provides.[^aclu_stopped_by_police]
 - **Do this if** immigration officers (ICE) are holding them: search ICE's online detainee locator with their name, country of birth and birth date, or their A-number.[^usagov_ice_detainee]
 - **Do this if** they were arrested at a protest: call your area's legal hotline, if one runs there.[^nlg_mass_defense]
 

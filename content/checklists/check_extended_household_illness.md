@@ -22,7 +22,7 @@ Someone at home will be sick or recovering for weeks or months, and needs care.
 
 ## Then
 
-1. **Name a health care proxy** in a durable power of attorney for health care.[^nia_affairs_checklist]
+1. **Help them name a health care proxy** in a durable power of attorney for health care.[^nia_affairs_checklist]
 2. **Give someone else a key,** and show them where supplies are and how to use the equipment.[^ready_gov_older_adults]
 3. **Look after the caregiver.** Keep regular sleep, and talk with people you trust.[^cdc_managing_stress]
 4. **Call or text 988** if stress becomes too much.[^samhsa_988]

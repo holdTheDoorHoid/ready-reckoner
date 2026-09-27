@@ -23,7 +23,7 @@ Your landlord gives you a notice to pay or leave, or you get court papers for an
 
 1. **Talk with your landlord** about a plan to catch up on rent.[^cfpb_facing_eviction]
 2. **Tell the court** in your answer if you applied for rent help.[^cfpb_facing_eviction]
-3. **Call a HUD-approved housing counselor** at 800-569-4287.[^cfpb_facing_eviction]
+3. **Call a HUD-approved housing counselor** at 1-800-569-4287.[^cfpb_facing_eviction]
 4. **Keep your important papers together** in case you have to move.[^fema_effak] {ref:documents}
 
 ## Leave or stay

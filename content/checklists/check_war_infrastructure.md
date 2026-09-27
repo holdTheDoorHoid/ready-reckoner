@@ -4,7 +4,7 @@ title: War with attacks on US infrastructure
 kind: checklist
 onset: ongoing
 applies_to: [hazard:war_infrastructure]
-citations: [cisa_volt_typhoon_2024, ready_gov_evacuation, ready_gov_alerts, ready_gov_kit, cdc_water_storage, ready_gov_financial, medicare_drugs_disaster, redcross_power_outage, ready_gov_power_outages, ready_gov_cybersecurity, cisa_secure_our_world, dhs_report_suspicious, ready_gov_low_cost, cdc_managing_stress, samhsa_disaster_distress, ready_gov_shelter, cdc_co_basics, ready_gov_recovering]
+citations: [cisa_volt_typhoon_2024, fcc_emergency_calling_tips, ready_gov_evacuation, ready_gov_alerts, ready_gov_kit, cdc_water_storage, ready_gov_financial, medicare_drugs_disaster, redcross_power_outage, ready_gov_power_outages, ready_gov_cybersecurity, cisa_secure_our_world, dhs_report_suspicious, ready_gov_low_cost, cdc_managing_stress, samhsa_disaster_distress, ready_gov_shelter, cdc_co_basics, ready_gov_recovering]
 pages: 1
 ---
 ## Use this when
@@ -15,7 +15,7 @@ The United States is at war, and power, water, fuel, phone or internet systems a
 
 1. **Follow official instructions.**[^ready_gov_evacuation]
 2. **Turn on emergency alerts** on every phone.[^ready_gov_alerts]
-3. **Keep a battery or hand-crank radio** on for news.[^ready_gov_kit]
+3. **Keep a battery or hand-crank radio** on for news.[^ready_gov_kit] {if:need:hearing}If someone cannot hear it, watch phone alerts and texts.[^fcc_emergency_calling_tips]{/if}
 4. **Fill clean bottles or jugs with tap water** while it runs.[^cdc_water_storage]
 5. **Get some cash** in small bills.[^ready_gov_financial]
 6. **Ask your drug plan** about a 60- to 90-day refill.[^medicare_drugs_disaster]
@@ -60,6 +60,7 @@ The United States is at war, and power, water, fuel, phone or internet systems a
 
 [^cisa_volt_typhoon_2024]: Cybersecurity and Infrastructure Security Agency, PRC State-Sponsored Actors Compromise and Maintain Persistent Access to U.S. Critical Infrastructure (AA24-038A) (2024).
 [^ready_gov_evacuation]: FEMA / Ready.gov, Evacuation (2026).
+[^fcc_emergency_calling_tips]: Federal Communications Commission, Tips for Communicating in an Emergency (2026).
 [^ready_gov_alerts]: FEMA / Ready.gov, Emergency Alerts (2026).
 [^ready_gov_kit]: FEMA / Ready.gov, Build A Kit (2026).
 [^cdc_water_storage]: Centers for Disease Control and Prevention, How to Create an Emergency Water Supply (2025).

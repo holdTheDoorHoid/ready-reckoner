@@ -19,14 +19,13 @@ Your pharmacy cannot fill a prescription, or you hear that a medicine you take i
 
 ## Then
 
-1. **Report the shortage to FDA** if the medicine is not on its list.[^fda_drug_shortages]
-2. **Ask your drug plan** about a 60- to 90-day supply once you can refill.[^medicare_drugs_disaster]
-3. **Keep a written list** of each person's medicines, doses and allergies.[^ready_gov_disability]
+1. **Ask your drug plan** about a 60- to 90-day supply once you can refill.[^medicare_drugs_disaster]
+2. **Keep a written list** of each person's medicines, doses and allergies.[^ready_gov_disability]
 
 ## Leave or stay
 
 - **Do this if** you will run out before you can refill: ask your doctor or pharmacist about an emergency supply.[^ready_gov_disability]
-- **Do this if** the medicine is on FDA's list: ask your prescriber about other treatments.[^fda_drug_shortages]
+- **Do this if** the medicine is not on FDA's list: report the shortage to FDA.[^fda_drug_shortages]
 
 ## Where and who
 

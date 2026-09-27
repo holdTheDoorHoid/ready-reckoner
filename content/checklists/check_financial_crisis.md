@@ -13,7 +13,7 @@ Banks close or limit withdrawals, or a bank you use fails. No one has lost a pen
 
 ## Do first
 
-1. **Use the cash you keep at home** for food, fuel and medicine.[^ready_gov_financial]
+1. **Use the cash you keep at home** for food, fuel and supplies.[^ready_gov_financial]
 2. **Watch your mail** for a letter from the FDIC or the bank that takes over your account.[^fdic_when_bank_fails]
 3. **Keep paying your loans** as agreed.[^fdic_borrowers_guide]
 4. **Call the FDIC at 1-877-275-3342** with questions about your deposits.[^fdic_deposit_insurance_faq]

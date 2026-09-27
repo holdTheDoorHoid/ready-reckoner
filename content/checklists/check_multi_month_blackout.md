@@ -13,26 +13,26 @@ Officials say the power may stay out for weeks or months. Water, fuel, stores an
 
 ## Do first
 
-1. **Follow official instructions** about shelters, water and where to go.[^ready_gov_evacuation]
+1. **Follow official instructions** on shelters and water.[^ready_gov_evacuation]
 2. {if:powered_device}**Plan for medical devices now.** If backup power will not last, move somewhere with power.[^redcross_power_outage]{/if}
 3. **Ask your doctor or pharmacist** how to get an emergency supply of medicine.[^ready_gov_disability]
-4. **Make water safe to drink.** Boil it for 1 minute, or 3 minutes above 5,000 feet.[^epa_emergency_disinfection]
+4. **Make water safe to drink.** Boil it for 1 minute (3 minutes above 5,000 feet). Or add unscented bleach per gallon, 8 drops of 6% or 6 drops of 8.25%, stir and wait 30 minutes.[^epa_emergency_disinfection]
 5. **Set up a two-bucket toilet** if toilets cannot flush.[^rdpo_emergency_toilet]
-6. **Keep one room livable.** In cold, close off other rooms and cover windows at night.[^cdc_winter_safety] In heat, shade the windows.[^ready_gov_heat]
+6. **Keep one room livable.** In cold, close off other rooms.[^cdc_winter_safety] In heat, shade the windows.[^ready_gov_heat]
 
 ## Then
 
 1. **Cook outdoors only,** at least 20 feet from windows.[^ready_gov_power_outages]
 2. **Eat fresh food first,** then the oldest cans.[^redcross_power_outage][^fsis_shelf_stable]
 3. **Wash hands with soap and water,** or sanitizer with at least 60% alcohol.[^cdc_hygiene_emergency]
-4. **Work with your neighbours.** Share tasks and check on each other.[^ncpc_home_safety]
+4. **Work with your neighbours** to look out for each other.[^ncpc_home_safety]
 5. **Apply for FEMA help** at 1-800-621-3362 if your county has a disaster declaration.[^disasterassistance_gov]
 6. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
 7. **Talk to someone** when stress builds. Call or text 1-800-985-5990.[^samhsa_disaster_distress]
 
 ## Leave or stay
 
-- **Leave if** the home cannot be kept safely warm or cool, or medical care needs power you cannot keep going. Go to {where_go}.[^redcross_power_outage] {ref:getting_out}
+- **Leave if** you cannot keep the home safely warm or cool, or keep medical devices running. Go to {where_go}.[^redcross_power_outage] {ref:getting_out}
 - **Leave if** officials open relocation or tell you to go.[^ready_gov_evacuation] {ref:getting_out}
 
 ## Where and who
