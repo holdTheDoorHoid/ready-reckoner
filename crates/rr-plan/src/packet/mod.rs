@@ -205,7 +205,9 @@ impl<'a> Ctx<'a> {
     /// ([`Ctx::hazard_relevant`]); a span about a kind of home (`{if:home:apartment_high_rise}`,
     /// `{if:not_home:…}`) when the household's home is (or is not) of that kind; an access need
     /// (`{if:need:hearing}`), an item (`{if:has:power_generator}`: owned, or in the plan) or a
-    /// benefit (`{if:benefit:snap_wic}`) when the household has it.
+    /// benefit (`{if:benefit:snap_wic}`) when the household has it; `{if:children}`,
+    /// `{if:pets}`, `{if:vehicle}` and `{if:powered_device}` (contract v3) from the household's
+    /// own answers.
     pub fn condition_holds(&self, id: &str) -> bool {
         match rr_content::policy::Condition::parse(id) {
             Ok(c) => c.holds(self),
@@ -306,6 +308,35 @@ impl rr_content::policy::HouseholdFacts for Ctx<'_> {
             .benefits
             .iter()
             .any(|b| b.as_str() == benefit)
+    }
+
+    fn has_children(&self) -> bool {
+        self.a.input.people.iter().any(|p| {
+            matches!(
+                p.age_band,
+                rr_types::AgeBand::Infant
+                    | rr_types::AgeBand::Toddler
+                    | rr_types::AgeBand::Child
+                    | rr_types::AgeBand::Teen
+            )
+        })
+    }
+
+    fn has_pets(&self) -> bool {
+        let p = &self.a.input.pets;
+        u16::from(p.dogs) + u16::from(p.cats) + u16::from(p.small) + u16::from(p.large_animals) > 0
+    }
+
+    fn has_vehicle(&self) -> bool {
+        !self.a.input.mobility.vehicles.is_empty()
+    }
+
+    fn has_powered_device(&self) -> bool {
+        self.a
+            .input
+            .people
+            .iter()
+            .any(|p| p.medical.powered_device != rr_types::PoweredDevice::None)
     }
 }
 

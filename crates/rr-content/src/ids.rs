@@ -1,7 +1,8 @@
 //! Ids content may name, and the rules that go with each kind of guidance block.
 //!
-//! Hazards, buckets, rare families, access needs and benefits come from engine contract v2 in
-//! `rr-types`; this module turns them into the checks the validator and the conditional spans use.
+//! Hazards, buckets, rare families, access needs and benefits come from the engine contract in
+//! `rr-types`; this module turns them into the checks the validator and the conditional spans use,
+//! and adds the everyday emergencies checklists apply to ([`EVENTS`], contract v3).
 //! A rare family is named by its lead hazard id ([`rr_types::HazardId::family`]), so a family
 //! block applies to `family:<hazard id>`.
 
@@ -15,6 +16,23 @@ pub const ACCESS_NEEDS: &[&str] = AccessNeed::STRS;
 
 /// Benefits a household may rely on, for `{if:benefit:<id>}` spans (`Finances.benefits`).
 pub const BENEFITS: &[&str] = Benefit::STRS;
+
+/// The everyday emergencies every household's binder has a checklist for whatever its hazards
+/// (DESIGN-DELTA-v3 §3.3, §5.5): the ids a checklist's `applies_to` may name as `event:<id>`.
+pub const EVENTS: &[&str] = &[
+    "gas_leak_or_co",
+    "missing_person",
+    "evacuation_order",
+    "shelter_in_place",
+    "boil_water_notice",
+    "power_outage",
+    "something_else",
+];
+
+/// An everyday emergency ([`EVENTS`]).
+pub fn is_event(id: &str) -> bool {
+    EVENTS.contains(&id)
+}
 
 /// A hazard id content may name: any id `rr-types` parses, the retired `terrorism` included (a
 /// block may keep explaining it for saved plans).
@@ -114,5 +132,24 @@ mod tests {
         assert_eq!(rare_families().len(), 9);
         assert!(ACCESS_NEEDS.contains(&"dialysis"));
         assert!(BENEFITS.contains(&"snap_wic"));
+    }
+
+    #[test]
+    fn the_everyday_emergencies_are_the_deltas_seven() {
+        assert_eq!(
+            EVENTS,
+            [
+                "gas_leak_or_co",
+                "missing_person",
+                "evacuation_order",
+                "shelter_in_place",
+                "boil_water_notice",
+                "power_outage",
+                "something_else"
+            ]
+        );
+        assert!(is_event("power_outage") && !is_event("power") && !is_event("tornado"));
+        // No event id doubles as a hazard id, so `event:` and `hazard:` never mean the same page.
+        assert!(EVENTS.iter().all(|e| !is_hazard(e)));
     }
 }

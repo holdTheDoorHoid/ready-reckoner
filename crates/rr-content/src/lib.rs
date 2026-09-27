@@ -13,6 +13,8 @@
 //! # Where things are
 //!
 //! - [`parse`]: the [`Content`] container, file parsing, lookups and [`Catalogue`](rr_types::Catalogue).
+//! - [`checklist`]: the incident checklists of the binder ([`Checklist`], contract v3): the file
+//!   format, [`Checklist::render_for`] and its blank and cross-reference markers.
 //! - [`validate`](mod@validate): the content validator and its [`Report`].
 //! - [`policy`]: the word lists the validator enforces (brands, firearm words, dosing units) and
 //!   the conditional spans of guidance blocks ([`policy::Condition`], [`policy::HouseholdFacts`]).
@@ -29,6 +31,7 @@ mod embedded {
     include!(concat!(env!("OUT_DIR"), "/embedded.rs"));
 }
 
+pub mod checklist;
 pub mod ids;
 pub mod parse;
 pub mod policy;
@@ -37,6 +40,7 @@ pub mod rules;
 pub mod tables;
 pub mod validate;
 
+pub use checklist::{Checklist, ChecklistSections, Onset};
 pub use ids::GuidanceKind;
 pub use parse::{Content, GlossaryEntry, Guidance, LoadError};
 pub use tables::{StateLine, StateRow, StateTable};
