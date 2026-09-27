@@ -31,7 +31,7 @@ A volcano near you erupts or officials warn that it may, or ash is falling. Ash 
 ## Leave or stay
 
 - **Leave if** officials tell you to. Go early.[^ready_gov_volcanoes] Go to {where_go}.{if:pets} Take your pets.[^ready_gov_pets]{/if} {ref:getting_out}
-- **Stay** inside while ash falls, if you have enough supplies and are not told to leave.[^ready_gov_volcanoes] {ref:home}
+- **Stay if** ash is falling and you are not told to leave. Stay inside if you have enough supplies.[^ready_gov_volcanoes] {ref:home}
 
 ## Where and who
 

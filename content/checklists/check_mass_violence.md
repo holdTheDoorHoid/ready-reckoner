@@ -34,7 +34,7 @@ Someone is attacking people near you, or there is an explosion.
 ## Leave or stay
 
 - **Leave if** you can get out safely. Go the way police tell you.[^ready_gov_public_spaces]
-- **Stay** hidden if you cannot get out, until police reach you.[^ready_gov_public_spaces]
+- **Stay if** you cannot get out. Stay hidden until police reach you.[^ready_gov_public_spaces]
 
 ## Where and who
 

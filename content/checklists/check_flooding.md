@@ -32,7 +32,7 @@ A flood or flash flood warning covers your area, or water is rising around you. 
 ## Leave or stay
 
 - **Leave if** officials tell you to, or water starts to rise around your home.[^ready_gov_floods][^nws_flood_during] Go to {where_go}.{if:pets} Take your pets.[^ready_gov_pets]{/if} {ref:getting_out}
-- **Stay if** the roads are flooded and your home is dry. Move to a higher floor. {ref:home}[^ready_gov_floods]
+- **Stay if** the roads are flooded and your home is dry. Move to a higher floor.[^ready_gov_floods] {ref:home}
 - **Call** 911 if you are trapped by rising water.[^nws_flood_during]
 
 ## Where and who

@@ -31,7 +31,7 @@ Officials warn that a dam or levee near you is failing or may fail, or you see w
 ## Leave or stay
 
 - **Leave if** a dam or levee is failing, or officials tell you to go.[^mo_sema_dam_failure] Go to {where_go}.{if:pets} Take your pets.[^ready_gov_pets]{/if} {ref:getting_out}
-- **Stay** on high ground until officials say it is safe to go back.[^mo_sema_dam_failure]
+- **Stay if** you are on high ground. Stay there until officials say it is safe to go back.[^mo_sema_dam_failure]
 
 ## Where and who
 

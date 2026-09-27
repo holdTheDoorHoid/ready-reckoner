@@ -32,9 +32,9 @@ The ground starts to shake, or your phone warns that shaking is coming.
 
 ## Leave or stay
 
-- **Leave if** the building is damaged. Go outside and move away from it. Meet at {meeting_near}. {ref:getting_out}[^ready_gov_earthquakes]
+- **Leave if** the building is damaged. Go outside and move away from it. Meet at {meeting_near}.[^ready_gov_earthquakes] {ref:getting_out}
 - **Go to** high ground or inland as soon as the shaking stops if a tsunami can reach you.[^ready_gov_earthquakes]
-- **Stay if** the building is not damaged. Drop, cover and hold on in each aftershock. {ref:home}[^ready_gov_earthquakes]
+- **Stay if** the building is not damaged. Drop, cover and hold on in each aftershock.[^ready_gov_earthquakes] {ref:home}
 
 ## Where and who
 

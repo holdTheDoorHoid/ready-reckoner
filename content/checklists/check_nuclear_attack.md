@@ -36,9 +36,9 @@ An alert warns of a nuclear attack, you see a blinding flash, or you learn a nuc
 
 ## Leave or stay
 
-- **Stay inside** for at least the first 24 hours, unless officials say otherwise.[^ready_gov_radiation][^fema_nuclear_planning_2022] {ref:home}
-- **Leave early only if** fire, a gas leak, a collapse or a serious injury threatens you there.[^ready_gov_radiation]
-- **Leave when officials tell you to.** Use the route they give. Go to {where_go}.[^ready_gov_radiation]{if:pets} Take your pets.[^ready_gov_pets]{/if} {ref:getting_out}
+- **Stay if** your shelter is safe. Stay in at least 24 hours unless officials say otherwise.[^ready_gov_radiation][^fema_nuclear_planning_2022] {ref:home}
+- **Leave if** fire, a gas leak, a collapse or a serious injury threatens you there.[^ready_gov_radiation]
+- **Leave if** officials tell you to. Use the route they give. Go to {where_go}.[^ready_gov_radiation]{if:pets} Take your pets.[^ready_gov_pets]{/if} {ref:getting_out}
 - **Call** 911 for a medical emergency. If you are sick or hurt, listen for where to get care.[^ready_gov_radiation]
 
 ## Where and who

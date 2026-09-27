@@ -35,7 +35,7 @@ A wildfire is near, officials tell you to get ready or to leave, or smoke or fla
 ## Leave or stay
 
 - **Leave if** officials tell you to, or you feel at risk.[^ready_gov_wildfires][^calfire_go_evacuation] Go to {where_go}.{if:pets} Take your pets.[^ready_gov_pets]{/if} {ref:getting_out}
-- **Stay if** fire blocks every way out. Shelter at home as in step 9, and call 911.[^calfire_go_evacuation]
+- **Stay if** fire blocks every way out. Call 911 and shelter at home, away from outside walls and windows.[^calfire_go_evacuation]
 
 ## Where and who
 
