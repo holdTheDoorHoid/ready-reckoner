@@ -382,10 +382,13 @@ check for danger, get to safety, get information, call, decide leave or stay, ke
 
 ### 5.6 Fit
 
-rr-plan estimates a checklist page at 330 words plus 8 field rows per printed page (a heading
-counts 6 words, a step or bullet its words plus 2, a field row 12) and fails a test when a
-`fit: one` page exceeds 1.0 or a `fit: two` page 2.0. verify3 prints every golden binder to PDF and
-checks the real page counts against `fit`.
+rr-plan estimates a page's load in word units (a heading counts 6, a step or bullet its words
+plus 2, a field row 8, a table row 10, a paragraph its words) against a capacity of **480 units per
+printed Letter page** (the content budget of 330 words leaves room for the eight headings, about
+twenty-five list items and a few household fields), and fails a test when a `fit: one` page exceeds
+1.0 or a `fit: two` page 2.0. The capacity is a starting estimate: the web-binder workstream
+calibrates it against the real PDF and verify3 checks every golden binder's real page counts against
+`fit`; a calibration changes the constant, not the content.
 
 ## 6. The web binder: on screen, as PDF, on paper
 
