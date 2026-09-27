@@ -740,7 +740,7 @@ guidance beyond safe storage and training pointers.
   `rr_etl::verify` (rr-cli drops rr-etl), and rr-data returns the NRI statement first. Open for the
   web workstream: the plan screen's list keys (V-10). Proposed, not done: pool counties without
   (or with few) outage records with the state series (V-15).
-- 2026-09-26 — Packet v2 and the 14-household golden set (agent/plan2, `agent/plan2b`, `agent/plan2c`;
+- 2026-09-26 — Packet v2 and the 14-household golden set (`agent/plan2`, `agent/plan2b`, `agent/plan2c`;
   `reports/plan2-report.md`). The packet is rewritten around the round-2 hazard, family-plan and
   model work above: **one `#` title, then fifteen `##` sections in a fixed order** (summary; your
   family plan; wallet cards; your risks; your targets; your plan; your shelter plan; the 48-hour

@@ -21,7 +21,7 @@ is handled has changed: still no server, no accounts, nothing sent anywhere.
   household member being arrested or detained (this counts arrests, never guilt). The old
   "terrorism" row is retired — it mixed two different things — and split into a disruption
   ("an attack or threat closes your area") and a personal-safety row (below). 53 hazards in total are
-  now tracked, up from the original set.
+  now tracked, natural, societal and personal combined.
 - **A new rare-but-severe table** for nine catastrophes that are real but very unlikely: nuclear
   attack or EMP, a severe solar storm, a power cut lasting months from any cause, a war that reaches
   US infrastructure, a chemical/biological/radiological attack, a pandemic far worse than COVID-19, a
@@ -47,10 +47,11 @@ is handled has changed: still no server, no accounts, nothing sent anywhere.
 - **The arrest-or-detention rate was corrected to count people, not events.** The first version
   counted arrests, so the small number of people arrested more than once inflated everyone's odds;
   Philadelphia's ten-year figure came down from about 50 of 100 households to about 30.
-- Two Puget Sound earthquake scenarios were recalculated against USGS's own regional numbers (the
-  Seattle scenario's ten-year chance is now about 4 in 100 households, from a flat 5%) and renamed to
-  say exactly what they model: "Magnitude 6.75 or larger earthquake on the Wasatch Front" and
-  "Magnitude 6.5 or larger shallow earthquake around Puget Sound."
+- Two named earthquake scenarios were renamed to say exactly what they model — "Magnitude 6.75 or
+  larger earthquake on the Wasatch Front" (greater Salt Lake City) and "Magnitude 6.5 or larger
+  shallow earthquake around Puget Sound" (greater Seattle) — and the Puget Sound one was recalculated
+  against USGS's own regional numbers: its ten-year chance for the four Puget Sound counties is now
+  about 4 in 100 households, up from a flat 5% that wasn't yet tied to USGS's own regional model.
 
 ### Your targets, and the data behind them
 
@@ -61,9 +62,9 @@ is handled has changed: still no server, no accounts, nothing sent anywhere.
   with bad readings and gaps fixed first), then blended with a credibility-weighted average of nearby
   counties, so a county with a thin history of its own borrows from its region instead of reading as
   artificially calm — or, just as often, artificially extreme from one noisy year. Restoration curves
-  from real events now drive the "worst event on record" line under each target ("In the worst power
-  cut in your region's records (Winter storm, March 2018) … some homes were without power for up to 2
-  weeks.").
+  from real events now drive a "worst on record" line under each target ("The worst power cut in your
+  region's records … was winter storm, March 2018; being ready for 3 days would have left some homes
+  that lost power still waiting.").
 - **Water targets now weigh two things that used to be ignored:** the county's own safe
   drinking-water violation record, and the household's own answer about past problems. Philadelphia's
   clean record brought its "tap water must be treated" target down from 7 days to 5; its harder "no
