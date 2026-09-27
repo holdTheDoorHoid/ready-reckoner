@@ -1,18 +1,20 @@
-//! Section 4: your plan. The free steps to do now, this month and next month, then the first
-//! year month by month with quantities, prices, price bands and what each step adds; the months
-//! after the first year as one compact table; savings toward bigger items; when the plan is done;
-//! and the guardrail warnings.
+//! Section: your plan. The free steps to do now; this month and next month in detail, with
+//! quantities, prices and, where prices spread widely, the usual price band, and the decisions
+//! due that month grouped on one line; a pointer to the checklists for the months after that
+//! (each line there carries its month, so every purchase is listed once); savings toward bigger
+//! items; when every need is covered; the guardrail warnings, including the deferred list when
+//! the plan runs long; and the rare-event allowance, in the allocator's words.
 
 use rr_types::{PlanItem, PlanItemKind, PlanMonth, WarningSeverity};
 
 use super::text::{self, md};
 use super::{Ctx, cite};
 
-/// Months shown in detail (months 0 to 5); later months go in a compact table (each purchase
-/// with its quantity, and the month's spend). Six, not twelve, since v0.1.1: the space pays for
-/// the life-safety cards and rules every packet now carries within the page budget
-/// (docs/PACKET.md).
-pub const DETAIL_MONTHS: u16 = 6;
+/// Months shown in detail: this month and next month (v0.1.1 showed six, v0.1.0 twelve). From
+/// month 2 the plan is the checklists, each line with the month the plan gets to it, so the
+/// packet lists each purchase once (packet v2: the page budget pays for the family plan, the
+/// shelter plan, the forecast list and the recovery page).
+pub const DETAIL_MONTHS: u16 = 2;
 
 /// What a step adds, in one sentence: the first sentence of its "why", after the "Free." that
 /// opens a free step's.
@@ -30,10 +32,11 @@ fn saving_for(name: &str) -> &str {
     name.strip_prefix("Save toward: ").unwrap_or(name)
 }
 
-/// A free step by name only (after the first month the reasons repeat).
+/// A free step by its short name (what it does is in the app, and its how-to where the packet
+/// has one).
 fn short_line(item: &PlanItem) -> String {
     let tick = if item.done { "x" } else { " " };
-    format!("- [{tick}] {} (free)", md(&item.name))
+    format!("- [{tick}] {}", md(text::short_name(&item.name)))
 }
 
 /// One plan line as a checklist entry, with what it adds.
@@ -67,76 +70,58 @@ pub(crate) fn item_line(item: &PlanItem) -> String {
     }
 }
 
-/// A plan line after month 0: free steps by name, everything else in full.
-fn later_line(item: &PlanItem) -> String {
-    if item.kind == PlanItemKind::FreeAction {
-        short_line(item)
+/// The price band after the estimate, when it says something the estimate does not: prices
+/// that spread more than a quarter either side of the middle ("about $12 (usually $3–20)");
+/// a narrow band ("about $483", usually $479–488) is left to the app.
+fn band_words(item: &PlanItem) -> String {
+    let (low, high) = (
+        f64::from(item.price_band.low),
+        f64::from(item.price_band.high),
+    );
+    let est = f64::from(item.est_cost_usd).max(0.01);
+    if high - low > 0.5 * est {
+        format!(" (usually {})", text::band(low, high))
     } else {
-        item_line(item)
+        String::new()
     }
 }
 
-/// A plan line in months 2 to 11: what, how much and what it costs (this month's and next
-/// month's lines also say what each step adds).
-fn brief_line(item: &PlanItem) -> String {
+/// A plan line after month 0: free steps by name, purchases with quantity, cost and price band
+/// (what each adds is the app's).
+fn later_line(item: &PlanItem) -> String {
     match item.kind {
         PlanItemKind::FreeAction => short_line(item),
-        PlanItemKind::Purchase => format!(
-            "- [ ] **{}**: {}, about {} (usually {})",
+        PlanItemKind::Purchase if !item.done => format!(
+            "- [ ] **{}**: {}, about {}{}",
             md(&item.name),
             md(&text::quantity(f64::from(item.quantity), &item.unit)),
             text::usd(f64::from(item.est_cost_usd)),
-            text::band(
-                f64::from(item.price_band.low),
-                f64::from(item.price_band.high)
-            )
+            band_words(item)
         ),
-        PlanItemKind::Reserve => item_line(item),
+        _ => item_line(item),
     }
 }
 
-/// One month after the first year as a table row: what to buy or do, and the money that leaves
-/// that month's budget ([`crate::Assessment::month_spend`]): a deposit counts once, and a purchase
-/// paid from savings only for what the savings do not cover (verification V-18: the row used to
-/// add the deposit and the full price, $130 in a $60 month).
-fn table_row(cx: &Ctx<'_>, m: &PlanMonth) -> String {
-    let start = text::month_start(cx.a.input.planning_date, m.index);
-    let mut what: Vec<String> = Vec::new();
-    for i in m.items.iter().filter(|i| !i.done) {
-        match i.kind {
-            PlanItemKind::FreeAction => what.push(format!("{} (free)", md(&i.name))),
-            PlanItemKind::Purchase => {
-                let q = text::quantity(f64::from(i.quantity), &i.unit);
-                let mut line = if q.is_empty() {
-                    md(&i.name)
-                } else {
-                    format!("{}: {}", md(&i.name), md(&q))
-                };
-                let saved = cx.a.from_savings(m.index, &i.item_id);
-                if saved > 0.005 {
-                    if saved + 0.005 >= f64::from(i.est_cost_usd) {
-                        line.push_str(", paid from savings");
-                    } else {
-                        line.push_str(&format!(", {} of it from savings", text::usd(saved)));
-                    }
-                }
-                what.push(line);
-            }
-            PlanItemKind::Reserve => {
-                what.push(format!(
-                    "save toward {}",
-                    md(&text::lower_first(saving_for(&i.name)))
-                ));
-            }
-        }
-    }
-    format!(
-        "| {} ({}) | {} | {} |",
-        m.index,
-        text::month_year(start),
-        what.join("; "),
-        text::usd(cx.a.month_spend(m.index))
-    )
+/// A decision's name without its "Decide:" opening, for the grouped line.
+fn decision_name(name: &str) -> String {
+    text::lower_first(name.strip_prefix("Decide: ").unwrap_or(name))
+}
+
+/// The month's decisions (insurance, ID and home repairs: `PlanItem::decision`) as one grouped
+/// line, not one line each (budget2: month 1 holds up to 13 of them).
+fn decisions_line(m: &PlanMonth) -> Option<String> {
+    let names: Vec<String> = m
+        .items
+        .iter()
+        .filter(|i| i.decision && !i.done)
+        .map(|i| decision_name(&i.name))
+        .collect();
+    (!names.is_empty()).then(|| {
+        format!(
+            "- [ ] **Decide this month** (see Documents and money): {}.",
+            md(&names.join("; "))
+        )
+    })
 }
 
 fn month_heading(cx: &Ctx<'_>, m: &PlanMonth) -> String {
@@ -168,9 +153,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         (false, false) => "You have set no money aside, so the plan is free steps.".to_owned(),
     };
     out.push(format!(
-        "{budget} The plan does the free steps first, then buys what protects you most for each \
-         dollar until each need reaches the step that is enough for it. Water, medicine and \
-         safety come first within each step.{}",
+        "{budget} Free steps come first, then what protects you most for each dollar, water, \
+         medicine and safety first, until each need reaches the step that is enough for it.{}",
         cite("prior_harm_weights")
     ));
     out.push(String::new());
@@ -180,19 +164,20 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         .map(|m| {
             m.items
                 .iter()
-                .filter(|i| i.kind == PlanItemKind::FreeAction && !i.done)
+                .filter(|i| i.kind == PlanItemKind::FreeAction && !i.done && !i.decision)
                 .collect()
         })
         .unwrap_or_default();
-    if !free0.is_empty() {
+    if !free0.is_empty() || first.and_then(decisions_line).is_some() {
         out.push(format!(
             "### Start now: free steps (from {})",
             text::date(a.input.planning_date)
         ));
         out.push(String::new());
         for i in free0 {
-            out.push(format!("- [ ] {}", md(&i.name)));
+            out.push(short_line(i));
         }
+        out.extend(first.and_then(decisions_line));
         out.push(String::new());
     }
     // The warning of each life-safety step, whatever month the step falls in.
@@ -220,7 +205,7 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(why.to_owned());
     } else {
         for i in bought0 {
-            out.push(item_line(i));
+            out.push(later_line(i));
         }
     }
     out.push(String::new());
@@ -228,64 +213,34 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     if let Some(m) = plan.months.get(1) {
         out.push(format!("### Next month: {}", month_heading(cx, m)));
         out.push(String::new());
-        let todo: Vec<&PlanItem> = m.items.iter().filter(|i| !i.done).collect();
-        if todo.is_empty() {
+        let todo: Vec<&PlanItem> = m.items.iter().filter(|i| !i.done && !i.decision).collect();
+        let decide = decisions_line(m);
+        if todo.is_empty() && decide.is_none() {
             out.push("Nothing new this month.".to_owned());
         }
         for i in todo {
             out.push(later_line(i));
         }
+        out.extend(decide);
         out.push(String::new());
     }
 
-    let later: Vec<&PlanMonth> = plan
+    // From month 2 the plan works through the checklists, each line with its month.
+    if plan
         .months
         .iter()
-        .skip(2)
-        .filter(|m| m.index < DETAIL_MONTHS && m.items.iter().any(|i| !i.done))
-        .collect();
-    if !later.is_empty() {
-        out.push("### Month by month".to_owned());
+        .any(|m| m.index >= DETAIL_MONTHS && m.items.iter().any(|i| !i.done))
+    {
+        out.push("### After that".to_owned());
         out.push(String::new());
-        for m in later {
-            out.push(format!("**{}**", month_heading(cx, m)));
-            out.push(String::new());
-            for i in m.items.iter().filter(|i| !i.done) {
-                out.push(brief_line(i));
-            }
-            out.push(String::new());
-        }
+        out.push(
+            "From month 2 the plan follows Checklists, free steps first; each line gives its \
+             month."
+                .to_owned(),
+        );
+        out.push(String::new());
     }
-    // Later months with a step in them; a month that only adds to savings shows up where the
-    // purchase it saves for says how much came from savings.
-    let later: Vec<&PlanMonth> = plan
-        .months
-        .iter()
-        .filter(|m| m.index >= DETAIL_MONTHS && m.items.iter().any(|i| !i.done))
-        .collect();
-    let after: Vec<&PlanMonth> = later
-        .iter()
-        .copied()
-        .filter(|m| {
-            m.items
-                .iter()
-                .any(|i| !i.done && i.kind != PlanItemKind::Reserve)
-        })
-        .collect();
-    if !after.is_empty() {
-        out.push("### Later months".to_owned());
-        out.push(String::new());
-        out.push("| Month | What | Spend |".to_owned());
-        out.push("| --- | --- | --- |".to_owned());
-        for m in &after {
-            out.push(table_row(cx, m));
-        }
-        out.push(String::new());
-        if after.len() < later.len() {
-            out.push("Months that only add to savings are left out.".to_owned());
-            out.push(String::new());
-        }
-    }
+    rare_allowance(cx, out);
 
     // Funds still open when the plan ends (the rest were spent on their item).
     let open: Vec<&rr_types::SavingsEnvelope> = plan
@@ -321,9 +276,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         Some(m) => {
             let date = text::month_start(a.input.planning_date, m);
             out.push(format!(
-                "By month {m} ({}) every need is covered to the step that is enough for your \
-                 risks. After that, keep up the maintenance calendar and put the same money \
-                 toward savings.",
+                "Every need is covered by month {m} ({}). After that, keep up the maintenance \
+                 calendar and put the same money toward savings.",
                 text::month_year(date)
             ));
         }
@@ -362,8 +316,40 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
                 WarningSeverity::Warn => "Worth acting on",
                 WarningSeverity::Note => "Worth knowing",
             };
+            // The bare-minimum warning's why names what still falls after three years (budget2's
+            // deferred list).
             out.push(format!("- **{lead}: {}** {}", md(&w.message), md(&w.why)));
         }
         out.push(String::new());
     }
+}
+
+/// Purchases paid from the rare-event allowance, each with the allocator's own words (the family
+/// it is for, the 1-in-1,000 threshold it passed, never a point estimate; budget2), only when the
+/// household opted in and the plan buys something with it.
+fn rare_allowance(cx: &Ctx<'_>, out: &mut Vec<String>) {
+    let lines: Vec<String> = cx
+        .steps()
+        .into_iter()
+        .filter(|(_, i)| i.kind == PlanItemKind::Purchase && !i.done)
+        .filter(|(_, i)| {
+            cx.item(i.item_id.as_str())
+                .is_some_and(|it| it.rare_catastrophic)
+        })
+        .map(|(m, i)| {
+            format!(
+                "- **{}** (month {m}, about {}): {}",
+                md(&i.name),
+                text::usd(f64::from(i.est_cost_usd)),
+                md(&i.why)
+            )
+        })
+        .collect();
+    if lines.is_empty() {
+        return;
+    }
+    out.push("### The rare-event allowance".to_owned());
+    out.push(String::new());
+    out.extend(lines);
+    out.push(String::new());
 }

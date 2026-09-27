@@ -38,6 +38,7 @@ pub mod packet;
 pub mod pipeline;
 pub mod provenance;
 pub mod source;
+pub mod validation;
 
 use rr_content::Content;
 use rr_types::{
@@ -131,8 +132,9 @@ impl<S: CountySource> Engine<S> {
             content_version: rr_content::CONTENT_VERSION.to_owned(),
             packs_loaded: self.store.packs_loaded(),
             attributions: self.store.attributions(),
-            // awaiting: plan — the bundled validation table (DESIGN-DELTA §1.3, docs/VALIDATION.md).
-            validation: rr_types::ValidationSummary::default(),
+            // The frozen backtest's tally for this version, bundled with the engine
+            // (docs/VALIDATION.md, `fixtures/backtest/events.json`).
+            validation: validation::summary(),
         }
     }
 
@@ -210,9 +212,16 @@ impl<S: CountySource> Engine<S> {
             warnings,
             packet_markdown,
             provenance: citations,
-            // awaiting: plan — the recovery page's facts (county declarations from data-model).
-            recovery: rr_types::RecoveryInfo::default(),
+            // The recovery page's facts: the county's federal disaster declarations (OpenFEMA).
+            recovery: packet::recovery_info(&a.county),
         }
+    }
+
+    /// Every warning the plan emits: the assessment's (guardrails, cliffs, assumed basics,
+    /// unknown items) and the ones added once the output is assembled (`citation_missing`, when
+    /// a number points to a source still being added). `explain` explains any of them.
+    pub fn warnings(&self, a: &Assessment) -> Vec<rr_types::Warning> {
+        self.output(a).warnings
     }
 
     /// `explain(kind, id, input)`.
@@ -227,6 +236,12 @@ impl<S: CountySource> Engine<S> {
         input: &PlanInput,
     ) -> Result<Explanation, EngineError> {
         let a = self.run(input)?;
+        if kind == ExplainKind::Warning {
+            // Warnings are added after the assessment too (a missing citation), so the whole
+            // list comes from the output.
+            let warnings = self.warnings(&a);
+            return explain::warning_in(&a, self.content, &warnings, id);
+        }
         explain::explain(&a, self.content, kind, id)
     }
 

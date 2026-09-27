@@ -387,28 +387,48 @@ fn page_one_carries_the_status_line() {
 
 #[test]
 fn the_dial_sentence_is_per_need() {
-    const CANONICAL: &str = "For any one need, something worse than its target comes in about 1 of \
-        every 10 ten-year stretches. Across all your needs together, the chance that at least one \
-        runs out is higher, roughly 1 in 3. That is why the plan also gives you ways to cope when \
-        a target runs out.";
+    // The sentence is computed from the model (DESIGN-DELTA §3): the chance for any one need, and
+    // the higher chance that at least one of them runs past its target.
+    let cope = "That is why the plan also gives you ways to cope when a target runs out.";
     for (name, input, out) in all() {
         let targets = section(&out.packet_markdown, "## Your targets");
         assert!(
             !targets.contains("Something worse than these targets"),
             "{name}: the old sentence"
         );
-        let want = rr_plan::packet::dial_sentence(input.dials.return_period);
+        let a = engine().run(input).expect("run");
+        let want = rr_plan::packet::dial_sentence(&a.consequence);
         assert!(targets.contains(&want), "{name}");
+        assert!(want.ends_with(cope), "{name}: {want}");
         if input.dials.return_period == rr_types::ReturnPeriod::OneIn100 {
-            assert_eq!(want, CANONICAL);
-        } else {
-            assert!(!want.contains("roughly 1 in 3"), "{name}: {want}");
+            // At the default dial the model's own sentence prints as it is: about 1 in 10 for any
+            // one need (1 − 0.9 in ten years).
+            assert_eq!(
+                want,
+                format!("{} {cope}", a.consequence.dial_sentence()),
+                "{name}"
+            );
+            assert!(
+                want.starts_with(
+                    "At this setting, about 1 in 10 households like yours will face a longer \
+                     disruption of any one kind in the next 10 years; about "
+                ),
+                "{name}: {want}"
+            );
         }
     }
-    // Coos Bay plans at 1 in 500: about 2 of every 100 ten-year stretches for one need.
+    // Coos Bay plans at 1 in 500: 100 · (1 − e^(−10 × 0.002)) = 1.98, about 2 in 100 households
+    // for one need in ten years, not the model sentence's floor of 1 in 10.
+    let coos = all()
+        .iter()
+        .find(|(n, _, _)| n == "coos-bay-well-owner-2")
+        .unwrap();
+    assert_eq!(coos.1.dials.return_period, rr_types::ReturnPeriod::OneIn500);
+    let a = engine().run(&coos.1).expect("run");
+    let s = rr_plan::packet::dial_sentence(&a.consequence);
     assert!(
-        rr_plan::packet::dial_sentence(rr_types::ReturnPeriod::OneIn500)
-            .contains("about 2 of every 100 ten-year stretches")
+        s.starts_with("At this setting, about 2 in 100 households like yours"),
+        "{s}"
     );
 }
 

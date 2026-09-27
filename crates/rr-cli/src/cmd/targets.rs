@@ -94,7 +94,6 @@ fn contributions(b: &BucketAssessment) -> Option<String> {
 
 /// The default report.
 fn targets(engine: &Engine<Source>, h: &Household, a: &Assessment) -> String {
-    let rp = h.input.dials.return_period;
     let mut s = header(
         &format!("Targets for {}", super::place(&a.location)),
         h,
@@ -103,7 +102,7 @@ fn targets(engine: &Engine<Source>, h: &Household, a: &Assessment) -> String {
     );
     s.push_str(&format!(
         "\n{}\n",
-        format::wrap(&rr_plan::packet::dial_sentence(rp), 100, 0)
+        format::wrap(&rr_plan::packet::dial_sentence(&a.consequence), 100, 0)
     ));
 
     s.push_str("\nHow long to manage on your own\n\n");

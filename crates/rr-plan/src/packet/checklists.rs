@@ -1,5 +1,7 @@
-//! Section 5: checklists per step (free steps, three days, two weeks, one month ...) up to the
-//! step recommended for the household's risks, the get-home bag per commuter, and
+//! Section: checklists. The free steps from month 2 on, then one list per step (three days, two
+//! weeks, one month ...) up to the step recommended for the household's risks, each line with its
+//! quantity added up across months and the month the plan gets to it (packet v2: from month 2
+//! the plan is these lists, so each purchase prints once); the get-home bag per commuter; and
 //! hazard-specific extras that sit outside the budget. Why each step matters is the app's Learn
 //! view; the lists here are for ticking off.
 
@@ -18,6 +20,17 @@ struct Entry {
     unit: String,
     done: bool,
     free: bool,
+    /// The first and last month it is bought in.
+    months: (u16, u16),
+}
+
+/// "(month 6)", "(months 1–4)".
+fn months_words((first, last): (u16, u16)) -> String {
+    if first == last {
+        format!("(month {first})")
+    } else {
+        format!("(months {first}–{last})")
+    }
 }
 
 pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
@@ -25,21 +38,52 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push("## Checklists".to_owned());
     out.push(String::new());
     out.push(
-        "One list per step, up to the step that is enough for your risks. The free steps are \
-         under Your plan."
+        "One list per step, up to the one your risks need, with each thing's month. This \
+         month's and next month's steps are under Your plan."
             .to_owned(),
     );
     out.push(String::new());
 
+    // The free steps from month 2 on (the first two months' are under Your plan); decisions are
+    // under Documents and money.
+    let free_later: Vec<(u16, &rr_types::PlanItem)> = cx
+        .steps()
+        .into_iter()
+        .filter(|(m, i)| {
+            *m >= super::DETAIL_MONTHS
+                && i.kind == PlanItemKind::FreeAction
+                && !i.done
+                && !i.decision
+        })
+        .collect();
+    if !free_later.is_empty() {
+        out.push("### Free steps".to_owned());
+        out.push(String::new());
+        // One line a month: "Month 2: keep your vehicle ready; legal readiness; ...".
+        let mut months: Vec<(u16, Vec<String>)> = Vec::new();
+        for (m, i) in free_later {
+            let name = text::lower_first(text::short_name(&i.name));
+            match months.last_mut() {
+                Some((last, names)) if *last == m => names.push(name),
+                _ => months.push((m, vec![name])),
+            }
+        }
+        for (m, names) in months {
+            out.push(format!("- [ ] Month {m}: {}.", md(&names.join("; "))));
+        }
+        out.push(String::new());
+    }
+
     // Items per tier, merged across months (quantities add up), in plan order.
     let mut by_tier: BTreeMap<TierId, Vec<Entry>> = BTreeMap::new();
     // What the household has (listed or assumed) is in the summary, not on a list to tick.
-    for (_, i) in cx.steps().into_iter().filter(|(_, i)| !i.done) {
+    for (m, i) in cx.steps().into_iter().filter(|(_, i)| !i.done) {
         let list = by_tier.entry(i.tier).or_default();
         match list.iter_mut().find(|e| e.id == i.item_id) {
             Some(e) => {
                 e.qty += f64::from(i.quantity);
                 e.done &= i.done;
+                e.months.1 = e.months.1.max(m);
             }
             None => list.push(Entry {
                 id: i.item_id.clone(),
@@ -48,6 +92,7 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
                 unit: i.unit.clone(),
                 done: i.done,
                 free: i.kind == PlanItemKind::FreeAction,
+                months: (m, m),
             }),
         }
     }
@@ -72,7 +117,11 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
                     format!(": {}", md(&q))
                 }
             };
-            out.push(format!("- [{tick}] {}{amount}", md(&e.name)));
+            out.push(format!(
+                "- [{tick}] {}{amount} {}",
+                md(text::short_name(&e.name)),
+                months_words(e.months)
+            ));
         }
         out.push(String::new());
     }
@@ -151,8 +200,7 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push("### Extras for the hazards you face".to_owned());
         out.push(String::new());
         out.push(
-            "These help with one hazard rather than a whole need, so they sit outside the \
-             budget. Consider them once the steps above are done."
+            "These help with one hazard, not a whole need, so they sit outside the budget."
                 .to_owned(),
         );
         out.push(String::new());

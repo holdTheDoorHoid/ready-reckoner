@@ -259,10 +259,7 @@ pub fn run<S: CountySource + ?Sized>(
     // The rare "power out for months" family ends with the household's own power curve at 60
     // days, which only exists once the consequence model has run (DESIGN-DELTA §3). Its rate
     // changes, so the rare rows are put back in order of how likely they are here.
-    hazards.add_power_curve(
-        consequence.power_curve_60_days(),
-        input.dials.horizon_years,
-    );
+    hazards.add_power_curve(consequence.power_curve_60_days(), input.dials.horizon_years);
     sort_rare_rows(&mut hazards.profiles);
     // tier_enough has one source: rr-supply's rule (DESIGN §4.5).
     let mut buckets: Vec<BucketAssessment> = consequence.buckets.clone();

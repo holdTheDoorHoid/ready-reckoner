@@ -15,7 +15,7 @@ use rr_types::{
     RestorationCurve,
 };
 
-use crate::args::DataArgs;
+use crate::args::{DataArgs, Packs};
 use crate::error::CliError;
 
 /// The data directory used when `--data` is not given.
@@ -109,7 +109,9 @@ impl Source {
 }
 
 /// Chooses and loads the source: `--fixtures`; `--data <dir>` (which must hold a pack); or by
-/// default `data/` when it holds a manifest, otherwise the fixtures with a note.
+/// default `data/` when it holds a manifest, otherwise the fixtures with a note. From a data
+/// directory only the core pack is loaded, as the web app loads it, unless `--optional <pack>`
+/// or `--all-packs` asks for more.
 ///
 /// # Errors
 ///
@@ -128,11 +130,11 @@ pub fn open(args: &DataArgs) -> Result<Opened, CliError> {
                 dir.display()
             )));
         }
-        load_dir(dir)?
+        load_dir(dir, &args.packs())?
     } else {
         let dir = Path::new(DEFAULT_DATA_DIR);
         if dir.join("manifest.json").is_file() {
-            load_dir(dir)?
+            load_dir(dir, &args.packs())?
         } else {
             notes.push(format!(
                 "note: no data pack in ./{DEFAULT_DATA_DIR} (manifest.json not found); using the \
@@ -169,17 +171,57 @@ pub fn manifest_paths(manifest: &Manifest) -> Vec<String> {
         .collect()
 }
 
-/// Loads every file the manifest in `dir` lists into a `DataStore` (manifest first; each file is
-/// checked against its sha256).
+/// The core pack's name: what the web app loads to plan.
+pub const CORE_PACK: &str = "core";
+
+/// The files of the chosen packs, by manifest path, in manifest order.
+///
+/// # Errors
+///
+/// An optional pack the manifest does not list (exit 2), naming the ones it does.
+pub fn chosen_paths(manifest: &Manifest, packs: &Packs) -> Result<Vec<String>, CliError> {
+    let names: Vec<&str> = match packs {
+        Packs::All => manifest.packs.keys().map(String::as_str).collect(),
+        Packs::Core { optional } => {
+            for name in optional {
+                if name == CORE_PACK || !manifest.packs.contains_key(name) {
+                    let others: Vec<&str> = manifest
+                        .packs
+                        .keys()
+                        .map(String::as_str)
+                        .filter(|n| *n != CORE_PACK)
+                        .collect();
+                    return Err(CliError::input(format!(
+                        "--optional {name}: the manifest has no such optional pack. It lists: {}.",
+                        others.join(", ")
+                    )));
+                }
+            }
+            std::iter::once(CORE_PACK)
+                .chain(optional.iter().map(String::as_str))
+                .collect()
+        }
+    };
+    Ok(manifest
+        .packs
+        .iter()
+        .filter(|(n, _)| names.contains(&n.as_str()))
+        .flat_map(|(_, p)| p.files.iter().map(|f| f.path.clone()))
+        .collect())
+}
+
+/// Loads the chosen packs of the data directory `dir` into a `DataStore` (manifest first; each
+/// file is checked against its sha256).
 ///
 /// # Errors
 ///
 /// A listed file that cannot be read (exit 1) or that the store rejects: a checksum mismatch or
-/// a file that does not parse (`pack_corrupt`, exit 1).
-pub fn load_dir(dir: &Path) -> Result<Source, CliError> {
+/// a file that does not parse (`pack_corrupt`, exit 1); an optional pack the manifest does not
+/// list (exit 2).
+pub fn load_dir(dir: &Path, packs: &Packs) -> Result<Source, CliError> {
     let (manifest, manifest_bytes) = read_manifest(dir)?;
     let mut files: Vec<(String, Vec<u8>)> = vec![("manifest.json".to_owned(), manifest_bytes)];
-    for p in manifest_paths(&manifest) {
+    for p in chosen_paths(&manifest, packs)? {
         let path = dir.join(&p);
         let bytes = std::fs::read(&path).map_err(|e| {
             CliError::failure(format!(

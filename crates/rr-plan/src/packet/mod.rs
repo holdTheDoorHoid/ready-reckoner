@@ -8,6 +8,8 @@
 
 mod calendar;
 mod checklists;
+mod family;
+mod pages;
 mod people;
 mod plan;
 mod risks;
@@ -17,13 +19,16 @@ mod summary;
 mod targets;
 pub(crate) mod text;
 
+pub use family::{NB_HYPHEN, WALLET_CARDS_HEADING};
+pub(crate) use pages::recovery_info;
 pub use plan::DETAIL_MONTHS;
 pub use risks::{
-    CARD_MIN_P10, CARDS as HAZARD_CARDS, FAST_HAZARDS, FREQUENT_CARDS, LIFE_SAFETY_MIN_P10, SEVERE,
+    CARD_MIN_P10, CARDS as HAZARD_CARDS, FAST_HAZARDS, FREQUENT_CARDS, LIFE_SAFETY_MIN_P10, MINOR,
+    SEVERE, WIND_HAZARDS, family_block_prints,
 };
 pub use safety::{SAFETY_RULES, SafetyRule};
-pub use summary::{LEAVE_FIRST_P10, LEAVE_FIRST_SCENARIOS};
-pub use targets::dial_sentence;
+pub use summary::{LEAVE_FIRST_FAST_HAZARDS, LEAVE_FIRST_P10, LEAVE_FIRST_SCENARIOS};
+pub use targets::{COPE_SENTENCE, dial_sentence};
 
 use std::collections::BTreeMap;
 
@@ -52,18 +57,38 @@ pub const PLACEHOLDERS: [&str; 5] = [
     "{household}",
 ];
 
-/// The section headings, in order (a test checks every packet has each one).
-pub const SECTION_HEADINGS: [&str; 10] = [
+/// The sections every packet has, in order (a test checks every packet has each one). Packet v2
+/// (DESIGN-DELTA §3): the household's own family plan and its wallet cards come right after the
+/// summary, the shelter plan and the forecast checklist after the plan, the local pointers,
+/// documents and the recovery page after the checklists. Two sections print only when they
+/// apply, in the places [`CONDITIONAL_HEADINGS`] names.
+pub const SECTION_HEADINGS: [&str; 15] = [
     "## Summary",
+    "## Your family plan",
+    WALLET_CARDS_HEADING,
     "## Your risks",
     "## Your targets",
     "## Your plan",
+    "## Your shelter plan",
+    "## When a storm, freeze or heat wave is forecast",
     "## Checklists",
-    "## Family plan",
+    "## Local help",
     "## Documents and money",
+    "## After a disaster: the first 30 days",
     "## Special needs",
     "## Maintenance calendar",
     "## Sources",
+];
+
+/// Sections that print only for some households, each with the section it follows: access and
+/// functional needs when anyone in the household has one (`Person::access_needs`), and the
+/// long-horizon section when the plan has one (`Plan::long_horizon`).
+pub const CONDITIONAL_HEADINGS: [(&str, &str); 2] = [
+    ("## Access and functional needs", "## Checklists"),
+    (
+        "## If it lasts for months",
+        "## After a disaster: the first 30 days",
+    ),
 ];
 
 /// A citation marker for one id.
@@ -92,33 +117,6 @@ pub(crate) fn md_marked(s: &str) -> String {
     }
     out.push_str(&text::md(rest));
     out
-}
-
-/// A marked paragraph cut after its `n`th run of citation markers (a run is the markers after one
-/// sentence or group of sentences); the whole paragraph when it has fewer.
-pub(crate) fn up_to_citation_runs(p: &str, n: usize) -> String {
-    let mut runs = 0;
-    let mut i = 0;
-    let bytes = p.as_bytes();
-    while let Some(start) = p[i..].find(OPEN).map(|k| k + i) {
-        // The run: markers back to back.
-        let mut end = start;
-        while p[end..].starts_with(OPEN) {
-            match p[end..].find(CLOSE) {
-                Some(k) => end += k + CLOSE.len_utf8(),
-                None => return p.to_owned(),
-            }
-        }
-        runs += 1;
-        if runs == n {
-            return p[..end].to_owned();
-        }
-        i = end;
-        if i >= bytes.len() {
-            break;
-        }
-    }
-    p.to_owned()
 }
 
 /// Markers for several ids (deduplicated, in order).
@@ -194,18 +192,30 @@ impl<'a> Ctx<'a> {
         text::per_100(chance) != "fewer than 1"
     }
 
-    /// Whether a conditional span belongs in this household's packet: a span about one hazard of
-    /// a family block (`{if:avalanche}…{/if}`) when that hazard is relevant here
+    /// Whether a conditional span belongs in this household's packet
+    /// (`docs/CONTENT_STANDARDS.md` §4, `rr_content::policy::Condition`): a span about one hazard
+    /// of a family block (`{if:avalanche}…{/if}`) when that hazard is relevant here
     /// ([`Ctx::hazard_relevant`]); a span about a kind of home (`{if:home:apartment_high_rise}`,
-    /// `{if:not_home:…}`) when the household's home is (or is not) of that kind.
+    /// `{if:not_home:…}`) when the household's home is (or is not) of that kind; an access need
+    /// (`{if:need:hearing}`), an item (`{if:has:power_generator}`: owned, or in the plan) or a
+    /// benefit (`{if:benefit:snap_wic}`) when the household has it.
     pub fn condition_holds(&self, id: &str) -> bool {
-        use rr_content::policy::Condition;
-        match Condition::parse(id) {
-            Ok(Condition::Hazard(h)) => self.hazard_relevant(&h),
-            Ok(c) => c.for_home(self.a.input.housing.kind).unwrap_or(true),
+        match rr_content::policy::Condition::parse(id) {
+            Ok(c) => c.holds(self),
             // Malformed conditions never pass the content validator; keep the text.
             Err(_) => true,
         }
+    }
+
+    /// Whether the household has a catalogue item: it lists it as owned (any quantity above 0)
+    /// or the plan includes it as a step.
+    pub fn has_item(&self, id: &str) -> bool {
+        self.a
+            .input
+            .existing
+            .iter()
+            .any(|o| o.item_id == id && o.qty > 0.0)
+            || self.in_plan(id)
     }
 
     /// A guidance block's prose with the placeholders filled and its footnotes turned into
@@ -259,8 +269,41 @@ impl<'a> Ctx<'a> {
     }
 }
 
+/// The household as the guidance blocks' conditions see it (`rr_content::policy::HouseholdFacts`),
+/// so the packet keeps exactly the spans the web app keeps.
+impl rr_content::policy::HouseholdFacts for Ctx<'_> {
+    fn hazard_relevant(&self, hazard: &str) -> bool {
+        Ctx::hazard_relevant(self, hazard)
+    }
+
+    fn home(&self) -> rr_types::HousingKind {
+        self.a.input.housing.kind
+    }
+
+    fn has_access_need(&self, need: &str) -> bool {
+        self.a
+            .input
+            .people
+            .iter()
+            .any(|p| p.access_needs.iter().any(|n| n.as_str() == need))
+    }
+
+    fn has_item(&self, item: &str) -> bool {
+        Ctx::has_item(self, item)
+    }
+
+    fn has_benefit(&self, benefit: &str) -> bool {
+        self.a
+            .input
+            .finances
+            .benefits
+            .iter()
+            .any(|b| b.as_str() == benefit)
+    }
+}
+
 /// The paragraphs of a rendered guidance block.
-fn paragraphs(rendered: &str) -> Vec<String> {
+pub(crate) fn paragraphs(rendered: &str) -> Vec<String> {
     rendered
         .split("\n\n")
         .map(str::trim)
@@ -316,6 +359,28 @@ pub(crate) fn headed_paragraphs(rendered: &str) -> Vec<String> {
     if headed.is_empty() { all } else { headed }
 }
 
+/// A block's paragraphs that open with a bold heading, each with the list that follows it (a
+/// heading such as "**Four ways to reach each other.**" introduces a numbered list, which is a
+/// paragraph of its own); the opening why and anything else unheaded are left out.
+pub(crate) fn headed_with_lists(rendered: &str) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for p in paragraphs(rendered) {
+        let list = p.starts_with("- ")
+            || p.starts_with("* ")
+            || p.split_once(". ")
+                .is_some_and(|(n, _)| !n.is_empty() && n.chars().all(|c| c.is_ascii_digit()));
+        if p.starts_with("**") {
+            out.push(p);
+        } else if list {
+            if let Some(last) = out.last_mut() {
+                last.push_str("\n\n");
+                last.push_str(&p);
+            }
+        }
+    }
+    out
+}
+
 /// How a guidance block's advice paragraphs open.
 const HELPS: &str = "**What helps.**";
 const AVOID: &str = "**What to avoid.**";
@@ -348,12 +413,19 @@ pub(crate) fn render(a: &Assessment, content: &Content) -> String {
     let cx = Ctx { a, content };
     let mut out: Vec<String> = Vec::new();
     summary::write(&cx, &mut out);
+    family::plan(&cx, &mut out);
+    family::wallet_cards(&cx, &mut out);
     risks::write(&cx, &mut out);
     targets::write(&cx, &mut out);
     plan::write(&cx, &mut out);
+    pages::shelter(&cx, &mut out);
+    pages::forecast(&cx, &mut out);
     checklists::write(&cx, &mut out);
-    people::family(&cx, &mut out);
+    pages::access_needs(&cx, &mut out);
+    pages::local_help(&cx, &mut out);
     people::documents(&cx, &mut out);
+    pages::after_disaster(&cx, &mut out);
+    pages::long_horizon(&cx, &mut out);
     people::special_needs(&cx, &mut out);
     calendar::write(&cx, &mut out);
     out.join("\n")

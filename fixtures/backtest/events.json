@@ -1,0 +1,521 @@
+{
+ "about": "The frozen backtest (docs/VALIDATION.md): 22 real events, the household used for each (fixtures/backtest/<household>.json), what happened (days until about half and about nine in ten of the affected households had service back), and the verdicts recorded for the four runs: the county-only model, with the data pack v2 tables, with the tables and the v2 answers, and with the pre-event water record. The third run is this version's headline tally (EngineInfo.validation). `rr validate` re-scores every run against these verdicts; crates/rr-consequence/tests/backtest.rs keeps the same set. Change a verdict only with a changed model or data, recorded in docs/VALIDATION.md.",
+ "runs": [
+  "county only",
+  "with the v2 tables",
+  "with the v2 answers",
+  "with the pre-event water record"
+ ],
+ "headline_run": 2,
+ "data_pack": "01a46abb2d5d",
+ "url_anchor": "#/validation",
+ "events": [
+  {
+   "id": "uri_austin",
+   "name": "Winter Storm Uri, Austin, Feb 2021",
+   "household": "uri-austin-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 2.0,
+     "p90": 4.0
+    },
+    {
+     "bucket": "thermal",
+     "median": 2.0,
+     "p90": 4.0
+    },
+    {
+     "bucket": "water_boil",
+     "median": 6.0,
+     "p90": 6.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "the storm is in the 2014-2025 outage records",
+   "expected": [
+    "covered",
+    "partial",
+    "partial",
+    "partial"
+   ]
+  },
+  {
+   "id": "uri_houston",
+   "name": "Winter Storm Uri, Houston, Feb 2021",
+   "household": "uri-houston-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 2.0,
+     "p90": 4.0
+    },
+    {
+     "bucket": "thermal",
+     "median": 2.0,
+     "p90": 4.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "the storm is in the 2014-2025 outage records",
+   "expected": [
+    "covered",
+    "covered",
+    "covered",
+    "covered"
+   ]
+  },
+  {
+   "id": "helene_asheville",
+   "name": "Hurricane Helene, Asheville (city water), Sep 2024",
+   "household": "helene-asheville-3",
+   "scored": [
+    {
+     "bucket": "water_out",
+     "median": 18.0,
+     "p90": 21.0
+    },
+    {
+     "bucket": "water_boil",
+     "median": 52.0,
+     "p90": 52.0
+    },
+    {
+     "bucket": "power",
+     "median": 7.0,
+     "p90": 14.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "frequent",
+   "in_sample": "the storm is in the outage records; the county's five-year violation record includes violations after it",
+   "expected": [
+    "short",
+    "short",
+    "short",
+    "short"
+   ]
+  },
+  {
+   "id": "helene_well",
+   "name": "Hurricane Helene, rural Buncombe (well), Sep 2024",
+   "household": "helene-buncombe-well-2",
+   "scored": [
+    {
+     "bucket": "water_out",
+     "median": 7.0,
+     "p90": 21.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "the storm is in the 2014-2025 outage records",
+   "expected": [
+    "covered",
+    "covered",
+    "covered",
+    "covered"
+   ]
+  },
+  {
+   "id": "ida_jefferson",
+   "name": "Hurricane Ida, Jefferson Parish, Aug 2021",
+   "household": "ida-jefferson-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 8.0,
+     "p90": 18.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "the storm is in the 2014-2025 outage records",
+   "expected": [
+    "partial",
+    "partial",
+    "partial",
+    "partial"
+   ]
+  },
+  {
+   "id": "ida_queens",
+   "name": "Ida remnants, Queens basement flat, Sep 2021",
+   "household": "ida-queens-basement-2",
+   "scored": [],
+   "leave": {
+    "hazard": "riverine_flooding",
+    "warning_hours": 0.25,
+    "days_away": 7.0
+   },
+   "not_modelled": false,
+   "answers": "basement",
+   "in_sample": "",
+   "expected": [
+    "short",
+    "short",
+    "partial",
+    "partial"
+   ]
+  },
+  {
+   "id": "camp_fire",
+   "name": "Camp Fire, Paradise, Nov 2018",
+   "household": "campfire-paradise-2",
+   "scored": [],
+   "leave": {
+    "hazard": "wildfire",
+    "warning_hours": 1.5,
+    "days_away": 180.0
+   },
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "",
+   "expected": [
+    "short",
+    "short",
+    "short",
+    "short"
+   ]
+  },
+  {
+   "id": "lahaina",
+   "name": "Lahaina fire, Maui, Aug 2023",
+   "household": "lahaina-maui-3",
+   "scored": [],
+   "leave": {
+    "hazard": "wildfire",
+    "warning_hours": 0.25,
+    "days_away": 180.0
+   },
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "",
+   "expected": [
+    "short",
+    "short",
+    "short",
+    "short"
+   ]
+  },
+  {
+   "id": "jackson",
+   "name": "Jackson water crisis, Aug-Sep 2022",
+   "household": "jackson-hinds-3",
+   "scored": [
+    {
+     "bucket": "water_out",
+     "median": 7.0,
+     "p90": 10.0
+    },
+    {
+     "bucket": "water_boil",
+     "median": 48.0,
+     "p90": 48.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "frequent",
+   "in_sample": "the county's five-year violation record includes violations during the crisis (and earlier ones)",
+   "expected": [
+    "short",
+    "short",
+    "short",
+    "short"
+   ]
+  },
+  {
+   "id": "east_palestine",
+   "name": "East Palestine derailment, Feb 2023",
+   "household": "eastpalestine-3",
+   "scored": [],
+   "leave": {
+    "hazard": "hazmat_release",
+    "warning_hours": 1.0,
+    "days_away": 5.0
+   },
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "",
+   "expected": [
+    "partial",
+    "partial",
+    "partial",
+    "partial"
+   ]
+  },
+  {
+   "id": "colonial",
+   "name": "Colonial Pipeline, Atlanta and Charlotte, May 2021",
+   "household": "colonial-gwinnett-3",
+   "scored": [],
+   "not_modelled": true,
+   "answers": "none",
+   "in_sample": "",
+   "expected": [
+    "not_modelled",
+    "not_modelled",
+    "not_modelled",
+    "not_modelled"
+   ]
+  },
+  {
+   "id": "pharmacy_it",
+   "name": "Change Healthcare and CrowdStrike, Franklin County OH, 2024",
+   "household": "pharmacy-franklin-oh-2",
+   "scored": [
+    {
+     "bucket": "medication",
+     "median": 7.0,
+     "p90": 15.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "",
+   "expected": [
+    "covered",
+    "covered",
+    "covered",
+    "covered"
+   ]
+  },
+  {
+   "id": "maria_san_juan",
+   "name": "Hurricane Maria, San Juan, Sep 2017",
+   "household": "maria-sanjuan-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 84.0,
+     "p90": 170.0
+    },
+    {
+     "bucket": "water_out",
+     "median": 68.0,
+     "p90": 150.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "frequent",
+   "in_sample": "the restoration curve behind the island's major-hurricane class is Maria's own",
+   "expected": [
+    "short",
+    "partial",
+    "partial",
+    "partial"
+   ]
+  },
+  {
+   "id": "maria_utuado",
+   "name": "Hurricane Maria, Utuado, Sep 2017",
+   "household": "maria-utuado-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 84.0,
+     "p90": 170.0
+    },
+    {
+     "bucket": "water_out",
+     "median": 68.0,
+     "p90": 150.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "frequent",
+   "in_sample": "the restoration curve behind the island's major-hurricane class is Maria's own",
+   "expected": [
+    "short",
+    "short",
+    "short",
+    "short"
+   ]
+  },
+  {
+   "id": "snap_lapse",
+   "name": "SNAP lapse, Philadelphia, Nov 2025",
+   "household": "snap-philadelphia-3",
+   "scored": [
+    {
+     "bucket": "supplies",
+     "median": 12.0,
+     "p90": 12.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "snap",
+   "in_sample": "",
+   "expected": [
+    "short",
+    "short",
+    "covered",
+    "covered"
+   ]
+  },
+  {
+   "id": "sandy_staten_island",
+   "name": "Superstorm Sandy, Staten Island, Oct 2012",
+   "household": "sandy-statenisland-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 5.0,
+     "p90": 13.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "",
+   "expected": [
+    "partial",
+    "partial",
+    "partial",
+    "partial"
+   ]
+  },
+  {
+   "id": "sandy_long_beach",
+   "name": "Superstorm Sandy, Long Beach NY, Oct 2012",
+   "household": "sandy-longbeach-2",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 10.0,
+     "p90": 13.0
+    },
+    {
+     "bucket": "water_out",
+     "median": 13.0,
+     "p90": 13.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "",
+   "expected": [
+    "short",
+    "short",
+    "short",
+    "short"
+   ]
+  },
+  {
+   "id": "blackout_cleveland",
+   "name": "Northeast blackout, Cleveland, Aug 2003",
+   "household": "blackout-cleveland-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 1.5,
+     "p90": 2.0
+    },
+    {
+     "bucket": "water_boil",
+     "median": 3.0,
+     "p90": 3.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "",
+   "expected": [
+    "covered",
+    "covered",
+    "covered",
+    "covered"
+   ]
+  },
+  {
+   "id": "blackout_manhattan",
+   "name": "Northeast blackout, Manhattan 20th floor, Aug 2003",
+   "household": "blackout-manhattan-highrise-2",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 1.2,
+     "p90": 2.0
+    },
+    {
+     "bucket": "water_out",
+     "median": 1.2,
+     "p90": 2.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "",
+   "expected": [
+    "covered",
+    "covered",
+    "covered",
+    "covered"
+   ]
+  },
+  {
+   "id": "ice_okc",
+   "name": "Ice storm, Oklahoma City, Oct 2020",
+   "household": "icestorm-okc-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 5.0,
+     "p90": 10.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "the storm is in the 2014-2025 outage records",
+   "expected": [
+    "covered",
+    "partial",
+    "partial",
+    "partial"
+   ]
+  },
+  {
+   "id": "ice_austin",
+   "name": "Ice storm, Austin, Feb 2023",
+   "household": "uri-austin-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 3.0,
+     "p90": 7.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "the storm is in the 2014-2025 outage records",
+   "expected": [
+    "partial",
+    "partial",
+    "partial",
+    "partial"
+   ]
+  },
+  {
+   "id": "derecho_linn",
+   "name": "Derecho, Linn County IA, Aug 2020",
+   "household": "derecho-linn-3",
+   "scored": [
+    {
+     "bucket": "power",
+     "median": 4.0,
+     "p90": 8.0
+    }
+   ],
+   "not_modelled": false,
+   "answers": "none",
+   "in_sample": "the storm is in the 2014-2025 outage records",
+   "expected": [
+    "covered",
+    "partial",
+    "partial",
+    "partial"
+   ]
+  }
+ ]
+}

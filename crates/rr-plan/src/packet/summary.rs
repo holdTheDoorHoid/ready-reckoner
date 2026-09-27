@@ -1,10 +1,12 @@
 //! Section 1: the summary page. Who the plan is for, the date and setting, the step reached and
-//! the step that is enough, the three sentences that matter most, the first free steps, and the
-//! everyday basics the plan assumes. (The targets in full are the next sections' table.)
+//! the step that is enough with the plan's two done months, the three sentences that matter
+//! most (leaving first where it matters: a likely evacuation, a surge area, a fast hazard, a
+//! named storm or tsunami), and the everyday basics the plan assumes. The free steps to start
+//! with are the first list under Your plan.
 
 use rr_types::{
-    BackupPower, BucketId, ClimateHorizon, Cooling, Heating, HousingKind, PlanItemKind, TierId,
-    WaterLevel, WaterSource,
+    BackupPower, BucketId, ClimateHorizon, Cooling, Heating, HousingKind, TierId, WaterLevel,
+    WaterSource,
 };
 
 use super::text::{self, md};
@@ -98,8 +100,7 @@ pub(crate) fn dial_phrase(cx: &Ctx<'_>) -> String {
         ClimateHorizon::Y2050 => "the climate expected around 2050",
     };
     format!(
-        "{label}, the kind that come about once in {} years (the 1-in-{} setting), in {climate}",
-        d.return_period.years(),
+        "{label} (the 1-in-{} setting), in {climate}",
         d.return_period.years()
     )
 }
@@ -205,7 +206,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             .to_owned();
     }
     out.push(format!(
-        "**Where you are now:** {now}. **What is enough for your risks:** {}.{when}",
+        "**Where you are now:** {now}. **What is enough for your risks:** {}.{when} Start with \
+         the free steps under Your plan.",
         tier_words(recommended)
     ));
     out.push(String::new());
@@ -217,59 +219,25 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     }
     out.push(String::new());
 
-    let first: Vec<&str> = a
-        .budget
-        .plan
-        .months
-        .first()
-        .map(|m| {
-            m.items
-                .iter()
-                .filter(|i| i.kind == PlanItemKind::FreeAction && !i.done)
-                .map(|i| i.name.as_str())
-                .collect()
-        })
-        .unwrap_or_default();
-    if !first.is_empty() {
-        out.push("### Start here".to_owned());
-        out.push(String::new());
-        out.push(format!(
-            "These cost nothing and come first. This month's {} free steps are all under Your \
-             plan.",
-            first.len()
-        ));
-        out.push(String::new());
-        for name in first.iter().take(3) {
-            out.push(format!("- [ ] {}", md(name)));
-        }
-        out.push(String::new());
-    }
     assumptions(cx, out);
 }
 
-/// What the plan assumed the household already has (`assume_basics`), and how to undo it.
+/// What the plan assumed the household already has (`assume_basics`), and how to undo it, in one
+/// paragraph (packet v2: the page budget).
 fn assumptions(cx: &Ctx<'_>, out: &mut Vec<String>) {
     let a = cx.a;
     if !a.assumed.is_empty() {
-        out.push("### What the plan assumes you already have".to_owned());
-        out.push(String::new());
-        for (id, qty) in &a.assumed {
-            if let Some(it) = cx.item(id.as_str()) {
-                let amount = text::quantity(*qty, &it.unit);
-                let amount = if amount.is_empty() {
-                    String::new()
-                } else {
-                    format!(" ({})", md(&amount))
-                };
-                out.push(format!("- [x] {}{amount}", md(&it.name)));
-            }
-        }
-        out.push(String::new());
-        out.push(
-            "If any is missing, untick \"Assume everyday basics\" on the Have screen and the plan \
-             will add it."
-                .to_owned(),
-        );
+        let names: Vec<String> = a
+            .assumed
+            .iter()
+            .filter_map(|(id, _)| cx.item(id.as_str()))
+            .map(|it| text::lower_first(text::short_name(&it.name)))
+            .collect();
+        out.push(format!(
+            "**What the plan assumes you already have:** {}. If any is missing, untick \"Assume \
+             everyday basics\" on the Have screen and the plan will add it.",
+            md(&text::join_and(&names))
+        ));
         out.push(String::new());
     } else if !a.input.assume_basics {
         out.push(
@@ -288,26 +256,77 @@ pub const LEAVE_FIRST_P10: f64 = 0.25;
 /// Named scenarios that make leaving the first thing that matters when the plan includes them.
 pub const LEAVE_FIRST_SCENARIOS: [&str; 2] = ["major_hurricane_direct_hit", "local_tsunami"];
 
-/// The decision to leave, when it comes before managing at home: the evacuation bucket's
-/// ten-year chance is at least [`LEAVE_FIRST_P10`], or the plan includes a major hurricane or a
-/// local tsunami. A local tsunami gives no time to be told, so its rule is added.
-fn leave_first(cx: &Ctx<'_>) -> Option<String> {
+/// Hazards that give minutes of warning and force people out (packet v2): from a ten-year chance
+/// of [`super::CARD_MIN_P10`] they put leaving first too.
+pub const LEAVE_FIRST_FAST_HAZARDS: [rr_types::HazardId; 2] =
+    [rr_types::HazardId::Wildfire, rr_types::HazardId::DamFailure];
+
+/// Whether the home is in a storm-surge area: the ZIP code's Category 1–3 surge share (the
+/// optional surge pack) or else the county's surge class, as the guardrail reads them
+/// (`rr_budget::is_surge_zone`, review RR-P02).
+fn surge_zone(cx: &Ctx<'_>) -> Option<rr_types::CitationId> {
+    let e = &cx.a.location.exposure;
+    let share = e.surge_cat3_share.as_ref();
+    let class = e.surge_proxy_class.as_ref();
+    rr_budget::is_surge_zone(share.map(|s| s.value), class.map(|c| c.value.as_str())).then(|| {
+        share
+            .map(|s| s.source.clone())
+            .or_else(|| class.map(|c| c.source.clone()))
+            .unwrap_or_else(|| rr_types::CitationId::from("rr_surge_proxy"))
+    })
+}
+
+/// The decision to leave, when it comes before managing at home (review S2): the evacuation
+/// bucket's ten-year chance is at least [`LEAVE_FIRST_P10`]; the plan includes a major hurricane
+/// or a local tsunami; the home is in a storm-surge area; or a hazard that gives minutes of
+/// warning ([`LEAVE_FIRST_FAST_HAZARDS`]: wildfire, a dam or levee failure) has a ten-year chance
+/// of at least [`super::CARD_MIN_P10`]. The sentence is the evacuation bucket's first, the
+/// action, the surge area when there is one, the consequence model's warning line for the fast
+/// hazards when it names them, and a local tsunami's shaking rule.
+pub(super) fn leave_first(cx: &Ctx<'_>) -> Option<String> {
     let a = cx.a;
     let p = match a.bucket(BucketId::Evacuate).target {
         rr_types::Target::Evacuate { p_need_10yr, .. } => p_need_10yr,
         _ => 0.0,
     };
     let on = |id: &str| a.consequence.scenarios.iter().any(|s| s.on && s.id == id);
-    if p < LEAVE_FIRST_P10 && !LEAVE_FIRST_SCENARIOS.iter().any(|id| on(id)) {
+    let years = a.input.dials.horizon_years;
+    let fast = LEAVE_FIRST_FAST_HAZARDS
+        .iter()
+        .any(|h| super::risks::chance(a.hazard_rate(*h), years) >= super::CARD_MIN_P10);
+    let surge = surge_zone(cx);
+    if p < LEAVE_FIRST_P10
+        && !LEAVE_FIRST_SCENARIOS.iter().any(|id| on(id))
+        && surge.is_none()
+        && !fast
+    {
         return None;
     }
-    let mut action = format!(
+    let mut action = String::new();
+    if let Some(src) = &surge {
+        action.push_str(&format!(
+            "Parts of your area flood in a hurricane's storm surge.{} ",
+            cite(src.as_str())
+        ));
+    }
+    action.push_str(&format!(
         "Know your evacuation zone and where you would go; leave when told.{}",
         cite_all([
             &rr_types::CitationId::from("ready_gov_evacuation"),
             &rr_types::CitationId::from("ready_gov_hurricanes"),
         ])
-    );
+    ));
+    // The warning by cause for the fast hazards, as the consequence model words it ("For
+    // wildfires, plan for as little as 15 minutes of warning; ...").
+    let evac = a.bucket(BucketId::Evacuate);
+    if let Some(line) = evac
+        .frequency_sentences
+        .iter()
+        .find(|s| s.starts_with("For ") && s.contains("plan for as little as"))
+        .filter(|_| fast)
+    {
+        action.push_str(&format!(" {line}{}", cite_all(&evac.sources)));
+    }
     if on("local_tsunami") {
         action.push_str(&format!(
             " On the coast, strong shaking is the warning: walk to high ground as soon as it \

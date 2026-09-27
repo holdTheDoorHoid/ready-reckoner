@@ -1,10 +1,36 @@
-//! Section 9: the maintenance calendar. Rotation, check and test dates for everything in the plan,
+//! Section: the maintenance calendar. Rotation, check and test dates for everything in the plan,
 //! computed from the planning date and the month each item enters the plan; short intervals as
-//! repeating rows; drills; and the yearly review.
+//! repeating rows; drills; the yearly review. An item with a season (`Item.season`, review N8:
+//! have it before the season starts, or check it then) is due at the start of its season:
+//! 1 March, 1 June, 1 September or 1 December, from the first one after it enters the plan, and
+//! then at its interval, or once a year when it has none (the fans before summer, the camp stove
+//! and the warm layers before fall).
 
 use std::collections::BTreeMap;
 
-use rr_types::Date;
+use rr_types::{Date, Season};
+
+/// The month a meteorological season starts (summer starts on 1 June with the hurricane season).
+fn season_month(s: Season) -> u8 {
+    match s {
+        Season::Spring => 3,
+        Season::Summer => 6,
+        Season::Fall => 9,
+        Season::Winter => 12,
+    }
+}
+
+/// The first start of `season` at least one month after `from`.
+fn next_season_start(from: Date, s: Season) -> Date {
+    let mut d = from.add_months(1).unwrap_or(from);
+    for _ in 0..13 {
+        if d.month() == season_month(s) {
+            return Date::from_ymd(d.year(), d.month(), 1).unwrap_or(d);
+        }
+        d = d.add_months(1).unwrap_or(d);
+    }
+    d
+}
 
 use super::text::{self, md};
 use super::{Ctx, cite};
@@ -45,10 +71,15 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             .maintenance
             .map_or((None, None), |m| (m.check_months, m.rotate_months));
         let check = check.filter(|c| Some(*c) != test);
+        // A seasonal item with no interval is checked once a year, at its season's start.
+        let check = match (check, rotate, test, item.season) {
+            (None, None, None, Some(_)) => Some(12),
+            _ => check,
+        };
         if check.is_none() && rotate.is_none() && test.is_none() {
             continue;
         }
-        let name = md(&text::lower_first(&item.name));
+        let name = md(&text::lower_first(text::short_name(&item.name)));
         for (interval, verb) in [
             (check, "Check"),
             (test, "Test"),
@@ -63,7 +94,10 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
                     .or_default()
                     .push((verb, name.clone()));
             } else {
-                let due = text::month_start(start, month + every);
+                let due = match item.season {
+                    Some(s) => next_season_start(text::month_start(start, *month), s),
+                    None => text::month_start(start, month + every),
+                };
                 dated
                     .entry(due)
                     .or_default()
@@ -114,8 +148,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             .collect();
         if date == review {
             cell.push(
-                "Yearly review: go through this plan again, update your household's answers, \
-                 check the documents and contact cards, and start a new calendar"
+                "Yearly review: update your answers, check the documents and contact cards, and \
+                 start a new calendar"
                     .to_owned(),
             );
         }

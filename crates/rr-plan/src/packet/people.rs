@@ -1,12 +1,10 @@
-//! Sections 6 to 8: the family plan (meeting places, contacts, school and work, leaving home,
-//! the go/stay card, pets), documents and money (the Emergency Financial First Aid Kit,
-//! insurance questions, cash, savings), and special needs (medicine, powered devices, babies,
-//! older adults, mobility, pregnancy, animals, stress and mental health). Advice comes from the
-//! catalogue's free steps (each a parent action with its sub-steps) and four topic blocks:
-//! talking with children, neighbours, drills, and mental health. Where a topic block covers a
-//! step, the step is listed by name only, so the packet does not say the same thing twice.
+//! Documents and money (the Emergency Financial First Aid Kit, the plan's decisions with the
+//! household's own insurance lines, cash, savings, and what a damaged home costs) and special
+//! needs (medicine, powered devices, babies, older adults, mobility, pregnancy, animals, stress
+//! and mental health). Advice comes from the catalogue (free steps, decision items), the
+//! requirement lines and the mental-health topic block. The family plan is `family.rs`.
 
-use rr_types::{AgeBand, BucketId, Mobility, PoweredDevice, Target};
+use rr_types::{AgeBand, Mobility, PoweredDevice};
 
 use super::text::{self, md};
 use super::{Ctx, cite, cite_all};
@@ -20,24 +18,6 @@ fn advice(cx: &Ctx<'_>, ids: &[&str], out: &mut Vec<String>) -> usize {
         }
         if let Some(p) = cx.item_advice(id) {
             out.push(format!("- {p}"));
-            n += 1;
-        }
-    }
-    if n > 0 {
-        out.push(String::new());
-    }
-    n
-}
-
-/// Steps offered to this household, by name only: the topic block that follows covers them.
-fn named(cx: &Ctx<'_>, ids: &[&str], out: &mut Vec<String>) -> usize {
-    let mut n = 0;
-    for id in ids {
-        if cx.a.offers.get(id).is_none() {
-            continue;
-        }
-        if let Some(it) = cx.item(id) {
-            out.push(format!("- **{}.**", md(&it.name)));
             n += 1;
         }
     }
@@ -86,107 +66,9 @@ fn block(cx: &Ctx<'_>, target: &str, out: &mut Vec<String>) {
     }
 }
 
-pub(super) fn family(cx: &Ctx<'_>, out: &mut Vec<String>) {
-    let a = cx.a;
-    let input = &a.input;
-    let children = input.people.iter().any(|p| {
-        matches!(
-            p.age_band,
-            AgeBand::Infant | AgeBand::Toddler | AgeBand::Child | AgeBand::Teen
-        )
-    });
-    let pets = input.pets.dogs + input.pets.cats + input.pets.small + input.pets.large_animals > 0;
-    let car = !input.mobility.vehicles.is_empty();
-    out.push("## Family plan".to_owned());
-    out.push(String::new());
-    out.push(format!(
-        "Fill this in together, and keep a copy in each go-bag and one on the fridge. Write \
-         the numbers down: phones die.{}",
-        cite("ready_gov_plan")
-    ));
-    out.push(String::new());
-    out.push("| Plan | Your answer |".to_owned());
-    out.push("| --- | --- |".to_owned());
-    let mut rows: Vec<&str> = vec![
-        "Meeting place near home",
-        "Meeting place outside the neighborhood",
-        "Out-of-area contact (name and phone)",
-    ];
-    if children {
-        rows.push("Who picks up the children, and from where");
-    }
-    rows.push("Work and school plans");
-    rows.push("Where we would stay if we had to leave");
-    rows.push(if car {
-        "Two routes out of the area"
-    } else {
-        "Who would drive us, or which bus or train leads out"
-    });
-    rows.push("Neighbors who check on us (names and phones)");
-    if pets {
-        rows.push("Who takes the animals if we cannot");
-    }
-    for r in rows {
-        out.push(format!("| {r} | |"));
-    }
-    out.push(String::new());
-
-    out.push("### Contacts and meeting places".to_owned());
-    out.push(String::new());
-    advice(cx, &["comms_contact_card"], out);
-    // How to set up alerts is the phone-and-internet part of Your targets when that part prints
-    // (alerts on every phone, a weather radio, when text-to-911 works); here it is named.
-    if a.target_days(BucketId::Comms) > 0.0 {
-        named(cx, &["comms_wea_alerts_on"], out);
-    } else {
-        advice(cx, &["comms_wea_alerts_on"], out);
-    }
-
-    out.push("### Leaving home: triggers and routes".to_owned());
-    out.push(String::new());
-    if let Target::Evacuate {
-        p_need_10yr,
-        notice_hours_low,
-        notice_hours_high,
-        days_away,
-    } = a.bucket(BucketId::Evacuate).target
-    {
-        out.push(format!(
-            "{} households like yours have to leave home quickly at least once in 10 years. \
-             Warning can be {} ahead. Plan to be away for about {}.{}",
-            text::upper_first(&text::households(p_need_10yr)),
-            text::notice_range(f64::from(notice_hours_low), f64::from(notice_hours_high)),
-            text::day_phrase(f64::from(days_away).max(1.0)),
-            cite_all(&a.bucket(BucketId::Evacuate).sources)
-        ));
-        out.push(String::new());
-    }
-    advice(
-        cx,
-        &["evac_know_zone", "evac_ride_plan", "evac_half_tank"],
-        out,
-    );
-    named(cx, &["evac_ten_minute_drills"], out);
-    block(cx, "topic:drills", out);
-
-    // School and work plans are rows of the table above, and each commuter's get-home bag is
-    // under Checklists; what is left here is talking with children.
-    if children {
-        out.push("### Children".to_owned());
-        out.push(String::new());
-        block(cx, "topic:talking_with_children", out);
-    }
-
-    out.push("### Neighbors".to_owned());
-    out.push(String::new());
-    named(cx, &["community_know_two_neighbours"], out);
-    block(cx, "topic:neighbours", out);
-
-    if pets {
-        out.push("### Pets".to_owned());
-        out.push(String::new());
-        advice(cx, &["special_pet_plan", "special_livestock_plan"], out);
-    }
+/// A decision's name without its "Decide:" opening, lower case, for a list.
+fn decision_name(name: &str) -> String {
+    text::lower_first(name.strip_prefix("Decide: ").unwrap_or(name))
 }
 
 pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
@@ -202,8 +84,8 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
     for part in [
         "**Who you are:** photo IDs, birth certificates, Social Security cards, passports, and \
          pet records.",
-        "**Money and legal papers:** insurance policies, the lease or deed, bank and card \
-         contact numbers (not PINs), and recent tax returns.",
+        "**Money and legal papers:** insurance policies, the lease or deed, a will and powers of \
+         attorney, bank and card contact numbers (not PINs), and recent tax returns.",
         "**Medical papers:** insurance cards, the written medicine list, prescriptions, and \
          vaccination records.",
         "**Contacts:** family, doctors, the insurance agent, the landlord or lender, and \
@@ -212,25 +94,77 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(format!("- [ ] {part}"));
     }
     out.push(String::new());
-    advice(cx, &["docs_effak", "docs_document_pouch"], out);
 
-    out.push("### Insurance questions".to_owned());
-    out.push(String::new());
-    let n = lines(
-        cx,
-        &[
-            "insurance_home_or_renters",
-            "insurance_flood",
-            "insurance_earthquake",
-        ],
-        out,
-    );
-    if n == 0 {
-        out.push(
-            "You have the insurance the plan looks for. Check once a year that it still pays for \
-             somewhere to stay if the home cannot be lived in."
-                .to_owned(),
-        );
+    // The plan's decisions (insurance, ID for every person, home repairs; `PlanItem::decision`):
+    // an insurance decision says it in the household's own words (its requirement line), the
+    // others in the catalogue's.
+    let decisions: Vec<&rr_types::PlanItem> = cx
+        .steps()
+        .into_iter()
+        .map(|(_, i)| i)
+        .filter(|i| i.decision && !i.done)
+        .collect();
+    let insurance_lines: Vec<&rr_supply::SizedLine> = a
+        .lines
+        .iter()
+        .filter(|l| l.kind == rr_supply::LineKind::Need && l.line.rule.starts_with("insurance_"))
+        .collect();
+    if !decisions.is_empty() || !insurance_lines.is_empty() {
+        out.push("### Decisions".to_owned());
+        out.push(String::new());
+        let mut used: Vec<&str> = Vec::new();
+        // Home repairs (a stronger roof, a safe room, a backflow valve, a retrofit, wildfire
+        // hardening) are decisions for when the time comes: one line, their names, and where
+        // grants and discounts are asked for (their specs, with the grant details, are the app's).
+        let repair = |d: &rr_types::PlanItem| {
+            cx.item(d.item_id.as_str())
+                .is_some_and(|it| it.quantity_rule.starts_with("once_if_owned"))
+        };
+        let repairs: Vec<&rr_types::PlanItem> =
+            decisions.iter().copied().filter(|d| repair(d)).collect();
+        for d in decisions.iter().filter(|d| !repair(d)) {
+            let item = cx.item(d.item_id.as_str());
+            let line = item.and_then(|it| {
+                insurance_lines
+                    .iter()
+                    .find(|l| l.line.rule == it.quantity_rule)
+            });
+            let (text, cites) = match (line, item) {
+                (Some(l), _) => {
+                    used.push(l.line.id.as_str());
+                    (md(&l.line.plain), cite_all(&l.line.citations))
+                }
+                (None, Some(it)) => (it.spec.clone(), cite_all(&it.citations)),
+                (None, None) => continue,
+            };
+            out.push(format!("- [ ] **{}.** {text}{cites}", md(&d.name)));
+        }
+        if !repairs.is_empty() {
+            let names: Vec<String> = repairs.iter().map(|d| decision_name(&d.name)).collect();
+            out.push(format!(
+                "- [ ] **Home repairs to weigh when the time comes:** {}. Some come with grants or \
+                 insurance discounts: ask your state emergency management office and your \
+                 insurer.{}",
+                md(&names.join("; ")),
+                cite_all(
+                    repairs
+                        .iter()
+                        .filter_map(|d| cx.item(d.item_id.as_str()))
+                        .flat_map(|it| it.citations.iter())
+                )
+            ));
+        }
+        // Insurance lines with no decision in the plan (the plan already has the cover).
+        for l in insurance_lines
+            .iter()
+            .filter(|l| !used.contains(&l.line.id.as_str()))
+        {
+            out.push(format!(
+                "- {}{}",
+                md(&l.line.plain),
+                cite_all(&l.line.citations)
+            ));
+        }
         out.push(String::new());
     }
 
@@ -242,7 +176,7 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push(String::new());
     match &a.budget.plan.savings_track {
         Some(s) => {
-            out.push(md(&s.why));
+            out.push(format!("{}{}", md(&s.why), cite_all(&a.budget.citations)));
             out.push(String::new());
         }
         None => {
@@ -254,7 +188,30 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
             out.push(String::new());
         }
     }
-    advice(cx, &["docs_start_emergency_fund"], out);
+    if let Some(m) = &a.budget.plan.first_milestone {
+        let date = text::month_year(text::month_start(a.input.planning_date, m.by_month));
+        out.push(format!(
+            "**A first step:** {} ({}) by month {} ({date}).",
+            text::usd(f64::from(m.usd)),
+            text::months_phrase(f64::from(m.months)),
+            m.by_month
+        ));
+        out.push(String::new());
+    }
+
+    // If damage forced the household out: how long, and what living elsewhere costs (the
+    // consequence model's home-loss line, model review M-08).
+    let home = a.bucket(rr_types::BucketId::HomeLoss);
+    if let Some(sentence) = home
+        .frequency_sentences
+        .iter()
+        .find(|s| s.starts_with("If damage forced you out"))
+    {
+        out.push("### If damage forces you out".to_owned());
+        out.push(String::new());
+        out.push(format!("{}{}", md(sentence), cite_all(&home.sources)));
+        out.push(String::new());
+    }
 }
 
 pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
@@ -277,15 +234,17 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
             &["medication_days", "rx_cold_storage", "epinephrine_check"],
             out,
         );
-        advice(
-            cx,
-            &[
-                "med_list_written",
-                "med_cooler_refrigerated_rx",
-                "med_epinephrine_plan",
-            ],
-            out,
-        );
+        // The medicine line already says to keep a written list and how refills work (the
+        // `med_list_written` step is in the plan by name).
+        // The cold-storage line already gives the cooler and insulin's temperatures.
+        let cold_line = a
+            .lines
+            .iter()
+            .any(|l| l.line.rule == "rx_cold_storage" && l.kind == rr_supply::LineKind::Need);
+        if !cold_line {
+            advice(cx, &["med_cooler_refrigerated_rx"], out);
+        }
+        advice(cx, &["med_epinephrine_plan"], out);
     }
     out.push("### Antibiotics".to_owned());
     out.push(String::new());
@@ -329,7 +288,11 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
         );
         advice(cx, &["special_infant_go_kit"], out);
     }
-    if people.iter().any(|p| p.age_band == AgeBand::Senior) {
+    // Older adults: the plan's own step (`special_older_adult_plan`), unless the household's
+    // getting-around lines below already cover leaving with help.
+    if people.iter().any(|p| p.age_band == AgeBand::Senior)
+        && people.iter().all(|p| p.medical.mobility == Mobility::None)
+    {
         any = true;
         out.push("### Older adults".to_owned());
         out.push(String::new());
@@ -339,12 +302,12 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
         any = true;
         out.push("### Getting around".to_owned());
         out.push(String::new());
+        // The line says what the access-needs step does; the step is in the plan by name.
         lines(
             cx,
             &["evacuation_assistance_plan", "wheelchair_battery"],
             out,
         );
-        advice(cx, &["special_access_needs_plan"], out);
     }
     if people.iter().any(|p| p.pregnant_or_nursing) {
         any = true;
@@ -359,18 +322,9 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(String::new());
         // The go-kit's water and food are staged from household stock, so they are listed with
         // the carrier they are packed in.
-        lines_with(
-            cx,
-            &[
-                "pet_food_lb",
-                "pet_carrier",
-                "pet_go_water",
-                "pet_go_food",
-                "livestock_water",
-            ],
-            true,
-            out,
-        );
+        // The go-kit's water and food come from household stock (the carrier's line says so;
+        // the staging steps are in the plan by name).
+        lines(cx, &["pet_food_lb", "pet_carrier", "livestock_water"], out);
     }
     if !any {
         out.push(

@@ -398,11 +398,11 @@ fn targets_prints_each_bucket_with_its_range_and_relief() {
     }
     assert!(text.contains("Help arrives") && text.contains("Mostly back"));
     assert!(text.contains("Enough for this household: "));
-    // The dial is per need (model review M-04): the canonical sentence, not "something worse than
-    // these targets comes in about 10 of every 100 ten-year stretches".
+    // The dial is per need (model review M-04): the sentence computed from the model, not
+    // "something worse than these targets comes in about 10 of every 100 ten-year stretches".
     let flat = text.split_whitespace().collect::<Vec<_>>().join(" ");
     assert!(
-        flat.contains(&rr_plan::packet::dial_sentence(ReturnPeriod::OneIn100)),
+        flat.contains(&rr_plan::packet::dial_sentence(&a.consequence)),
         "{text}"
     );
     assert!(!flat.contains("something worse than these targets"));
