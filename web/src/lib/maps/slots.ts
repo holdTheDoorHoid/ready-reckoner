@@ -10,6 +10,13 @@
  *
  * The region map fits zoom 10 down to 6: §9.2 names 8–10, which reaches about 350 km across, and
  * zoom 6 keeps a destination up to about 1,400 km away on the map instead of off its edge.
+ *
+ * **A map centred on the home is not centred exactly on it.** Every request a map makes (its
+ * tiles, the flood and wildfire boxes, the places box) is centred on the frame, so a frame centred
+ * on the home pin would tell each recipient where the home is to the metre. Frame centres are
+ * snapped to a grid of `SNAP_PX` world pixels at the map's zoom (about 230 m on the neighbourhood
+ * map in Philadelphia, 7.5 km on the area map): every home in the same grid cell asks for the
+ * same map, and the home is drawn off-centre by at most half a cell (64 pixels of 800).
  */
 import type { AgeBand, HazardId, LatLon, LocationResolved, PlanOutput } from '../../engine/types';
 import { chanceWithin } from '../format';
@@ -70,6 +77,15 @@ function fits(frame: Frame, box: CountyBox): boolean {
   return nw.x >= c.x - frame.width / 2 && se.x <= c.x + frame.width / 2 && nw.y >= c.y - frame.height / 2 && se.y <= c.y + frame.height / 2;
 }
 
+/** Frame centres snap to this many world pixels, so no request pinpoints the home. */
+export const SNAP_PX = 128;
+
+/** The centre of the grid cell a point falls in, at a zoom. */
+export function snapCenter(p: LatLon, zoom: number, grid = SNAP_PX): LatLon {
+  const w = project(p, zoom);
+  return unproject({ x: (Math.floor(w.x / grid) + 0.5) * grid, y: (Math.floor(w.y / grid) + 0.5) * grid }, zoom);
+}
+
 /** The frame of one map. */
 export function slotFrame(kind: MapSlotKind, maps: MapsState | undefined, location: MapLocation, countyBox?: CountyBox | null): Frame {
   const home = homePoint(maps, location).at;
@@ -78,17 +94,18 @@ export function slotFrame(kind: MapSlotKind, maps: MapsState | undefined, locati
     const zoom = [16, 15].reduce((best, z) =>
       Math.abs(metresPerPixel(home.lat, z) * MAP_WIDTH - NEIGHBOURHOOD_METRES) < Math.abs(metresPerPixel(home.lat, best) * MAP_WIDTH - NEIGHBOURHOOD_METRES) ? z : best,
     );
-    return { center: home, zoom, ...size };
+    return { center: snapCenter(home, zoom), zoom, ...size };
   }
   if (kind === 'area') {
-    const at12: Frame = { center: home, zoom: 12, ...size };
-    return countyBox && fits(at12, countyBox) ? at12 : { center: home, zoom: 11, ...size };
+    const at12: Frame = { center: snapCenter(home, 12), zoom: 12, ...size };
+    return countyBox && fits(at12, countyBox) ? at12 : { center: snapCenter(home, 11), zoom: 11, ...size };
   }
   const points: LatLon[] = [home];
   if (maps?.where_go) points.push(maps.where_go);
   for (const route of maps?.routes ?? []) points.push(...route);
-  if (points.length === 1) return { center: home, zoom: 9, ...size };
-  return fitFrame(points, MAP_WIDTH, MAP_HEIGHT, 56, 6, 10);
+  if (points.length === 1) return { center: snapCenter(home, 9), zoom: 9, ...size };
+  const fitted = fitFrame(points, MAP_WIDTH, MAP_HEIGHT, 56 + SNAP_PX / 2, 6, 10);
+  return { ...fitted, center: snapCenter(fitted.center, fitted.zoom) };
 }
 
 /** The middle of a frame, moved by whole pixels (for tests and the pin map). */

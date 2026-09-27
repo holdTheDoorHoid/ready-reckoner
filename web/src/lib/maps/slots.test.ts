@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import type { HazardProfile, PlanOutput } from '../../engine/types';
 import { emptyMapsState, type MapsState } from './state';
-import { hasChildren, homePoint, type MapLocation, MAP_HEIGHT, MAP_WIDTH, slotFrame, suggestedLayers } from './slots';
-import { distanceM, frameBox, inFrame, maxTilesFor, tilesFor } from './tiles';
+import { hasChildren, homePoint, type MapLocation, MAP_HEIGHT, MAP_WIDTH, SNAP_PX, slotFrame, snapCenter, suggestedLayers } from './slots';
+import { distanceM, frameBox, inFrame, maxTilesFor, tilesFor, toCanvas } from './tiles';
 
 const PHILLY: MapLocation = {
   county_fips: '42101',
@@ -32,7 +32,9 @@ describe('The three frames (§9.2)', () => {
   it('draws the neighbourhood about 1.5 km across: zoom 16 in Philadelphia, zoom 15 in Anchorage', () => {
     const f = slotFrame('neighbourhood', withPins(), PHILLY, PHILLY_BOX);
     expect(f.zoom).toBe(16);
-    expect(f.center).toEqual(HOME);
+    const home = toCanvas(f, HOME);
+    expect(Math.abs(home.x - MAP_WIDTH / 2)).toBeLessThanOrEqual(SNAP_PX / 2);
+    expect(Math.abs(home.y - MAP_HEIGHT / 2)).toBeLessThanOrEqual(SNAP_PX / 2);
     const box = frameBox(f);
     const across = distanceM({ lat: HOME.lat, lon: box[0] }, { lat: HOME.lat, lon: box[2] });
     expect(Math.abs(across - 1500)).toBeLessThan(100);
@@ -61,6 +63,25 @@ describe('The three frames (§9.2)', () => {
     const f = slotFrame('region', withPins({ where_go: chicago }), PHILLY);
     expect(f.zoom).toBe(6);
     expect(inFrame(f, chicago)).toBe(true);
+  });
+
+  it('never centres a request on the home: homes in the same grid cell ask for the same map', () => {
+    // A neighbour halfway to the middle of the home's zoom-16 cell is in the same cell at every
+    // zoom (the grids nest: a zoom-11 cell is 32 × 32 zoom-16 cells).
+    const mid = snapCenter(HOME, 16);
+    const neighbour = { lat: (HOME.lat + mid.lat) / 2, lon: (HOME.lon + mid.lon) / 2 };
+    expect(distanceM(HOME, neighbour)).toBeGreaterThan(1);
+    for (const kind of ['neighbourhood', 'area', 'region'] as const) {
+      const f = slotFrame(kind, withPins(), PHILLY, PHILLY_BOX);
+      expect(f.center, kind).not.toEqual(HOME);
+      const g = slotFrame(kind, withPins({ home: neighbour }), PHILLY, PHILLY_BOX);
+      expect(g, kind).toEqual(f);
+    }
+    // The cell is 128 world pixels: about 234 m at zoom 16 in Philadelphia.
+    const a = snapCenter(HOME, 16);
+    const b = snapCenter({ lat: HOME.lat, lon: HOME.lon + 0.0026 }, 16);
+    expect(distanceM(a, b)).toBeGreaterThan(200);
+    expect(distanceM(a, b)).toBeLessThan(260);
   });
 
   it('needs at most 60 tiles for all three maps: the budget in §9.3 is 250', () => {
