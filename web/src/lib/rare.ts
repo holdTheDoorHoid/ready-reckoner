@@ -86,12 +86,16 @@ function itemFamilies(cat: Catalogue | null, item: PlanItem): string[] {
   return [...new Set([...extras, ...item.hazards].filter((h) => rare.has(h)))];
 }
 
-/** What the rare allowance buys in this plan: the catalogue's rare-catastrophe items the plan schedules. */
+/**
+ * What the rare allowance buys in this plan: the catalogue's rare-catastrophe items the plan
+ * schedules, each once, in the month it is bought. The months of saving toward one (the engine's
+ * `reserve` lines, "Save toward: …") are not purchases and are left out.
+ */
 export function allowance(output: PlanOutput, cat: Catalogue | null, dials: Dials, monthlyBudget: number): Allowance {
   const bought: AllowanceLine[] = [];
   for (const m of output.plan.months) {
     for (const item of m.items) {
-      if (!catalogueItem(cat, item.item_id)?.rare_catastrophic) continue;
+      if (item.kind === 'reserve' || !catalogueItem(cat, item.item_id)?.rare_catastrophic) continue;
       bought.push({ item, month: m.index, families: itemFamilies(cat, item) });
     }
   }

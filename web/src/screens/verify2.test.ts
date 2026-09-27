@@ -21,7 +21,7 @@ import { FIXTURES } from '../engine/fixtures';
 import { createMockEngine } from '../engine/mock';
 import type { PlanOutput } from '../engine/types';
 import { render, savedFor, until, type Rendered } from '../test/helpers';
-import { golden, repoRoot } from '../test/real';
+import { engineWith, golden, repoRoot } from '../test/real';
 import About from './About.svelte';
 import PlanScreen from './PlanScreen.svelte';
 import Risks from './Risks.svelte';
@@ -138,6 +138,22 @@ describe('the legal-emergency switch (Dials.legal_opt_in)', () => {
 
     current = await render(Risks, { plan: savedFor(FIXTURES['minot-missile-field-3']), route: 'risks', engine: answering(off) });
     expect(text(card(current).querySelector('details.sources > summary'))).toBe(`Sources (${incomeSources})`);
+  });
+});
+
+describe('the rare allowance with the real engine output', () => {
+  it('names what it buys, once each, not every month of saving toward it (Minot)', async () => {
+    // The real plan saves $8 a month toward the dosimeter card (months 1–3) and the shielded bag
+    // (months 4–11) before buying them in months 4 and 12: "Save toward: …" reserve lines.
+    const out = golden('minot-missile-field-3');
+    const reserves = out.plan.months.flatMap((m) => m.items).filter((i) => i.kind === 'reserve' && i.item_id.startsWith('rare_'));
+    expect(reserves.length).toBeGreaterThan(5);
+    current = await render(Risks, { plan: savedFor(FIXTURES['minot-missile-field-3']), route: 'risks', engine: await engineWith(out) });
+    const words = text(current.target.querySelector('section.rare .allowance'));
+    expect(words).toContain(
+      'Your rare-event allowance (up to $8 a month) buys personal radiation dosimeter card ($25, around February 2027) for the nuclear attack or EMP row and shielded (Faraday) bag for spare electronics ($68, around October 2027) for the nuclear attack or EMP row.',
+    );
+    expect(words).not.toMatch(/save toward/i);
   });
 });
 
