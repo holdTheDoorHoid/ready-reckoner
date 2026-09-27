@@ -4291,6 +4291,83 @@ title = "Get Prepared: Home Protection"
 publisher = "Indiana Department of Homeland Security"
 year = 2026
 url = "https://www.in.gov/dhs/get-prepared/general-safety/home-protection/"
+# added by checklists-a2 (v0.3.0 incident checklists, tab 6: large fast hazards)
+#
+# Every entry below was read on 2026-09-27. How each was read, and what the checklists rely on:
+# - nws_flood_during: plain download of the page; quote matched in the page text.
+# - cdc_radiation_get_inside, cdc_radiation_self_decon: browser pages (cdc.gov refuses scripted
+#   clients); quotes matched in the page text.
+# - fema_nuclear_planning_2022: fema.gov refuses scripted clients; read from the Internet Archive
+#   capture of the same URL (2026-06-21, text extracted from the PDF); quote matched. The live URL
+#   is kept so a person can open it. Backs: cars and wood houses without basements are poor
+#   shelter; lethal fallout for hours even tens of miles away; move from a poor shelter to an
+#   adequate one within 30 minutes when one is under 15 minutes away; EMP is not a direct hazard
+#   to people, battery devices usually work after being turned off and on, AM/FM radios receive.
+# - ready_gov_explosions: browser page (ready.gov refuses scripted clients); quote matched.
+# - calfire_go_evacuation: browser page (the site refuses scripted clients); the "Tips if trapped"
+#   panels read from the page's own text; state publication, paraphrased.
+# - nrc_ep_backgrounder: browser page (nrc.gov refuses scripted clients; the old fact-sheet URL
+#   now redirects here); quote matched.
+# - medlineplus_bleeding: plain download. The article is licensed A.D.A.M. encyclopedia content,
+#   not public domain, so it is paraphrased and carries no quote.
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "nws_flood_during"
+title = "During a Flood"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/flood-during"
+retrieved = "2026-09-27"
+quote = "If you are trapped by moving water, move to the highest possible point and call 911 if possible."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_radiation_get_inside"
+title = "What to Do: Get Inside (radiation emergencies)"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/radiation-emergencies/response/get-inside.html"
+retrieved = "2026-09-27"
+quote = "Brick or concrete multi-story building or basement are best, but being inside any building is safer than being outside."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_radiation_self_decon"
+title = "How to Self-Decontaminate after a Radiation Emergency"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/radiation-emergencies/prevention/self-decontaminate.html"
+retrieved = "2026-09-27"
+quote = "Gently blow your nose and wipe your eyelids, eyelashes, and ears with a moist wipe, a clean wet cloth, or a damp paper towel."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_nuclear_planning_2022"
+title = "Planning Guidance for Response to a Nuclear Detonation, Third Edition"
+publisher = "FEMA (via Internet Archive)"
+year = 2022
+url = "https://www.fema.gov/sites/default/files/documents/fema_nuc-detonation-planning-guide.pdf"
+retrieved = "2026-09-27"
+quote = "Cars do not provide adequate shelter."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ready_gov_explosions"
+title = "Explosions"
+publisher = "FEMA / Ready.gov"
+year = 2025
+url = "https://www.ready.gov/explosions"
+retrieved = "2026-09-27"
+quote = "If it is safe to do so, leave the area as quickly as possible."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "calfire_go_evacuation"
+title = "Go Evacuation Guide (Ready for Wildfire): pre-evacuation steps and tips if trapped"
+publisher = "California Department of Forestry and Fire Protection (CAL FIRE)"
+year = 2026
+url = "https://www.readyforwildfire.org/prepare-for-wildfire/go-evacuation-guide/"
 retrieved = "2026-09-27"
 license = "State government publication (paraphrased, not quoted)"
 
@@ -4360,4 +4437,57 @@ year = 2026
 url = "https://www.fs.usda.gov/visit/know-before-you-go/avalanches"
 retrieved = "2026-09-27"
 quote = "Take a certified avalanche course."
+id = "nrc_ep_backgrounder"
+title = "Backgrounder on Emergency Preparedness at Nuclear Power Plants"
+publisher = "U.S. Nuclear Regulatory Commission"
+year = 2024
+url = "https://www.nrc.gov/regulations-legislation/fact-sheets-brochures/backgrounder-on-emergency-preparedness-at-nuclear-power-plants"
+retrieved = "2026-09-27"
+quote = "Under some conditions, people may be instructed to take shelter in their homes, schools, or office buildings."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "medlineplus_bleeding"
+title = "Bleeding (medical encyclopedia: first aid)"
+publisher = "MedlinePlus, National Library of Medicine"
+year = 2025
+url = "https://medlineplus.gov/ency/article/000045.htm"
+retrieved = "2026-09-27"
+license = "All rights reserved (paraphrased, not quoted)"
+
+# added by checklists-a2 (continued): the terrorism actions folded into the attack_disruption page
+# (planner decision 2026-09-27). cisa_suspicious_items and cisa_bomb_threats: browser pages
+# (cisa.gov refuses scripted clients), read 2026-09-27, quotes matched in the page text.
+# cisa_bomb_threat_guide_2025: the PDF, read from the Internet Archive capture of the same URL
+# (2026-06-23, text extracted); its checklist page says not to use two-way radios or cell phones
+# and not to touch or move a suspicious package. None of the three mentions secondary devices.
+
+[[citation]]
+id = "cisa_suspicious_items"
+title = "Suspicious Activity and Items"
+publisher = "Cybersecurity and Infrastructure Security Agency"
+year = 2026
+url = "https://www.cisa.gov/topics/physical-security/bombing-prevention/suspicious-activity-and-items"
+retrieved = "2026-09-27"
+quote = "If a suspicious item is discovered or the threat is elevated, it should be treated as an emergency by contacting 9-1-1."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_bomb_threats"
+title = "Bomb Threats"
+publisher = "Cybersecurity and Infrastructure Security Agency"
+year = 2026
+url = "https://www.cisa.gov/topics/physical-security/bombing-prevention/bomb-threats"
+retrieved = "2026-09-27"
+quote = "Write down the exact wording of the threat"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_bomb_threat_guide_2025"
+title = "Bomb Threat Guide (with the Bomb Threat Checklist)"
+publisher = "Cybersecurity and Infrastructure Security Agency (via Internet Archive)"
+year = 2025
+url = "https://www.cisa.gov/sites/default/files/2025-08/Bomb_Threat_Guide_082025_508.pdf"
+retrieved = "2026-09-27"
+quote = "Radio signals have the potential to detonate a bomb."
 license = "US Government Work (public domain)"
