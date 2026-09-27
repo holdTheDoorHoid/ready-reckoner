@@ -1,7 +1,7 @@
 //! Where county data comes from: the data packs in `data/` (or `--data <dir>`), loaded into an
 //! `rr_data::DataStore` exactly as the web app loads them (the manifest first, then every file it
-//! lists by its manifest path, each checked against its sha256), or the seven hand-built fixture
-//! counties (`--fixtures`, or when there is no pack).
+//! lists by its manifest path, each checked against its sha256), or the fourteen built-in
+//! fixture counties (`--fixtures`, or when there is no pack).
 //!
 //! `rr_plan::CountySource` and `rr_data::DataStore` live in different crates, so the store is
 //! wrapped in [`Source`], which implements the trait by passing every call through.
@@ -10,9 +10,12 @@ use std::path::{Path, PathBuf};
 
 use rr_data::{DataStore, Manifest};
 use rr_plan::{CountySource, Engine, FixtureSource};
-use rr_types::{Attribution, BaseRate, CountyRecord, EngineError, LocationInput, LocationResolved};
+use rr_types::{
+    Attribution, BaseRate, CountyRecord, EngineError, LocationInput, LocationResolved,
+    RestorationCurve,
+};
 
-use crate::args::DataArgs;
+use crate::args::{DataArgs, Packs};
 use crate::error::CliError;
 
 /// The data directory used when `--data` is not given.
@@ -21,7 +24,7 @@ pub const DEFAULT_DATA_DIR: &str = "data";
 /// County data for the engine.
 #[derive(Debug)]
 pub enum Source {
-    /// The seven hand-built fixture counties embedded in `rr-plan`.
+    /// The fourteen fixture counties embedded in `rr-plan`.
     Fixtures(FixtureSource),
     /// A national data pack, loaded from a directory.
     Pack {
@@ -66,12 +69,12 @@ impl Source {
         }
     }
 
-    /// One line saying what this is, for headers: "data pack e8b8cd6861e6 (data)" or "the seven
-    /// fixture counties (fixtures+1a2b3c4d)".
+    /// One line saying what this is, for headers: "data pack e8b8cd6861e6 (data)" or "the
+    /// fourteen fixture counties (fixtures+1a2b3c4d)".
     pub fn describe(&self) -> String {
         match self {
             Source::Fixtures(f) => format!(
-                "the seven fixture counties ({})",
+                "the fourteen fixture counties ({})",
                 f.pack_version().unwrap_or_default()
             ),
             Source::Pack { store, dir } => format!(
@@ -95,7 +98,7 @@ impl Source {
                     })
                     .collect();
                 Some(format!(
-                    "Only the seven fixture counties are loaded: {}. Leave out --fixtures, or \
+                    "Only the fourteen fixture counties are loaded: {}. Leave out --fixtures, or \
                      point --data at a data pack, to plan anywhere in the US.",
                     names.join(", ")
                 ))
@@ -106,7 +109,9 @@ impl Source {
 }
 
 /// Chooses and loads the source: `--fixtures`; `--data <dir>` (which must hold a pack); or by
-/// default `data/` when it holds a manifest, otherwise the fixtures with a note.
+/// default `data/` when it holds a manifest, otherwise the fixtures with a note. From a data
+/// directory only the core pack is loaded, as the web app loads it, unless `--optional <pack>`
+/// or `--all-packs` asks for more.
 ///
 /// # Errors
 ///
@@ -125,15 +130,15 @@ pub fn open(args: &DataArgs) -> Result<Opened, CliError> {
                 dir.display()
             )));
         }
-        load_dir(dir)?
+        load_dir(dir, &args.packs())?
     } else {
         let dir = Path::new(DEFAULT_DATA_DIR);
         if dir.join("manifest.json").is_file() {
-            load_dir(dir)?
+            load_dir(dir, &args.packs())?
         } else {
             notes.push(format!(
                 "note: no data pack in ./{DEFAULT_DATA_DIR} (manifest.json not found); using the \
-                 seven fixture counties. Run from the repository root or pass --data <dir>."
+                 fourteen fixture counties. Run from the repository root or pass --data <dir>."
             ));
             Source::fixtures()?
         }
@@ -166,22 +171,62 @@ pub fn manifest_paths(manifest: &Manifest) -> Vec<String> {
         .collect()
 }
 
-/// Loads every file the manifest in `dir` lists into a `DataStore` (manifest first; each file is
-/// checked against its sha256).
+/// The core pack's name: what the web app loads to plan.
+pub const CORE_PACK: &str = "core";
+
+/// The files of the chosen packs, by manifest path, in manifest order.
+///
+/// # Errors
+///
+/// An optional pack the manifest does not list (exit 2), naming the ones it does.
+pub fn chosen_paths(manifest: &Manifest, packs: &Packs) -> Result<Vec<String>, CliError> {
+    let names: Vec<&str> = match packs {
+        Packs::All => manifest.packs.keys().map(String::as_str).collect(),
+        Packs::Core { optional } => {
+            for name in optional {
+                if name == CORE_PACK || !manifest.packs.contains_key(name) {
+                    let others: Vec<&str> = manifest
+                        .packs
+                        .keys()
+                        .map(String::as_str)
+                        .filter(|n| *n != CORE_PACK)
+                        .collect();
+                    return Err(CliError::input(format!(
+                        "--optional {name}: the manifest has no such optional pack. It lists: {}.",
+                        others.join(", ")
+                    )));
+                }
+            }
+            std::iter::once(CORE_PACK)
+                .chain(optional.iter().map(String::as_str))
+                .collect()
+        }
+    };
+    Ok(manifest
+        .packs
+        .iter()
+        .filter(|(n, _)| names.contains(&n.as_str()))
+        .flat_map(|(_, p)| p.files.iter().map(|f| f.path.clone()))
+        .collect())
+}
+
+/// Loads the chosen packs of the data directory `dir` into a `DataStore` (manifest first; each
+/// file is checked against its sha256).
 ///
 /// # Errors
 ///
 /// A listed file that cannot be read (exit 1) or that the store rejects: a checksum mismatch or
-/// a file that does not parse (`pack_corrupt`, exit 1).
-pub fn load_dir(dir: &Path) -> Result<Source, CliError> {
+/// a file that does not parse (`pack_corrupt`, exit 1); an optional pack the manifest does not
+/// list (exit 2).
+pub fn load_dir(dir: &Path, packs: &Packs) -> Result<Source, CliError> {
     let (manifest, manifest_bytes) = read_manifest(dir)?;
     let mut files: Vec<(String, Vec<u8>)> = vec![("manifest.json".to_owned(), manifest_bytes)];
-    for p in manifest_paths(&manifest) {
+    for p in chosen_paths(&manifest, packs)? {
         let path = dir.join(&p);
         let bytes = std::fs::read(&path).map_err(|e| {
             CliError::failure(format!(
                 "{} is listed in the manifest but cannot be read: {e}\n  `rr data verify` \
-                 checks every file; --fixtures runs on the seven sample counties meanwhile.",
+                 checks every file; --fixtures runs on the fourteen sample counties meanwhile.",
                 path.display()
             ))
         })?;
@@ -197,7 +242,7 @@ pub fn load_dir(dir: &Path) -> Result<Source, CliError> {
             &e,
             Some(&format!(
                 "(loading the data pack in {}; `rr data verify` checks every file, and \
-                 --fixtures runs on the seven sample counties meanwhile)",
+                 --fixtures runs on the fourteen sample counties meanwhile)",
                 dir.display()
             )),
         )
@@ -234,6 +279,13 @@ impl CountySource for Source {
         match self {
             Source::Fixtures(f) => CountySource::base_rates(f),
             Source::Pack { store, .. } => store.base_rates(),
+        }
+    }
+
+    fn restoration_curves(&self) -> &[RestorationCurve] {
+        match self {
+            Source::Fixtures(f) => CountySource::restoration_curves(f),
+            Source::Pack { store, .. } => store.restoration_curves(),
         }
     }
 

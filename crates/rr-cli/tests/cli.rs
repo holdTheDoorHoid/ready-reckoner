@@ -216,7 +216,7 @@ fn unknown_places_exit_2_and_say_what_is_loaded() {
         .code(2)
         .stderr(predicate::str::contains("We don't have ZIP code 10001"))
         .stderr(predicate::str::contains(
-            "Only the seven fixture counties are loaded",
+            "Only the fourteen fixture counties are loaded",
         ));
     fixtures()
         .args([
@@ -322,7 +322,7 @@ fn without_a_pack_the_default_falls_back_to_the_fixtures_with_a_note() {
         .assert()
         .success()
         .stderr(predicate::str::contains("no data pack in ./data"))
-        .stdout(predicate::str::contains("the seven fixture counties"));
+        .stdout(predicate::str::contains("the fourteen fixture counties"));
     // An explicit --data that holds no pack is an error, not a silent fallback.
     rr().args(["--data"])
         .arg(&dir)
@@ -398,11 +398,11 @@ fn targets_prints_each_bucket_with_its_range_and_relief() {
     }
     assert!(text.contains("Help arrives") && text.contains("Mostly back"));
     assert!(text.contains("Enough for this household: "));
-    // The dial is per need (model review M-04): the canonical sentence, not "something worse than
-    // these targets comes in about 10 of every 100 ten-year stretches".
+    // The dial is per need (model review M-04): the sentence computed from the model, not
+    // "something worse than these targets comes in about 10 of every 100 ten-year stretches".
     let flat = text.split_whitespace().collect::<Vec<_>>().join(" ");
     assert!(
-        flat.contains(&rr_plan::packet::dial_sentence(ReturnPeriod::OneIn100)),
+        flat.contains(&rr_plan::packet::dial_sentence(&a.consequence)),
         "{text}"
     );
     assert!(!flat.contains("something worse than these targets"));
@@ -775,4 +775,40 @@ fn usage_errors_exit_2() {
         .assert()
         .success()
         .stdout(predicate::str::contains("rr "));
+}
+
+/// `rr validate` replays the frozen backtest (docs/VALIDATION.md): 22 events, four runs each,
+/// every verdict as recorded, the in-sample events marked, and the headline tally the app shows.
+#[test]
+fn validate_reproduces_every_recorded_verdict_of_the_22_events() {
+    let frozen = rr_plan::validation::frozen().expect("events.json");
+    assert_eq!(frozen.events.len(), 22);
+    let out = rr().args(["validate", "--details"]).output().unwrap();
+    assert!(out.status.success(), "{}{}", stdout(&out), stderr(&out));
+    let text = stdout(&out);
+    assert!(
+        text.contains("All 88 recorded verdicts reproduced."),
+        "{text}"
+    );
+    assert!(
+        text.contains(
+            "Headline (with the v2 answers): 6 covered, 9 partial, 6 short, 1 not modelled"
+        ),
+        "{text}"
+    );
+    for e in &frozen.events {
+        let star = if e.in_sample.is_empty() { "" } else { " *" };
+        assert!(
+            text.contains(&format!(" {}{star} ", e.name)),
+            "{}: {text}",
+            e.id
+        );
+    }
+    // --details shows each target against what happened.
+    assert!(text.contains("County only: power "), "{text}");
+    assert!(
+        text.contains(" d vs ") && text.contains(": covered"),
+        "{text}"
+    );
+    assert!(text.contains("* In-sample: the storm is in the 2014-2025 outage records."));
 }

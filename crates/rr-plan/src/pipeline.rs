@@ -202,6 +202,21 @@ fn cliff_driver(w: &Warning) -> String {
         .unwrap_or_else(|| w.message.clone())
 }
 
+/// The rare families in the register, most likely here first (by the middle of their range,
+/// which is never shown; then by id), as `rr-hazards` orders them: the ranked rows stay first and
+/// in their own order.
+fn sort_rare_rows(profiles: &mut [rr_types::HazardProfile]) {
+    let start = profiles
+        .iter()
+        .position(|p| p.display == rr_types::HazardDisplay::RareCatastrophic)
+        .unwrap_or(profiles.len());
+    profiles[start..].sort_by(|a, b| {
+        b.rate_per_year
+            .total_cmp(&a.rate_per_year)
+            .then_with(|| a.id.cmp(&b.id))
+    });
+}
+
 fn internal(what: &str, e: impl std::fmt::Display) -> EngineError {
     EngineError::new(
         ErrorCode::Internal,
@@ -230,15 +245,22 @@ pub fn run<S: CountySource + ?Sized>(
         })?
         .clone();
 
-    // Hazards and consequences.
-    let hazards = rr_hazards::assess(input, &county, source.base_rates(), &location);
+    // Hazards and consequences. The pack's pooled restoration curves are not per county, so they
+    // travel beside the county record (model review M-10: the regional restoration stretch and
+    // the island grids' Maria curves).
+    let mut hazards = rr_hazards::assess(input, &county, source.base_rates(), &location);
     let consequence = rr_consequence::assess_with_parts(
         input,
         &hazards.rates,
         &hazards.parts,
-        CountyData::from_record(&county),
+        CountyData::from_record(&county).with_curves(source.restoration_curves()),
         &hazards.scenarios,
     );
+    // The rare "power out for months" family ends with the household's own power curve at 60
+    // days, which only exists once the consequence model has run (DESIGN-DELTA §3). Its rate
+    // changes, so the rare rows are put back in order of how likely they are here.
+    hazards.add_power_curve(consequence.power_curve_60_days(), input.dials.horizon_years);
+    sort_rare_rows(&mut hazards.profiles);
     // tier_enough has one source: rr-supply's rule (DESIGN §4.5).
     let mut buckets: Vec<BucketAssessment> = consequence.buckets.clone();
     for b in &mut buckets {

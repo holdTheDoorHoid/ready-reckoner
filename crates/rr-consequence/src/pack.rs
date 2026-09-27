@@ -3,7 +3,7 @@
 //! types are `rr_types::calibration`'s; `crate::CountyData::from_record` reads a county's
 //! `outage_model` and `temperature`, and the restoration curves, which are not per county, come
 //! from `rr_data::DataStore::restoration_curves()` through [`crate::CountyData::with_curves`]
-//! (awaiting: plan — `rr-plan` passes them). The drinking-water and smoke columns come from
+//! (`rr-plan` passes them). The drinking-water and smoke columns come from
 //! `CountyRecord::exposure`.
 
 pub use rr_types::{

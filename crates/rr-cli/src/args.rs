@@ -25,12 +25,25 @@ pub struct Cli {
 #[derive(Debug, Clone, Default, Args)]
 pub struct DataArgs {
     /// Directory holding the data packs (`manifest.json`, `core/`, `geo/`). Default: `data` in the
-    /// current directory when it has a manifest, otherwise the seven fixture counties.
+    /// current directory when it has a manifest, otherwise the fourteen fixture counties.
     #[arg(long, global = true, value_name = "DIR")]
     pub data: Option<PathBuf>,
-    /// Use the seven hand-built fixture counties instead of a data pack.
+    /// Use the built-in sample counties instead of a data pack.
     #[arg(long, global = true, conflicts_with = "data")]
     pub fixtures: bool,
+    /// Also load this optional pack (repeat for several), for example `surge` or
+    /// `wildfire_places`. By default only the core pack is loaded, as the web app does, so the
+    /// CLI plans exactly as the site and the goldens do.
+    #[arg(
+        long = "optional",
+        global = true,
+        value_name = "PACK",
+        conflicts_with = "fixtures"
+    )]
+    pub optional: Vec<String>,
+    /// Load every pack the manifest lists, optional ones included.
+    #[arg(long, global = true, conflicts_with_all = ["optional", "fixtures"])]
+    pub all_packs: bool,
 }
 
 impl DataArgs {
@@ -38,6 +51,29 @@ impl DataArgs {
     pub fn explicit(&self) -> bool {
         self.data.is_some() || self.fixtures
     }
+
+    /// Which packs to load from a data directory.
+    pub fn packs(&self) -> Packs {
+        if self.all_packs {
+            Packs::All
+        } else {
+            Packs::Core {
+                optional: self.optional.clone(),
+            }
+        }
+    }
+}
+
+/// Which packs of a data directory to load.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Packs {
+    /// The core pack (what the web app loads to plan), plus these optional packs.
+    Core {
+        /// Optional packs by manifest name (`surge`, `wildfire_places`, `outage_events`).
+        optional: Vec<String>,
+    },
+    /// Every pack the manifest lists (for `rr data verify` and `rr data info`).
+    All,
 }
 
 /// The commands.
@@ -71,6 +107,9 @@ pub enum Command {
     Golden(GoldenArgs),
     /// Run every fixture household: timing, warnings, uncited items and determinism.
     Doctor(DoctorArgs),
+    /// Re-run the frozen backtest (22 real events, docs/VALIDATION.md) and compare every verdict
+    /// with the recorded one; exits 1 when one changed.
+    Validate(ValidateArgs),
 }
 
 /// The household and the dial overrides shared by every command that plans.
@@ -216,6 +255,14 @@ pub struct DoctorArgs {
     /// How many timed runs per fixture (the median is reported).
     #[arg(long, default_value_t = 5, value_parser = clap::value_parser!(u32).range(1..=100))]
     pub runs: u32,
+}
+
+/// `rr validate`.
+#[derive(Debug, Clone, Args)]
+pub struct ValidateArgs {
+    /// Show each target against what happened, under its event.
+    #[arg(long)]
+    pub details: bool,
 }
 
 /// A parser that offers exactly the stable id strings of an `rr-types` enum (so `--help` lists

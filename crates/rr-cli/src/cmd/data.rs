@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use rr_plan::{CountySource, Engine};
 
 use crate::Output;
-use crate::args::{DataArgs, DataCommand};
+use crate::args::{DataArgs, DataCommand, Packs};
 use crate::error::{CliError, Exit};
 use crate::format::{Table, fields, thousands, wrap};
 use crate::source::{self, DEFAULT_DATA_DIR, Source};
@@ -67,7 +67,7 @@ fn verify(data: &DataArgs) -> Result<Output, CliError> {
     // 1. The store: what the engine (and the web app) actually loads.
     let (manifest, _) = source::read_manifest(&dir)?;
     let listed = source::manifest_paths(&manifest);
-    match source::load_dir(&dir) {
+    match source::load_dir(&dir, &Packs::All) {
         Ok(src) => {
             let store = src.store().expect("load_dir returns a pack");
             let mut rows_ok = 0usize;
@@ -174,7 +174,7 @@ fn finish(mut s: String, problems: Vec<String>) -> Output {
 fn info(data: &DataArgs) -> Result<Output, CliError> {
     let dir = pack_dir(data)?;
     let src = match &dir {
-        Some(d) => source::load_dir(d)?,
+        Some(d) => source::load_dir(d, &Packs::All)?,
         None => Source::fixtures()?,
     };
     let engine = Engine::new(src).map_err(|e| CliError::engine(&e, None))?;

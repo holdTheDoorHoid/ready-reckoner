@@ -2,8 +2,8 @@
 //!
 //! Every command runs the same engine the web app runs (`rr_plan::Engine`), on the data packs in
 //! `data/` (loaded into an `rr_data::DataStore`, every file checked against its sha256 in
-//! `data/manifest.json`) or, when there is no pack or `--fixtures` is given, on the seven
-//! hand-built fixture counties. See `docs/CLI.md` for every command with examples.
+//! `data/manifest.json`) or, when there is no pack or `--fixtures` is given, on the fourteen
+//! built-in fixture counties. See `docs/CLI.md` for every command with examples.
 //!
 //! | Command | What it prints |
 //! | --- | --- |
@@ -17,6 +17,7 @@
 //! | `data verify/info` | check the packs; versions and attributions |
 //! | `golden [--update]` | compare (or rewrite) `fixtures/golden/*` with rr-plan's own helper |
 //! | `doctor` | every fixture household: timing, warnings, uncited items, determinism |
+//! | `validate [--details]` | the frozen backtest of 22 real events against the recorded verdicts |
 //!
 //! Exit status: 0 success; 1 a check failed or the engine could not run; 2 the input needs
 //! fixing (validation problems, an unknown or ambiguous location, a usage error).

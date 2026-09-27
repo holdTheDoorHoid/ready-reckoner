@@ -70,6 +70,9 @@ fn hazard(a: &Assessment, content: &Content, id: &str) -> Result<Explanation, En
             sources: Vec::new(),
         });
     };
+    if p.display == rr_types::HazardDisplay::RareCatastrophic {
+        return Ok(rare_chain(p, content, years));
+    }
     let mut plain = vec![
         p.frequency_sentence.clone(),
         rr_hazards::why_we_think_this(h).to_owned(),
@@ -112,6 +115,113 @@ fn hazard(a: &Assessment, content: &Content, id: &str) -> Result<Explanation, En
         math: Some(math),
         sources: sources(&p.sources, content),
     })
+}
+
+/// A yearly rate in words for the chain: "2.4 in 10,000 a year" (two significant figures).
+fn rate_words(r: f64) -> String {
+    if r <= 0.0 {
+        return "0 a year".to_owned();
+    }
+    let mut per = 100.0_f64;
+    while r * per < 1.0 && per < 1e12 {
+        per *= 10.0;
+    }
+    let v = r * per;
+    let v = if v < 10.0 {
+        format!("{:.1}", (v * 10.0).round() / 10.0)
+    } else {
+        format!("{}", v.round() as u64)
+    };
+    format!(
+        "{} in {} a year",
+        v.trim_end_matches(".0"),
+        text::usd(per).trim_start_matches('$')
+    )
+}
+
+/// A rare family's chain (DESIGN-DELTA §3, REVIEW §2.3): what the published rates say, the
+/// location factor that scales them for this place, and the named parts that add up to the row,
+/// each with its own range and sources. Rare rows are expert estimates stacked together, so only
+/// ranges are shown (`range_only`), low multiplied by low and high by high.
+fn rare_chain(p: &rr_types::HazardProfile, content: &Content, years: f64) -> Explanation {
+    let mut plain = vec![
+        p.frequency_sentence.clone(),
+        rr_hazards::why_we_think_this(p.id).to_owned(),
+    ];
+    let mut ids: Vec<CitationId> = p.sources.clone();
+    let mut math: Vec<String> = Vec::new();
+    math.push(format!(
+        "Your household's rate: between {} and {} (an expert range; the middle is never shown).",
+        rate_words(p.rate_range[0]),
+        rate_words(p.rate_range[1])
+    ));
+    if let Some(lf) = &p.location_factor {
+        plain.push(lf.label.clone());
+        let [lo, mid, hi] = lf.multiplier;
+        math.push(if (lo - hi).abs() < 1e-12 {
+            format!(
+                "Location factor (class {}): the published rate × {}.",
+                lf.class,
+                sig(mid)
+            )
+        } else {
+            format!(
+                "Location factor (class {}): the published rate × {} to {} (middle {}).",
+                lf.class,
+                sig(lo),
+                sig(hi),
+                sig(mid)
+            )
+        });
+        ids.extend(lf.sources.iter().cloned());
+    }
+    for s in &p.sub_causes {
+        math.push(match s.rate_range {
+            Some([lo, hi]) => format!(
+                "{}: between {} and {}. {}",
+                s.name,
+                rate_words(lo),
+                rate_words(hi),
+                s.note
+            ),
+            None => format!("{}: {}", s.name, s.note),
+        });
+        ids.extend(s.sources.iter().cloned());
+    }
+    math.push(format!(
+        "Chance in {years} years, 1 − e^(−{years} · r): between {} and {} in 100.",
+        sig(100.0 * chance(p.rate_range[0], years)),
+        sig(100.0 * chance(p.rate_range[1], years))
+    ));
+    for extra in [&p.if_it_reaches_you, &p.what_it_changes, &p.anchor_sentence]
+        .into_iter()
+        .flatten()
+    {
+        plain.push(extra.clone());
+    }
+    Explanation {
+        title: p.name.clone(),
+        plain,
+        math: Some(math),
+        sources: sources(&ids, content),
+    }
+}
+
+/// Two significant figures, without trailing zeros.
+fn sig(x: f64) -> String {
+    if x == 0.0 || !x.is_finite() {
+        return "0".to_owned();
+    }
+    let mut scale = 1.0_f64;
+    while x.abs() * scale < 10.0 {
+        scale *= 10.0;
+    }
+    while x.abs() * scale >= 100.0 {
+        scale /= 10.0;
+    }
+    let v = (x * scale).round() / scale;
+    let s = format!("{v:.6}");
+    s.trim_end_matches('0').trim_end_matches('.').to_owned()
 }
 
 fn bucket(a: &Assessment, content: &Content, id: &str) -> Result<Explanation, EngineError> {
@@ -239,6 +349,24 @@ fn bucket(a: &Assessment, content: &Content, id: &str) -> Result<Explanation, En
             text::day_phrase(f64::from(r.mostly_restored_days).round().max(0.5))
         ));
         ids.extend(r.sources.iter().cloned());
+    } else if let (Some(days), Some(st)) = (
+        crate::packet::relief_fallback_days(ba),
+        ba.stress_test.as_ref(),
+    ) {
+        // No restoration records for the event behind the target: the worst event on record
+        // stands in, as the packet's targets table says ("worst on record: up to N days").
+        let year = st.date.year().to_string();
+        let event = if st.event.contains(&year) {
+            st.event.clone()
+        } else {
+            format!("{} ({year})", st.event)
+        };
+        plain.push(format!(
+            "There are no restoration records for the kind of disruption behind this target, so \
+             the worst event on record stands in: {event} kept some homes waiting up to {}.",
+            text::day_phrase(f64::from(days))
+        ));
+        ids.extend(st.sources.iter().cloned());
     }
     if weight > 0.0 {
         ids.push(CitationId::from(rr_budget::weights::HARM_WEIGHT_CITATION));
@@ -381,8 +509,20 @@ fn requirement(a: &Assessment, content: &Content, id: &str) -> Result<Explanatio
 }
 
 fn warning(a: &Assessment, content: &Content, id: &str) -> Result<Explanation, EngineError> {
-    let w = a
-        .warnings
+    warning_in(a, content, &a.warnings, id)
+}
+
+/// Explains a warning from a list of them: the engine passes every warning the plan emits,
+/// including those added after the assessment (`citation_missing`; `Engine::warnings`). A
+/// warning's related ids name buckets, scenarios, items or citation ids, and the sources follow
+/// them.
+pub fn warning_in(
+    a: &Assessment,
+    content: &Content,
+    warnings: &[rr_types::Warning],
+    id: &str,
+) -> Result<Explanation, EngineError> {
+    let w = warnings
         .iter()
         .find(|w| w.id == id)
         .ok_or_else(|| not_found(ExplainKind::Warning, id))?;
@@ -393,6 +533,9 @@ fn warning(a: &Assessment, content: &Content, id: &str) -> Result<Explanation, E
         }
         if let Some(s) = a.consequence.scenarios.iter().find(|s| &s.id == r) {
             ids.extend(s.sources.iter().cloned());
+        }
+        if let Some(it) = content.item(r) {
+            ids.extend(it.citations.iter().cloned());
         }
     }
     Ok(Explanation {

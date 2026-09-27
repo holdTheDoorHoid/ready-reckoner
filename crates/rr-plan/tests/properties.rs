@@ -178,8 +178,13 @@ fn a_zero_budget_gives_free_steps_only_and_a_savings_suggestion() {
     assert!(out.packet_markdown.contains("even a few dollars a month"));
 }
 
+/// At most eight ordinary free steps a month. Decisions (insurance, ID, home repairs), the three
+/// steps of the trusted circle, legal readiness and a lockout plan (`rr_budget::EXEMPT_FREE_STEPS`)
+/// and the long-horizon steps sit outside the count on purpose (budget2); every decision is due by
+/// month 1.
 #[test]
 fn free_steps_are_at_most_eight_a_month_and_life_safety_first() {
+    let content = rr_content::content();
     for (name, input) in rr_types::fixtures::all() {
         let out = assess(&input);
         for m in &out.plan.months {
@@ -187,13 +192,23 @@ fn free_steps_are_at_most_eight_a_month_and_life_safety_first() {
                 .items
                 .iter()
                 .filter(|i| i.kind == PlanItemKind::FreeAction && !i.done)
+                .filter(|i| !i.decision)
+                .filter(|i| !rr_budget::EXEMPT_FREE_STEPS.contains(&i.item_id.as_str()))
+                .filter(|i| {
+                    !content
+                        .item(i.item_id.as_str())
+                        .is_some_and(|c| c.long_horizon)
+                })
                 .collect();
             assert!(
                 free.len() <= 8,
-                "{name} month {}: {} free steps",
+                "{name} month {}: {} ordinary free steps",
                 m.index,
                 free.len()
             );
+            for d in m.items.iter().filter(|i| i.decision) {
+                assert!(m.index <= 1, "{name}: {} in month {}", d.item_id, m.index);
+            }
         }
         let first: Vec<&str> = out.plan.months[0]
             .items
@@ -364,24 +379,27 @@ fn a_months_spend_never_exceeds_its_budget_plus_what_earlier_months_left() {
             assert!(s <= lines + 1e-6, "{name} month {}", m.index);
         }
     }
-    // Philadelphia, month 16 (v0.1.1 order): the last deposit toward the cash reserve, the $10 of
-    // the $100 cash not yet saved, the pet food and the fans are $80 of that month's $60 plus what
-    // earlier months left, not $170.
+    // Philadelphia, month 22 (v0.2.0 order; it was month 16 with a $100 reserve in v0.1.1): the
+    // last $30 deposit toward the $200 cash reserve, and the reserve itself with $120 of it from
+    // savings, are $30 + ($200 − $120) = $110 of that month's $60 plus what earlier months left,
+    // not $230.
     let a = common::run(&household("philadelphia-renters-4"));
-    // Displayed as $80 (the exact figure carries the price bands' cents).
+    let cash = rr_types::ItemId::from("docs_cash_reserve");
     assert!(
-        (a.month_spend(16) - 80.0).abs() < 0.5,
+        (a.from_savings(22, &cash) - 120.0).abs() < 0.01,
         "{}",
-        a.month_spend(16)
+        a.from_savings(22, &cash)
+    );
+    assert!(
+        (a.month_spend(22) - 110.0).abs() < 0.01,
+        "{}",
+        a.month_spend(22)
     );
     assert!(a.input.finances.monthly_budget_usd >= 40.0);
+    // The packet lists the reserve once, in the checklists, with the month the plan buys it.
     let packet = assess(&household("philadelphia-renters-4")).packet_markdown;
     assert!(
-        packet.contains(
-            "| 16 (February 2028) | save toward cash in small bills; Cash in small bills: $100, \
-             $90 of it from savings; Extra pet food in an airtight container: 5 pounds of dry \
-             food; Battery or rechargeable fan: 2 fans | $80 |"
-        ),
-        "the table row"
+        packet.contains("- [ ] Cash in small bills: $200 (month 22)"),
+        "the checklist line"
     );
 }

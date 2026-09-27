@@ -81,15 +81,23 @@ pub(super) fn write(a: &Assessment, provenance: &[Citation], more: usize, out: &
         ));
         out.push(String::new());
     }
-    if !a.attributions.is_empty() {
+    if let Some(first) = a.attributions.first() {
         out.push("### Data credits".to_owned());
         out.push(String::new());
-        for at in &a.attributions {
+        // The first credit (the National Risk Index statement, whose terms require its version and
+        // access date) says when; the others say it only when it differs.
+        let when = first.accessed;
+        for (i, at) in a.attributions.iter().enumerate() {
             let version = at
                 .version
                 .as_deref()
                 .map(|v| format!(", version {v}"))
                 .unwrap_or_default();
+            let accessed = if i == 0 || at.accessed != when {
+                format!(", accessed {}", text::date(at.accessed))
+            } else {
+                String::new()
+            };
             // The URL once: many statements already name it.
             let url = if at.text.contains(at.url.as_str()) {
                 String::new()
@@ -97,10 +105,16 @@ pub(super) fn write(a: &Assessment, provenance: &[Citation], more: usize, out: &
                 format!(" {}", at.url)
             };
             out.push(format!(
-                "> **{}{version}, accessed {}.** {}{url}",
+                "> **{}{version}{accessed}.** {}{url}",
                 md(&at.source),
-                text::date(at.accessed),
                 md(&at.text)
+            ));
+            out.push(String::new());
+        }
+        if a.attributions.len() > 1 {
+            out.push(format!(
+                "The other data sets were accessed {} too, unless they say otherwise.",
+                text::date(when)
             ));
             out.push(String::new());
         }

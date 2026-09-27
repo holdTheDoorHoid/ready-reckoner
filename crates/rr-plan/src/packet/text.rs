@@ -69,7 +69,7 @@ pub fn usd(x: f64) -> String {
     format!("${}", thousands(x.round().max(0.0) as u64))
 }
 
-fn thousands(n: u64) -> String {
+pub(crate) fn thousands(n: u64) -> String {
     let digits = n.to_string();
     let mut out = String::new();
     for (i, c) in digits.chars().enumerate() {
@@ -253,34 +253,6 @@ pub fn months_phrase(v: f64) -> String {
     }
 }
 
-/// Warning time: "15 minutes to 12 hours", "1 to 3 days".
-pub fn notice_range(low_hours: f64, high_hours: f64) -> String {
-    let one = |h: f64| -> String {
-        if h <= 0.0 {
-            "no warning".to_owned()
-        } else if h < 1.0 && (h * 60.0).round() < 60.0 {
-            // Singular and plural ("1 minute", review W1); 59.5 minutes and up read "1 hour".
-            let m = (h * 60.0).round().max(1.0);
-            format!("{} minute{}", m as i64, if m == 1.0 { "" } else { "s" })
-        } else if h < 48.0 {
-            let r = ((h * 10.0).round() / 10.0).max(1.0);
-            format!(
-                "{} hour{}",
-                n_text(r),
-                if (r - 1.0).abs() < 1e-9 { "" } else { "s" }
-            )
-        } else {
-            let d = (h / 24.0).round();
-            format!("{} day{}", d as i64, if d == 1.0 { "" } else { "s" })
-        }
-    };
-    if (low_hours - high_hours).abs() < 1e-9 {
-        one(low_hours)
-    } else {
-        format!("{} to {}", one(low_hours), one(high_hours))
-    }
-}
-
 /// Of 100 households, rounded as the app does: under 1 → "fewer than 1"; 1–10 whole; above 10 the
 /// nearest 5; 97.5 and above "almost all".
 pub fn per_100(p: f64) -> String {
@@ -367,6 +339,23 @@ pub fn household(input: &PlanInput) -> String {
     }
 }
 
+/// A catalogue name without its explanation: the part before the first ": " when that part is
+/// two words or more and the explanation longer than four ("Go-bag for each person: a backpack
+/// you pack from your supplies" is "Go-bag for each person"; "Practice: ten-minute drills" and
+/// "If you own firearms: safe storage and training" stay whole). For lists that name a step the
+/// plan already describes (checklists, the calendar, the assumed basics).
+pub fn short_name(name: &str) -> &str {
+    match name.split_once(": ") {
+        // A short explanation stays: "If you own firearms: safe storage and training".
+        Some((head, tail))
+            if head.split_whitespace().count() >= 2 && tail.split_whitespace().count() > 4 =>
+        {
+            head
+        }
+        _ => name,
+    }
+}
+
 /// "a, b and c".
 pub fn join_and(parts: &[String]) -> String {
     match parts {
@@ -429,13 +418,6 @@ mod tests {
         assert_eq!(per_100(0.254), "25");
         assert_eq!(per_100(0.004), "fewer than 1");
         assert_eq!(per_100(0.99), "almost all");
-        assert_eq!(notice_range(0.25, 12.0), "15 minutes to 12 hours");
-        // Singular and plural (review W1), and the rounding edges.
-        assert_eq!(notice_range(0.02, 72.0), "1 minute to 3 days");
-        assert_eq!(notice_range(1.0 / 60.0, 1.0), "1 minute to 1 hour");
-        assert_eq!(notice_range(0.995, 24.0), "1 hour to 24 hours");
-        assert_eq!(notice_range(0.1, 36.0), "6 minutes to 36 hours");
-        assert_eq!(notice_range(0.0, 2.0), "no warning to 2 hours");
         assert_eq!(md("a|b*c"), "a\\|b\\*c");
         assert_eq!(
             date(Date::from_ymd(2026, 10, 1).unwrap()),

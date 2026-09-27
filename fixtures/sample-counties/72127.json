@@ -1,0 +1,361 @@
+{
+  "county": {
+    "fips": "72127",
+    "name": "San Juan",
+    "state_abbr": "PR",
+    "state_name": "Puerto Rico",
+    "centroid": {
+      "lat": 18.4222,
+      "lon": -66.0691
+    },
+    "nca_region": "caribbean",
+    "coastal": true,
+    "tsunami_zone": true,
+    "population": 342000,
+    "building_value_usd": 74290000000.0,
+    "nri_version": "1.20.0 (December 2025)",
+    "nri": {
+      "coastal_flooding": {
+        "afreq": 0.212,
+        "afreq_kind": "events_per_year",
+        "expp": 59060.0,
+        "ealp": 0.02016,
+        "ealt": 913300.0,
+        "hlrb": 0.003426
+      },
+      "cold_wave": {
+        "afreq": 0.0,
+        "afreq_kind": "events_per_year",
+        "expp": 0.0,
+        "ealp": 0.0,
+        "ealt": 0.0,
+        "hlrb": 3.497e-7
+      },
+      "drought": {
+        "afreq": 1.685,
+        "afreq_kind": "events_per_year",
+        "ealt": 0.0
+      },
+      "earthquake": {
+        "afreq": 0.0431,
+        "afreq_kind": "annual_probability",
+        "expp": 342300.0,
+        "ealp": 4.826,
+        "ealt": 132100000.0,
+        "hlrb": 0.0115
+      },
+      "hail": {
+        "afreq": 0.02658,
+        "afreq_kind": "events_per_year",
+        "expp": 342000.0,
+        "ealp": 0.0003507,
+        "ealt": 5703.0,
+        "hlrb": 4.548e-7
+      },
+      "heat_wave": {
+        "afreq": 0.1017,
+        "afreq_kind": "events_per_year",
+        "expp": 336200.0,
+        "ealp": 0.0,
+        "ealt": 0.0,
+        "hlrb": 0.0
+      },
+      "hurricane": {
+        "afreq": 0.173,
+        "afreq_kind": "events_per_year",
+        "expp": 342000.0,
+        "ealp": 0.6454,
+        "ealt": 193300000.0,
+        "hlrb": 0.01436
+      },
+      "landslide": {
+        "afreq": 0.7704,
+        "afreq_kind": "events_per_year",
+        "expp": 16860.0,
+        "ealp": 0.000581,
+        "ealt": 4949000.0,
+        "hlrb": 0.02405
+      },
+      "lightning": {
+        "afreq": 56.08,
+        "afreq_kind": "events_per_year",
+        "expp": 342000.0,
+        "ealp": 0.2374,
+        "ealt": 3383000.0,
+        "hlrb": 3.292e-8
+      },
+      "riverine_flooding": {
+        "afreq": 5.643,
+        "afreq_kind": "events_per_year",
+        "expp": 45260.0,
+        "ealp": 0.008831,
+        "ealt": 34210000.0,
+        "hlrb": 0.00008159
+      },
+      "strong_wind": {
+        "afreq": 0.004984,
+        "afreq_kind": "events_per_year",
+        "expp": 342000.0,
+        "ealp": 0.0006844,
+        "ealt": 10900.0,
+        "hlrb": 0.000004121
+      },
+      "tornado": {
+        "afreq": 0.003235,
+        "afreq_kind": "events_per_year",
+        "expp": 342000.0,
+        "ealp": 0.008911,
+        "ealt": 274300.0,
+        "hlrb": 0.0006334
+      },
+      "tsunami": {
+        "afreq": 0.0557,
+        "afreq_kind": "annual_probability",
+        "expp": 18810.0,
+        "ealp": 4.719,
+        "ealt": 65350000.0,
+        "hlrb": 0.001161
+      },
+      "volcanic_activity": {
+        "afreq": 0.0101,
+        "afreq_kind": "annual_probability",
+        "expp": 342000.0,
+        "ealp": 0.0005975,
+        "ealt": 8213.0,
+        "hlrb": 0.0051
+      },
+      "winter_weather": {
+        "afreq": 0.0,
+        "afreq_kind": "events_per_year",
+        "expp": 0.0,
+        "ealp": 0.0,
+        "ealt": 0.0,
+        "hlrb": 0.000001005
+      }
+    },
+    "outages": {
+      "events_per_customer_year": 3.408,
+      "p_ge_1d": 0.1809,
+      "p_ge_3d": 0.05334,
+      "p_ge_7d": 0.03608,
+      "p_ge_14d": 0.01009,
+      "median_hours": 7.5,
+      "p90_hours": 39.0,
+      "years_covered": "2021-2025",
+      "event_definition": "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged, and up to 72 hours when the event had been at the 1% level for at least 6 hours, held it for the hour before the gap and holds at least half of that level for an hour after it (a utility missing from the data for a while; readings under half of the level inside such a gap are dropped). Inside an event the counts are repaired before durations are read: during a sustained outage, counts more than 1.5 times the 3-hour running median (reports counted twice) are cut to the median, and dips shorter than 24 hours are filled to the level around them (a utility missing from some snapshots, which otherwise reads as everyone restored and cut off again); short reversals under half of the current peak or trough, or under the 1% level, are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power, except that customers still out N days after the peak are counted as out at least N days even when a later wave would have restored them first. Rates are customer outages in such events per customer per year of data."
+    },
+    "events": {
+      "hurricane_passage": {
+        "rate_per_year": 0.1316
+      },
+      "major_hurricane_passage": {
+        "rate_per_year": 0.05263
+      },
+      "severe_wind_day": {
+        "rate_per_year": 0.5,
+        "share_damaging": 0.9333
+      },
+      "tornado": {
+        "rate_per_year": 0.03333,
+        "share_damaging": 0.0
+      },
+      "tropical_storm_passage": {
+        "rate_per_year": 0.3026
+      }
+    },
+    "seismic": {
+      "p_pga_ge_0_1g_per_year": 0.009672,
+      "p_pga_ge_0_2g_per_year": 0.002684
+    },
+    "climate": {
+      "cooling_degree_days_mid45": 1.162,
+      "cooling_degree_days_mid45_high": 1.225,
+      "days_over_2in_2050": 0.13,
+      "days_over_2in_2050_high": 0.14,
+      "days_over_2in_hist": 0.13,
+      "days_over_90f_hist": 0.07,
+      "days_over_95f_2050": 0.0,
+      "days_over_95f_2050_high": 0.02,
+      "days_over_95f_hist": 0.0,
+      "dry_days_mid45": 1.052,
+      "dry_days_mid45_high": 1.073,
+      "heavy_rain_days_1in_mid45": 0.9009,
+      "heavy_rain_days_1in_mid45_high": 0.9189,
+      "icing_days_2050": 0.0,
+      "icing_days_2050_high": 0.0,
+      "icing_days_hist": 0.0
+    },
+    "facilities": {
+      "nearest_nuclear_km": 1663.0,
+      "tri_facilities": 5,
+      "high_hazard_dams": 1
+    },
+    "exposure": {
+      "strategic_class": "C2",
+      "strategic_site_ids": [
+        "metro_41980"
+      ],
+      "strategic_places": [
+        {
+          "id": "metro_41980",
+          "name": "San Juan-Bayamón-Caguas, PR",
+          "kind": "metro",
+          "sources": [
+            "census_cbsa_pop_2024",
+            "census_delineation_2023"
+          ]
+        }
+      ],
+      "uasi_share": 0.0,
+      "uasi_area_share": 0.0,
+      "geomag_lat": 27.6,
+      "geomag_factor": 0.1,
+      "smoke_days_35": 0.0,
+      "smoke_days_55": 0.0,
+      "smoke_trend": 0.0,
+      "hms_smoke_days": 0.0,
+      "smoke_basis": "hms_only",
+      "karst_share": 0.00781,
+      "landslide_susceptible_share": 0.503,
+      "leveed_pop_share": 0.0,
+      "levee_risk_high_share": 0.0,
+      "dams_high_total": 1,
+      "dams_high_poor_condition": 0,
+      "sdwis_violation_pop_share": 1.0,
+      "cws_pop_share": 1.0,
+      "surge_proxy_class": "high",
+      "coastal_flood_pop_share": 0.173
+    },
+    "outage_model": {
+      "basis": "blend",
+      "rate": 3.06,
+      "lam_ge": [
+        0.341,
+        0.02,
+        0.00303,
+        0.0,
+        0.0
+      ],
+      "z": [
+        0.94,
+        0.67,
+        0.29,
+        0.0,
+        0.0
+      ],
+      "region_counties": 77,
+      "causes": {
+        "hurricane": 0.1,
+        "unattributed": 0.9
+      },
+      "causes_ge_1d": {
+        "hurricane": 0.45
+      },
+      "stress": {
+        "event": "Hurricane Maria",
+        "class": "hurricane",
+        "cause": "AL152017",
+        "date": "2017-09-20",
+        "peak_share": 1.0,
+        "share_out_at_days": [
+          [
+            1.0,
+            1.0
+          ],
+          [
+            3.0,
+            1.0
+          ],
+          [
+            7.0,
+            1.0
+          ],
+          [
+            14.0,
+            0.914
+          ],
+          [
+            30.0,
+            0.815
+          ]
+        ],
+        "source": "historic:maria_2017_pr"
+      }
+    },
+    "reliability": {
+      "saidi_with_med_min": 4960.0,
+      "saifi_with_med": 14.2,
+      "saidi_without_med_min": 1640.0,
+      "saifi_without_med": 11.7,
+      "utility_years": 4
+    },
+    "declarations": {
+      "last_5yr": 1,
+      "since_2000": 6,
+      "with_individual_assistance": 4,
+      "hurricane_or_flood": 4
+    }
+  },
+  "location": {
+    "country": "US",
+    "county_fips": "72127",
+    "county_name": "San Juan",
+    "state_abbr": "PR",
+    "state_name": "Puerto Rico",
+    "zip": "00907",
+    "centroid": {
+      "lat": 18.4222,
+      "lon": -66.0691
+    },
+    "nca_region": "caribbean",
+    "coastal": true,
+    "tsunami_zone": true,
+    "facility_flags": {
+      "nuclear_plant_within_16km": false,
+      "nuclear_plant_within_80km": false,
+      "hazmat_facilities_within_5km": 10
+    },
+    "exposure": {
+      "strategic_class": {
+        "value": "C2",
+        "source": "rr_strategic_sites"
+      },
+      "surge_proxy_class": {
+        "value": "high",
+        "source": "rr_surge_proxy"
+      },
+      "smoke_days_35": {
+        "value": 0.0,
+        "source": "epa_aqs_daily_pm25"
+      },
+      "leveed_pop_share": {
+        "value": 0.0,
+        "source": "usace_nld"
+      },
+      "dams_high_within_10km": {
+        "value": 0,
+        "source": "usace_nid"
+      },
+      "karst_share": {
+        "value": 0.00781,
+        "source": "usgs_karst_2014"
+      },
+      "landslide_susceptible_share": {
+        "value": 0.503,
+        "source": "usgs_landslide_2024"
+      },
+      "water_system_flag": {
+        "value": 1.0,
+        "source": "epa_echo_sdwa"
+      },
+      "geomag_factor": {
+        "value": 0.1,
+        "source": "nerc_tpl007_gmd"
+      },
+      "uasi_share": {
+        "value": 0.0,
+        "source": "fema_hsgp_fy2026"
+      }
+    }
+  }
+}

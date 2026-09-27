@@ -18,18 +18,23 @@ release build takes about 0.8 seconds and 15–30 milliseconds.
 
 | You pass | `rr` uses |
 | --- | --- |
-| nothing | the data pack in `./data` when it has a `manifest.json` (run from the repository root) |
-| nothing, and there is no `./data/manifest.json` | the seven hand-built fixture counties, with a note on standard error |
-| `--data <dir>` | the data pack in `<dir>`; an error (exit 2) if it has no `manifest.json` |
-| `--fixtures` | the seven fixture counties: Maricopa AZ, Miami-Dade FL, Cook IL, Ellis KS, Coos OR, Philadelphia PA, Fort Bend TX |
+| nothing | the core pack in `./data` when it has a `manifest.json` (run from the repository root) |
+| nothing, and there is no `./data/manifest.json` | the fourteen built-in sample counties, with a note on standard error |
+| `--data <dir>` | the core pack in `<dir>`; an error (exit 2) if it has no `manifest.json` |
+| `--optional <pack>` | the core pack plus this optional pack (repeat for several): `surge` (the ZIP code's storm-surge share), `wildfire_places`, `outage_events`; an unknown name is an error (exit 2) listing the packs the manifest has |
+| `--all-packs` | every pack the manifest lists, optional ones included |
+| `--fixtures` | the fourteen sample counties: Maricopa AZ, Miami-Dade FL, Cook IL, Ellis KS, Coos OR, Philadelphia PA, Fort Bend TX (hand-built, in `crates/rr-hazards/tests/data/counties/`), and Sacramento CA, Cameron LA, Wayne MI, Missoula MT, Ward ND, Galveston TX, San Juan PR (the core pack's own records, in `fixtures/sample-counties/`) |
 
-A data pack is loaded exactly as the web app loads it: `manifest.json` first, then every file the
-manifest lists, by its manifest path, each checked against its sha256. A file that fails its
-checksum stops the command (exit 1) and names the file.
+By default `rr` loads only the core pack, as the web app does, so it plans exactly what the site
+and the goldens show; the optional packs change some numbers (the surge share, the wildfire-place
+and outage-event credit lines) and come in only when asked for. `rr data verify` and `rr data info`
+always read every pack. A pack is loaded exactly as the web app loads it: `manifest.json` first,
+then every file the manifest lists for the chosen packs, by its manifest path, each checked
+against its sha256. A file that fails its checksum stops the command (exit 1) and names the file.
 
 The fixture households in `fixtures/households/` plan against real county records on the data
 pack (Philadelphia is county 42101 either way, but its numbers come from the national data), and
-against the hand-built records with `--fixtures`. Both are useful: the fixtures never change under
+against the sample records with `--fixtures`. Both are useful: the fixtures never change under
 you, and the pack is what users get.
 
 ## The household and the dials
@@ -58,7 +63,7 @@ validated, so a flag can fix a bad value in the file):
 | Code | Meaning |
 | --- | --- |
 | 0 | it worked |
-| 1 | a check failed (golden files differ, `doctor` found a problem, a citation id is missing), or the engine or a file could not be read (a corrupt pack) |
+| 1 | a check failed (golden files differ, `doctor` found a problem, a citation id is missing, a backtest verdict changed), or the engine or a file could not be read (a corrupt pack) |
 | 2 | the input needs fixing: validation problems, an unknown or ambiguous ZIP code or county, a usage error |
 
 Validation problems are listed one per line, with the field each one is about:
@@ -350,8 +355,62 @@ Engine 0.1.0 (API 1), content 2026.09.25+1318eadb, release build, 5 timed runs e
 Result: OK. Every fixture plans, repeats byte for byte, and cites every number.
 ```
 
+### `rr validate`: the frozen backtest
+
+```
+rr validate [--details]
+```
+
+Replays the frozen backtest of `docs/VALIDATION.md`: 22 real events (Winter Storm Uri, Helene,
+Ida, the Camp Fire, Lahaina, Jackson's water crisis, Maria, Sandy, the 2003 blackout and more),
+each with the household the round-2 model review built for it (`fixtures/backtest/`). Each
+household is planned four ways: the county-only model; with the data pack v2 tables (the regional
+outage model, restoration curves, drinking-water violations, smoke days); with those and the
+answers a household there would have given before the event (a basement bedroom in Queens, SNAP
+in Philadelphia, the water system's record in Jackson, Asheville and Puerto Rico); and with the
+county's drinking-water record as it stood before the event. Each plan's targets are scored
+against what happened: **covered** when a target is at least the duration of about nine in ten
+affected households, **partial** when it covers the median household but not the tail, **short**
+below the median, **over** above three times the event (counted as covered); an event with
+several needs takes the worst of them, and an evacuation is scored by the go-bag advice, the
+warning planned for and the time away.
+
+The inputs are frozen files, so the verdicts move only with the model: the county records and v2
+tables in `crates/rr-consequence/tests/data/backtest/` (the consequence crate's backtest test reads
+the same files) and the events, what happened and the recorded verdicts in
+`fixtures/backtest/events.json` (which the engine also embeds for the app's validation page).
+Events inside the records the model learned from are starred (in-sample, a weaker test).
+`--details` shows each target against what happened, under its event.
+
+```
+$ rr validate
+rr validate: the frozen backtest, 22 real events (docs/VALIDATION.md)
+Targets at the 1-in-100 setting from frozen inputs (county records from data pack 25f3ed156688, the v2 tables from 01a46abb2d5d), scored against what happened.
+
+ Event                                                        County only   With v2 tables  With v2 answers  Pre-event water record
+ Winter Storm Uri, Austin, Feb 2021 *                         covered       partial         partial          partial
+ ...
+ Derecho, Linn County IA, Aug 2020 *                          covered       partial         partial          partial
+
+ Run                     Short  Partial  Covered  Over  Not modelled
+ County only                 9        4        8     0             1
+ With v2 tables              8        8        5     0             1
+ With v2 answers             6        9        6     0             1
+ Pre-event water record      6        9        6     0             1
+
+ Headline (with the v2 answers): 6 covered, 9 partial, 6 short, 1 not modelled (over counts as covered).
+ All 88 recorded verdicts reproduced.
+```
+
+It exits 1 when any of the 88 verdicts differs from the recorded one, and lists each, worse or
+better. Worse is a regression; better has to be recorded before the published tally can claim it.
+Either way, record an intended change in `fixtures/backtest/events.json`,
+`crates/rr-consequence/tests/backtest.rs` and `docs/VALIDATION.md` together. It runs from a
+checkout of the repository it was built from (about 6 seconds in a debug build).
+
 ## In CI
 
 The `cli` job in `.github/workflows/ci.yml` runs, in order: `rr golden` (the goldens match
 rr-plan's helper), `rr doctor` on the committed data pack, `rr --fixtures doctor`,
-`rr citations --missing` and `rr data verify`. Any of them failing fails the job.
+`rr citations --missing`, `rr data verify` and `rr validate --details`. Any of them failing fails
+the job.

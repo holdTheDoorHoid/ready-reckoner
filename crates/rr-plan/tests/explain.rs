@@ -92,3 +92,119 @@ fn unknown_ids_are_bad_input_and_the_request_shape_works() {
         e.plain
     );
 }
+
+/// `explain warning <id>` covers every warning the plan emits, on every fixture, including the
+/// ones added once the output is assembled.
+#[test]
+fn every_warning_of_every_fixture_explains() {
+    let mut seen = 0;
+    for (name, input, out) in common::outputs() {
+        let a = common::run(input);
+        assert_eq!(
+            engine().warnings(&a),
+            out.warnings,
+            "{name}: Engine::warnings is the output's list"
+        );
+        for w in &out.warnings {
+            let e = engine()
+                .explain(ExplainKind::Warning, &w.id, input)
+                .unwrap_or_else(|err| panic!("{name}: {}: {err}", w.id));
+            assert_eq!(e.title, w.message, "{name}: {}", w.id);
+            assert_eq!(
+                e.plain.as_slice(),
+                std::slice::from_ref(&w.why),
+                "{name}: {}",
+                w.id
+            );
+            seen += 1;
+        }
+    }
+    assert!(seen > 20, "{seen}");
+}
+
+/// `citation_missing` is added after the assessment (a number whose source is still being added
+/// to the registry); explaining it reads the output's warnings, not the assessment's.
+#[test]
+fn a_missing_citation_warning_explains_too() {
+    let input = household("philadelphia-renters-4");
+    let a = common::run(&input);
+    let w = rr_plan::provenance::missing_warning(&[rr_types::CitationId::from(
+        "county_boil_water_records",
+    )])
+    .expect("a warning for an unknown id");
+    assert_eq!(w.id, "citation_missing");
+    assert!(!a.warnings.iter().any(|x| x.id == w.id));
+    let mut warnings = engine().warnings(&a);
+    warnings.push(w.clone());
+    let e = rr_plan::explain::warning_in(&a, rr_content::content(), &warnings, "citation_missing")
+        .expect("explained");
+    assert_eq!(e.title, w.message);
+    assert_eq!(e.plain, [w.why]);
+    // Without it in the list, it is an unknown id like any other.
+    let err =
+        rr_plan::explain::warning_in(&a, rr_content::content(), &a.warnings, "citation_missing")
+            .unwrap_err();
+    assert_eq!(err.code, ErrorCode::BadInput);
+}
+
+/// A rare family explains its chain: the household's range, the location factor, each sub-cause
+/// with its range and what it means, the ten-year chance, and the sources of all of them.
+#[test]
+fn a_rare_family_explains_its_chain() {
+    let input = household("minot-missile-field-3");
+    let e = engine()
+        .explain(ExplainKind::Hazard, "nuclear_attack", &input)
+        .unwrap();
+    let math = e.math.expect("the arithmetic").join("\n");
+    assert!(math.contains("Your household's rate: between"), "{math}");
+    assert!(math.contains("Location factor (class A)"), "{math}");
+    assert!(math.contains("Electromagnetic pulse (EMP)"), "{math}");
+    assert!(math.contains("Chance in 10 years"), "{math}");
+    let plain = e.plain.join("\n");
+    assert!(plain.contains("Minot Air Force Base"), "{plain}");
+    assert!(plain.contains("One free step"), "{plain}");
+    assert!(e.sources.len() >= 3, "{:?}", e.sources);
+    // The months-long blackout family's chain ends with the county's own power curve.
+    let e = engine()
+        .explain(
+            ExplainKind::Hazard,
+            "multi_month_blackout",
+            &household("coos-bay-well-owner-2"),
+        )
+        .unwrap();
+    let math = e.math.unwrap().join("\n");
+    assert!(math.contains("Your county's own outage record"), "{math}");
+}
+
+/// Where no restoration records match the event behind a target, `explain bucket` says so and
+/// names the worst event on record instead, as the packet's targets table does (Hays: a winter
+/// storm kept some homes out up to 7 days).
+#[test]
+fn a_bucket_without_relief_names_the_worst_event_on_record() {
+    let input = household("hays-kansas-farm-5");
+    let out = common::assess(&input);
+    let power = out
+        .buckets
+        .iter()
+        .find(|b| b.id == rr_types::BucketId::Power)
+        .unwrap();
+    assert!(power.relief.is_none(), "{:?}", power.relief);
+    let st = power.stress_test.as_ref().expect("a stress event");
+    let e = engine()
+        .explain(ExplainKind::Bucket, "power", &input)
+        .unwrap();
+    let plain = e.plain.join("\n");
+    assert!(
+        plain.contains("the worst event on record stands in: ")
+            && plain.contains(&st.event)
+            && plain.contains("kept some homes waiting up to 7 days"),
+        "{plain}"
+    );
+    assert!(
+        out.packet_markdown
+            .contains("worst on record: up to 7 days")
+    );
+    for c in &st.sources {
+        assert!(e.sources.iter().any(|s| s.id == *c), "{c}");
+    }
+}
