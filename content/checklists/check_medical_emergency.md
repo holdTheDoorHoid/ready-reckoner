@@ -4,7 +4,7 @@ title: Medical emergency
 kind: checklist
 onset: now
 applies_to: [hazard:medical_emergency]
-citations: [gov911_faq, medlineplus_cpr, redcross_choking_adult_child, redcross_bleeding_external, fema_until_help_arrives, cdc_stroke_signs, cdc_heart_attack, ready_gov_disability, redcross_first_aid_kit, ready_gov_safety_skills]
+citations: [gov911_faq, medlineplus_cpr, redcross_choking_adult_child, redcross_bleeding_external, fema_until_help_arrives, cdc_stroke_signs, cdc_heart_attack, ready_gov_disability, redcross_first_aid_kit, ready_gov_safety_skills, samhsa_988]
 pages: 1
 ---
 
@@ -28,8 +28,9 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 3. **Choking person goes limp?** Lay them down and start CPR.[^redcross_choking_adult_child]
 4. **Breathing but not awake?** Roll them onto their side.[^fema_until_help_arrives]
 5. **Keep them warm.** Cover them, and put something under them.[^fema_until_help_arrives]
-6. **Give responders** their medicine list and allergies (People tab).[^ready_gov_disability]
-7. **Cannot call?** Text 911.[^gov911_faq]
+6. **Talk to them.** Tell them help is coming.[^fema_until_help_arrives]
+7. **Give responders** their medicine list and allergies (People tab).[^ready_gov_disability]
+8. **Cannot call?** Text 911.[^gov911_faq]
 
 ## Leave or stay
 
@@ -52,6 +53,7 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 - Stroke signs that went away still need a doctor right away.[^cdc_stroke_signs]
 - Restock the first-aid kit and replace what you used.[^redcross_first_aid_kit]
 - Take a first aid and CPR class.[^ready_gov_safety_skills]
+- Feeling shaken is normal. Call or text 988 to talk.[^samhsa_988]
 
 ## Sources
 
@@ -65,3 +67,4 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
 [^redcross_first_aid_kit]: American Red Cross, Anatomy of a First Aid Kit (2025).
 [^ready_gov_safety_skills]: FEMA / Ready.gov, Safety Skills (2026).
+[^samhsa_988]: Substance Abuse and Mental Health Services Administration, 988 Suicide and Crisis Lifeline (2026).
