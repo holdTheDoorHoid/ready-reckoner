@@ -38,18 +38,18 @@ The tests hold the line:
 | --- | --- | --- |
 | Philadelphia (the budget's reference) | 28.07 pages, 13,349 words | 23.77 pages, 11,550 words |
 | Chicago, zero budget | 20.97 pages, 10,386 words | 20.24 pages, 10,066 words |
-| Coos Bay | 28.28 pages, 13,423 words | 24.59 pages, 11,911 words |
-| Hays, Kansas | 28.07 pages, 13,389 words | 24.67 pages, 11,973 words |
-| Miami | 27.69 pages, 13,260 words | 23.73 pages, 11,537 words |
+| Coos Bay | 28.28 pages, 13,423 words | 24.70 pages, 11,955 words |
+| Hays, Kansas | 28.07 pages, 13,389 words | 24.78 pages, 12,017 words |
+| Miami | 27.69 pages, 13,260 words | 23.84 pages, 11,581 words |
 | Phoenix | 27.70 pages, 13,258 words | 23.43 pages, 11,409 words |
 | Sugar Land | 29.59 pages, 14,091 words | 25.80 pages, 12,492 words |
-| Cameron Parish (new) | | 25.11 pages, 12,181 words |
+| Cameron Parish (new) | | 25.22 pages, 12,225 words |
 | Detroit (new) | | 24.46 pages, 11,832 words |
 | Galveston (new) | | 23.14 pages, 11,274 words |
 | Minot (new) | | 23.63 pages, 11,481 words |
 | Missoula (new) | | 23.02 pages, 11,208 words |
 | Sacramento (new) | | 22.84 pages, 11,173 words |
-| San Juan (new) | | 25.70 pages, 12,355 words |
+| San Juan (new) | | 25.81 pages, 12,399 words |
 
 Households with more to say than Philadelphia (insulin and a baby in Sugar Land, a well and
 livestock in Cameron Parish, Puerto Rico's long outages in San Juan) run longer; all stay under 26
@@ -157,7 +157,7 @@ shelter plan carry Miami's wind advice). `storm_and_heat_cards_stay_where_they_m
 | 11 | `## Local help` | The household's state row from the registries table (`content/states.toml`, `docs/CONTENT_STANDARDS.md` §10): evacuation zones and the registry for people who may need help, alerts, emergency prescription refills, each with its sources and the date it was checked; web addresses are left as they are so the app links them. A state without a row gets one sentence pointing to the county emergency management office. |
 | 12 | `## Documents and money` | FEMA's Emergency Financial First Aid Kit's four parts as a checklist; **Decisions**: each insurance and ID decision with the allocator's reason, home repairs (for owners) on one line; **Cash**: the cash line; **Savings**: the income gap, the savings goal and when the supplies money could turn to it, the first milestone; **If damage forces you out**: the home-loss bucket's months away and what living elsewhere costs. |
 | 13 | `## After a disaster: the first 30 days` | "**Your county.** Philadelphia County, Pennsylvania had one federal major-disaster declaration in the last five full years." (OpenFEMA, `PlanOutput.recovery`), then the `after_first_30_days` block (review RR-P06): going home, insurance and records, help from FEMA, scams, in rough order. Every household. |
-| 14 | `## If it lasts for months` (only when the plan has a long-horizon section) | The plan's long-horizon items (`plan.long_horizon`), one line each with the quantity and the month each starts (they stay in their months too), then the `topic_long_horizon` block, its wells paragraph only for a household on a well and its fuel paragraph only with a generator or fuel in the plan. |
+| 14 | `## If it lasts for months` (only when the plan has a long-horizon section) | The plan's long-horizon items (`plan.long_horizon`), one line each with the quantity and the month each starts (they stay in their months too); **how likely here**: power out for two months or more, and for three months or more, from the household's own power curve (the consequence model's `multi_month` 60- and 90-day rates, as ranges from their 10th and 90th percentiles); then the `topic_long_horizon` block, its wells paragraph only for a household on a well and its fuel paragraph only with a generator or fuel in the plan. |
 | 15 | `## Special needs` | Medicine (`medication_days`, `rx_cold_storage`, `epinephrine_check`, `med_list_written`; the cooler advice only without the cold-storage line); antibiotics; powered devices; babies and toddlers; older adults (when nobody has limited mobility, whose advice is under access needs and getting around); getting around; pregnancy and nursing; pets and animals (the pet food, carrier and livestock water lines); stress and mental health (`topic_mental_health`, always). A subsection appears only when the household needs it. |
 | 16 | `## Maintenance calendar` | Every item in the plan with a rotation or check interval (`Item.maintenance`): every 1 to 3 months as repeating rows; longer intervals as dates counted from the month the item enters the plan; seasonal items anchored to the start of their season (1 March, 1 June, 1 September, 1 December) and checked yearly when they have no interval of their own; "Test" rows for things that must work (lights, jump starters); the yearly review a year after the planning date. |
 | 17 | `## Sources` | The citations the packet's brackets point to (the first ones in `PlanOutput.provenance`), numbered in order and run together ten to a paragraph: title, publisher, year, the URL once, expert estimates marked; a count of the provenance's other sources; then the data credits from `EngineInfo.attributions` (the National Risk Index statement exactly as its terms require, with version and access date; the access date once, on the first credit). |

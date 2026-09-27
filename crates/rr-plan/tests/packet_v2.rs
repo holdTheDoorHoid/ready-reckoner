@@ -231,6 +231,15 @@ fn the_long_horizon_section_prints_only_with_the_plan_s_long_horizon_items() {
         );
         if let Some(s) = s {
             with += 1;
+            // How likely a cut of months is, from the household's own power curve, ranges only.
+            assert!(
+                s.contains(
+                    "**How likely here.** From your own power curve, power out for two \
+                     months or more: "
+                ),
+                "{name}: {s}"
+            );
+            assert!(s.contains("; for three months or more: "), "{name}");
             for i in &out.plan.long_horizon {
                 assert!(
                     s.contains(&format!("- [ ] {}", i.name)),

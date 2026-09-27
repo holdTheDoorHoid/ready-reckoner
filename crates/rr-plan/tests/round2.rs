@@ -376,27 +376,44 @@ fn shelter_advice_fits_the_home() {
         !miami.contains("basement on the lowest floor"),
         "Miami: basement advice"
     );
-    for c in ["Strong wind", "Hurricane"] {
-        let text = card(miami, c);
-        assert!(!text.contains("basement"), "Miami {c} card: {text}");
-        assert!(!text.contains("lowest floor"), "Miami {c} card: {text}");
-    }
+    // (Miami's strong-wind card yields to its cold wave under packet v2's card rule; the
+    // hurricane card and the shelter plan carry its wind advice.)
+    let text = card(miami, "Hurricane");
+    assert!(!text.contains("basement"), "Miami hurricane card: {text}");
     assert!(
-        card(miami, "Hurricane").contains("take shelter on or below the 10th floor"),
+        !text.contains("lowest floor"),
+        "Miami hurricane card: {text}"
+    );
+    assert!(
+        text.contains("take shelter on or below the 10th floor"),
         "Miami: the tenth-floor sentence"
+    );
+    assert!(
+        section(miami, "## Your shelter plan").contains("on or below the 10th floor"),
+        "Miami: the shelter plan's high-rise sentence"
     );
     assert!(
         section(miami, "## Your targets").contains("do not count on the elevator"),
         "Miami: the elevator warning"
     );
-    // Philadelphia, a rowhouse with a basement, keeps the basement sentence.
-    let phl = packet("philadelphia-renters-4");
+    // A detached house (Coos Bay) keeps the basement sentence on its wind card; an apartment
+    // (Chicago, third floor) gets the inside hallway instead.
     assert!(
-        card(phl, "Strong wind").contains(
+        card(packet("coos-bay-well-owner-2"), "Strong wind").contains(
             "small, windowless room or basement on the lowest floor of a sturdy building"
         ),
-        "Philadelphia: the basement sentence"
+        "Coos Bay: the basement sentence"
     );
+    let chicago = card(packet("chicago-student-zero-budget-1"), "Strong wind");
+    assert!(
+        chicago.contains("In an apartment building, pick an inside hallway"),
+        "Chicago: {chicago}"
+    );
+    assert!(
+        !chicago.contains("basement on the lowest floor"),
+        "Chicago: {chicago}"
+    );
+    let phl = packet("philadelphia-renters-4");
     assert!(
         !phl.contains("10th floor"),
         "Philadelphia: no high-rise advice"

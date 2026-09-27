@@ -203,8 +203,10 @@ pub(crate) fn recovery_info(county: &rr_types::CountyRecord) -> rr_types::Recove
 }
 
 /// `## If it lasts for months`: the long-horizon items (they stay in their months too, so here
-/// they are one line each with the quantities added up and the month each starts) and the
-/// block's pointers. Only when the plan has the section (`Plan::long_horizon`).
+/// they are one line each with the quantities added up and the month each starts), how likely a
+/// cut of two or three months is here (the consequence model's `multi_month`, from the household's
+/// own power curve, ranges only), and the block's pointers. Only when the plan has the section
+/// (`Plan::long_horizon`).
 pub(super) fn long_horizon(cx: &Ctx<'_>, out: &mut Vec<String>) {
     let items = &cx.a.budget.plan.long_horizon;
     if items.is_empty() {
@@ -235,6 +237,22 @@ pub(super) fn long_horizon(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(format!("- [ ] {}{q}{when}", md(&i.name)));
     }
     out.push(String::new());
+    // How likely a cut of months is here, from the household's own power curve (the consequence
+    // model's 60- and 90-day rates with their 10th and 90th percentiles), as ranges only, like
+    // the rare table's row.
+    let mm = &cx.a.consequence.multi_month;
+    let years = cx.a.input.dials.horizon_years.max(1);
+    if mm.range_60_days[1] > 0.0 {
+        out.push(format!(
+            "**How likely here.** From your own power curve, power out for two months or more: {} \
+             households like yours in {}; for three months or more: {}.{}",
+            super::risks::range_words(mm.range_60_days[0], mm.range_60_days[1], years),
+            rr_consequence::words::horizon_phrase(years),
+            super::risks::range_words(mm.range_90_days[0], mm.range_90_days[1], years),
+            cite_all(&mm.sources)
+        ));
+        out.push(String::new());
+    }
     // The pointer about wells is for households on one, the one about stored fuel for households
     // with a generator or fuel in the plan.
     let well = cx.a.input.housing.water == rr_types::WaterSource::Well;
