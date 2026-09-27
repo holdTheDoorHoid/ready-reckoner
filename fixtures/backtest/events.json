@@ -1,5 +1,5 @@
 {
- "about": "The frozen backtest (docs/VALIDATION.md): 22 real events, the household used for each (fixtures/backtest/<household>.json), what happened (days until about half and about nine in ten of the affected households had service back), and the verdicts recorded for the four runs: the county-only model, with the data pack v2 tables, with the tables and the v2 answers, and with the pre-event water record. The third run is this version's headline tally (EngineInfo.validation). `rr validate` re-scores every run against these verdicts; crates/rr-consequence/tests/backtest.rs keeps the same set. Change a verdict only with a changed model or data, recorded in docs/VALIDATION.md.",
+ "about": "The frozen backtest (docs/VALIDATION.md): 22 real events, the household used for each (fixtures/backtest/<household>.json), what happened (days until about half and about nine in ten of the affected households had service back), and the verdicts recorded for the four runs: the county-only model, with the data pack v2 tables, with the tables and the v2 answers, and with the pre-event water record. The third run is this version's headline tally (EngineInfo.validation). `rr validate` re-scores every run against these verdicts; crates/rr-consequence/tests/backtest.rs keeps the same set. Change a verdict only with a changed model or data, recorded in docs/VALIDATION.md. The fourth run replaces the county's drinking-water record with pre_event_water_record where the pack's five-year window contains the event and the record before it was clean (Buncombe had none before Helene broke its mains).",
  "runs": [
   "county only",
   "with the v2 tables",
@@ -9,6 +9,9 @@
  "headline_run": 2,
  "data_pack": "01a46abb2d5d",
  "url_anchor": "#/validation",
+ "pre_event_water_record": {
+  "37021": 0.0
+ },
  "events": [
   {
    "id": "uri_austin",

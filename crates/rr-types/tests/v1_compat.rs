@@ -33,21 +33,21 @@ fn json_files(dir: &Path) -> Vec<PathBuf> {
     files
 }
 
-/// The household staged in `pending/` for v0.1.1, written against contract v1 (the other staged
-/// households are the contract v2 fixtures).
-const V1_PENDING: [&str; 1] = ["cameron-insulin-well-farm-2"];
+/// The v0.1.1 household, written against contract v1 (the other households added in v0.2.0 are
+/// the contract v2 fixtures).
+const V1_ROUND2: [&str; 1] = ["cameron-insulin-well-farm-2"];
 
-/// Every v1 household in the repository: the seven v0.1 fixtures, the v1 one staged in
-/// `pending/`, and rr-plan's backtest households.
+/// Every v1 household in the repository: the seven v0.1 fixtures, the v0.1.1 one, and rr-plan's
+/// backtest households.
 fn v1_inputs() -> Vec<(String, String)> {
     let mut paths: Vec<PathBuf> = V1_FIXTURES
         .iter()
         .map(|n| repo_path(&format!("fixtures/households/{n}.json")))
         .collect();
     paths.extend(
-        V1_PENDING
+        V1_ROUND2
             .iter()
-            .map(|n| repo_path(&format!("fixtures/households/pending/{n}.json"))),
+            .map(|n| repo_path(&format!("fixtures/households/{n}.json"))),
     );
     paths.extend(json_files(&repo_path("crates/rr-plan/tests/data/backtest")));
     paths

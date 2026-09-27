@@ -45,7 +45,7 @@ jobs:
       - run: cargo test --workspace
 
   cli:
-    name: CLI oracle (goldens, doctor, citations, data)
+    name: CLI oracle (goldens, doctor, citations, data, backtest)
     runs-on: ubuntu-latest
     needs: workflows-parse
     steps:
@@ -64,6 +64,8 @@ jobs:
         run: cargo run -q -p rr-cli -- citations --missing
       - name: The data pack verifies (checksums, rows, joins)
         run: cargo run -q -p rr-cli -- data verify
+      - name: The frozen backtest keeps its recorded verdicts (22 real events, docs/VALIDATION.md)
+        run: cargo run -q -p rr-cli -- validate --details
 
   wasm:
     name: WebAssembly build, tests and parity

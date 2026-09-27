@@ -37,19 +37,24 @@ fn every_fixture_file_is_embedded() {
         embedded, on_disk,
         "update rr_types::fixtures::RAW and web/src/engine/fixtures.ts"
     );
-    assert_eq!(fixtures::RAW.len(), 7);
+    // The seven v0.1 households, the v0.1.1 cameron household and the six contract v2 ones.
+    assert_eq!(fixtures::RAW.len(), 14);
     for (name, raw) in fixtures::RAW {
         let file = std::fs::read_to_string(dir.join(format!("{name}.json"))).unwrap();
         assert_eq!(*raw, file, "{name} is stale");
     }
 
-    // The staged households in pending/ are embedded in PENDING, and only there.
+    // The staged households in pending/ are embedded in PENDING, and only there (git keeps no
+    // empty folder, so with nothing staged there is no pending/).
     let pending_dir = dir.join("pending");
     let staged: BTreeSet<String> = std::fs::read_dir(&pending_dir)
-        .unwrap()
-        .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
-        .filter_map(|n| n.strip_suffix(".json").map(str::to_owned))
-        .collect();
+        .map(|entries| {
+            entries
+                .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+                .filter_map(|n| n.strip_suffix(".json").map(str::to_owned))
+                .collect()
+        })
+        .unwrap_or_default();
     let embedded: BTreeSet<String> = fixtures::PENDING
         .iter()
         .map(|(n, _)| (*n).to_owned())

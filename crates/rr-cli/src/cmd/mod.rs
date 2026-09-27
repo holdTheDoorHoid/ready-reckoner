@@ -11,6 +11,7 @@ pub mod golden;
 pub mod plan;
 pub mod risks;
 pub mod targets;
+pub mod validate;
 
 use rr_content::Content;
 use rr_plan::Engine;
@@ -40,6 +41,7 @@ pub fn run(cli: &Cli) -> Result<Output, CliError> {
         Command::Data { command } => data::run(&cli.data, *command),
         Command::Golden(a) => golden::run(&cli.data, a),
         Command::Doctor(a) => with_engine(&cli.data, |e| doctor::run(e, a)),
+        Command::Validate(a) => validate::run(a),
     }
 }
 

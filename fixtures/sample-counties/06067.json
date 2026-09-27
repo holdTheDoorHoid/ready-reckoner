@@ -1,0 +1,521 @@
+{
+  "county": {
+    "fips": "06067",
+    "name": "Sacramento",
+    "state_abbr": "CA",
+    "state_name": "California",
+    "centroid": {
+      "lat": 38.4501,
+      "lon": -121.3443
+    },
+    "nca_region": "southwest",
+    "coastal": true,
+    "tsunami_zone": false,
+    "population": 1585000,
+    "households": 563856,
+    "building_value_usd": 296000000000.0,
+    "nri_version": "1.20.0 (December 2025)",
+    "nri": {
+      "coastal_flooding": {
+        "afreq": 0.01,
+        "afreq_kind": "events_per_year",
+        "expp": 1502.0,
+        "ealp": 0.0,
+        "ealt": 0.0,
+        "hlrb": 0.003426,
+        "risk_score": 0.0
+      },
+      "cold_wave": {
+        "afreq": 0.0,
+        "afreq_kind": "events_per_year",
+        "expp": 0.0,
+        "ealp": 0.0,
+        "ealt": 0.0,
+        "hlrb": 7.488e-7,
+        "risk_score": 0.0
+      },
+      "drought": {
+        "afreq": 62.96,
+        "afreq_kind": "events_per_year",
+        "ealt": 13840000.0,
+        "risk_score": 99.36
+      },
+      "earthquake": {
+        "afreq": 0.1246,
+        "afreq_kind": "annual_probability",
+        "expp": 1585000.0,
+        "ealp": 1.712,
+        "ealt": 107600000.0,
+        "hlrb": 0.001344,
+        "risk_score": 98.85
+      },
+      "hail": {
+        "afreq": 0.07194,
+        "afreq_kind": "events_per_year",
+        "expp": 1585000.0,
+        "ealp": 0.0002129,
+        "ealt": 313500.0,
+        "hlrb": 0.00001423,
+        "risk_score": 53.91
+      },
+      "heat_wave": {
+        "afreq": 6.974,
+        "afreq_kind": "events_per_year",
+        "expp": 1585000.0,
+        "ealp": 0.5415,
+        "ealt": 7559000.0,
+        "hlrb": 8.843e-10,
+        "risk_score": 96.11
+      },
+      "landslide": {
+        "afreq": 4.108,
+        "afreq_kind": "events_per_year",
+        "expp": 7125.0,
+        "ealp": 0.000297,
+        "ealt": 14730.0,
+        "hlrb": 0.0002095,
+        "risk_score": 79.36
+      },
+      "lightning": {
+        "afreq": 8.105,
+        "afreq_kind": "events_per_year",
+        "expp": 1585000.0,
+        "ealp": 0.02602,
+        "ealt": 384500.0,
+        "hlrb": 1.179e-8,
+        "risk_score": 63.3
+      },
+      "riverine_flooding": {
+        "afreq": 1.929,
+        "afreq_kind": "events_per_year",
+        "expp": 145100.0,
+        "ealp": 0.2656,
+        "ealt": 215700000.0,
+        "hlrb": 0.0003715,
+        "risk_score": 98.98
+      },
+      "strong_wind": {
+        "afreq": 0.03388,
+        "afreq_kind": "events_per_year",
+        "expp": 1585000.0,
+        "ealp": 0.002186,
+        "ealt": 55640.0,
+        "hlrb": 0.000003161,
+        "risk_score": 7.602
+      },
+      "tornado": {
+        "afreq": 0.1205,
+        "afreq_kind": "events_per_year",
+        "expp": 1585000.0,
+        "ealp": 0.03492,
+        "ealt": 2138000.0,
+        "hlrb": 0.00004648,
+        "risk_score": 65.04
+      },
+      "volcanic_activity": {
+        "afreq": 0.0001,
+        "afreq_kind": "annual_probability",
+        "expp": 1585000.0,
+        "ealp": 0.00002741,
+        "ealt": 376.6,
+        "hlrb": 3.6e-8,
+        "risk_score": 79.15
+      },
+      "wildfire": {
+        "afreq": 0.003432,
+        "afreq_kind": "annual_probability",
+        "expp": 50080.0,
+        "ealp": 0.02982,
+        "ealt": 4761000.0,
+        "hlrb": 0.3,
+        "risk_score": 95.93
+      },
+      "winter_weather": {
+        "afreq": 0.05827,
+        "afreq_kind": "events_per_year",
+        "expp": 1585000.0,
+        "ealp": 0.0002571,
+        "ealt": 4766.0,
+        "hlrb": 7.944e-8,
+        "risk_score": 6.556
+      }
+    },
+    "outages": {
+      "events_per_customer_year": 0.3271,
+      "p_ge_1d": 0.05329,
+      "p_ge_3d": 0.004992,
+      "p_ge_7d": 0.0,
+      "p_ge_14d": 0.0,
+      "median_hours": 3.0,
+      "p90_hours": 15.25,
+      "years_covered": "2014-2025",
+      "event_definition": "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged, and up to 72 hours when the event had been at the 1% level for at least 6 hours, held it for the hour before the gap and holds at least half of that level for an hour after it (a utility missing from the data for a while; readings under half of the level inside such a gap are dropped). Inside an event the counts are repaired before durations are read: during a sustained outage, counts more than 1.5 times the 3-hour running median (reports counted twice) are cut to the median, and dips shorter than 24 hours are filled to the level around them (a utility missing from some snapshots, which otherwise reads as everyone restored and cut off again); short reversals under half of the current peak or trough, or under the 1% level, are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power, except that customers still out N days after the peak are counted as out at least N days even when a later wave would have restored them first. Rates are customer outages in such events per customer per year of data."
+    },
+    "events": {
+      "drought": {
+        "rate_per_year": 1.567,
+        "share_damaging": 0.0,
+        "median_days": 31.0,
+        "p90_days": 31.0
+      },
+      "extreme_cold": {
+        "rate_per_year": 0.6,
+        "share_damaging": 0.0,
+        "median_days": 0.9993,
+        "p90_days": 1.999
+      },
+      "flash_flood": {
+        "rate_per_year": 0.2,
+        "share_damaging": 0.6667,
+        "median_days": 0.25,
+        "p90_days": 0.9993
+      },
+      "flood": {
+        "rate_per_year": 2.0,
+        "share_damaging": 0.1667,
+        "median_days": 1.0,
+        "p90_days": 4.361
+      },
+      "heat": {
+        "rate_per_year": 1.467,
+        "share_damaging": 0.0,
+        "median_days": 2.25,
+        "p90_days": 5.999
+      },
+      "high_wind": {
+        "rate_per_year": 1.167,
+        "share_damaging": 0.3429,
+        "median_days": 0.4583,
+        "p90_days": 1.5
+      },
+      "severe_wind_65kt_day": {
+        "rate_per_year": 0.06667,
+        "share_damaging": 0.5
+      },
+      "severe_wind_day": {
+        "rate_per_year": 0.1,
+        "share_damaging": 0.6667
+      },
+      "tornado": {
+        "rate_per_year": 0.4,
+        "share_damaging": 0.5833
+      },
+      "wildfire": {
+        "rate_per_year": 0.3667,
+        "share_damaging": 0.2727,
+        "median_days": 3.679,
+        "p90_days": 23.09
+      },
+      "winter_storm": {
+        "rate_per_year": 0.1,
+        "share_damaging": 0.0,
+        "median_days": 2.083,
+        "p90_days": 3.083
+      }
+    },
+    "seismic": {
+      "p_pga_ge_0_1g_per_year": 0.003857,
+      "p_pga_ge_0_2g_per_year": 0.0006365,
+      "mmi6_100yr": 0.7733
+    },
+    "climate": {
+      "annual_rain": 0.9868,
+      "annual_rain_high": 0.9975,
+      "consecutive_dry_days_mid45": 1.032,
+      "consecutive_dry_days_mid45_high": 1.032,
+      "cooling_degree_days_mid45": 1.609,
+      "cooling_degree_days_mid45_high": 1.827,
+      "days_over_2in_2050": 0.2682,
+      "days_over_2in_2050_high": 0.2855,
+      "days_over_2in_hist": 0.2223,
+      "days_over_90f_hist": 69.19,
+      "days_over_95f_2050": 66.95,
+      "days_over_95f_2050_high": 76.9,
+      "days_over_95f_hist": 34.58,
+      "dry_days_mid45": 1.002,
+      "dry_days_mid45_high": 1.002,
+      "dry_spell_days_2050": 138.7,
+      "dry_spell_days_2050_high": 138.6,
+      "dry_spell_days_hist": 134.4,
+      "extreme_rain_days": 1.034,
+      "extreme_rain_days_high": 1.088,
+      "extreme_rain_total": 1.011,
+      "extreme_rain_total_high": 1.185,
+      "freezing_nights": 0.5636,
+      "freezing_nights_high": 0.3933,
+      "heavy_rain_days_1in_mid45": 1.055,
+      "heavy_rain_days_1in_mid45_high": 1.037,
+      "hot_days_100f": 1.878,
+      "hot_days_100f_high": 2.717,
+      "hot_days_105f": 2.647,
+      "hot_days_105f_high": 4.686,
+      "hot_days_90f_mid45": 1.533,
+      "hot_days_90f_mid45_high": 1.675,
+      "hot_days_95f": 1.53,
+      "hot_days_95f_high": 1.919,
+      "icing_days_2050": 0.006658,
+      "icing_days_2050_high": 0.001578,
+      "icing_days_hist": 0.002267,
+      "warm_nights_70f": 3.045,
+      "warm_nights_70f_high": 6.635,
+      "wettest_day": 1.027,
+      "wettest_day_5yr": 1.021,
+      "wettest_day_5yr_high": 1.062,
+      "wettest_day_high": 1.062
+    },
+    "flood": {
+      "sfha_home_share": 0.08047,
+      "claims_per_1000_policies_year": 1.4,
+      "mean_paid_usd": 18160.0,
+      "sfha_basis": "structures"
+    },
+    "facilities": {
+      "nearest_nuclear_km": 362.7,
+      "tri_facilities": 20,
+      "high_hazard_dams": 14
+    },
+    "vulnerability": {
+      "cre_share_3plus_risk_factors": 0.195,
+      "svi_percentile": 0.7509
+    },
+    "exposure": {
+      "strategic_class": "C2",
+      "strategic_site_ids": [
+        "metro_40900"
+      ],
+      "strategic_places": [
+        {
+          "id": "metro_40900",
+          "name": "Sacramento-Roseville-Folsom, CA",
+          "kind": "metro",
+          "sources": [
+            "census_cbsa_pop_2024",
+            "census_delineation_2023"
+          ]
+        }
+      ],
+      "uasi_share": 0.004521,
+      "uasi_area_share": 0.006837,
+      "uasi_area": "Sacramento-Roseville-Folsom, CA",
+      "geomag_lat": 44.2,
+      "geomag_factor": 0.16,
+      "smoke_days_35": 6.12,
+      "smoke_days_55": 3.5,
+      "smoke_trend": 0.25,
+      "hms_smoke_days": 21.5,
+      "smoke_basis": "monitor",
+      "karst_share": 0.0,
+      "landslide_susceptible_share": 0.133,
+      "leveed_pop_share": 0.454,
+      "levee_risk_high_share": 0.944,
+      "dams_high_total": 14,
+      "dams_high_poor_condition": 0,
+      "sdwis_violation_pop_share": 0.147,
+      "cws_pop_share": 1.0,
+      "surge_proxy_class": "none",
+      "coastal_flood_pop_share": 0.000948
+    },
+    "outage_model": {
+      "basis": "blend",
+      "rate": 0.286,
+      "lam_ge": [
+        0.0231,
+        0.00442,
+        0.000321,
+        0.0000123,
+        1.89e-7
+      ],
+      "z": [
+        0.81,
+        0.54,
+        0.12,
+        0.023,
+        0.00014
+      ],
+      "region_counties": 55,
+      "causes": {
+        "flood": 0.068,
+        "grid": 0.054,
+        "heat": 0.017,
+        "unattributed": 0.37,
+        "wind": 0.49
+      },
+      "causes_ge_1d": {
+        "flood": 0.021
+      },
+      "stress": {
+        "event": "November 2018 Camp Fire",
+        "class": "wildfire",
+        "cause": "wildfire:131864",
+        "date": "2018-11-08",
+        "recorded_in": "06007",
+        "distance_km": 137.0,
+        "peak_share": 0.2839,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.9604
+          ],
+          [
+            3.0,
+            0.9567
+          ],
+          [
+            7.0,
+            0.8769
+          ],
+          [
+            14.0,
+            0.5459
+          ],
+          [
+            30.0,
+            0.4124
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "temperature": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.15,
+        0.45,
+        0.75,
+        0.72,
+        0.48,
+        0.09,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.08,
+        0.15,
+        0.12,
+        0.04,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_0f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "outage_hot_share": 0.0118,
+      "outage_cold_share": 0.0,
+      "region_outage_hot_share": 0.0425,
+      "region_outage_cold_share": 0.0141
+    },
+    "reliability": {
+      "saidi_with_med_min": 234.0,
+      "saifi_with_med": 1.41,
+      "saidi_without_med_min": 89.4,
+      "saifi_without_med": 1.1,
+      "utility_years": 20
+    },
+    "declarations": {
+      "last_5yr": 2,
+      "since_2000": 7,
+      "with_individual_assistance": 3,
+      "hurricane_or_flood": 3
+    }
+  },
+  "location": {
+    "country": "US",
+    "county_fips": "06067",
+    "county_name": "Sacramento",
+    "state_abbr": "CA",
+    "state_name": "California",
+    "zip": "95834",
+    "centroid": {
+      "lat": 38.4501,
+      "lon": -121.3443
+    },
+    "nca_region": "southwest",
+    "coastal": true,
+    "tsunami_zone": false,
+    "facility_flags": {
+      "nuclear_plant_within_16km": false,
+      "nuclear_plant_within_80km": false,
+      "hazmat_facilities_within_5km": 0
+    },
+    "exposure": {
+      "strategic_class": {
+        "value": "C2",
+        "source": "rr_strategic_sites"
+      },
+      "strategic_km": {
+        "value": 55.0,
+        "source": "rr_strategic_sites"
+      },
+      "surge_proxy_class": {
+        "value": "none",
+        "source": "rr_surge_proxy"
+      },
+      "smoke_days_35": {
+        "value": 6.12,
+        "source": "epa_aqs_daily_pm25"
+      },
+      "leveed_pop_share": {
+        "value": 0.454,
+        "source": "usace_nld"
+      },
+      "dams_high_within_10km": {
+        "value": 0,
+        "source": "usace_nid"
+      },
+      "karst_share": {
+        "value": 0.0,
+        "source": "usgs_karst_2014"
+      },
+      "landslide_susceptible_share": {
+        "value": 0.133,
+        "source": "usgs_landslide_2024"
+      },
+      "water_system_flag": {
+        "value": 0.147,
+        "source": "epa_echo_sdwa"
+      },
+      "geomag_factor": {
+        "value": 0.16,
+        "source": "nerc_tpl007_gmd"
+      },
+      "uasi_share": {
+        "value": 0.006837,
+        "source": "fema_hsgp_fy2026"
+      }
+    }
+  }
+}

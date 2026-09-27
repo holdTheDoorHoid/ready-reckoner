@@ -1,5 +1,5 @@
 /**
- * The seven fixture households (`fixtures/households/*.json`), typed as `PlanInput`, for the mock
+ * The fixture households (`fixtures/households/*.json`), typed as `PlanInput`, for the mock
  * engine, tests and screenshots. `crates/rr-types` embeds the same files.
  *
  * TypeScript widens the string values of an imported JSON file to `string`, so a JSON import can't
@@ -10,12 +10,19 @@
  */
 import type { PlanInput } from './types';
 
+import cameronInsulinWellFarm2 from '../../../fixtures/households/cameron-insulin-well-farm-2.json';
 import chicagoStudentZeroBudget1 from '../../../fixtures/households/chicago-student-zero-budget-1.json';
 import coosBayWellOwner2 from '../../../fixtures/households/coos-bay-well-owner-2.json';
+import detroitSnap3 from '../../../fixtures/households/detroit-snap-3.json';
+import galvestonHighrise1 from '../../../fixtures/households/galveston-highrise-1.json';
 import haysKansasFarm5 from '../../../fixtures/households/hays-kansas-farm-5.json';
 import miamiCondoRetiree1 from '../../../fixtures/households/miami-condo-retiree-1.json';
+import minotMissileField3 from '../../../fixtures/households/minot-missile-field-3.json';
+import missoulaSmoke2 from '../../../fixtures/households/missoula-smoke-2.json';
 import philadelphiaRenters4 from '../../../fixtures/households/philadelphia-renters-4.json';
 import phoenixApartmentCpap1 from '../../../fixtures/households/phoenix-apartment-cpap-1.json';
+import sacramentoLeveed2 from '../../../fixtures/households/sacramento-leveed-2.json';
+import sanJuan2 from '../../../fixtures/households/san-juan-2.json';
 import sugarLandEvHousehold3 from '../../../fixtures/households/sugar-land-ev-household-3.json';
 
 /** `T` with every string-literal union widened to `string`, as a JSON import types it. */
@@ -56,12 +63,19 @@ function fixture<F>(json: F & (MatchesPlanInput<F> extends true ? unknown : neve
 
 /** Every fixture household by name (the file stem). */
 export const FIXTURES = {
+  'cameron-insulin-well-farm-2': fixture(cameronInsulinWellFarm2),
   'chicago-student-zero-budget-1': fixture(chicagoStudentZeroBudget1),
   'coos-bay-well-owner-2': fixture(coosBayWellOwner2),
+  'detroit-snap-3': fixture(detroitSnap3),
+  'galveston-highrise-1': fixture(galvestonHighrise1),
   'hays-kansas-farm-5': fixture(haysKansasFarm5),
   'miami-condo-retiree-1': fixture(miamiCondoRetiree1),
+  'minot-missile-field-3': fixture(minotMissileField3),
+  'missoula-smoke-2': fixture(missoulaSmoke2),
   'philadelphia-renters-4': fixture(philadelphiaRenters4),
   'phoenix-apartment-cpap-1': fixture(phoenixApartmentCpap1),
+  'sacramento-leveed-2': fixture(sacramentoLeveed2),
+  'san-juan-2': fixture(sanJuan2),
   'sugar-land-ev-household-3': fixture(sugarLandEvHousehold3),
 } as const satisfies Record<string, PlanInput>;
 

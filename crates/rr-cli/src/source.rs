@@ -1,7 +1,7 @@
 //! Where county data comes from: the data packs in `data/` (or `--data <dir>`), loaded into an
 //! `rr_data::DataStore` exactly as the web app loads them (the manifest first, then every file it
-//! lists by its manifest path, each checked against its sha256), or the seven hand-built fixture
-//! counties (`--fixtures`, or when there is no pack).
+//! lists by its manifest path, each checked against its sha256), or the fourteen built-in
+//! fixture counties (`--fixtures`, or when there is no pack).
 //!
 //! `rr_plan::CountySource` and `rr_data::DataStore` live in different crates, so the store is
 //! wrapped in [`Source`], which implements the trait by passing every call through.
@@ -24,7 +24,7 @@ pub const DEFAULT_DATA_DIR: &str = "data";
 /// County data for the engine.
 #[derive(Debug)]
 pub enum Source {
-    /// The seven hand-built fixture counties embedded in `rr-plan`.
+    /// The fourteen fixture counties embedded in `rr-plan`.
     Fixtures(FixtureSource),
     /// A national data pack, loaded from a directory.
     Pack {
@@ -69,12 +69,12 @@ impl Source {
         }
     }
 
-    /// One line saying what this is, for headers: "data pack e8b8cd6861e6 (data)" or "the seven
-    /// fixture counties (fixtures+1a2b3c4d)".
+    /// One line saying what this is, for headers: "data pack e8b8cd6861e6 (data)" or "the
+    /// fourteen fixture counties (fixtures+1a2b3c4d)".
     pub fn describe(&self) -> String {
         match self {
             Source::Fixtures(f) => format!(
-                "the seven fixture counties ({})",
+                "the fourteen fixture counties ({})",
                 f.pack_version().unwrap_or_default()
             ),
             Source::Pack { store, dir } => format!(
@@ -98,7 +98,7 @@ impl Source {
                     })
                     .collect();
                 Some(format!(
-                    "Only the seven fixture counties are loaded: {}. Leave out --fixtures, or \
+                    "Only the fourteen fixture counties are loaded: {}. Leave out --fixtures, or \
                      point --data at a data pack, to plan anywhere in the US.",
                     names.join(", ")
                 ))
@@ -138,7 +138,7 @@ pub fn open(args: &DataArgs) -> Result<Opened, CliError> {
         } else {
             notes.push(format!(
                 "note: no data pack in ./{DEFAULT_DATA_DIR} (manifest.json not found); using the \
-                 seven fixture counties. Run from the repository root or pass --data <dir>."
+                 fourteen fixture counties. Run from the repository root or pass --data <dir>."
             ));
             Source::fixtures()?
         }
@@ -226,7 +226,7 @@ pub fn load_dir(dir: &Path, packs: &Packs) -> Result<Source, CliError> {
         let bytes = std::fs::read(&path).map_err(|e| {
             CliError::failure(format!(
                 "{} is listed in the manifest but cannot be read: {e}\n  `rr data verify` \
-                 checks every file; --fixtures runs on the seven sample counties meanwhile.",
+                 checks every file; --fixtures runs on the fourteen sample counties meanwhile.",
                 path.display()
             ))
         })?;
@@ -242,7 +242,7 @@ pub fn load_dir(dir: &Path, packs: &Packs) -> Result<Source, CliError> {
             &e,
             Some(&format!(
                 "(loading the data pack in {}; `rr data verify` checks every file, and \
-                 --fixtures runs on the seven sample counties meanwhile)",
+                 --fixtures runs on the fourteen sample counties meanwhile)",
                 dir.display()
             )),
         )

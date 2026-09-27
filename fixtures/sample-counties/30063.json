@@ -1,0 +1,501 @@
+{
+  "county": {
+    "fips": "30063",
+    "name": "Missoula",
+    "state_abbr": "MT",
+    "state_name": "Montana",
+    "centroid": {
+      "lat": 47.0273,
+      "lon": -113.8927
+    },
+    "nca_region": "northern_great_plains",
+    "coastal": false,
+    "tsunami_zone": false,
+    "population": 117700,
+    "households": 50446,
+    "building_value_usd": 24890000000.0,
+    "nri_version": "1.20.0 (December 2025)",
+    "nri": {
+      "avalanche": {
+        "afreq": 0.2,
+        "afreq_kind": "events_per_year",
+        "expp": 10.0,
+        "ealp": 0.213,
+        "ealt": 2925000.0,
+        "hlrb": 0.0139,
+        "risk_score": 91.52
+      },
+      "cold_wave": {
+        "afreq": 3.442,
+        "afreq_kind": "events_per_year",
+        "expp": 117700.0,
+        "ealp": 1.032,
+        "ealt": 14200000.0,
+        "hlrb": 4.333e-7,
+        "risk_score": 93.13
+      },
+      "drought": {
+        "afreq": 28.49,
+        "afreq_kind": "events_per_year",
+        "ealt": 1452.0,
+        "risk_score": 15.97
+      },
+      "earthquake": {
+        "afreq": 0.01317,
+        "afreq_kind": "annual_probability",
+        "expp": 117900.0,
+        "ealp": 0.2534,
+        "ealt": 10030000.0,
+        "hlrb": 0.01128,
+        "risk_score": 91.35
+      },
+      "hail": {
+        "afreq": 0.4548,
+        "afreq_kind": "events_per_year",
+        "expp": 117700.0,
+        "ealp": 0.002768,
+        "ealt": 66730.0,
+        "hlrb": 0.000002366,
+        "risk_score": 13.3
+      },
+      "heat_wave": {
+        "afreq": 1.162,
+        "afreq_kind": "events_per_year",
+        "expp": 117700.0,
+        "ealp": 0.04923,
+        "ealt": 675300.0,
+        "hlrb": 3.843e-9,
+        "risk_score": 53.5
+      },
+      "ice_storm": {
+        "afreq": 0.1916,
+        "afreq_kind": "events_per_year",
+        "expp": 117700.0,
+        "ealp": 0.07147,
+        "ealt": 1413000.0,
+        "hlrb": 0.00007961,
+        "risk_score": 89.9
+      },
+      "landslide": {
+        "afreq": 2.071,
+        "afreq_kind": "events_per_year",
+        "expp": 4413.0,
+        "ealp": 0.01473,
+        "ealt": 202000.0,
+        "hlrb": 0.000001674,
+        "risk_score": 95.13
+      },
+      "lightning": {
+        "afreq": 21.74,
+        "afreq_kind": "events_per_year",
+        "expp": 117700.0,
+        "ealp": 0.04286,
+        "ealt": 605200.0,
+        "hlrb": 3.292e-8,
+        "risk_score": 64.03
+      },
+      "riverine_flooding": {
+        "afreq": 1.036,
+        "afreq_kind": "events_per_year",
+        "expp": 2141.0,
+        "ealp": 0.03028,
+        "ealt": 19010000.0,
+        "hlrb": 0.0007217,
+        "risk_score": 68.64
+      },
+      "strong_wind": {
+        "afreq": 0.274,
+        "afreq_kind": "events_per_year",
+        "expp": 117700.0,
+        "ealp": 0.01232,
+        "ealt": 292500.0,
+        "hlrb": 0.00001871,
+        "risk_score": 21.06
+      },
+      "tornado": {
+        "afreq": 0.04072,
+        "afreq_kind": "events_per_year",
+        "expp": 117700.0,
+        "ealp": 0.00557,
+        "ealt": 101500.0,
+        "hlrb": 0.0000248,
+        "risk_score": 10.15
+      },
+      "wildfire": {
+        "afreq": 0.006614,
+        "afreq_kind": "annual_probability",
+        "expp": 25610.0,
+        "ealp": 0.03092,
+        "ealt": 6818000.0,
+        "hlrb": 0.3,
+        "risk_score": 95.77
+      },
+      "winter_weather": {
+        "afreq": 50.85,
+        "afreq_kind": "events_per_year",
+        "expp": 117700.0,
+        "ealp": 0.02396,
+        "ealt": 331100.0,
+        "hlrb": 3.104e-9,
+        "risk_score": 80.62
+      }
+    },
+    "outages": {
+      "events_per_customer_year": 0.6478,
+      "p_ge_1d": 0.1527,
+      "p_ge_3d": 0.03071,
+      "p_ge_7d": 0.0,
+      "p_ge_14d": 0.0,
+      "median_hours": 2.75,
+      "p90_hours": 42.75,
+      "years_covered": "2019-2025",
+      "event_definition": "EAGLE-I outage event: starts when at least 1% of the county's electricity customers (the larger of ORNL's modelled customer count and the county's households; at least 10 customers) are reported without power, needs at least 1 hour at that level, and lasts until fewer than 0.25% (at least 5) remain out, with dips or missing 15-minute snapshots of up to 2 hours bridged, and up to 72 hours when the event had been at the 1% level for at least 6 hours, held it for the hour before the gap and holds at least half of that level for an hour after it (a utility missing from the data for a while; readings under half of the level inside such a gap are dropped). Inside an event the counts are repaired before durations are read: during a sustained outage, counts more than 1.5 times the 3-hour running median (reports counted twice) are cut to the median, and dips shorter than 24 hours are filled to the level around them (a utility missing from some snapshots, which otherwise reads as everyone restored and cut off again); short reversals under half of the current peak or trough, or under the 1% level, are treated as reporting noise. Durations are per customer: customers are assumed to be restored in the order they lost power, except that customers still out N days after the peak are counted as out at least N days even when a later wave would have restored them first. Rates are customer outages in such events per customer per year of data."
+    },
+    "events": {
+      "dust_storm": {
+        "rate_per_year": 0.03333,
+        "share_damaging": 0.0,
+        "median_days": 0.08333,
+        "p90_days": 0.08333
+      },
+      "extreme_cold": {
+        "rate_per_year": 0.8333,
+        "share_damaging": 0.0,
+        "median_days": 1.0,
+        "p90_days": 2.875
+      },
+      "flash_flood": {
+        "rate_per_year": 0.1,
+        "share_damaging": 0.0,
+        "median_days": 0.01042,
+        "p90_days": 0.04167
+      },
+      "flood": {
+        "rate_per_year": 0.8333,
+        "share_damaging": 0.24,
+        "median_days": 3.594,
+        "p90_days": 12.17
+      },
+      "hail_1in_day": {
+        "rate_per_year": 1.2,
+        "share_damaging": 0.02778
+      },
+      "hail_2in_day": {
+        "rate_per_year": 0.1333,
+        "share_damaging": 0.0
+      },
+      "heat": {
+        "rate_per_year": 0.1667,
+        "share_damaging": 0.0,
+        "median_days": 2.499,
+        "p90_days": 7.375
+      },
+      "high_wind": {
+        "rate_per_year": 1.767,
+        "share_damaging": 0.5472,
+        "median_days": 0.1042,
+        "p90_days": 0.5
+      },
+      "ice_storm": {
+        "rate_per_year": 0.2333,
+        "share_damaging": 0.0,
+        "median_days": 0.1667,
+        "p90_days": 0.5
+      },
+      "severe_wind_65kt_day": {
+        "rate_per_year": 0.1667,
+        "share_damaging": 0.6
+      },
+      "severe_wind_day": {
+        "rate_per_year": 1.867,
+        "share_damaging": 0.4464
+      },
+      "wildfire": {
+        "rate_per_year": 0.2,
+        "share_damaging": 0.5,
+        "median_days": 0.1042,
+        "p90_days": 30.0
+      },
+      "winter_storm": {
+        "rate_per_year": 12.87,
+        "share_damaging": 0.03368,
+        "median_days": 1.0,
+        "p90_days": 1.958
+      }
+    },
+    "seismic": {
+      "p_pga_ge_0_1g_per_year": 0.001582,
+      "p_pga_ge_0_2g_per_year": 0.0004377,
+      "mmi6_100yr": 0.1681
+    },
+    "climate": {
+      "annual_rain": 1.038,
+      "annual_rain_high": 1.081,
+      "consecutive_dry_days_mid45": 1.078,
+      "consecutive_dry_days_mid45_high": 1.102,
+      "days_over_2in_2050": 0.3364,
+      "days_over_2in_2050_high": 0.3656,
+      "days_over_2in_hist": 0.2364,
+      "days_over_90f_hist": 3.052,
+      "days_over_95f_2050": 4.945,
+      "days_over_95f_2050_high": 9.252,
+      "days_over_95f_hist": 0.3897,
+      "dry_days_mid45": 0.9948,
+      "dry_days_mid45_high": 0.9955,
+      "dry_spell_days_2050": 37.13,
+      "dry_spell_days_2050_high": 37.97,
+      "dry_spell_days_hist": 34.45,
+      "extreme_rain_days": 1.197,
+      "extreme_rain_days_high": 1.441,
+      "extreme_rain_total": 1.161,
+      "extreme_rain_total_high": 1.388,
+      "freezing_nights": 0.8692,
+      "freezing_nights_high": 0.765,
+      "heavy_rain_days_1in_mid45": 1.192,
+      "heavy_rain_days_1in_mid45_high": 1.25,
+      "hot_days_90f_mid45": 5.846,
+      "hot_days_90f_mid45_high": 8.527,
+      "icing_days_2050": 52.74,
+      "icing_days_2050_high": 47.15,
+      "icing_days_hist": 74.36,
+      "very_cold_nights_0f": 0.7341,
+      "very_cold_nights_0f_high": 0.5783,
+      "wettest_day": 1.055,
+      "wettest_day_5yr": 1.064,
+      "wettest_day_5yr_high": 1.094,
+      "wettest_day_high": 1.102
+    },
+    "flood": {
+      "sfha_home_share": 0.02103,
+      "claims_per_1000_policies_year": 22.95,
+      "mean_paid_usd": 8203.0,
+      "sfha_basis": "structures"
+    },
+    "facilities": {
+      "nearest_nuclear_km": 419.1,
+      "tri_facilities": 4,
+      "high_hazard_dams": 6
+    },
+    "vulnerability": {
+      "cre_share_3plus_risk_factors": 0.1434,
+      "svi_percentile": 0.2762
+    },
+    "exposure": {
+      "strategic_class": "E",
+      "uasi_share": 0.0,
+      "uasi_area_share": 0.0,
+      "geomag_lat": 53.6,
+      "geomag_factor": 0.47,
+      "smoke_days_35": 7.62,
+      "smoke_days_55": 3.12,
+      "smoke_trend": 0.107,
+      "hms_smoke_days": 26.0,
+      "smoke_basis": "monitor",
+      "karst_share": 0.114,
+      "landslide_susceptible_share": 0.836,
+      "leveed_pop_share": 0.0184,
+      "levee_risk_high_share": 0.0,
+      "dams_high_total": 6,
+      "dams_high_poor_condition": 2,
+      "sdwis_violation_pop_share": 0.0244,
+      "cws_pop_share": 0.732,
+      "surge_proxy_class": "none",
+      "coastal_flood_pop_share": 0.0
+    },
+    "outage_model": {
+      "basis": "blend",
+      "rate": 0.612,
+      "lam_ge": [
+        0.0774,
+        0.0139,
+        0.000798,
+        0.0000119,
+        0.00000111
+      ],
+      "z": [
+        0.53,
+        0.23,
+        0.014,
+        0.00034,
+        0.000093
+      ],
+      "region_counties": 70,
+      "causes": {
+        "flood": 0.048,
+        "grid": 0.0078,
+        "unattributed": 0.52,
+        "wind": 0.36,
+        "winter": 0.057
+      },
+      "stress": {
+        "event": "Wind and thunderstorms, December 2025",
+        "class": "wind",
+        "cause": "high_wind:209558",
+        "date": "2025-12-16",
+        "recorded_in": "30053",
+        "distance_km": 206.0,
+        "peak_share": 0.5466,
+        "share_out_at_days": [
+          [
+            1.0,
+            0.7342
+          ],
+          [
+            3.0,
+            0.231
+          ],
+          [
+            7.0,
+            0.0
+          ],
+          [
+            14.0,
+            0.0
+          ],
+          [
+            30.0,
+            0.0
+          ]
+        ],
+        "source": "eaglei"
+      }
+    },
+    "temperature": {
+      "tmax_ge_90f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.06,
+        0.02,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmax_ge_100f": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tmin_le_20f": [
+        0.52,
+        0.51,
+        0.27,
+        0.07,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.06,
+        0.31,
+        0.61
+      ],
+      "tmin_le_0f": [
+        0.08,
+        0.07,
+        0.01,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.01,
+        0.02,
+        0.06
+      ],
+      "outage_hot_share": 0.0,
+      "outage_cold_share": 0.0226,
+      "region_outage_hot_share": 0.00377,
+      "region_outage_cold_share": 0.0925
+    },
+    "reliability": {
+      "saidi_with_med_min": 235.0,
+      "saifi_with_med": 1.54,
+      "saidi_without_med_min": 165.0,
+      "saifi_without_med": 1.38,
+      "utility_years": 25
+    },
+    "declarations": {
+      "last_5yr": 1,
+      "since_2000": 7,
+      "with_individual_assistance": 3,
+      "hurricane_or_flood": 1
+    }
+  },
+  "location": {
+    "country": "US",
+    "county_fips": "30063",
+    "county_name": "Missoula",
+    "state_abbr": "MT",
+    "state_name": "Montana",
+    "zip": "59801",
+    "centroid": {
+      "lat": 47.0273,
+      "lon": -113.8927
+    },
+    "nca_region": "northern_great_plains",
+    "coastal": false,
+    "tsunami_zone": false,
+    "facility_flags": {
+      "nuclear_plant_within_16km": false,
+      "nuclear_plant_within_80km": false,
+      "hazmat_facilities_within_5km": 0
+    },
+    "exposure": {
+      "strategic_class": {
+        "value": "E",
+        "source": "rr_strategic_sites"
+      },
+      "surge_proxy_class": {
+        "value": "none",
+        "source": "rr_surge_proxy"
+      },
+      "smoke_days_35": {
+        "value": 7.62,
+        "source": "epa_aqs_daily_pm25"
+      },
+      "leveed_pop_share": {
+        "value": 0.0184,
+        "source": "usace_nld"
+      },
+      "dams_high_within_10km": {
+        "value": 1,
+        "source": "usace_nid"
+      },
+      "karst_share": {
+        "value": 0.114,
+        "source": "usgs_karst_2014"
+      },
+      "landslide_susceptible_share": {
+        "value": 0.836,
+        "source": "usgs_landslide_2024"
+      },
+      "water_system_flag": {
+        "value": 0.0244,
+        "source": "epa_echo_sdwa"
+      },
+      "geomag_factor": {
+        "value": 0.47,
+        "source": "nerc_tpl007_gmd"
+      },
+      "uasi_share": {
+        "value": 0.0,
+        "source": "fema_hsgp_fy2026"
+      }
+    }
+  }
+}

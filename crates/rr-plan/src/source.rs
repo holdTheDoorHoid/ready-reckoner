@@ -1,5 +1,5 @@
 //! Where county data comes from: the [`CountySource`] trait, implemented by `rr-data`'s
-//! [`DataStore`] (the national data pack) and by [`FixtureSource`] (seven hand-built sample
+//! [`DataStore`] (the national data pack) and by [`FixtureSource`] (fourteen built-in sample
 //! counties, for tests and for an engine with no packs loaded; its locations say "sample data").
 //!
 //! Native callers load the repository's `data/` directory with [`load_data_dir`] (or
@@ -70,9 +70,10 @@ struct FixtureCounty {
     location: LocationResolved,
 }
 
-/// The fixture counties, embedded at compile time. They are rr-hazards' hand-built test inputs
-/// (NRI v1.20 and CMRA values, research outage rates; see that directory's README), not the data
-/// pack.
+/// The fixture counties, embedded at compile time. The first seven are rr-hazards' hand-built
+/// test inputs (NRI v1.20 and CMRA values, research outage rates; see that directory's README);
+/// the seven added in v0.2.0 are the core data pack's own records for the new fixture
+/// households' counties (`fixtures/sample-counties/README.md`). Neither is the data pack itself.
 const FIXTURE_COUNTIES: &[(&str, &str)] = &[
     (
         "04013",
@@ -102,13 +103,41 @@ const FIXTURE_COUNTIES: &[(&str, &str)] = &[
         "48157",
         include_str!("../../rr-hazards/tests/data/counties/48157.json"),
     ),
+    (
+        "06067",
+        include_str!("../../../fixtures/sample-counties/06067.json"),
+    ),
+    (
+        "22023",
+        include_str!("../../../fixtures/sample-counties/22023.json"),
+    ),
+    (
+        "26163",
+        include_str!("../../../fixtures/sample-counties/26163.json"),
+    ),
+    (
+        "30063",
+        include_str!("../../../fixtures/sample-counties/30063.json"),
+    ),
+    (
+        "38101",
+        include_str!("../../../fixtures/sample-counties/38101.json"),
+    ),
+    (
+        "48167",
+        include_str!("../../../fixtures/sample-counties/48167.json"),
+    ),
+    (
+        "72127",
+        include_str!("../../../fixtures/sample-counties/72127.json"),
+    ),
 ];
 
 const FIXTURE_BASE_RATES: &str = include_str!("../../rr-hazards/tests/data/base_rates.json");
 
 /// The note every fixture location carries, so no screen or packet mistakes test data for the
 /// national data pack.
-pub const FIXTURE_DATA_NOTE: &str = "The engine is running on seven hand-built sample \
+pub const FIXTURE_DATA_NOTE: &str = "The engine is running on fourteen built-in sample \
     counties, not the national data pack. Hazards describe your whole county.";
 
 /// When the fixture data was assembled (the retrieval date of the research inputs it copies).
@@ -117,8 +146,10 @@ const FIXTURE_ACCESSED: Date = match Date::from_ymd(2026, 9, 25) {
     None => panic!("fixture date is invalid"),
 };
 
-/// The seven fixture counties as a [`CountySource`]: Philadelphia, Coos (Oregon), Ellis
-/// (Kansas), Miami-Dade, Maricopa, Fort Bend (Texas) and Cook (Illinois). ZIP codes resolve
+/// The fourteen fixture counties as a [`CountySource`]: Philadelphia, Coos (Oregon), Ellis
+/// (Kansas), Miami-Dade, Maricopa, Fort Bend (Texas) and Cook (Illinois), and from v0.2.0
+/// Cameron Parish (Louisiana), Wayne (Michigan), Galveston (Texas), Ward (North Dakota),
+/// Missoula (Montana), Sacramento (California) and San Juan (Puerto Rico). ZIP codes resolve
 /// through each fixture's own ZIP code (each lies wholly in its county). Extra ZIP rows can be
 /// added for tests with [`FixtureSource::with_zip`].
 #[derive(Debug, Clone)]

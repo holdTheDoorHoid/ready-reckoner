@@ -9,12 +9,16 @@
 //! out of [`all`]: the goldens, the sample-county engine and the web app's fixture list cover
 //! [`RAW`] only. Moving a staged household up a level (and into [`RAW`] and `fixtures.ts`) is
 //! the planner's step, together with its golden files and, for a new county, its sample county.
-//! [`get`] finds a household in either list.
+//! [`get`] finds a household in either list. Nothing is staged at present.
 
 use crate::PlanInput;
 
 /// `(name, JSON)` for every fixture household, sorted by name. The name is the file stem.
 pub const RAW: &[(&str, &str)] = &[
+    (
+        "cameron-insulin-well-farm-2",
+        include_str!("../../../fixtures/households/cameron-insulin-well-farm-2.json"),
+    ),
     (
         "chicago-student-zero-budget-1",
         include_str!("../../../fixtures/households/chicago-student-zero-budget-1.json"),
@@ -22,6 +26,14 @@ pub const RAW: &[(&str, &str)] = &[
     (
         "coos-bay-well-owner-2",
         include_str!("../../../fixtures/households/coos-bay-well-owner-2.json"),
+    ),
+    (
+        "detroit-snap-3",
+        include_str!("../../../fixtures/households/detroit-snap-3.json"),
+    ),
+    (
+        "galveston-highrise-1",
+        include_str!("../../../fixtures/households/galveston-highrise-1.json"),
     ),
     (
         "hays-kansas-farm-5",
@@ -32,6 +44,14 @@ pub const RAW: &[(&str, &str)] = &[
         include_str!("../../../fixtures/households/miami-condo-retiree-1.json"),
     ),
     (
+        "minot-missile-field-3",
+        include_str!("../../../fixtures/households/minot-missile-field-3.json"),
+    ),
+    (
+        "missoula-smoke-2",
+        include_str!("../../../fixtures/households/missoula-smoke-2.json"),
+    ),
+    (
         "philadelphia-renters-4",
         include_str!("../../../fixtures/households/philadelphia-renters-4.json"),
     ),
@@ -40,45 +60,24 @@ pub const RAW: &[(&str, &str)] = &[
         include_str!("../../../fixtures/households/phoenix-apartment-cpap-1.json"),
     ),
     (
+        "sacramento-leveed-2",
+        include_str!("../../../fixtures/households/sacramento-leveed-2.json"),
+    ),
+    (
+        "san-juan-2",
+        include_str!("../../../fixtures/households/san-juan-2.json"),
+    ),
+    (
         "sugar-land-ev-household-3",
         include_str!("../../../fixtures/households/sugar-land-ev-household-3.json"),
     ),
 ];
 
-/// `(name, JSON)` for every household staged in `fixtures/households/pending/`, sorted by name:
-/// the v0.1.1 cameron household and the six contract v2 households (a missile-field county, a
-/// leveed county, a smoke county, a SNAP household with a family plan, a high-rise in a surge
-/// zone, and Puerto Rico).
-pub const PENDING: &[(&str, &str)] = &[
-    (
-        "cameron-insulin-well-farm-2",
-        include_str!("../../../fixtures/households/pending/cameron-insulin-well-farm-2.json"),
-    ),
-    (
-        "detroit-snap-3",
-        include_str!("../../../fixtures/households/pending/detroit-snap-3.json"),
-    ),
-    (
-        "galveston-highrise-1",
-        include_str!("../../../fixtures/households/pending/galveston-highrise-1.json"),
-    ),
-    (
-        "minot-missile-field-3",
-        include_str!("../../../fixtures/households/pending/minot-missile-field-3.json"),
-    ),
-    (
-        "missoula-smoke-2",
-        include_str!("../../../fixtures/households/pending/missoula-smoke-2.json"),
-    ),
-    (
-        "sacramento-leveed-2",
-        include_str!("../../../fixtures/households/pending/sacramento-leveed-2.json"),
-    ),
-    (
-        "san-juan-2",
-        include_str!("../../../fixtures/households/pending/san-juan-2.json"),
-    ),
-];
+/// `(name, JSON)` for every household staged in `fixtures/households/pending/`, sorted by name.
+/// None is staged: the v0.1.1 cameron household and the six contract v2 households moved up into
+/// [`RAW`] with their goldens and sample counties in v0.2.0. A household added later for tests
+/// before it has a golden goes here first.
+pub const PENDING: &[(&str, &str)] = &[];
 
 /// Every staged household, parsed, in the order of [`PENDING`].
 ///

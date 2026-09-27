@@ -350,6 +350,8 @@ fn every_duration_and_readiness_bucket_gets_lines() {
             let expect = match (name, b) {
                 // Coos Bay: the wood stove covers cold and a well has no boil-water notices.
                 ("coos-bay-well-owner-2", BucketId::Thermal | BucketId::WaterBoil) => false,
+                // Galveston (v0.2.0): a retiree at home; nobody commutes, so no get-home bag.
+                ("galveston-highrise-1", BucketId::GetHome) => false,
                 _ => true,
             };
             assert_eq!(lines.iter().any(|l| l.bucket == *b), expect, "{name}: {b}");
@@ -933,13 +935,13 @@ fn directional_cover_has_its_own_item_class() {
     }
 }
 
-/// The staged round-2 fixture (`fixtures/households/pending/`): insulin on a rural well with
-/// livestock and a long power target. It exercises every round-2 supply rule at once, so the
-/// planner's goldens cover them once it is wired into `rr_types::fixtures`.
+/// The round-2 fixture (`fixtures/households/`; staged in `pending/` until v0.2.0): insulin on
+/// a rural well with livestock and a long power target. It exercises every round-2 supply rule
+/// at once, and the goldens cover it.
 #[test]
 fn the_pending_cold_chain_and_well_fixture_exercises_the_round_two_rules() {
     let input: rr_types::PlanInput = serde_json::from_str(include_str!(
-        "../../../fixtures/households/pending/cameron-insulin-well-farm-2.json"
+        "../../../fixtures/households/cameron-insulin-well-farm-2.json"
     ))
     .unwrap();
     assert!(input.validate().is_empty(), "{:?}", input.validate());
