@@ -49,7 +49,9 @@ pub use lines::{LineKind, SizedLine};
 pub use minimum::{MINIMUM_KIT_DAYS, minimum_kit};
 pub use rules::Sizing;
 pub use storage::{StorageEstimate, StoragePart, storage_by_tier};
-pub use tiers::{ONE_MONTH_NOTE, tier_enough, tier_for_days, tier_recommended};
+pub use tiers::{
+    ONE_MONTH_MEDICINE_NOTE, ONE_MONTH_NOTE, tier_enough, tier_for_days, tier_recommended,
+};
 
 use household::Household;
 use lines::{Shape, make};
@@ -390,8 +392,10 @@ const COLD: &[HazardId] = &[
 /// Collects lines in output order.
 struct Out {
     lines: Vec<SizedLine>,
-    /// Whether the one-month note has been said.
+    /// Whether the one-month note has been said (outside the medication bucket).
     noted: bool,
+    /// Whether the medicine version of the one-month note has been said.
+    noted_medicine: bool,
 }
 
 impl Out {
@@ -406,10 +410,19 @@ impl Out {
         let Some(mut s) = s else { return };
         let tier = tier.unwrap_or_else(|| s.days.map_or(TierId::H72, tier_for_days));
         // Say once that the one-month tier is an interpolation, on the first need line that
-        // reaches it (DESIGN §4.5).
-        if !self.noted && tier == TierId::M1 && matches!(shape, Shape::Need | Shape::PerPerson(_)) {
-            s = s.extend(ONE_MONTH_NOTE, &tiers::one_month_basis());
-            self.noted = true;
+        // reaches it (DESIGN §4.5). Medicine has its own rule (at most a month on hand, fills for
+        // the rest), so its lines say that instead, once (verification R3-21).
+        let need = matches!(shape, Shape::Need | Shape::PerPerson(_));
+        if tier == TierId::M1 && need {
+            if bucket == BucketId::Medication {
+                if !self.noted_medicine {
+                    s = s.extend(ONE_MONTH_MEDICINE_NOTE, &tiers::one_month_medicine_basis());
+                    self.noted_medicine = true;
+                }
+            } else if !self.noted {
+                s = s.extend(ONE_MONTH_NOTE, &tiers::one_month_basis());
+                self.noted = true;
+            }
         }
         self.lines
             .push(make(bucket, s, shape, Some(tier), life_safety));
@@ -444,6 +457,7 @@ pub fn sized_requirements(
     let mut out = Out {
         lines: Vec::new(),
         noted: false,
+        noted_medicine: false,
     };
     let days_of = |b: BucketId| t.days(b).filter(|d| *d > 0.0);
     // Duration lines also cite the target's own sources (the hazard and duration data behind the

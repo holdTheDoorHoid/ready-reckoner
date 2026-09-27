@@ -58,7 +58,8 @@ pub fn tier_recommended(buckets: &[BucketAssessment]) -> TierId {
         .max(TierId::H72)
 }
 
-/// Said once in the plan, on the first line that reaches the one-month tier.
+/// Said once in the plan, on the first line outside the medication bucket that reaches the
+/// one-month tier: household stores (water, food, the toilet) have no agency amount for a month.
 pub const ONE_MONTH_NOTE: &str = "No agency sets a one-month amount: this step sits between the two-week advice (Red Cross, Oregon, Washington) and the Church's three-month pantry.";
 
 /// The sources behind [`ONE_MONTH_NOTE`].
@@ -69,6 +70,26 @@ pub(crate) fn one_month_basis() -> Basis {
         "oregon_2_weeks_ready",
         "washington_prepare_in_a_year",
         "church_home_storage_2007",
+    ] {
+        b.cite(id);
+    }
+    b
+}
+
+/// Said once in the plan, on the first medication line that reaches the one-month tier, in place of
+/// [`ONE_MONTH_NOTE`]: medicine follows its own rule, a reserve of at most 30 days on hand
+/// (`rx_days_on_hand`) and 60- to 90-day fills for the rest of a longer target (`medication_fills`).
+pub const ONE_MONTH_MEDICINE_NOTE: &str = "For medicine the plan keeps at most a month on hand: agencies advise 7 days to two weeks (Red Cross, CDC, Florida), and a longer target is kept up with 60- to 90-day fills from your drug plan (Medicare).";
+
+/// The sources behind [`ONE_MONTH_MEDICINE_NOTE`].
+pub(crate) fn one_month_medicine_basis() -> Basis {
+    let mut b = Basis::new();
+    for id in [
+        "redcross_survival_kit",
+        "cdc_pregnancy_emergency",
+        "cdc_diabetes_emergencies",
+        "florida_dem_medication",
+        "medicare_drugs_disaster",
     ] {
         b.cite(id);
     }
@@ -122,5 +143,21 @@ mod tests {
         let b = one_month_basis();
         assert_eq!(b.cites().len(), 4);
         assert!(ONE_MONTH_NOTE.contains("No agency sets a one-month amount"));
+        // Medicine: the 30-day cap on hand (`rx_days_on_hand`'s high end) and the 60- to 90-day
+        // fills beyond it (`rx_fill_days`, Medicare), with the agencies' 7 days to two weeks.
+        let m = one_month_medicine_basis();
+        assert_eq!(m.cites().len(), 5);
+        assert!(m.cites().iter().any(|c| c == "medicare_drugs_disaster"));
+        let cap = constants().constant(keys::RX_DAYS_ON_HAND);
+        assert_eq!(cap.high, Some(30.0));
+        assert!(ONE_MONTH_MEDICINE_NOTE.contains("at most a month on hand"));
+        let (fill_lo, fill_hi) = {
+            let f = constants().constant(keys::RX_FILL_DAYS);
+            (f.low.unwrap_or(f.default), f.high.unwrap_or(f.default))
+        };
+        assert!(
+            ONE_MONTH_MEDICINE_NOTE.contains(&format!("{fill_lo:.0}- to {fill_hi:.0}-day fills"))
+        );
+        assert!(!ONE_MONTH_MEDICINE_NOTE.contains("three-month pantry"));
     }
 }

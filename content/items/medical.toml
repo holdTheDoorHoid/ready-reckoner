@@ -40,7 +40,7 @@ buckets = ["medication"]
 tier = "h72"
 free = false
 life_safety = true
-spec = "Build a cushion of each daily prescription toward 14 days on hand, between CDC's 7 to 10 days and Florida's two weeks. Keep medicines in their labeled bottles in a cool, dry place and use the oldest first."
+spec = "Build a cushion of each daily prescription toward your medicine target, the days your plan's medicine line names: agencies advise 7 days to two weeks (Red Cross, CDC, Florida), and the plan keeps at most a month on hand, with 60- to 90-day fills for a longer target (Medicare). Keep medicines in their labeled bottles in a cool, dry place and use the oldest first."
 look_for = [
   "Pharmacy labels on every bottle",
   "Expiry dates past your next refill",
@@ -55,7 +55,7 @@ price_band_usd = { low = 0.40, high = 1.33, per = "day of one person's medicine"
 retrieved = "2026-09-25"
 quantity_rule = "medication_days"
 maintenance = { rotate_months = 1 }
-citations = ["cdc_pregnancy_emergency", "redcross_survival_kit", "florida_dem_medication", "cdc_diabetes_emergencies", "fda_expired_medicines", "kff_ehbs_2025", "rr_price_observations_2026_09"]
+citations = ["cdc_pregnancy_emergency", "redcross_survival_kit", "florida_dem_medication", "cdc_diabetes_emergencies", "medicare_drugs_disaster", "fda_expired_medicines", "kff_ehbs_2025", "rr_price_observations_2026_09"]
 hazard_extras = []
 
 [[item]]
