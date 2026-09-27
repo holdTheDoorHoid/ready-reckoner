@@ -180,20 +180,27 @@
         hasGas(input) ? 'Where it is, and the tool that turns it.' : 'Where it is, and the tool that turns it. Leave it blank if you have no gas.',
       )}
       {@render utility('water_utility', 'Water', 'Water company', 'the water company', 'shutoff_water', 'Main water shut-off', 'Often near the water meter, where the pipe comes into the home.')}
-      {@render place(['home', 'insurer'], home?.insurer, renting ? "Renter's insurance" : 'Home insurance', 'of the home insurer', {
-        help: 'Who to call to start a claim.',
-        labels: { name: 'Insurance company', phone: 'Claims phone' },
-      })}
-      <TextField
-        id="pl-home-policy"
-        label="Policy number"
-        context="of the home insurance"
-        value={home?.policy_number}
-        maxlength={HOME_MAX.policy_number}
-        width="medium"
-        oninput={(t) => edit(['home', 'policy_number'], t)}
-        onleave={() => leave(['home', 'policy_number'], HOME_MAX.policy_number)}
-      />
+      <ContactFields
+        id="pl-home-insurer"
+        legend={renting ? 'Renters insurance' : 'Home insurance'}
+        help="Who to call to start a claim."
+        value={home?.insurer}
+        context="of the home insurer"
+        labels={{ name: 'Insurance company', phone: 'Claims phone' }}
+        oninput={(part, t) => edit(['home', 'insurer', part], t)}
+        onleave={(part, max) => leave(['home', 'insurer', part], max)}
+      >
+        <TextField
+          id="pl-home-policy"
+          label="Policy number"
+          context="of the home insurance"
+          value={home?.policy_number}
+          maxlength={HOME_MAX.policy_number}
+          width="medium"
+          oninput={(t) => edit(['home', 'policy_number'], t)}
+          onleave={() => leave(['home', 'policy_number'], HOME_MAX.policy_number)}
+        />
+      </ContactFields>
       {@render place(['home', 'landlord_or_mortgage'], home?.landlord_or_mortgage, 'Landlord or mortgage company', 'of the landlord or mortgage company', {
         help: renting ? 'Who to call about damage and repairs.' : 'Call them after a disaster about your payments.',
       })}
@@ -492,6 +499,10 @@
   .group {
     margin-bottom: var(--s5);
   }
+  /* A group's title reads as a small heading above the answers it groups. */
+  .group > legend {
+    font-size: var(--text-lg);
+  }
   .group > :global(.field:last-child) {
     margin-bottom: 0;
   }
@@ -499,6 +510,8 @@
   .pair {
     display: grid;
     gap: var(--s3) var(--s4);
+    /* Inputs line up even when one answer has help text and its neighbour has none. */
+    align-items: end;
   }
   .pair :global(.field) {
     margin-bottom: 0;

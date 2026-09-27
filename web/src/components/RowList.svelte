@@ -65,17 +65,19 @@
           <button type="button" class="button button--quiet button--small row__remove" onclick={() => remove(i)}>
             <Icon name="trash" /> Remove<span class="visually-hidden">{' '}{legend(i)}</span>
           </button>
-          {@render row(i)}
+          <div class="row__body">{@render row(i)}</div>
         </fieldset>
       </li>
     {/each}
   </ol>
 {/if}
-{#if count < max}
-  <button id="{id}-add" type="button" class="button button--small" onclick={add}><Icon name="plus" /> {addLabel}</button>
-{:else}
-  <p class="small muted" id="{id}-add" tabindex="-1">{fullText}</p>
-{/if}
+<div class="rows__add">
+  {#if count < max}
+    <button id="{id}-add" type="button" class="button button--small" onclick={add}><Icon name="plus" /> {addLabel}</button>
+  {:else}
+    <p class="small muted" id="{id}-add" tabindex="-1">{fullText}</p>
+  {/if}
+</div>
 
 <style>
   .rows {
@@ -95,19 +97,40 @@
     border-radius: var(--r2);
     background: var(--surface);
   }
+  /* Floated so it flows inside the row's border (a legend otherwise sits on the border line). */
   .row__legend {
     float: left;
     width: 100%;
     padding-right: 7.5rem;
     margin-bottom: var(--s3);
     overflow-wrap: anywhere;
+    font-size: var(--text-lg);
   }
-  .row__legend + * {
+  /* Groups inside a row (a vet, an insurer) title below the row's own title. */
+  .row .row__body :global(.contact-fields > legend) {
+    font-size: var(--text-base);
+  }
+  /*
+   * Everything else starts below the legend (nothing may flow beside the float), across the whole
+   * row: without the explicit width Chrome shrinks a row to its content inside the grid of rows.
+   */
+  .row__body {
     clear: both;
+    width: 100%;
   }
   .row__remove {
     position: absolute;
     top: var(--s2);
     right: var(--s2);
+  }
+  .rows__add {
+    margin-bottom: var(--s5);
+  }
+  /* Last in its group: the group's own spacing follows. */
+  .rows__add:last-child {
+    margin-bottom: 0;
+  }
+  .rows__add p {
+    margin: 0;
   }
 </style>

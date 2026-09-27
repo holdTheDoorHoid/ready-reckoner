@@ -81,6 +81,10 @@
   .contact-fields {
     margin-bottom: var(--s5);
   }
+  /* A group's title reads as a small heading above the answers it groups. */
+  .contact-fields > legend {
+    font-size: var(--text-lg);
+  }
   .contact-fields > :global(.field:last-child) {
     margin-bottom: 0;
   }
@@ -89,6 +93,7 @@
     display: grid;
     gap: var(--s3) var(--s4);
     margin-bottom: var(--s4);
+    align-items: end;
   }
   .contact-fields__pair :global(.field) {
     margin-bottom: 0;

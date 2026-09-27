@@ -275,6 +275,8 @@
   .pair {
     display: grid;
     gap: var(--s3) var(--s4);
+    /* Inputs line up even when one answer has help text and its neighbour has none. */
+    align-items: end;
     margin-bottom: var(--s4);
   }
   .pair :global(.field) {
@@ -299,5 +301,10 @@
   .medicines,
   .insurance {
     margin-bottom: var(--s5);
+  }
+  /* A group's title reads as a small heading above the answers it groups. */
+  .medicines > legend,
+  .insurance > legend {
+    font-size: var(--text-lg);
   }
 </style>
