@@ -23,12 +23,12 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 
 ## Then
 
-1. **Heart attack signs:** chest pain or pressure, pain in the arms, jaw, neck or back, shortness of breath, feeling faint.[^cdc_heart_attack]
+1. **Heart attack signs:** chest pain or pressure, pain in the arms, jaw, neck or back, shortness of breath, feeling faint. Call 911.[^cdc_heart_attack]
 2. **Keep pushing** until help arrives or they breathe normally.[^medlineplus_cpr] {if:children}Children need breaths as well as chest pushes.[^medlineplus_cpr]{/if}
 3. **Choking person goes limp?** Lay them down and start CPR.[^redcross_choking_adult_child]
 4. **Breathing but not awake?** Roll them onto their side.[^fema_until_help_arrives]
 5. **Keep them warm.** Cover them, and put something under them.[^fema_until_help_arrives]
-6. **Talk to them.** Tell them help is coming.[^fema_until_help_arrives]
+6. **Talk to them.** Keep them calm.[^fema_until_help_arrives]
 7. **Give responders** their medicine list and allergies (People tab).[^ready_gov_disability]
 8. **Cannot call?** Text 911.[^gov911_faq]
 

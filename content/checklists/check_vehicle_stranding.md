@@ -25,7 +25,7 @@ Your vehicle breaks down or is stuck in snow, rising water or extreme heat.
 
 1. **Cold?** Move what you need from the trunk into the car. Wrap up, head included.[^cdc_winter_safety] {if:has:gethome_car_kit}Use the blankets and warm clothes in the car kit.[^ready_gov_winter]{/if}
 2. **Stay awake** and keep moving your arms and legs. Huddle together for warmth.[^cdc_winter_safety]
-3. **Keep shoes on,** and carry pets off the hot pavement.[^adot_severe_weather]
+3. **Out of the car in heat?** Keep shoes on, and carry pets off the hot pavement.[^adot_severe_weather]
 4. **Power line on the car?** Stay inside unless the car is on fire. Warn others not to touch it.[^osha_downed_wires][^cdc_electrical_hazards]
 
 ## Leave or stay

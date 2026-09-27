@@ -32,7 +32,7 @@ An avalanche warning covers your area or your roads, or snow slides while you ar
 ## Leave or stay
 
 - **Leave if** you are on or below a steep slope while warnings are out, or you see recent slides or cracks running across the snow.[^ready_gov_avalanche]
-- **Stay if** a road is closed. Do not stop where signs say not to.[^ready_gov_avalanche]
+- **Stay if** the road ahead is closed. Wait, and do not stop where signs say not to.[^ready_gov_avalanche]
 - **Call** 911 first if someone is buried, then search if it is safe.[^ready_gov_avalanche]
 
 ## Where and who
