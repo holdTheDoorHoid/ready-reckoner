@@ -20,13 +20,20 @@
 //! | guidance: conditional spans close, do not nest and stay in one paragraph; a hazard condition names one of the block's hazards (any hazard in plan, after and topic blocks); `need:`, `benefit:` and `has:` name known needs, benefits and catalogue items | error |
 //! | state table: every state, DC and Puerto Rico once; web addresses; a refill rule with sources that resolve; printed lines pass the text checks | error |
 //! | guidance reading level above grade 9 (Flesch-Kincaid) | warning |
+//! | checklists (contract v3, DESIGN-DELTA-v3 §5.4): id is the file name and starts `check_`; `pages` 1, or 2 for the two named blocks; `applies_to` names only `hazard:` and `event:` ids, each hazard or event in one block; the eight sections in order and no others; at most 6 / 10 / 4 / 3 / 5 / 5 steps, branches, lines and bullets; steps open with bold words (after a span marker); every step, "Do not" and "When it is over" bullet cites (a bullet that only points with `{ref:}` excepted); only §5.4's placeholders and `{ref:}` pages; spans as in guidance, any hazard; at most 330 words (620 for two pages); footnotes and the text rules as in guidance | error |
+//! | checklists: a retired hazard in `applies_to`; "Use this when" over two sentences; reading level above grade 8 | warning |
+//! | every active hazard and everyday emergency has a checklist: a warning while `content/checklists/` has ten files or fewer, an error after | warning, then error |
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::str::FromStr;
 
-use rr_types::{Item, TierId, is_well_formed_id};
+use rr_types::{HazardId, Item, TierId, is_well_formed_id};
 
+use crate::checklist::{
+    self, Checklist, MAX_DO_FIRST, MAX_DO_NOT, MAX_LEAVE_OR_STAY, MAX_THEN, MAX_WHEN_OVER,
+    MAX_WHERE_WHO, REF_TARGETS, SECTION_HEADINGS, TWO_PAGE_CHECKLISTS,
+};
 use crate::ids::{self, GuidanceKind, KindRules};
 use crate::parse::{Content, LoadError};
 use crate::policy::{self, ConditionScope, find_dosing, find_drug_dose, find_phrases, tokens};
@@ -41,6 +48,13 @@ pub const MAX_QUOTE_WORDS: usize = 50;
 pub const WARN_GRADE_ABOVE: f64 = 9.0;
 /// Every priced item cites a citation whose id starts with this (the price-observation log).
 pub const PRICE_CITATION_PREFIX: &str = "rr_price_observations";
+/// A checklist above this Flesch-Kincaid grade gets a warning (DESIGN-DELTA-v3 §5.4: grade 8 or
+/// below).
+pub const WARN_CHECKLIST_GRADE_ABOVE: f64 = 8.0;
+/// A missing checklist for a hazard or an everyday emergency is a warning while
+/// `content/checklists/` holds this many files or fewer, and an error once it holds more: the
+/// content workstreams fill the directory in v0.3.0.
+pub const CHECKLIST_COVERAGE_ERROR_ABOVE: usize = 10;
 
 /// How serious a finding is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -145,6 +159,8 @@ pub struct Summary {
     pub prior_citations: usize,
     /// Guidance blocks.
     pub guidance: usize,
+    /// Incident checklists (contract v3).
+    pub checklists: usize,
     /// Glossary entries.
     pub glossary: usize,
 }
@@ -157,6 +173,7 @@ pub fn summary(content: &Content) -> Summary {
         citations: content.citations.len(),
         prior_citations: content.citations.iter().filter(|c| c.prior).count(),
         guidance: content.guidance.len(),
+        checklists: content.checklists.len(),
         glossary: content.glossary.len(),
     }
 }
@@ -168,6 +185,7 @@ pub fn validate(content: &Content, rules: &BTreeSet<String>) -> Report {
     check_citations(content, &mut r);
     check_items(content, rules, &mut r);
     check_guidance(content, &mut r);
+    check_checklists(content, &mut r);
     check_glossary(content, &mut r);
     check_states(content, &mut r);
     r
@@ -239,6 +257,14 @@ fn who_cites(content: &Content) -> BTreeMap<String, BTreeSet<String>> {
                 .entry(c.as_str().to_owned())
                 .or_default()
                 .insert(format!("guidance:{}", g.meta.id));
+        }
+    }
+    for k in &content.checklists {
+        for c in &k.meta.citations {
+            users
+                .entry(c.as_str().to_owned())
+                .or_default()
+                .insert(format!("checklist:{}", k.meta.id));
         }
     }
     for t in &content.glossary {
@@ -628,6 +654,10 @@ fn resolve_target(
             "`{id}` is not the lead hazard of a rare family (one of {:?})",
             ids::rare_families()
         )),
+        GuidanceKind::Checklist => Err(format!(
+            "`{target}`: a checklist is not a target; checklists apply to `hazard:` and `event:` \
+             targets themselves"
+        )),
         GuidanceKind::Topic | GuidanceKind::Plan | GuidanceKind::After => {
             if slugs.get(&kind).is_some_and(|s| s.contains(id)) {
                 Ok(())
@@ -672,6 +702,12 @@ fn check_guidance(content: &Content, r: &mut Report) {
             r.error(&loc, format!("id `{id}` must equal the file name `{stem}`"));
         }
         let kind = g.kind();
+        if kind == GuidanceKind::Checklist {
+            r.error(
+                &loc,
+                "checklists live in content/checklists/, not guidance/ (DESIGN-DELTA-v3 §5.4)",
+            );
+        }
         let prefix = kind.prefix();
         if !id.starts_with(&prefix) {
             r.error(
@@ -859,14 +895,18 @@ fn first_paragraph(prose: &str) -> &str {
 }
 
 fn check_footnotes(g: &crate::Guidance, cited: &BTreeSet<&str>, loc: &str, r: &mut Report) {
-    let refs = g.footnote_references();
-    let defs: BTreeSet<String> = g
-        .footnote_definitions()
+    check_footnotes_in(&g.body, g.prose(), cited, loc, r);
+}
+
+/// Footnotes and front-matter citations agree: every `[^id]` in `prose` is cited and defined under
+/// `## Sources`, every cited id is defined, and (a warning) used.
+fn check_footnotes_in(body: &str, prose: &str, cited: &BTreeSet<&str>, loc: &str, r: &mut Report) {
+    let refs = crate::parse::footnote_references_in(prose);
+    let defs: BTreeSet<String> = crate::parse::footnote_definitions_in(body)
         .into_iter()
         .map(|(id, _)| id)
         .collect();
-    if !g
-        .body
+    if !body
         .lines()
         .any(|l| l.trim().eq_ignore_ascii_case("## sources"))
     {
@@ -900,6 +940,335 @@ fn check_footnotes(g: &crate::Guidance, cited: &BTreeSet<&str>, loc: &str, r: &m
             );
         }
     }
+}
+
+/// A step or bullet shortened for a message.
+fn short(item: &str) -> String {
+    let words: Vec<&str> = item.split_whitespace().collect();
+    if words.len() <= 8 {
+        words.join(" ")
+    } else {
+        format!("{} …", words[..8].join(" "))
+    }
+}
+
+/// The checklists (DESIGN-DELTA-v3 §5.4): each file's form, caps, citations, placeholders and
+/// words, the text rules every block follows, and then whether every active hazard and everyday
+/// emergency has one.
+fn check_checklists(content: &Content, r: &mut Report) {
+    let items: BTreeSet<String> = content
+        .items
+        .iter()
+        .map(|i| i.id.as_str().to_owned())
+        .collect();
+    let mut seen = BTreeSet::new();
+    let mut owner: BTreeMap<String, String> = BTreeMap::new();
+    for c in &content.checklists {
+        check_checklist(content, c, &items, &mut seen, &mut owner, r);
+    }
+
+    let required: Vec<String> = HazardId::ACTIVE
+        .iter()
+        .map(|h| format!("hazard:{}", h.as_str()))
+        .chain(ids::EVENTS.iter().map(|e| format!("event:{e}")))
+        .collect();
+    let missing: Vec<&str> = required
+        .iter()
+        .filter(|t| !owner.contains_key(t.as_str()))
+        .map(String::as_str)
+        .collect();
+    if !missing.is_empty() {
+        let message = format!(
+            "{} of the {} active hazards and everyday emergencies have no checklist yet \
+             (DESIGN-DELTA-v3 §5.1): {}",
+            missing.len(),
+            required.len(),
+            missing.join(", ")
+        );
+        if content.checklists.len() > CHECKLIST_COVERAGE_ERROR_ABOVE {
+            r.error("checklists/", message);
+        } else {
+            r.warn("checklists/", message);
+        }
+    }
+}
+
+fn check_checklist(
+    content: &Content,
+    c: &Checklist,
+    items: &BTreeSet<String>,
+    seen: &mut BTreeSet<String>,
+    owner: &mut BTreeMap<String, String>,
+    r: &mut Report,
+) {
+    let loc = c.file.clone();
+    let id = c.meta.id.as_str();
+    if !seen.insert(id.to_owned()) {
+        r.error(&loc, "duplicate checklist id");
+    }
+    if !is_well_formed_id(id) {
+        r.error(&loc, "id must be snake_case");
+    }
+    let stem = c
+        .file
+        .strip_prefix("checklists/")
+        .and_then(|f| f.strip_suffix(".md"))
+        .unwrap_or(&c.file);
+    if id != stem {
+        r.error(&loc, format!("id `{id}` must equal the file name `{stem}`"));
+    }
+    if !id.starts_with(ids::CHECKLIST_PREFIX) {
+        r.error(&loc, "a checklist's id starts with `check_`");
+    }
+    if c.meta.title.trim().is_empty() {
+        r.error(&loc, "missing title");
+    }
+    match c.pages {
+        1 => {}
+        2 if TWO_PAGE_CHECKLISTS.contains(&id) => {}
+        n => r.error(
+            &loc,
+            format!(
+                "`pages: {n}`: a checklist takes one page; only {TWO_PAGE_CHECKLISTS:?} may take two"
+            ),
+        ),
+    }
+
+    // What it applies to: hazards and everyday emergencies, each in one block.
+    if c.meta.applies_to.is_empty() {
+        r.error(&loc, "applies_to is empty");
+    }
+    let mut mine = BTreeSet::new();
+    for t in &c.meta.applies_to {
+        let known = match t.split_once(':') {
+            Some(("hazard", h)) if ids::is_hazard(h) => {
+                if h.parse::<HazardId>().is_ok_and(HazardId::is_retired) {
+                    r.warn(
+                        &loc,
+                        format!(
+                            "`{t}` is retired: no household's binder selects it; apply the page \
+                             to the hazards that replaced it"
+                        ),
+                    );
+                }
+                true
+            }
+            Some(("hazard", h)) => {
+                r.error(&loc, format!("applies_to: `{h}` is not a hazard id"));
+                false
+            }
+            Some(("event", e)) if ids::is_event(e) => true,
+            Some(("event", e)) => {
+                r.error(
+                    &loc,
+                    format!(
+                        "applies_to: `{e}` is not an everyday emergency (one of {:?})",
+                        ids::EVENTS
+                    ),
+                );
+                false
+            }
+            _ => {
+                r.error(
+                    &loc,
+                    format!("applies_to: `{t}` is not `hazard:<id>` or `event:<id>`"),
+                );
+                false
+            }
+        };
+        if !known {
+            continue;
+        }
+        if !mine.insert(t.as_str()) {
+            r.warn(&loc, format!("applies_to lists `{t}` twice"));
+            continue;
+        }
+        if let Some(other) = owner.insert(t.clone(), id.to_owned()) {
+            r.error(
+                &loc,
+                format!(
+                    "`{t}` already has the checklist `{other}`; a hazard or event has one page"
+                ),
+            );
+        }
+    }
+
+    // Citations and footnotes.
+    if c.meta.citations.is_empty() {
+        r.error(&loc, "a checklist cites at least one source");
+    }
+    let cited: BTreeSet<&str> = c.meta.citations.iter().map(|x| x.as_str()).collect();
+    if cited.len() != c.meta.citations.len() {
+        r.warn(&loc, "a citation is listed twice in the front matter");
+    }
+    for x in &cited {
+        if content.citation(x).is_none() {
+            r.error(&loc, format!("citation `{x}` is not in citations.toml"));
+        }
+    }
+    check_footnotes_in(&c.body, c.prose(), &cited, &loc, r);
+
+    // The eight sections, in order, and nothing before them.
+    if !c.preamble.trim().is_empty() {
+        r.error(
+            &loc,
+            "text before `## Use this when`: everything goes in a section",
+        );
+    }
+    let headings: Vec<&str> = c.raw.iter().map(|s| s.heading.as_str()).collect();
+    if headings != SECTION_HEADINGS {
+        for h in &headings {
+            if !SECTION_HEADINGS.contains(h) {
+                r.error(&loc, format!("unknown section `## {h}`"));
+            }
+        }
+        let mut first_seen: Vec<&str> = Vec::new();
+        for want in SECTION_HEADINGS {
+            match headings.iter().filter(|h| **h == want).count() {
+                0 => r.error(&loc, format!("missing section `## {want}`")),
+                1 => {}
+                n => r.error(&loc, format!("`## {want}` appears {n} times")),
+            }
+        }
+        for h in &headings {
+            if SECTION_HEADINGS.contains(h) && !first_seen.contains(h) {
+                first_seen.push(h);
+            }
+        }
+        let in_order: Vec<&str> = SECTION_HEADINGS
+            .iter()
+            .copied()
+            .filter(|h| first_seen.contains(h))
+            .collect();
+        if first_seen != in_order {
+            r.error(
+                &loc,
+                format!(
+                    "the sections are out of order: they go {}",
+                    SECTION_HEADINGS.join(", ")
+                ),
+            );
+        }
+    }
+
+    // "Use this when": one or two sentences.
+    let use_when = &c.sections.use_when;
+    if use_when.trim().is_empty() {
+        r.error(&loc, "`Use this when` is empty: say when to use the page");
+    } else if crate::readability::sentence_count(&strip_footnote_references(use_when)) > 2 {
+        r.warn(&loc, "`Use this when` is longer than two sentences");
+    }
+
+    // The lists: kind, caps, bold leads, citations.
+    let text_of = |h: &str| {
+        c.raw
+            .iter()
+            .find(|s| s.heading == h)
+            .map(|s| s.text.as_str())
+            .unwrap_or("")
+    };
+    // (section, numbered, most, bold lead, must cite)
+    let lists: [(&str, bool, usize, bool, bool); 6] = [
+        ("Do first", true, MAX_DO_FIRST, true, true),
+        ("Then", true, MAX_THEN, true, true),
+        ("Leave or stay", false, MAX_LEAVE_OR_STAY, false, false),
+        ("Where and who", false, MAX_WHERE_WHO, false, false),
+        ("Do not", false, MAX_DO_NOT, false, true),
+        ("When it is over", false, MAX_WHEN_OVER, false, true),
+    ];
+    for (section, numbered, most, bold, cite) in lists {
+        let scan = checklist::scan_list(text_of(section), numbered, section);
+        for p in scan.problems {
+            r.error(&loc, p);
+        }
+        let what = if numbered { "steps" } else { "entries" };
+        if scan.items.len() > most {
+            r.error(
+                &loc,
+                format!(
+                    "`{section}` has {} {what}; the most is {most}",
+                    scan.items.len()
+                ),
+            );
+        }
+        if section == "Do first" && scan.items.is_empty() {
+            r.error(&loc, "`Do first` needs at least one step");
+        }
+        for item in &scan.items {
+            let opening = checklist::without_leading_condition(item);
+            if bold && !(opening.starts_with("**") && opening[2..].contains("**")) {
+                r.error(
+                    &loc,
+                    format!(
+                        "`{section}` step `{}` opens with bold lead words (`**Get out.** …`)",
+                        short(item)
+                    ),
+                );
+            }
+            let pointer = section == "When it is over" && item.contains(checklist::REF_OPEN);
+            if cite && !pointer && !item.contains("[^") {
+                r.error(
+                    &loc,
+                    format!(
+                        "`{section}`: `{}` tells the reader what to do and cites no source",
+                        short(item)
+                    ),
+                );
+            }
+        }
+    }
+
+    // Placeholders and cross-references (DESIGN-DELTA-v3 §5.4) only.
+    let prose = c.prose();
+    for inner in checklist::braces(prose) {
+        let inner = inner.trim();
+        if inner.starts_with("if:") || inner == "/if" {
+            continue;
+        }
+        if let Some(page) = inner.strip_prefix("ref:") {
+            if !REF_TARGETS.contains(&page) {
+                r.error(
+                    &loc,
+                    format!("`{{ref:{page}}}` names no page (one of {REF_TARGETS:?})"),
+                );
+            }
+        } else if checklist::placeholder_width(inner).is_none() {
+            let known: Vec<&str> = checklist::PLACEHOLDERS.iter().map(|(n, _)| *n).collect();
+            r.error(
+                &loc,
+                format!("`{{{inner}}}` is not a checklist placeholder (one of {known:?})"),
+            );
+        }
+    }
+    // Conditional spans: as in guidance, and a checklist may name any hazard.
+    let scope = ConditionScope {
+        hazards: None,
+        items: Some(items),
+    };
+    for p in policy::condition_problems_in(prose, scope) {
+        r.error(&loc, p);
+    }
+
+    // Words and reading level.
+    let words = c.word_count();
+    let budget = c.word_budget();
+    if words > budget {
+        r.error(&loc, format!("{words} words; the limit is {budget}"));
+    }
+    if let Some(grade) = c.reading_grade()
+        && grade > WARN_CHECKLIST_GRADE_ABOVE
+    {
+        r.warn(
+            &loc,
+            format!("reading level is grade {grade:.1} (Flesch-Kincaid); aim for 8 or below"),
+        );
+    }
+
+    // The text rules every block follows: no brands, no pressure, no firearms, no drug doses.
+    let all = format!("{}\n{}", c.meta.title, strip_footnote_references(prose));
+    check_text(r, &loc, &all, false);
+    check_potassium_iodide(r, &loc, &all);
+    check_antibiotic_warnings(&crate::readability::plain_text(prose), &loc, r);
 }
 
 /// In guidance, unsafe antibiotic sources may be named only in a sentence that says not to use
@@ -1370,6 +1739,286 @@ hazard_extras = []
         let e = errors(&r);
         assert!(e.iter().any(|m| m.contains("jetpack")), "{r}");
         assert!(e.iter().any(|m| m.contains("telepathy")), "{r}");
+    }
+
+    /// A clean checklist (DESIGN-DELTA-v3 §5.4) for the tests below; `edit` changes its text.
+    fn checklist(id: &str, applies: &str) -> String {
+        format!(
+            "---\nid: {id}\ntitle: A title\nkind: checklist\nonset: now\napplies_to: [{applies}]\n\
+             citations: [ready_gov_water]\n---\n\
+             ## Use this when\n\nThe water stops.\n\n\
+             ## Do first\n\n1. **Stop.** Turn off the tap.[^ready_gov_water]\n\
+             2. {{if:pets}}**Water the pets.** Use stored water.[^ready_gov_water]{{/if}}\n\n\
+             ## Then\n\n1. **Listen.** Tune to {{alerts}}.[^ready_gov_water]\n\n\
+             ## Leave or stay\n\n- **Leave if** told to. Go to {{where_go}}. {{ref:getting_out}}\n\n\
+             ## Where and who\n\n- Meeting place: {{meeting_near}}\n\n\
+             ## Do not\n\n- Do not drink from the tap.[^ready_gov_water]\n\n\
+             ## When it is over\n\n- Run the tap for a minute.[^ready_gov_water]\n\
+             - Use the After pages. {{ref:after}}\n\n\
+             ## Sources\n\n[^ready_gov_water]: FEMA, Water (2021).\n"
+        )
+    }
+
+    fn run_checklist(text: &str) -> Report {
+        run(&[
+            ("citations.toml", CITES),
+            ("checklists/check_water.md", text),
+        ])
+    }
+
+    fn has(r: &Report, needle: &str) -> bool {
+        errors(r).iter().any(|m| m.contains(needle))
+    }
+
+    #[test]
+    fn a_clean_checklist_passes() {
+        let text = checklist(
+            "check_water",
+            "event:boil_water_notice, hazard:local_utility_outage",
+        );
+        let r = run_checklist(&text);
+        assert!(r.is_ok(), "{r}");
+        // With two files, missing coverage is only a warning.
+        assert!(
+            r.warnings()
+                .any(|w| w.message.contains("have no checklist yet")),
+            "{r}"
+        );
+    }
+
+    #[test]
+    fn checklist_sections_must_be_the_eight_in_order() {
+        let base = checklist("check_water", "event:boil_water_notice");
+        let missing = base.replace(
+            "## Then\n\n1. **Listen.** Tune to {alerts}.[^ready_gov_water]\n\n",
+            "",
+        );
+        let r = run_checklist(&missing);
+        assert!(has(&r, "missing section `## Then`"), "{r}");
+        let swapped = base
+            .replace("## Do not", "## Do not_")
+            .replace("## When it is over", "## Do not")
+            .replace("## Do not_", "## When it is over");
+        let r = run_checklist(&swapped);
+        assert!(has(&r, "out of order"), "{r}");
+        let extra = base.replace("## Sources", "## Why\n\nBecause.\n\n## Sources");
+        let r = run_checklist(&extra);
+        assert!(has(&r, "unknown section `## Why`"), "{r}");
+        let early = base.replace("---\n## Use this when", "---\nIntro.\n\n## Use this when");
+        let r = run_checklist(&early);
+        assert!(has(&r, "text before `## Use this when`"), "{r}");
+    }
+
+    #[test]
+    fn checklist_caps_bold_leads_and_citations() {
+        let base = checklist("check_water", "event:boil_water_notice");
+        let steps: String = (3..=7)
+            .map(|n| format!("{n}. **Step {n}.** Do it.[^ready_gov_water]\n"))
+            .collect();
+        let seven = base.replace("{/if}\n\n## Then", &format!("{{/if}}\n{steps}\n## Then"));
+        let r = run_checklist(&seven);
+        assert!(has(&r, "`Do first` has 7 steps; the most is 6"), "{r}");
+        let six = base.replace(
+            "{/if}\n\n## Then",
+            &format!("{{/if}}\n{}\n## Then", &steps[..steps.find("7.").unwrap()]),
+        );
+        assert!(run_checklist(&six).is_ok(), "six steps are fine");
+
+        let uncited = base.replace("Turn off the tap.[^ready_gov_water]", "Turn off the tap.");
+        let r = run_checklist(&uncited);
+        assert!(has(&r, "cites no source"), "{r}");
+        let uncited_bullet = base.replace(
+            "Do not drink from the tap.[^ready_gov_water]",
+            "Do not drink from the tap.",
+        );
+        assert!(has(&run_checklist(&uncited_bullet), "cites no source"));
+        // A pointer to the After pages needs no source; a leave-or-stay branch needs none either.
+        assert!(run_checklist(&base).is_ok());
+
+        let plain = base.replace("1. **Stop.** Turn off", "1. Stop and turn off");
+        assert!(has(&run_checklist(&plain), "opens with bold lead words"));
+        // A span marker may come before the bold lead (the pets step above).
+
+        let bullets_in_steps = base.replace("1. **Listen.**", "- **Listen.**");
+        assert!(has(&run_checklist(&bullets_in_steps), "is the other kind"));
+        let loose = base.replace("## Do not\n\n", "## Do not\n\nSome words.\n\n");
+        assert!(has(&run_checklist(&loose), "text outside its bullets"));
+        let five_branches: String = (0..5)
+            .map(|n| format!("- **Stay if** case {n}.\n"))
+            .collect();
+        let many = base.replace(
+            "- **Leave if** told to.",
+            &format!("{five_branches}- **Leave if** told to."),
+        );
+        assert!(has(
+            &run_checklist(&many),
+            "`Leave or stay` has 6 entries; the most is 4"
+        ));
+        let empty_first = base.replace(
+            "1. **Stop.** Turn off the tap.[^ready_gov_water]\n2. {if:pets}**Water the pets.** Use stored water.[^ready_gov_water]{/if}\n",
+            "",
+        );
+        assert!(has(
+            &run_checklist(&empty_first),
+            "`Do first` needs at least one step"
+        ));
+    }
+
+    #[test]
+    fn checklist_words_stop_at_the_budget() {
+        let base = checklist("check_water", "event:boil_water_notice");
+        let with_trigger = |n: usize| {
+            let words = vec!["word"; n].join(" ");
+            base.replace("The water stops.", &format!("{words}."))
+        };
+        let c = Content::from_files(&[("checklists/check_water.md", &with_trigger(1))]).unwrap();
+        let rest = c.checklists[0].word_count() - 1;
+        let r = run_checklist(&with_trigger(331 - rest));
+        assert!(has(&r, "331 words; the limit is 330"), "{r}");
+        let r = run_checklist(&with_trigger(330 - rest));
+        assert!(!has(&r, "words; the limit"), "{r}");
+        // Two pages only for the two named blocks, with the larger budget.
+        let two = base.replace("onset: now\n", "onset: now\npages: 2\n");
+        assert!(has(
+            &run_checklist(&two),
+            "only [\"check_hurricane\", \"check_nuclear_attack\"] may take two"
+        ));
+        let hurricane = checklist("check_hurricane", "hazard:hurricane")
+            .replace("onset: now\n", "onset: coming\npages: 2\n")
+            .replace(
+                "The water stops.",
+                &format!("{}.", vec!["word"; 400].join(" ")),
+            );
+        let r = run(&[
+            ("citations.toml", CITES),
+            ("checklists/check_hurricane.md", &hurricane),
+        ]);
+        assert!(!has(&r, "words; the limit"), "{r}");
+    }
+
+    #[test]
+    fn checklist_placeholders_references_and_spans() {
+        let base = checklist("check_water", "event:boil_water_notice");
+        let unknown = base.replace("{meeting_near}", "{frequency}");
+        assert!(has(
+            &run_checklist(&unknown),
+            "`{frequency}` is not a checklist placeholder"
+        ));
+        let colour = base.replace("{meeting_near}", "{favourite_colour}");
+        assert!(has(
+            &run_checklist(&colour),
+            "is not a checklist placeholder"
+        ));
+        let bad_ref = base.replace("{ref:after}", "{ref:kitchen}");
+        assert!(has(
+            &run_checklist(&bad_ref),
+            "`{ref:kitchen}` names no page"
+        ));
+        let nested = base.replace(
+            "{if:pets}**Water the pets.** Use stored water.",
+            "{if:pets}**Water the pets.** {if:children}Use stored water.{/if}",
+        );
+        assert!(
+            has(&run_checklist(&nested), "spans do not nest"),
+            "{}",
+            run_checklist(&nested)
+        );
+        // Every household condition, a home and a hazard condition are fine in a checklist.
+        let spans = base.replace(
+            "Turn off the tap.",
+            "Turn off the tap. {if:vehicle}Or the car's water.{/if} {if:children}Watch the kids.{/if} \
+             {if:powered_device}Charge devices.{/if} {if:home:mobile_home}Go out.{/if} {if:tornado}Go down.{/if}",
+        );
+        let r = run_checklist(&spans);
+        assert!(r.is_ok(), "{r}");
+        let unknown_need = base.replace("{if:pets}", "{if:need:telepathy}");
+        assert!(has(&run_checklist(&unknown_need), "telepathy"));
+    }
+
+    #[test]
+    fn checklist_targets_are_hazards_and_events_once_each() {
+        let r = run_checklist(&checklist("check_water", "bucket:water_out"));
+        assert!(has(&r, "is not `hazard:<id>` or `event:<id>`"), "{r}");
+        let r = run_checklist(&checklist("check_water", "event:asteroid"));
+        assert!(has(&r, "`asteroid` is not an everyday emergency"), "{r}");
+        let r = run_checklist(&checklist("check_water", "hazard:zombies"));
+        assert!(has(&r, "`zombies` is not a hazard id"), "{r}");
+        let r = run_checklist(&checklist("check_water", "hazard:terrorism"));
+        assert!(r.is_ok(), "{r}");
+        assert!(r.warnings().any(|w| w.message.contains("retired")), "{r}");
+        let r = run(&[
+            ("citations.toml", CITES),
+            (
+                "checklists/check_water.md",
+                &checklist("check_water", "event:power_outage"),
+            ),
+            (
+                "checklists/check_power.md",
+                &checklist("check_power", "event:power_outage"),
+            ),
+        ]);
+        assert!(
+            has(
+                &r,
+                "`event:power_outage` already has the checklist `check_power`"
+            ),
+            "{r}"
+        );
+        let r = run_checklist(&checklist("check_other", "event:power_outage"));
+        assert!(has(&r, "must equal the file name"), "{r}");
+        let r = run(&[
+            ("citations.toml", CITES),
+            (
+                "checklists/water.md",
+                &checklist("water", "event:power_outage"),
+            ),
+        ]);
+        assert!(has(&r, "starts with `check_`"), "{r}");
+        // A guidance block may not claim to be a checklist.
+        let g = guide("topic_x", "topic:x", "Text.[^ready_gov_water]")
+            .replace("kind: topic", "kind: checklist");
+        let r = run(&[("citations.toml", CITES), ("guidance/topic_x.md", &g)]);
+        assert!(has(&r, "checklists live in content/checklists/"), "{r}");
+    }
+
+    #[test]
+    fn missing_coverage_turns_into_an_error_past_ten_files() {
+        let hazards = [
+            "tornado",
+            "hail",
+            "lightning",
+            "earthquake",
+            "tsunami",
+            "wildfire",
+            "drought",
+            "heat_wave",
+            "cold_wave",
+            "hurricane",
+            "avalanche",
+        ];
+        let files: Vec<(String, String)> = hazards
+            .iter()
+            .map(|h| {
+                let id = format!("check_{h}");
+                (
+                    format!("checklists/{id}.md"),
+                    checklist(&id, &format!("hazard:{h}")),
+                )
+            })
+            .collect();
+        let mut all: Vec<(&str, &str)> = vec![("citations.toml", CITES)];
+        all.extend(files.iter().map(|(p, t)| (p.as_str(), t.as_str())));
+        let r = run(&all);
+        assert!(has(&r, "have no checklist yet"), "{r}");
+        assert!(has(&r, "event:power_outage"), "{r}");
+        assert!(!has(&r, "hazard:tornado,"), "tornado is covered: {r}");
+        // Ten files: still a warning.
+        let r = run(&all[..11]);
+        assert!(!has(&r, "have no checklist yet"), "{r}");
+        assert!(
+            r.warnings()
+                .any(|w| w.message.contains("have no checklist yet"))
+        );
     }
 
     const STATE: &str = "[[state]]\ncode = \"KS\"\nname = \"Kansas\"\n\

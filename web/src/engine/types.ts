@@ -14,8 +14,12 @@
  * not mirrored: the web app hands pack bytes to `load_pack` without reading them.
  */
 
-/** Version of the contract; `engine_info().api_version` must equal it. Version 2: v0.2.0. */
-export const ENGINE_API_VERSION = 2;
+/**
+ * Version of the contract; `engine_info().api_version` must equal it. Version 2: v0.2.0. Version 3:
+ * v0.3.0 (per-person profiles and family-plan groups, the binder and the Prepare sheet in place of
+ * `packet_markdown`, `zip_centroid`; docs/ENGINE-API.md "Changes from v2").
+ */
+export const ENGINE_API_VERSION = 3;
 
 /** A date written `YYYY-MM-DD`. */
 export type IsoDate = string;
@@ -335,6 +339,8 @@ export interface Person {
   commute?: Commute;
   /** CMIST needs (communication, health, independence, support and safety, transport). Defaults to [] when absent. */
   access_needs?: AccessNeed[];
+  /** The person's binder page and wallet card (contract v3): echo-only, never computed with; absent when empty. */
+  profile?: PersonProfile;
 }
 
 /** Needs that change how a person gets warnings, help or care in an emergency (CMIST). */
@@ -508,11 +514,24 @@ export interface FamilyPlan {
   lawyer?: Contact;
   roadside_assistance?: string;
   numbers_by_heart?: string[];
+  /** The home: address, utilities, insurer, landlord, where things are kept (contract v3). */
+  home?: HomeInfo;
+  /** Hospital, urgent care, pharmacy, shelter, the county emergency office, alerts (contract v3). */
+  neighbourhood?: Neighbourhood;
+  /** One entry per animal, at most PETS_MAX (contract v3); absent when empty. */
+  pets?: PetInfo[];
+  /** One entry per vehicle, at most VEHICLES_MAX (contract v3); absent when empty. */
+  vehicles?: VehicleInfo[];
+  /** Accounts (last four digits only), policies, where the documents are (contract v3). */
+  documents?: DocumentsInfo;
 }
 
+/** Name and phone are cut at FAMILY_PLAN_SHORT_MAX characters; the address at LONG_TEXT_MAX. */
 export interface Contact {
   name?: string;
   phone?: string;
+  /** Contract v3. */
+  address?: string;
 }
 
 export interface TrustedPerson {
@@ -524,6 +543,217 @@ export interface TrustedPerson {
 /** What a member of the trusted circle holds for the household. */
 export const HOLDS = ['spare_key', 'documents', 'medical_poa', 'backup_codes'] as const;
 export type Holds = (typeof HOLDS)[number];
+
+// Contract v3: the answers to the interview's optional steps 6–8 (DESIGN-DELTA-v3 §2, §3.1, §3.2).
+// Echo-only like FamilyPlan: the engine trims each string and cuts it at the cap its field names
+// (characters, after trimming; use it as the form's maxlength), drops blank strings, empty rows and
+// empty groups, and keeps lists to their length. Nothing here is ever required.
+
+/** AccountInfo.last4 keeps at most this many characters, and only digits. */
+export const LAST4_LEN = 4;
+/** PersonProfile.blood_type. */
+export const BLOOD_TYPE_MAX = 8;
+/** VehicleInfo.plate. */
+export const PLATE_MAX = 20;
+/** Dates of birth, the v3 phone fields, the kinds of pet, account and policy. */
+export const SHORT_TEXT_MAX = 40;
+/** Names of people and animals, doses, member IDs, group, policy and microchip numbers. */
+export const MEDIUM_TEXT_MAX = 60;
+/** Emails, institutions, insurance carriers and plan names, insurers, a medication's name, schedule and purpose. */
+export const LABEL_TEXT_MAX = 80;
+/** A place's name, an animal or a vehicle described. */
+export const DESCRIPTION_MAX = 120;
+/** Addresses and "where it is" answers, allergies, pick-up rules, safe spots, ID notes, alerts, pet medicines, what stays in the car. */
+export const LONG_TEXT_MAX = 200;
+/** Medical conditions, notes, a place's own emergency plan. */
+export const NOTE_MAX = 400;
+/** Most medications per person. */
+export const MEDICATIONS_MAX = 12;
+/** Most animals in FamilyPlan.pets. */
+export const PETS_MAX = 8;
+/** Most vehicles in FamilyPlan.vehicles. */
+export const VEHICLES_MAX = 4;
+/** Most accounts in DocumentsInfo.accounts. */
+export const ACCOUNTS_MAX = 12;
+/** Most policies in DocumentsInfo.policies. */
+export const POLICIES_MAX = 8;
+
+/** One person's binder page (step 6, "Your people"). */
+export interface PersonProfile {
+  /** MEDIUM_TEXT_MAX. */
+  name?: string;
+  /** SHORT_TEXT_MAX; as the household writes it. */
+  date_of_birth?: string;
+  /** SHORT_TEXT_MAX. */
+  phone?: string;
+  /** LABEL_TEXT_MAX. */
+  email?: string;
+  /** Where they spend the day. */
+  place?: Place;
+  doctor?: Contact;
+  pharmacy?: Contact;
+  /** NOTE_MAX. */
+  conditions?: string;
+  /** At most MEDICATIONS_MAX; absent when empty. */
+  medications?: Medication[];
+  /** LONG_TEXT_MAX. */
+  allergies?: string;
+  /** BLOOD_TYPE_MAX. */
+  blood_type?: string;
+  /** Health insurance. */
+  insurance?: HealthInsurance;
+  /** LONG_TEXT_MAX: "passport number, or where it is kept". */
+  id_notes?: string;
+  /** NOTE_MAX: anything else a helper should know. */
+  notes?: string;
+}
+
+/** What kind of place a person spends the day at. */
+export const PLACE_KINDS = ['work', 'school', 'childcare', 'other'] as const;
+export type PlaceKind = (typeof PLACE_KINDS)[number];
+
+/** Where a person spends the day. A place with nothing but its kind is dropped. */
+export interface Place {
+  kind: PlaceKind;
+  /** DESCRIPTION_MAX. */
+  name?: string;
+  /** LONG_TEXT_MAX. */
+  address?: string;
+  /** SHORT_TEXT_MAX. */
+  phone?: string;
+  /** NOTE_MAX: the place's own emergency plan. */
+  plan?: string;
+  /** LONG_TEXT_MAX: pick-up rules. */
+  pickup?: string;
+  /** LONG_TEXT_MAX: the safest spot there. */
+  safest_spot?: string;
+}
+
+/** One medication, as the household writes it (echoed, never checked). */
+export interface Medication {
+  /** LABEL_TEXT_MAX. */
+  name?: string;
+  /** MEDIUM_TEXT_MAX. */
+  dose?: string;
+  /** LABEL_TEXT_MAX: when it is taken. */
+  schedule?: string;
+  /** LABEL_TEXT_MAX: what it is for. */
+  purpose?: string;
+}
+
+/** A person's health insurance (PersonProfile.insurance); not the household's `Insurance` answers. */
+export interface HealthInsurance {
+  /** LABEL_TEXT_MAX. */
+  carrier?: string;
+  /** LABEL_TEXT_MAX. */
+  plan_name?: string;
+  /** MEDIUM_TEXT_MAX. */
+  member_id?: string;
+  /** MEDIUM_TEXT_MAX. */
+  group_number?: string;
+  /** SHORT_TEXT_MAX. */
+  phone?: string;
+}
+
+/** The home (step 7). The shut-offs, safest spot and neighbours stay in their FamilyPlan fields. */
+export interface HomeInfo {
+  /** LONG_TEXT_MAX. */
+  address?: string;
+  electric_utility?: Contact;
+  gas_utility?: Contact;
+  water_utility?: Contact;
+  insurer?: Contact;
+  /** MEDIUM_TEXT_MAX. */
+  policy_number?: string;
+  landlord_or_mortgage?: Contact;
+  /** LONG_TEXT_MAX. */
+  where_kit?: string;
+  /** LONG_TEXT_MAX. */
+  where_documents?: string;
+  /** LONG_TEXT_MAX. */
+  where_cash?: string;
+  /** LONG_TEXT_MAX. */
+  where_keys?: string;
+}
+
+/** The neighbourhood (step 7). */
+export interface Neighbourhood {
+  hospital?: Contact;
+  urgent_care?: Contact;
+  pharmacy?: Contact;
+  shelter?: Contact;
+  county_emergency_office?: Contact;
+  /** LONG_TEXT_MAX: how local alerts arrive. */
+  alerts?: string;
+}
+
+/** One animal (step 8). */
+export interface PetInfo {
+  /** MEDIUM_TEXT_MAX. */
+  name?: string;
+  /** SHORT_TEXT_MAX. */
+  kind?: string;
+  /** DESCRIPTION_MAX. */
+  description?: string;
+  /** LONG_TEXT_MAX. */
+  medications?: string;
+  vet?: Contact;
+  /** MEDIUM_TEXT_MAX. */
+  microchip?: string;
+  /** LONG_TEXT_MAX. */
+  records_where?: string;
+}
+
+/** One vehicle as the household describes it (step 8); its fuel stays in `mobility`. */
+export interface VehicleInfo {
+  /** DESCRIPTION_MAX: "blue 2016 hatchback". */
+  description?: string;
+  /** PLATE_MAX. */
+  plate?: string;
+  insurer?: Contact;
+  /** MEDIUM_TEXT_MAX. */
+  policy_number?: string;
+  /** LONG_TEXT_MAX. */
+  kept_in_car?: string;
+}
+
+/** Documents and money (step 8). */
+export interface DocumentsInfo {
+  /** At most ACCOUNTS_MAX; absent when empty. */
+  accounts?: AccountInfo[];
+  /** At most POLICIES_MAX; absent when empty. */
+  policies?: PolicyInfo[];
+  /** LONG_TEXT_MAX. */
+  where_originals?: string;
+  /** LONG_TEXT_MAX. */
+  where_copies?: string;
+  /** LONG_TEXT_MAX. */
+  digital_backup?: string;
+}
+
+/** An account to call about. The app never asks for an account number. */
+export interface AccountInfo {
+  /** LABEL_TEXT_MAX. */
+  institution?: string;
+  /** SHORT_TEXT_MAX. */
+  kind?: string;
+  /** SHORT_TEXT_MAX. */
+  phone?: string;
+  /** The engine keeps only the last LAST4_LEN digits of whatever was typed, and drops it when there is no digit. */
+  last4?: string;
+}
+
+/** An insurance policy (step 8). */
+export interface PolicyInfo {
+  /** LABEL_TEXT_MAX. */
+  insurer?: string;
+  /** SHORT_TEXT_MAX. */
+  kind?: string;
+  /** MEDIUM_TEXT_MAX. */
+  policy_number?: string;
+  /** SHORT_TEXT_MAX. */
+  phone?: string;
+}
 
 // ---------------------------------------------------------------------------------------------
 // Validation: `bad_input` errors carry `{ problems: Problem[] }` in `details`.
@@ -568,6 +798,8 @@ export interface LocationResolved {
   /** Share of the ZIP code inside this county, 0 to 1. */
   zip_county_share?: number;
   centroid: LatLon;
+  /** The ZIP code's centre, where the maps start (contract v3); absent when unknown. */
+  zip_centroid?: LatLon;
   /** Fifth National Climate Assessment region, for example "northeast". */
   nca_region: string;
   coastal: boolean;
@@ -923,8 +1155,10 @@ export interface PlanOutput {
   plan: Plan;
   requirements: RequirementLine[];
   warnings: Warning[];
-  /** The printable packet as Markdown. */
-  packet_markdown: string;
+  /** The during-event binder (contract v3; it replaces v2's `packet_markdown`). */
+  binder: Binder;
+  /** The Prepare sheet as Markdown: what the Prepare and Keep it up tabs print (contract v3). */
+  prepare_markdown: string;
   /** Every citation referenced above. */
   provenance: Citation[];
   /** Facts for the recovery page; absent when nothing is known. */
@@ -935,6 +1169,277 @@ export interface RecoveryInfo {
   /** Federal disaster declarations for the county in the last five years. */
   county_declarations_5yr?: number;
   sources: CitationId[];
+}
+
+// ---------------------------------------------------------------------------------------------
+// The binder (contract v3; docs/ENGINE-API.md "The binder", DESIGN-DELTA-v3 §4.1). A block and an
+// inline are objects with exactly one key, the variant's name: `{ heading: {...} }`, `{ para: [...] }`,
+// `{ t: 'text' }`, `{ cite: [3] }`, `{ blank: 24 }`, `{ page_break: true }`. Narrow them with `in`:
+// `if ('steps' in block) ...`.
+// ---------------------------------------------------------------------------------------------
+
+/** Tabs are numbered from 1 to this. */
+export const MAX_TABS = 10;
+/** Longest `Part.short_title` (it is printed on a tab divider). */
+export const SHORT_TITLE_MAX = 14;
+
+/** The during-event binder: cover facts, the parts in tab order, the numbered sources. */
+export interface Binder {
+  title: string;
+  /** The planning date. */
+  generated_on: IsoDate;
+  /** "2 adults, 1 older adult and 1 child, with 1 dog". */
+  household: string;
+  /** "Philadelphia County, Pennsylvania (ZIP code 19147)". */
+  location: string;
+  /** What the binder is and is not. */
+  status_line: string;
+  review_by: IsoDate;
+  /** In tab order. */
+  parts: Part[];
+  /** Numbered as cited: `sources[i].n === i + 1`; a `cite` number n points to `sources[n - 1]`. */
+  sources: SourceEntry[];
+  /** Data credits and disclaimers, each shown exactly. */
+  credits: string[];
+}
+
+/** The pages behind one tab divider. */
+export interface Part {
+  /** `start`, `people`, `home_places`, … (DESIGN-DELTA-v3 §4.2). */
+  id: string;
+  /** 1 to MAX_TABS, rising from part to part. */
+  tab: number;
+  title: string;
+  /** The tab label, at most SHORT_TITLE_MAX characters. */
+  short_title: string;
+  /** At least one. */
+  pages: Page[];
+}
+
+export interface Page {
+  /** Unique in the binder; `link.to` and `go_to` point to it. */
+  id: string;
+  title: string;
+  kind: PageKind;
+  fit: Fit;
+  blocks: Block[];
+}
+
+/** What a page is; it tells a renderer how to lay it out. */
+export const PAGE_KINDS = [
+  'cover',
+  'how_to_use',
+  'quick_start',
+  'index',
+  'contacts',
+  'person',
+  'wallet_cards',
+  'home',
+  'place',
+  'neighbourhood',
+  'getting_out',
+  'pets',
+  'vehicles',
+  'documents',
+  'inventory',
+  'risks_glance',
+  'checklist',
+  'after',
+  'log',
+  'sources',
+] as const;
+export type PageKind = (typeof PAGE_KINDS)[number];
+
+/** How much paper a page promises to take: one printed page, two, or as long as it needs. */
+export const PAGE_FITS = ['one', 'two', 'flow'] as const;
+export type Fit = (typeof PAGE_FITS)[number];
+
+export type Block =
+  | HeadingBlock
+  | ParaBlock
+  | BulletsBlock
+  | NumberedBlock
+  | StepsBlock
+  | FieldsBlock
+  | TableBlock
+  | CalloutBlock
+  | DecisionBlock
+  | MapSlotBlock
+  | CardsBlock
+  | LogBlock
+  | PageBreakBlock;
+
+export interface HeadingBlock {
+  heading: Heading;
+}
+
+/** A heading inside a page (the page's own title is `Page.title`). */
+export interface Heading {
+  /** 1, 2 or 3; 1 is the largest inside a page. */
+  level: number;
+  text: string;
+}
+
+export interface ParaBlock {
+  para: Inline[];
+}
+
+export interface BulletsBlock {
+  bullets: Inline[][];
+}
+
+export interface NumberedBlock {
+  numbered: Inline[][];
+}
+
+export interface StepsBlock {
+  steps: Step[];
+}
+
+/** An airline-checklist step. */
+export interface Step {
+  text: Inline[];
+  /** A "do first, from memory" item: rendered bold. */
+  memory: boolean;
+}
+
+export interface FieldsBlock {
+  fields: FieldRow[];
+}
+
+/** A labelled answer, or ruled lines to write on. */
+export interface FieldRow {
+  label: string;
+  /** The household's own words, printed as written; absent when not answered. */
+  value?: string;
+  /** Ruled lines to draw when there is no value. */
+  lines: number;
+}
+
+export interface TableBlock {
+  table: Table;
+}
+
+export interface Table {
+  header: string[];
+  /** Rows of cells; each cell is running text. */
+  rows: Inline[][][];
+}
+
+export interface CalloutBlock {
+  callout: Callout;
+}
+
+/** How a boxed note reads; never carried by colour alone. */
+export const CALLOUT_KINDS = ['stop', 'warning', 'note', 'decision'] as const;
+export type CalloutKind = (typeof CALLOUT_KINDS)[number];
+
+export interface Callout {
+  kind: CalloutKind;
+  title?: string;
+  blocks: Block[];
+}
+
+export interface DecisionBlock {
+  decision: Decision;
+}
+
+/** A leave-or-stay decision. */
+export interface Decision {
+  question: string;
+  branches: Branch[];
+}
+
+export interface Branch {
+  when: Inline[];
+  then: Inline[];
+  /** The page to turn to (a `Page.id`). */
+  go_to?: string;
+}
+
+export interface MapSlotBlock {
+  map_slot: MapSlot;
+}
+
+/** Which of the three maps goes in a slot (DESIGN-DELTA-v3 §9.2). */
+export const MAP_SLOT_KINDS = ['region', 'area', 'neighbourhood'] as const;
+export type MapSlotKind = (typeof MAP_SLOT_KINDS)[number];
+
+/** A place for a map the web app fills; the CLI prints a boxed placeholder. */
+export interface MapSlot {
+  id: string;
+  kind: MapSlotKind;
+  caption: string;
+}
+
+export interface CardsBlock {
+  cards: Card[];
+}
+
+/** A wallet card. */
+export interface Card {
+  title: string;
+  lines: Inline[][];
+}
+
+export interface LogBlock {
+  log: Log;
+}
+
+/** A blank log to fill in by hand. */
+export interface Log {
+  columns: string[];
+  /** Blank rows to print. */
+  rows: number;
+}
+
+/** Start a new printed page here. */
+export interface PageBreakBlock {
+  page_break: true;
+}
+
+export type Inline = TextInline | BoldInline | CiteInline | LinkInline | BlankInline;
+
+export interface TextInline {
+  t: string;
+}
+
+export interface BoldInline {
+  b: string;
+}
+
+/** Citation numbers into `Binder.sources` (1 is the first). */
+export interface CiteInline {
+  cite: number[];
+}
+
+export interface LinkInline {
+  link: Link;
+}
+
+/** A cross-reference to another page. */
+export interface Link {
+  /** A `Page.id`. */
+  to: string;
+  /** "Tab 3, Home". */
+  text: string;
+}
+
+/** A ruled blank of about this many characters. */
+export interface BlankInline {
+  blank: number;
+}
+
+/** One numbered source. */
+export interface SourceEntry {
+  /** From 1, in citation order. */
+  n: number;
+  title: string;
+  publisher: string;
+  year?: number;
+  url?: string;
+  /** An expert estimate rather than measured data. */
+  expert: boolean;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1025,7 +1530,8 @@ export interface GuidanceMeta {
   kind?: GuidanceKind;
 }
 
-export const GUIDANCE_KINDS = ['after', 'plan', 'hazard', 'bucket', 'tier', 'topic', 'family'] as const;
+/** `checklist` (contract v3): an incident checklist for the binder, applying to `hazard:` and `event:` targets. */
+export const GUIDANCE_KINDS = ['after', 'plan', 'hazard', 'bucket', 'tier', 'topic', 'family', 'checklist'] as const;
 export type GuidanceKind = (typeof GUIDANCE_KINDS)[number];
 
 // ---------------------------------------------------------------------------------------------
@@ -1201,8 +1707,30 @@ export interface Explanation {
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
 type Expect<T extends true> = T;
 
+/** The one key of each block and inline variant (contract v3). */
+type KeysOf<U> = U extends unknown ? keyof U : never;
+
 export type ContractChecks = [
   Expect<Equal<Target['kind'], TargetKind>>,
   Expect<Equal<DurationDist['kind'], 'log_normal' | 'fixed'>>,
   Expect<Equal<Envelope<null>['ok'], boolean>>,
+  Expect<
+    Equal<
+      KeysOf<Block>,
+      | 'heading'
+      | 'para'
+      | 'bullets'
+      | 'numbered'
+      | 'steps'
+      | 'fields'
+      | 'table'
+      | 'callout'
+      | 'decision'
+      | 'map_slot'
+      | 'cards'
+      | 'log'
+      | 'page_break'
+    >
+  >,
+  Expect<Equal<KeysOf<Inline>, 't' | 'b' | 'cite' | 'link' | 'blank'>>,
 ];

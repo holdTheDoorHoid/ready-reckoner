@@ -1,7 +1,8 @@
 //! Loaders for the data-pack v2 calibration files (the `data-model` workstream): the regional
 //! outage model, the stress table, pooled restoration curves, temperature shares, utility
 //! reliability, disaster declarations, the national series under `core/series/`, and the
-//! optional `outage_events` pack.
+//! per-event outage tables (`core/outage_events.csv`, `core/outage_holdout.csv`; bundled into the
+//! core pack, DESIGN-DELTA-v3 §8, 2026-09-27; formerly the optional `outage_events` pack).
 //!
 //! Kept apart from `lib.rs` so the county-record assembly there only asks this module to fill
 //! four fields ([`Calibration::fill`]).
@@ -31,8 +32,8 @@ pub const FILES: &[&str] = &[
     "core/series/fcc_dirs.toml",
     "core/series/fbi_arrests.toml",
     "core/series/ihp_displacement.toml",
-    "opt/outage_events/county_events.csv",
-    "opt/outage_events/holdout.csv",
+    "core/outage_events.csv",
+    "core/outage_holdout.csv",
 ];
 
 /// Outage lengths (days) of the curve columns `s_1d` ... `s_30d`.
@@ -130,7 +131,7 @@ impl SeriesFile {
     }
 }
 
-/// One county outage event of a day or more (optional pack `outage_events`).
+/// One county outage event of a day or more (`core/outage_events.csv`).
 #[derive(Debug, Clone, PartialEq)]
 pub struct CountyOutageEvent {
     /// Start, `YYYY-MM-DD HH:MM` UTC.
@@ -149,7 +150,7 @@ pub struct CountyOutageEvent {
     pub ge_7d_share: f32,
 }
 
-/// One row of the outage model's held-out test (optional pack `outage_events`).
+/// One row of the outage model's held-out test (`core/outage_holdout.csv`).
 #[derive(Debug, Clone, PartialEq)]
 pub struct HoldoutRow {
     /// Split ("2014-2019 -> 2020-2025", "even years -> odd years").
@@ -433,7 +434,7 @@ impl Calibration {
                     })
                     .collect();
             }
-            "opt/outage_events/county_events.csv" => {
+            "core/outage_events.csv" => {
                 let ix = |c: &str| t.col(c);
                 let (i_f, i_s, i_c, i_ca, i_p, i_1, i_7) = (
                     ix("county_fips")?,
@@ -460,7 +461,7 @@ impl Calibration {
                         });
                 }
             }
-            "opt/outage_events/holdout.csv" => {
+            "core/outage_holdout.csv" => {
                 let ix = |c: &str| t.col(c);
                 let (i_s, i_m, i_e, i_me, i_b, i_p, i_o, i_n) = (
                     ix("split")?,
@@ -528,9 +529,9 @@ impl Calibration {
         &self.series
     }
 
-    /// A county's outage events of a day or more (optional pack; empty until it is loaded).
-    /// Puerto Rico's record is one island-wide series, filed under San Juan (72127) and served
-    /// for every municipio.
+    /// A county's outage events of a day or more (`core/outage_events.csv`; empty until it is
+    /// loaded). Puerto Rico's record is one island-wide series, filed under San Juan (72127) and
+    /// served for every municipio.
     pub fn county_events(&self, fips: &str) -> &[CountyOutageEvent] {
         let key = if fips.starts_with("72") {
             "72127"
@@ -540,7 +541,7 @@ impl Calibration {
         self.events.get(key).map_or(&[], |v| v.as_slice())
     }
 
-    /// The outage model's held-out test (optional pack).
+    /// The outage model's held-out test (`core/outage_holdout.csv`).
     pub fn holdout(&self) -> &[HoldoutRow] {
         &self.holdout
     }

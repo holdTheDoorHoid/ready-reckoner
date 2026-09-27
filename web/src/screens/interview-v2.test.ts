@@ -41,6 +41,16 @@ async function open(Screen: Component, route: string, plan: SavedPlan | null): P
 }
 
 const fixture = (name: FixtureName) => savedFor(FIXTURES[name]);
+/**
+ * A fixture as a household that has written no family plan: since contract v3 Philadelphia's
+ * carries sample answers in the plan's new groups (home, pets, ...), which the family-plan screen's
+ * v2 fields never touch.
+ */
+const unplanned = (name: FixtureName) => {
+  const input = JSON.parse(JSON.stringify(FIXTURES[name])) as (typeof FIXTURES)[FixtureName];
+  delete input.family_plan;
+  return savedFor(input);
+};
 
 function button(r: Rendered, text: string): HTMLButtonElement {
   const b = [...r.target.querySelectorAll('button')].find((x) => x.textContent?.includes(text));
@@ -117,7 +127,7 @@ describe('Your family plan', () => {
   });
 
   it('saves answers as they are typed, tidies them on leaving, and keeps no empty plan', async () => {
-    const r = await open(FamilyPlan, 'family', fixture('philadelphia-renters-4'));
+    const r = await open(FamilyPlan, 'family', unplanned('philadelphia-renters-4'));
     const near = r.target.querySelector('#fp-meet-near') as HTMLInputElement;
     expect(near.maxLength).toBe(300);
     type(near, '  The corner mailbox ', false);
@@ -128,7 +138,7 @@ describe('Your family plan', () => {
     type(r.target.querySelector('#fp-contact-phone') as HTMLInputElement, '555-0100');
     expect(r.app.plan!.input.family_plan?.out_of_area_contact).toEqual({ phone: '555-0100' });
     expect((r.target.querySelector('#fp-contact-phone') as HTMLInputElement).maxLength).toBe(80);
-    await until(() => !!r.app.result.output?.packet_markdown.includes('The corner mailbox'), 'the packet to echo the plan');
+    await until(() => !!r.app.result.output?.prepare_markdown.includes('The corner mailbox'), 'the packet to echo the plan');
     type(near, '');
     type(r.target.querySelector('#fp-contact-phone') as HTMLInputElement, '');
     expect(r.app.plan!.input.family_plan).toBeUndefined();

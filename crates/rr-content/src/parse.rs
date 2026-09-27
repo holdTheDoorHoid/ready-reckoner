@@ -7,6 +7,9 @@
 //! - `guidance/<id>.md`: a front-matter block between `---` lines (`id`, `title`, `kind`,
 //!   `applies_to`, `citations`: the fields of [`GuidanceMeta`] plus the block's
 //!   [`GuidanceKind`]) followed by Markdown.
+//! - `checklists/<id>.md`: an incident checklist ([`crate::Checklist`], contract v3): the same
+//!   front matter plus `onset` and `pages`, then the eight `##` sections of DESIGN-DELTA-v3
+//!   §5.4.
 //! - `glossary.toml`: `[[term]]` tables, each a [`GlossaryEntry`].
 //! - `tables/state_registries.toml`: `[[state]]` tables, each a [`StateRow`].
 //! - `VERSION`: the human part of [`crate::CONTENT_VERSION`].
@@ -22,6 +25,7 @@ use rr_types::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::checklist::Checklist;
 use crate::ids::GuidanceKind;
 use crate::tables::{STATE_REGISTRIES_FILE, StateRow, StateTable};
 
@@ -36,7 +40,7 @@ pub struct LoadError {
 }
 
 impl LoadError {
-    fn new(file: &str, message: impl Into<String>) -> Self {
+    pub(crate) fn new(file: &str, message: impl Into<String>) -> Self {
         Self {
             file: file.to_owned(),
             message: message.into(),
@@ -100,47 +104,61 @@ impl Guidance {
 
     /// The prose part of the body: everything before the `## Sources` heading.
     pub fn prose(&self) -> &str {
-        match find_sources_heading(&self.body) {
-            Some(i) => &self.body[..i],
-            None => &self.body,
-        }
+        prose_of(&self.body)
     }
 
     /// The footnote definitions in the `## Sources` section, as `(citation id, text)`.
     pub fn footnote_definitions(&self) -> Vec<(String, String)> {
-        let Some(i) = find_sources_heading(&self.body) else {
-            return Vec::new();
-        };
-        self.body[i..]
-            .lines()
-            .filter_map(|line| {
-                let rest = line.trim().strip_prefix("[^")?;
-                let (id, text) = rest.split_once("]:")?;
-                Some((id.trim().to_owned(), text.trim().to_owned()))
-            })
-            .collect()
+        footnote_definitions_in(&self.body)
     }
 
     /// The citation ids referenced inline in the prose as `[^id]`, in order of first use.
     pub fn footnote_references(&self) -> Vec<String> {
-        let mut out: Vec<String> = Vec::new();
-        let prose = self.prose();
-        let mut rest = prose;
-        while let Some(start) = rest.find("[^") {
-            let after = &rest[start + 2..];
-            match after.find(']') {
-                Some(end) => {
-                    let id = after[..end].trim().to_owned();
-                    if !out.contains(&id) {
-                        out.push(id);
-                    }
-                    rest = &after[end + 1..];
-                }
-                None => break,
-            }
-        }
-        out
+        footnote_references_in(self.prose())
     }
+}
+
+/// Everything in a content body before its `## Sources` heading.
+pub(crate) fn prose_of(body: &str) -> &str {
+    match find_sources_heading(body) {
+        Some(i) => &body[..i],
+        None => body,
+    }
+}
+
+/// The footnote definitions in a body's `## Sources` section, as `(citation id, text)`.
+pub(crate) fn footnote_definitions_in(body: &str) -> Vec<(String, String)> {
+    let Some(i) = find_sources_heading(body) else {
+        return Vec::new();
+    };
+    body[i..]
+        .lines()
+        .filter_map(|line| {
+            let rest = line.trim().strip_prefix("[^")?;
+            let (id, text) = rest.split_once("]:")?;
+            Some((id.trim().to_owned(), text.trim().to_owned()))
+        })
+        .collect()
+}
+
+/// The citation ids referenced in `prose` as `[^id]`, in order of first use.
+pub(crate) fn footnote_references_in(prose: &str) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    let mut rest = prose;
+    while let Some(start) = rest.find("[^") {
+        let after = &rest[start + 2..];
+        match after.find(']') {
+            Some(end) => {
+                let id = after[..end].trim().to_owned();
+                if !out.contains(&id) {
+                    out.push(id);
+                }
+                rest = &after[end + 1..];
+            }
+            None => break,
+        }
+    }
+    out
 }
 
 /// `body` with `{frequency}` replaced, or dropped with the space after it.
@@ -194,6 +212,8 @@ pub struct Content {
     pub item_files: Vec<String>,
     /// Every guidance block.
     pub guidance: Vec<Guidance>,
+    /// Every incident checklist (`checklists/*.md`, contract v3), in file order.
+    pub checklists: Vec<Checklist>,
     /// Every glossary entry.
     pub glossary: Vec<GlossaryEntry>,
     /// The state table (`tables/state_registries.toml`); empty if the file is absent.
@@ -203,6 +223,7 @@ pub struct Content {
     citation_index: BTreeMap<String, usize>,
     item_index: BTreeMap<String, usize>,
     guidance_index: BTreeMap<String, usize>,
+    checklist_index: BTreeMap<String, usize>,
 }
 
 impl Content {
@@ -213,6 +234,7 @@ impl Content {
         let mut items = Vec::new();
         let mut item_files = Vec::new();
         let mut guidance = Vec::new();
+        let mut checklists = Vec::new();
         let mut glossary = Vec::new();
         let mut states = StateTable::default();
         let mut version = None;
@@ -247,27 +269,38 @@ impl Content {
                     return Err(LoadError::new(path, "guidance files are guidance/<id>.md"));
                 }
                 guidance.push(parse_guidance(path, &text)?);
+            } else if let Some(rest) = path.strip_prefix("checklists/") {
+                if !rest.ends_with(".md") || rest.contains('/') {
+                    return Err(LoadError::new(
+                        path,
+                        "checklist files are checklists/<id>.md",
+                    ));
+                }
+                checklists.push(crate::checklist::parse_checklist(path, &text)?);
             } else {
                 return Err(LoadError::new(
                     path,
-                    "unexpected file in content/ (expected citations.toml, glossary.toml, VERSION, items/*.toml, guidance/*.md or tables/state_registries.toml)",
+                    "unexpected file in content/ (expected citations.toml, glossary.toml, VERSION, items/*.toml, guidance/*.md, checklists/*.md or tables/state_registries.toml)",
                 ));
             }
         }
         let citation_index = first_index(citations.iter().map(|c| c.id.as_str()));
         let item_index = first_index(items.iter().map(|i| i.id.as_str()));
         let guidance_index = first_index(guidance.iter().map(|g| g.meta.id.as_str()));
+        let checklist_index = first_index(checklists.iter().map(|c| c.meta.id.as_str()));
         Ok(Content {
             citations,
             items,
             item_files,
             guidance,
+            checklists,
             glossary,
             states,
             version,
             citation_index,
             item_index,
             guidance_index,
+            checklist_index,
         })
     }
 
@@ -297,6 +330,25 @@ impl Content {
     /// Guidance blocks of one kind, in content order.
     pub fn guidance_of_kind(&self, kind: GuidanceKind) -> impl Iterator<Item = &Guidance> + '_ {
         self.guidance.iter().filter(move |g| g.kind() == kind)
+    }
+
+    /// Every incident checklist, in file order (contract v3).
+    pub fn checklists(&self) -> &[Checklist] {
+        &self.checklists
+    }
+
+    /// The checklist with this id (`check_house_fire`).
+    pub fn checklist(&self, id: &str) -> Option<&Checklist> {
+        self.checklist_index.get(id).map(|&i| &self.checklists[i])
+    }
+
+    /// The checklist for a hazard or an everyday emergency, by target: `"hazard:tornado"` or
+    /// `"event:power_outage"` (DESIGN-DELTA-v3 §5.1). A hazard has at most one checklist (the
+    /// validator rejects a second); `None` when no block applies to it yet.
+    pub fn checklist_for(&self, target: &str) -> Option<&Checklist> {
+        self.checklists
+            .iter()
+            .find(|c| c.meta.applies_to.iter().any(|a| a == target))
     }
 
     /// The family block for a rare hazard: the block of kind `family` that applies to
@@ -352,12 +404,18 @@ impl Content {
             .find(|g| g.term.eq_ignore_ascii_case(term))
     }
 
-    /// What the engine's `catalogue()` function returns.
+    /// What the engine's `catalogue()` function returns. `guidance` lists the guidance blocks,
+    /// then the checklists (kind `checklist`, contract v3).
     pub fn catalogue(&self) -> Catalogue {
         Catalogue {
             items: self.items.clone(),
             citations: self.citations.clone(),
-            guidance: self.guidance.iter().map(|g| g.meta.clone()).collect(),
+            guidance: self
+                .guidance
+                .iter()
+                .map(|g| g.meta.clone())
+                .chain(self.checklists.iter().map(|c| c.meta.clone()))
+                .collect(),
             hazards: HazardInfo::all(),
             buckets: BucketInfo::all(),
             tiers: TierInfo::all(),
@@ -373,23 +431,27 @@ fn first_index<'a>(ids: impl Iterator<Item = &'a str>) -> BTreeMap<String, usize
     map
 }
 
-/// Parses one guidance file: `---`, `key: value` lines (`id`, `title`, `kind`, `applies_to`,
-/// `citations`, all required), `---`, then Markdown.
-fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
+/// The front matter of a content Markdown file: `---`, `key: value` lines, `---`, then the body.
+/// Blank lines and `#` comments are skipped; a key outside `allowed`, or given twice, is an
+/// error. `what` names the kind of file in messages ("guidance", "a checklist").
+pub(crate) fn front_matter(
+    path: &str,
+    text: &str,
+    what: &str,
+    allowed: &[&str],
+) -> Result<(BTreeMap<String, String>, String), LoadError> {
     let rest = text.strip_prefix("---\n").ok_or_else(|| {
-        LoadError::new(path, "guidance must start with a `---` front-matter line")
+        LoadError::new(
+            path,
+            format!("{what} must start with a `---` front-matter line"),
+        )
     })?;
     let end = rest
         .find("\n---\n")
         .ok_or_else(|| LoadError::new(path, "front matter is not closed with a `---` line"))?;
     let front = &rest[..end];
     let body = rest[end + 5..].to_owned();
-
-    let mut id = None;
-    let mut title = None;
-    let mut kind = None;
-    let mut applies_to = None;
-    let mut citations = None;
+    let mut fields: BTreeMap<String, String> = BTreeMap::new();
     for (n, line) in front.lines().enumerate() {
         if line.trim().is_empty() || line.trim_start().starts_with('#') {
             continue;
@@ -400,40 +462,54 @@ fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
                 format!("front matter line {} is not `key: value`", n + 2),
             )
         })?;
-        let value = value.trim();
-        let slot = match key.trim() {
-            "id" => &mut id,
-            "title" => &mut title,
-            "kind" => &mut kind,
-            "applies_to" => &mut applies_to,
-            "citations" => &mut citations,
-            other => {
-                return Err(LoadError::new(
-                    path,
-                    format!(
-                        "unknown front-matter field `{other}` (allowed: id, title, kind, applies_to, citations)"
-                    ),
-                ));
-            }
-        };
-        if slot.is_some() {
+        let key = key.trim();
+        if !allowed.contains(&key) {
             return Err(LoadError::new(
                 path,
-                format!("`{}` is given twice", key.trim()),
+                format!(
+                    "unknown front-matter field `{key}` (allowed: {})",
+                    allowed.join(", ")
+                ),
             ));
         }
-        *slot = Some(value.to_owned());
+        if fields
+            .insert(key.to_owned(), value.trim().to_owned())
+            .is_some()
+        {
+            return Err(LoadError::new(path, format!("`{key}` is given twice")));
+        }
     }
-    let need = |v: Option<String>, name: &str| {
-        v.ok_or_else(|| LoadError::new(path, format!("front matter is missing `{name}`")))
-    };
-    let id = unquote(&need(id, "id")?);
-    let title = unquote(&need(title, "title")?);
-    let kind = unquote(&need(kind, "kind")?)
+    Ok((fields, body))
+}
+
+/// A required front-matter field, unquoted.
+pub(crate) fn required(
+    path: &str,
+    fields: &BTreeMap<String, String>,
+    name: &str,
+) -> Result<String, LoadError> {
+    fields
+        .get(name)
+        .map(|v| unquote(v))
+        .ok_or_else(|| LoadError::new(path, format!("front matter is missing `{name}`")))
+}
+
+/// Parses one guidance file: `---`, `key: value` lines (`id`, `title`, `kind`, `applies_to`,
+/// `citations`, all required), `---`, then Markdown.
+fn parse_guidance(path: &str, text: &str) -> Result<Guidance, LoadError> {
+    let (fields, body) = front_matter(
+        path,
+        text,
+        "guidance",
+        &["id", "title", "kind", "applies_to", "citations"],
+    )?;
+    let id = required(path, &fields, "id")?;
+    let title = required(path, &fields, "title")?;
+    let kind = required(path, &fields, "kind")?
         .parse::<GuidanceKind>()
         .map_err(|e| LoadError::new(path, e.to_string()))?;
-    let applies_to = parse_list(path, "applies_to", &need(applies_to, "applies_to")?)?;
-    let citations = parse_list(path, "citations", &need(citations, "citations")?)?
+    let applies_to = parse_list(path, "applies_to", &required(path, &fields, "applies_to")?)?;
+    let citations = parse_list(path, "citations", &required(path, &fields, "citations")?)?
         .into_iter()
         .map(CitationId::new)
         .collect();
@@ -461,7 +537,7 @@ fn unquote(s: &str) -> String {
     }
 }
 
-fn parse_list(path: &str, key: &str, value: &str) -> Result<Vec<String>, LoadError> {
+pub(crate) fn parse_list(path: &str, key: &str, value: &str) -> Result<Vec<String>, LoadError> {
     let inner = value
         .strip_prefix('[')
         .and_then(|v| v.strip_suffix(']'))
@@ -558,6 +634,18 @@ license = "US Government Work (public domain)"
                 i == "water_drum_55gal"
             }
             fn has_benefit(&self, _: &str) -> bool {
+                false
+            }
+            fn has_children(&self) -> bool {
+                false
+            }
+            fn has_pets(&self) -> bool {
+                false
+            }
+            fn has_vehicle(&self) -> bool {
+                false
+            }
+            fn has_powered_device(&self) -> bool {
                 false
             }
         }

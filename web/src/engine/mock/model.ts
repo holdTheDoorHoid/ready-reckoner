@@ -38,11 +38,12 @@ import type {
   Warning,
 } from '../types';
 import { BUCKET_IDS, ENGINE_API_VERSION, RETURN_PERIODS, TARGET_LADDER_DAYS, TIER_IDS } from '../types';
-import { chanceWithin, dayPhrase, frequencySentence, monthsPhrase } from '../../lib/format';
-import { citation } from './citations';
+import { addMonths, chanceWithin, dayPhrase, frequencySentence, monthsPhrase } from '../../lib/format';
+import { shimBinder, type ShimFacts } from './binder-shim';
+import { ATTRIBUTIONS, citation } from './citations';
 import { catalogueItem } from './items';
 import { BUCKETS, hazardName, hazardTier as tierOf } from './names';
-import { buildPacket } from './packet';
+import { buildPacket, householdPhrase } from './packet';
 import type { ByDial, DurationBucket, EvacuateSeed, HazardSeed, RegionProfile, ScenarioSeed } from './regions';
 import { DURATION_BUCKETS, PROFILES, tierForDays } from './regions';
 import { firstMilestone, RANGE_ONLY_RANKED, rangeSentence, rareFamilies, stressTestFor, subCausesFor, v2Seeds } from './v2';
@@ -1111,6 +1112,17 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
   ]).sort();
   const provenance: Citation[] = provenanceIds.map((id) => citation(id)).filter((c): c is Citation => c !== undefined);
 
+  // Contract v3: until the binder workstream lands, the Prepare sheet is the whole packet and the
+  // binder a transitional one built from it, as the engine does (binder-shim.ts).
+  const county = location.state_abbr === 'LA' ? 'Parish' : location.state_abbr === 'AK' ? '' : 'County';
+  const shimFacts: ShimFacts = {
+    generatedOn: input.planning_date,
+    household: householdPhrase(input),
+    location: `${location.county_name}${county ? ` ${county}` : ''}, ${location.state_name}${location.zip ? ` (ZIP code ${location.zip})` : ''}`,
+    reviewBy: addMonths(input.planning_date, 12),
+    provenance,
+    attributions: ATTRIBUTIONS,
+  };
   const output: PlanOutput = {
     engine_version: MOCK_ENGINE_VERSION,
     api_version: ENGINE_API_VERSION,
@@ -1125,11 +1137,13 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
     plan,
     requirements,
     warnings,
-    packet_markdown: '',
+    binder: shimBinder('', shimFacts),
+    prepare_markdown: '',
     provenance,
   };
   const result: ModelResult = { output, facts, profile, register, targets, states, schedule };
-  output.packet_markdown = buildPacket(input, result);
+  output.prepare_markdown = buildPacket(input, result);
+  output.binder = shimBinder(output.prepare_markdown, shimFacts);
   return result;
 }
 
