@@ -61,33 +61,95 @@ fn relief_cell(days: Option<f32>) -> String {
     }
 }
 
-/// Relief days on the target ladder, so "3.2 days" reads as "3 days".
+/// Relief days in plain words, as a person would say them and as the explain view says them:
+/// whole days under a month ("3 days" for 3.2), whole months under a year ("9 months" for 270,
+/// a month and a half kept), years to the nearest half beyond ("about 3 years" for the Oregon
+/// Resilience Plan's 1,095 days; verification R3-20). They are what a source says, not targets,
+/// so they are never rounded up to the target ladder, which stops at a year.
 fn round_relief(d: f64) -> f64 {
     if d < 0.75 {
         return 0.5;
     }
-    if d < 14.0 {
+    if d < 30.0 {
         return d.round().max(1.0);
     }
-    f64::from(rr_consequence::round_up_to_ladder(d))
+    if d < 365.0 {
+        if (d - 45.0).abs() < 7.5 {
+            return 45.0;
+        }
+        let months = (d / 30.0).round();
+        return if months >= 12.0 { 365.0 } else { months * 30.0 };
+    }
+    (d / 365.0 * 2.0).round() / 2.0 * 365.0
 }
 
-/// The longest a stress event kept some homes out: the last of the data's marks (1, 3, 7, 14 and
-/// 30 days) at which anyone was still out, as the app reads it (web-risks: "up to N").
-fn stress_up_to(st: &StressTest) -> Option<f32> {
-    st.share_out_at_days
+/// A home counts as still out at a mark while at least this share of customers is (0.5 in 100),
+/// the app's threshold (`BACK` in `web/src/lib/targets.ts`).
+const STILL_OUT: f32 = 0.005;
+
+/// How long the worst event on record kept homes out, read as the app reads it (`stressLine` in
+/// `web/src/lib/targets.ts`, verification R3-05), so print and screen agree.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) enum RecordSpan {
+    /// Some homes were out up to this many days: the first mark after the last one with at least
+    /// 0.5 in 100 still out, or a water event's nine-in-ten duration.
+    UpTo(f32),
+    /// Still out at the last mark: longer than this many days.
+    MoreThan(f32),
+    /// Nearly every home was back by the first mark.
+    Within(f32),
+    /// A water event recorded as one duration.
+    About(f32),
+}
+
+impl RecordSpan {
+    /// "up to 2 weeks", "more than 1 month", "within 1 day", "about 6 days".
+    pub(crate) fn words(self) -> String {
+        match self {
+            RecordSpan::UpTo(d) => format!("up to {}", text::day_phrase(f64::from(d))),
+            RecordSpan::MoreThan(d) => format!("more than {}", text::day_phrase(f64::from(d))),
+            RecordSpan::Within(d) => format!("within {}", text::day_phrase(f64::from(d))),
+            RecordSpan::About(d) => format!("about {}", text::day_phrase(f64::from(d))),
+        }
+    }
+}
+
+/// The record's span from its marks. Power events carry the share of customers still out after
+/// 1, 3, 7, 14 and 30 days: the span runs to the first mark after the last one with at least
+/// [`STILL_OUT`] still out (a home still out at day 7 and back by day 14 reads "up to 2 weeks",
+/// not "up to 7 days"). A water event carries the median home and the ninth in ten
+/// (`[[median, 0.5], [p90, 0.1]]`), read as up to the ninth in ten, or one duration.
+pub(crate) fn record_span(st: &StressTest, bucket: BucketId) -> Option<RecordSpan> {
+    let mut pts: Vec<(f32, f32)> = st
+        .share_out_at_days
         .iter()
-        .filter(|(_, s)| *s > 0.0)
-        .map(|(d, _)| *d)
-        .fold(None, |m, d| Some(m.map_or(d, |x: f32| x.max(d))))
+        .copied()
+        .filter(|(d, _)| d.is_finite() && *d > 0.0)
+        .collect();
+    pts.sort_by(|a, b| a.0.total_cmp(&b.0));
+    let first = *pts.first()?;
+    let water = matches!(bucket, BucketId::WaterOut | BucketId::WaterBoil);
+    if water && pts.len() == 2 && pts[0].1 >= 0.5 && pts[1].1 <= 0.1 {
+        return Some(RecordSpan::UpTo(pts[1].0));
+    }
+    if water && pts.len() == 1 {
+        return Some(RecordSpan::About(first.0));
+    }
+    let Some(last_out) = pts.iter().rposition(|(_, s)| *s >= STILL_OUT) else {
+        return Some(RecordSpan::Within(first.0));
+    };
+    Some(match pts.get(last_out + 1) {
+        Some((d, _)) => RecordSpan::UpTo(*d),
+        None => RecordSpan::MoreThan(pts[last_out].0),
+    })
 }
 
 /// The relief fallback (round-2 follow-up): when the event behind a target has no restoration
 /// record, the relief rating is not known; where the region's record has a worst event, the
-/// "mostly back" cell says how long it kept homes out instead ("worst on record: up to 6 days"),
-/// the note under the table says the target rests on an estimate, and the bucket's part below
-/// names the event (its worst-event line).
-pub(crate) fn relief_fallback_days(b: &BucketAssessment) -> Option<f32> {
+/// "mostly back" cell says how long it kept homes out instead ("worst on record: up to 2 weeks"),
+/// the note under the table says so, and the bucket's part below names the event (its
+/// worst-event line).
+pub(crate) fn relief_fallback(b: &BucketAssessment) -> Option<RecordSpan> {
     if b.relief.is_some() || !matches!(b.target, Target::Days { value, .. } if value > 0.0) {
         return None;
     }
@@ -97,7 +159,7 @@ pub(crate) fn relief_fallback_days(b: &BucketAssessment) -> Option<f32> {
     ) {
         return None;
     }
-    stress_up_to(b.stress_test.as_ref()?)
+    record_span(b.stress_test.as_ref()?, b.id)
 }
 
 /// The consequence model's sentences a bucket part prints besides the block's advice: the worst
@@ -216,10 +278,10 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         if b.id.kind() != BucketKind::Duration {
             continue;
         }
-        let back = match relief_fallback_days(b) {
-            Some(d) => {
+        let back = match relief_fallback(b) {
+            Some(span) => {
                 fallback_any = true;
-                format!("worst on record: up to {}", text::day_phrase(f64::from(d)))
+                format!("worst on record: {}", span.words())
             }
             None => relief_cell(b.relief.as_ref().map(|r| r.mostly_restored_days)),
         };
@@ -478,5 +540,85 @@ fn tier_cell(t: TierId) -> String {
     match t {
         TierId::Now => "free steps".to_owned(),
         other => text::lower_first(other.name()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn stress(marks: &[(f32, f32)]) -> StressTest {
+        StressTest {
+            event: "Winter storm, April 2017".to_owned(),
+            date: rr_types::Date::from_ymd(2017, 4, 29).unwrap(),
+            region: "your region's records".to_owned(),
+            share_out_at_days: marks.to_vec(),
+            covered_by_target: false,
+            sources: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn the_record_reads_as_the_app_reads_it() {
+        let power = BucketId::Power;
+        // Hays: 3.5 in 100 still out on day 7, none on day 14.
+        let hays = [
+            (1.0, 0.14),
+            (3.0, 0.089),
+            (7.0, 0.035),
+            (14.0, 0.0),
+            (30.0, 0.0),
+        ];
+        assert_eq!(
+            record_span(&stress(&hays), power),
+            Some(RecordSpan::UpTo(14.0))
+        );
+        // Under 0.5 in 100 does not count as still out (Minot: 0.44 in 100 on day 7).
+        let minot = [(1.0, 0.015), (3.0, 0.0063), (7.0, 0.0044), (14.0, 0.0)];
+        assert_eq!(
+            record_span(&stress(&minot), power),
+            Some(RecordSpan::UpTo(7.0))
+        );
+        // Still out at the last mark: longer than it.
+        let maria = [(1.0, 1.0), (7.0, 1.0), (14.0, 0.91), (30.0, 0.82)];
+        let span = record_span(&stress(&maria), power).unwrap();
+        assert_eq!(span, RecordSpan::MoreThan(30.0));
+        assert_eq!(span.words(), "more than 1 month");
+        // Nearly every home back by the first mark.
+        let brief = [(1.0, 0.002), (3.0, 0.0)];
+        assert_eq!(
+            record_span(&stress(&brief), power).unwrap().words(),
+            "within 1 day"
+        );
+        // Water: the median and the ninth in ten, or one duration.
+        let two = [(68.0, 0.5), (150.0, 0.1)];
+        assert_eq!(
+            record_span(&stress(&two), BucketId::WaterOut)
+                .unwrap()
+                .words(),
+            "up to 5 months"
+        );
+        assert_eq!(
+            record_span(&stress(&[(6.0, 1.0)]), BucketId::WaterBoil)
+                .unwrap()
+                .words(),
+            "about 6 days"
+        );
+        assert_eq!(record_span(&stress(&[]), power), None);
+    }
+
+    #[test]
+    fn relief_says_what_the_source_says() {
+        let words = |d: f64| text::day_phrase(round_relief(d));
+        assert_eq!(words(0.4), "half a day");
+        assert_eq!(words(3.2), "3 days");
+        assert_eq!(words(5.19), "5 days");
+        assert_eq!(words(14.0), "2 weeks");
+        assert_eq!(words(45.0), "1½ months");
+        assert_eq!(words(180.0), "6 months");
+        assert_eq!(words(270.0), "9 months");
+        assert_eq!(words(360.0), "1 year");
+        assert_eq!(words(1095.0), "3 years");
+        assert_eq!(words(540.0), "1½ years");
     }
 }

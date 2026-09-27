@@ -85,7 +85,8 @@ fn plural(unit: &str, qty: f64) -> String {
         return unit.to_owned();
     }
     match unit {
-        "each" | "Wh" | "kcal" | "oz" | "lb" => return unit.to_owned(),
+        // Abbreviations take no "s" ("58 fl oz", verification R3-19).
+        "each" | "Wh" | "kcal" | "oz" | "fl oz" | "lb" => return unit.to_owned(),
         "box" => return "boxes".to_owned(),
         "pouch" => return "pouches".to_owned(),
         "person_day" | "person-day" => return "person-days".to_owned(),
@@ -401,6 +402,8 @@ mod tests {
         assert_eq!(quantity(100.0, "dollar"), "$100");
         assert_eq!(quantity(13.0, "2,000 kcal"), "26,000 kcal");
         assert_eq!(quantity(4.0, "person"), "4 (one per person)");
+        assert_eq!(quantity(58.0, "fl oz"), "58 fl oz");
+        assert_eq!(quantity(1.0, "fl oz"), "1 fl oz");
         assert_eq!(per_100(0.254), "25");
         assert_eq!(per_100(0.004), "fewer than 1");
         assert_eq!(per_100(0.99), "almost all");
