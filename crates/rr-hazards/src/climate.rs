@@ -133,7 +133,7 @@ pub(crate) fn how_often(lo: f64, hi: f64) -> String {
             return "half as often".to_owned();
         }
         let pct = |x: f64| format!("{:.0}", ((1.0 - x) * 100.0).round());
-        both(pct(hi), pct(lo), " % less often")
+        both(pct(hi), pct(lo), "% less often")
     } else if lo >= 1.95 {
         let times = |x: f64| {
             let r = (x * 10.0).round() / 10.0;
@@ -148,7 +148,7 @@ pub(crate) fn how_often(lo: f64, hi: f64) -> String {
         "about as often as today".to_owned()
     } else {
         let pct = |x: f64| format!("{:.0}", ((x - 1.0) * 100.0).round());
-        both(pct(lo.max(1.0)), pct(hi), " % more often")
+        both(pct(lo.max(1.0)), pct(hi), "% more often")
     }
 }
 
@@ -448,12 +448,12 @@ mod tests {
     fn multipliers_read_in_plain_words() {
         assert_eq!(how_often(2.42, 3.0), "2.4 to 3 times as often");
         assert_eq!(how_often(3.0, 3.0), "3 times as often");
-        assert_eq!(how_often(1.368, 1.489), "37 to 49 % more often");
-        assert_eq!(how_often(1.14, 1.17), "14 to 17 % more often");
+        assert_eq!(how_often(1.368, 1.489), "37 to 49% more often");
+        assert_eq!(how_often(1.14, 1.17), "14 to 17% more often");
         assert_eq!(how_often(0.5, 0.5), "half as often");
-        assert_eq!(how_often(0.53, 0.62), "38 to 47 % less often");
+        assert_eq!(how_often(0.53, 0.62), "38 to 47% less often");
         assert_eq!(how_often(1.0, 1.0), "about as often as today");
-        assert_eq!(how_often(1.2104, 1.2113), "21 % more often");
+        assert_eq!(how_often(1.2104, 1.2113), "21% more often");
     }
 
     #[test]
