@@ -25,16 +25,16 @@ The ground starts to shake, or your phone warns that shaking is coming.
 
 1. **Expect aftershocks.** Drop, cover and hold on each time.[^ready_gov_earthquakes]
 2. **Check for injuries.** Help others if you have training.[^ready_gov_earthquakes]
-3. **Trapped?** Send a text, or bang on a pipe or wall. Use a whistle instead of shouting. Cover your mouth with your shirt.[^ready_gov_earthquakes]
-4. **Smell gas or hear hissing?** Open a window and get everyone out. Turn off the gas at the outside main valve if you can. Call the gas company from a neighbor's home.[^ready_gov_safety_skills]
+3. **Trapped?** Text, or bang on a pipe or wall. Use a whistle, not shouting. Cover your mouth with your shirt.[^ready_gov_earthquakes]
+4. **Smell gas or hear hissing?** Open a window, get everyone out and turn off the main gas valve if you can. Call the gas company from a neighbor's home.[^ready_gov_safety_skills]
 5. **Get news** from a battery radio or phone alerts. Text instead of calling.[^ready_gov_earthquakes]
-6. **Clean up** in long sleeves, work gloves and thick-soled shoes. Leave heavy debris for help.[^ready_gov_earthquakes]
+6. **Clean up** in gloves and thick-soled shoes. Leave heavy debris for help.[^ready_gov_earthquakes]
 
 ## Leave or stay
 
 - **Leave if** the building is damaged. Go outside and move away from it. Meet at {meeting_near}.[^ready_gov_earthquakes] {ref:getting_out}
-- **Go to** high ground or inland as soon as the shaking stops if a tsunami can reach you.[^ready_gov_earthquakes]
-- **Stay if** the building is not damaged. Drop, cover and hold on in each aftershock.[^ready_gov_earthquakes] {ref:home}
+- **Go to** high ground or inland when the shaking stops, if a tsunami can reach you.[^ready_gov_earthquakes]
+- **Stay if** the building is not damaged. {ref:home}
 
 ## Where and who
 
@@ -44,15 +44,13 @@ The ground starts to shake, or your phone warns that shaking is coming.
 
 ## Do not
 
-- Do not run outside or stand in a doorway during the shaking.[^ready_gov_earthquakes]
+- Do not run outside or stand in a doorway.[^ready_gov_earthquakes]
 - Do not go into a damaged building.[^ready_gov_earthquakes]
 - Do not turn the gas back on yourself. Only a trained worker should.[^ready_gov_safety_skills]
-- Do not let children help with the clean-up.[^ready_gov_earthquakes]
 
 ## When it is over
 
 - Go back into a damaged home only when officials say it is safe.[^ready_gov_recovering]
-- Let people know you are safe by text or social media.[^ready_gov_earthquakes]
 - For the weeks ahead, see {ref:after}.[^ready_gov_recovering]
 
 ## Sources
