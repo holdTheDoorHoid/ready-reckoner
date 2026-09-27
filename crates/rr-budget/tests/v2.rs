@@ -362,7 +362,8 @@ fn the_rare_allowance_buys_only_for_ticked_families_likely_enough_here() {
         .unwrap()
         .1;
     assert!(
-        line.why.contains("nuclear attack row you ticked"),
+        line.why
+            .contains("the nuclear attack or EMP row you ticked"),
         "{}",
         line.why
     );
@@ -387,6 +388,86 @@ fn the_rare_allowance_buys_only_for_ticked_families_likely_enough_here() {
         r.rare_catastrophic_skipped
             .contains(&ItemId::from("nuclear_extra"))
     );
+}
+
+/// An item that protects against one cause inside its family is gated, and valued, on that cause's
+/// chance (the middle of its published range), not on the family total. A shielded bag answers any
+/// electromagnetic pulse, so it is gated on the nuclear family's `emp` sub-cause, while the
+/// dosimeter card keeps the family's local blast-or-fallout total: where that total is about 1.2 in
+/// 10,000 over ten years (a remote county), the card is not bought and the bag is (its EMP part,
+/// 2.2e-5 to 3.45e-3 a year, is about 2.7 in 1,000), and its sentence names the pulse and the row. A
+/// pulse part of 0, or no sub-causes at all, buys no bag.
+#[test]
+fn an_item_for_one_cause_is_gated_on_that_cause_not_the_family_total() {
+    let run = |emp: Option<[f64; 2]>| {
+        let mut card = buy("rare_radiation_meter", BucketId::Security, TierId::Y1, 25.0);
+        card.rare_catastrophic = true;
+        card.hazard_extras = vec![HazardId::NuclearAttack];
+        let mut bag = buy("rare_faraday_storage", BucketId::Comms, TierId::Y1, 68.0);
+        bag.rare_catastrophic = true;
+        bag.hazard_extras = vec![HazardId::NuclearAttack];
+        let mut s = Setup::new(PHL, 100.0, 0.0)
+            .add(card, ItemMeta::new("rare_radiation_meter"))
+            .add(bag, ItemMeta::new("rare_faraday_storage"));
+        s.household.dials.rare_opt_in = vec!["nuclear_attack".into()];
+        // The family's local total: about 1.2 in 10,000 over ten years (a remote county).
+        s.risks.register.insert(HazardId::NuclearAttack, 1.2e-5);
+        if let Some(range) = emp {
+            s.risks.sub_causes.insert(
+                HazardId::NuclearAttack,
+                vec![rr_types::SubCause {
+                    id: "emp".into(),
+                    name: "Electromagnetic pulse (EMP) from a high-altitude burst".into(),
+                    note: String::new(),
+                    rate_range: Some(range),
+                    sources: Vec::new(),
+                }],
+            );
+        }
+        s.run()
+    };
+    let r = run(Some([2.2e-5, 3.45e-3]));
+    assert_eq!(
+        month_of(&r, "rare_radiation_meter"),
+        None,
+        "the card needs the local total"
+    );
+    assert!(
+        month_of(&r, "rare_faraday_storage").is_some(),
+        "the bag needs a pulse"
+    );
+    let line = lines(&r)
+        .into_iter()
+        .find(|(_, i)| i.item_id == "rare_faraday_storage" && i.kind == PlanItemKind::Purchase)
+        .unwrap()
+        .1;
+    assert!(
+        line.why.contains(
+            "It is for the pulse from a nuclear attack, part of the nuclear attack or EMP row you \
+             ticked"
+        ),
+        "{}",
+        line.why
+    );
+    assert_eq!(line.hazards, [HazardId::NuclearAttack]);
+    // Valued on the pulse's chance: about 2.7 in 1,000 times the bag's 0.5 harm-days.
+    let value = r
+        .sequence
+        .iter()
+        .find(|p| p.item_id == "rare_faraday_storage")
+        .unwrap()
+        .value;
+    let want = rr_budget::rare::p10_from_rate((2.2e-5_f64 * 3.45e-3).sqrt()) * 0.5;
+    assert!((value - want).abs() < 1e-12, "{value} vs {want}");
+    // No pulse part (the months-long family's rule outside the lower 48), or no sub-causes: no bag.
+    for emp in [Some([0.0, 0.0]), None] {
+        let r = run(emp);
+        assert_eq!(month_of(&r, "rare_faraday_storage"), None, "{emp:?}");
+        assert!(
+            r.rare_catastrophic_skipped
+                .contains(&ItemId::from("rare_faraday_storage"))
+        );
+    }
 }
 
 // ------------------------------------------------------------------------------------------------

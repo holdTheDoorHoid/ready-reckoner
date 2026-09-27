@@ -215,13 +215,13 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Financial crisis with bank closures | Between 1 in 200 and 1 in 11[14, 71] | Cards and bank transfers stop for days. | Keep some cash in small bills (already in your plan) and a second account at another bank (free). |
 | Very large volcanic eruption | Between 1 in 130 and 1 in 26[14, 72] | A year or two of higher food prices and some shortages. | Nothing beyond a two-week pantry. |
 | Severe pandemic | Between 1 in 200 and 1 in 21[14, 53, 54] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
-| Nuclear attack | Between 1 in 3,300 and 1 in 28[14, 59, 69, 70, 73, 74, 75, 76, 77, 78, 79] | Life-threatening: blast or heavy fallout near likely targets. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
+| Nuclear attack or EMP | Between 1 in 3,300 and 1 in 28[14, 59, 69, 70, 73, 74, 75, 76, 77, 78, 79] | Life-threatening: blast or heavy fallout near likely targets. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
 | Power out for months (any cause) | Between 1 in 1,400 and 1 in 43[13, 14, 69, 70, 73, 80, 81, 82, 83, 84, 85, 86] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Severe solar storm | Between 1 in 7,600 and 1 in 150[14, 80, 81, 82, 83, 84] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
 | Chemical, biological or radiological attack | Between 1 in 25,000 and 1 in 130[14, 59, 87] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
 | Mass shooting or bombing | Very unlikely: less than 1 in 100,000[14, 88] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
 
-**Nuclear attack: why here.** You live in the Houston metro area. Because of its size and importance, a place like this is treated as a likely target in a large nuclear war. That does not mean an attack is likely, only that the danger here would be greater than in most places.[14, 70, 76, 77]
+**Nuclear attack or EMP: why here.** You live in the Houston metro area. Because of its size and importance, a place like this is treated as a likely target in a large nuclear war. That does not mean an attack is likely, only that the danger here would be greater than in most places.[14, 70, 76, 77]
 
 ### Notes on these numbers
 
