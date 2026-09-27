@@ -7,8 +7,9 @@
 //!
 //! [`validate()`] enforces the mechanical parts of `docs/CONTENT_STANDARDS.md` §3–§5 (every item
 //! cites, every citation has a URL and licence, quantity rules exist, no brands, no dosing, firearm
-//! words only in the one permitted free action, guidance under 300 words, reading level) and runs in
-//! `cargo test`, so content that breaks the policy never reaches a build that passes CI.
+//! words only in the one permitted free action, guidance under 300 words, reading level, and the
+//! checklist format of DESIGN-DELTA-v3 §5.4) and runs in `cargo test`, so content that breaks the
+//! policy never reaches a build that passes CI.
 //!
 //! # Where things are
 //!

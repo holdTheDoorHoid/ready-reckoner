@@ -389,6 +389,17 @@ pressure phrases, the dosing rule and the firearms rule apply as to every block;
 what to do and when. Airline checklists are terse: no explanations inside a step; the reason, if
 one is needed, goes in "Use this when" or in one sentence under "Do not".
 
+As the validator implements it (types3, 2026-09-27; `check_checklists` in
+`crates/rr-content/src/validate.rs`, `docs/CONTENT_STANDARDS.md` §4): "Where and who" holds at
+most three lines of the block's own, written `Label: {placeholder}` or `Label:` alone for a line to
+write on; a citation is required on every step and on every "Do not" and "When it is over" bullet,
+except a bullet that only points to a page with `{ref:…}`, and not on "Leave or stay" branches or
+"Where and who" lines; the word count keeps every conditional span, counts each placeholder and
+`{ref:…}` as one word, and leaves out the `##` headings; reading level above grade 8 is a warning;
+a whole step or bullet may be conditional (the span opens right after `1. ` or `- ` and closes at
+the end of the line; a step left empty is dropped and the renderer numbers the steps); a span in a
+checklist may name any hazard; each hazard and event has one checklist.
+
 ### 5.5 Everyday emergencies
 
 `event:` blocks print for every household: gas leak or carbon-monoxide alarm; missing person (a
