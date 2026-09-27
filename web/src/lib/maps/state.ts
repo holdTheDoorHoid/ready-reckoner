@@ -17,18 +17,16 @@ import type { IsoDate, LatLon } from '../../engine/types';
 export const PIN_IDS = ['home', 'meeting_near', 'meeting_far', 'where_go'] as const;
 export type PinId = (typeof PIN_IDS)[number];
 
-/** The optional layers, in the order the consent screen lists them. */
-export const LAYER_IDS = ['base', 'places', 'flood', 'surge', 'wildfire'] as const;
+/** The optional layers the saved plan records, in the order the consent screen lists them. */
+export const LAYER_IDS = ['places', 'flood', 'surge', 'wildfire'] as const;
 export type LayerId = (typeof LAYER_IDS)[number];
 
 /**
- * Which layers the household chose on its last "Fetch maps". §9.5 names `places`, `flood`, `surge`
- * and `wildfire`; `base` (the street map itself) is optional and absent means "on", so a plan
- * written to the §9.5 shape reads the same.
+ * Which layers the household chose on its last "Fetch maps" (§9.5, exactly). Whether the street
+ * map itself was included is a choice of that one press (`LayerChoice` in `compose.ts`); the maps
+ * it made say so in their own status lines.
  */
 export interface MapLayers {
-  /** The street map (OpenStreetMap tiles, the Census map as the fallback). Absent: on. */
-  base?: boolean;
   places: boolean;
   flood: boolean;
   surge: boolean;
@@ -55,9 +53,9 @@ export const MAX_ROUTE_POINTS = 60;
 /** Decimal places kept for a pin: five is about a metre, finer than anyone can place a pin. */
 const PLACES = 5;
 
-/** A new, empty state: no pins, no routes, the default layers (base map and places on). */
+/** A new, empty state: no pins, no routes, the default layers (places on). */
 export function emptyMapsState(): MapsState {
-  return { routes: [], layers: { base: true, places: true, flood: false, surge: false, wildfire: false } };
+  return { routes: [], layers: { places: true, flood: false, surge: false, wildfire: false } };
 }
 
 const isObject = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
@@ -98,7 +96,6 @@ export function checkMapsState(x: unknown): MapsState | undefined {
   }
   const layers = isObject(x.layers) ? x.layers : {};
   out.layers = {
-    base: layers.base !== false,
     places: layers.places !== false,
     flood: layers.flood === true,
     surge: layers.surge === true,

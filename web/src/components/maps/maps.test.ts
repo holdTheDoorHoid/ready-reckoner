@@ -214,7 +214,7 @@ describe('The maps panel: nothing is fetched before "Fetch maps", on every press
     for (const r of fake.requests) expect(MAP_ORIGINS).toContain(new URL(r.url).origin);
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(m.target.querySelectorAll('figure img')).toHaveLength(3);
-    expect(changes.at(-1)).toMatchObject({ home: HOME, fetched_on: '2026-10-01', layers: { base: true, places: true, flood: true, surge: false, wildfire: false } });
+    expect(changes.at(-1)).toMatchObject({ home: HOME, fetched_on: '2026-10-01', layers: { places: true, flood: true, surge: false, wildfire: false } });
     expect(m.text()).toContain('Your maps are ready (fetched October 1, 2026)');
     expect(m.text()).toContain('Rite Aid');
     await noAxeViolations(m.target, 'the panel with its maps');

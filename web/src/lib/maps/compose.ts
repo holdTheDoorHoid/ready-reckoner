@@ -19,6 +19,9 @@ import { AREA_QUOTAS, KIND_LABELS, NEIGHBOURHOOD_QUOTAS, overpassQuery, parseOve
 import { type HomeBasis, homePoint, type MapLocation, type MapSlotKind, SLOT_KINDS, slotFrame, type SuggestedLayers } from './slots';
 import { CENSUS_BASE, FLOOD, MAX_TILES_PER_PRESS, OSM_TILES, OVERPASS, SURGE_NOTE, WILDFIRE } from './sources';
 import type { MapLayers, MapsState } from './state';
+
+/** What one press of "Fetch maps" asks for: the saved plan's layers, and whether to fetch the street map. */
+export type LayerChoice = MapLayers & { base: boolean };
 import { type Frame, frameBox, inFrame, scaleBar, TILE_SIZE, type TilePlacement, tilesFor, toCanvas } from './tiles';
 
 // ---------------------------------------------------------------------------------------------
@@ -103,7 +106,7 @@ export interface ComposeInput {
   location: MapLocation;
   county: CountyOutline | null;
   /** What the household ticked on the consent screen. */
-  layers: MapLayers;
+  layers: LayerChoice;
   /** The §9.2 rule (for the surge note, and to say a suggested layer was left off). */
   suggested: SuggestedLayers;
   children: boolean;
@@ -577,7 +580,7 @@ function drawMap(d: DrawInput, env: ComposeEnv, ratio: number): ComposedMap {
 /** How many requests a press can make at most, for the progress bar. */
 export function plannedRequests(input: ComposeInput): number {
   const frames = framesFor(input);
-  const tiles = input.layers.base !== false ? new Set(SLOT_KINDS.flatMap((s) => tilesFor(frames[s]).map((t) => `${t.z}/${t.x}/${t.y}`))).size : 0;
+  const tiles = input.layers.base ? new Set(SLOT_KINDS.flatMap((s) => tilesFor(frames[s]).map((t) => `${t.z}/${t.x}/${t.y}`))).size : 0;
   return tiles + (input.layers.places ? 1 : 0) + (input.layers.flood ? 1 : 0) + (input.layers.wildfire ? 1 : 0);
 }
 
@@ -602,7 +605,7 @@ export async function composeMaps(input: ComposeInput, env: ComposeEnv): Promise
   const progress = () => env.onProgress?.(Math.min(++done, total), total);
 
   const [base, places, flood, wildfire] = await Promise.all([
-    input.layers.base !== false
+    input.layers.base
       ? fetchBases(frames, fetcher, env, progress)
       : Promise.resolve({ bases: { neighbourhood: { source: 'none' }, area: { source: 'none' }, region: { source: 'none' } } as Record<MapSlotKind, Base>, tiles: 0 }),
     input.layers.places ? fetchPlaces(frames, input.children, fetcher, env.now ?? Date.now).finally(progress) : Promise.resolve(null),

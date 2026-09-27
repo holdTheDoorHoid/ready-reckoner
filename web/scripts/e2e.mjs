@@ -411,8 +411,9 @@ try {
     const offList = external.filter((e) => !MAP_ORIGINS.includes(new URL(e.url).origin));
     check('after consent, requests go only to the origins in sources.ts', offList.length === 0, offList.slice(0, 3).map((e) => e.url).join(', ') || `${external.length} requests to ${[...new Set(external.map((e) => new URL(e.url).origin))].join(', ')}`);
     const tiles = external.filter((e) => e.url.startsWith('https://tile.openstreetmap.org/'));
-    const refererless = tiles.filter((e) => !e.referer);
-    check('tile requests carry the site as the Referer (the OSMF policy), and nothing else does', refererless.length === 0 && external.filter((e) => !e.url.startsWith('https://tile.openstreetmap.org/') && !e.url.startsWith('https://nominatim.')).every((e) => !e.referer), `${tiles.length} tiles, Referer "${tiles[0]?.referer ?? ''}"`);
+    // The OSMF and Overpass rules ask for a Referer; it must be the site's address alone, never the page or its #/ route.
+    const badReferer = external.filter((e) => e.referer !== `${siteOrigin}/`);
+    check('every map request names the site by its address alone (the Referer the OSMF and Overpass rules ask for)', badReferer.length === 0, badReferer.slice(0, 2).map((e) => `${e.url.slice(0, 50)} -> "${e.referer}"`).join(', ') || `${external.length} requests, Referer "${external[0]?.referer ?? ''}"`);
     const pressTiles = Number(await p.$eval('[data-maps-tiles]', (el) => el.getAttribute('data-maps-tiles')));
     check('one press asks for at most 250 tiles (§9.3)', pressTiles > 0 && pressTiles <= 250, `${pressTiles} tiles for the three maps, ${tiles.length - pressTiles} for the pin map`);
     summary.maps = {

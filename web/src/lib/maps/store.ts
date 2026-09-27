@@ -52,7 +52,7 @@ export function mapsKey(maps: MapsState | undefined, countyFips: string): string
   const pins = PIN_IDS.map((id) => (maps[id] ? `${maps[id]!.lat},${maps[id]!.lon}` : '-'));
   const routes = maps.routes.map((r) => r.map((p) => `${p.lat},${p.lon}`).join(' '));
   const l = maps.layers;
-  const layers = [l.base !== false, l.places, l.flood, l.surge, l.wildfire].map((b) => (b ? 1 : 0)).join('');
+  const layers = [l.places, l.flood, l.surge, l.wildfire].map((b) => (b ? 1 : 0)).join('');
   return JSON.stringify([countyFips, pins, routes, layers, maps.fetched_on ?? '']);
 }
 

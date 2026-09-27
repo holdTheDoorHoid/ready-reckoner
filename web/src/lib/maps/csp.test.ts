@@ -17,7 +17,7 @@ describe('The content security policy lets the maps reach exactly the services i
       'https://imagery.geoplatform.gov',
       'https://nominatim.openstreetmap.org',
       'https://overpass-api.de',
-      'https://overpass.kumi.systems',
+      'https://overpass.private.coffee',
       'https://tigerweb.geo.census.gov',
       'https://tile.openstreetmap.org',
     ]);

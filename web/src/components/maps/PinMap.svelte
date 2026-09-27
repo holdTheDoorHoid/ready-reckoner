@@ -151,8 +151,9 @@
 <section class="pin-map" aria-labelledby="{uid}-title">
   <svelte:element this={`h${headingLevel}`} id="{uid}-title">Place your pins and ways out</svelte:element>
   <p class="small">
-    Pick what to place, then click the map. Or move the map (arrow keys, or the + and − buttons) until the cross in the middle is on the
-    spot, and press “Put it at the cross”. You can drag a pin to move it.
+    Pick what to place, then click the map. Or move the map (drag it, or use the arrow keys) and zoom (the + and − buttons, or Ctrl and
+    the scroll wheel) until the cross in the middle is on the spot, and press “Put it at the cross”. You can drag a pin to move it. To
+    start a way out at home, click the H pin, then click along the way, ending on the D pin.
   </p>
 
   <div class="pin-map__layout">

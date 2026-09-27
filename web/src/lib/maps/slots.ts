@@ -18,22 +18,16 @@
  * map in Philadelphia, 7.5 km on the area map): every home in the same grid cell asks for the
  * same map, and the home is drawn off-centre by at most half a cell (64 pixels of 800).
  */
-import type { LatLon, LocationResolved } from '../../engine/types';
+import type { LatLon, LocationResolved, MapSlot, MapSlotKind as ContractSlotKind } from '../../engine/types';
 import type { MapsState } from './state';
 import { type Frame, fitFrame, metresPerPixel, project, unproject } from './tiles';
 
-export const SLOT_KINDS = ['neighbourhood', 'area', 'region'] as const;
-export type MapSlotKind = (typeof SLOT_KINDS)[number];
+/** The three maps, in the order they are composed and listed (the contract's `MapSlotKind`). */
+export const SLOT_KINDS = ['neighbourhood', 'area', 'region'] as const satisfies readonly ContractSlotKind[];
+export type MapSlotKind = ContractSlotKind;
 
-/**
- * A `map_slot` block from the binder (DESIGN-DELTA-v3 §4.1).
- * awaiting: types3 (`web/src/engine/types.ts` gains `Block.map_slot`; this mirrors it until then).
- */
-export interface MapSlotBlock {
-  id: string;
-  kind: MapSlotKind;
-  caption: string;
-}
+/** A binder `map_slot` block's slot (DESIGN-DELTA-v3 §4.1): its id, kind and caption. */
+export type MapSlotBlock = MapSlot;
 
 /** Stand-ins for the binder's three slots until the binder lands (awaiting: binder). */
 export const MAP_SLOT_FIXTURES: readonly MapSlotBlock[] = [
@@ -49,12 +43,8 @@ export const MAP_HEIGHT = 560;
 /** The neighbourhood map aims at about this width on the ground (§9.2). */
 const NEIGHBOURHOOD_METRES = 1500;
 
-/** A location as the maps read it: `zip_centroid` arrives with contract v3 (§3.3). */
-export type MapLocation = Pick<LocationResolved, 'county_fips' | 'county_name' | 'state_abbr' | 'state_name' | 'centroid'> & {
-  /** awaiting: types3 (`LocationResolved.zip_centroid`). */
-  zip_centroid?: LatLon;
-  exposure?: LocationResolved['exposure'];
-};
+/** A location as the maps read it (`zip_centroid` is contract v3's, §3.3). */
+export type MapLocation = Pick<LocationResolved, 'county_fips' | 'county_name' | 'state_abbr' | 'state_name' | 'centroid' | 'zip_centroid' | 'exposure'>;
 
 /** Where the maps centre when there is no home pin. */
 export type HomeBasis = 'pin' | 'zip' | 'county';

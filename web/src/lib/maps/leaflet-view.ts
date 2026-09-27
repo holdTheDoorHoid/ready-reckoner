@@ -35,8 +35,20 @@ export function leafletView(element: HTMLElement, options: ViewOptions): MapView
     keyboard: true,
     zoomControl: true,
     attributionControl: true,
+    // The map sits in a long page: a plain scroll wheel scrolls the page, as it does elsewhere;
+    // Ctrl (or Cmd) with the wheel zooms the map (below), as do the buttons, double-click and pinch.
+    scrollWheelZoom: false,
   });
   map.attributionControl.setPrefix(false);
+  element.addEventListener(
+    'wheel',
+    (e: WheelEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      map.setZoom(map.getZoom() + (e.deltaY < 0 ? 1 : -1));
+    },
+    { passive: false },
+  );
 
   const osm = L.tileLayer(OSM_TILES.url, {
     maxZoom: PIN_MAP_MAX_ZOOM,
@@ -87,6 +99,12 @@ export function leafletView(element: HTMLElement, options: ViewOptions): MapView
         marker.on('dragend', () => {
           const p = marker.getLatLng();
           options.onPinMoved(pin.id, { lat: p.lat, lon: p.lng });
+        });
+        // A click on a pin counts as a click at the pin's own spot, so a way out can start exactly
+        // at home and end exactly where the household would go (Leaflet sends no click after a drag).
+        marker.on('click', () => {
+          const p = marker.getLatLng();
+          options.onClick({ lat: p.lat, lon: p.lng });
         });
         marker.addTo(pins);
       }

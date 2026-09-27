@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { checkLatLon, checkMapsState, emptyMapsState, hasPins, MAX_ROUTE_POINTS, MAX_ROUTES, mapsHoldLocation } from './state';
 
 describe('MapsState (DESIGN-DELTA-v3 §9.5)', () => {
-  it('starts with no pins, no routes, the street map and places on', () => {
+  it('starts with no pins, no routes, and places on', () => {
     const s = emptyMapsState();
-    expect(s).toEqual({ routes: [], layers: { base: true, places: true, flood: false, surge: false, wildfire: false } });
+    expect(s).toEqual({ routes: [], layers: { places: true, flood: false, surge: false, wildfire: false } });
     expect(hasPins(s)).toBe(false);
     expect(mapsHoldLocation(s)).toBe(false);
   });
@@ -20,19 +20,19 @@ describe('MapsState (DESIGN-DELTA-v3 §9.5)', () => {
     expect(checkLatLon([39.9, -75.1])).toBeUndefined();
   });
 
-  it('reads a state written to the §9.5 shape (no base-map field) as base map on', () => {
+  it('reads a state written to the §9.5 shape, and drops anything else (an old base-map field)', () => {
     const s = checkMapsState({
       home: { lat: 39.95, lon: -75.16 },
       meeting_far: { lat: 40.0, lon: -75.2 },
       routes: [[{ lat: 39.95, lon: -75.16 }, { lat: 40.1, lon: -75.3 }]],
-      layers: { places: true, flood: true, surge: false, wildfire: false },
+      layers: { base: false, places: true, flood: true, surge: false, wildfire: false },
       fetched_on: '2026-10-01',
     });
     expect(s).toEqual({
       home: { lat: 39.95, lon: -75.16 },
       meeting_far: { lat: 40, lon: -75.2 },
       routes: [[{ lat: 39.95, lon: -75.16 }, { lat: 40.1, lon: -75.3 }]],
-      layers: { base: true, places: true, flood: true, surge: false, wildfire: false },
+      layers: { places: true, flood: true, surge: false, wildfire: false },
       fetched_on: '2026-10-01',
     });
     expect(hasPins(s)).toBe(true);
@@ -54,8 +54,8 @@ describe('MapsState (DESIGN-DELTA-v3 §9.5)', () => {
     expect(s?.routes).toHaveLength(MAX_ROUTES);
     expect(s?.routes[0]).toHaveLength(MAX_ROUTE_POINTS);
     expect(s?.routes[1]).toEqual([{ lat: 1, lon: 1 }, { lat: 2, lon: 2 }]);
-    // A layer is on only when it is exactly true, except the two that default on, which are off only when exactly false.
-    expect(s?.layers).toEqual({ base: true, places: true, flood: false, surge: true, wildfire: false });
+    // A layer is on only when it is exactly true, except places (on by default), off only when exactly false.
+    expect(s?.layers).toEqual({ places: true, flood: false, surge: true, wildfire: false });
     expect(s?.fetched_on).toBeUndefined();
     expect(Object.keys(s ?? {})).not.toContain('password');
   });

@@ -18,7 +18,7 @@ import {
   toRecord,
 } from './store';
 
-const maps: MapsState = { ...emptyMapsState(), home: { lat: 39.9364, lon: -75.1534 }, layers: { base: true, places: true, flood: true, surge: false, wildfire: false }, fetched_on: '2026-10-01' };
+const maps: MapsState = { ...emptyMapsState(), home: { lat: 39.9364, lon: -75.1534 }, layers: { places: true, flood: true, surge: false, wildfire: false }, fetched_on: '2026-10-01' };
 
 function composed(slot: ComposedMap['slot']): ComposedMap {
   return {
@@ -117,7 +117,6 @@ describe('The maps store (IndexedDB "rr-maps")', () => {
   it('keys the choices in a fixed order, so the same choices always give the same key', () => {
     const a = mapsKey(maps, '42101');
     expect(mapsKey(JSON.parse(JSON.stringify(maps)) as MapsState, '42101')).toBe(a);
-    expect(mapsKey({ ...maps, layers: { ...maps.layers, base: undefined } }, '42101')).toBe(a);
     expect(mapsKey({ ...maps, layers: { ...maps.layers, flood: false } }, '42101')).not.toBe(a);
     expect(mapsKey(undefined, '42101')).toBe('');
   });

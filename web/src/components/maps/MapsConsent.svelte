@@ -13,7 +13,7 @@
 
   import type { SuggestedLayers } from '../../lib/maps/slots';
   import { EVERY_RECIPIENT_SEES, RECIPIENTS, type RecipientId, SURGE_NOTE } from '../../lib/maps/sources';
-  import type { MapLayers } from '../../lib/maps/state';
+  import type { LayerChoice } from '../../lib/maps/compose';
 
   let {
     mode = 'maps',
@@ -31,7 +31,7 @@
     hasHomePin?: boolean;
     /** The browser says it is offline: warn, do not block. */
     offline?: boolean;
-    onfetch: (layers: MapLayers) => void;
+    onfetch: (layers: LayerChoice) => void;
     oncancel: () => void;
     headingLevel?: 2 | 3;
   } = $props();

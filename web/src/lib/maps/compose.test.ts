@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import { type ComposeInput, composeMaps, COUNTY_CREDIT, framesFor, HOSPITAL_NOTE, longDate, plannedRequests } from './compose';
+import { type ComposeInput, composeMaps, COUNTY_CREDIT, framesFor, HOSPITAL_NOTE, longDate, plannedRequests, resetOverpassPauses } from './compose';
 import fixture from './fixtures/overpass-philadelphia.json';
 import { MAP_SLOT_FIXTURES, type MapLocation } from './slots';
 import { MAP_ORIGINS, OSM_TILES, SURGE_NOTE } from './sources';
@@ -56,7 +56,7 @@ function input(extra: Partial<ComposeInput> = {}): ComposeInput {
 const allGood: Route = (url) => {
   const host = new URL(url).host;
   if (host === 'tile.openstreetmap.org') return imageResponse('tile');
-  if (host === 'overpass-api.de' || host === 'overpass.kumi.systems') return jsonResponse(fixture);
+  if (host === 'overpass-api.de' || host === 'overpass.private.coffee') return jsonResponse(fixture);
   if (host === 'hazards.fema.gov') return imageResponse('flood');
   if (host === 'imagery.geoplatform.gov') return imageResponse('wildfire');
   if (host === 'tigerweb.geo.census.gov') return imageResponse('census');
@@ -67,6 +67,8 @@ const pixels = (tag: string, w: number, h: number) =>
   tag === 'flood' ? overlayPixels(w, h, 5000, 0) : tag === 'wildfire' ? overlayPixels(w, h, 0, 800) : new Uint8ClampedArray(w * h * 4);
 
 const origin = (url: string) => new URL(url).origin;
+
+beforeEach(() => resetOverpassPauses());
 
 describe('Composing the three maps for a Philadelphia household', () => {
   it('asks only the recipients the household agreed to, within the limits, and says how many', async () => {
@@ -91,13 +93,11 @@ describe('Composing the three maps for a Philadelphia household', () => {
     }
   });
 
-  it('sends the site’s address only to the tile server (its policy requires a Referer), and no one else', async () => {
+  it('identifies the site to every service by its address only, never the page or its route (the OSMF and Overpass rules)', async () => {
     const { env, requests } = fakeEnv(allGood, pixels);
     await composeMaps(input({ layers: { base: true, places: true, flood: true, surge: false, wildfire: true } }), env);
-    for (const r of requests) {
-      const expected = origin(r.url) === 'https://tile.openstreetmap.org' ? 'strict-origin-when-cross-origin' : 'no-referrer';
-      expect(r.init.referrerPolicy, r.url).toBe(expected);
-    }
+    expect(new Set(requests.map((r) => origin(r.url))).size).toBe(4);
+    for (const r of requests) expect(r.init.referrerPolicy, r.url).toBe('strict-origin-when-cross-origin');
     const overpass = requests.find((r) => r.url.includes('overpass'));
     expect(overpass?.init.method).toBe('POST');
     expect(String(overpass?.init.body)).toMatch(/^data=%5Bout%3Ajson%5D%5Btimeout%3A25%5D/);
@@ -201,18 +201,49 @@ describe('When a source fails, its layer is left out and the map says so', () =>
     const { env } = fakeEnv((url, init) => (url.startsWith('https://overpass-api.de') ? jsonResponse({ remark: 'busy' }, 504) : allGood(url, init)), pixels);
     const result = await composeMaps(input(), env);
     expect(result.requests['https://overpass-api.de']).toBe(1);
-    expect(result.requests['https://overpass.kumi.systems']).toBe(1);
+    expect(result.requests['https://overpass.private.coffee']).toBe(1);
     expect(result.maps[0]!.legend.length).toBe(11);
+  });
+
+  it('a server that answered 429 is left alone for 30 seconds, as the main instance asks, then asked again', async () => {
+    let now = 1_000_000;
+    const busy = fakeEnv((url, init) => (url.startsWith('https://overpass-api.de') ? jsonResponse({}, 429) : allGood(url, init)), pixels);
+    busy.env.now = () => now;
+    await composeMaps(input(), busy.env);
+    // Ten seconds later, another press goes straight to the second instance.
+    now += 10_000;
+    const soon = fakeEnv(allGood, pixels);
+    soon.env.now = () => now;
+    const second = await composeMaps(input(), soon.env);
+    expect(second.requests['https://overpass-api.de']).toBeUndefined();
+    expect(second.requests['https://overpass.private.coffee']).toBe(1);
+    // After the pause, the main instance is asked first again.
+    now += 25_000;
+    const later = fakeEnv(allGood, pixels);
+    later.env.now = () => now;
+    const third = await composeMaps(input(), later.env);
+    expect(third.requests['https://overpass-api.de']).toBe(1);
+    expect(third.requests['https://overpass.private.coffee']).toBeUndefined();
+  });
+
+  it('both servers busy: the maps say the places service was busy and to refresh later', async () => {
+    const { env } = fakeEnv((url, init) => (url.includes('overpass') ? jsonResponse({}, 429) : allGood(url, init)), pixels);
+    const [nb] = (await composeMaps(input(), env)).maps;
+    expect(nb!.statuses).toContainEqual({
+      layer: 'places',
+      state: 'failed',
+      text: 'Nearby places could not be fetched on October 1, 2026: the places service was busy. Refresh the maps later to add them.',
+    });
   });
 
   it('both Overpass servers fail (one times out inside a 200 answer): no third try, and the maps say so', async () => {
     const { env } = fakeEnv((url, init) => {
       if (url.startsWith('https://overpass-api.de')) return jsonResponse({ elements: [], remark: 'runtime error: Query timed out in "query" at line 3 after 25 seconds.' });
-      if (url.startsWith('https://overpass.kumi.systems')) return new Error('offline');
+      if (url.startsWith('https://overpass.private.coffee')) return new Error('offline');
       return allGood(url, init);
     }, pixels);
     const result = await composeMaps(input(), env);
-    expect((result.requests['https://overpass-api.de'] ?? 0) + (result.requests['https://overpass.kumi.systems'] ?? 0)).toBe(2);
+    expect((result.requests['https://overpass-api.de'] ?? 0) + (result.requests['https://overpass.private.coffee'] ?? 0)).toBe(2);
     const [nb, area] = result.maps;
     for (const map of [nb!, area!]) {
       expect(map.statuses).toContainEqual({ layer: 'places', state: 'failed', text: 'Nearby places could not be fetched on October 1, 2026.' });

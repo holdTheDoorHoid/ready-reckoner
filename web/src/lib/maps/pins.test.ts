@@ -52,7 +52,7 @@ describe('Placing pins and drawing the ways out', () => {
   });
 
   it('goes back to the saved shape: a one-point line is not a line, and the layers and date are kept', () => {
-    const saved = { ...emptyMapsState(), home: A, fetched_on: '2026-10-01', layers: { base: true, places: false, flood: true, surge: false, wildfire: false } };
+    const saved = { ...emptyMapsState(), home: A, fetched_on: '2026-10-01', layers: { places: false, flood: true, surge: false, wildfire: false } };
     let d = toDraft(saved);
     d = place(d, 'route1', A);
     d = place(d, 'route2', B);

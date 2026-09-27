@@ -27,7 +27,7 @@ export interface MapView {
 export interface ViewOptions {
   center: LatLon;
   zoom: number;
-  /** A click (or tap) on the map. */
+  /** A click (or tap) on the map, or on a pin (at the pin's own spot). */
   onClick(at: LatLon): void;
   /** A pin dragged to a new spot. */
   onPinMoved(id: PinId, at: LatLon): void;

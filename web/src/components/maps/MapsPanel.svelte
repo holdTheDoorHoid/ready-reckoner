@@ -11,10 +11,10 @@
   import { onMount, tick } from 'svelte';
 
   import type { IsoDate } from '../../engine/types';
-  import { browserEnv, type ComposeEnv, type ComposeResult, composeMaps, type CountyOutline, longDate } from '../../lib/maps/compose';
+  import { browserEnv, type ComposeEnv, type ComposeResult, composeMaps, type CountyOutline, type LayerChoice, longDate } from '../../lib/maps/compose';
   import type { AddressSearch } from '../../lib/maps/nominatim';
   import { homePoint, MAP_SLOT_FIXTURES, type MapLocation, type MapSlotBlock, type MapSlotKind, type SuggestedLayers } from '../../lib/maps/slots';
-  import { emptyMapsState, type MapLayers, type MapsState } from '../../lib/maps/state';
+  import { emptyMapsState, type MapsState } from '../../lib/maps/state';
   import { clearMaps, type MapRecord, mapRecordsFor, type MapsStatus, mapsKey, saveMaps, toRecord } from '../../lib/maps/store';
   import type { CreateView } from '../../lib/maps/view';
   import ConfirmDialog from '../ConfirmDialog.svelte';
@@ -69,7 +69,7 @@
   type Phase = 'idle' | 'consent' | 'pins' | 'fetching';
   let phase = $state<Phase>('idle');
   let intent = $state<'add' | 'refresh' | 'edit'>('add');
-  let chosen = $state<MapLayers>(emptyMapsState().layers);
+  let chosen = $state<LayerChoice>({ base: true, ...emptyMapsState().layers });
   let status = $state<MapsStatus>('none');
   let records = $state.raw<Partial<Record<MapSlotKind, MapRecord>>>({});
   let progress = $state({ done: 0, total: 0 });
@@ -117,9 +117,9 @@
     phase = 'consent';
   }
 
-  function consented(layers: MapLayers) {
+  function consented(layers: LayerChoice) {
     chosen = layers;
-    if (layers.base !== false && (intent === 'edit' || !maps?.home)) phase = 'pins';
+    if (layers.base && (intent === 'edit' || !maps?.home)) phase = 'pins';
     else void fetchMaps(maps);
   }
 
@@ -154,7 +154,8 @@
         if (pins !== maps) onchange(pins);
         return;
       }
-      const next: MapsState = { ...base, layers: { ...chosen }, fetched_on: day };
+      // The saved plan keeps §9.5's four layers; the street-map choice belonged to this press.
+      const next: MapsState = { ...base, layers: { places: chosen.places, flood: chosen.flood, surge: chosen.surge, wildfire: chosen.wildfire }, fetched_on: day };
       const nextKey = mapsKey(next, location.county_fips);
       const made = result.maps.map((m) => toRecord(m, nextKey));
       const kept = await saveMaps(made);
