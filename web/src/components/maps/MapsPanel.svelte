@@ -8,7 +8,7 @@
   Mounted on the Packet screen for now; web-binder moves it into the binder.
 -->
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   import type { IsoDate } from '../../engine/types';
   import { browserEnv, type ComposeEnv, type ComposeResult, composeMaps, type CountyOutline, longDate } from '../../lib/maps/compose';
@@ -170,7 +170,7 @@
     } finally {
       controller = null;
       phase = 'idle';
-      queueMicrotask(() => panel?.focus());
+      void tick().then(() => panel?.focus());
     }
   }
 

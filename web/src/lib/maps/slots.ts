@@ -18,8 +18,7 @@
  * map in Philadelphia, 7.5 km on the area map): every home in the same grid cell asks for the
  * same map, and the home is drawn off-centre by at most half a cell (64 pixels of 800).
  */
-import type { AgeBand, HazardId, LatLon, LocationResolved, PlanOutput } from '../../engine/types';
-import { chanceWithin } from '../format';
+import type { LatLon, LocationResolved } from '../../engine/types';
 import type { MapsState } from './state';
 import { type Frame, fitFrame, metresPerPixel, project, unproject } from './tiles';
 
@@ -114,41 +113,6 @@ export function shiftFrame(frame: Frame, dx: number, dy: number): Frame {
   return { ...frame, center: unproject({ x: c.x + dx, y: c.y + dy }, frame.zoom) };
 }
 
-// ---------------------------------------------------------------------------------------------
-// Which optional layers are suggested (§9.2)
-// ---------------------------------------------------------------------------------------------
-
-/** The flood hazards whose chance decides the flood-zone layer. */
-export const FLOOD_HAZARDS: readonly HazardId[] = ['riverine_flooding', 'coastal_flooding'];
-
-/** "1 in 100 or more": the matrix's chance over the household's horizon. */
-export const SUGGEST_AT = 0.01;
-
-export interface SuggestedLayers {
-  flood: boolean;
-  surge: boolean;
-  wildfire: boolean;
-}
-
-/**
- * Flood zones when a flood hazard is in the ranked matrix at 1 in 100 or more over the horizon;
- * storm surge when the home is in a surge area or hurricane is ranked (not drawn: see
- * `SURGE_NOTE`); wildfire hazard when wildfire is ranked at 1 in 100 or more.
- */
-export function suggestedLayers(output: Pick<PlanOutput, 'register' | 'location'> | null | undefined, years: number): SuggestedLayers {
-  const ranked = (output?.register ?? []).filter((h) => h.display === 'ranked');
-  const likely = (ids: readonly HazardId[]) => ranked.some((h) => ids.includes(h.id) && chanceWithin(h.rate_per_year, years) >= SUGGEST_AT);
-  const surgeShare = output?.location.exposure?.surge_cat3_share?.value ?? 0;
-  return {
-    flood: likely(FLOOD_HAZARDS),
-    surge: surgeShare > 0 || ranked.some((h) => h.id === 'hurricane'),
-    wildfire: likely(['wildfire']),
-  };
-}
-
-const CHILD_BANDS: readonly AgeBand[] = ['infant', 'toddler', 'child', 'teen'];
-
-/** Schools and child care are shown when the household has children. */
-export function hasChildren(people: readonly { age_band: AgeBand }[] | undefined): boolean {
-  return (people ?? []).some((p) => CHILD_BANDS.includes(p.age_band));
-}
+// Which optional layers are suggested (§9.2), and whether schools and child care are shown, live
+// in `rules.ts` (small, so the screens can use them without loading the map arithmetic).
+export { FLOOD_HAZARDS, hasChildren, SUGGEST_AT, type SuggestedLayers, suggestedLayers } from './rules';

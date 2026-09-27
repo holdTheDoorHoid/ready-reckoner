@@ -12,7 +12,7 @@
   import { untrack } from 'svelte';
 
   import type { SuggestedLayers } from '../../lib/maps/slots';
-  import { EVERY_RECIPIENT_SEES, RECIPIENTS, type RecipientId, SEARCH_RECIPIENT, SURGE_NOTE } from '../../lib/maps/sources';
+  import { EVERY_RECIPIENT_SEES, RECIPIENTS, type RecipientId, SURGE_NOTE } from '../../lib/maps/sources';
   import type { MapLayers } from '../../lib/maps/state';
 
   let {
@@ -99,7 +99,7 @@
       </ul>
     </fieldset>
     {#if suggested.surge}
-      <p class="note"><strong>Storm-surge zones:</strong> {SURGE_NOTE} Your binder points you to your state’s evacuation-zone map instead.</p>
+      <p class="note">{SURGE_NOTE} To find your evacuation zone, use your state or county emergency office’s map.</p>
     {/if}
     {#if !chosen.base && !hasHomePin}
       <p class="note" role="status">
@@ -114,8 +114,8 @@
 
   <p class="small">{EVERY_RECIPIENT_SEES}</p>
   <p class="small">
-    “Type an address instead” on the pin map sends what you type to a search service ({SEARCH_RECIPIENT.who.replace(/\.$/, '')}).
-    You will be asked first.
+    “Type an address instead” on the pin map sends what you type to OpenStreetMap’s search service, run by the OpenStreetMap Foundation
+    (UK). You will be asked first.
   </p>
   {#if offline}
     <p class="note" role="status">This device seems to be offline. The maps need an internet connection; you can still try.</p>

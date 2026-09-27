@@ -22,9 +22,9 @@
   import { cardsSection, countTables, packetSections, renderMarkdown, splitIntro } from '../lib/markdown';
   import { useRouter } from '../lib/router.svelte';
   // --- web-maps mount (DESIGN-DELTA-v3 §9.4): moves into the binder screen with web-binder ---
-  import MapsPanel from '../components/maps/MapsPanel.svelte';
+  // The panel and everything it uses load on first use (their own chunk, precached for offline).
   import type { CountyOutline } from '../lib/maps/compose';
-  import { hasChildren, suggestedLayers } from '../lib/maps/slots';
+  import { hasChildren, suggestedLayers } from '../lib/maps/rules';
   import type { MapsState } from '../lib/maps/state';
   // --- end web-maps mount ---
 
@@ -130,18 +130,24 @@
            the v2 packet; web-binder prints the maps in the binder's map slots. -->
       {#if mapsRequest > 0 || planMaps}
         <div class="packet__maps no-print">
-          {#key mapsRequest}
-            <MapsPanel
-              location={output.location}
-              suggested={suggestedLayers(output, app.plan?.input.dials.horizon_years ?? 10)}
-              children={hasChildren(app.plan?.input.people)}
-              maps={planMaps}
-              onchange={setPlanMaps}
-              today={app.today}
-              loadCounty={() => countyOutline(output.location.county_fips)}
-              start={mapsRequest > 0}
-            />
-          {/key}
+          {#await import('../components/maps/MapsPanel.svelte')}
+            <p class="small muted" aria-busy="true">Loading the maps panel…</p>
+          {:then { default: MapsPanel }}
+            {#key mapsRequest}
+              <MapsPanel
+                location={output.location}
+                suggested={suggestedLayers(output, app.plan?.input.dials.horizon_years ?? 10)}
+                children={hasChildren(app.plan?.input.people)}
+                maps={planMaps}
+                onchange={setPlanMaps}
+                today={app.today}
+                loadCounty={() => countyOutline(output.location.county_fips)}
+                start={mapsRequest > 0}
+              />
+            {/key}
+          {:catch}
+            <p class="small">The maps panel could not be loaded. Reload the page and try again.</p>
+          {/await}
         </div>
       {/if}
       <!-- end web-maps mount -->

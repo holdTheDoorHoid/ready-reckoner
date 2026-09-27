@@ -5,6 +5,8 @@
   place the pin. Warn, do not block: placing the pin by hand is always there instead.
 -->
 <script lang="ts">
+  import { tick } from 'svelte';
+
   import { type AddressMatch, AddressSearch, addressSearch, SearchError } from '../../lib/maps/nominatim';
   import { NOMINATIM, SEARCH_RECIPIENT } from '../../lib/maps/sources';
 
@@ -45,7 +47,7 @@
 
   function agree() {
     stage = 'open';
-    queueMicrotask(() => field?.focus());
+    void tick().then(() => field?.focus());
   }
 </script>
 

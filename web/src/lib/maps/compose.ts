@@ -149,7 +149,8 @@ export function browserEnv(): ComposeEnv {
   return {
     fetch: (url, init) => fetch(url, init),
     canvas,
-    decode: (blob) => createImageBitmap(blob, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' }),
+    // Exact pixels for the overlays' two colours; a browser that rejects the options decodes plainly.
+    decode: (blob) => createImageBitmap(blob, { colorSpaceConversion: 'none', premultiplyAlpha: 'none' }).catch(() => createImageBitmap(blob)),
     readPixels(image, width, height) {
       const ctx = canvas(width, height).getContext('2d', { willReadFrequently: true })!;
       ctx.drawImage(image as unknown as CanvasImageSource, 0, 0, width, height);
@@ -571,7 +572,8 @@ export async function composeMaps(input: ComposeInput, env: ComposeEnv): Promise
   const fetcher = new Fetcher(env);
   const total = plannedRequests(input);
   let done = 0;
-  const progress = () => env.onProgress?.(++done, total);
+  // A Census fallback adds requests the plan did not count: the bar stops at full, never past it.
+  const progress = () => env.onProgress?.(Math.min(++done, total), total);
 
   const [base, places, flood, wildfire] = await Promise.all([
     input.layers.base !== false

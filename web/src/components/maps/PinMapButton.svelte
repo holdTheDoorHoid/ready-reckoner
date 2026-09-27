@@ -5,6 +5,8 @@
   pin makes any maps already made "need refreshing" on the binder.
 -->
 <script lang="ts">
+  import { tick } from 'svelte';
+
   import type { AddressSearch } from '../../lib/maps/nominatim';
   import { PIN_MARKS, TOOL_LABELS } from '../../lib/maps/pins';
   import { homePoint, type MapLocation } from '../../lib/maps/slots';
@@ -45,7 +47,7 @@
 
   function back() {
     phase = 'idle';
-    queueMicrotask(() => button?.focus());
+    void tick().then(() => button?.focus());
   }
 </script>
 

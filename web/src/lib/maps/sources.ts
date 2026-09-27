@@ -262,28 +262,28 @@ export const RECIPIENTS: readonly Recipient[] = [
     layer: 'Street map',
     who: 'The OpenStreetMap Foundation (UK), which runs the OpenStreetMap map servers. If they do not answer, the U.S. Census Bureau instead.',
     receives:
-      'Which squares of map to send: about 60 small squares around your home, your meeting places and where you would go, which shows roughly where those places are.',
+      'The squares of map to draw: those around your home, your meeting places and where you would go, and any you look at on the pin map. Together they show roughly where those places are.',
     origins: [originOf(OSM_TILES.url.replace(/\{[xyz]\}/g, '0')), originOf(CENSUS_BASE.url)],
   },
   {
     id: 'places',
     layer: 'Nearby places (pharmacies, grocery stores, fire stations, hospitals…)',
     who: 'The Overpass service (FOSSGIS e.V., Germany), which searches OpenStreetMap. If it is busy, a second Overpass server (kumi.systems) instead.',
-    receives: 'Two boxes on the map: your neighbourhood, and your city or county.',
+    receives: 'Boxes on the map around your home, from your neighbourhood out to your city or county. Never your home’s exact spot.',
     origins: OVERPASS.urls.map(originOf),
   },
   {
     id: 'flood',
     layer: 'Flood zones',
     who: 'FEMA, the Federal Emergency Management Agency.',
-    receives: 'The box of your neighbourhood map, about 1.5 km across.',
+    receives: 'The box of your neighbourhood map, about 1.5 km (1 mile) across. Never your home’s exact spot.',
     origins: [originOf(FLOOD.url)],
   },
   {
     id: 'wildfire',
     layer: 'Wildfire hazard',
     who: 'The U.S. Forest Service, through the federal imagery service at geoplatform.gov.',
-    receives: 'The box of your city or county map.',
+    receives: 'The box of your city or county map. Never your home’s exact spot.',
     origins: [originOf(WILDFIRE.url)],
   },
 ];
