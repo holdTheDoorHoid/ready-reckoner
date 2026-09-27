@@ -30,7 +30,8 @@ A severe thunderstorm or high wind warning is issued, you hear thunder, or damag
 
 ## Leave or stay
 
-- **Stay if** you are in a sturdy building, until 30 minutes after the last thunder.[^nws_lightning_safety] {if:home:mobile_home}A mobile home is not one: move to a sturdy building before the wind picks up.[^nws_high_wind_during]{/if}
+- **Stay if** you are in a sturdy building, until 30 minutes after the last thunder.[^nws_lightning_safety]
+- {if:home:mobile_home}**Leave if** you are in a mobile home. Move to a sturdy building before the wind picks up.[^nws_high_wind_during]{/if}
 - **Go to** the nearest sturdy building if you are outside or in a shed.[^nws_severe_weather_during]
 
 ## Where and who
