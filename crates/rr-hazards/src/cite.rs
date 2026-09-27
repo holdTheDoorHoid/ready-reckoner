@@ -201,6 +201,9 @@ pub const CSIS_TERRORISM: &str = "csis_terrorism_2025";
 /// FBI, Crime in the United States, 2023, 2024 and 2025 editions: persons arrested (Table 29,
 /// the national estimate; Tables 39 and 40, arrests by age and sex), from the Crime Data Explorer.
 pub const FBI_ARRESTS: &str = "fbi_cius_arrests_2023_2025";
+/// SAMHSA, National Survey on Drug Use and Health 2022–2024: times arrested and booked in the past
+/// 12 months, by age and sex (public-use files, Data Analysis System): people arrested, not arrests.
+pub const NSDUH_ARRESTS: &str = "samhsa_nsduh_arrests_2022_2024";
 /// US Census Bureau, Vintage 2025 national population by single year of age and sex
 /// (NC-EST2025-AGESEX-RES): the population each arrest rate divides by.
 pub const CENSUS_AGESEX_2025: &str = "census_popest_agesex_2025";
@@ -347,6 +350,7 @@ pub const ALL: &[&str] = &[
     SNAP_LAPSE_2025,
     CSIS_TERRORISM,
     FBI_ARRESTS,
+    NSDUH_ARRESTS,
     CENSUS_AGESEX_2025,
     FBI_ACTIVE_SHOOTER,
     START_POICN,

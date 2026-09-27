@@ -352,27 +352,6 @@ pub(crate) fn per_year_words(rate: f64) -> String {
     }
 }
 
-/// Arrests for every 100 (or 1,000) households a year, in whole numbers: "about 7 arrests for
-/// every 100 households", "about 3 arrests for every 1,000 households".
-pub(crate) fn arrests_per_households(rate: f64) -> String {
-    let per100 = rate * 100.0;
-    if per100 >= 1.5 {
-        format!(
-            "about {:.0} arrests for every 100 households",
-            per100.round()
-        )
-    } else if per100 >= 0.95 {
-        "about 1 arrest for every 100 households".to_owned()
-    } else if rate * 1000.0 >= 0.95 {
-        format!(
-            "about {:.0} arrests for every 1,000 households",
-            (rate * 1000.0).round()
-        )
-    } else {
-        "fewer than 1 arrest for every 1,000 households".to_owned()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

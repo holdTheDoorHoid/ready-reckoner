@@ -182,10 +182,12 @@ pub(crate) fn track(
             dollars(f64::from(monthly))
         );
         if let Some(e) = expenses {
+            // Counted from today, like every other date in the plan: the supplies plan's months,
+            // then the saving that starts once it is done (verification R3-04).
             let months_needed = f64::from(gap_months * e) / f64::from(monthly);
             s.push_str(&format!(
-                ", reaching the goal in {}",
-                duration_text(months_needed)
+                ", reaching the goal in {} from now",
+                duration_text(f64::from(month) + months_needed)
             ));
         }
         s.push('.');
@@ -213,7 +215,7 @@ pub(crate) fn track(
 }
 
 /// "The first step, $500, comes by month 49; three months of expenses, about $12,600, in about
-/// 17 years." Only the steps still ahead are named.
+/// 17 years from now." Only the steps still ahead are named; every date counts from today.
 fn steps_sentence(household: &PlanInput, risks: &Risks, start: u16) -> Option<String> {
     let f = &household.finances;
     let monthly = f64::from(f.monthly_budget_usd.max(0.0));
@@ -239,7 +241,7 @@ fn steps_sentence(household: &PlanInput, risks: &Risks, start: u16) -> Option<St
         let when = if at <= 36.0 {
             format!("by month {}", at as u32)
         } else {
-            format!("in {}", duration_text(at))
+            format!("in {} from now", duration_text(at))
         };
         Some(format!(
             "three months of expenses, about {}, {when}",

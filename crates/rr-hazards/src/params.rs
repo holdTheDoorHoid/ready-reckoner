@@ -561,7 +561,8 @@ pub(crate) const ATTACK_LOSS_USD: f64 = 800.0;
 /// 1 July of that year. The value is the mean of the three years; low and high are the lowest and
 /// highest year. Recomputed from those tables on 2026-09-26: every figure matches to four
 /// significant figures. The FBI counts arrests, not people or convictions: one person arrested
-/// twice counts twice.
+/// twice counts twice, so the arrest row uses these only for the high end of its range, turned
+/// into people with [`ARRESTS_PER_ARRESTED_PERSON`]; its value is [`ARRESTED_PEOPLE_PER_100K`].
 pub(crate) const ARRESTS_PER_100K: &[(&str, u8, u8, Triple, Triple)] = &[
     (
         "10_17",
@@ -613,6 +614,65 @@ pub(crate) const ARRESTS_PER_100K: &[(&str, u8, u8, Triple, Triple)] = &[
         (115.3, 99.29, 132.0),
     ),
 ];
+/// DATA (SAMHSA, National Survey on Drug Use and Health 2022–2024, public-use files read through
+/// SAMHSA's Data Analysis System: `NOBOOKY2`, times arrested and booked in the past 12 months, not
+/// counting minor traffic violations, by age `CATAG6` and sex `IRSEX`, weighted `ANALWT2_C`): the
+/// people in households arrested and booked at least once in a year, per 100,000, as `(band,
+/// first age, last age, male (value, low, high), female (value, low, high))`. The value is the
+/// mean of the three years; low and high are the lowest and highest year (no sampled woman of 65
+/// or over reported an arrest in 2023). People, not arrests: of those arrested in a year, 24–35 %
+/// were booked more than once. The survey covers people in households, the app's users, but it
+/// is self-reported, so it runs low; the arrest row takes the high end of its range from the
+/// FBI's counts ([`ARRESTS_PER_100K`]) turned into people.
+pub(crate) const ARRESTED_PEOPLE_PER_100K: &[(&str, u8, u8, Triple, Triple)] = &[
+    (
+        "12_17",
+        12,
+        17,
+        (883.6, 577.6, 1071.0),
+        (416.9, 387.0, 453.6),
+    ),
+    (
+        "18_25",
+        18,
+        25,
+        (2590.0, 2476.0, 2789.0),
+        (953.7, 844.0, 1120.0),
+    ),
+    (
+        "26_34",
+        26,
+        34,
+        (2764.0, 2720.0, 2833.0),
+        (1542.0, 1221.0, 1851.0),
+    ),
+    (
+        "35_49",
+        35,
+        49,
+        (2264.0, 1548.0, 2723.0),
+        (1054.0, 946.8, 1183.0),
+    ),
+    (
+        "50_64",
+        50,
+        64,
+        (1221.0, 924.2, 1391.0),
+        (544.6, 469.5, 622.0),
+    ),
+    (
+        "65_plus",
+        65,
+        84,
+        (522.0, 316.9, 851.4),
+        (78.97, 0.0, 144.9),
+    ),
+];
+/// DERIVED (NSDUH 2022–2024, as [`ARRESTED_PEOPLE_PER_100K`], every age from 12): arrests and
+/// bookings per person arrested in a year, at least (three or more counted as three): 1.475 in
+/// 2022, 1.319 in 2023 and 1.349 in 2024, mean 1.381. Divides the FBI's arrest counts into people
+/// for the high end of the arrest row's range.
+pub(crate) const ARRESTS_PER_ARRESTED_PERSON: f64 = 1.381;
 /// PRIOR: what one arrest costs the household (bail, a lawyer, lost pay, care for children or
 /// pets), for severity only.
 pub(crate) const ARREST_LOSS_USD: f64 = 5_000.0;
@@ -904,6 +964,33 @@ mod tests {
             }
             assert!(m.0 > f.0, "{band}");
         }
+    }
+
+    #[test]
+    fn arrested_people_are_ordered_fewer_than_arrests_and_more_men() {
+        for (band, first, last, m, f) in ARRESTED_PEOPLE_PER_100K {
+            assert!(first <= last, "{band}");
+            for (v, lo, hi) in [m, f] {
+                assert!(*lo >= 0.0 && lo <= v && v <= hi, "{band}");
+            }
+            assert!(m.0 > f.0, "{band}");
+        }
+        // Every adult band has fewer people arrested than the FBI counts arrests, even after the
+        // FBI's counts are divided by the survey's bookings per arrested person.
+        let fbi: f64 = ARRESTS_PER_100K
+            .iter()
+            .filter(|b| b.0 != "10_17" && b.0 != "65_plus")
+            .map(|b| f64::from(b.2 - b.1 + 1) * (b.3.0 + b.4.0) / 2.0)
+            .sum::<f64>()
+            / 47.0;
+        let survey: f64 = ARRESTED_PEOPLE_PER_100K
+            .iter()
+            .filter(|b| b.0 != "12_17" && b.0 != "65_plus")
+            .map(|b| f64::from(b.2 - b.1 + 1) * (b.3.0 + b.4.0) / 2.0)
+            .sum::<f64>()
+            / 47.0;
+        assert!(survey < fbi / ARRESTS_PER_ARRESTED_PERSON);
+        assert!((ARRESTS_PER_ARRESTED_PERSON - (1.475 + 1.319 + 1.349) / 3.0).abs() < 5e-4);
     }
 
     #[test]

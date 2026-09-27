@@ -324,17 +324,26 @@ fn every_line_cites_on_random_households() {
                 l.line.id
             );
         }
-        let notes = lines
-            .iter()
-            .filter(|l| l.line.plain.contains(rr_supply::ONE_MONTH_NOTE))
-            .count();
-        let m1 = lines
-            .iter()
-            .any(|l| l.kind == LineKind::Need && l.tier == rr_types::TierId::M1);
+        // The one-month note is said once when a line outside the medication bucket reaches
+        // the one-month tier, and its medicine version once when a medication line does
+        // (verification R3-21: the stores' note read wrongly under a 21-day medicine line).
+        let said = |note: &str| lines.iter().filter(|l| l.line.plain.contains(note)).count();
+        let m1 = |medicine: bool| {
+            lines.iter().any(|l| {
+                l.kind == LineKind::Need
+                    && l.tier == rr_types::TierId::M1
+                    && (l.line.bucket == rr_types::BucketId::Medication) == medicine
+            })
+        };
         assert_eq!(
-            notes,
-            usize::from(m1),
+            said(rr_supply::ONE_MONTH_NOTE),
+            usize::from(m1(false)),
             "case {case}: the one-month note is said once when needed"
+        );
+        assert_eq!(
+            said(rr_supply::ONE_MONTH_MEDICINE_NOTE),
+            usize::from(m1(true)),
+            "case {case}: the medicine note is said once when needed"
         );
     }
 }

@@ -498,3 +498,54 @@ fn the_long_horizon_section_follows_the_longest_target() {
     assert!(long_horizon(&input, &short));
     assert_eq!(q(&input, &short), 1.0);
 }
+
+/// Verification R3-21: a three-week medicine target reached the one-month tier and carried the
+/// stores' note ("No agency sets a one-month amount … the Church's three-month pantry"). Medicine
+/// lines now carry their own note, which agrees with the 30-day cap on hand and the fills beyond
+/// it; the stores' note stays on the first other line in that tier.
+#[test]
+fn a_three_week_medicine_target_gets_the_medicine_note() {
+    use rr_supply::{ONE_MONTH_MEDICINE_NOTE, ONE_MONTH_NOTE};
+    let input = fixtures::get("philadelphia-renters-4").unwrap();
+    let targets = vec![
+        common::days(BucketId::Power, 3.0),
+        common::days(BucketId::Medication, 21.0),
+    ];
+    let lines = sized_requirements(&input, &targets, &SupplyContext::default());
+    let med = get(&lines, "medication.medication_days");
+    assert_eq!(med.tier, TierId::M1);
+    // One person on daily medicine keeps the 21-day target on hand (within the 7-30 day range).
+    assert_eq!(med.quantity, 21.0);
+    assert!(
+        med.line.plain.contains(ONE_MONTH_MEDICINE_NOTE),
+        "{}",
+        med.line.plain
+    );
+    assert!(!med.line.plain.contains(ONE_MONTH_NOTE));
+    assert!(
+        med.line
+            .citations
+            .iter()
+            .any(|c| c == "medicare_drugs_disaster")
+    );
+    assert!(!lines.iter().any(|l| l.line.plain.contains(ONE_MONTH_NOTE)));
+    // With a month without a store as well, the stores' note goes on that line, once.
+    let both = vec![
+        common::days(BucketId::Supplies, 30.0),
+        common::days(BucketId::Medication, 21.0),
+    ];
+    let lines = sized_requirements(&input, &both, &SupplyContext::default());
+    let noted: Vec<&str> = lines
+        .iter()
+        .filter(|l| l.line.plain.contains(ONE_MONTH_NOTE))
+        .map(|l| l.line.id.as_str())
+        .collect();
+    assert_eq!(noted.len(), 1);
+    assert!(!noted[0].starts_with("medication."), "{noted:?}");
+    assert!(
+        get(&lines, "medication.medication_days")
+            .line
+            .plain
+            .contains(ONE_MONTH_MEDICINE_NOTE)
+    );
+}
