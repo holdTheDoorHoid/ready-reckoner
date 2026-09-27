@@ -974,10 +974,17 @@ lets a ZIP across a county line from a site (Port Townsend, 36 km from Bangor) b
 
 Checks done while curating: the three missile-field county lists match the **Sentinel Final EIS
 Volume I** (sections 2.1.6.1 p. 2-13, 2.1.7.1 p. 2-33, 2.1.8.1 p. 2-40, read in full); the NNSA
-locations page was read in full. Precedent for telling the public: FEMA, *Protection in the
-Nuclear Age* (1985), p. 12 ("Designating a place as a 'risk' area does not mean that it will be
-attacked; it does indicate a greater potential for attack"); NAPB-90 (1987, released 2005) is a
-method precedent only (recorded in the manifest's definitions).
+locations page was read in full. Precedent for telling the public: FEMA's **SLG 101**, *Guide for
+All-Hazard Emergency Operations Planning*, Tab 2 to Attachment F: Nuclear Conflict (1996; cited as
+`fema_slg101_nuclear_1996` via an Internet Archive capture, since FEMA's own address no longer serves
+the file) — "Under the current international climate, it is unlikely that an organized attack on the
+United States would occur. However, if an attack did occur, areas potentially at risk might include:".
+**NAPB-90** (1987; cited as `fema_napb90` from the NTIS National Technical Reports Library copy,
+PB87-204624) is the method precedent for the risk-level approach (recorded in the manifest's
+definitions). Neither citation depends on a privately held copy: both are read from a federal or
+federally hosted address, addressing the gap the data-hazard and hazards2c workstreams flagged
+(2026-09-26) when the only precedent on hand was FEMA's 1985 *Protection in the Nuclear Age* booklet,
+known only from a copy outside any public archive.
 
 **UASI.** `uasi_share` = the county's share of the national FY2026 UASI total ($584,250,000 across
 44 urban areas): the area's allocation share split among its counties by 2020 population (NRI); 0

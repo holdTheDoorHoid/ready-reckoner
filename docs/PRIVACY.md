@@ -13,9 +13,13 @@ you've checked off — is kept only in your browser's local storage. It is never
 Two separate entries are used:
 
 - **`rr.plan.v1`** holds your household, your dial settings, what you already have, your check-offs
-  and paid amounts, and your progress through the interview. This is the entry that "Save a copy of
-  your plan" writes out as a file (`ready-reckoner-plan.json`) and "Open a saved plan" reads back
-  in. It never leaves your browser unless you choose to save or share that file yourself.
+  and paid amounts, your progress through the interview, and — since v0.2.0 — your family plan: the
+  out-of-area contact, meeting places, and the trusted circle of people who'd help, each with a name
+  and a phone number. **This is the one entry that can hold someone else's personal details, not just
+  your own.** This is the entry that "Save a copy of your plan" writes out as a file
+  (`ready-reckoner-plan.json`) and "Open a saved plan" reads back in. It never leaves your browser
+  unless you choose to save or share that file yourself, and nothing in it is used to work out your
+  plan's numbers.
 - **`rr.prefs.v1`** holds two display preferences: your light/dark theme choice and whether the
   expert view is turned on. It holds no household information, and it is not part of the saved
   file — importing or exporting a plan never touches it.
@@ -52,10 +56,16 @@ link out to, say, FEMA's website does not tell FEMA which page on this site you 
 **A caution about the address.** This site currently shares its address,
 `holdthedoorhoid.github.io`, with the project owner's other pages. Browser storage belongs to the
 whole address, not to one page on it, so in principle any page published at that same address could
-read a saved plan sitting in `rr.plan.v1`. Before relying on this for a real emergency, the site
-should move to an address of its own — a dedicated organisation or a custom domain. Until then,
-treat this like any shared computer: use "Forget everything" when you're done if that matters to
-you.
+read a saved plan sitting in `rr.plan.v1` — and since v0.2.0, that can include the names and phone
+numbers you put in your family plan, not only your own answers. The family-plan screen says this in
+the same words: *"Names and phone numbers are other people's details too, so keep a saved file
+somewhere safe. Until Ready Reckoner has a web address of its own, other pages at the same address
+could in principle read what this browser keeps. If that matters to you, write this plan on the
+printed packet instead."* Before relying on this for a real emergency, the site should move to an
+address of its own — a dedicated organisation or a custom domain. Until then, treat this like any
+shared computer: use "Forget everything" when you're done if that matters to you, and consider
+keeping the family plan on the printed packet rather than in the browser if you'd rather not store
+other people's details there at all.
 
 ## The content security policy, and its limits
 

@@ -4,6 +4,187 @@ Ready Reckoner has no accounts and no server, so nothing changes on you without 
 lists what shipped in each version, grouped by area, in plain language. It also lists what we
 already know still needs work.
 
+## v0.2.0 — September 2026
+
+A much larger release than v0.1.1, built by many people working on separate pieces at once under
+one shared engine contract (contract v2), then merged, tested and checked against real disasters
+together. It roughly triples what Ready Reckoner plans for, adds a family plan and wallet cards,
+rebuilds the outage and water models on real records instead of simple estimates, and adds a public
+page that shows exactly how well the model's predictions have held up. Nothing about how your data
+is handled has changed: still no server, no accounts, nothing sent anywhere.
+
+### Your risks, including nine rare-but-severe families
+
+- **Ten new hazards on the ranked list**, alongside the ones already there: burst pipes and other
+  water leaks, wildfire smoke, dust storms, sinkholes, dam and levee failure, phone and internet
+  outages, medicine shortages, a benefit or federal paycheck stopping, eviction (for renters), and a
+  household member being arrested or detained (this counts arrests, never guilt). The old
+  "terrorism" row is retired — it mixed two different things — and split into a disruption
+  ("an attack or threat closes your area") and a personal-safety row (below). 53 hazards in total are
+  now tracked, natural, societal and personal combined.
+- **A new rare-but-severe table** for nine catastrophes that are real but very unlikely: nuclear
+  attack or EMP, a severe solar storm, a power cut lasting months from any cause, a war that reaches
+  US infrastructure, a chemical/biological/radiological attack, a pandemic far worse than COVID-19, a
+  very large volcanic eruption, a financial crisis, and a mass shooting or bombing. They are sorted by
+  how likely each one is **where you live**, never by how bad it would be, so a wildly unlikely but
+  catastrophic event can't dominate the list. Each row shows a range (never a single made-up number),
+  what it would mean if it reached you, why it's rated the way it is for your county, and what — if
+  anything — it changes in your plan. For most households, most rows, the answer is "nothing beyond
+  your basics."
+- **The nuclear row is now specific to where you live**, from a curated list of 39 real sites
+  (missile fields, command posts, the ten largest metro areas, refineries, ports) that sorts every
+  county into one of six exposure classes. A household in Minot, North Dakota — home to Minot Air
+  Force Base and a missile field — sees "between 1 in 1,700 and 1 in 26" over ten years and "blast or
+  heavy fallout near likely targets." The same household in Coos Bay, Oregon sees "between 1 in
+  100,000 and 1 in 250" and "shortages, power cuts and lost income, not blast or heavy fallout." Both
+  numbers, and the plain-language reasoning behind them, are on the page.
+- **At most eight risk cards now** (was nine), and a less severe hazard always gives up its spot
+  first: a common-but-minor risk like a phone outage can no longer push a Serious wildfire-smoke or
+  house-fire card off the page. A new ranked table at the top of the risks screen lists every hazard,
+  most likely first, and every name jumps straight to its card.
+- Cards can now show their named sub-causes ("**Includes:** far from emergency care; falls.") and a
+  "How this number is made" drawer with the range, the sources, and why the range is as wide as it is.
+- **The arrest-or-detention rate was corrected to count people, not events.** The first version
+  counted arrests, so the small number of people arrested more than once inflated everyone's odds;
+  Philadelphia's ten-year figure came down from about 50 of 100 households to about 30.
+- Two named earthquake scenarios were renamed to say exactly what they model — "Magnitude 6.75 or
+  larger earthquake on the Wasatch Front" (greater Salt Lake City) and "Magnitude 6.5 or larger
+  shallow earthquake around Puget Sound" (greater Seattle) — and the Puget Sound one was recalculated
+  against USGS's own regional numbers: its ten-year chance for the four Puget Sound counties is now
+  about 4 in 100 households, up from a flat 5% that wasn't yet tied to USGS's own regional model.
+
+### Your targets, and the data behind them
+
+- **A new "unhealthy air indoors" target**, sized from each county's own smoke and dust days. Where
+  the ten-year chance is 2 in 100 or higher it adds N95 respirators, a way to clean the air in one
+  room (an air cleaner, or a box fan and a good filter), and a free sealed-room plan.
+- **The power-outage record was rebuilt** from repaired, hour-by-hour utility data (ORNL EAGLE-I,
+  with bad readings and gaps fixed first), then blended with a credibility-weighted average of nearby
+  counties, so a county with a thin history of its own borrows from its region instead of reading as
+  artificially calm — or, just as often, artificially extreme from one noisy year. Restoration curves
+  from real events now drive a "worst on record" line under each target ("The worst power cut in your
+  region's records … was winter storm, March 2018; being ready for 3 days would have left some homes
+  that lost power still waiting.").
+- **Water targets now weigh two things that used to be ignored:** the county's own safe
+  drinking-water violation record, and the household's own answer about past problems. Philadelphia's
+  clean record brought its "tap water must be treated" target down from 7 days to 5; its harder "no
+  tap water at all" target rose from 3 days to 5, because that failure is now modelled more
+  realistically rather than assumed rare.
+- **Compound events**: a cold snap that also knocks out the power, and a heat wave that does the
+  same, are now modelled as their own combined event, with their own target, instead of two separate
+  risks that happen to double-book a household.
+- **A public validation page and a matching packet section.** The model is checked against 22 real
+  disasters — the 2021 Texas freeze, Hurricane Ida, Hurricane Helene, Hurricane Maria, the Camp Fire,
+  the Lahaina fire, the 2003 Northeast blackout, the CrowdStrike outage, and more — and reports itself
+  honestly: 6 fully covered, 9 partly covered, 6 fell short, 1 not modelled yet. Every miss stays on
+  the page, along with what changed and why. `rr validate` on the command line fails the build if a
+  verdict ever changes, better or worse, without someone noticing.
+- **Household numbers moved**, mostly upward as the model got more realistic: Philadelphia's
+  "can't get to a store" target rose from 10 days to 2 weeks and its medicine target from 2 weeks to 3
+  weeks; Miami's medicine target rose from about 3 weeks to a month, while its "no tap water" target
+  came down from 3 weeks to 2 (a more realistic reading of the county's own record); Chicago's
+  ten-year chance of losing power for a day or more rose from about 30 of 100 households to 35.
+
+### Your plan and kit
+
+- **Bare-minimum mode.** For a long plan, or on request, the very first purchases are a small kit —
+  three days of water, one light, warmth, and three days of medicine and device power — so even a
+  slow, low-budget plan has an early finish line. Every one of the 14 test households now reaches this
+  bare minimum within the first six months, even where the full plan takes years (Philadelphia: bare
+  minimum by month 1, everything by month 40; Hays, Kansas: bare minimum by month 2, everything by
+  month 58).
+- **Capabilities before consumables.** Batteries are capped at two weeks' worth; after that, the plan
+  asks for a way to recharge (a car charger, a small inverter, or a solar panel) instead of piling on
+  more batteries forever.
+- **Cooking without power** becomes a need wherever a store target is two weeks or longer, or a
+  formula-fed baby is under a boil-water notice.
+- **All 22 practitioner-recommended kit items**, plus a jump starter, a key safe, cleanup gear, a
+  tarp kit and insect repellent, and 13 free decisions: insurance checks (home or renters, flood,
+  earthquake, sewer backup, life or disability), ID and passport guidance, and five home-hardening
+  steps gated by hazard and ownership, each with a grant pointer.
+- **A rare-catastrophe allowance**, opt in per family and capped, that only spends after the
+  three-day basics are covered: a Minot household that opts into the nuclear row can add a $25
+  radiation dosimeter card and, later, a $68 shielded bag for electronics — never before its everyday
+  safety.
+- **A long-horizon section** for the households whose plans reach that far, naming what a two- or
+  three-month power cut would mean using their own region's numbers.
+- Plans generally take longer to finish in full than before — there is a great deal more to cover —
+  but every household's core safety now arrives sooner, not later.
+
+### The packet
+
+- **Redesigned front to back.** Fifteen sections print for every household, in the same order every
+  time, and two more print only when they apply: summary; your family plan; wallet cards; your risks;
+  your targets; your plan; your shelter plan; the 48-hour storm/freeze/heat-wave list; checklists;
+  access and functional needs; local help; documents and money; the first 30 days after a disaster; if
+  it lasts for months; special needs; the maintenance calendar; sources.
+- **A family plan page** you fill in by hand or on screen — meeting places, an out-of-area contact,
+  a trusted circle of up to four people and what each holds, a lawyer — and **one wallet card per
+  person**, sized to cut out, with phone numbers that never break across a line.
+- **A page budget that held despite covering three times as much:** 25 US Letter pages (24 on A4)
+  for the reference household, and all 14 test households stay at or under that even though the
+  packet now covers roughly three times as many hazards as before. The extra pages (the family plan,
+  wallet cards, the shelter plan, the forecast list, access needs, local help, the recovery page, the
+  long-horizon section) were paid for by trimming duplicated explanation elsewhere, not by shrinking
+  the type.
+
+### The site
+
+- **A new family-plan screen** and printable wallet cards; **a validation page** (`#/validation`)
+  showing the same 22-disaster scorecard as the packet, in more detail; **a risk matrix** at the top
+  of the risks screen ranking every hazard with a jump link from each name.
+- **New interview questions, every one optional:** access and functional needs for each person,
+  sleeping below street level, water-system problems, what you cook on, a nearby source of water to
+  filter, benefits you rely on, and "show me the bare minimum first."
+- 334 automated web tests; an accessibility sweep (axe) with zero violations across 66 pages in
+  light, dark and phone layouts; and an end-to-end check, run against the site the way GitHub Pages
+  actually serves it, confirming it still works offline and never contacts anywhere but itself.
+
+### The command line
+
+- `rr` now builds plans from the core data pack only, by default — a smaller, faster download.
+  `--optional` or `--all-packs` bring in the surge, wildfire-places and outage-event packs for anyone
+  who wants them.
+- `rr explain warning <id>` now explains every warning the plan can raise, not just some of them.
+- `rr validate` reproduces the full 22-disaster backtest from the command line.
+
+### Known limitations
+
+- **Storage lines are not built.** The plan does not yet say how much space your supplies take or
+  where to keep them, beyond water, for lack of a public source on the size and weight of the rest.
+- **77 counties, mostly in western Washington and coastal Alaska, run their windstorm number on a
+  thin-record fallback**, because a gap in how storm events are matched to counties leaves them
+  without their own wind and winter-storm history. Their numbers are best treated as rough until that
+  gap is closed.
+- **The validation page's 22 rows are a hand-kept copy** of the engineering record
+  (`docs/VALIDATION.md`), not read live from it. A test checks that the two agree, but they are
+  still two documents to keep in sync, not one.
+- **The rare-catastrophe "shielded bag" for electronics** is offered whenever a household's own
+  ten-year chance of an EMP passes 1 in 1,000 — the same threshold and the same nationwide chance for
+  everyone in the lower 48 states. Whether that is the right gate, or the right item, is still open;
+  say if you'd rather it worked differently.
+- **The extra data packs (surge exposure, wildfire-prone places, individual outage events) are only
+  available from the command line today**, not offered as a choice on the website.
+- **A data column for eviction-filing rates was built** but is not shipped in this release, pending
+  sign-off on the source's licence (Eviction Lab, ODC-BY).
+- **The printed packet fills its page budget.** 25 US Letter pages (24 A4) for the reference
+  household is a real ceiling now, not headroom — a household with a lot to plan for (a well, insulin,
+  a long Puerto Rico outage) can run a page or two longer.
+- **The WebAssembly download is 1.40 MB compressed, against a 1.5 MB ceiling** — about 7% of headroom
+  left before the app needs to either trim data or raise the budget.
+- **The full plan calculation runs in about 46 ms in a command-line JavaScript engine and about 38 ms
+  in a real browser, against a 50 ms target.** Comfortable today; worth watching as more hazards and
+  data are added.
+- **A household with no phone on file gets only one free step** ("get a charged mobile phone") and
+  nothing else in the plan adjusts — a weather radio, for instance, doesn't move any earlier.
+- **British and American spellings are mixed** through the packet and the site (neighbour/neighbor,
+  litre/liter, practise, labour) — not yet passed through a single consistent style.
+- **The rare-but-severe rows are sorted by the middle of their range**, so a row can appear above one
+  whose range is actually higher at both ends. It is a defensible choice, but it means the order isn't
+  always the one you'd get from the low end or the high end alone.
+- **A few day-ranges start at zero** ("about 2 days (0–7)"), which can read strangely; it means "up
+  to 7 days, possibly none," not that the low end is meaningful on its own.
+
 ## v0.1.1 — September 2026
 
 A safety and correctness release, from a review by four independent panels (emergency management,
@@ -162,13 +343,18 @@ plan to smooth out.
 
 - **79 counties have no outage history of their own** (37 in Nebraska, 21 in Alaska, among others).
   For now, they fall back to a simpler estimate, and can read lower than a similar county next door.
-  A fix is planned that borrows the state's outage pattern instead.
+  A fix is planned that borrows the state's outage pattern instead. *(Addressed in v0.2.0: every
+  county's outage rate now blends its own record with a credibility-weighted average of nearby
+  counties, so a thin local record borrows from its region automatically instead of falling back to a
+  separate, simpler estimate.)*
 - **A few coastal counties may read too high.** We are re-checking how earthquake risk and outage
   history combine in some Pacific coast counties. Coos Bay, Oregon is one example, where water and
   power targets come out higher than expected.
 - **A hazard card can still carry a related hazard's advice** in the packet (a cold-wave card
   showing avalanche lines, snow advice in a hot county). The site's "What helps" lists are fixed in
-  v0.1.1; the packet's shared guidance blocks are split in v0.2.0.
+  v0.1.1; the packet's shared guidance blocks are split in v0.2.0. *(Fixed in v0.2.0: each hazard's
+  guidance is now its own short block, so a cold-wave card no longer carries avalanche lines, and a
+  hot county's card no longer carries snow advice.)*
 - **Heat wave and cold wave can read as less serious than they are** for a household with a baby, an
   older adult, or no cooling or heating. A fix is planned to weigh who is in the household, not just
   typical dollar cost.
@@ -178,12 +364,15 @@ plan to smooth out.
   for v0.2.0.
 - **Life-safety items can push other things later.** Because the extinguisher and bleeding kit now
   come first, Philadelphia's carbon monoxide alarms moved from month 2 to month 6. A per-item value
-  for readiness items (v0.2.0) will settle the order.
+  for readiness items (v0.2.0) will settle the order. *(Addressed in v0.2.0: every item now carries
+  its own readiness value, so cheap, life-critical items move earlier and low-value accessories move
+  later, rather than one blanket rule for every safety item.)*
 - **The printed packet's monthly spending can look higher than it is.** In a month where a saved-up
   purchase completes and a regular deposit also lands, both currently show in that month's total. A
   fix is proposed.
 - **The packet needs print polish.** Its source list is not laid out in columns yet, and a section
-  can still split across a page break.
+  can still split across a page break. *(Addressed in v0.2.0: sources now print in two columns, and a
+  heading is never left alone at the bottom of a page.)*
 - **A handful of source links point to a secondary copy** — a mirror, or a search results page —
   instead of the original document. We are replacing these with direct links where one exists.
 - **Some price ranges run higher than typical** in a few item categories. These are being checked
