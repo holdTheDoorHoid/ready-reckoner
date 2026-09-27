@@ -37,7 +37,7 @@ An avalanche warning covers your area or your roads, or snow slides while you ar
 
 ## Where and who
 
-- **How you get alerts:** {alerts}
+- How you get alerts: {alerts}
 
 ## Do not
 

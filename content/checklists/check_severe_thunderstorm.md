@@ -36,9 +36,9 @@ A severe thunderstorm or high wind warning is issued, you hear thunder, or damag
 
 ## Where and who
 
-- **Safe spot at home:** {shelter_home}
-- **Safe spot at work or school:** {shelter_work}
-- **How you get alerts:** {alerts}
+- Safe spot at home: {shelter_home}
+- Safe spot at work or school: {shelter_work}
+- How you get alerts: {alerts}
 
 ## Do not
 

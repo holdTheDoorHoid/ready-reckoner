@@ -34,8 +34,8 @@ Heavy rain soaks steep or burned slopes, or you hear rumbling, trees cracking or
 
 ## Where and who
 
-- **Where we would go:** {where_go}
-- **How you get alerts:** {alerts}
+- Where we would go: {where_go}
+- How you get alerts: {alerts}
 
 ## Do not
 

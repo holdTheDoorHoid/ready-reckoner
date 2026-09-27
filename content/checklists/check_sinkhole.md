@@ -36,8 +36,8 @@ A hole opens or the ground sinks near your home, or walls start to sink, sag or 
 
 ## Where and who
 
-- **Where we would go:** {where_go}
-- **Gas company:** {gas_utility}
+- Where we would go: {where_go}
+- Gas company: {gas_utility}
 
 ## Do not
 

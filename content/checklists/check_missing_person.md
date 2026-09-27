@@ -39,8 +39,8 @@ A child, or an adult who needs someone with them, is missing and you cannot find
 
 ## Where and who
 
-- **Out-of-area contact:** {out_of_area_contact}
-- **Meeting place near home:** {meeting_near}
+- Out-of-area contact: {out_of_area_contact}
+- Meeting place near home: {meeting_near}
 
 ## Do not
 

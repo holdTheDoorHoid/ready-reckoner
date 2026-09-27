@@ -40,7 +40,7 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 
 ## Where and who
 
-- **Hospital:** {hospital}
+- Hospital: {hospital}
 
 ## Do not
 

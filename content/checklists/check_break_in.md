@@ -38,7 +38,7 @@ Someone is breaking in while you are home, or you come home to a forced door, a 
 
 ## Where and who
 
-- **Meeting place near home:** {meeting_near}
+- Meeting place near home: {meeting_near}
 
 ## Do not
 

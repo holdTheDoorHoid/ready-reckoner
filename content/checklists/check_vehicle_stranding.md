@@ -36,7 +36,7 @@ Your vehicle breaks down or is stuck in snow, rising water or extreme heat.
 
 ## Where and who
 
-- **Out-of-area contact:** {out_of_area_contact}
+- Out-of-area contact: {out_of_area_contact}
 
 ## Do not
 

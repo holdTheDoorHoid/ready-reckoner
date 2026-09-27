@@ -36,9 +36,9 @@ A pipe bursts, a water heater or appliance leaks, or water is spreading across a
 
 ## Where and who
 
-- **Water shut-off:** {water_shutoff}
-- **Electrical panel:** {electric_panel}
-- **Water company:** {water_utility}
+- Water shut-off: {water_shutoff}
+- Electrical panel: {electric_panel}
+- Water company: {water_utility}
 
 ## Do not
 

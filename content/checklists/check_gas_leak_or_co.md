@@ -36,8 +36,8 @@ You smell gas or hear a blowing or hissing noise, or a carbon monoxide (CO) alar
 
 ## Where and who
 
-- **Gas company:** {gas_utility}
-- **Gas shut-off:** {gas_shutoff}
+- Gas company: {gas_utility}
+- Gas shut-off: {gas_shutoff}
 
 ## Do not
 
