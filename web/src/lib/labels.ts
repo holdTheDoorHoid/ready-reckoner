@@ -238,21 +238,42 @@ export function returnPeriodHelp(rp: ReturnPeriod): string {
 }
 
 /**
- * What the targets mean for all the needs together. The "roughly 1 in 3" was worked out for the
- * usual 1-in-100 setting (round-2 model review, M-04: 32 to 47 of 100 across seven needs), so the
- * other settings say "higher" without a number rather than a figure nobody computed.
+ * What the targets mean for all the needs together when the engine's own sentence is not at hand
+ * (the stand-in engine, or a moment after the dial is turned): no number. The share of households
+ * that meets at least one longer disruption differs from household to household (2 to 5 in 10
+ * across the fixtures at 1-in-100), so only the engine's figure is shown (`engineDialSentence`);
+ * the one fixed figure v0.1.1 gave every household is gone (verification R3-25).
  */
-export function dialJointSentence(rp: ReturnPeriod): string {
-  const joint =
-    rp === 'one_in_100'
-      ? 'Across all your needs together, the chance that at least one runs out is higher, roughly 1 in 3.'
-      : 'Across all your needs together, the chance that at least one runs out is higher.';
-  return `${joint} That is why the plan also gives you ways to cope when a target runs out.`;
+export function dialJointSentence(): string {
+  return 'Across all your needs together, the chance that at least one runs out is higher. That is why the plan also gives you ways to cope when a target runs out.';
 }
 
-/** The dial sentence (COMMON-P1's canonical wording at the usual 1-in-100 setting). */
-export function dialSentence(rp: ReturnPeriod): string {
-  return `${returnPeriodHelp(rp)} ${dialJointSentence(rp)}`;
+/**
+ * The engine's own dial sentence for this household (model review M-04; rr-consequence
+ * `dial_sentence`, printed by the packet): "At this setting, about 1 in 10 households like yours
+ * will face a longer disruption of any one kind in the next 10 years; about 3 in 10 will face at
+ * least one kind that runs past its target. That is why …". The contract carries it in one place,
+ * the first paragraph of the packet's "Your targets" section, so it is read from there, as the
+ * "Also checked" note is (lib/rare.ts). Undefined when the packet has no such paragraph (the
+ * stand-in engine) or names another setting (the plan for a newly turned dial is still coming).
+ */
+export function engineDialSentence(packetMarkdown: string | undefined, rp: ReturnPeriod): string | undefined {
+  const intro = packetMarkdown ? /^## Your targets\n+(.+)$/m.exec(packetMarkdown)?.[1] : undefined;
+  if (!intro) return undefined;
+  const plain = intro
+    .replace(/\[\d+(?:, \d+)*\]/g, '')
+    .replace(/\\([\\`*_{}[\]()#+\-.!|<>])/g, '$1')
+    .trim();
+  const m = /^How long to be ready for each kind of disruption at the (1-in-\d+) setting\. (At this setting, .+ That is why the plan also gives you ways to cope when a target runs out\.)$/.exec(plain);
+  return m && m[1] === RETURN_PERIOD[rp].jargon ? m[2] : undefined;
+}
+
+/**
+ * The dial sentence under "How long to be ready for": the engine's own for this household when the
+ * plan has it, otherwise what each need's target promises and the joint sentence without a number.
+ */
+export function dialSentence(rp: ReturnPeriod, packetMarkdown?: string): string {
+  return engineDialSentence(packetMarkdown, rp) ?? `${returnPeriodHelp(rp)} ${dialJointSentence()}`;
 }
 
 /** Start screen and About (the packet prints it from the engine). Canonical wording; do not edit. */

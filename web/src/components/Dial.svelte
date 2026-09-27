@@ -1,14 +1,25 @@
 <!--
   The return-period dial: four labelled settings, each with the plain phrase, the jargon in
   brackets, and what its targets promise for any one need. A note under the settings says what
-  that means for all the needs together (the dial sentence, M-04), for the setting chosen.
+  that means for all the needs together (the dial sentence, M-04), for the setting chosen: the
+  engine's own sentence for this household when the screen passes it (`joint`), otherwise the
+  sentence without a number.
 -->
 <script lang="ts">
   import type { ReturnPeriod } from '../engine/types';
   import { RETURN_PERIODS } from '../engine/types';
   import { dialJointSentence, RETURN_PERIOD, returnPeriodHelp } from '../lib/labels';
 
-  let { value, onchange }: { value: ReturnPeriod; onchange: (rp: ReturnPeriod) => void } = $props();
+  let {
+    value,
+    onchange,
+    joint = undefined,
+  }: {
+    value: ReturnPeriod;
+    onchange: (rp: ReturnPeriod) => void;
+    /** The engine's dial sentence for this household at `value` (lib/labels `engineDialSentence`). */
+    joint?: string;
+  } = $props();
   const uid = $props.id();
 </script>
 
@@ -32,7 +43,7 @@
     {/each}
   </div>
   </div>
-  <p class="dial__joint" id="{uid}-joint">{dialJointSentence(value)}</p>
+  <p class="dial__joint" id="{uid}-joint">{joint ?? dialJointSentence()}</p>
 </fieldset>
 
 <style>

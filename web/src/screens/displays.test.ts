@@ -13,8 +13,8 @@ import { FIXTURES } from '../engine/fixtures';
 import type { PlanOutput } from '../engine/types';
 import { ARTICLES, withSourceLinks } from '../learn/articles';
 import { helpsFor } from '../lib/helps';
-import { addMonths, chanceShort, chanceWithin, CONFIDENCE_LABELS, formatMonth, noticeRange, perYearWords, rangeOnly, severityBand, usd } from '../lib/format';
-import { dialSentence, NUCLEAR_NOTE, STATUS_LINE } from '../lib/labels';
+import { addMonths, chanceShort, chanceWithin, CONFIDENCE_LABELS, formatMonth, noticeRange, perYearWords, planMonthPhrase, rangeOnly, severityBand, usd } from '../lib/format';
+import { dialSentence, engineDialSentence, NUCLEAR_NOTE, STATUS_LINE } from '../lib/labels';
 import { lowerFirst } from '../lib/lookup';
 import { nextMilestone } from '../lib/savings';
 import { render, savedFor, type Rendered } from '../test/helpers';
@@ -167,15 +167,25 @@ describe('the rare box (H-02)', () => {
 });
 
 describe('the Risks cards and targets', () => {
-  it('say what the dial means per need and for all needs together (M-04), word for word at 1-in-100', async () => {
-    const { r } = await screenWith(Risks, 'risks');
-    expect(text(r.target)).toContain(dialSentence('one_in_100'));
+  it('say what the dial means per need and for all needs together (M-04), in the engine’s own words for the household', async () => {
+    const { r, out } = await screenWith(Risks, 'risks');
+    // Philadelphia: the packet's own sentence ("about 3 in 10"), not a fixed figure (R3-25).
+    const engine = engineDialSentence(out.packet_markdown, 'one_in_100')!;
+    expect(engine).toContain('about 1 in 10 households like yours will face a longer disruption of any one kind in the next 10 years; about 3 in 10 will face at least one kind that runs past its target.');
+    expect(text(r.target.querySelector('p.dial-sentence'))).toBe(engine);
+    expect(dialSentence('one_in_100', out.packet_markdown)).toBe(engine);
     (r.target.querySelector('button[aria-controls="settings-panel"]') as HTMLButtonElement).click();
     flushSync();
     const dial = r.target.querySelector('fieldset.dial')!;
     expect(text(dial)).toContain('For any one need, something worse than its target comes in about 1 of every 10 ten-year stretches.');
-    expect(text(dial)).toContain('Across all your needs together, the chance that at least one runs out is higher, roughly 1 in 3.');
+    expect(text(dial.querySelector('.dial__joint'))).toBe(engine);
+    expect(text(r.target)).not.toContain('roughly 1 in 3');
     expect(text(r.target)).not.toContain('Something longer reaches');
+    r.cleanup();
+
+    // Minot's own figure is 4 in 10.
+    const minot = await screenWith(Risks, 'risks', 'minot-missile-field-3');
+    expect(text(minot.r.target.querySelector('p.dial-sentence'))).toContain('about 4 in 10 will face at least one kind that runs past its target');
   });
 
   it('the savings card starts its sentences with a capital', async () => {
@@ -267,10 +277,15 @@ describe('the plan (W3, W9, W11)', () => {
     const { r } = await screenWith(PlanScreen, 'plan', NAME, out);
     const envelopes = [...r.target.querySelectorAll('.envelopes li')].map(text);
     const cash = envelopes.find((t) => t.startsWith('Cash in small bills'))!;
-    expect(cash).toMatch(/all set aside around \w+ \d{4}/);
+    // In the packet's numbering (month 0 is the plan date's month): the packet's checklist says
+    // "Cash in small bills: $200 (month 22)".
+    const month = out.plan.months.find((m) => m.items.includes(cashLine!))!.index;
+    expect(out.packet_markdown).toContain(`Cash in small bills: $200 (month ${month})`);
+    expect(cash).toContain(`all set aside in ${planMonthPhrase(FIXTURES[NAME].planning_date, month)}`);
+    expect(cash).toMatch(/all set aside in month \d+ \(\w+ \d{4}\)/);
     expect(cash).not.toContain('ready to buy');
     // Things (not money) keep "ready to buy".
-    for (const t of envelopes.filter((x) => !x.startsWith('Cash') && x.includes(' around '))) expect(t).toMatch(/ready to buy around/);
+    for (const t of envelopes.filter((x) => !x.startsWith('Cash') && x.includes(' in month '))) expect(t).toMatch(/ready to buy in month \d+ \(\w+ \d{4}\)/);
   });
 
   it('puts the nearer savings goal before the full goal, on the plan and the risks screens', async () => {

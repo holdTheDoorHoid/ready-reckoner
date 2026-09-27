@@ -5,6 +5,10 @@
   count only what the household does from here: what it already had (its own list, and the everyday
   basics the plan assumes) is shown apart as "Already have".
 
+  Months are numbered exactly as the printed packet numbers them (the packet is the oracle): month 0
+  begins on the plan date and reads "This month (October 2026)", the next is "Month 1 (November
+  2026)", so a purchase has the same month on the screen as in the packet's checklists.
+
   Contract v2: in bare-minimum mode (`Plan.minimum_kit`) a banner says the smallest three-day kit
   comes first and lists what falls beyond three years (the `plan_too_long` warning's `related`
   items); decisions show as decisions, grouped the way the packet groups them (one "Decide this
@@ -23,7 +27,7 @@
   import Warning from '../components/Warning.svelte';
   import type { PlanItem, PlanOutput } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
-  import { addMonths, formatDate, formatMonth, monthsBetween, quantity, usd } from '../lib/format';
+  import { addMonths, formatDate, formatMonth, monthsBetween, planMonthLabel, planMonthPhrase, quantity, usd } from '../lib/format';
   import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, stageLine } from '../lib/labels';
   import { allPlanItems, bucketName, catalogueItem, decisionList, itemSourceIds, keyedItems, tierName } from '../lib/lookup';
   import { href } from '../lib/router.svelte';
@@ -53,10 +57,9 @@
     return out.filter((g) => g.items.length);
   }
 
+  /** "This month (October 2026)", "Month 4 (February 2027)": the packet's numbering (month 0 is the plan date's month). */
   function monthLabel(index: number): string {
-    if (index === currentMonth) return 'This month';
-    if (index === currentMonth + 1) return 'Next month';
-    return `Month ${index + 1}: ${formatMonth(addMonths(planningDate, index))}`;
+    return planMonthLabel(planningDate, index, currentMonth);
   }
 
   function spend(items: PlanItem[]): number {
@@ -204,7 +207,7 @@
       {/if}
 
       <section aria-labelledby="this-title">
-        <h2 id="this-title">This month <span class="muted h-note">from {formatDate(addMonths(planningDate, currentMonth))}</span></h2>
+        <h2 id="this-title">{monthLabel(currentMonth)} <span class="muted h-note">from {formatDate(addMonths(planningDate, currentMonth))}</span></h2>
         {#if thisItems.length === 0}
           <p class="card">Nothing new to do this month{output.plan.envelopes.length ? '; your budget is saving toward a bigger item below' : ''}. {nextMonth ? 'The next step is shown below.' : ''}</p>
         {:else}
@@ -272,7 +275,7 @@
                 <strong>{catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id}</strong>: about {usd(e.needed_usd)}{#if month}; {isMoney(e.item_id)
                     ? 'all set aside'
                     : 'ready to buy'}
-                  around {formatMonth(addMonths(planningDate, month.index))}{/if}.
+                  in {planMonthPhrase(planningDate, month.index)}{/if}.
                 <Sources ids={itemSourceIds(app.catalogue, output, e.item_id)} variant="inline" what={catalogueItem(app.catalogue, e.item_id)?.name ?? e.item_id} />
               </li>
             {/each}
@@ -313,7 +316,7 @@
         {/each}
         {#if output.plan.done_month !== undefined}
           <p class="done-note">
-            <Icon name="check" /> After {formatMonth(addMonths(planningDate, output.plan.done_month))} you are done for your risk. From then on, keeping it up takes a few minutes a month.
+            <Icon name="check" /> After {planMonthPhrase(planningDate, output.plan.done_month)} you are done for your risk. From then on, keeping it up takes a few minutes a month.
             <a href={href('maintain')}>See what to keep up</a>
           </p>
         {/if}
@@ -439,7 +442,8 @@
 </div>
 
 <ConfirmDialog bind:open={confirmRestart} title="Restart the schedule from today?" confirmLabel="Restart from today" cancelLabel="Keep the schedule" onconfirm={restart}>
-  <p>Month 1 becomes this month. Nothing you have checked off is lost.</p>
+  <p>This month becomes month 0 of your plan again. Nothing you have checked off is lost.</p>
+  <p>If you printed your packet, print it again so its months match the screen.</p>
   <p>If you already spent the one-off amount, set it to $0 on the Money screen so it isn't counted again.</p>
 </ConfirmDialog>
 

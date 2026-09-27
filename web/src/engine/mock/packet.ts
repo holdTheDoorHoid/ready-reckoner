@@ -197,7 +197,7 @@ export function buildPacket(input: PlanInput, r: ModelResult): string {
     out.push('');
   }
   if (second) {
-    out.push(`### Month ${second.index + 1} (from ${formatDate(addMonths(input.planning_date, second.index))}): ${usd(second.budget_usd)}`, '');
+    out.push(`### Month ${second.index} (from ${formatDate(addMonths(input.planning_date, second.index))}): ${usd(second.budget_usd)}`, '');
     second.items.forEach((item) => out.push(taskLine(item)));
     out.push('');
   }
@@ -207,13 +207,13 @@ export function buildPacket(input: PlanInput, r: ModelResult): string {
     out.push('| Month | What | How much | About |', '| --- | --- | --- | --- |');
     for (const m of later) {
       for (const item of m.items) {
-        out.push(`| ${m.index + 1} | ${md(item.name)} | ${md(quantity(item.quantity, item.unit))} | ${usd(item.est_cost_usd)} |`);
+        out.push(`| ${m.index} | ${md(item.name)} | ${md(quantity(item.quantity, item.unit))} | ${usd(item.est_cost_usd)} |`);
       }
     }
     out.push('');
   }
   if (o.plan.done_month !== undefined) {
-    out.push(`By month ${o.plan.done_month + 1} (${formatDate(addMonths(input.planning_date, o.plan.done_month))}) every target is covered. After that you are done for your risk: keep up the maintenance calendar.`, '');
+    out.push(`By month ${o.plan.done_month} (${formatDate(addMonths(input.planning_date, o.plan.done_month))}) every target is covered. After that you are done for your risk: keep up the maintenance calendar.`, '');
   } else if (monthly <= 0 && input.finances.one_off_budget_usd <= 0) {
     out.push('With no budget, the plan is the free steps above. They still cover a lot. Add even a small monthly amount to start on supplies.', '');
   } else {

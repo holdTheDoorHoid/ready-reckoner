@@ -444,3 +444,25 @@ export function monthsBetween(from: IsoDate, to: IsoDate): number {
 export function daysBetween(from: IsoDate, to: IsoDate): number {
   return Math.round((parse(to).getTime() - parse(from).getTime()) / 86_400_000);
 }
+
+// ---------------------------------------------------------------------------------------------
+// Plan months, numbered as the packet numbers them
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * A plan month's name, numbered exactly as the printed packet numbers it (the packet is the
+ * oracle): month 0 begins on the plan date, month 1 a month later, and so on (`PlanMonth.index`).
+ * "Month 4 (February 2027)"; the month the household is in reads "This month (October 2026)", and
+ * keeps its number when the plan began earlier ("This month: month 2 (December 2026)"), so a
+ * purchase carries the same month on the screen as in the packet's checklists ("(month 4)").
+ */
+export function planMonthLabel(planningDate: IsoDate, index: number, currentMonth = 0): string {
+  const when = formatMonth(addMonths(planningDate, index));
+  if (index !== currentMonth) return `Month ${index} (${when})`;
+  return index === 0 ? `This month (${when})` : `This month: month ${index} (${when})`;
+}
+
+/** A plan month inside a sentence, as the packet writes it: "month 12 (October 2027)". */
+export function planMonthPhrase(planningDate: IsoDate, index: number): string {
+  return `month ${index} (${formatMonth(addMonths(planningDate, index))})`;
+}
