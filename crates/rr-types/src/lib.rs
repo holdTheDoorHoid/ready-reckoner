@@ -27,6 +27,8 @@
 //! - [`input`]: [`PlanInput`] and its parts; [`PlanInput::defaults`].
 //! - [`validate`]: [`PlanInput::validate`] and [`Problem`].
 //! - [`output`]: [`PlanOutput`] and its parts.
+//! - [`binder`]: the during-event binder [`PlanOutput::binder`] (contract v3), its blocks and
+//!   inlines, and [`Binder::check`].
 //! - [`content`]: catalogue [`Item`], [`Citation`], [`GuidanceMeta`].
 //! - [`effect`]: [`Effect`], [`DurationDist`] and [`HouseholdEventRate`].
 //! - [`data`]: data-pack records ([`CountyRecord`], [`BaseRate`]); engine-internal.
@@ -43,6 +45,7 @@
 mod macros;
 
 pub mod api;
+pub mod binder;
 pub mod calibration;
 pub mod content;
 pub mod data;
@@ -59,6 +62,7 @@ pub mod rng;
 pub mod validate;
 
 pub use api::*;
+pub use binder::Binder;
 pub use calibration::*;
 pub use content::*;
 pub use data::*;
@@ -77,7 +81,13 @@ pub use validate::*;
 /// Version 2 (v0.2.0): additive input and output fields with defaults, 19 new hazard ids, the
 /// `clean_air` bucket, and one breaking change, the retired `terrorism` id (kept so v1 plans
 /// parse, never emitted). `docs/ENGINE-API.md` § "Changes from v1" lists every change.
-pub const ENGINE_API_VERSION: u32 = 2;
+///
+/// Version 3 (v0.3.0): the optional per-person profiles and family-plan groups (echo-only, so
+/// every v2 input still parses), the during-event [`Binder`] and the Prepare sheet in place of
+/// the packet (`PlanOutput.packet_markdown` is removed: the one breaking change), the ZIP
+/// code's centre, and the `checklist` guidance kind. `docs/ENGINE-API.md` § "Changes from v2"
+/// lists every change.
+pub const ENGINE_API_VERSION: u32 = 3;
 
 /// Crate name, used by the CLI's `--version` and by the about screen.
 pub const CRATE: &str = "rr-types";
