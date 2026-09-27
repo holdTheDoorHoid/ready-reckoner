@@ -9,7 +9,7 @@ pages: 1
 ---
 ## Use this when
 
-The power is out across your town or region, not just your street, and could stay out for days. Stores, gas pumps, cash machines and phones may stop working too.
+The power is out across your town or region and could stay out for days. Stores, gas pumps, cash machines and phones may stop too.
 
 ## Do first
 
@@ -18,11 +18,11 @@ The power is out across your town or region, not just your street, and could sta
 3. **Unplug appliances and electronics.**[^ready_gov_power_outages]
 4. {if:powered_device}**Switch medical devices to backup power.** If it will not last, go where there is power.[^ready_gov_power_outages][^redcross_power_outage]{/if}
 5. **Get news** from a battery radio or phone alerts.[^redcross_power_outage]
-6. **Text instead of calling.** Keep calls short.[^fcc_emergency_calling_tips]
+6. **Text instead of calling.**[^fcc_emergency_calling_tips]
 
 ## Then
 
-1. **Check on your people and neighbours.** Ask who needs help.[^redcross_power_outage]
+1. **Check on your people and neighbours.**[^redcross_power_outage]
 2. **Treat a dark traffic light as a stop sign** in every direction.[^ca_dmv_rules_of_the_road]
 3. **Pay with cash** in small bills.[^ready_gov_financial]
 4. **Follow any water notice,** such as boil water or do not drink.[^cdc_water_advisories]
@@ -31,7 +31,7 @@ The power is out across your town or region, not just your street, and could sta
 7. {if:has:power_generator}**Let the generator cool** before you refuel it.[^ready_gov_power_outages]{/if}
 8. {if:has:med_cooler_refrigerated_rx}**Keep insulin below 86°F,** out of the sun and never frozen.[^fda_insulin_emergency]{/if}
 9. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
-10. {if:need:hearing}**If someone cannot hear the radio,** watch phone alerts and texts for warnings.[^fcc_emergency_calling_tips]{/if}
+10. {if:need:hearing}**If someone cannot hear the radio,** watch phone alerts.[^fcc_emergency_calling_tips]{/if}
 
 ## Leave or stay
 
@@ -52,7 +52,7 @@ The power is out across your town or region, not just your street, and could sta
 
 ## When it is over
 
-- Throw out food that was 40°F or warmer for 2 hours or more, or that smells or looks odd.[^ready_gov_power_outages]
+- Throw out food that was 40°F or warmer for 2 hours or more.[^ready_gov_power_outages]
 - Ask your pharmacist or doctor before you use a refrigerated medicine that got warm.[^redcross_power_outage]
 
 ## Sources

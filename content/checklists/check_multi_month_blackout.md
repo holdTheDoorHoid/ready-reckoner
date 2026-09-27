@@ -4,7 +4,7 @@ title: Power out for months
 kind: checklist
 onset: ongoing
 applies_to: [hazard:multi_month_blackout]
-citations: [ready_gov_evacuation, redcross_power_outage, ready_gov_disability, epa_emergency_disinfection, rdpo_emergency_toilet, cdc_winter_safety, ready_gov_heat, ready_gov_power_outages, fsis_shelf_stable, cdc_hygiene_emergency, ncpc_home_safety, fema_home_inspections, disasterassistance_gov, samhsa_disaster_distress, cdc_co_basics, cdc_find_clean_water, cdc_well_disinfection]
+citations: [ready_gov_evacuation, redcross_power_outage, ready_gov_disability, epa_emergency_disinfection, rdpo_emergency_toilet, cdc_winter_safety, ready_gov_heat, ready_gov_power_outages, fsis_shelf_stable, cdc_hygiene_emergency, ncpc_home_safety, fema_home_inspections, disasterassistance_gov, samhsa_disaster_distress, cdc_co_basics, cdc_find_clean_water]
 pages: 1
 ---
 ## Use this when
@@ -24,7 +24,7 @@ Officials say the power may stay out for weeks or months. Water, fuel, stores an
 
 1. **Cook outdoors only,** at least 20 feet from windows.[^ready_gov_power_outages]
 2. **Eat fresh food first,** then the oldest cans.[^redcross_power_outage][^fsis_shelf_stable]
-3. **Wash hands with soap and water,** or sanitizer with at least 60% alcohol.[^cdc_hygiene_emergency]
+3. **Wash hands with soap and water,** or 60% alcohol sanitizer.[^cdc_hygiene_emergency]
 4. **Work with your neighbours** to look out for each other.[^ncpc_home_safety]
 5. **Apply for FEMA help** at 1-800-621-3362 if your county has a disaster declaration.[^disasterassistance_gov]
 6. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
@@ -45,7 +45,6 @@ Officials say the power may stay out for weeks or months. Water, fuel, stores an
 - Never use a generator, camp stove or charcoal grill inside, even in the garage.[^cdc_co_basics][^ready_gov_power_outages]
 - Never heat your home with a gas stove or oven.[^ready_gov_power_outages]
 - Never drink pool or spa water. Use it only for washing and cleaning.[^cdc_find_clean_water]
-- After a flood, do not drink well water until it has been disinfected and tested.[^cdc_well_disinfection]
 
 ## When it is over
 
@@ -71,4 +70,3 @@ Officials say the power may stay out for weeks or months. Water, fuel, stores an
 [^samhsa_disaster_distress]: Substance Abuse and Mental Health Services Administration, Disaster Distress Helpline (2026).
 [^cdc_co_basics]: Centers for Disease Control and Prevention, Carbon Monoxide Poisoning Basics (2026).
 [^cdc_find_clean_water]: Centers for Disease Control and Prevention, How to Find Clean Water in an Emergency (2024).
-[^cdc_well_disinfection]: Centers for Disease Control and Prevention, How to Disinfect Wells After an Emergency (2025).
