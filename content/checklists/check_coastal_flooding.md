@@ -41,7 +41,7 @@ A coastal flood or storm surge warning covers your area. Surge can push far inla
 
 - Do not drive around barricades.[^ready_gov_floods] {if:vehicle}Do not drive or charge an electric car that has been in salt water. It can catch fire.[^hcfl_ev_safety]{/if}
 - Do not cross bridges over fast-moving water.[^ready_gov_floods]
-- Do not touch wet electrical equipment, or any while standing in water.[^ready_gov_floods]
+- Do not touch electrical equipment if it is wet or you are standing in water.[^ready_gov_floods]
 - Do not climb into a closed attic. Rising water can trap you.[^ready_gov_floods]
 
 ## When it is over

@@ -15,7 +15,7 @@ Officials declare a drought, or set limits on water use.[^ready_gov_drought]
 
 1. **Follow the limits.** Follow every state and local rule on water use.[^ready_gov_drought]
 2. **Fix leaks.** Fix dripping taps and other leaks.[^ready_gov_drought]
-3. **Take short showers.** Take short showers instead of baths.[^ready_gov_drought]
+3. **Shower quickly.** Take short showers instead of baths.[^ready_gov_drought]
 4. **Turn off the tap** while you brush your teeth, wash your face or shave.[^ready_gov_drought]
 5. **Run full loads.** Run the washer and dishwasher only when full.[^ready_gov_drought]
 
