@@ -14,8 +14,8 @@ A child, or an adult who needs someone with them, is missing and you cannot find
 
 ## Do first
 
-1. **Search the home and nearby at once.**[^alz_wandering] {if:children}Look in closets, laundry piles, under beds, inside large appliances, and in cars and trunks.[^ncmec_child_missing]{/if}
-2. **Call 911.** There is no waiting period for a missing child.[^ojjdp_missing_child_guide] {if:need:cognitive|supervision}For an adult with dementia, call if they are not found within 15 minutes.[^alz_wandering]{/if}
+1. **Call 911 now.** There is no waiting period for a missing child.[^ojjdp_missing_child_guide] {if:need:cognitive|supervision}For an adult with dementia, call if a search nearby does not find them in 15 minutes.[^alz_wandering]{/if}
+2. **Search the home and nearby.**[^ncmec_child_missing] {if:children}Look in closets, laundry piles, under beds, inside large appliances, and in cars and trunks.[^ncmec_child_missing]{/if}
 3. **Say they are missing** and when you noticed. Say if they have dementia.[^ncmec_child_missing][^alz_wandering]
 4. **Describe them:** height, weight, hair, eyes, glasses or braces, and what they were wearing.[^ojjdp_missing_child_guide][^ncmec_child_missing]
 5. **Say where and when** they were last seen.[^ojjdp_missing_child_guide]

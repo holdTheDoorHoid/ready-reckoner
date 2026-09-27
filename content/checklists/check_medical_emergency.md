@@ -45,7 +45,7 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 ## Do not
 
 - Do not hang up until the call-taker tells you to.[^gov911_faq]
-- Do not give back blows while they can still cough or speak.[^redcross_choking_adult_child]
+- Do not start back blows while they can still cough hard. Encourage them to keep coughing.[^redcross_choking_adult_child]
 - Do not stop pressing to put on a bandage. Pressure is what stops the bleeding.[^fema_until_help_arrives]
 
 ## When it is over
