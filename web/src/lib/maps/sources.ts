@@ -192,7 +192,7 @@ export const WILDFIRE: ExportSource & { high: number; veryHigh: number } = {
  * maps (see the note at the top), so the maps say so instead of drawing them. Set this to an
  * export source if NOAA publishes one, and add its origin to `MAP_ORIGINS` through it.
  */
-export const SURGE: ExportSource | null = null;
+export const SURGE = null as ExportSource | null;
 
 /** Why surge is not drawn, in the words the maps and the consent screen use. */
 export const SURGE_NOTE =
