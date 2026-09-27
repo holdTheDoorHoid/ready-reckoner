@@ -28,9 +28,10 @@ The power is out across your town or region, not just your street, and could sta
 4. **Follow any water notice,** such as boil water or do not drink.[^cdc_water_advisories]
 5. **Eat fresh food first.**[^redcross_power_outage]
 6. {if:has:power_generator}**Run the generator outdoors only,** at least 20 feet from windows, doors and attached garages.[^ready_gov_power_outages]{/if}
-7. {if:has:med_cooler_refrigerated_rx}**Keep insulin below 86°F,** out of the sun and never frozen.[^fda_insulin_emergency]{/if}
-8. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
-9. {if:need:hearing}**If someone cannot hear the radio,** watch phone alerts and texts for warnings.[^fcc_emergency_calling_tips]{/if}
+7. {if:has:power_generator}**Let the generator cool** before you refuel it.[^ready_gov_power_outages]{/if}
+8. {if:has:med_cooler_refrigerated_rx}**Keep insulin below 86°F,** out of the sun and never frozen.[^fda_insulin_emergency]{/if}
+9. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
+10. {if:need:hearing}**If someone cannot hear the radio,** watch phone alerts and texts for warnings.[^fcc_emergency_calling_tips]{/if}
 
 ## Leave or stay
 
@@ -48,7 +49,6 @@ The power is out across your town or region, not just your street, and could sta
 - Never heat your home with a gas stove or oven.[^ready_gov_power_outages]
 - Never use a generator, camp stove or charcoal grill inside, even in the garage.[^cdc_co_basics][^ready_gov_power_outages]
 - Stay at least 35 feet from a downed power line and anything it touches. Call 911.[^redcross_power_outage]
-- Do not switch a tripped circuit breaker back on until an electrician checks it.[^redcross_power_outage]
 
 ## When it is over
 

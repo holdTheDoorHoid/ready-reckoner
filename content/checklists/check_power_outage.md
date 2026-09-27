@@ -26,8 +26,9 @@ The power goes out at home and stays out for hours or days, from a storm, a faul
 2. **Move fridge food to coolers with ice** after 4 hours. A full, closed freezer stays cold about 48 hours.[^ready_gov_power_outages]
 3. **Check food temperatures** with a thermometer.[^ready_gov_power_outages]
 4. {if:has:power_generator}**Run the generator outdoors only,** at least 20 feet from windows, doors and attached garages.[^ready_gov_power_outages]{/if}
-5. {if:has:med_cooler_refrigerated_rx}**Keep insulin below 86°F,** out of the sun and never frozen. For other cold medicines, follow what your pharmacist told you.[^fda_insulin_emergency][^ready_gov_power_outages]{/if}
-6. **Save your phone battery.** Keep calls short, and text instead.[^fcc_emergency_calling_tips]
+5. {if:has:power_generator}**Let the generator cool** before you refuel it.[^ready_gov_power_outages]{/if}
+6. {if:has:med_cooler_refrigerated_rx}**Keep insulin below 86°F,** out of the sun and never frozen. For other cold medicines, follow what your pharmacist told you.[^fda_insulin_emergency][^ready_gov_power_outages]{/if}
+7. **Save your phone battery.** Keep calls short, and text instead.[^fcc_emergency_calling_tips]
 
 ## Leave or stay
 
@@ -43,7 +44,6 @@ The power goes out at home and stays out for hours or days, from a storm, a faul
 - Never heat your home with a gas stove or oven.[^ready_gov_power_outages]
 - Never use a generator, camp stove or charcoal grill inside, even in the garage.[^cdc_co_basics][^ready_gov_power_outages]
 - Stay at least 35 feet from a downed power line and anything it touches. Call 911.[^redcross_power_outage]
-- Do not switch a tripped circuit breaker back on until an electrician checks it.[^redcross_power_outage]
 
 ## When it is over
 
