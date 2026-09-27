@@ -1,6 +1,7 @@
 /**
  * The dials' input model for the v2 settings (docs/ENGINE-API.md "Dials"): which rare families
- * the rare allowance may buy for, bare-minimum mode and the long-horizon section.
+ * the rare allowance may buy for, bare-minimum mode, the long-horizon section and the
+ * legal-emergency line in the savings track.
  *
  * Rare families. `rare_opt_in` lists family ids (a family's id is the id of the rare hazard that
  * heads it, `RARE_HAZARD_IDS`) or `["all"]`. The v1 switch `rare_catastrophic_opt_in` still
@@ -85,4 +86,19 @@ export function longHorizon(dials: Dials): boolean {
 
 export function setLongHorizon(dials: Dials, on: boolean): void {
   dials.long_horizon = on;
+}
+
+/**
+ * A legal-emergency line in the savings track (`Dials.legal_opt_in`): what bail and a lawyer can
+ * cost, shown apart from the months of income the goal protects. Off by default, because the copy
+ * assumes nothing about the household; it never changes the supplies budget.
+ */
+export function legalOptIn(dials: Dials): boolean {
+  return dials.legal_opt_in === true;
+}
+
+/** Turn the line on, or off. Off leaves the key out of the saved plan, as the engine writes it. */
+export function setLegalOptIn(dials: Dials, on: boolean): void {
+  if (on) dials.legal_opt_in = true;
+  else delete dials.legal_opt_in;
 }

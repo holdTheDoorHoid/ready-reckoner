@@ -83,6 +83,64 @@ describe('hidden words keep their space', () => {
   });
 });
 
+describe('the legal-emergency switch (Dials.legal_opt_in)', () => {
+  const box = (r: Rendered) =>
+    [...r.target.querySelectorAll<HTMLInputElement>('#settings-panel input[type="checkbox"]')].find((i) =>
+      (i.closest('label')?.textContent ?? '').includes("Also save toward a legal emergency (bail, a lawyer's retainer)"),
+    );
+
+  it('sits in Your settings, off by default, and writes the dial only when turned on', async () => {
+    current = await render(Risks, { plan: savedFor(FIXTURES['minot-missile-field-3']), route: 'risks' });
+    const r = current;
+    (r.target.querySelector('button[aria-controls="settings-panel"]') as HTMLButtonElement).click();
+    flushSync();
+    const input = box(r)!;
+    expect(input, 'the switch').toBeDefined();
+    expect(input.checked).toBe(false);
+    expect(r.app.plan!.input.dials.legal_opt_in).toBeUndefined();
+    // Right after the rare-family list.
+    expect(input.closest('label')!.previousElementSibling?.matches('fieldset.rare-opt-in')).toBe(true);
+    expect(text(input.closest('label'))).toContain('It never takes money from your supplies budget.');
+    input.click();
+    flushSync();
+    expect(r.app.plan!.input.dials.legal_opt_in).toBe(true);
+    expect(text(r.target.querySelector('.settings__summary'))).toContain('also saving toward a legal emergency');
+    input.click();
+    flushSync();
+    // Off leaves the key out of the saved plan, as the engine writes it.
+    expect('legal_opt_in' in r.app.plan!.input.dials).toBe(false);
+    expect(text(r.target.querySelector('.settings__summary'))).not.toContain('legal emergency');
+  });
+
+  it('adds the source of the bail figures to the savings card when the engine prints the line', async () => {
+    // The real Minot plan, as the engine answers with the dial on: the legal sentence in the
+    // savings track and its source in the provenance (rr-budget savings.rs, legal_sentence).
+    const off = golden('minot-missile-field-3');
+    const on = golden('minot-missile-field-3');
+    on.plan.savings_track!.why += ' Apart from these months: an arrest in the household can mean paying bail and a lawyer.';
+    on.provenance.push({
+      id: 'bjs_felony_defendants_2009',
+      title: 'Felony Defendants in Large Urban Counties, 2009: Statistical Tables',
+      publisher: 'Reaves B.A., Bureau of Justice Statistics',
+      year: 2013,
+      url: 'https://bjs.ojp.gov/content/pub/pdf/fdluc09.pdf',
+      retrieved: '2026-09-26',
+      license: 'US Government Work (public domain)',
+    });
+    const incomeSources = off.buckets.find((b) => b.id === 'income')!.sources.length;
+    const card = (r: Rendered) => r.target.querySelector('[data-bucket="income"]')!;
+
+    const input = { ...FIXTURES['minot-missile-field-3'], dials: { ...FIXTURES['minot-missile-field-3'].dials, legal_opt_in: true } };
+    current = await render(Risks, { plan: savedFor(input), route: 'risks', engine: answering(on) });
+    expect(text(card(current))).toContain('an arrest in the household can mean paying bail and a lawyer');
+    expect(text(card(current).querySelector('details.sources > summary'))).toBe(`Sources (${incomeSources + 1})`);
+    current.cleanup();
+
+    current = await render(Risks, { plan: savedFor(FIXTURES['minot-missile-field-3']), route: 'risks', engine: answering(off) });
+    expect(text(card(current).querySelector('details.sources > summary'))).toBe(`Sources (${incomeSources})`);
+  });
+});
+
 describe('web copy keeps to the content policy', () => {
   /** rr-content's list of pressure phrases (docs/CONTENT_STANDARDS.md §4), read from the Rust source. */
   function bannedPhrases(): string[] {

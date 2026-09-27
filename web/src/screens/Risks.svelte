@@ -27,7 +27,7 @@
   import type { ClimateHorizon, Dials, PlanItem, PlanOutput, RareHazardId, ReturnPeriod, WaterLevel } from '../engine/types';
   import { CLIMATE_HORIZONS, WATER_LEVELS } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
-  import { isRareFamily, longHorizon, minimumKit, rareSummary, setLongHorizon, setMinimumKit } from '../lib/dials';
+  import { isRareFamily, legalOptIn, longHorizon, minimumKit, rareSummary, setLegalOptIn, setLongHorizon, setMinimumKit } from '../lib/dials';
   import { dayPhrase, targetDays } from '../lib/format';
   import { helpsFor } from '../lib/helps';
   import { CLIMATE, dialSentence, HORIZONS, RETURN_PERIOD, stageLine, WATER_LEVEL } from '../lib/labels';
@@ -68,6 +68,12 @@
     if (!app.plan) return;
     setLongHorizon(app.plan.input.dials, on);
     announcement = on ? 'The long-horizon part of the plan is shown.' : 'The long-horizon part is shown only when a target passes a month.';
+  }
+
+  function setLegal(on: boolean) {
+    if (!app.plan) return;
+    setLegalOptIn(app.plan.input.dials, on);
+    announcement = on ? 'Your savings track now also covers a legal emergency.' : 'The legal-emergency line is off.';
   }
 
   /** Plain names of the rare families, from the catalogue. */
@@ -149,7 +155,7 @@
                     {CLIMATE[dials.climate].label.toLowerCase()}; {WATER_LEVEL[dials.water_level ?? 'basic'].label.toLowerCase()} water; chances over
                     {dials.horizon_years} {dials.horizon_years === 1 ? 'year' : 'years'}{minimumKit(dials) ? '; bare minimum first' : ''}{rareSummary(dials) === 'none'
                       ? ''
-                      : `; rare-catastrophe allowance: ${rareSummary(dials)}`}.
+                      : `; rare-catastrophe allowance: ${rareSummary(dials)}`}{legalOptIn(dials) ? '; also saving toward a legal emergency' : ''}.
                   </p>
                 </div>
                 <button
@@ -209,6 +215,12 @@
                   names={hazardNames}
                   order={rare.map((h) => h.id).filter((id): id is RareHazardId => isRareFamily(id))}
                   onchange={(words) => (announcement = words)}
+                />
+                <CheckRow
+                  label="Also save toward a legal emergency (bail, a lawyer's retainer)"
+                  help="Your savings track then also says what bail and a lawyer can cost, and why money you can reach quickly helps. It never takes money from your supplies budget. Off unless you turn it on."
+                  checked={legalOptIn(dials)}
+                  onchange={setLegal}
                 />
                 <div class="settings__live" aria-hidden="true">
                   {#each duration.filter((b) => ['power', 'water_out', 'supplies'].includes(b.id)) as b (b.id)}
