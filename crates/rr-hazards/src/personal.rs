@@ -323,31 +323,70 @@ fn arrest_band(
     ((m.0 + f.0) / 2.0 / 1e5, f.1 / 1e5, m.2 / 1e5)
 }
 
-/// A household member is arrested or detained (owner decision 2026-09-26): FBI arrest counts per
-/// person-year by age band, summed over the household. Arrests are events, not people: one
-/// person arrested twice counts twice, and the sentence says so. Children under 13 are not
-/// counted (arrests of children under 10 are almost nil, and the FBI's youngest band is 10–17).
-fn arrest_or_detention(ctx: &Ctx<'_>) -> Option<HazardRate> {
-    // Adults: the five FBI bands from 18 to 64, weighted by the years each covers.
+/// Adults 18–64 (each band weighted by the years it covers), teens (bands ending before 18) and
+/// people 65 or over, from per-band `(value, low, high)` triples keyed by first and last age.
+fn by_life_stage(bands: &[(u8, u8, Triple)]) -> (Triple, Triple, Triple) {
     let mut adult = (0.0, 0.0, 0.0);
     let mut weight = 0.0;
     let mut teen = (0.0, 0.0, 0.0);
     let mut senior = (0.0, 0.0, 0.0);
-    let mut pack_sources: Vec<String> = Vec::new();
-    for &(band, first, last, male, female) in ARRESTS_PER_100K {
-        let t = arrest_band(ctx, band, male, female, &mut pack_sources);
-        match band {
-            "10_17" => teen = t,
-            "65_plus" => senior = t,
-            _ => {
-                let w = f64::from(last - first + 1);
-                adult = (adult.0 + w * t.0, adult.1 + w * t.1, adult.2 + w * t.2);
-                weight += w;
-            }
+    for &(first, last, t) in bands {
+        if last < 18 {
+            teen = t;
+        } else if first >= 65 {
+            senior = t;
+        } else {
+            let w = f64::from(last - first + 1);
+            adult = (adult.0 + w * t.0, adult.1 + w * t.1, adult.2 + w * t.2);
+            weight += w;
         }
     }
     let adult = (adult.0 / weight, adult.1 / weight, adult.2 / weight);
-    let sources: &[&str] = &[cite::FBI_ARRESTS, cite::CENSUS_AGESEX_2025];
+    (teen, adult, senior)
+}
+
+/// A household member is arrested or detained (owner decision 2026-09-26; verification R3-06):
+/// people arrested at least once a year, by age, summed over the household. The value is what
+/// people in households report to the National Survey on Drug Use and Health (2022–2024,
+/// [`ARRESTED_PEOPLE_PER_100K`]), men's and women's rates averaged since the form does not ask
+/// sex; the low end is the women's lowest year. The FBI counts arrests, not people (a person
+/// arrested twice counts twice), and the survey is self-reported, so the high end is the FBI's
+/// counts for the men's highest year divided by the survey's bookings per arrested person
+/// ([`ARRESTS_PER_ARRESTED_PERSON`]) where that is higher. Counting people keeps the ten-year
+/// chance from counting the same person's repeat arrests as more households. Children under 13
+/// are not counted (teens, 13–17, take the survey's 12–17 band).
+fn arrest_or_detention(ctx: &Ctx<'_>) -> Option<HazardRate> {
+    let mut pack_sources: Vec<String> = Vec::new();
+    let fbi: Vec<(u8, u8, Triple)> = ARRESTS_PER_100K
+        .iter()
+        .map(|&(band, first, last, male, female)| {
+            (
+                first,
+                last,
+                arrest_band(ctx, band, male, female, &mut pack_sources),
+            )
+        })
+        .collect();
+    let survey: Vec<(u8, u8, Triple)> = ARRESTED_PEOPLE_PER_100K
+        .iter()
+        .map(|&(_, first, last, m, f)| {
+            (first, last, ((m.0 + f.0) / 2.0 / 1e5, f.1 / 1e5, m.2 / 1e5))
+        })
+        .collect();
+    let (fbi_teen, fbi_adult, fbi_senior) = by_life_stage(&fbi);
+    let (teen, adult, senior) = by_life_stage(&survey);
+    // The survey's value and low end; the high end from the FBI's counts in people, where higher.
+    let people = |s: Triple, f: Triple| (s.0, s.1, s.2.max(f.2 / ARRESTS_PER_ARRESTED_PERSON));
+    let (teen, adult, senior) = (
+        people(teen, fbi_teen),
+        people(adult, fbi_adult),
+        people(senior, fbi_senior),
+    );
+    let sources: &[&str] = &[
+        cite::NSDUH_ARRESTS,
+        cite::FBI_ARRESTS,
+        cite::CENSUS_AGESEX_2025,
+    ];
     let mut total: Option<Estimate> = None;
     for p in &ctx.input.people {
         let t = match p.age_band {
@@ -364,11 +403,15 @@ fn arrest_or_detention(ctx: &Ctx<'_>) -> Option<HazardRate> {
     }
     let pack: Vec<&str> = pack_sources.iter().map(String::as_str).collect();
     let today = total?.cite(&pack);
+    let words = |rate: f64| crate::sentence::chance_words(crate::sentence::chance_within(rate, 1));
     let sentence = format!(
-        "For households with people the ages of yours, the FBI's counts come to {} a year \
-         (2023–2025). This counts arrests, not guilt or convictions, and one person arrested \
-         twice counts twice.",
-        crate::sentence::arrests_per_households(today.value)
+        "For households with people the ages of yours, {} have someone arrested in a year, going \
+         by what people tell a national survey (2022–2024); police records suggest up to {}. \
+         People arrested once are often arrested again, so over ten years fewer households are \
+         affected than a year-by-year count suggests. This counts arrests, not guilt or \
+         convictions.",
+        words(today.value),
+        words(today.high)
     );
     let mut r = HazardRate::new(
         HazardId::ArrestOrDetention,

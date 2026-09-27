@@ -3570,6 +3570,18 @@ url = "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/nation
 retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
+# Added 2026-09-27 (hazards2e, verification R3-06): people arrested in a year, not arrests, for
+# the arrest row. Read through SAMHSA's own data endpoint; how, in docs/CITATION_IDS.md.
+[[citation]]
+id = "samhsa_nsduh_arrests_2022_2024"
+title = "National Survey on Drug Use and Health, 2022-2024 public-use files: times arrested and booked in the past 12 months, by age and sex"
+publisher = "Substance Abuse and Mental Health Services Administration (SAMHSA), Data Analysis System"
+year = 2025
+url = "https://datatools.samhsa.gov/nsduh/2024/nsduh-2024-ds0001/crosstab?row=NOBOOKY2&column=CATAG6&control=IRSEX&weight=ANALWT2_C"
+retrieved = "2026-09-27"
+quote = "Not counting minor traffic violations, how many times during the past 12 months have you been arrested and booked for breaking a law?"
+license = "US Government Work (public domain)"
+
 [[citation]]
 id = "xpt_2023_karger"
 title = "Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament (FRI Working Paper 1)"
