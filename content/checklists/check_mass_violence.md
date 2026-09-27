@@ -24,7 +24,7 @@ Someone is attacking people near you, or there is an explosion.
 ## Then
 
 1. **Help the wounded** get to safety once you are safe yourself.[^ready_gov_public_spaces]
-2. **Press on the wound** with a cloth, clothing or your hand. Keep pressing until the bleeding stops.[^medlineplus_bleeding]{if:has:med_bleeding_control_kit} If that fails on severe bleeding, use your kit's tourniquet.[^medlineplus_bleeding]{/if}
+2. **Press on the wound** with a cloth, clothing or your hand. Keep pressing until the bleeding stops.[^medlineplus_bleeding]{if:has:med_bleeding_control_kit} If that does not stop severe bleeding, use the tourniquet in your kit.[^medlineplus_bleeding]{/if}
 3. **Blood soaks through?** Put another cloth on top. Do not lift the first one.[^medlineplus_bleeding]
 4. **Inside after a blast?** Stay low under smoke. Do not use elevators.[^ready_gov_explosions]
 5. **Trapped under debris?** Tap on a pipe or use a whistle or light. Shout only as a last resort. Cover your nose and mouth.[^ready_gov_explosions]
