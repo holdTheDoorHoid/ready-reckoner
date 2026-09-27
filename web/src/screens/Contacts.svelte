@@ -146,6 +146,15 @@
 
   const showPets = $derived(!!input && (hasAnimals(input) || !!plan?.pets?.length || !!plan?.who_takes_animals));
   const showVehicles = $derived(!!input && (hasVehicle(input) || !!plan?.vehicles?.length));
+
+  /** The parts of the step, for the links at the top: pets and vehicles only where the household has them. */
+  const parts = $derived<[string, string][]>([
+    ['circle', 'Your trusted circle'],
+    ['lawyer', 'A lawyer'],
+    ...(showPets ? ([['pets', 'Pets and animals']] as [string, string][]) : []),
+    ...(showVehicles ? ([['vehicles', 'Vehicles']] as [string, string][]) : []),
+    ['documents', 'Documents and money'],
+  ]);
 </script>
 
 <!-- One free-text answer inside `family_plan` at `path`. -->
@@ -184,7 +193,7 @@
 
     <nav class="toc no-print" aria-label="Parts of this step">
       <ul>
-        {#each [['circle', 'Your trusted circle'], ['lawyer', 'A lawyer'], ...(showPets ? [['pets', 'Pets and animals']] : []), ...(showVehicles ? [['vehicles', 'Vehicles']] : []), ['documents', 'Documents and money']] as [card, title] (card)}
+        {#each parts as [card, title] (card)}
           <li><a href="#contacts-{card}" onclick={(e) => jumpTo(`contacts-${card}`, { focus: 'h2' }) && e.preventDefault()}>{title}</a></li>
         {/each}
       </ul>

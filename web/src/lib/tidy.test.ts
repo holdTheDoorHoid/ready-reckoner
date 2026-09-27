@@ -50,7 +50,8 @@ function deltaCaps(): Record<string, Record<string, number>> {
   for (const m of blocks.matchAll(/^\s*([A-Z]\w+)\s*\{([^}]*)\}/gm)) {
     const fields: Record<string, number> = {};
     for (const f of m[2]!.matchAll(/(\w+)\??:\s*string\((\d+)\)/g)) fields[f[1]!] = Number(f[2]);
-    for (const f of m[2]!.matchAll(/(\w+):\s*\[\w+\]\s*\(≤\s*(\d+)\)/g)) fields[`${f[1]!}[]`] = Number(f[2]);
+    // Lists read `medications: [Medication] (≤ 12)`, or `medications?: …` since types3 marked them optional.
+    for (const f of m[2]!.matchAll(/(\w+)\??:\s*\[\w+\]\s*\(≤\s*(\d+)\)/g)) fields[`${f[1]!}[]`] = Number(f[2]);
     out[m[1]!] = { ...(out[m[1]!] ?? {}), ...fields };
   }
   return out;
@@ -59,10 +60,15 @@ function deltaCaps(): Record<string, Record<string, number>> {
 describe('the limits are the design delta’s (§3.1–3.2)', () => {
   const caps = deltaCaps();
 
+  // A person's health insurance is `Insurance` in the delta's first draft and `HealthInsurance` since
+  // types3 (the name `Insurance` was taken by the household's finances).
+  const healthInsurance = caps.HealthInsurance ?? caps.Insurance;
+
   it('found every struct in the delta', () => {
-    for (const s of ['PersonProfile', 'Place', 'Medication', 'Insurance', 'Contact', 'HomeInfo', 'Neighbourhood', 'PetInfo', 'VehicleInfo', 'DocumentsInfo', 'AccountInfo', 'PolicyInfo']) {
+    for (const s of ['PersonProfile', 'Place', 'Medication', 'Contact', 'HomeInfo', 'Neighbourhood', 'PetInfo', 'VehicleInfo', 'DocumentsInfo', 'AccountInfo', 'PolicyInfo']) {
       expect(caps[s], s).toBeDefined();
     }
+    expect(healthInsurance, 'HealthInsurance').toBeDefined();
   });
 
   it('person, place, medicine and health insurance', () => {
@@ -71,7 +77,7 @@ describe('the limits are the design delta’s (§3.1–3.2)', () => {
     expect(MEDICATIONS_MAX).toBe(medications);
     expect(PLACE_MAX).toEqual(caps.Place);
     expect(MEDICATION_MAX).toEqual(caps.Medication);
-    expect(HEALTH_INSURANCE_MAX).toEqual(caps.Insurance);
+    expect(HEALTH_INSURANCE_MAX).toEqual(healthInsurance);
   });
 
   it('contacts keep v2’s 80 for name and phone, and add the address', () => {

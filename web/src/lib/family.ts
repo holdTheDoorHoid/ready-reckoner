@@ -69,15 +69,6 @@ export type FamilyContact = (typeof FAMILY_CONTACTS)[number];
 export const FAMILY_SECTIONS = ['contact', 'children', 'shelter', 'leave', 'home', 'circle', 'lawyer'] as const;
 export type FamilySection = (typeof FAMILY_SECTIONS)[number];
 
-export function isFamilySection(s: string | undefined): s is FamilySection {
-  return (FAMILY_SECTIONS as readonly string[]).includes(s ?? '');
-}
-
-/** The element id of a section on the screen. */
-export function sectionId(section: FamilySection): string {
-  return `family-${section}`;
-}
-
 // ---------------------------------------------------------------------------------------------
 // Tidying, as the engine tidies (rr-types `FamilyPlan::tidy`)
 // ---------------------------------------------------------------------------------------------
