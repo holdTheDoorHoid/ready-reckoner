@@ -6,9 +6,8 @@ already know still needs work.
 
 ## v0.2.0 — September 2026
 
-A much larger release than v0.1.1, built by many people working on separate pieces at once under
-one shared engine contract (contract v2), then merged, tested and checked against real disasters
-together. It roughly triples what Ready Reckoner plans for, adds a family plan and wallet cards,
+A much larger release than v0.1.1, built as separate workstreams under one shared engine contract
+(contract v2), then merged, tested and checked against real disasters together. It roughly triples what Ready Reckoner plans for, adds a family plan and wallet cards,
 rebuilds the outage and water models on real records instead of simple estimates, and adds a public
 page that shows exactly how well the model's predictions have held up. Nothing about how your data
 is handled has changed: still no server, no accounts, nothing sent anywhere.
