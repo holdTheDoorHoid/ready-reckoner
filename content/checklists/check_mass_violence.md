@@ -16,7 +16,7 @@ Someone is attacking people near you, or there is an explosion.
 
 1. **Run.** Get away from the attacker. Leave your things behind.[^ready_gov_public_spaces]
 2. **Hide** if you cannot get out. Stay out of view, behind something solid.[^ready_gov_public_spaces]
-3. **Lock and block the door.** Close the blinds, turn off the lights and stay silent.[^ready_gov_public_spaces]
+3. **Lock and block the door.** Turn off the lights and stay silent.[^ready_gov_public_spaces]
 4. **Fight** only as a last resort, when you cannot run or hide.[^ready_gov_public_spaces]
 5. **Call 911** when you are safe. Describe the attacker and where they are.[^ready_gov_public_spaces]
 6. **Explosion?** If things are falling, get under a sturdy table. Then leave the area.[^ready_gov_explosions]
@@ -24,11 +24,11 @@ Someone is attacking people near you, or there is an explosion.
 ## Then
 
 1. **Help the wounded** get to safety once you are safe yourself.[^ready_gov_public_spaces]
-2. **Press on the wound** with a cloth, clothing or your hand. Keep pressing until the bleeding stops.[^medlineplus_bleeding]{if:has:med_bleeding_control_kit} If that fails and the bleeding is severe, use the tourniquet from your kit.[^medlineplus_bleeding]{/if}
+2. **Press on the wound** with a cloth, clothing or your hand. Keep pressing until the bleeding stops.[^medlineplus_bleeding]{if:has:med_bleeding_control_kit} If that fails on severe bleeding, use your kit's tourniquet.[^medlineplus_bleeding]{/if}
 3. **Blood soaks through?** Put another cloth on top. Do not lift the first one.[^medlineplus_bleeding]
 4. **Inside after a blast?** Stay low under smoke. Do not use elevators.[^ready_gov_explosions]
 5. **Trapped under debris?** Tap on a pipe or use a whistle or light. Shout only as a last resort. Cover your nose and mouth.[^ready_gov_explosions]
-6. **When police arrive,** stay calm, keep your hands empty and in view, and do what they say.[^ready_gov_public_spaces]
+6. **When police arrive,** stay calm, keep your hands empty and in view, and follow orders.[^ready_gov_public_spaces]
 7. **Text your family** that you are safe. Save calls for emergencies.[^ready_gov_explosions]
 
 ## Leave or stay
@@ -43,14 +43,12 @@ Someone is attacking people near you, or there is an explosion.
 
 ## Do not
 
-- Do not stop for belongings or to make phone calls.[^ready_gov_explosions]
 - Do not pull out anything stuck in a wound.[^medlineplus_bleeding]
 - Do not try to dig out people who are trapped. Tell rescuers where they are.[^ready_gov_explosions]
 
 ## When it is over
 
 - Go to the place police name to give information and get help.[^ready_gov_public_spaces]
-- Let family and friends know how you are.[^ready_gov_public_spaces]
 - For stress or shock, call or text the Disaster Distress Helpline, 1-800-985-5990.[^ready_gov_public_spaces][^samhsa_disaster_distress]
 
 ## Sources
