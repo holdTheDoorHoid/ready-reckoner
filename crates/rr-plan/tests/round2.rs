@@ -473,7 +473,8 @@ fn the_dial_sentence_is_per_need() {
         }
     }
     // Coos Bay plans at 1 in 500: 100 · (1 − e^(−10 × 0.002)) = 1.98, about 2 in 100 households
-    // for one need in ten years, not the model sentence's floor of 1 in 10.
+    // for one need in ten years (the model's sentence counts small chances in hundredths, not in
+    // tens with a floor of 1 in 10), and the packet prints it as the model words it.
     let coos = all()
         .iter()
         .find(|(n, _, _)| n == "coos-bay-well-owner-2")
@@ -485,6 +486,7 @@ fn the_dial_sentence_is_per_need() {
         s.starts_with("At this setting, about 2 in 100 households like yours"),
         "{s}"
     );
+    assert!(s.starts_with(&a.consequence.dial_sentence()), "{s}");
 }
 
 // ------------------------------------------------------------------------------------------------

@@ -27,9 +27,10 @@ use rr_types::{
     LocationResolved, PlanInput, Target, ValidationSummary, WaterSystemRecord,
 };
 
-/// Where the full table is published.
-pub const DOC_URL: &str =
-    "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/VALIDATION.md";
+/// The registry entry for the published table (`docs/VALIDATION.md`, `content/citations.toml`):
+/// the packet's tally cites it like any other source, so the Sources list carries its title and
+/// address from the registry.
+pub const CITATION: &str = "rr_validation_2026";
 
 /// The frozen set, as committed.
 pub const EVENTS_JSON: &str = include_str!("../../../fixtures/backtest/events.json");

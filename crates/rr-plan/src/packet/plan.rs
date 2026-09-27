@@ -153,8 +153,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         (false, false) => "You have set no money aside, so the plan is free steps.".to_owned(),
     };
     out.push(format!(
-        "{budget} Free steps come first, then what protects you most for each dollar, water, \
-         medicine and safety first, until each need reaches the step that is enough for it.{}",
+        "{budget} Free steps come first, then what protects you most for each dollar (water, \
+         medicine and safety first), until every need has enough.{}",
         cite("prior_harm_weights")
     ));
     out.push(String::new());

@@ -12,7 +12,7 @@ use rr_consequence::ConsequenceAssessment;
 use rr_types::{BucketAssessment, BucketId, BucketKind, StressTest, Target, TierId};
 
 use super::text::{self, md};
-use super::{Ctx, cite_all};
+use super::{Ctx, cite, cite_all};
 
 /// What the dial means, after the model's own sentence (model review Part 3.4): each target holds
 /// for its own need, so the plan also gives ways to cope when one runs out.
@@ -46,50 +46,12 @@ pub(crate) fn target_phrase(t: &Target) -> String {
 }
 
 /// What the dial means (model review M-04, DESIGN-DELTA §3): the consequence model's own
-/// sentence, computed from its event list (`ConsequenceAssessment::dial_sentence`: about 1 in 10
-/// for any one kind of disruption, and the share that runs past at least one target, from the
-/// joint rate), then [`COPE_SENTENCE`].
-///
-/// The model's sentence counts in tens and never says fewer than 1 in 10, which is right for
-/// every dial but the rarest: at 1 in 500 the chance for one need is about 2 in 100 in ten years,
-/// and "about 1 in 10" would overstate it five times. When either chance is under 1 in 10, the
-/// same sentence is written here from the model's two rates with that chance out of 100
-/// ([`dial_share`]).
+/// sentence, computed from its event list (`ConsequenceAssessment::dial_sentence`: the chance of
+/// a longer disruption of any one kind, and the higher chance that at least one kind runs past its
+/// target, from the joint rate, both on one scale, so the rarer settings read "about 2 in 100"),
+/// then [`COPE_SENTENCE`].
 pub fn dial_sentence(c: &ConsequenceAssessment) -> String {
-    let years = c.horizon_years.max(1.0);
-    let one = per_100(c.dial_rate, years);
-    let all = per_100(c.joint_rate(), years).max(one);
-    let model = if one >= 9.5 && all >= 9.5 {
-        c.dial_sentence()
-    } else {
-        format!(
-            "At this setting, about {} households like yours will face a longer disruption of \
-             any one kind in {}; about {} will face at least one kind that runs past its target.",
-            dial_share(one),
-            rr_consequence::words::horizon_phrase(years as u8),
-            dial_share(all)
-        )
-    };
-    format!("{model} {COPE_SENTENCE}")
-}
-
-/// Out of 100 households, how many see at least one event at `rate` a year in `years` years:
-/// 100 · (1 − e^(−years · rate)), as the consequence model counts it.
-fn per_100(rate: f64, years: f64) -> f64 {
-    (-100.0 * rr_types::math::exp_m1(-years * rate)).clamp(0.0, 100.0)
-}
-
-/// A chance out of 100 in the dial sentence's words: in tens from 1 in 10 up (as the model's
-/// sentence has it), out of 100 below ("2 in 100").
-fn dial_share(n: f64) -> String {
-    if n >= 9.5 {
-        format!(
-            "{} in 10",
-            ((n / 10.0 + 0.5).floor()).clamp(1.0, 10.0) as i64
-        )
-    } else {
-        format!("{} in 100", (n + 0.5).floor().max(1.0) as i64)
-    }
+    format!("{} {COPE_SENTENCE}", c.dial_sentence())
 }
 
 fn relief_cell(days: Option<f32>) -> String {
@@ -181,8 +143,9 @@ fn dedupe_year(sentence: &str, st: Option<&StressTest>) -> String {
 }
 
 /// "How well do these numbers hold up?" (model review Part 3.1): the frozen backtest's tally
-/// for this version, from the table bundled with the engine (`EngineInfo::validation`), and what
-/// it means for the household (`topic:validation`).
+/// for this version, from the table bundled with the engine (`EngineInfo::validation`), cited to
+/// the published table's registry entry ([`crate::validation::CITATION`]), and what it means for
+/// the household (`topic:validation`).
 fn validation(cx: &Ctx<'_>, out: &mut Vec<String>) {
     let v = crate::validation::summary();
     if v.events_tested == 0 {
@@ -199,7 +162,7 @@ fn validation(cx: &Ctx<'_>, out: &mut Vec<String>) {
         })
         .map(|p| {
             // Its first two sentences: a floor, not a promise; plan for anything longer your area
-            // has lived through. (The table is the address in brackets.)
+            // has lived through. (The table is the source the bracket points to.)
             let body = p.trim_start_matches("**What it means for you.**").trim();
             let mut end = 0;
             for (n, (i, _)) in body.match_indices(". ").enumerate() {
@@ -217,14 +180,13 @@ fn validation(cx: &Ctx<'_>, out: &mut Vec<String>) {
         .unwrap_or_default();
     out.push(format!(
         "**How well do these numbers hold up?** Tested against {} real disasters, this version \
-         covered {}, partly covered {}, fell short on {} and could not model {} (results: {}). \
-         {meaning}",
+         covered {}, partly covered {}, fell short on {} and could not model {}.{} {meaning}",
         v.events_tested,
         v.covered,
         v.partial,
         v.short,
         v.not_modelled,
-        crate::validation::DOC_URL
+        cite(crate::validation::CITATION)
     ));
     out.push(String::new());
 }
@@ -272,12 +234,12 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push(String::new());
     out.push(format!(
         "Brackets show how uncertain a target is. \"Not known\": no restoration records for the \
-         event behind that target.{}",
+         event behind that target{}",
         if fallback_any {
-            " \"Worst on record\": the target rests on an estimate, so the worst event on record \
-             stands in (named below)."
+            "; \"worst on record\": no such records either, so the worst event on record stands \
+             in (named below)."
         } else {
-            ""
+            "."
         }
     ));
     out.push(String::new());

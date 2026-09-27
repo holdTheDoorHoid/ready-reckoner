@@ -61,25 +61,11 @@ pub fn month_start(planning: Date, index: u16) -> Date {
     planning.add_months(i32::from(index)).unwrap_or(planning)
 }
 
-/// Whole dollars with thousands separators: "$1,234"; under half a dollar shows as "under $1".
-pub fn usd(x: f64) -> String {
-    if x > 0.0 && x < 0.5 {
-        return "under $1".to_owned();
-    }
-    format!("${}", thousands(x.round().max(0.0) as u64))
-}
-
-pub(crate) fn thousands(n: u64) -> String {
-    let digits = n.to_string();
-    let mut out = String::new();
-    for (i, c) in digits.chars().enumerate() {
-        if i > 0 && (digits.len() - i) % 3 == 0 {
-            out.push(',');
-        }
-        out.push(c);
-    }
-    out
-}
+pub(crate) use rr_types::money::thousands;
+/// Whole dollars with thousands separators ("$1,234"; under half a dollar shows as "under $1")
+/// and whole numbers with separators ("1,200"): the shared formatter in `rr-types`, so the packet
+/// writes amounts exactly as the other engine crates' sentences do.
+pub use rr_types::money::usd;
 
 /// A price band: "$30–45"; "$30" when both ends match; "free" at $0.
 pub fn band(low: f64, high: f64) -> String {

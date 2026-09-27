@@ -53,7 +53,9 @@ pub const FAST_HAZARDS: [HazardId; 8] = [
 /// unless one of them rated Severe already has a card (it shows the same block): storms are the
 /// likeliest dangerous weather for most homes, and the shelter-spot advice is on that card (the
 /// frequent-but-minor rows of v0.2, such as phone outages, had pushed it out). A Minor or Moderate
-/// wind card still yields to a Serious or Severe card ([`cards`]).
+/// wind card still yields to a Serious or Severe card ([`cards`]); a household without the card
+/// still reads where to shelter from wind in the shelter plan's Strong wind paragraph, which prints
+/// for everyone (`plan_shelter`).
 pub const WIND_HAZARDS: [HazardId; 4] = [
     HazardId::Tornado,
     HazardId::StrongWind,

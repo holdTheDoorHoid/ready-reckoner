@@ -126,59 +126,89 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(String::new());
     }
 
-    // The get-home bag, per commuter.
+    // The get-home bag, per commuter: the trip, the bag line (without the trip the person's line
+    // already gives) and the water and snacks for the walk in one line. When every commuter's bag
+    // line is the same (two people who both keep theirs in the car), it prints once, for each
+    // person, above them.
     let walks = &a.consequence.get_home.commuters;
     if !walks.is_empty() {
         out.push("### Get-home bag for each person who commutes".to_owned());
         out.push(String::new());
-        for w in walks {
-            let n = w.person + 1;
-            let lines: Vec<&rr_supply::SizedLine> = a
-                .lines
-                .iter()
-                .filter(|l| l.line.id.ends_with(&format!(".person_{n}")))
-                .collect();
-            let walk = rr_consequence::words::days_phrase(w.walk_hours / 24.0);
-            let walk = if walk.starts_with("about ") {
-                walk
-            } else {
-                format!("about {walk}")
-            };
-            out.push(format!(
-                "**Person {n}**: a {} trip, {walk} on foot.",
-                rr_consequence::words::distance_adjective(w.distance_km)
-            ));
+        struct Commuter {
+            trip: String,
+            bag: Vec<String>,
+            walk: Option<String>,
+        }
+        let commuters: Vec<Commuter> = walks
+            .iter()
+            .map(|w| {
+                let n = w.person + 1;
+                let walk = rr_consequence::words::days_phrase(w.walk_hours / 24.0);
+                let walk = if walk.starts_with("about ") {
+                    walk
+                } else {
+                    format!("about {walk}")
+                };
+                let trip = format!(
+                    "**Person {n}**: a {} trip, {walk} on foot.",
+                    rr_consequence::words::distance_adjective(w.distance_km)
+                );
+                let mut bag: Vec<String> = Vec::new();
+                let mut from_home: Vec<String> = Vec::new();
+                let mut cites: Vec<&rr_types::CitationId> = Vec::new();
+                for l in a
+                    .lines
+                    .iter()
+                    .filter(|l| l.line.id.ends_with(&format!(".person_{n}")))
+                {
+                    if l.kind == rr_supply::LineKind::Need {
+                        bag.push(format!(
+                            "{}{}",
+                            md(after_first_sentence(&l.line.plain)),
+                            cite_all(&l.line.citations)
+                        ));
+                    } else if l.quantity > 0.0 {
+                        let what = if l.line.unit == "kcal" {
+                            "of snacks"
+                        } else {
+                            "of water"
+                        };
+                        from_home.push(format!(
+                            "{} {what}",
+                            md(&text::quantity(l.quantity, &l.line.unit))
+                        ));
+                        cites.extend(l.line.citations.iter());
+                    }
+                }
+                let walk = (!from_home.is_empty()).then(|| {
+                    format!(
+                        "- [ ] For the walk, from home: {}.{}",
+                        text::join_and(&from_home),
+                        cite_all(cites)
+                    )
+                });
+                Commuter { trip, bag, walk }
+            })
+            .collect();
+        let shared = commuters.len() > 1
+            && !commuters[0].bag.is_empty()
+            && commuters.windows(2).all(|p| p[0].bag == p[1].bag);
+        if shared {
+            for b in &commuters[0].bag {
+                out.push(format!("- [ ] For each person: {}", text::lower_first(b)));
+            }
             out.push(String::new());
-            // The bag line, without the trip the heading above already gives; then the water
-            // and snacks for the walk in one line.
-            let mut from_home: Vec<String> = Vec::new();
-            let mut cites: Vec<&rr_types::CitationId> = Vec::new();
-            for l in lines {
-                if l.kind == rr_supply::LineKind::Need {
-                    out.push(format!(
-                        "- [ ] {}{}",
-                        md(after_first_sentence(&l.line.plain)),
-                        cite_all(&l.line.citations)
-                    ));
-                } else if l.quantity > 0.0 {
-                    let what = if l.line.unit == "kcal" {
-                        "of snacks"
-                    } else {
-                        "of water"
-                    };
-                    from_home.push(format!(
-                        "{} {what}",
-                        md(&text::quantity(l.quantity, &l.line.unit))
-                    ));
-                    cites.extend(l.line.citations.iter());
+        }
+        for c in &commuters {
+            out.push(c.trip.clone());
+            out.push(String::new());
+            if !shared {
+                for b in &c.bag {
+                    out.push(format!("- [ ] {b}"));
                 }
             }
-            if !from_home.is_empty() {
-                out.push(format!(
-                    "- [ ] For the walk, from home: {}.{}",
-                    text::join_and(&from_home),
-                    cite_all(cites)
-                ));
+            if let Some(w) = &c.walk {
+                out.push(w.clone());
             }
             out.push(String::new());
         }
