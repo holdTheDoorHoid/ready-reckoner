@@ -332,6 +332,14 @@ pub fn run<S: CountySource + ?Sized>(
         // track whether the arrest row applies; the simultaneous-need check is the consequence
         // crate's.
         register: register.clone(),
+        // The rare families' sub-causes with their rate ranges: an item that protects against
+        // one cause (Faraday storage: an electromagnetic pulse) is gated on that cause's chance.
+        sub_causes: hazards
+            .profiles
+            .iter()
+            .filter(|p| p.family.is_some())
+            .map(|p| (p.id, p.sub_causes.clone()))
+            .collect(),
         simultaneous: consequence
             .simultaneous
             .iter()
