@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:ice_storm]
 citations: [nws_ice_storms, cdc_winter_safety, ready_gov_power_outages, pa_puc_power_line_safety, ready_gov_winter, ready_gov_stay_safe_warm, cdc_co_basics, osha_downed_wires, cpsc_generator_alert_2021, ready_gov_evacuation, ready_gov_recovering]
+pages: 1
 ---
 ## Use this when
 

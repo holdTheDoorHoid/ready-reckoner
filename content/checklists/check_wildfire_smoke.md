@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:wildfire_smoke]
 citations: [epa_wildfire_indoor_air, epa_clean_room, epa_protect_lungs_2026, epa_diy_air_cleaners]
+pages: 1
 ---
 ## Use this when
 

@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:geomagnetic_storm]
 citations: [ready_gov_space_weather, ready_gov_power_outages, ready_gov_financial, ready_gov_water, ready_gov_kit, cdc_co_basics, cpsc_generator_alert_2021]
+pages: 1
 ---
 ## Use this when
 

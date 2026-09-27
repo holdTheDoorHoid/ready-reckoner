@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:pandemic]
 citations: [ready_gov_pandemic, cdc_respiratory_when_sick, cdc_masks, ready_gov_disability, samhsa_disaster_distress]
+pages: 1
 ---
 ## Use this when
 

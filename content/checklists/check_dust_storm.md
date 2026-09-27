@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:dust_storm]
 citations: [nws_dust_storms, cdc_valley_fever_prevention, ready_gov_shelter, cdc_valley_fever]
+pages: 1
 ---
 ## Use this when
 

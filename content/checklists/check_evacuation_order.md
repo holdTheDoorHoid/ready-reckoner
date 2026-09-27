@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [event:evacuation_order]
 citations: [ready_gov_chemical, cdc_evacuation_psa, ready_gov_evacuation, ready_gov_disability, fema_back_to_school_2026, ready_gov_shelter]
+pages: 1
 ---
 ## Use this when
 

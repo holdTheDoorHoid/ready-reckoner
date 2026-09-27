@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:coastal_flooding]
 citations: [nhc_storm_surge_overview, ready_gov_floods, ready_gov_evacuation, cdc_evacuation_psa, ready_gov_hurricanes, ready_gov_shelter, hcfl_ev_safety, ready_gov_recovering, floodsmart_start_claim]
+pages: 1
 ---
 ## Use this when
 

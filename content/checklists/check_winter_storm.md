@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:winter_weather]
 citations: [ready_gov_winter, cdc_winter_safety, nws_winter_storm_during, nws_aly_cold_safety, ready_gov_power_outages, ready_gov_stay_safe_warm, cdc_co_basics]
+pages: 1
 ---
 ## Use this when
 

@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [event:shelter_in_place]
 citations: [cdc_shelter_in_place_chemical_2018, ready_gov_shelter, ready_gov_chemical, ready_gov_nuclear, ready_gov_disability]
+pages: 1
 ---
 ## Use this when
 

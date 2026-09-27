@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:cold_wave]
 citations: [nws_cold_during, cdc_winter_safety, nws_aly_cold_safety, ready_gov_winter, ready_gov_stay_safe_warm, cdc_co_basics, ready_gov_recovering]
+pages: 1
 ---
 ## Use this when
 

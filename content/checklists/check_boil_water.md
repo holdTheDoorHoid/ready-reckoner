@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [event:boil_water_notice]
 citations: [cdc_water_advisories, epa_emergency_disinfection, nydoh_boil_water_checklist, cdc_co_basics]
+pages: 1
 ---
 ## Use this when
 

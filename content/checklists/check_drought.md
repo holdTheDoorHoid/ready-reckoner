@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:drought]
 citations: [ready_gov_drought, ready_gov_water]
+pages: 1
 ---
 ## Use this when
 

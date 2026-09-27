@@ -5,6 +5,7 @@ kind: checklist
 onset: coming
 applies_to: [hazard:heat_wave]
 citations: [ready_gov_heat, cdc_heat_health, cdc_heat_related_illness, ready_gov_power_outages, fda_insulin_emergency]
+pages: 1
 ---
 ## Use this when
 
