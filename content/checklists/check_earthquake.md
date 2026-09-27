@@ -53,7 +53,7 @@ The ground starts to shake, or your phone warns that shaking is coming.
 
 - Go back into a damaged home only when officials say it is safe.[^ready_gov_recovering]
 - Let people know you are safe by text or social media.[^ready_gov_earthquakes]
-- For the weeks ahead, see {ref:after}.
+- For the weeks ahead, see {ref:after}.[^ready_gov_recovering]
 
 ## Sources
 

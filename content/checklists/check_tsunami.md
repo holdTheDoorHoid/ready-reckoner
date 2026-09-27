@@ -4,7 +4,7 @@ title: Tsunami
 kind: checklist
 onset: now
 applies_to: [hazard:tsunami]
-citations: [nws_tsunami_safety, ready_gov_tsunamis, dogami_tsunami_faq, ready_gov_pets]
+citations: [nws_tsunami_safety, ready_gov_tsunamis, dogami_tsunami_faq, ready_gov_pets, ready_gov_recovering]
 pages: 1
 ---
 
@@ -25,14 +25,13 @@ Near the coast, you feel a strong or long earthquake, the sea rises fast or drai
 
 1. **Need help to leave?** Tie a white sheet or towel to your front doorknob.[^dogami_tsunami_faq]
 2. **Expect aftershocks.** Drop, cover and hold on each time.[^nws_tsunami_safety]
-3. {if:pets}**Take your pets** with you.[^ready_gov_pets]{/if}
-4. **Once safe, get updates** from a weather radio, local news or phone alerts.[^nws_tsunami_safety]
-5. **Text** instead of calling. Save calls for emergencies.[^ready_gov_tsunamis]
-6. **Stay away from** fallen power lines, damaged buildings, bridges and piers.[^nws_tsunami_safety]
+3. **Once safe, get updates** from a weather radio, local news or phone alerts.[^nws_tsunami_safety]
+4. **Text** instead of calling. Save calls for emergencies.[^ready_gov_tsunamis]
+5. **Stay away from** fallen power lines, damaged buildings, bridges and piers.[^nws_tsunami_safety]
 
 ## Leave or stay
 
-- **Leave if** you are in a tsunami zone and feel shaking, see the signs or get a warning. Go to high ground outside the zone. {ref:getting_out}[^nws_tsunami_safety]
+- **Leave if** you are in a tsunami zone and feel shaking, see the signs or get a warning. Go to high ground outside the zone.[^nws_tsunami_safety]{if:pets} Take your pets.[^ready_gov_pets]{/if} {ref:getting_out}
 - **Stay if** you are outside the tsunami zone. Stay where you are unless officials say otherwise.[^nws_tsunami_safety][^ready_gov_tsunamis]
 
 ## Where and who
@@ -51,7 +50,7 @@ Near the coast, you feel a strong or long earthquake, the sea rises fast or drai
 ## When it is over
 
 - Go back only when officials give the all clear. The danger can last hours or days.[^nws_tsunami_safety][^dogami_tsunami_faq]
-- For the weeks ahead, see {ref:after}.
+- For the weeks ahead, see {ref:after}.[^ready_gov_recovering]
 
 ## Sources
 
@@ -59,3 +58,4 @@ Near the coast, you feel a strong or long earthquake, the sea rises fast or drai
 [^ready_gov_tsunamis]: FEMA / Ready.gov, Tsunamis (2026).
 [^dogami_tsunami_faq]: Oregon Department of Geology and Mineral Industries, Oregon Tsunami Clearinghouse: frequently asked questions (2026).
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).
+[^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
