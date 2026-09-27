@@ -628,6 +628,10 @@ fn resolve_target(
             "`{id}` is not the lead hazard of a rare family (one of {:?})",
             ids::rare_families()
         )),
+        GuidanceKind::Checklist => Err(format!(
+            "`{target}`: a checklist is not a target; checklists apply to `hazard:` and `event:` \
+             targets themselves"
+        )),
         GuidanceKind::Topic | GuidanceKind::Plan | GuidanceKind::After => {
             if slugs.get(&kind).is_some_and(|s| s.contains(id)) {
                 Ok(())

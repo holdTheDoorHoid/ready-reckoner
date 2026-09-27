@@ -37,6 +37,9 @@ pub fn rare_families() -> Vec<&'static str> {
     rr_types::rare_family_ids().collect()
 }
 
+/// Every checklist id starts with this (`check_house_fire`; DESIGN-DELTA-v3 §5.4).
+pub const CHECKLIST_PREFIX: &str = "check_";
+
 /// The rules each kind of guidance block follows (the `kind` front-matter field). The validator
 /// checks that a block's id starts with its kind ([`KindRules::prefix`]) and that it applies to at
 /// least one target of the same kind.
@@ -54,7 +57,11 @@ pub trait KindRules {
 
 impl KindRules for GuidanceKind {
     fn prefix(self) -> String {
-        format!("{}_", self.as_str())
+        match self {
+            // DESIGN-DELTA-v3 §5.4: checklist ids start with `check_` (`check_house_fire`).
+            GuidanceKind::Checklist => CHECKLIST_PREFIX.to_owned(),
+            _ => format!("{}_", self.as_str()),
+        }
     }
 
     fn opens_with_frequency(self) -> bool {
@@ -80,7 +87,11 @@ mod tests {
     fn kinds_name_their_prefix_and_rules() {
         for k in GuidanceKind::ALL {
             assert_eq!(k.as_str().parse::<GuidanceKind>(), Ok(*k));
-            assert_eq!(k.prefix(), format!("{}_", k.as_str()));
+            let want = match k {
+                GuidanceKind::Checklist => "check_".to_owned(),
+                _ => format!("{}_", k.as_str()),
+            };
+            assert_eq!(k.prefix(), want);
         }
         assert!("recipe".parse::<GuidanceKind>().is_err());
         assert!(GuidanceKind::Family.opens_with_frequency());

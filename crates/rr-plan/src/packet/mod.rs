@@ -2,6 +2,10 @@
 //! guidance blocks, with the household's own numbers substituted. See `docs/PACKET.md` for the
 //! sections, what feeds each, and the placeholders.
 //!
+//! Contract v3 (DESIGN-DELTA-v3 §4): until the binder workstream lands, this v2 packet is
+//! `PlanOutput.prepare_markdown`, unchanged, and [`shim`] builds a transitional
+//! `PlanOutput.binder` from it.
+//!
 //! Citations are written as markers while the packet is assembled; once the provenance list is
 //! known they become numbers that point into the packet's numbered Sources section ("[3]",
 //! "[3, 7]"), so the packet reads the same on paper as on screen.
@@ -14,6 +18,8 @@ mod people;
 mod plan;
 mod risks;
 mod safety;
+// transitional: replaced by the binder workstream (DESIGN-DELTA-v3 §4, §11).
+pub mod shim;
 mod sources;
 mod summary;
 mod targets;

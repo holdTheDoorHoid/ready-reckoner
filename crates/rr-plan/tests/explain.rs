@@ -205,7 +205,7 @@ fn a_bucket_without_relief_names_the_worst_event_on_record() {
             "{name}: {marks:?}"
         );
         assert!(
-            out.packet_markdown
+            out.prepare_markdown
                 .contains(&format!("| not known | worst on record: {up_to} |")),
             "{name}: the targets table"
         );

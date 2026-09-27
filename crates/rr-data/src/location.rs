@@ -65,6 +65,9 @@ impl DataStore {
             zip: if share.is_some() { zip } else { None },
             zip_county_share: share,
             centroid: c.centroid,
+            // awaiting: data3 (the ZIP code's centre from core/zip_centroids.csv, DESIGN-DELTA-v3
+            // §3.3, §8)
+            zip_centroid: None,
             nca_region: c.nca_region.clone(),
             coastal: c.coastal,
             tsunami_zone: c.tsunami_zone,

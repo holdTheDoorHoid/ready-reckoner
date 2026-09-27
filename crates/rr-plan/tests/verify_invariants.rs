@@ -400,13 +400,13 @@ fn shape_problems(out: &PlanOutput) -> Vec<String> {
         "{/if}",
         "  .",
     ] {
-        if out.packet_markdown.contains(bad) {
+        if out.prepare_markdown.contains(bad) {
             problems.push(format!("packet contains {bad:?}"));
         }
     }
     // Every hazard card pairs its threat with what to do (PRINCIPLES §4).
     let risks = out
-        .packet_markdown
+        .prepare_markdown
         .split("## Your targets")
         .next()
         .unwrap_or_default();
