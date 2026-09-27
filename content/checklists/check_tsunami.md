@@ -4,7 +4,7 @@ title: Tsunami
 kind: checklist
 onset: now
 applies_to: [hazard:tsunami]
-citations: [nws_tsunami_safety, ready_gov_tsunamis, dogami_tsunami_faq, ready_gov_pets, ready_gov_recovering]
+citations: [nws_tsunami_safety, ready_gov_tsunamis, dogami_tsunami_faq, ready_gov_pets, ready_gov_recovering, fcc_wea]
 pages: 1
 ---
 
@@ -25,7 +25,7 @@ Near the coast, you feel a strong or long earthquake, the sea rises fast or drai
 
 1. **Need help to leave?** Tie a white sheet or towel to your front doorknob.[^dogami_tsunami_faq]
 2. **Expect aftershocks.** Drop, cover and hold on each time.[^nws_tsunami_safety]
-3. **Once safe, get updates** from a weather radio, local news or phone alerts.[^nws_tsunami_safety]
+3. **Once safe, get updates** from a weather radio, local news or phone alerts.[^nws_tsunami_safety]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
 4. **Text** instead of calling. Save calls for emergencies.[^ready_gov_tsunamis]
 5. **Stay away from** fallen power lines, damaged buildings, bridges and piers.[^nws_tsunami_safety]
 
@@ -59,3 +59,4 @@ Near the coast, you feel a strong or long earthquake, the sea rises fast or drai
 [^dogami_tsunami_faq]: Oregon Department of Geology and Mineral Industries, Oregon Tsunami Clearinghouse: frequently asked questions (2026).
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
+[^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).

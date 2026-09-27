@@ -4,7 +4,7 @@ title: Nuclear attack or EMP
 kind: checklist
 onset: now
 applies_to: [hazard:nuclear_attack]
-citations: [ready_gov_radiation, fema_nuclear_planning_2022, fema_nuclear_72h_2023, cdc_radiation_get_inside, cdc_radiation_self_decon, cdc_potassium_iodide, nrc_ep_backgrounder, ready_gov_power_outages, ready_gov_pets, samhsa_disaster_distress, ready_gov_recovering]
+citations: [ready_gov_radiation, fema_nuclear_planning_2022, fema_nuclear_72h_2023, cdc_radiation_get_inside, cdc_radiation_self_decon, cdc_potassium_iodide, nrc_ep_backgrounder, ready_gov_power_outages, ready_gov_pets, samhsa_disaster_distress, ready_gov_recovering, fcc_wea]
 pages: 2
 ---
 
@@ -19,7 +19,7 @@ An alert warns of a nuclear attack, you see a blinding flash, or you learn a nuc
 3. **Get into the best building you can reach in a few minutes.** Brick or concrete, a basement or an underground garage is best. Any building beats being outside.[^ready_gov_radiation][^cdc_radiation_get_inside]
 4. **Go to the basement or the middle.** Stay away from outer walls and the roof.[^cdc_radiation_get_inside]
 5. **Take off your outer layer of clothes** if you were outside. Seal it in a bag and wash.[^cdc_radiation_get_inside][^cdc_radiation_self_decon]
-6. **Stay inside at least 24 hours, and tune in** to a battery or hand-crank radio.[^ready_gov_radiation]
+6. **Stay inside at least 24 hours, and tune in** to a battery or hand-crank radio.[^ready_gov_radiation]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
 
 ## Then
 
@@ -57,7 +57,6 @@ An alert warns of a nuclear attack, you see a blinding flash, or you learn a nuc
 
 ## When it is over
 
-- Leave your shelter when officials say it is safe, by the route they give.[^ready_gov_radiation]
 - If you left the area, go back only when officials say it is safe.[^ready_gov_radiation]
 - Talk to someone if you feel upset. Call or text the Disaster Distress Helpline, 1-800-985-5990.[^ready_gov_radiation][^samhsa_disaster_distress]
 - For the weeks ahead, see {ref:after}.[^ready_gov_recovering]
@@ -75,3 +74,4 @@ An alert warns of a nuclear attack, you see a blinding flash, or you learn a nuc
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).
 [^samhsa_disaster_distress]: Substance Abuse and Mental Health Services Administration, Disaster Distress Helpline (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
+[^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).

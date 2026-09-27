@@ -4,7 +4,7 @@ title: Chemical spill or release
 kind: checklist
 onset: now
 applies_to: [hazard:hazmat_release]
-citations: [ready_gov_chemical, cdc_water_advisories, ready_gov_recovering]
+citations: [ready_gov_chemical, cdc_water_advisories, ready_gov_recovering, fcc_wea]
 pages: 1
 ---
 
@@ -14,7 +14,7 @@ Officials warn of a chemical spill or leak near you, or you see one happen. Some
 
 ## Do first
 
-1. **Listen** to local radio, TV or alerts, and follow the instructions.[^ready_gov_chemical]
+1. **Listen** to local radio, TV or alerts, and follow the instructions.[^ready_gov_chemical]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
 2. **Told to leave?** Go right away.[^ready_gov_chemical]
 3. **Outside?** Move away upwind, then get into the nearest building.[^ready_gov_chemical]
 4. **In a car?** Close the windows and vents. Turn off the heater and air conditioner.[^ready_gov_chemical]
@@ -59,3 +59,4 @@ Officials warn of a chemical spill or leak near you, or you see one happen. Some
 [^ready_gov_chemical]: FEMA / Ready.gov, Chemicals and Hazardous Materials Incidents (2026).
 [^cdc_water_advisories]: Centers for Disease Control and Prevention, Drinking Water Advisories: An Overview (2024).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
+[^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).

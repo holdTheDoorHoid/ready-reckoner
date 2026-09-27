@@ -4,7 +4,7 @@ title: Nuclear power plant accident
 kind: checklist
 onset: now
 applies_to: [hazard:nuclear_plant_incident]
-citations: [ready_gov_radiation, nrc_ep_backgrounder, cdc_radiation_get_inside, cdc_radiation_self_decon, cdc_evacuation_psa, cdc_potassium_iodide, ready_gov_pets, samhsa_disaster_distress, ready_gov_recovering]
+citations: [ready_gov_radiation, nrc_ep_backgrounder, cdc_radiation_get_inside, cdc_radiation_self_decon, cdc_evacuation_psa, cdc_potassium_iodide, ready_gov_pets, samhsa_disaster_distress, ready_gov_recovering, fcc_wea]
 pages: 1
 ---
 
@@ -14,7 +14,7 @@ Officials announce an emergency at a nuclear power plant near you, or tell peopl
 
 ## Do first
 
-1. **Tune in** to local radio, TV or alerts, and follow what officials say.[^ready_gov_radiation][^nrc_ep_backgrounder]
+1. **Tune in** to local radio, TV or alerts, and follow what officials say.[^ready_gov_radiation][^nrc_ep_backgrounder]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
 2. **Told to leave?** Leave by the route officials give.[^ready_gov_radiation]
 3. **Told to stay inside?** Get inside. Close and lock the windows and doors.[^cdc_radiation_get_inside]
 4. **Turn off** fans, air conditioning and heating that bring in outside air. Close fireplace dampers.[^ready_gov_radiation]
@@ -63,3 +63,4 @@ Officials announce an emergency at a nuclear power plant near you, or tell peopl
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).
 [^samhsa_disaster_distress]: Substance Abuse and Mental Health Services Administration, Disaster Distress Helpline (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
+[^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).

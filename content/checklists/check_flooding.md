@@ -4,7 +4,7 @@ title: Flooding and flash floods
 kind: checklist
 onset: now
 applies_to: [hazard:riverine_flooding]
-citations: [ready_gov_floods, nws_flood_during, ready_gov_pets, ready_gov_recovering]
+citations: [ready_gov_floods, nws_flood_during, ready_gov_pets, ready_gov_recovering, fcc_wea]
 pages: 1
 ---
 
@@ -23,7 +23,7 @@ A flood or flash flood warning covers your area, or water is rising around you. 
 
 ## Then
 
-1. **Listen** to alerts, a weather radio or local news.[^ready_gov_floods]
+1. **Listen** to alerts, a weather radio or local news.[^ready_gov_floods]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
 2. **Before you leave,** lock the house. If you have time, turn off utilities and unplug appliances.[^nws_flood_during]
 3. **Stay out of any room** where water covers outlets or cords.[^nws_flood_during]
 4. **Car caught in fast water?** Stay inside. Get on the roof if water comes in.[^ready_gov_floods]
@@ -62,3 +62,4 @@ A flood or flash flood warning covers your area, or water is rising around you. 
 [^nws_flood_during]: NOAA National Weather Service, During a Flood (2026).
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
+[^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).

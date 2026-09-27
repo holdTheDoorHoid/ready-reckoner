@@ -4,7 +4,7 @@ title: Volcanic eruption and ashfall
 kind: checklist
 onset: now
 applies_to: [hazard:volcanic_activity, hazard:vei7_eruption]
-citations: [ready_gov_volcanoes, ready_gov_pets, ready_gov_recovering]
+citations: [ready_gov_volcanoes, ready_gov_pets, ready_gov_recovering, fcc_wea]
 pages: 1
 ---
 
@@ -19,7 +19,7 @@ A volcano near you erupts or officials warn that it may, or ash is falling. Ash 
 3. **Get inside** and stay there while ash falls.[^ready_gov_volcanoes]
 4. **Close doors and windows, and cover vents.**[^ready_gov_volcanoes]
 5. **Outside?** Wear a well-fitting N95 mask. Use a cloth mask only if you have nothing better.[^ready_gov_volcanoes]
-6. **Listen** for alerts and instructions.[^ready_gov_volcanoes]
+6. **Listen** for alerts and instructions.[^ready_gov_volcanoes]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
 
 ## Then
 
@@ -54,3 +54,4 @@ A volcano near you erupts or officials warn that it may, or ash is falling. Ash 
 [^ready_gov_volcanoes]: FEMA / Ready.gov, Volcanoes (2026).
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
+[^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).

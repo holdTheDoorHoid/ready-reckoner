@@ -4,7 +4,7 @@ title: Dam or levee failure
 kind: checklist
 onset: now
 applies_to: [hazard:dam_failure]
-citations: [mo_sema_dam_failure, ready_gov_floods, nws_flood_during, ready_gov_pets, ready_gov_recovering]
+citations: [mo_sema_dam_failure, ready_gov_floods, nws_flood_during, ready_gov_pets, ready_gov_recovering, fcc_wea]
 pages: 1
 ---
 
@@ -23,7 +23,7 @@ Officials warn that a dam or levee near you is failing or may fail, or you see w
 
 ## Then
 
-1. **Listen** to local radio, TV or alerts for news.[^mo_sema_dam_failure]
+1. **Listen** to local radio, TV or alerts for news.[^mo_sema_dam_failure]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
 2. **If officials tell you to,** turn off utilities at the main switches or valves. Unplug appliances.[^mo_sema_dam_failure]
 3. **Trapped by moving water?** Get to the highest point you can and call 911.[^nws_flood_during]
 4. **Stay off bridges** over fast-moving water.[^ready_gov_floods]
@@ -61,3 +61,4 @@ Officials warn that a dam or levee near you is failing or may fail, or you see w
 [^nws_flood_during]: NOAA National Weather Service, During a Flood (2026).
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
+[^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).
