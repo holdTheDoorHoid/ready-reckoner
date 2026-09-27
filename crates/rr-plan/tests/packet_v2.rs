@@ -259,3 +259,95 @@ fn the_long_horizon_section_prints_only_with_the_plan_s_long_horizon_items() {
         .is_some()
     );
 }
+
+/// "How well do these numbers hold up?" cites the published table's registry entry
+/// (`rr_validation_2026`) like any other source: a bracket in the line, the entry in the
+/// provenance and in the Sources list with the registry's title and address, and no bare link.
+#[test]
+fn the_validation_line_cites_the_registry_entry() {
+    let content = rr_content::content();
+    let entry = content
+        .citation(rr_plan::validation::CITATION)
+        .expect("rr_validation_2026 is in content/citations.toml");
+    for (name, _, out) in outputs() {
+        let p = &out.packet_markdown;
+        let targets = section(p, "## Your targets").unwrap();
+        let line = targets
+            .lines()
+            .find(|l| l.starts_with("**How well do these numbers hold up?**"))
+            .unwrap_or_else(|| panic!("{name}: no validation line"));
+        assert!(!line.contains("http"), "{name}: a bare link in {line}");
+        let n = out
+            .provenance
+            .iter()
+            .position(|c| c.id == rr_plan::validation::CITATION)
+            .map(|i| i + 1)
+            .unwrap_or_else(|| panic!("{name}: rr_validation_2026 not in the provenance"));
+        assert!(
+            line.contains(&format!("could not model 1.[{n}]")),
+            "{name}: [{n}] not on {line}"
+        );
+        let sources = &p[p.find("\n## Sources\n").unwrap()..];
+        let listed = format!("**{n}** {}.", entry.title);
+        assert!(sources.contains(&listed), "{name}: {listed}");
+        assert!(
+            sources.contains(&entry.url),
+            "{name}: the registry's address"
+        );
+    }
+}
+
+/// The wind shelter advice prints once: the shelter plan's Strong wind paragraph is there for
+/// every household (the content block, since a Serious card can displace the Minor wind card),
+/// and a household without a wind card gets no other wind shelter line.
+#[test]
+fn the_wind_shelter_advice_prints_once() {
+    const WIND_CARD_ADVICE: &str = "Pick your shelter spot now.";
+    for (name, _, out) in outputs() {
+        let p = &out.packet_markdown;
+        let shelter = section(p, "## Your shelter plan").unwrap();
+        assert_eq!(
+            shelter.matches("**Strong wind.**").count(),
+            1,
+            "{name}: {shelter}"
+        );
+        assert_eq!(p.matches("**Strong wind.**").count(), 1, "{name}");
+        let risks = section(p, "## Your risks").unwrap();
+        let wind_card = risks.lines().any(|l| {
+            l.starts_with("#### ")
+                && ["Strong wind", "Tornado", "Hail", "Lightning"]
+                    .iter()
+                    .any(|h| l.ends_with(&format!(". {h}")))
+        });
+        if !wind_card {
+            assert!(!p.contains(WIND_CARD_ADVICE), "{name}: a second wind line");
+        }
+    }
+}
+
+/// The get-home bag line prints once, for each person, when every commuter's line is the same
+/// (Sugar Land: both keep theirs in the car), and per person when they differ (Philadelphia: one
+/// in the car, one at work); each commuter keeps their own trip and walk supplies.
+#[test]
+fn a_shared_get_home_bag_line_prints_once() {
+    let sugar = section(
+        &fixture("sugar-land-ev-household-3").2.packet_markdown,
+        "## Checklists",
+    )
+    .unwrap();
+    assert_eq!(
+        sugar.matches("get-home bag in the car").count(),
+        1,
+        "{sugar}"
+    );
+    assert!(sugar.contains("- [ ] For each person: keep a get-home bag in the car"));
+    assert_eq!(sugar.matches("- [ ] For the walk, from home: ").count(), 2);
+    let phl = section(
+        &fixture("philadelphia-renters-4").2.packet_markdown,
+        "## Checklists",
+    )
+    .unwrap();
+    assert!(phl.contains("- [ ] Keep a get-home bag in the car"));
+    assert!(phl.contains("- [ ] Keep a get-home bag at work or in your daily bag"));
+    assert!(!phl.contains("For each person: keep a get-home bag"));
+}
