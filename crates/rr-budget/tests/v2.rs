@@ -726,7 +726,7 @@ fn the_first_savings_step_and_the_three_month_point() {
     assert!((m.months - 0.17).abs() < 1e-6, "{}", m.months);
     let why = &r.plan.savings_track.as_ref().unwrap().why;
     assert!(
-        why.contains("The first step, $500, comes by month 6; three months of expenses, about $9,000, in about 8 years."),
+        why.contains("The first step, $500, comes by month 6; three months of expenses, about $9,000, in about 8 years from now."),
         "{why}"
     );
     // Expenses under $500: one month of them.
@@ -735,6 +735,43 @@ fn the_first_savings_step_and_the_three_month_point() {
     assert_eq!((m.usd, m.months, m.by_month), (400.0, 1.0, 5));
     // A fifth of a month saved is $600, past the $500 step.
     assert_eq!(savings_setup(0.2, 3000.0).run().plan.first_milestone, None);
+}
+
+/// Verification R3-04: both savings dates count from today, and the sentence says so, while still
+/// saying that the saving starts once the supplies are bought. A $3,000 item on $100 a month keeps
+/// the supplies plan going for about thirty months, so the two starting points give different
+/// years: the six-month goal ($18,000) comes about 180 months after the supplies plan ends, and
+/// three months ($9,000) about 90 months after it.
+#[test]
+fn the_savings_dates_count_from_today() {
+    let r = savings_setup(0.0, 3000.0)
+        .flat(BucketId::Power, 0.5, 3.0)
+        .add(
+            buy("generator", BucketId::Power, TierId::H72, 3000.0),
+            set("generator", BucketId::Power, 3.0),
+        )
+        .run();
+    let done = r.stopped_month.expect("the supplies plan ends");
+    assert!(done >= 25, "{done}");
+    let years = |months: u16| (f64::from(months) / 12.0).round() as u16;
+    let why = &r.plan.savings_track.as_ref().unwrap().why;
+    assert!(
+        why.contains(&format!(
+            "Your supplies plan is done by month {done}. After that, your $100 a month for \
+             supplies could go here, reaching the goal in about {} years from now.",
+            years(done + 180)
+        )),
+        "{why}"
+    );
+    assert!(
+        why.contains(&format!(
+            "three months of expenses, about $9,000, in about {} years from now.",
+            years(done + 90)
+        )),
+        "{why}"
+    );
+    // Counted from the end of the supplies plan, the goal would read about 15 years.
+    assert_ne!(years(done + 180), 15);
 }
 
 /// The legal-emergency line shows only when the household turns it on and the arrest row is in
