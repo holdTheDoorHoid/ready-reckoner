@@ -62,7 +62,7 @@ fn with_location(name: &str, location: serde_json::Value) -> String {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Before any pack: the seven built-in sample counties
+// Before any pack: the fourteen built-in sample counties
 // ---------------------------------------------------------------------------------------------
 
 #[test]
@@ -86,8 +86,8 @@ fn before_any_pack_the_sample_counties_answer_and_engine_info_says_so() {
 
 /// The sample-county check: with no pack loaded, the envelope path gives, byte for byte, what
 /// rr-plan's engine gives on its built-in sample counties (`Engine::with_fixtures`), so a site
-/// built without `data/` still plans the seven fixture households, and says it is using sample
-/// data. The goldens are planned from the packs; see
+/// built without `data/` still plans every fixture household (all fourteen), and says it is using
+/// sample data. The goldens are planned from the packs; see
 /// `with_the_packs_loaded_every_fixture_is_its_golden_file_to_the_last_digit`.
 #[test]
 fn in_sample_county_mode_every_fixture_is_exactly_what_rr_plan_plans_with_no_packs() {

@@ -61,7 +61,7 @@ if [ -f "$data_in/manifest.json" ]; then
   done
   echo "Copied data/manifest.json, data/core/ and data/geo/ into web/public/data/"
 else
-  echo "build-web.sh: data/manifest.json is missing, so the site will plan with the engine's seven built-in sample counties" >&2
+  echo "build-web.sh: data/manifest.json is missing, so the site will plan with the engine's fourteen built-in sample counties" >&2
 fi
 
 # --- Sizes --------------------------------------------------------------------------------------
@@ -75,8 +75,22 @@ if [ -f "$pkg/rr_wasm_bg.wasm" ]; then
     echo "build-web.sh: WARNING: the engine is over its size budget (see docs/ENGINE-API.md, Loading)" >&2
   fi
 fi
-if [ -d "$data_out/core" ]; then
-  core_gz=0
-  for f in "$data_out"/core/*; do core_gz=$((core_gz + $(gz_size "$f"))); done
-  echo "SIZE data/core: ${core_gz} bytes gzipped file by file ($(mb "$core_gz"))"
+if [ -d "$data_out" ]; then
+  # Walk each pack directory recursively (find -type f): the v2 core pack nests series files under
+  # core/series/, and handing a directory to gzip -c prints "is a directory -- ignored" and exits
+  # 2, which set -e treats as a real failure and stops the script (seen in CI at 33aca2b). Recursing
+  # means gzip only ever sees regular files, so the script fails loudly only when a file itself
+  # cannot be read or compressed.
+  total_gz=0
+  for pack_dir in "$data_out"/*/; do
+    [ -d "$pack_dir" ] || continue
+    pack="$(basename "$pack_dir")"
+    pack_gz=0
+    while IFS= read -r -d '' f; do
+      pack_gz=$((pack_gz + $(gz_size "$f")))
+    done < <(find "$pack_dir" -type f -print0)
+    total_gz=$((total_gz + pack_gz))
+    echo "SIZE data/${pack}: ${pack_gz} bytes gzipped file by file ($(mb "$pack_gz"))"
+  done
+  echo "SIZE data (total): ${total_gz} bytes gzipped file by file ($(mb "$total_gz"))"
 fi
