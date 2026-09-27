@@ -39,7 +39,7 @@ Officials warn of a chemical spill or leak near you, or you see one happen. Some
 
 ## Where and who
 
-- **Shelter room:** {shelter_home}
+- **Where we would go:** {where_go}
 - **How we get alerts:** {alerts}
 
 ## Do not

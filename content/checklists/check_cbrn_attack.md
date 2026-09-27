@@ -38,7 +38,7 @@ An attack releases a chemical, a germ or radioactive material, or officials warn
 
 ## Where and who
 
-- **Shelter room:** {shelter_home}
+- **Where we would go:** {where_go}
 - **Nearest hospital:** {hospital}
 - **How we get alerts:** {alerts}
 
