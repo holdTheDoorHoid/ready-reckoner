@@ -258,12 +258,12 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Severe pandemic | Between 1 in 200 and 1 in 21[8, 59, 60] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
 | War with attacks on US infrastructure | Between 1 in 830 and 1 in 42[8, 69, 70] | Outages of power, water or phones for days, and shortages across the country. | Nothing beyond your basics. |
 | Severe solar storm | Between 1 in 3,500 and 1 in 67[8, 71, 72, 73, 74, 75] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
-| Nuclear attack | Between 1 in 5,000 and 1 in 32[8, 69, 70, 76, 77, 78, 79, 80, 81, 82] | Serious disruption: sheltering inside for a day or more against fallout, then shortages and outages. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
+| Nuclear attack or EMP | Between 1 in 5,000 and 1 in 32[8, 69, 70, 76, 77, 78, 79, 80, 81, 82] | Serious disruption: sheltering inside for a day or more against fallout, then shortages and outages. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
 | Power out for months (any cause) | Between 1 in 21,000 and 1 in 57[8, 53, 69, 70, 71, 72, 73, 74, 75, 76, 83, 84] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Mass shooting or bombing | Between 1 in 200,000 and 1 in 20,000[8, 85] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
 | Chemical, biological or radiological attack | Very unlikely: less than 1 in 50,000[8, 64, 86] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
 
-**Nuclear attack: why here.** You live downwind of the nuclear missile fields in Wyoming, Nebraska and Colorado, about 240 miles to your northwest. Winds here usually blow from the west. If those missile sites were ever attacked, radioactive fallout could drift over your area within a day or two. That is the main reason your chance is higher than in most places.[8, 70, 79, 80]
+**Nuclear attack or EMP: why here.** You live downwind of the nuclear missile fields in Wyoming, Nebraska and Colorado, about 240 miles to your northwest. Winds here usually blow from the west. If those missile sites were ever attacked, radioactive fallout could drift over your area within a day or two. That is the main reason your chance is higher than in most places.[8, 70, 79, 80]
 
 ### Notes on these numbers
 
@@ -577,7 +577,7 @@ Of 100 households like yours, about 25 (10–45) will have an income gap of more
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 7 months; living elsewhere that long costs about $11000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[3, 5, 6, 7, 8, 9, 10, 11, 28, 29, 30, 150]
+If damage forced you out, 9 in 10 households like yours would be home again within about 7 months; living elsewhere that long costs about $11,000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[3, 5, 6, 7, 8, 9, 10, 11, 28, 29, 30, 150]
 
 ## After a disaster: the first 30 days
 

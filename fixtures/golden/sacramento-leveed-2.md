@@ -229,7 +229,7 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Very large volcanic eruption | Between 1 in 130 and 1 in 26[10, 72] | A year or two of higher food prices and some shortages. | Nothing beyond a two-week pantry. |
 | Severe pandemic | Between 1 in 200 and 1 in 21[10, 59, 60] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
 | Severe solar storm | Between 1 in 4,800 and 1 in 92[10, 73, 74, 75, 76, 77] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
-| Nuclear attack | Between 1 in 10,000 and 1 in 42[10, 64, 69, 70, 78, 79, 80, 81, 82, 83] | Serious disruption: sheltering inside for a day or more against fallout, then shortages and outages. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
+| Nuclear attack or EMP | Between 1 in 10,000 and 1 in 42[10, 64, 69, 70, 78, 79, 80, 81, 82, 83] | Serious disruption: sheltering inside for a day or more against fallout, then shortages and outages. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
 | Power out for months (any cause) | Between 1 in 21,000 and 1 in 46[10, 50, 69, 70, 73, 74, 75, 76, 77, 78, 84, 85] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Chemical, biological or radiological attack | Between 1 in 150,000 and 1 in 730[10, 64, 86] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
 | Mass shooting or bombing | Between 1 in 500,000 and 1 in 50,000[10, 87] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
@@ -265,7 +265,7 @@ Brackets show how uncertain a target is. "Not known": no restoration records for
 
 **What to avoid.** Never run a generator inside your home or garage, even with the doors and windows open. Keep it outside, more than 20 feet from windows, doors and vents.[89] Put a carbon monoxide alarm on every level of your home.[90] Headache, dizziness, nausea or confusion can mean carbon monoxide poisoning. Get everyone outside to fresh air, then call 911.[91] Never heat your home with a gas stove or oven. Unplug electronics, because the power can come back with a surge that damages them.[90] Treat every downed power line as live: stay at least 30 feet from it and anything it touches, and call 911.[92] If one falls on your car, stay inside unless the car is on fire.[93]
 
-The worst power cut in your region's records (where it was worst, about 85 miles (137 km) away) was November 2018 Camp Fire (2018); being ready for 3 days would have left some homes that lost power still waiting (about 25 in 100 of all customers there were still out).[4, 8, 10, 11, 12, 22, 42, 50, 51, 94, 95, 96]
+The worst power cut in your region's records (where it was worst, about 85 miles (137 km) away) was November 2018 Camp Fire; being ready for 3 days would have left some homes that lost power still waiting (about 25 in 100 of all customers there were still out).[4, 8, 10, 11, 12, 22, 42, 50, 51, 94, 95, 96]
 
 ### Tap water must be treated: about 3 days (0–10)
 
@@ -542,7 +542,7 @@ Of 100 households like yours, about 15 (8–25) will have an income gap of more 
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 8 months; living elsewhere that long costs about $13000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[4, 7, 8, 9, 10, 11, 12, 13, 35, 36, 42, 151]
+If damage forced you out, 9 in 10 households like yours would be home again within about 8 months; living elsewhere that long costs about $13,000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[4, 7, 8, 9, 10, 11, 12, 13, 35, 36, 42, 151]
 
 ## After a disaster: the first 30 days
 

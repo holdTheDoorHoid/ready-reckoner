@@ -10,7 +10,7 @@
 
 ## Summary
 
-**Where you are now:** getting started. **What is enough for your risks:** one month of supplies. At your budget, the bare minimum (three days of water, light, warmth and medicine) is in place by month 2 (December 2026), and everything by month 22 (August 2028). Start with the free steps under Your plan.
+**Where you are now:** getting started. **What is enough for your risks:** one month of supplies. At your budget, the bare minimum (three days of water, light, warmth and medicine) is in place by month 2 (December 2026), and everything by month 23 (September 2028). Start with the free steps under Your plan.
 
 ### The three things that matter most
 
@@ -237,14 +237,14 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Very large volcanic eruption | Between 1 in 130 and 1 in 26[9, 69] | A year or two of higher food prices and some shortages. | Nothing beyond a two-week pantry. |
 | Severe pandemic | Between 1 in 200 and 1 in 21[9, 58, 59] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
 | Severe solar storm | Between 1 in 1,200 and 1 in 24[9, 70, 71, 72, 73, 74] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
-| Nuclear attack | Between 1 in 1,700 and 1 in 26[9, 66, 67, 75, 76, 77, 78, 79, 80, 81] | Life-threatening: blast or heavy fallout near likely targets. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
+| Nuclear attack or EMP | Between 1 in 1,700 and 1 in 26[9, 66, 67, 75, 76, 77, 78, 79, 80, 81] | Life-threatening: blast or heavy fallout near likely targets. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
 | Power out for months (any cause) | Between 1 in 18,000 and 1 in 32[9, 66, 67, 70, 71, 72, 73, 74, 75, 82, 83, 84] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Mass shooting or bombing | Between 1 in 330,000 and 1 in 33,000[9, 85] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
 | Chemical, biological or radiological attack | Very unlikely: less than 1 in 50,000[9, 63, 86] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
 
 **Severe solar storm: why here.** Your county is at a high geomagnetic latitude (about 56°). Solar storms drive the strongest currents into long power lines nearer the magnetic pole, so the chance of a long outage here is about 2.8 times the national average. The ground's conductivity also matters and is not counted.[73, 74]
 
-**Nuclear attack: why here.** Your county has, or is close to, Minot Air Force Base: the Air Force base that runs a nuclear missile field. In a large nuclear war, places like this are treated as likely targets. That does not mean an attack is likely. It means that if one happened, this area would face more danger than most.[9, 67, 78, 79]
+**Nuclear attack or EMP: why here.** Your county has, or is close to, Minot Air Force Base: the Air Force base that runs a nuclear missile field. In a large nuclear war, places like this are treated as likely targets. That does not mean an attack is likely. It means that if one happened, this area would face more danger than most.[9, 67, 78, 79]
 
 ### Notes on these numbers
 
@@ -413,11 +413,12 @@ From month 2 the plan follows Checklists, free steps first; each line gives its 
 
 ### The rare-event allowance
 
-- **Personal radiation dosimeter card** (month 4, about $25): Paid from your rare-event allowance ($8 a month, a tenth of your monthly money), after your three-day basics. It is for the nuclear attack row you ticked: where you live, more than 1 in 1,000 households like yours face it in 10 years, the least the allowance needs. Your basics cover the rare rows it does not buy for. Paid with $24 saved in earlier months.
+- **Personal radiation dosimeter card** (month 4, about $25): Paid from your rare-event allowance ($8 a month, a tenth of your monthly money), after your three-day basics. It is for the nuclear attack or EMP row you ticked: where you live, more than 1 in 1,000 households like yours face it in 10 years, the least the allowance needs. Your basics cover the rare rows it does not buy for. Paid with $24 saved in earlier months.
+- **Shielded (Faraday) bag for spare electronics** (month 12, about $68): Paid from your rare-event allowance ($8 a month, a tenth of your monthly money), after your three-day basics. It is for the pulse from a nuclear attack, part of the nuclear attack or EMP row you ticked: where you live, more than 1 in 1,000 households like yours face it in 10 years, the least the allowance needs. Your basics cover the rare rows it does not buy for. Paid with $63 saved in earlier months.
 
 ### When you are done
 
-Every need is covered by month 22 (August 2028). After that, keep up the maintenance calendar and put the same money toward savings.
+Every need is covered by month 23 (September 2028). After that, keep up the maintenance calendar and put the same money toward savings.
 
 ### Things to watch
 
@@ -488,28 +489,28 @@ One list per step, up to the one your risks need, with each thing's month. This 
 - [ ] NOAA Weather Radio with a tone alert: 1 radio (month 3)
 - [ ] Wound-care and splint add-on for the first-aid kit: 1 kit (month 5)
 - [ ] Over-the-counter medicine basics: 1 set (month 5)
-- [ ] Foil emergency blankets: 3 blankets (month 5)
 - [ ] Pet go-kit: 1 (one per pet) (month 6)
-- [ ] Car emergency kit: 2 kits (month 7)
-- [ ] Disposable gloves, a box of 100: 1 box (month 8)
-- [ ] Shut-off wrench for gas and water: 1 wrench (month 8)
+- [ ] Disposable gloves, a box of 100: 1 box (month 7)
+- [ ] Foil emergency blankets: 3 blankets (month 7)
+- [ ] Car emergency kit: 2 kits (month 8)
 - [ ] Fire-resistant, waterproof document pouch: 1 pouch (month 9)
+- [ ] Shut-off wrench for gas and water: 1 wrench (month 9)
 - [ ] Phone power bank (about 20,000 mAh): 2 power banks (month 11)
-- [ ] Cash in small bills: $240 (month 13)
+- [ ] Cash in small bills: $240 (month 14)
 
 ### Two weeks
 
 - [ ] Extra supply of daily prescription medicine: 10 days of one person's medicine (month 0)
 - [ ] Bar soap and laundry soap: 3 person-months (month 1)
 - [ ] Air cleaner for the clean room (HEPA, or a box fan with a MERV 13 filter): 1 air cleaner (month 4)
-- [ ] Extra pet food in an airtight container: 5 pounds of dry food (month 7)
-- [ ] License-free two-way radios (FRS), a pair: 1 pair (month 8)
-- [ ] Escape ladder for upstairs bedrooms: 1 ladder (month 13)
-- [ ] Solar motion-sensor outdoor light: 1 light (month 14)
-- [ ] Cleanup gear for each teen and adult: 2 sets (month 15)
-- [ ] Extra shelf-stable food you already eat: 68,000 kcal (months 16–22)
-- [ ] Key safe for a spare house key: 1 key safe (month 18)
+- [ ] Extra pet food in an airtight container: 5 pounds of dry food (month 8)
+- [ ] License-free two-way radios (FRS), a pair: 1 pair (month 9)
+- [ ] Extra shelf-stable food you already eat: 68,000 kcal (months 14–23)
+- [ ] Solar motion-sensor outdoor light: 1 light (month 15)
+- [ ] Cleanup gear for each teen and adult: 2 sets (month 16)
 - [ ] Portable jump starter for the car: 2 jump starters (month 19)
+- [ ] Key safe for a spare house key: 1 key safe (month 19)
+- [ ] Escape ladder for upstairs bedrooms: 1 ladder (month 21)
 
 ### One month
 
@@ -565,11 +566,11 @@ Keep paper copies in a waterproof pouch and photos you can reach from any phone.
 
 ### Savings
 
-Of 100 households like yours, about 8 (4–15) will have an income gap of more than 3 months in the next 10 years. The goal is about 2.5 months of expenses (about $12,000); you have 1.5 months saved. Your supplies plan is done by month 22. After that, your $80 a month for supplies could go here, reaching the goal in about 5 years. This is a savings goal, kept separate from the supplies budget.
+Of 100 households like yours, about 8 (4–15) will have an income gap of more than 3 months in the next 10 years. The goal is about 2.5 months of expenses (about $12,000); you have 1.5 months saved. Your supplies plan is done by month 23. After that, your $80 a month for supplies could go here, reaching the goal in about 5 years. This is a savings goal, kept separate from the supplies budget.
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 7 months; living elsewhere that long costs about $10000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[3, 6, 7, 8, 9, 10, 11, 12, 29, 30, 31, 151]
+If damage forced you out, 9 in 10 households like yours would be home again within about 7 months; living elsewhere that long costs about $10,000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[3, 6, 7, 8, 9, 10, 11, 12, 29, 30, 31, 151]
 
 ## After a disaster: the first 30 days
 
@@ -627,10 +628,11 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 | September 1, 2027 | Check, then every 6 months: car emergency kit. Check, then every year: a warm blanket for each person; warm layers for each person |
 | October 1, 2027 | Check, then every year: make a household plan and a contact card for each person; neighbours and skills. Check, then every 6 months: pet go-kit. Yearly review: update your answers, check the documents and contact cards, and start a new calendar |
 | November 1, 2027 | Check, then every year: documents and insurance; legal readiness |
-| December 1, 2027 | Check, then every 6 months: license-free two-way radios (FRS), a pair. Check, then every year: your trusted circle: agree who helps whom; spare batteries for lights and the radio; lockout plan |
+| December 1, 2027 | Check, then every year: your trusted circle: agree who helps whom; spare batteries for lights and the radio; lockout plan |
+| January 1, 2028 | Check, then every 6 months: license-free two-way radios (FRS), a pair |
 | March 1, 2028 | Check, then every year: over-the-counter medicine basics; wound-care and splint add-on for the first-aid kit |
-| October 1, 2028 | Test, then every 6 months: key safe for a spare house key |
-| February 1, 2029 | Use and restock, then every year: extra shelf-stable food you already eat |
+| November 1, 2028 | Test, then every 6 months: key safe for a spare house key |
+| December 1, 2028 | Use and restock, then every year: extra shelf-stable food you already eat |
 
 ## Sources
 

@@ -215,14 +215,14 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Very large volcanic eruption | Between 1 in 130 and 1 in 26[8, 65] | A year or two of higher food prices and some shortages. | Nothing beyond a two-week pantry. |
 | Severe pandemic | Between 1 in 200 and 1 in 21[8, 49, 50] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
 | Severe solar storm | Between 1 in 2,200 and 1 in 44[8, 66, 67, 68, 69, 70] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
-| Nuclear attack | Between 1 in 3,300 and 1 in 28[8, 52, 62, 63, 71, 72, 73, 74, 75, 76, 77] | Life-threatening: blast or heavy fallout near likely targets. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
+| Nuclear attack or EMP | Between 1 in 3,300 and 1 in 28[8, 52, 62, 63, 71, 72, 73, 74, 75, 76, 77] | Life-threatening: blast or heavy fallout near likely targets. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
 | Power out for months (any cause) | Between 1 in 20,000 and 1 in 40[8, 62, 63, 66, 67, 68, 69, 70, 71, 78, 79, 80] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Chemical, biological or radiological attack | Between 1 in 19,000 and 1 in 95[8, 52, 81] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
 | Mass shooting or bombing | Very unlikely: less than 1 in 100,000[8, 82] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
 
 **Severe solar storm: why here.** Your county is at a middle geomagnetic latitude (about 51°). Solar storms drive the strongest currents into long power lines nearer the magnetic pole, so the chance of a long outage here is about 1.5 times the national average. The ground's conductivity also matters and is not counted.[69, 70]
 
-**Nuclear attack: why here.** You live in the Chicago metro area. Because of its size and importance, a place like this is treated as a likely target in a large nuclear war. That does not mean an attack is likely, only that the danger here would be greater than in most places.[8, 63, 74, 75]
+**Nuclear attack or EMP: why here.** You live in the Chicago metro area. Because of its size and importance, a place like this is treated as a likely target in a large nuclear war. That does not mean an attack is likely, only that the danger here would be greater than in most places.[8, 63, 74, 75]
 
 ### Notes on these numbers
 
@@ -475,7 +475,7 @@ No one in the household earns wages, so the plan sets no income-gap goal. Keep a
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $1400 at 30 % of your monthly spending, which loss-of-use insurance pays for.[5, 8, 9, 32, 33, 34, 46, 151, 152]
+If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $1,400 at 30 % of your monthly spending, which loss-of-use insurance pays for.[5, 8, 9, 32, 33, 34, 46, 151, 152]
 
 ## After a disaster: the first 30 days
 

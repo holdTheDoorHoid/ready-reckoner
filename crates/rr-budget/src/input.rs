@@ -13,8 +13,8 @@
 use std::collections::BTreeMap;
 
 use rr_types::{
-    BucketAssessment, BucketId, HazardId, Item, ItemId, Plan, PlanInput, RequirementLine, Target,
-    TierId, Warning,
+    BucketAssessment, BucketId, HazardId, Item, ItemId, Plan, PlanInput, RequirementLine, SubCause,
+    Target, TierId, Warning,
 };
 use serde::{Deserialize, Serialize};
 
@@ -37,6 +37,11 @@ pub struct Risks {
     /// buy for it) and whether the arrest row applies (the savings track's legal line). Empty:
     /// no rare family qualifies.
     pub register: BTreeMap<HazardId, f64>,
+    /// Each rare family's named sub-causes with their yearly rate ranges (`rr-hazards`'s
+    /// `HazardProfile::sub_causes`). The rare allowance gates an item that protects against one
+    /// cause inside its family (Faraday storage: an electromagnetic pulse) on that cause's chance
+    /// ([`crate::rare::RARE_CAUSES`]). Empty: such items are not bought.
+    pub sub_causes: BTreeMap<HazardId, Vec<SubCause>>,
     /// DESIGN §4.7's simultaneous-need check from `rr-consequence`
     /// (`ConsequenceAssessment::simultaneous`): for each event that sets a duration target, the
     /// other needs the same event brings at once. May be empty.

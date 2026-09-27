@@ -213,13 +213,13 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Financial crisis with bank closures | Between 1 in 200 and 1 in 11[10, 75] | Cards and bank transfers stop for days. | Keep some cash in small bills (already in your plan) and a second account at another bank (free). |
 | Very large volcanic eruption | Between 1 in 130 and 1 in 26[10, 76] | A year or two of higher food prices and some shortages. | Nothing beyond a two-week pantry. |
 | Severe pandemic | Between 1 in 200 and 1 in 21[10, 57, 58] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
-| Nuclear attack | Between 1 in 3,300 and 1 in 28[10, 62, 73, 74, 77, 78, 79, 80, 81, 82, 83] | Life-threatening: blast or heavy fallout near likely targets. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
+| Nuclear attack or EMP | Between 1 in 3,300 and 1 in 28[10, 62, 73, 74, 77, 78, 79, 80, 81, 82, 83] | Life-threatening: blast or heavy fallout near likely targets. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
 | Severe solar storm | Between 1 in 7,600 and 1 in 150[10, 84, 85, 86, 87, 88] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
 | Power out for months (any cause) | Between 1 in 22,000 and 1 in 49[10, 15, 73, 74, 77, 84, 85, 86, 87, 88, 89, 90] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Chemical, biological or radiological attack | Between 1 in 51,000 and 1 in 250[10, 62, 91] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
 | Mass shooting or bombing | Very unlikely: less than 1 in 100,000[10, 92] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
 
-**Nuclear attack: why here.** You live in the Phoenix metro area. Because of its size and importance, a place like this is treated as a likely target in a large nuclear war. That does not mean an attack is likely, only that the danger here would be greater than in most places.[10, 74, 80, 81]
+**Nuclear attack or EMP: why here.** You live in the Phoenix metro area. Because of its size and importance, a place like this is treated as a likely target in a large nuclear war. That does not mean an attack is likely, only that the danger here would be greater than in most places.[10, 74, 80, 81]
 
 ### Notes on these numbers
 
@@ -535,7 +535,7 @@ Of 100 households like yours, about 25 (10–40) will have an income gap of more
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $2500 at 30 % of your monthly spending, which loss-of-use insurance pays for.[10, 11, 30, 31, 54, 152, 153]
+If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $2,500 at 30 % of your monthly spending, which loss-of-use insurance pays for.[10, 11, 30, 31, 54, 152, 153]
 
 ## After a disaster: the first 30 days
 

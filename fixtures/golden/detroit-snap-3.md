@@ -241,7 +241,7 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Very large volcanic eruption | Between 1 in 130 and 1 in 26[10, 77] | A year or two of higher food prices and some shortages. | Nothing beyond a two-week pantry. |
 | Severe pandemic | Between 1 in 200 and 1 in 21[10, 60, 61] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
 | Severe solar storm | Between 1 in 2,100 and 1 in 40[10, 78, 79, 80, 81, 82] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
-| Nuclear attack | Between 1 in 10,000 and 1 in 42[10, 66, 74, 75, 83, 84, 85, 86, 87, 88] | Serious disruption: sheltering inside for a day or more against fallout, then shortages and outages. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
+| Nuclear attack or EMP | Between 1 in 10,000 and 1 in 42[10, 66, 74, 75, 83, 84, 85, 86, 87, 88] | Serious disruption: sheltering inside for a day or more against fallout, then shortages and outages. | One free step: pick your shelter spot at home and at work (a basement, or the middle of the building away from windows). |
 | Power out for months (any cause) | Between 1 in 18,000 and 1 in 39[10, 50, 74, 75, 78, 79, 80, 81, 82, 83, 89, 90] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Chemical, biological or radiological attack | Between 1 in 81,000 and 1 in 410[10, 66, 91] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
 | Mass shooting or bombing | Between 1 in 330,000 and 1 in 33,000[10, 92] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
@@ -568,7 +568,7 @@ Of 100 households like yours, about 25 (10–40) will have an income gap of more
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $2300 at 30 % of your monthly spending, which loss-of-use insurance pays for.[6, 9, 10, 11, 36, 37, 38, 55, 157, 158]
+If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $2,300 at 30 % of your monthly spending, which loss-of-use insurance pays for.[6, 9, 10, 11, 36, 37, 38, 55, 157, 158]
 
 ## After a disaster: the first 30 days
 

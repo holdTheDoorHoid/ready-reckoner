@@ -229,7 +229,7 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Severe pandemic | Between 1 in 200 and 1 in 21[10, 56, 57] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
 | War with attacks on US infrastructure | Between 1 in 830 and 1 in 42[10, 71, 74] | Outages of power, water or phones for days, and shortages across the country. | Nothing beyond your basics. |
 | Severe solar storm | Between 1 in 2,900 and 1 in 57[10, 66, 67, 68, 69, 70] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
-| Nuclear attack | Between 1 in 100,000 and 1 in 250[10, 71, 72, 74, 79, 80, 81, 82, 83] | Shortages, power cuts and lost income, not blast or heavy fallout. | Nothing beyond your basics. |
+| Nuclear attack or EMP | Between 1 in 100,000 and 1 in 250[10, 71, 72, 74, 79, 80, 81, 82, 83] | Shortages, power cuts and lost income, not blast or heavy fallout. | Nothing beyond your basics. |
 | Mass shooting or bombing | Between 1 in 500,000 and 1 in 50,000[10, 84] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
 | Chemical, biological or radiological attack | Very unlikely: less than 1 in 50,000[10, 63, 85] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
 
@@ -579,7 +579,7 @@ Of 100 households like yours, about 20 (10–40) will have an income gap of more
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 14 months; living elsewhere that long costs about $16000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[4, 6, 7, 8, 9, 10, 11, 32, 33, 92, 93, 94, 118]
+If damage forced you out, 9 in 10 households like yours would be home again within about 14 months; living elsewhere that long costs about $16,000 at 30 % of your monthly spending, which loss-of-use insurance pays for.[4, 6, 7, 8, 9, 10, 11, 32, 33, 92, 93, 94, 118]
 
 ## After a disaster: the first 30 days
 
