@@ -20,7 +20,7 @@
   import { addMonths, formatMonth, rangeOnly, usd } from '../lib/format';
   import { NUCLEAR_NOTE } from '../lib/labels';
   import { lowerFirst } from '../lib/lookup';
-  import { allowance, changesNothing, locationChain, whatItChanges, whyHereShort } from '../lib/rare';
+  import { allowance, changesNothing, locationChain, whatItChanges, whereYouLiveNoFactor, whyHereShort } from '../lib/rare';
   import Chance from './Chance.svelte';
   import ExplainButton from './ExplainButton.svelte';
   import Icon from './Icon.svelte';
@@ -179,7 +179,7 @@
                       </p>
                     {/if}
                   {:else}
-                    <p><strong>Where you live:</strong> this chance is the same everywhere; nothing in the data makes it higher or lower for your county.</p>
+                    <p><strong>Where you live:</strong> {whereYouLiveNoFactor(h)}</p>
                   {/if}
                   {#if h.sub_causes?.some((s) => s.rate_range)}
                     <p><strong>What goes into it:</strong> the named causes above, each with its own range a year where one is known. Some are shown for everyone and never added to your chance; their notes say so.</p>

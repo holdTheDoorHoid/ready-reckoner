@@ -19,6 +19,7 @@ import {
   locationChain,
   parseAlsoChecked,
   whatItChanges,
+  whereYouLiveNoFactor,
   whyHereShort,
 } from './rare';
 
@@ -56,8 +57,14 @@ describe('why here and what it changes', () => {
     expect(firstSentence('One sentence only.')).toBe('One sentence only.');
   });
 
-  it('says a row without a location term is the same everywhere', () => {
+  it('says a row without a location term is the same everywhere, except the months-long blackout (verify2)', () => {
     expect(whyHereShort(rare({ location_factor: undefined }))).toMatch(/^The same everywhere/);
+    expect(whereYouLiveNoFactor(rare({ location_factor: undefined }))).toMatch(/^this chance is the same everywhere/);
+    // Its range comes partly from the county's own power-cut curve: Coos Bay's is ~70 times Philadelphia's.
+    const months = rare({ id: 'multi_month_blackout', name: 'Power out for months (any cause)', location_factor: undefined });
+    expect(whyHereShort(months)).toBe('Worked out partly from the power-cut records for your area, so it differs from place to place.');
+    expect(whereYouLiveNoFactor(months)).toBe('worked out partly from the power-cut records for your area, so it differs from place to place.');
+    expect(whyHereShort(months)).not.toMatch(/same everywhere/);
     expect(
       whyHereShort(rare({ location_factor: { class: 'C1', label: 'You live in the Chicago metro area. More words.', multiplier: [0.3, 0.6, 0.9], sources: [] } })),
     ).toBe('You live in the Chicago metro area.');

@@ -1,5 +1,5 @@
 /**
- * Learn articles (docs/UI.md screen 10): the five topic blocks the content workstream writes,
+ * Learn articles (docs/UI.md screen 10): the seven topic blocks the content workstream writes,
  * cites and reviews in `content/guidance/topic_*.md`, read at build time, so the site shows exactly
  * the reviewed text with its sources (a missing file fails the build rather than hiding an
  * article). Each keeps the address the site has always used (`#/learn/numbers`); its title comes
@@ -11,11 +11,13 @@
  * being reviewed". To put that label back on an article while its text is reviewed again, add its
  * slug to `IN_REVIEW`.
  */
+import beforeRaw from '../../../content/guidance/topic_before_you_need_them.md?raw';
 import childrenRaw from '../../../content/guidance/topic_talking_with_children.md?raw';
 import consequencesRaw from '../../../content/guidance/topic_consequences_not_causes.md?raw';
 import mythsRaw from '../../../content/guidance/topic_disaster_myths.md?raw';
 import neighboursRaw from '../../../content/guidance/topic_neighbours.md?raw';
 import numbersRaw from '../../../content/guidance/topic_how_numbers_are_made.md?raw';
+import strategicRaw from '../../../content/guidance/topic_strategic_sites.md?raw';
 import type { Citation } from '../engine/types';
 
 export interface Article {
@@ -39,6 +41,18 @@ const TOPICS: { slug: string; raw: string; summary: string }[] = [
   { slug: 'numbers', raw: numbersRaw, summary: 'From your county and household to days to be ready for, and where each number comes from.' },
   { slug: 'children', raw: childrenRaw, summary: 'Simple facts, a part to play, and practice together.' },
   { slug: 'community', raw: neighboursRaw, summary: 'Knowing the people nearby is one of the strongest protections there is, and it is free.' },
+  // v0.2.0: the lessons of the Deviant Ollam talk (DESIGN-DELTA §4a), and why the plan names a
+  // strategic site near you (owner decision: say it plainly, with a source for every site).
+  {
+    slug: 'before-you-need-them',
+    raw: beforeRaw,
+    summary: 'A lawyer, proof of who you are, a locksmith, copies of your files and a first-aid skill: line them up on a calm day.',
+  },
+  {
+    slug: 'strategic-sites',
+    raw: strategicRaw,
+    summary: 'Why your plan may say you are near a likely target in a nuclear war, what that means, and what it does not.',
+  },
 ];
 
 /** Articles from `content/learn/*.md`, if the content workstream has added any. */

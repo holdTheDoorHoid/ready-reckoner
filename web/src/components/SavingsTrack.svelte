@@ -4,10 +4,15 @@
   first: the engine's first savings step when it sends one (contract v2 `Plan.first_milestone`:
   one month of expenses or $500, whichever is smaller, and the month it is reached); otherwise one
   month of expenses, or three once one is saved, dated from the same money the engine suggests
-  (the supplies budget, once the supplies plan is done). The full goal stays beside it.
+  (the supplies budget, once the supplies plan is done). The full goal stays beside it. With the
+  legal-emergency line on (`Dials.legal_opt_in`), the engine adds a sentence with the bail figures
+  to `why` and their source to the plan's provenance; that source joins the card's list, so every
+  number on the card has one.
 -->
 <script lang="ts">
   import type { BucketAssessment, IsoDate, PlanItem, SavingsMilestone, SavingsTrack } from '../engine/types';
+  import { useApp } from '../lib/app.svelte';
+  import { legalOptIn } from '../lib/dials';
   import { nextMilestone } from '../lib/savings';
   import { addMonths, formatMonth, monthsPhrase, targetMonths, usd } from '../lib/format';
   import ExplainButton from './ExplainButton.svelte';
@@ -35,6 +40,16 @@
     firstMilestone?: SavingsMilestone;
   } = $props();
 
+  const app = useApp();
+  /** The source of the legal-emergency line's bail figures (rr-budget `LEGAL_COST_CITATION`). */
+  const LEGAL_COST_CITATION = 'bjs_felony_defendants_2009';
+  const sources = $derived.by(() => {
+    const ids = [...(income?.sources ?? [])];
+    const legal =
+      !!app.plan && legalOptIn(app.plan.input.dials) && (app.result.output?.provenance ?? []).some((c) => c.id === LEGAL_COST_CITATION);
+    if (legal && !ids.includes(LEGAL_COST_CITATION)) ids.push(LEGAL_COST_CITATION);
+    return ids;
+  });
   const upperFirst = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
   const pct = $derived(track && track.target_months > 0 ? Math.min(100, (track.current_months / track.target_months) * 100) : 0);
   const milestone = $derived(track && !firstMilestone ? nextMilestone(track, planningDate, doneMonth) : null);
@@ -88,7 +103,7 @@
         <p class="small">{track.why}</p>
         <footer class="foot">
           <ExplainButton kind="bucket" id="income" />
-          <Sources ids={income.sources} />
+          <Sources ids={sources} />
         </footer>
       </article>
     {/if}

@@ -341,7 +341,7 @@ describe('the status line (C1)', () => {
 });
 
 describe('Learn (W7)', () => {
-  it('shows the five reviewed topic articles, with no draft labels', async () => {
+  it('shows the seven reviewed topic articles, with no draft labels', async () => {
     current = await render(Learn, { plan: null, route: 'learn' });
     expect(text(current.target)).not.toMatch(/draft/i);
     expect(ARTICLES.map((a) => [a.slug, a.title])).toEqual([
@@ -350,6 +350,10 @@ describe('Learn (W7)', () => {
       ['numbers', 'How the numbers are made'],
       ['children', 'Talking with children about emergencies'],
       ['community', 'Neighbours and mutual aid'],
+      // v0.2.0 (verify2): the Deviant Ollam lessons and the strategic-site explainer were written
+      // and reviewed but not reachable anywhere in the app.
+      ['before-you-need-them', 'Before you need them'],
+      ['strategic-sites', 'Why we say you are near a strategic site'],
     ]);
     for (const a of ARTICLES) {
       expect(a.draft, a.slug).toBe(false);

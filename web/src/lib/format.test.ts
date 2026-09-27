@@ -15,8 +15,10 @@ import {
   per100,
   percent,
   perYearWords,
+  plural,
   quantity,
   rangeOnly,
+  reliefPhrase,
   roundSig2,
   severityBand,
   sig2,
@@ -117,6 +119,43 @@ describe('money and quantities', () => {
     expect(quantity(2, 'box')).toBe('2 boxes');
     expect(quantity(3, 'pet-day')).toBe('3 pet-days');
     expect(quantity(100, 'dollar')).toBe('$100');
+  });
+
+  it('says catalogue units the way the packet does (verify2: "3 day of one person\'s medicines", "8 2,000 kcals")', () => {
+    // The same words as rr-plan's packet/text.rs `quantity` for the catalogue's units.
+    expect(quantity(3, "day of one person's medicine")).toBe("3 days of one person's medicine");
+    expect(quantity(1, "day of one person's medicine")).toBe("1 day of one person's medicine");
+    expect(quantity(5, 'pound of dry food')).toBe('5 pounds of dry food');
+    expect(quantity(2, "cycle's supply")).toBe("2 cycles' supplies");
+    expect(quantity(4, 'person-month')).toBe('4 person-months');
+    expect(quantity(2, 'gallon of tank space')).toBe('2 gallons of tank space');
+    expect(quantity(8, '2,000 kcal')).toBe('16,000 kcal');
+    expect(quantity(45, '2,000 kcal')).toBe('90,000 kcal');
+    expect(quantity(1, '24-pack')).toBe('1 × 24-pack');
+    expect(quantity(4, '3 days of food for one person')).toBe('4 × 3 days of food for one person');
+    expect(quantity(1, 'pet')).toBe('1 (one per pet)');
+    expect(quantity(4, 'person')).toBe('4 (one per person)');
+    expect(quantity(58, 'fl oz')).toBe('58 fl oz');
+    expect(quantity(170, 'Wh')).toBe('170 Wh');
+    expect(quantity(2.5, 'gallon')).toBe('2.5 gallons');
+    expect(quantity(1200, 'kcal')).toBe('1,200 kcal');
+    // The Have screen's unit labels.
+    expect(plural("day of one person's medicine", 2)).toBe("days of one person's medicine");
+    expect(plural('24-pack', 2)).toBe('24-packs');
+    expect(plural('battery', 2)).toBe('batteries');
+    expect(plural('each', 2)).toBe('each');
+  });
+
+  it('says when help arrives and when service is mostly back in whole days (verify2: "about 5.2 days")', () => {
+    expect(reliefPhrase(5.190795)).toBe('5 days');
+    expect(reliefPhrase(5.4448423)).toBe('5 days');
+    expect(reliefPhrase(3)).toBe('3 days');
+    expect(reliefPhrase(0.4)).toBe('half a day');
+    expect(reliefPhrase(0.8)).toBe('1 day');
+    expect(reliefPhrase(13.4)).toBe('13 days');
+    expect(reliefPhrase(14)).toBe('2 weeks');
+    expect(reliefPhrase(171.56725)).toBe('6 months');
+    expect(reliefPhrase(1095)).toBe('3 years');
   });
 
   it('labels severity in words', () => {

@@ -32,6 +32,19 @@ export function lowerFirst(s: string): string {
 }
 
 /**
+ * A decision's name without its "Decide:" lead, the way the packet lists decisions on one line
+ * ("flood insurance, even outside a flood zone"; "ID for every person …" keeps its capitals).
+ */
+export function decisionName(name: string): string {
+  return lowerFirst(name.replace(/^Decide(?::|\s+on\b)?\s*/i, ''));
+}
+
+/** Decisions (`PlanItem.decision`) in one line, in plan order, as the packet's "Decide this month" line. */
+export function decisionList(items: readonly PlanItem[]): string {
+  return items.map((i) => decisionName(i.name)).join('; ');
+}
+
+/**
  * The requirement lines behind an item's quantity: the lines worked out by the item's quantity
  * rule (`Item.quantity_rule` = `RequirementLine.rule`). Empty for items without one (free actions).
  */

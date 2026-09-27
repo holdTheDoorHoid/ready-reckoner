@@ -322,7 +322,7 @@ export const ITEMS: Item[] = withV2([
     unit: 'drill',
     buckets: ['evacuate'],
     tier: 'now',
-    spec: "If you feel strong or long shaking near the coast, walk to high ground right away. Don't wait for an alert and don't drive. Practise the route from home and from work.",
+    spec: "If you feel strong or long shaking near the coast, walk to high ground right away, without waiting for an alert, and don't drive. Practise the route from home and from work.",
     look_for: ['Blue tsunami evacuation route signs', 'High ground you can reach on foot'],
     avoid: ['Going to the shore to look'],
     check: 6,

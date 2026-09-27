@@ -230,7 +230,10 @@ one box per rare family, named from the catalogue. A saved v1 plan's single swit
 them and is retired on the first change; ticking every family also writes `["all"]`. Two switches
 join it: **Show me the bare minimum first** and **Show the long-horizon part of the plan**. The
 settings summary adds "bare minimum first" and "rare-catastrophe allowance: 2 of 9" (or "all of
-them") when they are on.
+them") when they are on. Under the rare list (verify2): **Also save toward a legal emergency (bail, a
+lawyer's retainer)** (`Dials.legal_opt_in`), off by default and left out of the saved plan when off;
+turned on, the engine adds the bail sentence to the savings track, the savings card lists its source
+(`bjs_felony_defendants_2009`), and the summary adds "also saving toward a legal emergency".
 
 ### Persistence (v2)
 
@@ -337,7 +340,11 @@ the nuclear note shows only while the nuclear row has no location term.
   and a folded list of what falls beyond three years (the `plan_too_long` warning's `related`
   items). The warning itself is not repeated below the banner.
 - **Decisions** (`PlanItem.decision`): a "Decision" chip, no price, and the check-off says
-  "Decided"; the details say it is never paid from the supplies budget.
+  "Decided"; the details say it is never paid from the supplies budget. Grouped as the packet
+  groups them (verify2): this month's in one "Decide this month (N)" block that names them on one
+  line ("ID for every person (…); flood insurance, even outside a flood zone; …", the item names
+  without "Decide:") with the cards folded below it; one "Decide (N): …" line in next month's
+  preview and in each month of the whole plan; "Still to decide" under earlier months.
 - **"With: …"** under an item that needs another first (`requires`), by name.
 - **First savings goal**: the engine's `first_milestone` when sent ("First goal: $500 in savings,
   by February 2028."); otherwise the v0.1.1 nearer goal. The full goal stays beside it.

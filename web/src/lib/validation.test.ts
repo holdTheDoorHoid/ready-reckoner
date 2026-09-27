@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createMockEngine } from '../engine/mock';
 import { repoRoot } from '../test/real';
-import { agrees, tally, VALIDATION_EVENTS, VALIDATION_RUN, VERDICTS, type Verdict } from './validation';
+import { agrees, tally, VALIDATION_DOC_URL, VALIDATION_EVENTS, VALIDATION_RUN, VERDICTS, type Verdict } from './validation';
 
 /** docs/VALIDATION.md, or another copy to check against before it merges (RR_VALIDATION_MD=path). */
 const DOC = process.env.RR_VALIDATION_MD ?? join(repoRoot(), 'docs', 'VALIDATION.md');
@@ -58,6 +58,14 @@ describe('the validation rows', () => {
     if (!info.ok || !info.value.validation) throw new Error('no validation summary');
     expect(agrees(info.value.validation, VALIDATION_EVENTS)).toBe(true);
     expect(agrees({ ...info.value.validation, short: 7 }, VALIDATION_EVENTS)).toBe(false);
+  });
+
+  it('link to the address the source registry gives the test (rr_validation_2026), which every packet cites', () => {
+    const toml = readFileSync(join(repoRoot(), 'content', 'citations.toml'), 'utf8');
+    const entry = toml.split('[[citation]]').find((block) => /^id = "rr_validation_2026"$/m.test(block));
+    expect(entry, 'rr_validation_2026 in content/citations.toml').toBeDefined();
+    expect(/^url = "([^"]+)"$/m.exec(entry!)?.[1]).toBe(VALIDATION_DOC_URL);
+    expect(VALIDATION_DOC_URL).toMatch(/^https:\/\/github\.com\/holdTheDoorHoid\/ready-reckoner\/blob\/main\/docs\/VALIDATION\.md$/);
   });
 
   it.runIf(existsSync(DOC))('match docs/VALIDATION.md verdict for verdict, and its tally', () => {

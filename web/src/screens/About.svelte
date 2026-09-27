@@ -108,7 +108,7 @@
     {:else if sampleCounties}
       <div class="mock card">
         <p>
-          <strong>The national data is not loaded.</strong> The real planning engine is running on seven hand-built sample counties
+          <strong>The national data is not loaded.</strong> The real planning engine is running on fourteen built-in sample counties
           instead: the places the example households live. Any other ZIP code or county will not be found. Reload the page to try
           loading the data again.
         </p>
@@ -173,7 +173,7 @@
                 <ul class="job-sources">
                   {#each job.sources as src, i (i)}
                     <li>
-                      {#if src.url}<a href={src.url} target="_blank" rel="noopener noreferrer">{src.name}<span class="visually-hidden"> (opens in a new tab)</span></a>{:else}{src.name}{/if}
+                      {#if src.url}<a href={src.url} target="_blank" rel="noopener noreferrer">{src.name}<span class="visually-hidden">{' '}(opens in a new tab)</span></a>{:else}{src.name}{/if}
                     </li>
                   {/each}
                 </ul>
@@ -215,7 +215,7 @@
           <li class="card">
             <p class="credit__source">{a.source}{a.version ? ` (${a.version})` : ''}</p>
             <p>{a.text}</p>
-            <p class="small muted">Accessed {formatDate(a.accessed)}. <a href={a.url} target="_blank" rel="noopener noreferrer">{a.url}<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+            <p class="small muted">Accessed {formatDate(a.accessed)}. <a href={a.url} target="_blank" rel="noopener noreferrer">{a.url}<span class="visually-hidden">{' '}(opens in a new tab)</span></a></p>
           </li>
         {/each}
       </ul>
@@ -228,7 +228,7 @@
     <ol class="source-list">
       {#each citations as c (c.id)}
         <li>
-          <a href={c.url} target="_blank" rel="noopener noreferrer">{c.title}<span class="visually-hidden"> (opens in a new tab)</span></a>.
+          <a href={c.url} target="_blank" rel="noopener noreferrer">{c.title}<span class="visually-hidden">{' '}(opens in a new tab)</span></a>.
           <span class="muted">{c.publisher}{c.year ? `, ${c.year}` : ''}. Checked {formatDate(c.retrieved)}. {c.license}.</span>
           {#if c.prior}<span class="chip">Expert estimate</span>{/if}
         </li>
@@ -269,7 +269,7 @@
       setting you had on.
     </p>
     <p>
-      <a class="button" href={REPORT_URL} target="_blank" rel="noopener noreferrer"><Icon name="alert" /> Report a wrong number on GitHub<span class="visually-hidden"> (opens in a new tab)</span></a>
+      <a class="button" href={REPORT_URL} target="_blank" rel="noopener noreferrer"><Icon name="alert" /> Report a wrong number on GitHub<span class="visually-hidden">{' '}(opens in a new tab)</span></a>
     </p>
     <p class="small">Add this line so we can see exactly what was running (it says nothing about you):</p>
     <p class="version-line"><code>{versionLine}</code></p>
@@ -278,7 +278,7 @@
       <span class="small" role="status">{copied}</span>
     </p>
     <p class="small muted">
-      GitHub reports are public. Please don't include your address. A saved plan file holds your household's details, so attach one only if you
+      GitHub reports are public. Please don't include your address. A saved plan file holds your household's details and any names and phone numbers in your family plan, so attach one only if you
       are happy for anyone to read it; a made-up household that shows the same number works just as well.
     </p>
   </section>

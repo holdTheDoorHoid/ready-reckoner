@@ -12,7 +12,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { FIXTURES, type FixtureName } from '../engine/fixtures';
 import type { PlanInput } from '../engine/types';
-import { firstSentence, whatItChanges } from '../lib/rare';
+import { whatItChanges, whyHereShort } from '../lib/rare';
 import { formatMonth, addMonths, rangeOnly } from '../lib/format';
 import { stressLine } from '../lib/targets';
 import type { Purchase } from '../lib/persistence';
@@ -68,7 +68,7 @@ describe('the rare-but-severe box, by family', () => {
       expect(text(cells[0]!.querySelector('.likely')), h.id).toBe(rangeOnly(h.rate_range[0], h.rate_range[1], 10));
       if (h.anchor_sentence) expect(text(cells[0]!.querySelector('.anchor')), h.id).toBe(h.anchor_sentence);
       expect(text(cells[1]), h.id).toBe(`If it reaches you ${h.if_it_reaches_you}`);
-      const why = h.location_factor ? firstSentence(h.location_factor.label) : 'The same everywhere: this chance does not depend on where you live.';
+      const why = whyHereShort(h);
       expect(text(cells[2]), h.id).toBe(`Why here ${why}`);
       expect(text(cells[3]), h.id).toBe(`What it changes in your plan ${whatItChanges(h)}`);
       // Every row ends with an action or a tick (EPPM: never a threat without what to do).

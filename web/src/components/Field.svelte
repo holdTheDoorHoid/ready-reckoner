@@ -33,7 +33,7 @@
   {#if help}<span class="help" id="{id}-help">{help}</span>{/if}
   {@render children({ id, describedBy, invalid: !!error })}
   {#if error}
-    <p class="error-text" id="{id}-error"><Icon name="alert" /><span><span class="visually-hidden">Problem: </span>{error}</span></p>
+    <p class="error-text" id="{id}-error"><Icon name="alert" /><span><span class="visually-hidden">Problem:{' '}</span>{error}</span></p>
   {/if}
 </div>
 

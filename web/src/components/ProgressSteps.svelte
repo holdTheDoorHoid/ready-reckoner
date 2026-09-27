@@ -21,8 +21,7 @@
           <span class="steps__num" aria-hidden="true">
             {#if completed.includes(step) && step !== current}<Icon name="check" size="0.95em" />{:else}{i + 1}{/if}
           </span>
-          <span class="steps__name">{ROUTES[step].title}</span>
-          {#if completed.includes(step)}<span class="visually-hidden"> (answered)</span>{/if}
+          <span class="steps__name">{ROUTES[step].title}</span>{#if completed.includes(step)}<span class="visually-hidden">{' '}(answered)</span>{/if}
         </a>
       </li>
     {/each}

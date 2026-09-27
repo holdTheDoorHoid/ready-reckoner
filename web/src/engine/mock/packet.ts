@@ -122,7 +122,7 @@ export function buildPacket(input: PlanInput, r: ModelResult): string {
   // The family plan and wallet cards follow the summary (packet v2): it is what goes on the fridge.
   const whenWeLeave = ['**When we leave.** If an evacuation warning covers our zone, we leave within 30 minutes. The bags are by the door. We meet at the place above.', ''];
   if (r.register.some((h) => h.seed.id === 'tsunami')) {
-    whenWeLeave.push('**Tsunami.** If we feel strong or long shaking near the coast, we walk uphill at once. We do not wait for an alert and we do not drive.', '');
+    whenWeLeave.push('**Tsunami.** If we feel strong or long shaking near the coast, we walk uphill at once, without waiting for an alert, and we do not drive.', '');
   }
   if (r.register.some((h) => h.seed.id === 'tornado' && h.rate >= 0.005)) {
     whenWeLeave.push('**Tornado.** On a warning we go to our shelter spot (basement or inner room on the lowest floor) and stay until it passes.', '');
