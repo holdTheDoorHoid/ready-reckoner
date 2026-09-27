@@ -421,11 +421,20 @@ export function savePrefs(storage: Storage | null, prefs: Prefs): void {
   }
 }
 
+/** The browser's IndexedDB, or null: some private modes throw when it is merely looked at. */
+function browserIndexedDB(): IDBFactory | null {
+  try {
+    return globalThis.indexedDB ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Delete the maps store (`rr-maps`: the map images and their legends). Resolves true once it is
  * gone or was never there, false when the browser has no IndexedDB or refused.
  */
-export function forgetMaps(idb: IDBFactory | null | undefined = globalThis.indexedDB): Promise<boolean> {
+export function forgetMaps(idb: IDBFactory | null | undefined = browserIndexedDB()): Promise<boolean> {
   if (!idb) return Promise.resolve(false);
   return new Promise((resolve) => {
     try {
@@ -444,7 +453,7 @@ export function forgetMaps(idb: IDBFactory | null | undefined = globalThis.index
  * "Forget everything": remove every key this app wrote, and the maps store (`forgetMaps`, which
  * finishes on its own). Returns how many storage keys were removed.
  */
-export function forgetEverything(storage: Storage | null, idb: IDBFactory | null | undefined = globalThis.indexedDB): number {
+export function forgetEverything(storage: Storage | null, idb: IDBFactory | null | undefined = browserIndexedDB()): number {
   void forgetMaps(idb);
   if (!storage) return 0;
   let removed = 0;

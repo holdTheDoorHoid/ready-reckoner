@@ -205,4 +205,21 @@ describe('forgetting everything', () => {
     expect(await forgetMaps(throwing)).toBe(false);
     expect(forgetEverything(new MemoryStorage(), null)).toBe(0);
   });
+
+  it('still forgets the plan in a browser that throws when IndexedDB is merely looked at', () => {
+    const storage = new MemoryStorage();
+    savePlan(storage, savedFor(philly));
+    Object.defineProperty(globalThis, 'indexedDB', {
+      configurable: true,
+      get() {
+        throw new DOMException('denied', 'SecurityError');
+      },
+    });
+    try {
+      expect(forgetEverything(storage)).toBe(1);
+      expect(storage.getItem(STORAGE_KEY)).toBeNull();
+    } finally {
+      delete (globalThis as { indexedDB?: unknown }).indexedDB;
+    }
+  });
 });
