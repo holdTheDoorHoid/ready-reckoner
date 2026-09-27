@@ -1,17 +1,19 @@
 <!--
-  On a plan step whose answer is written down in the family plan ("Make a household plan", the
-  trusted circle, legal readiness, leaving, the shut-offs): a link to that part of the
-  "Your family plan" screen. Nothing for any other step.
+  On a plan step whose answer is written down in the optional interview steps ("Make a household
+  plan", the trusted circle, legal readiness, leaving, the shut-offs): a link to where that answer
+  goes. The household-plan step opens step 6 ("Add your people and places for the binder"); the
+  others open the card on step 7 or 8 that holds their questions (DESIGN-DELTA-v3 §1). Nothing for
+  any other step.
 -->
 <script lang="ts">
   import { familySectionFor, type FamilySection } from '../lib/family';
-  import { href } from '../lib/router.svelte';
+  import { FAMILY_REDIRECTS, href, type Route } from '../lib/router.svelte';
   import Icon from './Icon.svelte';
 
   let { itemId }: { itemId: string } = $props();
 
   const LABELS: Record<FamilySection, string> = {
-    contact: 'Fill in your household plan here',
+    contact: 'Add your people and places for the binder',
     children: 'Write down who picks up the children',
     shelter: 'Write down where you would shelter',
     leave: 'Write down where you would go, and how',
@@ -21,11 +23,15 @@
   };
 
   const section = $derived(familySectionFor(itemId));
+  const target = $derived.by((): Route | undefined => {
+    if (!section) return undefined;
+    return section === 'contact' ? { id: 'people' } : FAMILY_REDIRECTS[section];
+  });
 </script>
 
-{#if section}
+{#if section && target}
   <p class="family-link no-print">
-    <a href={href('family', section === 'contact' ? undefined : section)}>{LABELS[section]} <Icon name="chevron-right" /></a>
+    <a href={href(target.id, target.param)}>{LABELS[section]} <Icon name="chevron-right" /></a>
   </p>
 {/if}
 

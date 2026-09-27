@@ -1,7 +1,11 @@
-<!-- Where you are in the interview. Every step is a link: nothing is locked. -->
+<!--
+  Where you are in the interview. Every step is a link: nothing is locked. Steps 6–8 are optional
+  (DESIGN-DELTA-v3 §1): the count reads "Step 6 of 8 · optional", and their numbers sit in dashed
+  circles with "(optional)" for screen readers.
+-->
 <script lang="ts">
   import { useApp } from '../lib/app.svelte';
-  import { STEP_IDS, type StepId } from '../lib/persistence';
+  import { isOptionalStep, STEP_IDS, type StepId } from '../lib/persistence';
   import { href, ROUTES } from '../lib/router.svelte';
   import Icon from './Icon.svelte';
 
@@ -12,16 +16,18 @@
 </script>
 
 <nav class="steps no-print" aria-label="Interview steps">
-  <p class="steps__count">Step {index + 1} of {STEP_IDS.length}</p>
+  <p class="steps__count">Step {index + 1} of {STEP_IDS.length}{isOptionalStep(current) ? ' · optional' : ''}</p>
   <div class="steps__bar" aria-hidden="true"><div class="steps__fill" style:width="{((index + 1) / STEP_IDS.length) * 100}%"></div></div>
   <ol class="steps__list">
     {#each STEP_IDS as step, i (step)}
-      <li class:current={step === current} class:done={completed.includes(step)}>
+      <li class:current={step === current} class:done={completed.includes(step)} class:optional={isOptionalStep(step)}>
         <a href={href(step)} aria-current={step === current ? 'step' : undefined}>
           <span class="steps__num" aria-hidden="true">
             {#if completed.includes(step) && step !== current}<Icon name="check" size="0.95em" />{:else}{i + 1}{/if}
           </span>
-          <span class="steps__name">{ROUTES[step].title}</span>{#if completed.includes(step)}<span class="visually-hidden">{' '}(answered)</span>{/if}
+          <span class="steps__name">{ROUTES[step].title}</span>{#if isOptionalStep(step)}<span class="visually-hidden">{' '}(optional)</span>{/if}{#if completed.includes(step)}<span
+              class="visually-hidden">{' '}(answered)</span
+            >{/if}
         </a>
       </li>
     {/each}
@@ -83,6 +89,9 @@
     border: 1.5px solid var(--border-strong);
     font-weight: 700;
     font-size: 0.8rem;
+  }
+  .optional .steps__num {
+    border-style: dashed;
   }
   .done .steps__num {
     border-color: var(--good);

@@ -5,20 +5,25 @@ import type { FamilyPlan, PlanInput } from '../engine/types';
 import { FAMILY_PLAN_SHORT_MAX, FAMILY_PLAN_TEXT_MAX, NUMBERS_BY_HEART_MAX, TRUSTED_CIRCLE_MAX } from '../engine/types';
 import detroitJson from '../../../fixtures/households/detroit-snap-3.json';
 import { clone } from '../test/helpers';
+import { PETS_MAX } from './tidy';
 import {
   addNumber,
+  addPlanRow,
   addTrustedPerson,
   familySectionFor,
   hasFamilyPlan,
   removeNumber,
+  removePlanRow,
   removeTrustedPerson,
   setContactPart,
   setHolds,
   setNote,
+  setPlanText,
   setRoute,
   tidyContactPart,
   tidyFamilyPlan,
   tidyNote,
+  tidyPlanText,
   tidyRoute,
   tidyText,
 } from './family';
@@ -140,5 +145,51 @@ describe('plan steps that the family plan answers', () => {
     expect(familySectionFor('evac_know_zone')).toBe('leave');
     expect(familySectionFor('fire_learn_shutoffs')).toBe('home');
     expect(familySectionFor('water_stored')).toBeUndefined();
+  });
+});
+
+describe('contract v3: the home, neighbourhood, pets, vehicles and documents (DESIGN-DELTA-v3 §3.2)', () => {
+  it('tidies every new group as the engine does: trimmed, cut, empty rows and groups dropped, lists cut', () => {
+    const plan: FamilyPlan = {
+      lawyer: { name: ' Legal aid ', address: `  ${'a'.repeat(250)} ` },
+      home: { address: ' 12 Sample St ', electric_utility: { name: 'Sample Power', phone: ' 555-0120 ' }, gas_utility: {}, where_keys: '   ' },
+      neighbourhood: { hospital: { name: 'Sample General', address: '1 Health Way', phone: '555-0130' }, alerts: '' },
+      pets: [{}, ...Array.from({ length: 10 }, (_, i) => ({ name: `Pet ${i + 1}`, microchip: ` ${i} ` }))],
+      vehicles: Array.from({ length: 6 }, (_, i) => ({ description: `Car ${i + 1}` })),
+      documents: {
+        accounts: [{ institution: 'First Sample Bank', last4: '4000 1234 5678 9010' }, { last4: 'none' }, ...Array.from({ length: 13 }, (_, i) => ({ kind: `Account ${i}` }))],
+        policies: Array.from({ length: 9 }, (_, i) => ({ insurer: ` Insurer ${i} ` })),
+        where_copies: ' With Rosa ',
+      },
+    };
+    const out = tidyFamilyPlan(plan)!;
+    expect(out.lawyer).toEqual({ name: 'Legal aid', address: 'a'.repeat(200) });
+    expect(out.home).toEqual({ address: '12 Sample St', electric_utility: { name: 'Sample Power', phone: '555-0120' } });
+    expect(out.neighbourhood).toEqual({ hospital: { name: 'Sample General', address: '1 Health Way', phone: '555-0130' } });
+    expect(out.pets).toHaveLength(8);
+    expect(out.pets![0]).toEqual({ name: 'Pet 1', microchip: '0' });
+    expect(out.vehicles).toHaveLength(4);
+    expect(out.documents!.accounts).toHaveLength(12);
+    expect(out.documents!.accounts![0]).toEqual({ institution: 'First Sample Bank', last4: '9010' });
+    expect(out.documents!.accounts![1]).toEqual({ kind: 'Account 0' });
+    expect(out.documents!.policies).toHaveLength(8);
+    expect(out.documents!.policies![0]).toEqual({ insurer: 'Insurer 0' });
+    expect(out.documents!.where_copies).toBe('With Rosa');
+    // v3 groups come after the v2 fields, in the engine's order.
+    expect(Object.keys(out)).toEqual(['lawyer', 'home', 'neighbourhood', 'pets', 'vehicles', 'documents']);
+    expect(tidyFamilyPlan({ home: { gas_utility: {} }, pets: [{}], documents: { accounts: [{ last4: 'abc' }] } })).toBeUndefined();
+  });
+
+  it('edits the new groups by path, and leaves no empty group or plan behind', () => {
+    const input = clone(FIXTURES['philadelphia-renters-4']);
+    setPlanText(input, ['home', 'water_utility', 'phone'], '555-0140');
+    expect(input.family_plan).toEqual({ home: { water_utility: { phone: '555-0140' } } });
+    expect(addPlanRow(input, ['pets'], PETS_MAX)).toBe(true);
+    setPlanText(input, ['pets', 0, 'vet', 'name'], 'Sample Vets');
+    tidyPlanText(input, ['pets', 0, 'vet', 'name'], 80);
+    expect(input.family_plan?.pets).toEqual([{ vet: { name: 'Sample Vets' } }]);
+    removePlanRow(input, ['pets'], 0);
+    setPlanText(input, ['home', 'water_utility', 'phone'], '');
+    expect(input.family_plan).toBeUndefined();
   });
 });

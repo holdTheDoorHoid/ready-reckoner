@@ -1,16 +1,22 @@
 <!--
   Screen 0, Start: what this is, the privacy promise, and three ways in: continue a saved plan,
-  start a new one (with two optional questions), or open a saved plan file.
+  start a new one (with two optional questions), or open a saved plan file (plain, or protected
+  with a passphrase, DESIGN-DELTA-v3 §7). "Continue your plan" goes where the household left off,
+  or to the first of the five required steps it has not answered, or to Prepare; the optional
+  steps 6–8 never hold it up, and a returning household is pointed at them ("Add your people and
+  places for the binder").
 -->
 <script lang="ts">
   import ConfirmDialog from '../components/ConfirmDialog.svelte';
   import Icon from '../components/Icon.svelte';
+  import PassphraseDialog from '../components/PassphraseDialog.svelte';
   import type { Problem, Stage } from '../engine/types';
   import { STAGES } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, STAGE, STATUS_LINE } from '../lib/labels';
-  import { engineInput, parseImport, STEP_IDS, type SavedPlan } from '../lib/persistence';
-  import { parseHash, useRouter } from '../lib/router.svelte';
+  import { engineInput, REQUIRED_STEP_IDS, type SavedPlan } from '../lib/persistence';
+  import { type EncryptedPlanFile, readPlanFile } from '../lib/protect';
+  import { formatHash, href, parseHash, useRouter } from '../lib/router.svelte';
 
   const app = useApp();
   const router = useRouter();
@@ -21,15 +27,17 @@
   let fileInput: HTMLInputElement | undefined = $state();
   let confirmReplace = $state(false);
   let pendingImport = $state<SavedPlan | null>(null);
+  /** A protected file waiting for its passphrase. */
+  let locked = $state<EncryptedPlanFile | null>(null);
 
   const county = $derived(app.result.output ? `${app.result.output.location.county_name}, ${app.result.output.location.state_abbr}` : '');
   const resumeHash = $derived.by(() => {
     const plan = app.plan;
     if (!plan) return '#/where';
     const last = plan.progress.last ? parseHash(plan.progress.last) : null;
-    if (last && last.id !== 'start' && last.id !== 'missing') return plan.progress.last!;
-    const next = STEP_IDS.find((s) => !plan.progress.completed.includes(s));
-    return next ? `#/${next}` : '#/plan';
+    if (last && last.id !== 'start' && last.id !== 'missing') return formatHash(last);
+    const next = REQUIRED_STEP_IDS.find((s) => !plan.progress.completed.includes(s));
+    return next ? `#/${next}` : '#/prepare';
   });
 
   async function startNew() {
@@ -43,13 +51,22 @@
 
   async function readFile(file: File) {
     importError = '';
-    const parsed = parseImport(await file.text());
-    if (!parsed.ok) {
-      importError = parsed.reason;
+    const read = readPlanFile(await file.text());
+    if (read.kind === 'error') {
+      importError = read.reason;
       return;
     }
+    if (read.kind === 'protected') {
+      locked = read.file;
+      return;
+    }
+    await accept(read.plan);
+  }
+
+  /** A plan read from a file (opened with its passphrase if it was protected): checked, then opened. */
+  async function accept(plan: SavedPlan) {
     if (app.engine) {
-      const check = await app.engine.assess(engineInput(parsed.plan));
+      const check = await app.engine.assess(engineInput(plan));
       if (!check.ok && check.error.code === 'bad_input') {
         const problems = (check.error.details as { problems?: Problem[] } | undefined)?.problems ?? [];
         const structural = problems.filter((p) => p.code === 'schema');
@@ -60,17 +77,17 @@
       }
     }
     if (app.plan) {
-      pendingImport = parsed.plan;
+      pendingImport = plan;
       confirmReplace = true;
     } else {
-      finishImport(parsed.plan);
+      finishImport(plan);
     }
   }
 
   function finishImport(plan: SavedPlan) {
     app.load(plan);
-    const done = STEP_IDS.every((s) => plan.progress.completed.includes(s));
-    router.go(done ? 'plan' : 'where');
+    const done = REQUIRED_STEP_IDS.every((s) => plan.progress.completed.includes(s));
+    router.go(done ? 'prepare' : 'where');
   }
 </script>
 
@@ -78,7 +95,7 @@
   <h1 id="page-title" tabindex="-1">Get ready for what is likely where you live</h1>
   <p class="lead">
     Ready Reckoner works out what is most likely to disrupt your household, what it would do to you, and what to prepare first with
-    the money you have. You get a month-by-month plan and a packet to print.
+    the money you have. You get a month-by-month plan and a binder to print.
   </p>
 
   {#if app.plan}
@@ -86,6 +103,7 @@
       <h2 id="resume-title">Welcome back</h2>
       <p>Your plan is saved on this device{county ? ` for ${county}` : ''}.</p>
       <p class="button-row"><a class="button button--primary" href={resumeHash}>Continue your plan <Icon name="chevron-right" /></a></p>
+      <p class="small"><a href={href('people')}>Add your people and places for the binder</a></p>
     </section>
   {/if}
 
@@ -101,7 +119,8 @@
     </div>
     <p class="small muted">
       About ten minutes, in five short steps: where you live, who lives with you, how you get around, money, and what you already have.
-      Stop whenever you like; your answers are saved on this device as you go.
+      Three optional steps after them add your people, places and contacts for the binder. Stop whenever you like; your answers are saved
+      on this device as you go.
     </p>
     <input
       bind:this={fileInput}
@@ -160,10 +179,12 @@
       <li><strong>Your risks, ranked</strong>: how often each one reaches households like yours, in plain numbers, with sources.</li>
       <li><strong>How long to be ready for</strong>: days without power, water or stores, for your household.</li>
       <li><strong>A month-by-month plan</strong> that starts with free steps and spends only your budget.</li>
-      <li><strong>A printable packet</strong> with checklists, a family plan and a maintenance calendar.</li>
+      <li><strong>A binder to print</strong> for when something happens: a page for each person and place, and a checklist for each emergency.</li>
     </ul>
   </section>
 </div>
+
+<PassphraseDialog bind:file={locked} onopened={(plan) => void accept(plan)} onerror={(reason) => (importError = reason)} />
 
 <ConfirmDialog
   bind:open={confirmReplace}

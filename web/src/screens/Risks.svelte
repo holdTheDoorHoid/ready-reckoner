@@ -329,7 +329,7 @@
       </section>
 
       <p class="next button-row">
-        <a class="button button--primary" href={href('plan')}>See your plan <Icon name="chevron-right" /></a>
+        <a class="button button--primary" href={href('prepare')}>See your plan <Icon name="chevron-right" /></a>
         <span class="small muted">Free steps first, then what to buy each month.</span>
       </p>
     {/snippet}

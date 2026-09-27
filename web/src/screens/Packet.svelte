@@ -1,12 +1,14 @@
 <!--
-  Screen 8, Your packet: the engine's packet (Markdown) rendered safely, ready to print, with the
-  county map at the start of "Your risks". The print stylesheet keeps it legible in black and
-  white, lets sections follow on from each other, and sets the sources in two small columns.
+  Your binder (#/binder; was "Your packet" at #/packet, which redirects here since v0.3.0): the
+  engine's packet (Markdown) rendered safely, ready to print, with the county map at the start of
+  "Your risks". The print stylesheet keeps it legible in black and white, lets sections follow on
+  from each other, and sets the sources in two small columns. (web-binder replaces this screen
+  with the binder rendered from the engine's tree, DESIGN-DELTA-v3 §6.)
 
-  `#/packet/<section>` opens the packet at one section (`#/packet/wallet-cards` from the family
-  plan's "Print wallet cards"). The wallet cards are the packet's "Wallet cards" section (or, if a
-  packet has none, its family plan); "Print only the wallet cards" prints that section alone, each
-  card (a block quote in the packet) boxed with a cut line and never split across pages.
+  `#/binder/<section>` opens it at one section (`#/binder/wallet-cards` from step 8's "Print
+  wallet cards"). The wallet cards are the packet's "Wallet cards" section (or, if a packet has
+  none, its family plan); "Print only the wallet cards" prints that section alone, each card (a
+  block quote in the packet) boxed with a cut line and never split across pages.
 -->
 <script lang="ts">
   import { tick } from 'svelte';
@@ -34,10 +36,10 @@
 
   const cardsSlug = $derived(app.result.output ? cardsSection(packetSections(app.result.output.packet_markdown)) : undefined);
 
-  // Opened at a section (#/packet/wallet-cards): go there once the packet is on the page. A
+  // Opened at a section (#/binder/wallet-cards): go there once the packet is on the page. A
   // request for the wallet cards finds them under whatever heading this packet gives them.
   $effect(() => {
-    const wanted = router.current.id === 'packet' ? router.current.param : undefined;
+    const wanted = router.current.id === 'binder' ? router.current.param : undefined;
     const output = app.result.output;
     if (!wanted || !output) return;
     const slugs = packetSections(output.packet_markdown).map((sec) => sec.slug);
@@ -81,7 +83,7 @@
 
 <div class="page packet-page" class:cards-only={cardsOnly}>
   <div class="toolbar no-print">
-    <h1 id="page-title" tabindex="-1">Your packet</h1>
+    <h1 id="page-title" tabindex="-1">Your binder</h1>
     <p class="lead">
       Everything in your plan on paper: risks, targets, checklists, your family plan, a maintenance calendar and every source. Print
       it, or choose "Save as PDF" in the print window. Keep a copy somewhere you can reach without power.
