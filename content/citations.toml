@@ -4603,4 +4603,208 @@ year = 2026
 url = "https://www.nhc.noaa.gov/surge/"
 retrieved = "2026-09-27"
 quote = "Storm surge can even travel up rivers and canals, reaching well inland from the coastline."
+# added by checklists-c (v0.3.0 tab 8 checklists: "it goes on"). Every page below was read on
+# 2026-09-27 in a browser page (these sites refuse plain HTTP clients); each stored quote was
+# matched in the page's own text. Non-federal sources are paraphrased and carry no quote.
+# ---------------------------------------------------------------------------------------------
+
+# Read in a browser page: flashlights not candles; check in with your support network; eat fresh
+# food first; leave if the home is too hot or too cold or a medical device needs power; stay 35 feet
+# from downed lines; ask your provider about refrigerated medicine; tripped breakers checked by an
+# electrician first.
+[[citation]]
+id = "redcross_power_outage"
+title = "Power Outage Safety"
+publisher = "American Red Cross"
+year = 2026
+url = "https://www.redcross.org/get-help/how-to-prepare-for-emergencies/types-of-emergencies/power-outage.html"
+retrieved = "2026-09-27"
+license = "All rights reserved (paraphrased, not quoted)"
+
+# Read in a browser page (no date on the page): limit calls, keep them short, text, try another
+# service or a landline, wait 10 seconds before redialing, name an out-of-area contact, call only
+# while the vehicle is stopped.
+[[citation]]
+id = "fcc_emergency_calling_tips"
+title = "Tips for Communicating in an Emergency"
+publisher = "Federal Communications Commission"
+year = 2026
+url = "https://www.fcc.gov/consumers/guides/tips-communicating-emergency"
+retrieved = "2026-09-27"
+quote = "Wait 10 seconds before redialing a call."
+license = "US Government Work (public domain)"
+
+# Read in a browser page (last updated July 28, 2014): no insured depositor has lost money; the
+# FDIC writes to each depositor, and a bank that takes over the accounts writes too; insured banks
+# show the FDIC sign at each teller window.
+[[citation]]
+id = "fdic_when_bank_fails"
+title = "When a Bank Fails: Facts for Depositors, Creditors, and Borrowers"
+publisher = "Federal Deposit Insurance Corporation"
+year = 2014
+url = "https://www.fdic.gov/bank-failures/when-bank-fails-facts-depositors-creditors-and-borrowers"
+retrieved = "2026-09-27"
+quote = "No depositor has ever lost a penny of insured deposits since the FDIC was created in 1933."
+license = "US Government Work (public domain)"
+
+# Read in a browser page (last updated April 1, 2024): the FDIC historically pays insured deposits
+# within a few days of a closing, usually the next business day, as a new account at another insured
+# bank or a check; 1-877-275-3342 for coverage questions. The payout sentence is over 50 words, so no
+# quote is stored.
+[[citation]]
+id = "fdic_deposit_insurance_faq"
+title = "Deposit Insurance FAQs"
+publisher = "Federal Deposit Insurance Corporation"
+year = 2024
+url = "https://www.fdic.gov/resources/deposit-insurance/faq"
+retrieved = "2026-09-27"
+license = "US Government Work (public domain)"
+
+# Read in a browser page (last updated June 18, 2024): keep making loan payments; the FDIC mails
+# payment instructions; borrowers in hardship may ask the FDIC about a loan workout.
+[[citation]]
+id = "fdic_borrowers_guide"
+title = "A Borrower's Guide to an FDIC Insured Bank Failure"
+publisher = "Federal Deposit Insurance Corporation"
+year = 2024
+url = "https://www.fdic.gov/bank-failures/borrowers-guide-fdic-insured-bank-failure"
+retrieved = "2026-09-27"
+quote = "A bank failure does not change your obligation as a borrower to make payments and comply with the terms of your loan."
+license = "US Government Work (public domain)"
+
+# Read in a browser page: losing coverage (job-based included) opens a 60-day Special Enrollment
+# Period; so does the death of someone on the household's Marketplace plan.
+[[citation]]
+id = "healthcare_gov_sep"
+title = "Getting health coverage outside Open Enrollment: Special Enrollment Periods"
+publisher = "CMS / HealthCare.gov"
+year = 2026
+url = "https://www.healthcare.gov/coverage-outside-open-enrollment/special-enrollment-period/"
+retrieved = "2026-09-27"
+quote = "You may qualify for a Special Enrollment Period if you or anyone in your household lost qualifying health coverage in the past 60 days OR expects to lose coverage in the next 60 days."
+license = "US Government Work (public domain)"
+
+# Read in a browser page: COBRA if the former employer offers it; one application checks a
+# Marketplace plan, Medicaid and CHIP; report a new job and income changes right away.
+[[citation]]
+id = "healthcare_gov_unemployed"
+title = "Health coverage options if you're unemployed"
+publisher = "CMS / HealthCare.gov"
+year = 2026
+url = "https://www.healthcare.gov/unemployed/coverage/"
+retrieved = "2026-09-27"
+quote = "You may be eligible for COBRA (Consolidated Omnibus Budget Reconciliation Act) continuation coverage if you lost your job, and your former employer offers it."
+license = "US Government Work (public domain)"
+
+# Read in a browser page: funeral homes usually report a death; otherwise call 1-800-772-1213;
+# certain family members may get monthly survivor benefits.
+[[citation]]
+id = "ssa_when_someone_dies"
+title = "What to do when someone dies"
+publisher = "Social Security Administration"
+year = 2026
+url = "https://www.ssa.gov/personal-record/when-someone-dies"
+retrieved = "2026-09-27"
+quote = "Certain family members may be eligible for monthly Survivor benefit payments."
+license = "US Government Work (public domain)"
+
+# Read in a browser page (last updated August 31, 2026): certified copies of the death
+# certificate for most agencies; notify the programs and businesses the person used; report the
+# death to banks, card companies and credit bureaus; the FTC explains what to do about debts.
+[[citation]]
+id = "usagov_report_death"
+title = "Agencies to notify when someone dies"
+publisher = "USAGov"
+year = 2026
+url = "https://www.usa.gov/report-a-death"
+retrieved = "2026-09-27"
+quote = "Report the person’s death to banks, credit card companies, credit bureaus, and other financial organizations."
+license = "US Government Work (public domain)"
+
+# Read in a browser page: disability benefits are for a condition that will last at least a year
+# (or result in death) and makes work hard or impossible; apply online or by appointment at
+# 1-800-772-1213.
+[[citation]]
+id = "ssa_apply_disability"
+title = "Apply for Social Security benefits: disability benefits for an adult"
+publisher = "Social Security Administration"
+year = 2026
+url = "https://www.ssa.gov/apply?benefits=disability&age=adult"
+retrieved = "2026-09-27"
+quote = "You have a medical condition that will last at least one year or result in death."
+license = "US Government Work (public domain)"
+
+# Read in a browser page (last updated January 26, 2026): unpaid, job-protected leave with group
+# health benefits kept; up to 12 workweeks in 12 months to care for a spouse, child or parent with a
+# serious health condition, or for the employee's own; state law may give more.
+[[citation]]
+id = "dol_fmla"
+title = "Family and Medical Leave Act"
+publisher = "U.S. Department of Labor, Wage and Hour Division"
+year = 2026
+url = "https://www.dol.gov/agencies/whd/fmla"
+retrieved = "2026-09-27"
+quote = "For eligible employees, up to 12 workweeks of leave in a 12-month period for any of the following qualifying reasons:"
+license = "US Government Work (public domain)"
+
+# Read in a browser page (the hazard page drawn from the county's Community Emergency Response
+# Guide): avoid the area and plan other routes; lock up and stay away from windows and doors; stay
+# informed; know exit routes; follow law enforcement directions; call 911 if the event changes;
+# afterwards check the area, get first aid or mental health first aid, report damage to police,
+# check in with family by text. No federal page gives household guidance for civil unrest.
+[[citation]]
+id = "fairfax_civil_disorder"
+title = "Civil Disorder (Ready Fairfax hazard page, from the county's Community Emergency Response Guide)"
+publisher = "Fairfax County, Virginia, Department of Emergency Management and Security"
+year = 2026
+url = "https://www.fairfaxcounty.gov/emergency/readyfairfax/civildisorder"
+retrieved = "2026-09-27"
+license = "Local government publication (paraphrased, not quoted)"
+
+# Read in a browser page (last updated March 17, 2026): the ICE online detainee locator takes a
+# name, country of birth and birth date, or the A-number; otherwise an ICE field office.
+[[citation]]
+id = "usagov_ice_detainee"
+title = "Locate someone being detained by ICE for immigration violation or deportation"
+publisher = "USAGov"
+year = 2026
+url = "https://www.usa.gov/detained-by-ice"
+retrieved = "2026-09-27"
+quote = "You can use the ICE detainee locator to find a person currently held by U.S. Immigration and Customs Enforcement (ICE)."
+license = "US Government Work (public domain)"
+
+# Read in a browser page (last updated July 24, 2025): report suspicious activity to local law
+# enforcement with who, what, when, where and why; in an emergency call 911.
+[[citation]]
+id = "dhs_report_suspicious"
+title = "How to Report Suspicious Activity (If You See Something, Say Something campaign)"
+publisher = "U.S. Department of Homeland Security"
+year = 2025
+url = "https://www.dhs.gov/see-something-say-something/how-to-report-suspicious-activity"
+retrieved = "2026-09-27"
+quote = "Do not report suspicious activity to the Department of Homeland Security. Instead, notify local law enforcement."
+license = "US Government Work (public domain)"
+
+# Read in a browser page: when a traffic light is not working, stop as if the intersection had
+# STOP signs in all directions, then go on carefully when it is safe. One state's handbook; the rule
+# is the common one, but traffic law is set by each state.
+[[citation]]
+id = "ca_dmv_rules_of_the_road"
+title = "California Driver Handbook, Section 7: Laws and Rules of the Road (traffic light not working)"
+publisher = "California Department of Motor Vehicles"
+year = 2026
+url = "https://www.dmv.ca.gov/portal/handbook/california-driver-handbook/laws-and-rules-of-the-road/"
+retrieved = "2026-09-27"
+license = "State government publication (paraphrased, not quoted)"
+
+# Read in a browser page (content current as of May 31, 2023): do not make or feed homemade infant
+# formula; with concerns about formula, contact your health care provider.
+[[citation]]
+id = "fda_infant_formula_dos_donts"
+title = "Infant Formula: Safety Do's and Don'ts"
+publisher = "U.S. Food and Drug Administration"
+year = 2023
+url = "https://www.fda.gov/consumers/consumer-updates/infant-formula-safety-dos-and-donts"
+retrieved = "2026-09-27"
+quote = "The FDA advises parents and caregivers to not make or feed homemade infant formula to infants."
 license = "US Government Work (public domain)"
