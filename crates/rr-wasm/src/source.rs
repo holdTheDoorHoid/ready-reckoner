@@ -5,9 +5,9 @@
 //! - the **data packs** (`rr_data::DataStore`), fed file by file through `load_pack`. The web
 //!   app loads `manifest.json` first and then every file of the `core` pack; each file is checked
 //!   against the sha256 the manifest records.
-//! - the **built-in sample counties** (`rr_plan::FixtureSource`): the seven hand-built counties
+//! - the **built-in sample counties** (`rr_plan::FixtureSource`): the fourteen hand-built counties
 //!   the fixture households live in. They answer only while no pack file has been loaded, so the
-//!   engine works (for those seven counties) before any data is fetched, in tests, and on a site
+//!   engine works (for those fourteen counties) before any data is fetched, in tests, and on a site
 //!   built without `data/`. The goldens in `fixtures/golden/` are planned from the packs, not from
 //!   this mode; this mode is checked against rr-plan's own sample-county engine instead.
 //!

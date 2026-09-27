@@ -18,8 +18,15 @@ use common::{minify, value_text};
 
 const PHILADELPHIA: &str = include_str!("../../../fixtures/households/philadelphia-renters-4.json");
 
-/// Every fixture household and its golden output, by name.
+/// Every fixture household and its golden output, by name. Sorted like `rr_types::fixtures::RAW`
+/// (all 14 golden households of v0.2.0: the seven original fixtures plus Cameron Parish, Detroit,
+/// Galveston, Minot, Missoula, Sacramento and San Juan).
 const FIXTURES: &[(&str, &str, &str)] = &[
+    (
+        "cameron-insulin-well-farm-2",
+        include_str!("../../../fixtures/households/cameron-insulin-well-farm-2.json"),
+        include_str!("../../../fixtures/golden/cameron-insulin-well-farm-2.json"),
+    ),
     (
         "chicago-student-zero-budget-1",
         include_str!("../../../fixtures/households/chicago-student-zero-budget-1.json"),
@@ -29,6 +36,16 @@ const FIXTURES: &[(&str, &str, &str)] = &[
         "coos-bay-well-owner-2",
         include_str!("../../../fixtures/households/coos-bay-well-owner-2.json"),
         include_str!("../../../fixtures/golden/coos-bay-well-owner-2.json"),
+    ),
+    (
+        "detroit-snap-3",
+        include_str!("../../../fixtures/households/detroit-snap-3.json"),
+        include_str!("../../../fixtures/golden/detroit-snap-3.json"),
+    ),
+    (
+        "galveston-highrise-1",
+        include_str!("../../../fixtures/households/galveston-highrise-1.json"),
+        include_str!("../../../fixtures/golden/galveston-highrise-1.json"),
     ),
     (
         "hays-kansas-farm-5",
@@ -41,6 +58,16 @@ const FIXTURES: &[(&str, &str, &str)] = &[
         include_str!("../../../fixtures/golden/miami-condo-retiree-1.json"),
     ),
     (
+        "minot-missile-field-3",
+        include_str!("../../../fixtures/households/minot-missile-field-3.json"),
+        include_str!("../../../fixtures/golden/minot-missile-field-3.json"),
+    ),
+    (
+        "missoula-smoke-2",
+        include_str!("../../../fixtures/households/missoula-smoke-2.json"),
+        include_str!("../../../fixtures/golden/missoula-smoke-2.json"),
+    ),
+    (
         "philadelphia-renters-4",
         PHILADELPHIA,
         include_str!("../../../fixtures/golden/philadelphia-renters-4.json"),
@@ -49,6 +76,16 @@ const FIXTURES: &[(&str, &str, &str)] = &[
         "phoenix-apartment-cpap-1",
         include_str!("../../../fixtures/households/phoenix-apartment-cpap-1.json"),
         include_str!("../../../fixtures/golden/phoenix-apartment-cpap-1.json"),
+    ),
+    (
+        "sacramento-leveed-2",
+        include_str!("../../../fixtures/households/sacramento-leveed-2.json"),
+        include_str!("../../../fixtures/golden/sacramento-leveed-2.json"),
+    ),
+    (
+        "san-juan-2",
+        include_str!("../../../fixtures/households/san-juan-2.json"),
+        include_str!("../../../fixtures/golden/san-juan-2.json"),
     ),
     (
         "sugar-land-ev-household-3",
@@ -248,9 +285,28 @@ fn keys(json: &str) -> Vec<String> {
     }
 }
 
+/// `FIXTURES` above must name exactly the households in `rr_types::fixtures::RAW`: the same drill
+/// as the `CORE`-vs-manifest check below, guarding against the list here going stale the way it did
+/// for plan2's seven new households (CI red on `data-model`'s merge until the core file list was
+/// fixed; see `INTEGRATION-STATUS.md`).
+#[wasm_bindgen_test]
+fn fixtures_names_match_rr_types_fixtures_raw() {
+    let mut raw: Vec<&str> = rr_types::fixtures::RAW
+        .iter()
+        .map(|(name, _)| *name)
+        .collect();
+    let mut here: Vec<&str> = FIXTURES.iter().map(|(name, _, _)| *name).collect();
+    raw.sort_unstable();
+    here.sort_unstable();
+    assert_eq!(
+        here, raw,
+        "FIXTURES in this file lists other households than rr_types::fixtures::RAW; update FIXTURES"
+    );
+}
+
 #[wasm_bindgen_test]
 fn sample_counties_first_then_the_packs_and_every_golden_to_the_last_digit() {
-    // 1. Before any data: the seven built-in sample counties answer, and say so.
+    // 1. Before any data: the fourteen built-in sample counties answer, and say so.
     let info: EngineInfo = value_of(&rr_wasm::engine_info());
     assert!(info.packs_loaded.is_empty(), "{:?}", info.packs_loaded);
     assert_eq!(info.data_pack_version, None);
@@ -272,7 +328,35 @@ fn sample_counties_first_then_the_packs_and_every_golden_to_the_last_digit() {
     );
     assert!(output.packet_markdown.starts_with("# "));
     assert!(!output.register.is_empty() && !output.plan.months.is_empty());
-    assert_eq!(keys(value_text(&sample)), keys(FIXTURES[4].2));
+    let philadelphia_golden = FIXTURES
+        .iter()
+        .find(|(name, _, _)| *name == "philadelphia-renters-4")
+        .expect("philadelphia-renters-4 is in FIXTURES")
+        .2;
+    let sample_keys = keys(value_text(&sample));
+    let golden_keys = keys(philadelphia_golden);
+    // Not a strict equality: `recovery` (v2) needs the real declarations pack
+    // (`rr_plan::packet::recovery_info` sends `RecoveryInfo::default()`, left out by the contract's
+    // "left out when empty" rule, when `CountyRecord.declarations` is `None`) and the hand-built
+    // sample counties (`crates/rr-hazards/tests/data/counties/`) predate that data source, so the
+    // golden (planned from the real core pack) legitimately carries one field sample-county mode
+    // cannot. Any other gap would mean a real chunk of the contract silently disappeared before a
+    // data pack loads, so it still fails the test.
+    assert!(
+        sample_keys.iter().all(|k| golden_keys.contains(k)),
+        "the sample-county plan has a top-level field the golden does not: {sample_keys:?} vs \
+         {golden_keys:?}"
+    );
+    let missing: Vec<&String> = golden_keys
+        .iter()
+        .filter(|k| !sample_keys.contains(k))
+        .collect();
+    assert_eq!(
+        missing,
+        vec!["recovery"],
+        "the sample-county plan is missing top-level fields besides the known recovery gap: \
+         {missing:?} (sample {sample_keys:?}, golden {golden_keys:?})"
+    );
 
     // 2. The packs, file by file: the manifest first, then the core pack.
     let manifest: serde_json::Value = serde_json::from_slice(MANIFEST).unwrap();
