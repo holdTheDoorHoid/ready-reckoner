@@ -136,6 +136,15 @@ mirrors every type. Field names below are final; types3 implements them verbatim
 change it has to make before other workstreams code against them. Length caps are characters after
 trimming; `tidy()` cuts and drops empties as `FamilyPlan::tidy` does today.
 
+As implemented by types3 (2026-09-27), two differences from the first draft, both recorded below:
+the person's insurance type is **`HealthInsurance`** (the JSON field stays `insurance`), because
+`Insurance` already names the household's insurance answers in `Finances` in Rust and TypeScript;
+and every list is **optional** in the JSON (`medications?`, `pets?`, `vehicles?`, `accounts?`,
+`policies?`), because an empty list is omitted like an empty group. The caps are exported by name
+(`SHORT_TEXT_MAX` 40, `MEDIUM_TEXT_MAX` 60, `LABEL_TEXT_MAX` 80, `DESCRIPTION_MAX` 120,
+`LONG_TEXT_MAX` 200, `NOTE_MAX` 400, `BLOOD_TYPE_MAX` 8, `PLATE_MAX` 20, `LAST4_LEN` 4, and the
+list lengths); `docs/ENGINE-API.md` lists which fields use which.
+
 ### 3.1 `Person.profile`
 
 ```
@@ -144,22 +153,23 @@ Person { …v2 fields unchanged…, profile?: PersonProfile }      # omitted whe
 PersonProfile {
   name?: string(60), date_of_birth?: string(40), phone?: string(40), email?: string(80),
   place?: Place, doctor?: Contact, pharmacy?: Contact,
-  conditions?: string(400), medications: [Medication] (≤ 12), allergies?: string(200),
-  blood_type?: string(8), insurance?: Insurance, id_notes?: string(200), notes?: string(400) }
+  conditions?: string(400), medications?: [Medication] (≤ 12), allergies?: string(200),
+  blood_type?: string(8), insurance?: HealthInsurance, id_notes?: string(200), notes?: string(400) }
 
 Place { kind: "work" | "school" | "childcare" | "other", name?: string(120), address?: string(200),
         phone?: string(40), plan?: string(400), pickup?: string(200), safest_spot?: string(200) }
+                                                  # dropped by tidy when only `kind` is set
 Medication { name?: string(80), dose?: string(60), schedule?: string(80), purpose?: string(80) }
-Insurance { carrier?: string(80), plan_name?: string(80), member_id?: string(60),
-            group_number?: string(60), phone?: string(40) }
+HealthInsurance { carrier?: string(80), plan_name?: string(80), member_id?: string(60),
+                  group_number?: string(60), phone?: string(40) }   # `Insurance` in the first draft
 Contact { name?, phone?, address?: string(200) }                  # v3 adds the optional address
 ```
 
 ### 3.2 `FamilyPlan` additions (v2 fields unchanged)
 
 ```
-FamilyPlan { …v2…, home?: HomeInfo, neighbourhood?: Neighbourhood, pets: [PetInfo] (≤ 8),
-             vehicles: [VehicleInfo] (≤ 4), documents?: DocumentsInfo }
+FamilyPlan { …v2…, home?: HomeInfo, neighbourhood?: Neighbourhood, pets?: [PetInfo] (≤ 8),
+             vehicles?: [VehicleInfo] (≤ 4), documents?: DocumentsInfo }
 
 HomeInfo { address?: string(200), electric_utility?: Contact, gas_utility?: Contact,
            water_utility?: Contact, insurer?: Contact, policy_number?: string(60),
@@ -171,7 +181,7 @@ PetInfo { name?: string(60), kind?: string(40), description?: string(120), medic
           vet?: Contact, microchip?: string(60), records_where?: string(200) }
 VehicleInfo { description?: string(120), plate?: string(20), insurer?: Contact,
               policy_number?: string(60), kept_in_car?: string(200) }
-DocumentsInfo { accounts: [AccountInfo] (≤ 12), policies: [PolicyInfo] (≤ 8),
+DocumentsInfo { accounts?: [AccountInfo] (≤ 12), policies?: [PolicyInfo] (≤ 8),
                 where_originals?: string(200), where_copies?: string(200), digital_backup?: string(200) }
 AccountInfo { institution?: string(80), kind?: string(40), phone?: string(40), last4?: string(4) }
 PolicyInfo { insurer?: string(80), kind?: string(40), policy_number?: string(60), phone?: string(40) }
@@ -190,6 +200,8 @@ full number never reaches the file).
 - `rr_content::ids::EVENTS`: the everyday emergencies that are not hazards, for `applies_to`:
   `gas_leak_or_co`, `missing_person`, `evacuation_order`, `shelter_in_place`, `boil_water_notice`,
   `power_outage`, `something_else`.
+- `GuidanceKind` (and `GuidanceMeta.kind`, `GUIDANCE_KINDS` in `types.ts`) gains `checklist`, so
+  `catalogue().guidance` can list the checklist blocks (types3, 2026-09-27).
 
 ## 4. Contract v3: the binder replaces the packet
 
@@ -239,8 +251,16 @@ Inline = { t: string } | { b: string } | { cite: [u32] } | { link: { to: string,
 SourceEntry { n: u32, title: string, publisher: string, year?: u16, url?: string, expert: bool }
 ```
 
-Rules: every `link.to`, `Branch.go_to` and `FieldRow` referring to a page names an existing
-`Page.id` (a test); every `cite` number is in `1..=sources.len()`; `fields.value` is user text,
+Names in code (types3, 2026-09-27): in Rust (`rr_types::binder`) and `types.ts` the anonymous
+payloads above are the types `Heading`, `Table`, `Callout`, `Decision`, `MapSlot`, `Log` and
+`Link`, with the enums `PageKind`, `Fit`, `CalloutKind` and `MapSlotKind`; in `types.ts` each
+block and inline variant is its own interface (`HeadingBlock { heading: Heading }`,
+`TextInline { t: string }`, …) in the unions `Block` and `Inline`. `Binder::check` returns the
+structural problems below and those it can see for itself (part ids used twice, a tab label over
+14 characters, sources numbered out of place, heading levels outside 1 to 3).
+
+Rules: every `link.to` and `Branch.go_to` names an existing `Page.id` (`Binder::check`; a
+`FieldRow` holds no page reference in this model); every `cite` number is in `1..=sources.len()`; `fields.value` is user text,
 printed as written, or absent, in which case the renderer draws `lines` ruled lines; `steps` with
 `memory: true` are the "do first from memory" items and render bold; `map_slot` is filled by the
 web app (§9) and rendered by the CLI as a boxed placeholder ("Map: your neighbourhood. Add it in the
@@ -370,6 +390,17 @@ Sources not counted; reading level at or below grade 8 (the validator computes i
 pressure phrases, the dosing rule and the firearms rule apply as to every block; no brands. Say
 what to do and when. Airline checklists are terse: no explanations inside a step; the reason, if
 one is needed, goes in "Use this when" or in one sentence under "Do not".
+
+As the validator implements it (types3, 2026-09-27; `check_checklists` in
+`crates/rr-content/src/validate.rs`, `docs/CONTENT_STANDARDS.md` §4): "Where and who" holds at
+most three lines of the block's own, written `Label: {placeholder}` or `Label:` alone for a line to
+write on; a citation is required on every step and on every "Do not" and "When it is over" bullet,
+except a bullet that only points to a page with `{ref:…}`, and not on "Leave or stay" branches or
+"Where and who" lines; the word count keeps every conditional span, counts each placeholder and
+`{ref:…}` as one word, and leaves out the `##` headings; reading level above grade 8 is a warning;
+a whole step or bullet may be conditional (the span opens right after `1. ` or `- ` and closes at
+the end of the line; a step left empty is dropped and the renderer numbers the steps); a span in a
+checklist may name any hazard; each hazard and event has one checklist.
 
 ### 5.5 Everyday emergencies
 

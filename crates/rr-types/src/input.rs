@@ -320,6 +320,12 @@ pub struct Person {
     /// contract v2, REVIEW N3). Defaults to none when absent.
     #[serde(default)]
     pub access_needs: Vec<AccessNeed>,
+    /// What the household wrote about this person for their binder page and wallet card: name,
+    /// phone, medical details, insurance, where they spend the day (contract v3; DESIGN-DELTA-v3
+    /// §2.1, §3.1). Echo-only, like [`FamilyPlan`]: trimmed, capped and printed, never computed
+    /// with and never required. Omitted when nothing in it is filled in.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub profile: Option<PersonProfile>,
 }
 
 string_enum! {
@@ -835,18 +841,41 @@ pub struct FamilyPlan {
     /// Phone numbers everyone knows by heart (at most [`NUMBERS_BY_HEART_MAX`]).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub numbers_by_heart: Vec<String>,
+    /// The home: address, utilities, insurer, landlord, where things are kept (contract v3;
+    /// DESIGN-DELTA-v3 §2.2, §3.2).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub home: Option<HomeInfo>,
+    /// The neighbourhood: hospital, urgent care, pharmacy, shelter, the county emergency office,
+    /// how local alerts arrive (contract v3).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub neighbourhood: Option<Neighbourhood>,
+    /// One entry per animal, at most [`PETS_MAX`] (contract v3; DESIGN-DELTA-v3 §2.3). Who takes
+    /// the animals stays in `who_takes_animals`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub pets: Vec<PetInfo>,
+    /// One entry per vehicle, at most [`VEHICLES_MAX`] (contract v3).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub vehicles: Vec<VehicleInfo>,
+    /// Accounts, policies and where the documents are (contract v3). Account numbers are never
+    /// asked: only their last four digits ([`AccountInfo::last4`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub documents: Option<DocumentsInfo>,
 }
 
-/// Someone to call: a name and a phone number, both free text.
+/// Someone to call: a name, a phone number and an address, all free text.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Contact {
-    /// The person's name.
+    /// The person's or the organisation's name.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     /// Their phone number, as the household writes it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
+    /// Their address, at most [`LONG_TEXT_MAX`] characters (contract v3: a hospital, a
+    /// pharmacy, a doctor's office).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub address: Option<String>,
 }
 
 /// Someone in the trusted circle, and what they hold for the household.
@@ -879,6 +908,363 @@ string_enum! {
     }
 }
 
+// Contract v3 (DESIGN-DELTA-v3 §3.1, §3.2): the answers to the interview's optional steps 6–8.
+// Like the family plan they are echo-only: `tidy` trims each string and cuts it to its cap (in
+// characters, after trimming), drops blank strings, empty entries and empty groups, and keeps
+// lists to their length. Nothing here is ever required or reported as a problem.
+
+/// The last four digits of an account number: [`AccountInfo::last4`] keeps at most this many,
+/// and only digits.
+pub const LAST4_LEN: usize = 4;
+
+/// Longest blood type ([`PersonProfile::blood_type`]).
+pub const BLOOD_TYPE_MAX: usize = 8;
+
+/// Longest licence plate ([`VehicleInfo::plate`]).
+pub const PLATE_MAX: usize = 20;
+
+/// Longest short answer: a date of birth, a phone number in the v3 groups, the kind of a pet,
+/// an account or a policy.
+pub const SHORT_TEXT_MAX: usize = 40;
+
+/// Longest name of a person or an animal, dose, member ID, group, policy or microchip number.
+pub const MEDIUM_TEXT_MAX: usize = 60;
+
+/// Longest email address, institution, insurance carrier or plan name, insurer, or a
+/// medication's name, schedule or purpose.
+pub const LABEL_TEXT_MAX: usize = 80;
+
+/// Longest description: a place's name, an animal or a vehicle described.
+pub const DESCRIPTION_MAX: usize = 120;
+
+/// Longest address or "where it is" answer: addresses, where things are kept, allergies,
+/// pick-up rules, safe spots, ID notes, how alerts arrive, an animal's medicines, what stays in
+/// the car.
+pub const LONG_TEXT_MAX: usize = 200;
+
+/// Longest note: medical conditions, anything else a helper should know, a place's own emergency
+/// plan.
+pub const NOTE_MAX: usize = 400;
+
+/// Most medications per person.
+pub const MEDICATIONS_MAX: usize = 12;
+
+/// Most animals in [`FamilyPlan::pets`].
+pub const PETS_MAX: usize = 8;
+
+/// Most vehicles in [`FamilyPlan::vehicles`].
+pub const VEHICLES_MAX: usize = 4;
+
+/// Most accounts in [`DocumentsInfo::accounts`].
+pub const ACCOUNTS_MAX: usize = 12;
+
+/// Most insurance policies in [`DocumentsInfo::policies`].
+pub const POLICIES_MAX: usize = 8;
+
+/// One person's page in the binder (DESIGN-DELTA-v3 §2.1): everything a helper would need to know
+/// about them, all optional free text.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PersonProfile {
+    /// Name or nickname ([`MEDIUM_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Date of birth, as the household writes it ([`SHORT_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub date_of_birth: Option<String>,
+    /// Phone number ([`SHORT_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+    /// Email address ([`LABEL_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    /// Where they spend the day: work, school, child care.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub place: Option<Place>,
+    /// Their doctor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub doctor: Option<Contact>,
+    /// Their pharmacy.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pharmacy: Option<Contact>,
+    /// Medical conditions ([`NOTE_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conditions: Option<String>,
+    /// Medications, at most [`MEDICATIONS_MAX`].
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub medications: Vec<Medication>,
+    /// Allergies ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allergies: Option<String>,
+    /// Blood type ([`BLOOD_TYPE_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub blood_type: Option<String>,
+    /// Health insurance (JSON field `insurance`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub insurance: Option<HealthInsurance>,
+    /// Identity documents: "passport number, or where it is kept" ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id_notes: Option<String>,
+    /// Anything else a helper should know ([`NOTE_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+}
+
+string_enum! {
+    /// What kind of place a person spends the day at ([`Place::kind`]).
+    pub enum PlaceKind: "place kind" {
+        /// A workplace.
+        Work = "work",
+        /// A school or college.
+        School = "school",
+        /// Child care: a nursery, day care, a sitter.
+        Childcare = "childcare",
+        /// Anywhere else (a day programme, a volunteer post).
+        Other = "other",
+    }
+}
+
+/// Where a person spends the day, with its own emergency arrangements.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Place {
+    /// Work, school, child care or other.
+    pub kind: PlaceKind,
+    /// The place's name ([`DESCRIPTION_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Its address ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub address: Option<String>,
+    /// Its phone number ([`SHORT_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+    /// The place's own emergency plan ([`NOTE_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub plan: Option<String>,
+    /// Pick-up rules: who may collect a child, what the school needs to see ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pickup: Option<String>,
+    /// The safest spot there ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub safest_spot: Option<String>,
+}
+
+/// One medication a person takes, as the household writes it. Echoed, never checked: the app
+/// gives no doses of its own.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Medication {
+    /// Its name ([`LABEL_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// The dose, as prescribed ([`MEDIUM_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dose: Option<String>,
+    /// When it is taken ([`LABEL_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schedule: Option<String>,
+    /// What it is for ([`LABEL_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub purpose: Option<String>,
+}
+
+/// A person's health insurance ([`PersonProfile::insurance`]). Not to be confused with
+/// [`Insurance`], the household's insurance answers in [`Finances`].
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct HealthInsurance {
+    /// The insurance company ([`LABEL_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub carrier: Option<String>,
+    /// The plan's name ([`LABEL_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub plan_name: Option<String>,
+    /// The member ID ([`MEDIUM_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub member_id: Option<String>,
+    /// The group number ([`MEDIUM_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group_number: Option<String>,
+    /// The insurer's phone number ([`SHORT_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+}
+
+/// The home (DESIGN-DELTA-v3 §2.2): address, the companies to call, and where things are kept.
+/// The shut-offs, the safest spot and the neighbours stay in their v2 [`FamilyPlan`] fields.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct HomeInfo {
+    /// The street address ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub address: Option<String>,
+    /// The electric company, with its outage number.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub electric_utility: Option<Contact>,
+    /// The gas company, with its outage number.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gas_utility: Option<Contact>,
+    /// The water company, with its outage number.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub water_utility: Option<Contact>,
+    /// The home or renters insurer.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub insurer: Option<Contact>,
+    /// The policy number ([`MEDIUM_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub policy_number: Option<String>,
+    /// The landlord or mortgage company.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub landlord_or_mortgage: Option<Contact>,
+    /// Where the emergency kit is ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub where_kit: Option<String>,
+    /// Where the documents are ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub where_documents: Option<String>,
+    /// Where the cash is ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub where_cash: Option<String>,
+    /// Where the spare keys are ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub where_keys: Option<String>,
+}
+
+/// The neighbourhood (DESIGN-DELTA-v3 §2.2): where help is, and how warnings arrive.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Neighbourhood {
+    /// The nearest hospital with an emergency room.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hospital: Option<Contact>,
+    /// Urgent care.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub urgent_care: Option<Contact>,
+    /// The pharmacy the household uses.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pharmacy: Option<Contact>,
+    /// The shelter or place the community opens in an emergency.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shelter: Option<Contact>,
+    /// The county emergency management office.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub county_emergency_office: Option<Contact>,
+    /// How the household gets local alerts: the county's alert service, a radio station
+    /// ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub alerts: Option<String>,
+}
+
+/// One animal (DESIGN-DELTA-v3 §2.3).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PetInfo {
+    /// Its name ([`MEDIUM_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// What kind of animal ([`SHORT_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
+    /// What it looks like ([`DESCRIPTION_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    /// Its medicines, as the household writes them ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub medications: Option<String>,
+    /// Its vet.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vet: Option<Contact>,
+    /// Microchip or tag number ([`MEDIUM_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub microchip: Option<String>,
+    /// Where its records are ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub records_where: Option<String>,
+}
+
+/// One vehicle as the household describes it (DESIGN-DELTA-v3 §2.3). Its fuel, which the plan
+/// computes with, stays in [`HouseholdMobility`].
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct VehicleInfo {
+    /// "blue 2016 hatchback" ([`DESCRIPTION_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    /// The licence plate ([`PLATE_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub plate: Option<String>,
+    /// The vehicle's insurer.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub insurer: Option<Contact>,
+    /// The policy number ([`MEDIUM_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub policy_number: Option<String>,
+    /// What stays in the car ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kept_in_car: Option<String>,
+}
+
+/// Documents and money (DESIGN-DELTA-v3 §2.3): the accounts and policies to call about, and
+/// where the papers are.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DocumentsInfo {
+    /// Bank and other accounts, at most [`ACCOUNTS_MAX`].
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub accounts: Vec<AccountInfo>,
+    /// Insurance policies not given elsewhere, at most [`POLICIES_MAX`].
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub policies: Vec<PolicyInfo>,
+    /// Where the original documents are ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub where_originals: Option<String>,
+    /// Where the copies are ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub where_copies: Option<String>,
+    /// Where the digital backup is ([`LONG_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub digital_backup: Option<String>,
+}
+
+/// An account to call about (DESIGN-DELTA-v3 §2.3). The app never asks for an account number.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AccountInfo {
+    /// The bank or institution ([`LABEL_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub institution: Option<String>,
+    /// What kind of account ([`SHORT_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
+    /// The institution's phone number ([`SHORT_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+    /// The last four digits of the account number, and nothing more: `tidy` keeps only the
+    /// last [`LAST4_LEN`] digits of whatever was typed, so a pasted full number never reaches the
+    /// file, and drops the field when it holds no digit.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last4: Option<String>,
+}
+
+/// An insurance policy (DESIGN-DELTA-v3 §2.3).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PolicyInfo {
+    /// The insurer ([`LABEL_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub insurer: Option<String>,
+    /// What kind of policy ([`SHORT_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
+    /// The policy number ([`MEDIUM_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub policy_number: Option<String>,
+    /// The insurer's phone number ([`SHORT_TEXT_MAX`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+}
+
 /// `text` without surrounding whitespace and at most `max` characters long; `None` when nothing
 /// is left.
 fn tidy_str(text: &str, max: usize) -> Option<String> {
@@ -899,16 +1285,284 @@ fn tidy_list(list: &mut Vec<String>, max_len: usize, max_items: usize) {
         .collect();
 }
 
+/// The echo-only groups, for the helpers below: tidy in place, then say whether anything is left.
+trait Echo {
+    fn tidy_echo(&mut self);
+    fn is_blank(&self) -> bool;
+}
+
+macro_rules! echo_groups {
+    ($($t:ty),+ $(,)?) => {
+        $(impl Echo for $t {
+            fn tidy_echo(&mut self) {
+                self.tidy();
+            }
+            fn is_blank(&self) -> bool {
+                self.is_empty()
+            }
+        })+
+    };
+}
+
+echo_groups!(
+    Contact,
+    PersonProfile,
+    Place,
+    Medication,
+    HealthInsurance,
+    HomeInfo,
+    Neighbourhood,
+    PetInfo,
+    VehicleInfo,
+    DocumentsInfo,
+    AccountInfo,
+    PolicyInfo,
+);
+
+/// Tidies an optional group and drops it when nothing is left in it.
+fn tidy_group<T: Echo>(group: &mut Option<T>) {
+    if let Some(g) = group.as_mut() {
+        g.tidy_echo();
+    }
+    if group.as_ref().is_some_and(Echo::is_blank) {
+        *group = None;
+    }
+}
+
+/// Tidies every row, drops the rows left empty, then keeps the first `max`.
+fn tidy_rows<T: Echo>(rows: &mut Vec<T>, max: usize) {
+    for row in rows.iter_mut() {
+        row.tidy_echo();
+    }
+    rows.retain(|row| !row.is_blank());
+    rows.truncate(max);
+}
+
+/// The last [`LAST4_LEN`] ASCII digits in `text`, in order (fewer when it has fewer); `None` when
+/// it holds no digit.
+fn last_four_digits(text: &str) -> Option<String> {
+    let digits: Vec<char> = text.chars().filter(char::is_ascii_digit).collect();
+    let keep = &digits[digits.len().saturating_sub(LAST4_LEN)..];
+    (!keep.is_empty()).then(|| keep.iter().collect())
+}
+
 impl Contact {
-    /// Trims both fields and caps them at [`FAMILY_PLAN_SHORT_MAX`] characters.
+    /// Trims every field and caps the name and phone number at [`FAMILY_PLAN_SHORT_MAX`]
+    /// characters and the address at [`LONG_TEXT_MAX`].
     pub fn tidy(&mut self) {
         tidy_opt(&mut self.name, FAMILY_PLAN_SHORT_MAX);
         tidy_opt(&mut self.phone, FAMILY_PLAN_SHORT_MAX);
+        tidy_opt(&mut self.address, LONG_TEXT_MAX);
     }
 
-    /// True when neither a name nor a phone number is given.
+    /// True when no name, phone number or address is given.
     pub fn is_empty(&self) -> bool {
-        self.name.is_none() && self.phone.is_none()
+        self.name.is_none() && self.phone.is_none() && self.address.is_none()
+    }
+}
+
+impl PersonProfile {
+    /// Trims every answer and caps it (the cap each field names), drops empty medications and
+    /// keeps at most [`MEDICATIONS_MAX`], and drops the place, doctor, pharmacy and insurance when
+    /// nothing is left in them.
+    pub fn tidy(&mut self) {
+        tidy_opt(&mut self.name, MEDIUM_TEXT_MAX);
+        tidy_opt(&mut self.date_of_birth, SHORT_TEXT_MAX);
+        tidy_opt(&mut self.phone, SHORT_TEXT_MAX);
+        tidy_opt(&mut self.email, LABEL_TEXT_MAX);
+        tidy_group(&mut self.place);
+        tidy_group(&mut self.doctor);
+        tidy_group(&mut self.pharmacy);
+        tidy_opt(&mut self.conditions, NOTE_MAX);
+        tidy_rows(&mut self.medications, MEDICATIONS_MAX);
+        tidy_opt(&mut self.allergies, LONG_TEXT_MAX);
+        tidy_opt(&mut self.blood_type, BLOOD_TYPE_MAX);
+        tidy_group(&mut self.insurance);
+        tidy_opt(&mut self.id_notes, LONG_TEXT_MAX);
+        tidy_opt(&mut self.notes, NOTE_MAX);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == PersonProfile::default()
+    }
+}
+
+impl Place {
+    /// Trims every answer and caps it (the cap each field names).
+    pub fn tidy(&mut self) {
+        tidy_opt(&mut self.name, DESCRIPTION_MAX);
+        tidy_opt(&mut self.address, LONG_TEXT_MAX);
+        tidy_opt(&mut self.phone, SHORT_TEXT_MAX);
+        tidy_opt(&mut self.plan, NOTE_MAX);
+        tidy_opt(&mut self.pickup, LONG_TEXT_MAX);
+        tidy_opt(&mut self.safest_spot, LONG_TEXT_MAX);
+    }
+
+    /// True when nothing but the kind is given. A kind alone tells a helper nothing (the form
+    /// preselects one), so [`PersonProfile::tidy`] drops such a place.
+    pub fn is_empty(&self) -> bool {
+        self.name.is_none()
+            && self.address.is_none()
+            && self.phone.is_none()
+            && self.plan.is_none()
+            && self.pickup.is_none()
+            && self.safest_spot.is_none()
+    }
+}
+
+impl Medication {
+    /// Trims every answer and caps it (the cap each field names).
+    pub fn tidy(&mut self) {
+        tidy_opt(&mut self.name, LABEL_TEXT_MAX);
+        tidy_opt(&mut self.dose, MEDIUM_TEXT_MAX);
+        tidy_opt(&mut self.schedule, LABEL_TEXT_MAX);
+        tidy_opt(&mut self.purpose, LABEL_TEXT_MAX);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == Medication::default()
+    }
+}
+
+impl HealthInsurance {
+    /// Trims every answer and caps it (the cap each field names).
+    pub fn tidy(&mut self) {
+        tidy_opt(&mut self.carrier, LABEL_TEXT_MAX);
+        tidy_opt(&mut self.plan_name, LABEL_TEXT_MAX);
+        tidy_opt(&mut self.member_id, MEDIUM_TEXT_MAX);
+        tidy_opt(&mut self.group_number, MEDIUM_TEXT_MAX);
+        tidy_opt(&mut self.phone, SHORT_TEXT_MAX);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == HealthInsurance::default()
+    }
+}
+
+impl HomeInfo {
+    /// Trims every answer and caps it (the cap each field names); drops a company or contact
+    /// with nothing left in it.
+    pub fn tidy(&mut self) {
+        tidy_opt(&mut self.address, LONG_TEXT_MAX);
+        tidy_group(&mut self.electric_utility);
+        tidy_group(&mut self.gas_utility);
+        tidy_group(&mut self.water_utility);
+        tidy_group(&mut self.insurer);
+        tidy_opt(&mut self.policy_number, MEDIUM_TEXT_MAX);
+        tidy_group(&mut self.landlord_or_mortgage);
+        tidy_opt(&mut self.where_kit, LONG_TEXT_MAX);
+        tidy_opt(&mut self.where_documents, LONG_TEXT_MAX);
+        tidy_opt(&mut self.where_cash, LONG_TEXT_MAX);
+        tidy_opt(&mut self.where_keys, LONG_TEXT_MAX);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == HomeInfo::default()
+    }
+}
+
+impl Neighbourhood {
+    /// Trims every answer and caps it (the cap each field names); drops a contact with nothing
+    /// left in it.
+    pub fn tidy(&mut self) {
+        tidy_group(&mut self.hospital);
+        tidy_group(&mut self.urgent_care);
+        tidy_group(&mut self.pharmacy);
+        tidy_group(&mut self.shelter);
+        tidy_group(&mut self.county_emergency_office);
+        tidy_opt(&mut self.alerts, LONG_TEXT_MAX);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == Neighbourhood::default()
+    }
+}
+
+impl PetInfo {
+    /// Trims every answer and caps it (the cap each field names).
+    pub fn tidy(&mut self) {
+        tidy_opt(&mut self.name, MEDIUM_TEXT_MAX);
+        tidy_opt(&mut self.kind, SHORT_TEXT_MAX);
+        tidy_opt(&mut self.description, DESCRIPTION_MAX);
+        tidy_opt(&mut self.medications, LONG_TEXT_MAX);
+        tidy_group(&mut self.vet);
+        tidy_opt(&mut self.microchip, MEDIUM_TEXT_MAX);
+        tidy_opt(&mut self.records_where, LONG_TEXT_MAX);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == PetInfo::default()
+    }
+}
+
+impl VehicleInfo {
+    /// Trims every answer and caps it (the cap each field names).
+    pub fn tidy(&mut self) {
+        tidy_opt(&mut self.description, DESCRIPTION_MAX);
+        tidy_opt(&mut self.plate, PLATE_MAX);
+        tidy_group(&mut self.insurer);
+        tidy_opt(&mut self.policy_number, MEDIUM_TEXT_MAX);
+        tidy_opt(&mut self.kept_in_car, LONG_TEXT_MAX);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == VehicleInfo::default()
+    }
+}
+
+impl DocumentsInfo {
+    /// Trims every answer and caps it (the cap each field names); drops empty accounts and
+    /// policies and keeps at most [`ACCOUNTS_MAX`] and [`POLICIES_MAX`].
+    pub fn tidy(&mut self) {
+        tidy_rows(&mut self.accounts, ACCOUNTS_MAX);
+        tidy_rows(&mut self.policies, POLICIES_MAX);
+        tidy_opt(&mut self.where_originals, LONG_TEXT_MAX);
+        tidy_opt(&mut self.where_copies, LONG_TEXT_MAX);
+        tidy_opt(&mut self.digital_backup, LONG_TEXT_MAX);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == DocumentsInfo::default()
+    }
+}
+
+impl AccountInfo {
+    /// Trims every answer and caps it (the cap each field names). `last4` keeps only the last
+    /// [`LAST4_LEN`] digits of whatever was typed ("1234 5678 9012" becomes "9012") and is dropped
+    /// when it holds no digit.
+    pub fn tidy(&mut self) {
+        tidy_opt(&mut self.institution, LABEL_TEXT_MAX);
+        tidy_opt(&mut self.kind, SHORT_TEXT_MAX);
+        tidy_opt(&mut self.phone, SHORT_TEXT_MAX);
+        self.last4 = self.last4.as_deref().and_then(last_four_digits);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == AccountInfo::default()
+    }
+}
+
+impl PolicyInfo {
+    /// Trims every answer and caps it (the cap each field names).
+    pub fn tidy(&mut self) {
+        tidy_opt(&mut self.insurer, LABEL_TEXT_MAX);
+        tidy_opt(&mut self.kind, SHORT_TEXT_MAX);
+        tidy_opt(&mut self.policy_number, MEDIUM_TEXT_MAX);
+        tidy_opt(&mut self.phone, SHORT_TEXT_MAX);
+    }
+
+    /// True when nothing is filled in.
+    pub fn is_empty(&self) -> bool {
+        *self == PolicyInfo::default()
     }
 }
 
@@ -929,8 +1583,9 @@ impl FamilyPlan {
     /// Trims every field and caps its length, which is all the engine ever does to the family
     /// plan: notes at [`FAMILY_PLAN_TEXT_MAX`] characters, names and numbers at
     /// [`FAMILY_PLAN_SHORT_MAX`], lists at [`ROUTES_MAX`], [`TRUSTED_CIRCLE_MAX`] and
-    /// [`NUMBERS_BY_HEART_MAX`] entries. Blank text becomes absent and empty entries are dropped;
-    /// nothing is ever required, and nothing is reported as a problem.
+    /// [`NUMBERS_BY_HEART_MAX`] entries; the v3 groups at the caps their fields name, with at most
+    /// [`PETS_MAX`] animals and [`VEHICLES_MAX`] vehicles. Blank text becomes absent, empty entries
+    /// and groups are dropped; nothing is ever required, and nothing is reported as a problem.
     pub fn tidy(&mut self) {
         for note in [
             &mut self.meeting_place_near,
@@ -949,14 +1604,8 @@ impl FamilyPlan {
             tidy_opt(note, FAMILY_PLAN_TEXT_MAX);
         }
         tidy_opt(&mut self.roadside_assistance, FAMILY_PLAN_SHORT_MAX);
-        for contact in [&mut self.out_of_area_contact, &mut self.lawyer] {
-            if let Some(c) = contact.as_mut() {
-                c.tidy();
-            }
-            if contact.as_ref().is_some_and(Contact::is_empty) {
-                *contact = None;
-            }
-        }
+        tidy_group(&mut self.out_of_area_contact);
+        tidy_group(&mut self.lawyer);
         tidy_list(&mut self.routes, FAMILY_PLAN_TEXT_MAX, ROUTES_MAX);
         tidy_list(
             &mut self.numbers_by_heart,
@@ -968,6 +1617,11 @@ impl FamilyPlan {
         }
         self.trusted_circle.retain(|p| !p.is_empty());
         self.trusted_circle.truncate(TRUSTED_CIRCLE_MAX);
+        tidy_group(&mut self.home);
+        tidy_group(&mut self.neighbourhood);
+        tidy_rows(&mut self.pets, PETS_MAX);
+        tidy_rows(&mut self.vehicles, VEHICLES_MAX);
+        tidy_group(&mut self.documents);
     }
 
     /// True when nothing in the plan is filled in.
@@ -1022,6 +1676,7 @@ impl PlanInput {
                 earner: true,
                 commute: None,
                 access_needs: Vec::new(),
+                profile: None,
             }],
             pets: Pets::default(),
             mobility: HouseholdMobility::default(),
@@ -1057,10 +1712,14 @@ impl PlanInput {
         }
     }
 
-    /// Tidies the free text the engine only echoes: the family plan ([`FamilyPlan::tidy`]), which
-    /// becomes absent when nothing is left in it. [`PlanInput::from_json`] calls this before
-    /// validating, so the CLI and the web app store and print the same text.
+    /// Tidies the free text the engine only echoes: each person's profile
+    /// ([`PersonProfile::tidy`]) and the family plan ([`FamilyPlan::tidy`]), each of which becomes
+    /// absent when nothing is left in it. [`PlanInput::from_json`] calls this before validating,
+    /// so the CLI and the web app store and print the same text.
     pub fn tidy(&mut self) {
+        for person in &mut self.people {
+            tidy_group(&mut person.profile);
+        }
         if let Some(plan) = self.family_plan.as_mut() {
             plan.tidy();
         }
@@ -1317,7 +1976,7 @@ mod tests {
             meeting_place_far: Some("   ".into()),
             out_of_area_contact: Some(Contact {
                 name: Some(" ".into()),
-                phone: None,
+                ..Contact::default()
             }),
             where_we_would_go: Some(long.clone()),
             routes: vec![" north ".into(), "".into(), "west".into(), "south".into()],
@@ -1349,6 +2008,7 @@ mod tests {
             lawyer: Some(Contact {
                 name: Some("J. Ortiz".into()),
                 phone: Some(format!(" {} ", "5".repeat(100))),
+                address: None,
             }),
             numbers_by_heart: (0..8).map(|i| format!("555-010{i}")).collect(),
             ..FamilyPlan::default()
@@ -1408,6 +2068,288 @@ mod tests {
             "tidying twice changes nothing"
         );
         assert_eq!(input.validate(), vec![]);
+    }
+
+    /// `n` characters of `c`, with spaces around it.
+    fn padded(c: char, n: usize) -> Option<String> {
+        Some(format!("  {}  ", c.to_string().repeat(n)))
+    }
+
+    fn len(text: &Option<String>) -> Option<usize> {
+        text.as_deref().map(|t| t.chars().count())
+    }
+
+    #[test]
+    fn last4_keeps_only_the_last_four_digits() {
+        let tidy = |typed: &str| {
+            let mut a = AccountInfo {
+                last4: Some(typed.to_owned()),
+                ..AccountInfo::default()
+            };
+            a.tidy();
+            a.last4
+        };
+        assert_eq!(tidy("1234 5678 9012 4821").as_deref(), Some("4821"));
+        assert_eq!(tidy("4821").as_deref(), Some("4821"));
+        assert_eq!(tidy(" •••• 0042 ").as_deref(), Some("0042"));
+        assert_eq!(tidy("acct-99").as_deref(), Some("99"), "fewer digits stay");
+        assert_eq!(tidy("12-34-56-78-90").as_deref(), Some("7890"));
+        assert_eq!(tidy("none"), None, "no digit, no field");
+        assert_eq!(tidy("   "), None);
+        // An account left with nothing else is dropped from the documents.
+        let mut docs = DocumentsInfo {
+            accounts: vec![AccountInfo {
+                last4: Some("n/a".into()),
+                ..AccountInfo::default()
+            }],
+            ..DocumentsInfo::default()
+        };
+        docs.tidy();
+        assert!(docs.is_empty());
+    }
+
+    #[test]
+    fn v3_answers_are_trimmed_capped_and_emptied() {
+        let long = |c| padded(c, 1000);
+        let mut profile = PersonProfile {
+            name: long('n'),
+            date_of_birth: long('d'),
+            phone: long('p'),
+            email: long('e'),
+            place: Some(Place {
+                kind: PlaceKind::School,
+                name: long('a'),
+                address: long('b'),
+                phone: long('c'),
+                plan: long('d'),
+                pickup: long('e'),
+                safest_spot: long('f'),
+            }),
+            doctor: Some(Contact {
+                name: long('g'),
+                phone: long('h'),
+                address: long('i'),
+            }),
+            pharmacy: Some(Contact {
+                name: Some("   ".into()),
+                ..Contact::default()
+            }),
+            conditions: long('j'),
+            medications: (0..20)
+                .map(|i| Medication {
+                    name: Some(format!(" med {i} ")),
+                    dose: long('k'),
+                    ..Medication::default()
+                })
+                .collect(),
+            allergies: long('l'),
+            blood_type: long('m'),
+            insurance: Some(HealthInsurance {
+                carrier: long('o'),
+                plan_name: long('q'),
+                member_id: long('r'),
+                group_number: long('s'),
+                phone: long('t'),
+            }),
+            id_notes: long('u'),
+            notes: long('v'),
+        };
+        profile.tidy();
+        assert_eq!(len(&profile.name), Some(MEDIUM_TEXT_MAX));
+        assert_eq!(len(&profile.date_of_birth), Some(SHORT_TEXT_MAX));
+        assert_eq!(len(&profile.phone), Some(SHORT_TEXT_MAX));
+        assert_eq!(len(&profile.email), Some(LABEL_TEXT_MAX));
+        let place = profile.place.as_ref().unwrap();
+        assert_eq!(len(&place.name), Some(DESCRIPTION_MAX));
+        assert_eq!(len(&place.address), Some(LONG_TEXT_MAX));
+        assert_eq!(len(&place.phone), Some(SHORT_TEXT_MAX));
+        assert_eq!(len(&place.plan), Some(NOTE_MAX));
+        assert_eq!(len(&place.pickup), Some(LONG_TEXT_MAX));
+        assert_eq!(len(&place.safest_spot), Some(LONG_TEXT_MAX));
+        let doctor = profile.doctor.as_ref().unwrap();
+        assert_eq!(len(&doctor.name), Some(FAMILY_PLAN_SHORT_MAX));
+        assert_eq!(len(&doctor.phone), Some(FAMILY_PLAN_SHORT_MAX));
+        assert_eq!(len(&doctor.address), Some(LONG_TEXT_MAX));
+        assert_eq!(profile.pharmacy, None, "a blank contact is dropped");
+        assert_eq!(len(&profile.conditions), Some(NOTE_MAX));
+        assert_eq!(profile.medications.len(), MEDICATIONS_MAX);
+        assert_eq!(profile.medications[0].name.as_deref(), Some("med 0"));
+        assert_eq!(len(&profile.medications[0].dose), Some(MEDIUM_TEXT_MAX));
+        assert_eq!(len(&profile.allergies), Some(LONG_TEXT_MAX));
+        assert_eq!(len(&profile.blood_type), Some(BLOOD_TYPE_MAX));
+        let ins = profile.insurance.as_ref().unwrap();
+        assert_eq!(len(&ins.carrier), Some(LABEL_TEXT_MAX));
+        assert_eq!(len(&ins.plan_name), Some(LABEL_TEXT_MAX));
+        assert_eq!(len(&ins.member_id), Some(MEDIUM_TEXT_MAX));
+        assert_eq!(len(&ins.group_number), Some(MEDIUM_TEXT_MAX));
+        assert_eq!(len(&ins.phone), Some(SHORT_TEXT_MAX));
+        assert_eq!(len(&profile.id_notes), Some(LONG_TEXT_MAX));
+        assert_eq!(len(&profile.notes), Some(NOTE_MAX));
+        let again = profile.clone();
+        profile.tidy();
+        assert_eq!(profile, again, "tidying twice changes nothing");
+
+        let mut plan = FamilyPlan {
+            home: Some(HomeInfo {
+                address: long('a'),
+                electric_utility: Some(Contact {
+                    phone: long('b'),
+                    ..Contact::default()
+                }),
+                gas_utility: Some(Contact::default()),
+                policy_number: long('c'),
+                where_kit: long('d'),
+                where_keys: Some("  with Rosa ".into()),
+                ..HomeInfo::default()
+            }),
+            neighbourhood: Some(Neighbourhood {
+                hospital: Some(Contact::default()),
+                alerts: Some(" ".into()),
+                ..Neighbourhood::default()
+            }),
+            pets: (0..12)
+                .map(|i| PetInfo {
+                    name: (i != 0).then(|| format!("Pet {i}")),
+                    kind: long('k'),
+                    description: long('e'),
+                    medications: long('m'),
+                    microchip: long('c'),
+                    records_where: long('r'),
+                    vet: None,
+                })
+                .collect(),
+            vehicles: (0..6)
+                .map(|i| VehicleInfo {
+                    description: long('v'),
+                    plate: Some(format!(" PLATE-{i}-{} ", "X".repeat(40))),
+                    policy_number: long('p'),
+                    kept_in_car: long('k'),
+                    insurer: None,
+                })
+                .collect(),
+            documents: Some(DocumentsInfo {
+                accounts: (0..15)
+                    .map(|i| AccountInfo {
+                        institution: long('i'),
+                        kind: long('k'),
+                        phone: long('p'),
+                        last4: Some(format!("0000 1111 2222 {:04}", i)),
+                    })
+                    .collect(),
+                policies: (0..10)
+                    .map(|_| PolicyInfo {
+                        insurer: long('i'),
+                        kind: long('k'),
+                        policy_number: long('n'),
+                        phone: long('p'),
+                    })
+                    .collect(),
+                where_originals: long('o'),
+                where_copies: long('c'),
+                digital_backup: long('d'),
+            }),
+            ..FamilyPlan::default()
+        };
+        plan.tidy();
+        let home = plan.home.as_ref().unwrap();
+        assert_eq!(len(&home.address), Some(LONG_TEXT_MAX));
+        assert_eq!(
+            len(&home.electric_utility.as_ref().unwrap().phone),
+            Some(FAMILY_PLAN_SHORT_MAX)
+        );
+        assert_eq!(home.gas_utility, None, "an empty company is dropped");
+        assert_eq!(len(&home.policy_number), Some(MEDIUM_TEXT_MAX));
+        assert_eq!(len(&home.where_kit), Some(LONG_TEXT_MAX));
+        assert_eq!(home.where_keys.as_deref(), Some("with Rosa"));
+        assert_eq!(
+            plan.neighbourhood, None,
+            "a group with nothing left is dropped"
+        );
+        assert_eq!(plan.pets.len(), PETS_MAX);
+        let pet = &plan.pets[0];
+        assert_eq!(pet.name, None);
+        assert_eq!(len(&pet.kind), Some(SHORT_TEXT_MAX));
+        assert_eq!(len(&pet.description), Some(DESCRIPTION_MAX));
+        assert_eq!(len(&pet.medications), Some(LONG_TEXT_MAX));
+        assert_eq!(len(&pet.microchip), Some(MEDIUM_TEXT_MAX));
+        assert_eq!(len(&pet.records_where), Some(LONG_TEXT_MAX));
+        assert_eq!(plan.vehicles.len(), VEHICLES_MAX);
+        assert_eq!(len(&plan.vehicles[0].plate), Some(PLATE_MAX));
+        assert_eq!(len(&plan.vehicles[0].description), Some(DESCRIPTION_MAX));
+        assert_eq!(len(&plan.vehicles[0].policy_number), Some(MEDIUM_TEXT_MAX));
+        assert_eq!(len(&plan.vehicles[0].kept_in_car), Some(LONG_TEXT_MAX));
+        let docs = plan.documents.as_ref().unwrap();
+        assert_eq!(docs.accounts.len(), ACCOUNTS_MAX);
+        assert_eq!(docs.accounts[3].last4.as_deref(), Some("0003"));
+        assert_eq!(len(&docs.accounts[0].institution), Some(LABEL_TEXT_MAX));
+        assert_eq!(len(&docs.accounts[0].kind), Some(SHORT_TEXT_MAX));
+        assert_eq!(len(&docs.accounts[0].phone), Some(SHORT_TEXT_MAX));
+        assert_eq!(docs.policies.len(), POLICIES_MAX);
+        assert_eq!(len(&docs.policies[0].insurer), Some(LABEL_TEXT_MAX));
+        assert_eq!(len(&docs.policies[0].policy_number), Some(MEDIUM_TEXT_MAX));
+        assert_eq!(len(&docs.where_originals), Some(LONG_TEXT_MAX));
+        assert_eq!(len(&docs.digital_backup), Some(LONG_TEXT_MAX));
+    }
+
+    #[test]
+    fn a_place_with_only_its_kind_and_an_empty_profile_disappear() {
+        let mut input = PlanInput::defaults();
+        input.people[0].profile = Some(PersonProfile {
+            place: Some(Place {
+                kind: PlaceKind::Work,
+                name: Some("  ".into()),
+                address: None,
+                phone: None,
+                plan: None,
+                pickup: None,
+                safest_spot: None,
+            }),
+            medications: vec![Medication::default(), Medication::default()],
+            notes: Some("\n\t".into()),
+            ..PersonProfile::default()
+        });
+        input.family_plan = Some(FamilyPlan {
+            pets: vec![PetInfo::default()],
+            documents: Some(DocumentsInfo::default()),
+            ..FamilyPlan::default()
+        });
+        input.tidy();
+        assert_eq!(input.people[0].profile, None);
+        assert_eq!(input.family_plan, None);
+        // Nothing in the new groups is ever a problem, and absent groups stay out of the JSON.
+        assert_eq!(input.validate(), vec![]);
+        let v = serde_json::to_value(&input).unwrap();
+        assert!(v["people"][0].get("profile").is_none());
+        assert!(v.get("family_plan").is_none());
+        // A place with a name stays, whatever its kind.
+        input.people[0].profile = Some(PersonProfile {
+            place: Some(Place {
+                kind: PlaceKind::Childcare,
+                name: Some("Little Oaks".into()),
+                address: None,
+                phone: None,
+                plan: None,
+                pickup: None,
+                safest_spot: None,
+            }),
+            ..PersonProfile::default()
+        });
+        input.tidy();
+        let v = serde_json::to_value(&input).unwrap();
+        assert_eq!(
+            v["people"][0]["profile"],
+            serde_json::json!({ "place": { "kind": "childcare", "name": "Little Oaks" } })
+        );
+    }
+
+    #[test]
+    fn place_kinds_are_the_four_json_values() {
+        assert_eq!(PlaceKind::STRS, ["work", "school", "childcare", "other"]);
+        assert!(serde_json::from_str::<Place>(r#"{"kind":"office"}"#).is_err());
+        assert!(
+            serde_json::from_str::<Place>(r#"{"name":"x"}"#).is_err(),
+            "kind is required"
+        );
     }
 
     #[test]

@@ -1,14 +1,18 @@
 # Engine API (contract between `rr-wasm` / `rr-cli` and the web app)
 
-`ENGINE_API_VERSION = 2`. Bump it whenever a type, id or function below changes shape; update
+`ENGINE_API_VERSION = 3`. Bump it whenever a type, id or function below changes shape; update
 `crates/rr-types`, `web/src/engine/types.ts` and `web/src/engine/mock.ts` in the same commit.
 `cargo test -p rr-types` fails if `types.ts` drifts from the Rust types (fields, optional markers,
-id lists) or if this file stops naming a function or error code.
+id lists, limits) or if this file stops naming a function or error code.
 
-Version 2 is the v0.2.0 contract (`~/Desktop/ready-reckoner-briefs/round2/phase2/DESIGN-DELTA.md`
-§1). Every addition is optional or defaults when absent, so a saved v1 plan (`rr.plan.v1`) still
-loads; the one breaking change is the retired hazard id `terrorism`. See
-[Changes from v1](#changes-from-v1).
+Version 3 is the v0.3.0 contract (`docs/DESIGN-DELTA-v3.md` §3, §4). Every input addition is
+optional, so a saved v1 or v2 plan still loads unchanged; the one breaking change is on the output
+side: `PlanOutput.packet_markdown` is gone, replaced by the during-event [binder](#the-binder)
+and the Prepare sheet (`prepare_markdown`). See [Changes from v2](#changes-from-v2).
+
+Version 2 was the v0.2.0 contract (`~/Desktop/ready-reckoner-briefs/round2/phase2/DESIGN-DELTA.md`
+§1): every addition optional or defaulted, the one breaking change the retired hazard id
+`terrorism`. See [Changes from v1](#changes-from-v1).
 
 All functions take and return JSON strings (wasm-bindgen `String`), so the mock engine in TypeScript
 and the WebAssembly engine are interchangeable behind `web/src/engine/index.ts` (`interface Engine`;
@@ -43,13 +47,13 @@ After `ambiguous_zip` the app asks the user to pick a county and stores it in
 | `load_pack(name, bytes)` | one data file: its path as `data/manifest.json` lists it (`manifest.json`, `core/nri_hazards.csv`, `geo/counties.json`), bytes (Uint8Array) | `PackInfo { name, version, rows }`: the path, the manifest's `pack_version`, the rows read. The web app fetches the files (same origin) and hands the bytes in, manifest first; the engine never fetches. See [Loading](#loading) |
 | `county_search(query)` | free text ("phila", "42101", "Cook, IL") | `[LocationResolved]`, up to 10 |
 | `resolve_location(json)` | `LocationInput` | `LocationResolved`, or `unknown_zip` / `unknown_county` / `ambiguous_zip` with suggestions |
-| `assess(json)` | `PlanInput` | `PlanOutput` |
+| `assess(json)` | `PlanInput` | `PlanOutput`, with the [binder](#the-binder) (`PlanOutput.binder`) and the Prepare sheet (`prepare_markdown`) built inside the call |
 | `explain(json)` | `ExplainRequest { kind: "hazard" \| "bucket" \| "item" \| "requirement" \| "warning", id, input: PlanInput }` | `Explanation { title, plain: [string], math?: [string], sources: [Citation] }` |
 | `catalogue()` | — | `Catalogue { items: [Item], citations: [Citation], guidance: [GuidanceMeta], hazards: [HazardInfo], buckets: [BucketInfo], tiers: [TierInfo] }` |
 | `defaults()` | — | a valid `PlanInput` skeleton with every section filled in (the interview starts from it) |
 
-`assess` must be pure and fast (target < 50 ms in wasm for any fixture): the UI calls it on every
-dial change. `rr_types::PlanInput::from_json` is the single parse-and-validate entry point, so
+`assess` must be pure and fast (target < 50 ms in wasm for any fixture, the binder included): the
+UI calls it on every dial change. `rr_types::PlanInput::from_json` is the single parse-and-validate entry point, so
 `rr-wasm` and `rr-cli` reject bad input identically.
 
 `defaults()` sets two placeholders the app must replace: `planning_date` (2026-10-01; the engine
@@ -57,7 +61,7 @@ never reads the clock) and `location.zip` `"00000"`, which is well formed but no
 so a forgotten placeholder fails with `unknown_zip` instead of planning for somewhere else.
 Safety equipment defaults to absent, so a skipped question leads to a recommendation.
 
-`attributions` lists the credit lines and disclaimers the About screen and the packet must show:
+`attributions` lists the credit lines and disclaimers the About screen and the binder must show:
 the FEMA National Risk Index terms require the dataset version, the access date and a statement that
 FEMA does not endorse the app; CC BY sources (EAGLE-I, the NCA5 Atlas) need credit lines. A
 source that only feeds an optional pack (the surge and wildfire-places packs) is listed only once
@@ -81,12 +85,17 @@ a file of that pack has been loaded.
 - Deterministic: same input, same output, byte for byte, on every target. Engine crates compute
   exp, ln, pow and the normal distribution with `rr_types::math` (pure-Rust libm), because the
   platform maths library differs between native builds and WebAssembly in the last bit.
-- Old files keep working. Input fields added in v2 are optional (absent means "not asked") or
-  default when absent; output fields added in v2 are left out when empty (absent, `[]` or
-  `false`), so a v1 output reads back byte for byte and the app can tolerate a stored output that
-  lacks them. The app recomputes outputs on load, so a stored output's ids never outlive the
-  engine. Retired ids still parse (`HazardId::is_retired`); the engine never emits them, and engine
-  crates build output from `HazardId::ACTIVE`, never from `ALL`.
+- Old files keep working. Input fields added in v2 and v3 are optional (absent means "not
+  asked") or default when absent, so every v1 and v2 input parses unchanged. Output fields added
+  in v2 are left out when empty (absent, `[]` or `false`). Contract v3 removed
+  `PlanOutput.packet_markdown` and made `binder` and `prepare_markdown` required, so an output
+  stored under v1 or v2 no longer parses as a v3 `PlanOutput`: the app recomputes outputs on load
+  and never reads a stored one, so a stored output's ids never outlive the engine. Retired ids
+  still parse (`HazardId::is_retired`); the engine never emits them, and engine crates build
+  output from `HazardId::ACTIVE`, never from `ALL`.
+- Echo-only text (the family plan and, since v3, the people's profiles and the family-plan
+  groups) is trimmed and length-capped by `PlanInput::tidy` and otherwise printed exactly as
+  written: never checked, corrected or used in a computation.
 
 ## Validation
 
@@ -108,7 +117,13 @@ guardrail warnings handle those, and they never block.
 `FAMILY_PLAN_TEXT_MAX` (300) characters for notes and `FAMILY_PLAN_SHORT_MAX` (80) for names and
 phone numbers, its lists to `ROUTES_MAX` (2), `TRUSTED_CIRCLE_MAX` (4) and `NUMBERS_BY_HEART_MAX`
 (5) entries; blank text becomes absent, empty entries are dropped, and an empty plan disappears.
-Nothing in the family plan is ever required or reported as a problem. The limits are exported in
+Since v3 the same goes for each person's `profile` and the family plan's `home`, `neighbourhood`,
+`pets`, `vehicles` and `documents`: every string is cut at the cap its field names (characters
+after trimming; the table under [Types](#types)), every list at its length, and an empty entry or
+group is dropped (a `Place` with nothing but its `kind` counts as empty). `AccountInfo.last4`
+keeps only the last four digits of whatever was typed, and is dropped when it holds no digit, so
+a pasted account number never reaches the file. Nothing in any of it is ever required or
+reported as a problem: a household with none of it is complete. The limits are exported in
 `types.ts` for the form's `maxlength`.
 
 ## Types
@@ -135,7 +150,8 @@ Housing { kind, tenure, floor: i8, basement, water: municipal|well, sewer: sewer
           water_system_record?: fine|occasional_notices|frequent_problems|unknown } # v2
 Person { age_band, pregnant_or_nursing, medical: Medical, earner, commute?: Commute,
          access_needs: [hearing|vision|limited_english|cognitive|supervision|service_animal
-                        |dialysis|home_health] }                   # v2; defaults to []
+                        |dialysis|home_health],                    # v2; defaults to []
+         profile?: PersonProfile }                                 # v3; omitted when empty
 Medical { daily_rx, refrigerated_rx, powered_device, mobility: none|limited|wheelchair,
           dietary: [string], epinephrine }
   powered_device: "none" | "cpap" | "oxygen" | { "other": { "watts": f32 } }
@@ -162,10 +178,52 @@ FamilyPlan { meeting_place_near?, meeting_place_far?, out_of_area_contact?: Cont
              where_we_would_go?, routes?: [string], neighbours_who_check?, who_takes_animals?,
              shutoff_gas?, shutoff_water?, shutoff_electric?,
              trusted_circle?: [TrustedPerson], lawyer?: Contact, roadside_assistance?,
-             numbers_by_heart?: [string] }                     # v2; every field free text
-Contact { name?, phone? }
+             numbers_by_heart?: [string],                      # v2; every field free text
+             home?: HomeInfo, neighbourhood?: Neighbourhood, pets?: [PetInfo] (≤ 8),
+             vehicles?: [VehicleInfo] (≤ 4), documents?: DocumentsInfo }   # v3
+Contact { name?, phone?, address? }                            # address: v3
 TrustedPerson { name?, phone?, holds?: [spare_key|documents|medical_poa|backup_codes] }
 ```
+
+The contract v3 groups (DESIGN-DELTA-v3 §3.1, §3.2), with each string's cap in characters after
+trimming. Every field is optional; a list or group left empty is omitted from the JSON, which is
+why the lists carry `?` here (the delta writes them without it).
+
+```
+PersonProfile { name?(60), date_of_birth?(40), phone?(40), email?(80), place?: Place,
+                doctor?: Contact, pharmacy?: Contact, conditions?(400),
+                medications?: [Medication] (≤ 12), allergies?(200), blood_type?(8),
+                insurance?: HealthInsurance, id_notes?(200), notes?(400) }
+Place { kind: work|school|childcare|other, name?(120), address?(200), phone?(40), plan?(400),
+        pickup?(200), safest_spot?(200) }                     # dropped when only `kind` is set
+Medication { name?(80), dose?(60), schedule?(80), purpose?(80) }
+HealthInsurance { carrier?(80), plan_name?(80), member_id?(60), group_number?(60), phone?(40) }
+Contact { name?(80), phone?(80), address?(200) }
+HomeInfo { address?(200), electric_utility?: Contact, gas_utility?: Contact,
+           water_utility?: Contact, insurer?: Contact, policy_number?(60),
+           landlord_or_mortgage?: Contact, where_kit?(200), where_documents?(200),
+           where_cash?(200), where_keys?(200) }
+Neighbourhood { hospital?: Contact, urgent_care?: Contact, pharmacy?: Contact, shelter?: Contact,
+                county_emergency_office?: Contact, alerts?(200) }
+PetInfo { name?(60), kind?(40), description?(120), medications?(200), vet?: Contact,
+          microchip?(60), records_where?(200) }
+VehicleInfo { description?(120), plate?(20), insurer?: Contact, policy_number?(60),
+              kept_in_car?(200) }
+DocumentsInfo { accounts?: [AccountInfo] (≤ 12), policies?: [PolicyInfo] (≤ 8),
+                where_originals?(200), where_copies?(200), digital_backup?(200) }
+AccountInfo { institution?(80), kind?(40), phone?(40), last4?(4, digits only) }
+PolicyInfo { insurer?(80), kind?(40), policy_number?(60), phone?(40) }
+```
+
+The caps are exported by name in Rust and `types.ts`: `LAST4_LEN` (4), `BLOOD_TYPE_MAX` (8),
+`PLATE_MAX` (20), `SHORT_TEXT_MAX` (40: dates of birth, the v3 phone fields, kinds),
+`MEDIUM_TEXT_MAX` (60: names of people and animals, doses, member, group, policy and microchip
+numbers), `LABEL_TEXT_MAX` (80: emails, institutions, insurers, carriers and plan names, a
+medication's name, schedule and purpose), `DESCRIPTION_MAX` (120), `LONG_TEXT_MAX` (200:
+addresses and where-it-is answers), `NOTE_MAX` (400), and the list lengths `MEDICATIONS_MAX` (12),
+`PETS_MAX` (8), `VEHICLES_MAX` (4), `ACCOUNTS_MAX` (12), `POLICIES_MAX` (8). A `Contact`'s name
+and phone keep their v2 cap, `FAMILY_PLAN_SHORT_MAX` (80). Each field's cap is named in its doc
+comment in `crates/rr-types/src/input.rs` and `types.ts`.
 
 `existing` is the baseline inventory. A free action counts as done when it appears there with `qty`
 1 or more. `paid_usd` is what the household paid for that quantity in total; recorded prices replace
@@ -200,12 +258,20 @@ v2 inputs, in plain terms:
 - `family_plan` is the household's own plan from a device-only screen: echoed into the packet and
   the wallet cards, stored in the saved plan file (it is the household's own file), never used for
   computation, and never sent anywhere.
+- v3: `Person.profile` and the family plan's `home`, `neighbourhood`, `pets`, `vehicles` and
+  `documents` are the answers to the interview's optional steps 6–8 (DESIGN-DELTA-v3 §2): echoed
+  into the binder (a page per person, the wallet cards, the home, places, neighbourhood, pets,
+  vehicles and documents pages; blank lines where nothing was answered) and never computed with.
+  The plan's own numbers still come from the v1 and v2 fields (`pets` counts, `mobility`
+  vehicles, `medical`). The saved file may now hold sensitive answers (DESIGN-DELTA-v3 §7).
 
 ### Outputs
 
 ```
 LocationResolved { country, county_fips, county_name, state_abbr, state_name, zip?,
-                   zip_county_share?: f32, centroid: { lat, lon }, nca_region, coastal, tsunami_zone,
+                   zip_county_share?: f32, centroid: { lat, lon },
+                   zip_centroid?: { lat, lon },                            # v3
+                   nca_region, coastal, tsunami_zone,
                    facility_flags: { nuclear_plant_within_16km, nuclear_plant_within_80km,
                                      hazmat_facilities_within_5km: u16 },
                    data_note?,
@@ -249,7 +315,8 @@ PlanOutput { engine_version, api_version, data_pack_version, content_version,
              location: LocationResolved, register: [HazardProfile], buckets: [BucketAssessment],
              scenarios: [ScenarioInfo], tier_reached: TierId, tier_recommended: TierId,
              plan: Plan, requirements: [RequirementLine], warnings: [Warning],
-             packet_markdown, provenance: [Citation],
+             binder: Binder, prepare_markdown,                                   # v3
+             provenance: [Citation],
              recovery?: RecoveryInfo }                                           # v2
 RecoveryInfo { county_declarations_5yr?: u16, sources: [CitationId] }            # v2
 Plan { months: [{ index, budget_usd, items: [PlanItem] }], done_month?,
@@ -274,6 +341,16 @@ What the numbers mean:
   inside a hazard (the EMP of a high-altitude burst, Yellowstone, a dam release), each a note with
   sources and, where known, its own rate range; they are data, not ids. `anchor_sentence` compares
   the row with the household's own list ("less likely than a house fire, about 5 in 100 for you").
+- `location.zip_centroid` (v3): the ZIP code's centre from the Census 2020 ZCTA Gazetteer
+  (`core/zip_centroids.csv`, DESIGN-DELTA-v3 §8), set at resolve time; the maps start there.
+  Absent without a ZIP code or when the pack does not know it (and on the built-in sample
+  counties).
+- `binder` (v3): the during-event binder, a tree of parts, pages and blocks; see
+  [The binder](#the-binder). `prepare_markdown` (v3): the Prepare sheet, a short Markdown
+  document of the preparation plan (the v2 packet's plan, checklists, decisions and maintenance
+  calendar conventions), cited and deterministic, printed by the Prepare and Keep it up tabs and
+  by `rr plan`. Until the binder workstream lands, `prepare_markdown` is the whole v2 packet and
+  `binder` a transitional binder built from it (see [Mock engine](#mock-engine)).
 - `location.exposure`: what the data pack knows about the place's exposure to the v2 hazards
   (strategic class A–E, distance to a strategic site, storm-surge share, smoke days, leveed
   population, high-hazard dams, karst, landslide susceptibility, drinking-water violations,
@@ -341,7 +418,7 @@ Item { id, name, category, unit, buckets: [BucketId], tier: TierId, free,
        season?: spring|summer|fall|winter,
        test_interval_months?: u16 }                            # v2
 GuidanceMeta { id, title, applies_to: [string], citations: [CitationId],
-               kind?: after|plan|hazard|bucket|tier|topic|family }   # v2
+               kind?: after|plan|hazard|bucket|tier|topic|family|checklist }   # v2; checklist: v3
 ```
 
 - `Citation.prior`: the source is an expert judgement, not data. Every number that cites it is shown
@@ -369,6 +446,14 @@ GuidanceMeta { id, title, applies_to: [string], citations: [CitationId],
   keep a span only for a housing kind (`{if:home:<kind>}`, `{if:not_home:<kind>}`), an access need
   (`{if:need:<access_need>}`), an item the plan holds (`{if:has:<item_id>}`) or a benefit
   (`{if:benefit:<benefit>}`). Spans do not nest.
+- v3: `GuidanceMeta.kind` `checklist` marks an incident checklist (`content/checklists/`,
+  DESIGN-DELTA-v3 §5.4); its `applies_to` names `hazard:<id>` and `event:<id>` targets, the events
+  being the everyday emergencies in `rr_content::ids::EVENTS` (`gas_leak_or_co`,
+  `missing_person`, `evacuation_order`, `shelter_in_place`, `boil_water_notice`, `power_outage`,
+  `something_else`). `catalogue().guidance` lists the checklists with the other blocks. Four more
+  renderer conditions, from the household's own answers: `{if:children}` (anyone under 18),
+  `{if:pets}` (a pet counted in `pets`), `{if:vehicle}` (a vehicle in `mobility`) and
+  `{if:powered_device}` (anyone with a powered medical device).
 
 ### Function arguments and results
 
@@ -415,6 +500,81 @@ homes ÷ all homes — a lower bound, since not everyone in the zone carries flo
 when the pack's `sfha_share_basis` cell is empty for that county. Not read by `rr-hazards` yet, and
 not mirrored in `types.ts`: like the rest of `FloodPriors`, it never crosses into JavaScript.
 
+## The binder
+
+`PlanOutput.binder` (contract v3): the during-event document the household prints and puts in a
+binder with ten tabs. This section copies `docs/DESIGN-DELTA-v3.md` §4.1; keep the two in step.
+rr-plan renders the tree to Markdown (the CLI, the goldens, humans) and the web app to HTML and
+PDF, never from Markdown.
+
+```
+Binder { title: string, generated_on: IsoDate, household: string, location: string,
+         status_line: string, review_by: IsoDate, parts: [Part], sources: [SourceEntry],
+         credits: [string] }
+Part   { id: string, tab: u8 (1..=10), title: string, short_title: string (≤ 14 chars, the tab label),
+         pages: [Page] }
+Page   { id: string (unique in the binder), title: string, kind: PageKind, fit: "one" | "two" | "flow",
+         blocks: [Block] }
+PageKind = "cover" | "how_to_use" | "quick_start" | "index" | "contacts" | "person" | "wallet_cards"
+         | "home" | "place" | "neighbourhood" | "getting_out" | "pets" | "vehicles" | "documents"
+         | "inventory" | "risks_glance" | "checklist" | "after" | "log" | "sources"
+
+Block  = { heading: { level: 1|2|3, text: string } }
+       | { para: [Inline] }
+       | { bullets: [[Inline]] }
+       | { numbered: [[Inline]] }
+       | { steps: [Step] }                       # airline-style: Step { text: [Inline], memory: bool }
+       | { fields: [FieldRow] }                  # FieldRow { label: string, value?: string, lines: u8 }
+       | { table: { header: [string], rows: [[[Inline]]] } }
+       | { callout: { kind: "stop"|"warning"|"note"|"decision", title?: string, blocks: [Block] } }
+       | { decision: { question: string, branches: [Branch] } }
+                                                 # Branch { when: [Inline], then: [Inline], go_to?: string (page id) }
+       | { map_slot: { id: string, kind: "region"|"area"|"neighbourhood", caption: string } }
+       | { cards: [Card] }                       # Card { title: string, lines: [[Inline]] }  (wallet cards)
+       | { log: { columns: [string], rows: u8 } }
+       | { page_break: true }
+
+Inline = { t: string } | { b: string } | { cite: [u32] } | { link: { to: string, text: string } }
+       | { blank: u8 }                           # a ruled blank of about n characters
+SourceEntry { n: u32, title: string, publisher: string, year?: u16, url?: string, expert: bool }
+```
+
+**JSON.** A block and an inline are objects with exactly one key, the variant's name:
+`{"heading": {"level": 2, "text": "Do first"}}`, `{"para": [{"t": "Stay low. "}, {"cite": [3]}]}`,
+`{"steps": [{"text": [{"b": "Get out."}], "memory": true}]}`, `{"blank": 24}`,
+`{"page_break": true}` (never `false`). Unknown keys are rejected at every level, as everywhere
+in the contract. In Rust (`rr_types::binder`), `Block` and `Inline` are enums whose variants
+carry the payloads as structs named `Heading`, `Table`, `Callout`, `Decision`, `MapSlot`, `Log` and
+`Link`, with the enums `PageKind`, `Fit`, `CalloutKind` and `MapSlotKind`; `page_break`'s
+payload is the marker `True` (`Block::page_break()`). In `types.ts` each variant is an interface
+(`HeadingBlock { heading: Heading }` … `PageBreakBlock { page_break: true }`, `TextInline { t }`,
+`BoldInline { b }`, `CiteInline { cite }`, `LinkInline { link }`, `BlankInline { blank }`)
+in the unions `Block` and `Inline`; narrow them with `'steps' in block`.
+
+**Rules.** `Binder::check` (Rust; rr-plan, the CLI and the tests share it) returns every
+structural problem, in a fixed order: a part whose `tab` is outside 1 to 10 or not above the one
+before (`MAX_TABS`); a part id used twice; a part with no pages; a tab label over 14 characters
+(`SHORT_TITLE_MAX`); a page id used twice anywhere; a `link.to` or `Branch.go_to` that names no
+page; a `cite` number outside 1 to `sources.len()`; a source whose `n` is not its place in the list
+(`sources[i].n == i + 1`, so `cite` n is `sources[n - 1]`); a heading level outside 1 to 3.
+`fields.value` is user text, printed as written, or absent, in which case the renderer draws
+`lines` ruled lines; `steps` with `memory: true` are the "do first from memory" items and render
+bold; `map_slot` is filled by the web app (DESIGN-DELTA-v3 §9) and rendered by the CLI as a
+boxed placeholder ("Map: your neighbourhood. Add it in the app, or paste a printed map here.");
+`fit: "one"` is a promise the page fits one printed page, enforced by a word-and-row proxy in
+rr-plan (DESIGN-DELTA-v3 §5.6) and by a real print in verification.
+
+**Renderers.** Markdown (rr-plan, for the CLI, the goldens and humans): parts as `#`, pages as
+`##`, blocks in the v2 packet's Markdown conventions, blanks as `__________`, cross-references as
+"(Tab 3, Home)". HTML and PDF in the web app (DESIGN-DELTA-v3 §6). The goldens in
+`fixtures/golden/` stay Markdown.
+
+**Parts.** Ten, in a fixed order (DESIGN-DELTA-v3 §4.2): 1 `start` (Start here), 2 `people`
+(People), 3 `home_places` (Home and places), 4 `pets_vehicles_documents` (Pets, vehicles and
+documents), 5 `have` (What you have), 6 `check_now` (Checklists: happening now), 7 `check_coming`
+(Checklists: it is coming), 8 `check_ongoing` (Checklists: it goes on), 9 `after` (After), 10
+`sources` (Sources). Every part starts on a new page; page numbers run per tab ("3-2").
+
 ## Ids
 
 Ids are stable snake_case strings. `rr-types` exposes them as enums with `ALL`, `as_str()`,
@@ -458,7 +618,11 @@ Ids are stable snake_case strings. `rr-types` exposes them as enums with `ALL`, 
 - **Return periods**: `one_in_10` "Common disruptions", `one_in_50` "Serious", `one_in_100` "Very
   serious" (default), `one_in_500` "Rare catastrophes".
 - **Seasons** (v2): `spring`, `summer`, `fall`, `winter`. **Guidance kinds** (v2): `after`, `plan`,
-  `hazard`, `bucket`, `tier`, `topic`, `family`.
+  `hazard`, `bucket`, `tier`, `topic`, `family`, and `checklist` (v3).
+- **Places** (v3, `Place.kind`; `PLACE_KINDS`): `work`, `school`, `childcare`, `other`.
+- **Binder** (v3): page kinds (`PAGE_KINDS`), page fits `one`, `two`, `flow` (`PAGE_FITS`), callout
+  kinds `stop`, `warning`, `note`, `decision` (`CALLOUT_KINDS`), map slots `region`, `area`,
+  `neighbourhood` (`MAP_SLOT_KINDS`); see [The binder](#the-binder).
 
 ## Warnings
 
@@ -498,7 +662,8 @@ copies `data/manifest.json`, `data/core/` and `data/geo/` into `web/public/data/
 git-ignored). It prints the raw and gzipped size of the `.wasm`; the budget is 1.5 MB gzipped,
 content included. The Pages workflow runs it before `npm run build`. The site talks to the
 WebAssembly engine when `web/public/pkg/rr_wasm.js` exists at build time or `VITE_ENGINE=wasm`,
-otherwise to the mock (`VITE_ENGINE=mock` forces it).
+otherwise to the mock (`VITE_ENGINE=mock` forces it). v0.3.0 raises the budget to 1.75 MB gzipped
+(DESIGN-DELTA-v3 §10: the checklist blocks and the binder code are new).
 
 **Start.** `getEngine()` imports `pkg/rr_wasm.js` from the site's own origin, instantiates
 `pkg/rr_wasm_bg.wasm`, checks that `engine_info().api_version` equals the app's
@@ -568,6 +733,77 @@ Once any pack file is loaded the packs decide, and the sample counties no longer
 fixture households (`web/src/engine/fixtures.ts`), so screens can be built and screenshot-tested
 before the engine exists. A parity test asserts that the mock and wasm outputs have identical JSON
 shapes for each fixture.
+
+Transitional, until the binder workstream lands (DESIGN-DELTA-v3 §11): the engine's
+`prepare_markdown` is the whole v2 packet, byte for byte, and its `binder` is built from that
+Markdown by `crates/rr-plan/src/packet/shim.rs`: one page of `para` blocks (one per Markdown
+paragraph, the text kept as it is) per v2 `##` section, the page placed in the part of
+DESIGN-DELTA-v3 §4.2 that will hold that material, parts without pages left out; `sources` from
+`PlanOutput.provenance` in order, `credits` from the data attributions. The mock's `assess` does
+the same with its own packet (`web/src/engine/mock/binder-shim.ts`), so the two stay
+shape-identical.
+
+## Changes from v2
+
+Contract v3 ships with v0.3.0. It comes from `docs/DESIGN-DELTA-v3.md` §3 and §4, which turn the
+owner's request and the interview decisions of 2026-09-27 (D1–D6 in the delta's §0) into contract
+changes. Every input addition is optional; the one breaking change is the removal of
+`PlanOutput.packet_markdown`.
+
+**Loading older files.** A v1 or v2 plan parses unchanged: every new input field is optional and
+a group left empty is omitted from the JSON (tested on every v1 and v2 household in the
+repository). An output stored under v1 or v2 no longer parses as a v3 `PlanOutput` (it has
+`packet_markdown` and no `binder`); the app recomputes outputs on load and never reads a stored
+one, and the goldens are regenerated under v3.
+
+### Inputs
+
+| Field | Type | When absent | Why |
+| --- | --- | --- | --- |
+| `Person.profile` | `PersonProfile` (with `Place`, `PlaceKind`, `Medication`, `HealthInsurance`) | absent (not answered) | step 6, "Your people": the person's binder page and wallet card (§2.1, §3.1; D2) |
+| `Contact.address` | string, 200 characters | absent | addresses of the hospital, the pharmacy, a doctor, a shelter (§3.1) |
+| `FamilyPlan.home` | `HomeInfo` | absent | step 7, "Your home": address, utilities and outage numbers, insurer, landlord, where things are (§2.2, §3.2; D4) |
+| `FamilyPlan.neighbourhood` | `Neighbourhood` | absent | step 7: hospital, urgent care, pharmacy, shelter, county emergency office, alerts (§2.2) |
+| `FamilyPlan.pets` | `[PetInfo]`, at most 8 | `[]`, left out | step 8: one entry per animal (§2.3) |
+| `FamilyPlan.vehicles` | `[VehicleInfo]`, at most 4 | `[]`, left out | step 8: one entry per vehicle (§2.3) |
+| `FamilyPlan.documents` | `DocumentsInfo` (with `AccountInfo`, `PolicyInfo`) | absent | step 8: accounts with their last four digits only, policies, where the papers are (§2.3; planner decision: no full account numbers) |
+
+All of it is echo-only, like the v2 family plan: `PlanInput::tidy` trims every string and cuts it
+at its cap, keeps lists to their length, drops empty entries and groups, and keeps only the last
+four digits of `AccountInfo.last4`; nothing is computed with it, and nothing in it is ever
+required or a problem. The caps are exported in Rust and `types.ts` (see [Types](#types)).
+
+### Outputs
+
+| Field | Type | When empty | Why |
+| --- | --- | --- | --- |
+| **`PlanOutput.packet_markdown`** | **removed (breaking)** | — | the packet becomes the during-event binder and the Prepare sheet (§4; owner request) |
+| `PlanOutput.binder` | `Binder` (with `Part`, `Page`, `PageKind`, `Fit`, `Block`, `Heading`, `Step`, `FieldRow`, `Table`, `Callout`, `CalloutKind`, `Decision`, `Branch`, `MapSlot`, `MapSlotKind`, `Card`, `Log`, `Inline`, `Link`, `SourceEntry`) | always present | the binder: ten tabs, a page per person, place and matter, airline-style checklists (§4.1, §4.2; D1, D3, D4) |
+| `PlanOutput.prepare_markdown` | string (Markdown) | always present | the Prepare sheet the Prepare and Keep it up tabs print (§4; D1) |
+| `LocationResolved.zip_centroid` | `LatLon` | left out | the ZIP code's centre, where the maps start (§3.3, §8; D5) |
+
+### Content and ids
+
+| Change | Ids | Why |
+| --- | --- | --- |
+| New guidance kind | `checklist`: incident checklists in `content/checklists/`, listed in `catalogue().guidance` | §5.4; D3 |
+| New enums | `PlaceKind` (`work`, `school`, `childcare`, `other`), `PageKind` (20), `Fit` (`one`, `two`, `flow`), `CalloutKind` (`stop`, `warning`, `note`, `decision`), `MapSlotKind` (`region`, `area`, `neighbourhood`) | §3.1, §4.1 |
+| New content targets | `event:<id>` in a checklist's `applies_to`, the ids in `rr_content::ids::EVENTS`: `gas_leak_or_co`, `missing_person`, `evacuation_order`, `shelter_in_place`, `boil_water_notice`, `power_outage`, `something_else` | §3.3, §5.5 |
+| New renderer conditions | `{if:children}`, `{if:pets}`, `{if:vehicle}`, `{if:powered_device}` (`rr_content::policy::HouseholdFacts::has_children`, `has_pets`, `has_vehicle`, `has_powered_device`) | §3.3, §5.4 |
+
+`types.ts` gains the matching lists (`PLACE_KINDS`, `PAGE_KINDS`, `PAGE_FITS`, `CALLOUT_KINDS`,
+`MAP_SLOT_KINDS`, and `checklist` in `GUIDANCE_KINDS`), the caps (`LAST4_LEN`, `BLOOD_TYPE_MAX`,
+`PLATE_MAX`, `SHORT_TEXT_MAX`, `MEDIUM_TEXT_MAX`, `LABEL_TEXT_MAX`, `DESCRIPTION_MAX`,
+`LONG_TEXT_MAX`, `NOTE_MAX`, `MEDICATIONS_MAX`, `PETS_MAX`, `VEHICLES_MAX`, `ACCOUNTS_MAX`,
+`POLICIES_MAX`) and the binder's `MAX_TABS` and `SHORT_TITLE_MAX`; the mirror test checks all of
+them.
+
+**Where the names differ from the delta's first draft.** The person's health insurance is the type
+`HealthInsurance` (JSON field `insurance`, as the delta says): `Insurance` already names the
+household's insurance answers in `Finances`, in Rust and in `types.ts`. The delta's anonymous
+payloads are named `Heading`, `Table`, `Callout`, `Decision`, `MapSlot`, `Log` and `Link`, and its
+lists that are omitted when empty carry `?` here (`pets?`, `vehicles?`, `medications?`,
+`accounts?`, `policies?`). `docs/DESIGN-DELTA-v3.md` records the same.
 
 ## Changes from v1
 

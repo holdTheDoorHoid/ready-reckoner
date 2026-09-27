@@ -8,7 +8,7 @@
 /// The placeholder the engine replaces with the household's own natural-frequency sentence.
 pub const FREQUENCY_PLACEHOLDER: &str = "{frequency}";
 
-/// Opens a conditional span of a guidance block. Six kinds of condition (see [`Condition`]):
+/// Opens a conditional span of a guidance block. The kinds of condition (see [`Condition`]):
 ///
 /// - a hazard: `{if:avalanche}In avalanche country, get training ...{/if}`. The packet keeps the
 ///   span when that hazard is likely enough for the household (a ten-year chance of at least 1 in
@@ -23,6 +23,10 @@ pub const FREQUENCY_PLACEHOLDER: &str = "{frequency}";
 ///   these catalogue items: it already owns it, or the plan includes it.
 /// - a benefit: `{if:benefit:snap_wic}…{/if}` keeps the span when the household relies on one of
 ///   these benefits ([`crate::ids::BENEFITS`]).
+/// - the household itself (contract v3, DESIGN-DELTA-v3 §3.3): `{if:children}` (anyone under 18),
+///   `{if:pets}` (an animal counted in `PlanInput::pets`), `{if:vehicle}` (a vehicle in
+///   `PlanInput::mobility`) and `{if:powered_device}` (anyone with a powered medical device).
+///   These words are never hazard ids.
 ///
 /// Every household-free view keeps every span. Spans do not nest and stay within one paragraph.
 pub const CONDITION_OPEN: &str = "{if:";
@@ -45,6 +49,10 @@ pub const HAS_PREFIX: &str = "has:";
 /// Prefix of a condition on a benefit the household relies on.
 pub const BENEFIT_PREFIX: &str = "benefit:";
 
+/// The household conditions (contract v3): `{if:children}`, `{if:pets}`, `{if:vehicle}`,
+/// `{if:powered_device}`.
+pub const HOUSEHOLD_CONDITIONS: [&str; 4] = ["children", "pets", "vehicle", "powered_device"];
+
 /// What a conditional span depends on (the text between `{if:` and `}`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Condition {
@@ -61,6 +69,14 @@ pub enum Condition {
     Has(Vec<String>),
     /// `benefit:<id>|<id>…`: kept when the household relies on one of these benefits.
     Benefit(Vec<String>),
+    /// `children`: kept when anyone in the household is under 18 (contract v3).
+    Children,
+    /// `pets`: kept when the household has animals (contract v3).
+    Pets,
+    /// `vehicle`: kept when the household has a vehicle (contract v3).
+    Vehicle,
+    /// `powered_device`: kept when anyone relies on a powered medical device (contract v3).
+    PoweredDevice,
 }
 
 /// What a household looks like to the conditions in a guidance block. The packet and the web
@@ -80,6 +96,15 @@ pub trait HouseholdFacts {
     fn has_item(&self, item: &str) -> bool;
     /// Whether the household relies on this benefit ([`crate::ids::BENEFITS`]).
     fn has_benefit(&self, benefit: &str) -> bool;
+    /// Whether anyone in the household is under 18: an infant, toddler, child or teen
+    /// (`{if:children}`; contract v3).
+    fn has_children(&self) -> bool;
+    /// Whether the household has animals, counted in `PlanInput::pets` (`{if:pets}`; contract v3).
+    fn has_pets(&self) -> bool;
+    /// Whether the household has a vehicle in `PlanInput::mobility` (`{if:vehicle}`; contract v3).
+    fn has_vehicle(&self) -> bool;
+    /// Whether anyone relies on a powered medical device (`{if:powered_device}`; contract v3).
+    fn has_powered_device(&self) -> bool;
 }
 
 /// Splits `a|b|c` into its parts, rejecting an empty or repeated part.
@@ -127,6 +152,13 @@ impl Condition {
     /// an empty or repeated value.
     pub fn parse(id: &str) -> Result<Condition, String> {
         let id = id.trim();
+        match id {
+            "children" => return Ok(Condition::Children),
+            "pets" => return Ok(Condition::Pets),
+            "vehicle" => return Ok(Condition::Vehicle),
+            "powered_device" => return Ok(Condition::PoweredDevice),
+            _ => {}
+        }
         if let Some(v) = id.strip_prefix(NEED_PREFIX) {
             return listed_values(id, v, crate::ids::ACCESS_NEEDS, "an access need")
                 .map(Condition::Need);
@@ -184,7 +216,11 @@ impl Condition {
             Condition::Hazard(_)
             | Condition::Need(_)
             | Condition::Has(_)
-            | Condition::Benefit(_) => None,
+            | Condition::Benefit(_)
+            | Condition::Children
+            | Condition::Pets
+            | Condition::Vehicle
+            | Condition::PoweredDevice => None,
         }
     }
 
@@ -197,6 +233,10 @@ impl Condition {
             Condition::Need(needs) => needs.iter().any(|n| h.has_access_need(n)),
             Condition::Has(items) => items.iter().any(|i| h.has_item(i)),
             Condition::Benefit(benefits) => benefits.iter().any(|b| h.has_benefit(b)),
+            Condition::Children => h.has_children(),
+            Condition::Pets => h.has_pets(),
+            Condition::Vehicle => h.has_vehicle(),
+            Condition::PoweredDevice => h.has_powered_device(),
         }
     }
 }
@@ -952,6 +992,18 @@ mod tests {
         fn has_benefit(&self, benefit: &str) -> bool {
             benefit == "snap_wic"
         }
+        fn has_children(&self) -> bool {
+            true
+        }
+        fn has_pets(&self) -> bool {
+            false
+        }
+        fn has_vehicle(&self) -> bool {
+            true
+        }
+        fn has_powered_device(&self) -> bool {
+            false
+        }
     }
 
     #[test]
@@ -980,6 +1032,34 @@ mod tests {
         // They say nothing about the kind of home on their own.
         let need = Condition::parse("need:hearing").unwrap();
         assert_eq!(need.for_home(rr_types::HousingKind::Detached), None);
+    }
+
+    #[test]
+    fn household_conditions_parse_and_apply() {
+        assert_eq!(Condition::parse("children"), Ok(Condition::Children));
+        assert_eq!(Condition::parse(" pets "), Ok(Condition::Pets));
+        assert_eq!(Condition::parse("vehicle"), Ok(Condition::Vehicle));
+        assert_eq!(
+            Condition::parse("powered_device"),
+            Ok(Condition::PoweredDevice)
+        );
+        for word in HOUSEHOLD_CONDITIONS {
+            assert!(!crate::ids::is_hazard(word), "{word} is a hazard id");
+            assert_eq!(
+                Condition::parse(word)
+                    .unwrap()
+                    .for_home(rr_types::HousingKind::Detached),
+                None
+            );
+            // Allowed in any block, even one whose hazards are restricted.
+            let span = format!("a {{if:{word}}}b{{/if}}");
+            assert!(condition_problems(&span, &[]).is_empty(), "{word}");
+        }
+        // Flat: children and a vehicle, no pets, no powered device.
+        let text = "A. {if:children}B.{/if} {if:pets}C.{/if} {if:vehicle}D.{/if} \
+                    {if:powered_device}E.{/if} Z.";
+        assert_eq!(apply_conditions_for(text, &Flat), "A. B. D. Z.");
+        assert_eq!(apply_conditions(text, |_| true), "A. B. C. D. E. Z.");
     }
 
     #[test]

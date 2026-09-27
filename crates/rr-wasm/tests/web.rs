@@ -326,7 +326,7 @@ fn sample_counties_first_then_the_packs_and_every_golden_to_the_last_digit() {
             .unwrap_or_default()
             .contains("sample counties")
     );
-    assert!(output.packet_markdown.starts_with("# "));
+    assert!(output.prepare_markdown.starts_with("# "));
     assert!(!output.register.is_empty() && !output.plan.months.is_empty());
     let philadelphia_golden = FIXTURES
         .iter()

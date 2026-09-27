@@ -34,7 +34,7 @@ fn the_json_parses_back_and_has_no_widened_floats() {
     let json = rr_plan::to_json(&out);
     let back: rr_types::PlanOutput = serde_json::from_str(&json).expect("round trip");
     assert_eq!(back.buckets.len(), out.buckets.len());
-    assert_eq!(back.packet_markdown, out.packet_markdown);
+    assert_eq!(back.prepare_markdown, out.prepare_markdown);
     // f32 fields (money, days) print at their own width: "7.03", never "7.03000020980835".
     for line in json.lines().filter(|l| l.contains("\"est_cost_usd\"")) {
         let number = line.split(':').nth(1).unwrap().trim().trim_end_matches(',');
@@ -138,6 +138,7 @@ fn more_people_never_need_less_water() {
         earner: false,
         commute: None,
         access_needs: Vec::new(),
+        profile: None,
     });
     assert!(water(&more) > before);
 }
@@ -175,7 +176,7 @@ fn a_zero_budget_gives_free_steps_only_and_a_savings_suggestion() {
         "no emergency-fund step"
     );
     assert!(out.warnings.iter().any(|w| w.id == "zero_budget"));
-    assert!(out.packet_markdown.contains("even a few dollars a month"));
+    assert!(out.prepare_markdown.contains("even a few dollars a month"));
 }
 
 /// At most eight ordinary free steps a month. Decisions (insurance, ID, home repairs), the three
@@ -397,7 +398,7 @@ fn a_months_spend_never_exceeds_its_budget_plus_what_earlier_months_left() {
     );
     assert!(a.input.finances.monthly_budget_usd >= 40.0);
     // The packet lists the reserve once, in the checklists, with the month the plan buys it.
-    let packet = assess(&household("philadelphia-renters-4")).packet_markdown;
+    let packet = assess(&household("philadelphia-renters-4")).prepare_markdown;
     assert!(
         packet.contains("- [ ] Cash in small bills: $200 (month 22)"),
         "the checklist line"

@@ -28,7 +28,7 @@ fn switching_off_cascadia_lowers_the_coos_bay_targets() {
     assert!(b.scenarios.iter().any(|s| s.id == "cascadia_m9" && !s.on));
     assert!(days(&b, BucketId::Power) < days(&a, BucketId::Power));
     assert!(days(&b, BucketId::WaterOut) < days(&a, BucketId::WaterOut));
-    assert!(b.packet_markdown.contains("left out of your plan"));
+    assert!(b.prepare_markdown.contains("left out of your plan"));
 }
 
 #[test]
@@ -119,7 +119,7 @@ fn the_dials_change_targets_in_the_expected_direction() {
     let mut hot = base.clone();
     hot.dials.climate = ClimateHorizon::Y2050;
     let (a, b) = (assess(&base), assess(&hot));
-    assert!(b.packet_markdown.contains("around 2050"));
+    assert!(b.prepare_markdown.contains("around 2050"));
     assert!(days(&b, BucketId::Thermal) >= days(&a, BucketId::Thermal));
     let water = |i: &rr_types::PlanInput| {
         assess(i)
@@ -144,8 +144,8 @@ fn the_horizon_reaches_the_sentences() {
     fifty.dials.horizon_years = 50;
     let a = assess(&one);
     let b = assess(&fifty);
-    assert!(a.packet_markdown.contains("the next year"));
-    assert!(b.packet_markdown.contains("the next 50 years"));
+    assert!(a.prepare_markdown.contains("the next year"));
+    assert!(b.prepare_markdown.contains("the next 50 years"));
     // Targets do not depend on the horizon (it only changes the sentences).
     assert_eq!(days(&a, BucketId::Power), days(&b, BucketId::Power));
 }
@@ -190,7 +190,7 @@ fn assumed_basics_are_credited_listed_and_can_be_switched_off() {
         assert_eq!(it.why, rr_plan::pipeline::ASSUMED_WHY);
     }
     assert!(
-        a.packet_markdown
+        a.prepare_markdown
             .contains("What the plan assumes you already have")
     );
     assert!(
@@ -351,7 +351,7 @@ fn a_county_without_outage_records_plans_with_its_states_series() {
     assert!(days(&out, BucketId::Thermal) > 0.0);
     assert!(days(&out, BucketId::Comms) >= 2.0);
     assert!(
-        out.packet_markdown
+        out.prepare_markdown
             .contains("its power-cut figures use Alaska's records (2015-2025) instead"),
         "the packet's notes name the state series"
     );

@@ -47,7 +47,7 @@ describe('packet rendering', () => {
     for (const name of FIXTURE_NAMES) {
       const r = await engine.assess(FIXTURES[name]);
       if (!r.ok) throw new Error(name);
-      const html = renderMarkdown(r.value.packet_markdown, { idPrefix: 'pk', headingOffset: 1 });
+      const html = renderMarkdown(r.value.prepare_markdown, { idPrefix: 'pk', headingOffset: 1 });
       expect(unsafe(html), name).toEqual([]);
       expect(html).toContain('<h2 class="md-h1">Your preparedness packet</h2>');
       expect(html).toContain('<h3 class="md-h2">Sources</h3>');
@@ -155,8 +155,8 @@ describe('the packet in sections (so the map can sit in Your risks and the sourc
     for (const name of FIXTURE_NAMES) {
       const out = await mock.assess(FIXTURES[name]);
       if (!out.ok) throw new Error(out.error.message);
-      const sections = packetSections(out.value.packet_markdown);
-      expect(sections.map((s) => s.markdown).join(''), name).toBe(out.value.packet_markdown);
+      const sections = packetSections(out.value.prepare_markdown);
+      expect(sections.map((s) => s.markdown).join(''), name).toBe(out.value.prepare_markdown);
       expect(sections.some((s) => s.slug === 'your-risks'), name).toBe(true);
     }
   });
