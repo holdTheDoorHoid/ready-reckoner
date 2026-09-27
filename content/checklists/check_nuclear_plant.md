@@ -36,9 +36,9 @@ Officials announce an emergency at a nuclear power plant near you, or tell peopl
 
 ## Where and who
 
-- **Shelter spot at home:** {shelter_home}
-- **Where we would go:** {where_go}
-- **How we get alerts:** {alerts}
+- Shelter spot at home: {shelter_home}
+- Where we would go: {where_go}
+- How we get alerts: {alerts}
 
 ## Do not
 

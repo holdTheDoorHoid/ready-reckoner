@@ -39,9 +39,9 @@ A wildfire is near, officials tell you to get ready or to leave, or smoke or fla
 
 ## Where and who
 
-- **Where we would go:** {where_go}
-- **Gas shut-off:** {gas_shutoff}
-- **Meeting place outside the neighborhood:** {meeting_far}
+- Where we would go: {where_go}
+- Gas shut-off: {gas_shutoff}
+- Meeting place outside the neighborhood: {meeting_far}
 
 ## Do not
 

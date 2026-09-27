@@ -38,9 +38,9 @@ An attack releases a chemical, a germ or radioactive material, or officials warn
 
 ## Where and who
 
-- **Where we would go:** {where_go}
-- **Nearest hospital:** {hospital}
-- **How we get alerts:** {alerts}
+- Where we would go: {where_go}
+- Nearest hospital: {hospital}
+- How we get alerts: {alerts}
 
 ## Do not
 

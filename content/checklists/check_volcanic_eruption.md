@@ -35,8 +35,8 @@ A volcano near you erupts or officials warn that it may, or ash is falling. Ash 
 
 ## Where and who
 
-- **Where we would go:** {where_go}
-- **How we get alerts:** {alerts}
+- Where we would go: {where_go}
+- How we get alerts: {alerts}
 
 ## Do not
 

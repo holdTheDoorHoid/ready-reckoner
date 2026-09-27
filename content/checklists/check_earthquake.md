@@ -38,9 +38,9 @@ The ground starts to shake, or your phone warns that shaking is coming.
 
 ## Where and who
 
-- **Gas shut-off:** {gas_shutoff}
-- **Water shut-off:** {water_shutoff}
-- **Out-of-area contact:** {out_of_area_contact}
+- Gas shut-off: {gas_shutoff}
+- Water shut-off: {water_shutoff}
+- Out-of-area contact: {out_of_area_contact}
 
 ## Do not
 

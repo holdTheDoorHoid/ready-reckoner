@@ -38,8 +38,8 @@ Someone is attacking people near you, or there is an explosion.
 
 ## Where and who
 
-- **Out-of-area contact:** {out_of_area_contact}
-- **Nearest hospital:** {hospital}
+- Out-of-area contact: {out_of_area_contact}
+- Nearest hospital: {hospital}
 
 ## Do not
 

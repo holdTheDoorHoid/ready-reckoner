@@ -37,9 +37,9 @@ After an attack, a bomb threat or another threat, police close streets or transi
 
 ## Where and who
 
-- **Meeting place outside the neighborhood:** {meeting_far}
-- **Out-of-area contact:** {out_of_area_contact}
-- **How we get alerts:** {alerts}
+- Meeting place outside the neighborhood: {meeting_far}
+- Out-of-area contact: {out_of_area_contact}
+- How we get alerts: {alerts}
 
 ## Do not
 

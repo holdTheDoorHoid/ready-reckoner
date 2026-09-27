@@ -36,9 +36,9 @@ Near the coast, you feel a strong or long earthquake, the sea rises fast or drai
 
 ## Where and who
 
-- **Where we would go:** {where_go}
-- **Meeting place outside the neighborhood:** {meeting_far}
-- **Out-of-area contact:** {out_of_area_contact}
+- Where we would go: {where_go}
+- Meeting place outside the neighborhood: {meeting_far}
+- Out-of-area contact: {out_of_area_contact}
 
 ## Do not
 

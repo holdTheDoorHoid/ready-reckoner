@@ -37,9 +37,9 @@ A flood or flash flood warning covers your area, or water is rising around you. 
 
 ## Where and who
 
-- **Where we would go:** {where_go}
-- **Electric panel:** {electric_panel}
-- **Meeting place outside the neighborhood:** {meeting_far}
+- Where we would go: {where_go}
+- Electric panel: {electric_panel}
+- Meeting place outside the neighborhood: {meeting_far}
 
 ## Do not
 

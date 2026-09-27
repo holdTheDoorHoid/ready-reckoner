@@ -43,9 +43,9 @@ An alert warns of a nuclear attack, you see a blinding flash, or you learn a nuc
 
 ## Where and who
 
-- **Shelter spot at home:** {shelter_home}
-- **Shelter spot at work or school:** {shelter_work}
-- **How we get alerts:** {alerts}
+- Shelter spot at home: {shelter_home}
+- Shelter spot at work or school: {shelter_work}
+- How we get alerts: {alerts}
 
 ## Do not
 

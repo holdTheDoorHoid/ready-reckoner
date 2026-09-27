@@ -39,8 +39,8 @@ Officials warn of a chemical spill or leak near you, or you see one happen. Some
 
 ## Where and who
 
-- **Where we would go:** {where_go}
-- **How we get alerts:** {alerts}
+- Where we would go: {where_go}
+- How we get alerts: {alerts}
 
 ## Do not
 

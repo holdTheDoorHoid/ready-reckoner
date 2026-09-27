@@ -35,9 +35,9 @@ Officials warn that a dam or levee near you is failing or may fail, or you see w
 
 ## Where and who
 
-- **Where we would go:** {where_go}
-- **Meeting place outside the neighborhood:** {meeting_far}
-- **How we get alerts:** {alerts}
+- Where we would go: {where_go}
+- Meeting place outside the neighborhood: {meeting_far}
+- How we get alerts: {alerts}
 
 ## Do not
 
