@@ -33,7 +33,7 @@ is handled has changed: still no server, no accounts, nothing sent anywhere.
   your basics."
 - **The nuclear row is now specific to where you live**, from a curated list of 39 real sites
   (missile fields, command posts, the ten largest metro areas, refineries, ports) that sorts every
-  county into one of five exposure classes. A household in Minot, North Dakota — home to Minot Air
+  county into one of six exposure classes. A household in Minot, North Dakota — home to Minot Air
   Force Base and a missile field — sees "between 1 in 1,700 and 1 in 26" over ten years and "blast or
   heavy fallout near likely targets." The same household in Coos Bay, Oregon sees "between 1 in
   100,000 and 1 in 250" and "shortages, power cuts and lost income, not blast or heavy fallout." Both
