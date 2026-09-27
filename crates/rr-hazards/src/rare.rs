@@ -530,9 +530,9 @@ fn multi_month(gmd: &Estimate, war: &Estimate, lower48: bool) -> Row {
         if_it_reaches_you: "No power for months: water, heat, medicine and money all affected. \
                             Puerto Rico waited 328 days after Hurricane Maria."
             .to_owned(),
-        what_it_changes: "Nothing to stockpile for months. The long-horizon section lists what \
-                          helps instead: a water filter with a water source, a way to cook, \
-                          sanitation."
+        what_it_changes: "Nothing to stockpile for months. What helps instead: a way to treat \
+                          water from a nearby source, a way to cook without power, a plan for \
+                          toilets and waste, and some cash."
             .to_owned(),
     }
 }
