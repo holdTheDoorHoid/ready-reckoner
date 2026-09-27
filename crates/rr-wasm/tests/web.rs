@@ -253,6 +253,36 @@ const CORE: &[(&str, &[u8])] = &[
         "core/series/oe417.toml",
         include_bytes!("../../../data/core/series/oe417.toml"),
     ),
+    // Added for v0.3.0 (DESIGN-DELTA-v3 §8): the eviction column, the ZIP centroids restore, and
+    // the storm-surge, wildfire-place and outage-event tables bundled from their optional packs.
+    (
+        "core/eviction.csv",
+        include_bytes!("../../../data/core/eviction.csv"),
+    ),
+    (
+        "core/zip_centroids.csv",
+        include_bytes!("../../../data/core/zip_centroids.csv"),
+    ),
+    (
+        "core/zip_surge.csv",
+        include_bytes!("../../../data/core/zip_surge.csv"),
+    ),
+    (
+        "core/wildfire_places.csv",
+        include_bytes!("../../../data/core/wildfire_places.csv"),
+    ),
+    (
+        "core/zip_wildfire_places.csv",
+        include_bytes!("../../../data/core/zip_wildfire_places.csv"),
+    ),
+    (
+        "core/outage_events.csv",
+        include_bytes!("../../../data/core/outage_events.csv"),
+    ),
+    (
+        "core/outage_holdout.csv",
+        include_bytes!("../../../data/core/outage_holdout.csv"),
+    ),
     (
         "core/counties.csv",
         include_bytes!("../../../data/core/counties.csv"),

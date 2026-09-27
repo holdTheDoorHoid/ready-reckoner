@@ -9,6 +9,8 @@
  *   them; `crates/rr-wasm/src/source.rs` (`ZIP_FILES`) answers `pack_missing` for a location with a
  *   ZIP code until they are in, so a plan is never made from half of the data.
  * - When a map is shown: `geo/counties.json`.
+ * - When the binder's Neighbourhood page is shown: `places/hospitals.csv` (its own pack,
+ *   `places`, so a first visit and a household that never opens that page fetch nothing extra).
  */
 
 /** Where build-web.sh puts the engine, relative to the site root. */
@@ -22,9 +24,12 @@ export const CORE_PACK = 'core';
 /** Loaded last so county records are assembled once. */
 export const COUNTY_LIST = 'core/counties.csv';
 /** The core files only ZIP-code lookups read; loaded when a ZIP code is needed. Same list as `ZIP_FILES` in crates/rr-wasm/src/source.rs. */
-export const ZIP_FILES: readonly string[] = ['core/zip_county.csv', 'core/zip_facilities.csv'];
+export const ZIP_FILES: readonly string[] = ['core/zip_county.csv', 'core/zip_facilities.csv', 'core/zip_surge.csv', 'core/zip_centroids.csv'];
 /** County outlines for the map thumbnail; loaded when a map is shown. */
 export const MAP_FILE = 'geo/counties.json';
+/** County hospitals with emergency services, for the binder's Neighbourhood page; its own pack
+ * (`places`, like `geo`), loaded only when that page is shown. */
+export const PLACES_FILE = 'places/hospitals.csv';
 /** `defaults()` puts this well-formed but unreal ZIP code in a new plan; the app must replace it. */
 export const PLACEHOLDER_ZIP = '00000';
 
@@ -54,7 +59,7 @@ export function startupFiles(manifest: Manifest): string[] {
   return coreLoadOrder(manifest).filter((p) => !ZIP_FILES.includes(p));
 }
 
-/** The ZIP tables the manifest lists (normally all three). */
+/** The ZIP tables the manifest lists (normally all four). */
 export function zipFiles(manifest: Manifest): string[] {
   return coreLoadOrder(manifest).filter((p) => ZIP_FILES.includes(p));
 }

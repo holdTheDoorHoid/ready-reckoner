@@ -64,6 +64,10 @@ impl DataStore {
             state_name: c.state_name.clone(),
             zip: if share.is_some() { zip } else { None },
             zip_county_share: share,
+            // awaiting: types3 — once `LocationResolved.zip_centroid: Option<LatLon>` exists
+            // (DESIGN-DELTA-v3 §3.3), set it here:
+            // `zip_centroid: zip.as_deref().and_then(|z| self.zip_centroid(z)),`
+            // (`DataStore::zip_centroid` is ready: crates/rr-data/src/lib.rs.)
             centroid: c.centroid,
             // awaiting: data3 (the ZIP code's centre from core/zip_centroids.csv, DESIGN-DELTA-v3
             // §3.3, §8)
