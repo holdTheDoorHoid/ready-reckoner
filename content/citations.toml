@@ -4260,3 +4260,40 @@ year = 2025
 url = "https://medlineplus.gov/ency/article/000045.htm"
 retrieved = "2026-09-27"
 license = "All rights reserved (paraphrased, not quoted)"
+
+# added by checklists-a2 (continued): the terrorism actions folded into the attack_disruption page
+# (planner decision 2026-09-27). cisa_suspicious_items and cisa_bomb_threats: browser pages
+# (cisa.gov refuses scripted clients), read 2026-09-27, quotes matched in the page text.
+# cisa_bomb_threat_guide_2025: the PDF, read from the Internet Archive capture of the same URL
+# (2026-06-23, text extracted); its checklist page says not to use two-way radios or cell phones
+# and not to touch or move a suspicious package. None of the three mentions secondary devices.
+
+[[citation]]
+id = "cisa_suspicious_items"
+title = "Suspicious Activity and Items"
+publisher = "Cybersecurity and Infrastructure Security Agency"
+year = 2026
+url = "https://www.cisa.gov/topics/physical-security/bombing-prevention/suspicious-activity-and-items"
+retrieved = "2026-09-27"
+quote = "If a suspicious item is discovered or the threat is elevated, it should be treated as an emergency by contacting 9-1-1."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_bomb_threats"
+title = "Bomb Threats"
+publisher = "Cybersecurity and Infrastructure Security Agency"
+year = 2026
+url = "https://www.cisa.gov/topics/physical-security/bombing-prevention/bomb-threats"
+retrieved = "2026-09-27"
+quote = "Write down the exact wording of the threat"
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cisa_bomb_threat_guide_2025"
+title = "Bomb Threat Guide (with the Bomb Threat Checklist)"
+publisher = "Cybersecurity and Infrastructure Security Agency (via Internet Archive)"
+year = 2025
+url = "https://www.cisa.gov/sites/default/files/2025-08/Bomb_Threat_Guide_082025_508.pdf"
+retrieved = "2026-09-27"
+quote = "Radio signals have the potential to detonate a bomb."
+license = "US Government Work (public domain)"
