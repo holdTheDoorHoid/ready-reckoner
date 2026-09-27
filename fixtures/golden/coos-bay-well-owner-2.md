@@ -110,7 +110,7 @@ Nearly every household like yours will lose power or have damage in a windstorm 
 
 Nearly every household like yours will have someone need emergency care in the next ten years.[19, 20]
 
-**Includes:** far from emergency care; falls; going into labour during a disaster.
+**Includes:** far from emergency care; falls.
 
 **What helps.** Take a first-aid and bleeding-control class. You may be able to save a life by acting right after an injury, before help arrives.[21] If a teen or adult collapses and their heart stops, call 911 and push hard and fast in the center of the chest. This hands-only CPR needs no training. Note where the nearest heart defibrillator (AED) is; it talks you through each step.[22] Keep a stocked first-aid kit. Check it regularly and replace anything used or out of date.[23] Keep a list of each person's medicines, doses and allergies with your emergency supplies.[24] Know how to reach 911. Call if you can, and text where that service works.[25]
 
@@ -223,7 +223,7 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 
 | What | How likely | If it reaches you | What it changes in your plan |
 | --- | --- | --- | --- |
-| Power out for months (any cause) | Between 1 in 49 and 1 in 8[10, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. The long-horizon section lists what helps instead: a water filter with a water source, a way to cook, sanitation. |
+| Power out for months (any cause) | Between 1 in 49 and 1 in 8[10, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Financial crisis with bank closures | Between 1 in 200 and 1 in 11[10, 77] | Cards and bank transfers stop for days. | Keep some cash in small bills (already in your plan) and a second account at another bank (free). |
 | Very large volcanic eruption | Between 1 in 130 and 1 in 26[10, 78] | A year or two of higher food prices and some shortages. | Nothing beyond a two-week pantry. |
 | Severe pandemic | Between 1 in 200 and 1 in 21[10, 56, 57] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |

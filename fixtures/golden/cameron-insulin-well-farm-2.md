@@ -99,7 +99,7 @@ What could reach a household like yours in Cameron Parish, Louisiana over the ne
 
 Nearly every household like yours will have someone need emergency care in the next ten years.[15, 16]
 
-**Includes:** far from emergency care; falls; going into labour during a disaster.
+**Includes:** far from emergency care; falls.
 
 **What helps.** Take a first-aid and bleeding-control class. You may be able to save a life by acting right after an injury, before help arrives.[17] If a teen or adult collapses and their heart stops, call 911 and push hard and fast in the center of the chest. This hands-only CPR needs no training. Note where the nearest heart defibrillator (AED) is; it talks you through each step.[18] Keep a stocked first-aid kit. Check it regularly and replace anything used or out of date.[19] Keep a list of each person's medicines, doses and allergies with your emergency supplies.[20] Know how to reach 911. Call if you can, and text where that service works.[21]
 
@@ -224,7 +224,7 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 | Severe pandemic | Between 1 in 200 and 1 in 21[11, 56, 57] | Months of disruption, strained hospitals and lost income. | Nothing new: the pandemic row already sizes your food and medicine. |
 | War with attacks on US infrastructure | Between 1 in 830 and 1 in 42[11, 71, 72] | Outages of power, water or phones for days, and shortages across the country. | Nothing beyond your basics. |
 | Severe solar storm | Between 1 in 7,600 and 1 in 150[11, 73, 74, 75, 76, 77] | Power out for days, and longer where large transformers fail. | Nothing beyond your power plan: a solar storm harms long power lines, not phones or radios. |
-| Power out for months (any cause) | Between 1 in 2,900 and 1 in 62[10, 11, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. The long-horizon section lists what helps instead: a water filter with a water source, a way to cook, sanitation. |
+| Power out for months (any cause) | Between 1 in 2,900 and 1 in 62[10, 11, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80] | No power for months: water, heat, medicine and money all affected. Puerto Rico waited 328 days after Hurricane Maria. | Nothing to stockpile for months. What helps instead: a way to treat water from a nearby source, a way to cook without power, a plan for toilets and waste, and some cash. |
 | Nuclear attack | Between 1 in 100,000 and 1 in 250[11, 71, 72, 78, 81, 82, 83, 84, 85] | Shortages, power cuts and lost income, not blast or heavy fallout. | Nothing beyond your basics. |
 | Mass shooting or bombing | Between 1 in 500,000 and 1 in 50,000[11, 86] | Injury or death. | Nothing to buy. Two free steps: know "run, hide, fight", and learn to stop bleeding. |
 | Chemical, biological or radiological attack | Very unlikely: less than 1 in 50,000[11, 66, 87] | An order to stay inside for hours, closed buildings, or medicine handed out at public sites. | Nothing beyond your basics: your three-day supplies cover sheltering inside. |
