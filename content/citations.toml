@@ -4160,3 +4160,204 @@ year = 2026
 url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/VALIDATION.md"
 retrieved = "2026-09-26"
 license = "CC BY-SA 4.0"
+
+# ---------------------------------------------------------------------------------------------
+# added by checklists-a1 (v0.3.0, tab 6 everyday and smaller hazards), 2026-09-27. How each page
+# was read: a plain download for weather.gov, ojjdp.ojp.gov, epa.gov, fs.usda.gov, avalanche.org,
+# missingkids.org, alz.org, nashville.gov, in.gov and azdot.gov; a browser page for cdc.gov,
+# cpsc.gov, 911.gov, nia.nih.gov and redcross.org (they refuse scripted clients); the Internet
+# Archive capture of FEMA's own ready.gov PDF (2025-08-09) for Until Help Arrives. Quotes are
+# stored only where the wording was matched in the page's own text.
+# ---------------------------------------------------------------------------------------------
+
+[[citation]]
+id = "gov911_faq"
+title = "FAQ About Calling 911"
+publisher = "National 911 Program (NHTSA)"
+year = 2023
+url = "https://www.911.gov/calling-911/frequently-asked-questions/"
+retrieved = "2026-09-27"
+quote = "Be prepared to follow any instructions the call-taker gives you."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "fema_until_help_arrives"
+title = "Until Help Arrives (web-based training transcript, version 1.0)"
+publisher = "FEMA / Ready.gov (via Internet Archive)"
+year = 2020
+url = "https://www.ready.gov/sites/default/files/2020-07/until-help-arrives-web-tutorial.pdf"
+retrieved = "2026-09-27"
+quote = "If the injured person is breathing, move them into the recovery position."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_stroke_signs"
+title = "Signs and Symptoms of Stroke"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/stroke/signs-symptoms/index.html"
+retrieved = "2026-09-27"
+quote = "Note the time when any symptoms first appear."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "cdc_heart_attack"
+title = "About Heart Attack Symptoms, Risk, and Recovery"
+publisher = "Centers for Disease Control and Prevention"
+year = 2024
+url = "https://www.cdc.gov/heart-disease/about/heart-attack.html"
+retrieved = "2026-09-27"
+quote = "If you notice the symptoms of a heart attack in yourself or someone else, call 9-1-1 immediately."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "redcross_choking_adult_child"
+title = "Adult & Child Choking: Symptoms and First Aid"
+publisher = "American Red Cross"
+year = 2026
+url = "https://www.redcross.org/take-a-class/resources/learn-first-aid/adult-child-choking"
+retrieved = "2026-09-27"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "redcross_bleeding_external"
+title = "Bleeding (Life-Threatening External)"
+publisher = "American Red Cross"
+year = 2026
+url = "https://www.redcross.org/take-a-class/resources/learn-first-aid/bleeding-life-threatening-external"
+retrieved = "2026-09-27"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "cpsc_co_questions_answers"
+title = "Carbon Monoxide Questions and Answers"
+publisher = "U.S. Consumer Product Safety Commission"
+year = 2026
+url = "https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Carbon-Monoxide-Information-Center/Carbon-Monoxide-Questions-and-Answers"
+retrieved = "2026-09-27"
+quote = "After calling 911, do a head count to check that all persons are accounted for."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ojjdp_missing_child_guide"
+title = "When Your Child Is Missing: A Family Survival Guide (fifth edition, 2025 update)"
+publisher = "U.S. Department of Justice, Office of Juvenile Justice and Delinquency Prevention"
+year = 2025
+url = "https://ojjdp.ojp.gov/publications/family-survival-guide-fifth-edition.pdf"
+retrieved = "2026-09-27"
+quote = "Immediately report your child as missing to your local law enforcement agency."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "ncmec_child_missing"
+title = "Is Your Child Missing?"
+publisher = "National Center for Missing & Exploited Children"
+year = 2026
+url = "https://www.missingkids.org/gethelpnow/isyourchildmissing"
+retrieved = "2026-09-27"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "alz_wandering"
+title = "Wandering (when someone with dementia is missing)"
+publisher = "Alzheimer's Association"
+year = 2026
+url = "https://www.alz.org/help-support/caregiving/stages-behaviors/wandering"
+retrieved = "2026-09-27"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "nia_wandering"
+title = "Coping With Alzheimer's Behaviors: Wandering and Getting Lost"
+publisher = "National Institute on Aging"
+year = 2024
+url = "https://www.nia.nih.gov/health/alzheimers-changes-behavior-and-communication/coping-alzheimers-behaviors-wandering-and"
+retrieved = "2026-09-27"
+quote = "Keep a recent photograph or video of the person to help police if the person becomes lost."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "mnpd_burglary_victim"
+title = "What To Do If You're a Victim of a Burglary"
+publisher = "Metropolitan Nashville Police Department"
+year = 2025
+url = "https://www.nashville.gov/departments/police/safety-information/burglary-victim-information"
+retrieved = "2026-09-27"
+license = "Local government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "in_dhs_home_protection"
+title = "Get Prepared: Home Protection"
+publisher = "Indiana Department of Homeland Security"
+year = 2026
+url = "https://www.in.gov/dhs/get-prepared/general-safety/home-protection/"
+retrieved = "2026-09-27"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "cdc_electrical_hazards"
+title = "What to Do to Protect Yourself From Electrical Hazards"
+publisher = "Centers for Disease Control and Prevention"
+year = 2026
+url = "https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-from-electrical-hazards.html"
+retrieved = "2026-09-27"
+quote = "Do not enter standing water to access the main power switch."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "epa_mold_moisture_guide"
+title = "A Brief Guide to Mold, Moisture and Your Home"
+publisher = "U.S. Environmental Protection Agency"
+year = 2026
+url = "https://www.epa.gov/mold/brief-guide-mold-moisture-and-your-home"
+retrieved = "2026-09-27"
+quote = "It is important to dry water-damaged areas and items within 24-48 hours to prevent mold growth."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "adot_severe_weather"
+title = "Severe Weather (driving in extreme heat, dust storms and monsoons)"
+publisher = "Arizona Department of Transportation"
+year = 2026
+url = "https://azdot.gov/about/transportation-safety/severe-weather"
+retrieved = "2026-09-27"
+license = "State government publication (paraphrased, not quoted)"
+
+[[citation]]
+id = "nws_lightning_safety"
+title = "Overview: Lightning Safety"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/lightning-safety-overview"
+retrieved = "2026-09-27"
+quote = "Finally, wait 30 minutes after the last lightning or thunder before going back outside."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nws_nwr_deaf"
+title = "NOAA Weather Radio for the Deaf and Hard of Hearing"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/nwr/special_needs"
+retrieved = "2026-09-27"
+quote = "Some receivers are equipped with special output connectors that activate alerting devices such as vibrators, bed shakers, pillow vibrators, strobe lights and other alerting systems."
+license = "US Government Work (public domain)"
+
+[[citation]]
+id = "nac_perform_rescue"
+title = "Avalanche Safety: Perform a Rescue"
+publisher = "National Avalanche Center (avalanche.org)"
+year = 2026
+url = "https://avalanche.org/avalanche-tutorial/avalanche-rescue.php"
+retrieved = "2026-09-27"
+license = "All rights reserved (paraphrased, not quoted)"
+
+[[citation]]
+id = "usfs_avalanche_safety"
+title = "Avalanches (Know Before You Go)"
+publisher = "USDA Forest Service"
+year = 2026
+url = "https://www.fs.usda.gov/visit/know-before-you-go/avalanches"
+retrieved = "2026-09-27"
+quote = "Take a certified avalanche course."
+license = "US Government Work (public domain)"
