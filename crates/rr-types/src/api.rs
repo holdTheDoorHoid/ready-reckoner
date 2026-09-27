@@ -503,6 +503,7 @@ mod tests {
                 lat: 40.0,
                 lon: -75.1,
             },
+            zip_centroid: None,
             nca_region: "northeast".into(),
             coastal: false,
             tsunami_zone: false,

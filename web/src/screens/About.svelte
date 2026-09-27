@@ -6,7 +6,7 @@
 -->
 <script lang="ts">
   import Icon from '../components/Icon.svelte';
-  import { MAP_FILE, ZIP_FILES } from '../engine/data-files';
+  import { MAP_FILE, PLACES_FILE, ZIP_FILES } from '../engine/data-files';
   import type { Phase } from '../engine/loader';
   import { useApp } from '../lib/app.svelte';
   import { formatDate } from '../lib/format';
@@ -43,10 +43,12 @@
     const zips = core.filter((f) => ZIP_FILES.includes(f.path));
     const counties = core.filter((f) => !ZIP_FILES.includes(f.path));
     const map = (manifest.packs.geo?.files ?? []).filter((f) => f.path === MAP_FILE);
+    const places = (manifest.packs.places?.files ?? []).filter((f) => f.path === PLACES_FILE);
     return [
       { name: 'County data', what: 'For every county: natural hazards, power outages, storms and other events, climate projections, floods, earthquakes, nearby facilities and how resilient the community is.', files: counties.length, bytes: size(counties), status: phaseWords(app.data?.core.phase, 'Loads when the app opens') },
       { name: 'ZIP code list', what: 'Which county each ZIP code is in, and how far it is from nuclear plants and chemical sites.', files: zips.length, bytes: size(zips), status: phaseWords(app.data?.zip.phase, 'Loads when you type a ZIP code') },
       { name: 'County map', what: 'The outline of every county, for the small maps.', files: map.length, bytes: size(map), status: phaseWords(app.data?.map.phase, 'Loads when a map is shown') },
+      { name: 'Hospitals', what: 'Hospitals with emergency services near you, for the binder.', files: places.length, bytes: size(places), status: phaseWords(app.data?.places.phase, 'Loads when the Neighbourhood page is shown') },
     ].filter((p) => p.files > 0);
   });
 
@@ -144,8 +146,8 @@
     <section aria-labelledby="data-title">
       <h2 id="data-title">The data on this device</h2>
       <p>
-        The app downloads its data once, from this site only, and keeps it in this browser so it also works offline. The ZIP code list and the
-        map come only when they are needed. Sizes are as stored; the download is smaller.
+        The app downloads its data once, from this site only, and keeps it in this browser so it also works offline. The ZIP code list, the
+        map and the hospital list come only when they are needed. Sizes are as stored; the download is smaller.
       </p>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div class="table-wrap" tabindex="0" role="region" aria-label="Data parts: size and status">

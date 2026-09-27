@@ -1,7 +1,8 @@
 //! Ids content may name, and the rules that go with each kind of guidance block.
 //!
-//! Hazards, buckets, rare families, access needs and benefits come from engine contract v2 in
-//! `rr-types`; this module turns them into the checks the validator and the conditional spans use.
+//! Hazards, buckets, rare families, access needs and benefits come from the engine contract in
+//! `rr-types`; this module turns them into the checks the validator and the conditional spans use,
+//! and adds the everyday emergencies checklists apply to ([`EVENTS`], contract v3).
 //! A rare family is named by its lead hazard id ([`rr_types::HazardId::family`]), so a family
 //! block applies to `family:<hazard id>`.
 
@@ -15,6 +16,23 @@ pub const ACCESS_NEEDS: &[&str] = AccessNeed::STRS;
 
 /// Benefits a household may rely on, for `{if:benefit:<id>}` spans (`Finances.benefits`).
 pub const BENEFITS: &[&str] = Benefit::STRS;
+
+/// The everyday emergencies every household's binder has a checklist for whatever its hazards
+/// (DESIGN-DELTA-v3 §3.3, §5.5): the ids a checklist's `applies_to` may name as `event:<id>`.
+pub const EVENTS: &[&str] = &[
+    "gas_leak_or_co",
+    "missing_person",
+    "evacuation_order",
+    "shelter_in_place",
+    "boil_water_notice",
+    "power_outage",
+    "something_else",
+];
+
+/// An everyday emergency ([`EVENTS`]).
+pub fn is_event(id: &str) -> bool {
+    EVENTS.contains(&id)
+}
 
 /// A hazard id content may name: any id `rr-types` parses, the retired `terrorism` included (a
 /// block may keep explaining it for saved plans).
@@ -37,6 +55,9 @@ pub fn rare_families() -> Vec<&'static str> {
     rr_types::rare_family_ids().collect()
 }
 
+/// Every checklist id starts with this (`check_house_fire`; DESIGN-DELTA-v3 §5.4).
+pub const CHECKLIST_PREFIX: &str = "check_";
+
 /// The rules each kind of guidance block follows (the `kind` front-matter field). The validator
 /// checks that a block's id starts with its kind ([`KindRules::prefix`]) and that it applies to at
 /// least one target of the same kind.
@@ -54,7 +75,11 @@ pub trait KindRules {
 
 impl KindRules for GuidanceKind {
     fn prefix(self) -> String {
-        format!("{}_", self.as_str())
+        match self {
+            // DESIGN-DELTA-v3 §5.4: checklist ids start with `check_` (`check_house_fire`).
+            GuidanceKind::Checklist => CHECKLIST_PREFIX.to_owned(),
+            _ => format!("{}_", self.as_str()),
+        }
     }
 
     fn opens_with_frequency(self) -> bool {
@@ -80,7 +105,11 @@ mod tests {
     fn kinds_name_their_prefix_and_rules() {
         for k in GuidanceKind::ALL {
             assert_eq!(k.as_str().parse::<GuidanceKind>(), Ok(*k));
-            assert_eq!(k.prefix(), format!("{}_", k.as_str()));
+            let want = match k {
+                GuidanceKind::Checklist => "check_".to_owned(),
+                _ => format!("{}_", k.as_str()),
+            };
+            assert_eq!(k.prefix(), want);
         }
         assert!("recipe".parse::<GuidanceKind>().is_err());
         assert!(GuidanceKind::Family.opens_with_frequency());
@@ -103,5 +132,24 @@ mod tests {
         assert_eq!(rare_families().len(), 9);
         assert!(ACCESS_NEEDS.contains(&"dialysis"));
         assert!(BENEFITS.contains(&"snap_wic"));
+    }
+
+    #[test]
+    fn the_everyday_emergencies_are_the_deltas_seven() {
+        assert_eq!(
+            EVENTS,
+            [
+                "gas_leak_or_co",
+                "missing_person",
+                "evacuation_order",
+                "shelter_in_place",
+                "boil_water_notice",
+                "power_outage",
+                "something_else"
+            ]
+        );
+        assert!(is_event("power_outage") && !is_event("power") && !is_event("tornado"));
+        // No event id doubles as a hazard id, so `event:` and `hazard:` never mean the same page.
+        assert!(EVENTS.iter().all(|e| !is_hazard(e)));
     }
 }

@@ -31,8 +31,10 @@
 //! 5. **A held-out test**: fit on 2014-2019, predict 2020-2025, for the county's own record, the
 //!    region alone and the blend (plus an even/odd-year split that is not affected by the lower
 //!    coverage of the early years).
-//! 6. **Per-county event curves** for events of a day or more, in the optional pack
-//!    `opt/outage_events/`.
+//! 6. **Per-county event curves** for events of a day or more, in `core/outage_events.csv` and
+//!    `core/outage_holdout.csv` (bundled into the core pack, DESIGN-DELTA-v3 §8, 2026-09-27;
+//!    formerly the optional `outage_events` pack, issue #15). Loaded eagerly with the rest of the
+//!    core pack; expert views and the validation page are still the only readers.
 
 // The five outage lengths and ten causes are parallel fixed-size arrays; indexing them by
 // position reads more plainly than zipped iterators.
@@ -57,10 +59,11 @@ pub const CAUSES: &str = "core/outage_causes.csv";
 pub const CURVES: &str = "core/outage_curves.csv";
 /// The worst outage event in each county's region, with its curve.
 pub const STRESS: &str = "core/outage_stress.csv";
-/// Optional pack: every county event of a day or more with its restoration curve.
-pub const OPT_EVENTS: &str = "opt/outage_events/county_events.csv";
-/// Optional pack: the held-out test results, for the validation page.
-pub const OPT_HOLDOUT: &str = "opt/outage_events/holdout.csv";
+/// Every county event of a day or more with its restoration curve. A core file, but read only by
+/// the expert views and the validation page.
+pub const OPT_EVENTS: &str = "core/outage_events.csv";
+/// The held-out test results, for the validation page. A core file (see [`OPT_EVENTS`]).
+pub const OPT_HOLDOUT: &str = "core/outage_holdout.csv";
 
 /// Radius of a county's region for the stress table.
 pub const REGION_RADIUS_KM: f64 = 250.0;

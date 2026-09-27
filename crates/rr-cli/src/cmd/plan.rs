@@ -1,4 +1,6 @@
-//! `rr plan`: the printable packet (Markdown) and/or the whole PlanOutput (JSON). The JSON is
+//! `rr plan`: the printable packet (Markdown) and/or the whole PlanOutput (JSON). The Markdown is
+//! `PlanOutput::prepare_markdown` (contract v3), which until the binder workstream lands is the v2
+//! packet unchanged; the binder workstream decides what `rr plan` prints then. The JSON is
 //! written with `rr_plan::to_json`, so for a fixture household on the fixture counties it is the
 //! same bytes as `fixtures/golden/<name>.json`.
 
@@ -29,7 +31,7 @@ pub fn run(engine: &Engine<Source>, args: &PlanArgs) -> Result<Output, CliError>
         notes: household::scenario_notes(&h, &output.scenarios, &super::place(&output.location)),
         ..Output::default()
     };
-    let md = || output.packet_markdown.clone();
+    let md = || output.prepare_markdown.clone();
     let json = || rr_plan::to_json(&output);
     match &args.out {
         None => {

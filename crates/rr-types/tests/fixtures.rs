@@ -291,7 +291,111 @@ fn the_v2_households_use_the_new_inputs() {
     assert!(any(&|i| !i.dials.rare_opt_in.is_empty()));
     assert!(any(&|i| i.dials.minimum_kit));
     assert!(any(&|i| i.dials.long_horizon));
-    assert_eq!(v2.iter().filter(|i| i.family_plan.is_some()).count(), 1);
+    // One v2 household fills in the v2 family plan (Detroit); Minot's plan holds only the v3
+    // sample answers (DESIGN-DELTA-v3 §10).
+    assert_eq!(
+        v2.iter()
+            .filter(|i| i.family_plan.as_ref().is_some_and(has_v2_answers))
+            .count(),
+        1
+    );
+}
+
+/// Whether a family plan holds anything besides the contract v3 groups.
+fn has_v2_answers(plan: &FamilyPlan) -> bool {
+    let older = FamilyPlan {
+        home: None,
+        neighbourhood: None,
+        pets: vec![],
+        vehicles: vec![],
+        documents: None,
+        ..plan.clone()
+    };
+    !older.is_empty()
+}
+
+/// DESIGN-DELTA-v3 §10: three households carry the optional answers so the goldens exercise
+/// every page kind once the binder lands: Philadelphia everything, Minot names and phone numbers
+/// with part of the home, Chicago nothing.
+#[test]
+fn the_v3_samples_are_full_partial_and_empty() {
+    let get = |n: &str| fixtures::get(n).unwrap();
+    let phila = get("philadelphia-renters-4");
+    let profiles: Vec<&PersonProfile> = phila
+        .people
+        .iter()
+        .map(|p| p.profile.as_ref().expect("every person has a profile"))
+        .collect();
+    let any = |f: &dyn Fn(&PersonProfile) -> bool| profiles.iter().any(|p| f(p));
+    assert!(
+        profiles
+            .iter()
+            .all(|p| p.name.is_some() && p.place.is_some())
+    );
+    assert!(any(&|p| p.date_of_birth.is_some()
+        && p.phone.is_some()
+        && p.email.is_some()));
+    assert!(any(&|p| p
+        .doctor
+        .as_ref()
+        .is_some_and(|d| d.address.is_some())));
+    assert!(any(&|p| p.pharmacy.is_some() && p.conditions.is_some()));
+    assert!(any(&|p| p.medications.len() >= 2));
+    assert!(any(&|p| p.allergies.is_some() && p.blood_type.is_some()));
+    assert!(any(&|p| p
+        .insurance
+        .as_ref()
+        .is_some_and(|i| i.group_number.is_some())));
+    assert!(any(&|p| p.id_notes.is_some() && p.notes.is_some()));
+    let kinds: Vec<PlaceKind> = profiles
+        .iter()
+        .filter_map(|p| p.place.as_ref().map(|pl| pl.kind))
+        .collect();
+    assert!(kinds.contains(&PlaceKind::Work) && kinds.contains(&PlaceKind::School));
+    let plan = phila.family_plan.as_ref().unwrap();
+    assert!(
+        !has_v2_answers(plan),
+        "Philadelphia's v2 family plan stays empty"
+    );
+    let home = plan.home.as_ref().unwrap();
+    assert!(home.address.is_some() && home.electric_utility.is_some());
+    assert!(home.landlord_or_mortgage.is_some() && home.where_cash.is_some());
+    let hood = plan.neighbourhood.as_ref().unwrap();
+    assert!(hood.hospital.is_some() && hood.alerts.is_some());
+    assert_eq!(plan.pets.len(), 2);
+    assert_eq!(plan.vehicles.len(), 1);
+    let docs = plan.documents.as_ref().unwrap();
+    assert!(!docs.accounts.is_empty() && !docs.policies.is_empty());
+    assert!(
+        docs.accounts
+            .iter()
+            .all(|a| a.last4.as_deref().is_some_and(|l| l.len() == 4))
+    );
+
+    // Sample data only: every phone number is a 555-01xx number.
+    let json = serde_json::to_string(&phila).unwrap();
+    for piece in json.split("\"phone\":\"").skip(1) {
+        let number = &piece[..piece.find('"').unwrap()];
+        assert!(number.starts_with("555-01"), "{number}");
+    }
+
+    let minot = get("minot-missile-field-3");
+    for p in &minot.people {
+        let profile = p.profile.as_ref().expect("a profile");
+        let only_name_and_phone = PersonProfile {
+            name: profile.name.clone(),
+            phone: profile.phone.clone(),
+            ..PersonProfile::default()
+        };
+        assert_eq!(profile, &only_name_and_phone);
+    }
+    let minot_plan = minot.family_plan.as_ref().unwrap();
+    assert!(minot_plan.home.is_some() && minot_plan.neighbourhood.is_none());
+    assert!(minot_plan.pets.is_empty() && minot_plan.documents.is_none());
+
+    let chicago = get("chicago-student-zero-budget-1");
+    assert!(chicago.people.iter().all(|p| p.profile.is_none()));
+    assert!(chicago.family_plan.is_none());
 }
 
 #[test]

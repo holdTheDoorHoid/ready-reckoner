@@ -170,10 +170,10 @@ describe('the Risks cards and targets', () => {
   it('say what the dial means per need and for all needs together (M-04), in the engine’s own words for the household', async () => {
     const { r, out } = await screenWith(Risks, 'risks');
     // Philadelphia: the packet's own sentence ("about 3 in 10"), not a fixed figure (R3-25).
-    const engine = engineDialSentence(out.packet_markdown, 'one_in_100')!;
+    const engine = engineDialSentence(out.prepare_markdown, 'one_in_100')!;
     expect(engine).toContain('about 1 in 10 households like yours will face a longer disruption of any one kind in the next 10 years; about 3 in 10 will face at least one kind that runs past its target.');
     expect(text(r.target.querySelector('p.dial-sentence'))).toBe(engine);
-    expect(dialSentence('one_in_100', out.packet_markdown)).toBe(engine);
+    expect(dialSentence('one_in_100', out.prepare_markdown)).toBe(engine);
     (r.target.querySelector('button[aria-controls="settings-panel"]') as HTMLButtonElement).click();
     flushSync();
     const dial = r.target.querySelector('fieldset.dial')!;
@@ -280,7 +280,7 @@ describe('the plan (W3, W9, W11)', () => {
     // In the packet's numbering (month 0 is the plan date's month): the packet's checklist says
     // "Cash in small bills: $200 (month 22)".
     const month = out.plan.months.find((m) => m.items.includes(cashLine!))!.index;
-    expect(out.packet_markdown).toContain(`Cash in small bills: $200 (month ${month})`);
+    expect(out.prepare_markdown).toContain(`Cash in small bills: $200 (month ${month})`);
     expect(cash).toContain(`all set aside in ${planMonthPhrase(FIXTURES[NAME].planning_date, month)}`);
     expect(cash).toMatch(/all set aside in month \d+ \(\w+ \d{4}\)/);
     expect(cash).not.toContain('ready to buy');

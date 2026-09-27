@@ -8,9 +8,12 @@
     "below_grade_bedroom": false, "cooking": "gas", "water_system_record": "fine"
   },
   "people": [
-    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 22, "mode": "car", "remote_possible": false } },
-    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": true, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 5, "mode": "car", "remote_possible": true } },
-    { "age_band": "child", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": false }
+    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 22, "mode": "car", "remote_possible": false },
+      "profile": { "name": "Chris", "phone": "555-0150" } },
+    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": true, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 5, "mode": "car", "remote_possible": true },
+      "profile": { "name": "Jordan", "phone": "555-0151" } },
+    { "age_band": "child", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": false,
+      "profile": { "name": "Avery" } }
   ],
   "pets": { "dogs": 1, "cats": 0, "small": 0, "large_animals": 0 },
   "mobility": { "vehicles": [ { "fuel": "gas" }, { "fuel": "hybrid" } ] },
@@ -28,5 +31,13 @@
   "dials": {
     "return_period": "one_in_100", "climate": "today", "horizon_years": 10,
     "rare_opt_in": ["nuclear_attack", "geomagnetic_storm"]
+  },
+  "family_plan": {
+    "home": {
+      "address": "56 Sample Road, Minot, ND 58701",
+      "electric_utility": { "name": "Sample Rural Electric", "phone": "555-0152" },
+      "where_kit": "Basement shelf by the stairs",
+      "where_documents": "Fireproof box in the bedroom closet"
+    }
   }
 }

@@ -7,6 +7,11 @@
  * Contract v2: every new input is optional (absent means "not asked", or its default), and the one
  * new check is `rare_opt_in`, whose entries must be family ids or `all` (`unknown_id`). Nothing in
  * the family plan is ever a problem beyond its types: it is only tidied (`tidyFamilyPlan`).
+ *
+ * Contract v3 (types3): the people's `profile` and the family plan's `home`, `neighbourhood`,
+ * `pets`, `vehicles` and `documents` are accepted with their types, every field optional (a
+ * `Place` needs its `kind`); like the family plan they are never a problem. Echoing them is the
+ * interview workstream's (awaiting: web-interview3).
  */
 import type { PlanInput, Problem, ProblemCode } from '../types';
 import {
@@ -24,6 +29,7 @@ import {
   HOUSING_KINDS,
   INCOME_STABILITIES,
   MOBILITY_LEVELS,
+  PLACE_KINDS,
   RARE_HAZARD_IDS,
   RAW_WATER_SOURCES,
   RETURN_PERIODS,
@@ -57,7 +63,67 @@ const list = (of: Schema): Schema => ({ t: 'array', of });
 /** An object whose every field may be left out (the family plan and its parts). */
 const loose = (fields: Record<string, Schema>): Schema => obj(fields, Object.keys(fields));
 
-const CONTACT: Schema = loose({ name: str, phone: str });
+const CONTACT: Schema = loose({ name: str, phone: str, address: str });
+
+/** Contract v3: the answers to the interview's optional steps 6–8 (DESIGN-DELTA-v3 §3.1, §3.2). */
+const PLACE: Schema = obj(
+  { kind: en(PLACE_KINDS), name: str, address: str, phone: str, plan: str, pickup: str, safest_spot: str },
+  ['name', 'address', 'phone', 'plan', 'pickup', 'safest_spot'],
+);
+const PERSON_PROFILE: Schema = loose({
+  name: str,
+  date_of_birth: str,
+  phone: str,
+  email: str,
+  place: PLACE,
+  doctor: CONTACT,
+  pharmacy: CONTACT,
+  conditions: str,
+  medications: list(loose({ name: str, dose: str, schedule: str, purpose: str })),
+  allergies: str,
+  blood_type: str,
+  insurance: loose({ carrier: str, plan_name: str, member_id: str, group_number: str, phone: str }),
+  id_notes: str,
+  notes: str,
+});
+const HOME_INFO: Schema = loose({
+  address: str,
+  electric_utility: CONTACT,
+  gas_utility: CONTACT,
+  water_utility: CONTACT,
+  insurer: CONTACT,
+  policy_number: str,
+  landlord_or_mortgage: CONTACT,
+  where_kit: str,
+  where_documents: str,
+  where_cash: str,
+  where_keys: str,
+});
+const NEIGHBOURHOOD: Schema = loose({
+  hospital: CONTACT,
+  urgent_care: CONTACT,
+  pharmacy: CONTACT,
+  shelter: CONTACT,
+  county_emergency_office: CONTACT,
+  alerts: str,
+});
+const PET_INFO: Schema = loose({
+  name: str,
+  kind: str,
+  description: str,
+  medications: str,
+  vet: CONTACT,
+  microchip: str,
+  records_where: str,
+});
+const VEHICLE_INFO: Schema = loose({ description: str, plate: str, insurer: CONTACT, policy_number: str, kept_in_car: str });
+const DOCUMENTS_INFO: Schema = loose({
+  accounts: list(loose({ institution: str, kind: str, phone: str, last4: str })),
+  policies: list(loose({ insurer: str, kind: str, policy_number: str, phone: str })),
+  where_originals: str,
+  where_copies: str,
+  digital_backup: str,
+});
 
 /** `FamilyPlan` (contract v2): free text only, every field optional. */
 const FAMILY_PLAN: Schema = loose({
@@ -79,6 +145,11 @@ const FAMILY_PLAN: Schema = loose({
   lawyer: CONTACT,
   roadside_assistance: str,
   numbers_by_heart: list(str),
+  home: HOME_INFO,
+  neighbourhood: NEIGHBOURHOOD,
+  pets: list(PET_INFO),
+  vehicles: list(VEHICLE_INFO),
+  documents: DOCUMENTS_INFO,
 });
 
 const PLAN_INPUT: Schema = obj(
@@ -118,8 +189,9 @@ const PLAN_INPUT: Schema = obj(
           earner: bool,
           commute: obj({ distance_km: num, mode: en(COMMUTE_MODES), remote_possible: bool }),
           access_needs: list(en(ACCESS_NEEDS)),
+          profile: PERSON_PROFILE,
         },
-        ['commute', 'access_needs'],
+        ['commute', 'access_needs', 'profile'],
       ),
     },
     pets: obj({ dogs: u8, cats: u8, small: u8, large_animals: u8 }),

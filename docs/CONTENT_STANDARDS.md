@@ -212,9 +212,29 @@ with `|` (any one matches); an unknown, empty or repeated value is an error.
 | `{if:need:<need>}` | someone in the household has that access or functional need | `hearing`, `vision`, `limited_english`, `cognitive`, `supervision`, `service_animal`, `dialysis`, `home_health` |
 | `{if:has:<item id>}` | the household owns the item or the plan includes it | any catalogue item id |
 | `{if:benefit:<benefit>}` | the household relies on that benefit | `federal_pay`, `snap_wic`, `ssi_ssdi`, `va`, `unemployment` |
+| `{if:children}`, `{if:pets}`, `{if:vehicle}`, `{if:powered_device}` | anyone is under 18; an animal is counted; a vehicle is listed; anyone relies on a powered medical device (contract v3) | none (the word alone) |
 
 A sentence for a condition no span covers (a well, wood heat) is written plainly and opens with its
 condition ("If you heat with wood, ...").
+
+**Checklists** (`content/checklists/<id>.md`, contract v3; `docs/DESIGN-DELTA-v3.md` §5.3–5.5 is
+the specification). The front matter adds `onset` (`now`, `coming`, `ongoing`: tab 6, 7 or 8)
+and `pages` (1, or 2 for `check_hurricane` and `check_nuclear_attack` only); `kind` is
+`checklist`, ids start with `check_`, and `applies_to` names only `hazard:<id>` and `event:<id>`
+targets (`rr_content::ids::EVENTS`), each hazard or event in one block. The validator
+(`check_checklists` in `crates/rr-content/src/validate.rs`) enforces: the eight `##` sections in
+order (`Use this when`, `Do first`, `Then`, `Leave or stay`, `Where and who`, `Do not`, `When it is
+over`, `Sources`) and no others; numbered steps in `Do first` (1 to 6) and `Then` (up to 10), each
+opening with bold lead words; `- ` lines in the other lists (up to 4, 3, 5 and 5); a `[^id]` on
+every step and on every `Do not` and `When it is over` bullet (a bullet that only points to a page
+with `{ref:…}` excepted); only the placeholders and `{ref:…}` pages of §5.4; at most 330 words (620
+for two pages), counting every span, each placeholder or `{ref:…}` as one word, and neither the
+headings nor Sources. A whole step or bullet may be conditional: open the span right after `1. ` or
+`- ` and close it at the end of the line; a step left empty for a household is dropped and the
+steps are renumbered. A checklist may name any hazard in a span. Reading level above grade 8, a
+retired hazard in `applies_to`, and a `Use this when` of more than two sentences are warnings. Once
+`content/checklists/` holds more than ten files, every active hazard and everyday emergency must
+have a checklist (a warning until then).
 
 **Life-safety sentences reach paper.** A sentence that could save a life (fire escape, gas leak,
 carbon monoxide, downed lines, CPR, heat stroke, medicine storage) goes in a block the packet

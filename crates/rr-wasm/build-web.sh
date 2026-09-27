@@ -54,12 +54,12 @@ rm -rf "$data_out"
 if [ -f "$data_in/manifest.json" ]; then
   mkdir -p "$data_out"
   cp "$data_in/manifest.json" "$data_out/"
-  for pack in core geo; do
+  for pack in core geo places; do
     if [ -d "$data_in/$pack" ]; then
       cp -R "$data_in/$pack" "$data_out/$pack"
     fi
   done
-  echo "Copied data/manifest.json, data/core/ and data/geo/ into web/public/data/"
+  echo "Copied data/manifest.json, data/core/, data/geo/ and data/places/ into web/public/data/"
 else
   echo "build-web.sh: data/manifest.json is missing, so the site will plan with the engine's fourteen built-in sample counties" >&2
 fi

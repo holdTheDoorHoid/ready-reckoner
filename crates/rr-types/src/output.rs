@@ -6,7 +6,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    BucketId, Citation, CitationId, Date, HazardId, HazardTier, ItemId, TargetKind, TierId,
+    Binder, BucketId, Citation, CitationId, Date, HazardId, HazardTier, ItemId, TargetKind, TierId,
 };
 
 /// A location the engine recognised: a county, plus the ZIP code if one was given.
@@ -31,6 +31,11 @@ pub struct LocationResolved {
     pub zip_county_share: Option<f32>,
     /// The county's centre.
     pub centroid: LatLon,
+    /// The ZIP code's centre (Census 2020 ZCTA Gazetteer; DESIGN-DELTA-v3 §3.3, §8), where the
+    /// maps start. Omitted when the location has no ZIP code or the pack does not know it
+    /// (contract v3).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zip_centroid: Option<LatLon>,
     /// Fifth National Climate Assessment region id, for example `"northeast"`.
     pub nca_region: String,
     /// The county touches the coast.
@@ -721,8 +726,12 @@ pub struct PlanOutput {
     pub requirements: Vec<RequirementLine>,
     /// Guardrail warnings.
     pub warnings: Vec<Warning>,
-    /// The printable packet (DESIGN §9), as Markdown.
-    pub packet_markdown: String,
+    /// The during-event binder (DESIGN-DELTA-v3 §4): parts, pages and blocks for the renderers
+    /// (contract v3; it replaces v2's `packet_markdown`).
+    pub binder: Binder,
+    /// The Prepare sheet as Markdown (DESIGN-DELTA-v3 §4): the preparation plan the Prepare and
+    /// Keep it up tabs print and `rr plan` writes (contract v3).
+    pub prepare_markdown: String,
     /// Every citation referenced anywhere above.
     pub provenance: Vec<Citation>,
     /// Facts for the recovery page ("After a disaster: the first 30 days") (contract v2; REVIEW
