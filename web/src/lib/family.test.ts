@@ -4,7 +4,7 @@ import { FIXTURES } from '../engine/fixtures';
 import type { FamilyPlan, PlanInput } from '../engine/types';
 import { FAMILY_PLAN_SHORT_MAX, FAMILY_PLAN_TEXT_MAX, NUMBERS_BY_HEART_MAX, TRUSTED_CIRCLE_MAX } from '../engine/types';
 import detroitJson from '../../../fixtures/households/detroit-snap-3.json';
-import { clone } from '../test/helpers';
+import { clone, withoutOptional } from '../test/helpers';
 import { PETS_MAX } from './tidy';
 import {
   addNumber,
@@ -181,7 +181,7 @@ describe('contract v3: the home, neighbourhood, pets, vehicles and documents (DE
   });
 
   it('edits the new groups by path, and leaves no empty group or plan behind', () => {
-    const input = clone(FIXTURES['philadelphia-renters-4']);
+    const input = withoutOptional(FIXTURES['philadelphia-renters-4']);
     setPlanText(input, ['home', 'water_utility', 'phone'], '555-0140');
     expect(input.family_plan).toEqual({ home: { water_utility: { phone: '555-0140' } } });
     expect(addPlanRow(input, ['pets'], PETS_MAX)).toBe(true);

@@ -16,7 +16,7 @@ import detroitJson from '../../../fixtures/households/detroit-snap-3.json';
 import { STORAGE_KEY, type SavedPlan } from '../lib/persistence';
 import { AGE_WORD } from '../lib/profile';
 import { ENCRYPTED_FORMAT, protectedExportText } from '../lib/protect';
-import { render, savedFor, until, type Rendered } from '../test/helpers';
+import { render, savedFor, until, withoutOptional, type Rendered } from '../test/helpers';
 import Contacts from './Contacts.svelte';
 import Have from './Have.svelte';
 import Maintain from './Maintain.svelte';
@@ -44,11 +44,14 @@ async function open(Screen: Component, route: string, plan: SavedPlan | null): P
   return current;
 }
 
+/** A fixture household as it is (contract v3 fixtures carry sample answers to the optional steps). */
 const fixture = (name: FixtureName) => savedFor(FIXTURES[name]);
+/** A fixture household that has not answered any optional step yet. */
+const blank = (name: FixtureName) => savedFor(withoutOptional(FIXTURES[name]));
 
-/** A saved plan with the five required steps answered and the optional ones not. */
+/** A blank household with the five required steps answered and the optional ones not. */
 function requiredOnly(name: FixtureName): SavedPlan {
-  const plan = fixture(name);
+  const plan = blank(name);
   plan.progress.completed = ['where', 'who', 'travel', 'money', 'have'];
   return plan;
 }
@@ -120,7 +123,7 @@ function said(from: Rendered | Element): string {
 
 describe('Step 6, Your people', () => {
   it('has a card per person from step 2, in order, headed by age group until a name is given', async () => {
-    for (const plan of [fixture('philadelphia-renters-4'), fixture('chicago-student-zero-budget-1'), savedFor(detroit), fixture('hays-kansas-farm-5')]) {
+    for (const plan of [blank('philadelphia-renters-4'), blank('chicago-student-zero-budget-1'), savedFor(detroit), blank('hays-kansas-farm-5')]) {
       const r = await open(People, 'people', plan);
       expect(r.target.querySelector('h1')?.textContent).toBe('Your people');
       expect(r.text()).toContain('Step 6 of 8 · optional');
@@ -131,7 +134,7 @@ describe('Step 6, Your people', () => {
   });
 
   it('asks §2.1’s questions in its order, every one optional', async () => {
-    const r = await open(People, 'people', fixture('philadelphia-renters-4'));
+    const r = await open(People, 'people', blank('philadelphia-renters-4'));
     openAll(r);
     const card = r.target.querySelector('#person-1')!;
     const labels = [...card.querySelectorAll('label:not(.choice), legend')].map(shown);
@@ -177,7 +180,7 @@ describe('Step 6, Your people', () => {
   });
 
   it('saves answers as typed, tidies them when left, takes the name as the heading, and keeps no empty profile', async () => {
-    const r = await open(People, 'people', fixture('philadelphia-renters-4'));
+    const r = await open(People, 'people', blank('philadelphia-renters-4'));
     const name = field(r, 'pp-1-name');
     type(name, '  Ana ', false);
     expect(r.app.plan!.input.people[1]!.profile).toEqual({ name: '  Ana ' });
@@ -195,7 +198,7 @@ describe('Step 6, Your people', () => {
   });
 
   it('gives where a person spends the day a kind for their age, and asks the six things about it', async () => {
-    const plan = fixture('philadelphia-renters-4');
+    const plan = blank('philadelphia-renters-4');
     const child = plan.input.people.findIndex((p) => p.age_band === 'child');
     const r = await open(People, 'people', plan);
     openAll(r);
@@ -228,7 +231,7 @@ describe('Step 6, Your people', () => {
   });
 
   it('adds and removes medicines, a legend per row, up to 12, and moves focus with them', async () => {
-    const r = await open(People, 'people', fixture('chicago-student-zero-budget-1'));
+    const r = await open(People, 'people', blank('chicago-student-zero-budget-1'));
     openAll(r);
     expect(r.target.querySelectorAll('#pp-0-med-0')).toHaveLength(0);
     for (let i = 0; i < 12; i++) {
@@ -275,7 +278,7 @@ describe('Step 6, Your people', () => {
   });
 
   it('keeps the plan working with profiles in it, and the plan echoes them', async () => {
-    const r = await open(People, 'people', fixture('philadelphia-renters-4'));
+    const r = await open(People, 'people', blank('philadelphia-renters-4'));
     openAll(r);
     type(field(r, 'pp-0-name'), 'Ana Sample');
     type(field(r, 'pp-0-allergies'), 'Penicillin');
@@ -291,7 +294,7 @@ describe('Step 6, Your people', () => {
   });
 
   it('is accessible, empty and filled in', async () => {
-    for (const plan of [fixture('philadelphia-renters-4'), savedFor(detroit)]) {
+    for (const plan of [blank('philadelphia-renters-4'), fixture('philadelphia-renters-4'), savedFor(detroit)]) {
       const r = await open(People, 'people', plan);
       openAll(r);
       button(r, 'Add a medicine').click();
@@ -367,10 +370,10 @@ describe('Step 7, Your places', () => {
   });
 
   it('asks only what fits the household: children and a car', async () => {
-    let r = await open(Places, 'places', fixture('chicago-student-zero-budget-1'));
+    let r = await open(Places, 'places', blank('chicago-student-zero-budget-1'));
     expect(r.target.querySelector('#fp-school')).toBeNull();
     expect(r.target.querySelector('#fp-roadside')).toBeNull();
-    r = await open(Places, 'places', fixture('philadelphia-renters-4'));
+    r = await open(Places, 'places', blank('philadelphia-renters-4'));
     expect(r.target.querySelector('#fp-school')).not.toBeNull();
     expect(r.target.querySelector('#fp-roadside')).not.toBeNull();
   });
@@ -384,7 +387,7 @@ describe('Step 7, Your places', () => {
   });
 
   it('saves v2 and v3 answers as typed, tidies them when left, and the plan echoes them', async () => {
-    const r = await open(Places, 'places', fixture('philadelphia-renters-4'));
+    const r = await open(Places, 'places', blank('philadelphia-renters-4'));
     const near = field(r, 'fp-meet-near');
     expect(near.maxLength).toBe(300);
     type(near, '  The corner mailbox ', false);
@@ -412,7 +415,7 @@ describe('Step 7, Your places', () => {
   });
 
   it('keeps up to five numbers by heart', async () => {
-    const r = await open(Places, 'places', fixture('philadelphia-renters-4'));
+    const r = await open(Places, 'places', blank('philadelphia-renters-4'));
     for (let i = 0; i < 5; i++) {
       button(r, 'Add a number').click();
       flushSync();
@@ -437,7 +440,7 @@ describe('Step 7, Your places', () => {
   });
 
   it('is accessible', async () => {
-    for (const plan of [fixture('philadelphia-renters-4'), savedFor(detroit)]) {
+    for (const plan of [blank('philadelphia-renters-4'), fixture('philadelphia-renters-4'), savedFor(detroit)]) {
       const r = await open(Places, 'places', plan);
       openAll(r);
       await noAxeViolations(r, 'your places');
@@ -467,7 +470,7 @@ describe('Step 8, Contacts, pets, vehicles and documents', () => {
   });
 
   it('keeps up to four people in the trusted circle, with what each holds', async () => {
-    const r = await open(Contacts, 'contacts', fixture('philadelphia-renters-4'));
+    const r = await open(Contacts, 'contacts', blank('philadelphia-renters-4'));
     for (let i = 0; i < 4; i++) {
       button(r, 'Add someone').click();
       flushSync();
@@ -487,7 +490,7 @@ describe('Step 8, Contacts, pets, vehicles and documents', () => {
   });
 
   it('adds animals (up to 8) and vehicles (up to 4), each with its own fields, and removes them', async () => {
-    const r = await open(Contacts, 'contacts', fixture('philadelphia-renters-4'));
+    const r = await open(Contacts, 'contacts', blank('philadelphia-renters-4'));
     for (let i = 0; i < 8; i++) {
       button(r, 'Add an animal').click();
       await tick();
@@ -521,7 +524,7 @@ describe('Step 8, Contacts, pets, vehicles and documents', () => {
   });
 
   it('keeps only the last four digits of an account, even when a whole number is pasted', async () => {
-    const r = await open(Contacts, 'contacts', fixture('philadelphia-renters-4'));
+    const r = await open(Contacts, 'contacts', blank('philadelphia-renters-4'));
     button(r, 'Add an account').click();
     await tick();
     flushSync();
@@ -548,7 +551,7 @@ describe('Step 8, Contacts, pets, vehicles and documents', () => {
   });
 
   it('points a household with no animals or vehicles to the steps that ask about them', async () => {
-    const r = await open(Contacts, 'contacts', fixture('chicago-student-zero-budget-1'));
+    const r = await open(Contacts, 'contacts', blank('chicago-student-zero-budget-1'));
     expect(r.target.querySelector('#ct-pet-add')).toBeNull();
     expect(r.target.querySelector('#ct-vehicle-add')).toBeNull();
     expect(r.target.querySelector('#fp-animals')).toBeNull();
@@ -583,7 +586,7 @@ describe('Step 8, Contacts, pets, vehicles and documents', () => {
   });
 
   it('is accessible, empty and with a row of each kind', async () => {
-    const r = await open(Contacts, 'contacts', fixture('philadelphia-renters-4'));
+    const r = await open(Contacts, 'contacts', blank('philadelphia-renters-4'));
     await noAxeViolations(r, 'contacts, empty');
     for (const add of ['Add someone', 'Add an animal', 'Add a vehicle', 'Add an account', 'Add a policy']) {
       button(r, add).click();
@@ -701,7 +704,7 @@ function chooseFile(r: Rendered, text: string) {
 }
 
 function sensitive(): SavedPlan {
-  const plan = fixture('philadelphia-renters-4');
+  const plan = blank('philadelphia-renters-4');
   plan.input.people[0]!.profile = { name: 'Ana Sample', allergies: 'Penicillin' };
   plan.input.family_plan = { home: { address: '12 Sample St' } };
   return plan;
@@ -710,7 +713,7 @@ function sensitive(): SavedPlan {
 describe('saving a copy', () => {
   it('saves a plan with no sensitive answers as a plain file at once, as before', async () => {
     const files = watchDownloads();
-    const r = await open(Maintain, 'maintain', fixture('philadelphia-renters-4'));
+    const r = await open(Maintain, 'maintain', blank('philadelphia-renters-4'));
     button(r, 'Save a copy of your plan').click();
     flushSync();
     expect(r.target.querySelector('dialog[open]')).toBeNull();
@@ -718,7 +721,7 @@ describe('saving a copy', () => {
     const file = JSON.parse(await files[0]!) as SavedPlan;
     expect(file.format).toBe('ready-reckoner-plan');
     expect(file.version).toBe(2);
-    expect(file.input).toEqual(FIXTURES['philadelphia-renters-4']);
+    expect(file.input).toEqual(withoutOptional(FIXTURES['philadelphia-renters-4']));
     expect(said(r)).toContain('Keep it somewhere safe: it can hold names, phone numbers, medical details, insurance IDs and your address.');
   });
 
@@ -782,7 +785,7 @@ describe('opening a protected file', () => {
   it('asks for the passphrase, says plainly when it is wrong, and opens with the right one (Keep it up)', async () => {
     const plan = sensitive();
     const text = await protectedExportText(plan, 'blue river lamp');
-    const r = await open(Maintain, 'maintain', fixture('chicago-student-zero-budget-1'));
+    const r = await open(Maintain, 'maintain', blank('chicago-student-zero-budget-1'));
     chooseFile(r, text);
     await until(() => !!r.target.ownerDocument.querySelector('dialog[open]'), 'the passphrase dialog');
     const dialog = r.target.ownerDocument.querySelector('dialog[open]') as HTMLDialogElement;

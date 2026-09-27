@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { FIXTURES } from '../engine/fixtures';
 import type { Person } from '../engine/types';
-import { clone } from '../test/helpers';
+import { clone, withoutOptional } from '../test/helpers';
 import {
   addMedication,
   defaultPlaceKind,
@@ -19,7 +19,8 @@ import {
 } from './profile';
 import { MEDICATIONS_MAX, PROFILE_MAX } from './tidy';
 
-const adult = (): Person => clone(FIXTURES['philadelphia-renters-4'].people[0]!);
+/** Philadelphia's first adult, before step 6 is answered. */
+const adult = (): Person => clone(withoutOptional(FIXTURES['philadelphia-renters-4']).people[0]!);
 
 describe('a person card', () => {
   it('is headed "Person 1 (adult)" until a name is given, then by the name', () => {
@@ -83,7 +84,7 @@ describe('a person card', () => {
 
 describe('the engine’s tidy of every profile (the mock engine)', () => {
   it('tidies each person’s profile, drops empty ones, and leaves the household untouched', () => {
-    const input = clone(FIXTURES['philadelphia-renters-4']);
+    const input = withoutOptional(FIXTURES['philadelphia-renters-4']);
     input.people[0]!.profile = { name: ' Ana ', place: { kind: 'work' } };
     input.people[1]!.profile = { medications: [{}], email: ' ' };
     const people = tidyPeopleProfiles(input);

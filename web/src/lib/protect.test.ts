@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { FIXTURES } from '../engine/fixtures';
-import { clone, savedFor } from '../test/helpers';
+import { clone, savedFor, withoutOptional } from '../test/helpers';
 import { exportText, parseImport, type SavedPlan } from './persistence';
 import {
   decryptText,
@@ -24,7 +24,8 @@ import {
   toBase64,
 } from './protect';
 
-const philly = FIXTURES['philadelphia-renters-4'];
+/** Philadelphia before any optional step is answered (the fixture itself may carry sample answers). */
+const philly = withoutOptional(FIXTURES['philadelphia-renters-4']);
 const PASS = 'correct horse battery staple';
 
 function withAnswers(edit: (plan: SavedPlan) => void): SavedPlan {
