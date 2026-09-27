@@ -11,7 +11,7 @@
 <script lang="ts">
   import type { BucketAssessment, Target } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
-  import { dayPhrase, targetDays } from '../lib/format';
+  import { dayPhrase, reliefPhrase, targetDays } from '../lib/format';
   import { hazardName, lowerFirst } from '../lib/lookup';
   import { CONFIDENCE_BADGE, confidenceOf, drivers, shareWords, stressLine } from '../lib/targets';
   import ExplainButton from './ExplainButton.svelte';
@@ -102,7 +102,7 @@
       {#if bucket.relief}
         <p class="gauge__relief small">
           <Icon name="clock" />
-          <span>Help likely arrives in about {dayPhrase(bucket.relief.help_arrives_days)}; service mostly back in about {dayPhrase(bucket.relief.mostly_restored_days)}.</span>
+          <span>Help likely arrives in about {reliefPhrase(bucket.relief.help_arrives_days)}; service mostly back in about {reliefPhrase(bucket.relief.mostly_restored_days)}.</span>
         </p>
       {/if}
       {#if stress && bucket.stress_test}

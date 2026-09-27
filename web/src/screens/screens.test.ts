@@ -314,9 +314,14 @@ describe('what the screens show', () => {
     expect(current.app.source?.kind).toBe('wasm');
     expect(current.text()).toContain('The national data is not loaded');
     expect(current.text()).not.toContain('stand-in engine');
+    // One built-in sample county per fixture household: fourteen since v0.2.0 (rr_plan::FixtureSource).
+    expect(Object.keys(FIXTURES)).toHaveLength(14);
+    expect(current.text()).toContain('running on fourteen built-in sample counties');
+    expect(current.target.querySelector('.mock')?.textContent ?? '').not.toMatch(/\bseven\b/);
     current.cleanup();
     current = await render(MockBanner, { plan, engine: realEngine([]) });
     expect(current.text()).toContain('Sample counties only');
+    expect(current.text()).toContain('the planner knows just fourteen sample counties');
     current.cleanup();
     current = await render(MockBanner, { plan, engine: realEngine(['core']) });
     expect(current.text().trim()).toBe('');

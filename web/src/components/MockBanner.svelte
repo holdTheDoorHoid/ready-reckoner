@@ -1,6 +1,6 @@
 <!--
   Says plainly, on every screen, when the numbers are not the full engine on the national data: the
-  stand-in engine, or the real engine running on its seven built-in sample counties because no data
+  stand-in engine, or the real engine running on its fourteen built-in sample counties because no data
   pack is loaded (engine_info lists no packs).
 -->
 <script lang="ts">
@@ -26,7 +26,7 @@
   <section class="mock-banner" aria-label="About these numbers">
     <p>
       <strong>Sample counties only.</strong>
-      This copy of the site has no national data, so the planner knows just seven sample counties and cannot plan anywhere else.
+      This copy of the site has no national data, so the planner knows just fourteen sample counties and cannot plan anywhere else.
       <a href={href('about')}>What this means</a>
     </p>
   </section>

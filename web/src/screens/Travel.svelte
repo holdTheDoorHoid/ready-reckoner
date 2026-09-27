@@ -43,7 +43,7 @@
 <div class="page page--narrow">
   <ProgressSteps current="travel" />
   <h1 id="page-title" tabindex="-1">How you get around</h1>
-  <p class="lead">How far people travel decides what to keep for getting home, and how you would leave in a hurry.</p>
+  <p class="lead">How far people travel decides what to keep for getting home, and how you would leave quickly.</p>
 
   {#if input}
     <section aria-labelledby="vehicles-title">

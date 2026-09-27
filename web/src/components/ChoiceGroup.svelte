@@ -54,7 +54,7 @@
     {/each}
   </div>
   {#if error}
-    <p class="error-text" id="{uid}-error"><Icon name="alert" /><span><span class="visually-hidden">Problem: </span>{error}</span></p>
+    <p class="error-text" id="{uid}-error"><Icon name="alert" /><span><span class="visually-hidden">Problem:{' '}</span>{error}</span></p>
   {/if}
 </fieldset>
 

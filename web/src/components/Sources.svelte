@@ -51,9 +51,9 @@
   <details class="sources sources--{variant}" bind:open>
     <summary>
       {#if variant === 'inline'}
-        sources<span class="visually-hidden"> for {what ?? 'this number'} ({unique.length})</span>
+        sources<span class="visually-hidden">{' '}for {what ?? 'this number'} ({unique.length})</span>
       {:else}
-        {label} ({unique.length}){#if what}<span class="visually-hidden"> for {what}</span>{/if}
+        {label} ({unique.length}){#if what}<span class="visually-hidden">{' '}for {what}</span>{/if}
       {/if}
     </summary>
     {#if open}
@@ -62,7 +62,7 @@
           <li>
             <p class="sources__title">
               {#if c.url}
-                <a href={c.url} target="_blank" rel="noopener noreferrer">{c.title}<span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href={c.url} target="_blank" rel="noopener noreferrer">{c.title}<span class="visually-hidden">{' '}(opens in a new tab)</span></a>
                 {#if site(c.url)}<span class="meta"> ({site(c.url)})</span>{/if}
               {:else}
                 <span>{c.title}</span>

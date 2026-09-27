@@ -240,6 +240,17 @@ export function dayPhrase(d: number): string {
   return `${nText(u.n)} ${u.unit}${u.n === 1 ? '' : 's'}`;
 }
 
+/**
+ * When help arrives or service is mostly back, in whole days: half a day under ¾ of a day, whole
+ * days under two weeks as the packet has them (rr-plan `round_relief`), and longer spans in weeks,
+ * months or years. The engine sends these unrounded, and "about 5.2 days" is not how anyone talks.
+ */
+export function reliefPhrase(d: number): string {
+  if (!(d > 0)) return dayPhrase(0);
+  if (d < 0.75) return dayPhrase(0.5);
+  return dayPhrase(Math.max(1, Math.round(d)));
+}
+
 /** A target with its range: "about 3 days (2–5)", "about 2 weeks (10 days–3 weeks)". */
 export function targetDays(value: number, low: number, high: number): string {
   const main = `about ${dayPhrase(value)}`;
@@ -305,30 +316,57 @@ export function band(low: number, high: number): string {
   return `${usd(l)}–${usd0.format(h)}`;
 }
 
+// Catalogue and requirement units, pluralised as the packet does (rr-plan `packet/text.rs`,
+// `plural` and `quantity`), so the screens and the printed packet say the same thing.
 const IRREGULAR: Record<string, string> = {
-  each: 'each',
   box: 'boxes',
   pouch: 'pouches',
   'person-day': 'person-days',
   'pet-day': 'pet-days',
+  'person-month': 'person-months',
   'day per person': 'days per person',
+  "day of one person's medicine": "days of one person's medicine",
+  'pound of dry food': 'pounds of dry food',
+  'ounce of powder': 'ounces of powder',
+  "cycle's supply": "cycles' supplies",
+  '8-ounce canister': '8-ounce canisters',
+  '12-ounce bottle': '12-ounce bottles',
+  '24-pack': '24-packs',
 };
+/** Units that never take an "s". */
+const INVARIANT = new Set(['each', 'Wh', 'kcal', 'oz', 'fl oz', 'lb']);
 
 export function plural(unit: string, qty: number): string {
-  if (qty === 1) return unit;
+  if (qty === 1 || INVARIANT.has(unit)) return unit;
   const irregular = IRREGULAR[unit];
   if (irregular) return irregular;
+  // "gallon of tank space" -> "gallons of tank space": the head noun takes the plural.
+  const of = unit.indexOf(' of ');
+  if (of > 0) return `${plural(unit.slice(0, of), qty)}${unit.slice(of)}`;
   if (/[^aeiou]y$/.test(unit)) return `${unit.slice(0, -1)}ies`;
   if (/(s|x|ch|sh)$/.test(unit)) return `${unit}es`;
   return `${unit}s`;
 }
 
-/** "12 gallons", "1 kit", "$100" for a quantity of dollars. */
+/** A count for a quantity: whole numbers with separators ("1,200"), otherwise one decimal ("2.5"). */
+function count(q: number): string {
+  const r = Math.round(q * 10) / 10;
+  return Number.isInteger(r) ? usd0.format(r) : r.toFixed(1);
+}
+
+/**
+ * "12 gallons", "1 kit", "$100" for dollars, "16,000 kcal" for food counted in 2,000 kcal units,
+ * "4 (one per person)" for items counted per person or pet, and "1 × 24-pack" for a unit that is
+ * itself an amount.
+ */
 export function quantity(qty: number, unit: string): string {
-  const q = Number.isInteger(qty) ? usd0.format(qty) : String(Math.round(qty * 10) / 10);
+  const kcal = /^([\d,]+) kcal$/.exec(unit);
+  if (kcal) return `${count(qty * Number(kcal[1]!.replace(/,/g, '')))} kcal`;
   if (unit === 'dollar') return usd(qty);
-  if (unit === 'each') return q;
-  return `${q} ${plural(unit, qty)}`;
+  if (unit === 'each') return count(qty);
+  if (unit === 'person' || unit === 'pet') return `${count(qty)} (one per ${unit})`;
+  if (/^\d/.test(unit)) return `${count(qty)} × ${unit}`;
+  return `${count(qty)} ${plural(unit, qty)}`;
 }
 
 // ---------------------------------------------------------------------------------------------

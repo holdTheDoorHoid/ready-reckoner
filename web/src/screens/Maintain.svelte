@@ -237,7 +237,7 @@
     <div class="data__actions">
       <div>
         <button type="button" class="button" onclick={exportPlan} disabled={!app.plan}><Icon name="download" /> Save a copy of your plan</button>
-        <p class="small muted">Saves {EXPORT_FILENAME}. Keep it somewhere safe; it holds your household details.</p>
+        <p class="small muted">Saves {EXPORT_FILENAME}. Keep it somewhere safe; it holds your household details, and any names and phone numbers in your family plan.</p>
       </div>
       <div>
         <input

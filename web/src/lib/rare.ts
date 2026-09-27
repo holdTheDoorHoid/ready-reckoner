@@ -28,10 +28,28 @@ export function firstSentence(text: string): string {
   return m ? m[1]! : text.trim();
 }
 
+/**
+ * Families the engine sends without a location factor although their chance is worked out from
+ * the household's own county: the months-long blackout row comes partly from the county's own
+ * power-cut curve (with the solar-storm, pulse and war rows), so its range differs from place to
+ * place (Coos Bay and San Juan dozens of times Philadelphia's). "The same everywhere" would be
+ * wrong for them.
+ */
+const LOCAL_WITHOUT_FACTOR: Readonly<Record<string, string>> = {
+  multi_month_blackout: 'Worked out partly from the power-cut records for your area, so it differs from place to place.',
+};
+
 /** "Why here" in a few words for the table: the location factor's first sentence, or "the same everywhere". */
 export function whyHereShort(h: HazardProfile): string {
-  if (!h.location_factor?.label) return 'The same everywhere: this chance does not depend on where you live.';
-  return firstSentence(h.location_factor.label);
+  if (h.location_factor?.label) return firstSentence(h.location_factor.label);
+  return LOCAL_WITHOUT_FACTOR[h.id] ?? 'The same everywhere: this chance does not depend on where you live.';
+}
+
+/** The "How this number is made" drawer's "Where you live" words for a family with no location factor. */
+export function whereYouLiveNoFactor(h: HazardProfile): string {
+  const local = LOCAL_WITHOUT_FACTOR[h.id];
+  if (local) return local.charAt(0).toLowerCase() + local.slice(1);
+  return 'this chance is the same everywhere; nothing in the data makes it higher or lower for your county.';
 }
 
 /** "Nothing beyond your basics", "Nothing new: …": the engine's words say the plan needs nothing more. */
