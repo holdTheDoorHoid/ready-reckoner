@@ -38,7 +38,7 @@ fn lines_with(cx: &Ctx<'_>, rules: &[&str], staged: bool, out: &mut Vec<String>)
     }) {
         out.push(format!(
             "- {}{}",
-            md(&l.line.plain),
+            md(&text::without_source_names(&l.line.plain)),
             cite_all(&l.line.citations)
         ));
         n += 1;
@@ -134,7 +134,10 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
             let (text, cites) = match (line, item) {
                 (Some(l), _) => {
                     used.push(l.line.id.as_str());
-                    (md(&l.line.plain), cite_all(&l.line.citations))
+                    (
+                        md(&text::without_source_names(&l.line.plain)),
+                        cite_all(&l.line.citations),
+                    )
                 }
                 (None, Some(it)) => (it.spec.clone(), cite_all(&it.citations)),
                 (None, None) => continue,
@@ -163,7 +166,7 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
         {
             out.push(format!(
                 "- {}{}",
-                md(&l.line.plain),
+                md(&text::without_source_names(&l.line.plain)),
                 cite_all(&l.line.citations)
             ));
         }

@@ -176,35 +176,51 @@ fn a_rare_family_explains_its_chain() {
     assert!(math.contains("Your county's own outage record"), "{math}");
 }
 
-/// Where no restoration records match the event behind a target, `explain bucket` says so and
-/// names the worst event on record instead, as the packet's targets table does (Hays: a winter
-/// storm kept some homes out up to 7 days).
+/// Where no restoration records match the event behind a target, the packet's targets table and
+/// `explain bucket` name the worst event on record instead, and read how long it lasted as the
+/// app does (verification R3-05): up to the first mark after the last one with at least 0.5 in
+/// 100 homes still out. Hays: a winter storm with 3.5 in 100 still out on day 7 and none on day
+/// 14 reads "up to 2 weeks" (it read "up to 7 days"); Phoenix: 1.6 in 100 still out on day 3 and
+/// none on day 7 reads "up to 7 days" (it read "up to 3 days").
 #[test]
 fn a_bucket_without_relief_names_the_worst_event_on_record() {
-    let input = household("hays-kansas-farm-5");
-    let out = common::assess(&input);
-    let power = out
-        .buckets
-        .iter()
-        .find(|b| b.id == rr_types::BucketId::Power)
-        .unwrap();
-    assert!(power.relief.is_none(), "{:?}", power.relief);
-    let st = power.stress_test.as_ref().expect("a stress event");
-    let e = engine()
-        .explain(ExplainKind::Bucket, "power", &input)
-        .unwrap();
-    let plain = e.plain.join("\n");
-    assert!(
-        plain.contains("the worst event on record stands in: ")
-            && plain.contains(&st.event)
-            && plain.contains("kept some homes waiting up to 7 days"),
-        "{plain}"
-    );
-    assert!(
-        out.packet_markdown
-            .contains("worst on record: up to 7 days")
-    );
-    for c in &st.sources {
-        assert!(e.sources.iter().any(|s| s.id == *c), "{c}");
+    for (name, still_out, up_to) in [
+        ("hays-kansas-farm-5", (7.0, 0.035), "up to 2 weeks"),
+        ("phoenix-apartment-cpap-1", (3.0, 0.016), "up to 7 days"),
+    ] {
+        let input = household(name);
+        let out = common::assess(&input);
+        let power = out
+            .buckets
+            .iter()
+            .find(|b| b.id == rr_types::BucketId::Power)
+            .unwrap();
+        assert!(power.relief.is_none(), "{name}: {:?}", power.relief);
+        let st = power.stress_test.as_ref().expect("a stress event");
+        // The record the rule reads: the last mark with homes still out, and none at the next.
+        let marks = &st.share_out_at_days;
+        let at = marks.iter().position(|(d, _)| *d == still_out.0).unwrap();
+        assert!(
+            (marks[at].1 - still_out.1).abs() < 0.001 && marks[at + 1].1 < 0.005,
+            "{name}: {marks:?}"
+        );
+        assert!(
+            out.packet_markdown
+                .contains(&format!("| not known | worst on record: {up_to} |")),
+            "{name}: the targets table"
+        );
+        let e = engine()
+            .explain(ExplainKind::Bucket, "power", &input)
+            .unwrap();
+        let plain = e.plain.join("\n");
+        assert!(
+            plain.contains("the worst event on record stands in: ")
+                && plain.contains(&st.event)
+                && plain.contains(&format!("kept some homes waiting {up_to}.")),
+            "{name}: {plain}"
+        );
+        for c in &st.sources {
+            assert!(e.sources.iter().any(|s| s.id == *c), "{name}: {c}");
+        }
     }
 }

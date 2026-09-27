@@ -67,6 +67,29 @@ pub(crate) use rr_types::money::thousands;
 /// writes amounts exactly as the other engine crates' sentences do.
 pub use rr_types::money::usd;
 
+/// A supply line's sentence as the packet prints it. rr-supply ends each sentence with the short
+/// names of its sources ("(Ready.gov, CDC)"); in the packet the numbered bracket right after the
+/// line cites the same sources, so the names are left out and only the note that some amounts are
+/// estimates stays ("(some amounts are estimates)"; R3-15, repeated text). A closing parenthesis
+/// that does not follow a finished sentence is part of the text and stays.
+pub(crate) fn without_source_names(plain: &str) -> String {
+    let t = plain.trim_end();
+    let Some(open) = t.strip_suffix(')').and_then(|body| body.rfind('(')) else {
+        return plain.to_owned();
+    };
+    let (head, inner) = (&t[..open], &t[open + 1..t.len() - 1]);
+    if !head.trim_end().ends_with('.') || inner.contains('(') {
+        return plain.to_owned();
+    }
+    let head = head.trim_end();
+    match inner.split_once("; ") {
+        Some((_, "some amounts are estimates")) => format!("{head} (some amounts are estimates)"),
+        None if inner == "an estimate" => plain.to_owned(),
+        None if inner.split(", ").all(|n| !n.is_empty() && n.len() <= 40) => head.to_owned(),
+        _ => plain.to_owned(),
+    }
+}
+
 /// A price band: "$30–45"; "$30" when both ends match; "free" at $0.
 pub fn band(low: f64, high: f64) -> String {
     let (l, h) = (low.round().max(0.0), high.round().max(0.0));
@@ -85,7 +108,8 @@ fn plural(unit: &str, qty: f64) -> String {
         return unit.to_owned();
     }
     match unit {
-        "each" | "Wh" | "kcal" | "oz" | "lb" => return unit.to_owned(),
+        // Abbreviations take no "s" ("58 fl oz", verification R3-19).
+        "each" | "Wh" | "kcal" | "oz" | "fl oz" | "lb" => return unit.to_owned(),
         "box" => return "boxes".to_owned(),
         "pouch" => return "pouches".to_owned(),
         "person_day" | "person-day" => return "person-days".to_owned(),
@@ -401,6 +425,24 @@ mod tests {
         assert_eq!(quantity(100.0, "dollar"), "$100");
         assert_eq!(quantity(13.0, "2,000 kcal"), "26,000 kcal");
         assert_eq!(quantity(4.0, "person"), "4 (one per person)");
+        assert_eq!(quantity(58.0, "fl oz"), "58 fl oz");
+        assert_eq!(
+            without_source_names("Keep 3 days. Check it yearly. (Ready.gov, CDC)"),
+            "Keep 3 days. Check it yearly."
+        );
+        assert_eq!(
+            without_source_names("About $200. (Ready.gov, FEMA; some amounts are estimates)"),
+            "About $200. (some amounts are estimates)"
+        );
+        assert_eq!(
+            without_source_names("Store it cool. (an estimate)"),
+            "Store it cool. (an estimate)"
+        );
+        assert_eq!(
+            without_source_names("Keep a light (and batteries)"),
+            "Keep a light (and batteries)"
+        );
+        assert_eq!(quantity(1.0, "fl oz"), "1 fl oz");
         assert_eq!(per_100(0.254), "25");
         assert_eq!(per_100(0.004), "fewer than 1");
         assert_eq!(per_100(0.99), "almost all");

@@ -164,7 +164,9 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
                     if l.kind == rr_supply::LineKind::Need {
                         bag.push(format!(
                             "{}{}",
-                            md(after_first_sentence(&l.line.plain)),
+                            md(&text::without_source_names(after_first_sentence(
+                                &l.line.plain
+                            ))),
                             cite_all(&l.line.citations)
                         ));
                     } else if l.quantity > 0.0 {

@@ -122,8 +122,8 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
             .map(|(verb, names)| format!("{verb}: {}", names.join("; ")))
             .collect();
         out.push(format!(
-            "| Every {} | {} |",
-            every_phrase(*every),
+            "| Every\u{a0}{} | {} |",
+            every_phrase(*every).replace(' ', "\u{a0}"),
             cell.join(". ")
         ));
     }
@@ -153,7 +153,13 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
                     .to_owned(),
             );
         }
-        out.push(format!("| {} | {} |", text::date(date), cell.join(". ")));
+        // The date never wraps inside its narrow column ("September 1, 2027" on one line): a
+        // wrapped date doubled the height of rows whose task fits on one line (print, R3-15).
+        out.push(format!(
+            "| {} | {} |",
+            text::date(date).replace(' ', "\u{a0}"),
+            cell.join(". ")
+        ));
     }
     out.push(String::new());
 }

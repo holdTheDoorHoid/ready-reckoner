@@ -349,22 +349,28 @@ fn bucket(a: &Assessment, content: &Content, id: &str) -> Result<Explanation, En
             text::day_phrase(f64::from(r.mostly_restored_days).round().max(0.5))
         ));
         ids.extend(r.sources.iter().cloned());
-    } else if let (Some(days), Some(st)) = (
-        crate::packet::relief_fallback_days(ba),
-        ba.stress_test.as_ref(),
-    ) {
+    } else if let (Some(span), Some(st)) =
+        (crate::packet::relief_fallback(ba), ba.stress_test.as_ref())
+    {
         // No restoration records for the event behind the target: the worst event on record
-        // stands in, as the packet's targets table says ("worst on record: up to N days").
+        // stands in, as the packet's targets table says ("worst on record: up to 2 weeks"), read
+        // as the app reads it.
         let year = st.date.year().to_string();
         let event = if st.event.contains(&year) {
             st.event.clone()
         } else {
             format!("{} ({year})", st.event)
         };
+        let how_long = match span {
+            crate::packet::RecordSpan::About(_) => format!("{event} lasted {}", span.words()),
+            crate::packet::RecordSpan::Within(_) => {
+                format!("after {event} nearly every home was back {}", span.words())
+            }
+            _ => format!("{event} kept some homes waiting {}", span.words()),
+        };
         plain.push(format!(
             "There are no restoration records for the kind of disruption behind this target, so \
-             the worst event on record stands in: {event} kept some homes waiting up to {}.",
-            text::day_phrase(f64::from(days))
+             the worst event on record stands in: {how_long}."
         ));
         ids.extend(st.sources.iter().cloned());
     }
