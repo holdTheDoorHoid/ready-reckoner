@@ -10,7 +10,7 @@ pages: 2
 
 ## Use this when
 
-An alert warns of a nuclear attack, you see a blinding flash, or you learn a nuclear blast has happened. Fallout is sand-like radioactive dust from a blast near the ground. It can start to fall 10 minutes or more after the blast.[^ready_gov_radiation] In the first hours it can be deadly, even tens of miles away and even when you cannot see it.[^fema_nuclear_planning_2022] It gets weaker fast.[^ready_gov_radiation] A basement or the middle of a big brick or concrete building cuts your dose by 10 times or more.[^fema_nuclear_planning_2022] An EMP, a burst of energy from the blast, does not hurt people directly. It can knock out power and electronics, over a wide area from a blast high in the sky.[^fema_nuclear_planning_2022]
+An alert warns of a nuclear attack, you see a blinding flash, you learn a nuclear blast has happened, or power and electronics fail after a blast high in the sky (an EMP, which does not hurt people directly).[^fema_nuclear_planning_2022] Fallout, a sand-like radioactive dust, can start to fall 10 minutes or more after a blast; a basement or the middle of a big brick or concrete building cuts your dose by 10 times or more.[^ready_gov_radiation][^fema_nuclear_planning_2022]
 
 ## Do first
 
@@ -23,7 +23,7 @@ An alert warns of a nuclear attack, you see a blinding flash, or you learn a nuc
 
 ## Then
 
-1. **In a car or a wood-frame house with no basement?** If a better building is 15 minutes away or less, move there within 30 minutes of the blast.[^fema_nuclear_planning_2022]
+1. **In a car or a wood-frame house with no basement?** These protect little. If a better building is 15 minutes away or less, move there within 30 minutes of the blast.[^fema_nuclear_planning_2022]
 2. **Close windows, doors and fireplace dampers.** Turn off fans and heating or cooling that pull in outside air.[^ready_gov_radiation]{if:pets} Keep pets inside. Brush and wash any that were outside.[^ready_gov_radiation]{/if}
 3. **Wash** in a warm shower with lots of soap, and shampoo your hair. No shower? Wipe uncovered skin and hair with a wet cloth.[^cdc_radiation_self_decon]
 4. **Blow your nose** gently. Wipe your eyelids, eyelashes and ears.[^cdc_radiation_self_decon]
@@ -36,7 +36,7 @@ An alert warns of a nuclear attack, you see a blinding flash, or you learn a nuc
 
 ## Leave or stay
 
-- **Stay if** your shelter is safe. Stay in at least 24 hours unless officials say otherwise.[^ready_gov_radiation][^fema_nuclear_planning_2022] {ref:home}
+- **Stay if** your shelter is safe. Stay in at least 24 hours unless officials say otherwise; radiation gets much weaker in that time.[^ready_gov_radiation][^fema_nuclear_planning_2022] {ref:home}
 - **Leave if** fire, a gas leak, a collapse or a serious injury threatens you there.[^ready_gov_radiation]
 - **Leave if** officials tell you to. Use the route they give. Go to {where_go}.[^ready_gov_radiation]{if:pets} Take your pets.[^ready_gov_pets]{/if} {ref:getting_out}
 - **Call** 911 for a medical emergency. If you are sick or hurt, listen for where to get care.[^ready_gov_radiation]
@@ -49,8 +49,8 @@ An alert warns of a nuclear attack, you see a blinding flash, or you learn a nuc
 
 ## Do not
 
+- Do not go outside in the first hours. Fallout can be deadly then, even tens of miles away and when you cannot see it.[^fema_nuclear_planning_2022]
 - Do not go out to get family. Schools and care centers have plans to keep people safe.[^cdc_radiation_get_inside]
-- Do not shelter in a car. Cars give little protection.[^fema_nuclear_planning_2022]
 - Do not take potassium iodide unless officials tell you to. It protects only the thyroid.[^cdc_potassium_iodide][^nrc_ep_backgrounder]
 - Do not eat garden food, or anything left outside uncovered, until officials say it is safe.[^ready_gov_radiation]
 - Do not scrub your skin, or use cleaning wipes or hand sanitizer on it.[^cdc_radiation_self_decon][^ready_gov_radiation]

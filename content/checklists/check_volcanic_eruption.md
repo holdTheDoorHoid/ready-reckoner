@@ -10,7 +10,7 @@ pages: 1
 
 ## Use this when
 
-A volcano near you erupts or officials warn that it may, or ash is falling. Ash can make it hard to breathe, irritate your eyes and skin, and stall cars.[^ready_gov_volcanoes]{if:vei7_eruption} Ash from a big eruption can fall hundreds of miles away, so these steps apply far from the volcano too.[^ready_gov_volcanoes]{/if}
+A volcano near you erupts or officials warn that it may, or ash is falling; ash can make it hard to breathe and can stall cars.[^ready_gov_volcanoes]{if:vei7_eruption} Ash from a big eruption can fall hundreds of miles away, so these steps apply far from the volcano too.[^ready_gov_volcanoes]{/if}
 
 ## Do first
 
