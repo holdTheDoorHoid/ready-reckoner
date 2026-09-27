@@ -3,7 +3,7 @@ id: check_mass_violence
 title: An attack or explosion in a public place
 kind: checklist
 onset: now
-applies_to: [hazard:mass_violence, hazard:terrorism]
+applies_to: [hazard:mass_violence]
 citations: [ready_gov_public_spaces, ready_gov_explosions, medlineplus_bleeding, samhsa_disaster_distress]
 pages: 1
 ---
