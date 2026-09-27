@@ -1184,7 +1184,7 @@ the most warning among terms with at least 5 % of the rate. "Plan to be away" st
 wildfire you could be away for a month or more"). Home loss adds the displacement estimate: if
 damage forced the household out, the months by which nine in ten households like it would be home
 (the 90th percentile of the home-loss rows' displacement durations, weighted by how often each
-cause happens), and what living elsewhere that long costs at 30 % of monthly expenses: what
+cause happens), and what living elsewhere that long costs at 30% of monthly expenses: what
 loss-of-use insurance pays for. The durations stay expert estimates: the data pack's FEMA
 housing-assistance series (`ihp_displacement`) gives no months away (only 3 % of rental-eligible
 registrations carry an end date), and its rental assistance per approved household is a floor on

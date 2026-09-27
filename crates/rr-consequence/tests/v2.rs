@@ -686,7 +686,7 @@ fn displacement_months_and_their_cost() {
         a.bucket(BucketId::HomeLoss)
             .frequency_sentences
             .iter()
-            .any(|s| s.contains(&format!("costs about {said} at 30 %"))),
+            .any(|s| s.contains(&format!("costs about {said} at 30% of your monthly"))),
         "{said}: {:?}",
         a.bucket(BucketId::HomeLoss).frequency_sentences
     );
@@ -758,6 +758,30 @@ fn the_stress_line_says_whether_the_target_outlasts_the_worst_event() {
     assert!(
         line.contains("was August 2020 Midwest derecho; being ready"),
         "{line}"
+    );
+    // A generic cause label is lower-cased mid-sentence; the month keeps its capital.
+    let mut generic = m.clone();
+    if let Some(st) = generic.stress.as_mut() {
+        st.event = "Winter storm, March 2018".to_owned();
+        st.date = "2018-03-02".to_owned();
+    }
+    let g = run(
+        &input,
+        &rates,
+        CountyData {
+            outage_model: Some(&generic),
+            state_abbr: "PA",
+            nca_region: "northeast",
+            ..CountyData::default()
+        },
+    );
+    assert!(
+        g.bucket(BucketId::Power)
+            .frequency_sentences
+            .iter()
+            .any(|s| s.contains("was winter storm, March 2018; being ready")),
+        "{:?}",
+        g.bucket(BucketId::Power).frequency_sentences
     );
     let mut helene = m.clone();
     if let Some(st) = helene.stress.as_mut() {

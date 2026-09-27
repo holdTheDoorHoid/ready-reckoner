@@ -247,6 +247,41 @@ pub fn lower_first(s: &str) -> String {
     }
 }
 
+/// The generic cause labels the data pack's outage job gives events it cannot name
+/// (`rr-etl`, `jobs::outage_model::class_label`): "Winter storm, March 2018".
+pub const GENERIC_EVENT_LABELS: [&str; 10] = [
+    "Hurricane or tropical storm",
+    "Ice storm",
+    "Winter storm",
+    "Wind and thunderstorms",
+    "Wildfire or fire-weather shutoff",
+    "Heat",
+    "Cold and a grid emergency",
+    "Flooding",
+    "Grid failure",
+    "Power cut, cause not recorded",
+];
+
+/// An event's name mid-sentence: a generic cause label loses its capital ("was winter storm,
+/// March 2018"); a named storm or a dated event keeps its own ("was Hurricane Helene", "was
+/// November 2018 Camp Fire").
+pub fn event_mid_sentence(name: &str) -> String {
+    let generic = GENERIC_EVENT_LABELS.iter().any(|g| {
+        name.strip_prefix(g)
+            .is_some_and(|rest| rest.chars().next().is_none_or(|c| !c.is_alphanumeric()))
+    });
+    if generic {
+        lower_first(name)
+    } else {
+        name.to_owned()
+    }
+}
+
+/// A share as the packet prints percentages, with no space before the sign: "30%".
+pub fn percent(share: f64) -> String {
+    format!("{}%", round_nice(100.0 * share))
+}
+
 /// A scenario's name as one event with an article, mid-sentence: "Magnitude 9 Cascadia
 /// earthquake" becomes "a magnitude 9 Cascadia earthquake"; a name that already starts with an
 /// article keeps it.
@@ -667,6 +702,36 @@ mod tests {
             chance_pair(0.65, 0.99),
             ("about 7 in 10".to_owned(), "nearly all".to_owned())
         );
+    }
+
+    #[test]
+    fn event_names_and_percentages_read_mid_sentence() {
+        assert_eq!(
+            event_mid_sentence("Winter storm, March 2018"),
+            "winter storm, March 2018"
+        );
+        assert_eq!(
+            event_mid_sentence("Power cut, cause not recorded, February 2021"),
+            "power cut, cause not recorded, February 2021"
+        );
+        assert_eq!(
+            event_mid_sentence("Hurricane or tropical storm, September 2020"),
+            "hurricane or tropical storm, September 2020"
+        );
+        assert_eq!(event_mid_sentence("Heat, July 2022"), "heat, July 2022");
+        // Named storms and dated events keep their capitals.
+        assert_eq!(event_mid_sentence("Hurricane Helene"), "Hurricane Helene");
+        assert_eq!(
+            event_mid_sentence("November 2018 Camp Fire"),
+            "November 2018 Camp Fire"
+        );
+        assert_eq!(
+            event_mid_sentence("Hurricanes Irma and Maria (US Virgin Islands)"),
+            "Hurricanes Irma and Maria (US Virgin Islands)"
+        );
+        assert_eq!(event_mid_sentence("Heatwave Kerberos"), "Heatwave Kerberos");
+        assert_eq!(percent(0.3), "30%");
+        assert_eq!(percent(0.065), "7%");
     }
 
     #[test]

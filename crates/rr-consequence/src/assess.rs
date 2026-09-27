@@ -826,7 +826,7 @@ fn stress_sentence(bucket: BucketId, st: &StressTest, target: f32) -> String {
             format!(
                 "The worst power cut in {} was {}{when}; being ready for {} would have {}.",
                 st.region,
-                st.event,
+                words::event_mid_sentence(&st.event),
                 words::ladder_phrase(target),
                 if st.covered_by_target {
                     "outlasted it for at least 9 in 10 of the homes that lost power".to_owned()
@@ -865,7 +865,7 @@ fn stress_sentence(bucket: BucketId, st: &StressTest, target: f32) -> String {
                     "boil-water notice"
                 },
                 st.region,
-                st.event,
+                words::event_mid_sentence(&st.event),
                 words::ladder_phrase(target),
                 if st.covered_by_target {
                     "would have covered"
@@ -1758,9 +1758,9 @@ fn home_loss_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, HomeLossDetail) {
             Some(c) => format!(
                 "If damage forced you out, 9 in 10 households like yours would be home again \
                  within about {months} {unit}; living elsewhere that long costs about {} at \
-                 {} % of your monthly spending, which loss-of-use insurance pays for.",
+                 {} of your monthly spending, which loss-of-use insurance pays for.",
                 words::usd(c),
-                words::round_nice(100.0 * prm.housing_share_of_expenses.value)
+                words::percent(prm.housing_share_of_expenses.value)
             ),
             None => format!(
                 "If damage forced you out, 9 in 10 households like yours would be home again \
