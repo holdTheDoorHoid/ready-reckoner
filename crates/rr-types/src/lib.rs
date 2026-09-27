@@ -34,6 +34,7 @@
 //! - [`calibration`]: data-pack v2 calibration records (outage model, stress event, restoration
 //!   curves, temperature shares, reliability, declarations); engine-internal.
 //! - [`api`]: [`Envelope`], [`EngineError`], and the other function arguments and results.
+//! - [`money`]: dollars and counts with thousands separators, as the packet prints them.
 //! - [`date`], [`math`], [`rng`], [`fixtures`].
 #![forbid(unsafe_code)]
 #![cfg_attr(not(test), deny(missing_docs))]
@@ -52,6 +53,7 @@ pub mod fixtures;
 pub mod ids;
 pub mod input;
 pub mod math;
+pub mod money;
 pub mod output;
 pub mod rng;
 pub mod validate;

@@ -157,18 +157,15 @@ impl ConsequenceAssessment {
     /// kind in 10 years; about 3 in 10 will face at least one kind that runs past its target."
     pub fn dial_sentence(&self) -> String {
         let years = self.horizon_years.max(1.0);
-        let one = crate::curve::natural_frequency(self.dial_rate, years);
-        let all = crate::curve::natural_frequency(self.joint_rate(), years).max(one);
-        let in_10 = |n: f64| {
-            let k = (n / 10.0 + 0.5).floor().clamp(1.0, 10.0) as i64;
-            format!("{k} in 10")
-        };
+        let one = crate::curve::natural_frequency(self.dial_rate, years) / 100.0;
+        let all = (crate::curve::natural_frequency(self.joint_rate(), years) / 100.0).max(one);
+        // One scale for both halves: tenths at the default setting, hundredths or thousandths
+        // for the rarer settings and short horizons (1 in 500 over ten years is about 2 in 100).
+        let (one, all) = words::chance_pair(one, all);
         format!(
-            "At this setting, about {} households like yours will face a longer disruption of \
-             any one kind in {}; about {} will face at least one kind that runs past its target.",
-            in_10(one),
+            "At this setting, {one} households like yours will face a longer disruption of any \
+             one kind in {}; {all} will face at least one kind that runs past its target.",
             words::horizon_phrase(years as u8),
-            in_10(all)
         )
     }
 
@@ -812,6 +809,12 @@ fn stress_test(ctx: &Ctx<'_>, bucket: BucketId, target: f32) -> Option<StressTes
 /// The stress line in words, for the bucket's sentences.
 fn stress_sentence(bucket: BucketId, st: &StressTest, target: f32) -> String {
     let year = &st.date.to_string()[..4];
+    // "Winter storm, March 2018" already says when; "Hurricane Helene" gets "(2024)".
+    let when = if st.event.contains(year) {
+        String::new()
+    } else {
+        format!(" ({year})")
+    };
     let what = match bucket {
         BucketId::Power => "homes that lost power",
         BucketId::WaterOut => "homes",
@@ -821,12 +824,14 @@ fn stress_sentence(bucket: BucketId, st: &StressTest, target: f32) -> String {
     match bucket {
         BucketId::Power => {
             format!(
-                "The worst power cut in {} was {} ({year}); being ready for {} would have {}.",
+                "The worst power cut in {} was {}{when}; being ready for {} would have {}.",
                 st.region,
                 st.event,
                 words::ladder_phrase(target),
                 if st.covered_by_target {
                     "outlasted it for at least 9 in 10 of the homes that lost power".to_owned()
+                } else if 100.0 * at >= words::NEARLY_ALL_PER_100 {
+                    "left nearly all customers there still waiting".to_owned()
                 } else {
                     format!(
                         "left some {what} still waiting (about {} in 100 of all customers there \
@@ -852,7 +857,7 @@ fn stress_sentence(bucket: BucketId, st: &StressTest, target: f32) -> String {
                 )
             };
             format!(
-                "The worst {} on record in your state was in {} after {} ({year}): {long}. Being \
+                "The worst {} on record in your state was in {} after {}{when}: {long}. Being \
                  ready for {} {} that.",
                 if bucket == BucketId::WaterOut {
                     "loss of tap water"
@@ -1752,9 +1757,9 @@ fn home_loss_bucket(ctx: &Ctx<'_>) -> (BucketAssessment, HomeLossDetail) {
         sentences.push(match cost {
             Some(c) => format!(
                 "If damage forced you out, 9 in 10 households like yours would be home again \
-                 within about {months} {unit}; living elsewhere that long costs about ${} at \
+                 within about {months} {unit}; living elsewhere that long costs about {} at \
                  {} % of your monthly spending, which loss-of-use insurance pays for.",
-                words::round_nice(c),
+                words::usd(c),
                 words::round_nice(100.0 * prm.housing_share_of_expenses.value)
             ),
             None => format!(
@@ -2068,10 +2073,29 @@ fn scenario_summaries(
                 }
             }
             if need_on != need_off {
-                changes.push(format!(
-                    "households like yours that have to leave home quickly within 10 years: {} → {} in 100",
-                    need_off as i64, need_on as i64
-                ));
+                let top = words::NEARLY_ALL_PER_100;
+                changes.push(if need_on >= top || need_off >= top {
+                    // Never "100 in 100".
+                    let w = |n: f64| {
+                        if n >= top {
+                            "nearly all".to_owned()
+                        } else {
+                            format!("{} in 100", n as i64)
+                        }
+                    };
+                    format!(
+                        "households like yours that have to leave home quickly within 10 years: \
+                         {} → {}",
+                        w(need_off),
+                        w(need_on)
+                    )
+                } else {
+                    format!(
+                        "households like yours that have to leave home quickly within 10 years: \
+                         {} → {} in 100",
+                        need_off as i64, need_on as i64
+                    )
+                });
             }
             let effect_summary = if changes.is_empty() {
                 "Does not change your targets at this setting.".to_owned()
@@ -2322,8 +2346,8 @@ fn statement(
     }
     if evacuate.p_need_10yr >= ctx.table.params.readiness_threshold.value {
         out.push(format!(
-            "Keep a go-bag: about {} of 100 households like yours have to leave home quickly within 10 years.",
-            words::per_100(100.0 * evacuate.p_need_10yr)
+            "Keep a go-bag: {} households like yours have to leave home quickly within 10 years.",
+            words::count_of_100(100.0 * evacuate.p_need_10yr)
         ));
     }
     let mut said: Vec<&str> = Vec::new();

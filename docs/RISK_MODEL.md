@@ -1258,7 +1258,11 @@ For every duration bucket, Λ_b(d) = Σ r_h · q_{h,b} · S_{h,b}(d) (thresholds
   for Coos Bay and Miami, where one named scenario drives most targets at once. The packet, the
   CLI and the web app say "roughly 1 in 3" (the canonical dial sentence); since v0.2.0
   `ConsequenceAssessment::dial_sentence()` computes the household's own ("about 3 in 10 will face
-  at least one kind that runs past its target") for rr-plan to print (awaiting: plan).
+  at least one kind that runs past its target"). Both chances are put on one scale: tenths while
+  the one-kind chance is at least about 1 in 10, hundredths below that (Coos Bay at 1 in 500:
+  "about 2 in 100 … about 3 in 100"), thousandths below 1 in 100 (a one-year horizon at 1 in
+  500: "about 2 in 1,000"), "nearly all" at the top. Counts that round to 100 of 100 are
+  written "nearly all (90 or more)", and money uses `rr_types::money::usd` ("$4,600").
 - **Rounding note** (v0.2.0, M-15): where the raw target sits less than 15 % past the step below
   the ladder target, the bucket says so ("This rounds up to 5 days: before rounding it is about
   3.2 days, just past 3 days").

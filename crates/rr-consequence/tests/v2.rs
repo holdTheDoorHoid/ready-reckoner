@@ -671,6 +671,25 @@ fn displacement_months_and_their_cost() {
         "{:?}",
         a.bucket(BucketId::HomeLoss).frequency_sentences
     );
+    // The amount in the shared money format, two figures with a thousands separator.
+    let said = rr_types::money::usd(if cost >= 10.0 {
+        let mag = rr_types::math::pow(
+            10.0,
+            (rr_types::math::ln(cost) / std::f64::consts::LN_10).floor() - 1.0,
+        );
+        (cost / mag).round() * mag
+    } else {
+        cost
+    });
+    assert!(said.contains(','), "{said}");
+    assert!(
+        a.bucket(BucketId::HomeLoss)
+            .frequency_sentences
+            .iter()
+            .any(|s| s.contains(&format!("costs about {said} at 30 %"))),
+        "{said}: {:?}",
+        a.bucket(BucketId::HomeLoss).frequency_sentences
+    );
     assert_eq!(a.home_loss.months_away_at_dial, 0.0);
 }
 
@@ -735,6 +754,34 @@ fn the_stress_line_says_whether_the_target_outlasts_the_worst_event() {
         .cloned()
         .expect("the stress sentence");
     assert!(!line.contains("  "), "{line}");
+    // The event's name already says 2020, so the year is not repeated after it.
+    assert!(
+        line.contains("was August 2020 Midwest derecho; being ready"),
+        "{line}"
+    );
+    let mut helene = m.clone();
+    if let Some(st) = helene.stress.as_mut() {
+        st.event = "Hurricane Helene".to_owned();
+        st.date = "2024-09-27".to_owned();
+    }
+    let h = run(
+        &input,
+        &rates,
+        CountyData {
+            outage_model: Some(&helene),
+            state_abbr: "NC",
+            nca_region: "southeast",
+            ..CountyData::default()
+        },
+    );
+    assert!(
+        h.bucket(BucketId::Power)
+            .frequency_sentences
+            .iter()
+            .any(|s| s.contains("was Hurricane Helene (2024); being ready")),
+        "{:?}",
+        h.bucket(BucketId::Power).frequency_sentences
+    );
     let mut long = m.clone();
     if let Some(st) = long.stress.as_mut() {
         st.share_out_at_days = vec![(1.0, 1.0), (3.0, 1.0), (7.0, 0.9), (14.0, 0.8), (30.0, 0.5)];
@@ -889,6 +936,23 @@ fn the_dial_sentence_and_the_multi_month_power_curve() {
     assert!(
         s.contains(&format!("about {k} in 10 will face at least one kind")),
         "{s}"
+    );
+    // At 1 in 500 the one-kind chance is about 2 in 100 over ten years: no "1 in 10" floor.
+    let mut rare = input.clone();
+    rare.dials.return_period = rr_types::ReturnPeriod::OneIn500;
+    let r = run(&rare, &rates, CountyData::default());
+    let rs = r.dial_sentence();
+    assert!(
+        rs.starts_with("At this setting, about 2 in 100 households like yours will face a longer"),
+        "{rs}"
+    );
+    assert!(rs.contains(" in 100 will face at least one kind"), "{rs}");
+    // One year at 1 in 500: thousandths.
+    rare.dials.horizon_years = 1;
+    let y = run(&rare, &rates, CountyData::default()).dial_sentence();
+    assert!(
+        y.starts_with("At this setting, about 2 in 1,000 households"),
+        "{y}"
     );
     let m = a.multi_month_blackout();
     assert!((m.rate_60_days - a.curve(BucketId::Power).unwrap().lambda(60.0)).abs() < 1e-15);
