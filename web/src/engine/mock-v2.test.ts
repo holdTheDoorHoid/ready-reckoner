@@ -4,13 +4,13 @@ import { describe, expect, it } from 'vitest';
 import { FIXTURES } from './fixtures';
 import { createMockEngine, mockDefaults, tidyInput } from './mock';
 import type { EngineError, PlanInput, PlanOutput, Problem } from './types';
-import cameron from '../../../fixtures/households/pending/cameron-insulin-well-farm-2.json';
-import detroit from '../../../fixtures/households/pending/detroit-snap-3.json';
-import galveston from '../../../fixtures/households/pending/galveston-highrise-1.json';
-import minot from '../../../fixtures/households/pending/minot-missile-field-3.json';
-import missoula from '../../../fixtures/households/pending/missoula-smoke-2.json';
-import sacramento from '../../../fixtures/households/pending/sacramento-leveed-2.json';
-import sanJuan from '../../../fixtures/households/pending/san-juan-2.json';
+import cameron from '../../../fixtures/households/cameron-insulin-well-farm-2.json';
+import detroit from '../../../fixtures/households/detroit-snap-3.json';
+import galveston from '../../../fixtures/households/galveston-highrise-1.json';
+import minot from '../../../fixtures/households/minot-missile-field-3.json';
+import missoula from '../../../fixtures/households/missoula-smoke-2.json';
+import sacramento from '../../../fixtures/households/sacramento-leveed-2.json';
+import sanJuan from '../../../fixtures/households/san-juan-2.json';
 
 const engine = createMockEngine();
 

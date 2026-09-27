@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 import { FIXTURES } from '../engine/fixtures';
 import type { PlanInput } from '../engine/types';
-import detroitJson from '../../../fixtures/households/pending/detroit-snap-3.json';
-import minotJson from '../../../fixtures/households/pending/minot-missile-field-3.json';
+import detroitJson from '../../../fixtures/households/detroit-snap-3.json';
+import minotJson from '../../../fixtures/households/minot-missile-field-3.json';
 import { MemoryStorage, savedFor } from '../test/helpers';
 import { checkSavedPlan, engineInput, exportText, heldQuantity, loadPlan, mergeOwned, parseImport, savePlan, setTestedOn, testedOn } from './persistence';
 
