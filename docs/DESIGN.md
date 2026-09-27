@@ -596,18 +596,38 @@ No third-party scripts, fonts or analytics.
 
 ## 9. The packet
 
-1. Summary page: who this is for, date, tier reached and tier recommended, the three sentences that
-   matter most.
-2. Your risks: ranked hazard cards with natural-frequency sentences and a county map.
-3. Your targets: the buckets with days, the dial settings, and what drives each.
-4. Your plan: this month, next month, and the full phased list with prices and "why".
-5. Checklists per tier (three days, get-home bag per commuter, two weeks, one month...).
-6. Family plan: meeting places, out-of-area contact, school and work plans, evacuation routes and
-   triggers, pets.
-7. Documents and money: the Emergency Financial First Aid Kit list, insurance questions, cash.
-8. Special needs: medication continuity, powered devices, infants, seniors, disability, pets.
-9. Maintenance calendar: rotation, checks, drills, annual review.
-10. Sources: every citation used, with URLs and retrieval dates.
+**Since v0.2.0 (§14, the 2026-09-26 packet v2 entry): fifteen sections print for every household, in
+this fixed order, and two more print only when they apply** (marked *conditional* below).
+`docs/PACKET.md` is the authoritative reference — what feeds each section field by field, the card
+rule, the page budget and how it is measured, and the placeholder and conditional-text syntax; read
+it for anything more than the one-line summary here.
+
+1. Summary: who this is for, the date, where the household stands and what is enough for its risks,
+   the two done months (the bare-minimum kit and everything), the three things that matter most, and
+   what the plan assumes the household already has.
+2. Your family plan: meeting places, the out-of-area contact, school and work plans, shelter spots,
+   evacuation routes, the trusted circle and lawyer, staying in touch — word for word what the
+   household wrote, never computed with.
+3. Wallet cards: one per person, sized to cut out.
+4. Your risks: ranked hazard cards (at most eight; see the card rule in `docs/PACKET.md`), the other
+   ranked hazards as a table, and the nine rare-but-severe families as their own table.
+5. Your targets: the duration buckets with days, ranges, relief times, the worst event on record, and
+   the validation backtest's headline tally.
+6. Your plan: free steps, safety rules, this month and next month in detail, decisions grouped by
+   month, savings, the rare-catastrophe allowance, and the guardrail warnings.
+7. Your shelter plan: where to shelter from wind and from whichever other dangers apply here.
+8. When a storm, freeze or heat wave is forecast: the 48-hour list.
+9. Checklists: every remaining purchase by tier and the month the plan buys it.
+10. *(conditional)* Access and functional needs: only when someone in the household has one.
+11. Local help: the household's state row (evacuation zones, registries, alerts, refill rules).
+12. Documents and money: the Emergency Financial First Aid Kit list, insurance and ID decisions,
+    cash, savings, and the cost of being displaced.
+13. After a disaster: the first 30 days, with the county's own federal-declaration history.
+14. *(conditional)* If it lasts for months: only when the plan has a long-horizon section.
+15. Special needs: medicine, powered devices, infants, older adults, pregnancy, pets, mental health.
+16. Maintenance calendar: rotation, checks, drills, test dates, the yearly review.
+17. Sources: every citation used, in two printed columns, with URLs and retrieval dates, then the
+    data-pack credits.
 
 ## 10. Privacy and security
 
@@ -686,8 +706,10 @@ guidance beyond safe storage and training pointers.
   a rare family's id is its hazard's id; the natural tier now includes five non-NRI hazards
   (`HazardId::is_nri` marks the 18); every new input optional or defaulted and every new output
   field left out when empty, so v1 plans and outputs load unchanged; the family plan is trimmed and
-  length-capped, never required; the six v2 fixture households are staged in
-  `fixtures/households/pending/` until their goldens and sample counties exist.
+  length-capped, never required; the seven v2 fixture households are no longer staged in a
+  `pending/` directory (the plan workstream gave each one its goldens and sample county) — they are
+  in the golden set with everyone else, 14 households in all. See the 2026-09-26 packet v2 entry
+  below.
 - 2026-09-26 — Release follow-ups (agent/followups; `~/Desktop/ready-reckoner-briefs/brief-release-followups.md`).
   `BucketAssessment.covered_today` (additive; API 1): coverage from `existing` and the assumed
   basics before the plan buys anything; `covered` stays the plan's end, and the plan and risks
@@ -718,6 +740,31 @@ guidance beyond safe storage and training pointers.
   `rr_etl::verify` (rr-cli drops rr-etl), and rr-data returns the NRI statement first. Open for the
   web workstream: the plan screen's list keys (V-10). Proposed, not done: pool counties without
   (or with few) outage records with the state series (V-15).
+- 2026-09-26 — Packet v2 and the 14-household golden set (agent/plan2, `agent/plan2b`, `agent/plan2c`;
+  `reports/plan2-report.md`). The packet is rewritten around the round-2 hazard, family-plan and
+  model work above: **one `#` title, then fifteen `##` sections in a fixed order** (summary; your
+  family plan; wallet cards; your risks; your targets; your plan; your shelter plan; the 48-hour
+  storm/freeze/heat-wave list; checklists; access and functional needs; local help; documents and
+  money; the first 30 days after a disaster; if it lasts for months; special needs; the maintenance
+  calendar; sources — "if it lasts for months" and "access and functional needs" print only when they
+  apply, so 15 always print and 2 more sometimes do), replacing the ten-item sketch in §9 above, which
+  predates the family plan, wallet cards, shelter plan, forecast list, validation line, and recovery
+  page. `docs/PACKET.md` is the authoritative, field-by-field version of this table; §9 here is kept
+  as a short summary and must be read alongside it, not instead of it. **The card rule** changed from
+  nine cards to **eight**, with a Minor hazard never displacing a Serious or Severe one (decision (c)
+  on Strong wind in Philadelphia and Miami: the card gives way to a Serious card of the household's
+  own, and the shelter-plan block gets its own Strong-wind paragraph instead so the advice still
+  prints once for everyone). **The CLI** builds from the core data pack by default, with `--optional`
+  and `--all-packs` for the surge, wildfire-places and outage-event packs; `explain warning <id>` now
+  finds every warning the plan can raise; `rr validate` reproduces the 22-event backtest and fails on
+  any changed verdict. **The page budget is 25 US Letter pages (24 A4)** for the reference household
+  (Philadelphia), measured in Chrome, not the first-cut proxy figure; every one of the fixture and
+  backtest households stays at or under 28. **The six v2 fixture households named in the entry above
+  turned out to be seven** (`cameron-insulin-well-farm-2`, `detroit-snap-3`, `galveston-highrise-1`,
+  `minot-missile-field-3`, `missoula-smoke-2`, `sacramento-leveed-2`, `san-juan-2`); all seven now
+  have goldens and sample counties and sit in `fixtures/households/` with the original seven, 14 in
+  all — none are staged in `fixtures/households/pending/` any longer, and that directory no longer
+  exists.
 - 2026-09-25 — Founding interview decisions recorded in §2. Planner decisions recorded in §2.
 - 2026-09-26 — Polish round merged (supply2 296939c, budget2 c4e0452, content2 17a6334, supply3 c9db968,
   plan-2 24aec38; plus rr-cli 0be9046 and rr-wasm 7efef62). Goldens now come from the REAL data pack and
