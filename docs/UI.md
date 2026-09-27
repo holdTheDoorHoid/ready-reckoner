@@ -86,10 +86,23 @@ The owner's request (2026-09-26): the whole register at a glance, before any car
 - The **dial sentence** says what a target promises for one need, never for all at once. Each
   setting: "For any one need, something worse than its target comes in about 1 of every 10 ten-year
   stretches" (6 of every 10, 2 of every 10, 1 of every 10, 2 of every 100 for the four settings).
-  For all needs together: "Across all your needs together, the chance that at least one runs out
-  is higher, roughly 1 in 3. That is why the plan also gives you ways to cope when a target runs
-  out." The "roughly 1 in 3" is said only at 1-in-100, where it was worked out; the other settings
-  say "higher" without a number. It sits under the dial and under "How long to be ready for".
+  For all needs together, the engine's own sentence for the household, as the packet prints it
+  ("At this setting, about 1 in 10 households like yours will face a longer disruption of any one
+  kind in the next 10 years; about 3 in 10 will face at least one kind that runs past its target.
+  That is why the plan also gives you ways to cope when a target runs out."), read from the first
+  paragraph of the packet's "Your targets" section, since the contract carries it only there. The
+  figure differs by household (2 to 5 in 10 across the fixtures at 1-in-100), so when the engine's
+  sentence is not at hand (the stand-in engine, or a moment after the dial is turned) the site says
+  "Across all your needs together, the chance that at least one runs out is higher" with no
+  number (since v0.2.0; v0.1.1 gave one fixed figure). It sits under the dial and under "How long
+  to be ready for".
+- **Plan months are numbered as the packet numbers them** (the packet is the oracle): month 0 is the
+  plan date's month and reads "This month (October 2026)", then "Month 1 (November 2026)", "Month 4
+  (February 2027)", so a purchase has the same month on the Plan screen as in the packet's
+  checklists ("(month 4)"). Back later, the month the household is in keeps its number ("This
+  month: month 2 (December 2026)"); the others never move. Envelopes ("ready to buy in month 12
+  (October 2027)") and the done line ("After month 40 (February 2030)") use the same numbers. Keep it
+  up and the summary cards give calendar dates only.
 - One idea per sentence. Eighth-grade level. Natural frequencies before percentages.
 - Threat and action always together: "Outages of three days or more hit about 12 of 100 households
   like yours per decade. Two weeks of stored water costs about $20 in reused bottles."

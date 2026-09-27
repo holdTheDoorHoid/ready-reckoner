@@ -30,7 +30,7 @@
   import { isRareFamily, legalOptIn, longHorizon, minimumKit, rareSummary, setLegalOptIn, setLongHorizon, setMinimumKit } from '../lib/dials';
   import { dayPhrase, targetDays } from '../lib/format';
   import { helpsFor } from '../lib/helps';
-  import { CLIMATE, dialSentence, HORIZONS, RETURN_PERIOD, stageLine, WATER_LEVEL } from '../lib/labels';
+  import { CLIMATE, dialSentence, engineDialSentence, HORIZONS, RETURN_PERIOD, stageLine, WATER_LEVEL } from '../lib/labels';
   import { allPlanItems } from '../lib/lookup';
   import { alsoCheckedFor } from '../lib/rare';
   import { href } from '../lib/router.svelte';
@@ -169,7 +169,11 @@
                 </button>
               </div>
               <div id="settings-panel" class="settings__panel" hidden={!settingsOpen}>
-                <Dial value={dials.return_period} onchange={(rp: ReturnPeriod) => setDial('return_period', rp, `${RETURN_PERIOD[rp].label} (${RETURN_PERIOD[rp].jargon})`)} />
+                <Dial
+                  value={dials.return_period}
+                  joint={engineDialSentence(output.packet_markdown, dials.return_period)}
+                  onchange={(rp: ReturnPeriod) => setDial('return_period', rp, `${RETURN_PERIOD[rp].label} (${RETURN_PERIOD[rp].jargon})`)}
+                />
                 <div class="settings__grid">
                   <ChoiceGroup
                     legend="Climate"
@@ -282,7 +286,7 @@
           The days your household should be able to manage for each kind of disruption, at your settings. The solid bar is what you have
           now; the striped bar is how much of it your plan covers once every step in it is done.
         </p>
-        {#if dials}<p class="section-intro dial-sentence">{dialSentence(dials.return_period)}</p>{/if}
+        {#if dials}<p class="section-intro dial-sentence">{dialSentence(dials.return_period, output.packet_markdown)}</p>{/if}
         <div class="grid">
           {#each duration as b (b.id)}<BucketGauge bucket={b} />{/each}
         </div>

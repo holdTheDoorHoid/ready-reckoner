@@ -174,7 +174,7 @@ describe('decisions on the Plan screen, grouped as the packet groups them', () =
     expect(lines.filter((l) => l.startsWith('Decide'))).toEqual([`Decide (8): ${packetLine(hays)}. No cost to your supplies budget.`]);
     expect(lines).toHaveLength(out.plan.months[1]!.items.filter((i) => !i.done).length - 8 + 1);
     // The whole plan's month 2 also gives them one line.
-    const month = [...current.target.querySelectorAll('details.month')].find((d) => text(d.querySelector('summary')).startsWith('Next month'))!;
+    const month = [...current.target.querySelectorAll('details.month')].find((d) => text(d.querySelector('summary')).startsWith('Month 1 (November 2026)'))!;
     const decideLines = [...month.querySelectorAll('.month__list > li')].map(text).filter((l) => l.startsWith('Decide'));
     expect(decideLines).toEqual([`Decide (8): ${packetLine(hays)} free Decisions`]);
   });
