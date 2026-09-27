@@ -353,20 +353,38 @@ pub fn rate_phrase(rate: f64) -> String {
     format!("once every {} years", round_nice(1.0 / rate))
 }
 
-/// Rounds to two significant figures for display (research §7.2: at most 2 significant figures).
-pub fn round_nice(x: f64) -> String {
-    if !(x.is_finite()) {
-        return "many".to_owned();
+/// Rounds to two significant figures for display (research §7.2: at most 2 significant figures):
+/// whole numbers below 10 (at least 1), then two figures ("4,600").
+pub fn round_sig2(x: f64) -> f64 {
+    if !x.is_finite() {
+        return x;
     }
     if x < 10.0 {
-        let r = (x + 0.5).floor();
-        return format!("{}", r.max(1.0) as i64);
+        return (x + 0.5).floor().max(1.0);
     }
     let mut mag = 1.0;
     while x / mag >= 100.0 {
         mag *= 10.0;
     }
-    format!("{}", (((x / mag) + 0.5).floor() * mag) as i64)
+    ((x / mag) + 0.5).floor() * mag
+}
+
+/// [`round_sig2`] in words, with thousands separators: "7", "45", "1,200"; "many" when infinite.
+pub fn round_nice(x: f64) -> String {
+    if !(x.is_finite()) {
+        return "many".to_owned();
+    }
+    rr_types::money::thousands(round_sig2(x) as u64)
+}
+
+/// An amount of money for a sentence: two significant figures, whole dollars with thousands
+/// separators ("$4,600"), the shared `rr_types::money` format.
+pub fn usd(x: f64) -> String {
+    rr_types::money::usd(if x.is_finite() && x > 0.0 {
+        round_sig2(x)
+    } else {
+        x
+    })
 }
 
 /// Natural frequency in words (research §7.1): under 1 → "fewer than 1"; 1 to 10 → a whole
@@ -382,8 +400,13 @@ pub fn per_100(n: f64) -> String {
     format!("{}", r.min(100.0) as i64)
 }
 
+/// A count out of 100 that rounds to all of them ([`per_100`] rounds 97.5 and up to 100) is
+/// said as "nearly all", never "about 100 of 100".
+pub const NEARLY_ALL_PER_100: f64 = 97.5;
+
 /// A natural frequency with its range: "about 9 (5–15)"; the range is dropped when it rounds to
 /// the same words. Below 1 in 100 the central value has no "about": "fewer than 1 (up to 2)".
+/// At the top: "nearly all (90 or more)".
 pub fn per_100_range(n: f64, lo: f64, hi: f64) -> String {
     let (c, l, h) = (per_100(n), per_100(lo), per_100(hi));
     if n < 1.0 && hi < 1.0 {
@@ -392,11 +415,93 @@ pub fn per_100_range(n: f64, lo: f64, hi: f64) -> String {
     if n.is_nan() || n < 1.0 {
         return format!("fewer than 1 (up to {h})");
     }
+    if n >= NEARLY_ALL_PER_100 {
+        return if lo >= NEARLY_ALL_PER_100 {
+            "nearly all".to_owned()
+        } else {
+            let l = if lo < 1.0 { "0".to_owned() } else { l };
+            format!("nearly all ({l} or more)")
+        };
+    }
     if l == h {
         return format!("about {c}");
     }
     let l = if lo < 1.0 { "0".to_owned() } else { l };
     format!("about {c} ({l}–{h})")
+}
+
+/// A count of households or customers out of 100 as the subject of a sentence: "about 9 of
+/// 100", "fewer than 1 of 100", "nearly all".
+pub fn count_of_100(n: f64) -> String {
+    if n >= NEARLY_ALL_PER_100 {
+        "nearly all".to_owned()
+    } else if n.is_nan() || n < 1.0 {
+        "fewer than 1 of 100".to_owned()
+    } else {
+        format!("about {} of 100", per_100(n))
+    }
+}
+
+/// How a count out of 1,000 reads: "fewer than 1", "5", "45", "1,200".
+fn per_1000(n: f64) -> String {
+    if n.is_nan() || n < 0.5 {
+        "fewer than 1".to_owned()
+    } else if n < 10.0 {
+        format!("{}", (n + 0.5).floor() as i64)
+    } else {
+        round_nice(n)
+    }
+}
+
+/// Two chances over the horizon (0 to 1) on one scale, for a sentence that sets them side by
+/// side: tenths while the smaller is at least about 1 in 10 (the default setting's "about 1 in
+/// 10 … about 3 in 10"), hundredths down to about 1 in 100, then thousandths ("about 2 in 1,000
+/// … about 9 in 1,000"), as the rest of the engine writes small chances; "nearly all" at the top.
+pub fn chance_pair(small: f64, large: f64) -> (String, String) {
+    let tenths = |p: f64| {
+        if p >= 0.95 {
+            "nearly all".to_owned()
+        } else {
+            format!("about {} in 10", ((p * 10.0) + 0.5).floor().max(1.0) as i64)
+        }
+    };
+    let hundredths = |p: f64| {
+        let n = 100.0 * p;
+        if n >= NEARLY_ALL_PER_100 {
+            "nearly all".to_owned()
+        } else if n < 1.0 {
+            "fewer than 1 in 100".to_owned()
+        } else {
+            format!("about {} in 100", per_100(n))
+        }
+    };
+    let thousandths = |p: f64| {
+        let n = 1000.0 * p;
+        if n >= 10.0 * NEARLY_ALL_PER_100 {
+            "nearly all".to_owned()
+        } else if n < 0.5 {
+            "fewer than 1 in 1,000".to_owned()
+        } else {
+            format!("about {} in 1,000", per_1000(n))
+        }
+    };
+    let small = if small.is_finite() {
+        small.max(0.0)
+    } else {
+        0.0
+    };
+    let large = if large.is_finite() {
+        large.max(small)
+    } else {
+        small
+    };
+    if small >= 0.095 {
+        (tenths(small), tenths(large))
+    } else if small >= 0.0095 {
+        (hundredths(small), hundredths(large))
+    } else {
+        (thousandths(small), thousandths(large))
+    }
 }
 
 /// "the next 10 years" / "the next year".
@@ -531,6 +636,47 @@ mod tests {
         assert_eq!(per_100_range(3.0, 0.4, 6.0), "about 3 (0–6)");
         // Never "about fewer than 1 (0–2)".
         assert_eq!(per_100_range(0.4, 0.1, 2.3), "fewer than 1 (up to 2)");
+        // Never "about 100 (90–100)".
+        assert_eq!(per_100_range(99.2, 91.0, 100.0), "nearly all (90 or more)");
+        assert_eq!(per_100_range(99.8, 98.0, 100.0), "nearly all");
+        assert_eq!(per_100_range(96.0, 88.0, 99.0), "about 95 (90–100)");
+        assert_eq!(count_of_100(100.0), "nearly all");
+        assert_eq!(count_of_100(30.0), "about 30 of 100");
+        assert_eq!(count_of_100(0.3), "fewer than 1 of 100");
+    }
+
+    #[test]
+    fn chances_side_by_side_share_one_scale() {
+        // The default setting: 1 in 10 for one kind, about 3 in 10 for any.
+        assert_eq!(
+            chance_pair(0.10, 0.28),
+            ("about 1 in 10".to_owned(), "about 3 in 10".to_owned())
+        );
+        // 1 in 500 over ten years: 2 in 100, not "1 in 10".
+        assert_eq!(
+            chance_pair(0.0198, 0.068),
+            ("about 2 in 100".to_owned(), "about 7 in 100".to_owned())
+        );
+        // One year at 1 in 500: thousandths.
+        assert_eq!(
+            chance_pair(0.002, 0.009),
+            ("about 2 in 1,000".to_owned(), "about 9 in 1,000".to_owned())
+        );
+        assert_eq!(chance_pair(0.0001, 0.0003).0, "fewer than 1 in 1,000");
+        assert_eq!(
+            chance_pair(0.65, 0.99),
+            ("about 7 in 10".to_owned(), "nearly all".to_owned())
+        );
+    }
+
+    #[test]
+    fn money_and_big_numbers_group_thousands() {
+        assert_eq!(usd(4614.0), "$4,600");
+        assert_eq!(usd(16_812.0), "$17,000");
+        assert_eq!(usd(820.0), "$820");
+        assert_eq!(round_nice(1000.0), "1,000");
+        assert_eq!(round_nice(7.4), "7");
+        assert_eq!(rate_phrase(0.001), "once every 1,000 years");
     }
 
     #[test]

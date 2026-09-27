@@ -475,7 +475,7 @@ No one in the household earns wages, so the plan sets no income-gap goal. Keep a
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $1400 at 30 % of your monthly spending, which loss-of-use insurance pays for.[5, 8, 9, 32, 33, 34, 46, 151, 152]
+If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $1,400 at 30 % of your monthly spending, which loss-of-use insurance pays for.[5, 8, 9, 32, 33, 34, 46, 151, 152]
 
 ## After a disaster: the first 30 days
 

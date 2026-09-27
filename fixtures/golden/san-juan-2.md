@@ -15,7 +15,7 @@
 ### The three things that matter most
 
 1. Of 100 households like yours, about 45 (40–60) will have to leave home quickly at least once in the next 10 years. Parts of your area flood in a hurricane's storm surge.[2] Know your evacuation zone and where you would go; leave when told.[3, 4] On the coast, strong shaking is the warning: walk to high ground as soon as it stops.[5]
-2. Of 100 households like yours, about 100 (95–100) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 3 months at home with no power, and about 6 months with no tap water.
+2. Of 100 households like yours, nearly all (95 or more) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 3 months at home with no power, and about 6 months with no tap water.
 3. Of 100 households like yours, about 65 (40–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 weeks of food you normally eat, and 6 months of daily medicine on hand.
 
 **What the plan assumes you already have:** a charged mobile phone, go-bag for each person, manual can opener, a cooking pot with a lid, three days of the food you normally eat and towels to wet and cool down. If any is missing, untick "Assume everyday basics" on the Have screen and the plan will add it.
@@ -278,7 +278,7 @@ The worst power cut in the territory's records was Hurricane Maria (2017); being
 
 **What to avoid.** Do not store water in containers that held chemicals.[92] Milk jugs seal poorly and turn brittle.[97] Never drink pool or spa water. Use it only for washing and cleaning.[95] After a flood, do not drink from a private well until it has been disinfected and tested. Your health department can tell you how.[98]
 
-Water-system failures are counted about 9 times as often as the national average here (an expert estimate), because about 100 of 100 public-water customers in your county are served by a system with a health-based violation in the last five years (EPA) and you said your water system has frequent notices or outages. This rounds up to 6 months: before rounding it is about 3 months, just past 3 months. The worst loss of tap water on record in your state was in Puerto Rico after Hurricane Maria (2017): 2 months for most, up to 5 months. Being ready for 6 months would have covered that.[7, 10, 11, 12, 13, 14, 99, 100, 101]
+Water-system failures are counted about 9 times as often as the national average here (an expert estimate), because nearly all public-water customers in your county are served by a system with a health-based violation in the last five years (EPA) and you said your water system has frequent notices or outages. This rounds up to 6 months: before rounding it is about 3 months, just past 3 months. The worst loss of tap water on record in your state was in Puerto Rico after Hurricane Maria (2017): 2 months for most, up to 5 months. Being ready for 6 months would have covered that.[7, 10, 11, 12, 13, 14, 99, 100, 101]
 
 ### Can't get to a store: about 2 weeks (10 days to 1 month)
 
@@ -581,7 +581,7 @@ Of 100 households like yours, about 20 (10–40) will have an income gap of more
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 9 months; living elsewhere that long costs about $5200 at 30 % of your monthly spending, which loss-of-use insurance pays for.[9, 10, 11, 12, 13, 14, 15, 30, 31, 33, 122]
+If damage forced you out, 9 in 10 households like yours would be home again within about 9 months; living elsewhere that long costs about $5,200 at 30 % of your monthly spending, which loss-of-use insurance pays for.[9, 10, 11, 12, 13, 14, 15, 30, 31, 33, 122]
 
 ## After a disaster: the first 30 days
 
