@@ -127,7 +127,7 @@ fn spending_never_outruns_the_money() {
 #[test]
 fn the_packet_has_every_section_in_order_and_nothing_left_over() {
     for (name, _, out) in outputs() {
-        let p = &out.packet_markdown;
+        let p = &out.prepare_markdown;
         assert!(p.starts_with("# Your preparedness packet\n"), "{name}");
         let mut at = 0;
         for h in SECTION_HEADINGS {
@@ -244,9 +244,11 @@ fn words(markdown: &str) -> usize {
 /// v0.1.0 and 14,100 before packet v2).
 #[test]
 fn the_packet_stays_short() {
-    const MAX_WORDS: usize = 12_500;
+    // Transitional (v0.3): the three data credits data3 made unconditional add ~150 words to
+    // every packet; the binder retires this cap when it lands (DESIGN-DELTA-v3 §4).
+    const MAX_WORDS: usize = 12_700;
     for (name, _, out) in outputs() {
-        let p = &out.packet_markdown;
+        let p = &out.prepare_markdown;
         let n = words(p);
         assert!(n <= MAX_WORDS, "{name}: {n} words");
         // Bucket parts carry what to do, not the why or the requirement lines.
@@ -335,7 +337,7 @@ fn hazard_cards_follow_the_life_safety_rule() {
     };
     for (name, input, out) in outputs() {
         let a = common::run(input);
-        let p = &out.packet_markdown;
+        let p = &out.prepare_markdown;
         let risks =
             &p[p.find("\n## Your risks\n").unwrap()..p.find("\n## Your targets\n").unwrap()];
         let cards: Vec<&rr_types::HazardProfile> = risks
@@ -453,7 +455,7 @@ fn hazard_cards_follow_the_life_safety_rule() {
 fn storm_and_heat_cards_stay_where_they_matter() {
     let cards = |name: &str| -> Vec<String> {
         let (_, _, out) = outputs().iter().find(|(n, _, _)| *n == name).unwrap();
-        let p = &out.packet_markdown;
+        let p = &out.prepare_markdown;
         let risks =
             &p[p.find("\n## Your risks\n").unwrap()..p.find("\n## Your targets\n").unwrap()];
         risks
@@ -622,7 +624,7 @@ fn family_blocks_keep_only_the_hazards_that_apply_here() {
         outputs()
             .iter()
             .find(|(n, _, _)| *n == name)
-            .map(|(_, _, o)| o.packet_markdown.clone())
+            .map(|(_, _, o)| o.prepare_markdown.clone())
             .unwrap()
     };
     // Philadelphia: avalanches and tsunamis do not reach a rowhouse, so the cold-wave card says

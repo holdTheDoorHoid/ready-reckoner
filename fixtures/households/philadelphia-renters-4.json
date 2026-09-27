@@ -7,10 +7,64 @@
     "backup_power": "none", "alarms": { "smoke": true, "co": false, "extinguisher": false }
   },
   "people": [
-    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 19, "mode": "car", "remote_possible": false } },
-    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 6, "mode": "transit", "remote_possible": true } },
-    { "age_band": "child", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": false },
-    { "age_band": "senior", "pregnant_or_nursing": false, "medical": { "daily_rx": true, "refrigerated_rx": false, "powered_device": "none", "mobility": "limited", "dietary": [], "epinephrine": false }, "earner": false }
+    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 19, "mode": "car", "remote_possible": false },
+      "profile": {
+        "name": "Dana", "date_of_birth": "April 12, 1986", "phone": "555-0101", "email": "dana@example.org",
+        "place": { "kind": "work", "name": "Riverside Warehouse", "address": "400 Sample Industrial Road, Philadelphia", "phone": "555-0102", "plan": "Staff shelter in the break room; the site closes when the city declares an emergency", "pickup": "Not needed", "safest_spot": "The break room, no windows" },
+        "doctor": { "name": "Dr. Morgan, Sample Family Practice", "phone": "555-0103", "address": "12 Sample Avenue, Philadelphia" },
+        "pharmacy": { "name": "Corner pharmacy on Sample Street", "phone": "555-0104" },
+        "conditions": "Seasonal allergies",
+        "medications": [ { "name": "Allergy tablet", "dose": "As prescribed", "schedule": "Mornings in spring", "purpose": "Seasonal allergies" } ],
+        "allergies": "None known",
+        "blood_type": "A+",
+        "insurance": { "carrier": "Sample Health Plan", "plan_name": "Employer Silver", "member_id": "SHP-000-111", "group_number": "G-4521", "phone": "555-0105" },
+        "id_notes": "Driver's license in wallet; passport in the document box",
+        "notes": "Commutes by car; keeps a get-home bag in the trunk"
+      } },
+    { "age_band": "adult", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": true, "commute": { "distance_km": 6, "mode": "transit", "remote_possible": true },
+      "profile": {
+        "name": "Sam", "date_of_birth": "September 3, 1988", "phone": "555-0106", "email": "sam@example.org",
+        "place": { "kind": "work", "name": "Sample Street Library", "address": "220 Sample Street, Philadelphia", "phone": "555-0107", "plan": "The library is a cooling center; staff stay until relieved", "pickup": "Not needed", "safest_spot": "The reading room on the ground floor" },
+        "doctor": { "name": "Dr. Morgan, Sample Family Practice", "phone": "555-0103", "address": "12 Sample Avenue, Philadelphia" },
+        "pharmacy": { "name": "Corner pharmacy on Sample Street", "phone": "555-0104" },
+        "conditions": "Asthma, mild",
+        "medications": [ { "name": "Rescue inhaler", "dose": "As prescribed", "schedule": "When needed", "purpose": "Asthma" } ],
+        "allergies": "Penicillin",
+        "blood_type": "O+",
+        "insurance": { "carrier": "Sample Health Plan", "plan_name": "Employer Silver", "member_id": "SHP-000-112", "group_number": "G-4521", "phone": "555-0105" },
+        "id_notes": "State ID in wallet; passport in the document box",
+        "notes": "Keeps a spare inhaler at work"
+      } },
+    { "age_band": "child", "pregnant_or_nursing": false, "medical": { "daily_rx": false, "refrigerated_rx": false, "powered_device": "none", "mobility": "none", "dietary": [], "epinephrine": false }, "earner": false,
+      "profile": {
+        "name": "Riley", "date_of_birth": "June 21, 2017",
+        "place": { "kind": "school", "name": "Sample Elementary School", "address": "90 Sample Lane, Philadelphia", "phone": "555-0108", "plan": "The school shelters in place and sends a text alert; parents collect children from the gym door", "pickup": "Dana, Sam, or Aunt Rosa, who is on the school's card", "safest_spot": "The interior hallway by the gym" },
+        "doctor": { "name": "Dr. Patel, Sample Children's Clinic", "phone": "555-0109", "address": "30 Sample Avenue, Philadelphia" },
+        "pharmacy": { "name": "Corner pharmacy on Sample Street", "phone": "555-0104" },
+        "conditions": "None",
+        "allergies": "Peanuts (mild)",
+        "blood_type": "A+",
+        "insurance": { "carrier": "Sample Health Plan", "plan_name": "Employer Silver", "member_id": "SHP-000-113", "group_number": "G-4521", "phone": "555-0105" },
+        "id_notes": "Birth certificate and insurance card copy in the document box",
+        "notes": "Knows Aunt Rosa's number by heart"
+      } },
+    { "age_band": "senior", "pregnant_or_nursing": false, "medical": { "daily_rx": true, "refrigerated_rx": false, "powered_device": "none", "mobility": "limited", "dietary": [], "epinephrine": false }, "earner": false,
+      "profile": {
+        "name": "Grandpa Joe", "date_of_birth": "February 2, 1950", "phone": "555-0110", "email": "joe@example.org",
+        "place": { "kind": "other", "name": "Sample Senior Center", "address": "75 Sample Avenue, Philadelphia", "phone": "555-0111", "plan": "The center closes in severe weather and calls families", "pickup": "The center's van brings him home at 3 p.m.", "safest_spot": "The dining room" },
+        "doctor": { "name": "Dr. Kim, Sample Geriatrics", "phone": "555-0112", "address": "40 Sample Avenue, Philadelphia" },
+        "pharmacy": { "name": "Corner pharmacy on Sample Street", "phone": "555-0104" },
+        "conditions": "High blood pressure; uses a cane on stairs",
+        "medications": [
+          { "name": "Blood pressure tablet", "dose": "As prescribed", "schedule": "Every morning", "purpose": "High blood pressure" },
+          { "name": "Cholesterol tablet", "dose": "As prescribed", "schedule": "Every evening", "purpose": "Cholesterol" }
+        ],
+        "allergies": "None known",
+        "blood_type": "B+",
+        "insurance": { "carrier": "Medicare", "plan_name": "Original Medicare with a supplement", "member_id": "SAMPLE-MBI-0001", "phone": "555-0113" },
+        "id_notes": "Medicare card in wallet; a copy in the document box",
+        "notes": "Needs help on stairs; hearing aids charge on the kitchen counter"
+      } }
   ],
   "pets": { "dogs": 1, "cats": 0, "small": 0, "large_animals": 0 },
   "mobility": { "vehicles": [ { "fuel": "gas" } ] },
@@ -21,5 +75,45 @@
     "insurance": { "home_or_renters": false, "flood": false, "earthquake": false }
   },
   "existing": [],
-  "dials": { "return_period": "one_in_100", "climate": "today", "horizon_years": 10 }
+  "dials": { "return_period": "one_in_100", "climate": "today", "horizon_years": 10 },
+  "family_plan": {
+    "home": {
+      "address": "1234 Sample Street, Philadelphia, PA 19147",
+      "electric_utility": { "name": "Sample Electric", "phone": "555-0120" },
+      "gas_utility": { "name": "Sample Gas Works", "phone": "555-0121" },
+      "water_utility": { "name": "Sample Water Department", "phone": "555-0122" },
+      "landlord_or_mortgage": { "name": "Pine Street Rentals", "phone": "555-0123", "address": "9 Sample Plaza, Philadelphia" },
+      "where_kit": "Hall closet by the front door",
+      "where_documents": "Fireproof box on the closet shelf",
+      "where_cash": "Envelope in the fireproof box",
+      "where_keys": "Hook inside the kitchen cabinet; a spare with Aunt Rosa"
+    },
+    "neighbourhood": {
+      "hospital": { "name": "Sample General Hospital, emergency room", "phone": "555-0124", "address": "800 Sample Boulevard, Philadelphia" },
+      "urgent_care": { "name": "Sample Walk-in Clinic", "phone": "555-0125", "address": "15 Sample Street, Philadelphia" },
+      "pharmacy": { "name": "Corner pharmacy on Sample Street", "phone": "555-0104" },
+      "shelter": { "name": "Sample Recreation Center", "phone": "555-0126", "address": "300 Sample Park Drive, Philadelphia" },
+      "county_emergency_office": { "name": "City Office of Emergency Management", "phone": "555-0127" },
+      "alerts": "The city's text alerts, and the news radio station"
+    },
+    "pets": [
+      { "name": "Biscuit", "kind": "Dog", "description": "Brown terrier mix, red collar", "medications": "Heartworm medicine from the vet", "vet": { "name": "Sample Animal Hospital", "phone": "555-0128", "address": "60 Sample Avenue, Philadelphia" }, "microchip": "985-000-000-000", "records_where": "Fireproof box, green folder" },
+      { "name": "Pickles", "kind": "Rabbit", "description": "Small grey rabbit", "vet": { "name": "Sample Animal Hospital", "phone": "555-0128" }, "records_where": "Fireproof box, green folder" }
+    ],
+    "vehicles": [
+      { "description": "Blue 2016 hatchback", "plate": "SMP-0101", "insurer": { "name": "Sample Auto Insurance", "phone": "555-0129" }, "policy_number": "AUTO-0000-1234", "kept_in_car": "Blanket, water, phone charger, a paper map" }
+    ],
+    "documents": {
+      "accounts": [
+        { "institution": "Sample Credit Union", "kind": "Checking", "phone": "555-0130", "last4": "4821" },
+        { "institution": "Sample Credit Union", "kind": "Savings", "phone": "555-0130", "last4": "7302" }
+      ],
+      "policies": [
+        { "insurer": "Sample Life", "kind": "Group life (through work)", "policy_number": "LIFE-0000-77", "phone": "555-0131" }
+      ],
+      "where_originals": "Fireproof box on the closet shelf",
+      "where_copies": "With Aunt Rosa in Harrisburg",
+      "digital_backup": "Photos on an encrypted USB drive in the go-bag"
+    }
+  }
 }

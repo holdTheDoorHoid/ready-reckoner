@@ -22,7 +22,7 @@
   import StepPrivacy from '../components/StepPrivacy.svelte';
   import TextField from '../components/TextField.svelte';
   import type { Person } from '../engine/types';
-  import { PLACE_KINDS, type PersonProfile } from '../engine/v3-shim';
+  import { PLACE_KINDS, type PersonProfile } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import {
     addMedication,

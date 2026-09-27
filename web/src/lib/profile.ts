@@ -7,8 +7,7 @@
  * kind (`Place.kind` is required by the contract), so typing into an empty place first gives it
  * the likeliest kind for the person's age, which the card shows chosen and the person can change.
  */
-import type { AgeBand, Person, PlanInput } from '../engine/types';
-import type { PersonProfile, PlaceKind } from '../engine/v3-shim';
+import type { AgeBand, Person, PersonProfile, PlaceKind, PlanInput } from '../engine/types';
 import { addRow, MEDICATIONS_MAX, type Path, PROFILE_SPEC, removeRow, setTextAt, tidyTextAt, tidyValue } from './tidy';
 
 /** A person in words, where the plan has no name for them: "adult", "teenager". */

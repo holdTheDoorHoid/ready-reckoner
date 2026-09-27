@@ -8,7 +8,6 @@ import { describe, expect, it } from 'vitest';
 import { FIXTURES } from './fixtures';
 import { createMockEngine, tidyInput } from './mock';
 import type { PlanInput, Problem } from './types';
-import { prepareMarkdownOf } from './v3-shim';
 import { clone } from '../test/helpers';
 
 /** Philadelphia with every v3 answer filled in, some with stray spaces and over-long lists. */
@@ -82,7 +81,7 @@ describe('the stand-in engine and contract v3’s answers', () => {
     const out = await createMockEngine().assess(withEverything());
     expect(out.ok).toBe(true);
     if (!out.ok) return;
-    const md = prepareMarkdownOf(out.value);
+    const md = out.value.prepare_markdown;
     for (const said of [
       '**Ana Sample (person 1, adult).**',
       'Where they spend the day (work): Name: Sample Logistics',

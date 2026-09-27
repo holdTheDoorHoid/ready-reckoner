@@ -34,7 +34,7 @@
     rest?: string;
   }
 
-  const cardsSlug = $derived(app.result.output ? cardsSection(packetSections(app.result.output.packet_markdown)) : undefined);
+  const cardsSlug = $derived(app.result.output ? cardsSection(packetSections(app.result.output.prepare_markdown)) : undefined);
 
   // Opened at a section (#/binder/wallet-cards): go there once the packet is on the page. A
   // request for the wallet cards finds them under whatever heading this packet gives them.
@@ -42,7 +42,7 @@
     const wanted = router.current.id === 'binder' ? router.current.param : undefined;
     const output = app.result.output;
     if (!wanted || !output) return;
-    const slugs = packetSections(output.packet_markdown).map((sec) => sec.slug);
+    const slugs = packetSections(output.prepare_markdown).map((sec) => sec.slug);
     const slug = slugs.includes(wanted) ? wanted : wanted === 'wallet-cards' ? cardsSlug : undefined;
     if (!slug) return;
     const timer = setTimeout(() => jumpTo(`packet-${slug}`, { focus: 'h2, h3, h4' }), 0);
@@ -73,7 +73,7 @@
       tables += countTables(html);
       return html;
     };
-    return packetSections(output.packet_markdown).map((section) => {
+    return packetSections(output.prepare_markdown).map((section) => {
       if (section.slug !== 'your-risks') return { slug: section.slug, html: md(section.markdown) };
       const { intro, rest } = splitIntro(section.markdown);
       return { slug: section.slug, html: md(intro), rest: md(rest) };

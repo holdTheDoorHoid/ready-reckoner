@@ -29,14 +29,14 @@ describe('the dial sentence (M-04)', () => {
       const rp = FIXTURES[name].dials.return_period;
       const md = readFileSync(join(repoRoot(), 'fixtures', 'golden', `${name}.md`), 'utf8');
       const printed = /^How long to be ready for each kind of disruption at the 1-in-\d+ setting\. (.*)\[[\d, ]+\]$/m.exec(md)![1]!;
-      const sentence = engineDialSentence(out.packet_markdown, rp);
+      const sentence = engineDialSentence(out.prepare_markdown, rp);
       expect(sentence, name).toBe(printed);
-      expect(dialSentence(rp, out.packet_markdown), name).toBe(printed);
+      expect(dialSentence(rp, out.prepare_markdown), name).toBe(printed);
       expect(sentence, name).toMatch(/^At this setting, about \d+ in 10+ households like yours will face a longer disruption of any one kind in the next 10 years; about \d+ in 10+ will face at least one kind that runs past its target\. That is why the plan also gives you ways to cope when a target runs out\.$/);
       joint.add(/; about (\d+ in 10+) will face/.exec(sentence!)![1]!);
       // A packet worked out for another setting is not this setting's sentence.
       const other = RETURN_PERIODS.find((r) => r !== rp)!;
-      expect(engineDialSentence(out.packet_markdown, other), name).toBeUndefined();
+      expect(engineDialSentence(out.prepare_markdown, other), name).toBeUndefined();
     }
     expect([...joint].sort()).toEqual(['2 in 10', '3 in 10', '3 in 100', '4 in 10', '5 in 10']);
   });

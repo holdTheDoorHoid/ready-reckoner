@@ -11,7 +11,7 @@
  * The binder workstreams replace this with the real binder's pages.
  */
 import type { Contact, FamilyPlan, Person, PlanInput } from '../types';
-import type { PersonProfile } from '../v3-shim';
+import type { PersonProfile } from '../types';
 import { hasAnimals, hasChildren, hasVehicle, tidyFamilyPlan } from '../../lib/family';
 import { ACCESS_NEED, HOLD } from '../../lib/labels';
 import { AGE_WORD, PLACE_KIND, tidyProfile } from '../../lib/profile';

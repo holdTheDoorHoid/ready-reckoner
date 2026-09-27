@@ -11,7 +11,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import SiteHeader from '../components/SiteHeader.svelte';
 import { FIXTURES, type FixtureName } from '../engine/fixtures';
 import type { PlanInput } from '../engine/types';
-import { prepareMarkdownOf } from '../engine/v3-shim';
 import detroitJson from '../../../fixtures/households/detroit-snap-3.json';
 import { STORAGE_KEY, type SavedPlan } from '../lib/persistence';
 import { AGE_WORD } from '../lib/profile';
@@ -286,8 +285,8 @@ describe('Step 6, Your people', () => {
     await tick();
     flushSync();
     type(field(r, 'pp-0-medications-0-name'), 'Blood pressure tablet');
-    await until(() => !!r.app.result.output && prepareMarkdownOf(r.app.result.output).includes('Blood pressure tablet') && !r.app.pending, 'the plan to echo the profile');
-    const md = prepareMarkdownOf(r.app.result.output!);
+    await until(() => !!r.app.result.output && r.app.result.output.prepare_markdown.includes('Blood pressure tablet') && !r.app.pending, 'the plan to echo the profile');
+    const md = r.app.result.output!.prepare_markdown;
     expect(md).toContain('Ana Sample (person 1, adult)');
     expect(md).toContain('Allergies: Penicillin');
     expect(r.app.result.error).toBeUndefined();
@@ -404,8 +403,8 @@ describe('Step 7, Your places', () => {
       home: { address: '12 Sample St, Unit 2', electric_utility: { phone: '555-0120' } },
       neighbourhood: { hospital: { name: 'Sample General Hospital', address: '1 Health Way' } },
     });
-    await until(() => !!r.app.result.output && prepareMarkdownOf(r.app.result.output).includes('Sample General Hospital'), 'the plan to echo the answers');
-    const md = prepareMarkdownOf(r.app.result.output!);
+    await until(() => !!r.app.result.output && r.app.result.output.prepare_markdown.includes('Sample General Hospital'), 'the plan to echo the answers');
+    const md = r.app.result.output!.prepare_markdown;
     expect(md).toContain('The corner mailbox');
     expect(md).toContain('Address: 12 Sample St, Unit 2');
     // Clearing everything leaves no family plan behind.
@@ -634,7 +633,7 @@ describe('the tabs after v0.3.0', () => {
     await until(() => print.mock.calls.length > 0, 'the print window');
     expect(r.target.querySelector('.prepare-page')?.classList.contains('printing')).toBe(true);
     // The engine's Prepare sheet, through the site's Markdown renderer.
-    expect(sheet.querySelector('h2')?.textContent).toBe(prepareMarkdownOf(r.app.result.output!).match(/^# (.+)$/m)![1]);
+    expect(sheet.querySelector('h2')?.textContent).toBe(r.app.result.output!.prepare_markdown.match(/^# (.+)$/m)![1]);
     expect(sheet.querySelector('script, img, iframe')).toBeNull();
     window.dispatchEvent(new Event('afterprint'));
     flushSync();

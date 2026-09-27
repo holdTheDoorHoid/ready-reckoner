@@ -82,7 +82,14 @@ describe('tidying the family plan as the engine does (rr-types FamilyPlan::tidy)
 });
 
 describe('editing the family plan in a saved household', () => {
-  const fresh = () => clone(FIXTURES['philadelphia-renters-4']);
+  // Philadelphia as a household that has written no plan: since contract v3 its fixture carries
+  // sample answers in the family plan's new groups (home, pets, ...), which these v2 fields never
+  // touch, so they are left out here.
+  const fresh = () => {
+    const input = clone(FIXTURES['philadelphia-renters-4']);
+    delete input.family_plan;
+    return input;
+  };
 
   it('saves notes as typed, tidies them on leaving, and leaves no empty plan behind', () => {
     const input = fresh();

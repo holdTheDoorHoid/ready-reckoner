@@ -184,9 +184,9 @@ Of 100 households like yours, about 3 (1–10) will be cut off or lose building 
 | Local water or gas outage | about 80 of 100[6, 14] | Minor | Mostly data |
 | Strong wind | about 65 of 100[10, 11, 13, 14] | Minor | Rough data |
 | Medicine shortage | about 40 of 100[14, 50, 51] | Moderate | Mostly data |
+| Eviction | about 30 of 100[14, 52] | Serious | Mostly data |
 | Civil unrest | about 25 of 100[14] | Minor | Expert estimate |
 | Chemical spill or release | about 25 of 100[7, 14] | Moderate | Mostly data |
-| Eviction | about 20 of 100[14, 52] | Serious | Mostly data |
 | Cyberattack on services | about 20 of 100[14] | Minor | Expert estimate |
 | Pandemic | about 10 of 100[14, 53, 54] | Serious | Rough data |
 | Long illness in the household | about 10 of 100[14] | Serious | Expert estimate |
@@ -541,7 +541,7 @@ No one in the household earns wages, so the plan sets no income-gap goal. Keep a
 
 ### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 4 months; living elsewhere that long costs about $2,400 at 30% of your monthly spending, which loss-of-use insurance pays for.[8, 9, 10, 11, 12, 13, 14, 15, 40, 41, 52, 123, 150]
+If damage forced you out, 9 in 10 households like yours would be home again within about 4 months; living elsewhere that long costs about $2,300 at 30% of your monthly spending, which loss-of-use insurance pays for.[8, 9, 10, 11, 12, 13, 14, 15, 40, 41, 52, 123, 150]
 
 ## After a disaster: the first 30 days
 
@@ -612,7 +612,7 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 
 The numbers in brackets point to this list; "expert estimate" marks a judgement, not measured data. The targets and the plan are Ready Reckoner's calculations from these.
 
-**1** Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water **2** County storm-surge proxy. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/DATA_SOURCES.md **3** Evacuation. FEMA / Ready.gov, 2026. https://www.ready.gov/evacuation **4** Hurricanes. FEMA / Ready.gov, 2026. https://www.ready.gov/hurricanes **5** Make A Plan. FEMA / Ready.gov, 2026. https://www.ready.gov/plan **6** National Occurrence and Causes of Boil Water Advisories in the United States, Report to Congress. U.S. Environmental Protection Agency, 2024. https://www.epa.gov/system/files/documents/2025-01/10586_boil-water-advisories_final_rtc_20240603_admin.pdf **7** Toxics Release Inventory, 2024 national data. U.S. Environmental Protection Agency, 2025. https://www.epa.gov/toxics-release-inventory-tri-program **8** Flood Zones (glossary): the Special Flood Hazard Area has a 1-percent chance of flooding in any given year. FEMA, 2026. https://www.fema.gov/about/glossary/flood-zones **9** National Risk Index, version 1.20.0 (December 2025), county data. FEMA, 2025. https://www.fema.gov/about/openfema/data-sets/national-risk-index-data **10** Continental United States Hurricane Impacts/Landfalls 1851–2025. NOAA AOML Hurricane Research Division and National Hurricane Center, 2026. https://www.aoml.noaa.gov/hrd/hurdat/All_U.S._Hurricanes.html
+**1** Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water **2** National Storm Surge Risk Maps. NOAA National Hurricane Center, 2026. https://www.nhc.noaa.gov/nationalsurge/ **3** Evacuation. FEMA / Ready.gov, 2026. https://www.ready.gov/evacuation **4** Hurricanes. FEMA / Ready.gov, 2026. https://www.ready.gov/hurricanes **5** Make A Plan. FEMA / Ready.gov, 2026. https://www.ready.gov/plan **6** National Occurrence and Causes of Boil Water Advisories in the United States, Report to Congress. U.S. Environmental Protection Agency, 2024. https://www.epa.gov/system/files/documents/2025-01/10586_boil-water-advisories_final_rtc_20240603_admin.pdf **7** Toxics Release Inventory, 2024 national data. U.S. Environmental Protection Agency, 2025. https://www.epa.gov/toxics-release-inventory-tri-program **8** Flood Zones (glossary): the Special Flood Hazard Area has a 1-percent chance of flooding in any given year. FEMA, 2026. https://www.fema.gov/about/glossary/flood-zones **9** National Risk Index, version 1.20.0 (December 2025), county data. FEMA, 2025. https://www.fema.gov/about/openfema/data-sets/national-risk-index-data **10** Continental United States Hurricane Impacts/Landfalls 1851–2025. NOAA AOML Hurricane Research Division and National Hurricane Center, 2026. https://www.aoml.noaa.gov/hrd/hurdat/All_U.S._Hurricanes.html
 
 **11** Storm Events Database. NOAA National Centers for Environmental Information, 2026. https://www.ncei.noaa.gov/stormevents/ **12** OpenFEMA: NFIP Residential Penetration Rates (v1) and FIMA NFIP Redacted Claims. FEMA, 2026. https://www.fema.gov/about/openfema/data-sets **13** A dataset of recorded electricity outages by United States county 2014–2022 (EAGLE-I), Scientific Data 11:271, data updated through 2025. Brelsford C. et al., Oak Ridge National Laboratory, 2024. https://doi.org/10.1038/s41597-024-03095-5 **14** Ready Reckoner expert estimates for hazard rates and disruption durations. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md Expert estimate. **15** Residential fire estimate summaries. U.S. Fire Administration, 2025. https://www.usfa.fema.gov/statistics/residential-fires/ **16** Set Your PACE: Prepare Your Critical Communications for Out-of-the-Ordinary Situations. Cybersecurity and Infrastructure Security Agency (SAFECOM/NCSWIC), 2025. https://www.cisa.gov/sites/default/files/2025-02/Updated_PACE_Flyer_022025.pdf **17** Earthquakes. FEMA / Ready.gov, 2026. https://www.ready.gov/earthquakes **18** FastStats: Emergency Department Visits. CDC National Center for Health Statistics, 2025. https://www.cdc.gov/nchs/fastats/emergency-department.htm **19** Stop the Bleed. U.S. Department of Homeland Security, 2026. https://www.dhs.gov/stopthebleed **20** CPR. MedlinePlus, National Library of Medicine, 2026. https://medlineplus.gov/cpr.html
 
@@ -660,15 +660,19 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 > **EPA ECHO SDWA.** Drinking-water system violations from the U.S. Environmental Protection Agency's Enforcement and Compliance History Online (ECHO), Safe Drinking Water Act data downloads. https://echo.epa.gov/tools/data-downloads/sdwa-download-summary
 
-> **EPA TRI, USACE NID, FEMA nuclear sites.** Facility counts from EPA Toxics Release Inventory (2024), USACE National Inventory of Dams (2026-9-23) and FEMA's Operating Nuclear Power Plant Sites layer. https://nid.sec.usace.army.mil/
+> **EPA TRI, USACE NID, FEMA nuclear sites, accessed September 27, 2026.** Facility counts from EPA Toxics Release Inventory (2024), USACE National Inventory of Dams (2026-9-23) and FEMA's Operating Nuclear Power Plant Sites layer. https://nid.sec.usace.army.mil/
+
+> **Eviction Lab, version county estimates 2000-2018, accessed September 27, 2026.** Eviction filing rates derived by Ready Reckoner from: Ashley Gromis, Ian Fellows, James R. Hendrickson, Lavar Edmonds, Lillian Leung, Adam Porton, and Matthew Desmond. Estimating Eviction Prevalence across the United States. Princeton University Eviction Lab. https://data-downloads.evictionlab.org/\#estimating-eviction-prevalance-across-us/. Deposited May 13, 2022. This data is shared under the terms of the Open Data Commons Attribution License (ODC-BY 1.0).
 
 > **IGRF-14 and NERC TPL-007, version IGRF-14 epoch 2025.0.** Geomagnetic latitude from the International Geomagnetic Reference Field, 14th generation (IAGA, distributed by NOAA NCEI); scaling factor from NERC's Benchmark Geomagnetic Disturbance Event Description (TPL-007). https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt
 
 > **NCA5 Atlas and LOCA2, version NCA5 (2023).** Climate projections: U.S. Global Change Research Program, Fifth National Climate Assessment Interactive Atlas and LOCA2 county summaries (CC BY 4.0). Ratios derived by Ready Reckoner. https://www.arcgis.com/home/item.html?id=2f7a8715927b4ba083be450c85f7f761
 
-> **NCA5 Atlas regions, version NCA5 (2023).** Region boundaries: U.S. Global Change Research Program, Fifth National Climate Assessment Interactive Atlas (CC0 1.0). https://www.arcgis.com/home/item.html?id=d6614156fe694956be25f4bb9f52b378
+> **NCA5 Atlas regions, version NCA5 (2023), accessed September 27, 2026.** Region boundaries: U.S. Global Change Research Program, Fifth National Climate Assessment Interactive Atlas (CC0 1.0). https://www.arcgis.com/home/item.html?id=d6614156fe694956be25f4bb9f52b378
 
 > **NOAA HMS and EPA AQS, version 2016-2023.** Smoke days from NOAA NESDIS Hazard Mapping System smoke analysis polygons and U.S. EPA Air Quality System daily PM2.5 data. https://www.ospo.noaa.gov/products/land/hms.html
+
+> **NOAA NHC storm surge maps, version v2 (2016) Texas to Maine; v3 and earlier elsewhere.** Storm-surge areas from NOAA's National Hurricane Center National Storm Surge Risk Maps (Zachry, B. C., Booth, W. J., Rhome, J. R., and Sharon, T. M., 2015: A National View of Storm Surge Risk and Inundation. Weather, Climate, and Society, 7(2), 109-117). For awareness at a community level; check your official evacuation zone. https://www.nhc.noaa.gov/nationalsurge/
 
 > **NOAA nClimGrid-Daily, version v1.0.0.** Daily temperature from NOAA's NClimGrid-Daily county averages (Durre et al., NOAA National Centers for Environmental Information). https://www.ncei.noaa.gov/products/land-based-station/nclimgrid-daily
 
@@ -685,6 +689,8 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 > **Strategic sites, version reviewed 2026-09-26.** Strategic-site classes compiled by Ready Reckoner from public sources: DoD MIRTA installation points, the Sentinel Final EIS (Department of the Air Force), NNSA, the Missile Defense Agency, Census metropolitan areas and centres of population, EIA refinery capacity, BTS port statistics and FEMA's FY2026 UASI allocations. A higher class does not mean an attack is likely. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml
 
 > **USACE National Levee Database.** People behind levees and levee risk ratings from the U.S. Army Corps of Engineers National Levee Database. https://levees.sec.usace.army.mil/
+
+> **USDA Forest Service Wildfire Risk to Communities, version 2nd edition, tabular download of 2026-04-15.** USDA Forest Service. 2026. Wildfire Risk to Communities. https://wildfirerisk.org (accessed 2026-09-26). https://wildfirerisk.org/
 
 > **USGS National Seismic Hazard Model, version NSHM 2023 grids, Hawaii 2021.R2 grid, PRVI 2025 service.** Earthquake shaking probabilities from the U.S. Geological Survey National Seismic Hazard Model (2023 50-state model data release; Hawaii 2021.R2; Puerto Rico and U.S. Virgin Islands 2025). https://doi.org/10.5066/P9GNPCOD
 

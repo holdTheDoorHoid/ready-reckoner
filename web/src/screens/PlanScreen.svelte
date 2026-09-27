@@ -33,7 +33,6 @@
   import Sources from '../components/Sources.svelte';
   import Warning from '../components/Warning.svelte';
   import type { PlanItem, PlanOutput } from '../engine/types';
-  import { prepareMarkdownOf } from '../engine/v3-shim';
   import { useApp } from '../lib/app.svelte';
   import { addMonths, formatDate, formatMonth, monthsBetween, planMonthLabel, planMonthPhrase, quantity, usd } from '../lib/format';
   import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, stageLine } from '../lib/labels';
@@ -48,7 +47,7 @@
 
   function renderSheet() {
     const output = app.result.output;
-    sheet = output ? renderMarkdown(prepareMarkdownOf(output), { idPrefix: 'prep', headingOffset: 1, notesLabel: 'Notes: your preparation plan' }) : '';
+    sheet = output ? renderMarkdown(output.prepare_markdown, { idPrefix: 'prep', headingOffset: 1, notesLabel: 'Notes: your preparation plan' }) : '';
   }
 
   async function printSheet() {

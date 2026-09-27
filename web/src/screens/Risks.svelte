@@ -171,7 +171,7 @@
               <div id="settings-panel" class="settings__panel" hidden={!settingsOpen}>
                 <Dial
                   value={dials.return_period}
-                  joint={engineDialSentence(output.packet_markdown, dials.return_period)}
+                  joint={engineDialSentence(output.prepare_markdown, dials.return_period)}
                   onchange={(rp: ReturnPeriod) => setDial('return_period', rp, `${RETURN_PERIOD[rp].label} (${RETURN_PERIOD[rp].jargon})`)}
                 />
                 <div class="settings__grid">
@@ -286,7 +286,7 @@
           The days your household should be able to manage for each kind of disruption, at your settings. The solid bar is what you have
           now; the striped bar is how much of it your plan covers once every step in it is done.
         </p>
-        {#if dials}<p class="section-intro dial-sentence">{dialSentence(dials.return_period, output.packet_markdown)}</p>{/if}
+        {#if dials}<p class="section-intro dial-sentence">{dialSentence(dials.return_period, output.prepare_markdown)}</p>{/if}
         <div class="grid">
           {#each duration as b (b.id)}<BucketGauge bucket={b} />{/each}
         </div>

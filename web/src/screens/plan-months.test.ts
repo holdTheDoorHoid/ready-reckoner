@@ -84,7 +84,7 @@ describe('the Plan screen and the printed packet name the same month for the sam
   it('Philadelphia: every purchase in the packet’s checklists sits under the month the packet gives it', async () => {
     const { r, out, date } = await plan('philadelphia-renters-4');
     const md = packet('philadelphia-renters-4');
-    expect(md).toBe(out.packet_markdown);
+    expect(md).toBe(out.prepare_markdown);
     const lines = checklistMonths(md);
     expect(lines.length).toBeGreaterThan(40);
     const months = screenMonths(r);

@@ -11,14 +11,14 @@
  * its first N entries, and an account's `last4` keeps only the last four digits typed (a pasted
  * full account number never reaches the file).
  *
- * awaiting: types3 — the named caps come from the shim until `v0.3` has types3's `types.ts`, which
- * exports the same names and values; then import them from there.
+ * The named caps are the contract's (`types.ts`, mirrored from rr-types); the tables below say
+ * which field uses which, as docs/ENGINE-API.md does.
  */
-import { FAMILY_PLAN_SHORT_MAX } from '../engine/types';
 import {
   ACCOUNTS_MAX,
   BLOOD_TYPE_MAX,
   DESCRIPTION_MAX,
+  FAMILY_PLAN_SHORT_MAX,
   LABEL_TEXT_MAX,
   LONG_TEXT_MAX,
   MEDICATIONS_MAX,
@@ -30,7 +30,7 @@ import {
   POLICIES_MAX,
   SHORT_TEXT_MAX,
   VEHICLES_MAX,
-} from '../engine/v3-shim';
+} from '../engine/types';
 
 export { ACCOUNTS_MAX, MEDICATIONS_MAX, PETS_MAX, POLICIES_MAX, VEHICLES_MAX };
 

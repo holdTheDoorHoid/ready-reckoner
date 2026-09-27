@@ -1,6 +1,7 @@
-//! Optional job `wildfire_places` — wildfire exposure by Census place, for the optional
-//! `wildfire_places` pack (issue #15), from the USDA Forest Service *Wildfire Risk to
-//! Communities* tabular download (2nd edition; the "Communities" sheet: Census places).
+//! Job `wildfire_places` — wildfire exposure by Census place, from the USDA Forest Service
+//! *Wildfire Risk to Communities* tabular download (2nd edition; the "Communities" sheet: Census
+//! places). Bundled into the core pack (DESIGN-DELTA-v3 §8, 2026-09-27; formerly the optional
+//! `wildfire_places` pack, issue #15).
 //!
 //! Per place: the share of its buildings directly exposed (in or next to burnable vegetation:
 //! flames can reach them), indirectly exposed (embers and home-to-home spread), and the national
@@ -19,10 +20,12 @@ use crate::num::fixed;
 use crate::{Result, data_err};
 use std::collections::BTreeMap;
 
-/// Wildfire exposure by place (optional pack).
-pub const PLACES: &str = "opt/wildfire_places/places.csv";
-/// Places each ZIP overlaps (optional pack).
-pub const ZIP_PLACES: &str = "opt/wildfire_places/zip_places.csv";
+/// Wildfire exposure by place. A core file, loaded eagerly with the rest of the core pack
+/// (unlike `ZIP_PLACES`, this is not ZIP-keyed, so it does not join the lazy ZIP group).
+pub const PLACES: &str = "core/wildfire_places.csv";
+/// Places each ZIP overlaps. A core file; loaded eagerly with the rest of the core pack
+/// (DESIGN-DELTA-v3 §8: only `surge`'s ZIP table joins the lazy ZIP group, not this one).
+pub const ZIP_PLACES: &str = "core/zip_wildfire_places.csv";
 
 const WORKBOOK: &str =
     "https://wildfirerisk.org/wp-content/uploads/2026/04/wrc_download_20260415.xlsx";

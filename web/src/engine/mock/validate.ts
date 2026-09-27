@@ -8,9 +8,10 @@
  * new check is `rare_opt_in`, whose entries must be family ids or `all` (`unknown_id`). Nothing in
  * the family plan is ever a problem beyond its types: it is only tidied (`tidyFamilyPlan`).
  *
- * Contract v3 (DESIGN-DELTA-v3 §3.1–3.2): a person's `profile` and the family plan's `home`,
- * `neighbourhood`, `pets`, `vehicles` and `documents`, and an `address` on every contact. All
- * optional free text, checked only for its types (a place needs its kind), then tidied.
+ * Contract v3 (types3): the people's `profile` and the family plan's `home`, `neighbourhood`,
+ * `pets`, `vehicles` and `documents` are accepted with their types, every field optional (a
+ * `Place` needs its `kind`); like the family plan they are never a problem. They are tidied by
+ * `tidyInput` and echoed by `mock/family.ts`.
  */
 import type { PlanInput, Problem, ProblemCode } from '../types';
 import {
@@ -28,6 +29,7 @@ import {
   HOUSING_KINDS,
   INCOME_STABILITIES,
   MOBILITY_LEVELS,
+  PLACE_KINDS,
   RARE_HAZARD_IDS,
   RAW_WATER_SOURCES,
   RETURN_PERIODS,
@@ -40,7 +42,6 @@ import {
   WATER_SOURCES,
   WATER_SYSTEM_RECORDS,
 } from '../types';
-import { PLACE_KINDS } from '../v3-shim';
 
 type Schema =
   | { t: 'string' }
@@ -62,23 +63,19 @@ const list = (of: Schema): Schema => ({ t: 'array', of });
 /** An object whose every field may be left out (the family plan and its parts). */
 const loose = (fields: Record<string, Schema>): Schema => obj(fields, Object.keys(fields));
 
-/** `Contact`: a name and a phone (v2) and an address (v3). */
 const CONTACT: Schema = loose({ name: str, phone: str, address: str });
 
-/** `Person.profile` (contract v3): free text only; a place needs its kind. */
+/** Contract v3: the answers to the interview's optional steps 6–8 (DESIGN-DELTA-v3 §3.1, §3.2). */
+const PLACE: Schema = obj(
+  { kind: en(PLACE_KINDS), name: str, address: str, phone: str, plan: str, pickup: str, safest_spot: str },
+  ['name', 'address', 'phone', 'plan', 'pickup', 'safest_spot'],
+);
 const PERSON_PROFILE: Schema = loose({
   name: str,
   date_of_birth: str,
   phone: str,
   email: str,
-  place: obj({ kind: en(PLACE_KINDS), name: str, address: str, phone: str, plan: str, pickup: str, safest_spot: str }, [
-    'name',
-    'address',
-    'phone',
-    'plan',
-    'pickup',
-    'safest_spot',
-  ]),
+  place: PLACE,
   doctor: CONTACT,
   pharmacy: CONTACT,
   conditions: str,
@@ -89,8 +86,46 @@ const PERSON_PROFILE: Schema = loose({
   id_notes: str,
   notes: str,
 });
+const HOME_INFO: Schema = loose({
+  address: str,
+  electric_utility: CONTACT,
+  gas_utility: CONTACT,
+  water_utility: CONTACT,
+  insurer: CONTACT,
+  policy_number: str,
+  landlord_or_mortgage: CONTACT,
+  where_kit: str,
+  where_documents: str,
+  where_cash: str,
+  where_keys: str,
+});
+const NEIGHBOURHOOD: Schema = loose({
+  hospital: CONTACT,
+  urgent_care: CONTACT,
+  pharmacy: CONTACT,
+  shelter: CONTACT,
+  county_emergency_office: CONTACT,
+  alerts: str,
+});
+const PET_INFO: Schema = loose({
+  name: str,
+  kind: str,
+  description: str,
+  medications: str,
+  vet: CONTACT,
+  microchip: str,
+  records_where: str,
+});
+const VEHICLE_INFO: Schema = loose({ description: str, plate: str, insurer: CONTACT, policy_number: str, kept_in_car: str });
+const DOCUMENTS_INFO: Schema = loose({
+  accounts: list(loose({ institution: str, kind: str, phone: str, last4: str })),
+  policies: list(loose({ insurer: str, kind: str, policy_number: str, phone: str })),
+  where_originals: str,
+  where_copies: str,
+  digital_backup: str,
+});
 
-/** `FamilyPlan` (contract v2, and the v3 groups): free text only, every field optional. */
+/** `FamilyPlan` (contract v2): free text only, every field optional. */
 const FAMILY_PLAN: Schema = loose({
   meeting_place_near: str,
   meeting_place_far: str,
@@ -110,29 +145,11 @@ const FAMILY_PLAN: Schema = loose({
   lawyer: CONTACT,
   roadside_assistance: str,
   numbers_by_heart: list(str),
-  home: loose({
-    address: str,
-    electric_utility: CONTACT,
-    gas_utility: CONTACT,
-    water_utility: CONTACT,
-    insurer: CONTACT,
-    policy_number: str,
-    landlord_or_mortgage: CONTACT,
-    where_kit: str,
-    where_documents: str,
-    where_cash: str,
-    where_keys: str,
-  }),
-  neighbourhood: loose({ hospital: CONTACT, urgent_care: CONTACT, pharmacy: CONTACT, shelter: CONTACT, county_emergency_office: CONTACT, alerts: str }),
-  pets: list(loose({ name: str, kind: str, description: str, medications: str, vet: CONTACT, microchip: str, records_where: str })),
-  vehicles: list(loose({ description: str, plate: str, insurer: CONTACT, policy_number: str, kept_in_car: str })),
-  documents: loose({
-    accounts: list(loose({ institution: str, kind: str, phone: str, last4: str })),
-    policies: list(loose({ insurer: str, kind: str, policy_number: str, phone: str })),
-    where_originals: str,
-    where_copies: str,
-    digital_backup: str,
-  }),
+  home: HOME_INFO,
+  neighbourhood: NEIGHBOURHOOD,
+  pets: list(PET_INFO),
+  vehicles: list(VEHICLE_INFO),
+  documents: DOCUMENTS_INFO,
 });
 
 const PLAN_INPUT: Schema = obj(

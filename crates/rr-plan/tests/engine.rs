@@ -60,7 +60,7 @@ fn with_no_packs_the_sample_counties_still_plan() {
         out.location.data_note.as_deref(),
         Some(rr_plan::source::FIXTURE_DATA_NOTE)
     );
-    assert!(out.packet_markdown.contains("**Sample data.**"));
+    assert!(out.prepare_markdown.contains("**Sample data.**"));
 }
 
 #[test]

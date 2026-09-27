@@ -53,7 +53,7 @@ fn every_person_has_a_wallet_card_and_none_is_empty() {
         "- Medical notes: ",
     ];
     for (name, input, out) in outputs() {
-        let p = &out.packet_markdown;
+        let p = &out.prepare_markdown;
         assert!(
             p.contains(&format!("\n{WALLET_CARDS_HEADING}\n")),
             "{name}: the app finds the cards by this heading"
@@ -85,7 +85,7 @@ fn phone_numbers_on_the_cards_never_break() {
         .family_plan
         .as_ref()
         .expect("Detroit wrote a family plan");
-    let cards = cards(&out.packet_markdown);
+    let cards = cards(&out.prepare_markdown);
     let tanya = plan.out_of_area_contact.as_ref().unwrap();
     let phone = tanya
         .phone
@@ -107,13 +107,14 @@ fn phone_numbers_on_the_cards_never_break() {
 }
 
 /// Everything the household wrote on the family-plan screen is printed word for word; nothing in
-/// it is computed with. Detroit filled in the whole plan; Philadelphia wrote none, so every field
+/// it is computed with. Detroit filled in the whole plan; Philadelphia wrote none of it (its plan
+/// holds only the contract v3 sample answers, which this packet does not print), so every field
 /// is a line to write on.
 #[test]
 fn the_family_plan_echoes_what_the_household_wrote() {
     let (_, input, out) = fixture("detroit-snap-3");
     let plan = input.family_plan.as_ref().unwrap();
-    let s = section(&out.packet_markdown, "## Your family plan").expect("family plan");
+    let s = section(&out.prepare_markdown, "## Your family plan").expect("family plan");
     let nb = |t: &str| t.replace('-', &NB_HYPHEN.to_string());
     let mut written: Vec<String> = [
         &plan.meeting_place_near,
@@ -153,8 +154,10 @@ fn the_family_plan_echoes_what_the_household_wrote() {
     assert!(s.contains("This is the plan you wrote"));
 
     let (_, input, out) = fixture("philadelphia-renters-4");
-    assert!(input.family_plan.is_none());
-    let s = section(&out.packet_markdown, "## Your family plan").unwrap();
+    let v3_only = input.family_plan.as_ref().expect("the v3 sample answers");
+    assert!(v3_only.meeting_place_near.is_none() && v3_only.out_of_area_contact.is_none());
+    assert!(v3_only.trusted_circle.is_empty() && v3_only.shutoff_gas.is_none());
+    let s = section(&out.prepare_markdown, "## Your family plan").unwrap();
     assert!(
         s.contains("| Meeting place near home | __________ |"),
         "{s}"
@@ -170,7 +173,7 @@ fn the_family_plan_echoes_what_the_household_wrote() {
 fn every_packet_has_the_recovery_page() {
     for (name, _, out) in outputs() {
         let s = section(
-            &out.packet_markdown,
+            &out.prepare_markdown,
             "## After a disaster: the first 30 days",
         )
         .unwrap_or_else(|| panic!("{name}: no recovery page"));
@@ -202,7 +205,7 @@ fn the_access_needs_page_prints_only_when_someone_has_a_need() {
     let mut with = 0;
     for (name, input, out) in outputs() {
         let needs = input.people.iter().any(|p| !p.access_needs.is_empty());
-        let s = section(&out.packet_markdown, "## Access and functional needs");
+        let s = section(&out.prepare_markdown, "## Access and functional needs");
         assert_eq!(s.is_some(), needs, "{name}");
         if let Some(s) = s {
             with += 1;
@@ -213,7 +216,7 @@ fn the_access_needs_page_prints_only_when_someone_has_a_need() {
     // (Spanish speakers) at least.
     assert!(with >= 3, "{with}");
     let (_, _, out) = fixture("detroit-snap-3");
-    let s = section(&out.packet_markdown, "## Access and functional needs").unwrap();
+    let s = section(&out.prepare_markdown, "## Access and functional needs").unwrap();
     assert!(s.contains("deaf or hard of hearing"), "{s}");
 }
 
@@ -223,7 +226,7 @@ fn the_access_needs_page_prints_only_when_someone_has_a_need() {
 fn the_long_horizon_section_prints_only_with_the_plan_s_long_horizon_items() {
     let mut with = 0;
     for (name, _, out) in outputs() {
-        let s = section(&out.packet_markdown, "## If it lasts for months");
+        let s = section(&out.prepare_markdown, "## If it lasts for months");
         assert_eq!(
             s.is_some(),
             !out.plan.long_horizon.is_empty(),
@@ -253,7 +256,7 @@ fn the_long_horizon_section_prints_only_with_the_plan_s_long_horizon_items() {
     assert!(with >= 2, "{with}");
     assert!(
         section(
-            &fixture("san-juan-2").2.packet_markdown,
+            &fixture("san-juan-2").2.prepare_markdown,
             "## If it lasts for months"
         )
         .is_some()
@@ -270,7 +273,7 @@ fn the_validation_line_cites_the_registry_entry() {
         .citation(rr_plan::validation::CITATION)
         .expect("rr_validation_2026 is in content/citations.toml");
     for (name, _, out) in outputs() {
-        let p = &out.packet_markdown;
+        let p = &out.prepare_markdown;
         let targets = section(p, "## Your targets").unwrap();
         let line = targets
             .lines()
@@ -304,7 +307,7 @@ fn the_validation_line_cites_the_registry_entry() {
 fn the_wind_shelter_advice_prints_once() {
     const WIND_CARD_ADVICE: &str = "Pick your shelter spot now.";
     for (name, _, out) in outputs() {
-        let p = &out.packet_markdown;
+        let p = &out.prepare_markdown;
         let shelter = section(p, "## Your shelter plan").unwrap();
         assert_eq!(
             shelter.matches("**Strong wind.**").count(),
@@ -331,7 +334,7 @@ fn the_wind_shelter_advice_prints_once() {
 #[test]
 fn a_shared_get_home_bag_line_prints_once() {
     let sugar = section(
-        &fixture("sugar-land-ev-household-3").2.packet_markdown,
+        &fixture("sugar-land-ev-household-3").2.prepare_markdown,
         "## Checklists",
     )
     .unwrap();
@@ -343,7 +346,7 @@ fn a_shared_get_home_bag_line_prints_once() {
     assert!(sugar.contains("- [ ] For each person: keep a get-home bag in the car"));
     assert_eq!(sugar.matches("- [ ] For the walk, from home: ").count(), 2);
     let phl = section(
-        &fixture("philadelphia-renters-4").2.packet_markdown,
+        &fixture("philadelphia-renters-4").2.prepare_markdown,
         "## Checklists",
     )
     .unwrap();

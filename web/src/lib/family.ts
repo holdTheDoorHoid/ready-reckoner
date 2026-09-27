@@ -19,7 +19,7 @@
  */
 import type { Contact, FamilyPlan, Holds, PlanInput, TrustedPerson } from '../engine/types';
 import { FAMILY_PLAN_SHORT_MAX, FAMILY_PLAN_TEXT_MAX, HOLDS, NUMBERS_BY_HEART_MAX, ROUTES_MAX, TRUSTED_CIRCLE_MAX } from '../engine/types';
-import type { DocumentsInfo, HomeInfo, Neighbourhood, PetInfo, VehicleInfo } from '../engine/v3-shim';
+import type { DocumentsInfo, HomeInfo, Neighbourhood, PetInfo, VehicleInfo } from '../engine/types';
 import {
   addRow,
   CONTACT_SPEC,

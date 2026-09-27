@@ -352,9 +352,9 @@ pub fn verify(dir: &Path) -> Result<Report, String> {
 }
 
 /// Model review M-02: (a) a county whose recorded event kept at least 1% of its customers out for
-/// a week (optional pack `opt/outage_events/county_events.csv`) must show customer outages of a
-/// week or more in `core/outages.csv`; (b) outages per customer-year more than three times the
-/// serving utilities' SAIFI (`core/reliability.csv`) point at reporting flicker and are listed.
+/// a week (`core/outage_events.csv`) must show customer outages of a week or more in
+/// `core/outages.csv`; (b) outages per customer-year more than three times the serving utilities'
+/// SAIFI (`core/reliability.csv`) point at reporting flicker and are listed.
 fn outage_checks(dir: &Path, rep: &mut Report) {
     let Ok((oh, orows)) = read_table(dir, "core/outages.csv") else {
         return;
@@ -376,7 +376,7 @@ fn outage_checks(dir: &Path, rep: &mut Report) {
             )
         })
         .collect();
-    if let Ok((eh, erows)) = read_table(dir, "opt/outage_events/county_events.csv")
+    if let Ok((eh, erows)) = read_table(dir, "core/outage_events.csv")
         && let (Ok(e_f), Ok(e_p), Ok(e_7)) = (
             col(&eh, "county_fips"),
             col(&eh, "peak_share"),

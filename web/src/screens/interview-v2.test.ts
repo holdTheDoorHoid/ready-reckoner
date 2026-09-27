@@ -38,7 +38,6 @@ async function open(Screen: Component, route: string, plan: SavedPlan | null): P
 }
 
 const fixture = (name: FixtureName) => savedFor(FIXTURES[name]);
-
 function button(r: Rendered, text: string): HTMLButtonElement {
   const b = [...r.target.querySelectorAll('button')].find((x) => x.textContent?.includes(text));
   if (!b) throw new Error(`no button "${text}"`);

@@ -51,7 +51,7 @@ describe('mock engine: contract v2 inputs', () => {
     it(`plans for the staged v2 household ${name}`, async () => {
       const o = await assess(input);
       expect(o.buckets).toHaveLength(15);
-      expect(o.packet_markdown).toContain('## Wallet cards');
+      expect(o.prepare_markdown).toContain('## Wallet cards');
     });
   }
 
@@ -94,17 +94,17 @@ describe('mock engine: contract v2 inputs', () => {
     expect(tidyInput(input).family_plan).toEqual({ meeting_place_near: 'The corner', numbers_by_heart: ['555-0100'] });
     expect(input.family_plan.work_plans).toBe('   ');
     const o = await assess(input);
-    expect(o.packet_markdown).toContain('| Meeting place near home | The corner |');
-    expect(o.packet_markdown).toContain('**Numbers we know by heart:** 555-0100');
+    expect(o.prepare_markdown).toContain('| Meeting place near home | The corner |');
+    expect(o.prepare_markdown).toContain('**Numbers we know by heart:** 555-0100');
     input.family_plan = { work_plans: '  ' };
     expect(tidyInput(input).family_plan).toBeUndefined();
-    expect((await assess(input)).packet_markdown).toContain('Fill this in together');
+    expect((await assess(input)).prepare_markdown).toContain('Fill this in together');
   });
 
   it('prints the family plan word for word and one wallet card per person, and escapes what could break the page', async () => {
     const d = PENDING.detroit!;
     const o = await assess(d);
-    const md = o.packet_markdown;
+    const md = o.prepare_markdown;
     expect(md.indexOf('## Your family plan')).toBeLessThan(md.indexOf('## Your risks'));
     expect(md).toContain('| Out-of-area contact (name and phone) | Cousin Tanya in Columbus, 555-0140 |');
     expect(md).toContain('| Tanya | 555-0140 | a spare key, copies of our papers |');
@@ -113,7 +113,7 @@ describe('mock engine: contract v2 inputs', () => {
     expect(md).toContain('**Help in an emergency:** person 3 is deaf or hard of hearing.');
     const tricky = clone(d);
     tricky.family_plan!.meeting_place_near = 'Corner | <b>bold</b> *star*\nnext line';
-    const t = (await assess(tricky)).packet_markdown;
+    const t = (await assess(tricky)).prepare_markdown;
     expect(t).toContain('| Meeting place near home | Corner \\| \\<b\\>bold\\</b\\> \\*star\\* next line |');
   });
 

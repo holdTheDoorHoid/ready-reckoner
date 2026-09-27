@@ -71,7 +71,7 @@ fn render_with(engine: &Engine<Source>) -> Result<Vec<Golden>, CliError> {
             .map_err(|e| CliError::failure(format!("{name}: {e}")))?;
         out.push(Golden {
             name: name.to_owned(),
-            markdown: output.packet_markdown.clone(),
+            markdown: output.prepare_markdown.clone(),
             json: rr_plan::to_json(&output),
         });
     }
