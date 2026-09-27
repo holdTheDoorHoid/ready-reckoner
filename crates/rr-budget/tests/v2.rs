@@ -389,6 +389,64 @@ fn the_rare_allowance_buys_only_for_ticked_families_likely_enough_here() {
     );
 }
 
+/// An item that protects against one cause inside its family (Faraday storage: an electromagnetic
+/// pulse, the `emp` sub-cause of the months-long blackout family) is gated on that cause's chance,
+/// the middle of its published range, not on the family total: a family at 8 in 100 over ten years
+/// with an EMP part of about 0.21 in 1,000 buys nothing; an EMP part above the line buys the bag,
+/// and its sentence names the cause and its family; a family that lists no such cause buys nothing.
+#[test]
+fn an_item_for_one_cause_is_gated_on_that_cause_not_the_family_total() {
+    let run = |emp: Option<[f64; 2]>| {
+        let mut bag = buy("rare_faraday_storage", BucketId::Comms, TierId::Y1, 68.0);
+        bag.rare_catastrophic = true;
+        bag.hazard_extras = vec![HazardId::MultiMonthBlackout];
+        let mut s = Setup::new(PHL, 100.0, 0.0).add(bag, ItemMeta::new("rare_faraday_storage"));
+        s.household.dials.rare_opt_in = vec!["multi_month_blackout".into()];
+        // The family total: about 8 in 100 over ten years (Coos Bay with Cascadia).
+        s.risks
+            .register
+            .insert(HazardId::MultiMonthBlackout, 8.0e-3);
+        if let Some(range) = emp {
+            s.risks.sub_causes.insert(
+                HazardId::MultiMonthBlackout,
+                vec![rr_types::SubCause {
+                    id: "emp".into(),
+                    name: "EMP from a nuclear attack".into(),
+                    note: String::new(),
+                    rate_range: Some(range),
+                    sources: Vec::new(),
+                }],
+            );
+        }
+        s.run()
+    };
+    // The lower 48's EMP part: 4.4e-7 to 1.035e-3 a year, middle about 0.21 in 1,000.
+    let low = run(Some([4.4e-7, 1.035e-3]));
+    assert_eq!(month_of(&low, "rare_faraday_storage"), None);
+    assert!(
+        low.rare_catastrophic_skipped
+            .contains(&ItemId::from("rare_faraday_storage"))
+    );
+    // No sub-causes known: not bought either.
+    assert_eq!(month_of(&run(None), "rare_faraday_storage"), None);
+    // An EMP part above the line (middle about 3.2e-3 a year, 31 in 1,000): bought, and said so.
+    let high = run(Some([1.0e-3, 1.0e-2]));
+    assert!(month_of(&high, "rare_faraday_storage").is_some());
+    let line = lines(&high)
+        .into_iter()
+        .find(|(_, i)| i.item_id == "rare_faraday_storage" && i.kind == PlanItemKind::Purchase)
+        .unwrap()
+        .1;
+    assert!(
+        line.why.contains(
+            "It is for EMP from a nuclear attack, part of the power out for months row you ticked"
+        ),
+        "{}",
+        line.why
+    );
+    assert_eq!(line.hazards, [HazardId::MultiMonthBlackout]);
+}
+
 // ------------------------------------------------------------------------------------------------
 // Bare-minimum mode and the two done months
 // ------------------------------------------------------------------------------------------------

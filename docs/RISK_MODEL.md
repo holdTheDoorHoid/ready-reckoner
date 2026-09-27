@@ -1641,26 +1641,28 @@ rr-plan's readiness harm estimates):
 | Item | Harm-days | Why |
 | --- | --- | --- |
 | `rare_radiation_meter` (dosimeter card) | 2 | tells a sheltering household when it is safe to go outside, the main decision after fallout (like the go-bag's 2) |
-| `rare_faraday_storage` | 0.5 | keeps a spare radio or phone working after an electromagnetic pulse, a supporting item (like the get-home bag's 0.5); eligible through the months-long blackout family, not the nuclear one (a pulse reaches far beyond any blast or fallout zone) |
+| `rare_faraday_storage` | 0.5 | keeps a spare radio or phone working after an electromagnetic pulse, a supporting item (like the get-home bag's 0.5); gated on the EMP part of the months-long blackout family, not the family total (`rr_budget::rare::RARE_CAUSES`) |
 | any other specialised item | 0.5 | a supporting item |
 
 Potassium iodide is free and keeps rr-supply's planning-zone rule (a free step near a plant, not an
 allowance purchase). Each allowance purchase says which ticked family it is for and that the chance
 here passes 1 in 1,000 (no point estimate: rare rows show ranges only). Rare items are on no
-readiness checklist. The dosimeter card goes with the nuclear family and Faraday storage with the
-months-long blackout family (`multi_month_blackout`, whose block carries the EMP paragraph). That
-family's central estimate is not the same everywhere (it is built from the household's own power
-curve at 60 days, which `rr-plan` passes to `rr-hazards` after the consequence model has run, and
-the latitude-scaled solar-storm row): from about 0.7 in 1,000 (Hays) to 12.5 in 100 (San Juan, on
-Maria's restoration curves) over ten years; Coos Bay reads 7.7 in 100 (Cascadia). It is above 1 in
-1,000 in ten of the fourteen fixtures, all but Hays, Phoenix, Missoula and Sacramento (Cameron
-Parish only just, 1.02 in 1,000). Fixtures: Minot (class A; nuclear and solar storm ticked) buys the
-dosimeter card in month 4 and no Faraday storage, because the blackout family is not ticked;
-Philadelphia with every family buys the card in month 10 and Faraday storage in month 21 (the
-blackout family at about 1.12 in 1,000, just over the line); Coos Bay with every family buys the
-Faraday storage in month 5 (the blackout family, driven by Cascadia) and no dosimeter card (nuclear
-about 1.2 in 10,000). The Faraday bag answers a pulse, not an earthquake, so for Coos Bay the family
-buys an item its main cause does not call for (a question for the planner).
+readiness checklist. The dosimeter card goes with the nuclear family. Faraday storage protects
+small electronics from an electromagnetic pulse, so it is gated on the cause it protects against,
+not on its family's total (planner, 2026-09-26): the `emp` sub-cause of the months-long blackout
+family (`multi_month_blackout`, whose block carries the EMP paragraph), against the same 1-in-1,000
+line. Sub-causes publish a range only, so its central value is the geometric middle of the range.
+That family's total now reads the household's own power curve at 60 days (7.7 in 100 over ten years
+in Coos Bay with Cascadia, 12.5 in 100 in San Juan on Maria's restoration curves), while its EMP
+part is the EMP rate times the share of EMP outages lasting two months or more: 4.4e-7 to 1.035e-3
+a year in the lower 48 (middle 2.1e-5, about 0.21 in 1,000 over ten years) and 0 outside it. It is
+under the line everywhere, so no household buys the bag, and the rare box already says there is
+nothing to stockpile for months. Fixtures: Minot (class A; nuclear and solar storm ticked) buys the
+dosimeter card in month 4; Philadelphia and San Juan with every family ticked buy the card (months
+10 and 29); Coos Bay with every family ticked buys nothing (nuclear about 1.2 in 10,000). The
+nuclear family's own EMP sub-cause, a pulse at all rather than one that cuts power for months, is
+about 2.7 in 1,000 over ten years (the middle of 2.2e-5 to 3.45e-3 a year); gating the bag on it
+would make it eligible nearly everywhere (an owner question).
 
 ### Savings
 

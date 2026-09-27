@@ -210,17 +210,15 @@ fn fans_arrive_before_summer_where_the_cost_order_allows() {
 }
 
 /// REVIEW §2.4: the allowance buys only for ticked families likely enough here. The dosimeter card
-/// goes with the nuclear family; Faraday storage with the months-long blackout family (an
-/// electromagnetic pulse reaches far beyond any blast zone; planner, 2026-09-26). Minot (a missile
-/// field, class A) ticked the nuclear and solar-storm families: the card comes after the three-day
-/// life-safety purchases and says what it is for, and there is no Faraday storage (the blackout
-/// family is not ticked). Coos Bay ticking every family buys no dosimeter (the nuclear family,
-/// class E, about 1.2 in 10,000 over ten years) but does buy the Faraday storage: the months-long
-/// blackout row now reads the plan's own power curve at 60 days (DESIGN-DELTA §3), and a Cascadia
-/// earthquake (0.0102 a year here) leaves about 77 in 100 of the homes it reaches without power
-/// for more than two months, about 7.6 in 100 over ten years (it read 6.9 in 10,000 on
-/// rr-hazards' fallback). Philadelphia ticking every family buys both (the blackout family about
-/// 1.07 in 1,000).
+/// goes with the nuclear family. Faraday storage protects small electronics from an
+/// electromagnetic pulse, so it is gated on the EMP part of its family, the months-long blackout,
+/// not on the family total (planner, 2026-09-26): that total now reads the household's own power
+/// curve at 60 days (about 7.7 in 100 over ten years in Coos Bay with Cascadia, 12.5 in 100 in San
+/// Juan), while its EMP part is about 0.21 in 1,000 in the lower 48 (the middle of 4.4e-7 to
+/// 1.035e-3 a year) and 0 elsewhere, under the 1-in-1,000 line everywhere. So no household buys the
+/// bag. Minot (class A, nuclear and solar storm ticked): the card after the three-day life-safety
+/// purchases, saying what it is for. Coos Bay, every family ticked: nothing (the nuclear family, class
+/// E, about 1.2 in 10,000). Philadelphia and San Juan, every family ticked: the card only.
 #[test]
 fn the_rare_allowance_by_family_on_the_fixtures() {
     let (_, _, a, minot) = every_household()
@@ -261,47 +259,65 @@ fn the_rare_allowance_by_family_on_the_fixtures() {
         "card in month {}, basics until {basics}",
         card.0
     );
-
-    let mut coos = household("coos-bay-well-owner-2");
-    coos.dials.rare_opt_in = vec!["all".into()];
-    let out = assess(&coos);
-    let rare: Vec<&str> = out
-        .plan
-        .months
-        .iter()
-        .flat_map(|m| &m.items)
-        .filter(|i| i.item_id.as_str().starts_with("rare_") && i.kind == PlanItemKind::Purchase)
-        .map(|i| i.item_id.as_str())
-        .collect();
-    assert_eq!(
-        rare,
-        ["rare_faraday_storage"],
-        "class E: the nuclear family is under 1 in 1,000 over ten years; the months-long \
-         blackout family (Cascadia) is not"
-    );
-
     assert_eq!(first_month(minot, "rare_faraday_storage"), None);
 
-    let mut phl = household("philadelphia-renters-4");
-    phl.dials.rare_opt_in = vec!["all".into()];
-    let out = assess(&phl);
-    for id in ["rare_radiation_meter", "rare_faraday_storage"] {
-        assert!(first_month(&out, id).is_some(), "Philadelphia: {id}");
+    // Every family ticked: what the allowance buys, and that the bag is left out.
+    let all = |name: &str| {
+        let mut h = household(name);
+        h.dials.rare_opt_in = vec!["all".into()];
+        let a = common::run(&h);
+        let bought: Vec<String> = a
+            .budget
+            .sequence
+            .iter()
+            .filter(|p| p.rare_catastrophic)
+            .map(|p| p.item_id.as_str().to_owned())
+            .collect();
+        (a, bought)
+    };
+    let family_p10 =
+        |a: &Assessment, h: rr_types::HazardId| -rr_types::math::exp_m1(-10.0 * a.hazard_rate(h));
+    for (name, card) in [
+        ("coos-bay-well-owner-2", false),
+        ("philadelphia-renters-4", true),
+        ("san-juan-2", true),
+    ] {
+        let (a, bought) = all(name);
+        let want: Vec<&str> = if card {
+            vec!["rare_radiation_meter"]
+        } else {
+            Vec::new()
+        };
+        assert_eq!(bought, want, "{name}");
+        assert!(
+            a.budget
+                .rare_catastrophic_skipped
+                .contains(&rr_types::ItemId::from("rare_faraday_storage")),
+            "{name}: the bag is left out"
+        );
+        // The EMP part of the months-long blackout family is under the line; the family total
+        // passes it in Coos Bay and San Juan.
+        let emp = a
+            .hazards
+            .profiles
+            .iter()
+            .find(|p| p.id == rr_types::HazardId::MultiMonthBlackout)
+            .and_then(|p| p.sub_causes.iter().find(|s| s.id == "emp"))
+            .expect("the EMP sub-cause");
+        let p10 = -rr_types::math::exp_m1(-10.0 * rr_budget::rare::sub_cause_rate(emp));
+        assert!(
+            p10 < rr_budget::rare::RARE_MIN_P10,
+            "{name}: EMP part {p10}"
+        );
+        if name != "philadelphia-renters-4" {
+            assert!(
+                family_p10(&a, rr_types::HazardId::MultiMonthBlackout) > 0.05,
+                "{name}: the family total"
+            );
+        }
     }
-    let bag = out
-        .plan
-        .months
-        .iter()
-        .flat_map(|m| &m.items)
-        .find(|i| i.item_id == "rare_faraday_storage" && i.kind == PlanItemKind::Purchase)
-        .unwrap();
-    assert_eq!(bag.hazards, [rr_types::HazardId::MultiMonthBlackout]);
-    assert!(
-        bag.why.contains("power out for months row you ticked"),
-        "{}",
-        bag.why
-    );
-    // Ticking the nuclear family alone no longer buys it.
+
+    // Ticking the nuclear family alone buys the card and never the bag.
     let mut nuclear_only = household("philadelphia-renters-4");
     nuclear_only.dials.rare_opt_in = vec!["nuclear_attack".into()];
     let out = assess(&nuclear_only);

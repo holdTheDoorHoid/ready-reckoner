@@ -614,6 +614,14 @@ struct Mode {
     minimum_first: bool,
 }
 
+/// Why the rare allowance may buy an item: the ticked, likely-enough families it is for, and the
+/// name of the one cause inside them it is gated on, if any ([`rare::RARE_CAUSES`]).
+#[derive(Debug, Clone, Default)]
+struct RareFor {
+    families: Vec<HazardId>,
+    cause: Option<String>,
+}
+
 /// Everything one pass of the allocator produces, before the plan is assembled.
 struct Outcome {
     events: Vec<Vec<Event>>,
@@ -640,7 +648,7 @@ struct Outcome {
     main_fund: f64,
     rare_skipped: Vec<ItemId>,
     /// The ticked, likely-enough families of each item the rare allowance may buy.
-    rare_families: BTreeMap<usize, Vec<HazardId>>,
+    rare_families: BTreeMap<usize, RareFor>,
     checklist: Vec<ChecklistEntry>,
     minimum_done_month: Option<u16>,
     /// Offers still worth buying when the plan ended without running out of things to buy.
@@ -1226,12 +1234,11 @@ fn rare_queue(
     ctx: &Ctx<'_>,
     state: &State,
     one_off: f64,
-) -> (Vec<Candidate>, Vec<ItemId>, BTreeMap<usize, Vec<HazardId>>) {
-    let register = &ctx.input.risks.register;
-    let p10 = |f: &HazardId| rare::p10_from_rate(register.get(f).copied().unwrap_or(0.0));
+) -> (Vec<Candidate>, Vec<ItemId>, BTreeMap<usize, RareFor>) {
+    let risks = ctx.input.risks;
     let mut queue: Vec<Candidate> = Vec::new();
     let mut skipped: Vec<ItemId> = Vec::new();
-    let mut families: BTreeMap<usize, Vec<HazardId>> = BTreeMap::new();
+    let mut families: BTreeMap<usize, RareFor> = BTreeMap::new();
     for (i, o) in ctx.offers.iter().enumerate() {
         if o.item.free || !o.item.rare_catastrophic {
             continue;
@@ -1240,18 +1247,46 @@ fn rare_queue(
         if remaining <= EPS {
             continue;
         }
-        let eligible: Vec<HazardId> = o
+        // The local ten-year chance behind the item in family `f`: the family's, or, for an item
+        // that protects against one cause inside it, that cause's (0 when the family does not list
+        // the cause), with the cause's name.
+        let cause = rare::cause_of(o.item.id.as_str());
+        let chance_in = |f: &HazardId| -> (f64, Option<String>) {
+            match cause {
+                None => (
+                    rare::p10_from_rate(risks.register.get(f).copied().unwrap_or(0.0)),
+                    None,
+                ),
+                Some(id) => risks
+                    .sub_causes
+                    .get(f)
+                    .and_then(|subs| subs.iter().find(|s| s.id == id))
+                    .map_or((0.0, None), |s| {
+                        (
+                            rare::p10_from_rate(rare::sub_cause_rate(s)),
+                            Some(s.name.clone()),
+                        )
+                    }),
+            }
+        };
+        let eligible: Vec<(HazardId, f64, Option<String>)> = o
             .families
             .iter()
             .copied()
-            .filter(|f| ctx.families_on.contains(f) && p10(f) >= rare::RARE_MIN_P10)
+            .filter(|f| ctx.families_on.contains(f))
+            .map(|f| {
+                let (p, name) = chance_in(&f);
+                (f, p, name)
+            })
+            .filter(|(_, p, _)| *p >= rare::RARE_MIN_P10)
             .collect();
         if eligible.is_empty() {
             skipped.push(o.item.id.clone());
             continue;
         }
-        // V = the families' local ten-year chance × the harm-days the item avoids.
-        let chance: f64 = eligible.iter().map(p10).sum();
+        // V = the families' (or the cause's) local ten-year chance × the harm-days the item
+        // avoids.
+        let chance: f64 = eligible.iter().map(|(_, p, _)| *p).sum();
         let value = chance.min(1.0) * rare::harm_days(o.item.id.as_str());
         queue.push(Candidate {
             offer: i,
@@ -1265,7 +1300,13 @@ fn rare_queue(
             gains: Vec::new(),
             ready: Vec::new(),
         });
-        families.insert(i, eligible);
+        families.insert(
+            i,
+            RareFor {
+                families: eligible.iter().map(|(f, _, _)| *f).collect(),
+                cause: eligible.iter().find_map(|(_, _, name)| name.clone()),
+            },
+        );
     }
     queue.sort_by(|a, b| {
         b.density()
@@ -1279,7 +1320,7 @@ fn rare_queue(
     let cap = rare::RARE_FAMILY_MAX_SHARE * total;
     let mut spent: BTreeMap<HazardId, f64> = BTreeMap::new();
     queue.retain(|c| {
-        let fams = &families[&c.offer];
+        let fams = &families[&c.offer].families;
         let fits = fams
             .iter()
             .all(|f| spent.get(f).copied().unwrap_or(0.0) + c.cost <= cap + EPS);
@@ -2725,7 +2766,7 @@ fn money(x: f64) -> f32 {
 fn plan_items(
     ctx: &Ctx<'_>,
     events: &[Event],
-    rare_families: &BTreeMap<usize, Vec<HazardId>>,
+    rare_families: &BTreeMap<usize, RareFor>,
     rare_monthly: f64,
 ) -> Vec<PlanItem> {
     // Merge Buy events per (offer, rare) into the first occurrence.
@@ -2795,7 +2836,7 @@ fn merge_into(into: &mut Candidate, more: &Candidate) {
 fn plan_item(
     ctx: &Ctx<'_>,
     e: &Event,
-    rare_families: &BTreeMap<usize, Vec<HazardId>>,
+    rare_families: &BTreeMap<usize, RareFor>,
     rare_monthly: f64,
 ) -> PlanItem {
     match e {
@@ -2851,11 +2892,13 @@ fn plan_item(
                 None,
             );
             if *rare {
-                // What the allowance bought and why: the ticked families it is for, which pass
-                // the 1-in-1,000 line here (no point estimate: rare rows show ranges only).
-                let families = rare_families.get(&cand.offer).cloned().unwrap_or_default();
-                item.why = rare::allowance_sentence(&families, rare_monthly);
-                item.hazards = families;
+                // What the allowance bought and why: the ticked families it is for (and the cause
+                // inside them it is gated on), which pass the 1-in-1,000 line here (no point
+                // estimate: rare rows show ranges only).
+                let why = rare_families.get(&cand.offer).cloned().unwrap_or_default();
+                item.why =
+                    rare::allowance_sentence(&why.families, why.cause.as_deref(), rare_monthly);
+                item.hazards = why.families;
             } else {
                 // Explain with coverage as the plan reports it (free actions count from their
                 // month).
