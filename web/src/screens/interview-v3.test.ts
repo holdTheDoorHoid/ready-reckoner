@@ -18,6 +18,7 @@ import { AGE_WORD } from '../lib/profile';
 import { ENCRYPTED_FORMAT, protectedExportText } from '../lib/protect';
 import { render, savedFor, until, type Rendered } from '../test/helpers';
 import Contacts from './Contacts.svelte';
+import Have from './Have.svelte';
 import Maintain from './Maintain.svelte';
 import Packet from './Packet.svelte';
 import People from './People.svelte';
@@ -303,6 +304,22 @@ describe('Step 6, Your people', () => {
   it('invites a person with no plan to start one', async () => {
     const r = await open(People, 'people', null);
     expect(r.text()).toContain("You haven't started a plan on this device yet");
+  });
+});
+
+describe('step 5 leads into the optional steps', () => {
+  it('says Continue, names the optional step next, and marks step 5 answered', async () => {
+    const plan = requiredOnly('philadelphia-renters-4');
+    plan.progress.completed = ['where', 'who', 'travel', 'money'];
+    const r = await open(Have, 'have', plan);
+    expect(r.text()).toContain('Step 5 of 8');
+    expect(r.text()).not.toContain('Step 5 of 8 · optional');
+    expect([...r.target.querySelectorAll('.interview-nav a')].map((a) => a.textContent?.trim())).not.toContain('Skip for now');
+    expect(r.text()).toContain('Next: Your people (optional)');
+    button(r, 'Continue').click();
+    flushSync();
+    expect(r.router.current.id).toBe('people');
+    expect(r.app.plan!.progress.completed).toContain('have');
   });
 });
 

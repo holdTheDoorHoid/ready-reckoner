@@ -162,7 +162,7 @@ export function familyPlanSections(input: PlanInput, hazardLines: string[]): str
   out.push(
     tidyFamilyPlan(input.family_plan)
       ? 'This is the plan you wrote. Fill in anything still blank together, then keep a copy in each go-bag and one on the fridge.'
-      : 'Fill this in together, or on the "Your family plan" screen. Keep a copy in each go-bag and one on the fridge.',
+      : 'Fill this in together, or in the optional steps of "Your answers". Keep a copy in each go-bag and one on the fridge.',
     '',
   );
   out.push('| Plan | Your answer |', '| --- | --- |');

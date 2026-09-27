@@ -486,7 +486,7 @@
 
 <ConfirmDialog bind:open={confirmRestart} title="Restart the schedule from today?" confirmLabel="Restart from today" cancelLabel="Keep the schedule" onconfirm={restart}>
   <p>This month becomes month 0 of your plan again. Nothing you have checked off is lost.</p>
-  <p>If you printed your packet, print it again so its months match the screen.</p>
+  <p>If you printed your preparation plan, print it again so its months match the screen.</p>
   <p>If you already spent the one-off amount, set it to $0 on the Money screen so it isn't counted again.</p>
 </ConfirmDialog>
 

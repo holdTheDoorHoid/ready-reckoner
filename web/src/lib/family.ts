@@ -63,8 +63,8 @@ export type FamilyContact = (typeof FAMILY_CONTACTS)[number];
 
 /**
  * The v2 family-plan screen's parts. Its addresses (`#/family/<section>`) now redirect to the card
- * on step 7 or 8 that holds the same questions (`familyRedirect` in the router), and the plan steps
- * that answer one of them link there (`FamilyPlanLink`).
+ * on step 7 or 8 that holds the same questions (`FAMILY_REDIRECTS` in the router), and the plan
+ * steps that answer one of them link there (`FamilyPlanLink`).
  */
 export const FAMILY_SECTIONS = ['contact', 'children', 'shelter', 'leave', 'home', 'circle', 'lawyer'] as const;
 export type FamilySection = (typeof FAMILY_SECTIONS)[number];
