@@ -222,13 +222,15 @@ fn every_ranked_hazard_has_a_checklist() {
         {
             match content.checklist_for(&format!("hazard:{}", p.id)) {
                 Some(c) => assert!(b.page(&c.meta.id).is_some(), "{name}: {} has no page", p.id),
-                None => assert!(!REQUIRE_ALL_CHECKLISTS, "{name}: {} has no block", p.id),
+                None if REQUIRE_ALL_CHECKLISTS => panic!("{name}: {} has no block", p.id),
+                None => {}
             }
         }
         for e in rr_content::ids::EVENTS {
             match content.checklist_for(&format!("event:{e}")) {
                 Some(c) => assert!(b.page(&c.meta.id).is_some(), "{name}: {e} has no page"),
-                None => assert!(!REQUIRE_ALL_CHECKLISTS, "{name}: {e} has no block"),
+                None if REQUIRE_ALL_CHECKLISTS => panic!("{name}: {e} has no block"),
+                None => {}
             }
         }
     }

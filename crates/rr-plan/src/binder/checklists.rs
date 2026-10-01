@@ -503,10 +503,11 @@ fn take_ref(bx: &Bx<'_>, marked: &str) -> (String, Option<String>) {
 /// a full stop, question or exclamation mark outside the household's words, with any citation
 /// markers after it, followed by a space or the end.
 fn first_sentence_end(s: &str) -> Option<usize> {
-    let mut i = 0;
-    if s.starts_with("**") {
-        i = 2 + s[2..].find("**").map_or(0, |e| e + 2);
-    }
+    // Past the bold lead, if the text opens with one.
+    let mut i = match s.strip_prefix("**") {
+        Some(rest) => 2 + rest.find("**").map_or(0, |e| e + 2),
+        None => 0,
+    };
     let mut in_user = false;
     while i < s.len() {
         let c = s[i..].chars().next()?;
