@@ -91,7 +91,7 @@
     <p class="small helps">
       <strong>What helps:</strong>
       {#each keyedItems(helps.slice(0, 3)) as { key, item }, i (key)}{i > 0 ? ', ' : ''}{lowerFirst(item.name)} ({helpNote(item)}){/each}.
-      <a href={href('plan')}>See it in your plan</a>
+      <a href={href('prepare')}>See it in your plan</a>
     </p>
   {/if}
   <footer class="hazard__foot">

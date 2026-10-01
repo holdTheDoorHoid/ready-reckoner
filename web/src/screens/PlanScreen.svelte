@@ -1,9 +1,15 @@
 <!--
-  Screen 7, Your plan: phased purchases and actions by month, this month first and free steps
-  first. Each item can be checked off with what was paid. Progress per consequence, guardrail
-  warnings (never blocks), money being saved toward bigger items, and the whole schedule. Steps
-  count only what the household does from here: what it already had (its own list, and the everyday
-  basics the plan assumes) is shown apart as "Already have".
+  Prepare: what to do before (#/prepare; was "Your plan" at #/plan, which redirects here since
+  v0.3.0, DESIGN-DELTA-v3 §1): the actions to take before anything happens. Free steps, what to buy
+  and when, decisions and savings, by month: this month first and free steps first. Each item can
+  be checked off with what was paid. Progress per consequence, guardrail warnings (never blocks),
+  money being saved toward bigger items, and the whole schedule. Steps count only what the
+  household does from here: what it already had (its own list, and the everyday basics the plan
+  assumes) is shown apart as "Already have".
+
+  "Print your preparation plan" prints the engine's Prepare sheet (`prepare_markdown`) with the
+  site's Markdown renderer, in a region that exists only on paper; the browser's own Print on this
+  tab prints the same sheet. (web-binder may give it a nicer sheet later, DESIGN-DELTA-v3 §6.)
 
   Months are numbered exactly as the printed packet numbers them (the packet is the oracle): month 0
   begins on the plan date and reads "This month (October 2026)", the next is "Month 1 (November
@@ -17,6 +23,7 @@
   section (`Plan.long_horizon`) follows the whole plan.
 -->
 <script lang="ts">
+  import { tick } from 'svelte';
   import BucketGauge from '../components/BucketGauge.svelte';
   import ConfirmDialog from '../components/ConfirmDialog.svelte';
   import Icon from '../components/Icon.svelte';
@@ -30,10 +37,36 @@
   import { addMonths, formatDate, formatMonth, monthsBetween, planMonthLabel, planMonthPhrase, quantity, usd } from '../lib/format';
   import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, stageLine } from '../lib/labels';
   import { allPlanItems, bucketName, catalogueItem, decisionList, itemSourceIds, keyedItems, tierName } from '../lib/lookup';
+  import { renderMarkdown } from '../lib/markdown';
   import { href } from '../lib/router.svelte';
 
   const app = useApp();
   let confirmRestart = $state(false);
+  /** The Prepare sheet as HTML while it is being printed; empty otherwise. */
+  let sheet = $state('');
+
+  function renderSheet() {
+    const output = app.result.output;
+    sheet = output ? renderMarkdown(output.prepare_markdown, { idPrefix: 'prep', headingOffset: 1, notesLabel: 'Notes: your preparation plan' }) : '';
+  }
+
+  async function printSheet() {
+    renderSheet();
+    await tick();
+    window.print();
+  }
+
+  // The browser's own Print on this tab prints the sheet too, and the page forgets it afterwards.
+  $effect(() => {
+    const before = () => renderSheet();
+    const after = () => (sheet = '');
+    window.addEventListener('beforeprint', before);
+    window.addEventListener('afterprint', after);
+    return () => {
+      window.removeEventListener('beforeprint', before);
+      window.removeEventListener('afterprint', after);
+    };
+  });
 
   const planningDate = $derived(app.plan?.input.planning_date ?? app.today());
   const currentMonth = $derived(Math.max(0, monthsBetween(planningDate, app.today())));
@@ -120,8 +153,8 @@
   </details>
 {/snippet}
 
-<div class="page">
-  <h1 id="page-title" tabindex="-1">Your plan</h1>
+<div class="page prepare-page" class:printing={sheet !== ''}>
+  <h1 id="page-title" tabindex="-1">Prepare: what to do before</h1>
   <PlanGate>
     {#snippet children(output)}
       {@const months = output.plan.months}
@@ -133,7 +166,14 @@
       {@const had = allPlanItems(output).filter((x) => alreadyHad(x.item)).map((x) => x.item)}
       {@const c = counts(output)}
       {@const monthly = app.plan?.input.finances.monthly_budget_usd ?? 0}
-      <p class="lead">{stageLine(app.plan?.input.stage)} Month by month: free steps first, then the cheapest protection for your risks, within your budget.</p>
+      <p class="lead">
+        {stageLine(app.plan?.input.stage)} The things to do before anything happens: free steps, what to buy and when, decisions to make,
+        and money to set aside. Month by month, free steps come first, then the cheapest protection for your risks, within your budget.
+      </p>
+      <p class="button-row print-row no-print">
+        <button type="button" class="button" onclick={printSheet}><Icon name="print" /> Print your preparation plan</button>
+        <span class="small muted">The month-by-month steps, decisions and upkeep on paper, to keep with your binder.</span>
+      </p>
 
       <ul class="stats" aria-label="Summary">
         <li class="card">
@@ -439,15 +479,30 @@
       </section>
     {/snippet}
   </PlanGate>
+  <!-- Paper only: filled while printing (the button above, or the browser's own Print). -->
+  <article class="print-only prepare-sheet packet" aria-label="Your preparation plan">{@html sheet}</article>
 </div>
 
 <ConfirmDialog bind:open={confirmRestart} title="Restart the schedule from today?" confirmLabel="Restart from today" cancelLabel="Keep the schedule" onconfirm={restart}>
   <p>This month becomes month 0 of your plan again. Nothing you have checked off is lost.</p>
-  <p>If you printed your packet, print it again so its months match the screen.</p>
+  <p>If you printed your preparation plan, print it again so its months match the screen.</p>
   <p>If you already spent the one-off amount, set it to $0 on the Money screen so it isn't counted again.</p>
 </ConfirmDialog>
 
 <style>
+  .print-row {
+    margin: 0 0 var(--s4);
+    align-items: center;
+  }
+  @media print {
+    /* Printing the sheet: the sheet alone, never the screen around it. */
+    .prepare-page.printing > :global(:not(.prepare-sheet)) {
+      display: none !important;
+    }
+    .prepare-page:not(.printing) > .prepare-sheet {
+      display: none !important;
+    }
+  }
   .stats {
     list-style: none;
     padding: 0;

@@ -1,7 +1,11 @@
-<!-- The site header: name, main sections, and a menu button on narrow screens. -->
+<!--
+  The site header: name, main sections, and a menu button on narrow screens. Since v0.3.0
+  (DESIGN-DELTA-v3 §1) the tabs are Your answers (all eight interview steps), Risks, Prepare,
+  Binder, Keep it up, Learn and About; the family plan's questions are steps 6–8.
+-->
 <script lang="ts">
   import { useApp } from '../lib/app.svelte';
-  import { STEP_IDS } from '../lib/persistence';
+  import { OPTIONAL_STEP_IDS, REQUIRED_STEP_IDS } from '../lib/persistence';
   import { href, isStep, type RouteId, useRouter } from '../lib/router.svelte';
   import Icon from './Icon.svelte';
 
@@ -9,17 +13,17 @@
   const router = useRouter();
   let open = $state(false);
 
+  /** The first step still to answer: a required one first, then an optional one; the first step once all are done. */
   const answersTarget = $derived.by((): RouteId => {
     const done = app.plan?.progress.completed ?? [];
-    return STEP_IDS.find((s) => !done.includes(s)) ?? 'where';
+    return REQUIRED_STEP_IDS.find((s) => !done.includes(s)) ?? OPTIONAL_STEP_IDS.find((s) => !done.includes(s)) ?? 'where';
   });
 
   const links = $derived<{ id: RouteId; label: string; current: boolean }[]>([
     { id: app.plan ? answersTarget : 'start', label: app.plan ? 'Your answers' : 'Start', current: isStep(router.current.id) || router.current.id === 'start' },
-    { id: 'family', label: 'Family plan', current: router.current.id === 'family' },
     { id: 'risks', label: 'Risks', current: router.current.id === 'risks' },
-    { id: 'plan', label: 'Plan', current: router.current.id === 'plan' },
-    { id: 'packet', label: 'Packet', current: router.current.id === 'packet' },
+    { id: 'prepare', label: 'Prepare', current: router.current.id === 'prepare' },
+    { id: 'binder', label: 'Binder', current: router.current.id === 'binder' },
     { id: 'maintain', label: 'Keep it up', current: router.current.id === 'maintain' },
     { id: 'learn', label: 'Learn', current: router.current.id === 'learn' },
     { id: 'about', label: 'About', current: router.current.id === 'about' },

@@ -1,18 +1,44 @@
 /**
- * The household's own plan (docs/UI.md "Your family plan", `PlanInput.family_plan`): how its text
- * is tidied, which parts of the form a household sees, and which plan steps it answers.
+ * The household's own plan (`PlanInput.family_plan`): how its text is tidied, the edits the
+ * optional interview steps make to it, which questions a household sees, and which plan steps it
+ * answers.
  *
- * The plan is free text the engine only echoes (into the packet and the wallet cards); it is
+ * The plan is free text the engine only echoes (into the binder and the wallet cards); it is
  * never computed with and never required. `PlanInput::from_json` tidies it before anything else
  * (rr-types `FamilyPlan::tidy`): text trimmed, notes cut at 300 characters, names and numbers at
  * 80, lists at 2 routes, 4 people and 5 numbers; blank text becomes absent, empty entries are
- * dropped, and an empty plan disappears. `tidyFamilyPlan` does exactly that, so the mock engine
- * prints what the real one prints, and the form tidies each field the same way when it is left.
+ * dropped, and an empty plan disappears. Contract v3 (DESIGN-DELTA-v3 §3.2) adds the home, the
+ * neighbourhood, pets, vehicles and documents, with the limits in `./tidy`, and an address on
+ * every contact. `tidyFamilyPlan` does all of that, so the mock engine prints what the real one
+ * prints, and the forms tidy each field the same way when it is left.
+ *
+ * Since v0.3.0 the questions are steps 7 and 8 of the interview (`#/places`, `#/contacts`); the v2
+ * family-plan screen and its address `#/family` are gone (the address redirects).
  *
  * It is kept in the saved plan (this browser, and the file "Save a copy" writes) and nowhere else.
  */
 import type { Contact, FamilyPlan, Holds, PlanInput, TrustedPerson } from '../engine/types';
 import { FAMILY_PLAN_SHORT_MAX, FAMILY_PLAN_TEXT_MAX, HOLDS, NUMBERS_BY_HEART_MAX, ROUTES_MAX, TRUSTED_CIRCLE_MAX } from '../engine/types';
+import type { DocumentsInfo, HomeInfo, Neighbourhood, PetInfo, VehicleInfo } from '../engine/types';
+import {
+  addRow,
+  CONTACT_SPEC,
+  DOCUMENTS_SPEC,
+  HOME_SPEC,
+  NEIGHBOURHOOD_SPEC,
+  type Path,
+  PET_SPEC,
+  PETS_MAX,
+  removeRow,
+  setTextAt,
+  tidyText,
+  tidyTextAt,
+  tidyValue,
+  VEHICLE_SPEC,
+  VEHICLES_MAX,
+} from './tidy';
+
+export { tidyText } from './tidy';
 
 /** The free-text notes (300 characters each), in the order the engine's struct declares them. */
 export const FAMILY_NOTES = [
@@ -35,41 +61,21 @@ export type FamilyNote = (typeof FAMILY_NOTES)[number];
 export const FAMILY_CONTACTS = ['out_of_area_contact', 'lawyer'] as const;
 export type FamilyContact = (typeof FAMILY_CONTACTS)[number];
 
-/** The screen's sections, each reachable as `#/family/<section>`. */
+/**
+ * The v2 family-plan screen's parts. Its addresses (`#/family/<section>`) now redirect to the card
+ * on step 7 or 8 that holds the same questions (`FAMILY_REDIRECTS` in the router), and the plan
+ * steps that answer one of them link there (`FamilyPlanLink`).
+ */
 export const FAMILY_SECTIONS = ['contact', 'children', 'shelter', 'leave', 'home', 'circle', 'lawyer'] as const;
 export type FamilySection = (typeof FAMILY_SECTIONS)[number];
-
-export function isFamilySection(s: string | undefined): s is FamilySection {
-  return (FAMILY_SECTIONS as readonly string[]).includes(s ?? '');
-}
-
-/** The element id of a section on the screen. */
-export function sectionId(section: FamilySection): string {
-  return `family-${section}`;
-}
 
 // ---------------------------------------------------------------------------------------------
 // Tidying, as the engine tidies (rr-types `FamilyPlan::tidy`)
 // ---------------------------------------------------------------------------------------------
 
-/**
- * `text` trimmed and at most `max` characters long (counted as the engine counts them: Unicode
- * characters, not UTF-16 units), trimmed again at the end; undefined when nothing is left.
- */
-export function tidyText(text: string | undefined, max: number): string | undefined {
-  if (typeof text !== 'string') return undefined;
-  const kept = Array.from(text.trim()).slice(0, max).join('').trimEnd();
-  return kept === '' ? undefined : kept;
-}
-
+/** A contact tidied: name and phone (80 characters each) and, since contract v3, an address (200). */
 function tidyContact(c: Contact | undefined): Contact | undefined {
-  if (!c) return undefined;
-  const out: Contact = {};
-  const name = tidyText(c.name, FAMILY_PLAN_SHORT_MAX);
-  const phone = tidyText(c.phone, FAMILY_PLAN_SHORT_MAX);
-  if (name !== undefined) out.name = name;
-  if (phone !== undefined) out.phone = phone;
-  return name === undefined && phone === undefined ? undefined : out;
+  return tidyValue(c, CONTACT_SPEC) as Contact | undefined;
 }
 
 function tidyList(list: readonly string[] | undefined, maxLen: number, maxItems: number): string[] {
@@ -127,7 +133,23 @@ export function tidyFamilyPlan(plan: FamilyPlan | undefined): FamilyPlan | undef
   if (roadside !== undefined) out.roadside_assistance = roadside;
   const numbers = tidyList(plan.numbers_by_heart, FAMILY_PLAN_SHORT_MAX, NUMBERS_BY_HEART_MAX);
   if (numbers.length) out.numbers_by_heart = numbers;
+  // Contract v3 (DESIGN-DELTA-v3 §3.2).
+  const home = tidyValue(plan.home, HOME_SPEC) as HomeInfo | undefined;
+  if (home) out.home = home;
+  const neighbourhood = tidyValue(plan.neighbourhood, NEIGHBOURHOOD_SPEC) as Neighbourhood | undefined;
+  if (neighbourhood) out.neighbourhood = neighbourhood;
+  const pets = tidyRows<PetInfo>(plan.pets, PET_SPEC, PETS_MAX);
+  if (pets.length) out.pets = pets;
+  const vehicles = tidyRows<VehicleInfo>(plan.vehicles, VEHICLE_SPEC, VEHICLES_MAX);
+  if (vehicles.length) out.vehicles = vehicles;
+  const documents = tidyValue(plan.documents, DOCUMENTS_SPEC) as DocumentsInfo | undefined;
+  if (documents) out.documents = documents;
   return Object.keys(out).length ? out : undefined;
+}
+
+/** Rows tidied one by one, empty rows dropped, at most `max` kept. */
+function tidyRows<T>(rows: readonly unknown[] | undefined, spec: Parameters<typeof tidyValue>[1], max: number): T[] {
+  return (rows ?? []).map((r) => tidyValue(r, spec) as T | undefined).filter((r): r is T => r !== undefined).slice(0, max);
 }
 
 /** True when anything in the plan is filled in (after tidying). */
@@ -316,6 +338,33 @@ export function setHolds(input: PlanInput, index: number, what: Holds, on: boole
   const next = HOLDS.filter((h) => held.has(h));
   if (next.length) person.holds = next;
   else delete person.holds;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Contract v3 groups (steps 7 and 8): the home, the neighbourhood, pets, vehicles and documents.
+// Paths start inside `family_plan`, for example `['home', 'electric_utility', 'phone']`.
+// ---------------------------------------------------------------------------------------------
+
+const inPlan = (path: Path): Path => ['family_plan', ...path];
+
+/** Set an answer as typed; blank removes it, and any group (or the whole plan) left empty. */
+export function setPlanText(input: PlanInput, path: Path, text: string): void {
+  setTextAt(input, inPlan(path), text);
+}
+
+/** Tidy an answer when the person leaves the field, as the engine will. */
+export function tidyPlanText(input: PlanInput, path: Path, max: number): void {
+  tidyTextAt(input, inPlan(path), max);
+}
+
+/** Add an empty row to a repeating group (a pet, a vehicle, an account, a policy); false when it is full. */
+export function addPlanRow(input: PlanInput, path: Path, max: number): boolean {
+  return addRow(input, inPlan(path), max);
+}
+
+/** Remove one row of a repeating group; an emptied group goes, and an emptied plan. */
+export function removePlanRow(input: PlanInput, path: Path, index: number): void {
+  removeRow(input, inPlan(path), index);
 }
 
 // ---------------------------------------------------------------------------------------------

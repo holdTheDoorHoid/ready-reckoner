@@ -4,7 +4,7 @@ title: Tornado
 kind: checklist
 onset: now
 applies_to: [hazard:tornado]
-citations: [ready_gov_tornadoes, ready_gov_tornadoes_2014, noaa_spc_tornado_safety]
+citations: [ready_gov_tornadoes, ready_gov_tornadoes_2014, noaa_spc_tornado_safety, fcc_wea]
 pages: 1
 ---
 ## Use this when
@@ -24,7 +24,7 @@ A tornado warning is issued for your area, or you see a funnel cloud or hear a r
 
 1. **Pad yourself.** Pile blankets or cushions around you.[^ready_gov_tornadoes]
 2. {if:home:apartment_low_rise|apartment_high_rise}**Stay off the elevators.** Take the stairs.[^ready_gov_tornadoes_2014]{/if}
-3. **Keep listening.** Follow the warning on {alerts} until it ends.[^ready_gov_tornadoes]
+3. **Keep listening.** Follow the warning on {alerts} until it ends.[^ready_gov_tornadoes]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
 4. {if:vehicle}**If you are driving, get to a sturdy building.** A car is not a safe place in a tornado.[^ready_gov_tornadoes]{/if}
 5. {if:vehicle}**If you are caught in a car, stay buckled in.** Keep your head below the windows.[^ready_gov_tornadoes]{/if}
 
@@ -56,3 +56,4 @@ A tornado warning is issued for your area, or you see a funnel cloud or hear a r
 [^ready_gov_tornadoes]: FEMA / Ready.gov, Tornadoes (2026).
 [^ready_gov_tornadoes_2014]: FEMA / Ready.gov, Tornadoes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
 [^noaa_spc_tornado_safety]: NOAA National Weather Service, Storm Prediction Center, Tornado Safety (The Online Tornado FAQ) (2026).
+[^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).

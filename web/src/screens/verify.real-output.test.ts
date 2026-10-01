@@ -92,7 +92,7 @@ describe("screens with the real engine output (verification)", () => {
       engine: answering(golden(name)),
     });
     try {
-      expect(r.target.querySelector("h1")?.textContent).toContain("Your plan");
+      expect(r.target.querySelector("h1")?.textContent).toContain("Prepare");
       expect(r.text()).toContain("Cash in small bills");
     } finally {
       r.cleanup();
