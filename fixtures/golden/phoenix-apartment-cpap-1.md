@@ -3020,6 +3020,12 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 ## Summary
 
+### The three things that matter most
+
+1. Of 100 households like yours, about 35 (20–70) will lose grid power for a day or more in the next 10 years. Be ready to manage about 3 days at home with no power, and about 5 days with no tap water.
+2. Of 100 households like yours, about 55 (30–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 10 days of food you normally eat, and 3 weeks of daily medicine on hand.
+3. Of 100 households like yours, about 20 (10–40) will have an income gap of more than 3 months in the next 10 years. Losing a paycheck is the longest disruption most households face. Aim for about 7 months of expenses in savings over time, apart from this supplies budget.
+
 **Where you are now:** getting started. **What is enough for your risks:** one month of supplies. At your budget, the bare minimum (three days of water, light, warmth and medicine) is in place by month 4 (February 2027), and everything by month 42 (April 2030). Start with the free steps under Your plan.
 
 **What the plan assumes you already have:** a charged mobile phone, go-bag for each person, manual can opener, a cooking pot with a lid and three days of the food you normally eat. If any is missing, untick "Assume everyday basics" on the Have screen and the plan will add it.

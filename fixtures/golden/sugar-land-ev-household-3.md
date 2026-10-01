@@ -3176,13 +3176,19 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 ## Summary
 
+### The three things that matter most
+
+1. Of 100 households like yours, about 25 (20–40) will have to leave home quickly at least once in the next 10 years. Know your evacuation zone and where you would go; leave when told.[2, 3]
+2. Of 100 households like yours, about 60 (50–80) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 5 days at home with no power, and about 2 days with no tap water.
+3. Of 100 households like yours, about 60 (35–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 10 days of food you normally eat, and 3 weeks of daily medicine on hand.
+
 **Where you are now:** getting started. **What is enough for your risks:** one month of supplies. At your budget, the bare minimum (three days of water, light, warmth and medicine) is in place by month 6 (April 2027), and everything by month 9 (July 2027). Start with the free steps under Your plan.
 
 **What the plan assumes you already have:** a charged mobile phone, go-bag for each person, manual can opener, a cooking pot with a lid, three days of the food you normally eat, a warm blanket for each person and warm layers for each person. If any is missing, untick "Assume everyday basics" on the Have screen and the plan will add it.
 
 ## Your plan
 
-Your budget is $200 a month, plus $1,000 once at the start. Free steps come first, then what protects you most for each dollar (water, medicine and safety first), until every need has enough.[2]
+Your budget is $200 a month, plus $1,000 once at the start. Free steps come first, then what protects you most for each dollar (water, medicine and safety first), until every need has enough.[4]
 
 ### Start now: free steps (from October 1, 2026)
 
@@ -3197,12 +3203,12 @@ Your budget is $200 a month, plus $1,000 once at the start. Free steps come firs
 
 ### Safety rules to learn now
 
-- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[3, 4]
-- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[5]
-- **Water heater:** Turn off its power or gas before you drain it for water.[5]
-- **Food:** In a power cut, throw out food that has been at 40°F or warmer for 2 hours.[6]
-- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[6, 7]
-- **CPR:** Take a first-aid and CPR class.[8]
+- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[5, 6]
+- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[7]
+- **Water heater:** Turn off its power or gas before you drain it for water.[7]
+- **Food:** In a power cut, throw out food that has been at 40°F or warmer for 2 hours.[8]
+- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[8, 9]
+- **CPR:** Take a first-aid and CPR class.[10]
 
 ### This month
 
@@ -3325,33 +3331,33 @@ One list per step, up to the one your risks need, with each thing's month. This 
 
 ### Get-home bag for each person who commutes
 
-- [ ] For each person: keep a get-home bag in the car: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (some amounts are estimates)[9, 10, 11, 12]
+- [ ] For each person: keep a get-home bag in the car: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (some amounts are estimates)[11, 12, 13, 14]
 
 **Person 1**: a 20-mile (32 km) trip, about 7 hours on foot.
 
-- [ ] For the walk, from home: 4.7 litres of water and 700 kcal of snacks.[9, 10, 13, 14]
+- [ ] For the walk, from home: 4.7 litres of water and 700 kcal of snacks.[11, 12, 15, 16]
 
 **Person 2**: a 5-mile (8 km) trip, about 2 hours on foot.
 
-- [ ] For the walk, from home: 1.2 litres of water and 200 kcal of snacks.[9, 10, 13, 14]
+- [ ] For the walk, from home: 1.2 litres of water and 200 kcal of snacks.[11, 12, 15, 16]
 
 ### Extras for the hazards you face
 
 These help with one hazard, not a whole need, so they sit outside the budget.
 
-- Tarp kit to cover a broken window or roof: heavy tarp, rope and duct tape (usually $40–68 per kit)[12, 15, 16]
-- Insect repellent for the weeks after a flood or hurricane (usually $8–10 per can)[16, 17, 18]
-- Battery or rechargeable fan (usually $11–23 per fan)[16, 19, 20]
+- Tarp kit to cover a broken window or roof: heavy tarp, rope and duct tape (usually $40–68 per kit)[14, 17, 18]
+- Insect repellent for the weeks after a flood or hurricane (usually $8–10 per can)[18, 19, 20]
+- Battery or rechargeable fan (usually $11–23 per fan)[18, 21, 22]
 
 ## Documents and money: decisions and savings
 
 ### Decisions
 
-- [ ] **Decide: ID for every person (passport book or card, or a state ID).** A passport book or card for each person, children included, proves who you are and your citizenship if other papers are lost, and the card shows no home address; get them before you need them. The federal fee schedule: a first adult book $165 and card $65 ($130 and $30 plus a $35 acceptance fee), for children under 16 a book $135 and card $50 (22 CFR 22.1).[21, 22, 23]
-- [ ] **Decide: flood insurance, even outside a flood zone.** Home and renters policies usually don't cover floods. Decide on flood insurance before you need it: Most homes in your county are outside the mapped high-risk flood zone, and that is where many uninsured floods happen: about 3 in 10 flood insurance claims come from outside high-risk flood areas. A quote costs nothing, and a new policy usually starts 30 days after you buy it. It pays up to $250,000 for the building and $100,000 for belongings.[24, 25, 26, 27, 28]
-- [ ] **Check your hurricane or windstorm deductible.** Hurricanes drive your home-loss risk: check your policy for a separate hurricane or windstorm deductible. In some places it is a percentage of the home's insured value rather than a dollar amount, and coastal policies can leave out wind damage altogether. Find the amount on the declarations page and add it to your savings goal.[29]
-- [ ] **Decide: disability and life insurance for the people who earn.** More than one of you earns money the household relies on: check whether your job offers disability insurance, and whether life insurance would carry the others through the years they would need. About 1 in 4 workers who start at 20 become disabled before retirement age. NAIC's buyer's guide helps you work out how much cover is enough.[30, 31]
-- [ ] **Home repairs to weigh when the time comes:** a stronger roof when you re-roof (FORTIFIED); a tornado or hurricane safe room; harden the home against embers and wildfire. Some come with grants or insurance discounts: ask your state emergency management office and your insurer.[32, 33, 34, 35, 36, 37, 38]
+- [ ] **Decide: ID for every person (passport book or card, or a state ID).** A passport book or card for each person, children included, proves who you are and your citizenship if other papers are lost, and the card shows no home address; get them before you need them. The federal fee schedule: a first adult book $165 and card $65 ($130 and $30 plus a $35 acceptance fee), for children under 16 a book $135 and card $50 (22 CFR 22.1).[23, 24, 25]
+- [ ] **Decide: flood insurance, even outside a flood zone.** Home and renters policies usually don't cover floods. Decide on flood insurance before you need it: Most homes in your county are outside the mapped high-risk flood zone, and that is where many uninsured floods happen: about 3 in 10 flood insurance claims come from outside high-risk flood areas. A quote costs nothing, and a new policy usually starts 30 days after you buy it. It pays up to $250,000 for the building and $100,000 for belongings.[26, 27, 28, 29, 30]
+- [ ] **Check your hurricane or windstorm deductible.** Hurricanes drive your home-loss risk: check your policy for a separate hurricane or windstorm deductible. In some places it is a percentage of the home's insured value rather than a dollar amount, and coastal policies can leave out wind damage altogether. Find the amount on the declarations page and add it to your savings goal.[31]
+- [ ] **Decide: disability and life insurance for the people who earn.** More than one of you earns money the household relies on: check whether your job offers disability insurance, and whether life insurance would carry the others through the years they would need. About 1 in 4 workers who start at 20 become disabled before retirement age. NAIC's buyer's guide helps you work out how much cover is enough.[32, 33]
+- [ ] **Home repairs to weigh when the time comes:** a stronger roof when you re-roof (FORTIFIED); a tornado or hurricane safe room; harden the home against embers and wildfire. Some come with grants or insurance discounts: ask your state emergency management office and your insurer.[3, 34, 35, 36, 37, 38, 39]
 
 ### Savings
 
@@ -3359,7 +3365,7 @@ Of 100 households like yours, about 15 (7–30) will have an income gap of more 
 
 ## Maintenance calendar
 
-Dates count from when each item enters your plan; move them if you buy earlier or later.[12]
+Dates count from when each item enters your plan; move them if you buy earlier or later.[14]
 
 | When | What |
 | --- | --- |
@@ -3382,13 +3388,13 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 
 The numbers in brackets point to this list; "expert estimate" marks a judgement, not measured data. The plan is Ready Reckoner's calculation from these.
 
-**1** Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water **2** Harm weights used by the allocator. Ready Reckoner, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md Expert estimate. **3** Home Fires. FEMA / Ready.gov, 2026. https://www.ready.gov/home-fires **4** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **5** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **6** Power Outages. FEMA / Ready.gov, 2026. https://www.ready.gov/power-outages **7** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf **8** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills **9** Ready Reckoner expert estimates for supply sizing and upkeep. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md Expert estimate. **10** Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds. Federal Highway Administration, 2009. https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm
+**1** Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water **2** Evacuation. FEMA / Ready.gov, 2026. https://www.ready.gov/evacuation **3** Hurricanes. FEMA / Ready.gov, 2026. https://www.ready.gov/hurricanes **4** Harm weights used by the allocator. Ready Reckoner, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md Expert estimate. **5** Home Fires. FEMA / Ready.gov, 2026. https://www.ready.gov/home-fires **6** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **7** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **8** Power Outages. FEMA / Ready.gov, 2026. https://www.ready.gov/power-outages **9** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf **10** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills
 
-**11** Build A Kit. FEMA / Ready.gov (via Internet Archive), 2020. https://web.archive.org/web/20200101090440/https://www.ready.gov/kit **12** Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit **13** Heat Stress: Recommendations. CDC National Institute for Occupational Safety and Health, 2026. https://www.cdc.gov/niosh/heat-stress/recommendations/index.html **14** Dietary Guidelines for Americans, 2020–2025, Appendix 2: Estimated Calorie Needs. U.S. Department of Agriculture and U.S. Department of Health and Human Services, 2020. https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf **15** U.S. Army Corps of Engineers and FEMA begin Operation Blue Roof in Florida. FEMA, 2018. https://www.fema.gov/press-release/20250121/us-army-corps-engineers-and-fema-begin-operation-blue-roof-florida **16** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **17** What to Do After a Hurricane or Flood. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/mosquitoes/response/index.html **18** Preventing Mosquito Bites. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mosquitoes/prevention/index.html **19** About Heat and Your Health. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/heat-health/about/index.html **20** Extreme Heat. FEMA / Ready.gov, 2026. https://www.ready.gov/heat
+**11** Ready Reckoner expert estimates for supply sizing and upkeep. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md Expert estimate. **12** Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds. Federal Highway Administration, 2009. https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm **13** Build A Kit. FEMA / Ready.gov (via Internet Archive), 2020. https://web.archive.org/web/20200101090440/https://www.ready.gov/kit **14** Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit **15** Heat Stress: Recommendations. CDC National Institute for Occupational Safety and Health, 2026. https://www.cdc.gov/niosh/heat-stress/recommendations/index.html **16** Dietary Guidelines for Americans, 2020–2025, Appendix 2: Estimated Calorie Needs. U.S. Department of Agriculture and U.S. Department of Health and Human Services, 2020. https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf **17** U.S. Army Corps of Engineers and FEMA begin Operation Blue Roof in Florida. FEMA, 2018. https://www.fema.gov/press-release/20250121/us-army-corps-engineers-and-fema-begin-operation-blue-roof-florida **18** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **19** What to Do After a Hurricane or Flood. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/mosquitoes/response/index.html **20** Preventing Mosquito Bites. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mosquitoes/prevention/index.html
 
-**21** 22 CFR 22.1, Schedule of Fees for Consular Services (passport book, card and execution fees), 2025 edition. U.S. Government Publishing Office (Code of Federal Regulations), 2025. https://www.govinfo.gov/content/pkg/CFR-2025-title22-vol1/pdf/CFR-2025-title22-vol1-sec22-1.pdf **22** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **23** Emergency Financial First Aid Kit. FEMA and Operation HOPE, 2019. https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf **24** Flood Insurance. FEMA, 2026. https://www.fema.gov/flood-insurance **25** Buy a Policy. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/get-insured/buy-a-policy **26** What Is My Flood Risk?. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/flood-zones-and-maps/what-is-my-flood-risk **27** Financial Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/financial-preparedness **28** OpenFEMA: NFIP Residential Penetration Rates (v1) and FIMA NFIP Redacted Claims. FEMA, 2026. https://www.fema.gov/about/openfema/data-sets **29** A Consumer's Guide to Home Insurance. National Association of Insurance Commissioners, 2022. https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf **30** Disability Benefits. Social Security Administration, 2026. https://www.ssa.gov/pubs/EN-05-10029.pdf
+**21** About Heat and Your Health. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/heat-health/about/index.html **22** Extreme Heat. FEMA / Ready.gov, 2026. https://www.ready.gov/heat **23** 22 CFR 22.1, Schedule of Fees for Consular Services (passport book, card and execution fees), 2025 edition. U.S. Government Publishing Office (Code of Federal Regulations), 2025. https://www.govinfo.gov/content/pkg/CFR-2025-title22-vol1/pdf/CFR-2025-title22-vol1-sec22-1.pdf **24** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **25** Emergency Financial First Aid Kit. FEMA and Operation HOPE, 2019. https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf **26** Flood Insurance. FEMA, 2026. https://www.fema.gov/flood-insurance **27** Buy a Policy. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/get-insured/buy-a-policy **28** What Is My Flood Risk?. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/flood-zones-and-maps/what-is-my-flood-risk **29** Financial Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/financial-preparedness **30** OpenFEMA: NFIP Residential Penetration Rates (v1) and FIMA NFIP Redacted Claims. FEMA, 2026. https://www.fema.gov/about/openfema/data-sets
 
-**31** Life Insurance Buyer's Guide. National Association of Insurance Commissioners, 2019. https://content.naic.org/sites/default/files/publication-lig-lp-consumer-life.pdf **32** FORTIFIED Home: Financial Incentives. Insurance Institute for Business & Home Safety, 2026. https://fortifiedhome.org/incentives/ **33** Hurricanes. FEMA / Ready.gov, 2026. https://www.ready.gov/hurricanes **34** Taking Shelter from the Storm: Building or Installing a Safe Room for Your Home. FEMA, 2025. https://www.fema.gov/sites/default/files/documents/fema_rsl_fema-p-320-taking-shelter-from-the-storm_042025.pdf **35** Safe Room Funding. FEMA, 2025. https://www.fema.gov/emergency-managers/risk-management/building-science/safe-rooms/funding **36** Tornadoes. FEMA / Ready.gov, 2026. https://www.ready.gov/tornadoes **37** Wildfires. FEMA / Ready.gov, 2026. https://www.ready.gov/wildfires **38** Safer from Wildfires: insurance discounts for wildfire mitigation. California Department of Insurance, 2026. https://www.insurance.ca.gov/01-consumers/200-wrr/Safer-from-Wildfires.cfm
+**31** A Consumer's Guide to Home Insurance. National Association of Insurance Commissioners, 2022. https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf **32** Disability Benefits. Social Security Administration, 2026. https://www.ssa.gov/pubs/EN-05-10029.pdf **33** Life Insurance Buyer's Guide. National Association of Insurance Commissioners, 2019. https://content.naic.org/sites/default/files/publication-lig-lp-consumer-life.pdf **34** FORTIFIED Home: Financial Incentives. Insurance Institute for Business & Home Safety, 2026. https://fortifiedhome.org/incentives/ **35** Taking Shelter from the Storm: Building or Installing a Safe Room for Your Home. FEMA, 2025. https://www.fema.gov/sites/default/files/documents/fema_rsl_fema-p-320-taking-shelter-from-the-storm_042025.pdf **36** Safe Room Funding. FEMA, 2025. https://www.fema.gov/emergency-managers/risk-management/building-science/safe-rooms/funding **37** Tornadoes. FEMA / Ready.gov, 2026. https://www.ready.gov/tornadoes **38** Wildfires. FEMA / Ready.gov, 2026. https://www.ready.gov/wildfires **39** Safer from Wildfires: insurance discounts for wildfire mitigation. California Department of Insurance, 2026. https://www.insurance.ca.gov/01-consumers/200-wrr/Safer-from-Wildfires.cfm
 
 ### Data credits
 

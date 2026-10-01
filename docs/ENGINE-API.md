@@ -349,8 +349,11 @@ What the numbers mean:
   [The binder](#the-binder). `prepare_markdown` (v3): the Prepare sheet, a short Markdown
   document of the preparation plan (the v2 packet's plan, checklists, decisions and maintenance
   calendar conventions), cited and deterministic, printed by the Prepare and Keep it up tabs and
-  by `rr plan`. Until the binder workstream lands, `prepare_markdown` is the whole v2 packet and
-  `binder` a transitional binder built from it (see [Mock engine](#mock-engine)).
+  by `rr plan`. Both are built inside `assess` by rr-plan (`crates/rr-plan/src/binder/` and
+  `crates/rr-plan/src/packet/`); the binder's `cite` numbers are its own, numbered in the order
+  it first cites them, and `provenance` starts with those sources in the same order, so `cite` n
+  is `binder.sources[n - 1]` and `provenance[n - 1]`. The Prepare sheet numbers its own sources
+  from 1 in its Sources section.
 - `location.exposure`: what the data pack knows about the place's exposure to the v2 hazards
   (strategic class A–E, distance to a strategic site, storm-surge share, smoke days, leveed
   population, high-hazard dams, karst, landslide susceptibility, drinking-water violations,
@@ -573,7 +576,9 @@ rr-plan (DESIGN-DELTA-v3 §5.6) and by a real print in verification.
 (People), 3 `home_places` (Home and places), 4 `pets_vehicles_documents` (Pets, vehicles and
 documents), 5 `have` (What you have), 6 `check_now` (Checklists: happening now), 7 `check_coming`
 (Checklists: it is coming), 8 `check_ongoing` (Checklists: it goes on), 9 `after` (After), 10
-`sources` (Sources). Every part starts on a new page; page numbers run per tab ("3-2").
+`sources` (Sources). Every part starts on a new page; page numbers are one running count
+through the whole binder ("page 37 of 112"), so the table of contents and every cross-reference
+point to a single number.
 
 ## Ids
 
@@ -741,14 +746,15 @@ fixture households (`web/src/engine/fixtures.ts`), so screens can be built and s
 before the engine exists. A parity test asserts that the mock and wasm outputs have identical JSON
 shapes for each fixture.
 
-Transitional, until the binder workstream lands (DESIGN-DELTA-v3 §11): the engine's
-`prepare_markdown` is the whole v2 packet, byte for byte, and its `binder` is built from that
-Markdown by `crates/rr-plan/src/packet/shim.rs`: one page of `para` blocks (one per Markdown
-paragraph, the text kept as it is) per v2 `##` section, the page placed in the part of
-DESIGN-DELTA-v3 §4.2 that will hold that material, parts without pages left out; `sources` from
-`PlanOutput.provenance` in order, `credits` from the data attributions. The mock's `assess` does
-the same with its own packet (`web/src/engine/mock/binder-shim.ts`), so the two stay
-shape-identical.
+The engine's binder is the real one (rr-plan's `binder` module, merged for v0.3.0): the ten
+parts of DESIGN-DELTA-v3 §4.2 with every block kind in use (headings, paragraphs, bullets,
+numbered lists, steps, fields, tables, callouts, decisions, map slots, cards, logs), and
+`prepare_markdown` is the Prepare sheet. The transitional shim (`packet/shim.rs`, a page of
+`para` blocks per v2 packet section) is gone from the engine. The mock's `assess` must give a
+binder of the same shape (the parity test above); its transitional builder,
+`web/src/engine/mock/binder-shim.ts`, still makes the shim's one-paragraph pages from the mock's
+own packet until the web binder workstream replaces it, so until then the two binders do not
+have the same shape (the mock's pages hold only `para` blocks).
 
 ## Changes from v2
 

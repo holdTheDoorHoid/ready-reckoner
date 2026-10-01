@@ -1131,6 +1131,18 @@ fn the_prepare_sheet_has_its_sections_and_its_own_sources() {
     for (name, _, out) in outputs() {
         let p = &out.prepare_markdown;
         assert!(p.starts_with("# Prepare: what to do before\n"), "{name}");
+        // The summary opens with the three things that matter most.
+        let summary = &p[p.find("\n## Summary\n").unwrap() + 1..];
+        let summary = &summary[..summary[3..].find("\n## ").map_or(summary.len(), |e| e + 3)];
+        assert!(
+            summary.starts_with("## Summary\n\n### The three things that matter most\n\n1. "),
+            "{name}: {summary}"
+        );
+        assert!(
+            summary.contains("\n2. ") && summary.contains("\n3. "),
+            "{name}"
+        );
+        assert!(!summary.contains("\n4. "), "{name}");
         let mut at = 0;
         for h in rr_plan::packet::SECTION_HEADINGS {
             let found = p[at..]

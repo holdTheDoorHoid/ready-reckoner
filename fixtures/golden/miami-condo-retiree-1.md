@@ -3002,13 +3002,19 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 ## Summary
 
+### The three things that matter most
+
+1. Of 100 households like yours, about 50 (40–65) will have to leave home quickly at least once in the next 10 years. Parts of your area flood in a hurricane's storm surge.[2] Know your evacuation zone and where you would go; leave when told.[3, 4]
+2. Of 100 households like yours, about 65 (55–85) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 2 weeks at home with no power or tap water.
+3. Of 100 households like yours, about 70 (50–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 weeks of food you normally eat, and 1 month of daily medicine on hand.
+
 **Where you are now:** getting started. **What is enough for your risks:** one month of supplies. At your budget, the bare minimum (three days of water, light, warmth and medicine) is in place by month 4 (February 2027), and everything by month 19 (May 2028). Start with the free steps under Your plan.
 
 **What the plan assumes you already have:** a charged mobile phone, go-bag for each person, manual can opener, a cooking pot with a lid, three days of the food you normally eat, a warm blanket for each person, warm layers for each person and towels to wet and cool down. If any is missing, untick "Assume everyday basics" on the Have screen and the plan will add it.
 
 ## Your plan
 
-Your budget is $100 a month. Free steps come first, then what protects you most for each dollar (water, medicine and safety first), until every need has enough.[2]
+Your budget is $100 a month. Free steps come first, then what protects you most for each dollar (water, medicine and safety first), until every need has enough.[5]
 
 ### Start now: free steps (from October 1, 2026)
 
@@ -3023,12 +3029,12 @@ Your budget is $100 a month. Free steps come first, then what protects you most 
 
 ### Safety rules to learn now
 
-- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[3, 4]
-- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[5]
-- **Water heater:** Turn off its power or gas before you drain it for water.[5]
-- **Food:** In a power cut, throw out food that has been at 40°F or warmer for 2 hours.[6]
-- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[6, 7]
-- **CPR:** Take a first-aid and CPR class.[8]
+- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[6, 7]
+- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[8]
+- **Water heater:** Turn off its power or gas before you drain it for water.[8]
+- **Food:** In a power cut, throw out food that has been at 40°F or warmer for 2 hours.[9]
+- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[9, 10]
+- **CPR:** Take a first-aid and CPR class.[11]
 
 ### This month
 
@@ -3132,15 +3138,15 @@ One list per step, up to the one your risks need, with each thing's month. This 
 
 These help with one hazard, not a whole need, so they sit outside the budget.
 
-- Insect repellent for the weeks after a flood or hurricane (usually $8–10 per can)[9, 10, 11]
+- Insect repellent for the weeks after a flood or hurricane (usually $8–10 per can)[12, 13, 14]
 
 ## Documents and money: decisions and savings
 
 ### Decisions
 
-- [ ] **Decide: ID for every person (passport book or card, or a state ID).** A passport book or card for each person, children included, proves who you are and your citizenship if other papers are lost, and the card shows no home address; get them before you need them. The federal fee schedule: a first adult book $165 and card $65 ($130 and $30 plus a $35 acceptance fee), for children under 16 a book $135 and card $50 (22 CFR 22.1).[12, 13, 14]
-- [ ] **Check your hurricane or windstorm deductible.** Hurricanes drive your home-loss risk: check your policy for a separate hurricane or windstorm deductible. In some places it is a percentage of the home's insured value rather than a dollar amount, and coastal policies can leave out wind damage altogether. Find the amount on the declarations page and add it to your savings goal.[15]
-- [ ] **Check your condominium unit-owners policy.** You own an apartment: check that your policy is a condominium unit-owners policy, which covers your belongings and your own walls, floors and ceilings, and ask your association what its building policy leaves to you after a disaster.[15]
+- [ ] **Decide: ID for every person (passport book or card, or a state ID).** A passport book or card for each person, children included, proves who you are and your citizenship if other papers are lost, and the card shows no home address; get them before you need them. The federal fee schedule: a first adult book $165 and card $65 ($130 and $30 plus a $35 acceptance fee), for children under 16 a book $135 and card $50 (22 CFR 22.1).[15, 16, 17]
+- [ ] **Check your hurricane or windstorm deductible.** Hurricanes drive your home-loss risk: check your policy for a separate hurricane or windstorm deductible. In some places it is a percentage of the home's insured value rather than a dollar amount, and coastal policies can leave out wind damage altogether. Find the amount on the declarations page and add it to your savings goal.[18]
+- [ ] **Check your condominium unit-owners policy.** You own an apartment: check that your policy is a condominium unit-owners policy, which covers your belongings and your own walls, floors and ceilings, and ask your association what its building policy leaves to you after a disaster.[18]
 
 ### Savings
 
@@ -3148,7 +3154,7 @@ No one in the household earns wages, so the plan sets no income-gap goal. Keep a
 
 ## Maintenance calendar
 
-Dates count from when each item enters your plan; move them if you buy earlier or later.[16]
+Dates count from when each item enters your plan; move them if you buy earlier or later.[19]
 
 | When | What |
 | --- | --- |
@@ -3175,9 +3181,9 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 
 The numbers in brackets point to this list; "expert estimate" marks a judgement, not measured data. The plan is Ready Reckoner's calculation from these.
 
-**1** Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water **2** Harm weights used by the allocator. Ready Reckoner, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md Expert estimate. **3** Home Fires. FEMA / Ready.gov, 2026. https://www.ready.gov/home-fires **4** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **5** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **6** Power Outages. FEMA / Ready.gov, 2026. https://www.ready.gov/power-outages **7** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf **8** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills **9** What to Do After a Hurricane or Flood. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/mosquitoes/response/index.html **10** Preventing Mosquito Bites. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mosquitoes/prevention/index.html
+**1** Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water **2** National Storm Surge Risk Maps. NOAA National Hurricane Center, 2026. https://www.nhc.noaa.gov/nationalsurge/ **3** Evacuation. FEMA / Ready.gov, 2026. https://www.ready.gov/evacuation **4** Hurricanes. FEMA / Ready.gov, 2026. https://www.ready.gov/hurricanes **5** Harm weights used by the allocator. Ready Reckoner, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md Expert estimate. **6** Home Fires. FEMA / Ready.gov, 2026. https://www.ready.gov/home-fires **7** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **8** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **9** Power Outages. FEMA / Ready.gov, 2026. https://www.ready.gov/power-outages **10** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf
 
-**11** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **12** 22 CFR 22.1, Schedule of Fees for Consular Services (passport book, card and execution fees), 2025 edition. U.S. Government Publishing Office (Code of Federal Regulations), 2025. https://www.govinfo.gov/content/pkg/CFR-2025-title22-vol1/pdf/CFR-2025-title22-vol1-sec22-1.pdf **13** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **14** Emergency Financial First Aid Kit. FEMA and Operation HOPE, 2019. https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf **15** A Consumer's Guide to Home Insurance. National Association of Insurance Commissioners, 2022. https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf **16** Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit
+**11** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills **12** What to Do After a Hurricane or Flood. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/mosquitoes/response/index.html **13** Preventing Mosquito Bites. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mosquitoes/prevention/index.html **14** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **15** 22 CFR 22.1, Schedule of Fees for Consular Services (passport book, card and execution fees), 2025 edition. U.S. Government Publishing Office (Code of Federal Regulations), 2025. https://www.govinfo.gov/content/pkg/CFR-2025-title22-vol1/pdf/CFR-2025-title22-vol1-sec22-1.pdf **16** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **17** Emergency Financial First Aid Kit. FEMA and Operation HOPE, 2019. https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf **18** A Consumer's Guide to Home Insurance. National Association of Insurance Commissioners, 2022. https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf **19** Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit
 
 ### Data credits
 
