@@ -20,6 +20,14 @@
 //  5. Offline: with the network gone, a reload still shows the same plan.
 //  6. Screenshots (risks, plan, packet print view, About with the credits, the ambiguous-ZIP
 //     picker, the county map, the loading line) into SHOTS_DIR.
+//  7. Maps behind consent (DESIGN-DELTA-v3 §9): a first visit makes no request off the site;
+//     opening the maps panel makes none until "Fetch maps" is pressed, and the consent screen
+//     names every recipient in web/src/lib/maps/sources.ts; after consent, requests go only to
+//     those origins, with the site's address alone as the Referer, and one press asks for at most
+//     250 tiles; the maps are kept in the IndexedDB database rr-maps, which "Forget everything"
+//     deletes. Every outside service is answered by a stub here: the check never contacts
+//     OpenStreetMap, FEMA or anyone else (the OSMF tile policy forbids automated scans), and the
+//     pin-map chunk opens offline from the service worker.
 //
 // Exits non-zero on the first failed check. Prints a JSON summary last.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -53,6 +61,13 @@ const base = /src="(\/[^"]*?)assets\//.exec(html)?.[1] ?? '/';
 const formatOut = join(web, 'node_modules', '.cache', 'e2e-format.mjs');
 await build({ entryPoints: [join(web, 'src', 'lib', 'format.ts')], bundle: true, format: 'esm', platform: 'node', outfile: formatOut, logLevel: 'silent' });
 const { targetDays, targetMonths } = await import(pathToFileURL(formatOut).href);
+// The maps' origins, from the one module that lists them (the CSP is built from the same list).
+const sourcesOut = join(web, 'node_modules', '.cache', 'e2e-map-sources.mjs');
+await build({ entryPoints: [join(web, 'src', 'lib', 'maps', 'sources.ts')], bundle: true, format: 'esm', platform: 'node', outfile: sourcesOut, logLevel: 'silent' });
+const { MAP_ORIGINS, RECIPIENTS } = await import(pathToFileURL(sourcesOut).href);
+const overpassFixture = readFileSync(join(web, 'src', 'lib', 'maps', 'fixtures', 'overpass-philadelphia.json'));
+// A 1 × 1 grey PNG: what every stubbed map service answers with (tiles and export images alike).
+const STUB_PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR42mO4e/cuAAUyApj98CkjAAAAAElFTkSuQmCC', 'base64');
 
 const results = [];
 function check(name, ok, detail = '') {
@@ -100,6 +115,8 @@ try {
   // -------------------------------------------------------------------------------------------
   const context = await browser.createBrowserContext();
   const { page, problems } = await freshPage(context);
+  const firstVisitRequests = [];
+  page.on('request', (r) => firstVisitRequests.push(r.url()));
   const cdp = await page.createCDPSession();
   await cdp.send('Network.enable');
   const NET = { offline: false, latency: 40, downloadThroughput: 1_250_000, uploadThroughput: 500_000 };
@@ -137,6 +154,11 @@ try {
   check('no file is sent twice on the first visit (the offline copy reuses the browser cache)', first.files.every((f) => f.requests === 1 || f.path === 'index.html'), first.files.filter((f) => f.requests > 1).map((f) => f.path).join(', '));
   const csp = await page.$eval('meta[http-equiv="Content-Security-Policy"]', (m) => m.getAttribute('content')).catch(() => null);
   check('content security policy in force', !!csp && csp.includes("script-src 'self'"));
+  const siteOrigin = new URL(site.url).origin;
+  const offsite = firstVisitRequests.filter((u) => !u.startsWith('data:') && !u.startsWith('blob:') && new URL(u).origin !== siteOrigin);
+  check('a first visit makes no request off the site', offsite.length === 0, offsite.slice(0, 3).join(', ') || `${firstVisitRequests.length} requests, all to ${siteOrigin}`);
+  const mapCsp = MAP_ORIGINS.every((o) => csp?.includes(o));
+  check('the content security policy allows exactly the map origins in sources.ts', mapCsp && (csp.match(/https:\/\//g) ?? []).length === 2 * MAP_ORIGINS.length, MAP_ORIGINS.join(' '));
   await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
 
   // -------------------------------------------------------------------------------------------
@@ -156,7 +178,8 @@ try {
   const mapFiles = lazy.files.filter((f) => f.path.startsWith('data/geo/'));
   summary.zipTables = { bytes: zipFiles.reduce((s, f) => s + f.bytes, 0), files: zipFiles.map((f) => f.path) };
   summary.map = { bytes: mapFiles.reduce((s, f) => s + f.bytes, 0), files: mapFiles.map((f) => f.path) };
-  check('the imported ZIP code fetches the ZIP tables, once', zipFiles.length === 2 && zipFiles.every((f) => f.requests === 1), summary.zipTables.files.join(', '));
+  // The five ZIP tables: ZIP_FILES in web/src/engine/data-files.ts (zip_county, zip_facilities, zip_surge, zip_centroids, zip_wildfire_places).
+  check('the imported ZIP code fetches the five ZIP tables, once each', zipFiles.length === 5 && zipFiles.every((f) => f.requests === 1), summary.zipTables.files.join(', '));
   check('the first map fetches the county outlines, once', mapFiles.length === 1 && mapFiles[0].requests === 1, `${kb(summary.map.bytes)}`);
   await continueTo(page, 'Who is in your household');
   await continueTo(page, 'How you get around');
@@ -337,6 +360,141 @@ try {
     await p.screenshot({ path: join(shots, 'loading-progress-line--desktop.png') });
     const line = await p.$eval('.data-progress', (el) => el.textContent.replace(/\s+/g, ' ').trim());
     check('a calm progress line shows while the county data loads', /Getting the county data ready/.test(line), line.slice(0, 90));
+    await ctx.close();
+  }
+
+  // -------------------------------------------------------------------------------------------
+  // 7. Maps behind consent, every outside service stubbed
+  // -------------------------------------------------------------------------------------------
+  {
+    const ctx = await browser.createBrowserContext();
+    const { page: p, problems: mapProblems } = await freshPage(ctx);
+    const siteOrigin = new URL(site.url).origin;
+    const external = [];
+    await p.setRequestInterception(true);
+    p.on('request', (req) => {
+      const url = req.url();
+      if (url.startsWith('data:') || url.startsWith('blob:') || new URL(url).origin === siteOrigin) {
+        req.continue();
+        return;
+      }
+      external.push({ url, referer: req.headers().referer ?? '', method: req.method() });
+      const cors = { 'access-control-allow-origin': '*' };
+      if (url.includes('overpass')) req.respond({ status: 200, headers: cors, contentType: 'application/json', body: overpassFixture });
+      else if (MAP_ORIGINS.includes(new URL(url).origin)) req.respond({ status: 200, headers: cors, contentType: 'image/png', body: STUB_PNG });
+      else req.respond({ status: 404, headers: cors, body: '' });
+    });
+    await p.evaluateOnNewDocument((saved) => localStorage.setItem('rr.plan.v1', JSON.stringify(saved)), {
+      format: 'ready-reckoner-plan',
+      version: 1,
+      input: JSON.parse(readFileSync(fixturePath, 'utf8')),
+      purchases: [],
+      progress: { completed: ['where', 'who', 'travel', 'money', 'have'] },
+      confidence: {},
+      dismissed_warnings: [],
+      done_dates: {},
+    });
+    await p.goto(`${site.url}#/binder`);
+    await p.waitForSelector('[data-screen-ready][aria-busy="false"] .packet', { timeout: 60000 });
+    await p.waitForFunction(() => !!navigator.serviceWorker?.controller, { timeout: 60000 });
+    const clickButton = (text) => p.evaluate((t) => {
+      const b = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === t);
+      if (!b) throw new Error(`no button "${t}"`);
+      b.click();
+    }, text);
+    await clickButton('Add maps');
+    await p.waitForFunction(() => document.body.textContent.includes('Before we fetch your maps'), { timeout: 20000 });
+    const consentText = await p.$eval('.consent', (el) => el.textContent.replace(/\s+/g, ' '));
+    const unnamed = RECIPIENTS.filter((r) => !consentText.includes(r.who) || !consentText.includes(r.layer));
+    check('the consent screen names every recipient in sources.ts and what each receives', unnamed.length === 0 && consentText.includes('Nothing has been sent yet'), unnamed.map((r) => r.id).join(', ') || RECIPIENTS.map((r) => r.layer.split(' (')[0]).join(', '));
+    await p.screenshot({ path: join(shots, 'maps-consent--philadelphia--desktop.png'), fullPage: false });
+    const consent = await p.$('.consent');
+    if (consent) await consent.screenshot({ path: join(shots, 'maps-consent--screen.png') });
+    await clickButton('Not now');
+    await sleep(300);
+    check('opening the maps panel makes no request off the site until "Fetch maps"', external.length === 0, external.slice(0, 3).map((e) => e.url).join(', '));
+    await clickButton('Add maps');
+    await p.waitForFunction(() => document.body.textContent.includes('Before we fetch your maps'), { timeout: 20000 });
+    check('the consent screen appears again on the next press (nothing remembered)', external.length === 0);
+    await clickButton('Fetch maps');
+    await p.waitForSelector('.pin-map .leaflet-container', { timeout: 30000 });
+    await p.waitForFunction(() => document.querySelectorAll('.leaflet-tile-loaded').length > 0, { timeout: 30000 });
+    const mapBox = await (await p.$('.pin-map__map')).boundingBox();
+    await p.mouse.click(mapBox.x + mapBox.width / 2, mapBox.y + mapBox.height / 2);
+    await p.waitForFunction(() => document.querySelector('.pin-map')?.textContent.includes('Home: placed'), { timeout: 10000 });
+    const pinMap = await p.$('.pin-map');
+    if (pinMap) await pinMap.screenshot({ path: join(shots, 'maps-pin-map--stubbed-tiles.png') });
+    await clickButton('Done');
+    await p.waitForSelector('.maps-panel[data-maps-phase="idle"] .map-figure__img', { timeout: 60000 });
+    const figures = await p.$$eval('.maps-panel .map-figure__img', (els) => els.map((e) => e.getAttribute('src').length));
+    check('after consent, the three maps are made and shown', figures.length === 3, `${figures.length} images`);
+    const offList = external.filter((e) => !MAP_ORIGINS.includes(new URL(e.url).origin));
+    check('after consent, requests go only to the origins in sources.ts', offList.length === 0, offList.slice(0, 3).map((e) => e.url).join(', ') || `${external.length} requests to ${[...new Set(external.map((e) => new URL(e.url).origin))].join(', ')}`);
+    const tiles = external.filter((e) => e.url.startsWith('https://tile.openstreetmap.org/'));
+    // The OSMF and Overpass rules ask for a Referer; it must be the site's address alone, never the page or its #/ route.
+    const badReferer = external.filter((e) => e.referer !== `${siteOrigin}/`);
+    check('every map request names the site by its address alone (the Referer the OSMF and Overpass rules ask for)', badReferer.length === 0, badReferer.slice(0, 2).map((e) => `${e.url.slice(0, 50)} -> "${e.referer}"`).join(', ') || `${external.length} requests, Referer "${external[0]?.referer ?? ''}"`);
+    const pressTiles = Number(await p.$eval('[data-maps-tiles]', (el) => el.getAttribute('data-maps-tiles')));
+    check('one press asks for at most 250 tiles (§9.3)', pressTiles > 0 && pressTiles <= 250, `${pressTiles} tiles for the three maps, ${tiles.length - pressTiles} for the pin map`);
+    summary.maps = {
+      externalRequests: external.length,
+      byOrigin: Object.fromEntries([...new Set(external.map((e) => new URL(e.url).origin))].map((o) => [o, external.filter((e) => new URL(e.url).origin === o).length])),
+      composerTiles: pressTiles,
+      pinMapTiles: tiles.length - pressTiles,
+      imageDataUrlChars: figures,
+    };
+    const panel = await p.$('.maps-panel');
+    if (panel) await panel.screenshot({ path: join(shots, 'maps-panel--stubbed-services.png') });
+    // The images live in IndexedDB (rr-maps), one record per map, never in the saved plan.
+    const stored = await p.evaluate(
+      () =>
+        new Promise((resolve) => {
+          const req = indexedDB.open('rr-maps');
+          req.onsuccess = () => {
+            const db = req.result;
+            const all = db.transaction('maps', 'readonly').objectStore('maps').getAll();
+            all.onsuccess = () => {
+              resolve(all.result.map((r) => ({ slot: r.slot, jpeg: r.image.startsWith('data:image/jpeg;base64,') })));
+              db.close();
+            };
+          };
+          req.onerror = () => resolve([]);
+        }),
+    );
+    const savedPlan = await p.evaluate(() => localStorage.getItem('rr.plan.v1') ?? '');
+    check('the three maps are kept in the IndexedDB database rr-maps, and the saved plan holds pins, never images', stored.length === 3 && stored.every((r) => r.jpeg) && savedPlan.includes('"maps"') && !savedPlan.includes('data:image'), stored.map((r) => r.slot).join(', '));
+    check('no console errors or policy violations with the maps', mapProblems.length === 0, mapProblems.slice(0, 3).join(' | '));
+
+    // Offline: the panel and the pin-map chunk still open (from the service worker); it says maps need a connection.
+    external.length = 0;
+    await p.setOfflineMode(true);
+    site.setOffline(true);
+    await p.goto(`${site.url}#/binder`, { waitUntil: 'domcontentloaded' });
+    await p.waitForSelector('[data-screen-ready][aria-busy="false"] .packet', { timeout: 60000 });
+    // The saved plan keeps its maps across a reload, so the toolbar offers "Refresh maps" (either label is accepted).
+    const toolbarLabel = await p.evaluate(() => [...document.querySelectorAll('.toolbar button')].map((b) => b.textContent.trim()).find((t) => t === 'Add maps' || t === 'Refresh maps'));
+    await clickButton(toolbarLabel);
+    await p.waitForFunction(() => document.body.textContent.includes('Before we fetch your maps'), { timeout: 20000 });
+    const offlineNote = await p.evaluate(() => document.querySelector('.consent')?.textContent.includes('seems to be offline') ?? false);
+    await clickButton('Not now');
+    const canEdit = await p.evaluate(() => [...document.querySelectorAll('.maps-panel button')].some((b) => b.textContent.trim() === 'Edit pins'));
+    await clickButton(canEdit ? 'Edit pins' : toolbarLabel);
+    await p.waitForFunction(() => document.body.textContent.includes('Before we fetch your maps'), { timeout: 20000 });
+    await clickButton('Fetch maps');
+    const chunk = await p.waitForSelector('.pin-map .leaflet-container', { timeout: 30000 }).then(() => true).catch(() => false);
+    check('offline, the maps panel and the pin-map chunk still open, and the consent screen says maps need a connection', offlineNote && chunk, `offline note ${offlineNote}, pin map ${chunk}`);
+    await p.setOfflineMode(false);
+    site.setOffline(false);
+
+    // "Forget everything" deletes the maps store with the rest.
+    await p.goto(`${site.url}#/maintain`);
+    await p.waitForFunction(() => [...document.querySelectorAll('button')].some((b) => b.textContent.trim() === 'Forget everything'), { timeout: 30000 });
+    await clickButton('Forget everything');
+    await p.waitForSelector('dialog[open]', { timeout: 10000 });
+    await p.evaluate(() => [...document.querySelectorAll('dialog[open] button')].find((b) => b.textContent.trim() === 'Forget everything').click());
+    await sleep(500);
+    const afterForget = await p.evaluate(async () => ({ dbs: (await indexedDB.databases()).map((d) => d.name), plan: localStorage.getItem('rr.plan.v1') }));
+    check('"Forget everything" deletes the maps store rr-maps with the plan', !afterForget.dbs.includes('rr-maps') && afterForget.plan === null, `databases left: ${afterForget.dbs.join(', ') || 'none'}`);
     await ctx.close();
   }
 } finally {

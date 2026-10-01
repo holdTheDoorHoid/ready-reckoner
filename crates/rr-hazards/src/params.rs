@@ -520,13 +520,48 @@ pub(crate) const UNEMPLOYMENT_DELAY: Triple = (0.01, 0.002, 0.04);
 /// PRIOR: a month of lost pay or benefits, the severity of one interruption.
 pub(crate) const BENEFIT_LOSS_USD: f64 = 1_500.0;
 
-/// PRIOR (Eviction Lab, national rate for 2016: about 2.3 eviction judgments per 100 renter
-/// households; UNVERIFIED beyond summaries): judgments per renter household a year, used when
-/// the county's filing rate is not in the pack.
-pub(crate) const EVICTION_NATIONAL: Triple = (0.023, 0.01, 0.05);
-/// PRIOR (Eviction Lab 2016: about 0.9 million judgments from 2.3 million filings; UNVERIFIED):
-/// share of eviction filings that end in an order to leave.
-pub(crate) const EVICTION_JUDGMENT_SHARE: Triple = (0.4, 0.3, 0.55);
+/// DATA (fitted to Eviction Lab's county estimates, 2014–2018, which count households threatened
+/// with eviction beside filings): each household taken to court is filed on 1 + 1.7 × (the
+/// county's filings per renter household) times a year, so households taken to court per renter
+/// household = filings ÷ (1 + 1.7 × filings) ([`eviction_households`]). Least squares over the
+/// 3,137 counties with both counts: half the counties within 2 % of the Lab's own household
+/// count, nine in ten within 8 %, the national total within 3 % (2.75 million households a year
+/// from 3.74 million filings). Baltimore County, MD: 1.37 filings, 0.41 households (the Lab
+/// 0.42); Wayne County, MI: 0.239 and 0.17 (0.18); Missoula County, MT: 0.0077 and 0.0076
+/// (0.0075). Where landlords file rarely, nearly every filing is a different household; in
+/// Maryland, where filing in court was the first step of collecting late rent, repeat filings
+/// against the same households were 57.4 % of cases in 2018 (Gromis et al., 2022).
+pub(crate) const EVICTION_REPEAT_SLOPE: f64 = 1.7;
+/// How far the households taken to court in a county may be from [`eviction_households`]'s value,
+/// as a factor either way: most county-years are the Lab's model estimates rather than court
+/// counts, and among the 42 counties above 0.3 filings per renter household the fit misses the
+/// Lab's own count by up to 37 % (Marion County, SC).
+pub(crate) const EVICTION_HOUSEHOLDS_SPREAD: f64 = 1.3;
+/// PRIOR (Eviction Lab, Help & FAQ, read 2026-10-01): share of households taken to court that get
+/// an eviction judgment, an order to leave. The Lab's judgment rates for 2014–2018 (2.09, 2.03,
+/// 1.95, 1.73 and 1.79 per 100 renting households, "interpreted with caution") over its
+/// households-threatened rates for the same years (6.42, 6.12, 5.98, 5.99 and 5.83 per 100):
+/// 1.918 ÷ 6.069 = 0.316. Low end: the lowest year, 2000 (1.49 ÷ 6.11 = 0.24). High end: the
+/// Lab's first national count, 898,479 evictions from 2,350,042 filings in 2016 (0.38 a filing),
+/// at that year's 0.728 households per filing: 0.525.
+pub(crate) const EVICTION_JUDGMENT_SHARE: Triple = (0.32, 0.24, 0.525);
+/// PRIOR (Eviction Lab, Help & FAQ: eviction judgments per 100 renting households, mean of
+/// 2014–2018, 1.92): judgments per renter household a year, used where the pack has no county
+/// figure (the territories) or the Lab's estimate is zero. The range runs from about half to about
+/// twice it.
+pub(crate) const EVICTION_NATIONAL: Triple = (0.0192, 0.01, 0.04);
+/// PRIOR: the most a county's own figure may say, 7 judgments per 100 renting households a year,
+/// so that the county alone never puts more than about half of its renting households in court
+/// and ordered to leave within ten years (1 − e^(−0.7) = 0.50). The ten-year chance treats each
+/// year's cases as new households; where landlords file most, they take the same households to
+/// court month after month and year after year (Eviction Lab, serial filing), and the Lab says
+/// Maryland's filing counts do not mean more evictions. Household modifiers apply on top.
+pub(crate) const EVICTION_CAP: f64 = 0.07;
+/// Households taken to court per renter household a year, from the county's eviction filings per
+/// renter household ([`EVICTION_REPEAT_SLOPE`]).
+pub(crate) fn eviction_households(filings: f64) -> f64 {
+    filings / (1.0 + EVICTION_REPEAT_SLOPE * filings)
+}
 /// PRIOR (hazard-expansion, `eviction`): three months or more of savings halves the rate.
 pub(crate) const EVICTION_SAVINGS: Triple = (0.5, 0.3, 0.8);
 /// Months of savings from which [`EVICTION_SAVINGS`] applies.
@@ -991,6 +1026,75 @@ mod tests {
             / 47.0;
         assert!(survey < fbi / ARRESTS_PER_ARRESTED_PERSON);
         assert!((ARRESTS_PER_ARRESTED_PERSON - (1.475 + 1.319 + 1.349) / 3.0).abs() < 5e-4);
+    }
+
+    #[test]
+    fn eviction_judgments_are_the_labs_judgments_over_households_threatened() {
+        // Eviction Lab, Help & FAQ (read 2026-10-01), 2014-2018: eviction judgments per 100
+        // renting households, and households threatened over renting households.
+        let judgments = [2.09, 2.03, 1.95, 1.73, 1.79];
+        let threatened = [
+            (2_814_987.0, 43_816_132.0),
+            (2_729_296.0, 44_587_612.0),
+            (2_711_472.0, 45_359_092.0),
+            (2_764_012.5, 46_130_568.0),
+            (2_734_662.8, 46_902_048.0),
+        ];
+        let j = judgments.iter().sum::<f64>() / 500.0;
+        let h = threatened.iter().map(|(t, r)| t / r).sum::<f64>() / 5.0;
+        assert!(
+            (EVICTION_JUDGMENT_SHARE.0 - j / h).abs() < 0.005,
+            "{}",
+            j / h
+        );
+        // The national fallback is the same judgment rate.
+        assert!((EVICTION_NATIONAL.0 - j).abs() < 5e-5, "{j}");
+        // Low end: 2000, the lowest year (1.49 per 100; 2,177,580 of 35,664,348 threatened).
+        assert!((EVICTION_JUDGMENT_SHARE.1 - 0.0149 / (2_177_580.3 / 35_664_348.0)).abs() < 0.005);
+        // High end: the first national count, 898,479 evictions from 2,350,042 filings (2016),
+        // at that year's households per filing (2,711,472 households, 3,725,835 filings).
+        let high = (898_479.0 / 2_350_042.0) / (2_711_472.0 / 3_725_835.3);
+        assert!((EVICTION_JUDGMENT_SHARE.2 - high).abs() < 0.005, "{high}");
+    }
+
+    #[test]
+    fn eviction_households_follow_the_labs_own_household_counts() {
+        // (county, filings per renter household in the pack, the Lab's households threatened per
+        // renter household): 2014-2018 means of `hh_threat_estimate / renting_hh` in Eviction Lab's
+        // county file (county_eviction_estimates_2000_2018.csv, sha256 c8c1c4c3…, read
+        // 2026-09-27).
+        let lab = [
+            ("Baltimore County, MD", 1.37, 0.4213),
+            ("Prince George's County, MD", 1.2, 0.4581),
+            ("Baltimore city, MD", 1.03, 0.3938),
+            ("Wayne County, MI", 0.239, 0.1805),
+            ("Maricopa County, AZ", 0.106, 0.0886),
+            ("Galveston County, TX", 0.0826, 0.0701),
+            ("Philadelphia County, PA", 0.0783, 0.0695),
+            ("Cook County, IL", 0.0281, 0.0261),
+            ("Missoula County, MT", 0.00772, 0.0075),
+        ];
+        for (county, f, h) in lab {
+            let model = eviction_households(f);
+            assert!(
+                (model / h - 1.0).abs() < 0.15,
+                "{county}: {model:.4} against the Lab's {h}"
+            );
+            // Never more households than filings, and never more than 1 in 1.7 renters.
+            assert!(model <= f && model < 1.0 / EVICTION_REPEAT_SLOPE);
+        }
+        // Gromis et al. (2022): Maryland 2018, 69.6 filings per 100 renting households, 57.4 % of
+        // them repeats: 29.6 households per 100. The curve, read at the state's mean, sits above
+        // the pooled state figure (the curve bends down, so a pooled figure is lower).
+        let md = 0.696 * (1.0 - 0.574);
+        let at_mean = eviction_households(0.696);
+        assert!(at_mean > md && at_mean / md < 1.1, "{at_mean} {md}");
+    }
+
+    #[test]
+    fn the_eviction_cap_is_about_half_in_ten_years() {
+        let ten = -rr_types::math::exp_m1(-10.0 * EVICTION_CAP);
+        assert!((ten - 0.5).abs() < 0.01, "{ten}");
     }
 
     #[test]
