@@ -108,7 +108,6 @@ function checklist(id: string, title: string, fit: 'one' | 'two', here: string |
       [b('Signal for help.'), t(' Call 911 and wave a light-colored cloth or a flashlight at the window.'), cite(4)],
       [b('If your clothes catch fire, stop, drop and roll.'), cite(4)],
     ),
-    h(2, 'Leave or stay?'),
     decision(
       'Leave or stay?',
       { when: [b('Leave if'), t(' there is fire or smoke in the home.')], then: [t('Go to '), t('the corner mailbox at 12th and Sample'), t('.')], go_to: 'neighbourhood' },
