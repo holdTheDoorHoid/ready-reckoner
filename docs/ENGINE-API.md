@@ -750,11 +750,15 @@ The engine's binder is the real one (rr-plan's `binder` module, merged for v0.3.
 parts of DESIGN-DELTA-v3 §4.2 with every block kind in use (headings, paragraphs, bullets,
 numbered lists, steps, fields, tables, callouts, decisions, map slots, cards, logs), and
 `prepare_markdown` is the Prepare sheet. The transitional shim (`packet/shim.rs`, a page of
-`para` blocks per v2 packet section) is gone from the engine. The mock's `assess` must give a
-binder of the same shape (the parity test above); its transitional builder,
-`web/src/engine/mock/binder-shim.ts`, still makes the shim's one-paragraph pages from the mock's
-own packet until the web binder workstream replaces it, so until then the two binders do not
-have the same shape (the mock's pages hold only `para` blocks).
+`para` blocks per v2 packet section) is gone from the engine. The mock's `assess` gives a binder
+of the same shape (the parity test above): `web/src/engine/mock/binder.ts` builds the same ten
+parts, page ids, page kinds, fits, block kinds and map slots as rr-plan, from the mock's own
+numbers and the household's answers (its checklist pages are stand-ins of the content's titles,
+not the content's text), and numbers its citations by first use. Where the two disagree, the
+engine is right. The mock's `prepare_markdown` is still its v2 packet (the stand-in screens read
+its "Your targets" and "Also checked" notes); the web reads both from the binder when the engine
+gives one: the dial sentence from the "What to expect" page's first paragraph, the "Also checked"
+line from "Which checklist?".
 
 ## Changes from v2
 
