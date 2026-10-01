@@ -2,6 +2,7 @@
   "county": {
     "fips": "22023",
     "name": "Cameron",
+    "name_full": "Cameron Parish",
     "state_abbr": "LA",
     "state_name": "Louisiana",
     "centroid": {
