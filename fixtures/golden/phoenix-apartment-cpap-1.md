@@ -362,6 +362,27 @@ Pick a spot for each danger below, at home and at work, and practice going there
 | Alerts | Emergency alerts reach phones with no sign-up. Ask your county emergency management office about its own text or email alerts.[7] |
 | Prescription refills | When the governor declares an emergency, a pharmacist may give up to a 30-day supply if your prescriber cannot be reached.[19] |
 
+#### Hospitals with emergency rooms in Maricopa County, Arizona
+
+From the federal list of hospitals (CMS) of August 13, 2026. Check before you need it: a hospital can close or stop taking patients.[57]
+
+| Hospital | City | Phone |
+| --- | --- | --- |
+| ABRAZO ARROWHEAD HOSPITAL | GLENDALE | (623) 561-1000 |
+| ABRAZO CENTRAL CAMPUS | PHOENIX | (602) 249-0212 |
+| ABRAZO SCOTTSDALE CAMPUS | PHOENIX | (602) 923-5609 |
+| ABRAZO WEST CAMPUS | GOODYEAR | (623) 882-1970 |
+| BANNER - UNIVERSITY MEDICAL CENTER PHOENIX | PHOENIX | (602) 839-2000 |
+| BANNER BAYWOOD MEDICAL CENTER | MESA | (480) 321-2000 |
+| BANNER BOSWELL MEDICAL CENTER | SUN CITY | (623) 832-4000 |
+| BANNER DEL E. WEBB MEDICAL CENTER | SUN CITY WEST | (623) 524-4000 |
+| BANNER DESERT MEDICAL CENTER | MESA | (480) 412-3000 |
+| BANNER ESTRELLA MEDICAL CENTER | PHOENIX | (623) 327-4000 |
+| BANNER GATEWAY MEDICAL CENTER | GILBERT | (480) 543-2000 |
+| BANNER OCOTILLO MEDICAL CENTER | CHANDLER | (480) 256-7000 |
+
+The list has 17 more in the county; these are the first 12 by name.
+
 > Map: your neighborhood. Add it in the app, or paste a printed map here.
 
 ## Getting out
@@ -373,7 +394,7 @@ Pick a spot for each danger below, at home and at work, and practice going there
 | Second way out | __________ |
 | Roadside assistance | __________ |
 
-Of 100 households like yours, about 15 (10–25) will have to leave home quickly at least once in the next 10 years. Warning can be as short as a few minutes (a home fire) or as long as 12 hours. For chemical spills and releases, plan for as little as a few minutes of warning; for wildfires, 15 minutes. Plan to be away for about 2 days. Most evacuations last a few days, but after a home fire you could be away for 2 months or more.[22, 26, 27, 36, 38, 39, 40, 57, 58]
+Of 100 households like yours, about 15 (10–25) will have to leave home quickly at least once in the next 10 years. Warning can be as short as a few minutes (a home fire) or as long as 12 hours. For chemical spills and releases, plan for as little as a few minutes of warning; for wildfires, 15 minutes. Plan to be away for about 2 days. Most evacuations last a few days, but after a home fire you could be away for 2 months or more.[22, 26, 27, 36, 38, 39, 40, 58, 59]
 
 **When you are told to leave:** (Tab 7, Evacuation order) · (Tab 6, Wildfire) · (Tab 7, Hurricane or tropical storm) · (Tab 6, Flooding and flash floods)
 
@@ -403,7 +424,7 @@ If you are stuck on the road: (Tab 6, Stranded in a vehicle).
 
 ## Documents and money
 
-Keep paper copies in a waterproof pouch and photos you can reach from any phone. FEMA's Emergency Financial First Aid Kit groups them in four parts.[59]
+Keep paper copies in a waterproof pouch and photos you can reach from any phone. FEMA's Emergency Financial First Aid Kit groups them in four parts.[60]
 
 | Part | What goes in it | Where it is |
 | --- | --- | --- |
@@ -435,7 +456,7 @@ Keep paper copies in a waterproof pouch and photos you can reach from any phone.
 
 #### Cash
 
-- Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about $120: half of 3 days of your usual spending ($2,600 a month), the part that goes on food, fuel and medicine. No agency gives a dollar amount. (some amounts are estimates)[26, 38, 39, 40, 41, 45, 59, 60, 61]
+- Cash in small bills, kept with your documents, because ATMs and cards may not work in an outage: about $120: half of 3 days of your usual spending ($2,600 a month), the part that goes on food, fuel and medicine. No agency gives a dollar amount. (some amounts are estimates)[26, 38, 39, 40, 41, 45, 60, 61, 62]
 
 | | |
 | --- | --- |
@@ -443,7 +464,7 @@ Keep paper copies in a waterproof pouch and photos you can reach from any phone.
 
 #### If damage forces you out
 
-If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $2,500 at 30% of your monthly spending, which loss-of-use insurance pays for.[26, 27, 62, 63, 64, 65, 66, 67, 68]
+If damage forced you out, 9 in 10 households like yours would be home again within about 3 months; living elsewhere that long costs about $2,500 at 30% of your monthly spending, which loss-of-use insurance pays for.[26, 27, 63, 64, 65, 66, 67, 68, 69]
 
 After a disaster, start a claim and keep every receipt: (Tab 9, After a disaster: the first 30 days).
 
@@ -564,7 +585,7 @@ Medicines: each person's list is on their page in (Tab 2, Who is in this binder)
 
 ## What to expect
 
-How long to be ready for each kind of disruption at the 1-in-100 setting. At this setting, about 1 in 10 households like yours will face a longer disruption of any one kind in the next 10 years; about 4 in 10 will face at least one kind that runs past its target. That is why the plan also gives you ways to cope when a target runs out.[26, 69]
+How long to be ready for each kind of disruption at the 1-in-100 setting. At this setting, about 1 in 10 households like yours will face a longer disruption of any one kind in the next 10 years; about 4 in 10 will face at least one kind that runs past its target. That is why the plan also gives you ways to cope when a target runs out.[26, 70]
 
 | If this happens | Be ready for | Help likely in | Mostly back in | Worst on record |
 | --- | --- | --- | --- | --- |
@@ -578,7 +599,7 @@ How long to be ready for each kind of disruption at the 1-in-100 setting. At thi
 
 Brackets show how uncertain a target is. "Not known": no restoration records for the event behind that target. "Worst on record": how long the worst power or water event in your region's records kept homes waiting.
 
-**How well do these numbers hold up?** Tested against 22 real disasters, this version covered 6, partly covered 9, fell short on 6 and could not model 1.[70] Treat each target as a floor, not a promise. If your area has lived through something longer, plan for that.
+**How well do these numbers hold up?** Tested against 22 real disasters, this version covered 6, partly covered 9, fell short on 6 and could not model 1.[71] Treat each target as a floor, not a promise. If your area has lived through something longer, plan for that.
 
 ## Risks at a glance
 
@@ -588,52 +609,52 @@ What could reach a household like yours in Maricopa County, Arizona over the nex
 | --- | --- | --- | --- |
 | Heat wave | almost all[36, 41, 42, 44] | Serious | (Tab 7, Heat wave) |
 | Dust storm | almost all[26, 41] | Serious | (Tab 7, Dust storm) |
-| Medical emergency | almost all[71] | Serious | (Tab 6, Medical emergency) |
+| Medical emergency | almost all[72] | Serious | (Tab 6, Medical emergency) |
 | Strong wind | almost all[26, 41] | Minor | (Tab 6, Severe thunderstorm, strong wind, hail or lightning) |
-| Phone or internet outage | about 95 in 100[26, 61] | Minor | (Tab 8, Phone or internet outage) |
+| Phone or internet outage | about 95 in 100[26, 62] | Minor | (Tab 8, Phone or internet outage) |
 | Supply chain disruption | about 85 in 100[26] | Minor | (Tab 8, Supply chain disruption) |
 | Local water or gas outage | about 80 in 100[22, 26] | Minor | (Tab 8, No tap water, or a local water or gas outage) |
-| Stranded in a vehicle | about 80 in 100[26, 72] | Minor | (Tab 6, Stranded in a vehicle) |
-| Job loss | about 75 in 100[26, 73, 74] | Serious | (Tab 8, Job loss) |
-| Eviction | about 40 in 100[26, 63, 64, 65, 66] | Serious | (Tab 8, Eviction) |
+| Stranded in a vehicle | about 80 in 100[26, 73] | Minor | (Tab 6, Stranded in a vehicle) |
+| Job loss | about 75 in 100[26, 74, 75] | Serious | (Tab 8, Job loss) |
+| Eviction | about 40 in 100[26, 64, 65, 66, 67] | Serious | (Tab 8, Eviction) |
 | Medicine shortage | about 40 in 100[20, 25, 26] | Moderate | (Tab 8, Medicine shortage) |
-| Chemical spill or release | about 30 in 100[26, 57] | Moderate | (Tab 6, Chemical spill or release) |
+| Chemical spill or release | about 30 in 100[26, 58] | Moderate | (Tab 6, Chemical spill or release) |
 | Civil unrest | about 25 in 100[26] | Minor | (Tab 8, Civil unrest) |
 | Cyberattack on services | about 20 in 100[26] | Minor | (Tab 8, Cyberattack on services) |
-| A household member is arrested or detained | about 15 in 100[75, 76, 77] | Serious | (Tab 8, A household member is arrested or detained) |
-| Burst pipe or water leak | about 10 in 100[26, 67] | Severe | (Tab 6, Burst pipe or water leak) |
+| A household member is arrested or detained | about 15 in 100[76, 77, 78] | Serious | (Tab 8, A household member is arrested or detained) |
+| Burst pipe or water leak | about 10 in 100[26, 68] | Severe | (Tab 6, Burst pipe or water leak) |
 | Pandemic | about 10 in 100[21, 24, 26] | Serious | (Tab 7, Pandemic) |
 | Long illness in the household | about 10 in 100[26] | Serious | (Tab 8, Long illness in the household) |
 | Break-in | about 10 in 100[26] | Serious | (Tab 6, Break-in) |
-| Death or disability of an earner | about 9 in 100[26, 78, 79] | Very severe | (Tab 8, An earner dies or can no longer work) |
+| Death or disability of an earner | about 9 in 100[26, 79, 80] | Very severe | (Tab 8, An earner dies or can no longer work) |
 | Drought | about 8 in 100[26, 36, 38] | Moderate | (Tab 7, Drought) |
 | Winter storm | about 8 in 100[26, 41] | Minor | (Tab 7, Winter storm or blizzard) |
 | Hurricane | about 6 in 100[26, 38, 39, 40] | Minor | (Tab 7, Hurricane or tropical storm) |
 | House fire | about 5 in 100[26, 27] | Severe | (Tab 6, House fire) |
 | Regional blackout | about 5 in 100[26] | Moderate | (Tab 8, Regional blackout) |
 | Wildfire | about 3 in 100[26, 36, 38] | Moderate | (Tab 6, Wildfire) |
-| Flooding from rivers or heavy rain | about 2 in 100[26, 58] | Very severe | (Tab 6, Flooding and flash floods) |
+| Flooding from rivers or heavy rain | about 2 in 100[26, 59] | Very severe | (Tab 6, Flooding and flash floods) |
 | Lightning | about 2 in 100[26, 38] | Moderate | (Tab 6, Severe thunderstorm, strong wind, hail or lightning) |
 | Hail | about 1 in 100[26, 38] | Severe | (Tab 6, Severe thunderstorm, strong wind, hail or lightning) |
-| Attack or threat closes your area | fewer than 1 in 100[26, 80, 81] | Moderate | (Tab 6, An attack or threat closes your area) |
-| Dam or levee failure | fewer than 1 in 100[26, 82, 83, 84] | Severe | (Tab 6, Dam or levee failure) |
-| Earthquake | fewer than 1 in 100[85] | Very severe | (Tab 6, Earthquake) |
+| Attack or threat closes your area | fewer than 1 in 100[26, 81, 82] | Moderate | (Tab 6, An attack or threat closes your area) |
+| Dam or levee failure | fewer than 1 in 100[26, 83, 84, 85] | Severe | (Tab 6, Dam or levee failure) |
+| Earthquake | fewer than 1 in 100[86] | Very severe | (Tab 6, Earthquake) |
 | Tornado | fewer than 1 in 100[26, 38] | Severe | (Tab 6, Tornado) |
-| Nuclear power plant accident | fewer than 1 in 100[26, 86] | Severe | (Tab 6, Nuclear power plant accident) |
+| Nuclear power plant accident | fewer than 1 in 100[26, 87] | Severe | (Tab 6, Nuclear power plant accident) |
 
 #### Rare but severe
 
 | What | How likely (a range only) | How bad | Checklist |
 | --- | --- | --- | --- |
-| War with attacks on US infrastructure | Between 1 in 250 and 1 in 13[26, 87, 88] | Serious | Not in this binder; see (Tab 8, Something else) |
-| Financial crisis with bank closures | Between 1 in 200 and 1 in 11[26, 89] | Moderate | Not in this binder; see (Tab 8, Something else) |
-| Very large volcanic eruption | Between 1 in 130 and 1 in 26[26, 90] | Moderate | Not in this binder; see (Tab 8, Something else) |
+| War with attacks on US infrastructure | Between 1 in 250 and 1 in 13[26, 88, 89] | Serious | Not in this binder; see (Tab 8, Something else) |
+| Financial crisis with bank closures | Between 1 in 200 and 1 in 11[26, 90] | Moderate | Not in this binder; see (Tab 8, Something else) |
+| Very large volcanic eruption | Between 1 in 130 and 1 in 26[26, 91] | Moderate | Not in this binder; see (Tab 8, Something else) |
 | Severe pandemic | Between 1 in 200 and 1 in 21[21, 24, 26] | Very severe | Not in this binder; see (Tab 8, Something else) |
-| Nuclear attack or EMP | Between 1 in 3,300 and 1 in 28[26, 56, 81, 87, 88, 91, 92, 93, 94, 95, 96] | Very severe | Not in this binder; see (Tab 8, Something else) |
-| Severe solar storm | Between 1 in 7,600 and 1 in 150[26, 97, 98, 99, 100, 101] | Serious | Not in this binder; see (Tab 8, Something else) |
-| Power out for months (any cause) | Between 1 in 22,000 and 1 in 49[26, 42, 87, 88, 91, 97, 98, 99, 100, 101, 102, 103] | Very severe | Not in this binder; see (Tab 8, Something else) |
-| Chemical, biological or radiological attack | Between 1 in 51,000 and 1 in 250[26, 81, 104] | Serious | Not in this binder; see (Tab 8, Something else) |
-| Mass shooting or bombing | Very unlikely: less than 1 in 100,000[26, 105] | Very severe | Not in this binder; see (Tab 8, Something else) |
+| Nuclear attack or EMP | Between 1 in 3,300 and 1 in 28[26, 56, 82, 88, 89, 92, 93, 94, 95, 96, 97] | Very severe | Not in this binder; see (Tab 8, Something else) |
+| Severe solar storm | Between 1 in 7,600 and 1 in 150[26, 98, 99, 100, 101, 102] | Serious | Not in this binder; see (Tab 8, Something else) |
+| Power out for months (any cause) | Between 1 in 22,000 and 1 in 49[26, 42, 88, 89, 92, 98, 99, 100, 101, 102, 103, 104] | Very severe | Not in this binder; see (Tab 8, Something else) |
+| Chemical, biological or radiological attack | Between 1 in 51,000 and 1 in 250[26, 82, 105] | Serious | Not in this binder; see (Tab 8, Something else) |
+| Mass shooting or bombing | Very unlikely: less than 1 in 100,000[26, 106] | Very severe | Not in this binder; see (Tab 8, Something else) |
 
 #### Notes on these numbers
 
@@ -656,25 +677,25 @@ You smell gas or hear a blowing or hissing noise, or a carbon monoxide (CO) alar
 
 ### Do first
 
-1. **Get everyone out now. Do not stop to look for the source.[106, 107]**
-2. **Leave windows and doors open as you go.[106, 108]**
-3. **Make no sparks. Leave light switches as they are, and do not use a phone inside.[106]**
-4. **Call 911 from outside, away from any smell. For gas, call the gas company too.[106, 107]**
-5. **Count heads once you are outside.[107]**
-6. **Stay out until responders say it is safe to go back in.[106, 107]**
+1. **Get everyone out now. Do not stop to look for the source.[107, 108]**
+2. **Leave windows and doors open as you go.[107, 109]**
+3. **Make no sparks. Leave light switches as they are, and do not use a phone inside.[107]**
+4. **Call 911 from outside, away from any smell. For gas, call the gas company too.[107, 108]**
+5. **Count heads once you are outside.[108]**
+6. **Stay out until responders say it is safe to go back in.[107, 108]**
 
 ### Then
 
-1. **Turn off the gas** at the outside main valve if you can: __________.[108]
-2. **Anyone sick?** Keep them in fresh air, and describe their symptoms to the call-taker.[107, 109]
-3. **Alarm sounds again** within a day of going back? Get out, call 911 again, then have a qualified technician check every fuel-burning appliance.[107]
-4. **Keep a faulty appliance off** until trained workers have serviced it.[107]
+1. **Turn off the gas** at the outside main valve if you can: __________.[109]
+2. **Anyone sick?** Keep them in fresh air, and describe their symptoms to the call-taker.[108, 110]
+3. **Alarm sounds again** within a day of going back? Get out, call 911 again, then have a qualified technician check every fuel-burning appliance.[108]
+4. **Keep a faulty appliance off** until trained workers have serviced it.[108]
 
 **Leave or stay?**
 
-- **Leave if** you smell gas, hear hissing or a CO alarm sounds. Go far enough that you cannot smell gas.[106] (Tab 3, Getting out)
-- **Go to** your meeting place, __________, and count heads.[3, 107]
-- **Call** 911 and the gas company, __________, from outside.[106]
+- **Leave if** you smell gas, hear hissing or a CO alarm sounds. Go far enough that you cannot smell gas.[107] (Tab 3, Getting out)
+- **Go to** your meeting place, __________, and count heads.[3, 108]
+- **Call** 911 and the gas company, __________, from outside.[107]
 
 ### Where and who
 
@@ -686,15 +707,15 @@ You smell gas or hear a blowing or hissing noise, or a carbon monoxide (CO) alar
 
 ### Do not
 
-- Do not turn lights or switches on or off, or use a phone, inside.[106]
-- Do not look for the leak or the source of the CO.[107]
-- Never turn the gas back on yourself. Only a qualified professional does that.[108]
+- Do not turn lights or switches on or off, or use a phone, inside.[107]
+- Do not look for the leak or the source of the CO.[108]
+- Never turn the gas back on yourself. Only a qualified professional does that.[109]
 - Never run a generator, grill or camp stove inside the home or garage, even with doors and windows open.[48]
 
 ### When it is over
 
-- Put CO alarms with battery backup on every level and outside sleeping areas.[107]
-- Ask the gas company how to shut off your meter. Do not turn it off to practice.[108] (Tab 3, Home)
+- Put CO alarms with battery backup on every level and outside sleeping areas.[108]
+- Ask the gas company how to shut off your meter. Do not turn it off to practice.[109] (Tab 3, Home)
 - Have your chimney checked or cleaned every year.[48]
 
 ## Missing person
@@ -705,28 +726,28 @@ A child, or an adult who needs someone with them, is missing and you cannot find
 
 ### Do first
 
-1. **Call 911 now. There is no waiting period for a missing child.[110]**
-2. **Search the home and nearby.[111]**
-3. **Say when you noticed they were gone.[111]**
-4. **Describe them: height, weight, hair, eyes, glasses or braces, and what they were wearing.[110, 111]**
-5. **Say where and when they were last seen.[110]**
-6. **Give police a recent photo that looks like them on a normal day.[110]**
+1. **Call 911 now. There is no waiting period for a missing child.[111]**
+2. **Search the home and nearby.[112]**
+3. **Say when you noticed they were gone.[112]**
+4. **Describe them: height, weight, hair, eyes, glasses or braces, and what they were wearing.[111, 112]**
+5. **Say where and when they were last seen.[111]**
+6. **Give police a recent photo that looks like them on a normal day.[111]**
 
 ### Then
 
-1. **Keep others out of the home** until police have searched it.[110]
-2. **Leave their room as it is.** Do not touch, move or remove anything.[110]
-3. **Keep their phone, computer and other devices** for police.[110]
-4. **Check what is gone,** such as clothes, a phone, money or medicines.[110]
-5. **Search where they have gone before.**[112]
-6. **Call the National Center for Missing & Exploited Children,** 1-800-843-5678, after you call police.[111]
-7. **Write down every call:** names, phone numbers, dates and times.[110]
+1. **Keep others out of the home** until police have searched it.[111]
+2. **Leave their room as it is.** Do not touch, move or remove anything.[111]
+3. **Keep their phone, computer and other devices** for police.[111]
+4. **Check what is gone,** such as clothes, a phone, money or medicines.[111]
+5. **Search where they have gone before.**[113]
+6. **Call the National Center for Missing & Exploited Children,** 1-800-843-5678, after you call police.[112]
+7. **Write down every call:** names, phone numbers, dates and times.[111]
 
 **Leave or stay?**
 
-- **Stay if** you are at home. Keep the home as it is for police.[110]
-- **Go to** the manager or security desk first if a child goes missing in a store, then call 911.[111]
-- **Call** the police with anything new you learn.[110]
+- **Stay if** you are at home. Keep the home as it is for police.[111]
+- **Go to** the manager or security desk first if a child goes missing in a store, then call 911.[112]
+- **Call** the police with anything new you learn.[111]
 
 ### Where and who
 
@@ -737,18 +758,18 @@ A child, or an adult who needs someone with them, is missing and you cannot find
 
 ### Do not
 
-- Do not put off the call to do a long search yourself.[110]
-- Do not look through their phone or computer yourself.[110]
+- Do not put off the call to do a long search yourself.[111]
+- Do not look through their phone or computer yourself.[111]
 
 ### When it is over
 
-- Ask police to arrange a full medical check for a found child.[110]
-- Keep a recent photo of the person to help police another time.[113]
-- For support, call or text 988, or ask the National Center for Missing & Exploited Children.[110]
+- Ask police to arrange a full medical check for a found child.[111]
+- Keep a recent photo of the person to help police another time.[114]
+- For support, call or text 988, or ask the National Center for Missing & Exploited Children.[111]
 
 ## Medical emergency
 
-**Here:** almost all households like yours in the next 10 years · How bad: Serious[71]
+**Here:** almost all households like yours in the next 10 years · How bad: Serious[72]
 
 ### Use this when
 
@@ -756,29 +777,29 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 
 ### Do first
 
-1. **Call 911. Give the address and do what the call-taker says.[109]**
-2. **Not breathing normally? Push hard and fast in the center of the chest, 100 to 120 pushes a minute.[114]**
-3. **Send someone for an AED. Turn it on and follow its voice.[114]**
-4. **Choking? If they cannot cough, speak or breathe, give 5 back blows, then 5 abdominal thrusts. Repeat.[115]**
-5. **Bleeding hard? Press firmly on the wound with a cloth or your hands until help takes over.[116, 117] On an arm or leg, use the tourniquet if trained.[116]**
-6. **Stroke signs? A face droops, an arm drifts down or speech is slurred. Note the time.[118]**
+1. **Call 911. Give the address and do what the call-taker says.[110]**
+2. **Not breathing normally? Push hard and fast in the center of the chest, 100 to 120 pushes a minute.[115]**
+3. **Send someone for an AED. Turn it on and follow its voice.[115]**
+4. **Choking? If they cannot cough, speak or breathe, give 5 back blows, then 5 abdominal thrusts. Repeat.[116]**
+5. **Bleeding hard? Press firmly on the wound with a cloth or your hands until help takes over.[117, 118] On an arm or leg, use the tourniquet if trained.[117]**
+6. **Stroke signs? A face droops, an arm drifts down or speech is slurred. Note the time.[119]**
 
 ### Then
 
-1. **Heart attack signs:** chest pain or pressure, pain in the arms, jaw, neck or back, shortness of breath, feeling faint. Call 911.[119]
-2. **Keep pushing** until help arrives or they breathe normally.[114]
-3. **Choking person goes limp?** Lay them down and start CPR.[115]
-4. **Breathing but not awake?** Roll them onto their side.[117]
-5. **Keep them warm.** Cover them, and put something under them.[117]
-6. **Talk to them.** Keep them calm.[117]
+1. **Heart attack signs:** chest pain or pressure, pain in the arms, jaw, neck or back, shortness of breath, feeling faint. Call 911.[120]
+2. **Keep pushing** until help arrives or they breathe normally.[115]
+3. **Choking person goes limp?** Lay them down and start CPR.[116]
+4. **Breathing but not awake?** Roll them onto their side.[118]
+5. **Keep them warm.** Cover them, and put something under them.[118]
+6. **Talk to them.** Keep them calm.[118]
 7. **Give responders** their medicine list and allergies.[34] (Tab 2, Who is in this binder)
-8. **Cannot call?** Text 911.[109]
+8. **Cannot call?** Text 911.[110]
 
 **Leave or stay?**
 
-- **Stay if** it is safe there. Stay with them until help arrives.[116]
-- **Leave if** it is not safe there. Move them out of danger first, such as out of traffic.[117]
-- **Call** 911 for an ambulance for stroke signs. Do not drive them yourself.[118]
+- **Stay if** it is safe there. Stay with them until help arrives.[117]
+- **Leave if** it is not safe there. Move them out of danger first, such as out of traffic.[118]
+- **Call** 911 for an ambulance for stroke signs. Do not drive them yourself.[119]
 
 ### Where and who
 
@@ -788,15 +809,15 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 
 ### Do not
 
-- Do not hang up until the call-taker tells you to.[109]
-- Do not start back blows while they can still cough hard. Encourage them to keep coughing.[115]
-- Do not stop pressing to put on a bandage. Pressure stops the bleeding.[117]
+- Do not hang up until the call-taker tells you to.[110]
+- Do not start back blows while they can still cough hard. Encourage them to keep coughing.[116]
+- Do not stop pressing to put on a bandage. Pressure stops the bleeding.[118]
 
 ### When it is over
 
-- Stroke signs that went away still need a doctor right away.[118]
-- Restock the first-aid kit and replace what you used.[120]
-- Take a first aid and CPR class.[108]
+- Stroke signs that went away still need a doctor right away.[119]
+- Restock the first-aid kit and replace what you used.[121]
+- Take a first aid and CPR class.[109]
 - Feeling shaken is normal. Call or text 988 to talk.[10]
 
 ## Severe thunderstorm, strong wind, hail or lightning
@@ -813,23 +834,23 @@ A severe thunderstorm or high wind warning is issued, you hear thunder, or damag
 
 ### Do first
 
-1. **Go inside a sturdy building or a hard-topped car when you hear thunder.[121]**
+1. **Go inside a sturdy building or a hard-topped car when you hear thunder.[122]**
 2. **Go to your safe spot, an inside room or basement: __________.[52]**
-3. **Stay away from windows and outside doors.[53, 121]**
-4. **Stay off corded phones, plugged-in devices and running water.[121, 122]**
-5. **Follow the warnings on the radio, TV or your phone.[52, 122]**
+3. **Stay away from windows and outside doors.[53, 122]**
+4. **Stay off corded phones, plugged-in devices and running water.[122, 123]**
+5. **Follow the warnings on the radio, TV or your phone.[52, 123]**
 
 ### Then
 
-1. **Caught outside?** Get to a sturdy building or a hard-topped car. Sheds and rain shelters are not safe.[53, 121]
+1. **Caught outside?** Get to a sturdy building or a hard-topped car. Sheds and rain shelters are not safe.[53, 122]
 2. **Driving?** Hold the wheel with both hands and slow down. Head for a sturdy building if you can.[52]
 3. **No building near?** Stop where trees and power lines are less likely to fall on the car.[52]
-4. **Wait 30 minutes** after the last thunder before going outside.[121]
-5. **Someone struck by lightning?** Call 911. They are safe to touch. Start CPR or use an AED if needed.[121]
+4. **Wait 30 minutes** after the last thunder before going outside.[122]
+5. **Someone struck by lightning?** Call 911. They are safe to touch. Start CPR or use an AED if needed.[122]
 
 **Leave or stay?**
 
-- **Stay if** you are in a sturdy building, until 30 minutes after the last thunder.[121]
+- **Stay if** you are in a sturdy building, until 30 minutes after the last thunder.[122]
 - **Go to** the nearest sturdy building if you are outside or in a shed.[53]
 
 ### Where and who
@@ -843,21 +864,21 @@ A severe thunderstorm or high wind warning is issued, you hear thunder, or damag
 
 ### Do not
 
-- Do not shelter under a tree, in a shed or in a rain shelter.[53, 121]
-- Do not lie on a garage floor.[121]
+- Do not shelter under a tree, in a shed or in a rain shelter.[53, 122]
+- Do not lie on a garage floor.[122]
 - Do not go into big open rooms, such as a gym or cafeteria.[53]
-- Do not drive through flooded roads.[122]
+- Do not drive through flooded roads.[123]
 - Do not go near fallen power lines. They may be live.[52]
 
 ### When it is over
 
-- Stay at least 35 feet from fallen power lines. Call 911, then the power company: __________.[123, 124]
-- Photograph damage before you clean up, then call your insurer.[125, 126] (Tab 9, After a disaster: the first 30 days)
-- Sign up for your community's warnings.[122]
+- Stay at least 35 feet from fallen power lines. Call 911, then the power company: __________.[124, 125]
+- Photograph damage before you clean up, then call your insurer.[126, 127] (Tab 9, After a disaster: the first 30 days)
+- Sign up for your community's warnings.[123]
 
 ## Stranded in a vehicle
 
-**Here:** about 80 in 100 households like yours in the next 10 years · How bad: Minor[26, 72]
+**Here:** about 80 in 100 households like yours in the next 10 years · How bad: Minor[26, 73]
 
 ### Use this when
 
@@ -865,25 +886,25 @@ Your vehicle breaks down or is stuck in snow, rising water or extreme heat.
 
 ### Do first
 
-1. **Pull out of the traffic lanes if you can. Turn on the hazard lights. Raise the hood if it is not snowing.[127, 128]**
-2. **Call for help right away. Call 911 if anyone is hurt or in danger.[127]**
-3. **In fast-moving water, stay inside. Get on the roof if water rises inside the car.[129]**
-4. **In a snowstorm, stay with the car. Tie a bright cloth to the antenna.[128]**
-5. **Run the engine about 10 minutes an hour, a window cracked and the exhaust pipe clear of snow.[128]**
-6. **In heat, drink water. Run the air conditioning, or roll down all the windows.[127]**
+1. **Pull out of the traffic lanes if you can. Turn on the hazard lights. Raise the hood if it is not snowing.[128, 129]**
+2. **Call for help right away. Call 911 if anyone is hurt or in danger.[128]**
+3. **In fast-moving water, stay inside. Get on the roof if water rises inside the car.[130]**
+4. **In a snowstorm, stay with the car. Tie a bright cloth to the antenna.[129]**
+5. **Run the engine about 10 minutes an hour, a window cracked and the exhaust pipe clear of snow.[129]**
+6. **In heat, drink water. Run the air conditioning, or roll down all the windows.[128]**
 
 ### Then
 
-1. **Cold?** Move what you need from the trunk into the car. Wrap up, head included.[128] Use the blankets and warm clothes in the car kit.[130]
-2. **Stay awake** and keep moving your arms and legs. Huddle together for warmth.[128]
-3. **Out of the car in heat?** Keep shoes on, and carry pets off the hot pavement.[127]
-4. **Power line on the car?** Stay inside and warn others away. If the car catches fire, jump clear without touching the car and the ground at once. Land with feet together and shuffle away.[124, 131]
+1. **Cold?** Move what you need from the trunk into the car. Wrap up, head included.[129] Use the blankets and warm clothes in the car kit.[131]
+2. **Stay awake** and keep moving your arms and legs. Huddle together for warmth.[129]
+3. **Out of the car in heat?** Keep shoes on, and carry pets off the hot pavement.[128]
+4. **Power line on the car?** Stay inside and warn others away. If the car catches fire, jump clear without touching the car and the ground at once. Land with feet together and shuffle away.[125, 132]
 
 **Leave or stay?**
 
-- **Stay if** snow or ice makes it hard to see or drive.[128]
-- **Stay if** your car is caught in fast-moving water.[129]
-- **Leave if** the car gets too hot inside. Take everyone, pets too, into shade away from traffic.[127]
+- **Stay if** snow or ice makes it hard to see or drive.[129]
+- **Stay if** your car is caught in fast-moving water.[130]
+- **Leave if** the car gets too hot inside. Take everyone, pets too, into shade away from traffic.[128]
 
 ### Where and who
 
@@ -893,20 +914,20 @@ Your vehicle breaks down or is stuck in snow, rising water or extreme heat.
 
 ### Do not
 
-- Do not drive or walk into floodwater. A foot of moving water can sweep a car away.[129]
-- Do not stand in the traffic lanes.[127]
-- Do not eat snow. It lowers your body temperature.[128]
-- Do not touch a fallen power line.[124]
+- Do not drive or walk into floodwater. A foot of moving water can sweep a car away.[130]
+- Do not stand in the traffic lanes.[128]
+- Do not eat snow. It lowers your body temperature.[129]
+- Do not touch a fallen power line.[125]
 
 ### When it is over
 
-- Watch for hypothermia: shivering, confusion, slurred speech, drowsiness. Below 95°F, get medical help right away.[128]
-- Heavy sweating, nausea or fainting in heat? Get to a cool place, sip water and use cool wet cloths.[132]
-- Restock the car kit and keep the gas tank at least half full.[8, 130]
+- Watch for hypothermia: shivering, confusion, slurred speech, drowsiness. Below 95°F, get medical help right away.[129]
+- Heavy sweating, nausea or fainting in heat? Get to a cool place, sip water and use cool wet cloths.[133]
+- Restock the car kit and keep the gas tank at least half full.[8, 131]
 
 ## Chemical spill or release
 
-**Here:** about 30 in 100 households like yours in the next 10 years · How bad: Moderate[26, 57]
+**Here:** about 30 in 100 households like yours in the next 10 years · How bad: Moderate[26, 58]
 
 ### Use this when
 
@@ -948,16 +969,16 @@ Officials warn of a chemical spill or leak near you, or you see one. Some chemic
 
 - Do not walk toward the spill or the cloud.[55]
 - Do not leave your shelter, even to help others, until officials say it is safe.[55]
-- Do not eat or drink anything that may be contaminated. Boiling tap water does not remove chemicals.[55, 133]
+- Do not eat or drink anything that may be contaminated. Boiling tap water does not remove chemicals.[55, 134]
 
 ### When it is over
 
 - Go home only when officials say it is safe.[55]
-- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[125]
+- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[126]
 
 ## Burst pipe or water leak
 
-**Here:** about 10 in 100 households like yours in the next 10 years · How bad: Severe[26, 67]
+**Here:** about 10 in 100 households like yours in the next 10 years · How bad: Severe[26, 68]
 
 ### Use this when
 
@@ -965,25 +986,25 @@ A pipe bursts, a water heater or appliance leaks, or water is spreading across a
 
 ### Do first
 
-1. **Water near outlets, cords or appliances? Turn off the power at the main breaker, but only from a dry spot: __________.[124]**
-2. **Cannot reach it without standing in water? Keep out and call an electrician.[124]**
-3. **Turn off the main water valve: __________.[108]**
+1. **Water near outlets, cords or appliances? Turn off the power at the main breaker, but only from a dry spot: __________.[125]**
+2. **Cannot reach it without standing in water? Keep out and call an electrician.[125]**
+3. **Turn off the main water valve: __________.[109]**
 
 ### Then
 
-1. **If you rent,** tell your landlord or building manager right away.[134]
-2. **Take photos** of the damage before you clean up.[125]
-3. **Call your insurer** as soon as you can.[126] (Tab 3, Home)
-4. **Stop more damage:** clean up the water.[126]
-5. **Dry wet areas and things** within 24 to 48 hours.[134]
-6. **Sewage or dirty water?** Have a professional clean it up.[134]
-7. **Get the leak fixed** as soon as you can, and dry everything completely.[134]
-8. **Frozen pipe?** Thaw it with a hair dryer.[135]
+1. **If you rent,** tell your landlord or building manager right away.[135]
+2. **Take photos** of the damage before you clean up.[126]
+3. **Call your insurer** as soon as you can.[127] (Tab 3, Home)
+4. **Stop more damage:** clean up the water.[127]
+5. **Dry wet areas and things** within 24 to 48 hours.[135]
+6. **Sewage or dirty water?** Have a professional clean it up.[135]
+7. **Get the leak fixed** as soon as you can, and dry everything completely.[135]
+8. **Frozen pipe?** Thaw it with a hair dryer.[136]
 
 **Leave or stay?**
 
-- **Leave if** water is near outlets or wiring and you cannot turn the power off from a dry spot.[124] (Tab 3, Getting out)
-- **Stay if** the water is off and there is no power in the wet area. Start drying out.[124, 134]
+- **Leave if** water is near outlets or wiring and you cannot turn the power off from a dry spot.[125] (Tab 3, Getting out)
+- **Stay if** the water is off and there is no power in the wet area. Start drying out.[125, 135]
 
 ### Where and who
 
@@ -995,16 +1016,16 @@ A pipe bursts, a water heater or appliance leaks, or water is spreading across a
 
 ### Do not
 
-- Do not walk into standing water to reach the breaker.[124]
-- Never turn power on or off, or use an electric tool or appliance, while standing in water.[124]
-- Never thaw a pipe with an open flame or torch.[135]
-- Do not turn the power back on until an electrician has checked the wet equipment.[124]
+- Do not walk into standing water to reach the breaker.[125]
+- Never turn power on or off, or use an electric tool or appliance, while standing in water.[125]
+- Never thaw a pipe with an open flame or torch.[136]
+- Do not turn the power back on until an electrician has checked the wet equipment.[125]
 
 ### When it is over
 
-- Make sure everyone knows how to shut off the water.[135]
-- Check that the main valve closes all the way. Replace it if it does not.[108]
-- In freezing weather, let a faucet drip at night, open the cabinet doors under sinks on outside walls, and keep the heat at 55°F or higher.[135]
+- Make sure everyone knows how to shut off the water.[136]
+- Check that the main valve closes all the way. Replace it if it does not.[109]
+- In freezing weather, let a faucet drip at night, open the cabinet doors under sinks on outside walls, and keep the heat at 55°F or higher.[136]
 
 ## Break-in
 
@@ -1016,27 +1037,27 @@ Someone is breaking in while you are home, or you come home to a forced door, a 
 
 ### Do first
 
-1. **Get out by your escape route if you can. Call 911 from a safe place.[136, 137]**
-2. **Cannot get out? Go to a room that locks from the inside. Lock it, call 911 and stay there until police arrive.[136]**
-3. **Stay on the line. Give the address and answer the call-taker's questions.[109]**
-4. **Came home to a break-in? Do not go in. Go somewhere else and call the police.[137]**
-5. **Let the police search the home first.[137]**
+1. **Get out by your escape route if you can. Call 911 from a safe place.[137, 138]**
+2. **Cannot get out? Go to a room that locks from the inside. Lock it, call 911 and stay there until police arrive.[137]**
+3. **Stay on the line. Give the address and answer the call-taker's questions.[110]**
+4. **Came home to a break-in? Do not go in. Go somewhere else and call the police.[138]**
+5. **Let the police search the home first.[138]**
 
 ### Then
 
-1. **Tell the police** what was moved, and about anything left behind that is not yours.[137]
-2. **List what is missing,** with serial numbers and descriptions.[137]
-3. **Cards stolen?** Call the bank or card company that issued them right away.[138]
-4. **Take photos** of the damage before you clean up.[125]
-5. **Call your insurer** as soon as you can.[126] (Tab 3, Home)
-6. **Board up** a broken door or window to stop more damage.[126]
-7. **IDs stolen?** To replace them, many offices ask for your birth certificate.[139] (Tab 4, Documents and money)
+1. **Tell the police** what was moved, and about anything left behind that is not yours.[138]
+2. **List what is missing,** with serial numbers and descriptions.[138]
+3. **Cards stolen?** Call the bank or card company that issued them right away.[139]
+4. **Take photos** of the damage before you clean up.[126]
+5. **Call your insurer** as soon as you can.[127] (Tab 3, Home)
+6. **Board up** a broken door or window to stop more damage.[127]
+7. **IDs stolen?** To replace them, many offices ask for your birth certificate.[140] (Tab 4, Documents and money)
 
 **Leave or stay?**
 
-- **Leave if** you can get out safely. Go to a neighbour's home or another safe place.[136, 137]
-- **Stay if** you cannot get out. Stay locked in a room with a phone until police arrive.[136]
-- **Call** 911 from wherever you are safe.[109]
+- **Leave if** you can get out safely. Go to a neighbour's home or another safe place.[137, 138]
+- **Stay if** you cannot get out. Stay locked in a room with a phone until police arrive.[137]
+- **Call** 911 from wherever you are safe.[110]
 
 ### Where and who
 
@@ -1046,17 +1067,17 @@ Someone is breaking in while you are home, or you come home to a forced door, a 
 
 ### Do not
 
-- Do not search the home yourself. Let the police do it.[137]
-- Do not touch more than you need to. Things may hold fingerprints.[137]
-- Do not hang up until the call-taker tells you to.[109]
-- Never open the door to strangers.[136]
+- Do not search the home yourself. Let the police do it.[138]
+- Do not touch more than you need to. Things may hold fingerprints.[138]
+- Do not hang up until the call-taker tells you to.[110]
+- Never open the door to strangers.[137]
 
 ### When it is over
 
-- Lock windows and doors, even while you are home.[136]
-- Never hide a spare key under a rock or doormat.[136]
-- Keep the outside well lit at night, and cut back bushes near windows and doors.[136]
-- Pick a room that locks from the inside, with a phone and a flashlight, and practice your escape routes.[136]
+- Lock windows and doors, even while you are home.[137]
+- Never hide a spare key under a rock or doormat.[137]
+- Keep the outside well lit at night, and cut back bushes near windows and doors.[137]
+- Pick a room that locks from the inside, with a phone and a flashlight, and practice your escape routes.[137]
 
 ## House fire
 
@@ -1071,7 +1092,7 @@ A smoke alarm sounds, or you see or smell smoke or fire in your home.
 1. **Get out. Leave by the nearest safe way; do not stop for anything.[4]**
 2. **In an apartment building, pull the fire alarm on the way out and take the stairs, not the elevator.[4]**
 3. **Stay low. If there is smoke, crawl under it to your way out.[5]**
-4. **Feel doors first. If a door or its knob is hot, keep it closed and use your second way out.[5] Close doors behind you as you leave.[140]**
+4. **Feel doors first. If a door or its knob is hot, keep it closed and use your second way out.[5] Close doors behind you as you leave.[141]**
 5. **Meet outside. Go to your meeting place and stay there.[4]**
 6. **Call 911 from outside. Call once you are out, not before.[4]**
 
@@ -1108,7 +1129,7 @@ A smoke alarm sounds, or you see or smell smoke or fire in your home.
 
 - Go back inside only when the fire department says it is safe.[5]
 - Call your landlord or insurer, and list what was lost.[5]
-- Put in new smoke alarms and test them every month.[141]
+- Put in new smoke alarms and test them every month.[142]
 - Use the After pages for the first days. (Tab 9, After a disaster: the first 30 days)
 
 ## Wildfire
@@ -1121,28 +1142,28 @@ A wildfire is near, officials tell you to get ready or leave, or smoke or flames
 
 ### Do first
 
-1. **Leave right away when officials tell you to.[142]**
-2. **Leave early if you feel at risk, or need extra time with children, pets or someone who needs help, even without an order.[143, 144]**
-3. **Put your go-bag in the car.[143]**
-4. **Wear an N95 mask in smoke.[142]**
-5. **Trapped? Call 911 and give your location. Turn on lights for rescuers.[142]**
+1. **Leave right away when officials tell you to.[143]**
+2. **Leave early if you feel at risk, or need extra time with children, pets or someone who needs help, even without an order.[144, 145]**
+3. **Put your go-bag in the car.[144]**
+4. **Wear an N95 mask in smoke.[143]**
+5. **Trapped? Call 911 and give your location. Turn on lights for rescuers.[143]**
 
 ### Then
 
-1. **If you have time,** close windows and doors, but leave them unlocked.[143]
-2. **Turn off the gas** at the meter, and pilot lights.[143]
-3. **Move things that burn** away from windows. Take down curtains.[143]
-4. **Leave lights on** so firefighters can see the house.[143]
-5. **Connect garden hoses** to outside taps. Shut off propane tanks.[143]
-6. **Park facing out,** loaded, with the windows shut.[143]
-7. **Trapped in a car?** Park away from brush. Close windows and vents. Lie on the floor under a wool blanket or coat.[143]
-8. **Trapped on foot?** Lie face down in a ditch or on clear, flat ground. Cover your body.[143]
-9. **Trapped at home?** Fill sinks and tubs with cold water. Keep doors and windows shut, not locked. Stay away from outside walls.[143]
+1. **If you have time,** close windows and doors, but leave them unlocked.[144]
+2. **Turn off the gas** at the meter, and pilot lights.[144]
+3. **Move things that burn** away from windows. Take down curtains.[144]
+4. **Leave lights on** so firefighters can see the house.[144]
+5. **Connect garden hoses** to outside taps. Shut off propane tanks.[144]
+6. **Park facing out,** loaded, with the windows shut.[144]
+7. **Trapped in a car?** Park away from brush. Close windows and vents. Lie on the floor under a wool blanket or coat.[144]
+8. **Trapped on foot?** Lie face down in a ditch or on clear, flat ground. Cover your body.[144]
+9. **Trapped at home?** Fill sinks and tubs with cold water. Keep doors and windows shut, not locked. Stay away from outside walls.[144]
 
 **Leave or stay?**
 
-- **Leave if** officials tell you to, or you feel at risk.[142, 143] Go to __________. (Tab 3, Getting out)
-- **Stay if** fire blocks every way out. Call 911 and shelter at home.[143]
+- **Leave if** officials tell you to, or you feel at risk.[143, 144] Go to __________. (Tab 3, Getting out)
+- **Stay if** fire blocks every way out. Call 911 and shelter at home.[144]
 
 ### Where and who
 
@@ -1154,45 +1175,45 @@ A wildfire is near, officials tell you to get ready or leave, or smoke or flames
 
 ### Do not
 
-- Do not leave sprinklers or water running.[143]
-- Do not touch power lines.[143] Stay at least 35 feet from downed lines, and call 911.[123]
+- Do not leave sprinklers or water running.[144]
+- Do not touch power lines.[144] Stay at least 35 feet from downed lines, and call 911.[124]
 
 ### When it is over
 
-- Go home only when officials say it is safe.[142]
-- Watch for hot ash, embers, smoldering debris and downed lines.[142, 143]
-- Clean up in long sleeves, gloves, sturdy shoes and a respirator.[142]
-- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[125]
+- Go home only when officials say it is safe.[143]
+- Watch for hot ash, embers, smoldering debris and downed lines.[143, 144]
+- Clean up in long sleeves, gloves, sturdy shoes and a respirator.[143]
+- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[126]
 
 ## Flooding and flash floods
 
-**Here:** about 2 in 100 households like yours in the next 10 years · How bad: Very severe[26, 58]
+**Here:** about 2 in 100 households like yours in the next 10 years · How bad: Very severe[26, 59]
 
 ### Use this when
 
-A flood or flash flood warning covers your area, or water is rising around you.[129]
+A flood or flash flood warning covers your area, or water is rising around you.[130]
 
 ### Do first
 
-1. **Get to higher ground now if you are in a low area.[145]**
-2. **Leave at once if officials tell you to.[129]**
-3. **Stay out of floodwater. Do not walk, swim or drive through it.[129]**
-4. **Turn around at a flooded road or a barrier.[129]**
-5. **Stay off bridges over fast-moving water.[129]**
-6. **Trapped in a building? Go to the highest floor. Go on the roof only if needed, and signal for help.[129]**
+1. **Get to higher ground now if you are in a low area.[146]**
+2. **Leave at once if officials tell you to.[130]**
+3. **Stay out of floodwater. Do not walk, swim or drive through it.[130]**
+4. **Turn around at a flooded road or a barrier.[130]**
+5. **Stay off bridges over fast-moving water.[130]**
+6. **Trapped in a building? Go to the highest floor. Go on the roof only if needed, and signal for help.[130]**
 
 ### Then
 
-1. **Listen** to alerts, a weather radio or local news.[129]
-2. **Before you leave,** lock up. If you have time, turn off utilities and unplug appliances.[145]
-3. **Stay out of any room** where water covers outlets or cords.[145]
-4. **Car caught in fast water?** Stay inside. Get on the roof if water comes in.[129]
-5. **Trapped by moving water?** Get to the highest point and call 911.[145]
+1. **Listen** to alerts, a weather radio or local news.[130]
+2. **Before you leave,** lock up. If you have time, turn off utilities and unplug appliances.[146]
+3. **Stay out of any room** where water covers outlets or cords.[146]
+4. **Car caught in fast water?** Stay inside. Get on the roof if water comes in.[130]
+5. **Trapped by moving water?** Get to the highest point and call 911.[146]
 
 **Leave or stay?**
 
-- **Leave if** officials tell you to, or water rises around your home.[129, 145] Go to __________. (Tab 3, Getting out)
-- **Stay if** roads are flooded and your home is dry. Move to a higher floor.[129] (Tab 3, Home)
+- **Leave if** officials tell you to, or water rises around your home.[130, 146] Go to __________. (Tab 3, Getting out)
+- **Stay if** roads are flooded and your home is dry. Move to a higher floor.[130] (Tab 3, Home)
 
 ### Where and who
 
@@ -1204,20 +1225,20 @@ A flood or flash flood warning covers your area, or water is rising around you.[
 
 ### Do not
 
-- Do not climb into a closed attic.[129]
-- Do not touch electrical equipment if it is wet or you are standing in water.[129]
-- Do not wade in floodwater. It can hide debris and carry electric current.[129]
+- Do not climb into a closed attic.[130]
+- Do not touch electrical equipment if it is wet or you are standing in water.[130]
+- Do not wade in floodwater. It can hide debris and carry electric current.[130]
 
 ### When it is over
 
-- Go home only when officials say it is safe.[129]
-- Clean up in heavy gloves and boots. Watch for snakes.[129]
+- Go home only when officials say it is safe.[130]
+- Clean up in heavy gloves and boots. Watch for snakes.[130]
 - Run a generator only outdoors, more than 20 feet from windows, doors and vents.[48]
-- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[125]
+- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[126]
 
 ## An attack or threat closes your area
 
-**Here:** fewer than 1 in 100 households like yours in the next 10 years · How bad: Moderate[26, 80, 81]
+**Here:** fewer than 1 in 100 households like yours in the next 10 years · How bad: Moderate[26, 81, 82]
 
 ### Use this when
 
@@ -1225,24 +1246,24 @@ After an attack, a bomb threat or another threat, police close streets or transi
 
 ### Do first
 
-1. **Move away from the scene if you are near it.[146]**
-2. **Follow police and officials. You may be told to leave, to stay inside, or to turn off power and water.[146, 147]**
-3. **Attacker near you? Run if you can. Hide if you cannot. Fight only as a last resort.[147]**
-4. **Suspicious bag or package? Do not touch it. Move away and get others to move away. Then call 911.[148]**
-5. **Text your family that you are safe. Save calls for emergencies.[146]**
+1. **Move away from the scene if you are near it.[147]**
+2. **Follow police and officials. You may be told to leave, to stay inside, or to turn off power and water.[147, 148]**
+3. **Attacker near you? Run if you can. Hide if you cannot. Fight only as a last resort.[148]**
+4. **Suspicious bag or package? Do not touch it. Move away and get others to move away. Then call 911.[149]**
+5. **Text your family that you are safe. Save calls for emergencies.[147]**
 
 ### Then
 
-1. **Threat by phone?** Stay calm and keep the caller on the line. Write down the exact words. Report it to police.[149]
-2. **Threat by text, email or social media?** Leave the message open, take a screenshot and report it.[149]
-3. **Children at school or child care?** Follow official directions on where to pick them up.[150]
-4. **Check alerts and local news** for road and transit closures.[146]
-5. **Help others get to safety** if it is safe to do so.[146]
+1. **Threat by phone?** Stay calm and keep the caller on the line. Write down the exact words. Report it to police.[150]
+2. **Threat by text, email or social media?** Leave the message open, take a screenshot and report it.[150]
+3. **Children at school or child care?** Follow official directions on where to pick them up.[151]
+4. **Check alerts and local news** for road and transit closures.[147]
+5. **Help others get to safety** if it is safe to do so.[147]
 
 **Leave or stay?**
 
-- **Leave if** police tell you to. Go the way they direct.[147] (Tab 3, Getting out)
-- **Stay if** officials tell you to stay inside. Keep listening for updates.[146] (Tab 3, Home)
+- **Leave if** police tell you to. Go the way they direct.[148] (Tab 3, Getting out)
+- **Stay if** officials tell you to stay inside. Keep listening for updates.[147] (Tab 3, Home)
 - **Go to** __________ if you cannot get home.[3]
 
 ### Where and who
@@ -1255,17 +1276,17 @@ After an attack, a bomb threat or another threat, police close streets or transi
 
 ### Do not
 
-- Do not go toward the scene to look.[146]
-- Do not use a phone or two-way radio near a suspicious item.[151]
-- Do not treat anyone as suspicious because of their race, religion or looks.[148]
+- Do not go toward the scene to look.[147]
+- Do not use a phone or two-way radio near a suspicious item.[152]
+- Do not treat anyone as suspicious because of their race, religion or looks.[149]
 
 ### When it is over
 
-- For stress or shock, call or text the Disaster Distress Helpline, 1-800-985-5990.[12, 147]
+- For stress or shock, call or text the Disaster Distress Helpline, 1-800-985-5990.[12, 148]
 
 ## Dam or levee failure
 
-**Here:** fewer than 1 in 100 households like yours in the next 10 years · How bad: Severe[26, 82, 83, 84]
+**Here:** fewer than 1 in 100 households like yours in the next 10 years · How bad: Severe[26, 83, 84, 85]
 
 ### Use this when
 
@@ -1273,24 +1294,24 @@ Officials warn that a dam or levee near you is failing or may fail, or water ris
 
 ### Do first
 
-1. **Go to higher ground now. You do not need to be told.[152]**
-2. **Follow your evacuation route out of the water's path.[152]**
-3. **Stay out of floodwater. Do not walk, swim or drive through it.[129]**
-4. **Water rising around your car? Leave it and get to higher ground if you safely can.[152]**
-5. **Car swept into fast water? Stay inside. Get on the roof if water comes in.[129]**
-6. **Trapped in a building? Go to the highest floor. Go on the roof only if needed, and signal for help.[129]**
+1. **Go to higher ground now. You do not need to be told.[153]**
+2. **Follow your evacuation route out of the water's path.[153]**
+3. **Stay out of floodwater. Do not walk, swim or drive through it.[130]**
+4. **Water rising around your car? Leave it and get to higher ground if you safely can.[153]**
+5. **Car swept into fast water? Stay inside. Get on the roof if water comes in.[130]**
+6. **Trapped in a building? Go to the highest floor. Go on the roof only if needed, and signal for help.[130]**
 
 ### Then
 
-1. **Listen** to local radio, TV or alerts for news.[152]
-2. **If officials say to,** turn off utilities at the main switches. Unplug appliances.[152]
-3. **Trapped by moving water?** Get to the highest point you can and call 911.[145]
-4. **Stay off bridges** over fast-moving water.[129]
+1. **Listen** to local radio, TV or alerts for news.[153]
+2. **If officials say to,** turn off utilities at the main switches. Unplug appliances.[153]
+3. **Trapped by moving water?** Get to the highest point you can and call 911.[146]
+4. **Stay off bridges** over fast-moving water.[130]
 
 **Leave or stay?**
 
-- **Leave if** a dam or levee is failing, or officials tell you to go.[152] Go to __________. (Tab 3, Getting out)
-- **Stay if** you are on high ground, until officials say it is safe to go back.[152]
+- **Leave if** a dam or levee is failing, or officials tell you to go.[153] Go to __________. (Tab 3, Getting out)
+- **Stay if** you are on high ground, until officials say it is safe to go back.[153]
 
 ### Where and who
 
@@ -1302,20 +1323,20 @@ Officials warn that a dam or levee near you is failing or may fail, or water ris
 
 ### Do not
 
-- Do not touch electrical equipment if you are wet or standing in water.[152]
-- Do not go into a building that floodwater surrounds.[152]
+- Do not touch electrical equipment if you are wet or standing in water.[153]
+- Do not go into a building that floodwater surrounds.[153]
 
 ### When it is over
 
-- Go home only when officials say it is safe.[152]
-- Check the news before you drink tap water.[152]
-- Watch for weak roads and downed power lines.[152]
-- Clean and disinfect everything that got wet.[152]
-- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[125]
+- Go home only when officials say it is safe.[153]
+- Check the news before you drink tap water.[153]
+- Watch for weak roads and downed power lines.[153]
+- Clean and disinfect everything that got wet.[153]
+- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[126]
 
 ## Earthquake
 
-**Here:** fewer than 1 in 100 households like yours in the next 10 years · How bad: Very severe[85]
+**Here:** fewer than 1 in 100 households like yours in the next 10 years · How bad: Very severe[86]
 
 ### Use this when
 
@@ -1335,7 +1356,7 @@ The ground starts to shake, or your phone warns that shaking is coming.
 1. **Expect aftershocks.** Drop, cover and hold on each time.[14]
 2. **Check for injuries.** Help others if you have training.[14]
 3. **Trapped?** Text, or bang on a pipe or wall. Use a whistle, not shouting. Cover your mouth with your shirt.[14]
-4. **Smell gas or hear hissing?** Get everyone out, leaving doors and windows open. Call 911 and the gas company from outside. Turn off the main gas valve if you can.[106, 108]
+4. **Smell gas or hear hissing?** Get everyone out, leaving doors and windows open. Call 911 and the gas company from outside. Turn off the main gas valve if you can.[107, 109]
 5. **Get news** from a battery radio or phone alerts. Text instead of calling.[14]
 6. **Clean up** in gloves and thick-soled shoes. Leave heavy debris for help.[14]
 
@@ -1357,12 +1378,12 @@ The ground starts to shake, or your phone warns that shaking is coming.
 
 - Do not run outside or stand in a doorway.[14]
 - Do not go into a damaged building.[14]
-- Do not turn the gas back on yourself. Only a trained worker should.[108]
+- Do not turn the gas back on yourself. Only a trained worker should.[109]
 
 ### When it is over
 
-- Go back into a damaged home only when officials say it is safe.[125]
-- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[125]
+- Go back into a damaged home only when officials say it is safe.[126]
+- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[126]
 
 ## Tornado
 
@@ -1370,28 +1391,28 @@ The ground starts to shake, or your phone warns that shaking is coming.
 
 ### Use this when
 
-A tornado warning is issued for your area, or you see a funnel cloud or hear a roar like a freight train.[153]
+A tornado warning is issued for your area, or you see a funnel cloud or hear a roar like a freight train.[154]
 
 ### Do first
 
-1. **Go to your shelter now. Get to __________.[153]**
-2. **Use an inside hallway. Pick a stairwell or small room with no windows, as low as you can get to quickly.[154]**
-3. **Cover your head. Protect your head and neck with your arms.[153]**
-4. **Stay away from windows. Keep away from windows, doors and outside walls.[153]**
+1. **Go to your shelter now. Get to __________.[154]**
+2. **Use an inside hallway. Pick a stairwell or small room with no windows, as low as you can get to quickly.[155]**
+3. **Cover your head. Protect your head and neck with your arms.[154]**
+4. **Stay away from windows. Keep away from windows, doors and outside walls.[154]**
 
 ### Then
 
-1. **Pad yourself.** Pile blankets or cushions around you.[153]
-2. **Stay off the elevators.** Take the stairs.[154]
-3. **Keep listening.** Follow the warning on __________ until it ends.[153]
-4. **Outside with no building near?** Lie flat, face down, on low ground. Cover the back of your head with your arms.[155]
-5. **If you are driving, get to a sturdy building.**[153]
-6. **If you are caught in a car, stay buckled in.** Keep your head below the windows.[153]
+1. **Pad yourself.** Pile blankets or cushions around you.[154]
+2. **Stay off the elevators.** Take the stairs.[155]
+3. **Keep listening.** Follow the warning on __________ until it ends.[154]
+4. **Outside with no building near?** Lie flat, face down, on low ground. Cover the back of your head with your arms.[156]
+5. **If you are driving, get to a sturdy building.**[154]
+6. **If you are caught in a car, stay buckled in.** Keep your head below the windows.[154]
 
 **Leave or stay?**
 
 - **Stay if** you are in a sturdy building. Go to the lowest floor, away from windows. (Tab 3, Home)
-- **Leave if** you are in a mobile home or outdoors. Go to the nearest sturdy building or storm shelter.[154]
+- **Leave if** you are in a mobile home or outdoors. Go to the nearest sturdy building or storm shelter.[155]
 - **Go to** __________ if the home is too damaged to stay in. (Tab 3, Getting out)
 
 ### Where and who
@@ -1405,19 +1426,19 @@ A tornado warning is issued for your area, or you see a funnel cloud or hear a r
 
 ### Do not
 
-- Do not open windows to let air in.[155]
-- Do not stay in a car or a mobile home if a sturdy building is close.[154]
+- Do not open windows to let air in.[156]
+- Do not stay in a car or a mobile home if a sturdy building is close.[155]
 
 ### When it is over
 
-- Stay at least 35 feet from fallen power lines, and clear of broken utility lines.[123, 153]
-- Do not go into a damaged building until you are told it is safe.[153]
-- Text or use social media to check in; keep phone lines free for emergencies.[153]
+- Stay at least 35 feet from fallen power lines, and clear of broken utility lines.[124, 154]
+- Do not go into a damaged building until you are told it is safe.[154]
+- Text or use social media to check in; keep phone lines free for emergencies.[154]
 - Use the After pages for the first days. (Tab 9, After a disaster: the first 30 days)
 
 ## Nuclear power plant accident
 
-**Here:** fewer than 1 in 100 households like yours in the next 10 years · How bad: Severe[26, 86]
+**Here:** fewer than 1 in 100 households like yours in the next 10 years · How bad: Severe[26, 87]
 
 ### Use this when
 
@@ -1425,25 +1446,25 @@ Officials announce an emergency at a nuclear power plant near you, or tell peopl
 
 ### Do first
 
-1. **Tune in to local radio, TV or alerts, and follow officials.[156, 157]**
-2. **Told to leave? Leave by the route officials give.[156]**
-3. **Told to stay inside? Get inside and lock the windows and doors.[158]**
-4. **Turn off fans and heating or cooling that bring in outside air. Close fireplace dampers.[156]**
-5. **Go to the basement or the middle of the building.[158]**
-6. **Were you outside? Take off your outer clothes, bag them and wash.[159]**
+1. **Tune in to local radio, TV or alerts, and follow officials.[157, 158]**
+2. **Told to leave? Leave by the route officials give.[157]**
+3. **Told to stay inside? Get inside and lock the windows and doors.[159]**
+4. **Turn off fans and heating or cooling that bring in outside air. Close fireplace dampers.[157]**
+5. **Go to the basement or the middle of the building.[159]**
+6. **Were you outside? Take off your outer clothes, bag them and wash.[160]**
 
 ### Then
 
-1. **Stay inside** until officials say it is safe, usually at least 24 hours.[156]
-2. **Wash** with soap and water, and shampoo your hair. No shower? Wipe skin with a wet cloth.[159]
-3. **Eat and drink what was inside.** Wipe sealed containers from outside first.[156]
-4. **Use tap water for washing.** Drink bottled water if officials say the tap is unsafe.[159]
-5. **If you leave,** take your phone, chargers, medicines, ID and cash.[160]
+1. **Stay inside** until officials say it is safe, usually at least 24 hours.[157]
+2. **Wash** with soap and water, and shampoo your hair. No shower? Wipe skin with a wet cloth.[160]
+3. **Eat and drink what was inside.** Wipe sealed containers from outside first.[157]
+4. **Use tap water for washing.** Drink bottled water if officials say the tap is unsafe.[160]
+5. **If you leave,** take your phone, chargers, medicines, ID and cash.[161]
 
 **Leave or stay?**
 
-- **Leave if** officials tell your area to leave.[157] Go to __________. (Tab 3, Getting out)
-- **Stay if** officials tell you to. Go to __________.[157] (Tab 3, Home)
+- **Leave if** officials tell your area to leave.[158] Go to __________. (Tab 3, Getting out)
+- **Stay if** officials tell you to. Go to __________.[158] (Tab 3, Home)
 
 ### Where and who
 
@@ -1455,15 +1476,15 @@ Officials announce an emergency at a nuclear power plant near you, or tell peopl
 
 ### Do not
 
-- Do not take potassium iodide unless officials tell you to. It protects only the thyroid.[157, 161]
-- Do not go out to pick up family. Schools and care centers have plans.[158]
-- Do not eat garden food, or anything left outside uncovered, until officials say it is safe.[156]
+- Do not take potassium iodide unless officials tell you to. It protects only the thyroid.[158, 162]
+- Do not go out to pick up family. Schools and care centers have plans.[159]
+- Do not eat garden food, or anything left outside uncovered, until officials say it is safe.[157]
 
 ### When it is over
 
-- Go home only when officials say it is safe.[156]
-- For stress, call or text the Disaster Distress Helpline, 1-800-985-5990.[12, 156]
-- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[125]
+- Go home only when officials say it is safe.[157]
+- For stress, call or text the Disaster Distress Helpline, 1-800-985-5990.[12, 157]
+- For the weeks ahead, see (Tab 9, After a disaster: the first 30 days).[126]
 
 # Tab 7: Checklists: it is coming
 
@@ -1475,54 +1496,54 @@ Hurricanes, winter storms and heat waves usually come with warning. Keep your ph
 
 ### Before any storm
 
-1. Charge phones, power banks and other batteries.[162]
-2. Fill the car's tank and get some cash, since card readers and cash machines need power.[162] Charge the power station.[162] If you would leave in an electric car, charge it fully.[163]
-3. Refill prescriptions if you can.[162]
-4. Fill the bathtub and other large containers with water for flushing and cleaning.[162]
-5. Turn the fridge to its coldest setting and keep the doors shut.[162] A full freezer keeps food cold for about 48 hours, a fridge for about four.[35]
+1. Charge phones, power banks and other batteries.[163]
+2. Fill the car's tank and get some cash, since card readers and cash machines need power.[163] Charge the power station.[163] If you would leave in an electric car, charge it fully.[164]
+3. Refill prescriptions if you can.[163]
+4. Fill the bathtub and other large containers with water for flushing and cleaning.[163]
+5. Turn the fridge to its coldest setting and keep the doors shut.[163] A full freezer keeps food cold for about 48 hours, a fridge for about four.[35]
 6. Bring in or tie down outdoor furniture and grills.[54]
 7. Check your evacuation zone and your plan to leave.[54]
 8. Check with neighbors, older adults and anyone who may need help.[54]
 
 ### Before a hard freeze
 
-1. Let hot and cold water drip from a faucet at night, open the cabinet doors under sinks on outside walls, and keep the heat at 55°F or higher.[135]
-2. Make sure everyone knows how to shut off the water in case a pipe bursts.[135]
+1. Let hot and cold water drip from a faucet at night, open the cabinet doors under sinks on outside walls, and keep the heat at 55°F or higher.[136]
+2. Make sure everyone knows how to shut off the water in case a pipe bursts.[136]
 
 ### Before a heat wave
 
-1. Pick a place to cool down, such as a library, or ask your local health department about cooling options.[164]
-2. Plan to check on family, older adults and neighbors.[164]
-3. Fans do not lower body temperature.[164]
+1. Pick a place to cool down, such as a library, or ask your local health department about cooling options.[165]
+2. Plan to check on family, older adults and neighbors.[165]
+3. Fans do not lower body temperature.[165]
 
 ## Boil-water notice
 
 ### Use this when
 
-Your water utility or health department issues a boil-water notice. The water still runs, but germs may be in it.[133]
+Your water utility or health department issues a boil-water notice. The water still runs, but germs may be in it.[134]
 
 ### Do first
 
-1. **Do not drink tap water. Use bottled water, or boil tap water first.[133]**
-2. **Boil it. Bring clear water to a rolling boil for 1 minute, or 3 minutes above 5,000 feet. Let it cool.[165]**
-3. **Tell everyone. Tape a note on each tap.[166]**
-4. **Turn off the fridge water. Do not use the fridge's water or ice dispenser.[133]**
-5. **Toss ice and drinks made with tap water.[166]**
-6. **Cook and brush teeth with boiled or bottled water.[133]**
+1. **Do not drink tap water. Use bottled water, or boil tap water first.[134]**
+2. **Boil it. Bring clear water to a rolling boil for 1 minute, or 3 minutes above 5,000 feet. Let it cool.[166]**
+3. **Tell everyone. Tape a note on each tap.[167]**
+4. **Turn off the fridge water. Do not use the fridge's water or ice dispenser.[134]**
+5. **Toss ice and drinks made with tap water.[167]**
+6. **Cook and brush teeth with boiled or bottled water.[134]**
 
 ### Then
 
-1. **Bathe carefully.** Do not swallow the water. Give babies and young children a sponge bath.[133]
-2. **Wash dishes safely.** Use a dishwasher's sanitize cycle, or soak rinsed dishes for a minute in 1 teaspoon of unscented bleach per gallon of warm water. Let them air-dry.[133]
-3. **Wash hands** with soap and tap water, unless local officials say not to.[133]
-4. **Boil filtered water too.** A home or pitcher filter does not make it safe.[133]
-5. **Cannot boil?** Add 8 drops of plain, unscented 6% bleach per gallon. Stir, and wait 30 minutes.[165]
-6. **Do laundry** as usual.[133]
+1. **Bathe carefully.** Do not swallow the water. Give babies and young children a sponge bath.[134]
+2. **Wash dishes safely.** Use a dishwasher's sanitize cycle, or soak rinsed dishes for a minute in 1 teaspoon of unscented bleach per gallon of warm water. Let them air-dry.[134]
+3. **Wash hands** with soap and tap water, unless local officials say not to.[134]
+4. **Boil filtered water too.** A home or pitcher filter does not make it safe.[134]
+5. **Cannot boil?** Add 8 drops of plain, unscented 6% bleach per gallon. Stir, and wait 30 minutes.[166]
+6. **Do laundry** as usual.[134]
 
 **Leave or stay?**
 
-- **Use only bottled water if** the notice says do not drink or do not use. Boiling does not remove chemicals.[133]
-- **Follow** __________ and local officials to learn when the notice ends.[133]
+- **Use only bottled water if** the notice says do not drink or do not use. Boiling does not remove chemicals.[134]
+- **Follow** __________ and local officials to learn when the notice ends.[134]
 
 ### Where and who
 
@@ -1532,16 +1553,16 @@ Your water utility or health department issues a boil-water notice. The water st
 
 ### Do not
 
-- Do not use unboiled tap water for drinking, cooking, brushing teeth, formula or ice.[133]
-- Do not eat food made with unboiled tap water.[166]
+- Do not use unboiled tap water for drinking, cooking, brushing teeth, formula or ice.[134]
+- Do not eat food made with unboiled tap water.[167]
 
 ### When it is over
 
-- **Flush the pipes.** Run each tap for at least 5 minutes.[166]
-- **Reset the ice maker.** Make and throw away three batches of ice, then wipe the bin.[166]
-- **Flush appliances** that use water, like the coffee maker and fridge tap.[166]
-- **Replace water filters** as their maker says.[166]
-- **Refresh the water heater.** Run enough hot water to empty and refill its tank once.[166]
+- **Flush the pipes.** Run each tap for at least 5 minutes.[167]
+- **Reset the ice maker.** Make and throw away three batches of ice, then wipe the bin.[167]
+- **Flush appliances** that use water, like the coffee maker and fridge tap.[167]
+- **Replace water filters** as their maker says.[167]
+- **Refresh the water heater.** Run enough hot water to empty and refill its tank once.[167]
 
 ## Evacuation order
 
@@ -1552,7 +1573,7 @@ Officials order your area to leave, or warn that an order may come, for any reas
 ### Do first
 
 1. **Go right away. Leave as soon as officials tell you to.[55]**
-2. **Grab the go-bag. Take phones, chargers, medicines, ID, cash and the car kit.[160] Take medical devices and their chargers.[34]**
+2. **Grab the go-bag. Take phones, chargers, medicines, ID, cash and the car kit.[161] Take medical devices and their chargers.[34]**
 3. **Follow the route. Take the routes officials give.[8]**
 4. **Listen. Keep a battery radio on for instructions.[8]**
 5. **Check on others. Offer a ride to neighbors who need one.[8]**
@@ -1568,9 +1589,9 @@ Officials order your area to leave, or warn that an order may come, for any reas
 
 **Leave or stay?**
 
-- **Leave early,** before an order, if someone needs extra time or help to leave: small children, pets or a disability.[8, 144] (Tab 3, Getting out)
+- **Leave early,** before an order, if someone needs extra time or help to leave: small children, pets or a disability.[8, 145] (Tab 3, Getting out)
 - **Go to** __________. If you are split up, meet at __________.[8] (Tab 3, Getting out)
-- **Go to** a public shelter if needed. Text SHELTER and your ZIP code to 43362.[167]
+- **Go to** a public shelter if needed. Text SHELTER and your ZIP code to 43362.[168]
 - **Call** the Maricopa County, Arizona emergency management office if you have no way to leave.[8]
 
 ### Where and who
@@ -1593,32 +1614,32 @@ Officials order your area to leave, or warn that an order may come, for any reas
 ### When it is over
 
 - **Check** with officials, where you are and back home, before you travel.[8]
-- **Stay at least 35 feet** from downed power lines. Call 911, then __________.[8, 123]
-- **Run a generator** only outdoors, more than 20 feet from windows, doors and vents. Never plug it into a wall outlet.[48, 168] (Tab 9, After a disaster: the first 30 days)
+- **Stay at least 35 feet** from downed power lines. Call 911, then __________.[8, 124]
+- **Run a generator** only outdoors, more than 20 feet from windows, doors and vents. Never plug it into a wall outlet.[48, 169] (Tab 9, After a disaster: the first 30 days)
 
 ## Shelter-in-place order
 
 ### Use this when
 
-Officials tell you to stay inside because the outside air may be dangerous. Most orders last a few hours.[169]
+Officials tell you to stay inside because the outside air may be dangerous. Most orders last a few hours.[170]
 
 ### Do first
 
-1. **Go inside now. Bring everyone inside.[169]**
-2. **Close up. Lock the doors. Close the windows, air vents and fireplace damper.[167]**
-3. **Air off. Turn off fans, air conditioning and forced-air heat.[167]**
-4. **Pick the room. Take your kit to an inside room with few windows.[167]**
-5. **Listen. Turn on the radio or TV for instructions.[167, 169]**
+1. **Go inside now. Bring everyone inside.[170]**
+2. **Close up. Lock the doors. Close the windows, air vents and fireplace damper.[168]**
+3. **Air off. Turn off fans, air conditioning and forced-air heat.[168]**
+4. **Pick the room. Take your kit to an inside room with few windows.[168]**
+5. **Listen. Turn on the radio or TV for instructions.[168, 170]**
 6. **Stay put until officials say it is safe.[55]**
 
 ### Then
 
-1. **Chemical spill?** Use a room above ground, because the gases sink.[55, 169]
-2. **Radiation?** Go to a basement or the middle of the building.[158]
-3. **Seal the room** if told to. Tape plastic sheeting over windows, doors and vents, corners first.[167]
+1. **Chemical spill?** Use a room above ground, because the gases sink.[55, 170]
+2. **Radiation?** Go to a basement or the middle of the building.[159]
+3. **Seal the room** if told to. Tape plastic sheeting over windows, doors and vents, corners first.[168]
 4. **Block gaps** under doors with wet towels.[55]
-5. **Drink stored water,** not tap water.[169]
-6. **Save the phone** for serious emergencies.[169]
+5. **Drink stored water,** not tap water.[170]
+6. **Save the phone** for serious emergencies.[170]
 7. **Fumes getting in?** Take shallow breaths through a cloth or towel.[55]
 
 **Leave or stay?**
@@ -1626,7 +1647,7 @@ Officials tell you to stay inside because the outside air may be dangerous. Most
 - **Stay if** officials say to shelter in place. Stay until they say it is safe.[55] (Tab 3, Home)
 - **Leave if** officials change the order to leave. Go right away.[55] (Tab 3, Getting out)
 - **Go to** the nearest building if you are outside or in a car. Move upwind of a chemical leak.[55]
-- **Call** 911 only for a serious emergency.[169]
+- **Call** 911 only for a serious emergency.[170]
 
 ### Where and who
 
@@ -1638,13 +1659,13 @@ Officials tell you to stay inside because the outside air may be dangerous. Most
 ### Do not
 
 - Do not go outside, even to help others, until officials say it is safe.[55]
-- Do not shelter in a car unless you have no other choice.[169]
+- Do not shelter in a car unless you have no other choice.[170]
 - Do not eat or drink anything that may be contaminated.[55]
 
 ### When it is over
 
-- **Wait** for the all-clear on the radio or TV.[169]
-- **Follow instructions** for going outside and making the home safe again.[169]
+- **Wait** for the all-clear on the radio or TV.[170]
+- **Follow instructions** for going outside and making the home safe again.[170]
 - **Exposed to a chemical?** Bag your clothes, wash with soap and water, flush your eyes, and see a doctor.[55]
 
 ## Heat wave
@@ -1653,32 +1674,32 @@ Officials tell you to stay inside because the outside air may be dangerous. Most
 
 ### Use this when
 
-An extreme heat warning is out, or it will stay above 90°F for two or more days.[164]
+An extreme heat warning is out, or it will stay above 90°F for two or more days.[165]
 
 ### Do first
 
-1. **Stay cool. Stay in air conditioning. If you have none, go to a cooling center. Dial 2-1-1 to find one.[164, 170]**
-2. **Drink. Drink plenty of fluids.[164]**
-3. **Cars. Never leave people or pets in a closed car.[164]**
-4. **Check on others. Check on older adults, family and neighbors.[164]**
-5. **Know heat stroke. Body temperature of 103°F or more, hot red skin that is dry or damp, confusion or passing out: call 911.[171]**
-6. **Rest at midday. Avoid hard work outside in the middle of the day.[164]**
+1. **Stay cool. Stay in air conditioning. If you have none, go to a cooling center. Dial 2-1-1 to find one.[165, 171]**
+2. **Drink. Drink plenty of fluids.[165]**
+3. **Cars. Never leave people or pets in a closed car.[165]**
+4. **Check on others. Check on older adults, family and neighbors.[165]**
+5. **Know heat stroke. Body temperature of 103°F or more, hot red skin that is dry or damp, confusion or passing out: call 911.[172]**
+6. **Rest at midday. Avoid hard work outside in the middle of the day.[165]**
 
 ### Then
 
-1. **Cool down.** Take cool showers or baths.[164]
-2. **Dress light.** Wear loose, lightweight, light-colored clothes.[164]
-3. **Block the sun.** Close drapes or shades. Use the oven less.[164]
-4. **Outside,** stay in the shade and wear a wide hat.[164]
-5. **Heat stroke care.** While you wait for help, move the person somewhere cooler. Cool them with cool cloths or a cool bath.[171]
-6. **Heat exhaustion.** Heavy sweating, weakness, dizziness or nausea: move somewhere cooler, take off extra clothes and sip water. Call a doctor if it gets worse or lasts over an hour.[164]
-7. **If the power goes out** and the home gets too hot, go to a place with power.[35, 164] Use the backup plan for any medical device.[35]
+1. **Cool down.** Take cool showers or baths.[165]
+2. **Dress light.** Wear loose, lightweight, light-colored clothes.[165]
+3. **Block the sun.** Close drapes or shades. Use the oven less.[165]
+4. **Outside,** stay in the shade and wear a wide hat.[165]
+5. **Heat stroke care.** While you wait for help, move the person somewhere cooler. Cool them with cool cloths or a cool bath.[172]
+6. **Heat exhaustion.** Heavy sweating, weakness, dizziness or nausea: move somewhere cooler, take off extra clothes and sip water. Call a doctor if it gets worse or lasts over an hour.[165]
+7. **If the power goes out** and the home gets too hot, go to a place with power.[35, 165] Use the backup plan for any medical device.[35]
 
 **Leave or stay?**
 
-- **Stay if** your air conditioning works.[164] (Tab 3, Home)
-- **Go to** a cooling center, library or mall if your home has no air conditioning.[164] (Tab 3, Neighborhood)
-- **Call** 911 for signs of heat stroke.[171]
+- **Stay if** your air conditioning works.[165] (Tab 3, Home)
+- **Go to** a cooling center, library or mall if your home has no air conditioning.[165] (Tab 3, Neighborhood)
+- **Call** 911 for signs of heat stroke.[172]
 
 ### Where and who
 
@@ -1688,12 +1709,12 @@ An extreme heat warning is out, or it will stay above 90°F for two or more days
 
 ### Do not
 
-- Do not rely on a fan when it is over 90°F indoors. It can make you hotter.[170]
-- Do not give a person with heat stroke anything to drink.[171]
+- Do not rely on a fan when it is over 90°F indoors. It can make you hotter.[171]
+- Do not give a person with heat stroke anything to drink.[172]
 
 ### When it is over
 
-- **Check on** older neighbors and family.[164]
+- **Check on** older neighbors and family.[165]
 - **After a power cut,** throw out food that was 40°F or warmer for 2 hours or more.[35]
 
 ## Dust storm
@@ -1702,35 +1723,35 @@ An extreme heat warning is out, or it will stay above 90°F for two or more days
 
 ### Use this when
 
-A dust storm warning is out, or a wall of dust is coming. Most dust storms pass in a few minutes.[172]
+A dust storm warning is out, or a wall of dust is coming. Most dust storms pass in a few minutes.[173]
 
 ### Do first
 
-1. **Driving? Pull off. Pull off the pavement as far as you can, and stop.[172]**
-2. **Lights off. Turn off all your lights. Set the parking brake, and take your foot off the brake pedal.[172]**
-3. **At home, stay in. Go inside and close the windows.[173]**
-4. **Close up. Close the doors and air vents.[167]**
-5. **Filter the air. Run an air cleaner if you have one.[173]**
+1. **Driving? Pull off. Pull off the pavement as far as you can, and stop.[173]**
+2. **Lights off. Turn off all your lights. Set the parking brake, and take your foot off the brake pedal.[173]**
+3. **At home, stay in. Go inside and close the windows.[174]**
+4. **Close up. Close the doors and air vents.[168]**
+5. **Filter the air. Run an air cleaner if you have one.[174]**
 
 ### Then
 
-1. **Cannot pull off?** Slow down, turn on your lights and sound the horn now and then. Follow the painted center line, and look for a safe place to pull off.[172]
-2. **Caught outside?** Wear a fitted N95 respirator if you cannot get out of the dust.[173]
+1. **Cannot pull off?** Slow down, turn on your lights and sound the horn now and then. Follow the painted center line, and look for a safe place to pull off.[173]
+2. **Caught outside?** Wear a fitted N95 respirator if you cannot get out of the dust.[174]
 
 **Leave or stay?**
 
-- **Stay if** you are indoors. Keep the windows closed until the dust passes.[173] (Tab 3, Home)
-- **Stay if** you are driving and cannot see. Stay pulled off the road with your lights off.[172]
+- **Stay if** you are indoors. Keep the windows closed until the dust passes.[174] (Tab 3, Home)
+- **Stay if** you are driving and cannot see. Stay pulled off the road with your lights off.[173]
 
 ### Do not
 
-- Never stop in a lane of traffic.[172]
-- Do not leave your lights on once you park. Drivers behind you may follow them and hit you.[172]
-- Do not drive into a dust storm if you can avoid it.[172]
+- Never stop in a lane of traffic.[173]
+- Do not leave your lights on once you park. Drivers behind you may follow them and hit you.[173]
+- Do not drive into a dust storm if you can avoid it.[173]
 
 ### When it is over
 
-- **See a doctor** if a cough, fever or tiredness follows the dust. It can be Valley fever, and early treatment helps.[174]
+- **See a doctor** if a cough, fever or tiredness follows the dust. It can be Valley fever, and early treatment helps.[175]
 
 ## Pandemic
 
@@ -1738,34 +1759,34 @@ A dust storm warning is out, or a wall of dust is coming. Most dust storms pass 
 
 ### Use this when
 
-Health officials say a new disease is spreading from person to person across many countries.[175]
+Health officials say a new disease is spreading from person to person across many countries.[176]
 
 ### Do first
 
-1. **Follow health officials. Follow CDC and your state and local health departments.[175]**
-2. **Stay home when sick, except to get medical care. Stay away from others at home too.[175, 176]**
-3. **Wash hands often with soap and water, for at least 20 seconds. With no soap, use hand sanitizer with at least 60 percent alcohol.[175]**
-4. **Cover coughs and sneezes. Use a tissue.[175]**
-5. **Mask up in public when advised. An N95 protects best.[175, 177]**
-6. **Get vaccinated when a vaccine is offered.[175]**
+1. **Follow health officials. Follow CDC and your state and local health departments.[176]**
+2. **Stay home when sick, except to get medical care. Stay away from others at home too.[176, 177]**
+3. **Wash hands often with soap and water, for at least 20 seconds. With no soap, use hand sanitizer with at least 60 percent alcohol.[176]**
+4. **Cover coughs and sneezes. Use a tissue.[176]**
+5. **Mask up in public when advised. An N95 protects best.[176, 178]**
+6. **Get vaccinated when a vaccine is offered.[176]**
 
 ### Then
 
-1. **Stock up slowly.** Get food, water, cleaning supplies and prescriptions to stay home for days or weeks. Buy a little at a time.[175]
+1. **Stock up slowly.** Get food, water, cleaning supplies and prescriptions to stay home for days or weeks. Buy a little at a time.[176]
 2. **Medicines.** Ask your doctor or pharmacist about an emergency supply.[34]
-3. **Plan for closures.** Schools and workplaces may close. Plan for school and work from home.[175]
-4. **Keep apart.** Stay 6 feet from people outside your household.[175]
-5. **Clean** surfaces people touch often.[175]
-6. **Exposed?** Call your doctor. Follow their quarantine advice, and watch for symptoms.[175]
-7. **Check your insurance,** including telemedicine.[175]
-8. **Stay in touch** by phone and video. Feeling anxious is normal. Talk to someone, or call or text 1-800-985-5990.[12, 175]
+3. **Plan for closures.** Schools and workplaces may close. Plan for school and work from home.[176]
+4. **Keep apart.** Stay 6 feet from people outside your household.[176]
+5. **Clean** surfaces people touch often.[176]
+6. **Exposed?** Call your doctor. Follow their quarantine advice, and watch for symptoms.[176]
+7. **Check your insurance,** including telemedicine.[176]
+8. **Stay in touch** by phone and video. Feeling anxious is normal. Talk to someone, or call or text 1-800-985-5990.[12, 176]
 
 **Leave or stay?**
 
-- **Stay home** as much as you can.[175] (Tab 3, Home)
-- **Call** your doctor if you are sick or were exposed.[175]
-- **Call** 911 in an emergency, and wear a mask while you wait.[175]
-- **Go to** emergency care for trouble breathing or chest pain.[176]
+- **Stay home** as much as you can.[176] (Tab 3, Home)
+- **Call** your doctor if you are sick or were exposed.[176]
+- **Call** 911 in an emergency, and wear a mask while you wait.[176]
+- **Go to** emergency care for trouble breathing or chest pain.[177]
 
 ### Where and who
 
@@ -1775,17 +1796,17 @@ Health officials say a new disease is spreading from person to person across man
 
 ### Do not
 
-- Do not go to work or school sick.[175]
-- Do not buy everything at once.[175]
-- Do not pass on rumors or unproven treatments.[175]
-- Do not blame people or places for the disease.[175]
-- Do not fall for scams.[175]
+- Do not go to work or school sick.[176]
+- Do not buy everything at once.[176]
+- Do not pass on rumors or unproven treatments.[176]
+- Do not blame people or places for the disease.[176]
+- Do not fall for scams.[176]
 
 ### When it is over
 
-- **Keep** staying home when sick, and keep washing your hands.[175]
-- **Update** your family emergency plan.[175]
-- **Talk** with your community about what you learned.[175]
+- **Keep** staying home when sick, and keep washing your hands.[176]
+- **Update** your family emergency plan.[176]
+- **Talk** with your community about what you learned.[176]
 
 ## Drought
 
@@ -1793,30 +1814,30 @@ Health officials say a new disease is spreading from person to person across man
 
 ### Use this when
 
-Officials declare a drought, or set limits on water use.[178]
+Officials declare a drought, or set limits on water use.[179]
 
 ### Do first
 
-1. **Follow the limits. Follow every state and local rule on water use.[178]**
-2. **Fix leaks. Fix dripping taps and other leaks.[178]**
-3. **Shower quickly. Take short showers instead of baths.[178]**
-4. **Turn off the tap while you brush your teeth, wash your face or shave.[178]**
-5. **Run full loads. Run the washer and dishwasher only when full.[178]**
+1. **Follow the limits. Follow every state and local rule on water use.[179]**
+2. **Fix leaks. Fix dripping taps and other leaks.[179]**
+3. **Shower quickly. Take short showers instead of baths.[179]**
+4. **Turn off the tap while you brush your teeth, wash your face or shave.[179]**
+5. **Run full loads. Run the washer and dishwasher only when full.[179]**
 
 ### Then
 
-1. **Water outside less.** If the lawn needs water, water early in the morning or late in the evening.[178]
-2. **Save the trees.** In extreme drought, let the lawn go and keep trees and large shrubs alive.[178]
-3. **Reuse water.** Catch the water that runs while it warms up, and use it on plants.[178]
-4. **Flush less.** Put tissues and other trash in the bin, not the toilet.[178]
-5. **Wash food in a pan** of water, not under a running tap.[178]
-6. **Sweep** driveways and walks instead of hosing them.[178]
-7. **Check a well pump.** If it turns on when no water is being used, you have a leak.[178]
-8. **Keep stored water.** Keep at least one gallon per person per day, for several days.[179]
+1. **Water outside less.** If the lawn needs water, water early in the morning or late in the evening.[179]
+2. **Save the trees.** In extreme drought, let the lawn go and keep trees and large shrubs alive.[179]
+3. **Reuse water.** Catch the water that runs while it warms up, and use it on plants.[179]
+4. **Flush less.** Put tissues and other trash in the bin, not the toilet.[179]
+5. **Wash food in a pan** of water, not under a running tap.[179]
+6. **Sweep** driveways and walks instead of hosing them.[179]
+7. **Check a well pump.** If it turns on when no water is being used, you have a leak.[179]
+8. **Keep stored water.** Keep at least one gallon per person per day, for several days.[180]
 
 **Leave or stay?**
 
-- **Call** __________ for the current limits and for help.[178]
+- **Call** __________ for the current limits and for help.[179]
 
 ### Where and who
 
@@ -1827,15 +1848,15 @@ Officials declare a drought, or set limits on water use.[178]
 
 ### Do not
 
-- Do not leave sprinklers or hoses running unattended.[178]
-- Do not pour water down the drain if you can use it for something else.[178]
-- Do not thaw food under running water.[178]
-- Do not rinse dishes before they go in the dishwasher. Just scrape them.[178]
+- Do not leave sprinklers or hoses running unattended.[179]
+- Do not pour water down the drain if you can use it for something else.[179]
+- Do not thaw food under running water.[179]
+- Do not rinse dishes before they go in the dishwasher. Just scrape them.[179]
 
 ### When it is over
 
-- **Keep saving water.** Make it a daily habit.[178]
-- **Check** pipes and sprinklers for leaks.[178]
+- **Keep saving water.** Make it a daily habit.[179]
+- **Check** pipes and sprinklers for leaks.[179]
 
 ## Winter storm or blizzard
 
@@ -1843,31 +1864,31 @@ Officials declare a drought, or set limits on water use.[178]
 
 ### Use this when
 
-A winter storm watch or warning covers your area.[130]
+A winter storm watch or warning covers your area.[131]
 
 ### Do first
 
-1. **Stay home. Stay off the roads if you can.[130]**
-2. **Stock up. Have several days of food, water and medicine.[130]**
+1. **Stay home. Stay off the roads if you can.[131]**
+2. **Stock up. Have several days of food, water and medicine.[131]**
 3. **Lights. Have a flashlight for each person.[35] Charge any medical device, and follow its power plan.[35]**
-4. **Heat safely. Never heat with a gas stove or oven.[130]**
-5. **Check on others. Check on older neighbors often.[128]**
+4. **Heat safely. Never heat with a gas stove or oven.[131]**
+5. **Check on others. Check on older neighbors often.[129]**
 
 ### Then
 
-1. **Protect pipes.** Let taps drip. Open the cabinets under sinks.[128]
-2. **One warm room.** If the heat fails, close off unused rooms. Stuff towels under doors.[128]
-3. **Dress in layers.** Wear loose, warm layers.[180]
-4. **Space heaters.** Keep them 3 feet from anything that can burn.[128]
-5. **If you have to drive,** tell someone your route and when you will arrive.[128] If the car gets stuck, stay in it. Run the engine 10 minutes an hour, with a window cracked and the exhaust clear of snow.[180]
-6. **Shovel slowly.** Take breaks.[130]
-7. **Cold injury.** Numb, white or waxy skin can be frostbite. Shivering, confusion or slurred speech can be hypothermia. Get the person warm.[130]
+1. **Protect pipes.** Let taps drip. Open the cabinets under sinks.[129]
+2. **One warm room.** If the heat fails, close off unused rooms. Stuff towels under doors.[129]
+3. **Dress in layers.** Wear loose, warm layers.[181]
+4. **Space heaters.** Keep them 3 feet from anything that can burn.[129]
+5. **If you have to drive,** tell someone your route and when you will arrive.[129] If the car gets stuck, stay in it. Run the engine 10 minutes an hour, with a window cracked and the exhaust clear of snow.[181]
+6. **Shovel slowly.** Take breaks.[131]
+7. **Cold injury.** Numb, white or waxy skin can be frostbite. Shivering, confusion or slurred speech can be hypothermia. Get the person warm.[131]
 
 **Leave or stay?**
 
-- **Stay if** you can keep one room warm.[128] (Tab 3, Home)
-- **Leave if** the home gets too cold. Go to a warming center; dial 2-1-1 to find one.[181] (Tab 3, Getting out)
-- **Call** 911 if a person's body temperature is below 95°F.[130]
+- **Stay if** you can keep one room warm.[129] (Tab 3, Home)
+- **Leave if** the home gets too cold. Go to a warming center; dial 2-1-1 to find one.[182] (Tab 3, Getting out)
+- **Call** 911 if a person's body temperature is below 95°F.[131]
 
 ### Where and who
 
@@ -1878,19 +1899,19 @@ A winter storm watch or warning covers your area.[130]
 
 ### Do not
 
-- Never run a generator, grill or camp stove inside the home or garage.[48, 128]
-- Do not use candles. Use flashlights.[128]
-- Do not drive on icy roads, bridges or overpasses.[128]
-- Do not thaw pipes with a torch.[128]
-- Do not rub frostbite or warm it with a heating pad.[130]
+- Never run a generator, grill or camp stove inside the home or garage.[48, 129]
+- Do not use candles. Use flashlights.[129]
+- Do not drive on icy roads, bridges or overpasses.[129]
+- Do not thaw pipes with a torch.[129]
+- Do not rub frostbite or warm it with a heating pad.[131]
 
 ### When it is over
 
-- **Clear the furnace vent** of snow.[180]
-- **Salt or sand** icy steps and walks.[128]
-- **If a pipe bursts,** shut off the water at __________.[135]
+- **Clear the furnace vent** of snow.[181]
+- **Salt or sand** icy steps and walks.[129]
+- **If a pipe bursts,** shut off the water at __________.[136]
 - **Check food.** Throw out food that was 40°F or warmer for 2 hours or more.[35]
-- **Check on neighbors** again.[128]
+- **Check on neighbors** again.[129]
 
 ## Hurricane or tropical storm
 
@@ -1898,34 +1919,34 @@ A winter storm watch or warning covers your area.[130]
 
 ### Use this when
 
-A hurricane or tropical storm watch or warning covers your area. A watch comes about 48 hours before storm winds arrive, and a warning about 36 hours before.[182]
+A hurricane or tropical storm watch or warning covers your area. A watch comes about 48 hours before storm winds arrive, and a warning about 36 hours before.[183]
 
 ### Do first
 
 1. **Check your zone. If officials tell your zone to leave, go right away.[54]**
-2. **Keep alerts on. Keep a radio or phone on for official updates.[182]**
-3. **Charge up. Charge phones and backup batteries.[54] Charge any medical device, and follow the power plan you made with your medical provider.[35] Charge the power station.[162] Fill the car's gas tank.[182]**
-4. **Store water. Fill the bathtub and large containers for flushing and cleaning.[182]**
-5. **Refill medicines. Refill prescriptions if you can.[162]**
-6. **Pack a go-bag. Pack medicines, ID, cash and phone chargers.[160, 182]**
+2. **Keep alerts on. Keep a radio or phone on for official updates.[183]**
+3. **Charge up. Charge phones and backup batteries.[54] Charge any medical device, and follow the power plan you made with your medical provider.[35] Charge the power station.[163] Fill the car's gas tank.[183]**
+4. **Store water. Fill the bathtub and large containers for flushing and cleaning.[183]**
+5. **Refill medicines. Refill prescriptions if you can.[163]**
+6. **Pack a go-bag. Pack medicines, ID, cash and phone chargers.[161, 183]**
 
 ### Then
 
-1. **Clear the yard.** Bring in outdoor furniture, trash cans, tools and anything the wind can throw.[182]
-2. **Cover windows.** Close storm shutters, or board up windows.[182]
-3. **Set the fridge cold.** Turn it to its coldest setting and keep it shut. Unplug small appliances, and turn off propane tanks.[182]
-4. **Tell someone.** Tell neighbors and __________ your plan.[182]
+1. **Clear the yard.** Bring in outdoor furniture, trash cans, tools and anything the wind can throw.[183]
+2. **Cover windows.** Close storm shutters, or board up windows.[183]
+3. **Set the fridge cold.** Turn it to its coldest setting and keep it shut. Unplug small appliances, and turn off propane tanks.[183]
+4. **Tell someone.** Tell neighbors and __________ your plan.[183]
 5. **Check on neighbors.** Ask older neighbors and others if they need help.[54]
-6. **When the wind rises,** go to __________. Use a small inside room, closet or hallway on the lowest floor that will not flood. Close the inside doors and stay away from windows.[54, 182]
-7. **If the wind gets very strong,** lie on the floor under a sturdy table.[182]
-8. **Watch for tornadoes.** Hurricanes often bring them.[182]
+6. **When the wind rises,** go to __________. Use a small inside room, closet or hallway on the lowest floor that will not flood. Close the inside doors and stay away from windows.[54, 183]
+7. **If the wind gets very strong,** lie on the floor under a sturdy table.[183]
+8. **Watch for tornadoes.** Hurricanes often bring them.[183]
 9. **Text, do not call.** Keep phone calls for emergencies.[54]
 
 **Leave or stay?**
 
-- **Leave if** officials order your zone to leave. Leave early if someone needs extra time or help to leave.[8] Go to __________. Turn off the power, gas and water only if officials tell you to.[54, 182] (Tab 3, Getting out)
-- **Stay if** you are not told to leave and your home is out of the flood zone.[182] (Tab 3, Home)
-- **Go to** a public shelter if you have nowhere else. Text SHELTER and your ZIP code to 43362, and bring your go-bag.[167]
+- **Leave if** officials order your zone to leave. Leave early if someone needs extra time or help to leave.[8] Go to __________. Turn off the power, gas and water only if officials tell you to.[54, 183] (Tab 3, Getting out)
+- **Stay if** you are not told to leave and your home is out of the flood zone.[183] (Tab 3, Home)
+- **Go to** a public shelter if you have nowhere else. Text SHELTER and your ZIP code to 43362, and bring your go-bag.[168]
 - **Go to** the highest floor if floodwater traps you. Do not climb into a closed attic.[54]
 
 ### Where and who
@@ -1941,19 +1962,19 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 
 ### Do not
 
-- Do not leave shelter when the storm turns calm. It may be the eye, and the wind will return fast from the other side.[182]
+- Do not leave shelter when the storm turns calm. It may be the eye, and the wind will return fast from the other side.[183]
 - Do not walk, swim or drive through floodwater. Six inches of moving water can knock you down.[54]
-- Do not drink the water stored in the bathtub.[182]
+- Do not drink the water stored in the bathtub.[183]
 - Never use a generator, grill or camp stove inside the home or garage.[35, 48]
-- Do not use candles. Use flashlights.[182]
+- Do not use candles. Use flashlights.[183]
 
 ### When it is over
 
-- **Wait** until officials say it is safe to go out or go home.[8, 182]
-- **Stay at least 35 feet** from downed power lines. Call 911, then __________.[8, 123]
-- **Check** gas, water and electric lines for damage. If you smell gas or the building looks damaged, stay out.[125, 182]
+- **Wait** until officials say it is safe to go out or go home.[8, 183]
+- **Stay at least 35 feet** from downed power lines. Call 911, then __________.[8, 124]
+- **Check** gas, water and electric lines for damage. If you smell gas or the building looks damaged, stay out.[126, 183]
 - **Clean up** in gloves and boots, with a partner. Children should not help.[54]
-- **Take photos** of the damage before you clean up, then call your insurer.[54, 125] (Tab 9, After a disaster: the first 30 days)
+- **Take photos** of the damage before you clean up, then call your insurer.[54, 126] (Tab 9, After a disaster: the first 30 days)
 
 # Tab 8: Checklists: it goes on
 
@@ -1965,24 +1986,24 @@ The power goes out at home and stays out for hours or days, from a storm, a faul
 
 ### Do first
 
-1. **Switch medical devices to backup power. If it will not last, go where there is power.[35, 123]**
-2. **Use flashlights, not candles.[123]**
-3. **Check on your people. Tell them you are OK, and ask if they need help.[123]**
-4. **Check for news on a battery radio or phone alerts.[123]**
+1. **Switch medical devices to backup power. If it will not last, go where there is power.[35, 124]**
+2. **Use flashlights, not candles.[124]**
+3. **Check on your people. Tell them you are OK, and ask if they need help.[124]**
+4. **Check for news on a battery radio or phone alerts.[124]**
 5. **Keep the fridge and freezer closed.[35]**
 
 ### Then
 
 1. **Unplug appliances and electronics.**[35]
-2. **Eat fresh food first.**[123]
+2. **Eat fresh food first.**[124]
 3. **Move fridge food to coolers with ice** after 4 hours. A full, closed freezer stays cold about 48 hours.[35]
 4. **Check food temperatures** with a thermometer.[35]
 5. **Save your phone battery.** Keep calls short, and text instead.[9]
 
 **Leave or stay?**
 
-- **Leave if** the home gets too hot or too cold, or a medical device needs power you cannot supply. Go to a warming or cooling center, or __________.[123] (Tab 3, Getting out)
-- **Call 911 if** anyone has a headache, dizziness, nausea or confusion. Get everyone outside first.[183]
+- **Leave if** the home gets too hot or too cold, or a medical device needs power you cannot supply. Go to a warming or cooling center, or __________.[124] (Tab 3, Getting out)
+- **Call 911 if** anyone has a headache, dizziness, nausea or confusion. Get everyone outside first.[184]
 
 ### Where and who
 
@@ -1996,36 +2017,36 @@ The power goes out at home and stays out for hours or days, from a storm, a faul
 
 - Never heat your home with a gas stove or oven.[35]
 - Never use a generator, camp stove or charcoal grill inside, even in the garage.[35, 48]
-- Stay at least 35 feet from a downed power line and anything it touches. Call 911.[123]
+- Stay at least 35 feet from a downed power line and anything it touches. Call 911.[124]
 
 ### When it is over
 
 - Throw out food that was 40°F or warmer for 2 hours or more, or that smells or looks odd. When in doubt, throw it out.[35]
-- Ask your pharmacist or doctor before you use a refrigerated medicine that got warm.[123]
-- If there was damage, take photos before you clean up.[125] (Tab 9, After a disaster: the first 30 days)
+- Ask your pharmacist or doctor before you use a refrigerated medicine that got warm.[124]
+- If there was damage, take photos before you clean up.[126] (Tab 9, After a disaster: the first 30 days)
 
 ## Phone or internet outage
 
-**Here:** about 95 in 100 households like yours in the next 10 years · How bad: Minor[26, 61]
+**Here:** about 95 in 100 households like yours in the next 10 years · How bad: Minor[26, 62]
 
 ### Use this when
 
-Calls will not go through, your phone shows no service, or the internet is down for more than a few minutes. In a large outage, calls to 911 can fail too.[61]
+Calls will not go through, your phone shows no service, or the internet is down for more than a few minutes. In a large outage, calls to 911 can fail too.[62]
 
 ### Do first
 
 1. **Try another way. Send a text or an email, or use a landline if you have one.[9]**
-2. **Use Wi-Fi calling if your internet still works.[61]**
-3. **If 911 does not answer, call the police or fire number on your family card.[184]**
+2. **Use Wi-Fi calling if your internet still works.[62]**
+3. **If 911 does not answer, call the police or fire number on your family card.[185]**
 4. **Wait 10 seconds before you redial.[9]**
-5. **Use your paper list of numbers.[185]**
+5. **Use your paper list of numbers.[186]**
 6. **Get news from a battery or hand-crank radio.[1]**
 
 ### Then
 
 1. **Text your out-of-area contact** to say where you are.[9]
 2. **Keep calls short** and make only the ones you need.[9]
-3. **Pay with cash** if card readers are down.[60]
+3. **Pay with cash** if card readers are down.[61]
 
 **Leave or stay?**
 
@@ -2042,13 +2063,13 @@ Calls will not go through, your phone shows no service, or the internet is down 
 
 - Do not count on texting 911. It is not available everywhere, so call if you can.[6]
 - Do not make calls while driving. Stop first.[9]
-- Do not click links in texts or emails from people you do not know.[186]
+- Do not click links in texts or emails from people you do not know.[187]
 
 ### When it is over
 
 - Tell your household and your out-of-area contact that you are OK.[3]
-- Write your police and fire departments' regular numbers on your family card.[184]
-- Turn on Wi-Fi calling on every phone before the next outage.[61]
+- Write your police and fire departments' regular numbers on your family card.[185]
+- Turn on Wi-Fi calling on every phone before the next outage.[62]
 
 ## Supply chain disruption
 
@@ -2060,19 +2081,19 @@ Stores run short of food, fuel, medicine or other basics for days or weeks, or p
 
 ### Do first
 
-1. **Use what you have first, oldest cans first.[187]**
-2. **Buy a little at a time, so others can get what they need too.[175]**
+1. **Use what you have first, oldest cans first.[188]**
+2. **Buy a little at a time, so others can get what they need too.[176]**
 3. **Ask your drug plan about a 60- to 90-day refill.[28]**
 
 ### Then
 
-1. **Try other pharmacies** if a medicine is out.[188]
-2. **Store food somewhere cool and dry,** below 85°F if you can.[187]
+1. **Try other pharmacies** if a medicine is out.[189]
+2. **Store food somewhere cool and dry,** below 85°F if you can.[188]
 
 **Leave or stay?**
 
-- **Do this if** food runs low: call the USDA National Hunger Hotline, 1-866-348-6479, for food banks and meal sites near you.[189]
-- **Do this if** a medicine is out everywhere: ask your prescriber or pharmacist about an alternative.[188]
+- **Do this if** food runs low: call the USDA National Hunger Hotline, 1-866-348-6479, for food banks and meal sites near you.[190]
+- **Do this if** a medicine is out everywhere: ask your prescriber or pharmacist about an alternative.[189]
 
 ### Where and who
 
@@ -2083,13 +2104,13 @@ Stores run short of food, fuel, medicine or other basics for days or weeks, or p
 
 ### Do not
 
-- Do not buy or eat from cans that bulge, leak, are rusted or are deeply dented.[187]
-- Do not buy medicine from a website that is not a state-licensed pharmacy.[190]
+- Do not buy or eat from cans that bulge, leak, are rusted or are deeply dented.[188]
+- Do not buy medicine from a website that is not a state-licensed pharmacy.[191]
 
 ### When it is over
 
-- Restock slowly, a little each week.[175]
-- Keep using the oldest food first and replacing it as you go.[187]
+- Restock slowly, a little each week.[176]
+- Keep using the oldest food first and replacing it as you go.[188]
 
 ## No tap water, or a local water or gas outage
 
@@ -2101,20 +2122,20 @@ No water comes from the tap, or a notice says not to drink or use it. Or the gas
 
 ### Do first
 
-1. **If you smell gas or hear hissing, get everyone out. Call 911 and __________ from outside.[106, 108]**
-2. **Read the water notice and follow it: boil, do not drink, or do not use.[133]**
-3. **Drink stored or bottled water.[179]**
-4. **Clean hands with sanitizer that has at least 60% alcohol.[191]**
-5. **Set up a two-bucket toilet if toilets cannot flush.[192]**
+1. **If you smell gas or hear hissing, get everyone out. Call 911 and __________ from outside.[107, 109]**
+2. **Read the water notice and follow it: boil, do not drink, or do not use.[134]**
+3. **Drink stored or bottled water.[180]**
+4. **Clean hands with sanitizer that has at least 60% alcohol.[192]**
+5. **Set up a two-bucket toilet if toilets cannot flush.[193]**
 
 ### Then
 
-1. **Heat safely.** Use electric space heaters with automatic shut-off, 3 feet from anything that can burn.[128, 193]
+1. **Heat safely.** Use electric space heaters with automatic shut-off, 3 feet from anything that can burn.[129, 194]
 
 **Leave or stay?**
 
-- **Leave if** you smell gas or hear hissing. Go outside and away from the building.[108]
-- **Leave if** you cannot keep the home warm. Go to a warming center (dial 2-1-1 to find one), or __________.[181] (Tab 3, Getting out)
+- **Leave if** you smell gas or hear hissing. Go outside and away from the building.[109]
+- **Leave if** you cannot keep the home warm. Go to a warming center (dial 2-1-1 to find one), or __________.[182] (Tab 3, Getting out)
 
 ### Where and who
 
@@ -2127,19 +2148,19 @@ No water comes from the tap, or a notice says not to drink or use it. Or the gas
 
 ### Do not
 
-- Do not turn the gas back on yourself. Only a qualified professional does that.[108]
-- If you smell gas, do not switch lights on or off or use a phone inside.[106]
-- Do not use water or ice from the fridge dispenser while a notice is on.[133]
-- Do not boil water under a do-not-drink notice. Boiling does not remove chemicals.[133]
+- Do not turn the gas back on yourself. Only a qualified professional does that.[109]
+- If you smell gas, do not switch lights on or off or use a phone inside.[107]
+- Do not use water or ice from the fridge dispenser while a notice is on.[134]
+- Do not boil water under a do-not-drink notice. Boiling does not remove chemicals.[134]
 
 ### When it is over
 
-- Let the gas company or another qualified professional turn the gas back on.[108, 123]
-- Refill your stored water.[194]
+- Let the gas company or another qualified professional turn the gas back on.[109, 124]
+- Refill your stored water.[195]
 
 ## Job loss
 
-**Here:** about 75 in 100 households like yours in the next 10 years · How bad: Serious[26, 73, 74]
+**Here:** about 75 in 100 households like yours in the next 10 years · How bad: Serious[26, 74, 75]
 
 ### Use this when
 
@@ -2147,19 +2168,19 @@ You or another earner in the household loses a job, or most of their hours.
 
 ### Do first
 
-1. **File for unemployment with your state as soon as you can.[195]**
-2. **Choose health coverage within 60 days. Ask about COBRA, or apply for a Marketplace plan, Medicaid or CHIP.[196, 197]**
-3. **Gather your papers: pay stubs, bank and insurance records, and the numbers of people to call.[59] (Tab 4, Documents and money)**
+1. **File for unemployment with your state as soon as you can.[196]**
+2. **Choose health coverage within 60 days. Ask about COBRA, or apply for a Marketplace plan, Medicaid or CHIP.[197, 198]**
+3. **Gather your papers: pay stubs, bank and insurance records, and the numbers of people to call.[60] (Tab 4, Documents and money)**
 
 ### Then
 
-1. **Get food help** from the USDA National Hunger Hotline, 1-866-348-6479.[189]
-2. **Apply for rent help early** if rent will be hard to pay. Call 211 or your local government. Help can take several weeks.[198]
+1. **Get food help** from the USDA National Hunger Hotline, 1-866-348-6479.[190]
+2. **Apply for rent help early** if rent will be hard to pay. Call 211 or your local government. Help can take several weeks.[199]
 
 **Leave or stay?**
 
-- **Do this if** you cannot afford a Marketplace plan: get low-cost care at a community health center.[197]
-- **Do this if** a landlord files to evict you: file a written answer and go to court.[199]
+- **Do this if** you cannot afford a Marketplace plan: get low-cost care at a community health center.[198]
+- **Do this if** a landlord files to evict you: file a written answer and go to court.[200]
 
 ### Where and who
 
@@ -2170,16 +2191,16 @@ You or another earner in the household loses a job, or most of their hours.
 
 ### Do not
 
-- Do not take a payday loan. A typical two-week loan costs as much as almost 400 percent a year.[200]
+- Do not take a payday loan. A typical two-week loan costs as much as almost 400 percent a year.[201]
 
 ### When it is over
 
-- Report your new job and income to the Marketplace right away, if you have a plan there.[197]
-- Rebuild your emergency fund. Save a little automatically each payday.[201]
+- Report your new job and income to the Marketplace right away, if you have a plan there.[198]
+- Rebuild your emergency fund. Save a little automatically each payday.[202]
 
 ## Eviction
 
-**Here:** about 40 in 100 households like yours in the next 10 years · How bad: Serious[26, 63, 64, 65, 66]
+**Here:** about 40 in 100 households like yours in the next 10 years · How bad: Serious[26, 64, 65, 66, 67]
 
 ### Use this when
 
@@ -2187,24 +2208,24 @@ Your landlord gives you a notice to pay or leave, or you get court papers for an
 
 ### Do first
 
-1. **Call legal aid or your local bar association. You may qualify for free legal help.[199, 202]**
-2. **Call the court clerk. Ask the deadline to file an answer, the court date, and whether there is mediation.[199]**
-3. **File a written answer by the deadline, with a lawyer or on your own.[199]**
-4. **Apply for rent help. Call 211 or your local government.[198]**
-5. **Go to court on your court date.[199]**
+1. **Call legal aid or your local bar association. You may qualify for free legal help.[200, 203]**
+2. **Call the court clerk. Ask the deadline to file an answer, the court date, and whether there is mediation.[200]**
+3. **File a written answer by the deadline, with a lawyer or on your own.[200]**
+4. **Apply for rent help. Call 211 or your local government.[199]**
+5. **Go to court on your court date.[200]**
 
 ### Then
 
-1. **Talk with your landlord** about a plan to catch up on rent.[199]
-2. **Tell the court** in your answer if you applied for rent help.[199]
-3. **Call a HUD-approved housing counselor** at 1-800-569-4287.[199]
-4. **Keep your important papers together** in case you have to move.[59] (Tab 4, Documents and money)
+1. **Talk with your landlord** about a plan to catch up on rent.[200]
+2. **Tell the court** in your answer if you applied for rent help.[200]
+3. **Call a HUD-approved housing counselor** at 1-800-569-4287.[200]
+4. **Keep your important papers together** in case you have to move.[60] (Tab 4, Documents and money)
 
 **Leave or stay?**
 
-- **Do this if** the court rules against you: ask the judge or clerk to put the order on hold while your rent help is processed.[199]
-- **Do this if** you have to move: apply for help with moving costs, a deposit and application fees.[199] (Tab 3, Getting out)
-- **Do this if** you are in the military: call your Legal Assistance Office. You can ask the court to pause the case for up to 90 days.[199]
+- **Do this if** the court rules against you: ask the judge or clerk to put the order on hold while your rent help is processed.[200]
+- **Do this if** you have to move: apply for help with moving costs, a deposit and application fees.[200] (Tab 3, Getting out)
+- **Do this if** you are in the military: call your Legal Assistance Office. You can ask the court to pause the case for up to 90 days.[200]
 
 ### Where and who
 
@@ -2216,7 +2237,7 @@ Your landlord gives you a notice to pay or leave, or you get court papers for an
 
 ### Do not
 
-- Do not ignore court papers. Too many renters give up before they have a chance to go to court.[199]
+- Do not ignore court papers. Too many renters give up before they have a chance to go to court.[200]
 
 ### When it is over
 
@@ -2232,8 +2253,8 @@ Your pharmacy cannot fill a prescription, or you hear that a medicine you take i
 
 ### Do first
 
-1. **Call other pharmacies.[188]**
-2. **Ask your prescriber or pharmacist whether another medicine would work.[188]**
+1. **Call other pharmacies.[189]**
+2. **Ask your prescriber or pharmacist whether another medicine would work.[189]**
 3. **Search FDA's drug shortage list by the medicine's generic name.[23]**
 
 ### Then
@@ -2255,7 +2276,7 @@ Your pharmacy cannot fill a prescription, or you hear that a medicine you take i
 
 ### Do not
 
-- Do not buy medicine from a website that is not a state-licensed pharmacy.[190]
+- Do not buy medicine from a website that is not a state-licensed pharmacy.[191]
 - Do not use expired medicines.[31]
 - Do not share antibiotics or save them for later.[29]
 
@@ -2274,25 +2295,25 @@ There are riots, violent protests or a curfew near your home, your work or your 
 
 ### Do first
 
-1. **Stay away from the area. Take another route.[203]**
-2. **Go inside and lock the doors. Stay away from windows and doors.[203]**
-3. **Follow police directions and any curfew.[203]**
-4. **Stay informed through official alerts or a battery radio.[203]**
+1. **Stay away from the area. Take another route.[204]**
+2. **Go inside and lock the doors. Stay away from windows and doors.[204]**
+3. **Follow police directions and any curfew.[204]**
+4. **Stay informed through official alerts or a battery radio.[204]**
 5. **Text your household to say where you are.[9]**
 
 ### Then
 
-1. **Know your exit routes** in case you have to leave.[203]
+1. **Know your exit routes** in case you have to leave.[204]
 2. **Use your home supplies** of food, water and medicine.[1]
-3. **Look out for your neighbours,** and ask them to look out for you.[204]
-4. **If someone near you is tense,** stay calm and friendly, and get help if you need it.[205]
-5. **If violence starts near you, get away.** If you cannot, hide out of sight behind something solid.[147]
+3. **Look out for your neighbours,** and ask them to look out for you.[205]
+4. **If someone near you is tense,** stay calm and friendly, and get help if you need it.[206]
+5. **If violence starts near you, get away.** If you cannot, hide out of sight behind something solid.[148]
 
 **Leave or stay?**
 
-- **Stay if** the trouble is not at your home. Stay inside, away from windows, in __________.[203] (Tab 3, Home)
-- **Leave if** officials tell you to, or the danger reaches your street. Use your exit route to __________.[8, 203] (Tab 3, Getting out)
-- **Call 911 if** you see the situation change near you, or someone is hurt.[203]
+- **Stay if** the trouble is not at your home. Stay inside, away from windows, in __________.[204] (Tab 3, Home)
+- **Leave if** officials tell you to, or the danger reaches your street. Use your exit route to __________.[8, 204] (Tab 3, Getting out)
+- **Call 911 if** you see the situation change near you, or someone is hurt.[204]
 
 ### Where and who
 
@@ -2304,14 +2325,14 @@ There are riots, violent protests or a curfew near your home, your work or your 
 
 ### Do not
 
-- Do not go to look. Stay away from the area.[203]
-- Do not stop for belongings if you have to get away.[147]
+- Do not go to look. Stay away from the area.[204]
+- Do not stop for belongings if you have to get away.[148]
 
 ### When it is over
 
-- Check that the area is safe before you go out.[203]
-- Get first aid, or support for stress, if anyone needs it.[203]
-- Report any damage to your property to the police, and take photos for your insurer.[125, 203] (Tab 9, After a disaster: the first 30 days)
+- Check that the area is safe before you go out.[204]
+- Get first aid, or support for stress, if anyone needs it.[204]
+- Report any damage to your property to the police, and take photos for your insurer.[126, 204] (Tab 9, After a disaster: the first 30 days)
 
 ## Cyberattack on services
 
@@ -2323,27 +2344,27 @@ Card payments, a bank, a pharmacy, a hospital or a utility stops working because
 
 ### Do first
 
-1. **Pay with cash in small bills.[60]**
-2. **Check your bank and card statements for charges you did not make.[186]**
-3. **Tell your bank or card company about any charge you did not make.[186]**
-4. **Change your passwords if you see strange activity.[186]**
-5. **Try another pharmacy if yours cannot fill a prescription.[188]**
+1. **Pay with cash in small bills.[61]**
+2. **Check your bank and card statements for charges you did not make.[187]**
+3. **Tell your bank or card company about any charge you did not make.[187]**
+4. **Change your passwords if you see strange activity.[187]**
+5. **Try another pharmacy if yours cannot fill a prescription.[189]**
 6. **Take your written medicine list to the pharmacy or doctor.[34] (Tab 2, Who is in this binder)**
 
 ### Then
 
-1. **Check your credit reports** for accounts or loans you did not open.[186]
-2. **Turn on two-step sign-in** for your email and bank.[186]
-3. **Install software updates.**[206]
-4. **Tell your work or school** if a device you use there was affected.[186]
-5. **Report identity theft** to the Federal Trade Commission.[186]
-6. **Report online crime** to the FBI's Internet Crime Complaint Center (IC3).[186]
-7. **File a police report** if you were a victim, so there is an official record.[186]
+1. **Check your credit reports** for accounts or loans you did not open.[187]
+2. **Turn on two-step sign-in** for your email and bank.[187]
+3. **Install software updates.**[207]
+4. **Tell your work or school** if a device you use there was affected.[187]
+5. **Report identity theft** to the Federal Trade Commission.[187]
+6. **Report online crime** to the FBI's Internet Crime Complaint Center (IC3).[187]
+7. **File a police report** if you were a victim, so there is an official record.[187]
 
 **Leave or stay?**
 
-- **Do this if** your Social Security number was stolen: call Social Security at 1-800-269-0271.[186]
-- **Do this if** someone who says they are from the government asks you for money: hang up. The government does not call, text or message you about owing money.[186]
+- **Do this if** your Social Security number was stolen: call Social Security at 1-800-269-0271.[187]
+- **Do this if** someone who says they are from the government asks you for money: hang up. The government does not call, text or message you about owing money.[187]
 
 ### Where and who
 
@@ -2353,19 +2374,19 @@ Card payments, a bank, a pharmacy, a hospital or a utility stops working because
 
 ### Do not
 
-- Do not click links in texts or emails from people you do not know.[186]
-- Do not give a caller control of your computer. Companies do not call to fix it.[186]
-- Do not share PINs or passwords.[186]
+- Do not click links in texts or emails from people you do not know.[187]
+- Do not give a caller control of your computer. Companies do not call to fix it.[187]
+- Do not share PINs or passwords.[187]
 
 ### When it is over
 
-- Keep checking your statements and credit reports.[186]
-- Back up your files in encrypted storage.[186]
-- Keep some cash at home in small bills.[60]
+- Keep checking your statements and credit reports.[187]
+- Back up your files in encrypted storage.[187]
+- Keep some cash at home in small bills.[61]
 
 ## A household member is arrested or detained
 
-**Here:** about 15 in 100 households like yours in the next 10 years · How bad: Serious[75, 76, 77]
+**Here:** about 15 in 100 households like yours in the next 10 years · How bad: Serious[76, 77, 78]
 
 ### Use this when
 
@@ -2373,20 +2394,20 @@ Someone in your household is arrested, or held by the police or another agency.
 
 ### Do first
 
-1. **Call your lawyer.[207] (Tab 1, Contacts at a glance)**
-2. **Arrange care for any children and pets with your trusted circle.[207] (Tab 1, Contacts at a glance)**
-3. **Answer calls from unknown numbers until they are home.[207]**
+1. **Call your lawyer.[208] (Tab 1, Contacts at a glance)**
+2. **Arrange care for any children and pets with your trusted circle.[208] (Tab 1, Contacts at a glance)**
+3. **Answer calls from unknown numbers until they are home.[208]**
 
 ### Then
 
-1. **If they gave you power of attorney,** use it to handle their bills and health care while they cannot.[208]
+1. **If they gave you power of attorney,** use it to handle their bills and health care while they cannot.[209]
 2. **Call or text 988** if the stress is too much.[10]
 
 **Leave or stay?**
 
-- **Do this if** they cannot afford a lawyer: they have the right to one the government provides.[209]
-- **Do this if** immigration officers (ICE) are holding them: search ICE's online detainee locator with their name, country of birth and birth date, or their A-number.[210]
-- **Do this if** they were arrested at a protest: call your area's legal hotline, if one runs there.[211]
+- **Do this if** they cannot afford a lawyer: they have the right to one the government provides.[210]
+- **Do this if** immigration officers (ICE) are holding them: search ICE's online detainee locator with their name, country of birth and birth date, or their A-number.[211]
+- **Do this if** they were arrested at a protest: call your area's legal hotline, if one runs there.[212]
 
 ### Where and who
 
@@ -2398,11 +2419,11 @@ Someone in your household is arrested, or held by the police or another agency.
 
 ### Do not
 
-- Do not talk about what happened on calls from custody. Police can listen to them, except calls with a lawyer.[209]
+- Do not talk about what happened on calls from custody. Police can listen to them, except calls with a lawyer.[210]
 
 ### When it is over
 
-- Keep your lawyer's number on paper, and learn one or two numbers by heart.[207]
+- Keep your lawyer's number on paper, and learn one or two numbers by heart.[208]
 
 ## Long illness in the household
 
@@ -2414,24 +2435,24 @@ Someone at home will be sick or recovering for weeks or months, and needs care.
 
 ### Do first
 
-1. **Ask your employer about family and medical leave. Eligible workers can take up to 12 weeks of unpaid, job-protected leave to care for a spouse, child or parent.[212]**
+1. **Ask your employer about family and medical leave. Eligible workers can take up to 12 weeks of unpaid, job-protected leave to care for a spouse, child or parent.[213]**
 2. **Write down every medicine, its dose, and any allergies.[34] (Tab 2, Who is in this binder)**
 3. **Ask the doctor or pharmacist how to keep an emergency supply of medicine.[34]**
-4. **Apply for Social Security disability if an earner's illness will last a year or more and keeps them from working.[213]**
-5. **Ask your trusted circle for help with rides, meals and errands.[207] (Tab 1, Contacts at a glance)**
+4. **Apply for Social Security disability if an earner's illness will last a year or more and keeps them from working.[214]**
+5. **Ask your trusted circle for help with rides, meals and errands.[208] (Tab 1, Contacts at a glance)**
 6. **Make a power outage plan for their medical equipment with their provider.[35]**
 
 ### Then
 
-1. **Help them name a health care proxy** in a durable power of attorney for health care.[208]
-2. **Give someone else a key,** and show them where supplies are and how to use the equipment.[214]
-3. **Look after the caregiver.** Keep regular sleep, and talk with people you trust.[215]
+1. **Help them name a health care proxy** in a durable power of attorney for health care.[209]
+2. **Give someone else a key,** and show them where supplies are and how to use the equipment.[215]
+3. **Look after the caregiver.** Keep regular sleep, and talk with people you trust.[216]
 4. **Call or text 988** if stress becomes too much.[10]
 
 **Leave or stay?**
 
-- **Do this if** you need more leave than federal law gives: ask your state labor department.[212]
-- **Do this if** the household loses health coverage: pick a Marketplace plan within 60 days.[196]
+- **Do this if** you need more leave than federal law gives: ask your state labor department.[213]
+- **Do this if** the household loses health coverage: pick a Marketplace plan within 60 days.[197]
 
 ### Where and who
 
@@ -2443,16 +2464,16 @@ Someone at home will be sick or recovering for weeks or months, and needs care.
 ### Do not
 
 - Do not share antibiotics or save them for later.[29]
-- Do not take a payday loan to cover bills. A typical two-week loan costs as much as almost 400 percent a year.[200]
+- Do not take a payday loan to cover bills. A typical two-week loan costs as much as almost 400 percent a year.[201]
 
 ### When it is over
 
 - Update the medicine list and refill the emergency supply.[34]
-- Keep the power of attorney papers with your other documents.[208] (Tab 4, Documents and money)
+- Keep the power of attorney papers with your other documents.[209] (Tab 4, Documents and money)
 
 ## An earner dies or can no longer work
 
-**Here:** about 9 in 100 households like yours in the next 10 years · How bad: Very severe[26, 78, 79]
+**Here:** about 9 in 100 households like yours in the next 10 years · How bad: Very severe[26, 79, 80]
 
 ### Use this when
 
@@ -2460,24 +2481,24 @@ Someone whose income the household relies on dies, or becomes unable to work for
 
 ### Do first
 
-1. **Get several certified copies of the death certificate.[216]**
-2. **Call Social Security at 1-800-772-1213 to ask about survivor benefits.[217]**
-3. **Tell banks, card companies and credit bureaus about the death.[216]**
-4. **Apply for Social Security disability if the earner's condition will last a year or more and keeps them from working. Apply online or at 1-800-772-1213.[213]**
-5. **Check your health coverage. If you lose it, you can pick a Marketplace plan within 60 days.[196]**
-6. **Ask your trusted circle for help with children, meals and errands.[207] (Tab 1, Contacts at a glance)**
+1. **Get several certified copies of the death certificate.[217]**
+2. **Call Social Security at 1-800-772-1213 to ask about survivor benefits.[218]**
+3. **Tell banks, card companies and credit bureaus about the death.[217]**
+4. **Apply for Social Security disability if the earner's condition will last a year or more and keeps them from working. Apply online or at 1-800-772-1213.[214]**
+5. **Check your health coverage. If you lose it, you can pick a Marketplace plan within 60 days.[197]**
+6. **Ask your trusted circle for help with children, meals and errands.[208] (Tab 1, Contacts at a glance)**
 
 ### Then
 
-1. **Tell the other programs and businesses the person used,** and close or transfer accounts.[216]
-2. **If the earner is alive but cannot act,** ask the person named in their power of attorney to handle money and health care.[208]
-3. **Get legal help** with the will and accounts. Legal aid helps people with low incomes.[202]
+1. **Tell the other programs and businesses the person used,** and close or transfer accounts.[217]
+2. **If the earner is alive but cannot act,** ask the person named in their power of attorney to handle money and health care.[209]
+3. **Get legal help** with the will and accounts. Legal aid helps people with low incomes.[203]
 4. **Call or text 988** for support when grief or stress is too much.[10]
 
 **Leave or stay?**
 
-- **Do this if** rent or the mortgage will be late: call 211 or your local government about help.[198]
-- **Do this if** the person left debts: read the FTC's advice on what to do about them.[216]
+- **Do this if** rent or the mortgage will be late: call 211 or your local government about help.[199]
+- **Do this if** the person left debts: read the FTC's advice on what to do about them.[217]
 
 ### Where and who
 
@@ -2488,11 +2509,11 @@ Someone whose income the household relies on dies, or becomes unable to work for
 
 ### Do not
 
-- Do not take a payday loan. A typical two-week loan costs as much as almost 400 percent a year.[200]
+- Do not take a payday loan. A typical two-week loan costs as much as almost 400 percent a year.[201]
 
 ### When it is over
 
-- Update your own will and powers of attorney.[208]
+- Update your own will and powers of attorney.[209]
 
 ## Regional blackout
 
@@ -2504,26 +2525,26 @@ The power is out across your town or region and could stay out for days. Stores,
 
 ### Do first
 
-1. **Switch medical devices to backup power. If it will not last, go where there is power.[35, 123]**
-2. **Use flashlights, not candles.[123]**
-3. **Check on your people and neighbours.[123]**
-4. **Get news from a battery radio or phone alerts.[123]**
+1. **Switch medical devices to backup power. If it will not last, go where there is power.[35, 124]**
+2. **Use flashlights, not candles.[124]**
+3. **Check on your people and neighbours.[124]**
+4. **Get news from a battery radio or phone alerts.[124]**
 5. **Text instead of calling.[9]**
 6. **Keep the fridge and freezer closed.[35]**
 
 ### Then
 
 1. **Unplug appliances and electronics.**[35]
-2. **Treat a dark traffic light as a stop sign** in every direction.[218]
-3. **Pay with cash** in small bills.[60]
-4. **Follow any water notice,** such as boil water or do not drink.[133]
-5. **Eat fresh food first.**[123]
+2. **Treat a dark traffic light as a stop sign** in every direction.[219]
+3. **Pay with cash** in small bills.[61]
+4. **Follow any water notice,** such as boil water or do not drink.[134]
+5. **Eat fresh food first.**[124]
 
 **Leave or stay?**
 
-- **Leave if** the home gets too hot or too cold, or a medical device needs power you cannot supply. Go to a warming or cooling center, or __________.[123] (Tab 3, Getting out)
+- **Leave if** the home gets too hot or too cold, or a medical device needs power you cannot supply. Go to a warming or cooling center, or __________.[124] (Tab 3, Getting out)
 - **Leave if** officials tell you to. Go early.[8] (Tab 3, Getting out)
-- **Call 911 if** anyone has a headache, dizziness, nausea or confusion. Get everyone outside first.[183]
+- **Call 911 if** anyone has a headache, dizziness, nausea or confusion. Get everyone outside first.[184]
 
 ### Where and who
 
@@ -2537,12 +2558,12 @@ The power is out across your town or region and could stay out for days. Stores,
 
 - Never heat your home with a gas stove or oven.[35]
 - Never use a generator, camp stove or charcoal grill inside, even in the garage.[35, 48]
-- Stay at least 35 feet from a downed power line and anything it touches. Call 911.[123]
+- Stay at least 35 feet from a downed power line and anything it touches. Call 911.[124]
 
 ### When it is over
 
 - Throw out food that was 40°F or warmer for 2 hours or more.[35]
-- Ask your pharmacist or doctor before you use a refrigerated medicine that got warm.[123]
+- Ask your pharmacist or doctor before you use a refrigerated medicine that got warm.[124]
 
 ## Something else
 
@@ -2552,23 +2573,23 @@ Something is wrong and no other checklist fits.
 
 ### Do first
 
-1. **Get away from danger. If you smell gas, see fire or smoke, or the building looks damaged, get everyone out.[4, 108, 125]**
-2. **Call 911 if anyone is hurt or in danger.[109]**
-3. **If a teen or adult's heart has stopped, do hands-only CPR.[114]**
-4. **Check on everyone in your household, and ask who needs help.[123]**
+1. **Get away from danger. If you smell gas, see fire or smoke, or the building looks damaged, get everyone out.[4, 109, 126]**
+2. **Call 911 if anyone is hurt or in danger.[110]**
+3. **If a teen or adult's heart has stopped, do hands-only CPR.[115]**
+4. **Check on everyone in your household, and ask who needs help.[124]**
 5. **Get official news from phone alerts, radio or TV.[7]**
 6. **Text your out-of-area contact to say where you are.[9]**
 
 ### Then
 
 1. **Follow instructions from local officials.**[8]
-2. **Keep a record.** Take photos, list any damage, and keep every receipt.[125, 219] (Tab 9, After a disaster: the first 30 days)
+2. **Keep a record.** Take photos, list any damage, and keep every receipt.[126, 220] (Tab 9, After a disaster: the first 30 days)
 3. **Talk to someone** if you need to. Call or text 988, or 1-800-985-5990 after a disaster.[10, 12]
 
 **Leave or stay?**
 
-- **Leave if** officials tell you to, or the home is unsafe. Take phones, chargers, medicines, ID and cash. Go to __________.[8, 160] (Tab 3, Getting out)
-- **Stay if** officials tell you to stay inside. Go to __________.[167] (Tab 3, Home)
+- **Leave if** officials tell you to, or the home is unsafe. Take phones, chargers, medicines, ID and cash. Go to __________.[8, 161] (Tab 3, Getting out)
+- **Stay if** officials tell you to stay inside. Go to __________.[168] (Tab 3, Home)
 - **Go to** __________ if you are separated from your household.[3] (Tab 3, Neighborhood)
 
 ### Where and who
@@ -2584,34 +2605,34 @@ Something is wrong and no other checklist fits.
 
 ### Do not
 
-- Do not go into a building that smells of gas or looks damaged.[125]
+- Do not go into a building that smells of gas or looks damaged.[126]
 - Never use a generator, camp stove or charcoal grill inside, even in the garage.[35, 48]
-- Stay at least 35 feet from a downed power line and anything it touches. Call 911.[123]
-- Never walk or drive through floodwater.[129]
+- Stay at least 35 feet from a downed power line and anything it touches. Call 911.[124]
+- Never walk or drive through floodwater.[130]
 
 ### When it is over
 
-- Apply for FEMA help at 1-800-621-3362 if your county has a federal disaster declaration.[220] (Tab 9, After a disaster: the first 30 days)
+- Apply for FEMA help at 1-800-621-3362 if your county has a federal disaster declaration.[221] (Tab 9, After a disaster: the first 30 days)
 
 # Tab 9: After
 
 ## After a disaster: the first 30 days
 
-**Your county.** Maricopa County, Arizona had no federal major-disaster declarations in the last five full years.[221]
+**Your county.** Maricopa County, Arizona had no federal major-disaster declarations in the last five full years.[222]
 
 Recovery takes weeks. These steps come in rough order.
 
-**Going home.** Go back only when local officials say it is safe. Do not go inside if you smell gas or the building looks damaged.[125] Run a generator only outside, more than 20 feet from windows, doors and vents.[48]
+**Going home.** Go back only when local officials say it is safe. Do not go inside if you smell gas or the building looks damaged.[126] Run a generator only outside, more than 20 feet from windows, doors and vents.[48]
 
-**Insurance and records.** Before you clean up, take photos and videos and make a list of the damage.[125] Keep every receipt.[219] Call your insurer as soon as you can, and an adjuster will come to inspect. Check the adjuster's estimate, and talk to them before you sign a repair contract.[222]
+**Insurance and records.** Before you clean up, take photos and videos and make a list of the damage.[126] Keep every receipt.[220] Call your insurer as soon as you can, and an adjuster will come to inspect. Check the adjuster's estimate, and talk to them before you sign a repair contract.[223]
 
-**Help from FEMA.** If a federal disaster declaration covers your county, apply at DisasterAssistance.gov or call 1-800-621-3362.[220] FEMA help does not replace insurance.[223]
+**Help from FEMA.** If a federal disaster declaration covers your county, apply at DisasterAssistance.gov or call 1-800-621-3362.[221] FEMA help does not replace insurance.[224]
 
-**Scams.** FEMA never charges to apply or to inspect.[224] Its inspectors carry an official photo ID and never ask for your bank details; a FEMA shirt is not an ID.[219] Never sign your insurance check over to a contractor, and walk away from anyone who wants cash up front.[225]
+**Scams.** FEMA never charges to apply or to inspect.[225] Its inspectors carry an official photo ID and never ask for your bank details; a FEMA shirt is not an ID.[220] Never sign your insurance check over to a contractor, and walk away from anyone who wants cash up front.[226]
 
-**Medicine.** In a declared disaster, Medicare drug plans can help you find a pharmacy and replace lost medicine.[28] Many states let a pharmacist give an emergency supply when your prescriber cannot be reached, and the rules differ by state.[19] Healthcare Ready's Rx Open map shows which pharmacies are open in a disaster area.[226]
+**Medicine.** In a declared disaster, Medicare drug plans can help you find a pharmacy and replace lost medicine.[28] Many states let a pharmacist give an emergency supply when your prescriber cannot be reached, and the rules differ by state.[19] Healthcare Ready's Rx Open map shows which pharmacies are open in a disaster area.[227]
 
-**Papers.** To replace lost IDs, start with your birth certificate, from the vital records office of the state where you were born.[139]
+**Papers.** To replace lost IDs, start with your birth certificate, from the vital records office of the state where you were born.[140]
 
 Keep track as you go: (Tab 9, Damage log), (Tab 9, Expenses log), (Tab 9, People contacted) and (Tab 9, Medications given).
 
@@ -2801,176 +2822,177 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 54. Hurricanes. FEMA / Ready.gov, 2026. https://www.ready.gov/hurricanes
 55. Chemicals and Hazardous Materials Incidents. FEMA / Ready.gov, 2026. https://www.ready.gov/chemical
 56. Nuclear Explosion. FEMA / Ready.gov (via Internet Archive), 2022. https://web.archive.org/web/20221222190617/https://www.ready.gov/nuclear-explosion
-57. Toxics Release Inventory, 2024 national data. U.S. Environmental Protection Agency, 2025. https://www.epa.gov/toxics-release-inventory-tri-program
-58. OpenFEMA: NFIP Residential Penetration Rates (v1) and FIMA NFIP Redacted Claims. FEMA, 2026. https://www.fema.gov/about/openfema/data-sets
-59. Emergency Financial First Aid Kit. FEMA and Operation HOPE, 2019. https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf
-60. Financial Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/financial-preparedness
-61. February 22, 2024 nationwide wireless network outage: report and findings. Federal Communications Commission, Public Safety and Homeland Security Bureau, 2024. https://docs.fcc.gov/public/attachments/DOC-404150A1.pdf
-62. Household Pulse Survey: adults displaced by natural disasters. U.S. Census Bureau data, reported by the National Low Income Housing Coalition, 2023. https://nlihc.org/resource/new-data-household-pulse-survey-suggest-disparities-among-households-displaced-disasters
-63. Estimating Eviction Prevalence across the United States. Gromis A. et al., Princeton University Eviction Lab, 2022. https://data-downloads.evictionlab.org/
-64. Help & FAQ: households threatened with eviction and eviction judgments, 2000-2018. Eviction Lab, Princeton University, 2026. https://evictionlab.org/help-faq/
-65. National Estimates: Eviction in America. Eviction Lab, Princeton University, 2026. https://evictionlab.org/national-estimates/
-66. Estimating eviction prevalence across the United States. Gromis A., Fellows I., Hendrickson J. R., Edmonds L., Leung L., Porton A. and Desmond M.; Proceedings of the National Academy of Sciences 119(21), e2116169119, 2022. https://pmc.ncbi.nlm.nih.gov/articles/PMC9173767/
-67. Facts + Statistics: Homeowners and renters insurance. Insurance Information Institute (Triple-I), from ISO data, 2026. https://www.iii.org/fact-statistic/facts-statistics-homeowners-and-renters-insurance
-68. How to protect your home from water damage. Insurance Information Institute (Triple-I), 2026. https://www.iii.org/article/how-to-protect-your-home-from-water-damage
-69. Quantitative core model specification (research report): hazards, consequence buckets, durations. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/risk-model.md
-70. How well do these numbers hold up? The frozen backtest (docs/VALIDATION.md): 22 past disasters, the scoring rule and the verdicts for each engine version. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/VALIDATION.md
-71. FastStats: Emergency Department Visits. CDC National Center for Health Statistics, 2025. https://www.cdc.gov/nchs/fastats/emergency-department.htm
-72. Overview of Motor Vehicle Traffic Crashes in 2023. National Highway Traffic Safety Administration, 2025. https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813705
-73. Work Experience of the Population, 2024. U.S. Bureau of Labor Statistics, 2026. https://www.bls.gov/news.release/work.nr0.htm
-74. Job Openings and Labor Turnover Survey: layoffs and discharges rate. U.S. Bureau of Labor Statistics, 2026. https://www.bls.gov/jlt/
-75. National Survey on Drug Use and Health, 2022-2024 public-use files: times arrested and booked in the past 12 months, by age and sex. Substance Abuse and Mental Health Services Administration (SAMHSA), Data Analysis System, 2025. https://datatools.samhsa.gov/nsduh/2024/nsduh-2024-ds0001/crosstab?row=NOBOOKY2&column=CATAG6&control=IRSEX&weight=ANALWT2_C
-76. Crime in the United States, 2023, 2024 and 2025 editions: persons arrested. FBI Uniform Crime Reporting Program (Crime Data Explorer), 2026. https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads
-77. Annual Estimates of the Resident Population by Single Year of Age and Sex for the United States: April 1, 2020 to July 1, 2025. U.S. Census Bureau, Population Division, 2026. https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/national/asrh/nc-est2025-agesex-res.csv
-78. Disability Benefits. Social Security Administration, 2026. https://www.ssa.gov/pubs/EN-05-10029.pdf
-79. FastStats: Accidents or Unintentional Injuries. CDC National Center for Health Statistics, 2026. https://www.cdc.gov/nchs/fastats/accidental-injury.htm
-80. Methodology and Codebook: The Rising Threat of Anti-Government Domestic Terrorism. Center for Strategic and International Studies, Warfare, Irregular Threats, and Terrorism Program, 2024. https://csis-website-prod.s3.amazonaws.com/s3fs-public/2024-10/241021_McCabe_Domestic_Methodology.pdf
-81. Fiscal Year 2026 Homeland Security Grant Program: Notice of Funding Opportunity. FEMA, 2026. https://www.fema.gov/sites/default/files/documents/fema_gpd_hsgp-nofo-fy2026.pdf
-82. Dam Failures and Incidents. Association of State Dam Safety Officials, 2025. https://damsafety.org/dam-failures
-83. National Inventory of Dams. U.S. Army Corps of Engineers, 2026. https://nid.sec.usace.army.mil/
-84. National Levee Database. U.S. Army Corps of Engineers, 2026. https://levees.sec.usace.army.mil/
-85. 2023 National Seismic Hazard Model for the conterminous United States. U.S. Geological Survey, 2023. https://doi.org/10.5066/P14VGAV4
-86. Operating Nuclear Power Plant Sites. FEMA, 2026. https://gis.fema.gov/arcgis/rest/services/Partner/Operating_Nuclear_Power_Plant_Sites/FeatureServer/0
-87. Can Humanity Achieve a Century of Nuclear Peace?. Forecasting Research Institute, 2024. https://forecastingresearch.org/research/nuclear-risk
-88. Strategic sites and county strategic-exposure classes. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml
-89. Bank Failures and Assistance Transactions. Federal Deposit Insurance Corporation, 2026. https://banks.data.fdic.gov/bankfind-suite/failures
-90. Risk of volcano catastrophe ‘a roll of the dice’, say experts. University of Cambridge, 2022. https://www.cam.ac.uk/research/news/risk-of-volcano-catastrophe-a-roll-of-the-dice-say-experts
-91. Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament. Karger E. et al., Forecasting Research Institute, 2023. https://forecastingresearch.org/pdf/existential-risk-persuasion-tournament.pdf
-92. How likely is a nuclear exchange between the US and Russia?. Rodriguez L., Rethink Priorities, 2019. https://rethinkpriorities.org/research-area/how-likely-is-a-nuclear-exchange-between-the-us-and-russia/
-93. Analyzing and Reducing the Risks of Inadvertent Nuclear War Between the United States and Russia. Barrett A.M., Baum S.D. and Hostetler K., 2013. https://scienceandglobalsecurity.org/archive/sgs21barrett.pdf
-94. Nuclear Attack Planning Base - 1990 (NAPB-90): Final Project Report. FEMA (via the NTIS National Technical Reports Library, PB87-204624), 1987. https://ntrl.ntis.gov/NTRL/dashboard/searchResults/titleDetail/PB87204624.xhtml
-95. SLG 101: Guide for All-Hazard Emergency Operations Planning, Tab 2 to Attachment F: Nuclear Conflict. FEMA (via Internet Archive), 1996. https://web.archive.org/web/20090108212857/http://www.fema.gov/pdf/plan/6-ch-f-2.pdf
-96. Nuclear Detonation Response Guidance: Planning for the First 72 Hours. FEMA, 2023. https://www.fema.gov/sites/default/files/documents/fema_oet-72-hour-nuclear-detonation-response-guidance.pdf
-97. On the lognormality of historical magnetic-storm intensity statistics: Implications for extreme-event probabilities. Love J.J., Rigler E.J., Pulkkinen A. and Riley P. (U.S. Geological Survey publication record), 2015. https://www.usgs.gov/publications/lognormality-historical-magnetic-storm-intensity-statistics-implications-extreme-event
-98. Probability estimation of a Carrington-like geomagnetic storm. Moriña D. et al., 2019. https://www.nature.com/articles/s41598-019-38918-8
-99. Solar Storm Risk to the North American Electric Grid. Lloyd's and Atmospheric and Environmental Research, 2013. https://assets.lloyds.com/assets/pdf-solar-storm-risk-to-the-north-american-electric-grid/1/pdf-Solar-Storm-Risk-to-the-North-American-Electric-Grid.pdf
-100. Benchmark Geomagnetic Disturbance Event Description. North American Electric Reliability Corporation, 2014. https://www.nerc.com/globalassets/standards/projects/2013-03/benchmark_gmd_event_aug27_clean.pdf
-101. International Geomagnetic Reference Field, 14th generation (IGRF-14): coefficients. IAGA (NOAA NCEI copy), 2024. https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt
-102. EMP Threat Real but Limited, EPRI Says in Much-Anticipated Report. POWER magazine, 2019. https://www.powermag.com/emp-threat-real-but-limited-epri-says-in-anticipated-report/
-103. 11 Months After Hurricane Maria Hit Puerto Rico, Officials Say All Power Is Restored. NPR, 2018. https://www.npr.org/2018/08/15/639001372/11-months-after-hurricane-maria-hit-puerto-rico-officials-say-all-power-is-resto
-104. Profiles of Incidents Involving CBRN and Non-state Actors (POICN) Database. START, University of Maryland, 2026. https://www.start.umd.edu/research-projects/profiles-incidents-involving-cbrn-and-non-state-actors-poicn-database
-105. FBI report on active attacker incidents in the United States in 2024. FBI (via Internet Archive), 2025. https://web.archive.org/web/20260904170718/https://www.fbi.gov/file-repository/reports-and-publications/2024-active-shooter-report/view
-106. Gas Emergencies. Pennsylvania Public Utility Commission, 2026. https://www.puc.pa.gov/pipeline-safety/gas-emergencies/
-107. Carbon Monoxide Questions and Answers. U.S. Consumer Product Safety Commission, 2026. https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Carbon-Monoxide-Information-Center/Carbon-Monoxide-Questions-and-Answers
-108. Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills
-109. FAQ About Calling 911. National 911 Program (NHTSA), 2023. https://www.911.gov/calling-911/frequently-asked-questions/
-110. When Your Child Is Missing: A Family Survival Guide. U.S. Department of Justice, Office of Juvenile Justice and Delinquency Prevention, 2025. https://ojjdp.ojp.gov/publications/family-survival-guide-fifth-edition.pdf
-111. Is Your Child Missing?. National Center for Missing & Exploited Children, 2026. https://www.missingkids.org/gethelpnow/isyourchildmissing
-112. Wandering. Alzheimer's Association, 2026. https://www.alz.org/help-support/caregiving/stages-behaviors/wandering
-113. Coping With Alzheimer's Behaviors: Wandering and Getting Lost. National Institute on Aging, 2024. https://www.nia.nih.gov/health/alzheimers-changes-behavior-and-communication/coping-alzheimers-behaviors-wandering-and
-114. CPR. MedlinePlus, National Library of Medicine, 2026. https://medlineplus.gov/cpr.html
-115. Adult & Child Choking: Symptoms and First Aid. American Red Cross, 2026. https://www.redcross.org/take-a-class/resources/learn-first-aid/adult-child-choking
-116. Bleeding. American Red Cross, 2026. https://www.redcross.org/take-a-class/resources/learn-first-aid/bleeding-life-threatening-external
-117. Until Help Arrives. FEMA / Ready.gov (via Internet Archive), 2020. https://www.ready.gov/sites/default/files/2020-07/until-help-arrives-web-tutorial.pdf
-118. Signs and Symptoms of Stroke. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/stroke/signs-symptoms/index.html
-119. About Heart Attack Symptoms, Risk, and Recovery. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/heart-disease/about/heart-attack.html
-120. Anatomy of a First Aid Kit. American Red Cross, 2025. https://www.redcross.org/get-help/how-to-prepare-for-emergencies/anatomy-of-a-first-aid-kit.html
-121. Overview: Lightning Safety. NOAA National Weather Service, 2026. https://www.weather.gov/safety/lightning-safety-overview
-122. Thunderstorms and Lightning. FEMA / Ready.gov, 2026. https://www.ready.gov/thunderstorms-lightning
-123. Power Outage Safety. American Red Cross, 2026. https://www.redcross.org/get-help/how-to-prepare-for-emergencies/types-of-emergencies/power-outage.html
-124. What to Do to Protect Yourself From Electrical Hazards. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-from-electrical-hazards.html
-125. Recovering from Disaster. FEMA / Ready.gov, 2026. https://www.ready.gov/recovering-disaster
-126. A Consumer's Guide to Home Insurance. National Association of Insurance Commissioners, 2022. https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf
-127. Severe Weather. Arizona Department of Transportation, 2026. https://azdot.gov/about/transportation-safety/severe-weather
-128. Safety Guidelines: During and After a Winter Storm. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/winter-weather/safety/stay-safe-during-after-a-winter-storm-safety.html
-129. Floods. FEMA / Ready.gov, 2026. https://www.ready.gov/floods
-130. Winter Weather. FEMA / Ready.gov, 2026. https://www.ready.gov/winter-weather
-131. Working Safely Around Downed Electrical Wires. Occupational Safety and Health Administration, 2018. https://www.osha.gov/sites/default/files/publications/downed_electrical_wires.pdf
-132. During Hot Weather, Watch for Heat Illness. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/natural-disasters/psa-toolkit/during-hot-weather.html
-133. Drinking Water Advisories: An Overview. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/about/drinking-water-advisories-an-overview.html
-134. A Brief Guide to Mold, Moisture and Your Home. U.S. Environmental Protection Agency, 2026. https://www.epa.gov/mold/brief-guide-mold-moisture-and-your-home
-135. Cold Weather Safety Tips. NOAA National Weather Service, Albany NY office, 2019. https://www.weather.gov/media/aly/PSAs/ExtremeCold.pdf
-136. Get Prepared: Home Protection. Indiana Department of Homeland Security, 2026. https://www.in.gov/dhs/get-prepared/general-safety/home-protection/
-137. What To Do If You're a Victim of a Burglary. Metropolitan Nashville Police Department, 2025. https://www.nashville.gov/departments/police/safety-information/burglary-victim-information
-138. Lost or Stolen Credit, ATM, and Debit Cards. Federal Trade Commission, Consumer Advice, 2026. https://consumer.ftc.gov/articles/lost-or-stolen-credit-atm-and-debit-cards
-139. How to replace lost or stolen ID cards. USAGov, 2026. https://www.usa.gov/replace-vital-documents
-140. How to make a home fire escape plan. National Fire Protection Association, 2026. https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning
-141. Smoke alarms. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/smoke-alarms/
-142. Wildfires. FEMA / Ready.gov, 2026. https://www.ready.gov/wildfires
-143. Go Evacuation Guide (Ready for Wildfire): pre-evacuation steps and tips if trapped. California Department of Forestry and Fire Protection (CAL FIRE), 2026. https://www.readyforwildfire.org/prepare-for-wildfire/go-evacuation-guide/
-144. Wildfire Evacuation Outreach Materials. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/wui/outreach/wildfire-evacuation.html
-145. During a Flood. NOAA National Weather Service, 2026. https://www.weather.gov/safety/flood-during
-146. Explosions. FEMA / Ready.gov, 2025. https://www.ready.gov/explosions
-147. Mass Gathering Incidents. FEMA / Ready.gov, 2026. https://www.ready.gov/public-spaces
-148. Suspicious Activity and Items. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/topics/physical-security/bombing-prevention/suspicious-activity-and-items
-149. Bomb Threats. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/topics/physical-security/bombing-prevention/bomb-threats
-150. Back to School, Back to Safety. FEMA, 2026. https://www.fema.gov/blog/back-school-back-safety
-151. Bomb Threat Guide. Cybersecurity and Infrastructure Security Agency (via Internet Archive), 2025. https://www.cisa.gov/sites/default/files/2025-08/Bomb_Threat_Guide_082025_508.pdf
-152. Dam Failures. Missouri State Emergency Management Agency, 2026. https://sema.dps.mo.gov/plan_and_prepare/dam_failure.php
-153. Tornadoes. FEMA / Ready.gov, 2026. https://www.ready.gov/tornadoes
-154. Tornadoes. FEMA / Ready.gov (via Internet Archive), 2014. https://web.archive.org/web/20140701131414/https://www.ready.gov/tornadoes
-155. Tornado Safety. NOAA National Weather Service, Storm Prediction Center, 2026. https://www.spc.noaa.gov/faq/tornado/safety.html
-156. Radiation Emergencies. FEMA / Ready.gov, 2026. https://www.ready.gov/radiation
-157. Backgrounder on Emergency Preparedness at Nuclear Power Plants. U.S. Nuclear Regulatory Commission, 2024. https://www.nrc.gov/regulations-legislation/fact-sheets-brochures/backgrounder-on-emergency-preparedness-at-nuclear-power-plants
-158. What to Do: Get Inside. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/radiation-emergencies/response/get-inside.html
-159. How to Self-Decontaminate after a Radiation Emergency. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/radiation-emergencies/prevention/self-decontaminate.html
-160. Be Prepared in Case You Need to Evacuate. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/natural-disasters/psa-toolkit/be-prepared-in-case-you-need-to-evacuate.html
-161. Potassium Iodide. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html
-162. Hurricanes: what to do before, during and after. Texas Department of State Health Services (TexasReady), 2026. https://texasready.gov/be-informed/natural-disasters/hurricanes.html
-163. Staying Safe with Electric Vehicles. Hillsborough County, Florida, 2025. https://hcfl.gov/residents/sustainability-and-green/green-hillsborough/staying-safe-with-electric-vehicles
-164. Extreme Heat. FEMA / Ready.gov, 2026. https://www.ready.gov/heat
-165. Emergency Disinfection of Drinking Water. U.S. Environmental Protection Agency, 2026. https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water
-166. Boil Water Notices: Checklist for Residents and Homeowners. New York State Department of Health, 2018. https://www.health.ny.gov/environmental/water/drinking/boilwater/docs/checklist_residents_and_homeowners.pdf
-167. Shelter. FEMA / Ready.gov, 2026. https://www.ready.gov/shelter
-168. Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf
-169. Chemical Agents: Facts About Sheltering in Place. Centers for Disease Control and Prevention (via Internet Archive), 2018. https://web.archive.org/web/20220305164057/https://emergency.cdc.gov/planning/shelteringfacts.asp
-170. About Heat and Your Health. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/heat-health/about/index.html
-171. Heat-Related Illnesses: What to Look For, What to Do. Centers for Disease Control and Prevention, 2017. https://www.cdc.gov/disasters/extremeheat/pdf/Heat_Related_Illness.pdf
-172. Dust Storms and Haboobs. NOAA National Weather Service, 2026. https://www.weather.gov/safety/wind-dust-storm
-173. Reducing Risk for Valley Fever. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/valley-fever/prevention/index.html
-174. About Valley Fever. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/valley-fever/about/index.html
-175. Pandemic. FEMA / Ready.gov, 2026. https://www.ready.gov/pandemic
-176. Preventing Spread of Respiratory Viruses When You're Sick. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/respiratory-viruses/prevention/precautions-when-sick.html
-177. Masks and Respiratory Viruses Prevention. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/respiratory-viruses/prevention/masks.html
-178. Drought. FEMA / Ready.gov, 2026. https://www.ready.gov/drought
-179. Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water
-180. What To Do If You're Caught in a Winter Storm. NOAA National Weather Service, 2026. https://www.weather.gov/safety/winter-during
-181. Stay Safe and Warm Toolkit. FEMA / Ready.gov, 2026. https://www.ready.gov/sites/default/files/2026-01/ready_toolkit_stay-safe-and-warm_01272026.pdf
-182. Hurricane Safety: What to do before, during and after a hurricane. NOAA National Weather Service, 2010. https://www.weather.gov/media/safety/hurricane_safety.pdf
-183. Carbon Monoxide Information Center. U.S. Consumer Product Safety Commission, 2026. https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Carbon-Monoxide-Information-Center
-184. Family Communication Plan fillable card. FEMA / Ready.gov, 2025. https://www.ready.gov/sites/default/files/2025-06/family-communication-plan_fillable-card.pdf
-185. Low and No Cost Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/low-and-no-cost
-186. Cybersecurity. FEMA / Ready.gov, 2026. https://www.ready.gov/cybersecurity
-187. Shelf-Stable Food Safety. USDA Food Safety and Inspection Service, 2024. https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/shelf-stable-food
-188. Frequently Asked Questions about Drug Shortages. U.S. Food and Drug Administration, 2024. https://www.fda.gov/drugs/drug-shortages/frequently-asked-questions-about-drug-shortages
-189. USDA National Hunger Hotline. U.S. Department of Agriculture, 2025. https://www.fna.usda.gov/national-hunger-hotline
-190. BeSafeRx: Your Source for Online Pharmacy Information. U.S. Food and Drug Administration, 2020. https://www.fda.gov/drugs/buying-using-medicine-safely/besaferx-your-source-online-pharmacy-information
-191. Guidelines for Personal Hygiene During an Emergency. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/safety/guidelines-for-personal-hygiene-during-an-emergency.html
-192. Emergency Toilet Guidebook. Regional Disaster Preparedness Organization, Portland Metro Region, 2024. https://www.rdpo.net/emergency-toilet
-193. Heating fire safety. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prevent-fires/heating/
-194. How to Create an Emergency Water Supply. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/water-emergency/about/how-to-create-and-store-an-emergency-water-supply.html
-195. Unemployment Insurance. U.S. Department of Labor, 2026. https://www.dol.gov/general/topic/unemployment-insurance
-196. Getting health coverage outside Open Enrollment: Special Enrollment Periods. CMS / HealthCare.gov, 2026. https://www.healthcare.gov/coverage-outside-open-enrollment/special-enrollment-period/
-197. Health coverage options if you're unemployed. CMS / HealthCare.gov, 2026. https://www.healthcare.gov/unemployed/coverage/
-198. Get help paying rent and bills. Consumer Financial Protection Bureau, 2026. https://www.consumerfinance.gov/housing/housing-insecurity/help-for-renters/get-help-paying-rent-and-bills/
-199. What to do if you’re facing eviction. Consumer Financial Protection Bureau, 2024. https://www.consumerfinance.gov/housing/housing-insecurity/help-for-renters/what-to-do-if-youre-facing-eviction/
-200. What is a payday loan?. Consumer Financial Protection Bureau, 2026. https://www.consumerfinance.gov/ask-cfpb/what-is-a-payday-loan-en-1567/
-201. An essential guide to building an emergency fund. Consumer Financial Protection Bureau, 2025. https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/
-202. I Need Legal Help. Legal Services Corporation, 2026. https://www.lsc.gov/about-lsc/what-legal-aid/i-need-legal-help
-203. Civil Disorder. Fairfax County, Virginia, Department of Emergency Management and Security, 2026. https://www.fairfaxcounty.gov/emergency/readyfairfax/civildisorder
-204. Home and Neighborhood Safety. National Crime Prevention Council, 2026. https://www.ncpc.org/resources/home-neighborhood-safety/
-205. Non-Confrontational Techniques. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/topics/physical-security/non-confrontational-techniques
-206. Secure Our World. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/secure-our-world
-207. A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI
-208. Getting Your Affairs in Order Checklist: Documents to Prepare for the Future. National Institute on Aging, 2026. https://www.nia.nih.gov/health/advance-care-planning/getting-your-affairs-order-checklist-documents-prepare-future
-209. Know Your Rights: Stopped by Police. American Civil Liberties Union, 2026. https://www.aclu.org/know-your-rights/stopped-by-police
-210. Locate someone being detained by ICE for immigration violation or deportation. USAGov, 2026. https://www.usa.gov/detained-by-ice
-211. Mass Defense Resources. National Lawyers Guild, 2026. https://www.nlg.org/massdefenseprogram/protest-tools/
-212. Family and Medical Leave Act. U.S. Department of Labor, Wage and Hour Division, 2026. https://www.dol.gov/agencies/whd/fmla
-213. Apply for Social Security benefits: disability benefits for an adult. Social Security Administration, 2026. https://www.ssa.gov/apply?benefits=disability&age=adult
-214. Older Adults. FEMA / Ready.gov, 2026. https://www.ready.gov/older-adults
-215. Managing Stress. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mental-health/living-with/index.html
-216. Agencies to notify when someone dies. USAGov, 2026. https://www.usa.gov/report-a-death
-217. What to do when someone dies. Social Security Administration, 2026. https://www.ssa.gov/personal-record/when-someone-dies
-218. California Driver Handbook, Section 7: Laws and Rules of the Road. California Department of Motor Vehicles, 2026. https://www.dmv.ca.gov/portal/handbook/california-driver-handbook/laws-and-rules-of-the-road/
-219. Home Inspections. FEMA, 2026. https://www.fema.gov/assistance/individual/after-applying/home-inspections
-220. DisasterAssistance.gov: apply for disaster assistance. U.S. Department of Homeland Security, 2026. https://www.disasterassistance.gov/
-221. OpenFEMA: Disaster Declarations Summaries. FEMA, 2026. https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2
-222. Start a Claim. FEMA, National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/recover/start-a-claim
-223. Individuals and Households Program. FEMA, 2026. https://www.fema.gov/assistance/individual/program
-224. Disaster Fraud. FEMA, 2026. https://www.fema.gov/about/offices/security/disaster-fraud
-225. How To Avoid Scams After Weather Emergencies and Natural Disasters. Federal Trade Commission, 2026. https://consumer.ftc.gov/articles/how-avoid-scams-after-weather-emergencies-and-natural-disasters
-226. Rx Open: open pharmacies in disaster areas. Healthcare Ready, 2026. https://healthcareready.org/rxopen/
+57. Hospital General Information. Centers for Medicare & Medicaid Services (CMS), 2026. https://data.cms.gov/provider-data/dataset/xubh-q36u
+58. Toxics Release Inventory, 2024 national data. U.S. Environmental Protection Agency, 2025. https://www.epa.gov/toxics-release-inventory-tri-program
+59. OpenFEMA: NFIP Residential Penetration Rates (v1) and FIMA NFIP Redacted Claims. FEMA, 2026. https://www.fema.gov/about/openfema/data-sets
+60. Emergency Financial First Aid Kit. FEMA and Operation HOPE, 2019. https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf
+61. Financial Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/financial-preparedness
+62. February 22, 2024 nationwide wireless network outage: report and findings. Federal Communications Commission, Public Safety and Homeland Security Bureau, 2024. https://docs.fcc.gov/public/attachments/DOC-404150A1.pdf
+63. Household Pulse Survey: adults displaced by natural disasters. U.S. Census Bureau data, reported by the National Low Income Housing Coalition, 2023. https://nlihc.org/resource/new-data-household-pulse-survey-suggest-disparities-among-households-displaced-disasters
+64. Estimating Eviction Prevalence across the United States. Gromis A. et al., Princeton University Eviction Lab, 2022. https://data-downloads.evictionlab.org/
+65. Help & FAQ: households threatened with eviction and eviction judgments, 2000-2018. Eviction Lab, Princeton University, 2026. https://evictionlab.org/help-faq/
+66. National Estimates: Eviction in America. Eviction Lab, Princeton University, 2026. https://evictionlab.org/national-estimates/
+67. Estimating eviction prevalence across the United States. Gromis A., Fellows I., Hendrickson J. R., Edmonds L., Leung L., Porton A. and Desmond M.; Proceedings of the National Academy of Sciences 119(21), e2116169119, 2022. https://pmc.ncbi.nlm.nih.gov/articles/PMC9173767/
+68. Facts + Statistics: Homeowners and renters insurance. Insurance Information Institute (Triple-I), from ISO data, 2026. https://www.iii.org/fact-statistic/facts-statistics-homeowners-and-renters-insurance
+69. How to protect your home from water damage. Insurance Information Institute (Triple-I), 2026. https://www.iii.org/article/how-to-protect-your-home-from-water-damage
+70. Quantitative core model specification (research report): hazards, consequence buckets, durations. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/risk-model.md
+71. How well do these numbers hold up? The frozen backtest (docs/VALIDATION.md): 22 past disasters, the scoring rule and the verdicts for each engine version. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/VALIDATION.md
+72. FastStats: Emergency Department Visits. CDC National Center for Health Statistics, 2025. https://www.cdc.gov/nchs/fastats/emergency-department.htm
+73. Overview of Motor Vehicle Traffic Crashes in 2023. National Highway Traffic Safety Administration, 2025. https://crashstats.nhtsa.dot.gov/Api/Public/ViewPublication/813705
+74. Work Experience of the Population, 2024. U.S. Bureau of Labor Statistics, 2026. https://www.bls.gov/news.release/work.nr0.htm
+75. Job Openings and Labor Turnover Survey: layoffs and discharges rate. U.S. Bureau of Labor Statistics, 2026. https://www.bls.gov/jlt/
+76. National Survey on Drug Use and Health, 2022-2024 public-use files: times arrested and booked in the past 12 months, by age and sex. Substance Abuse and Mental Health Services Administration (SAMHSA), Data Analysis System, 2025. https://datatools.samhsa.gov/nsduh/2024/nsduh-2024-ds0001/crosstab?row=NOBOOKY2&column=CATAG6&control=IRSEX&weight=ANALWT2_C
+77. Crime in the United States, 2023, 2024 and 2025 editions: persons arrested. FBI Uniform Crime Reporting Program (Crime Data Explorer), 2026. https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads
+78. Annual Estimates of the Resident Population by Single Year of Age and Sex for the United States: April 1, 2020 to July 1, 2025. U.S. Census Bureau, Population Division, 2026. https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/national/asrh/nc-est2025-agesex-res.csv
+79. Disability Benefits. Social Security Administration, 2026. https://www.ssa.gov/pubs/EN-05-10029.pdf
+80. FastStats: Accidents or Unintentional Injuries. CDC National Center for Health Statistics, 2026. https://www.cdc.gov/nchs/fastats/accidental-injury.htm
+81. Methodology and Codebook: The Rising Threat of Anti-Government Domestic Terrorism. Center for Strategic and International Studies, Warfare, Irregular Threats, and Terrorism Program, 2024. https://csis-website-prod.s3.amazonaws.com/s3fs-public/2024-10/241021_McCabe_Domestic_Methodology.pdf
+82. Fiscal Year 2026 Homeland Security Grant Program: Notice of Funding Opportunity. FEMA, 2026. https://www.fema.gov/sites/default/files/documents/fema_gpd_hsgp-nofo-fy2026.pdf
+83. Dam Failures and Incidents. Association of State Dam Safety Officials, 2025. https://damsafety.org/dam-failures
+84. National Inventory of Dams. U.S. Army Corps of Engineers, 2026. https://nid.sec.usace.army.mil/
+85. National Levee Database. U.S. Army Corps of Engineers, 2026. https://levees.sec.usace.army.mil/
+86. 2023 National Seismic Hazard Model for the conterminous United States. U.S. Geological Survey, 2023. https://doi.org/10.5066/P14VGAV4
+87. Operating Nuclear Power Plant Sites. FEMA, 2026. https://gis.fema.gov/arcgis/rest/services/Partner/Operating_Nuclear_Power_Plant_Sites/FeatureServer/0
+88. Can Humanity Achieve a Century of Nuclear Peace?. Forecasting Research Institute, 2024. https://forecastingresearch.org/research/nuclear-risk
+89. Strategic sites and county strategic-exposure classes. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/crates/rr-etl/data/strategic_sites.toml
+90. Bank Failures and Assistance Transactions. Federal Deposit Insurance Corporation, 2026. https://banks.data.fdic.gov/bankfind-suite/failures
+91. Risk of volcano catastrophe ‘a roll of the dice’, say experts. University of Cambridge, 2022. https://www.cam.ac.uk/research/news/risk-of-volcano-catastrophe-a-roll-of-the-dice-say-experts
+92. Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament. Karger E. et al., Forecasting Research Institute, 2023. https://forecastingresearch.org/pdf/existential-risk-persuasion-tournament.pdf
+93. How likely is a nuclear exchange between the US and Russia?. Rodriguez L., Rethink Priorities, 2019. https://rethinkpriorities.org/research-area/how-likely-is-a-nuclear-exchange-between-the-us-and-russia/
+94. Analyzing and Reducing the Risks of Inadvertent Nuclear War Between the United States and Russia. Barrett A.M., Baum S.D. and Hostetler K., 2013. https://scienceandglobalsecurity.org/archive/sgs21barrett.pdf
+95. Nuclear Attack Planning Base - 1990 (NAPB-90): Final Project Report. FEMA (via the NTIS National Technical Reports Library, PB87-204624), 1987. https://ntrl.ntis.gov/NTRL/dashboard/searchResults/titleDetail/PB87204624.xhtml
+96. SLG 101: Guide for All-Hazard Emergency Operations Planning, Tab 2 to Attachment F: Nuclear Conflict. FEMA (via Internet Archive), 1996. https://web.archive.org/web/20090108212857/http://www.fema.gov/pdf/plan/6-ch-f-2.pdf
+97. Nuclear Detonation Response Guidance: Planning for the First 72 Hours. FEMA, 2023. https://www.fema.gov/sites/default/files/documents/fema_oet-72-hour-nuclear-detonation-response-guidance.pdf
+98. On the lognormality of historical magnetic-storm intensity statistics: Implications for extreme-event probabilities. Love J.J., Rigler E.J., Pulkkinen A. and Riley P. (U.S. Geological Survey publication record), 2015. https://www.usgs.gov/publications/lognormality-historical-magnetic-storm-intensity-statistics-implications-extreme-event
+99. Probability estimation of a Carrington-like geomagnetic storm. Moriña D. et al., 2019. https://www.nature.com/articles/s41598-019-38918-8
+100. Solar Storm Risk to the North American Electric Grid. Lloyd's and Atmospheric and Environmental Research, 2013. https://assets.lloyds.com/assets/pdf-solar-storm-risk-to-the-north-american-electric-grid/1/pdf-Solar-Storm-Risk-to-the-North-American-Electric-Grid.pdf
+101. Benchmark Geomagnetic Disturbance Event Description. North American Electric Reliability Corporation, 2014. https://www.nerc.com/globalassets/standards/projects/2013-03/benchmark_gmd_event_aug27_clean.pdf
+102. International Geomagnetic Reference Field, 14th generation (IGRF-14): coefficients. IAGA (NOAA NCEI copy), 2024. https://www.ngdc.noaa.gov/IAGA/vmod/coeffs/igrf14coeffs.txt
+103. EMP Threat Real but Limited, EPRI Says in Much-Anticipated Report. POWER magazine, 2019. https://www.powermag.com/emp-threat-real-but-limited-epri-says-in-anticipated-report/
+104. 11 Months After Hurricane Maria Hit Puerto Rico, Officials Say All Power Is Restored. NPR, 2018. https://www.npr.org/2018/08/15/639001372/11-months-after-hurricane-maria-hit-puerto-rico-officials-say-all-power-is-resto
+105. Profiles of Incidents Involving CBRN and Non-state Actors (POICN) Database. START, University of Maryland, 2026. https://www.start.umd.edu/research-projects/profiles-incidents-involving-cbrn-and-non-state-actors-poicn-database
+106. FBI report on active attacker incidents in the United States in 2024. FBI (via Internet Archive), 2025. https://web.archive.org/web/20260904170718/https://www.fbi.gov/file-repository/reports-and-publications/2024-active-shooter-report/view
+107. Gas Emergencies. Pennsylvania Public Utility Commission, 2026. https://www.puc.pa.gov/pipeline-safety/gas-emergencies/
+108. Carbon Monoxide Questions and Answers. U.S. Consumer Product Safety Commission, 2026. https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Carbon-Monoxide-Information-Center/Carbon-Monoxide-Questions-and-Answers
+109. Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills
+110. FAQ About Calling 911. National 911 Program (NHTSA), 2023. https://www.911.gov/calling-911/frequently-asked-questions/
+111. When Your Child Is Missing: A Family Survival Guide. U.S. Department of Justice, Office of Juvenile Justice and Delinquency Prevention, 2025. https://ojjdp.ojp.gov/publications/family-survival-guide-fifth-edition.pdf
+112. Is Your Child Missing?. National Center for Missing & Exploited Children, 2026. https://www.missingkids.org/gethelpnow/isyourchildmissing
+113. Wandering. Alzheimer's Association, 2026. https://www.alz.org/help-support/caregiving/stages-behaviors/wandering
+114. Coping With Alzheimer's Behaviors: Wandering and Getting Lost. National Institute on Aging, 2024. https://www.nia.nih.gov/health/alzheimers-changes-behavior-and-communication/coping-alzheimers-behaviors-wandering-and
+115. CPR. MedlinePlus, National Library of Medicine, 2026. https://medlineplus.gov/cpr.html
+116. Adult & Child Choking: Symptoms and First Aid. American Red Cross, 2026. https://www.redcross.org/take-a-class/resources/learn-first-aid/adult-child-choking
+117. Bleeding. American Red Cross, 2026. https://www.redcross.org/take-a-class/resources/learn-first-aid/bleeding-life-threatening-external
+118. Until Help Arrives. FEMA / Ready.gov (via Internet Archive), 2020. https://www.ready.gov/sites/default/files/2020-07/until-help-arrives-web-tutorial.pdf
+119. Signs and Symptoms of Stroke. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/stroke/signs-symptoms/index.html
+120. About Heart Attack Symptoms, Risk, and Recovery. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/heart-disease/about/heart-attack.html
+121. Anatomy of a First Aid Kit. American Red Cross, 2025. https://www.redcross.org/get-help/how-to-prepare-for-emergencies/anatomy-of-a-first-aid-kit.html
+122. Overview: Lightning Safety. NOAA National Weather Service, 2026. https://www.weather.gov/safety/lightning-safety-overview
+123. Thunderstorms and Lightning. FEMA / Ready.gov, 2026. https://www.ready.gov/thunderstorms-lightning
+124. Power Outage Safety. American Red Cross, 2026. https://www.redcross.org/get-help/how-to-prepare-for-emergencies/types-of-emergencies/power-outage.html
+125. What to Do to Protect Yourself From Electrical Hazards. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-from-electrical-hazards.html
+126. Recovering from Disaster. FEMA / Ready.gov, 2026. https://www.ready.gov/recovering-disaster
+127. A Consumer's Guide to Home Insurance. National Association of Insurance Commissioners, 2022. https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf
+128. Severe Weather. Arizona Department of Transportation, 2026. https://azdot.gov/about/transportation-safety/severe-weather
+129. Safety Guidelines: During and After a Winter Storm. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/winter-weather/safety/stay-safe-during-after-a-winter-storm-safety.html
+130. Floods. FEMA / Ready.gov, 2026. https://www.ready.gov/floods
+131. Winter Weather. FEMA / Ready.gov, 2026. https://www.ready.gov/winter-weather
+132. Working Safely Around Downed Electrical Wires. Occupational Safety and Health Administration, 2018. https://www.osha.gov/sites/default/files/publications/downed_electrical_wires.pdf
+133. During Hot Weather, Watch for Heat Illness. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/natural-disasters/psa-toolkit/during-hot-weather.html
+134. Drinking Water Advisories: An Overview. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/about/drinking-water-advisories-an-overview.html
+135. A Brief Guide to Mold, Moisture and Your Home. U.S. Environmental Protection Agency, 2026. https://www.epa.gov/mold/brief-guide-mold-moisture-and-your-home
+136. Cold Weather Safety Tips. NOAA National Weather Service, Albany NY office, 2019. https://www.weather.gov/media/aly/PSAs/ExtremeCold.pdf
+137. Get Prepared: Home Protection. Indiana Department of Homeland Security, 2026. https://www.in.gov/dhs/get-prepared/general-safety/home-protection/
+138. What To Do If You're a Victim of a Burglary. Metropolitan Nashville Police Department, 2025. https://www.nashville.gov/departments/police/safety-information/burglary-victim-information
+139. Lost or Stolen Credit, ATM, and Debit Cards. Federal Trade Commission, Consumer Advice, 2026. https://consumer.ftc.gov/articles/lost-or-stolen-credit-atm-and-debit-cards
+140. How to replace lost or stolen ID cards. USAGov, 2026. https://www.usa.gov/replace-vital-documents
+141. How to make a home fire escape plan. National Fire Protection Association, 2026. https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning
+142. Smoke alarms. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/smoke-alarms/
+143. Wildfires. FEMA / Ready.gov, 2026. https://www.ready.gov/wildfires
+144. Go Evacuation Guide (Ready for Wildfire): pre-evacuation steps and tips if trapped. California Department of Forestry and Fire Protection (CAL FIRE), 2026. https://www.readyforwildfire.org/prepare-for-wildfire/go-evacuation-guide/
+145. Wildfire Evacuation Outreach Materials. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/wui/outreach/wildfire-evacuation.html
+146. During a Flood. NOAA National Weather Service, 2026. https://www.weather.gov/safety/flood-during
+147. Explosions. FEMA / Ready.gov, 2025. https://www.ready.gov/explosions
+148. Mass Gathering Incidents. FEMA / Ready.gov, 2026. https://www.ready.gov/public-spaces
+149. Suspicious Activity and Items. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/topics/physical-security/bombing-prevention/suspicious-activity-and-items
+150. Bomb Threats. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/topics/physical-security/bombing-prevention/bomb-threats
+151. Back to School, Back to Safety. FEMA, 2026. https://www.fema.gov/blog/back-school-back-safety
+152. Bomb Threat Guide. Cybersecurity and Infrastructure Security Agency (via Internet Archive), 2025. https://www.cisa.gov/sites/default/files/2025-08/Bomb_Threat_Guide_082025_508.pdf
+153. Dam Failures. Missouri State Emergency Management Agency, 2026. https://sema.dps.mo.gov/plan_and_prepare/dam_failure.php
+154. Tornadoes. FEMA / Ready.gov, 2026. https://www.ready.gov/tornadoes
+155. Tornadoes. FEMA / Ready.gov (via Internet Archive), 2014. https://web.archive.org/web/20140701131414/https://www.ready.gov/tornadoes
+156. Tornado Safety. NOAA National Weather Service, Storm Prediction Center, 2026. https://www.spc.noaa.gov/faq/tornado/safety.html
+157. Radiation Emergencies. FEMA / Ready.gov, 2026. https://www.ready.gov/radiation
+158. Backgrounder on Emergency Preparedness at Nuclear Power Plants. U.S. Nuclear Regulatory Commission, 2024. https://www.nrc.gov/regulations-legislation/fact-sheets-brochures/backgrounder-on-emergency-preparedness-at-nuclear-power-plants
+159. What to Do: Get Inside. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/radiation-emergencies/response/get-inside.html
+160. How to Self-Decontaminate after a Radiation Emergency. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/radiation-emergencies/prevention/self-decontaminate.html
+161. Be Prepared in Case You Need to Evacuate. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/natural-disasters/psa-toolkit/be-prepared-in-case-you-need-to-evacuate.html
+162. Potassium Iodide. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/radiation-emergencies/treatment/potassium-iodide.html
+163. Hurricanes: what to do before, during and after. Texas Department of State Health Services (TexasReady), 2026. https://texasready.gov/be-informed/natural-disasters/hurricanes.html
+164. Staying Safe with Electric Vehicles. Hillsborough County, Florida, 2025. https://hcfl.gov/residents/sustainability-and-green/green-hillsborough/staying-safe-with-electric-vehicles
+165. Extreme Heat. FEMA / Ready.gov, 2026. https://www.ready.gov/heat
+166. Emergency Disinfection of Drinking Water. U.S. Environmental Protection Agency, 2026. https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water
+167. Boil Water Notices: Checklist for Residents and Homeowners. New York State Department of Health, 2018. https://www.health.ny.gov/environmental/water/drinking/boilwater/docs/checklist_residents_and_homeowners.pdf
+168. Shelter. FEMA / Ready.gov, 2026. https://www.ready.gov/shelter
+169. Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf
+170. Chemical Agents: Facts About Sheltering in Place. Centers for Disease Control and Prevention (via Internet Archive), 2018. https://web.archive.org/web/20220305164057/https://emergency.cdc.gov/planning/shelteringfacts.asp
+171. About Heat and Your Health. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/heat-health/about/index.html
+172. Heat-Related Illnesses: What to Look For, What to Do. Centers for Disease Control and Prevention, 2017. https://www.cdc.gov/disasters/extremeheat/pdf/Heat_Related_Illness.pdf
+173. Dust Storms and Haboobs. NOAA National Weather Service, 2026. https://www.weather.gov/safety/wind-dust-storm
+174. Reducing Risk for Valley Fever. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/valley-fever/prevention/index.html
+175. About Valley Fever. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/valley-fever/about/index.html
+176. Pandemic. FEMA / Ready.gov, 2026. https://www.ready.gov/pandemic
+177. Preventing Spread of Respiratory Viruses When You're Sick. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/respiratory-viruses/prevention/precautions-when-sick.html
+178. Masks and Respiratory Viruses Prevention. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/respiratory-viruses/prevention/masks.html
+179. Drought. FEMA / Ready.gov, 2026. https://www.ready.gov/drought
+180. Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water
+181. What To Do If You're Caught in a Winter Storm. NOAA National Weather Service, 2026. https://www.weather.gov/safety/winter-during
+182. Stay Safe and Warm Toolkit. FEMA / Ready.gov, 2026. https://www.ready.gov/sites/default/files/2026-01/ready_toolkit_stay-safe-and-warm_01272026.pdf
+183. Hurricane Safety: What to do before, during and after a hurricane. NOAA National Weather Service, 2010. https://www.weather.gov/media/safety/hurricane_safety.pdf
+184. Carbon Monoxide Information Center. U.S. Consumer Product Safety Commission, 2026. https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Carbon-Monoxide-Information-Center
+185. Family Communication Plan fillable card. FEMA / Ready.gov, 2025. https://www.ready.gov/sites/default/files/2025-06/family-communication-plan_fillable-card.pdf
+186. Low and No Cost Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/low-and-no-cost
+187. Cybersecurity. FEMA / Ready.gov, 2026. https://www.ready.gov/cybersecurity
+188. Shelf-Stable Food Safety. USDA Food Safety and Inspection Service, 2024. https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/shelf-stable-food
+189. Frequently Asked Questions about Drug Shortages. U.S. Food and Drug Administration, 2024. https://www.fda.gov/drugs/drug-shortages/frequently-asked-questions-about-drug-shortages
+190. USDA National Hunger Hotline. U.S. Department of Agriculture, 2025. https://www.fna.usda.gov/national-hunger-hotline
+191. BeSafeRx: Your Source for Online Pharmacy Information. U.S. Food and Drug Administration, 2020. https://www.fda.gov/drugs/buying-using-medicine-safely/besaferx-your-source-online-pharmacy-information
+192. Guidelines for Personal Hygiene During an Emergency. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/water-emergency/safety/guidelines-for-personal-hygiene-during-an-emergency.html
+193. Emergency Toilet Guidebook. Regional Disaster Preparedness Organization, Portland Metro Region, 2024. https://www.rdpo.net/emergency-toilet
+194. Heating fire safety. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prevent-fires/heating/
+195. How to Create an Emergency Water Supply. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/water-emergency/about/how-to-create-and-store-an-emergency-water-supply.html
+196. Unemployment Insurance. U.S. Department of Labor, 2026. https://www.dol.gov/general/topic/unemployment-insurance
+197. Getting health coverage outside Open Enrollment: Special Enrollment Periods. CMS / HealthCare.gov, 2026. https://www.healthcare.gov/coverage-outside-open-enrollment/special-enrollment-period/
+198. Health coverage options if you're unemployed. CMS / HealthCare.gov, 2026. https://www.healthcare.gov/unemployed/coverage/
+199. Get help paying rent and bills. Consumer Financial Protection Bureau, 2026. https://www.consumerfinance.gov/housing/housing-insecurity/help-for-renters/get-help-paying-rent-and-bills/
+200. What to do if you’re facing eviction. Consumer Financial Protection Bureau, 2024. https://www.consumerfinance.gov/housing/housing-insecurity/help-for-renters/what-to-do-if-youre-facing-eviction/
+201. What is a payday loan?. Consumer Financial Protection Bureau, 2026. https://www.consumerfinance.gov/ask-cfpb/what-is-a-payday-loan-en-1567/
+202. An essential guide to building an emergency fund. Consumer Financial Protection Bureau, 2025. https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/
+203. I Need Legal Help. Legal Services Corporation, 2026. https://www.lsc.gov/about-lsc/what-legal-aid/i-need-legal-help
+204. Civil Disorder. Fairfax County, Virginia, Department of Emergency Management and Security, 2026. https://www.fairfaxcounty.gov/emergency/readyfairfax/civildisorder
+205. Home and Neighborhood Safety. National Crime Prevention Council, 2026. https://www.ncpc.org/resources/home-neighborhood-safety/
+206. Non-Confrontational Techniques. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/topics/physical-security/non-confrontational-techniques
+207. Secure Our World. Cybersecurity and Infrastructure Security Agency, 2026. https://www.cisa.gov/secure-our-world
+208. A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI
+209. Getting Your Affairs in Order Checklist: Documents to Prepare for the Future. National Institute on Aging, 2026. https://www.nia.nih.gov/health/advance-care-planning/getting-your-affairs-order-checklist-documents-prepare-future
+210. Know Your Rights: Stopped by Police. American Civil Liberties Union, 2026. https://www.aclu.org/know-your-rights/stopped-by-police
+211. Locate someone being detained by ICE for immigration violation or deportation. USAGov, 2026. https://www.usa.gov/detained-by-ice
+212. Mass Defense Resources. National Lawyers Guild, 2026. https://www.nlg.org/massdefenseprogram/protest-tools/
+213. Family and Medical Leave Act. U.S. Department of Labor, Wage and Hour Division, 2026. https://www.dol.gov/agencies/whd/fmla
+214. Apply for Social Security benefits: disability benefits for an adult. Social Security Administration, 2026. https://www.ssa.gov/apply?benefits=disability&age=adult
+215. Older Adults. FEMA / Ready.gov, 2026. https://www.ready.gov/older-adults
+216. Managing Stress. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mental-health/living-with/index.html
+217. Agencies to notify when someone dies. USAGov, 2026. https://www.usa.gov/report-a-death
+218. What to do when someone dies. Social Security Administration, 2026. https://www.ssa.gov/personal-record/when-someone-dies
+219. California Driver Handbook, Section 7: Laws and Rules of the Road. California Department of Motor Vehicles, 2026. https://www.dmv.ca.gov/portal/handbook/california-driver-handbook/laws-and-rules-of-the-road/
+220. Home Inspections. FEMA, 2026. https://www.fema.gov/assistance/individual/after-applying/home-inspections
+221. DisasterAssistance.gov: apply for disaster assistance. U.S. Department of Homeland Security, 2026. https://www.disasterassistance.gov/
+222. OpenFEMA: Disaster Declarations Summaries. FEMA, 2026. https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2
+223. Start a Claim. FEMA, National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/recover/start-a-claim
+224. Individuals and Households Program. FEMA, 2026. https://www.fema.gov/assistance/individual/program
+225. Disaster Fraud. FEMA, 2026. https://www.fema.gov/about/offices/security/disaster-fraud
+226. How To Avoid Scams After Weather Emergencies and Natural Disasters. Federal Trade Commission, 2026. https://consumer.ftc.gov/articles/how-avoid-scams-after-weather-emergencies-and-natural-disasters
+227. Rx Open: open pharmacies in disaster areas. Healthcare Ready, 2026. https://healthcareready.org/rxopen/
 
 ### Data credits
 

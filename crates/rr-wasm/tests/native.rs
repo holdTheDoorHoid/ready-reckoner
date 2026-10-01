@@ -416,15 +416,18 @@ fn the_data_packs_load_file_by_file_and_then_answer_for_every_fixture() {
 }
 
 /// Loads `data/manifest.json`, then every file of the core pack with the county list last, as
-/// `web/src/engine/loader.ts` does (it loads the ZIP tables later; here they come with the rest).
-/// Returns the manifest's pack version.
-fn load_core_packs() -> String {
+/// `web/src/engine/loader.ts` does (it loads the ZIP tables later; here they come with the rest),
+/// then the `places` pack's one file (county hospitals, read by the binder's Neighbourhood page):
+/// every pack `rr_plan::source::DATA_DIR_PACKS` now loads natively, so this agrees with
+/// `Engine::with_data_dir` below (wasm3, 2026-10-01). Returns the manifest's pack version.
+fn load_binder_packs() -> String {
     let manifest_bytes = read("data/manifest.json");
     let manifest: serde_json::Value = serde_json::from_slice(&manifest_bytes).unwrap();
     let _: PackInfo = value(&api::load_pack("manifest.json", &manifest_bytes));
     let mut files = core_files(&manifest);
     files.retain(|f| f != "core/counties.csv");
     files.push("core/counties.csv".to_owned());
+    files.push("places/hospitals.csv".to_owned());
     for f in &files {
         let _: PackInfo = value(&api::load_pack(f, &read(&format!("data/{f}"))));
     }
@@ -438,7 +441,7 @@ fn load_core_packs() -> String {
 /// or the envelope path (a real disagreement with the native engine on the same data).
 #[test]
 fn with_the_packs_loaded_every_fixture_is_its_golden_file_to_the_last_digit() {
-    let pack_version = load_core_packs();
+    let pack_version = load_binder_packs();
     let mut native: Option<rr_plan::Engine<rr_data::DataStore>> = None;
     let mut problems = Vec::new();
     for (name, raw) in rr_types::fixtures::RAW {
@@ -564,6 +567,12 @@ fn without_the_zip_tables_a_county_plans_and_a_zip_code_waits_for_them() {
     let info: EngineInfo = value(&api::engine_info());
     assert_eq!(info.packs_loaded, ["core"]);
     assert_eq!(api::assess(&by_county), before_zips);
+    // The golden also prints the county hospital list from the `places` pack (the binder's
+    // Neighbourhood page), so that pack goes in before the ZIP code's plan is held to its golden.
+    let _: PackInfo = value(&api::load_pack(
+        "places/hospitals.csv",
+        &read("data/places/hospitals.csv"),
+    ));
     let golden = String::from_utf8(read("fixtures/golden/philadelphia-renters-4.json")).unwrap();
     assert_eq!(
         value_text(&api::assess(&fixture_json("philadelphia-renters-4"))),

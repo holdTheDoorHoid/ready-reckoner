@@ -31,12 +31,11 @@ pub struct DataArgs {
     /// Use the built-in sample counties instead of a data pack.
     #[arg(long, global = true, conflicts_with = "data")]
     pub fixtures: bool,
-    /// Also load this optional pack (repeat for several), for example `places` (the county
-    /// hospitals the binder's Neighborhood page lists, which the web app loads when it shows the
-    /// binder). By default only the core pack is loaded, as the web app loads it to plan, so the
-    /// CLI plans exactly as the site and the goldens do; `surge`, `wildfire_places` and
-    /// `outage_events` are core files now (DESIGN-DELTA-v3 §8) and load with the core pack
-    /// regardless.
+    /// Also load this optional pack (repeat for several). By default the core pack and, when the
+    /// manifest lists it, `places` (the county hospitals the binder's Neighborhood page lists)
+    /// are loaded, exactly the packs the goldens are made from (`rr_plan::source::DATA_DIR_PACKS`);
+    /// `surge`, `wildfire_places` and `outage_events` are core files now (DESIGN-DELTA-v3 §8) and
+    /// load with the core pack regardless.
     #[arg(
         long = "optional",
         global = true,
@@ -70,7 +69,7 @@ impl DataArgs {
 /// Which packs of a data directory to load.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Packs {
-    /// The core pack (what the web app loads to plan), plus these optional packs.
+    /// The goldens' packs (core, and `places` when the manifest lists it), plus these optional packs.
     Core {
         /// Optional packs by manifest name (`places`, for county hospitals).
         optional: Vec<String>,
