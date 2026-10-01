@@ -41,16 +41,29 @@
   let current = $state('');
   const wanted = $derived(router.current.id === 'binder' ? router.current.param : undefined);
 
+  /** The address last gone to: a binder that is drawn again (the hospitals arriving) does not move the page. */
+  let jumpedTo: string | undefined;
+
   // Opened at a page (#/binder/home, #/binder/wallet-cards): go there once it is on the page.
   $effect(() => {
     const param = wanted;
     const binder = app.result.output?.binder;
-    if (!param || !binder) return;
+    if (!param) jumpedTo = undefined;
+    if (!param || !binder || param === jumpedTo) return;
     const entry = findPage(binder, param);
     if (!entry) return;
     current = entry.page.id;
-    const timer = setTimeout(() => jumpTo(pageDomId(entry.page.id), { focus: 'h3' }), 0);
+    const timer = setTimeout(() => {
+      jumpedTo = param;
+      jumpTo(pageDomId(entry.page.id), { focus: 'h3' });
+    }, 0);
     return () => clearTimeout(timer);
+  });
+
+  // The county hospitals for the Neighborhood page come with their own small pack, fetched the
+  // first time the binder is shown; the binder is drawn again when they are in.
+  $effect(() => {
+    app.loadPlaces();
   });
 
   /** A contents link to the page already in the address changes nothing the router sees: jump anyway. */
