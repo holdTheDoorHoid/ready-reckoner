@@ -12,6 +12,20 @@
 
   const toc = $derived(tableOfContents(binder));
   let nav: HTMLElement | undefined = $state();
+  /**
+   * Open beside the binder on a wide screen; folded on a narrow one, where the contents sit above
+   * the pages and a list of some eighty entries would push the first page far down (the
+   * breakpoint is the Binder screen's own, 60rem).
+   */
+  let open = $state(true);
+  $effect(() => {
+    try {
+      const narrow = window.matchMedia?.('(max-width: 60rem)');
+      if (narrow?.matches) open = false;
+    } catch {
+      // No matchMedia (a test page): stay open.
+    }
+  });
 
   // Keep the page on screen in view in the contents (it scrolls on its own on a wide screen).
   $effect(() => {
@@ -25,7 +39,7 @@
 </script>
 
 <nav class="binder-toc" aria-label="Binder contents" bind:this={nav}>
-  <details open>
+  <details bind:open>
     <summary class="binder-toc__summary">Contents</summary>
     <ol class="binder-toc__parts">
       {#each toc as part (part.id)}
