@@ -236,8 +236,8 @@ Ranges only, shown apart so a tiny chance of a huge loss cannot take over the pl
 
 ### Notes on these numbers
 
-- These chances are for San Juan County as a whole. A home near a river, the coast or a steep slope can face more; the county's average is what the plan uses.
-- Power-outage records (2021-2025) show homes in San Juan County caught in an outage about 3.4 times a year. Matched by date to the storms behind them, some outages come from hurricanes more often than the county's storm records explain, so the difference is counted under each cause, never more often than the storm records show that storm. Outages from other causes, or matched to no storm, are counted in the power-cut estimates, not under a storm.
+- These chances are for San Juan Municipio as a whole. A home near a river, the coast or a steep slope can face more; the county's average is what the plan uses.
+- Power-outage records (2021-2025) show homes in San Juan Municipio caught in an outage about 3.4 times a year. Matched by date to the storms behind them, some outages come from hurricanes more often than the county's storm records explain, so the difference is counted under each cause, never more often than the storm records show that storm. Outages from other causes, or matched to no storm, are counted in the power-cut estimates, not under a storm.
 - Heat waves are marked Serious for this household because someone in it is 65 or older; they are most dangerous for households like yours.
 
 ## Your targets
@@ -348,8 +348,8 @@ What to do about lost income and a damaged home is under Documents and money.
 
 A named scenario is one rare, severe event that would change your targets a lot; you can turn each on or off on the risks screen.
 
-- **Tsunami from a nearby earthquake** (included in your plan). Part of San Juan County is in the tsunami zone: about 6 in 100 residents live there. After a nearby earthquake the first waves can arrive within minutes, so anyone who lives, works or goes to school in the zone should walk to high ground as soon as the shaking stops. Knowing the route costs nothing, so the plan includes it. Does not change your targets at this setting.[4, 9, 13, 124]
-- **Direct hit by a major hurricane** (included in your plan). Tropical storms and hurricanes reach San Juan County about once every 6 years, and about 1 in 7 of them is a major storm (Category 3 or stronger) that can cut power and water for weeks. Hurricane guidance in Puerto Rico covers it, so the plan includes it. Planning for it changes: Power: 7 days → 90 days; Tap water: 21 days → 180 days; Food and supplies: 10 days → 14 days; Heat or cold: 5 days → 14 days; Medicine: 30 days → 180 days; Phone and payments: 3 days → 5 days; households like yours that have to leave home quickly within 10 years: 36 → 46 in 100.[9, 10, 13, 90, 101, 124, 125]
+- **Tsunami from a nearby earthquake** (included in your plan). Part of San Juan Municipio is in the tsunami zone: about 6 in 100 residents live there. After a nearby earthquake the first waves can arrive within minutes, so anyone who lives, works or goes to school in the zone should walk to high ground as soon as the shaking stops. Knowing the route costs nothing, so the plan includes it. Does not change your targets at this setting.[4, 9, 13, 124]
+- **Direct hit by a major hurricane** (included in your plan). Tropical storms and hurricanes reach San Juan Municipio about once every 6 years, and about 1 in 7 of them is a major storm (Category 3 or stronger) that can cut power and water for weeks. Hurricane guidance in Puerto Rico covers it, so the plan includes it. Planning for it changes: Power: 7 days → 90 days; Tap water: 21 days → 180 days; Food and supplies: 10 days → 14 days; Heat or cold: 5 days → 14 days; Medicine: 30 days → 180 days; Phone and payments: 3 days → 5 days; households like yours that have to leave home quickly within 10 years: 36 → 46 in 100.[9, 10, 13, 90, 101, 124, 125]
 
 ### When one event drives the answer
 
