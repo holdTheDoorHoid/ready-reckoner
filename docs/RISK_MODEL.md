@@ -84,7 +84,7 @@ and one note names the missing columns.
 | `leveed_pop_share`, `levee_risk_high_share` | the levee part of dam or levee failure | no levee part |
 | `dams_high_total` (else `facilities.high_hazard_dams`), `dams_high_poor_condition` | the county part of dam failure; the poor-condition weight | ×1 for condition |
 | `dams_high_within_10km` (ZIP, `LocationResolved::exposure`) | the downstream part of dam failure | the county part |
-| `eviction_filing_rate` | eviction (only once the owner approves Eviction Lab's ODC-BY licence) | the national judgment rate |
+| `eviction_filing_rate` | eviction: filings become households taken to court, about 1 in 3 of them ordered to leave, the county's figure capped at 7 in 100 a year (the Eviction row below); a rate above 1 is read, not dropped | the national judgment rate, 1.92 per 100 renter households a year (the territories, or a Lab estimate of zero) |
 
 **`events` keys** (episodes a year; the pack's Storm Events, SPC and HURDAT2 types, then hazard
 ids as aliases): heat wave `heat`; cold wave `extreme_cold`; winter weather `winter_storm`; ice
@@ -461,7 +461,7 @@ and out of 100 households over ten years:
 
 Philadelphia further down: phone or internet outage 0.30, windstorm 0.21, store shortages 0.20,
 job loss 0.166 (81 in 100, research §8.3 row 1), arrests 0.069 (about 7 for every 100 households a
-year), medicine shortage 0.05, eviction 0.023, burst pipe or leak 0.019, flooding with the basement
+year), medicine shortage 0.05, eviction 0.019, burst pipe or leak 0.019, flooding with the basement
 0.0061, house fire 0.0052 (5 in 100), earthquake 0.0016, an attack closing the area 0.00085 (range
 only). Its rare box: war 2.5 in 1,000, financial crisis 2 in 1,000, eruption 1.8 in 1,000, severe
 pandemic 1.5 in 1,000, solar storm 3.4 in 10,000, nuclear 2.4 in 10,000 (class C1, "between 1 in
@@ -536,8 +536,10 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   so a person's repeat arrests in a year are one household event. People arrested in one year are
   often arrested in others too, so the ten-year chance the packet compounds from the yearly rate
   still runs high; the sentence says so.
-- **Eviction uses the national rate** until the owner approves Eviction Lab's ODC-BY licence; the
-  county column then takes over with filings × 0.4 to judgments. Income stability (the job-loss
+- **Eviction counts households, not filings** (v0.3.0, owner-approved Eviction Lab column): the
+  county's filings become households taken to court, about 1 in 3 of those households is ordered to
+  leave, and a county's own figure is capped at 7 in 100 a year (the Eviction row); without a county
+  figure (the territories) the national judgment rate applies. Income stability (the job-loss
   modifier) and savings scale it, as the hazard-expansion CSV proposed.
 - **Medicine shortages and phone outages are national priors**; phone and internet outages (0.3 a
   year) now rank near the top of most registers with a tiny severity ($100 an event).
@@ -592,12 +594,14 @@ at 1.02 %/yr), tsunami 0.0092 (with `local_tsunami`), house fire 0.0026; nuclear
   `heat_blackout` is rr-consequence's heat-plus-outage class and owns its durations and effects
   (see "Blackouts during heat waves" under Consequences), so there is no second, overlapping
   class.
-- **Figures to confirm** (hazard-expansion "UNVERIFIED items"): III's 1 in 67 and $15,400, Eviction
-  Lab's 2.3 in 100 and the 0.4 judgment share, the count of metro-wide closures (CSIS does not
-  count them), the southern San Andreas 19 %, and the dust-storm rate in the Maricopa fixture (a test
-  value until the Storm Events dust job lands). Checked 2026-09-26: Riley 2012's 12 % a decade (as
-  Moriña 2019 reports it) and the Wasatch 43 % (region-wide); the Seattle fault's 5 % has no
-  source and was replaced by USGS's regional 17 %.
+- **Figures to confirm** (hazard-expansion "UNVERIFIED items"): III's 1 in 67 and $15,400, the
+  count of metro-wide closures (CSIS does not count them), the southern San Andreas 19 %, and the
+  dust-storm rate in the Maricopa fixture (a test value until the Storm Events dust job lands).
+  Checked 2026-09-26: Riley 2012's 12 % a decade (as Moriña 2019 reports it) and the Wasatch 43 %
+  (region-wide); the Seattle fault's 5 % has no source and was replaced by USGS's regional 17 %.
+  Checked 2026-10-01: Eviction Lab's 2.3 in 100 (2016, its first count; the national rate is now
+  its 2014–2018 judgment rate, 1.92) and the 0.4 judgment share (now 0.32 of households taken to
+  court, from the Lab's own judgment and household tables; the Eviction row).
 
 ## Consequences and targets
 
