@@ -1,6 +1,7 @@
 /**
- * jsdom gaps the app relies on: matchMedia (theme), dialog.showModal (confirmations), scrolling
- * and object URLs (export). Each stub is the smallest thing that behaves like a browser.
+ * jsdom gaps the app relies on: matchMedia (theme), dialog.showModal (confirmations), scrolling,
+ * object URLs (export) and Blob.text (reading a chosen plan file). Each stub is the smallest thing
+ * that behaves like a browser.
  */
 if (!window.matchMedia) {
   window.matchMedia = (query: string): MediaQueryList =>
@@ -31,3 +32,15 @@ window.scrollTo = () => {};
 Element.prototype.scrollIntoView ??= function () {};
 URL.createObjectURL ??= () => 'blob:test';
 URL.revokeObjectURL ??= () => {};
+
+// Every browser reads a chosen file with File.text(); jsdom has FileReader but not Blob.text.
+if (typeof Blob !== 'undefined' && !Blob.prototype.text) {
+  Blob.prototype.text = function (this: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsText(this);
+    });
+  };
+}

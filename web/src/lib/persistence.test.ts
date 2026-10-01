@@ -81,7 +81,7 @@ describe('checking saved plans and imports', () => {
       expect(r.ok).toBe(false);
       if (!r.ok) expect(r.reason.length).toBeGreaterThan(10);
     }
-    const newer = checkSavedPlan({ ...savedFor(philly), version: 2 });
+    const newer = checkSavedPlan({ ...savedFor(philly), version: 3 });
     expect(!newer.ok && newer.reason).toMatch(/newer version/);
     const damaged = checkSavedPlan({ ...savedFor(philly), purchases: [{ item_id: 'x', qty: -1, date: 'soon' }] });
     expect(damaged.ok).toBe(false);

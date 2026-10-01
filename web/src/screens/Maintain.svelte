@@ -4,15 +4,23 @@
   then); a calendar file for your own calendar (this app never contacts you); and your data: save a
   copy, open a saved copy, or forget everything. "Tested today" records the day an item was tried
   (contract v2 `Owned.tested_on`), the same date the Have screen shows.
+
+  Saving (DESIGN-DELTA-v3 §7): a plan with sensitive answers (medical details, insurance IDs, an
+  address, accounts…) opens the save dialog, which protects the file with a passphrase unless the
+  household unticks it; any other plan saves as a plain file at once, as before. Opening a protected
+  file asks for its passphrase. "Forget everything" also deletes the maps store.
 -->
 <script lang="ts">
   import ConfirmDialog from '../components/ConfirmDialog.svelte';
   import Icon from '../components/Icon.svelte';
+  import PassphraseDialog from '../components/PassphraseDialog.svelte';
+  import SavePlanDialog from '../components/SavePlanDialog.svelte';
   import type { Problem } from '../engine/types';
   import { useApp } from '../lib/app.svelte';
   import { addMonths, formatDate } from '../lib/format';
   import { calendarFile, drillItems, intervalLabel, maintenanceTasks, SEASON_WORDS, seasonalAnchors, type Task } from '../lib/maintenance';
-  import { engineInput, EXPORT_FILENAME, exportText, parseImport, setTestedOn, type SavedPlan } from '../lib/persistence';
+  import { engineInput, EXPORT_FILENAME, exportText, setTestedOn, type SavedPlan } from '../lib/persistence';
+  import { type EncryptedPlanFile, hasSensitiveAnswers, readPlanFile } from '../lib/protect';
   import { useRouter } from '../lib/router.svelte';
 
   const app = useApp();
@@ -23,6 +31,9 @@
   let message = $state('');
   let importError = $state('');
   let fileInput: HTMLInputElement | undefined = $state();
+  let saving = $state(false);
+  /** A protected file waiting for its passphrase. */
+  let locked = $state<EncryptedPlanFile | null>(null);
 
   const today = $derived(app.today());
   const tasks = $derived(app.plan && app.catalogue ? maintenanceTasks($state.snapshot(app.plan) as SavedPlan, app.catalogue) : []);
@@ -80,11 +91,28 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  function snapshot(): SavedPlan | null {
+    return app.plan ? ($state.snapshot(app.plan) as SavedPlan) : null;
+  }
+
+  /** "Save a copy": the save dialog when the plan holds sensitive answers, otherwise the plain file at once. */
   function exportPlan() {
-    if (!app.plan) return;
+    const plan = snapshot();
+    if (!plan) return;
     app.saveNow();
-    download(EXPORT_FILENAME, 'application/json', exportText($state.snapshot(app.plan) as SavedPlan));
+    if (hasSensitiveAnswers(plan)) {
+      saving = true;
+      return;
+    }
+    download(EXPORT_FILENAME, 'application/json', exportText(plan));
     message = `Saved a copy as ${EXPORT_FILENAME} in your downloads.`;
+  }
+
+  function saved(text: string, protectedFile: boolean) {
+    download(EXPORT_FILENAME, 'application/json', text);
+    message = protectedFile
+      ? `Saved a protected copy as ${EXPORT_FILENAME} in your downloads. It opens only with your passphrase.`
+      : `Saved a copy as ${EXPORT_FILENAME} in your downloads. It is not protected, so keep it somewhere safe.`;
   }
 
   function exportCalendar() {
@@ -94,13 +122,22 @@
 
   async function readFile(file: File) {
     importError = '';
-    const parsed = parseImport(await file.text());
-    if (!parsed.ok) {
-      importError = parsed.reason;
+    const read = readPlanFile(await file.text());
+    if (read.kind === 'error') {
+      importError = read.reason;
       return;
     }
+    if (read.kind === 'protected') {
+      locked = read.file;
+      return;
+    }
+    await accept(read.plan);
+  }
+
+  /** A plan read from a file (opened with its passphrase if it was protected): checked, then opened. */
+  async function accept(plan: SavedPlan) {
     if (app.engine) {
-      const check = await app.engine.assess(engineInput(parsed.plan));
+      const check = await app.engine.assess(engineInput(plan));
       if (!check.ok && check.error.code === 'bad_input') {
         const problems = ((check.error.details as { problems?: Problem[] } | undefined)?.problems ?? []).filter((p) => p.code === 'schema');
         if (problems.length) {
@@ -109,7 +146,7 @@
         }
       }
     }
-    pending = parsed.plan;
+    pending = plan;
     if (app.plan) confirmImport = true;
     else finishImport();
   }
@@ -237,7 +274,10 @@
     <div class="data__actions">
       <div>
         <button type="button" class="button" onclick={exportPlan} disabled={!app.plan}><Icon name="download" /> Save a copy of your plan</button>
-        <p class="small muted">Saves {EXPORT_FILENAME}. Keep it somewhere safe; it holds your household details, and any names and phone numbers in your family plan.</p>
+        <p class="small muted">
+          Saves {EXPORT_FILENAME}. Keep it somewhere safe: it can hold names, phone numbers, medical details, insurance IDs and your address.
+          Once it does, you can protect it with a passphrase.
+        </p>
       </div>
       <div>
         <input
@@ -264,8 +304,11 @@
   </section>
 </div>
 
+<SavePlanDialog bind:open={saving} plan={snapshot} onsave={saved} />
+<PassphraseDialog bind:file={locked} onopened={(plan) => void accept(plan)} onerror={(reason) => (importError = reason)} />
+
 <ConfirmDialog bind:open={confirmForget} title="Forget everything?" confirmLabel="Forget everything" cancelLabel="Keep my plan" onconfirm={forget}>
-  <p>This deletes your household details, your plan, your check-offs and your settings from this browser. It cannot be undone.</p>
+  <p>This deletes your household details, your plan, your check-offs, your maps and your settings from this browser. It cannot be undone.</p>
   <p>If you want a copy, cancel and choose "Save a copy of your plan" first. The app itself stays available offline.</p>
 </ConfirmDialog>
 

@@ -1,13 +1,16 @@
 <!--
   Back and Continue for an interview step. If answers on this step look wrong, Continue first
   lists them (with links to each field); "Continue anyway" always goes on. Warn, never block.
+
+  On the optional steps (6–8, DESIGN-DELTA-v3 §1) "Skip for now" sits beside Continue: it moves on
+  without marking the step answered, and the plan works out the same either way.
 -->
 <script lang="ts">
   import { tick } from 'svelte';
   import { useApp } from '../lib/app.svelte';
-  import type { StepId } from '../lib/persistence';
+  import { isOptionalStep, type StepId } from '../lib/persistence';
   import type { FieldProblem } from '../lib/ui-types';
-  import { href, ROUTES, stepAfter, stepBefore, useRouter } from '../lib/router.svelte';
+  import { href, isOptional, ROUTES, stepAfter, stepBefore, useRouter } from '../lib/router.svelte';
   import Icon from './Icon.svelte';
 
   let { step, problems = [], nextLabel }: { step: StepId; problems?: FieldProblem[]; nextLabel?: string } = $props();
@@ -18,6 +21,7 @@
   let summary: HTMLDivElement | undefined = $state();
   const next = $derived(stepAfter(step));
   const back = $derived(stepBefore(step));
+  const skippable = $derived(isOptionalStep(step));
 
   $effect(() => {
     if (problems.length === 0) showSummary = false;
@@ -66,10 +70,15 @@
 <div class="interview-nav no-print">
   <a class="button" href={href(back)}><Icon name="chevron-left" /> Back</a>
   <div class="interview-nav__next">
-    <button type="button" class="button button--primary" onclick={go}>
-      {nextLabel ?? 'Continue'} <Icon name="chevron-right" />
-    </button>
-    <span class="small muted">Next: {ROUTES[next].title}</span>
+    <div class="interview-nav__buttons">
+      {#if skippable}
+        <a class="button" href={href(next)}>Skip for now</a>
+      {/if}
+      <button type="button" class="button button--primary" onclick={go}>
+        {nextLabel ?? 'Continue'} <Icon name="chevron-right" />
+      </button>
+    </div>
+    <span class="small muted">Next: {ROUTES[next].title}{isOptional(next) ? ' (optional)' : ''}</span>
   </div>
 </div>
 
@@ -88,6 +97,13 @@
     flex-direction: column;
     align-items: flex-end;
     gap: var(--s1);
+    text-align: right;
+  }
+  .interview-nav__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--s2);
   }
   .error-summary {
     margin-top: var(--s5);

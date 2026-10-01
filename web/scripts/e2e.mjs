@@ -11,8 +11,9 @@
 //     before the county data is in; every byte the server sends until the county data has loaded
 //     and the offline copy is made is counted (gzip at about Pages' level).
 //  2. The Philadelphia fixture is opened through "Open a saved plan" and walked through the five
-//     interview steps with Continue; on "Your risks" every bucket target (the data on each card
-//     and the words on screen) equals fixtures/golden/philadelphia-renters-4.json.
+//     required interview steps with Continue, then past the three optional ones (Continue into
+//     step 6, "Skip for now" twice, "See your risks"); on "Your risks" every bucket target (the
+//     data on each card and the words on screen) equals fixtures/golden/philadelphia-renters-4.json.
 //  3. In-browser timing of `assess` (performance.now() around the engine call, recorded by the
 //     app as the performance measures rr:assess:engine and rr:assess), over several dial changes.
 //  4. The ZIP tables and the map are fetched only when needed, and counted separately.
@@ -99,6 +100,12 @@ async function continueTo(page, heading) {
   await page.waitForFunction((h) => document.querySelector('#page-title')?.textContent?.includes(h), { timeout: 20000 }, heading);
 }
 
+/** "Skip for now" on an optional step (6–8): on to the next without answering. */
+async function skipTo(page, heading) {
+  await page.click('.interview-nav__next a');
+  await page.waitForFunction((h) => document.querySelector('#page-title')?.textContent?.includes(h), { timeout: 20000 }, heading);
+}
+
 try {
   // -------------------------------------------------------------------------------------------
   // 1. First visit, on a typical mobile connection (10 Mbps down, 40 ms round trip)
@@ -174,6 +181,10 @@ try {
   await continueTo(page, 'How you get around');
   await continueTo(page, 'Money');
   await continueTo(page, 'What you already have');
+  // Steps 6–8 are optional (v0.3.0): into the first, then skipped, as a first-time visitor may.
+  await continueTo(page, 'Your people');
+  await skipTo(page, 'Your places');
+  await skipTo(page, 'Contacts, pets, vehicles and documents');
   await page.click('.interview-nav__next button');
   await page.waitForFunction(() => document.querySelector('#page-title')?.textContent?.includes('Your risks'), { timeout: 20000 });
   await page.waitForSelector('[data-screen-ready][aria-busy="false"] [data-bucket]', { timeout: 30000 });
@@ -254,11 +265,11 @@ try {
   await page.click('#settings-panel input[value="one_in_100"]').catch(() => undefined);
   await page.waitForSelector('[data-screen-ready][aria-busy="false"]');
 
-  // Plan and packet.
-  await page.goto(`${site.url}#/plan`);
+  // Prepare (was the Plan tab) and the binder (was the packet).
+  await page.goto(`${site.url}#/prepare`);
   await page.waitForSelector('[data-screen-ready][aria-busy="false"]', { timeout: 30000 });
   await page.screenshot({ path: join(shots, 'plan--philadelphia--desktop.png'), fullPage: true });
-  await page.goto(`${site.url}#/packet`);
+  await page.goto(`${site.url}#/binder`);
   await page.waitForSelector('[data-screen-ready] .packet .county-map__svg', { timeout: 30000 });
   // Media type and colour scheme are set together: puppeteer's separate setters each reset the other.
   const media = await page.createCDPSession();
