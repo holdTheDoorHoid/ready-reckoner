@@ -4,7 +4,7 @@ title: Ice storm
 kind: checklist
 onset: coming
 applies_to: [hazard:ice_storm]
-citations: [nws_ice_storms, cdc_winter_safety, ready_gov_power_outages, pa_puc_power_line_safety, ready_gov_winter, ready_gov_stay_safe_warm, cdc_co_basics, osha_downed_wires, cpsc_generator_alert_2021, ready_gov_evacuation, ready_gov_recovering]
+citations: [nws_ice_storms, cdc_winter_safety, ready_gov_power_outages, pa_puc_power_line_safety, redcross_power_outage, ready_gov_winter, ready_gov_stay_safe_warm, cdc_co_basics, osha_downed_wires, cpsc_generator_alert_2021, ready_gov_evacuation, ready_gov_recovering]
 pages: 1
 ---
 ## Use this when
@@ -15,20 +15,20 @@ An ice storm is forecast. Heavy ice can bring down trees and power lines, and cu
 
 1. **Stay home.** Avoid travel. Bridges and overpasses freeze first.[^nws_ice_storms][^cdc_winter_safety]
 2. **Lights and power.** Have a flashlight for each person and a charged power bank.[^ready_gov_power_outages] {if:powered_device}Charge any medical device, and follow its power plan.[^ready_gov_power_outages]{/if}
-3. **Keep clear of lines.** Treat every downed line as live. Stay 30 feet away, and call 911.[^pa_puc_power_line_safety]
+3. **Keep clear of lines.** Treat every downed line as live. Stay at least 35 feet away, and call 911.[^pa_puc_power_line_safety][^redcross_power_outage]
 4. **Heat safely.** Never heat with a gas stove or oven.[^ready_gov_winter]
-5. **Protect pipes.** Let taps drip. Open the cabinets under sinks.[^cdc_winter_safety]
-6. **Keep food cold.** Keep the fridge and freezer shut.[^ready_gov_power_outages]
+5. **Check on others.** Check on older neighbors often.[^cdc_winter_safety]
 
 ## Then
 
-1. **One warm room.** If the heat fails, close off unused rooms. Stuff towels under doors.[^cdc_winter_safety] {if:children}Never let a baby sleep in a cold room.[^cdc_winter_safety]{/if}
-2. **Dress warmly.** Wear loose layers, a hat and mittens.[^cdc_winter_safety]
-3. **Unplug electronics.** Power can come back with a surge.[^ready_gov_power_outages]
-4. **Salt or sand** icy steps and walks.[^cdc_winter_safety]
-5. **Space heaters.** Keep them 3 feet from anything that can burn.[^cdc_winter_safety]
-6. **Check on others.** Check on older neighbors often.[^cdc_winter_safety]
-7. **Cold injury.** For numb, white skin, or shivering, confusion or slurred speech, get the person warm.[^ready_gov_winter]
+1. **Protect pipes.** Let taps drip. Open the cabinets under sinks.[^cdc_winter_safety]
+2. **Keep food cold.** Keep the fridge and freezer shut.[^ready_gov_power_outages]
+3. **One warm room.** If the heat fails, close off unused rooms. Stuff towels under doors.[^cdc_winter_safety] {if:children}Never let a baby sleep in a cold room.[^cdc_winter_safety]{/if}
+4. **Dress warmly.** Wear loose layers, a hat and mittens.[^cdc_winter_safety]
+5. **Unplug electronics.**[^ready_gov_power_outages]
+6. **Salt or sand** icy steps and walks.[^cdc_winter_safety]
+7. **Space heaters.** Keep them 3 feet from anything that can burn.[^cdc_winter_safety]
+8. **Cold injury.** For numb, white skin, or shivering, confusion or slurred speech, get the person warm.[^ready_gov_winter]
 
 ## Leave or stay
 
@@ -38,7 +38,7 @@ An ice storm is forecast. Heavy ice can bring down trees and power lines, and cu
 
 ## Where and who
 
-- Nearest warming center:
+- Warming center or shelter: {shelter}
 
 ## Do not
 
@@ -51,7 +51,7 @@ An ice storm is forecast. Heavy ice can bring down trees and power lines, and cu
 ## When it is over
 
 - **Report** downed lines to {electric_utility}, and stay away from them.[^ready_gov_evacuation]
-- **Check food.** Throw out food that sat at 40°F or warmer for two hours.[^ready_gov_power_outages]
+- **Check food.** Throw out food that was 40°F or warmer for 2 hours or more.[^ready_gov_power_outages]
 - **Check on neighbors** again.[^cdc_winter_safety]
 - **Damage?** Take photos before you clean up, then call your insurer.[^ready_gov_recovering] {ref:after}
 
@@ -61,6 +61,7 @@ An ice storm is forecast. Heavy ice can bring down trees and power lines, and cu
 [^cdc_winter_safety]: Centers for Disease Control and Prevention, Safety Guidelines: During and After a Winter Storm (2026).
 [^ready_gov_power_outages]: FEMA / Ready.gov, Power Outages (2026).
 [^pa_puc_power_line_safety]: Pennsylvania Public Utility Commission, Power Line Safety (consumer fact sheet) (2013).
+[^redcross_power_outage]: American Red Cross, Power Outage Safety (2026).
 [^ready_gov_winter]: FEMA / Ready.gov, Winter Weather (2026).
 [^ready_gov_stay_safe_warm]: FEMA / Ready.gov, Stay Safe and Warm Toolkit (FEMA Advisory) (2026).
 [^cdc_co_basics]: Centers for Disease Control and Prevention, Carbon Monoxide Poisoning Basics (2026).

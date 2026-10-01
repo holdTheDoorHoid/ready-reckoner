@@ -14,24 +14,24 @@ A pipe bursts, a water heater or appliance leaks, or water is spreading across a
 
 ## Do first
 
-1. **Turn off the main water valve:** {water_shutoff}.[^ready_gov_safety_skills]
-2. **Water near outlets, cords or appliances?** Turn off the power at the main breaker, but only from a dry spot: {electric_panel}.[^cdc_electrical_hazards]
-3. **Cannot reach it without standing in water?** Keep out and call an electrician.[^cdc_electrical_hazards]
-4. **If you rent,** tell your landlord or building manager right away.[^epa_mold_moisture_guide]
-5. **Take photos** of the damage before you clean up.[^ready_gov_recovering]
-6. **Call your insurer** as soon as you can.[^naic_home_insurance_guide] {ref:home}
+1. **Water near outlets, cords or appliances?** Turn off the power at the main breaker, but only from a dry spot: {electric_panel}.[^cdc_electrical_hazards]
+2. **Cannot reach it without standing in water?** Keep out and call an electrician.[^cdc_electrical_hazards]
+3. **Turn off the main water valve:** {water_shutoff}.[^ready_gov_safety_skills]
 
 ## Then
 
-1. **Stop more damage:** clean up the water.[^naic_home_insurance_guide]
-2. **Dry wet areas and things** within 24 to 48 hours.[^epa_mold_moisture_guide]
-3. **Sewage or dirty water?** Have a professional clean it up.[^epa_mold_moisture_guide]
-4. **Get the leak fixed** as soon as you can, and dry everything completely.[^epa_mold_moisture_guide]
-5. **Frozen pipe?** Thaw it with a hair dryer.[^nws_aly_cold_safety]
+1. **If you rent,** tell your landlord or building manager right away.[^epa_mold_moisture_guide]
+2. **Take photos** of the damage before you clean up.[^ready_gov_recovering]
+3. **Call your insurer** as soon as you can.[^naic_home_insurance_guide] {ref:home}
+4. **Stop more damage:** clean up the water.[^naic_home_insurance_guide]
+5. **Dry wet areas and things** within 24 to 48 hours.[^epa_mold_moisture_guide]
+6. **Sewage or dirty water?** Have a professional clean it up.[^epa_mold_moisture_guide]
+7. **Get the leak fixed** as soon as you can, and dry everything completely.[^epa_mold_moisture_guide]
+8. **Frozen pipe?** Thaw it with a hair dryer.[^nws_aly_cold_safety]
 
 ## Leave or stay
 
-- **Leave if** water is near outlets or wiring and you cannot turn the power off from a dry spot.[^cdc_electrical_hazards]
+- **Leave if** water is near outlets or wiring and you cannot turn the power off from a dry spot.[^cdc_electrical_hazards] {ref:getting_out}
 - **Stay if** the water is off and there is no power in the wet area. Start drying out.[^cdc_electrical_hazards][^epa_mold_moisture_guide]
 
 ## Where and who

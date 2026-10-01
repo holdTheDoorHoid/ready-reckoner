@@ -13,12 +13,12 @@ citations: [cdc_heat_health, semenza_1996_heat_deaths, cdc_winter_safety, ready_
 
 ## Sources
 
-[^cdc_heat_health]: CDC, About Heat and Your Health (2026).
+[^cdc_heat_health]: Centers for Disease Control and Prevention, About Heat and Your Health (2026).
 [^semenza_1996_heat_deaths]: Semenza J.C. et al., Heat-Related Deaths during the July 1995 Heat Wave in Chicago (New England Journal of Medicine 335:84–90) (1996).
-[^cdc_winter_safety]: CDC, Safety Guidelines: During and After a Winter Storm (2026).
+[^cdc_winter_safety]: Centers for Disease Control and Prevention, Safety Guidelines: During and After a Winter Storm (2026).
 [^ready_gov_heat]: FEMA / Ready.gov, Extreme Heat (2026).
 [^ready_gov_stay_safe_warm]: FEMA / Ready.gov, Stay Safe and Warm Toolkit (FEMA Advisory) (2026).
 [^epa_burnwise_faq]: U.S. Environmental Protection Agency, Frequent Questions about Wood-Burning Appliances (Burn Wise) (2026).
-[^cdc_co_basics]: CDC, Carbon Monoxide Poisoning Basics (2026).
+[^cdc_co_basics]: Centers for Disease Control and Prevention, Carbon Monoxide Poisoning Basics (2026).
 [^cpsc_co_information_center]: U.S. Consumer Product Safety Commission, Carbon Monoxide Information Center (2026).
 [^usfa_heating_fires]: U.S. Fire Administration, Heating fire safety (2026).

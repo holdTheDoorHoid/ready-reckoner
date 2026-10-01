@@ -27,13 +27,13 @@ No water comes from the tap, or a notice says not to drink or use it. Or the gas
 ## Leave or stay
 
 - **Leave if** you smell gas or hear hissing. Go outside and away from the building.[^ready_gov_safety_skills]
-- **Leave if** you cannot keep the home warm. Go to a warming center (call 211 to find one), or {where_go}.[^ready_gov_stay_safe_warm] {ref:getting_out}
+- **Leave if** you cannot keep the home warm. Go to a warming center (dial 2-1-1 to find one), or {where_go}.[^ready_gov_stay_safe_warm] {ref:getting_out}
 
 ## Where and who
 
 - Water company: {water_utility}
 - Gas company: {gas_utility}
-- Main water shut-off: {water_shutoff}
+- Water shut-off: {water_shutoff}
 
 ## Do not
 

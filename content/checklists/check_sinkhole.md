@@ -18,15 +18,15 @@ A hole opens or the ground sinks near your home, or walls start to sink, sag or 
 2. **Get out of the house** if its walls are sinking, sagging or cracking.[^fl_dep_sinkhole_faq]
 3. **Call 911** if lives or the home are in danger.[^fl_dep_sinkhole_faq]
 4. **Mark off the hole** with a fence, rope or tape.[^fl_dep_sinkhole_faq]
-5. **Call your insurer** right away if the hole threatens your home.[^fl_dep_sinkhole_faq] {ref:home}
 
 ## Then
 
-1. **Smell gas?** Leave, and call 911 and the gas company from far away: {gas_utility}.[^pa_puc_gas_emergencies]
-2. **Hole in a street?** Mark it off, tell the police and call the city or county road department.[^fl_dep_sinkhole_faq]
-3. **Stay back from the edges** for several days, longer after heavy rain.[^fl_dep_sinkhole_faq]
-4. **Take photos** of the hole and any damage.[^ready_gov_recovering]
-5. **Hole next door?** Check your own yard for soft or sinking spots.[^fl_dep_sinkhole_faq]
+1. **Call your insurer** right away if the hole threatens your home.[^fl_dep_sinkhole_faq] {ref:home}
+2. **Smell gas?** Leave, and call 911 and the gas company from far away: {gas_utility}.[^pa_puc_gas_emergencies]
+3. **Hole in a street?** Mark it off, tell the police and call the city or county road department.[^fl_dep_sinkhole_faq]
+4. **Stay back from the edges** for several days, longer after heavy rain.[^fl_dep_sinkhole_faq]
+5. **Take photos** of the hole and any damage.[^ready_gov_recovering]
+6. **Hole next door?** Check your own yard for soft or sinking spots.[^fl_dep_sinkhole_faq]
 
 ## Leave or stay
 

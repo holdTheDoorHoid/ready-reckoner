@@ -16,13 +16,13 @@ citations: [cdc_nchs_ed_visits, mell_2017_ems_response, oregon_2_weeks_ready, dh
 [^cdc_nchs_ed_visits]: CDC National Center for Health Statistics, FastStats: Emergency Department Visits (NHAMCS 2022) (2025).
 [^mell_2017_ems_response]: Mell H.K. et al., Emergency Medical Services Response Times in Rural, Suburban, and Urban Areas (JAMA Surgery) (2017).
 [^oregon_2_weeks_ready]: Oregon Department of Emergency Management, 2 Weeks Ready (2026).
-[^dhs_stop_the_bleed]: U.S. Department of Homeland Security, Stop the Bleed (2026).
+[^dhs_stop_the_bleed]: U.S. Department of Homeland Security (via Internet Archive), Stop the Bleed (2022).
 [^medlineplus_cpr]: MedlinePlus, National Library of Medicine, CPR (health topic summary) (2026).
 [^redcross_first_aid_kit]: American Red Cross, Anatomy of a First Aid Kit (2025).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
-[^fcc_text_911]: FCC, What You Need to Know About Text-to-911 (2026).
+[^fcc_text_911]: Federal Communications Commission, What You Need to Know About Text-to-911 (2026).
 [^ready_gov_cert]: FEMA / Ready.gov, Community Emergency Response Team (2022).
-[^samhsa_988]: SAMHSA, 988 Suicide and Crisis Lifeline (2026).
-[^cdc_antibiotic_use]: CDC, Antibiotic Use: Be Antibiotics Aware (2025).
+[^samhsa_988]: Substance Abuse and Mental Health Services Administration, 988 Suicide and Crisis Lifeline (2026).
+[^cdc_antibiotic_use]: Centers for Disease Control and Prevention, Antibiotic Use: Be Antibiotics Aware (2025).
 [^gargano_2017_wtc_training]: Gargano L.M. et al., Previous emergency training and PTSD among World Trade Center evacuees (Journal of Emergency Management 15(5):275–284) (2017).
 [^nia_affairs_checklist]: National Institute on Aging, Getting Your Affairs in Order Checklist: Documents to Prepare for the Future (2026).

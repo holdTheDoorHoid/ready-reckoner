@@ -50,6 +50,6 @@ Stores run short of food, fuel, medicine or other basics for days or weeks, or p
 [^ready_gov_pandemic]: FEMA / Ready.gov, Pandemic (2026).
 [^medicare_drugs_disaster]: CMS / Medicare.gov, Getting drugs in a disaster or emergency (2026).
 [^fda_infant_formula_dos_donts]: U.S. Food and Drug Administration, Infant Formula: Safety Do's and Don'ts (2023).
-[^fda_drug_shortages_faq]: U.S. Food and Drug Administration, Frequently Asked Questions about Drug Shortages (2026).
+[^fda_drug_shortages_faq]: U.S. Food and Drug Administration, Frequently Asked Questions about Drug Shortages (2024).
 [^usda_hunger_hotline]: U.S. Department of Agriculture, USDA National Hunger Hotline (2025).
 [^fda_besaferx]: U.S. Food and Drug Administration, BeSafeRx: Your Source for Online Pharmacy Information (2020).

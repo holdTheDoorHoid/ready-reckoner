@@ -17,7 +17,7 @@ Some companies sell "emergency antibiotic kits" for disaster preparedness. Ready
 
 [^usc_21_353]: Legal Information Institute (text of the United States Code), 21 U.S.C. 353(b)(1): prescription-only drugs (2026).
 [^mo_med_2026_antibiotic_kits]: Missouri State Medical Association, A Review of Direct-to-Consumer Home Antibiotic Kits: A Threat to Antimicrobial Stewardship and Patient Safety (Missouri Medicine 123(4):344–350) (2026).
-[^cdc_yellow_book_travel_kits]: CDC, CDC Yellow Book 2026: Travel Health Kits (2025).
-[^cdc_antibiotic_use]: CDC, Antibiotic Use: Be Antibiotics Aware (2025).
+[^cdc_yellow_book_travel_kits]: Centers for Disease Control and Prevention, CDC Yellow Book 2026: Travel Health Kits (2025).
+[^cdc_antibiotic_use]: Centers for Disease Control and Prevention, Antibiotic Use: Be Antibiotics Aware (2025).
 [^fda_expired_medicines]: U.S. Food and Drug Administration, Don't Be Tempted to Use Expired Medicines (2021).
 [^fda_fish_antibiotics_warning_2023]: U.S. Food and Drug Administration, Warning letter on unapproved aquarium and bird antibiotic products (Chewy, Inc., November 30, 2023) (2023).

@@ -45,7 +45,7 @@ Officials warn that a severe solar storm could cause wide power outages, or powe
 
 ## When it is over
 
-- **Check food.** Throw out food that sat at 40°F or warmer for two hours, or that smells or looks odd.[^ready_gov_space_weather]
+- **Check food.** Throw out food that was 40°F or warmer for 2 hours or more, or that smells or looks odd.[^ready_gov_space_weather]
 - **Refreeze** food only if it still has ice crystals or is below 40°F.[^ready_gov_space_weather]
 - **Ask your pharmacist** about any medicine that got warm.[^ready_gov_space_weather]
 

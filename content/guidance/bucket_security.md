@@ -18,6 +18,6 @@ citations: [bjs_criminal_victimization_2023, clarke_2002_panic, tierney_2006_dis
 [^tierney_2006_disaster_myths]: Tierney K., Bevc C. and Kuligowski E., Metaphors Matter: Disaster Myths, Media Frames, and Their Consequences in Hurricane Katrina (Annals of the AAPSS 604:57–81) (2006).
 [^ncpc_home_safety]: National Crime Prevention Council, Home and Neighborhood Safety (2026).
 [^ready_gov_cybersecurity]: FEMA / Ready.gov, Cybersecurity (2026).
-[^cisa_deescalation]: CISA, Non-Confrontational Techniques (de-escalation and the Power of Hello) (2026).
+[^cisa_deescalation]: Cybersecurity and Infrastructure Security Agency, Non-Confrontational Techniques (de-escalation and the Power of Hello) (2026).
 [^ready_gov_public_spaces]: FEMA / Ready.gov, Mass Gathering Incidents (Run. Hide. Fight.) (2026).
 [^ftc_disaster_scams]: Federal Trade Commission, Dealing with Weather Emergencies (spotting and reporting disaster scams) (2026).

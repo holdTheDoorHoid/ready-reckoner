@@ -4,7 +4,7 @@ title: Tsunami
 kind: checklist
 onset: now
 applies_to: [hazard:tsunami]
-citations: [nws_tsunami_safety, ready_gov_tsunamis, dogami_tsunami_faq, ready_gov_pets, ready_gov_recovering, fcc_wea]
+citations: [nws_tsunami_safety, nws_tsunami_before, ready_gov_tsunamis, dogami_tsunami_faq, ready_gov_pets, ready_gov_recovering, fcc_wea]
 pages: 1
 ---
 
@@ -15,7 +15,7 @@ Near the coast, you feel a strong or long earthquake, the sea rises or drains aw
 ## Do first
 
 1. **Drop, cover and hold on** until the shaking stops.[^nws_tsunami_safety]
-2. **Go to high ground or inland** as soon as you can move safely, even without an official warning.[^nws_tsunami_safety]
+2. **Go to high ground or inland** as soon as you can move safely, even without an official warning. Go on foot if you can.[^nws_tsunami_safety][^nws_tsunami_before]
 3. **On the beach?** Leave for high ground after any earthquake, big or small.[^nws_tsunami_safety]
 4. **Follow the evacuation signs** (a wave and an arrow) if you cannot reach your safe place.[^nws_tsunami_safety][^ready_gov_tsunamis]
 5. **Cannot get out?** Go to the third floor or higher of a concrete building.[^dogami_tsunami_faq]
@@ -55,6 +55,7 @@ Near the coast, you feel a strong or long earthquake, the sea rises or drains aw
 ## Sources
 
 [^nws_tsunami_safety]: NOAA National Weather Service, Tsunami Safety: During a Tsunami (2026).
+[^nws_tsunami_before]: NOAA National Weather Service, Tsunami Safety: Before a Tsunami (2026).
 [^ready_gov_tsunamis]: FEMA / Ready.gov, Tsunamis (2026).
 [^dogami_tsunami_faq]: Oregon Department of Geology and Mineral Industries, Oregon Tsunami Clearinghouse: frequently asked questions (2026).
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).

@@ -15,4 +15,4 @@ citations: [fbi_active_shooter_2024, ready_gov_public_spaces, dhs_stop_the_bleed
 
 [^fbi_active_shooter_2024]: FBI (via Internet Archive), FBI report on active attacker incidents in the United States in 2024 (2025).
 [^ready_gov_public_spaces]: FEMA / Ready.gov, Mass Gathering Incidents (Run. Hide. Fight.) (2026).
-[^dhs_stop_the_bleed]: U.S. Department of Homeland Security, Stop the Bleed (2026).
+[^dhs_stop_the_bleed]: U.S. Department of Homeland Security (via Internet Archive), Stop the Bleed (2022).
