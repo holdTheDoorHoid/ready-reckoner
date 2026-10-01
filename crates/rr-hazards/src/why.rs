@@ -240,9 +240,10 @@ pub fn why_we_think_this(hazard: HazardId) -> &'static str {
              Freezing weather and a basement raise the chance; renters report fewer claims."
         }
         Eviction => {
-            "Eviction Lab counts eviction filings per renting household in your county, when it has \
-             a figure for it; counties it does not cover use the national rate, about 2 in 100 \
-             renting households a year. Savings and steadier income lower the chance."
+            "Eviction Lab counts eviction cases in your county. Many renters face court again and \
+             again, so we count households, not cases; about 1 in 3 of them is ordered to leave. \
+             Counties above 7 in 100 a year, as in much of Maryland, are capped at 7; with no count \
+             we use the national rate. Savings and steady pay lower it."
         }
         ArrestOrDetention => {
             "The FBI counts about 7 million arrests a year, by age and sex. We add up the rates for \
@@ -265,5 +266,18 @@ mod tests {
             assert!(s.len() < 320, "{h}: {} characters", s.len());
             assert!(!s.contains("  "), "{h}: double space");
         }
+    }
+
+    #[test]
+    fn the_eviction_reason_matches_its_numbers() {
+        use crate::params::{EVICTION_CAP, EVICTION_JUDGMENT_SHARE};
+        let s = why_we_think_this(HazardId::Eviction);
+        // "About 1 in 3" of the households taken to court are ordered to leave.
+        assert!(s.contains("about 1 in 3 of them is ordered to leave"));
+        assert!((EVICTION_JUDGMENT_SHARE.0 - 1.0 / 3.0).abs() < 0.02);
+        // The cap, in households per 100 a year.
+        let cap = format!("above {} in 100 a year", (EVICTION_CAP * 100.0).round());
+        assert!(s.contains(&cap), "{s}");
+        assert!(s.contains("capped at 7;") && s.contains("households, not cases"));
     }
 }

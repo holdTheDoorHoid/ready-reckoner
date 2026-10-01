@@ -38,6 +38,9 @@ pub(crate) struct HazardRate {
     /// sentence: the part's rate today and around 2050, and its verb. The landslide card says how
     /// many households have the home itself damaged, apart from roads cut off (model review M-05).
     pub part_sentence: Option<(Estimate, Estimate, String)>,
+    /// A plain sentence appended last to the card's sentence, when the number needs one: the
+    /// eviction card says when the county's own figure was capped.
+    pub caveat: Option<String>,
     /// Named causes inside the hazard (contract v2), each a note with its sources.
     pub sub_causes: Vec<SubCause>,
     /// The location term behind the rate, for "Why here" (contract v2).
@@ -73,6 +76,7 @@ impl HazardRate {
             fixed_severity: None,
             fixed_confidence: None,
             part_sentence: None,
+            caveat: None,
             sub_causes: Vec::new(),
             location_factor: None,
             range_only: false,

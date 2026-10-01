@@ -262,35 +262,65 @@ fn water_damage(ctx: &Ctx<'_>) -> HazardRate {
     r
 }
 
-/// Eviction (REVIEW H7), renters only: the county's filing rate × the share that end in an order
-/// to leave when the pack has it, otherwise the national judgment rate; × income stability; ×0.5
-/// with three months of savings.
+/// Eviction (REVIEW H7; hazards3), renters only. Households, not filings: the county's eviction
+/// filings per renter household become households taken to court
+/// ([`eviction_households`], the Lab's own household counts), × the share of them ordered to
+/// leave ([`EVICTION_JUDGMENT_SHARE`]); the county figure is capped at [`EVICTION_CAP`], and the
+/// card's sentence then says so. Without a county figure, the national judgment rate. Then ×
+/// income stability, and ×0.5 with three months of savings.
 fn eviction(ctx: &Ctx<'_>) -> Option<HazardRate> {
     if ctx.input.housing.tenure != Tenure::Rent {
         return None;
     }
+    let mut capped = false;
     let base = match ctx.exposure().eviction_filing_rate() {
         Some(f) if f > 0.0 => {
-            Estimate::data(f, f / 1.3, f * 1.3, &[cite::EVICTION_LAB]).times(&prior(
+            let h = eviction_households(f);
+            let ordered = Estimate::data(
+                h,
+                h / EVICTION_HOUSEHOLDS_SPREAD,
+                h * EVICTION_HOUSEHOLDS_SPREAD,
+                &[cite::EVICTION_LAB, cite::GROMIS_2022],
+            )
+            .times(&prior(
                 EVICTION_JUDGMENT_SHARE,
-                &[cite::EVICTION_LAB, cite::RR_PRIORS],
-            ))
+                &[
+                    cite::EVICTION_LAB_FAQ,
+                    cite::EVICTION_LAB_NATIONAL,
+                    cite::RR_PRIORS,
+                ],
+            ));
+            if ordered.value > EVICTION_CAP {
+                capped = true;
+                ordered.scaled(EVICTION_CAP / ordered.value)
+            } else {
+                ordered
+            }
         }
-        _ => prior(EVICTION_NATIONAL, &[cite::EVICTION_LAB, cite::RR_PRIORS]),
+        _ => prior(
+            EVICTION_NATIONAL,
+            &[cite::EVICTION_LAB_FAQ, cite::RR_PRIORS],
+        ),
     };
     let mut m = income_stability(ctx.input.finances.income.stability);
     if ctx.input.finances.emergency_fund_months >= EVICTION_SAVINGS_MONTHS {
         m = m.times(&prior(EVICTION_SAVINGS, &[cite::RR_PRIORS]));
     }
-    Some(
-        HazardRate::new(
-            HazardId::Eviction,
-            base.times(&m),
-            "be taken to court and ordered to leave their rented home",
-            5_000.0,
-        )
-        .with_county_average(base.value),
+    let mut r = HazardRate::new(
+        HazardId::Eviction,
+        base.times(&m),
+        "be taken to court and ordered to leave their rented home",
+        5_000.0,
     )
+    .with_county_average(base.value);
+    if capped {
+        r.caveat = Some(format!(
+            "Landlords here often take the same renters to court again and again, so we cap your \
+             county's figure at {} in 100 households a year.",
+            crate::sentence::sig2(EVICTION_CAP * 100.0)
+        ));
+    }
+    Some(r)
 }
 
 /// Arrests per person a year for one age band, as (value, low, high): the mean of the men's and

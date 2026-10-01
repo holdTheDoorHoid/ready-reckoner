@@ -24,6 +24,12 @@ fn share(v: Option<f32>) -> Option<f64> {
     finite(v).filter(|x| (0.0..=1.0).contains(x))
 }
 
+/// A count per household a year, if present, finite and not negative. Unlike a share it can
+/// exceed 1.
+fn per_household(v: Option<f32>) -> Option<f64> {
+    finite(v).filter(|x| *x >= 0.0)
+}
+
 /// A share as the decimal the pack wrote (0.02842, not 0.028419999…), if present and between 0
 /// and 1. The UASI shares are published four-figure numbers, so the metro weight keeps them as
 /// published.
@@ -212,10 +218,18 @@ impl<'a> Exposure<'a> {
         }
     }
 
-    /// Eviction filings per renter household a year in the county (present only once the
-    /// owner has approved Eviction Lab's attribution licence).
+    /// Eviction filings per renter household a year in the county (Eviction Lab, 2014–2018). Not a
+    /// share: where landlords file against the same households again and again it exceeds 1
+    /// (Baltimore County, MD, 1.37), and such a county keeps its own figure rather than falling
+    /// back to the national rate.
     pub fn eviction_filing_rate(&self) -> Option<f64> {
-        share(self.county.eviction_filing_rate).or_else(|| shown_share(&self.shown.eviction_rate))
+        per_household(self.county.eviction_filing_rate).or_else(|| {
+            self.shown
+                .eviction_rate
+                .as_ref()
+                .map(|s| s.value)
+                .filter(|x| x.is_finite() && *x >= 0.0)
+        })
     }
 }
 
@@ -261,6 +275,19 @@ mod tests {
         // Nor is a value outside 0 to 1.
         c.exposure.uasi_area_share = Some(1.5);
         assert_eq!(Exposure::new(&c, &l).uasi(), Uasi::Absent);
+    }
+
+    #[test]
+    fn eviction_filings_above_one_per_household_are_read() {
+        let (mut c, l) = record();
+        // Baltimore County, MD: 1.37 filings per renter household a year (serial filing).
+        c.exposure.eviction_filing_rate = Some(1.37);
+        let f = Exposure::new(&c, &l).eviction_filing_rate().unwrap();
+        assert!((f - 1.37).abs() < 1e-6);
+        c.exposure.eviction_filing_rate = Some(-0.1);
+        assert_eq!(Exposure::new(&c, &l).eviction_filing_rate(), None);
+        c.exposure.eviction_filing_rate = Some(f32::NAN);
+        assert_eq!(Exposure::new(&c, &l).eviction_filing_rate(), None);
     }
 
     #[test]
