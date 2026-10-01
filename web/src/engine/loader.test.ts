@@ -17,6 +17,7 @@ const MANIFEST: Manifest = {
         { path: 'core/zip_facilities.csv', bytes: 30 },
         { path: 'core/zip_surge.csv', bytes: 20 },
         { path: 'core/zip_centroids.csv', bytes: 60 },
+        { path: 'core/zip_wildfire_places.csv', bytes: 40 },
       ],
     },
     geo: { files: [{ path: 'geo/counties.json', bytes: 40 }] },
@@ -48,6 +49,7 @@ const fullSite = () =>
     'data/core/zip_facilities.csv': { body: 'zf' },
     'data/core/zip_surge.csv': { body: 'zs' },
     'data/core/zip_centroids.csv': { body: 'zn' },
+    'data/core/zip_wildfire_places.csv': { body: 'zw' },
     'data/geo/counties.json': { body: JSON.stringify(MAP), type: 'application/json' },
   });
 
@@ -83,6 +85,7 @@ describe('which files load when', () => {
       'core/zip_facilities.csv',
       'core/zip_surge.csv',
       'core/zip_centroids.csv',
+      'core/zip_wildfire_places.csv',
       'core/counties.csv',
     ]);
     expect(startupFiles(MANIFEST)).toEqual(['core/base_rates.toml', 'core/nri_hazards.csv', 'core/counties.csv']);
@@ -136,8 +139,9 @@ describe('the pack loader', () => {
       'core/zip_facilities.csv',
       'core/zip_surge.csv',
       'core/zip_centroids.csv',
+      'core/zip_wildfire_places.csv',
     ]);
-    expect(loader.status.zip).toMatchObject({ phase: 'ready', bytesLoaded: 160, bytesTotal: 160 });
+    expect(loader.status.zip).toMatchObject({ phase: 'ready', bytesLoaded: 200, bytesTotal: 200 });
     expect(await loader.map()).toEqual(MAP);
     expect(loaded.at(-1)!.name).toBe('geo/counties.json');
     expect(requested.filter((u) => u.includes('manifest')).length).toBe(1);

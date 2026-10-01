@@ -24,7 +24,13 @@ export const CORE_PACK = 'core';
 /** Loaded last so county records are assembled once. */
 export const COUNTY_LIST = 'core/counties.csv';
 /** The core files only ZIP-code lookups read; loaded when a ZIP code is needed. Same list as `ZIP_FILES` in crates/rr-wasm/src/source.rs. */
-export const ZIP_FILES: readonly string[] = ['core/zip_county.csv', 'core/zip_facilities.csv', 'core/zip_surge.csv', 'core/zip_centroids.csv'];
+export const ZIP_FILES: readonly string[] = [
+  'core/zip_county.csv',
+  'core/zip_facilities.csv',
+  'core/zip_surge.csv',
+  'core/zip_centroids.csv',
+  'core/zip_wildfire_places.csv',
+];
 /** County outlines for the map thumbnail; loaded when a map is shown. */
 export const MAP_FILE = 'geo/counties.json';
 /** County hospitals with emergency services, for the binder's Neighbourhood page; its own pack
@@ -59,7 +65,7 @@ export function startupFiles(manifest: Manifest): string[] {
   return coreLoadOrder(manifest).filter((p) => !ZIP_FILES.includes(p));
 }
 
-/** The ZIP tables the manifest lists (normally all four). */
+/** The ZIP tables the manifest lists (normally all five). */
 export function zipFiles(manifest: Manifest): string[] {
   return coreLoadOrder(manifest).filter((p) => ZIP_FILES.includes(p));
 }

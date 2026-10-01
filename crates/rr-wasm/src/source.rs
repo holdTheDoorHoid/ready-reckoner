@@ -46,6 +46,7 @@ pub const ZIP_FILES: &[&str] = &[
     "core/zip_facilities.csv",
     "core/zip_surge.csv",
     "core/zip_centroids.csv",
+    "core/zip_wildfire_places.csv",
 ];
 
 /// Which data is answering.

@@ -689,7 +689,7 @@ comes back at once.
    (DESIGN-DELTA-v3 §8); a first visit is correspondingly larger (about 3.5 MB gzipped, up from
    2.4 MB in v0.2.0).
 3. The ZIP tables (`core/zip_county.csv`, `core/zip_facilities.csv`, `core/zip_surge.csv`,
-   `core/zip_centroids.csv`; `ZIP_FILES` in `crates/rr-wasm/src/source.rs`) when a location has a
+   `core/zip_centroids.csv`, `core/zip_wildfire_places.csv`; `ZIP_FILES` in `crates/rr-wasm/src/source.rs`) when a location has a
    real ZIP code: the app starts fetching them when someone starts typing one, or when a saved
    plan has one. Only ZIP lookups read them, so a first visit is about 0.76 MB lighter, and someone
    who finds their county by name never downloads them.

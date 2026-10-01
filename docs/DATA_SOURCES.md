@@ -1237,7 +1237,7 @@ from the optional-pack versions below).
 | --- | --- | ---: | ---: | --- |
 | `opt/surge/zip_surge.csv` | `core/zip_surge.csv` | 26,459 | 80.9 KB | lazily, with the ZIP tables (§13.8) |
 | `opt/wildfire_places/places.csv` | `core/wildfire_places.csv` | 32,038 | 463.5 KB | eagerly, with the rest of core |
-| `opt/wildfire_places/zip_places.csv` | `core/zip_wildfire_places.csv` | 35,568 | 223.2 KB | eagerly, with the rest of core |
+| `opt/wildfire_places/zip_places.csv` | `core/zip_wildfire_places.csv` | 35,568 | 223.2 KB | lazily, with the ZIP tables (§13.8; in `ZIP_FILES` since 2026-10-01: it is ZIP-keyed and only ZIP lookups read it) |
 | `opt/outage_events/county_events.csv` | `core/outage_events.csv` | 29,878 | 356.0 KB | eagerly, with the rest of core |
 | `opt/outage_events/holdout.csv` | `core/outage_holdout.csv` | 130 | 1.6 KB | eagerly, with the rest of core |
 
