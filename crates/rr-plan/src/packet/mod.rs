@@ -1,7 +1,7 @@
 //! The Prepare sheet (DESIGN-DELTA-v3 §4: `PlanOutput::prepare_markdown`) and the v2 packet's
 //! writers the binder still uses. The Prepare sheet is the v2 packet's preparation content,
-//! unchanged in substance: the summary's step reached and the plan's two done months with the
-//! basics it assumes, "Your plan" (the budget, the free steps and the safety rules to learn now,
+//! unchanged in substance: the summary's three things that matter most, the step reached and the
+//! plan's two done months with the basics it assumes, "Your plan" (the budget, the free steps and the safety rules to learn now,
 //! this month and next), the checklists of purchases by step, the decisions and savings of
 //! "Documents and money", and the maintenance calendar, with its own numbered Sources at the end.
 //! The during-event material is the binder's (`crate::binder`).
@@ -75,6 +75,29 @@ pub const SECTION_HEADINGS: [&str; 6] = [
 /// A citation marker for one id.
 pub(crate) fn cite(id: &str) -> String {
     format!("{OPEN}{id}{CLOSE}")
+}
+
+/// Escapes text for Markdown ([`text::md`]) but leaves citation markers as they are, for a
+/// sentence that already carries its markers.
+pub(crate) fn md_marked(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 8);
+    let mut rest = s;
+    while let Some(start) = rest.find(OPEN) {
+        out.push_str(&text::md(&rest[..start]));
+        let after = &rest[start..];
+        match after.find(CLOSE) {
+            Some(end) => {
+                out.push_str(&after[..end + CLOSE.len_utf8()]);
+                rest = &after[end + CLOSE.len_utf8()..];
+            }
+            None => {
+                out.push_str(&text::md(after));
+                rest = "";
+            }
+        }
+    }
+    out.push_str(&text::md(rest));
+    out
 }
 
 /// Markers for several ids (deduplicated, in order).
