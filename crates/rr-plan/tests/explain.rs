@@ -176,7 +176,7 @@ fn a_rare_family_explains_its_chain() {
     assert!(math.contains("Your county's own outage record"), "{math}");
 }
 
-/// Where no restoration records match the event behind a target, the packet's targets table and
+/// Where no restoration records match the event behind a target, the binder's What to expect table and
 /// `explain bucket` name the worst event on record instead, and read how long it lasted as the
 /// app does (verification R3-05): up to the first mark after the last one with at least 0.5 in
 /// 100 homes still out. Hays: a winter storm with 3.5 in 100 still out on day 7 and none on day
@@ -205,9 +205,9 @@ fn a_bucket_without_relief_names_the_worst_event_on_record() {
             "{name}: {marks:?}"
         );
         assert!(
-            out.prepare_markdown
-                .contains(&format!("| not known | worst on record: {up_to} |")),
-            "{name}: the targets table"
+            rr_plan::binder::markdown::render(&out.binder)
+                .contains(&format!("| not known | not known | {up_to} |")),
+            "{name}: the binder's What to expect table"
         );
         let e = engine()
             .explain(ExplainKind::Bucket, "power", &input)

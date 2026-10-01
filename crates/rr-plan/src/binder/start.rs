@@ -89,7 +89,7 @@ fn block_page(bx: &Bx<'_>, id: &str, kind: PageKind, target: &str) -> Page {
     page(id, title_of(id), kind, blocks)
 }
 
-/// Quick start (`plan_quick_start`): its numbered list is the memory steps.
+/// Quick start (`plan_quick_start`): its numbered list is the memory steps; then where to turn.
 fn quick_start(bx: &Bx<'_>) -> Page {
     let mut p = block_page(bx, "quick_start", PageKind::QuickStart, "plan:quick_start");
     for block in &mut p.blocks {
@@ -102,6 +102,12 @@ fn quick_start(bx: &Bx<'_>) -> Page {
             );
         }
     }
+    let mut next = vec![b("Then: "), t("find what is happening in ")];
+    next.extend(bx.link_inline("index"));
+    next.push(t(". Numbers to call: "));
+    next.extend(bx.link_inline("contacts"));
+    next.push(t("."));
+    p.blocks.push(Block::Para(next));
     p.fit = super::fit::fit_for(&p);
     p
 }

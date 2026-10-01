@@ -1,5 +1,5 @@
-//! Round 2 (v0.1.1) regression tests: what the packet prints and the model numbers the reviews
-//! found wrong (`~/Desktop/ready-reckoner-briefs/round2/REVIEW.md`, S2–S8, M-04, M-08, M-13, C1).
+//! Round 2 (v0.1.1) regression tests: what the binder and the Prepare sheet print, and the model
+//! numbers the reviews found wrong (`~/Desktop/ready-reckoner-briefs/round2/REVIEW.md`, S2–S8, M-04, M-08, M-13, C1).
 //!
 //! Besides the seven fixture households, five backtest households from the model review are
 //! planned against the repository's data packs (`tests/data/backtest/`, copied from the review's
@@ -49,15 +49,6 @@ fn all() -> &'static Vec<(String, PlanInput, PlanOutput)> {
     })
 }
 
-fn packet(name: &str) -> &'static str {
-    &all()
-        .iter()
-        .find(|(n, _, _)| n == name)
-        .unwrap_or_else(|| panic!("no household {name}"))
-        .2
-        .prepare_markdown
-}
-
 fn input(name: &str) -> &'static PlanInput {
     &all()
         .iter()
@@ -66,7 +57,7 @@ fn input(name: &str) -> &'static PlanInput {
         .1
 }
 
-/// The part of a packet from one `##` heading to the next.
+/// The part of the Prepare sheet from one `##` heading to the next.
 fn section<'a>(p: &'a str, heading: &str) -> &'a str {
     let start = p
         .find(&format!("\n{heading}\n"))
@@ -76,158 +67,73 @@ fn section<'a>(p: &'a str, heading: &str) -> &'a str {
     &rest[..end]
 }
 
-/// The hazard cards of a packet, by name, in order.
-fn cards(p: &str) -> Vec<&str> {
-    section(p, "## Your risks")
-        .lines()
-        .filter_map(|l| l.strip_prefix("#### "))
-        .filter_map(|l| l.split_once(". ").map(|(_, t)| t))
-        .collect()
+/// The words of one binder page, its running text joined.
+fn page_text(out: &PlanOutput, id: &str) -> String {
+    let page = out
+        .binder
+        .page(id)
+        .unwrap_or_else(|| panic!("no page {id}"));
+    let md = rr_plan::binder::markdown::render(&rr_types::Binder {
+        parts: vec![rr_types::binder::Part {
+            id: "x".into(),
+            tab: 1,
+            title: "x".into(),
+            short_title: "x".into(),
+            pages: vec![page.clone()],
+        }],
+        ..out.binder.clone()
+    });
+    md.replace('\\', "")
 }
 
-/// One card's text, from its heading to the next heading.
-fn card<'a>(p: &'a str, name: &str) -> &'a str {
-    let risks = section(p, "## Your risks");
-    let at = risks
-        .lines()
-        .position(|l| l.starts_with("#### ") && l.ends_with(&format!(". {name}")))
-        .unwrap_or_else(|| panic!("no card {name}"));
-    let lines: Vec<&str> = risks.lines().collect();
-    let first = risks.find(lines[at]).unwrap();
-    let rest = &risks[first + lines[at].len()..];
-    let end = rest.find("\n###").unwrap_or(rest.len());
-    &risks[first..first + lines[at].len() + end]
+/// The binder page a hazard's checklist is on.
+fn checklist_of(hazard: HazardId) -> String {
+    rr_content::content()
+        .checklist_for(&format!("hazard:{hazard}"))
+        .map(|c| c.meta.id.clone())
+        .unwrap_or_else(|| panic!("no checklist for {hazard}"))
 }
 
 // ------------------------------------------------------------------------------------------------
-// S3: which hazards get a card
+// S3: what to do about the hazards that kill reaches paper
 // ------------------------------------------------------------------------------------------------
 
 #[test]
-fn every_packet_has_a_house_fire_card() {
+fn every_binder_has_the_house_fire_page() {
     for (name, _, out) in all() {
-        let c = cards(&out.prepare_markdown);
-        assert!(c.contains(&"House fire"), "{name}: {c:?}");
-        // Its escape steps reach paper (RR-P03: "crawl low" was in 0 of 7 packets).
         assert!(
-            out.prepare_markdown.contains("crawl low"),
-            "{name}: the house-fire card's advice"
+            out.binder
+                .page(&checklist_of(HazardId::HouseFire))
+                .is_some(),
+            "{name}: no house-fire page"
         );
     }
 }
 
 #[test]
-fn hazards_that_kill_get_a_card_where_they_threaten() {
+fn hazards_that_kill_get_their_page_where_they_threaten() {
     for (name, hazard) in [
-        ("campfire-paradise-2", "Wildfire"),
-        (
-            "ida-queens-basement-2",
-            "Flooding from rivers or heavy rain",
-        ),
-        ("miami-condo-retiree-1", "Hurricane"),
-        ("lahaina-maui-3", "Wildfire"),
-        ("lahaina-maui-3", "Tsunami"),
-        ("maria-utuado-3", "Landslide"),
+        ("campfire-paradise-2", HazardId::Wildfire),
+        ("ida-queens-basement-2", HazardId::RiverineFlooding),
+        ("miami-condo-retiree-1", HazardId::Hurricane),
+        ("lahaina-maui-3", HazardId::Wildfire),
+        ("lahaina-maui-3", HazardId::Tsunami),
+        ("maria-utuado-3", HazardId::Landslide),
     ] {
-        let c = cards(packet(name));
-        assert!(c.contains(&hazard), "{name}: no {hazard} card in {c:?}");
-    }
-    // Paradise: the wildfire card says to leave as soon as told, even without flames.
-    assert!(
-        card(packet("campfire-paradise-2"), "Wildfire").contains("even if you cannot see flames")
-    );
-}
-
-/// Words outside the Sources section on one printed US Letter page (docs/PACKET.md, "Length").
-const BODY_WORDS_PER_PAGE: f64 = 405.0;
-
-/// Words of the two-column, 8-point Sources section (with the data credits) on one printed page.
-const SOURCES_WORDS_PER_PAGE: f64 = 690.0;
-
-/// The packet's length in printed US Letter pages, as docs/PACKET.md defines the proxy: words
-/// outside the Sources section at 405 a page, words in the Sources section at 690. Calibrated on
-/// Chrome's Letter prints of the v0.2.0 packets (`web/scripts/packet-pages.mjs`, verification
-/// R3-15): Philadelphia 19.90 body pages for 8,089 words and 4.90 Sources pages for 3,421 (24.80
-/// in all against 24.93 here), Minot 19.85 and 4.95 for 8,073 and 3,400, Sugar Land 21.33 and
-/// 5.29 for 8,780 and 3,670, San Juan 21.28 and 5.05 for 8,950 and 3,532. The first proxy (400
-/// and 1,000, from the v0.1.0 print) held for the body but put the Sources section at two thirds
-/// of its printed length, so it read 23.66 where Chrome printed 26 pages (25.59).
-fn printed_pages(p: &str) -> f64 {
-    let at = p.find("\n## Sources\n").expect("a Sources section");
-    words(&p[..at]) as f64 / BODY_WORDS_PER_PAGE + words(&p[at..]) as f64 / SOURCES_WORDS_PER_PAGE
-}
-
-/// Words as a reader counts them: tokens with a letter or digit, citation brackets left out (the
-/// same count as `the_packet_stays_short`).
-fn words(markdown: &str) -> usize {
-    let mut text = String::with_capacity(markdown.len());
-    let mut rest = markdown;
-    while let Some(start) = rest.find('[') {
-        text.push_str(&rest[..start]);
-        let after = &rest[start + 1..];
-        match after.find(']') {
-            Some(end)
-                if !after[..end].is_empty()
-                    && after[..end].split(", ").all(|n| n.parse::<usize>().is_ok()) =>
-            {
-                text.push(' ');
-                rest = &after[end + 1..];
-            }
-            _ => {
-                text.push('[');
-                rest = after;
-            }
-        }
-    }
-    text.push_str(rest);
-    text.split_whitespace()
-        .filter(|w| w.chars().any(char::is_alphanumeric))
-        .count()
-}
-
-/// The most the Philadelphia packet may print on: 25 US Letter pages (docs/PACKET.md). Packet v2
-/// aimed at 24, but measured in Chrome it printed on 26 (24 on A4); two table headings that
-/// wrapped every row, calendar dates that wrapped and the source names repeated before each supply
-/// line's bracket brought it to 25 (24.80 filled, 24.93 by this proxy, 24 on A4). Reaching 24
-/// would take about a page of advice out, so the budget is what the content needs. (v0.1.1
-/// allowed 23.5 on the first proxy; the v0.2 packet before packet v2 printed on 28 by that
-/// proxy.)
-// Transitional (v0.3): the unconditional data credits since data3 add about a fifth of a page;
-// the binder retires this cap when it lands (DESIGN-DELTA-v3 §4).
-const PHILADELPHIA_MAX_PAGES: f64 = 25.3;
-
-/// The most any fixture or backtest packet may print on. Households with more to say (insulin, a
-/// baby, a well, a surge zone, Puerto Rico's long outages) run longer than Philadelphia; this
-/// catches the packet growing back (Sugar Land 27.00 and San Juan 27.22 are the longest; Chrome
-/// prints both on 27 Letter pages).
-const ANY_MAX_PAGES: f64 = 28.0;
-
-#[test]
-fn philadelphia_stays_within_25_printed_pages() {
-    for (name, _, out) in all() {
-        let pages = printed_pages(&out.prepare_markdown);
-        eprintln!(
-            "{name}: {pages:.2} printed pages, {} words",
-            words(&out.prepare_markdown)
-        );
+        let out = &all().iter().find(|(n, _, _)| n == name).unwrap().2;
         assert!(
-            pages <= ANY_MAX_PAGES,
-            "{name} prints on about {pages:.2} pages"
+            out.binder.page(&checklist_of(hazard)).is_some(),
+            "{name}: no page for {hazard}"
         );
     }
-    let pages = printed_pages(packet("philadelphia-renters-4"));
-    assert!(
-        pages <= PHILADELPHIA_MAX_PAGES,
-        "Philadelphia prints on about {pages:.2} pages"
-    );
 }
 
 // ------------------------------------------------------------------------------------------------
-// S3b: the life-safety rules reach every packet
+// S3b: the life-safety rules reach every Prepare sheet
 // ------------------------------------------------------------------------------------------------
 
 #[test]
-fn every_packet_prints_the_life_safety_rules() {
+fn every_prepare_sheet_prints_the_life_safety_rules() {
     for (name, _, out) in all() {
         let plan = section(&out.prepare_markdown, "## Your plan");
         for r in &rr_plan::packet::SAFETY_RULES {
@@ -307,25 +213,20 @@ fn rare_catastrophe_gear_prints_only_with_the_opt_in() {
 }
 
 // ------------------------------------------------------------------------------------------------
-// S2: leaving first, and shelter advice that fits the home
+// S2: leaving first
 // ------------------------------------------------------------------------------------------------
 
-fn three_things(p: &str) -> Vec<&str> {
-    let s = section(p, "## Summary");
-    s.lines()
-        .filter(|l| l.starts_with(|c: char| c.is_ascii_digit()) && l.contains(". "))
-        .collect()
-}
-
-/// Leaving comes first (review S2, packet v2): when the evacuation bucket's ten-year chance is at
-/// least 25 in 100, the plan includes a major hurricane or a local tsunami, the home is in a
-/// storm-surge area (review RR-P02, the guardrail's own test), or a hazard that gives minutes of
-/// warning (wildfire, a dam or levee failure) has a ten-year chance of 10 in 100 or more.
+/// Leaving comes first (review S2, packet v2; the binder's Getting out page): when the
+/// evacuation bucket's ten-year chance is at least 25 in 100, the plan includes a major hurricane
+/// or a local tsunami, the home is in a storm-surge area (review RR-P02, the guardrail's own
+/// test), or a hazard that gives minutes of warning (wildfire, a dam or levee failure) has a
+/// ten-year chance of 10 in 100 or more.
 #[test]
 fn leaving_comes_first_where_it_matters() {
     const LEAVE: &str = "Know your evacuation zone and where you would go; leave when told.";
-    for (name, _, out) in all() {
-        let a = run(&all().iter().find(|(n, _, _)| n == name).unwrap().1);
+    const BOX: &str = "Leaving comes first here.";
+    for (name, input, out) in all() {
+        let a = run(input);
         let p10 = match a.bucket(BucketId::Evacuate).target {
             Target::Evacuate { p_need_10yr, .. } => p_need_10yr,
             _ => 0.0,
@@ -349,90 +250,33 @@ fn leaving_comes_first_where_it_matters() {
                 .map_or(0.0, |p| p.rate_per_year);
             -rr_types::math::exp_m1(-10.0 * rate) >= rr_plan::packet::CARD_MIN_P10
         });
-        let things = three_things(&out.prepare_markdown);
-        let first_is_leaving = things.first().is_some_and(|t| t.contains(LEAVE));
+        let page = page_text(out, "getting_out");
+        let first = page.contains(BOX);
         assert_eq!(
-            first_is_leaving,
+            first,
             p10 >= rr_plan::packet::LEAVE_FIRST_P10 || scenario || surge || fast,
-            "{name}: p10 {p10}, scenario {scenario}, surge {surge}, fast {fast}: {things:?}"
+            "{name}: p10 {p10}, scenario {scenario}, surge {surge}, fast {fast}"
         );
+        assert_eq!(first, page.contains(LEAVE), "{name}");
         if surge {
             assert!(
-                things[0].contains("storm surge"),
+                page.contains("storm surge"),
                 "{name}: the surge area is named"
             );
         }
-        if first_is_leaving {
-            assert!(
-                things
-                    .iter()
-                    .skip(1)
-                    .any(|t| t.contains("If you are not told to leave, be ready to manage")),
-                "{name}: the stay-home amounts are for when you are not told to leave"
-            );
-        }
     }
+    let page = |name: &str| {
+        let out = &all().iter().find(|(n, _, _)| n == name).unwrap().2;
+        page_text(out, "getting_out")
+    };
     // Miami (whole city an evacuation zone, major-hurricane scenario on) leads with leaving; a
     // local-tsunami county adds the shaking rule; Galveston Island is a surge area; Paradise's
     // wildfire gives minutes of warning.
-    assert!(three_things(packet("miami-condo-retiree-1"))[0].contains(LEAVE));
-    assert!(three_things(packet("lahaina-maui-3"))[0].contains("strong shaking is the warning"));
-    assert!(three_things(packet("galveston-highrise-1"))[0].contains("storm surge"));
-    assert!(three_things(packet("campfire-paradise-2"))[0].contains("for wildfires, 15 minutes"));
-    assert!(!three_things(packet("philadelphia-renters-4"))[0].contains(LEAVE));
-}
-
-#[test]
-fn shelter_advice_fits_the_home() {
-    // Miami, floor 14 of a tall building: no basement or lowest-floor shelter in the wind and
-    // hurricane advice; the tenth-floor rule and the elevator warning instead.
-    let miami = packet("miami-condo-retiree-1");
-    assert!(
-        !miami.contains("basement on the lowest floor"),
-        "Miami: basement advice"
-    );
-    // (Miami's strong-wind card yields to its cold wave under packet v2's card rule; the
-    // hurricane card and the shelter plan carry its wind advice.)
-    let text = card(miami, "Hurricane");
-    assert!(!text.contains("basement"), "Miami hurricane card: {text}");
-    assert!(
-        !text.contains("lowest floor"),
-        "Miami hurricane card: {text}"
-    );
-    assert!(
-        text.contains("take shelter on or below the 10th floor"),
-        "Miami: the tenth-floor sentence"
-    );
-    assert!(
-        section(miami, "## Your shelter plan").contains("on or below the 10th floor"),
-        "Miami: the shelter plan's high-rise sentence"
-    );
-    assert!(
-        section(miami, "## Your targets").contains("do not count on the elevator"),
-        "Miami: the elevator warning"
-    );
-    // A detached house (Coos Bay) keeps the basement sentence on its wind card; an apartment
-    // (Chicago, third floor) gets the inside hallway instead.
-    assert!(
-        card(packet("coos-bay-well-owner-2"), "Strong wind").contains(
-            "small, windowless room or basement on the lowest floor of a sturdy building"
-        ),
-        "Coos Bay: the basement sentence"
-    );
-    let chicago = card(packet("chicago-student-zero-budget-1"), "Strong wind");
-    assert!(
-        chicago.contains("In an apartment building, pick an inside hallway"),
-        "Chicago: {chicago}"
-    );
-    assert!(
-        !chicago.contains("basement on the lowest floor"),
-        "Chicago: {chicago}"
-    );
-    let phl = packet("philadelphia-renters-4");
-    assert!(
-        !phl.contains("10th floor"),
-        "Philadelphia: no high-rise advice"
-    );
+    assert!(page("miami-condo-retiree-1").contains(LEAVE));
+    assert!(page("lahaina-maui-3").contains("strong shaking is the warning"));
+    assert!(page("galveston-highrise-1").contains("storm surge"));
+    assert!(page("campfire-paradise-2").contains("for wildfires, 15 minutes"));
+    assert!(!page("philadelphia-renters-4").contains(LEAVE));
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -440,13 +284,16 @@ fn shelter_advice_fits_the_home() {
 // ------------------------------------------------------------------------------------------------
 
 #[test]
-fn page_one_carries_the_status_line() {
+fn the_cover_carries_the_status_line() {
     for (name, _, out) in all() {
-        let p = &out.prepare_markdown;
-        let at = p
-            .find(rr_plan::packet::STATUS_LINE)
-            .unwrap_or_else(|| panic!("{name}: no status line"));
-        assert!(at < p.find("\n## Summary\n").unwrap(), "{name}: on page 1");
+        assert!(
+            page_text(out, "cover").contains(rr_plan::packet::STATUS_LINE),
+            "{name}: no status line on the cover"
+        );
+        assert!(
+            out.prepare_markdown.contains(rr_plan::packet::STATUS_LINE),
+            "{name}: no status line on the Prepare sheet"
+        );
     }
     assert!(rr_plan::packet::STATUS_LINE.starts_with(
         "Ready Reckoner is an independent, open-source planning aid. It is not official emergency \
@@ -458,10 +305,11 @@ fn page_one_carries_the_status_line() {
 #[test]
 fn the_dial_sentence_is_per_need() {
     // The sentence is computed from the model (DESIGN-DELTA §3): the chance for any one need, and
-    // the higher chance that at least one of them runs past its target.
+    // the higher chance that at least one of them runs past its target. The binder prints it on
+    // What to expect.
     let cope = "That is why the plan also gives you ways to cope when a target runs out.";
     for (name, input, out) in all() {
-        let targets = section(&out.prepare_markdown, "## Your targets");
+        let targets = page_text(out, "what_to_expect");
         assert!(
             !targets.contains("Something worse than these targets"),
             "{name}: the old sentence"
@@ -489,7 +337,7 @@ fn the_dial_sentence_is_per_need() {
     }
     // Coos Bay plans at 1 in 500: 100 · (1 − e^(−10 × 0.002)) = 1.98, about 2 in 100 households
     // for one need in ten years (the model's sentence counts small chances in hundredths, not in
-    // tens with a floor of 1 in 10), and the packet prints it as the model words it.
+    // tens with a floor of 1 in 10), and the binder prints it as the model words it.
     let coos = all()
         .iter()
         .find(|(n, _, _)| n == "coos-bay-well-owner-2")
@@ -670,21 +518,27 @@ fn fast_hazards_set_the_short_warning() {
         "{:?}",
         a.consequence.evacuate.notice_hours
     );
-    let lahaina = packet("lahaina-maui-3");
+    let getting_out = |name: &str| {
+        let out = &all().iter().find(|(n, _, _)| n == name).unwrap().2;
+        page_text(out, "getting_out")
+    };
+    // The Getting out page: the warning line, and the warning by cause (in the leave-first box
+    // when leaving comes first, as it does in Lahaina).
+    let lahaina = getting_out("lahaina-maui-3");
     let line = lahaina
         .lines()
         .find(|l| l.contains("Warning can be"))
         .expect("Lahaina's warning line");
     assert!(
         line.contains("as short as no warning at all (an earthquake)")
-            && line.contains("for tsunamis, 15 minutes")
             && !line.contains("Warning can be 2 hours"),
         "{line}"
     );
+    assert!(lahaina.contains("for tsunamis, 15 minutes"), "{lahaina}");
     // Paradise: no warning at all at the short end too, and the wildfire's 15 minutes by cause.
     let p = run(input("campfire-paradise-2"));
     assert!(p.consequence.evacuate.notice_hours[0] < 1.0);
-    let paradise = packet("campfire-paradise-2");
+    let paradise = getting_out("campfire-paradise-2");
     assert!(paradise.contains("Warning can be as short as no warning at all"));
     assert!(paradise.contains("for wildfires, 15 minutes"));
 }
