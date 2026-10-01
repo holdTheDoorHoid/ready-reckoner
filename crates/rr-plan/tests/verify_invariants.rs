@@ -390,6 +390,7 @@ fn shape_problems(out: &PlanOutput) -> Vec<String> {
             _ => {}
         }
     }
+    let binder_md = rr_plan::binder::markdown::render(&out.binder);
     for bad in [
         "about 1 times",
         "about fewer than",
@@ -401,19 +402,26 @@ fn shape_problems(out: &PlanOutput) -> Vec<String> {
         "  .",
     ] {
         if out.prepare_markdown.contains(bad) {
-            problems.push(format!("packet contains {bad:?}"));
+            problems.push(format!("the Prepare sheet contains {bad:?}"));
+        }
+        if binder_md.contains(bad) {
+            problems.push(format!("the binder contains {bad:?}"));
         }
     }
-    // Every hazard card pairs its threat with what to do (PRINCIPLES §4).
-    let risks = out
-        .prepare_markdown
-        .split("## Your targets")
-        .next()
-        .unwrap_or_default();
-    for card in risks.split("\n#### ").skip(1) {
-        if !card.contains("**What helps.**") {
-            let title = card.lines().next().unwrap_or_default();
-            problems.push(format!("the card {title:?} has no \"What helps\""));
+    // The binder holds together, and every checklist page pairs its threat with what to do first
+    // (PRINCIPLES §4).
+    problems.extend(out.binder.check());
+    for p in out
+        .binder
+        .pages()
+        .filter(|p| p.kind == rr_types::binder::PageKind::Checklist && p.id.starts_with("check_"))
+    {
+        let steps = p
+            .blocks
+            .iter()
+            .any(|b| matches!(b, rr_types::binder::Block::Steps(s) if s.iter().any(|x| x.memory)));
+        if !steps {
+            problems.push(format!("the checklist {} has no \"Do first\" steps", p.id));
         }
     }
     problems

@@ -28,8 +28,11 @@ release build takes about 0.8 seconds and 15–30 milliseconds.
 By default `rr` loads only the core pack, as the web app does, so it plans exactly what the site
 and the goldens show; the core pack now includes the eviction column and the storm-surge,
 wildfire-place and outage-event tables that used to be optional packs (bundled 2026-09-27,
-DESIGN-DELTA-v3 §8). Only `places` (county hospitals, read by the binder, not by the plan) is
-still a separate pack, and comes in only when asked for with `--optional places` or `--all-packs`.
+DESIGN-DELTA-v3 §8). Only `places` (county hospitals, read by the binder's Neighborhood page, not
+by the plan) is still a separate pack, and comes in only when asked for with `--optional places`
+or `--all-packs`: then `rr plan` and `rr binder` print the county's hospitals with an emergency
+room, as the web app's binder does once it has loaded that pack. The goldens are planned on the
+core pack alone.
 `rr data verify` and `rr data info`
 always read every pack. A pack is loaded exactly as the web app loads it: `manifest.json` first,
 then every file the manifest lists for the chosen packs, by its manifest path, each checked
@@ -79,28 +82,42 @@ rr: The household has 1 problem to fix:
 
 ## Commands
 
-### `rr plan`: the packet and the whole plan
+### `rr plan`: the binder, the Prepare sheet and the whole plan
 
 ```
 rr plan --household <file> [dial options] [--format md|json|both] [--out <dir>]
 ```
 
-Prints the printable packet (Markdown, the default) or the whole `PlanOutput` (`--format json`).
-The JSON is written with the same function that writes the goldens, so for a fixture household on
-the fixture counties it is byte for byte `fixtures/golden/<name>.json`. `--out <dir>` writes
-`<name>.md` and/or `<name>.json` there instead; `--format both` needs `--out`.
+Prints the household's binder (DESIGN-DELTA-v3 §4: ten tabs, a page per person, place and matter,
+an airline-style checklist for every risk in its matrix and every everyday emergency), a rule, then
+the Prepare sheet (the preparation plan: the budget, the free steps, what to buy month by month,
+the decisions and savings, the maintenance calendar), as Markdown, the default; or the whole
+`PlanOutput` (`--format json`). The Markdown is byte for byte `fixtures/golden/<name>.md` and the
+JSON `fixtures/golden/<name>.json` for a fixture household on the repository's packs: both are
+written with the functions that write the goldens. `--out <dir>` writes `<name>.md` and/or
+`<name>.json` there instead; `--format both` needs `--out`.
 
 ```
-$ rr plan --household fixtures/households/philadelphia-renters-4.json | head -4
-# Your preparedness packet
+$ rr plan --household fixtures/households/philadelphia-renters-4.json | head -3
+# Emergency binder for Dana, Sam, Riley and Grandpa Joe
 
-**For:** 2 adults, 1 older adult and 1 child, with 1 dog
-**Where:** Philadelphia County, Pennsylvania (ZIP code 19147)
+**Contents**
 
-$ rr plan --household coos-bay-well-owner-2 --scenario cascadia_m9=off --format both --out packets/
-wrote packets/coos-bay-well-owner-2.md
-wrote packets/coos-bay-well-owner-2.json
+$ rr plan --household coos-bay-well-owner-2 --scenario cascadia_m9=off --format both --out plans/
+wrote plans/coos-bay-well-owner-2.md
+wrote plans/coos-bay-well-owner-2.json
 ```
+
+### `rr binder`: the binder alone
+
+```
+rr binder --household <file> [dial options] [--json]
+```
+
+Prints the binder only: Markdown (parts as `#`, pages as `##`, the household's blanks as
+`__________`, cross-references as "(Tab 3, Home)", citations as "[3]"), or with `--json` the
+`Binder` tree the web app renders to HTML and PDF (`PlanOutput.binder`). Any risk or everyday
+emergency that has no checklist block yet is named on standard error.
 
 ### `rr risks`: the risk register
 
@@ -133,7 +150,7 @@ Ranked, most important first (29 hazards)
 rr targets --household <file> [dial options] [--sweep]
 ```
 
-First what the dial means (the same sentence as the packet, model review M-04): each target holds
+First what the dial means (the same sentence as the binder's What to expect page, model review M-04): each target holds
 for its own need, and the chance that at least one need runs past its target is higher. At the
 default setting:
 
@@ -307,16 +324,17 @@ Everything checks out.
 
 `info` prints the engine, content and pack versions, when the pack was refreshed, one line per ETL
 job (when its sources were retrieved, how many, their licences, how many counties it has no data
-for), and the attributions the About screen and every packet must show, the FEMA National Risk
+for), and the attributions the About screen and every binder must show, the FEMA National Risk
 Index statement first.
 
-### `rr golden`: the golden packets
+### `rr golden`: the golden binders
 
 ```
 rr golden [--update]
 ```
 
-Compares `fixtures/golden/*.md` and `*.json` with a fresh rendering by rr-plan's own helper
+Compares `fixtures/golden/*.md` (the binder, a rule, then the Prepare sheet) and `*.json` with a
+fresh rendering by rr-plan's own helper
 (`rr_plan::golden::render_all`, the same one `cargo test -p rr-plan --test goldens` checks),
 showing the changed lines of every file that differs. `--update` rewrites them with
 `rr_plan::golden::write_all`; explain the change in the commit message. `rr` itself knows nothing

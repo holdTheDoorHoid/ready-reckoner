@@ -59,6 +59,81 @@ pub trait CountySource {
     fn resolve(&self, input: &LocationInput) -> Result<LocationResolved, EngineError> {
         location::resolve_with(self, input)
     }
+
+    /// The county's hospitals with emergency services, for the binder's Neighborhood page
+    /// (DESIGN-DELTA-v3 §4.2, §8): `None` while the list is not loaded (the `places` pack, loaded
+    /// when the binder is shown), so the page says nothing about it; `Some` with no rows for a
+    /// county the list has no hospital for, which the page says in one sentence. The default is
+    /// `None` (the sample counties carry no list).
+    fn county_hospitals(&self, fips: &str) -> Option<CountyHospitals> {
+        let _ = fips;
+        None
+    }
+}
+
+/// A county's hospitals with emergency services, as the binder prints them ([`CountySource`]).
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct CountyHospitals {
+    /// The hospitals, as the dataset lists them (name, city, phone), in the dataset's order.
+    pub rows: Vec<HospitalRow>,
+    /// When the dataset was released, when the pack records it.
+    pub released: Option<Date>,
+}
+
+/// One hospital with emergency services.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct HospitalRow {
+    /// Its name, as the dataset lists it.
+    pub name: String,
+    /// The city or town.
+    pub city: String,
+    /// Its telephone number, as the dataset lists it.
+    pub phone: String,
+}
+
+/// The pack file of the county hospital list (`rr-data`'s `places` pack).
+pub const HOSPITALS_FILE: &str = "places/hospitals.csv";
+
+/// The county hospital list of a loaded data store: `None` until [`HOSPITALS_FILE`] is loaded.
+/// The release date comes from the manifest's `hospitals` job ("released 2026-08-13" in a
+/// source's version, else its `released` definition, else the day the job ran).
+pub fn store_hospitals(store: &DataStore, fips: &str) -> Option<CountyHospitals> {
+    if !store.loaded().contains_key(HOSPITALS_FILE) {
+        return None;
+    }
+    let rows = store
+        .county_hospitals(fips)
+        .iter()
+        .map(|h| HospitalRow {
+            name: one_space(&h.name),
+            city: one_space(&h.city),
+            phone: one_space(&h.phone),
+        })
+        .collect();
+    let released = store.manifest().and_then(|m| {
+        let job = m.jobs.get("hospitals")?;
+        job.sources
+            .iter()
+            .find_map(|s| date_after(&s.version, "released "))
+            .or_else(|| {
+                job.definitions
+                    .get("released")
+                    .and_then(|d| date_after(d, "released this dataset on "))
+            })
+            .or_else(|| Date::parse(job.finished.get(..10)?).ok())
+    });
+    Some(CountyHospitals { rows, released })
+}
+
+/// The words of a dataset field with runs of spaces as one ("CENTER HOSPITAL  CAROLINA").
+fn one_space(s: &str) -> String {
+    s.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+/// The ISO date that follows `marker` in `text`.
+fn date_after(text: &str, marker: &str) -> Option<Date> {
+    let at = text.find(marker)? + marker.len();
+    Date::parse(text.get(at..at + 10)?).ok()
 }
 
 /// One fixture county: the record and the resolved location, as in
@@ -372,14 +447,23 @@ impl CountySource for DataStore {
     fn resolve(&self, input: &LocationInput) -> Result<LocationResolved, EngineError> {
         DataStore::resolve(self, input)
     }
+
+    fn county_hospitals(&self, fips: &str) -> Option<CountyHospitals> {
+        store_hospitals(self, fips)
+    }
 }
 
-/// The packs [`load_data_dir`] loads: the core pack (every lookup the engine makes). The `geo`
-/// pack only draws the map.
+/// The packs [`load_data_dir`] loads: the core pack (every lookup the engine makes), as the web
+/// app loads it to plan; the goldens are planned on it. The `geo` pack only draws the map.
 pub const DATA_DIR_PACKS: [&str; 1] = ["core"];
 
-/// Loads a data directory the way the web app loads the packs: `manifest.json` first, then every
-/// file of the core pack, each checked against its sha256. Native only.
+/// The core pack and the `places` pack: the county hospital list the binder's Neighborhood page
+/// prints, which the web app loads when the binder is shown ([`load_data_dir_packs`]).
+pub const BINDER_PACKS: [&str; 2] = ["core", "places"];
+
+/// Loads a data directory the way the web app loads the packs to plan: `manifest.json` first,
+/// then every file of the packs in [`DATA_DIR_PACKS`], each checked against its sha256. Native
+/// only.
 ///
 /// # Errors
 ///
@@ -387,6 +471,19 @@ pub const DATA_DIR_PACKS: [&str; 1] = ["core"];
 /// cannot be decoded.
 #[cfg(not(target_arch = "wasm32"))]
 pub fn load_data_dir(dir: &std::path::Path) -> Result<DataStore, EngineError> {
+    load_data_dir_packs(dir, &DATA_DIR_PACKS)
+}
+
+/// As [`load_data_dir`], with these packs (for example [`BINDER_PACKS`]). Native only.
+///
+/// # Errors
+///
+/// As [`load_data_dir`].
+#[cfg(not(target_arch = "wasm32"))]
+pub fn load_data_dir_packs(
+    dir: &std::path::Path,
+    packs: &[&str],
+) -> Result<DataStore, EngineError> {
     let read = |rel: &str| -> Result<Vec<u8>, EngineError> {
         let path = dir.join(rel);
         std::fs::read(&path).map_err(|e| {
@@ -404,8 +501,8 @@ pub fn load_data_dir(dir: &std::path::Path) -> Result<DataStore, EngineError> {
         )
     })?;
     let mut files: Vec<(String, Vec<u8>)> = vec![("manifest.json".to_owned(), manifest_bytes)];
-    for pack in DATA_DIR_PACKS {
-        if let Some(p) = manifest.packs.get(pack) {
+    for pack in packs {
+        if let Some(p) = manifest.packs.get(*pack) {
             for f in &p.files {
                 files.push((f.path.clone(), read(&f.path)?));
             }

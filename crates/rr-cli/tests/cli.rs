@@ -79,8 +79,13 @@ fn manifest_pack_version() -> String {
 
 // ---------------------------------------------------------------------------------------- plan
 
+/// The Markdown `rr plan` prints: the binder, a rule, then the Prepare sheet.
+fn plan_markdown(o: &PlanOutput) -> String {
+    rr_plan::binder::markdown::with_prepare(&o.binder, &o.prepare_markdown)
+}
+
 #[test]
-fn plan_prints_the_packet_and_the_json_the_engine_makes() {
+fn plan_prints_the_binder_the_prepare_sheet_and_the_json_the_engine_makes() {
     let input = fixture("philadelphia-renters-4");
     let expected = engine().assess(&input).unwrap();
     let out = fixtures()
@@ -88,9 +93,17 @@ fn plan_prints_the_packet_and_the_json_the_engine_makes() {
         .output()
         .unwrap();
     assert!(out.status.success(), "{}", stderr(&out));
-    assert_eq!(stdout(&out), expected.prepare_markdown);
+    assert_eq!(stdout(&out), plan_markdown(&expected));
+    assert!(stdout(&out).starts_with("# Emergency binder for Dana, Sam, Riley and Grandpa Joe\n"));
     for heading in rr_plan::packet::SECTION_HEADINGS {
         assert!(stdout(&out).contains(heading), "{heading}");
+    }
+    for part in rr_plan::binder::PARTS {
+        assert!(
+            stdout(&out).contains(&format!("\n# Tab {}: {}\n", part.0, part.2)),
+            "{}",
+            part.2
+        );
     }
     // By fixture name, as JSON: the golden bytes.
     let out = fixtures()
@@ -120,7 +133,7 @@ fn plan_writes_both_files_into_out() {
     let md = std::fs::read_to_string(dir.join("miami-condo-retiree-1.md")).unwrap();
     let json = std::fs::read_to_string(dir.join("miami-condo-retiree-1.json")).unwrap();
     let parsed: PlanOutput = serde_json::from_str(&json).unwrap();
-    assert_eq!(md, parsed.prepare_markdown);
+    assert_eq!(md, plan_markdown(&parsed));
     assert_eq!(parsed.location.county_fips, "12086");
     // Both needs somewhere to put two files.
     fixtures()
@@ -147,7 +160,30 @@ fn plan_reads_standard_input() {
         .write_stdin(json)
         .assert()
         .success()
-        .stdout(expected.prepare_markdown);
+        .stdout(plan_markdown(&expected));
+}
+
+#[test]
+fn binder_prints_the_binder_alone_as_markdown_or_json() {
+    let expected = engine().assess(&fixture("detroit-snap-3")).unwrap();
+    let out = fixtures()
+        .args(["binder", "--household", "detroit-snap-3"])
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "{}", stderr(&out));
+    assert_eq!(
+        stdout(&out),
+        rr_plan::binder::markdown::render(&expected.binder)
+    );
+    assert!(!stdout(&out).contains("# Prepare sheet"));
+    let out = fixtures()
+        .args(["binder", "--household", "detroit-snap-3", "--json"])
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "{}", stderr(&out));
+    let b: rr_types::Binder = serde_json::from_str(&stdout(&out)).unwrap();
+    assert_eq!(b, expected.binder);
+    assert_eq!(b.check(), Vec::<String>::new());
 }
 
 #[test]
