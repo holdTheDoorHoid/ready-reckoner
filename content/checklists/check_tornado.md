@@ -25,8 +25,9 @@ A tornado warning is issued for your area, or you see a funnel cloud or hear a r
 1. **Pad yourself.** Pile blankets or cushions around you.[^ready_gov_tornadoes]
 2. {if:home:apartment_low_rise|apartment_high_rise}**Stay off the elevators.** Take the stairs.[^ready_gov_tornadoes_2014]{/if}
 3. **Keep listening.** Follow the warning on {alerts} until it ends.[^ready_gov_tornadoes]{if:need:hearing} Keep a phone on and close by. Emergency alerts come with a vibration.[^fcc_wea]{/if}
-4. {if:vehicle}**If you are driving, get to a sturdy building.** A car is not a safe place in a tornado.[^ready_gov_tornadoes]{/if}
-5. {if:vehicle}**If you are caught in a car, stay buckled in.** Keep your head below the windows.[^ready_gov_tornadoes]{/if}
+4. **Outside with no building near?** Lie flat, face down, on low ground. Cover the back of your head with your arms.[^noaa_spc_tornado_safety]
+5. {if:vehicle}**If you are driving, get to a sturdy building.**[^ready_gov_tornadoes]{/if}
+6. {if:vehicle}**If you are caught in a car, stay buckled in.** Keep your head below the windows.[^ready_gov_tornadoes]{/if}
 
 ## Leave or stay
 

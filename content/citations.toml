@@ -4912,3 +4912,22 @@ year = 2026
 url = "https://evictionlab.org/help-faq/"
 retrieved = "2026-10-01"
 license = "All rights reserved (paraphrased, not quoted)"
+
+# ---------------------------------------------------------------------------------------------
+# added by checklist-review (follow-up: the two exemplar gaps), 2026-10-01.
+# ---------------------------------------------------------------------------------------------
+
+# Read in a browser page (nfpa.org); a standards body, so paraphrased and no quote. The page says
+# that closing doors on your way out slows the spread of fire and gives you more time to escape,
+# that a closed door may slow the spread of smoke, heat and fire, and that someone should be
+# assigned to help infants, older adults and people with disabilities get out (the house-fire
+# page's "Who helps whom get out" line). USFA's escape-plan page says to close the door behind you
+# only for apartments, so this backs the step for every home.
+[[citation]]
+id = "nfpa_escape_planning"
+title = "How to make a home fire escape plan"
+publisher = "National Fire Protection Association"
+year = 2026
+url = "https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"
+retrieved = "2026-10-01"
+license = "All rights reserved (paraphrased, not quoted)"
