@@ -12,12 +12,15 @@ import { createMockEngine } from '../engine/mock';
 import { STORAGE_KEY } from '../lib/persistence';
 import { render, savedFor, until, type Rendered } from '../test/helpers';
 import About from './About.svelte';
+import Contacts from './Contacts.svelte';
 import Have from './Have.svelte';
 import Learn from './Learn.svelte';
 import Maintain from './Maintain.svelte';
 import Money from './Money.svelte';
 import NotFound from './NotFound.svelte';
 import Packet from './Packet.svelte';
+import People from './People.svelte';
+import Places from './Places.svelte';
 import PlanScreen from './PlanScreen.svelte';
 import Risks from './Risks.svelte';
 import Start from './Start.svelte';
@@ -33,9 +36,12 @@ const SCREENS: [string, Component, string, string][] = [
   ['travel', Travel, 'travel', 'How you get around'],
   ['money', Money, 'money', 'Money'],
   ['have', Have, 'have', 'What you already have'],
+  ['people', People, 'people', 'Your people'],
+  ['places', Places, 'places', 'Your places'],
+  ['contacts', Contacts, 'contacts', 'Contacts, pets, vehicles and documents'],
   ['risks', Risks, 'risks', 'Your risks'],
-  ['plan', PlanScreen, 'plan', 'Your plan'],
-  ['packet', Packet, 'packet', 'Your packet'],
+  ['prepare', PlanScreen, 'prepare', 'Prepare: what to do before'],
+  ['binder', Packet, 'binder', 'Your binder'],
   ['maintain', Maintain, 'maintain', 'Keep it up'],
   ['learn', Learn, 'learn', 'Learn'],
   ['learn article', Learn, 'learn/myths', 'Disaster myths'],
@@ -88,7 +94,7 @@ describe('every screen renders with every fixture', () => {
 
 describe('screens with no plan yet', () => {
   it('invite the person to start instead of failing', async () => {
-    for (const [name, Screen, route] of SCREENS.filter(([n]) => ['risks', 'plan', 'packet'].includes(n))) {
+    for (const [name, Screen, route] of SCREENS.filter(([n]) => ['risks', 'prepare', 'binder', 'people', 'places', 'contacts'].includes(n))) {
       const r = await screen(Screen, route, null);
       expect(r.text(), name).toContain("You haven't started a plan on this device yet");
       r.cleanup();
@@ -204,8 +210,8 @@ describe('what the screens show', () => {
     expect(r.text()).toContain('Battery backup for a medical device');
   });
 
-  it('packet: renders the engine packet safely with a print button', async () => {
-    const r = await screen(Packet, 'packet', 'philadelphia-renters-4');
+  it('binder: renders the engine packet safely with a print button', async () => {
+    const r = await screen(Packet, 'binder', 'philadelphia-renters-4');
     expect(r.target.querySelector('.packet h2')?.textContent).toBe('Your preparedness packet');
     expect(r.target.querySelector('.packet script, .packet img, .packet iframe')).toBeNull();
     expect([...r.target.querySelectorAll('button')].some((b) => b.textContent?.includes('Print or save as PDF'))).toBe(true);

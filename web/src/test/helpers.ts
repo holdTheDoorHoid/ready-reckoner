@@ -37,6 +37,18 @@ export function clone<T>(x: T): T {
   return JSON.parse(JSON.stringify(x)) as T;
 }
 
+/**
+ * A fixture household with none of the optional steps' answers: no profile on anyone and no family
+ * plan. Contract v3's fixtures carry sample answers (DESIGN-DELTA-v3 §10); a test that starts from
+ * a blank form starts here.
+ */
+export function withoutOptional(input: PlanInput): PlanInput {
+  const out = clone(input);
+  for (const person of out.people) delete person.profile;
+  delete out.family_plan;
+  return out;
+}
+
 /** A saved plan for a fixture household, with the interview marked complete. */
 export function savedFor(input: PlanInput, extra: Partial<SavedPlan> = {}): SavedPlan {
   const plan = newPlan(clone(input));

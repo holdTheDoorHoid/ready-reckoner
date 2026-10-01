@@ -25,6 +25,7 @@ import type {
 } from './types';
 import { ENGINE_API_VERSION, EXPLAIN_KINDS } from './types';
 import { tidyFamilyPlan } from '../lib/family';
+import { tidyPeopleProfiles } from '../lib/profile';
 import { ATTRIBUTIONS, CITATIONS } from './mock/citations';
 import { explainFrom } from './mock/explain';
 import { ITEMS } from './mock/items';
@@ -203,7 +204,7 @@ const GUIDANCE: GuidanceMeta[] = [
  * The defaults as the engine sends them (`PlanInput::defaults()`): the contract v2 fields that
  * default (`below_grade_bedroom`, `access_needs`, `benefits` and the three new dials) are written
  * out; the ones that mean "not asked" (`cooking`, `raw_water_source`, `water_system_record`, the
- * insurance extras, `family_plan`) are left out.
+ * insurance extras, `family_plan`, and contract v3's `profile` on each person) are left out.
  */
 export function mockDefaults(): PlanInput {
   return {
@@ -258,15 +259,20 @@ export function mockDefaults(): PlanInput {
 }
 
 /**
- * What `PlanInput::from_json` does before validating: the family plan is trimmed and capped, and
- * an empty one disappears (rr-types `PlanInput::tidy`). The caller's object is not changed.
+ * What `PlanInput::from_json` does before validating: the family plan and each person's profile
+ * (contract v3) are trimmed and capped, and empty ones disappear (rr-types `PlanInput::tidy`). The
+ * caller's object is not changed.
  */
 export function tidyInput(input: PlanInput): PlanInput {
-  if (input.family_plan === undefined) return input;
+  const profiles = input.people.some((p) => p.profile !== undefined);
+  if (input.family_plan === undefined && !profiles) return input;
   const out: PlanInput = { ...input };
-  const plan = tidyFamilyPlan(input.family_plan);
-  if (plan) out.family_plan = plan;
-  else delete out.family_plan;
+  if (input.family_plan !== undefined) {
+    const plan = tidyFamilyPlan(input.family_plan);
+    if (plan) out.family_plan = plan;
+    else delete out.family_plan;
+  }
+  if (profiles) out.people = tidyPeopleProfiles(input);
   return out;
 }
 

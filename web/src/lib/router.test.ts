@@ -18,7 +18,7 @@ describe('hash routes', () => {
 
   it('sends unknown paths, and extra path parts, to "page not found"', () => {
     expect(parseHash('#/nowhere')).toEqual({ id: 'missing' });
-    expect(parseHash('#/plan/extra')).toEqual({ id: 'missing' });
+    expect(parseHash('#/prepare/extra')).toEqual({ id: 'missing' });
     expect(parseHash('#/%E0%A4%A')).toEqual({ id: 'missing' });
   });
 
@@ -27,12 +27,16 @@ describe('hash routes', () => {
     expect(parseHash('#pk-fn-mock_nri_county')).toBeNull();
   });
 
-  it('numbers the five interview steps and links them in order', () => {
-    expect(['where', 'who', 'travel', 'money', 'have'].map((s) => ROUTES[s as 'where'].step)).toEqual([1, 2, 3, 4, 5]);
+  it('numbers the eight interview steps, the last three optional, and links them in order', () => {
+    const steps = ['where', 'who', 'travel', 'money', 'have', 'people', 'places', 'contacts'] as const;
+    expect(steps.map((s) => ROUTES[s].step)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(steps.map((s) => ROUTES[s].optional ?? false)).toEqual([false, false, false, false, false, true, true, true]);
     expect(stepAfter('where')).toBe('who');
-    expect(stepAfter('have')).toBe('risks');
+    expect(stepAfter('have')).toBe('people');
+    expect(stepAfter('contacts')).toBe('risks');
     expect(stepBefore('where')).toBe('start');
     expect(stepBefore('money')).toBe('travel');
+    expect(stepBefore('people')).toBe('have');
   });
 
   it('points engine problems at the screen where the answer lives', () => {

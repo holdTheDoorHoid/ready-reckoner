@@ -212,7 +212,7 @@
       <h2 id="basics-title" class="visually-hidden">Everyday basics</h2>
       <CheckRow
         label="Assume I have everyday basics (blankets, a pot, a phone, a bag, three days of ordinary food)"
-        help="Checked by default. Most households already have these, so your plan won't ask you to buy them again — enter specific amounts below if you're missing any. Your packet lists what was assumed."
+        help="Checked by default. Most households already have these, so your plan won't ask you to buy them again — enter specific amounts below if you're missing any. The Prepare tab lists what was assumed."
         checked={input.assume_basics ?? true}
         onchange={(on) => (input.assume_basics = on)}
       />
@@ -264,7 +264,7 @@
       </fieldset>
     </section>
 
-    <InterviewNav step="have" nextLabel="See your risks" />
+    <InterviewNav step="have" />
   {/if}
 </div>
 

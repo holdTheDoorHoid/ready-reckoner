@@ -10,8 +10,8 @@
  *
  * Contract v3 (types3): the people's `profile` and the family plan's `home`, `neighbourhood`,
  * `pets`, `vehicles` and `documents` are accepted with their types, every field optional (a
- * `Place` needs its `kind`); like the family plan they are never a problem. Echoing them is the
- * interview workstream's (awaiting: web-interview3).
+ * `Place` needs its `kind`); like the family plan they are never a problem. They are tidied by
+ * `tidyInput` and echoed by `mock/family.ts`.
  */
 import type { PlanInput, Problem, ProblemCode } from '../types';
 import {

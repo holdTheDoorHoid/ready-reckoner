@@ -7,6 +7,6 @@
   <p class="lead">That address doesn't match anything in Ready Reckoner. Your plan is safe.</p>
   <p class="button-row">
     <a class="button button--primary" href={href('start')}>Go to the start</a>
-    <a class="button" href={href('plan')}>Your plan</a>
+    <a class="button" href={href('prepare')}>Prepare</a>
   </p>
 </div>

@@ -2,19 +2,25 @@
  * What the app keeps in the browser (docs/UI.md "Persistence"): one `localStorage` entry,
  * `rr.plan.v1`, holding the household and dials, what the household already had, the check-offs
  * and paid amounts recorded on the plan, and small bits of progress. The same object is what
- * "Export" saves as `ready-reckoner-plan.json` and "Import" reads back. Display preferences
- * (theme, expert view) live separately in `rr.prefs.v1` and are not exported.
+ * "Export" saves as `ready-reckoner-plan.json` and "Import" reads back (plain, or protected with a
+ * passphrase: `./protect`). Display preferences (theme, expert view) live separately in
+ * `rr.prefs.v1` and are not exported.
  *
- * Contract v2 answers live inside `input` like every other answer (the household's access needs,
- * the new home and money questions, the dials, the family plan), so they are saved, exported and
- * imported with no change to the file's version. The one v2 answer outside `input` is when an item
- * that needs testing was last tried (`Owned.tested_on`): it is kept on the item's entry in
- * `input.existing` when the household had it before the plan, otherwise on its latest check-off
- * (`Purchase.tested_on`), and `engineInput` hands the engine the latest date for each item.
+ * Every answer lives inside `input` (contract v2's household questions and family plan, contract
+ * v3's profiles and family-plan groups from the optional steps 6–8), so it is saved, exported and
+ * imported as it is. Outside `input`: when an item that needs testing was last tried
+ * (`Owned.tested_on`, kept on the item's entry in `input.existing` when the household had it
+ * before the plan, otherwise on its latest check-off, `Purchase.tested_on`; `engineInput` hands the
+ * engine the latest date for each item), and the maps' pins and choices (`maps`, web-only,
+ * DESIGN-DELTA-v3 §9.5; the map images live in the IndexedDB database `rr-maps`, never in the file).
+ *
+ * Version 2 (v0.3.0, DESIGN-DELTA-v3 §2.4) differs from version 1 only by what it may hold: every
+ * version-1 field keeps its name and place, so a version-1 entry or file loads unchanged and is
+ * written back as version 2. Top-level keys this version does not know are kept, not dropped.
  *
  * Nothing here ever leaves the browser.
  */
-import type { IsoDate, Owned, PlanInput, TierId } from '../engine/types';
+import type { IsoDate, LatLon, Owned, PlanInput, TierId } from '../engine/types';
 import { TIER_IDS } from '../engine/types';
 
 export const STORAGE_KEY = 'rr.plan.v1';
@@ -22,9 +28,109 @@ export const PREFS_KEY = 'rr.prefs.v1';
 export const EXPORT_FORMAT = 'ready-reckoner-plan';
 export const EXPORT_FILENAME = 'ready-reckoner-plan.json';
 
-/** The interview steps, in order. */
-export const STEP_IDS = ['where', 'who', 'travel', 'money', 'have'] as const;
+/** The version `newPlan` writes and `checkSavedPlan` returns; version 1 files are read as version 2. */
+export const SAVED_PLAN_VERSION = 2;
+
+/** The interview steps that the plan needs, in order (steps 1–5). */
+export const REQUIRED_STEP_IDS = ['where', 'who', 'travel', 'money', 'have'] as const;
+/** The optional steps for the binder (steps 6–8, DESIGN-DELTA-v3 §2): nothing on them is ever required. */
+export const OPTIONAL_STEP_IDS = ['people', 'places', 'contacts'] as const;
+/** Every interview step, in order. */
+export const STEP_IDS = [...REQUIRED_STEP_IDS, ...OPTIONAL_STEP_IDS] as const;
 export type StepId = (typeof STEP_IDS)[number];
+export type OptionalStepId = (typeof OPTIONAL_STEP_IDS)[number];
+
+export function isOptionalStep(step: string): step is OptionalStepId {
+  return (OPTIONAL_STEP_IDS as readonly string[]).includes(step);
+}
+
+/**
+ * The IndexedDB database that holds the map images (web-maps' `MAPS_DB`; DESIGN-DELTA-v3 §9.5).
+ * "Forget everything" deletes it with the rest.
+ */
+export const MAPS_DB_NAME = 'rr-maps';
+
+// ---------------------------------------------------------------------------------------------
+// The maps' pins and choices (DESIGN-DELTA-v3 §9.5)
+//
+// awaiting: web-maps — `web/src/lib/maps/state.ts` (on agent/web-maps, not yet on v0.3) exports
+// `MapLayers`, `MapsState`, `checkMapsState` and `mapsHoldLocation`. The four below copy them
+// exactly (names, shapes and rules, checked against agent/web-maps aa4e6c0); when web-maps is
+// merged, delete them and import from './maps/state' instead.
+// ---------------------------------------------------------------------------------------------
+
+/** Which layers the household chose on its last "Fetch maps"; `base` (the street map) absent means on. */
+export interface MapLayers {
+  base?: boolean;
+  places: boolean;
+  flood: boolean;
+  surge: boolean;
+  wildfire: boolean;
+}
+
+/** `SavedPlan.maps`: web-only, outside `input`; the images it describes stay in the `rr-maps` store. */
+export interface MapsState {
+  home?: LatLon;
+  meeting_near?: LatLon;
+  meeting_far?: LatLon;
+  where_go?: LatLon;
+  /** The ways out as the household drew them (at most 2, each at most 60 points). */
+  routes: LatLon[][];
+  layers: MapLayers;
+  /** The day the images now in the maps store were fetched. */
+  fetched_on?: IsoDate;
+}
+
+const MAX_ROUTES = 2;
+const MAX_ROUTE_POINTS = 60;
+const PIN_IDS = ['home', 'meeting_near', 'meeting_far', 'where_go'] as const;
+
+/** A point rounded to about a metre (five decimal places), or undefined when it is not a real latitude and longitude. */
+function checkLatLon(x: unknown): LatLon | undefined {
+  if (typeof x !== 'object' || x === null || Array.isArray(x)) return undefined;
+  const { lat, lon } = x as Record<string, unknown>;
+  if (typeof lat !== 'number' || typeof lon !== 'number' || !Number.isFinite(lat) || !Number.isFinite(lon)) return undefined;
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return undefined;
+  const round = (v: number) => Math.round(v * 1e5) / 1e5;
+  return { lat: round(lat), lon: round(lon) };
+}
+
+/**
+ * Read `SavedPlan.maps` back from storage or a file: undefined when it is missing or not an
+ * object; otherwise a clean state with bad points, extra routes and extra points dropped (a route
+ * needs two points) and each layer choice a boolean (base map and places on unless turned off).
+ */
+export function checkMapsState(x: unknown): MapsState | undefined {
+  if (typeof x !== 'object' || x === null || Array.isArray(x)) return undefined;
+  const m = x as Record<string, unknown>;
+  const out: MapsState = { routes: [], layers: { base: true, places: true, flood: false, surge: false, wildfire: false } };
+  for (const id of PIN_IDS) {
+    const p = checkLatLon(m[id]);
+    if (p) out[id] = p;
+  }
+  if (Array.isArray(m.routes)) {
+    out.routes = m.routes
+      .filter(Array.isArray)
+      .map((r) => (r as unknown[]).map(checkLatLon).filter((p): p is LatLon => !!p).slice(0, MAX_ROUTE_POINTS))
+      .filter((r) => r.length >= 2)
+      .slice(0, MAX_ROUTES);
+  }
+  const layers = typeof m.layers === 'object' && m.layers !== null && !Array.isArray(m.layers) ? (m.layers as Record<string, unknown>) : {};
+  out.layers = {
+    base: layers.base !== false,
+    places: layers.places !== false,
+    flood: layers.flood === true,
+    surge: layers.surge === true,
+    wildfire: layers.wildfire === true,
+  };
+  if (typeof m.fetched_on === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(m.fetched_on)) out.fetched_on = m.fetched_on;
+  return out;
+}
+
+/** The saved maps hold where the household lives (the home pin, or a drawn route, which usually starts there). */
+export function mapsHoldLocation(maps: MapsState | undefined): boolean {
+  return !!maps && (maps.home !== undefined || maps.routes.length > 0);
+}
 
 /** Something bought or done from the plan, with the day it was recorded (for the maintenance calendar). */
 export interface Purchase {
@@ -40,7 +146,7 @@ export interface Purchase {
 
 export interface SavedPlan {
   format: typeof EXPORT_FORMAT;
-  version: 1;
+  version: typeof SAVED_PLAN_VERSION;
   /** When the file was exported; informational. */
   saved_at?: string;
   /** The household and dials. `existing` holds only what the household had before the plan (the "What you already have" screen). */
@@ -53,6 +159,8 @@ export interface SavedPlan {
   /** Maintenance: key -> the last day it was done (rotations, checks, drills). */
   done_dates: Record<string, IsoDate>;
   reviewed_on?: IsoDate;
+  /** The maps' pins and choices (web-only; DESIGN-DELTA-v3 §9.5). */
+  maps?: MapsState;
 }
 
 export interface Prefs {
@@ -65,7 +173,7 @@ export const DEFAULT_PREFS: Prefs = { theme: 'system', expert: false };
 export function newPlan(input: PlanInput): SavedPlan {
   return {
     format: EXPORT_FORMAT,
-    version: 1,
+    version: SAVED_PLAN_VERSION,
     input,
     purchases: [],
     progress: { completed: [] },
@@ -188,10 +296,32 @@ function looksLikeInput(x: unknown): x is PlanInput {
   );
 }
 
+/** The top-level keys this version reads; any other key is kept as it came. */
+const KNOWN_KEYS: ReadonlySet<string> = new Set([
+  'format',
+  'version',
+  'saved_at',
+  'input',
+  'purchases',
+  'progress',
+  'confidence',
+  'dismissed_warnings',
+  'done_dates',
+  'reviewed_on',
+  'maps',
+]);
+
+/**
+ * Check a saved plan from storage or a file, and bring it to the current version. Version 1
+ * (v0.1.0–v0.2.0) needs no change beyond the version number: every field kept its name.
+ */
 export function checkSavedPlan(x: unknown): Check {
   if (!isObject(x)) return { ok: false, reason: 'The file is not a saved plan.' };
   if (x.format !== EXPORT_FORMAT) return { ok: false, reason: 'The file is not a Ready Reckoner plan.' };
-  if (x.version !== 1) return { ok: false, reason: 'The plan was saved by a newer version of Ready Reckoner. Reload the page to update, then try again.' };
+  if (isNum(x.version) && x.version > SAVED_PLAN_VERSION) {
+    return { ok: false, reason: 'The plan was saved by a newer version of Ready Reckoner. Reload the page to update, then try again.' };
+  }
+  if (x.version !== 1 && x.version !== 2) return { ok: false, reason: 'The file is not a Ready Reckoner plan it can read: its version is missing or damaged.' };
   if (!looksLikeInput(x.input)) return { ok: false, reason: 'The household details in the file are incomplete.' };
   const purchases = x.purchases ?? [];
   if (
@@ -220,7 +350,7 @@ export function checkSavedPlan(x: unknown): Check {
   if (isObject(x.done_dates)) for (const [k, v] of Object.entries(x.done_dates)) if (isDate(v)) doneDates[k] = v;
   const plan: SavedPlan = {
     format: EXPORT_FORMAT,
-    version: 1,
+    version: SAVED_PLAN_VERSION,
     input: x.input,
     purchases: purchases as Purchase[],
     progress: { completed, ...(typeof progress.last === 'string' ? { last: progress.last } : {}) },
@@ -233,6 +363,12 @@ export function checkSavedPlan(x: unknown): Check {
   if (before !== undefined) plan.confidence.before = before;
   if (after !== undefined) plan.confidence.after = after;
   if (isDate(x.reviewed_on)) plan.reviewed_on = x.reviewed_on;
+  const maps = checkMapsState(x.maps);
+  if (maps) plan.maps = maps;
+  // Keys a later version wrote are carried along untouched, so opening and saving never loses them.
+  for (const [key, value] of Object.entries(x)) {
+    if (!KNOWN_KEYS.has(key)) (plan as unknown as Record<string, unknown>)[key] = value;
+  }
   return { ok: true, plan };
 }
 
@@ -320,8 +456,40 @@ export function savePrefs(storage: Storage | null, prefs: Prefs): void {
   }
 }
 
-/** "Forget everything": remove every key this app wrote. Returns how many were removed. */
-export function forgetEverything(storage: Storage | null): number {
+/** The browser's IndexedDB, or null: some private modes throw when it is merely looked at. */
+function browserIndexedDB(): IDBFactory | null {
+  try {
+    return globalThis.indexedDB ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Delete the maps store (`rr-maps`: the map images and their legends). Resolves true once it is
+ * gone or was never there, false when the browser has no IndexedDB or refused.
+ */
+export function forgetMaps(idb: IDBFactory | null | undefined = browserIndexedDB()): Promise<boolean> {
+  if (!idb) return Promise.resolve(false);
+  return new Promise((resolve) => {
+    try {
+      const request = idb.deleteDatabase(MAPS_DB_NAME);
+      request.onsuccess = () => resolve(true);
+      request.onerror = () => resolve(false);
+      // Another tab still has it open: it is deleted once that tab closes it.
+      request.onblocked = () => resolve(true);
+    } catch {
+      resolve(false);
+    }
+  });
+}
+
+/**
+ * "Forget everything": remove every key this app wrote, and the maps store (`forgetMaps`, which
+ * finishes on its own). Returns how many storage keys were removed.
+ */
+export function forgetEverything(storage: Storage | null, idb: IDBFactory | null | undefined = browserIndexedDB()): number {
+  void forgetMaps(idb);
   if (!storage) return 0;
   let removed = 0;
   try {
