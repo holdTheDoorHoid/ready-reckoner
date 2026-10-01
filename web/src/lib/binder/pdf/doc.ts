@@ -944,8 +944,14 @@ class Ctx {
     const at = sourceListIndex(p, this.b);
     const half = (width - 14) / 2;
     const flow: Content[] = [];
+    // Each entry is kept whole: pdfmake drops the anchor (`id`) of a paragraph whose first line it
+    // moves to the next column or page of snaking columns, and every citation to that number then
+    // led nowhere (verify3 R4-01). A whole entry moves with its anchor, and is never split.
     const items = (texts: TextRun[]): Content[] =>
-      texts.map((text, i) => ({ id: sourceDest(i + 1), text: [{ text: `${i + 1}. `, bold: true }, ...text], fontSize: 7, margin: [0, 0, 0, 2] }));
+      texts.map((text, i) => ({
+        unbreakable: true,
+        stack: [{ id: sourceDest(i + 1), text: [{ text: `${i + 1}. `, bold: true }, ...text], fontSize: 7, margin: [0, 0, 0, 2] }],
+      }));
     if (at >= 0) {
       const list = p.blocks[at]!;
       flow.push(...this.blocks(p.blocks.slice(0, at), half, p));
