@@ -12,9 +12,15 @@ use super::text::{self, md};
 use super::{Ctx, cite, cite_all};
 use crate::source::FIXTURE_DATA_NOTE;
 
-/// "Philadelphia County, Pennsylvania".
+/// "Philadelphia County, Pennsylvania", "Richmond city, Virginia", "San Juan Municipio, Puerto
+/// Rico": the county's name as the Census gives it (`CountyRecord::name_full`, data pack v0.3.0),
+/// or, for a record without it (the hand-built sample counties), the short name with "County"
+/// ("Parish" in Louisiana, nothing in Alaska).
 pub(crate) fn place(cx: &Ctx<'_>) -> String {
     let loc = &cx.a.location;
+    if let Some(full) = cx.a.county.name_full.as_deref() {
+        return format!("{full}, {}", loc.state_name);
+    }
     let kind = match loc.state_abbr.as_str() {
         "LA" => " Parish",
         "AK" => "",

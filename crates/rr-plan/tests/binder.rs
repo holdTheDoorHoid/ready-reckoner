@@ -1191,3 +1191,42 @@ fn page_kinds_are_what_the_renderers_expect() {
             .any(|b| matches!(b, Block::Steps(s) if !s.is_empty() && s.iter().all(|x| x.memory)))
     );
 }
+
+/// A county-equivalent is named as the Census names it everywhere the binder prints the place
+/// (hazards3 follow-up: `CountyRecord::name_full`): Richmond city, not Richmond County; San Juan
+/// Municipio. The sample counties, which have no full name, keep the old rule.
+#[test]
+fn county_equivalents_are_named_as_the_census_names_them() {
+    let mut input = common::household("philadelphia-renters-4");
+    input.location.zip = None;
+    input.location.county_fips = Some("51760".into());
+    let out = common::assess(&input);
+    assert!(
+        out.binder.location.starts_with("Richmond city, Virginia"),
+        "{}",
+        out.binder.location
+    );
+    let md = markdown::render(&out.binder);
+    assert!(
+        !md.contains("Richmond County, Virginia"),
+        "the old rule leaks"
+    );
+    assert!(md.contains("Richmond city, Virginia"));
+    let (_, _, sj) = fixture("san-juan-2");
+    assert!(
+        sj.binder
+            .location
+            .starts_with("San Juan Municipio, Puerto Rico")
+    );
+    let sample = common::fixture_engine()
+        .assess(&common::household("philadelphia-renters-4"))
+        .unwrap();
+    assert!(
+        sample
+            .binder
+            .location
+            .starts_with("Philadelphia County, Pennsylvania"),
+        "{}",
+        sample.binder.location
+    );
+}

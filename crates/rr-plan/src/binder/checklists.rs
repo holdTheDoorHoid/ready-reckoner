@@ -313,7 +313,6 @@ pub(crate) fn answer(bx: &Bx<'_>, name: &str) -> Option<String> {
         "alerts" => hood.alerts.clone(),
         "county" => Some(crate::packet::summary::place(cx)),
         "shelter" => super::contact_short(hood.shelter.as_ref()),
-        // awaiting: rr-content (the planner adds `county_office` to `PLACEHOLDERS`, width 28)
         "county_office" => super::contact_short(hood.county_emergency_office.as_ref()),
         _ => None,
     }

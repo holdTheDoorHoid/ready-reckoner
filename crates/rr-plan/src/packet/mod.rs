@@ -185,9 +185,16 @@ impl<'a> Ctx<'a> {
     pub fn guidance(&self, g: &Guidance, frequency: Option<&str>, target: Option<&str>) -> String {
         let mut body =
             rr_content::policy::apply_conditions(g.prose().trim(), |id| self.condition_holds(id));
+        // The county's full name where the pack has it ("Richmond city, Virginia"), else the
+        // short one ("Philadelphia, Pennsylvania").
         let county = format!(
             "{}, {}",
-            self.a.location.county_name, self.a.location.state_name
+            self.a
+                .county
+                .name_full
+                .as_deref()
+                .unwrap_or(&self.a.location.county_name),
+            self.a.location.state_name
         );
         let horizon = rr_consequence::words::horizon_phrase(self.a.input.dials.horizon_years);
         let household = text::household(&self.a.input);
