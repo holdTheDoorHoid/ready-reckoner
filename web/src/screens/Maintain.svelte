@@ -168,6 +168,13 @@
 <div class="page page--narrow">
   <h1 id="page-title" tabindex="-1">Keep it up</h1>
   <p class="lead">A few minutes a month keeps your plan working: use and replace, check, and practise. Missing a month is fine.</p>
+  {#if app.plan && app.catalogue}
+    <p class="button-row no-print">
+      <button type="button" class="button" onclick={() => window.print()}><Icon name="print" /> Print this calendar</button>
+      <span class="small muted">What is due, the year ahead, the seasons and the drills, on one sheet to keep with your binder.</span>
+    </p>
+    <p class="print-only maintain-print-date">Ready Reckoner · Keep it up · printed {formatDate(today)}</p>
+  {/if}
   <p class="visually-hidden" aria-live="polite">{message}</p>
 
   {#if app.plan && app.catalogue}
@@ -186,7 +193,7 @@
                   {lastLine(t)}
                 </p>
               </div>
-              <button type="button" class="button button--small" onclick={() => done(t)}
+              <button type="button" class="button button--small no-print" onclick={() => done(t)}
                 ><Icon name="check" /> {t.kind === 'test' ? 'Tested today' : 'Done today'}<span class="visually-hidden">: {t.title}</span></button
               >
             </li>
@@ -246,14 +253,14 @@
                   {d.maintenance?.check_months ? `${intervalLabel(d.maintenance.check_months)}. ` : ''}{last ? `Last practised ${formatDate(last)}.` : 'Not practised yet.'}
                 </p>
               </div>
-              <button type="button" class="button button--small" onclick={() => practised(d.id, d.name)}>Practised today<span class="visually-hidden">: {d.name}</span></button>
+              <button type="button" class="button button--small no-print" onclick={() => practised(d.id, d.name)}>Practised today<span class="visually-hidden">: {d.name}</span></button>
             </li>
           {/each}
         </ul>
       </section>
     {/if}
 
-    <section aria-labelledby="reminders-title">
+    <section aria-labelledby="reminders-title" class="no-print">
       <h2 id="reminders-title">Reminders</h2>
       <p>
         This app never contacts you, so it cannot send reminders. Add the dates to your own calendar instead. The file lists item names and
@@ -265,7 +272,7 @@
     <p class="card">Start a plan first, and its maintenance calendar appears here.</p>
   {/if}
 
-  <section aria-labelledby="data-title" class="data">
+  <section aria-labelledby="data-title" class="data no-print">
     <h2 id="data-title">Your data</h2>
     <p>
       Your plan is kept in this browser only{app.storageAvailable ? '' : ' (this browser is not keeping it: private browsing or blocked storage, so save a copy)'}.
@@ -317,6 +324,27 @@
 </ConfirmDialog>
 
 <style>
+  /* The Keep it up sheet (DESIGN-DELTA-v3 §6): printing this tab prints its calendar alone, compact,
+     black on white; the buttons, the calendar file and Your data stay on the screen. */
+  @media print {
+    .maintain-print-date {
+      font-size: 8.5pt;
+      font-weight: 700;
+      border-bottom: 1.5pt solid #000;
+      padding-bottom: 3pt;
+      margin: 0 0 8pt;
+    }
+    .card {
+      border: 0.75pt solid #000 !important;
+      box-shadow: none !important;
+      padding: 4pt 6pt !important;
+      break-inside: avoid;
+    }
+    h2 {
+      font-size: 13pt;
+      margin: 12pt 0 4pt;
+    }
+  }
   .tasks {
     list-style: none;
     padding: 0;

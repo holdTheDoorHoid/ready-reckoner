@@ -7,9 +7,9 @@
   household does from here: what it already had (its own list, and the everyday basics the plan
   assumes) is shown apart as "Already have".
 
-  "Print your preparation plan" prints the engine's Prepare sheet (`prepare_markdown`) with the
-  site's Markdown renderer, in a region that exists only on paper; the browser's own Print on this
-  tab prints the same sheet. (web-binder may give it a nicer sheet later, DESIGN-DELTA-v3 §6.)
+  "Print your preparation plan" prints the engine's Prepare sheet (`prepare_markdown`) as a clean
+  sheet (PrepareSheet: title, date, the site's Markdown renderer, sources in two columns), in a
+  region that exists only on paper; the browser's own Print on this tab prints the same sheet.
 
   Months are numbered exactly as the printed packet numbers them (the packet is the oracle): month 0
   begins on the plan date and reads "This month (October 2026)", the next is "Month 1 (November
@@ -26,6 +26,7 @@
   import { tick } from 'svelte';
   import BucketGauge from '../components/BucketGauge.svelte';
   import ConfirmDialog from '../components/ConfirmDialog.svelte';
+  import PrepareSheet from '../components/PrepareSheet.svelte';
   import Icon from '../components/Icon.svelte';
   import ItemCard from '../components/ItemCard.svelte';
   import PlanGate from '../components/PlanGate.svelte';
@@ -37,29 +38,23 @@
   import { addMonths, formatDate, formatMonth, monthsBetween, planMonthLabel, planMonthPhrase, quantity, usd } from '../lib/format';
   import { CONFIDENCE_QUESTION, CONFIDENCE_SCALE, stageLine } from '../lib/labels';
   import { allPlanItems, bucketName, catalogueItem, decisionList, itemSourceIds, keyedItems, tierName } from '../lib/lookup';
-  import { renderMarkdown } from '../lib/markdown';
   import { href } from '../lib/router.svelte';
 
   const app = useApp();
   let confirmRestart = $state(false);
-  /** The Prepare sheet as HTML while it is being printed; empty otherwise. */
-  let sheet = $state('');
-
-  function renderSheet() {
-    const output = app.result.output;
-    sheet = output ? renderMarkdown(output.prepare_markdown, { idPrefix: 'prep', headingOffset: 1, notesLabel: 'Notes: your preparation plan' }) : '';
-  }
+  /** The Prepare sheet is on the page (for paper only) while it is being printed. */
+  let printing = $state(false);
 
   async function printSheet() {
-    renderSheet();
+    printing = true;
     await tick();
     window.print();
   }
 
   // The browser's own Print on this tab prints the sheet too, and the page forgets it afterwards.
   $effect(() => {
-    const before = () => renderSheet();
-    const after = () => (sheet = '');
+    const before = () => (printing = true);
+    const after = () => (printing = false);
     window.addEventListener('beforeprint', before);
     window.addEventListener('afterprint', after);
     return () => {
@@ -153,7 +148,7 @@
   </details>
 {/snippet}
 
-<div class="page prepare-page" class:printing={sheet !== ''}>
+<div class="page prepare-page" class:printing>
   <h1 id="page-title" tabindex="-1">Prepare: what to do before</h1>
   <PlanGate>
     {#snippet children(output)}
@@ -479,8 +474,12 @@
       </section>
     {/snippet}
   </PlanGate>
-  <!-- Paper only: filled while printing (the button above, or the browser's own Print). -->
-  <article class="print-only prepare-sheet packet" aria-label="Your preparation plan">{@html sheet}</article>
+  <!-- Paper only: on the page while printing (the button above, or the browser's own Print). -->
+  <div class="print-only prepare-print">
+    {#if printing && app.result.output}
+      <PrepareSheet markdown={app.result.output.prepare_markdown} planDate={planningDate} appVersion={__RR_APP_VERSION__} />
+    {/if}
+  </div>
 </div>
 
 <ConfirmDialog bind:open={confirmRestart} title="Restart the schedule from today?" confirmLabel="Restart from today" cancelLabel="Keep the schedule" onconfirm={restart}>
@@ -496,10 +495,10 @@
   }
   @media print {
     /* Printing the sheet: the sheet alone, never the screen around it. */
-    .prepare-page.printing > :global(:not(.prepare-sheet)) {
+    .prepare-page.printing > :global(:not(.prepare-print)) {
       display: none !important;
     }
-    .prepare-page:not(.printing) > .prepare-sheet {
+    .prepare-page:not(.printing) > .prepare-print {
       display: none !important;
     }
   }

@@ -11,9 +11,11 @@ import { createMockEngine } from '../engine/mock';
 import type { Dials, HazardProfile, PlanInput } from '../engine/types';
 import { RARE_HAZARD_IDS } from '../engine/types';
 import { rareItemsFor } from '../engine/mock/items-v2';
+import { golden } from '../test/real';
 import {
   allowance,
   alsoCheckedFor,
+  alsoCheckedLine,
   changesNothing,
   firstSentence,
   locationChain,
@@ -165,6 +167,15 @@ describe('"Also checked"', () => {
     expect(parseAlsoChecked(undefined)).toBeNull();
   });
 
+  it("comes from the binder's \"Which checklist?\" page in the real engine's output (v0.3)", () => {
+    const out = golden('philadelphia-renters-4');
+    const also = alsoCheckedFor(out, null)!;
+    expect(also.lead).toBe('Also checked, and too unlikely here to need a page');
+    expect(also.items.map((i) => i.name)).toContain('a Yellowstone super-eruption');
+    const listed = new Set(out.register.map((h) => h.name.toLowerCase()));
+    for (const i of also.items) expect(listed.has(i.name), i.name).toBe(false);
+  });
+
   it('comes from the engine packet on every fixture, in the mock and in the real v0.1 goldens', async () => {
     const engine = createMockEngine();
     const cat = await engine.catalogue();
@@ -175,6 +186,8 @@ describe('"Also checked"', () => {
       const also = alsoCheckedFor(r.value, cat.value)!;
       expect(also.lead, name).toBe('Also checked, and under 1 in 100,000 a year here');
       expect(also.items.at(-1), name).toEqual({ name: 'a Yellowstone super-eruption', rate: 'about 1 in 730,000 a year' });
+      // Its binder's "Which checklist?" page names the same hazards, as the engine's does.
+      expect(parseAlsoChecked(alsoCheckedLine(r.value))?.items.map((i) => i.name), name).toEqual(also.items.map((i) => i.name));
       // Nothing on the household's own list is also "checked and too rare".
       const listed = new Set(r.value.register.map((h) => h.name.toLowerCase()));
       for (const i of also.items) expect(listed.has(i.name), `${name}: ${i.name}`).toBe(false);

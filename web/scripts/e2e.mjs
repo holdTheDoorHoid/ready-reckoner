@@ -18,7 +18,7 @@
 //     app as the performance measures rr:assess:engine and rr:assess), over several dial changes.
 //  4. The ZIP tables and the map are fetched only when needed, and counted separately.
 //  5. Offline: with the network gone, a reload still shows the same plan.
-//  6. Screenshots (risks, plan, packet print view, About with the credits, the ambiguous-ZIP
+//  6. Screenshots (risks, plan, the binder's print view, About with the credits, the ambiguous-ZIP
 //     picker, the county map, the loading line) into SHOTS_DIR.
 //  7. Maps behind consent (DESIGN-DELTA-v3 §9): a first visit makes no request off the site;
 //     opening the maps panel makes none until "Fetch maps" is pressed, and the consent screen
@@ -274,22 +274,27 @@ try {
   await page.waitForSelector('[data-screen-ready][aria-busy="false"]', { timeout: 30000 });
   await page.screenshot({ path: join(shots, 'plan--philadelphia--desktop.png'), fullPage: true });
   await page.goto(`${site.url}#/binder`);
-  await page.waitForSelector('[data-screen-ready] .packet .county-map__svg', { timeout: 30000 });
+  await page.waitForSelector('[data-screen-ready] article.binder-page', { timeout: 30000 });
   // Media type and colour scheme are set together: puppeteer's separate setters each reset the other.
   const media = await page.createCDPSession();
   const emulate = (type, scheme) => media.send('Emulation.setEmulatedMedia', { media: type, features: [{ name: 'prefers-color-scheme', value: scheme }] });
   await emulate('print', 'light');
-  await page.screenshot({ path: join(shots, 'packet-print-view--philadelphia.png'), fullPage: true });
-  await page.pdf({ path: join(shots, 'packet--philadelphia--letter.pdf'), format: 'Letter', printBackground: false });
-  check('the packet shows the county map in its print view', !!(await page.$('.packet .county-map__svg')));
+  await page.screenshot({ path: join(shots, 'binder-print-view--philadelphia.png'), fullPage: true });
+  await page.pdf({ path: join(shots, 'binder-print--philadelphia--letter.pdf'), format: 'Letter', printBackground: false });
+  // The browser's own Print (the fallback to Download PDF) prints every binder page and none of the screen around it.
+  const printed = await page.evaluate(() => ({
+    pages: document.querySelectorAll('article.binder-page').length,
+    hidden: ['.binder-side', '.pdf-options'].every((sel) => { const el = document.querySelector(sel); return !el || getComputedStyle(el).display === 'none'; }),
+  }));
+  check('the binder prints every page, without the contents or the buttons', printed.pages > 50 && printed.hidden, JSON.stringify(printed));
   // A device in dark mode still prints dark ink on white paper.
   await emulate('print', 'dark');
   const ink = await page.evaluate(() => {
-    const p = document.querySelector('.packet p');
-    const land = document.querySelector('.packet .county--context');
-    return { text: p ? getComputedStyle(p).color : '', land: land ? getComputedStyle(land).fill : '' };
+    const p = document.querySelector('article.binder-page p');
+    const page = document.querySelector('article.binder-page');
+    return { text: p ? getComputedStyle(p).color : '', paper: page ? getComputedStyle(page).backgroundColor : '' };
   });
-  check('printing from a dark-mode device gives dark text and a white map', ink.text === 'rgb(0, 0, 0)' && ink.land === 'rgb(255, 255, 255)', JSON.stringify(ink));
+  check('printing from a dark-mode device gives dark text on white', ink.text === 'rgb(0, 0, 0)' && /^(rgba\(0, 0, 0, 0\)|rgb\(255, 255, 255\)|transparent)$/.test(ink.paper), JSON.stringify(ink));
   await emulate('', 'light');
 
   // About: versions and every credit line, the NRI statement first.
@@ -395,7 +400,7 @@ try {
       done_dates: {},
     });
     await p.goto(`${site.url}#/binder`);
-    await p.waitForSelector('[data-screen-ready][aria-busy="false"] .packet', { timeout: 60000 });
+    await p.waitForSelector('[data-screen-ready][aria-busy="false"] article.binder-page', { timeout: 60000 });
     await p.waitForFunction(() => !!navigator.serviceWorker?.controller, { timeout: 60000 });
     const clickButton = (text) => p.evaluate((t) => {
       const b = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === t);
@@ -425,9 +430,11 @@ try {
     const pinMap = await p.$('.pin-map');
     if (pinMap) await pinMap.screenshot({ path: join(shots, 'maps-pin-map--stubbed-tiles.png') });
     await clickButton('Done');
-    await p.waitForSelector('.maps-panel[data-maps-phase="idle"] .map-figure__img', { timeout: 60000 });
-    const figures = await p.$$eval('.maps-panel .map-figure__img', (els) => els.map((e) => e.getAttribute('src').length));
-    check('after consent, the three maps are made and shown', figures.length === 3, `${figures.length} images`);
+    // The maps show in the binder's own map slots (the panel keeps only its controls).
+    await p.waitForSelector('.maps-panel[data-maps-phase="idle"]', { timeout: 60000 });
+    await p.waitForFunction(() => document.querySelectorAll('article.binder-page .map-figure__img').length === 3, { timeout: 60000 });
+    const figures = await p.$$eval('article.binder-page .map-figure__img', (els) => els.map((e) => e.getAttribute('src').length));
+    check('after consent, the three maps are made and shown in their binder pages', figures.length === 3, `${figures.length} images`);
     const offList = external.filter((e) => !MAP_ORIGINS.includes(new URL(e.url).origin));
     check('after consent, requests go only to the origins in sources.ts', offList.length === 0, offList.slice(0, 3).map((e) => e.url).join(', ') || `${external.length} requests to ${[...new Set(external.map((e) => new URL(e.url).origin))].join(', ')}`);
     const tiles = external.filter((e) => e.url.startsWith('https://tile.openstreetmap.org/'));
@@ -470,9 +477,9 @@ try {
     await p.setOfflineMode(true);
     site.setOffline(true);
     await p.goto(`${site.url}#/binder`, { waitUntil: 'domcontentloaded' });
-    await p.waitForSelector('[data-screen-ready][aria-busy="false"] .packet', { timeout: 60000 });
+    await p.waitForSelector('[data-screen-ready][aria-busy="false"] article.binder-page', { timeout: 60000 });
     // The saved plan keeps its maps across a reload, so the toolbar offers "Refresh maps" (either label is accepted).
-    const toolbarLabel = await p.evaluate(() => [...document.querySelectorAll('.toolbar button')].map((b) => b.textContent.trim()).find((t) => t === 'Add maps' || t === 'Refresh maps'));
+    const toolbarLabel = await p.evaluate(() => [...document.querySelectorAll('.pdf-options button')].map((b) => b.textContent.trim()).find((t) => t === 'Add maps' || t === 'Refresh maps'));
     await clickButton(toolbarLabel);
     await p.waitForFunction(() => document.body.textContent.includes('Before we fetch your maps'), { timeout: 20000 });
     const offlineNote = await p.evaluate(() => document.querySelector('.consent')?.textContent.includes('seems to be offline') ?? false);

@@ -122,7 +122,7 @@ export class AppState {
       this.#unsubscribe = loader.subscribe((status) => {
         this.data = status;
         // Versions, loaded packs and credit lines change as packs arrive.
-        const key = `${status.core.phase}|${status.zip.phase}|${status.map.phase}`;
+        const key = `${status.core.phase}|${status.zip.phase}|${status.map.phase}|${status.places.phase}`;
         if (key !== last) {
           last = key;
           void this.refreshInfo();
@@ -198,6 +198,28 @@ export class AppState {
   /** Start fetching the ZIP tables before they are needed (when someone starts typing a ZIP code). */
   prefetchZip(): void {
     void this.#loader?.zip().catch(() => undefined);
+  }
+
+  /**
+   * The county's hospitals for the binder's Neighborhood page: the `places` pack, fetched the first
+   * time the binder is shown (a first visit, and a household that never opens the binder, fetch
+   * nothing more). Once it is in, the plan is asked for again so its binder lists them; until then,
+   * and on a site without the pack, the page has no hospital table and nothing in its place.
+   */
+  loadPlaces(): void {
+    const loader = this.#loader;
+    if (!loader) return;
+    const phase = loader.status.places.phase;
+    if (phase !== 'idle' && phase !== 'failed') return;
+    if (phase === 'failed') loader.retry();
+    void loader
+      .places()
+      .then(() => {
+        if (loader.status.places.phase !== 'ready') return;
+        this.#lastKey = '';
+        this.#schedule(this.engineInput);
+      })
+      .catch(() => undefined);
   }
 
   /** County outlines for the map, loaded once; null when the site has none. */

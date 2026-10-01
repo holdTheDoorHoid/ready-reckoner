@@ -176,4 +176,36 @@ describe('AppState with the data loading behind it', () => {
     expect(app.dataUrlsFetched()).toContain('/s/data/core/counties.csv?v=v9');
     app.destroy();
   });
+  it('fetches the county hospitals only when the binder asks, once, and then plans again', async () => {
+    const manifest = JSON.stringify({
+      pack_version: 'v9',
+      packs: { core: { files: [{ path: 'core/counties.csv', bytes: 10 }] }, places: { files: [{ path: 'places/hospitals.csv', bytes: 10 }] } },
+    });
+    const fetched: string[] = [];
+    const get = async (url: string): Promise<Response> => {
+      fetched.push(url);
+      if (url.includes('manifest.json')) return new Response(manifest, { headers: { 'content-type': 'application/json' } });
+      return new Response('rows', { headers: { 'content-type': 'text/plain' } });
+    };
+    const mock = createMockEngine();
+    let assessed = 0;
+    const counting = { ...mock, assess: (input: Parameters<typeof mock.assess>[0]) => ((assessed += 1), mock.assess(input)) };
+    const loader = new PackLoader(counting, '/s/', { fetch: get });
+    const storage = new MemoryStorage();
+    storage.setItem(STORAGE_KEY, JSON.stringify(savedFor(FIXTURES['philadelphia-renters-4'])));
+    const app = new AppState({ storage, engine: gateEngine(counting, loader), loader, delay: 0, saveDelay: 0, today: () => '2026-10-02' });
+    void loader.core().catch(() => undefined);
+    await app.init();
+    await until(() => !!app.result.output && !app.pending, 'the first plan');
+    const before = assessed;
+    expect(fetched.some((u) => u.includes('places/'))).toBe(false);
+    app.loadPlaces();
+    await until(() => assessed > before && !app.pending, 'the plan asked for again with the hospitals in');
+    expect(app.data?.places.phase).toBe('ready');
+    app.loadPlaces();
+    await new Promise((r) => setTimeout(r, 20));
+    expect(fetched.filter((u) => u.includes('places/hospitals.csv'))).toHaveLength(1);
+    expect(assessed).toBe(before + 1);
+    app.destroy();
+  });
 });

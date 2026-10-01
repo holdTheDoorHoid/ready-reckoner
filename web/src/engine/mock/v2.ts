@@ -683,18 +683,33 @@ function perYearWords(rate: number): string {
   return 'fewer than 1 in 1,000,000 a year';
 }
 
+/** The hazards checked for this place and found too rare to list, with their yearly rates. */
+function alsoChecked(register: readonly RankedHazard[]): [string, number][] {
+  const present = new Set<string>(register.map((h) => h.seed.id));
+  const checked: [string, number][] = (Object.keys(PLURAL) as HazardId[])
+    .filter((id) => !present.has(id))
+    .map((id) => [PLURAL[id]!, 0]);
+  checked.push(['an asteroid or comet impact', 3e-9], ['a Yellowstone super-eruption', 1 / 730_000]);
+  return checked;
+}
+
+/**
+ * The binder's "Also checked" line (rr-plan, the "Which checklist?" page): the same hazards as the
+ * note, by name only.
+ */
+export function alsoCheckedLine(register: readonly RankedHazard[]): string {
+  const names = alsoChecked(register).map(([name]) => name);
+  const joined = names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names.at(-1)!}` : names[0]!;
+  return `Also checked, and too unlikely here to need a page: ${joined}.`;
+}
+
 /**
  * The "Also checked" note (rr-hazards lib.rs): the natural hazards checked for this place and
  * found under 1 in 100,000 a year (none recorded, in the mock), then the rare sub-rows too small to
  * show, each with its rate.
  */
 export function alsoCheckedNote(register: readonly RankedHazard[]): string {
-  const present = new Set<string>(register.map((h) => h.seed.id));
-  const checked: [string, number][] = (Object.keys(PLURAL) as HazardId[])
-    .filter((id) => !present.has(id))
-    .map((id) => [PLURAL[id]!, 0]);
-  checked.push(['an asteroid or comet impact', 3e-9], ['a Yellowstone super-eruption', 1 / 730_000]);
-  const list = checked.map(([name, rate]) => `${name} (${perYearWords(rate)})`);
+  const list = alsoChecked(register).map(([name, rate]) => `${name} (${perYearWords(rate)})`);
   const joined = list.length > 1 ? `${list.slice(0, -1).join(', ')} and ${list.at(-1)!}` : list[0]!;
   return `Also checked, and under 1 in 100,000 a year here: ${joined}.`;
 }
