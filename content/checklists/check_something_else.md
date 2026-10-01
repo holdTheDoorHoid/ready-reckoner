@@ -36,7 +36,7 @@ Something is wrong and no other checklist fits.
 
 - Out-of-area contact: {out_of_area_contact}
 - Nearest hospital: {hospital}
-- County emergency office phone:
+- County emergency office: {county_office}
 
 ## Do not
 
