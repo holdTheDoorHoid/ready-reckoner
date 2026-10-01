@@ -18,7 +18,7 @@ Card payments, a bank, a pharmacy, a hospital or a utility stops working because
 3. **Tell your bank or card company** about any charge you did not make.[^ready_gov_cybersecurity]
 4. **Change your passwords** if you see strange activity.[^ready_gov_cybersecurity]
 5. **Try another pharmacy** if yours cannot fill a prescription.[^fda_drug_shortages_faq]
-6. **Take your written medicine list** to the pharmacy or doctor.[^ready_gov_disability]
+6. **Take your written medicine list** to the pharmacy or doctor.[^ready_gov_disability] {ref:people}
 
 ## Then
 
@@ -55,6 +55,6 @@ Card payments, a bank, a pharmacy, a hospital or a utility stops working because
 
 [^ready_gov_financial]: FEMA / Ready.gov, Financial Preparedness (2026).
 [^ready_gov_cybersecurity]: FEMA / Ready.gov, Cybersecurity (2026).
-[^fda_drug_shortages_faq]: U.S. Food and Drug Administration, Frequently Asked Questions about Drug Shortages (2026).
+[^fda_drug_shortages_faq]: U.S. Food and Drug Administration, Frequently Asked Questions about Drug Shortages (2024).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
 [^cisa_secure_our_world]: Cybersecurity and Infrastructure Security Agency, Secure Our World (2026).

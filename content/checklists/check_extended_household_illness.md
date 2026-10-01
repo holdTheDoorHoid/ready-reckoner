@@ -14,7 +14,7 @@ Someone at home will be sick or recovering for weeks or months, and needs care.
 ## Do first
 
 1. **Ask your employer about family and medical leave.** Eligible workers can take up to 12 weeks of unpaid, job-protected leave to care for a spouse, child or parent.[^dol_fmla]
-2. **Write down every medicine,** its dose, and any allergies.[^ready_gov_disability]
+2. **Write down every medicine,** its dose, and any allergies.[^ready_gov_disability] {ref:people}
 3. **Ask the doctor or pharmacist** how to keep an emergency supply of medicine.[^ready_gov_disability]
 4. **Apply for Social Security disability** if an earner's illness will last a year or more and keeps them from working.[^ssa_apply_disability]
 5. **Ask your trusted circle for help** with rides, meals and errands.[^ollam_2022_lawyer_passport_locksmith_gun] {ref:contacts}
@@ -35,7 +35,7 @@ Someone at home will be sick or recovering for weeks or months, and needs care.
 ## Where and who
 
 - Pharmacy: {pharmacy}
-- Hospital: {hospital}
+- Nearest hospital: {hospital}
 
 ## Do not
 

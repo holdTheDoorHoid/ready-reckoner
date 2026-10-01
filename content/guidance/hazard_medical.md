@@ -16,10 +16,10 @@ citations: [nchs_accidental_injury_2024, cdc_nchs_ed_visits, mell_2017_ems_respo
 [^nchs_accidental_injury_2024]: CDC National Center for Health Statistics, FastStats: Accidents or Unintentional Injuries (2024 mortality data) (2026).
 [^cdc_nchs_ed_visits]: CDC National Center for Health Statistics, FastStats: Emergency Department Visits (NHAMCS 2022) (2025).
 [^mell_2017_ems_response]: Mell H.K. et al., Emergency Medical Services Response Times in Rural, Suburban, and Urban Areas (JAMA Surgery) (2017).
-[^dhs_stop_the_bleed]: U.S. Department of Homeland Security, Stop the Bleed (2026).
+[^dhs_stop_the_bleed]: U.S. Department of Homeland Security (via Internet Archive), Stop the Bleed (2022).
 [^medlineplus_cpr]: MedlinePlus, National Library of Medicine, CPR (health topic summary) (2026).
 [^redcross_first_aid_kit]: American Red Cross, Anatomy of a First Aid Kit (2025).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
-[^fcc_text_911]: FCC, What You Need to Know About Text-to-911 (2026).
-[^cdc_antibiotic_use]: CDC, Antibiotic Use: Be Antibiotics Aware (2025).
+[^fcc_text_911]: Federal Communications Commission, What You Need to Know About Text-to-911 (2026).
+[^cdc_antibiotic_use]: Centers for Disease Control and Prevention, Antibiotic Use: Be Antibiotics Aware (2025).
 [^fda_expired_medicines]: U.S. Food and Drug Administration, Don't Be Tempted to Use Expired Medicines (2021).

@@ -38,7 +38,7 @@ Officials say the power may stay out for weeks or months. Water, fuel, stores an
 ## Where and who
 
 - Out-of-area contact: {out_of_area_contact}
-- County emergency office: {county}
+- County emergency office phone:
 
 ## Do not
 

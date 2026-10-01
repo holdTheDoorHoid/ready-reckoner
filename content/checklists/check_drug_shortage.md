@@ -20,7 +20,7 @@ Your pharmacy cannot fill a prescription, or you hear that a medicine you take i
 ## Then
 
 1. **Ask your drug plan** about a 60- to 90-day supply once you can refill.[^medicare_drugs_disaster]
-2. **Keep a written list** of each person's medicines, doses and allergies.[^ready_gov_disability]
+2. **Keep a written list** of each person's medicines, doses and allergies.[^ready_gov_disability] {ref:people}
 
 ## Leave or stay
 
@@ -45,7 +45,7 @@ Your pharmacy cannot fill a prescription, or you hear that a medicine you take i
 
 ## Sources
 
-[^fda_drug_shortages_faq]: U.S. Food and Drug Administration, Frequently Asked Questions about Drug Shortages (2026).
+[^fda_drug_shortages_faq]: U.S. Food and Drug Administration, Frequently Asked Questions about Drug Shortages (2024).
 [^fda_drug_shortages]: U.S. Food and Drug Administration, Drug Shortages (2026).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
 [^medicare_drugs_disaster]: CMS / Medicare.gov, Getting drugs in a disaster or emergency (2026).

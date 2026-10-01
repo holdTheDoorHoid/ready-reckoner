@@ -15,7 +15,7 @@ citations: [ready_gov_winter, shaffer_2026_texas_boil_notices, cdc_winter_safety
 
 [^ready_gov_winter]: FEMA / Ready.gov, Winter Weather (2026).
 [^shaffer_2026_texas_boil_notices]: Shaffer M., Awad N., Davenport F. and Fakhreddine S., Evaluating the Resilience of Drinking Water Systems to Severe Weather Events Using Boil Water Notices and Bottled Water Sales (Environmental Science and Technology 60(31):21648–21660) (2026).
-[^cdc_winter_safety]: CDC, Safety Guidelines: During and After a Winter Storm (2026).
+[^cdc_winter_safety]: Centers for Disease Control and Prevention, Safety Guidelines: During and After a Winter Storm (2026).
 [^ready_gov_stay_safe_warm]: FEMA / Ready.gov, Stay Safe and Warm Toolkit (FEMA Advisory) (2026).
 [^ready_gov_avalanche]: FEMA / Ready.gov, Avalanche (2026).
 [^usfa_heating_fires]: U.S. Fire Administration, Heating fire safety (2026).

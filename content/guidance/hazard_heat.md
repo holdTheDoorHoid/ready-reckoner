@@ -13,8 +13,8 @@ citations: [cdc_heat_health, stone_2023_heat_blackout, ready_gov_heat, ready_gov
 
 ## Sources
 
-[^cdc_heat_health]: CDC, About Heat and Your Health (2026).
+[^cdc_heat_health]: Centers for Disease Control and Prevention, About Heat and Your Health (2026).
 [^stone_2023_heat_blackout]: Stone B. Jr. et al., How Blackouts during Heat Waves Amplify Mortality and Morbidity Risk (Environmental Science and Technology 57(22):8245–8255) (2023).
 [^ready_gov_heat]: FEMA / Ready.gov, Extreme Heat (2026).
 [^ready_gov_drought]: FEMA / Ready.gov, Drought (2026).
-[^cdc_heat_related_illness]: CDC, Heat-Related Illnesses: What to Look For, What to Do (CS280226) (2017).
+[^cdc_heat_related_illness]: Centers for Disease Control and Prevention, Heat-Related Illnesses: What to Look For, What to Do (CS280226) (2017).

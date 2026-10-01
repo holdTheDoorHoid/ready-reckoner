@@ -17,4 +17,4 @@ citations: [ready_gov_severe_weather, ready_gov_tornadoes, ready_gov_thunderstor
 [^ready_gov_tornadoes]: FEMA / Ready.gov, Tornadoes (2026).
 [^ready_gov_thunderstorms_lightning]: FEMA / Ready.gov, Thunderstorms and Lightning (2026).
 [^noaa_spc_tornado_safety]: NOAA National Weather Service, Storm Prediction Center, Tornado Safety (The Online Tornado FAQ) (2026).
-[^ready_gov_tornadoes_2014]: FEMA / Ready.gov, Tornadoes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
+[^ready_gov_tornadoes_2014]: FEMA / Ready.gov (via Internet Archive), Tornadoes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).

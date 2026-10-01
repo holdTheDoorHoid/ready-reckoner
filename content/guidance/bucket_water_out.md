@@ -13,14 +13,14 @@ citations: [epa_asheville_boil_notice_2024, rr_research_risk_model, ready_gov_wa
 
 ## Sources
 
-[^epa_asheville_boil_notice_2024]: U.S. EPA, City of Asheville lifts systemwide boil water notice issued after Hurricane Helene (2024).
+[^epa_asheville_boil_notice_2024]: U.S. Environmental Protection Agency, City of Asheville lifts systemwide boil water notice issued after Hurricane Helene (2024).
 [^rr_research_risk_model]: Ready Reckoner contributors, Quantitative core model specification (research report): hazards, consequence buckets, durations (2026).
 [^ready_gov_water]: FEMA / Ready.gov, Water (2021).
-[^cdc_water_storage]: CDC, How to Create an Emergency Water Supply (2025).
+[^cdc_water_storage]: Centers for Disease Control and Prevention, How to Create an Emergency Water Supply (2025).
 [^sphere_2018]: Sphere Association, The Sphere Handbook: Humanitarian Charter and Minimum Standards in Humanitarian Response, 4th edition (2018).
 [^doe_water_heaters]: U.S. Department of Energy, Energy Saver (via Internet Archive), Storage Water Heaters (archived May 2026; the Energy Saver page was later removed) (2026).
-[^cdc_find_clean_water]: CDC, How to Find Clean Water in an Emergency (2024).
-[^cdc_water_disinfection]: CDC, How to Make Water Safe in an Emergency (2024).
+[^cdc_find_clean_water]: Centers for Disease Control and Prevention, How to Find Clean Water in an Emergency (2024).
+[^cdc_water_disinfection]: Centers for Disease Control and Prevention, How to Make Water Safe in an Emergency (2024).
 [^rdpo_emergency_toilet]: Regional Disaster Preparedness Organization, Portland Metro Region, Emergency Toilet Guidebook (twin-bucket toilet) (2024).
 [^church_emergency_prep_manual]: The Church of Jesus Christ of Latter-day Saints, Emergency Preparedness manual: guidelines on emergency water storage and purification (2023).
-[^cdc_well_disinfection]: CDC, How to Disinfect Wells After an Emergency (2025).
+[^cdc_well_disinfection]: Centers for Disease Control and Prevention, How to Disinfect Wells After an Emergency (2025).

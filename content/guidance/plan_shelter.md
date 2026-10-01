@@ -34,4 +34,4 @@ Pick a spot for each danger below, at home and at work, and practice going there
 [^ready_gov_earthquakes]: FEMA / Ready.gov, Earthquakes (2026).
 [^ready_gov_chemical]: FEMA / Ready.gov, Chemicals and Hazardous Materials Incidents (2026).
 [^epa_clean_room]: U.S. Environmental Protection Agency, Create a Clean Room to Protect Indoor Air Quality During a Wildfire (2026).
-[^ready_gov_nuclear]: FEMA / Ready.gov, Nuclear Explosion (2026).
+[^ready_gov_nuclear]: FEMA / Ready.gov (via Internet Archive), Nuclear Explosion (2022).

@@ -4,7 +4,7 @@ title: Hurricane or tropical storm
 kind: checklist
 onset: coming
 applies_to: [hazard:hurricane]
-citations: [nws_hurricane_safety_brochure, ready_gov_hurricanes, texasready_hurricanes, cdc_evacuation_psa, ready_gov_pets, ready_gov_power_outages, ready_gov_disability, fema_hurricane_safety_tips_2012, ready_gov_shelter, cdc_co_basics, ready_gov_evacuation, ready_gov_recovering]
+citations: [nws_hurricane_safety_brochure, ready_gov_hurricanes, texasready_hurricanes, cdc_evacuation_psa, ready_gov_pets, ready_gov_power_outages, ready_gov_disability, fema_hurricane_safety_tips_2012, ready_gov_shelter, cdc_co_basics, ready_gov_evacuation, redcross_power_outage, ready_gov_recovering]
 pages: 2
 ---
 ## Use this when
@@ -18,7 +18,7 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 3. **Charge up.** Charge phones and backup batteries.[^ready_gov_hurricanes] {if:powered_device}Charge any medical device, and follow the power plan you made with your medical provider.[^ready_gov_power_outages]{/if} {if:has:power_generator}Fuel the generator and check that it works.[^texasready_hurricanes]{/if} {if:has:power_station}Charge the power station.[^texasready_hurricanes]{/if} {if:vehicle}Fill the car's gas tank.[^nws_hurricane_safety_brochure]{/if}
 4. **Store water.** Fill the bathtub and large containers for flushing and cleaning.[^nws_hurricane_safety_brochure]
 5. **Refill medicines.** Refill prescriptions if you can.[^texasready_hurricanes]
-6. **Pack a go-bag.** Pack medicines, ID, cash and phone chargers. Cash machines may not work without power.[^cdc_evacuation_psa][^nws_hurricane_safety_brochure] {if:pets}Add your pets' food, water and medicine.[^ready_gov_hurricanes]{/if}
+6. **Pack a go-bag.** Pack medicines, ID, cash and phone chargers.[^cdc_evacuation_psa][^nws_hurricane_safety_brochure] {if:pets}Add your pets' food, water and medicine.[^ready_gov_hurricanes]{/if}
 
 ## Then
 
@@ -34,7 +34,7 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 
 ## Leave or stay
 
-- **Leave if** officials order your zone to leave{if:home:mobile_home}, or if you live in a mobile home. It is not safe in hurricane winds, even tied down{/if}. Go to {where_go}. {if:pets}Take your pets.[^ready_gov_pets]{/if} Turn off the power, gas and water only if officials tell you to.[^ready_gov_hurricanes][^nws_hurricane_safety_brochure] {ref:getting_out}
+- **Leave if** officials order your zone to leave{if:home:mobile_home}, or if you live in a mobile home. It is not safe in hurricane winds, even tied down{/if}. Leave early if someone needs extra time or help to leave.[^ready_gov_evacuation] Go to {where_go}. {if:pets}Take your pets.[^ready_gov_pets]{/if} Turn off the power, gas and water only if officials tell you to.[^ready_gov_hurricanes][^nws_hurricane_safety_brochure] {ref:getting_out}
 - **Stay if** you are not told to leave and your home is out of the flood zone.[^nws_hurricane_safety_brochure] {if:home:apartment_high_rise}In a tall building, stay on or below the 10th floor.[^fema_hurricane_safety_tips_2012]{/if} {ref:home}
 - **Go to** a public shelter if you have nowhere else. Text SHELTER and your ZIP code to 43362, and bring your go-bag.[^ready_gov_shelter]
 - **Go to** the highest floor if floodwater traps you. Do not climb into a closed attic.[^ready_gov_hurricanes]
@@ -42,6 +42,7 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 ## Where and who
 
 - Our evacuation zone:
+- Public shelter: {shelter}
 
 ## Do not
 
@@ -54,7 +55,7 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 ## When it is over
 
 - **Wait** until officials say it is safe to go out or go home.[^nws_hurricane_safety_brochure][^ready_gov_evacuation]
-- **Stay away** from downed power lines, and report them to {electric_utility}.[^ready_gov_evacuation]
+- **Stay at least 35 feet** from downed power lines. Call 911, then {electric_utility}.[^redcross_power_outage][^ready_gov_evacuation]
 - **Check** gas, water and electric lines for damage. If you smell gas or the building looks damaged, stay out.[^nws_hurricane_safety_brochure][^ready_gov_recovering]
 - **Clean up** in gloves and boots, with a partner. Children should not help.[^ready_gov_hurricanes]
 - **Take photos** of the damage before you clean up, then call your insurer.[^ready_gov_hurricanes][^ready_gov_recovering] {ref:after}
@@ -72,4 +73,5 @@ A hurricane or tropical storm watch or warning covers your area. A watch comes a
 [^ready_gov_shelter]: FEMA / Ready.gov, Shelter (2026).
 [^cdc_co_basics]: Centers for Disease Control and Prevention, Carbon Monoxide Poisoning Basics (2026).
 [^ready_gov_evacuation]: FEMA / Ready.gov, Evacuation (2026).
+[^redcross_power_outage]: American Red Cross, Power Outage Safety (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).

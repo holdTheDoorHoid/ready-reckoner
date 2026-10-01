@@ -49,6 +49,6 @@ You or another earner in the household loses a job, or most of their hours.
 [^fema_effak]: FEMA and Operation HOPE, Emergency Financial First Aid Kit (FEMA P-1075) (2019).
 [^usda_hunger_hotline]: U.S. Department of Agriculture, USDA National Hunger Hotline (2025).
 [^cfpb_rent_help]: Consumer Financial Protection Bureau, Get help paying rent and bills (2026).
-[^cfpb_facing_eviction]: Consumer Financial Protection Bureau, What to do if you’re facing eviction (2026).
+[^cfpb_facing_eviction]: Consumer Financial Protection Bureau, What to do if you’re facing eviction (2024).
 [^cfpb_payday_loans]: Consumer Financial Protection Bureau, What is a payday loan? (2026).
 [^cfpb_emergency_fund]: Consumer Financial Protection Bureau, An essential guide to building an emergency fund (2025).

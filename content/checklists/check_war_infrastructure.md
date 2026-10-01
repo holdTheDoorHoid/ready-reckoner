@@ -42,7 +42,7 @@ The United States is at war, and power, water, fuel, phone or internet systems a
 ## Where and who
 
 - Out-of-area contact: {out_of_area_contact}
-- Local alerts: {alerts}
+- How we get alerts: {alerts}
 
 ## Do not
 

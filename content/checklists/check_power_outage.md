@@ -13,22 +13,22 @@ The power goes out at home and stays out for hours or days, from a storm, a faul
 
 ## Do first
 
-1. **Use flashlights, not candles.**[^redcross_power_outage]
-2. **Keep the fridge and freezer closed.**[^ready_gov_power_outages]
-3. **Unplug appliances and electronics.**[^ready_gov_power_outages]
-4. {if:powered_device}**Switch medical devices to backup power.** If it will not last, go where there is power.[^ready_gov_power_outages][^redcross_power_outage]{/if}
-5. **Check on your people.** Tell them you are OK, and ask if they need help.[^redcross_power_outage]
-6. **Check for news** on a battery radio or phone alerts.[^redcross_power_outage]
+1. {if:powered_device}**Switch medical devices to backup power.** If it will not last, go where there is power.[^ready_gov_power_outages][^redcross_power_outage]{/if}
+2. **Use flashlights, not candles.**[^redcross_power_outage]
+3. **Check on your people.** Tell them you are OK, and ask if they need help.[^redcross_power_outage]
+4. **Check for news** on a battery radio or phone alerts.[^redcross_power_outage]
+5. **Keep the fridge and freezer closed.**[^ready_gov_power_outages]
 
 ## Then
 
-1. **Eat fresh food first.**[^redcross_power_outage]
-2. **Move fridge food to coolers with ice** after 4 hours. A full, closed freezer stays cold about 48 hours.[^ready_gov_power_outages]
-3. **Check food temperatures** with a thermometer.[^ready_gov_power_outages]
-4. {if:has:power_generator}**Run the generator outdoors only,** at least 20 feet from windows, doors and attached garages.[^ready_gov_power_outages]{/if}
-5. {if:has:power_generator}**Let the generator cool** before you refuel it.[^ready_gov_power_outages]{/if}
-6. {if:has:med_cooler_refrigerated_rx}**Keep insulin below 86°F,** out of the sun and never frozen. For other cold medicines, follow what your pharmacist told you.[^fda_insulin_emergency][^ready_gov_power_outages]{/if}
-7. **Save your phone battery.** Keep calls short, and text instead.[^fcc_emergency_calling_tips]
+1. **Unplug appliances and electronics.**[^ready_gov_power_outages]
+2. **Eat fresh food first.**[^redcross_power_outage]
+3. **Move fridge food to coolers with ice** after 4 hours. A full, closed freezer stays cold about 48 hours.[^ready_gov_power_outages]
+4. **Check food temperatures** with a thermometer.[^ready_gov_power_outages]
+5. {if:has:power_generator}**Run the generator only outdoors,** more than 20 feet from windows, doors and vents.[^cdc_co_basics]{/if}
+6. {if:has:power_generator}**Let the generator cool** before you refuel it.[^ready_gov_power_outages]{/if}
+7. {if:has:med_cooler_refrigerated_rx}**Keep insulin below 86°F,** out of the sun and never frozen. For other cold medicines, follow what your pharmacist told you.[^fda_insulin_emergency][^ready_gov_power_outages]{/if}
+8. **Save your phone battery.** Keep calls short, and text instead.[^fcc_emergency_calling_tips]
 
 ## Leave or stay
 
@@ -38,7 +38,7 @@ The power goes out at home and stays out for hours or days, from a storm, a faul
 ## Where and who
 
 - Power company outage line: {electric_utility}
-- Nearest warming or cooling center:
+- Warming or cooling center: {shelter}
 
 ## Do not
 

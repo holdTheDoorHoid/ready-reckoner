@@ -16,4 +16,4 @@ citations: [eviction_lab_national, cfpb_rent_help, lsc_get_legal_help, cfpb_faci
 [^eviction_lab_national]: Eviction Lab, Princeton University, National Estimates: Eviction in America (2026).
 [^cfpb_rent_help]: Consumer Financial Protection Bureau, Get help paying rent and bills (2026).
 [^lsc_get_legal_help]: Legal Services Corporation, I Need Legal Help (2026).
-[^cfpb_facing_eviction]: Consumer Financial Protection Bureau, What to do if you’re facing eviction (2026).
+[^cfpb_facing_eviction]: Consumer Financial Protection Bureau, What to do if you’re facing eviction (2024).
