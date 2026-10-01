@@ -585,9 +585,43 @@ fn split_first_sentence(s: &str) -> (&str, &str) {
     }
 }
 
+/// Marked text (content prose with citation markers, no bold lead) as sentences, each with the
+/// citation markers that follow it.
+fn sentences(s: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut rest = s.trim();
+    while !rest.is_empty() {
+        // A leading space keeps `first_sentence_end` from reading a bold lead at the start.
+        let padded = format!(" {rest}");
+        let (head, tail) = match first_sentence_end(&padded) {
+            Some(at) => (&rest[..at - 1], &rest[at - 1..]),
+            None => (rest, ""),
+        };
+        out.push(head.trim().to_owned());
+        rest = tail.trim_start();
+    }
+    out
+}
+
+/// The citation markers that end a marked sentence (empty when it ends without one).
+fn trailing_cites(sentence: &str) -> String {
+    let mut start = sentence.len();
+    let mut rest = sentence;
+    while let Some(stripped) = rest.strip_suffix(crate::packet::CLOSE) {
+        match stripped.rfind(crate::packet::OPEN) {
+            Some(open) => {
+                start = open;
+                rest = &stripped[..open];
+            }
+            None => break,
+        }
+    }
+    sentence[start..].to_owned()
+}
+
 /// Tab 7's first page (§4.2, brief 1): `plan_forecast_48h` as a checklist-shaped page. The
 /// block's opening paragraph says when to use it; each list becomes steps, and each headed
-/// paragraph ("Before a hard freeze.") a heading with the paragraph as one step. The freeze steps
+/// paragraph ("Before a hard freeze.") a heading with a step a sentence. The freeze steps
 /// print where a cold wave, winter storm or ice storm is likely enough to list (a ten-year
 /// chance of 1 in 100), the heat-wave steps where heat waves are, as in the v2 packet.
 pub(super) fn forecast(bx: &Bx<'_>) -> Page {
@@ -622,8 +656,9 @@ pub(super) fn forecast(bx: &Bx<'_>) -> Page {
                     blocks.push(Block::Para(bx.inl(p)));
                 }
                 _ => {
-                    // "**Before a hard freeze.** Let … . Make sure …[^id]": a heading, then the
-                    // paragraph as one step, so it keeps its citation.
+                    // "**Before a hard freeze.** Let … . Make sure …[^id]": a heading, then a step
+                    // a sentence; a sentence without a citation of its own carries the one that
+                    // closes the paragraph, which covers it.
                     let (lead, rest) = match p.strip_prefix("**").and_then(|r| r.split_once("**")) {
                         Some((lead, rest)) => (Some(lead.trim_end_matches('.')), rest),
                         None => (None, p.as_str()),
@@ -631,10 +666,25 @@ pub(super) fn forecast(bx: &Bx<'_>) -> Page {
                     if let Some(l) = lead {
                         blocks.push(heading(1, l));
                     }
-                    blocks.push(Block::Steps(vec![Step {
-                        text: bx.inl(rest.trim()),
-                        memory: false,
-                    }]));
+                    let parts = sentences(rest);
+                    let closing = parts.last().map(|x| trailing_cites(x)).unwrap_or_default();
+                    blocks.push(Block::Steps(
+                        parts
+                            .iter()
+                            .map(|sentence| {
+                                let own = trailing_cites(sentence);
+                                let text = if own.is_empty() {
+                                    format!("{sentence}{closing}")
+                                } else {
+                                    sentence.clone()
+                                };
+                                Step {
+                                    text: bx.inl(&text),
+                                    memory: false,
+                                }
+                            })
+                            .collect(),
+                    ));
                 }
             }
         }
@@ -650,6 +700,25 @@ pub(super) fn forecast(bx: &Bx<'_>) -> Page {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn sentences_keep_their_citations_and_the_household_s_words_whole() {
+        let c = |id: &str| crate::packet::cite(id);
+        let s = format!(
+            "Let water drip. Keep the heat at 55°F.{} Call {} now.{}{}",
+            c("nws"),
+            user("St. Mary's. Hall"),
+            c("a"),
+            c("b")
+        );
+        let parts = sentences(&s);
+        assert_eq!(parts.len(), 3, "{parts:?}");
+        assert_eq!(parts[0], "Let water drip.");
+        assert!(parts[1].ends_with(&c("nws")), "{parts:?}");
+        assert!(parts[2].contains("St. Mary's. Hall"), "{parts:?}");
+        assert_eq!(trailing_cites(&parts[2]), format!("{}{}", c("a"), c("b")));
+        assert_eq!(trailing_cites(&parts[0]), "");
+    }
 
     #[test]
     fn branches_split_where_the_content_splits_them() {
