@@ -2988,13 +2988,19 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 ## Summary
 
+### The three things that matter most
+
+1. Of 100 households like yours, about 45 (40–60) will have to leave home quickly at least once in the next 10 years. Know your evacuation zone and where you would go; leave when told.[2, 3] On the coast, strong shaking is the warning: walk to high ground as soon as it stops.[4]
+2. Of 100 households like yours, nearly all (95 or more) will lose grid power for a day or more in the next 10 years. If you are not told to leave, be ready to manage about 3 months at home with no power, and about 6 months with no tap water.
+3. Of 100 households like yours, about 65 (40–90) will be unable to shop for food and supplies for 3 days or more in the next 10 years. Keep about 2 weeks of food you normally eat, and 6 months of daily medicine on hand.
+
 **Where you are now:** getting started. **What is enough for your risks:** six months of supplies. At your budget, the bare minimum (three days of water, light, warmth and medicine) is in place by month 3 (January 2027), and everything by month 48 (October 2030). Start with the free steps under Your plan.
 
 **What the plan assumes you already have:** a charged mobile phone, go-bag for each person, manual can opener, a cooking pot with a lid, three days of the food you normally eat and towels to wet and cool down. If any is missing, untick "Assume everyday basics" on the Have screen and the plan will add it.
 
 ## Your plan
 
-Your budget is $50 a month. Free steps come first, then what protects you most for each dollar (water, medicine and safety first), until every need has enough.[2]
+Your budget is $50 a month. Free steps come first, then what protects you most for each dollar (water, medicine and safety first), until every need has enough.[5]
 
 ### Start now: free steps (from October 1, 2026)
 
@@ -3009,12 +3015,12 @@ Your budget is $50 a month. Free steps come first, then what protects you most f
 
 ### Safety rules to learn now
 
-- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[3, 4]
-- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[5]
-- **Water heater:** Turn off its power or gas before you drain it for water.[5]
-- **Food:** In a power cut, throw out food that has been at 40°F or warmer for 2 hours.[6]
-- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[6, 7]
-- **CPR:** Take a first-aid and CPR class.[8]
+- **Fire:** Know two ways out of every room. Once you are out, stay out, and call 911.[6, 7]
+- **Gas:** If your gas was shut off, only the gas company or a professional should turn it back on.[8]
+- **Water heater:** Turn off its power or gas before you drain it for water.[8]
+- **Food:** In a power cut, throw out food that has been at 40°F or warmer for 2 hours.[9]
+- **Generator:** Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring: that can electrocute utility workers and neighbors.[9, 10]
+- **CPR:** Take a first-aid and CPR class.[11]
 
 ### This month
 
@@ -3127,24 +3133,24 @@ One list per step, up to the one your risks need, with each thing's month. This 
 
 **Person 1**: a 5-mile (8 km) trip, about 2 hours on foot.
 
-- [ ] Keep a get-home bag in the car: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (some amounts are estimates)[9, 10, 11, 12]
-- [ ] For the walk, from home: 0.8 litres of water and 200 kcal of snacks.[9, 10, 13]
+- [ ] Keep a get-home bag in the car: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (some amounts are estimates)[12, 13, 14, 15]
+- [ ] For the walk, from home: 0.8 litres of water and 200 kcal of snacks.[12, 13, 16]
 
 ### Extras for the hazards you face
 
 These help with one hazard, not a whole need, so they sit outside the budget.
 
-- Insect repellent for the weeks after a flood or hurricane (usually $8–10 per can)[14, 15, 16]
+- Insect repellent for the weeks after a flood or hurricane (usually $8–10 per can)[17, 18, 19]
 
 ## Documents and money: decisions and savings
 
 ### Decisions
 
-- [ ] **Decide: ID for every person (passport book or card, or a state ID).** A passport book or card for each person, children included, proves who you are and your citizenship if other papers are lost, and the card shows no home address; get them before you need them. The federal fee schedule: a first adult book $165 and card $65 ($130 and $30 plus a $35 acceptance fee), for children under 16 a book $135 and card $50 (22 CFR 22.1).[17, 18, 19]
-- [ ] **Decide: homeowners, condo or renters insurance.** You have no condominium unit-owners insurance yet: get a quote and decide. Check what it pays if you have to live somewhere else for a while.[19, 20, 21]
-- [ ] **Decide: flood insurance, even outside a flood zone.** Home and renters policies usually don't cover floods. Decide on flood insurance before you need it: about 3 in 10 flood insurance claims come from outside high-risk flood areas. A quote costs nothing, and a new policy usually starts 30 days after you buy it. It pays up to $250,000 for the building and $100,000 for belongings.[20, 22, 23, 24]
-- [ ] **Decide: earthquake insurance.** A standard home policy does not cover earthquake damage. Decide whether earthquake insurance is worth its deductible where you live.[25]
-- [ ] **Decide: disability and life insurance for the people who earn.** Someone in your household earns money the others rely on: check whether your job offers disability insurance, and whether life insurance would carry the others through the years they would need. About 1 in 4 workers who start at 20 become disabled before retirement age. NAIC's buyer's guide helps you work out how much cover is enough.[26, 27]
+- [ ] **Decide: ID for every person (passport book or card, or a state ID).** A passport book or card for each person, children included, proves who you are and your citizenship if other papers are lost, and the card shows no home address; get them before you need them. The federal fee schedule: a first adult book $165 and card $65 ($130 and $30 plus a $35 acceptance fee), for children under 16 a book $135 and card $50 (22 CFR 22.1).[20, 21, 22]
+- [ ] **Decide: homeowners, condo or renters insurance.** You have no condominium unit-owners insurance yet: get a quote and decide. Check what it pays if you have to live somewhere else for a while.[22, 23, 24]
+- [ ] **Decide: flood insurance, even outside a flood zone.** Home and renters policies usually don't cover floods. Decide on flood insurance before you need it: about 3 in 10 flood insurance claims come from outside high-risk flood areas. A quote costs nothing, and a new policy usually starts 30 days after you buy it. It pays up to $250,000 for the building and $100,000 for belongings.[23, 25, 26, 27]
+- [ ] **Decide: earthquake insurance.** A standard home policy does not cover earthquake damage. Decide whether earthquake insurance is worth its deductible where you live.[28]
+- [ ] **Decide: disability and life insurance for the people who earn.** Someone in your household earns money the others rely on: check whether your job offers disability insurance, and whether life insurance would carry the others through the years they would need. About 1 in 4 workers who start at 20 become disabled before retirement age. NAIC's buyer's guide helps you work out how much cover is enough.[29, 30]
 
 ### Savings
 
@@ -3152,7 +3158,7 @@ Of 100 households like yours, about 20 (10–35) will have an income gap of more
 
 ## Maintenance calendar
 
-Dates count from when each item enters your plan; move them if you buy earlier or later.[12]
+Dates count from when each item enters your plan; move them if you buy earlier or later.[15]
 
 | When | What |
 | --- | --- |
@@ -3187,11 +3193,11 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 
 The numbers in brackets point to this list; "expert estimate" marks a judgement, not measured data. The plan is Ready Reckoner's calculation from these.
 
-**1** Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water **2** Harm weights used by the allocator. Ready Reckoner, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md Expert estimate. **3** Home Fires. FEMA / Ready.gov, 2026. https://www.ready.gov/home-fires **4** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **5** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **6** Power Outages. FEMA / Ready.gov, 2026. https://www.ready.gov/power-outages **7** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf **8** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills **9** Ready Reckoner expert estimates for supply sizing and upkeep. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md Expert estimate. **10** Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds. Federal Highway Administration, 2009. https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm
+**1** Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water **2** Evacuation. FEMA / Ready.gov, 2026. https://www.ready.gov/evacuation **3** Hurricanes. FEMA / Ready.gov, 2026. https://www.ready.gov/hurricanes **4** Oregon Tsunami Clearinghouse: frequently asked questions. Oregon Department of Geology and Mineral Industries, 2026. https://www.oregon.gov/dogami/tsuclearinghouse/pages/faq-tsunami.aspx **5** Harm weights used by the allocator. Ready Reckoner, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md Expert estimate. **6** Home Fires. FEMA / Ready.gov, 2026. https://www.ready.gov/home-fires **7** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **8** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **9** Power Outages. FEMA / Ready.gov, 2026. https://www.ready.gov/power-outages **10** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf
 
-**11** Build A Kit. FEMA / Ready.gov (via Internet Archive), 2020. https://web.archive.org/web/20200101090440/https://www.ready.gov/kit **12** Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit **13** Dietary Guidelines for Americans, 2020–2025, Appendix 2: Estimated Calorie Needs. U.S. Department of Agriculture and U.S. Department of Health and Human Services, 2020. https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf **14** What to Do After a Hurricane or Flood. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/mosquitoes/response/index.html **15** Preventing Mosquito Bites. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mosquitoes/prevention/index.html **16** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **17** 22 CFR 22.1, Schedule of Fees for Consular Services (passport book, card and execution fees), 2025 edition. U.S. Government Publishing Office (Code of Federal Regulations), 2025. https://www.govinfo.gov/content/pkg/CFR-2025-title22-vol1/pdf/CFR-2025-title22-vol1-sec22-1.pdf **18** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **19** Emergency Financial First Aid Kit. FEMA and Operation HOPE, 2019. https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf **20** Financial Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/financial-preparedness
+**11** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills **12** Ready Reckoner expert estimates for supply sizing and upkeep. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/QUANTITY_RULES.md Expert estimate. **13** Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds. Federal Highway Administration, 2009. https://mutcd.fhwa.dot.gov/htm/2009/part4/part4e.htm **14** Build A Kit. FEMA / Ready.gov (via Internet Archive), 2020. https://web.archive.org/web/20200101090440/https://www.ready.gov/kit **15** Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit **16** Dietary Guidelines for Americans, 2020–2025, Appendix 2: Estimated Calorie Needs. U.S. Department of Agriculture and U.S. Department of Health and Human Services, 2020. https://www.dietaryguidelines.gov/sites/default/files/2020-12/Dietary_Guidelines_for_Americans_2020-2025.pdf **17** What to Do After a Hurricane or Flood. Centers for Disease Control and Prevention, 2024. https://www.cdc.gov/mosquitoes/response/index.html **18** Preventing Mosquito Bites. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/mosquitoes/prevention/index.html **19** Retail price observations behind the item catalogue's price bands, September 2026. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/PRICE_OBSERVATIONS.md **20** 22 CFR 22.1, Schedule of Fees for Consular Services (passport book, card and execution fees), 2025 edition. U.S. Government Publishing Office (Code of Federal Regulations), 2025. https://www.govinfo.gov/content/pkg/CFR-2025-title22-vol1/pdf/CFR-2025-title22-vol1-sec22-1.pdf
 
-**21** A Consumer's Guide to Home Insurance. National Association of Insurance Commissioners, 2022. https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf **22** Flood Insurance. FEMA, 2026. https://www.fema.gov/flood-insurance **23** Buy a Policy. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/get-insured/buy-a-policy **24** What Is My Flood Risk?. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/flood-zones-and-maps/what-is-my-flood-risk **25** Earthquakes. FEMA / Ready.gov, 2026. https://www.ready.gov/earthquakes **26** Disability Benefits. Social Security Administration, 2026. https://www.ssa.gov/pubs/EN-05-10029.pdf **27** Life Insurance Buyer's Guide. National Association of Insurance Commissioners, 2019. https://content.naic.org/sites/default/files/publication-lig-lp-consumer-life.pdf
+**21** A Talk About Risk & Preparedness. Deviant Ollam (video and slides), 2022. https://www.youtube.com/watch?v=6ihrGNGesfI **22** Emergency Financial First Aid Kit. FEMA and Operation HOPE, 2019. https://www.ready.gov/sites/default/files/2020-03/ready_emergency-financial-first-aid-toolkit.pdf **23** Financial Preparedness. FEMA / Ready.gov, 2026. https://www.ready.gov/financial-preparedness **24** A Consumer's Guide to Home Insurance. National Association of Insurance Commissioners, 2022. https://content.naic.org/sites/default/files/publication-hoi-pp-consumer-homeowners.pdf **25** Flood Insurance. FEMA, 2026. https://www.fema.gov/flood-insurance **26** Buy a Policy. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/get-insured/buy-a-policy **27** What Is My Flood Risk?. FEMA National Flood Insurance Program (FloodSmart), 2026. https://www.floodsmart.gov/flood-zones-and-maps/what-is-my-flood-risk **28** Earthquakes. FEMA / Ready.gov, 2026. https://www.ready.gov/earthquakes **29** Disability Benefits. Social Security Administration, 2026. https://www.ssa.gov/pubs/EN-05-10029.pdf **30** Life Insurance Buyer's Guide. National Association of Insurance Commissioners, 2019. https://content.naic.org/sites/default/files/publication-lig-lp-consumer-life.pdf
 
 ### Data credits
 
