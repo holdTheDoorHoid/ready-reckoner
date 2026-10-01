@@ -280,7 +280,9 @@ try {
       await new Promise((r) => setTimeout(r, 200));
     }
     const file = join(outDir, `${shot.name}.png`);
-    await page.screenshot({ path: file, fullPage: true });
+    // The whole binder is one very long page (some 80 sheets' worth): Chrome refuses a full-page
+    // capture of it on a phone, so binder shots show the screen as it first opens.
+    await page.screenshot({ path: file, fullPage: !shot.route.startsWith('binder') });
     await page.addScriptTag({ path: axePath });
     const result = await page.evaluate(async () => {
       // eslint-disable-next-line no-undef
