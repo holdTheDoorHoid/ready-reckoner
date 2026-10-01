@@ -567,6 +567,12 @@ fn without_the_zip_tables_a_county_plans_and_a_zip_code_waits_for_them() {
     let info: EngineInfo = value(&api::engine_info());
     assert_eq!(info.packs_loaded, ["core"]);
     assert_eq!(api::assess(&by_county), before_zips);
+    // The golden also prints the county hospital list from the `places` pack (the binder's
+    // Neighbourhood page), so that pack goes in before the ZIP code's plan is held to its golden.
+    let _: PackInfo = value(&api::load_pack(
+        "places/hospitals.csv",
+        &read("data/places/hospitals.csv"),
+    ));
     let golden = String::from_utf8(read("fixtures/golden/philadelphia-renters-4.json")).unwrap();
     assert_eq!(
         value_text(&api::assess(&fixture_json("philadelphia-renters-4"))),

@@ -110,8 +110,9 @@ impl Source {
 
 /// Chooses and loads the source: `--fixtures`; `--data <dir>` (which must hold a pack); or by
 /// default `data/` when it holds a manifest, otherwise the fixtures with a note. From a data
-/// directory only the core pack is loaded, as the web app loads it, unless `--optional <pack>`
-/// or `--all-packs` asks for more.
+/// directory the packs of [`rr_plan::source::DATA_DIR_PACKS`] are loaded (core, and the county
+/// hospital list the binder prints, when the manifest lists it), as the goldens are made, unless
+/// `--optional <pack>` or `--all-packs` asks for more.
 ///
 /// # Errors
 ///
@@ -197,9 +198,18 @@ pub fn chosen_paths(manifest: &Manifest, packs: &Packs) -> Result<Vec<String>, C
                     )));
                 }
             }
-            std::iter::once(CORE_PACK)
-                .chain(optional.iter().map(String::as_str))
-                .collect()
+            // The goldens' packs (core, and `places` when the manifest has it), then the extras.
+            let mut names: Vec<&str> = rr_plan::source::DATA_DIR_PACKS
+                .iter()
+                .copied()
+                .filter(|n| *n == CORE_PACK || manifest.packs.contains_key(*n))
+                .collect();
+            for name in optional {
+                if !names.contains(&name.as_str()) {
+                    names.push(name.as_str());
+                }
+            }
+            names
         }
     };
     Ok(manifest
