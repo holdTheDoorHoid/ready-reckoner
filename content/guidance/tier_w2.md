@@ -16,7 +16,7 @@ Two weeks is where much official advice meets. The Red Cross suggests two weeks 
 ## Sources
 
 [^redcross_survival_kit]: American Red Cross, Survival Kit Supplies (2026).
-[^cdc_water_storage]: CDC, How to Create an Emergency Water Supply (2025).
+[^cdc_water_storage]: Centers for Disease Control and Prevention, How to Create an Emergency Water Supply (2025).
 [^oregon_2_weeks_ready]: Oregon Department of Emergency Management, 2 Weeks Ready (2026).
 [^bbk_vorsorgen_2025]: Bundesamt für Bevölkerungsschutz und Katastrophenhilfe (BBK), Germany, Vorsorgen für Krisen und Katastrophen (Preparing for crises and disasters), 2nd edition, November 2025 (2025).
 [^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).

@@ -2,6 +2,7 @@
   "county": {
     "fips": "38101",
     "name": "Ward",
+    "name_full": "Ward County",
     "state_abbr": "ND",
     "state_name": "North Dakota",
     "centroid": {

@@ -35,8 +35,8 @@ There are riots, violent protests or a curfew near your home, your work or your 
 
 ## Where and who
 
-- Safest spot at home: {shelter_home}
-- Local alerts: {alerts}
+- Shelter spot at home: {shelter_home}
+- How we get alerts: {alerts}
 
 ## Do not
 

@@ -29,7 +29,7 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 4. **Breathing but not awake?** Roll them onto their side.[^fema_until_help_arrives]
 5. **Keep them warm.** Cover them, and put something under them.[^fema_until_help_arrives]
 6. **Talk to them.** Keep them calm.[^fema_until_help_arrives]
-7. **Give responders** their medicine list and allergies (People tab).[^ready_gov_disability]
+7. **Give responders** their medicine list and allergies.[^ready_gov_disability] {ref:people}
 8. **Cannot call?** Text 911.[^gov911_faq]
 
 ## Leave or stay
@@ -40,7 +40,7 @@ Someone collapses, stops breathing normally, is choking or bleeding hard, or sho
 
 ## Where and who
 
-- Hospital: {hospital}
+- Nearest hospital: {hospital}
 
 ## Do not
 

@@ -378,7 +378,7 @@ Placeholders, each rendered as the household's answer or a blank of fitting leng
 `{meeting_near}`, `{meeting_far}`, `{shelter_home}`, `{shelter_work}`, `{where_go}`,
 `{out_of_area_contact}`, `{gas_shutoff}`, `{water_shutoff}`, `{electric_panel}`,
 `{electric_utility}`, `{gas_utility}`, `{water_utility}`, `{hospital}`, `{pharmacy}`,
-`{alerts}`, `{county}`, `{shelter}`. Cross-references: `{ref:home}`, `{ref:getting_out}`, `{ref:neighbourhood}`,
+`{alerts}`, `{county}`, `{shelter}`, `{county_office}`. Cross-references: `{ref:home}`, `{ref:getting_out}`, `{ref:neighbourhood}`,
 `{ref:contacts}`, `{ref:after}`, `{ref:documents}`, `{ref:people}` (page ids from §4.2), rendered by each renderer
 as a link or "(Tab 3, Home)".
 

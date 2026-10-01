@@ -1208,13 +1208,20 @@ that it ships) is the Lab's own "How to cite":
 (Connecticut converted by land share). Shipped: 3,144 counties, 13.6 KB gzipped; county mean
 0.0478; Baltimore County, MD 1.37, the highest (filings can exceed one per renter household where
 landlords file again and again). Most county-years are model estimates; filings are not completed
-evictions; the data end in 2018. The 88 counties without a figure (mostly small or independent
-cities the Lab's file does not cover) keep `rr-hazards`' national fallback prior, about 2.3 per
-100 renter households a year (`rr-hazards`' `personal.rs::eviction`); `why.rs`'s "why we think this"
-text for the Eviction hazard says both paths plainly. This moves `HazardId::Eviction`'s rate (and
-so the packet's eviction line and its share of the "loss of the home" bucket) for every renting
-fixture household whose real county has a figure; see the `agent/data3` report for exactly which
-fixtures moved and by how much (golden regeneration is the planner's step).
+evictions; the data end in 2018. The 88 county-equivalents without a figure (the territories:
+Puerto Rico's 78 municipios, Guam, the US Virgin Islands, American Samoa and the Northern Mariana
+Islands) and the five Texas counties the Lab estimates at zero filings use `rr-hazards`' national
+fallback, 1.92 eviction judgments per 100 renter households a year (the Lab's 2014-2018 judgment
+rate, Help & FAQ, `eviction_lab_faq`). Every other county's rate is read as it is, above 1 included
+(three Maryland counties). Since v0.3.0 (hazards3) `rr-hazards` turns the filings into households
+taken to court with a curve fitted to the Lab's own household counts in the same file
+(`hh_threat_estimate`, which the job does not ship), counts about 1 in 3 of those households as
+ordered to leave, and caps a county's own figure at 7 in 100 a year (`docs/RISK_MODEL.md`, the
+Eviction row); `why.rs`'s "why we think this" text says so, and the card says when the cap applied.
+This moves `HazardId::Eviction`'s rate (and so the packet's eviction line and its share of the
+"loss of the home" bucket) for every renting fixture household whose real county has a figure; see
+the `agent/data3` and `agent/hazards3` reports for exactly which fixtures moved and by how much
+(golden regeneration is the planner's step).
 
 ### 13.11 What is not done
 

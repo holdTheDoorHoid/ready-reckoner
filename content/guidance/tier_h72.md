@@ -16,7 +16,7 @@ After an emergency, you may need to get by on your own for several days.[^ready_
 [^ready_gov_kit]: FEMA / Ready.gov, Build A Kit (2026).
 [^ready_gov_kit_2020]: FEMA / Ready.gov (via Internet Archive), Build A Kit (archived January 2020 version, with the 72-hour and work-kit wording) (2020).
 [^dema_prepared_for_crises]: Danish Emergency Management Agency (Beredskabsstyrelsen), Prepared for crises.
-[^cdc_water_storage]: CDC, How to Create an Emergency Water Supply (2025).
+[^cdc_water_storage]: Centers for Disease Control and Prevention, How to Create an Emergency Water Supply (2025).
 [^ready_gov_food]: FEMA / Ready.gov, Food (2026).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
 [^ready_gov_evacuation]: FEMA / Ready.gov, Evacuation (2026).

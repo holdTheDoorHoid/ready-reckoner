@@ -51,14 +51,18 @@ retrieved = "2026-09-26"
 quote = "The refrigerator will keep food cold for about four hours if it is unopened."
 license = "US Government Work (public domain)"
 
+# Quote replaced by checklist-review (2026-10-01; page read in a browser, last updated 2026-06-04).
+# The old quote was the page's "discard refrigerated medication after a day" line, which the content
+# deliberately does not follow (CONTENT_STANDARDS §5, FDA insulin guidance) and which the Sources
+# screen printed under this entry. The new quote is the sentence the blocks rely on.
 [[citation]]
 id = "ready_gov_power_outages"
 title = "Power Outages"
 publisher = "FEMA / Ready.gov"
 year = 2026
 url = "https://www.ready.gov/power-outages"
-retrieved = "2026-09-26"
-quote = "If the power is out for more than a day, discard any medication that should be refrigerated, unless the drug’s label says otherwise."
+retrieved = "2026-10-01"
+quote = "Talk to your medical provider about a power outage plan for medical devices powered by electricity and refrigerated medicines."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -220,14 +224,19 @@ retrieved = "2026-09-25"
 quote = "Get to high ground as far inland as possible"
 license = "US Government Work (public domain)"
 
+# Ready.gov retired this page (the address redirects to "Radiation Emergencies", ready_gov_radiation,
+# since 2025-01-07; checklists-a2). Re-pointed by checklist-review (2026-10-01) to the Internet Archive
+# capture of the agency's own URL (2022-12-22, page last updated 2022-03-07), read as a plain download.
+# The old quote was the page's three headings joined, not a sentence; replaced by one matched in the
+# capture. The capture has no "do not look at the flash" line.
 [[citation]]
 id = "ready_gov_nuclear"
 title = "Nuclear Explosion"
-publisher = "FEMA / Ready.gov"
-year = 2026
-url = "https://www.ready.gov/nuclear-explosion"
-retrieved = "2026-09-25"
-quote = "Get inside. Stay inside. Stay tuned."
+publisher = "FEMA / Ready.gov (via Internet Archive)"
+year = 2022
+url = "https://web.archive.org/web/20221222190617/https://www.ready.gov/nuclear-explosion"
+retrieved = "2026-10-01"
+quote = "Stay inside for 24 hours unless local authorities provide other instructions."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -797,7 +806,7 @@ id = "epa_wildfire_indoor_air"
 title = "Wildfires and Indoor Air Quality"
 publisher = "U.S. Environmental Protection Agency"
 year = 2026
-url = "https://www.epa.gov/indoor-air-quality-iaq/wildfires-and-indoor-air-quality-iaq"
+url = "https://www.epa.gov/emergencies-iaq/wildfires-and-indoor-air-quality-iaq"
 retrieved = "2026-09-26"
 license = "US Government Work (public domain)"
 
@@ -1131,13 +1140,19 @@ retrieved = "2026-09-25"
 quote = "This toll-free, multilingual, crisis support service is available 24/7 to all residents in the U.S. and its territories who are experiencing emotional distress related to natural or human-caused disasters. Call or text 1-800-985-5990."
 license = "US Government Work (public domain)"
 
+# DHS took down the campaign page's content in 2025 (the address now lands on an archived notice
+# with no instructions; checklists-a2, 2026-09-27). Re-pointed by checklist-review (2026-10-01) to
+# the Internet Archive capture of DHS's own URL (2024-01-01, page last updated 2022-10-14), read as
+# a plain download; quote matched. The capture also says to ask the local health department,
+# hospitals, EMS, fire or police departments about a course, and that bystanders are first on scene.
 [[citation]]
 id = "dhs_stop_the_bleed"
 title = "Stop the Bleed"
-publisher = "U.S. Department of Homeland Security"
-year = 2026
-url = "https://www.dhs.gov/stopthebleed"
-retrieved = "2026-09-26"
+publisher = "U.S. Department of Homeland Security (via Internet Archive)"
+year = 2022
+url = "https://web.archive.org/web/20240101032901/https://www.dhs.gov/stopthebleed"
+retrieved = "2026-10-01"
+quote = "A person who is bleeding can die from blood loss within five minutes, therefore it is important to quickly stop the blood loss."
 license = "US Government Work (public domain)"
 
 [[citation]]
@@ -2879,7 +2894,7 @@ license = "US Government Work (public domain)"
 id = "fda_drug_shortages_faq"
 title = "Frequently Asked Questions about Drug Shortages"
 publisher = "U.S. Food and Drug Administration"
-year = 2026
+year = 2024
 url = "https://www.fda.gov/drugs/drug-shortages/frequently-asked-questions-about-drug-shortages"
 retrieved = "2026-09-26"
 quote = "Check multiple stores or pharmacies, or ask your health care provider or pharmacist if there is an alternative to the medicine you’re looking for."
@@ -2963,7 +2978,7 @@ license = "US Government Work (public domain)"
 id = "cfpb_facing_eviction"
 title = "What to do if you’re facing eviction"
 publisher = "Consumer Financial Protection Bureau"
-year = 2026
+year = 2024
 url = "https://www.consumerfinance.gov/housing/housing-insecurity/help-for-renters/what-to-do-if-youre-facing-eviction/"
 retrieved = "2026-09-26"
 quote = "Too many renters give up before they have a chance to go to court."
@@ -4822,6 +4837,53 @@ retrieved = "2026-09-27"
 quote = "The FDA advises parents and caregivers to not make or feed homemade infant formula to infants."
 license = "US Government Work (public domain)"
 
+# ---------------------------------------------------------------------------------------------
+# added by checklist-review (v0.3.0 practitioner review of the incident checklists), 2026-10-01.
+# How each page was read is noted above it. Quotes are stored only where the wording was matched
+# in the page's own text.
+# ---------------------------------------------------------------------------------------------
+
+# Read as a plain download (weather.gov); quote matched. Backs "go on foot if you can" on the
+# tsunami checklist and "walk to high ground" in hazard_earthquake (handed back by checklists-a2:
+# not in the "During" page, Ready.gov or the Oregon FAQ). The page also says to practise walking
+# the evacuation routes, at night and in bad weather.
+[[citation]]
+id = "nws_tsunami_before"
+title = "Tsunami Safety: Before a Tsunami"
+publisher = "NOAA National Weather Service"
+year = 2026
+url = "https://www.weather.gov/safety/tsunami-before"
+retrieved = "2026-10-01"
+quote = "You should plan to be able to reach your safe place on foot if you can because of possible road damage, closed roads and traffic jams."
+license = "US Government Work (public domain)"
+
+# Read as a plain download (usfa.fema.gov); quote matched. Messages for fire departments to give
+# residents: when told to evacuate, go promptly; if you feel unsafe, do not wait for an order;
+# waiting until the last minute means heavy traffic, and smoke, embers and debris make it hard to
+# see; leave early, especially with small children, pets, livestock, physical challenges or other
+# needs that take extra time or help.
+[[citation]]
+id = "usfa_wildfire_evacuation"
+title = "Wildfire Evacuation Outreach Materials"
+publisher = "U.S. Fire Administration"
+year = 2026
+url = "https://www.usfa.fema.gov/wui/outreach/wildfire-evacuation.html"
+retrieved = "2026-10-01"
+quote = "When told to evacuate, go promptly."
+license = "US Government Work (public domain)"
+
+# Read as a plain download (consumer.ftc.gov); quote matched. Report a lost or stolen card to the
+# bank or credit union that issued it as soon as possible; report identity theft at IdentityTheft.gov.
+[[citation]]
+id = "ftc_lost_stolen_cards"
+title = "Lost or Stolen Credit, ATM, and Debit Cards"
+publisher = "Federal Trade Commission, Consumer Advice"
+year = 2026
+url = "https://consumer.ftc.gov/articles/lost-or-stolen-credit-atm-and-debit-cards"
+retrieved = "2026-10-01"
+quote = "Call — or get on the mobile app — and report the loss or theft to the bank or credit union that issued the card as soon as possible."
+license = "US Government Work (public domain)"
+
 # hazards3 (v0.3.0), the eviction row's households-not-filings conversion. Read 2026-10-01 as a
 # plain download of the PMC copy of the open-access article: 69.7 million cases filed 2000-2018,
 # more than 3.6 million a year; about 2.7 million households received a filing a year (just under
@@ -4848,5 +4910,24 @@ title = "Help & FAQ: households threatened with eviction and eviction judgments,
 publisher = "Eviction Lab, Princeton University"
 year = 2026
 url = "https://evictionlab.org/help-faq/"
+retrieved = "2026-10-01"
+license = "All rights reserved (paraphrased, not quoted)"
+
+# ---------------------------------------------------------------------------------------------
+# added by checklist-review (follow-up: the two exemplar gaps), 2026-10-01.
+# ---------------------------------------------------------------------------------------------
+
+# Read in a browser page (nfpa.org); a standards body, so paraphrased and no quote. The page says
+# that closing doors on your way out slows the spread of fire and gives you more time to escape,
+# that a closed door may slow the spread of smoke, heat and fire, and that someone should be
+# assigned to help infants, older adults and people with disabilities get out (the house-fire
+# page's "Who helps whom get out" line). USFA's escape-plan page says to close the door behind you
+# only for apartments, so this backs the step for every home.
+[[citation]]
+id = "nfpa_escape_planning"
+title = "How to make a home fire escape plan"
+publisher = "National Fire Protection Association"
+year = 2026
+url = "https://www.nfpa.org/education-and-research/home-fire-safety/escape-planning"
 retrieved = "2026-10-01"
 license = "All rights reserved (paraphrased, not quoted)"

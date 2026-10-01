@@ -4,7 +4,7 @@ title: Break-in
 kind: checklist
 onset: now
 applies_to: [hazard:burglary]
-citations: [in_dhs_home_protection, mnpd_burglary_victim, gov911_faq, ready_gov_recovering, naic_home_insurance_guide, usa_gov_replace_ids]
+citations: [in_dhs_home_protection, mnpd_burglary_victim, gov911_faq, ready_gov_recovering, naic_home_insurance_guide, usa_gov_replace_ids, ftc_lost_stolen_cards]
 pages: 1
 ---
 
@@ -15,20 +15,20 @@ Someone is breaking in while you are home, or you come home to a forced door, a 
 ## Do first
 
 1. **Get out** by your escape route if you can. Call 911 from a safe place.[^in_dhs_home_protection][^mnpd_burglary_victim]
-2. **Cannot get out?** Go to a room that locks from the inside, lock it and call 911.[^in_dhs_home_protection]
+2. **Cannot get out?** Go to a room that locks from the inside. Lock it, call 911 and stay there until police arrive.[^in_dhs_home_protection]
 3. **Stay on the line.** Give the address and answer the call-taker's questions.[^gov911_faq]
-4. **Stay in the locked room** until police arrive.[^in_dhs_home_protection]
-5. **Came home to a break-in?** Do not go in. Go somewhere else and call the police.[^mnpd_burglary_victim]
-6. **Let the police search** the home first.[^mnpd_burglary_victim]
+4. **Came home to a break-in?** Do not go in. Go somewhere else and call the police.[^mnpd_burglary_victim]
+5. **Let the police search** the home first.[^mnpd_burglary_victim]
 
 ## Then
 
 1. **Tell the police** what was moved, and about anything left behind that is not yours.[^mnpd_burglary_victim]
 2. **List what is missing,** with serial numbers and descriptions.[^mnpd_burglary_victim]
-3. **Take photos** of the damage before you clean up.[^ready_gov_recovering]
-4. **Call your insurer** as soon as you can.[^naic_home_insurance_guide] {ref:home}
-5. **Board up** a broken door or window to stop more damage.[^naic_home_insurance_guide]
-6. **IDs stolen?** To replace them, many offices ask for your birth certificate.[^usa_gov_replace_ids] {ref:documents}
+3. **Cards stolen?** Call the bank or card company that issued them right away.[^ftc_lost_stolen_cards]
+4. **Take photos** of the damage before you clean up.[^ready_gov_recovering]
+5. **Call your insurer** as soon as you can.[^naic_home_insurance_guide] {ref:home}
+6. **Board up** a broken door or window to stop more damage.[^naic_home_insurance_guide]
+7. **IDs stolen?** To replace them, many offices ask for your birth certificate.[^usa_gov_replace_ids] {ref:documents}
 
 ## Leave or stay
 
@@ -62,3 +62,4 @@ Someone is breaking in while you are home, or you come home to a forced door, a 
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
 [^naic_home_insurance_guide]: National Association of Insurance Commissioners, A Consumer's Guide to Home Insurance (2022).
 [^usa_gov_replace_ids]: USAGov, How to replace lost or stolen ID cards (2026).
+[^ftc_lost_stolen_cards]: Federal Trade Commission, Consumer Advice, Lost or Stolen Credit, ATM, and Debit Cards (2026).

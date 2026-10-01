@@ -338,6 +338,7 @@ mod tests {
         CountyRecord {
             fips: "42101".into(),
             name: "Philadelphia".into(),
+            name_full: None,
             state_abbr: "PA".into(),
             state_name: "Pennsylvania".into(),
             centroid: rr_types::LatLon {

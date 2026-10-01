@@ -19,4 +19,4 @@ Renters face disasters with less cushion. In FEMA's 2024 survey, 43 of every 100
 [^fema_effak]: FEMA and Operation HOPE, Emergency Financial First Aid Kit (FEMA P-1075) (2019).
 [^floodsmart_buy_policy]: FEMA National Flood Insurance Program (FloodSmart), Buy a Policy (2026).
 [^usfa_smoke_alarm_renters]: U.S. Fire Administration, Pictograph: Where to put home smoke alarms (renters) (2026).
-[^cdc_co_basics]: CDC, Carbon Monoxide Poisoning Basics (2026).
+[^cdc_co_basics]: Centers for Disease Control and Prevention, Carbon Monoxide Poisoning Basics (2026).

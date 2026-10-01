@@ -23,5 +23,10 @@ code, with the ZIP code's county share and the data note left out (the sample so
 of these ZIP codes lies wholly in its county in the pack's ZIP table). The sources of every field are
 the core pack's, listed in `data/manifest.json` and `docs/DATA_SOURCES.md`.
 
+Each record also carries `name_full`, the Census name with its type word ("Cameron Parish", "San
+Juan Municipio"), added 2026-10-01 from the current pack's `core/counties.csv`, which rr-hazards
+prints as the county's name. The seven hand-built counties do not carry it; their names are rebuilt
+from the short name ("Coos" becomes "Coos County").
+
 A plan made on the sample counties says so ("The engine is running on fourteen built-in sample
 counties…"); the goldens in `fixtures/golden/` are planned from the data packs, not from these files.

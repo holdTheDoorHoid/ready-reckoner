@@ -17,7 +17,7 @@ citations: [nhtsa_crashes_2023, ready_gov_winter, ready_gov_evacuation, nhtsa_ti
 [^ready_gov_winter]: FEMA / Ready.gov, Winter Weather (2026).
 [^ready_gov_evacuation]: FEMA / Ready.gov, Evacuation (2026).
 [^nhtsa_tires]: National Highway Traffic Safety Administration, Tires (2026).
-[^cdc_winter_safety]: CDC, Safety Guidelines: During and After a Winter Storm (2026).
+[^cdc_winter_safety]: Centers for Disease Control and Prevention, Safety Guidelines: During and After a Winter Storm (2026).
 [^hcfl_ev_safety]: Hillsborough County, Florida, Staying Safe with Electric Vehicles (hurricane season and flooding) (2025).
 [^doe_afdc_stations]: U.S. Department of Energy, Alternative Fuels Data Center, Alternative Fueling Station Locator (2026).
 [^nws_turn_around_dont_drown]: NOAA National Weather Service, Turn Around Don't Drown (2026).

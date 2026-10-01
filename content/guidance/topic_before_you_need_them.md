@@ -29,4 +29,4 @@ This article draws on a 2022 talk about risk and preparedness by the security re
 [^ftc_2008_locksmith]: Federal Trade Commission, FTC Urges Consumers to Use Caution When Seeking a Locksmith (2008).
 [^cisa_data_backup_2012]: Ruggiero P. and Heckathorn M.A., US-CERT (now CISA), Data Backup Options (2012).
 [^ready_gov_cybersecurity]: FEMA / Ready.gov, Cybersecurity (2026).
-[^dhs_stop_the_bleed]: U.S. Department of Homeland Security, Stop the Bleed (2026).
+[^dhs_stop_the_bleed]: U.S. Department of Homeland Security (via Internet Archive), Stop the Bleed (2022).

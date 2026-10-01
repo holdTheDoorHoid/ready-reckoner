@@ -23,6 +23,11 @@ pub struct CountyRecord {
     pub fips: String,
     /// County name without the word "County".
     pub name: String,
+    /// The Census Bureau's full name, type word included: "Baltimore County", "Baltimore city",
+    /// "Orleans Parish", "Anchorage Municipality", "San Juan Municipio". The name to show a
+    /// person; absent in records built before data pack v0.3.0 (the hand-built sample counties).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name_full: Option<String>,
     /// Two-letter state abbreviation.
     pub state_abbr: String,
     /// State name.
@@ -293,6 +298,7 @@ mod tests {
     #[test]
     fn a_full_record_round_trips() {
         let mut v = minimal_json();
+        v["name_full"] = "Philadelphia County".into();
         v["population"] = 1_550_000.into();
         v["households"] = 640_000.into();
         v["building_value_usd"] = 2.1e11.into();
@@ -318,6 +324,7 @@ mod tests {
             AfreqKind::AnnualProbability
         );
         assert_eq!(r.nri[&HazardId::HeatWave].risk_score, Some(95.5));
+        assert_eq!(r.name_full.as_deref(), Some("Philadelphia County"));
         let again: CountyRecord =
             serde_json::from_str(&serde_json::to_string(&r).unwrap()).unwrap();
         assert_eq!(again, r);

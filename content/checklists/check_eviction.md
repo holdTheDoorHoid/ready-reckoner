@@ -29,7 +29,7 @@ Your landlord gives you a notice to pay or leave, or you get court papers for an
 ## Leave or stay
 
 - **Do this if** the court rules against you: ask the judge or clerk to put the order on hold while your rent help is processed.[^cfpb_facing_eviction]
-- **Do this if** you have to move: apply for help with moving costs, a deposit and application fees.[^cfpb_facing_eviction]
+- **Do this if** you have to move: apply for help with moving costs, a deposit and application fees.[^cfpb_facing_eviction] {ref:getting_out}
 - **Do this if** you are in the military: call your Legal Assistance Office. You can ask the court to pause the case for up to 90 days.[^cfpb_facing_eviction]
 
 ## Where and who
@@ -48,7 +48,7 @@ Your landlord gives you a notice to pay or leave, or you get court papers for an
 
 ## Sources
 
-[^cfpb_facing_eviction]: Consumer Financial Protection Bureau, What to do if you’re facing eviction (2026).
+[^cfpb_facing_eviction]: Consumer Financial Protection Bureau, What to do if you’re facing eviction (2024).
 [^lsc_get_legal_help]: Legal Services Corporation, I Need Legal Help (2026).
 [^cfpb_rent_help]: Consumer Financial Protection Bureau, Get help paying rent and bills (2026).
 [^fema_effak]: FEMA and Operation HOPE, Emergency Financial First Aid Kit (FEMA P-1075) (2019).

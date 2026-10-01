@@ -13,6 +13,6 @@ citations: [cdc_water_advisories, ready_gov_chemical, ready_gov_shelter]
 
 ## Sources
 
-[^cdc_water_advisories]: CDC, Drinking Water Advisories: An Overview (2024).
+[^cdc_water_advisories]: Centers for Disease Control and Prevention, Drinking Water Advisories: An Overview (2024).
 [^ready_gov_chemical]: FEMA / Ready.gov, Chemicals and Hazardous Materials Incidents (2026).
 [^ready_gov_shelter]: FEMA / Ready.gov, Shelter (2026).

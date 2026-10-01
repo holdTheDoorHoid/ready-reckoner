@@ -13,21 +13,21 @@ The power is out across your town or region and could stay out for days. Stores,
 
 ## Do first
 
-1. **Use flashlights, not candles.**[^redcross_power_outage]
-2. **Keep the fridge and freezer closed.**[^ready_gov_power_outages]
-3. **Unplug appliances and electronics.**[^ready_gov_power_outages]
-4. {if:powered_device}**Switch medical devices to backup power.** If it will not last, go where there is power.[^ready_gov_power_outages][^redcross_power_outage]{/if}
-5. **Get news** from a battery radio or phone alerts.[^redcross_power_outage]
-6. **Text instead of calling.**[^fcc_emergency_calling_tips]
+1. {if:powered_device}**Switch medical devices to backup power.** If it will not last, go where there is power.[^ready_gov_power_outages][^redcross_power_outage]{/if}
+2. **Use flashlights, not candles.**[^redcross_power_outage]
+3. **Check on your people and neighbours.**[^redcross_power_outage]
+4. **Get news** from a battery radio or phone alerts.[^redcross_power_outage]
+5. **Text instead of calling.**[^fcc_emergency_calling_tips]
+6. **Keep the fridge and freezer closed.**[^ready_gov_power_outages]
 
 ## Then
 
-1. **Check on your people and neighbours.**[^redcross_power_outage]
+1. **Unplug appliances and electronics.**[^ready_gov_power_outages]
 2. **Treat a dark traffic light as a stop sign** in every direction.[^ca_dmv_rules_of_the_road]
 3. **Pay with cash** in small bills.[^ready_gov_financial]
 4. **Follow any water notice,** such as boil water or do not drink.[^cdc_water_advisories]
 5. **Eat fresh food first.**[^redcross_power_outage]
-6. {if:has:power_generator}**Run the generator outdoors only,** at least 20 feet from windows, doors and attached garages.[^ready_gov_power_outages]{/if}
+6. {if:has:power_generator}**Run the generator only outdoors,** more than 20 feet from windows, doors and vents.[^cdc_co_basics]{/if}
 7. {if:has:power_generator}**Let the generator cool** before you refuel it.[^ready_gov_power_outages]{/if}
 8. {if:has:med_cooler_refrigerated_rx}**Keep insulin below 86°F,** out of the sun and never frozen.[^fda_insulin_emergency]{/if}
 9. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
@@ -42,7 +42,7 @@ The power is out across your town or region and could stay out for days. Stores,
 ## Where and who
 
 - Power company outage line: {electric_utility}
-- Nearest warming or cooling center:
+- Warming or cooling center: {shelter}
 
 ## Do not
 

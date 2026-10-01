@@ -15,7 +15,7 @@ citations: [ready_gov_pandemic, marani_2021_pandemics, cdc_mmwr_stay_at_home_202
 
 [^ready_gov_pandemic]: FEMA / Ready.gov, Pandemic (2026).
 [^marani_2021_pandemics]: Marani M., Katul G.G., Pan W.K. and Parolari A.J., Intensity and frequency of extreme novel epidemics (PNAS 118(35):e2105482118) (2021).
-[^cdc_mmwr_stay_at_home_2020]: CDC, Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020 (MMWR 69(35)) (2020).
+[^cdc_mmwr_stay_at_home_2020]: Centers for Disease Control and Prevention, Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020 (MMWR 69(35)) (2020).
 [^rr_research_risk_model]: Ready Reckoner contributors, Quantitative core model specification (research report): hazards, consequence buckets, durations (2026).
-[^cdc_masks]: CDC, Masks and Respiratory Viruses Prevention (2025).
+[^cdc_masks]: Centers for Disease Control and Prevention, Masks and Respiratory Viruses Prevention (2025).
 [^cfpb_emergency_fund]: Consumer Financial Protection Bureau, An essential guide to building an emergency fund (2025).

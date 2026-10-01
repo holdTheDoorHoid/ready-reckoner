@@ -17,4 +17,4 @@ A one-year tier appears only when a target is longer than six months, or when yo
 [^church_home_storage_2007]: The Church of Jesus Christ of Latter-day Saints, All Is Safely Gathered In: Family Home Storage (2007).
 [^ensign_2006_year_supply]: The Church of Jesus Christ of Latter-day Saints, Food Storage for One Year (Ensign, March 2006) (2006).
 [^usu_food_storage_booklet]: Utah State University Extension, Food Storage (extension booklet) (2013).
-[^cdc_potassium_iodide]: CDC, Potassium Iodide (KI) (2025).
+[^cdc_potassium_iodide]: Centers for Disease Control and Prevention, Potassium Iodide (KI) (2025).

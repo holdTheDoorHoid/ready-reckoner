@@ -33,4 +33,4 @@ A higher group does not mean an attack is likely.[^fri_nuclear_risk_2024]
 [^eia_refinery_capacity_2026]: U.S. Energy Information Administration, Refinery Capacity Report, Table 3: Capacity of Operable Petroleum Refineries by State as of January 1, 2026 (2026).
 [^fema_nuclear_72h_2023]: FEMA, Nuclear Detonation Response Guidance: Planning for the First 72 Hours (2023).
 [^cdc_potassium_iodide]: Centers for Disease Control and Prevention, Potassium Iodide (KI) (2025).
-[^ready_gov_nuclear]: FEMA / Ready.gov, Nuclear Explosion (2026).
+[^ready_gov_nuclear]: FEMA / Ready.gov (via Internet Archive), Nuclear Explosion (2022).

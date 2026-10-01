@@ -4,7 +4,7 @@ title: Severe thunderstorm, strong wind, hail or lightning
 kind: checklist
 onset: now
 applies_to: [hazard:strong_wind, hazard:hail, hazard:lightning]
-citations: [nws_lightning_safety, nws_high_wind_during, nws_severe_weather_during, ready_gov_thunderstorms_lightning, cdc_electrical_hazards, ready_gov_recovering, naic_home_insurance_guide, nws_nwr_deaf]
+citations: [nws_lightning_safety, nws_high_wind_during, nws_severe_weather_during, ready_gov_thunderstorms_lightning, cdc_electrical_hazards, redcross_power_outage, ready_gov_recovering, naic_home_insurance_guide, nws_nwr_deaf]
 pages: 1
 ---
 
@@ -36,9 +36,9 @@ A severe thunderstorm or high wind warning is issued, you hear thunder, or damag
 
 ## Where and who
 
-- Safe spot at home: {shelter_home}
-- Safe spot at work or school: {shelter_work}
-- How you get alerts: {alerts}
+- Shelter spot at home: {shelter_home}
+- Shelter spot at work or school: {shelter_work}
+- How we get alerts: {alerts}
 
 ## Do not
 
@@ -50,7 +50,7 @@ A severe thunderstorm or high wind warning is issued, you hear thunder, or damag
 
 ## When it is over
 
-- Watch for fallen power lines and trees. Report fallen lines to the power company: {electric_utility}.[^ready_gov_thunderstorms_lightning][^cdc_electrical_hazards]
+- Stay at least 35 feet from fallen power lines. Call 911, then the power company: {electric_utility}.[^redcross_power_outage][^cdc_electrical_hazards]
 - Photograph damage before you clean up, then call your insurer.[^ready_gov_recovering][^naic_home_insurance_guide] {ref:after}
 - Sign up for your community's warnings.[^ready_gov_thunderstorms_lightning] {if:need:hearing}A weather radio can set off a strobe light or bed shaker for anyone who cannot hear alerts.[^nws_nwr_deaf]{/if}
 
@@ -61,6 +61,7 @@ A severe thunderstorm or high wind warning is issued, you hear thunder, or damag
 [^nws_severe_weather_during]: NOAA National Weather Service, What to Do During Severe Weather (2026).
 [^ready_gov_thunderstorms_lightning]: FEMA / Ready.gov, Thunderstorms and Lightning (2026).
 [^cdc_electrical_hazards]: Centers for Disease Control and Prevention, What to Do to Protect Yourself From Electrical Hazards (2026).
+[^redcross_power_outage]: American Red Cross, Power Outage Safety (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
 [^naic_home_insurance_guide]: National Association of Insurance Commissioners, A Consumer's Guide to Home Insurance (2022).
 [^nws_nwr_deaf]: NOAA National Weather Service, NOAA Weather Radio for the Deaf and Hard of Hearing (2026).
