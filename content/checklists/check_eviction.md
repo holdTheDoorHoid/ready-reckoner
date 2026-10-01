@@ -48,7 +48,7 @@ Your landlord gives you a notice to pay or leave, or you get court papers for an
 
 ## Sources
 
-[^cfpb_facing_eviction]: Consumer Financial Protection Bureau, What to do if you’re facing eviction (2026).
+[^cfpb_facing_eviction]: Consumer Financial Protection Bureau, What to do if you’re facing eviction (2024).
 [^lsc_get_legal_help]: Legal Services Corporation, I Need Legal Help (2026).
 [^cfpb_rent_help]: Consumer Financial Protection Bureau, Get help paying rent and bills (2026).
 [^fema_effak]: FEMA and Operation HOPE, Emergency Financial First Aid Kit (FEMA P-1075) (2019).

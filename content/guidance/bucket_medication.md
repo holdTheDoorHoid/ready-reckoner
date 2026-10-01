@@ -20,11 +20,11 @@ citations: [rr_research_risk_model, redcross_survival_kit, florida_dem_medicatio
 [^medicare_drugs_disaster]: CMS / Medicare.gov, Getting drugs in a disaster or emergency (2026).
 [^healthcare_ready_refill_laws]: Healthcare Ready, A Review of State Emergency Prescription Protocols (2023).
 [^hhs_aspr_epap]: HHS Administration for Strategic Preparedness and Response, Emergency Prescription Assistance Program (EPAP) (2026).
-[^cdc_diabetes_emergencies]: CDC, Diabetes Care During Emergencies (2025).
+[^cdc_diabetes_emergencies]: Centers for Disease Control and Prevention, Diabetes Care During Emergencies (2025).
 [^aace_diabetes_emergency]: American Association of Clinical Endocrinology, Are You Prepared to Manage Your Diabetes in an Emergency? (2026).
 [^fda_insulin_emergency]: U.S. Food and Drug Administration, Information Regarding Insulin Storage and Switching Between Products in an Emergency (2017).
-[^cdc_insulin_emergency]: CDC, Managing Insulin in an Emergency (2025).
+[^cdc_insulin_emergency]: Centers for Disease Control and Prevention, Managing Insulin in an Emergency (2025).
 [^ready_gov_power_outages]: FEMA / Ready.gov, Power Outages (2026).
 [^ada_insulin_storage]: American Diabetes Association, Insulin Storage and Syringe Safety (2026).
 [^fda_expired_medicines]: U.S. Food and Drug Administration, Don't Be Tempted to Use Expired Medicines (2021).
-[^cdc_antibiotic_use]: CDC, Antibiotic Use: Be Antibiotics Aware (2025).
+[^cdc_antibiotic_use]: Centers for Disease Control and Prevention, Antibiotic Use: Be Antibiotics Aware (2025).

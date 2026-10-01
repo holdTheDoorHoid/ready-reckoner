@@ -14,9 +14,9 @@ citations: [fri_nuclear_risk_2024, ready_gov_nuclear, ready_gov_radiation, fema_
 ## Sources
 
 [^fri_nuclear_risk_2024]: Forecasting Research Institute, Can Humanity Achieve a Century of Nuclear Peace? (2024).
-[^ready_gov_nuclear]: FEMA / Ready.gov, Nuclear Explosion (2026).
+[^ready_gov_nuclear]: FEMA / Ready.gov (via Internet Archive), Nuclear Explosion (2022).
 [^ready_gov_radiation]: FEMA / Ready.gov, Radiation Emergencies (2026).
 [^fema_nuclear_sites]: FEMA, Operating Nuclear Power Plant Sites (with 10-mile and 50-mile planning zones) (2026).
-[^cdc_potassium_iodide]: CDC, Potassium Iodide (KI) (2025).
+[^cdc_potassium_iodide]: Centers for Disease Control and Prevention, Potassium Iodide (KI) (2025).
 [^nrc_potassium_iodide]: U.S. Nuclear Regulatory Commission, Consideration of Potassium Iodide in Emergency Planning (2025).
 [^rr_research_risk_model]: Ready Reckoner contributors, Quantitative core model specification (research report): hazards, consequence buckets, durations (2026).

@@ -15,11 +15,11 @@ citations: [census_pulse_displacement, ready_gov_evacuation, cdc_evacuation_psa,
 
 [^census_pulse_displacement]: U.S. Census Bureau data, reported by the National Low Income Housing Coalition, Household Pulse Survey: adults displaced by natural disasters (as reported by NLIHC) (2023).
 [^ready_gov_evacuation]: FEMA / Ready.gov, Evacuation (2026).
-[^cdc_evacuation_psa]: CDC, Be Prepared in Case You Need to Evacuate (PSA toolkit) (2025).
+[^cdc_evacuation_psa]: Centers for Disease Control and Prevention, Be Prepared in Case You Need to Evacuate (PSA toolkit) (2025).
 [^gollwitzer_sheeran_2006]: Gollwitzer P.M. and Sheeran P., Implementation Intentions and Goal Achievement: A Meta-analysis of Effects and Processes (Advances in Experimental Social Psychology 38:69–119) (2006).
 [^wood_2018_milling]: Wood M.M., Mileti D.S., Bean H., Liu B.F. et al., Milling and Public Warnings (Environment and Behavior 50(5):535–566) (2018).
 [^ready_gov_floods]: FEMA / Ready.gov, Floods (2026).
 [^nws_hurricane_safety_brochure]: NOAA National Weather Service, Hurricane Safety: What to do before, during and after a hurricane (brochure) (2010).
-[^ready_gov_hurricanes_2014]: FEMA / Ready.gov, Hurricanes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
+[^ready_gov_hurricanes_2014]: FEMA / Ready.gov (via Internet Archive), Hurricanes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
 [^noaa_spc_tornado_safety]: NOAA National Weather Service, Storm Prediction Center, Tornado Safety (The Online Tornado FAQ) (2026).
-[^ready_gov_tornadoes_2014]: FEMA / Ready.gov, Tornadoes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
+[^ready_gov_tornadoes_2014]: FEMA / Ready.gov (via Internet Archive), Tornadoes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).

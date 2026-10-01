@@ -17,7 +17,7 @@ Free actions come first in every plan, because they cost nothing and cover a lot
 [^ready_gov_alerts]: FEMA / Ready.gov, Emergency Alerts (2026).
 [^ready_gov_low_cost]: FEMA / Ready.gov, Low and No Cost Preparedness (2026).
 [^ready_gov_earthquakes]: FEMA / Ready.gov, Earthquakes (2026).
-[^cdc_water_storage]: CDC, How to Create an Emergency Water Supply (2025).
+[^cdc_water_storage]: Centers for Disease Control and Prevention, How to Create an Emergency Water Supply (2025).
 [^usfa_smoke_alarms]: U.S. Fire Administration, Smoke alarms (2026).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
 [^fema_effak]: FEMA and Operation HOPE, Emergency Financial First Aid Kit (FEMA P-1075) (2019).

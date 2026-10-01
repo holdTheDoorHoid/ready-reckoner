@@ -59,5 +59,5 @@ Officials tell you to stay inside because the outside air may be dangerous. Most
 [^cdc_shelter_in_place_chemical_2018]: Centers for Disease Control and Prevention (via Internet Archive), Chemical Agents: Facts About Sheltering in Place (2018).
 [^ready_gov_shelter]: FEMA / Ready.gov, Shelter (2026).
 [^ready_gov_chemical]: FEMA / Ready.gov, Chemicals and Hazardous Materials Incidents (2026).
-[^ready_gov_nuclear]: FEMA / Ready.gov, Nuclear Explosion (2026).
+[^ready_gov_nuclear]: FEMA / Ready.gov (via Internet Archive), Nuclear Explosion (2022).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).

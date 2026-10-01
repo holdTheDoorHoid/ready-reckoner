@@ -13,9 +13,9 @@ citations: [epa_boil_water_report_2024, shaffer_2026_texas_boil_notices, epa_eme
 
 ## Sources
 
-[^epa_boil_water_report_2024]: U.S. EPA, National Occurrence and Causes of Boil Water Advisories in the United States, Report to Congress (EPA 810-R-24-003) (2024).
+[^epa_boil_water_report_2024]: U.S. Environmental Protection Agency, National Occurrence and Causes of Boil Water Advisories in the United States, Report to Congress (EPA 810-R-24-003) (2024).
 [^shaffer_2026_texas_boil_notices]: Shaffer M., Awad N., Davenport F. and Fakhreddine S., Evaluating the Resilience of Drinking Water Systems to Severe Weather Events Using Boil Water Notices and Bottled Water Sales (Environmental Science and Technology 60(31):21648–21660) (2026).
-[^epa_emergency_disinfection]: U.S. EPA, Emergency Disinfection of Drinking Water (2026).
-[^cdc_co_basics]: CDC, Carbon Monoxide Poisoning Basics (2026).
-[^cdc_water_advisories]: CDC, Drinking Water Advisories: An Overview (2024).
-[^cdc_water_disinfection]: CDC, How to Make Water Safe in an Emergency (2024).
+[^epa_emergency_disinfection]: U.S. Environmental Protection Agency, Emergency Disinfection of Drinking Water (2026).
+[^cdc_co_basics]: Centers for Disease Control and Prevention, Carbon Monoxide Poisoning Basics (2026).
+[^cdc_water_advisories]: Centers for Disease Control and Prevention, Drinking Water Advisories: An Overview (2024).
+[^cdc_water_disinfection]: Centers for Disease Control and Prevention, How to Make Water Safe in an Emergency (2024).

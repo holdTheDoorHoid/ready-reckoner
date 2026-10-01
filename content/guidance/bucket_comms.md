@@ -21,6 +21,6 @@ citations: [ready_gov_earthquakes, ready_gov_alerts, ready_gov_kit, nws_weather_
 [^nws_weather_radio]: NOAA National Weather Service, NOAA Weather Radio All Hazards (2026).
 [^ready_gov_low_cost]: FEMA / Ready.gov, Low and No Cost Preparedness (2026).
 [^ready_gov_financial]: FEMA / Ready.gov, Financial Preparedness (2026).
-[^fcc_frs]: FCC, Family Radio Service (FRS) (2026).
-[^fcc_text_911]: FCC, What You Need to Know About Text-to-911 (2026).
+[^fcc_frs]: Federal Communications Commission, Family Radio Service (FRS) (2026).
+[^fcc_text_911]: Federal Communications Commission, What You Need to Know About Text-to-911 (2026).
 [^ollam_2022_lawyer_passport_locksmith_gun]: Deviant Ollam (video and slides), A Talk About Risk & Preparedness (SAINTCON 2022 keynote) (2022).

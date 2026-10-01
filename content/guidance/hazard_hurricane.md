@@ -15,10 +15,10 @@ citations: [ready_gov_hurricanes, noaa_hurdat2, epa_asheville_boil_notice_2024, 
 
 [^ready_gov_hurricanes]: FEMA / Ready.gov, Hurricanes (2026).
 [^noaa_hurdat2]: NOAA AOML Hurricane Research Division and National Hurricane Center, Continental United States Hurricane Impacts/Landfalls 1851–2025 (from HURDAT2; revised September 2026) (2026).
-[^epa_asheville_boil_notice_2024]: U.S. EPA, City of Asheville lifts systemwide boil water notice issued after Hurricane Helene (2024).
+[^epa_asheville_boil_notice_2024]: U.S. Environmental Protection Agency, City of Asheville lifts systemwide boil water notice issued after Hurricane Helene (2024).
 [^ready_gov_floods]: FEMA / Ready.gov, Floods (2026).
 [^hcfl_ev_safety]: Hillsborough County, Florida, Staying Safe with Electric Vehicles (hurricane season and flooding) (2025).
-[^cdc_co_basics]: CDC, Carbon Monoxide Poisoning Basics (2026).
+[^cdc_co_basics]: Centers for Disease Control and Prevention, Carbon Monoxide Poisoning Basics (2026).
 [^nws_hurricane_safety_brochure]: NOAA National Weather Service, Hurricane Safety: What to do before, during and after a hurricane (brochure) (2010).
-[^ready_gov_hurricanes_2014]: FEMA / Ready.gov, Hurricanes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
-[^fema_hurricane_safety_tips_2012]: FEMA, Hurricane safety tips: Learn what to do before, during and after a hurricane (news release, archived) (2012).
+[^ready_gov_hurricanes_2014]: FEMA / Ready.gov (via Internet Archive), Hurricanes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
+[^fema_hurricane_safety_tips_2012]: FEMA (via Internet Archive), Hurricane safety tips: Learn what to do before, during and after a hurricane (news release, archived) (2012).

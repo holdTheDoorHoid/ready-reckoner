@@ -55,6 +55,6 @@ Card payments, a bank, a pharmacy, a hospital or a utility stops working because
 
 [^ready_gov_financial]: FEMA / Ready.gov, Financial Preparedness (2026).
 [^ready_gov_cybersecurity]: FEMA / Ready.gov, Cybersecurity (2026).
-[^fda_drug_shortages_faq]: U.S. Food and Drug Administration, Frequently Asked Questions about Drug Shortages (2026).
+[^fda_drug_shortages_faq]: U.S. Food and Drug Administration, Frequently Asked Questions about Drug Shortages (2024).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
 [^cisa_secure_our_world]: Cybersecurity and Infrastructure Security Agency, Secure Our World (2026).

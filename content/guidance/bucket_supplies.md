@@ -13,7 +13,7 @@ citations: [cdc_mmwr_stay_at_home_2020, rr_research_risk_model, ready_gov_food, 
 
 ## Sources
 
-[^cdc_mmwr_stay_at_home_2020]: CDC, Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020 (MMWR 69(35)) (2020).
+[^cdc_mmwr_stay_at_home_2020]: Centers for Disease Control and Prevention, Timing of State and Territorial COVID-19 Stay-at-Home Orders and Changes in Population Movement, United States, March 1–May 31, 2020 (MMWR 69(35)) (2020).
 [^rr_research_risk_model]: Ready Reckoner contributors, Quantitative core model specification (research report): hazards, consequence buckets, durations (2026).
 [^ready_gov_food]: FEMA / Ready.gov, Food (2026).
 [^fsis_shelf_stable]: USDA Food Safety and Inspection Service, Shelf-Stable Food Safety (2024).

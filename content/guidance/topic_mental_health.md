@@ -17,8 +17,8 @@ Stress before, during and after a disaster is normal. In FEMA's 2024 survey, the
 
 [^fema_nhs_2024]: FEMA (via Internet Archive), 2024 National Household Survey on Disaster Preparedness: Findings (2025).
 [^gargano_2017_wtc_training]: Gargano L.M. et al., Previous emergency training and PTSD among World Trade Center evacuees (Journal of Emergency Management 15(5):275–284) (2017).
-[^samhsa_988]: SAMHSA, 988 Suicide and Crisis Lifeline (2026).
-[^samhsa_disaster_distress]: SAMHSA, Disaster Distress Helpline (2026).
+[^samhsa_988]: Substance Abuse and Mental Health Services Administration, 988 Suicide and Crisis Lifeline (2026).
+[^samhsa_disaster_distress]: Substance Abuse and Mental Health Services Administration, Disaster Distress Helpline (2026).
 [^rr_research_prior_art]: Ready Reckoner contributors, Prior art and behavioural science for a household preparedness planner (research report) (2026).
 [^oregon_2_weeks_ready]: Oregon Department of Emergency Management, 2 Weeks Ready (2026).
 [^aap_talking_to_children]: American Academy of Pediatrics (HealthyChildren.org), Talking to Children About Disasters (archived 2014 version) (2014).

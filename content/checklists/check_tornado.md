@@ -54,6 +54,6 @@ A tornado warning is issued for your area, or you see a funnel cloud or hear a r
 ## Sources
 
 [^ready_gov_tornadoes]: FEMA / Ready.gov, Tornadoes (2026).
-[^ready_gov_tornadoes_2014]: FEMA / Ready.gov, Tornadoes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
+[^ready_gov_tornadoes_2014]: FEMA / Ready.gov (via Internet Archive), Tornadoes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
 [^noaa_spc_tornado_safety]: NOAA National Weather Service, Storm Prediction Center, Tornado Safety (The Online Tornado FAQ) (2026).
 [^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).

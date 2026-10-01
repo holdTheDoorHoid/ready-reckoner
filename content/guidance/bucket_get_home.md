@@ -18,5 +18,5 @@ citations: [ready_gov_kit_2020, ready_gov_kit, fhwa_mutcd_walking_speed, cdc_nio
 [^fhwa_mutcd_walking_speed]: Federal Highway Administration, Manual on Uniform Traffic Control Devices (2009), section 4E.06: pedestrian walking speeds (2009).
 [^cdc_niosh_heat_hydration]: CDC National Institute for Occupational Safety and Health, Heat Stress: Recommendations (hydration) (2026).
 [^ready_gov_plan]: FEMA / Ready.gov, Make A Plan (2026).
-[^cdc_yellow_book_heat_cold]: CDC, CDC Yellow Book 2026: Heat and Cold Illness in Travelers (2025).
-[^cdc_winter_safety]: CDC, Safety Guidelines: During and After a Winter Storm (2026).
+[^cdc_yellow_book_heat_cold]: Centers for Disease Control and Prevention, CDC Yellow Book 2026: Heat and Cold Illness in Travelers (2025).
+[^cdc_winter_safety]: Centers for Disease Control and Prevention, Safety Guidelines: During and After a Winter Storm (2026).

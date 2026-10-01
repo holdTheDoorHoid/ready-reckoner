@@ -14,11 +14,11 @@ citations: [rr_research_risk_model, epa_boil_water_report_2024, ready_gov_kit, r
 ## Sources
 
 [^rr_research_risk_model]: Ready Reckoner contributors, Quantitative core model specification (research report): hazards, consequence buckets, durations (2026).
-[^epa_boil_water_report_2024]: U.S. EPA, National Occurrence and Causes of Boil Water Advisories in the United States, Report to Congress (EPA 810-R-24-003) (2024).
+[^epa_boil_water_report_2024]: U.S. Environmental Protection Agency, National Occurrence and Causes of Boil Water Advisories in the United States, Report to Congress (EPA 810-R-24-003) (2024).
 [^ready_gov_kit]: FEMA / Ready.gov, Build A Kit (2026).
 [^ready_gov_financial]: FEMA / Ready.gov, Financial Preparedness (2026).
 [^ready_gov_low_cost]: FEMA / Ready.gov, Low and No Cost Preparedness (2026).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).
 [^ready_gov_cybersecurity]: FEMA / Ready.gov, Cybersecurity (2026).
-[^cisa_secure_our_world]: CISA, Secure Our World (2026).
-[^cdc_water_advisories]: CDC, Drinking Water Advisories: An Overview (2024).
+[^cisa_secure_our_world]: Cybersecurity and Infrastructure Security Agency, Secure Our World (2026).
+[^cdc_water_advisories]: Centers for Disease Control and Prevention, Drinking Water Advisories: An Overview (2024).

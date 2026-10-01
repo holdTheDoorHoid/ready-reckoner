@@ -17,7 +17,7 @@ The easiest supplies to keep fresh are the ones you use. Store the foods your ho
 
 [^fsis_shelf_stable]: USDA Food Safety and Inspection Service, Shelf-Stable Food Safety (2024).
 [^church_home_storage_2007]: The Church of Jesus Christ of Latter-day Saints, All Is Safely Gathered In: Family Home Storage (2007).
-[^cdc_water_storage]: CDC, How to Create an Emergency Water Supply (2025).
+[^cdc_water_storage]: Centers for Disease Control and Prevention, How to Create an Emergency Water Supply (2025).
 [^usfa_smoke_alarms]: U.S. Fire Administration, Smoke alarms (2026).
 [^redcross_first_aid_kit]: American Red Cross, Anatomy of a First Aid Kit (2025).
 [^fema_effak]: FEMA and Operation HOPE, Emergency Financial First Aid Kit (FEMA P-1075) (2019).
