@@ -59,6 +59,76 @@ pub trait CountySource {
     fn resolve(&self, input: &LocationInput) -> Result<LocationResolved, EngineError> {
         location::resolve_with(self, input)
     }
+
+    /// The county's hospitals with emergency services, for the binder's Neighborhood page
+    /// (DESIGN-DELTA-v3 §4.2, §8): `None` while the list is not loaded (the `places` pack, loaded
+    /// when the binder is shown), so the page says nothing about it; `Some` with no rows for a
+    /// county the list has no hospital for, which the page says in one sentence. The default is
+    /// `None` (the sample counties carry no list).
+    fn county_hospitals(&self, fips: &str) -> Option<CountyHospitals> {
+        let _ = fips;
+        None
+    }
+}
+
+/// A county's hospitals with emergency services, as the binder prints them ([`CountySource`]).
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct CountyHospitals {
+    /// The hospitals, as the dataset lists them (name, city, phone), in the dataset's order.
+    pub rows: Vec<HospitalRow>,
+    /// When the dataset was released, when the pack records it.
+    pub released: Option<Date>,
+}
+
+/// One hospital with emergency services.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct HospitalRow {
+    /// Its name, as the dataset lists it.
+    pub name: String,
+    /// The city or town.
+    pub city: String,
+    /// Its telephone number, as the dataset lists it.
+    pub phone: String,
+}
+
+/// The pack file of the county hospital list (`rr-data`'s `places` pack).
+pub const HOSPITALS_FILE: &str = "places/hospitals.csv";
+
+/// The county hospital list of a loaded data store: `None` until [`HOSPITALS_FILE`] is loaded.
+/// The release date comes from the manifest's `hospitals` job ("released 2026-08-13" in a
+/// source's version, else its `released` definition, else the day the job ran).
+pub fn store_hospitals(store: &DataStore, fips: &str) -> Option<CountyHospitals> {
+    if !store.loaded().contains_key(HOSPITALS_FILE) {
+        return None;
+    }
+    let rows = store
+        .county_hospitals(fips)
+        .iter()
+        .map(|h| HospitalRow {
+            name: h.name.clone(),
+            city: h.city.clone(),
+            phone: h.phone.clone(),
+        })
+        .collect();
+    let released = store.manifest().and_then(|m| {
+        let job = m.jobs.get("hospitals")?;
+        job.sources
+            .iter()
+            .find_map(|s| date_after(&s.version, "released "))
+            .or_else(|| {
+                job.definitions
+                    .get("released")
+                    .and_then(|d| date_after(d, "released this dataset on "))
+            })
+            .or_else(|| Date::parse(job.finished.get(..10)?).ok())
+    });
+    Some(CountyHospitals { rows, released })
+}
+
+/// The ISO date that follows `marker` in `text`.
+fn date_after(text: &str, marker: &str) -> Option<Date> {
+    let at = text.find(marker)? + marker.len();
+    Date::parse(text.get(at..at + 10)?).ok()
 }
 
 /// One fixture county: the record and the resolved location, as in
@@ -372,14 +442,20 @@ impl CountySource for DataStore {
     fn resolve(&self, input: &LocationInput) -> Result<LocationResolved, EngineError> {
         DataStore::resolve(self, input)
     }
+
+    fn county_hospitals(&self, fips: &str) -> Option<CountyHospitals> {
+        store_hospitals(self, fips)
+    }
 }
 
-/// The packs [`load_data_dir`] loads: the core pack (every lookup the engine makes). The `geo`
-/// pack only draws the map.
-pub const DATA_DIR_PACKS: [&str; 1] = ["core"];
+/// The packs [`load_data_dir`] loads: the core pack (every lookup the engine makes) and the
+/// `places` pack (the county hospital list the binder's Neighborhood page prints; the web app
+/// loads it when the binder is shown). The `geo` pack only draws the map.
+pub const DATA_DIR_PACKS: [&str; 2] = ["core", "places"];
 
-/// Loads a data directory the way the web app loads the packs: `manifest.json` first, then every
-/// file of the core pack, each checked against its sha256. Native only.
+/// Loads a data directory the way the web app loads the packs for the binder: `manifest.json`
+/// first, then every file of the packs in [`DATA_DIR_PACKS`], each checked against its sha256.
+/// Native only.
 ///
 /// # Errors
 ///

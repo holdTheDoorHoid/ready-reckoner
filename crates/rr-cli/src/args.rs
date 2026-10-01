@@ -31,11 +31,11 @@ pub struct DataArgs {
     /// Use the built-in sample counties instead of a data pack.
     #[arg(long, global = true, conflicts_with = "data")]
     pub fixtures: bool,
-    /// Also load this optional pack (repeat for several), for example `places` (county
-    /// hospitals, read only by the binder). By default only the core pack is loaded, as the web
-    /// app does, so the CLI plans exactly as the site and the goldens do; `surge`, `wildfire_places`
-    /// and `outage_events` are core files now (DESIGN-DELTA-v3 §8) and load with the core pack
-    /// regardless.
+    /// Also load this optional pack (repeat for several). By default the core pack is loaded, as
+    /// the web app loads it to plan, and `rr plan` and `rr binder` also load `places` (the county
+    /// hospitals the binder's Neighborhood page lists), as the web app does when it shows the
+    /// binder and as the goldens are planned; `surge`, `wildfire_places` and `outage_events` are
+    /// core files now (DESIGN-DELTA-v3 §8) and load with the core pack regardless.
     #[arg(
         long = "optional",
         global = true,
@@ -46,6 +46,10 @@ pub struct DataArgs {
     /// Load every pack the manifest lists, optional ones included.
     #[arg(long, global = true, conflicts_with_all = ["optional", "fixtures"])]
     pub all_packs: bool,
+    /// Set by the commands that print the binder: load the `places` pack too when the manifest
+    /// lists it ([`DataArgs::with_binder_packs`]).
+    #[arg(skip)]
+    pub binder: bool,
 }
 
 impl DataArgs {
@@ -61,10 +65,26 @@ impl DataArgs {
         } else {
             Packs::Core {
                 optional: self.optional.clone(),
+                binder: self.binder,
             }
         }
     }
 }
+
+impl DataArgs {
+    /// The same choice with the `places` pack added, for the commands that print the binder (a
+    /// manifest without it simply has none to load).
+    pub fn with_binder_packs(&self) -> DataArgs {
+        let mut d = self.clone();
+        if !d.all_packs && !d.optional.iter().any(|p| p == BINDER_PACK) {
+            d.binder = true;
+        }
+        d
+    }
+}
+
+/// The optional pack the binder reads (county hospitals).
+pub const BINDER_PACK: &str = "places";
 
 /// Which packs of a data directory to load.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -73,6 +93,8 @@ pub enum Packs {
     Core {
         /// Optional packs by manifest name (`places`, for county hospitals).
         optional: Vec<String>,
+        /// Also the binder's pack ([`BINDER_PACK`]), when the manifest lists it.
+        binder: bool,
     },
     /// Every pack the manifest lists (for `rr data verify` and `rr data info`).
     All,
@@ -81,8 +103,10 @@ pub enum Packs {
 /// The commands.
 #[derive(Debug, Subcommand)]
 pub enum Command {
-    /// Print the packet (Markdown) and/or the whole plan (PlanOutput JSON) for a household.
+    /// Print the binder and the Prepare sheet (Markdown) and/or the whole plan (PlanOutput JSON).
     Plan(PlanArgs),
+    /// Print the binder only: Markdown, or the Binder as JSON.
+    Binder(BinderArgs),
     /// Print the risk register: ranked hazards and the rare-but-severe box, with sources.
     Risks(HouseholdArgs),
     /// Print how long to be ready for each need, with ranges and when help arrives.
@@ -105,7 +129,7 @@ pub enum Command {
         #[command(subcommand)]
         command: DataCommand,
     },
-    /// Compare the golden packets in fixtures/golden with the engine (--update rewrites them).
+    /// Compare the golden binders in fixtures/golden with the engine (--update rewrites them).
     Golden(GoldenArgs),
     /// Run every fixture household: timing, warnings, uncited items and determinism.
     Doctor(DoctorArgs),
@@ -148,7 +172,8 @@ pub struct PlanArgs {
     /// The household and dials.
     #[command(flatten)]
     pub household: HouseholdArgs,
-    /// What to print: the packet, the PlanOutput JSON, or both (both needs --out).
+    /// What to print: the binder and the Prepare sheet, the PlanOutput JSON, or both (both needs
+    /// --out).
     #[arg(long, value_enum, default_value_t = Format::Md)]
     pub format: Format,
     /// Write `<name>.md` and/or `<name>.json` into this directory instead of printing.
@@ -156,10 +181,21 @@ pub struct PlanArgs {
     pub out: Option<PathBuf>,
 }
 
+/// `rr binder`.
+#[derive(Debug, Clone, Args)]
+pub struct BinderArgs {
+    /// The household and dials.
+    #[command(flatten)]
+    pub household: HouseholdArgs,
+    /// Print the Binder as JSON (`PlanOutput.binder`) instead of Markdown.
+    #[arg(long)]
+    pub json: bool,
+}
+
 /// What `rr plan` prints.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
 pub enum Format {
-    /// The printable packet (Markdown).
+    /// The binder, a rule, then the Prepare sheet (Markdown).
     Md,
     /// The whole PlanOutput (JSON, the bytes the goldens hold).
     Json,

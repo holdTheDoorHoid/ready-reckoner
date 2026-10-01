@@ -1,8 +1,7 @@
-//! `rr plan`: the printable packet (Markdown) and/or the whole PlanOutput (JSON). The Markdown is
-//! `PlanOutput::prepare_markdown` (contract v3), which until the binder workstream lands is the v2
-//! packet unchanged; the binder workstream decides what `rr plan` prints then. The JSON is
-//! written with `rr_plan::to_json`, so for a fixture household on the fixture counties it is the
-//! same bytes as `fixtures/golden/<name>.json`.
+//! `rr plan`: the binder and the Prepare sheet (Markdown: the binder, a rule, then the Prepare
+//! sheet, as `fixtures/golden/<name>.md` holds them) and/or the whole PlanOutput (JSON, written
+//! with `rr_plan::to_json`, so for a fixture household on the repository's packs it is the same
+//! bytes as `fixtures/golden/<name>.json`). `rr binder` prints the binder alone.
 
 use rr_plan::Engine;
 
@@ -20,7 +19,7 @@ use crate::source::Source;
 pub fn run(engine: &Engine<Source>, args: &PlanArgs) -> Result<Output, CliError> {
     if args.format == Format::Both && args.out.is_none() {
         return Err(CliError::input(
-            "--format both writes two files, the packet and the JSON: add --out <dir>.",
+            "--format both writes two files, the Markdown and the JSON: add --out <dir>.",
         ));
     }
     let h = household::load(&args.household)?;
@@ -31,7 +30,7 @@ pub fn run(engine: &Engine<Source>, args: &PlanArgs) -> Result<Output, CliError>
         notes: household::scenario_notes(&h, &output.scenarios, &super::place(&output.location)),
         ..Output::default()
     };
-    let md = || output.prepare_markdown.clone();
+    let md = || rr_plan::binder::markdown::with_prepare(&output.binder, &output.prepare_markdown);
     let json = || rr_plan::to_json(&output);
     match &args.out {
         None => {

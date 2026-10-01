@@ -164,6 +164,39 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push(String::new());
 }
 
+/// The first check, test or rotation of a catalogue item that enters the plan in plan month
+/// `month` (0 for something the household already has), as the calendar dates it: "Check by
+/// March 1, 2027", "Test every 3 months", "Use and restock by June 1, 2027". `None` when the item
+/// needs no upkeep.
+pub(crate) fn next_due(start: Date, item: &rr_types::Item, month: u16) -> Option<String> {
+    let test = item.test_interval_months.filter(|n| *n > 0);
+    let (check, rotate) = item
+        .maintenance
+        .map_or((None, None), |m| (m.check_months, m.rotate_months));
+    let check = check.filter(|c| Some(*c) != test);
+    let check = match (check, rotate, test, item.season) {
+        (None, None, None, Some(_)) => Some(12),
+        _ => check,
+    };
+    // The soonest of the three.
+    let (every, verb) = [
+        (check, "Check"),
+        (test, "Test"),
+        (rotate, "Use and restock"),
+    ]
+    .into_iter()
+    .filter_map(|(n, v)| n.filter(|n| *n > 0).map(|n| (n, v)))
+    .min_by_key(|(n, _)| *n)?;
+    if every <= REPEATING_MAX_MONTHS && item.season.is_none() {
+        return Some(format!("{verb} every {}", every_phrase(every)));
+    }
+    let due = match item.season {
+        Some(s) => next_season_start(text::month_start(start, month), s),
+        None => text::month_start(start, month + every),
+    };
+    Some(format!("{verb} by {}", text::date(due)))
+}
+
 fn every_phrase(months: u16) -> String {
     match months {
         1 => "month".to_owned(),

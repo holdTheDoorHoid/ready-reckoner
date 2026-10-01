@@ -1,6 +1,7 @@
 //! The commands, and what they share: the engine on the chosen source, the header naming the
 //! household, the place and the dial, and the sources legend.
 
+pub mod binder;
 pub mod catalogue;
 pub mod citations;
 pub mod county;
@@ -31,7 +32,8 @@ use crate::source::{self, Source};
 /// Whatever the command reports; see [`CliError`].
 pub fn run(cli: &Cli) -> Result<Output, CliError> {
     match &cli.command {
-        Command::Plan(a) => with_engine(&cli.data, |e| plan::run(e, a)),
+        Command::Plan(a) => with_engine(&cli.data.with_binder_packs(), |e| plan::run(e, a)),
+        Command::Binder(a) => with_engine(&cli.data.with_binder_packs(), |e| binder::run(e, a)),
         Command::Risks(a) => with_engine(&cli.data, |e| risks::run(e, a)),
         Command::Targets(a) => with_engine(&cli.data, |e| targets::run(e, a)),
         Command::Explain(a) => with_engine(&cli.data, |e| explain::run(e, a)),

@@ -4821,3 +4821,46 @@ url = "https://www.fda.gov/consumers/consumer-updates/infant-formula-safety-dos-
 retrieved = "2026-09-27"
 quote = "The FDA advises parents and caregivers to not make or feed homemade infant formula to infants."
 license = "US Government Work (public domain)"
+
+# added by binder (2026-10-01): the Poison Control number on the binder's Contacts at a glance
+# page. Read in the Internet Archive's capture of 2026-09-29 (the live site refuses automated
+# requests); the page was last updated December 11, 2024. Its description says the toll-free line
+# connects you to your local poison center, any time, anywhere in the United States and many
+# territories.
+[[citation]]
+id = "hrsa_poison_help"
+title = "Poison Help"
+publisher = "Health Resources and Services Administration (HRSA)"
+year = 2024
+url = "https://poisonhelp.hrsa.gov/"
+retrieved = "2026-10-01"
+quote = "The Poison Help line is a toll-free line (1-800-222-1222) that connects you to your local poison center."
+license = "US Government Work (public domain)"
+
+# added by binder (2026-10-01): the county hospital table on the binder's Neighborhood page
+# (data3's `places/hospitals.csv`, hospitals with emergency services only). Read in CMS's own
+# catalogue entry for the dataset (metastore id xubh-q36u), released 2026-08-13.
+[[citation]]
+id = "cms_hospital_general_information"
+title = "Hospital General Information"
+publisher = "Centers for Medicare & Medicaid Services (CMS)"
+year = 2026
+url = "https://data.cms.gov/provider-data/dataset/xubh-q36u"
+retrieved = "2026-10-01"
+quote = "A list of all hospitals that have been registered with Medicare. The list includes addresses, phone numbers, hospital type, and overall hospital rating."
+license = "US Government Work (public domain)"
+
+# added by binder (2026-10-01): the binder's "How to use this binder" and Quick start pages.
+# Read on the page itself: make a plan with your household and practice it; two meeting places,
+# one right outside the home for a sudden emergency such as a fire and one outside the
+# neighborhood; an out-of-area contact, since texting or calling long distance may work when local
+# lines are overloaded; everyone carries the contact information in writing and on their phone;
+# practice evacuating your home twice a year.
+[[citation]]
+id = "redcross_make_a_plan"
+title = "Make a Plan"
+publisher = "American Red Cross"
+year = 2026
+url = "https://www.redcross.org/get-help/how-to-prepare-for-emergencies/make-a-plan.html"
+retrieved = "2026-10-01"
+license = "All rights reserved (paraphrased, not quoted)"

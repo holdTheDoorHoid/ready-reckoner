@@ -1,8 +1,6 @@
-//! The packet v2 pages that are guidance blocks in their own right (DESIGN-DELTA §3, review N1,
-//! N2, N3, N6): the shelter plan (`plan:shelter`), the list for the 48 hours before a forecast
-//! storm (`plan:forecast_48h`), access and functional needs (`topic:access_needs`, CMIST) when
-//! anyone in the household has one, the household's state row from the registries table, "After
-//! a disaster: the first 30 days" (`after:first_30_days`) with the county's declarations, and the
+//! The v2 packet pages the binder still prints from their guidance blocks: access and functional
+//! needs (`topic:access_needs`, CMIST) when anyone in the household has one, "After a disaster:
+//! the first 30 days" (`after:first_30_days`) with the county's declarations, and the
 //! long-horizon section ("If it lasts for months", `topic:long_horizon`) when the plan has one.
 //! Each block's conditional spans are kept or dropped for this household; the text is the
 //! block's, and the code only joins it with the household's own facts.
@@ -28,32 +26,6 @@ fn push_paragraphs(out: &mut Vec<String>, paras: Vec<String>) {
     }
 }
 
-/// `## Your shelter plan`: where to shelter from each danger that is likely enough here.
-pub(super) fn shelter(cx: &Ctx<'_>, out: &mut Vec<String>) {
-    out.push("## Your shelter plan".to_owned());
-    out.push(String::new());
-    push_paragraphs(out, block_paragraphs(cx, "plan:shelter"));
-}
-
-/// `## When a storm, freeze or heat wave is forecast`: the 48-hour list (practitioner P-08). The
-/// freeze and heat-wave steps print where those hazards are likely enough to list (a ten-year
-/// chance of 1 in 100, as the block's own hazard spans would keep them): no freeze steps in
-/// Puerto Rico.
-pub(super) fn forecast(cx: &Ctx<'_>, out: &mut Vec<String>) {
-    out.push("## When a storm, freeze or heat wave is forecast".to_owned());
-    out.push(String::new());
-    let freeze = ["cold_wave", "winter_weather", "ice_storm"]
-        .iter()
-        .any(|h| cx.hazard_relevant(h));
-    let heat = cx.hazard_relevant("heat_wave");
-    let paras: Vec<String> = block_paragraphs(cx, "plan:forecast_48h")
-        .into_iter()
-        .filter(|p| freeze || !p.starts_with("**Before a hard freeze."))
-        .filter(|p| heat || !p.starts_with("**Before a heat wave."))
-        .collect();
-    push_paragraphs(out, paras);
-}
-
 /// An access or functional need in words, for "person 3 (older adult): …".
 fn need_words(n: AccessNeed) -> &'static str {
     match n {
@@ -69,7 +41,7 @@ fn need_words(n: AccessNeed) -> &'static str {
 }
 
 /// `## Access and functional needs` (CMIST; review RR-P08), only when someone has one.
-pub(super) fn access_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
+pub(crate) fn access_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
     let people = &cx.a.input.people;
     let who: Vec<String> = people
         .iter()
@@ -82,9 +54,8 @@ pub(super) fn access_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
                 .map(|n| need_words(*n).to_owned())
                 .collect();
             format!(
-                "person {} ({}): {}",
-                i + 1,
-                super::text::lower_first(age_word(p.age_band)),
+                "{}: {}",
+                crate::binder::person_title(i, p),
                 text::join_and(&needs)
             )
         })
@@ -99,77 +70,9 @@ pub(super) fn access_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
     push_paragraphs(out, block_paragraphs(cx, "topic:access_needs"));
 }
 
-fn age_word(b: rr_types::AgeBand) -> &'static str {
-    match b {
-        rr_types::AgeBand::Infant => "baby",
-        rr_types::AgeBand::Toddler => "toddler",
-        rr_types::AgeBand::Child => "child",
-        rr_types::AgeBand::Teen => "teenager",
-        rr_types::AgeBand::Adult => "adult",
-        rr_types::AgeBand::Senior => "older adult",
-    }
-}
-
-/// Escapes text for Markdown but leaves web addresses as they are, so the app can link them.
-fn md_keep_urls(s: &str) -> String {
-    let mut out = String::with_capacity(s.len() + 8);
-    let mut rest = s;
-    while let Some(start) = rest.find("http") {
-        out.push_str(&md(&rest[..start]));
-        let url = &rest[start..];
-        let end = url
-            .char_indices()
-            .find(|(_, c)| c.is_whitespace() || *c == ')')
-            .map_or(url.len(), |(i, _)| i);
-        // A sentence's full stop after the address is not part of it.
-        let end = if url[..end].ends_with('.') {
-            end - 1
-        } else {
-            end
-        };
-        out.push_str(&url[..end]);
-        rest = &url[end..];
-    }
-    out.push_str(&md(rest));
-    out
-}
-
-/// `## Local help`: the household's state row from the registries table (evacuation zones, the
-/// registry for people who may need help, alerts, emergency prescription refills;
-/// `docs/CONTENT_STANDARDS.md` §10).
-pub(super) fn local_help(cx: &Ctx<'_>, out: &mut Vec<String>) {
-    let loc = &cx.a.location;
-    out.push("## Local help".to_owned());
-    out.push(String::new());
-    let Some(row) = cx.content.states.row(&loc.state_abbr) else {
-        out.push(
-            "Your county emergency management office can tell you your evacuation zone, any \
-             registry for people who may need help, and how to get local alerts."
-                .to_owned(),
-        );
-        out.push(String::new());
-        return;
-    };
-    out.push(format!(
-        "Where to start in {}, checked {}:",
-        md(&row.name),
-        text::date(row.checked)
-    ));
-    out.push(String::new());
-    for l in row.lines() {
-        out.push(format!(
-            "- **{}:** {}{}",
-            md(l.topic),
-            md_keep_urls(&l.text),
-            cite_all(&l.sources)
-        ));
-    }
-    out.push(String::new());
-}
-
 /// `## After a disaster: the first 30 days` (review RR-P06), with the county's federal disaster
 /// declarations in the last five years (`PlanOutput::recovery`).
-pub(super) fn after_disaster(cx: &Ctx<'_>, out: &mut Vec<String>) {
+pub(crate) fn after_disaster(cx: &Ctx<'_>, out: &mut Vec<String>) {
     out.push("## After a disaster: the first 30 days".to_owned());
     out.push(String::new());
     if let Some(n) = cx.a.county.declarations.as_ref().map(|d| d.last_5yr) {
@@ -207,7 +110,7 @@ pub(crate) fn recovery_info(county: &rr_types::CountyRecord) -> rr_types::Recove
 /// cut of two or three months is here (the consequence model's `multi_month`, from the household's
 /// own power curve, ranges only), and the block's pointers. Only when the plan has the section
 /// (`Plan::long_horizon`).
-pub(super) fn long_horizon(cx: &Ctx<'_>, out: &mut Vec<String>) {
+pub(crate) fn long_horizon(cx: &Ctx<'_>, out: &mut Vec<String>) {
     let items = &cx.a.budget.plan.long_horizon;
     if items.is_empty() {
         return;

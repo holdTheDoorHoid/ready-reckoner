@@ -1,9 +1,10 @@
-//! Ready Reckoner — `rr-plan`: the engine pipeline, [`PlanOutput`], `explain`, and the printable
-//! packet (DESIGN §4.8, §5, §9; `docs/ENGINE-API.md`).
+//! Ready Reckoner — `rr-plan`: the engine pipeline, [`PlanOutput`], `explain`, the binder and the
+//! Prepare sheet (DESIGN §4.8, §5; DESIGN-DELTA-v3 §4, §5; `docs/ENGINE-API.md`).
 //!
 //! ```text
 //! PlanInput ─► location ─► rr-hazards ─► rr-consequence ─► rr-supply ─► rr-budget ─► PlanOutput
-//!                (source)   (rates)       (targets)          (lines)       (plan)       + packet
+//!                (source)   (rates)       (targets)          (lines)       (plan)       + binder
+//!                                                                                      + Prepare sheet
 //! ```
 //!
 //! [`Engine`] owns a county data source ([`CountySource`]: `rr-data`'s `DataStore` with the data
@@ -20,7 +21,8 @@
 //! - the final bucket assessments (the plan's coverage, and `tier_enough` from `rr-supply`);
 //! - one list of warnings (the consequence crate's cliff warnings are kept, the budget crate's
 //!   duplicates dropped);
-//! - the provenance list and the packet ([`packet`], `docs/PACKET.md`).
+//! - the provenance list, the during-event binder ([`binder`], DESIGN-DELTA-v3 §4, §5) and the
+//!   Prepare sheet ([`packet`]).
 //!
 //! Deterministic: no clock (the planning date is an input), no randomness, no hash-map iteration;
 //! the same input gives byte-identical output on every target ([`to_json`] writes it; the output
@@ -28,6 +30,7 @@
 #![forbid(unsafe_code)]
 #![cfg_attr(not(test), deny(missing_docs))]
 
+pub mod binder;
 pub mod coverage;
 pub mod explain;
 // Reads the repository's data packs from disk (`Engine::with_data_dir`): native builds only.
@@ -47,7 +50,7 @@ use rr_types::{
 };
 
 pub use pipeline::Assessment;
-pub use source::{CountySource, FixtureSource};
+pub use source::{CountyHospitals, CountySource, FixtureSource, HospitalRow};
 
 /// Crate name, used by the CLI's `--version` and by the about screen.
 pub const CRATE: &str = "rr-plan";
@@ -184,26 +187,48 @@ impl<S: CountySource> Engine<S> {
     }
 
     /// The [`PlanOutput`] for an assessment: provenance, warnings, the binder and the Prepare
-    /// sheet.
+    /// sheet. The provenance list starts with the binder's sources in the order the binder first
+    /// cites them (so a binder `cite` n is `provenance[n - 1]`), then the Prepare sheet's own,
+    /// then every other id the output refers to, sorted.
     pub fn output(&self, a: &Assessment) -> PlanOutput {
+        let data_pack_version = self
+            .store
+            .pack_version()
+            .unwrap_or_else(|| NO_DATA_PACK.to_owned());
+        let hospitals = self.store.county_hospitals(&a.location.county_fips);
+        let draft = binder::draft(
+            a,
+            self.content,
+            binder::Extras {
+                hospitals: hospitals.as_ref(),
+                engine_version: ENGINE_VERSION,
+                data_pack_version: &data_pack_version,
+                content_version: rr_content::CONTENT_VERSION,
+            },
+        );
         let marked = packet::render(a, self.content);
-        let first = packet::cited_ids(&marked);
+        let binder_ids = draft.cited();
+        let prepare_ids = packet::cited_ids(&marked);
+        let first: Vec<rr_types::CitationId> = binder_ids
+            .iter()
+            .chain(prepare_ids.iter().filter(|id| !binder_ids.contains(id)))
+            .cloned()
+            .collect();
         let rest = provenance::output_ids(a, self.content);
         let order = provenance::order(&first, &rest);
         let (citations, unknown) = provenance::resolve(&order, self.content);
         let mut warnings = a.warnings.clone();
         warnings.extend(provenance::missing_warning(&unknown));
-        // Until the binder workstream lands, the Prepare sheet is the whole v2 packet and the
-        // binder a transitional one built from it (DESIGN-DELTA-v3 §4, §11).
-        let prepare_markdown = packet::finish(&marked, a, &citations);
-        let binder = packet::shim::binder(&prepare_markdown, a, self.content, &citations);
+        let binder = draft.finish(&citations);
+        let prepare_sources: Vec<rr_types::Citation> = prepare_ids
+            .iter()
+            .filter_map(|id| citations.iter().find(|c| c.id == *id).cloned())
+            .collect();
+        let prepare_markdown = packet::finish(&marked, a, &prepare_sources);
         PlanOutput {
             engine_version: ENGINE_VERSION.to_owned(),
             api_version: rr_types::ENGINE_API_VERSION,
-            data_pack_version: self
-                .store
-                .pack_version()
-                .unwrap_or_else(|| NO_DATA_PACK.to_owned()),
+            data_pack_version,
             content_version: rr_content::CONTENT_VERSION.to_owned(),
             location: a.location.clone(),
             register: a.hazards.profiles.clone(),

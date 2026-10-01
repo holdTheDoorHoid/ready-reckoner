@@ -1,7 +1,7 @@
-//! Golden files: `fixtures/golden/<fixture>.md` (the Markdown: until the binder workstream
-//! lands, `PlanOutput::prepare_markdown`, which is the v2 packet) and `.json` (the whole
+//! Golden files: `fixtures/golden/<fixture>.md` (the binder's Markdown, a rule, then the Prepare
+//! sheet: [`crate::binder::markdown::with_prepare`]) and `.json` (the whole
 //! [`rr_types::PlanOutput`]) for every fixture household, planned against the repository's data
-//! packs (`data/`). [`compare_all`] is what the tests (and `rr golden`) run; [`write_all`]
+//! packs (`data/`: the core pack and the `places` pack, as the web app plans the binder). [`compare_all`] is what the tests (and `rr golden`) run; [`write_all`]
 //! regenerates them when `RR_UPDATE_GOLDENS=1`. A change to a golden must be explained in the
 //! commit message (CLAUDE.md).
 
@@ -17,8 +17,7 @@ pub const UPDATE_ENV: &str = "RR_UPDATE_GOLDENS";
 pub struct Golden {
     /// The fixture's name (file stem).
     pub name: String,
-    /// The Markdown golden (until the binder workstream lands: the Prepare sheet, which is the
-    /// v2 packet).
+    /// The Markdown golden: the binder, a rule, then the Prepare sheet.
     pub markdown: String,
     /// The PlanOutput as sorted JSON.
     pub json: String,
@@ -46,7 +45,10 @@ pub fn render_all() -> Result<Vec<Golden>, String> {
         let output = engine.assess(&input).map_err(|e| format!("{name}: {e}"))?;
         out.push(Golden {
             name: name.to_owned(),
-            markdown: output.prepare_markdown.clone(),
+            markdown: crate::binder::markdown::with_prepare(
+                &output.binder,
+                &output.prepare_markdown,
+            ),
             json: to_json(&output),
         });
     }

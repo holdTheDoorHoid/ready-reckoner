@@ -1,13 +1,13 @@
-//! Documents and money (the Emergency Financial First Aid Kit, the plan's decisions with the
-//! household's own insurance lines, cash, savings, and what a damaged home costs) and special
-//! needs (medicine, powered devices, babies, older adults, mobility, pregnancy, animals, stress
-//! and mental health). Advice comes from the catalogue (free steps, decision items), the
-//! requirement lines and the mental-health topic block. The family plan is `family.rs`.
+//! Documents and money for the Prepare sheet (the plan's decisions with the household's own
+//! insurance lines, and the savings goal), and the body of the binder's "Special needs and
+//! health" page (medicine, powered devices, babies, older adults, getting around, pregnancy, and
+//! stress, mental health and the 988 line). Advice comes from the catalogue (free steps,
+//! decision items), the requirement lines and the mental-health topic block.
 
 use rr_types::{AgeBand, Mobility, PoweredDevice};
 
 use super::text::{self, md};
-use super::{Ctx, cite, cite_all};
+use super::{Ctx, cite_all};
 
 /// Advice paragraphs for catalogue items offered to this household, in the order given.
 fn advice(cx: &Ctx<'_>, ids: &[&str], out: &mut Vec<String>) -> usize {
@@ -73,30 +73,14 @@ fn decision_name(name: &str) -> String {
     text::lower_first(name.strip_prefix("Decide: ").unwrap_or(name))
 }
 
-pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
+/// "Documents and money: decisions and savings" on the Prepare sheet: each insurance and ID
+/// decision with the allocator's reason (home repairs on one line), the insurance lines with no
+/// decision left, and the savings goal with its first step. The four-part kit, the cash and what
+/// a damaged home costs are the binder's Documents and money page.
+pub(super) fn decisions_and_savings(cx: &Ctx<'_>, out: &mut Vec<String>) {
     let a = cx.a;
-    out.push("## Documents and money".to_owned());
+    out.push("## Documents and money: decisions and savings".to_owned());
     out.push(String::new());
-    out.push(format!(
-        "Keep paper copies in a waterproof pouch and photos you can reach from any phone. FEMA's \
-         Emergency Financial First Aid Kit groups them in four parts.{}",
-        cite("fema_effak")
-    ));
-    out.push(String::new());
-    for part in [
-        "**Who you are:** photo IDs, birth certificates, Social Security cards, passports, and \
-         pet records.",
-        "**Money and legal papers:** insurance policies, the lease or deed, a will and powers of \
-         attorney, bank and card contact numbers (not PINs), and recent tax returns.",
-        "**Medical papers:** insurance cards, the written medicine list, prescriptions, and \
-         vaccination records.",
-        "**Contacts:** family, doctors, the insurance agent, the landlord or lender, and \
-         employers.",
-    ] {
-        out.push(format!("- [ ] {part}"));
-    }
-    out.push(String::new());
-
     // The plan's decisions (insurance, ID for every person, home repairs; `PlanItem::decision`):
     // an insurance decision says it in the household's own words (its requirement line), the
     // others in the catalogue's.
@@ -173,10 +157,6 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(String::new());
     }
 
-    out.push("### Cash".to_owned());
-    out.push(String::new());
-    lines(cx, &["cash_reserve_usd"], out);
-
     out.push("### Savings".to_owned());
     out.push(String::new());
     match &a.budget.plan.savings_track {
@@ -203,27 +183,14 @@ pub(super) fn documents(cx: &Ctx<'_>, out: &mut Vec<String>) {
         ));
         out.push(String::new());
     }
-
-    // If damage forced the household out: how long, and what living elsewhere costs (the
-    // consequence model's home-loss line, model review M-08).
-    let home = a.bucket(rr_types::BucketId::HomeLoss);
-    if let Some(sentence) = home
-        .frequency_sentences
-        .iter()
-        .find(|s| s.starts_with("If damage forced you out"))
-    {
-        out.push("### If damage forces you out".to_owned());
-        out.push(String::new());
-        out.push(format!("{}{}", md(sentence), cite_all(&home.sources)));
-        out.push(String::new());
-    }
 }
 
-pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
+/// The body of the binder's "Special needs and health" page, as Markdown with markers: each part
+/// only when the household needs it (the pets' lines are on the Pets page), then "Stress, mental
+/// health and the 988 line", always.
+pub(crate) fn special_needs_body(cx: &Ctx<'_>, out: &mut Vec<String>) {
     let a = cx.a;
     let people = &a.input.people;
-    out.push("## Special needs".to_owned());
-    out.push(String::new());
     let mut any = false;
 
     let rx = people
@@ -320,17 +287,8 @@ pub(super) fn special_needs(cx: &Ctx<'_>, out: &mut Vec<String>) {
         out.push(String::new());
         advice(cx, &["special_pregnancy_plan"], out);
     }
-    let pets = &a.input.pets;
-    if pets.dogs + pets.cats + pets.small + pets.large_animals > 0 {
-        any = true;
-        out.push("### Pets and animals".to_owned());
-        out.push(String::new());
-        // The go-kit's water and food are staged from household stock, so they are listed with
-        // the carrier they are packed in.
-        // The go-kit's water and food come from household stock (the carrier's line says so;
-        // the staging steps are in the plan by name).
-        lines(cx, &["pet_food_lb", "pet_carrier", "livestock_water"], out);
-    }
+    // The binder adds the access-and-functional-needs part (CMIST) when someone has a need.
+    any |= people.iter().any(|p| !p.access_needs.is_empty());
     if !any {
         out.push(
             "Nobody in the household listed medical or access needs. Keep a written medicine \

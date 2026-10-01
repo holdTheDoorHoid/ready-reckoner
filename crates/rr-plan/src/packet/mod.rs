@@ -1,41 +1,38 @@
-//! The printable packet (DESIGN §9): Markdown assembled from the plan's numbers and the content
-//! guidance blocks, with the household's own numbers substituted. See `docs/PACKET.md` for the
-//! sections, what feeds each, and the placeholders.
+//! The Prepare sheet (DESIGN-DELTA-v3 §4: `PlanOutput::prepare_markdown`) and the v2 packet's
+//! writers the binder still uses. The Prepare sheet is the v2 packet's preparation content,
+//! unchanged in substance: the summary's step reached and the plan's two done months with the
+//! basics it assumes, "Your plan" (the budget, the free steps and the safety rules to learn now,
+//! this month and next), the checklists of purchases by step, the decisions and savings of
+//! "Documents and money", and the maintenance calendar, with its own numbered Sources at the end.
+//! The during-event material is the binder's (`crate::binder`).
 //!
-//! Contract v3 (DESIGN-DELTA-v3 §4): until the binder workstream lands, this v2 packet is
-//! `PlanOutput.prepare_markdown`, unchanged, and [`shim`] builds a transitional
-//! `PlanOutput.binder` from it.
-//!
-//! Citations are written as markers while the packet is assembled; once the provenance list is
-//! known they become numbers that point into the packet's numbered Sources section ("[3]",
-//! "[3, 7]"), so the packet reads the same on paper as on screen.
+//! Citations are written as markers while a document is assembled; once the order of first use is
+//! known they become numbers that point into its numbered Sources ("[3]", "[3, 7]"), so it reads
+//! the same on paper as on screen.
 
-mod calendar;
+pub(crate) mod calendar;
 mod checklists;
-mod family;
-mod pages;
-mod people;
+pub(crate) mod pages;
+pub(crate) mod people;
 mod plan;
-mod risks;
+pub(crate) mod risks;
 mod safety;
-// transitional: replaced by the binder workstream (DESIGN-DELTA-v3 §4, §11).
-pub mod shim;
-mod sources;
-mod summary;
-mod targets;
+pub(crate) mod sources;
+pub(crate) mod summary;
+pub(crate) mod targets;
 pub(crate) mod text;
 
-pub use family::{NB_HYPHEN, WALLET_CARDS_HEADING};
 pub(crate) use pages::recovery_info;
 pub use plan::DETAIL_MONTHS;
-pub use risks::{
-    CARD_MIN_P10, CARDS as HAZARD_CARDS, FAST_HAZARDS, FREQUENT_CARDS, LIFE_SAFETY_MIN_P10, MINOR,
-    SEVERE, WIND_HAZARDS, family_block_prints,
-};
+pub use risks::CARD_MIN_P10;
 pub use safety::{SAFETY_RULES, SafetyRule};
 pub use summary::{LEAVE_FIRST_FAST_HAZARDS, LEAVE_FIRST_P10, LEAVE_FIRST_SCENARIOS};
 pub use targets::{COPE_SENTENCE, dial_sentence};
 pub(crate) use targets::{RecordSpan, relief_fallback};
+
+/// A non-breaking hyphen (U+2011): phone numbers on the wallet cards use it so a number never
+/// breaks across two lines of a card.
+pub const NB_HYPHEN: char = '\u{2011}';
 
 use std::collections::BTreeMap;
 
@@ -50,10 +47,11 @@ pub const STATUS_LINE: &str = "Ready Reckoner is an independent, open-source pla
     not official emergency guidance, and not medical, legal or financial advice. Follow \
     instructions from your local officials first.";
 
-/// Marks where a citation marker starts and ends while the packet is assembled. Neither character
+/// Marks where a citation marker starts while a document is assembled. Neither marker character
 /// can occur in content text.
-const OPEN: char = '\u{1}';
-const CLOSE: char = '\u{2}';
+pub(crate) const OPEN: char = '\u{1}';
+/// Marks where a citation marker ends.
+pub(crate) const CLOSE: char = '\u{2}';
 
 /// Placeholders a guidance block may contain; see `docs/PACKET.md`.
 pub const PLACEHOLDERS: [&str; 5] = [
@@ -64,66 +62,19 @@ pub const PLACEHOLDERS: [&str; 5] = [
     "{household}",
 ];
 
-/// The sections every packet has, in order (a test checks every packet has each one). Packet v2
-/// (DESIGN-DELTA §3): the household's own family plan and its wallet cards come right after the
-/// summary, the shelter plan and the forecast checklist after the plan, the local pointers,
-/// documents and the recovery page after the checklists. Two sections print only when they
-/// apply, in the places [`CONDITIONAL_HEADINGS`] names.
-pub const SECTION_HEADINGS: [&str; 15] = [
+/// The Prepare sheet's sections, in order (a test checks every sheet has each one).
+pub const SECTION_HEADINGS: [&str; 6] = [
     "## Summary",
-    "## Your family plan",
-    WALLET_CARDS_HEADING,
-    "## Your risks",
-    "## Your targets",
     "## Your plan",
-    "## Your shelter plan",
-    "## When a storm, freeze or heat wave is forecast",
     "## Checklists",
-    "## Local help",
-    "## Documents and money",
-    "## After a disaster: the first 30 days",
-    "## Special needs",
+    "## Documents and money: decisions and savings",
     "## Maintenance calendar",
     "## Sources",
-];
-
-/// Sections that print only for some households, each with the section it follows: access and
-/// functional needs when anyone in the household has one (`Person::access_needs`), and the
-/// long-horizon section when the plan has one (`Plan::long_horizon`).
-pub const CONDITIONAL_HEADINGS: [(&str, &str); 2] = [
-    ("## Access and functional needs", "## Checklists"),
-    (
-        "## If it lasts for months",
-        "## After a disaster: the first 30 days",
-    ),
 ];
 
 /// A citation marker for one id.
 pub(crate) fn cite(id: &str) -> String {
     format!("{OPEN}{id}{CLOSE}")
-}
-
-/// Escapes text for Markdown ([`text::md`]) but leaves citation markers as they are, for a
-/// sentence that already carries its markers.
-pub(crate) fn md_marked(s: &str) -> String {
-    let mut out = String::with_capacity(s.len() + 8);
-    let mut rest = s;
-    while let Some(start) = rest.find(OPEN) {
-        out.push_str(&text::md(&rest[..start]));
-        let after = &rest[start..];
-        match after.find(CLOSE) {
-            Some(end) => {
-                out.push_str(&after[..end + CLOSE.len_utf8()]);
-                rest = &after[end + CLOSE.len_utf8()..];
-            }
-            None => {
-                out.push_str(&text::md(after));
-                rest = "";
-            }
-        }
-    }
-    out.push_str(&text::md(rest));
-    out
 }
 
 /// Markers for several ids (deduplicated, in order).
@@ -359,20 +310,6 @@ pub(crate) fn advice_paragraphs(rendered: &str) -> Vec<String> {
         .collect()
 }
 
-/// The paragraph of a rendered guidance block that says what to do ("**What helps.**"), or its
-/// advice paragraphs, or the whole block when it has neither.
-pub(crate) fn helps_paragraph(rendered: &str) -> Vec<String> {
-    let advice = advice_paragraphs(rendered);
-    if let Some(p) = advice.iter().find(|p| p.starts_with(HELPS)) {
-        return vec![p.clone()];
-    }
-    if advice.is_empty() {
-        paragraphs(rendered)
-    } else {
-        advice
-    }
-}
-
 /// A topic block's what-to-do: its "What helps" and "What to avoid" paragraphs when it has a
 /// "What helps", otherwise every paragraph that opens with a bold heading (a block written as
 /// steps, such as drills), otherwise the whole block. The why (opening paragraph, figures) is
@@ -424,7 +361,7 @@ const HELPS: &str = "**What helps.**";
 const AVOID: &str = "**What to avoid.**";
 
 /// Turns `[^id]` footnote references into citation markers.
-fn footnotes_to_markers(s: &str) -> String {
+pub(crate) fn footnotes_to_markers(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     let mut rest = s;
     while let Some(start) = rest.find("[^") {
@@ -445,26 +382,15 @@ fn footnotes_to_markers(s: &str) -> String {
     out
 }
 
-/// The packet with citation markers, sections 1 to 9. The Sources section is added by
-/// [`finish`] once the provenance list is known.
+/// The Prepare sheet with citation markers; its Sources section is added by [`finish`] once the
+/// order of first use is known.
 pub(crate) fn render(a: &Assessment, content: &Content) -> String {
     let cx = Ctx { a, content };
     let mut out: Vec<String> = Vec::new();
     summary::write(&cx, &mut out);
-    family::plan(&cx, &mut out);
-    family::wallet_cards(&cx, &mut out);
-    risks::write(&cx, &mut out);
-    targets::write(&cx, &mut out);
     plan::write(&cx, &mut out);
-    pages::shelter(&cx, &mut out);
-    pages::forecast(&cx, &mut out);
     checklists::write(&cx, &mut out);
-    pages::access_needs(&cx, &mut out);
-    pages::local_help(&cx, &mut out);
-    people::documents(&cx, &mut out);
-    pages::after_disaster(&cx, &mut out);
-    pages::long_horizon(&cx, &mut out);
-    people::special_needs(&cx, &mut out);
+    people::decisions_and_savings(&cx, &mut out);
     calendar::write(&cx, &mut out);
     out.join("\n")
 }
@@ -487,9 +413,11 @@ pub(crate) fn cited_ids(marked: &str) -> Vec<CitationId> {
     out
 }
 
-/// Replaces the markers with source numbers and appends the Sources section.
-pub(crate) fn finish(marked: &str, a: &Assessment, provenance: &[Citation]) -> String {
-    let index: BTreeMap<&str, usize> = provenance
+/// Replaces the markers with source numbers and appends the Sources section: the sources are
+/// `citations` (the ids [`cited_ids`] finds, in that order, resolved), numbered from 1, so the
+/// sheet's numbers are its own.
+pub(crate) fn finish(marked: &str, a: &Assessment, citations: &[Citation]) -> String {
+    let index: BTreeMap<&str, usize> = citations
         .iter()
         .enumerate()
         .map(|(i, c)| (c.id.as_str(), i + 1))
@@ -519,16 +447,8 @@ pub(crate) fn finish(marked: &str, a: &Assessment, provenance: &[Citation]) -> S
         rest = cursor;
     }
     out.push_str(rest);
-    // The packet lists the sources its brackets point to: they come first in the provenance
-    // order. The others (behind quantities, prices and warnings the packet does not quote) stay
-    // in the plan's provenance list.
-    let cited = cited_ids(marked);
-    let shown = provenance
-        .iter()
-        .take_while(|c| cited.contains(&c.id))
-        .count();
     let mut tail: Vec<String> = Vec::new();
-    sources::write(a, &provenance[..shown], provenance.len() - shown, &mut tail);
+    sources::write(a, citations, &mut tail);
     out.push('\n');
     out.push_str(&tail.join("\n"));
     // One trailing newline, no trailing spaces except Markdown line breaks.

@@ -302,16 +302,6 @@ pub fn severity(s: f64) -> &'static str {
     }
 }
 
-/// How sure the estimate is, in words.
-pub fn confidence(c: rr_types::DataConfidence) -> &'static str {
-    match c {
-        rr_types::DataConfidence::High => "Based on data",
-        rr_types::DataConfidence::Medium => "Mostly data",
-        rr_types::DataConfidence::Low => "Rough data",
-        rr_types::DataConfidence::Prior => "Expert estimate",
-    }
-}
-
 /// "2 adults, 1 older adult and 1 child, with 1 dog".
 pub fn household(input: &PlanInput) -> String {
     const ORDER: [(AgeBand, &str, &str); 6] = [
