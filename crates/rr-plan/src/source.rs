@@ -105,9 +105,9 @@ pub fn store_hospitals(store: &DataStore, fips: &str) -> Option<CountyHospitals>
         .county_hospitals(fips)
         .iter()
         .map(|h| HospitalRow {
-            name: h.name.clone(),
-            city: h.city.clone(),
-            phone: h.phone.clone(),
+            name: one_space(&h.name),
+            city: one_space(&h.city),
+            phone: one_space(&h.phone),
         })
         .collect();
     let released = store.manifest().and_then(|m| {
@@ -123,6 +123,11 @@ pub fn store_hospitals(store: &DataStore, fips: &str) -> Option<CountyHospitals>
             .or_else(|| Date::parse(job.finished.get(..10)?).ok())
     });
     Some(CountyHospitals { rows, released })
+}
+
+/// The words of a dataset field with runs of spaces as one ("CENTER HOSPITAL  CAROLINA").
+fn one_space(s: &str) -> String {
+    s.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 /// The ISO date that follows `marker` in `text`.

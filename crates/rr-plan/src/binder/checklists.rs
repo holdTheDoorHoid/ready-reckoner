@@ -565,32 +565,9 @@ fn split_first_sentence(s: &str) -> (&str, &str) {
     }
 }
 
-/// Marked text as sentences, each with the citation markers that follow it.
-fn sentences(s: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut rest = s.trim();
-    while !rest.is_empty() {
-        // Sentence ends are looked for from the start: no bold lead to skip here.
-        let (head, tail) = match first_sentence_end_plain(rest) {
-            Some(at) => (&rest[..at], &rest[at..]),
-            None => (rest, ""),
-        };
-        out.push(head.trim().to_owned());
-        rest = tail.trim_start();
-    }
-    out
-}
-
-/// As [`first_sentence_end`], without skipping a bold lead.
-fn first_sentence_end_plain(s: &str) -> Option<usize> {
-    let padded = format!("x{s}");
-    // `first_sentence_end` skips a bold lead only at the very start; a leading "x" defeats it.
-    first_sentence_end(&padded).map(|e| e - 1)
-}
-
 /// Tab 7's first page (§4.2, brief 1): `plan_forecast_48h` as a checklist-shaped page. The
 /// block's opening paragraph says when to use it; each list becomes steps, and each headed
-/// paragraph ("Before a hard freeze.") a heading with one step per sentence. The freeze steps
+/// paragraph ("Before a hard freeze.") a heading with the paragraph as one step. The freeze steps
 /// print where a cold wave, winter storm or ice storm is likely enough to list (a ten-year
 /// chance of 1 in 100), the heat-wave steps where heat waves are, as in the v2 packet.
 pub(super) fn forecast(bx: &Bx<'_>) -> Page {
@@ -625,8 +602,8 @@ pub(super) fn forecast(bx: &Bx<'_>) -> Page {
                     blocks.push(Block::Para(bx.inl(p)));
                 }
                 _ => {
-                    // "**Before a hard freeze.** Let … . Make sure …": a heading, then a step a
-                    // sentence.
+                    // "**Before a hard freeze.** Let … . Make sure …[^id]": a heading, then the
+                    // paragraph as one step, so it keeps its citation.
                     let (lead, rest) = match p.strip_prefix("**").and_then(|r| r.split_once("**")) {
                         Some((lead, rest)) => (Some(lead.trim_end_matches('.')), rest),
                         None => (None, p.as_str()),
@@ -634,15 +611,10 @@ pub(super) fn forecast(bx: &Bx<'_>) -> Page {
                     if let Some(l) = lead {
                         blocks.push(heading(1, l));
                     }
-                    blocks.push(Block::Steps(
-                        sentences(rest)
-                            .iter()
-                            .map(|sentence| Step {
-                                text: bx.inl(sentence),
-                                memory: false,
-                            })
-                            .collect(),
-                    ));
+                    blocks.push(Block::Steps(vec![Step {
+                        text: bx.inl(rest.trim()),
+                        memory: false,
+                    }]));
                 }
             }
         }
@@ -660,18 +632,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn sentences_keep_their_citations_and_the_household_s_words_whole() {
-        let c = |id: &str| crate::packet::cite(id);
-        let s = format!(
-            "Let water drip. Keep the heat at 55°F.{} Call {} now.",
-            c("nws"),
-            user("St. Mary's. Hall")
-        );
-        let parts = sentences(&s);
-        assert_eq!(parts.len(), 3, "{parts:?}");
-        assert_eq!(parts[0], "Let water drip.");
-        assert!(parts[1].ends_with(&c("nws")), "{parts:?}");
-        assert!(parts[2].contains("St. Mary's. Hall"), "{parts:?}");
+    fn branches_split_where_the_content_splits_them() {
         let (when, then) = split_first_sentence("**Leave if** it burns. Go now.");
         assert_eq!((when, then.trim()), ("**Leave if** it burns.", "Go now."));
         let (when, then) = split_first_sentence("**Go to** somewhere safe");

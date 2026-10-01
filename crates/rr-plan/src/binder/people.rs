@@ -305,10 +305,13 @@ pub(crate) fn nb(text: &str) -> String {
 
 /// A card line: the label, then the words or a line to write on.
 fn card_line(label: &str, value: Option<String>) -> Vec<Inline> {
-    let mut v = vec![b(format!("{label}: "))];
+    let mut v = vec![b(format!("{label}:"))];
     match value {
-        Some(s) => v.push(t(s)),
-        None => v.push(Inline::Blank(20)),
+        Some(s) => v.push(t(format!(" {s}"))),
+        None => {
+            v.push(t(" "));
+            v.push(Inline::Blank(20));
+        }
     }
     v
 }

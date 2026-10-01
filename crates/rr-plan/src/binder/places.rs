@@ -142,11 +142,9 @@ fn turn_here(bx: &Bx<'_>, lead: &str, ids: &[&str]) -> Option<Block> {
     if links.is_empty() {
         return None;
     }
-    let mut v = vec![b(lead.to_owned())];
+    let mut v = vec![b(lead.trim_end().to_owned())];
     for (i, l) in links.into_iter().enumerate() {
-        if i > 0 {
-            v.push(t(" · "));
-        }
+        v.push(t(if i > 0 { " · " } else { " " }));
         v.push(l);
     }
     Some(Block::Para(v))

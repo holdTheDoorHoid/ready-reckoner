@@ -45,18 +45,27 @@ fn cover(bx: &Bx<'_>) -> Page {
     let a = bx.a();
     let fp = super::family(&bx.cx);
     let mut blocks = vec![
-        Block::Para(vec![b("For: "), t(text::household(&a.input))]),
-        Block::Para(vec![b("Where: "), t(super::location_line(&bx.cx))]),
+        Block::Para(vec![
+            b("For:"),
+            t(format!(" {}", text::household(&a.input))),
+        ]),
+        Block::Para(vec![
+            b("Where:"),
+            t(format!(" {}", super::location_line(&bx.cx))),
+        ]),
         Block::Fields(vec![row(
             "Home address",
             fp.home.as_ref().and_then(|h| h.address.as_deref()),
         )]),
-        Block::Para(vec![b("Made on: "), t(text::date(a.input.planning_date))]),
+        Block::Para(vec![
+            b("Made on:"),
+            t(format!(" {}", text::date(a.input.planning_date))),
+        ]),
     ];
     let mut review = vec![
-        b("Review by: "),
+        b("Review by:"),
         t(format!(
-            "{}, and whenever something changes.",
+            " {}, and whenever something changes.",
             text::date(super::review_by(a))
         )),
     ];
@@ -102,7 +111,7 @@ fn quick_start(bx: &Bx<'_>) -> Page {
             );
         }
     }
-    let mut next = vec![b("Then: "), t("find what is happening in ")];
+    let mut next = vec![b("Then:"), t(" find what is happening in ")];
     next.extend(bx.link_inline("index"));
     next.push(t(". Numbers to call: "));
     next.extend(bx.link_inline("contacts"));
@@ -284,6 +293,12 @@ fn contacts(bx: &Bx<'_>) -> Page {
                 contact_short(fp.out_of_area_contact.as_ref()).as_deref(),
             ),
             row("Lawyer", contact_short(fp.lawyer.as_ref()).as_deref()),
+            row(
+                "Numbers we know by heart",
+                (!fp.numbers_by_heart.is_empty())
+                    .then(|| fp.numbers_by_heart.join("; "))
+                    .as_deref(),
+            ),
         ],
     );
 
@@ -432,6 +447,10 @@ fn contacts(bx: &Bx<'_>) -> Page {
             row(
                 "Urgent care",
                 contact_short(hood.urgent_care.as_ref()).as_deref(),
+            ),
+            row(
+                "Community shelter",
+                contact_short(hood.shelter.as_ref()).as_deref(),
             ),
             row(
                 "County emergency office",
