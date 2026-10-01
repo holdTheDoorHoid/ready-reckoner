@@ -430,9 +430,11 @@ try {
     const pinMap = await p.$('.pin-map');
     if (pinMap) await pinMap.screenshot({ path: join(shots, 'maps-pin-map--stubbed-tiles.png') });
     await clickButton('Done');
-    await p.waitForSelector('.maps-panel[data-maps-phase="idle"] .map-figure__img', { timeout: 60000 });
-    const figures = await p.$$eval('.maps-panel .map-figure__img', (els) => els.map((e) => e.getAttribute('src').length));
-    check('after consent, the three maps are made and shown', figures.length === 3, `${figures.length} images`);
+    // The maps show in the binder's own map slots (the panel keeps only its controls).
+    await p.waitForSelector('.maps-panel[data-maps-phase="idle"]', { timeout: 60000 });
+    await p.waitForFunction(() => document.querySelectorAll('article.binder-page .map-figure__img').length === 3, { timeout: 60000 });
+    const figures = await p.$$eval('article.binder-page .map-figure__img', (els) => els.map((e) => e.getAttribute('src').length));
+    check('after consent, the three maps are made and shown in their binder pages', figures.length === 3, `${figures.length} images`);
     const offList = external.filter((e) => !MAP_ORIGINS.includes(new URL(e.url).origin));
     check('after consent, requests go only to the origins in sources.ts', offList.length === 0, offList.slice(0, 3).map((e) => e.url).join(', ') || `${external.length} requests to ${[...new Set(external.map((e) => new URL(e.url).origin))].join(', ')}`);
     const tiles = external.filter((e) => e.url.startsWith('https://tile.openstreetmap.org/'));
