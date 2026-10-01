@@ -1,5 +1,6 @@
-// Prints the Philadelphia packet from the built site to PDF (US Letter and A4) in headless Chrome
-// and reports the page counts, so a change to the print stylesheet can be measured.
+// Prints the Philadelphia binder from the built site with the browser's own Print (the fallback to
+// Download PDF, which draws its own PDF) to PDF (US Letter and A4) in headless Chrome, and reports
+// the page counts, so a change to the print stylesheet can be measured.
 //
 //   npm run build && node scripts/packet-pages.mjs [out-dir]
 //
@@ -42,9 +43,9 @@ try {
   const page = await browser.newPage();
   await page.setViewport({ width: 1280, height: 900 });
   await page.evaluateOnNewDocument((p) => localStorage.setItem('rr.plan.v1', JSON.stringify(p)), plan);
-  await page.goto(`${site.url}#/packet`, { waitUntil: 'networkidle0' });
-  await page.waitForSelector('[data-screen-ready] .packet', { timeout: 60000 });
-  const words = await page.$eval('.packet', (el) => el.innerText.split(/\s+/).filter(Boolean).length);
+  await page.goto(`${site.url}#/binder`, { waitUntil: 'networkidle0' });
+  await page.waitForSelector('[data-screen-ready] article.binder-page', { timeout: 60000 });
+  const words = await page.$$eval('article.binder-page', (els) => els.reduce((n, el) => n + el.innerText.split(/\s+/).filter(Boolean).length, 0));
   const result = { fixture, words };
   for (const format of ['Letter', 'A4']) {
     const file = join(outDir, `${fixture}--${format.toLowerCase()}.pdf`);

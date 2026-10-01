@@ -1,5 +1,5 @@
 // Screenshots of every screen at desktop and phone widths, an axe accessibility check of each
-// page in a real browser, and the packet printed to PDF (Letter and A4).
+// page in a real browser, and the binder printed to PDF by the browser's own Print (Letter and A4).
 //
 //   npm run build && npm run shots
 //
@@ -290,8 +290,11 @@ try {
     axeReport.push({ shot: shot.name, violations: result });
     console.log(`${shot.name}: ${result.length ? result.map((v) => `${v.id}(${v.nodes})`).join(', ') : 'axe clean'}`);
     if (shot.cardsPrint) {
-      // What "Print only the wallet cards" sends to the printer: the cards section alone.
-      await page.evaluate(() => document.querySelector('.packet-page')?.classList.add('cards-only'));
+      // What "Print this page" on the wallet cards sends to the printer: that page alone.
+      await page.evaluate(() => {
+        document.querySelector('.binder-screen')?.classList.add('printing-one');
+        document.querySelector('#binder-wallet_cards')?.closest('.binder-pagewrap')?.classList.add('print-this');
+      });
       await page.emulateMediaType('print');
       await page.screenshot({ path: join(outDir, `${shot.name.replace('--desktop', '')}--print-cards-only.png`), fullPage: true });
       await page.pdf({ path: join(outDir, `${shot.name.replace('--desktop', '')}--cards-only--letter.pdf`), format: 'Letter', printBackground: false });

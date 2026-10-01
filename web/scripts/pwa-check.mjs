@@ -92,9 +92,9 @@ try {
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForSelector('[data-screen-ready]', { timeout: 10000 });
   check('reloads and plans with the network off', (await page.$eval('h1', (h) => h.textContent)) === 'Your risks');
-  await page.goto(`${site}#/packet`, { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('.packet h2', { timeout: 10000 });
-  check('packet renders offline', true);
+  await page.goto(`${site}#/binder`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('article.binder-page h3', { timeout: 10000 });
+  check('binder renders offline', true);
   await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
 
   // 3. A new version is offered, and taken only when the person chooses.
