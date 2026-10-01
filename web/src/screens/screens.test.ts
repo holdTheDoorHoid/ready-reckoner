@@ -117,8 +117,9 @@ describe('accessibility (axe in jsdom; colour contrast is checked in a real brow
         current = undefined;
       }
       // axe over the long risks and plan pages takes most of the default 30 s in jsdom when the
-      // suite runs in parallel.
-    }, 90_000);
+      // suite runs in parallel; over the binder (every page of it on one screen) about 20 s a
+      // fixture alone, and up to two minutes beside the rest of the suite.
+    }, name === 'binder' ? 240_000 : 90_000);
   }
 });
 
