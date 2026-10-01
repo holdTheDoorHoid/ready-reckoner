@@ -434,6 +434,9 @@ fn page_counts_for_the_report() {
             .collect();
         let total: u32 = out.binder.pages().map(fit::printed_pages).sum();
         eprintln!("PAGES {name}: {total} ({})", per_tab.join(" "));
+        for p in out.binder.pages().filter(|p| fit::load(p) > 1.0) {
+            eprintln!("OVER {name} {}: {:.2} ({:?})", p.id, fit::load(p), p.fit);
+        }
     }
     let (_, _, phl) = fixture("philadelphia-renters-4");
     for p in phl.binder.pages().filter(|p| p.kind == PageKind::Checklist) {
