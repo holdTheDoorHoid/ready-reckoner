@@ -46,7 +46,7 @@ A wildfire is near, officials tell you to get ready or leave, or smoke or flames
 ## Do not
 
 - Do not leave sprinklers or water running.[^calfire_go_evacuation]
-- Do not touch power lines.[^calfire_go_evacuation] Stay at least 35 feet from downed lines.[^redcross_power_outage]
+- Do not touch power lines.[^calfire_go_evacuation] Stay at least 35 feet from downed lines, and call 911.[^redcross_power_outage]
 
 ## When it is over
 

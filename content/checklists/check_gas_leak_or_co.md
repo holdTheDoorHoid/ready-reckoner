@@ -51,7 +51,7 @@ You smell gas or hear a blowing or hissing noise, or a carbon monoxide (CO) alar
 - Put CO alarms with battery backup on every level and outside sleeping areas.[^cpsc_co_questions_answers]
 - Ask the gas company how to shut off your meter. Do not turn it off to practice.[^ready_gov_safety_skills] {ref:home}
 - Have your chimney checked or cleaned every year.[^cdc_co_basics]
-- {if:has:power_generator}Run the generator only outside, more than 20 feet from windows, doors and vents.[^cdc_co_basics]{/if}
+- {if:has:power_generator}Run the generator only outdoors, more than 20 feet from windows, doors and vents.[^cdc_co_basics]{/if}
 
 ## Sources
 
