@@ -12,6 +12,7 @@
   import { formatDate } from '../lib/format';
   import { STATUS_LINE } from '../lib/labels';
   import { href } from '../lib/router.svelte';
+  import fontLicence from '../lib/binder/pdf/fonts/OFL.txt?url';
 
   const app = useApp();
   const info = $derived(app.info);
@@ -244,6 +245,10 @@
       <li>The code is free software under the GNU General Public License, version 3.</li>
       <li>Guidance text and tables are under Creative Commons Attribution-ShareAlike 4.0.</li>
       <li>Data packs are built from public federal sources; each one's terms are recorded with the data.</li>
+      <li>
+        The binder's PDF is made on this device with pdfmake (MIT License) and set in Noto Sans, by the Noto Project Authors, under the
+        <a href={fontLicence}>SIL Open Font License 1.1</a>.
+      </li>
     </ul>
     {#if dataLicences.length}
       <p class="small">The data's own terms:</p>

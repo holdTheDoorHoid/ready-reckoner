@@ -25,10 +25,11 @@ import type { PdfMakeInstance } from 'pdfmake/build/pdfmake.min.js';
 import { describe, expect, it } from 'vitest';
 
 import type { Binder } from '../../../engine/types';
+import { gridPng } from '../../../test/png';
 import { readPdf, type ReadPdf } from '../../../test/read-pdf';
 import { AWKWARD, FIXTURE_BINDER } from '../fixture';
 import { binderPages, FIT_CAPACITY, fitUnits } from '../model';
-import { type Paper, type PdfOptions, sheetFill, sheetRange, sheetsAllowed } from './doc';
+import { type Paper, type PdfMap, type PdfOptions, sheetFill, sheetRange } from './doc';
 import { LABEL_SPEC } from './labels';
 import { FONT_FILES, type FontFiles, renderBinderPdf, type RenderedPdf } from './render';
 
@@ -99,6 +100,9 @@ describe('the PDF binder, from the fixture binder', () => {
       expect(all).not.toMatch(/page 000\b|\b00000\b/);
       expect(pdf.fonts.every((f) => /\+NotoSans-/.test(f))).toBe(true);
       expect(pdf.info.Title).toBe(FIXTURE_BINDER.title);
+      // No maps stored: each slot is one line saying so, never an empty frame or an image.
+      expect(all.split('no map added. Add maps on the Binder screen of the app, then print this page again.').length - 1).toBe(3);
+      expect(pdf.pages.flatMap((p) => p.images)).toEqual([]);
     });
   }
 
@@ -115,12 +119,50 @@ describe('the PDF binder, from the fixture binder', () => {
     expect(flat(pdf.pages[end]!.text)).toContain('This page is blank on purpose.');
   });
 
+  it('embeds each stored map with its legend, keys, notes and credits on one sheet; a slot with none gets its line', async () => {
+    const png = gridPng(160, 112);
+    const map = (place: string): PdfMap => ({
+      dataUrl: png,
+      width: 1600,
+      height: 1120,
+      legend: [
+        { mark: 'H', name: 'Home', kind: 'Your plan', own: true },
+        { mark: 'M1', name: 'Meeting place near home', kind: 'Your plan', own: true },
+        ...Array.from({ length: 8 }, (_, i) => ({ mark: `${i + 1}`, name: `${place} place ${i + 1}`, kind: 'Hospital with an emergency room', address: `${100 + i} Sample Street`, phone: '555-0100' })),
+      ],
+      keys: [{ pattern: 'stripes', text: 'FEMA high-risk flood zone: about a 1 in 100 chance of flooding each year.' }],
+      statuses: [],
+      notes: ['Storm-surge zones are not on these maps.'],
+      credits: ['Map data © OpenStreetMap contributors, openstreetmap.org/copyright'],
+      scale: 'The bars show 500 ft and 200 m.',
+      fetched_on: '2026-09-27',
+    });
+    const { r, pdf } = await draw(FIXTURE_BINDER, { paper: 'LETTER', maps: { neighbourhood: map('Neighborhood'), area: map('Area') }, mapsStatus: 'ready' }, 'fixture-maps');
+    const pictured = pdf.pages.filter((p) => p.images.length > 0);
+    expect(pictured.flatMap((p) => p.images)).toEqual([
+      { width: 160, height: 112 },
+      { width: 160, height: 112 },
+    ]);
+    // The map and everything that explains it share its sheet.
+    for (const [p, place] of pictured.map((p, i) => [p, ['Neighborhood', 'Area'][i]!] as const)) {
+      const text = flat(p.text);
+      for (const s of [`${place} place 1`, `${place} place 8`, 'FEMA high-risk flood zone', 'Storm-surge zones are not on these maps.', 'OpenStreetMap contributors', 'The bars show 500 ft and 200 m.']) expect(text, `${place}: ${s}`).toContain(s);
+    }
+    // The region has no map: its line, and no frame.
+    expect(flat(pdf.pages.map((p) => p.text).join('\n'))).toContain('Map of your region and the ways out: no map added.');
+    // A page with a map may take a sheet more for each map, and no page takes more than that.
+    const sheet = (id: string) => r.doc.sheets.find((s) => s.entry?.page.id === id)!;
+    expect(sheet('neighbourhood').allowed).toBe(2);
+    expect(sheet('getting_out').allowed).toBe(3);
+    for (const s of r.doc.sheets) if (s.entry) expect(sheetFill(s)!.pages, s.entry.page.id).toBeLessThanOrEqual(s.allowed);
+  });
+
   it('keeps every one-sheet page to one sheet', async () => {
     const { r } = await draw(FIXTURE_BINDER, { paper: 'LETTER' }, 'fixture-fit');
     for (const s of r.doc.sheets) {
       if (!s.entry) continue;
       const f = sheetFill(s)!;
-      expect(f.pages, `${s.entry.page.id} (${s.entry.page.fit}, scale ${s.scale.toFixed(2)})`).toBeLessThanOrEqual(sheetsAllowed(s.entry.page));
+      expect(f.pages, `${s.entry.page.id} (${s.entry.page.fit}, scale ${s.scale.toFixed(2)})`).toBeLessThanOrEqual(s.allowed);
     }
   });
 });
@@ -149,7 +191,7 @@ describe("the PDF of the engine's Philadelphia binder", () => {
         if (!s.entry) continue;
         const page = s.entry.page;
         const f = sheetFill(s)!;
-        expect(f.pages, `${page.id} (${page.fit}, ${fitUnits(page)} units, scale ${s.scale.toFixed(2)})`).toBeLessThanOrEqual(sheetsAllowed(page));
+        expect(f.pages, `${page.id} (${page.fit}, ${fitUnits(page)} units, scale ${s.scale.toFixed(2)})`).toBeLessThanOrEqual(s.allowed);
         const t = tabs.get(s.entry.part.tab) ?? { real: 0, proxy: 0 };
         t.real += f.pages;
         t.proxy += Math.max(1, Math.ceil(fitUnits(page) / FIT_CAPACITY));

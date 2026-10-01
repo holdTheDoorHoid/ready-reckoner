@@ -138,6 +138,11 @@ export interface Sheet {
   end: Node;
   /** The type scale it was drawn at. */
   scale: number;
+  /**
+   * Sheets it may take: its page's `fit` (one, two, or any number), and one more for each map the
+   * household added to it (a map is kept on one sheet with its legend, `Ctx.map`).
+   */
+  allowed: number;
 }
 
 export interface BinderDoc {
@@ -182,7 +187,7 @@ export function binderDocument(
     const start = stack.find((n): n is Node => typeof n === 'object' && typeof n.id === 'string') ?? (stack[0] as Node);
     const end = endMark();
     stack.push(end);
-    sheets.push({ key, node, entry, start, end, scale });
+    sheets.push({ key, node, entry, start, end, scale, allowed: entry ? sheetsAllowed(entry.page, opts) : Infinity });
   };
 
   // The table of contents follows "How to use this binder", or the cover when there is none.
@@ -248,9 +253,15 @@ export function sheetFill(s: Pick<Sheet, 'start' | 'end'>): { pages: number; fil
   return { pages: range[1] - range[0] + 1, fill: range[1] - range[0] + Math.min(1, Math.max(0, end.verticalRatio ?? 0)) };
 }
 
-/** Sheets a laid-out binder page may take: one or two by its `fit`, any number when it flows. */
-export function sheetsAllowed(page: Page): number {
-  return page.fit === 'one' ? 1 : page.fit === 'two' ? 2 : Infinity;
+/**
+ * Sheets a binder page may take: one or two by its `fit`, any number when it flows; and, given the
+ * PDF's options, one more for each of its map slots that holds a map (the engine's fit proxy counts
+ * a map as half a page; a map at a readable size with its legend takes a sheet of its own).
+ */
+export function sheetsAllowed(page: Page, opts?: Pick<PdfOptions, 'maps'>): number {
+  const base = page.fit === 'one' ? 1 : page.fit === 'two' ? 2 : Infinity;
+  const maps = opts?.maps ? flatBlocks(page.blocks).filter((bl) => 'map_slot' in bl && opts.maps?.[bl.map_slot.kind]).length : 0;
+  return base + maps;
 }
 
 /** Which sheet each printed page belongs to, read from the laid-out nodes (once per layout). */
@@ -809,22 +820,43 @@ class Ctx {
             : 'no map added. Add maps on the Binder screen of the app, then print this page again.';
       return [{ text: [{ text: `Map of ${PLACEHOLDER[slot.kind]}: `, bold: true }, why], ...this.st('small'), margin: [0, 2, 0, 6] }];
     }
-    const h = Math.round((width * m.height) / Math.max(1, m.width));
+    // The figure (the map, its caption, the legend, the keys, the notes and the credits) stays
+    // on one sheet, so the numbers on the map and the table that names them are read together. The
+    // map is as wide as the page unless that would push the legend off the sheet.
     const small = 8;
-    const out: Content[] = [{ unbreakable: true, stack: [{ image: m.dataUrl, width, height: h }, { text: nfc(slot.caption), bold: true, margin: [0, 3, 0, 3] }] }];
+    const legendCells = m.legend.map((r): Inline[][] => [[{ t: r.mark }], [{ t: nfc(r.name) + (r.offMap ? ' (beyond the edge of this map)' : '') }], [{ t: nfc(r.kind) }], [{ t: nfc([r.address, r.phone].filter(Boolean).join(' · ') || '—') }]]);
+    const legendWidths = columnWidths(['Mark', 'Name', 'What it is', 'Address or phone'], legendCells, 4, width, small);
+    const words = (n: number, chars: number) => Math.max(1, Math.ceil(n / Math.max(1, chars)));
+    const perLine = (w: number) => w / (small * 0.52);
+    const rowLines = (cells: Inline[][]) => Math.max(...cells.map((c, i) => words(inlineChars(c), perLine(legendWidths[i]!))));
+    const notes = [...m.statuses.map((x) => x.text), ...m.notes];
+    const credits = `${m.credits.map(nfc).join(' · ')}. ${nfc(m.scale)}`;
+    const textHeight =
+      18 + // caption
+      (m.legend.length ? 16 + legendCells.reduce((a, r) => a + rowLines(r) * small * 1.18 + 4.5, 0) + 6 : 0) +
+      m.keys.length * 13 +
+      notes.reduce((a, n) => a + words(n.length, perLine(width)) * small * 1.18 + 1, 0) +
+      words(credits.length, width / (7.5 * 0.5)) * 7.5 * 1.18 +
+      12;
+    const room = this.paper.height - MARGINS[1] - MARGINS[3] - 6;
+    const natural = (width * m.height) / Math.max(1, m.width);
+    const h = Math.round(Math.max(room * 0.3, Math.min(natural, room - textHeight)));
+    const w = Math.round((h * m.width) / Math.max(1, m.height));
+    const figure: Content[] = [
+      { image: m.dataUrl, width: Math.min(width, w), height: h, alignment: 'center' },
+      { text: nfc(slot.caption), bold: true, margin: [0, 3, 0, 3] },
+    ];
     if (m.legend.length) {
-      out.push({
+      figure.push({
         table: {
           headerRows: 1,
           dontBreakRows: true,
-          widths: columnWidths(['Mark', 'Name', 'What it is', 'Address or phone'], m.legend.map((r) => [[{ t: r.mark }], [{ t: r.name }], [{ t: r.kind }], [{ t: [r.address, r.phone].filter(Boolean).join(' · ') }]]), 4, width, small),
+          widths: legendWidths,
           body: [
             ['Mark', 'Name', 'What it is', 'Address or phone'].map((t) => ({ text: t, bold: true, fontSize: small })),
-            ...m.legend.map((r) => [
-              { text: r.mark, bold: true, fontSize: small, alignment: 'center' },
-              { text: nfc(r.name) + (r.offMap ? ' (beyond the edge of this map)' : ''), fontSize: small },
-              { text: nfc(r.kind), fontSize: small },
-              { text: nfc([r.address, r.phone].filter(Boolean).join(' · ') || '—'), fontSize: small },
+            ...legendCells.map((r, i) => [
+              { text: m.legend[i]!.mark, bold: true, fontSize: small, alignment: 'center' },
+              ...r.slice(1).map((c) => ({ text: inlinePlain(c), fontSize: small })),
             ]),
           ],
         },
@@ -833,11 +865,11 @@ class Ctx {
       });
     }
     for (const key of m.keys) {
-      out.push({ columns: [{ canvas: swatch(key.pattern), width: 30 }, { text: nfc(key.text), fontSize: small, width: '*' }], columnGap: 6, margin: [0, 0, 0, 2] });
+      figure.push({ columns: [{ canvas: swatch(key.pattern), width: 30 }, { text: nfc(key.text), fontSize: small, width: '*' }], columnGap: 6, margin: [0, 0, 0, 2] });
     }
-    for (const t of [...m.statuses.map((s) => s.text), ...m.notes]) out.push({ text: nfc(t), fontSize: small, margin: [0, 0, 0, 1] });
-    out.push({ text: `${m.credits.map(nfc).join(' · ')}. ${nfc(m.scale)}`, ...this.st('tiny'), margin: [0, 2, 0, 8] });
-    return out;
+    for (const t of notes) figure.push({ text: nfc(t), fontSize: small, margin: [0, 0, 0, 1] });
+    figure.push({ text: credits, ...this.st('tiny'), margin: [0, 2, 0, 0] });
+    return [{ unbreakable: true, stack: figure, margin: [0, 2, 0, 8] }];
   }
 
   // ---- wallet cards ---------------------------------------------------------------------------
@@ -1073,6 +1105,17 @@ function closingPair(blocks: readonly Block[], i: number): [[{ level: number; te
   ];
 }
 
+/** A cell's plain text (the map legend's cells hold nothing else). */
+function inlinePlain(cell: readonly Inline[]): string {
+  return cell.map((i) => ('t' in i ? i.t : 'b' in i ? i.b : 'link' in i ? i.link.text : '')).join('');
+}
+
+/** A cell's length in characters, roughly as it prints. */
+function inlineChars(cell: readonly Inline[]): number {
+  const ws = cellWords(cell);
+  return ws.reduce((a, w) => a + w, 0) + Math.max(0, ws.length - 1);
+}
+
 /**
  * A cell's words as widths in characters, roughly as they print: a citation's small numbers count
  * three quarters of a character each, a blank its underscores.
@@ -1119,7 +1162,8 @@ function wrappedLines(words: readonly number[], per: number): number {
 export function columnWidths(header: readonly string[], rows: readonly Inline[][][], cols: number, width: number, size = 9, padding = 8): number[] {
   const em = size * 0.52;
   const avail = width - padding * cols - (cols + 1) * 0.5;
-  const cells: number[][][] = [header.map((h) => cellWords([{ t: h }])), ...rows.map((r) => Array.from({ length: cols }, (_, c) => cellWords(r[c] ?? [])))];
+  // A header is bold, and often starts with a capital: a fifth wider than body text.
+  const cells: number[][][] = [header.map((h) => cellWords([{ t: h }]).map((w) => w * 1.2)), ...rows.map((r) => Array.from({ length: cols }, (_, c) => cellWords(r[c] ?? [])))];
   const lineOf = (ws: readonly number[]) => ws.reduce((a, w, i) => a + w + (i ? 1 : 0), 0);
   const natural: number[] = [];
   const least: number[] = [];

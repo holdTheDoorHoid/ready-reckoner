@@ -77,7 +77,7 @@ export async function renderBinderPdf(pdfMake: PdfMakeInstance, fonts: FontFiles
   let scales = new Map<string, number>();
   for (const part of b.parts) {
     for (const page of part.pages) {
-      const allowed = sheetsAllowed(page);
+      const allowed = sheetsAllowed(page, opts);
       // The proxy was calibrated on prose pages; a register sets its tables far denser.
       if (Number.isFinite(allowed) && !REGISTER_KINDS.has(page.kind)) {
         const k = firstScale(fitUnits(page), allowed);
@@ -95,8 +95,30 @@ export async function renderBinderPdf(pdfMake: PdfMakeInstance, fonts: FontFiles
     const next = pass < MAX_PASSES ? refit(doc) : null;
     if ((!next && !stale) || pass >= MAX_LAYOUTS) return { bytes: new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength), doc, passes: pass };
     if (next) scales = next;
-    numbers = starts;
+    // The next layout's numbers: where each page will start if every page drawn smaller now fits.
+    numbers = next ? predictStarts(doc, next) : starts;
   }
+}
+
+/**
+ * Where each binder page will start in the next layout, by page id: this layout's pages, except
+ * that a page about to be drawn smaller (in `next`) is counted at the sheets it is allowed. Pages
+ * that start on a right-hand page (`beforeEven`) skip to the next odd page. A guess, checked after
+ * the layout: it saves a layout whenever the pages drawn smaller fit as hoped.
+ */
+export function predictStarts(doc: BinderDoc, next: ReadonlyMap<string, number>): Map<string, number> {
+  const out = new Map<string, number>();
+  let last = 0;
+  for (const s of doc.sheets) {
+    const fill = sheetFill(s);
+    let pages = fill?.pages ?? 1;
+    if (s.entry && (next.get(s.entry.page.id) ?? 1) < s.scale && pages > s.allowed) pages = s.allowed;
+    let start = last + 1;
+    if (last > 0 && s.node.pageBreak === 'beforeEven' && start % 2 === 0) start += 1;
+    if (s.entry) out.set(s.entry.page.id, start);
+    last = start + pages - 1;
+  }
+  return out;
 }
 
 /**
@@ -110,7 +132,7 @@ export function refit(doc: BinderDoc): Map<string, number> | null {
   for (const s of doc.sheets) {
     if (!s.entry) continue;
     if (s.scale < 1) next.set(s.entry.page.id, s.scale);
-    const allowed = sheetsAllowed(s.entry.page);
+    const allowed = s.allowed;
     const f = sheetFill(s);
     if (!f || f.pages <= allowed || s.scale <= MIN_SCALE) continue;
     const want = s.scale * ((allowed - 0.03) / f.fill) ** (1 / 1.5);

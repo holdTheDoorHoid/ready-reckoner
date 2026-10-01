@@ -72,7 +72,12 @@ export function labelSheet(parts: readonly Part[], width: number): Node[] {
         width: '*',
         stack: tabs
           .filter((_, i) => i % 2 === col)
-          .map((p) => ({ text: [{ text: `Tab ${p.tab}: `, bold: true }, p.short_title.normalize('NFC'), ` (${p.title.normalize('NFC')})`], margin: [0, 0, 0, 3] })),
+          .map((p) => {
+            const short = p.short_title.normalize('NFC');
+            const title = p.title.normalize('NFC');
+            // The full title in brackets only when the label shortens it.
+            return { text: [{ text: `Tab ${p.tab}: `, bold: true }, short, title === short ? '' : ` (${title})`], margin: [0, 0, 0, 3] };
+          }),
       })),
       columnGap: 18,
     },

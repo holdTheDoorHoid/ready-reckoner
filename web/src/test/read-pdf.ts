@@ -19,6 +19,8 @@ export interface PdfPage {
   /** The page's text, a line per text line. */
   text: string;
   links: PdfLink[];
+  /** Images drawn on the page: their size in pixels. */
+  images: { width: number; height: number }[];
 }
 
 export interface ReadPdf {
@@ -167,7 +169,14 @@ export function readPdf(bytes: Uint8Array): ReadPdf {
         const uri = /\/URI \(((?:\\.|[^)])*)\)/.exec(action)?.[1];
         return { rect, ...(dest !== undefined ? { dest: literal(dest) } : {}), ...(uri !== undefined ? { uri: literal(uri) } : {}) };
       });
-    return { number: i + 1, mediaBox, text, links };
+    // Images: the page's XObjects of subtype Image that its content draws (`/Name Do`).
+    const xobjDict = /\/XObject\s*<<([\s\S]*?)>>/.exec(res)?.[1] ?? '';
+    const xobjs = new Map([...xobjDict.matchAll(/\/(\w+) (\d+) 0 R/g)].map((x) => [x[1]!, Number(x[2])]));
+    const images = contents
+      .flatMap((c) => [...c.matchAll(/\/(\w+) Do\b/g)].map((d) => objs.get(xobjs.get(d[1]!) ?? -1)?.dict ?? ''))
+      .filter((d) => /\/Subtype \/Image/.test(d))
+      .map((d) => ({ width: Number(/\/Width (\d+)/.exec(d)?.[1] ?? 0), height: Number(/\/Height (\d+)/.exec(d)?.[1] ?? 0) }));
+    return { number: i + 1, mediaBox, text, links, images };
   });
 
   // Named destinations: the catalog's /Dests name tree (pdfkit writes one flat /Names array).
