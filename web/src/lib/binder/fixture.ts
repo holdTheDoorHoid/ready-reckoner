@@ -3,8 +3,10 @@
  * block kind and every inline kind at least once, with a Philadelphia household's sample answers
  * (the fixture household's own, `fixtures/households/philadelphia-renters-4.json`) and some
  * awkward user text: markup, Markdown marks, a table bar, accents and a very long name. It is
- * shaped like the engine's binder (page ids and slots from rr-plan's `binder` module), so the
- * screen and the PDF can be built and measured before the real tree reaches a golden.
+ * derived from the engine's Philadelphia binder (the golden): the same parts, page ids, kinds and
+ * map slots, the same table columns and the same way of writing headings, links and decisions,
+ * with shorter pages. The tests also draw the golden itself; this one adds what the golden never
+ * holds (an explicit page break, the awkward text, a person with no answers at all).
  *
  * Test data only: nothing in the app imports it.
  */
@@ -184,6 +186,7 @@ const PARTS: Part[] = [
           ],
         ),
         para(t('Not in this binder: rare families you did not add. Tick them under Your settings to add them.')),
+        para(t('Also checked, and too unlikely here to need a page: landslides, wildfires, dust storms and a Yellowstone super-eruption.')),
       ),
       page(
         'contacts',
@@ -203,8 +206,31 @@ const PARTS: Part[] = [
     title: 'People',
     short_title: 'People',
     pages: [
+      page(
+        'people',
+        'Who is in this binder',
+        'index',
+        'one',
+        table(
+          ['Who', 'Age group', 'Their page'],
+          [...PEOPLE.map((p, i) => [[t(p.name)], [t(i < 2 ? 'Adult' : 'Child')], [link(p.id, `Tab 2, ${p.name}`)]]), [[t(AWKWARD.long)], [t('Older adult')], [link('person_4', 'Tab 2, Grandpa Joe')]]],
+        ),
+        para(t('Cut out a wallet card for each person: '), link('wallet_cards', 'Tab 2, Wallet cards'), t('. Medicine, devices and other health needs: '), link('special_needs', 'Tab 2, Special needs and health'), t('.')),
+      ),
       ...PEOPLE.map((p, i) => personPage(p, i + 1)),
       page('person_4', AWKWARD.long, 'person', 'one', fields(f('Name', AWKWARD.long), f('Date of birth'), f('Phone'), f('Blood type')), bullets([t('Uses a powered medical device: '), b('yes, 60 watts')])),
+      page(
+        'special_needs',
+        'Special needs and health',
+        'person',
+        'one',
+        h(2, 'Medicine'),
+        bullets([t('1 person takes prescription medicine every day: keep 21 days of it on hand, and a written list of each medicine and its dose.'), cite(9)]),
+        h(2, 'Getting around'),
+        bullets([t('1 person may need help to leave quickly: arrange a ride and a helper now.'), cite(9)]),
+        h(2, 'Stress, mental health and the 988 line'),
+        para(b('What helps.'), t(' Save 988 in every phone: free support by call, text or chat, at any hour.'), cite(10)),
+      ),
       page(
         'wallet_cards',
         'Wallet cards',
@@ -343,26 +369,55 @@ const PARTS: Part[] = [
         'inventory',
         'What you have',
         'inventory',
-        'flow',
-        h(2, 'No power'),
+        'two',
+        para(t('Tick each thing when you have it, and write where it is kept.')),
+        ...(['No grid power at home', 'Tap water must be treated', 'No tap water at all'] as const).flatMap((section, k) => [
+          h(2, section),
+          table(
+            ['What', 'How much', 'Have it?', 'Where kept', 'Next check'],
+            Array.from({ length: 6 }, (_, i) => [[t(`${section}: supply ${i + 1}`)], [t(`${i + 2} each`)], [t((i + k) % 3 ? 'have' : `still to get (month ${i + 1})`)], [blank(14)], [t(i % 2 ? '—' : 'Check by September 1, 2027')]]),
+          ),
+        ]),
+        para(t('Medicines: each person\'s list is on their page in '), link('people', 'Tab 2, Who is in this binder'), t('.')),
+      ),
+      page(
+        'what_to_expect',
+        'What to expect',
+        'risks_glance',
+        'one',
+        para(
+          t('How long to be ready for each kind of disruption at the 1-in-100 setting. At this setting, about 1 in 10 households like yours will face a longer disruption of any one kind in the next 10 years; about 3 in 10 will face at least one kind that runs past its target. That is why the plan also gives you ways to cope when a target runs out.'),
+          cite(10),
+        ),
         table(
-          ['Item', 'How much', 'Status', 'Where kept', 'Next check'],
-          Array.from({ length: 18 }, (_, i) => [[t(`Supply line ${i + 1}: flashlights and batteries`)], [t(`${i + 2} each`)], [i % 3 ? t('have') : t('still to get (month 3)')], [], [t('October 2027')]]),
+          ['If this happens', 'Be ready for', 'Help likely in', 'Mostly back in', 'Worst on record'],
+          [
+            [[t('No grid power at home')], [t('about 3 days (up to 5 days)')], [t('about 3 days')], [t('about 5 days')], [t('up to 2 weeks')]],
+            [[t('No tap water at all')], [t('about 5 days (3–10)')], [t('not known')], [t('not known')], [t('—')]],
+          ],
         ),
       ),
       page(
         'risks_glance',
         'Risks at a glance',
         'risks_glance',
-        'one',
+        'two',
+        para(t('What could reach a household like yours in Philadelphia County, Pennsylvania over the next 10 years, most likely first.')),
         table(
-          ['Hazard', 'How likely here, 10 years', 'How bad', 'Checklist'],
+          ['What could happen', 'Households like yours, 10 years', 'How bad', 'Checklist'],
           [
-            [[t('House fire')], [t('about 4 in 100 households')], [t('Severe')], [link('check_house_fire', 'Tab 6, House fire')]],
-            [[t('Power outage')], [t('about 60 in 100 households')], [t('Moderate')], [link('check_power_outage', 'Tab 8, Power outage at home')]],
+            [[t('Power outage')], [t('about 60 in 100'), cite(10)], [t('Moderate')], [link('check_power_outage', 'Tab 8, Power outage at home')]],
+            [[t('Hurricane')], [t('about 8 in 100'), cite(8)], [t('Severe')], [link('check_hurricane', 'Tab 7, Hurricane')]],
+            [[t('House fire')], [t('about 4 in 100'), cite(3)], [t('Severe')], [link('check_house_fire', 'Tab 6, House fire')]],
           ],
         ),
-        para(t('The chances are for households like yours in this county.'), cite(10)),
+        h(2, 'Rare but severe'),
+        table(
+          ['What', 'How likely (a range only)', 'How bad', 'Checklist'],
+          [[[t('Severe solar storm')], [t('Between 1 in 2,600 and 1 in 51'), cite(10)], [t('Serious')], [t('Not in this binder; see '), link('check_power_outage', 'Tab 8, Power outage at home')]]],
+        ),
+        h(2, 'Notes on these numbers'),
+        bullets([t('These chances are for Philadelphia County as a whole.'), cite(10)]),
       ),
     ],
   },
@@ -389,7 +444,19 @@ const PARTS: Part[] = [
     tab: 7,
     title: 'Checklists: it is coming',
     short_title: 'It is coming',
-    pages: [checklist('check_hurricane', 'Hurricane', 'two', 'about 8 in 100 households like yours over ten years', [h(2, 'After the storm passes'), bullets([t('Stay off the roads until officials say they are clear.'), cite(8)])])],
+    pages: [
+      page(
+        'forecast',
+        'When a storm, freeze or heat wave is forecast',
+        'checklist',
+        'one',
+        h(1, 'Use this when'),
+        para(t('Hurricanes, winter storms and heat waves usually come with warning. Use the time the same way each time.'), cite(8)),
+        h(1, 'Before any storm'),
+        steps(false, [t('Charge phones, power banks and other batteries.'), cite(8)], [t('Fill the car\'s tank and get some cash.'), cite(8)]),
+      ),
+      checklist('check_hurricane', 'Hurricane', 'two', 'about 8 in 100 households like yours over ten years', [h(2, 'After the storm passes'), bullets([t('Stay off the roads until officials say they are clear.'), cite(8)])]),
+    ],
   },
   {
     id: 'check_ongoing',
@@ -422,8 +489,18 @@ const PARTS: Part[] = [
         { page_break: true },
         callout('decision', 'Stay or move out?', para(t('If the home is not safe, contact your insurer and the county before you sign anything.'), cite(11))),
       ),
+      page(
+        'after_months',
+        'If it lasts for months',
+        'after',
+        'one',
+        bullets([t('Going further: food for months (month 1)')], [t('Water carriers for hauling, about 5 gallons each: 2 carriers (month 19)')]),
+        para(b('Rain.'), t(' Each state sets its own rules on collecting rain, so check yours.'), cite(11)),
+      ),
       page('log_damage', 'Damage log', 'log', 'one', { log: { columns: ['What', 'Where', 'Photo taken', 'Reported to'], rows: 14 } }),
       page('log_expenses', 'Expenses log', 'log', 'one', { log: { columns: ['Date', 'What', 'Amount', 'Receipt'], rows: 14 } }),
+      page('log_contacts', 'People contacted', 'log', 'one', para(t('Write it down as it happens: insurers and FEMA ask for dates, names and receipts.')), { log: { columns: ['Date', 'Who', 'Number', 'What they said'], rows: 24 } }),
+      page('log_medications', 'Medications given', 'log', 'one', para(t('Write it down as it happens: insurers and FEMA ask for dates, names and receipts.')), { log: { columns: ['Date', 'Who', 'What', 'Time'], rows: 24 } }),
     ],
   },
   {
