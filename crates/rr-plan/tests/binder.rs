@@ -371,6 +371,104 @@ fn lower_first(s: &str) -> String {
     }
 }
 
+/// The index also lists each page's title and the warning names people hear (the practitioner
+/// review), pointing to the same page, when that page is in the binder; never a name twice.
+#[test]
+fn the_index_lists_titles_and_the_names_people_hear() {
+    let content = rr_content::content();
+    for (name, _, out) in outputs() {
+        let b = &out.binder;
+        let index = b.page("index").unwrap();
+        let rows: Vec<(String, Vec<Inline>)> = index
+            .blocks
+            .iter()
+            .flat_map(|bl| match bl {
+                Block::Table(t) => t
+                    .rows
+                    .iter()
+                    .map(|r| (binder::text_of(&r[0]), r[1].clone()))
+                    .collect(),
+                _ => Vec::new(),
+            })
+            .collect();
+        let names: Vec<String> = rows.iter().map(|(n, _)| n.to_lowercase()).collect();
+        let unique: BTreeSet<&String> = names.iter().collect();
+        assert_eq!(unique.len(), names.len(), "{name}: a name twice");
+        let points_to = |n: &str| {
+            rows.iter().find(|(x, _)| x == n).and_then(|(_, turn)| {
+                turn.iter().find_map(|i| match i {
+                    Inline::Link(l) => Some(l.to.clone()),
+                    _ => None,
+                })
+            })
+        };
+        // A title that only adds an article to a listed name ("An attack or threat closes your
+        // area") is not listed again.
+        let key = |n: &str| {
+            let l = n.to_lowercase();
+            ["a ", "an ", "the "]
+                .iter()
+                .find_map(|a| l.strip_prefix(a).map(str::to_owned))
+                .unwrap_or(l)
+        };
+        for p in b.pages().filter(|p| p.id.starts_with("check_")) {
+            let said = names.iter().any(|n| key(n) == key(&p.title));
+            assert!(said, "{name}: the title {} is not in the index", p.title);
+        }
+        for (alias, target) in binder::ALIASES {
+            let Some(page) = content.checklist_for(target).map(|c| c.meta.id.clone()) else {
+                continue;
+            };
+            if b.page(&page).is_none() {
+                continue;
+            }
+            let covered = names.iter().any(|n| n.contains(&alias.to_lowercase()));
+            assert!(covered, "{name}: {alias} is not in the index");
+            if let Some(to) = points_to(alias) {
+                assert_eq!(to, page, "{name}: {alias}");
+            }
+        }
+    }
+    let (_, _, phl) = fixture("philadelphia-renters-4");
+    let text = page_texts(phl.binder.page("index").unwrap()).join("\n");
+    for alias in [
+        "Flash flood warning",
+        "Extreme heat warning",
+        "Terrorist attack",
+    ] {
+        assert!(text.contains(alias), "{alias}");
+    }
+    assert!(
+        !text.contains("\nBlizzard\n"),
+        "already in the title Winter storm or blizzard"
+    );
+}
+
+/// A checklist never draws an empty box: a "Leave or stay" decision has branches, and a "Where
+/// and who" heading is followed by rows.
+#[test]
+fn checklists_draw_no_empty_box() {
+    for (name, _, out) in outputs() {
+        for p in out.binder.pages().filter(|p| p.kind == PageKind::Checklist) {
+            for (i, b) in p.blocks.iter().enumerate() {
+                if let Block::Decision(d) = b {
+                    assert!(!d.branches.is_empty(), "{name} {}", p.id);
+                    for br in &d.branches {
+                        assert!(!br.when.is_empty(), "{name} {}: an empty branch", p.id);
+                    }
+                }
+                if matches!(b, Block::Heading(h) if h.text == "Where and who") {
+                    assert!(
+                        matches!(p.blocks.get(i + 1), Some(Block::Fields(rows)) if !rows.is_empty()),
+                        "{name} {}",
+                        p.id
+                    );
+                }
+            }
+        }
+    }
+}
+
 /// Every `fit: one` page fits one printed page by the proxy, every `fit: two` page two
 /// (DESIGN-DELTA-v3 §5.6); the checklists keep the promise their block makes.
 #[test]

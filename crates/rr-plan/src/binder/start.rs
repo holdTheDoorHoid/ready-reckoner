@@ -135,12 +135,93 @@ fn turn_to(bx: &Bx<'_>, sel: &Selection<'_>, page: Option<&str>) -> Vec<Inline> 
     v
 }
 
+/// The other names people hear for what a checklist covers (the practitioner review): the
+/// warning or notice a forecast office or a utility issues, and two names the delta uses. Each
+/// points to the page of its target (`hazard:<id>` or `event:<id>`) and is listed only when that
+/// page is in the binder.
+pub const ALIASES: [(&str, &str); 11] = [
+    ("Flash flood warning", "hazard:riverine_flooding"),
+    ("Blizzard", "hazard:winter_weather"),
+    ("Extreme cold or wind chill warning", "hazard:cold_wave"),
+    ("Extreme heat warning", "hazard:heat_wave"),
+    ("Storm surge warning", "hazard:coastal_flooding"),
+    ("Haboob (a wall of dust)", "hazard:dust_storm"),
+    ("Air quality alert", "hazard:wildfire_smoke"),
+    ("Do-not-drink notice", "hazard:local_utility_outage"),
+    ("Evacuation warning", "event:evacuation_order"),
+    ("Terrorist attack", "hazard:attack_disruption"),
+    ("Mass shooting or bombing", "hazard:mass_violence"),
+];
+
+/// The index's rows as they are built: each name once, and after the first name that points to a
+/// page, the page's title (when no row has it yet) and the other names people hear for it.
+struct IndexRows<'b, 'a> {
+    bx: &'b Bx<'a>,
+    sel: &'b Selection<'a>,
+    rows: Vec<Vec<Vec<Inline>>>,
+    listed: Vec<String>,
+}
+
+/// A name as the index compares names: lower case, without a leading article.
+fn key(name: &str) -> String {
+    let lower = name.trim().to_lowercase();
+    ["a ", "an ", "the "]
+        .iter()
+        .find_map(|a| lower.strip_prefix(a))
+        .unwrap_or(&lower)
+        .to_owned()
+}
+
+impl IndexRows<'_, '_> {
+    fn add(&mut self, name: &str, page: Option<&str>) {
+        if self.listed.contains(&key(name)) {
+            return;
+        }
+        self.listed.push(key(name));
+        self.rows
+            .push(vec![vec![t(name)], turn_to(self.bx, self.sel, page)]);
+        let Some(s) = page.and_then(|id| self.sel.page(id)) else {
+            return;
+        };
+        // The page's title, unless it only repeats the name; then the other names people hear,
+        // unless the title or the name already says them ("Blizzard" after "Winter storm or
+        // blizzard").
+        let title = s.checklist.meta.title.as_str();
+        let mut said = vec![key(name)];
+        if !self.listed.contains(&key(title)) {
+            self.listed.push(key(title));
+            self.rows
+                .push(vec![vec![t(title)], turn_to(self.bx, self.sel, page)]);
+        }
+        said.push(key(title));
+        for (alias, _) in ALIASES
+            .iter()
+            .filter(|(_, target)| s.checklist.applies_to(target))
+        {
+            let k = key(alias);
+            if self.listed.contains(&k) || said.iter().any(|x| x.contains(&k)) {
+                continue;
+            }
+            self.listed.push(k);
+            self.rows
+                .push(vec![vec![t(*alias)], turn_to(self.bx, self.sel, page)]);
+        }
+    }
+}
+
 /// "Which checklist?": every everyday emergency and every hazard in the ranked matrix, most
-/// likely first, with the page to turn to; the rare families the household opted into; the ones
-/// it did not, in one line; the hazards too unlikely here to rank, in one line.
+/// likely first, with the page to turn to; after the first name that points to a page, its title
+/// when that differs and the other names people hear for it ([`ALIASES`]); the rare families the
+/// household opted into (and any whose page is here for another hazard); the ones it did not, in
+/// one line; the hazards too unlikely here to rank, in one line.
 fn index(bx: &Bx<'_>, sel: &Selection<'_>) -> Page {
     let cx = &bx.cx;
-    let mut rows: Vec<Vec<Vec<Inline>>> = Vec::new();
+    let mut ix = IndexRows {
+        bx,
+        sel,
+        rows: Vec::new(),
+        listed: Vec::new(),
+    };
     for &event in rr_content::ids::EVENTS
         .iter()
         .filter(|e| **e != SOMETHING_ELSE)
@@ -148,13 +229,13 @@ fn index(bx: &Bx<'_>, sel: &Selection<'_>) -> Page {
         let page = sel
             .page_for_event(event)
             .map(|s| s.checklist.meta.id.as_str());
-        rows.push(vec![vec![t(event_name(event))], turn_to(bx, sel, page)]);
+        ix.add(event_name(event), page);
     }
     for p in super::checklists::ranked(cx) {
         let page = sel
             .page_for_hazard(p.id)
             .map(|s| s.checklist.meta.id.as_str());
-        rows.push(vec![vec![t(p.name.clone())], turn_to(bx, sel, page)]);
+        ix.add(&p.name, page);
     }
     // Rare families: the ones the household opted into, and any whose page is in the binder
     // for another hazard (a volcano page also covers a very large eruption).
@@ -177,28 +258,24 @@ fn index(bx: &Bx<'_>, sel: &Selection<'_>) -> Page {
                     .filter(|id| sel.page(id).is_some())
             });
         if opted.contains(&p.id.as_str()) || page.is_some() {
-            rows.push(vec![vec![t(p.name.clone())], turn_to(bx, sel, page)]);
+            ix.add(&p.name, page);
         } else {
             not_here.push(text::lower_first(&p.name));
         }
     }
-    rows.push(vec![
-        vec![t("Anything else")],
-        turn_to(
-            bx,
-            sel,
-            sel.page_for_event(SOMETHING_ELSE)
-                .map(|s| s.checklist.meta.id.as_str()),
-        ),
-    ]);
+    let anything = sel
+        .page_for_event(SOMETHING_ELSE)
+        .map(|s| s.checklist.meta.id.as_str());
+    ix.add(event_name(SOMETHING_ELSE), anything);
     let mut blocks = vec![
         Block::Para(vec![t(
             "Find what is happening, then turn to its page. Everyday emergencies come first, then \
-             the risks where you live, most likely first.",
+             the risks where you live, most likely first, each with the other names you may hear \
+             for it.",
         )]),
         Block::Table(Table {
             header: vec!["If this happens".to_owned(), "Turn to".to_owned()],
-            rows,
+            rows: ix.rows,
         }),
     ];
     if !not_here.is_empty() {

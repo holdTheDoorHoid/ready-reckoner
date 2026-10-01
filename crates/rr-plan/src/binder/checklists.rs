@@ -313,6 +313,8 @@ pub(crate) fn answer(bx: &Bx<'_>, name: &str) -> Option<String> {
         "alerts" => hood.alerts.clone(),
         "county" => Some(crate::packet::summary::place(cx)),
         "shelter" => super::contact_short(hood.shelter.as_ref()),
+        // awaiting: rr-content (the planner adds `county_office` to `PLACEHOLDERS`, width 28)
+        "county_office" => super::contact_short(hood.county_emergency_office.as_ref()),
         _ => None,
     }
 }
@@ -336,6 +338,7 @@ pub(crate) fn answer_label(name: &str) -> &'static str {
         "pharmacy" => "Pharmacy",
         "alerts" => "How we get alerts",
         "shelter" => "Community shelter",
+        "county_office" => "County emergency office",
         _ => "",
     }
 }
@@ -426,10 +429,12 @@ fn checklist_page(bx: &Bx<'_>, s: &Selected<'_>) -> Page {
             added += 1;
         }
     }
-    if !rows.is_empty() {
+    // Where the engine's rows sit in `blocks`, so they can yield to the page's promise below.
+    let fields_at = (!rows.is_empty()).then(|| {
         blocks.push(heading(1, "Where and who"));
         blocks.push(Block::Fields(rows));
-    }
+        blocks.len() - 1
+    });
     let bullets =
         |items: &[String]| Block::Bullets(items.iter().map(|i| bx.inl(&mark(i))).collect());
     if !r.do_not.is_empty() {
@@ -441,8 +446,23 @@ fn checklist_page(bx: &Bx<'_>, s: &Selected<'_>) -> Page {
         blocks.push(bullets(&r.when_over));
     }
     let mut p = page(&c.meta.id, &c.meta.title, PageKind::Checklist, blocks);
-    // The block promises its length (DESIGN-DELTA-v3 §5.4); the proxy test holds it to it.
+    // The block promises its length (DESIGN-DELTA-v3 §5.4); the proxy test holds it to it. The
+    // household's own answers can be long, so the rows the engine added to "Where and who" make
+    // room first, last added first (they repeat answers the steps already print).
+    let pages = if c.pages >= 2 { 2.0 } else { 1.0 };
     p.fit = if c.pages >= 2 { Fit::Two } else { Fit::One };
+    if let Some(at) = fields_at {
+        while added > 0 && super::fit::load(&p) > pages {
+            if let Block::Fields(rows) = &mut p.blocks[at] {
+                rows.pop();
+            }
+            added -= 1;
+        }
+        // Nothing left to show: no heading over an empty box.
+        if matches!(&p.blocks[at], Block::Fields(rows) if rows.is_empty()) {
+            p.blocks.drain(at - 1..=at);
+        }
+    }
     p
 }
 

@@ -47,6 +47,7 @@ use crate::source::CountyHospitals;
 pub(crate) use checklists::select;
 pub use checklists::{EVENT_NAMES, SOMETHING_ELSE};
 pub use inline::text_of;
+pub use start::{ALIASES, POISON_HELP};
 
 /// When `true`, a ranked hazard, an everyday emergency or an opted-in rare family with no
 /// checklist block fails `every_ranked_hazard_has_a_checklist`; while it is `false` the binder

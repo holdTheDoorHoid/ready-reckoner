@@ -313,6 +313,8 @@ fn neighbourhood(bx: &Bx<'_>, no_places: bool) -> Page {
             contact_text(hood.county_emergency_office.as_ref()).as_deref(),
         ),
         row("How we get local alerts", hood.alerts.as_deref()),
+        // Four checklists ask for it; the state's lookup, where it has one, is in the table below.
+        row("Our evacuation zone", None),
     ])];
     if no_places {
         blocks.extend(general_answers(bx));
