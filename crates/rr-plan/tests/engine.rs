@@ -28,8 +28,7 @@ fn engine_info_carries_versions_and_the_nri_statement() {
         info.data_pack_version.as_deref(),
         manifest["pack_version"].as_str()
     );
-    // The core pack and the county hospital list the binder's Neighborhood page prints.
-    assert_eq!(info.packs_loaded, ["core", "places"]);
+    assert_eq!(info.packs_loaded, ["core"]);
     let first = &info.attributions[0];
     assert!(
         first.source.contains("National Risk Index"),

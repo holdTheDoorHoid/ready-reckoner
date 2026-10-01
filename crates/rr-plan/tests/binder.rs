@@ -794,11 +794,15 @@ fn user_text_is_escaped_in_the_markdown() {
 }
 
 /// Philadelphia's county has hospitals with emergency rooms (CMS): a table of at most twelve, by
-/// name, with the dataset's date and the citation; a county the list has none for gets one
-/// sentence; with the list not loaded (the sample counties) the page says nothing about it.
+/// name, with the dataset's date and the citation, once the `places` pack is loaded (as the web
+/// app loads it when the binder is shown); a county the list has none for gets one sentence;
+/// with the list not loaded (the core pack alone, the goldens; the sample counties) the page says
+/// nothing about it.
 #[test]
 fn the_hospital_table_appears_where_the_county_has_hospitals() {
-    let (_, _, out) = fixture("philadelphia-renters-4");
+    let input = common::household("philadelphia-renters-4");
+    let out = common::binder_engine().assess(&input).unwrap();
+    assert_eq!(out.binder.check(), Vec::<String>::new());
     let page = out.binder.page("neighbourhood").unwrap();
     let table = page
         .blocks
@@ -828,7 +832,7 @@ fn the_hospital_table_appears_where_the_county_has_hospitals() {
     let mut input = common::household("philadelphia-renters-4");
     input.location.zip = None;
     input.location.county_fips = Some("01009".into());
-    let out = common::assess(&input);
+    let out = common::binder_engine().assess(&input).unwrap();
     let page = out.binder.page("neighbourhood").unwrap();
     assert!(!page.blocks.iter().any(
         |b| matches!(b, Block::Table(t) if t.header.first().map(String::as_str) == Some("Hospital"))
@@ -839,11 +843,29 @@ fn the_hospital_table_appears_where_the_county_has_hospitals() {
         "{text}"
     );
 
-    // Without the list (the sample counties), nothing.
+    // Without the list (the core pack alone, as the goldens are planned; the sample counties),
+    // nothing.
     let input = common::household("philadelphia-renters-4");
-    let out = common::fixture_engine().assess(&input).unwrap();
-    let text = page_texts(out.binder.page("neighbourhood").unwrap()).join("\n");
-    assert!(!text.contains("Hospital\n") && !text.contains("federal list of hospitals"));
+    for out in [
+        common::assess(&input),
+        common::fixture_engine().assess(&input).unwrap(),
+    ] {
+        let text = page_texts(out.binder.page("neighbourhood").unwrap()).join("\n");
+        assert!(!text.contains("federal list of hospitals"), "{text}");
+    }
+    // With the list, every fixture's binder still holds together and keeps its promises.
+    for (name, input) in rr_types::fixtures::all() {
+        let out = common::binder_engine().assess(&input).unwrap();
+        assert_eq!(out.binder.check(), Vec::<String>::new(), "{name}");
+        for p in out.binder.pages() {
+            let load = fit::load(p);
+            match p.fit {
+                Fit::One => assert!(load <= 1.0, "{name} {}: {load:.2}", p.id),
+                Fit::Two => assert!(load <= 2.0, "{name} {}: {load:.2}", p.id),
+                Fit::Flow => {}
+            }
+        }
+    }
 }
 
 /// One wallet card per person, with their name or "Person 2 (child)", none empty; phone numbers

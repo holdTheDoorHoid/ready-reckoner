@@ -29,9 +29,10 @@ By default `rr` loads only the core pack, as the web app does, so it plans exact
 and the goldens show; the core pack now includes the eviction column and the storm-surge,
 wildfire-place and outage-event tables that used to be optional packs (bundled 2026-09-27,
 DESIGN-DELTA-v3 §8). Only `places` (county hospitals, read by the binder's Neighborhood page, not
-by the plan) is still a separate pack: `rr plan`, `rr binder` and `rr golden` load it whenever
-the manifest lists it, as the web app does when it shows the binder and as the goldens are
-planned; other commands load it only with `--optional places` or `--all-packs`.
+by the plan) is still a separate pack, and comes in only when asked for with `--optional places`
+or `--all-packs`: then `rr plan` and `rr binder` print the county's hospitals with an emergency
+room, as the web app's binder does once it has loaded that pack. The goldens are planned on the
+core pack alone.
 `rr data verify` and `rr data info`
 always read every pack. A pack is loaded exactly as the web app loads it: `manifest.json` first,
 then every file the manifest lists for the chosen packs, by its manifest path, each checked

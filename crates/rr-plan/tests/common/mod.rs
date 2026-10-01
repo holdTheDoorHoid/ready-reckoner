@@ -15,6 +15,20 @@ pub fn engine() -> &'static Engine<DataStore> {
     })
 }
 
+/// One engine on the repository's data packs with the `places` pack too (the county hospital
+/// list the binder's Neighborhood page prints).
+pub fn binder_engine() -> &'static Engine<DataStore> {
+    static ENGINE: OnceLock<Engine<DataStore>> = OnceLock::new();
+    ENGINE.get_or_init(|| {
+        let store = rr_plan::source::load_data_dir_packs(
+            &rr_plan::golden::data_dir(),
+            &rr_plan::source::BINDER_PACKS,
+        )
+        .expect("the data packs in data/ load");
+        Engine::new(store).expect("engine")
+    })
+}
+
 /// One engine on the seven sample counties (no data packs).
 pub fn fixture_engine() -> &'static Engine {
     static ENGINE: OnceLock<Engine> = OnceLock::new();

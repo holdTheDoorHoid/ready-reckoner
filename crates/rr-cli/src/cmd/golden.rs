@@ -37,7 +37,7 @@ pub fn run(data: &DataArgs, args: &GoldenArgs) -> Result<Output, CliError> {
         return update(&dir, &shown);
     }
     let (goldens, rendered_by) = if data.explicit() {
-        let opened = source::open(&data.with_binder_packs())?;
+        let opened = source::open(data)?;
         for n in &opened.notes {
             eprintln!("{n}");
         }

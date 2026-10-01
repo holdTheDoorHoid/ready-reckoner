@@ -453,14 +453,17 @@ impl CountySource for DataStore {
     }
 }
 
-/// The packs [`load_data_dir`] loads: the core pack (every lookup the engine makes) and the
-/// `places` pack (the county hospital list the binder's Neighborhood page prints; the web app
-/// loads it when the binder is shown). The `geo` pack only draws the map.
-pub const DATA_DIR_PACKS: [&str; 2] = ["core", "places"];
+/// The packs [`load_data_dir`] loads: the core pack (every lookup the engine makes), as the web
+/// app loads it to plan; the goldens are planned on it. The `geo` pack only draws the map.
+pub const DATA_DIR_PACKS: [&str; 1] = ["core"];
 
-/// Loads a data directory the way the web app loads the packs for the binder: `manifest.json`
-/// first, then every file of the packs in [`DATA_DIR_PACKS`], each checked against its sha256.
-/// Native only.
+/// The core pack and the `places` pack: the county hospital list the binder's Neighborhood page
+/// prints, which the web app loads when the binder is shown ([`load_data_dir_packs`]).
+pub const BINDER_PACKS: [&str; 2] = ["core", "places"];
+
+/// Loads a data directory the way the web app loads the packs to plan: `manifest.json` first,
+/// then every file of the packs in [`DATA_DIR_PACKS`], each checked against its sha256. Native
+/// only.
 ///
 /// # Errors
 ///
@@ -468,6 +471,19 @@ pub const DATA_DIR_PACKS: [&str; 2] = ["core", "places"];
 /// cannot be decoded.
 #[cfg(not(target_arch = "wasm32"))]
 pub fn load_data_dir(dir: &std::path::Path) -> Result<DataStore, EngineError> {
+    load_data_dir_packs(dir, &DATA_DIR_PACKS)
+}
+
+/// As [`load_data_dir`], with these packs (for example [`BINDER_PACKS`]). Native only.
+///
+/// # Errors
+///
+/// As [`load_data_dir`].
+#[cfg(not(target_arch = "wasm32"))]
+pub fn load_data_dir_packs(
+    dir: &std::path::Path,
+    packs: &[&str],
+) -> Result<DataStore, EngineError> {
     let read = |rel: &str| -> Result<Vec<u8>, EngineError> {
         let path = dir.join(rel);
         std::fs::read(&path).map_err(|e| {
@@ -485,8 +501,8 @@ pub fn load_data_dir(dir: &std::path::Path) -> Result<DataStore, EngineError> {
         )
     })?;
     let mut files: Vec<(String, Vec<u8>)> = vec![("manifest.json".to_owned(), manifest_bytes)];
-    for pack in DATA_DIR_PACKS {
-        if let Some(p) = manifest.packs.get(pack) {
+    for pack in packs {
+        if let Some(p) = manifest.packs.get(*pack) {
             for f in &p.files {
                 files.push((f.path.clone(), read(&f.path)?));
             }
