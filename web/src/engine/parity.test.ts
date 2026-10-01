@@ -245,6 +245,12 @@ describe.runIf(BUILT)('parity: mock and WebAssembly engines, and the goldens', (
     loadMs = performance.now() - start;
     await loader.zip();
     zipMs = performance.now() - start - loadMs;
+    // The lazy `places` pack too (county hospitals, read by the binder's Neighbourhood page),
+    // the way the site loads it when the binder is shown: this checks `WasmSource.county_hospitals`
+    // end to end. Loading it here means `packsWasm`'s binder carries a hospital table the current
+    // goldens do not yet (`DATA_DIR_PACKS` now includes `places` too, wasm3 2026-10-01): the
+    // golden-equality test below is expected to fail until the next golden regeneration.
+    await loader.places();
     if (loader.status.core.phase !== 'ready') throw new Error('data/manifest.json is missing');
     packVersion = loader.status.packVersion ?? '';
   });
@@ -361,13 +367,14 @@ describe.runIf(BUILT)('parity: mock and WebAssembly engines, and the goldens', (
     expect(sample.packs_loaded).toEqual([]);
     expect(sample.data_pack_version).toBeUndefined();
     const loaded = value(await packsWasm.engine_info(), 'packs');
-    expect(loaded.packs_loaded).toEqual(['core']);
+    // `beforeAll` already loaded `places` too (county hospitals), alongside `core`.
+    expect(loaded.packs_loaded).toEqual(['core', 'places']);
     expect(loaded.data_pack_version).toBe(packVersion);
     expect(loaded.attributions[0]!.source).toBe('FEMA National Risk Index');
     // The map pack loads on demand through the same loader.
     const map = (await loader.map()) as { features: unknown[] };
     expect(map.features.length).toBeGreaterThan(3000);
-    expect(value(await packsWasm.engine_info(), 'packs').packs_loaded).toEqual(['core', 'geo']);
+    expect(value(await packsWasm.engine_info(), 'packs').packs_loaded).toEqual(['core', 'geo', 'places']);
     console.info(`data packs ${packVersion}: the county data loaded through PackLoader in ${loadMs.toFixed(0)} ms, the ZIP tables in ${zipMs.toFixed(0)} ms more`);
   });
 });

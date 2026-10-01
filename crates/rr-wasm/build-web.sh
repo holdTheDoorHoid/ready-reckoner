@@ -2,8 +2,8 @@
 # Builds the engine for the web site and puts the data packs next to it, so the site serves both
 # from its own origin:
 #
-#   web/public/pkg/rr_wasm.js, rr_wasm_bg.wasm     the engine (wasm-pack, --target web)
-#   web/public/data/manifest.json, core/, geo/      copies of data/ (the packs rr-etl builds)
+#   web/public/pkg/rr_wasm.js, rr_wasm_bg.wasm        the engine (wasm-pack, --target web)
+#   web/public/data/manifest.json, core/, geo/, places/   copies of data/ (the packs rr-etl builds)
 #
 # Usage (from anywhere in the repository):
 #
@@ -13,7 +13,8 @@
 # Size is steered with environment variables, never with --profile (the wasm-pack the Pages
 # workflow installs rejects it): CARGO_PROFILE_RELEASE_OPT_LEVEL (default "s", as the workspace's
 # release profile) and the wasm-opt flags in crates/rr-wasm/Cargo.toml. The script prints the raw
-# and gzipped size of the .wasm; the budget is 1.5 MB gzipped.
+# and gzipped size of the .wasm; the budget is 1.75 MB gzipped (DESIGN-DELTA-v3 §10: raised from
+# 1.5 MB for the binder's checklist blocks and assembly code, wasm3 2026-10-01).
 set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,7 +22,7 @@ repo="$(cd "$here/../.." && pwd)"
 pkg="$repo/web/public/pkg"
 data_in="$repo/data"
 data_out="$repo/web/public/data"
-budget_bytes=$((1500 * 1000))
+budget_bytes=$((1750 * 1000))
 
 data_only=false
 for arg in "$@"; do

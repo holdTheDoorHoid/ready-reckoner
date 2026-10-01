@@ -453,13 +453,19 @@ impl CountySource for DataStore {
     }
 }
 
-/// The packs [`load_data_dir`] loads: the core pack (every lookup the engine makes), as the web
-/// app loads it to plan; the goldens are planned on it. The `geo` pack only draws the map.
-pub const DATA_DIR_PACKS: [&str; 1] = ["core"];
-
 /// The core pack and the `places` pack: the county hospital list the binder's Neighborhood page
 /// prints, which the web app loads when the binder is shown ([`load_data_dir_packs`]).
 pub const BINDER_PACKS: [&str; 2] = ["core", "places"];
+
+/// The packs [`load_data_dir`] loads: every lookup the engine makes, plus the county hospital
+/// list the binder's Neighborhood page prints, so `rr plan`'s default and the goldens show the
+/// table (DESIGN-DELTA-v3 §8; wasm3, 2026-10-01: before this, `WasmSource` had no
+/// `county_hospitals` to show it with, so neither did; the `places` pack is cheap and read-only,
+/// so loading it by default costs nothing a lookup needs). The `geo` pack still only draws the
+/// map and stays its own, separate opt-in. Equal to [`BINDER_PACKS`] (kept as a separate name: it
+/// says what a *native* caller without `--data`/`--fixtures` gets, which is one thing `places`
+/// happens to be for right now and might not always be).
+pub const DATA_DIR_PACKS: [&str; 2] = BINDER_PACKS;
 
 /// Loads a data directory the way the web app loads the packs to plan: `manifest.json` first,
 /// then every file of the packs in [`DATA_DIR_PACKS`], each checked against its sha256. Native

@@ -659,12 +659,12 @@ How the web app gets the engine and its data (`crates/rr-wasm`, `web/src/engine/
 the release profile at opt-level `s` unless `CARGO_PROFILE_RELEASE_OPT_LEVEL` says otherwise, then
 `wasm-opt -Os`; never `--profile`) into `web/public/pkg/` (`rr_wasm.js`, `rr_wasm_bg.wasm`) and
 copies `data/manifest.json`, `data/core/`, `data/geo/` and `data/places/` into `web/public/data/`
-(all git-ignored). It prints the raw and gzipped size of the `.wasm`; the budget is 1.5 MB gzipped,
-content included (DESIGN-DELTA-v3 §10 raises the shipped budget to 1.75 MB; this script's constant
-is unchanged). The Pages workflow runs it before `npm run build`. The site talks to the
-WebAssembly engine when `web/public/pkg/rr_wasm.js` exists at build time or `VITE_ENGINE=wasm`,
-otherwise to the mock (`VITE_ENGINE=mock` forces it). v0.3.0 raises the budget to 1.75 MB gzipped
-(DESIGN-DELTA-v3 §10: the checklist blocks and the binder code are new).
+(all git-ignored). It prints the raw and gzipped size of the `.wasm`; the budget is 1.75 MB
+gzipped, content included (DESIGN-DELTA-v3 §10; raised from 1.5 MB for the binder's checklist
+blocks and assembly code, the script's own constant too, wasm3 2026-10-01). The Pages workflow
+runs it before `npm run build`. The site talks to the WebAssembly engine when
+`web/public/pkg/rr_wasm.js` exists at build time or `VITE_ENGINE=wasm`, otherwise to the mock
+(`VITE_ENGINE=mock` forces it).
 
 **Start.** `getEngine()` imports `pkg/rr_wasm.js` from the site's own origin, instantiates
 `pkg/rr_wasm_bg.wasm`, checks that `engine_info().api_version` equals the app's

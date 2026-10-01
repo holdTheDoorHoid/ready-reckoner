@@ -795,9 +795,10 @@ fn user_text_is_escaped_in_the_markdown() {
 
 /// Philadelphia's county has hospitals with emergency rooms (CMS): a table of at most twelve, by
 /// name, with the dataset's date and the citation, once the `places` pack is loaded (as the web
-/// app loads it when the binder is shown); a county the list has none for gets one sentence;
-/// with the list not loaded (the core pack alone, the goldens; the sample counties) the page says
-/// nothing about it.
+/// app loads it when the binder is shown, and as `common::engine()` now loads it too,
+/// `DATA_DIR_PACKS`, wasm3 2026-10-01); a county the list has none for gets one sentence; with
+/// the list not loaded (the core pack on its own; the sample counties) the page says nothing
+/// about it.
 #[test]
 fn the_hospital_table_appears_where_the_county_has_hospitals() {
     let input = common::household("philadelphia-renters-4");
@@ -843,11 +844,15 @@ fn the_hospital_table_appears_where_the_county_has_hospitals() {
         "{text}"
     );
 
-    // Without the list (the core pack alone, as the goldens are planned; the sample counties),
-    // nothing.
+    // Without the list (the core pack on its own; the sample counties), nothing.
+    // `common::engine()` now loads `places` too (`DATA_DIR_PACKS`, wasm3 2026-10-01: the CLI's
+    // default and the goldens show the table), so "core alone" needs its own engine here.
     let input = common::household("philadelphia-renters-4");
+    let core_store = rr_plan::source::load_data_dir_packs(&rr_plan::golden::data_dir(), &["core"])
+        .expect("the core pack alone loads");
+    let core_only = rr_plan::Engine::new(core_store).expect("engine");
     for out in [
-        common::assess(&input),
+        core_only.assess(&input).unwrap(),
         common::fixture_engine().assess(&input).unwrap(),
     ] {
         let text = page_texts(out.binder.page("neighbourhood").unwrap()).join("\n");
