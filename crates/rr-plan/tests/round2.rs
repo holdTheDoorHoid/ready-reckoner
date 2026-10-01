@@ -216,6 +216,14 @@ fn rare_catastrophe_gear_prints_only_with_the_opt_in() {
 // S2: leaving first
 // ------------------------------------------------------------------------------------------------
 
+/// The three things that matter most, at the top of the Prepare sheet's summary.
+fn three_things(p: &str) -> Vec<&str> {
+    let s = section(p, "## Summary");
+    s.lines()
+        .filter(|l| l.starts_with(|c: char| c.is_ascii_digit()) && l.contains(". "))
+        .collect()
+}
+
 /// Leaving comes first (review S2, packet v2; the binder's Getting out page): when the
 /// evacuation bucket's ten-year chance is at least 25 in 100, the plan includes a major hurricane
 /// or a local tsunami, the home is in a storm-surge area (review RR-P02, the guardrail's own
@@ -264,7 +272,40 @@ fn leaving_comes_first_where_it_matters() {
                 "{name}: the surge area is named"
             );
         }
+        // The Prepare sheet's three things lead with leaving under the same rule, and the
+        // stay-home amounts are then for when you are not told to leave.
+        let things = three_things(&out.prepare_markdown);
+        assert_eq!(things.len(), 3, "{name}: {things:?}");
+        assert_eq!(things[0].contains(LEAVE), first, "{name}: {things:?}");
+        if surge {
+            assert!(
+                things[0].contains("storm surge"),
+                "{name}: the surge area is named"
+            );
+        }
+        if first {
+            assert!(
+                things
+                    .iter()
+                    .skip(1)
+                    .any(|t| t.contains("If you are not told to leave, be ready to manage")),
+                "{name}: the stay-home amounts are for when you are not told to leave"
+            );
+        }
     }
+    let prepare = |name: &str| {
+        &all()
+            .iter()
+            .find(|(n, _, _)| n == name)
+            .unwrap()
+            .2
+            .prepare_markdown
+    };
+    assert!(three_things(prepare("miami-condo-retiree-1"))[0].contains(LEAVE));
+    assert!(three_things(prepare("lahaina-maui-3"))[0].contains("strong shaking is the warning"));
+    assert!(three_things(prepare("galveston-highrise-1"))[0].contains("storm surge"));
+    assert!(three_things(prepare("campfire-paradise-2"))[0].contains("for wildfires, 15 minutes"));
+    assert!(!three_things(prepare("philadelphia-renters-4"))[0].contains(LEAVE));
     let page = |name: &str| {
         let out = &all().iter().find(|(n, _, _)| n == name).unwrap().2;
         page_text(out, "getting_out")

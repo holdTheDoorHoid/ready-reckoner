@@ -1,7 +1,9 @@
 //! The Prepare sheet's opening: who and where, the plan date and setting, the status line, then
-//! the summary: the step reached, the step that is enough with the plan's two done months, and
-//! the everyday basics the plan assumes. The free steps to start with are the first list under
-//! Your plan. The leave-first rule ([`leave_first`]) is the binder's Getting out page's.
+//! the summary: the three things that matter most (leaving first where it matters: a likely
+//! evacuation, a surge area, a fast hazard, a named storm or tsunami), the step reached, the step
+//! that is enough with the plan's two done months, and the everyday basics the plan assumes. The
+//! free steps to start with are the first list under Your plan. The leave-first rule
+//! ([`leave_first`]) also opens the binder's Getting out page.
 
 use rr_types::{
     BackupPower, BucketId, ClimateHorizon, Cooling, Heating, HousingKind, TierId, WaterLevel,
@@ -161,6 +163,14 @@ pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
     }
 
     out.push("## Summary".to_owned());
+    out.push(String::new());
+    // The three things that matter most open the summary (preparation material: the v0.2.0
+    // packet's three, worded and cited as it worded them).
+    out.push("### The three things that matter most".to_owned());
+    out.push(String::new());
+    for (i, s) in three_things(cx).iter().enumerate() {
+        out.push(format!("{}. {s}", i + 1));
+    }
     out.push(String::new());
     let reached = a.budget.tier_reached;
     let recommended = a
@@ -333,6 +343,151 @@ pub(crate) fn leave_first(cx: &Ctx<'_>) -> Option<String> {
         ));
     }
     Some(join(cx.bucket_frequency(BucketId::Evacuate), &action))
+}
+
+/// The three sentences that matter most: a threat paired with what to do about it (the v0.2.0
+/// packet's, review S2). The cliff warning's pointer names the app's risks screen, where the
+/// named scenarios and the targets are shown since v0.3.0 (it named the packet's "Your targets",
+/// which no longer prints).
+fn three_things(cx: &Ctx<'_>) -> Vec<String> {
+    let a = cx.a;
+    let input = &a.input;
+    let mut out: Vec<String> = Vec::new();
+    let days = |b: BucketId| a.target_days(b);
+    let (power, water) = (days(BucketId::Power), days(BucketId::WaterOut));
+
+    // 0. Leaving, when it matters more than managing at home: then the stay-home amounts are
+    // for when you are not told to leave.
+    let leave = leave_first(cx);
+    let manage = if leave.is_some() {
+        "If you are not told to leave, be ready to manage"
+    } else {
+        "Be ready to manage"
+    };
+    out.extend(leave);
+
+    // 1. Power and water.
+    if power > 0.0 || water > 0.0 {
+        let lead = if power > 0.0 {
+            cx.bucket_frequency(BucketId::Power)
+        } else {
+            cx.bucket_frequency(BucketId::WaterOut)
+        };
+        let action = if power > 0.0 && (power - water).abs() < 1e-6 {
+            format!(
+                "{manage} about {} at home with no power or tap water.",
+                text::day_phrase(power)
+            )
+        } else if power > 0.0 && water > 0.0 {
+            format!(
+                "{manage} about {} at home with no power, and about {} with no tap water.",
+                text::day_phrase(power),
+                text::day_phrase(water)
+            )
+        } else if power > 0.0 {
+            format!(
+                "{manage} about {} at home with no power.",
+                text::day_phrase(power)
+            )
+        } else {
+            format!(
+                "{manage} about {} with no tap water.",
+                text::day_phrase(water)
+            )
+        };
+        out.push(join(lead, &action));
+    }
+
+    // 2. Food and medicine.
+    let food = days(BucketId::Supplies);
+    let meds = days(BucketId::Medication);
+    let rx = input
+        .people
+        .iter()
+        .any(|p| p.medical.daily_rx || p.medical.refrigerated_rx);
+    if food > 0.0 {
+        let meds_clause = if rx && meds > 0.0 {
+            format!(", and {} of daily medicine on hand", text::day_phrase(meds))
+        } else {
+            String::new()
+        };
+        out.push(join(
+            cx.bucket_frequency(BucketId::Supplies),
+            &format!(
+                "Keep about {} of food you normally eat{meds_clause}.",
+                text::day_phrase(food)
+            ),
+        ));
+    }
+
+    // 3. One event that drives the answer, the biggest long disruption, or leaving home.
+    let income_months = match a.bucket(BucketId::Income).target {
+        rr_types::Target::Months { value, .. } => f64::from(value),
+        _ => 0.0,
+    };
+    // A named scenario the plan includes that changes the targets explains long targets best.
+    let driving = a
+        .consequence
+        .scenarios
+        .iter()
+        .find(|s| s.on && s.effect_summary.starts_with("Planning for it changes"));
+    if let Some(w) = a.warnings.iter().find(|w| w.id.starts_with("cliff_")) {
+        let scenario = w
+            .related
+            .first()
+            .and_then(|id| a.consequence.scenarios.iter().find(|s| &s.id == id));
+        let tail = match scenario {
+            Some(s) if s.on => " The plan includes it; the risks screen shows what it changes.",
+            Some(_) => " The plan leaves it out; the risks screen shows what it would change.",
+            None => " The risks screen shows how much it moves the numbers.",
+        };
+        out.push(format!("{}{tail}", w.message));
+    } else if let Some(s) = driving {
+        out.push(format!(
+            "Your longest targets come from one event the plan includes: a {}. {} You can turn \
+             it off on the risks screen to see the plan without it.",
+            text::lower_first(&s.name),
+            s.effect_summary
+        ));
+    } else if input.finances.income.earners > 0 && income_months > 0.0 {
+        let lead = a
+            .bucket(BucketId::Income)
+            .frequency_sentences
+            .first()
+            .map(String::as_str);
+        out.push(join(
+            lead,
+            &format!(
+                "Losing a paycheck is the longest disruption most households face. Aim for about \
+                 {} of expenses in savings over time, apart from this supplies budget.",
+                text::months_phrase(income_months)
+            ),
+        ));
+    } else {
+        let evac = a.bucket(BucketId::Evacuate);
+        if let Some(lead) = evac.frequency_sentences.first() {
+            out.push(join(
+                Some(lead),
+                "Keep a packed go-bag for each person near the door.",
+            ));
+        }
+    }
+    if out.len() < 3
+        && let Some(p) = a
+            .hazards
+            .profiles
+            .iter()
+            .find(|p| p.display == rr_types::HazardDisplay::Ranked)
+    {
+        out.push(format!(
+            "{} The plan starts with the free steps that help most with it.",
+            p.frequency_sentence
+        ));
+    }
+    out.into_iter()
+        .take(3)
+        .map(|s| super::md_marked(&s))
+        .collect()
 }
 
 fn join(lead: Option<&str>, action: &str) -> String {
