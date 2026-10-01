@@ -20,8 +20,9 @@
  *
  * Nothing here ever leaves the browser.
  */
-import type { IsoDate, LatLon, Owned, PlanInput, TierId } from '../engine/types';
+import type { IsoDate, Owned, PlanInput, TierId } from '../engine/types';
 import { TIER_IDS } from '../engine/types';
+import { checkMapsState, type MapsState } from './maps/state';
 
 export const STORAGE_KEY = 'rr.plan.v1';
 export const PREFS_KEY = 'rr.prefs.v1';
@@ -50,87 +51,9 @@ export function isOptionalStep(step: string): step is OptionalStepId {
  */
 export const MAPS_DB_NAME = 'rr-maps';
 
-// ---------------------------------------------------------------------------------------------
-// The maps' pins and choices (DESIGN-DELTA-v3 §9.5)
-//
-// awaiting: web-maps — `web/src/lib/maps/state.ts` (on agent/web-maps, not yet on v0.3) exports
-// `MapLayers`, `MapsState`, `checkMapsState` and `mapsHoldLocation`. The four below copy them
-// exactly (names, shapes and rules, checked against agent/web-maps aa4e6c0); when web-maps is
-// merged, delete them and import from './maps/state' instead.
-// ---------------------------------------------------------------------------------------------
-
-/** Which layers the household chose on its last "Fetch maps"; `base` (the street map) absent means on. */
-export interface MapLayers {
-  base?: boolean;
-  places: boolean;
-  flood: boolean;
-  surge: boolean;
-  wildfire: boolean;
-}
-
-/** `SavedPlan.maps`: web-only, outside `input`; the images it describes stay in the `rr-maps` store. */
-export interface MapsState {
-  home?: LatLon;
-  meeting_near?: LatLon;
-  meeting_far?: LatLon;
-  where_go?: LatLon;
-  /** The ways out as the household drew them (at most 2, each at most 60 points). */
-  routes: LatLon[][];
-  layers: MapLayers;
-  /** The day the images now in the maps store were fetched. */
-  fetched_on?: IsoDate;
-}
-
-const MAX_ROUTES = 2;
-const MAX_ROUTE_POINTS = 60;
-const PIN_IDS = ['home', 'meeting_near', 'meeting_far', 'where_go'] as const;
-
-/** A point rounded to about a metre (five decimal places), or undefined when it is not a real latitude and longitude. */
-function checkLatLon(x: unknown): LatLon | undefined {
-  if (typeof x !== 'object' || x === null || Array.isArray(x)) return undefined;
-  const { lat, lon } = x as Record<string, unknown>;
-  if (typeof lat !== 'number' || typeof lon !== 'number' || !Number.isFinite(lat) || !Number.isFinite(lon)) return undefined;
-  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return undefined;
-  const round = (v: number) => Math.round(v * 1e5) / 1e5;
-  return { lat: round(lat), lon: round(lon) };
-}
-
-/**
- * Read `SavedPlan.maps` back from storage or a file: undefined when it is missing or not an
- * object; otherwise a clean state with bad points, extra routes and extra points dropped (a route
- * needs two points) and each layer choice a boolean (base map and places on unless turned off).
- */
-export function checkMapsState(x: unknown): MapsState | undefined {
-  if (typeof x !== 'object' || x === null || Array.isArray(x)) return undefined;
-  const m = x as Record<string, unknown>;
-  const out: MapsState = { routes: [], layers: { base: true, places: true, flood: false, surge: false, wildfire: false } };
-  for (const id of PIN_IDS) {
-    const p = checkLatLon(m[id]);
-    if (p) out[id] = p;
-  }
-  if (Array.isArray(m.routes)) {
-    out.routes = m.routes
-      .filter(Array.isArray)
-      .map((r) => (r as unknown[]).map(checkLatLon).filter((p): p is LatLon => !!p).slice(0, MAX_ROUTE_POINTS))
-      .filter((r) => r.length >= 2)
-      .slice(0, MAX_ROUTES);
-  }
-  const layers = typeof m.layers === 'object' && m.layers !== null && !Array.isArray(m.layers) ? (m.layers as Record<string, unknown>) : {};
-  out.layers = {
-    base: layers.base !== false,
-    places: layers.places !== false,
-    flood: layers.flood === true,
-    surge: layers.surge === true,
-    wildfire: layers.wildfire === true,
-  };
-  if (typeof m.fetched_on === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(m.fetched_on)) out.fetched_on = m.fetched_on;
-  return out;
-}
-
-/** The saved maps hold where the household lives (the home pin, or a drawn route, which usually starts there). */
-export function mapsHoldLocation(maps: MapsState | undefined): boolean {
-  return !!maps && (maps.home !== undefined || maps.routes.length > 0);
-}
+// The maps' pins and choices (DESIGN-DELTA-v3 §9.5) are web-maps' `./maps/state`, re-exported here
+// so this module stays the one place the saved plan's shape is read from.
+export { checkMapsState, type MapLayers, type MapsState, mapsHoldLocation } from './maps/state';
 
 /** Something bought or done from the plan, with the day it was recorded (for the maintenance calendar). */
 export interface Purchase {

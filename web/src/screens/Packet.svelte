@@ -9,6 +9,9 @@
   wallet cards"). The wallet cards are the packet's "Wallet cards" section (or, if a packet has
   none, its family plan); "Print only the wallet cards" prints that section alone, each card (a
   block quote in the packet) boxed with a cut line and never split across pages.
+
+  The maps panel (web-maps, DESIGN-DELTA-v3 §9.4) is mounted here for now: a toolbar button and a
+  panel above the packet, both marked "web-maps mount". web-binder moves it into the binder.
 -->
 <script lang="ts">
   import { tick } from 'svelte';
@@ -20,6 +23,12 @@
   import { useApp } from '../lib/app.svelte';
   import { cardsSection, countTables, packetSections, renderMarkdown, splitIntro } from '../lib/markdown';
   import { useRouter } from '../lib/router.svelte';
+  // --- web-maps mount (DESIGN-DELTA-v3 §9.4): moves into the binder screen with web-binder ---
+  // The panel and everything it uses load on first use (their own chunk, precached for offline).
+  import type { CountyOutline } from '../lib/maps/compose';
+  import { hasChildren, suggestedLayers } from '../lib/maps/rules';
+  import type { MapsState } from '../lib/maps/state';
+  // --- end web-maps mount ---
 
   const app = useApp();
   const router = useRouter();
@@ -48,6 +57,23 @@
     const timer = setTimeout(() => jumpTo(`packet-${slug}`, { focus: 'h2, h3, h4' }), 0);
     return () => clearTimeout(timer);
   });
+
+  // --- web-maps mount (DESIGN-DELTA-v3 §9.4): moves into the binder screen with web-binder ---
+  /** Each toolbar press opens the panel afresh at the consent screen. */
+  let mapsRequest = $state(0);
+  /** `SavedPlan.maps`: saved with the plan, never in `input` (DESIGN-DELTA-v3 §9.5). */
+  const planMaps = $derived(app.plan?.maps);
+  function setPlanMaps(next: MapsState | undefined) {
+    if (!app.plan) return;
+    if (next) app.plan.maps = next;
+    else delete app.plan.maps;
+  }
+  async function countyOutline(fips: string): Promise<CountyOutline | null> {
+    const shapes = await app.countyShapes();
+    const county = shapes?.byFips.get(fips);
+    return county ? { rings: county.rings, bbox: county.bbox } : null;
+  }
+  // --- end web-maps mount ---
 
   function afterPrint() {
     cardsOnly = false;
@@ -93,11 +119,38 @@
       {#if cardsSlug}
         <button type="button" class="button" onclick={printCards}><Icon name="print" /> Print only the wallet cards</button>
       {/if}
+      <!-- web-maps mount: the toolbar button (DESIGN-DELTA-v3 §9.4) -->
+      <button type="button" class="button" onclick={() => (mapsRequest += 1)}>{planMaps?.fetched_on ? 'Refresh maps' : 'Add maps'}</button>
       <span class="small muted">Works on Letter and A4 paper, in black and white.</span>
     </p>
   </div>
   <PlanGate>
     {#snippet children(output)}
+      <!-- web-maps mount: the maps panel above the packet (DESIGN-DELTA-v3 §9.4). Not printed with
+           the v2 packet; web-binder prints the maps in the binder's map slots. -->
+      {#if mapsRequest > 0 || planMaps}
+        <div class="packet__maps no-print">
+          {#await import('../components/maps/MapsPanel.svelte')}
+            <p class="small muted" aria-busy="true">Loading the maps panel…</p>
+          {:then { default: MapsPanel }}
+            {#key mapsRequest}
+              <MapsPanel
+                location={output.location}
+                suggested={suggestedLayers(output, app.plan?.input.dials.horizon_years ?? 10)}
+                children={hasChildren(app.plan?.input.people)}
+                maps={planMaps}
+                onchange={setPlanMaps}
+                today={app.today}
+                loadCounty={() => countyOutline(output.location.county_fips)}
+                start={mapsRequest > 0}
+              />
+            {/key}
+          {:catch}
+            <p class="small">The maps panel could not be loaded. Reload the page and try again.</p>
+          {/await}
+        </div>
+      {/if}
+      <!-- end web-maps mount -->
       <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
       <article class="packet card" aria-label="Preparedness packet" onclick={followInPageAnchor}>
         {#each render(output) as section (section.slug)}
