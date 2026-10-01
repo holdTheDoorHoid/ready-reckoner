@@ -68,6 +68,9 @@ export const CITATIONS: Citation[] = [
   mock('mock_smoke_days', 'county wildfire smoke days (stands in for published smoke data)'),
   mock('mock_arrests', 'arrest counts by age (stands in for the FBI Crime Data Explorer)'),
   mock('mock_eviction', 'eviction filings (stands in for Eviction Lab)'),
+  mock('mock_make_a_plan', 'making an emergency plan (stands in for FEMA / Ready.gov and the Red Cross)'),
+  mock('mock_emergency_numbers', 'emergency numbers: 911, 988 and Poison Help (stands in for FCC, SAMHSA and HRSA)'),
+  mock('mock_hospital_list', 'hospitals with emergency rooms (stands in for the CMS hospital list)'),
 ];
 
 const BY_ID = new Map(CITATIONS.map((c) => [c.id, c]));

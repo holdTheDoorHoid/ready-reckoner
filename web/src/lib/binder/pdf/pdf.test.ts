@@ -1,4 +1,3 @@
-// @vitest-environment node
 /**
  * The PDF binder, drawn in Node with the same pdfmake build the browser loads
  * (DESIGN-DELTA-v3 §6): it builds on Letter and A4, single- and double-sided; the table of
@@ -11,6 +10,7 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { join } from 'node:path';
 
 import type { PdfMakeInstance } from 'pdfmake/build/pdfmake.min.js';
 import { describe, expect, it } from 'vitest';
@@ -24,9 +24,8 @@ import { readPdf } from '../../../test/read-pdf';
 
 const require = createRequire(import.meta.url);
 const pdfMake = require('pdfmake/build/pdfmake.min.js') as PdfMakeInstance;
-const fonts = Object.fromEntries(
-  Object.entries(FONT_FILES).map(([style, file]) => [style, new Uint8Array(readFileSync(new URL(`./fonts/${file}`, import.meta.url)))]),
-) as FontFiles;
+const FONT_DIR = join(process.cwd(), 'src', 'lib', 'binder', 'pdf', 'fonts');
+const fonts = Object.fromEntries(Object.entries(FONT_FILES).map(([style, file]) => [style, new Uint8Array(readFileSync(join(FONT_DIR, file)))])) as FontFiles;
 
 const OUT = process.env.RR_PDF_OUT;
 

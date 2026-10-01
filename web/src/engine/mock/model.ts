@@ -39,11 +39,11 @@ import type {
 } from '../types';
 import { BUCKET_IDS, ENGINE_API_VERSION, RETURN_PERIODS, TARGET_LADDER_DAYS, TIER_IDS } from '../types';
 import { addMonths, chanceWithin, dayPhrase, frequencySentence, monthsPhrase } from '../../lib/format';
-import { shimBinder, type ShimFacts } from './binder-shim';
+import { buildBinder } from './binder';
 import { ATTRIBUTIONS, citation } from './citations';
 import { catalogueItem } from './items';
 import { BUCKETS, hazardName, hazardTier as tierOf } from './names';
-import { buildPacket, householdPhrase } from './packet';
+import { buildPacket } from './packet';
 import type { ByDial, DurationBucket, EvacuateSeed, HazardSeed, RegionProfile, ScenarioSeed } from './regions';
 import { DURATION_BUCKETS, PROFILES, tierForDays } from './regions';
 import { firstMilestone, RANGE_ONLY_RANKED, rangeSentence, rareFamilies, stressTestFor, subCausesFor, v2Seeds } from './v2';
@@ -1112,17 +1112,6 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
   ]).sort();
   const provenance: Citation[] = provenanceIds.map((id) => citation(id)).filter((c): c is Citation => c !== undefined);
 
-  // Contract v3: until the binder workstream lands, the Prepare sheet is the whole packet and the
-  // binder a transitional one built from it, as the engine does (binder-shim.ts).
-  const county = location.state_abbr === 'LA' ? 'Parish' : location.state_abbr === 'AK' ? '' : 'County';
-  const shimFacts: ShimFacts = {
-    generatedOn: input.planning_date,
-    household: householdPhrase(input),
-    location: `${location.county_name}${county ? ` ${county}` : ''}, ${location.state_name}${location.zip ? ` (ZIP code ${location.zip})` : ''}`,
-    reviewBy: addMonths(input.planning_date, 12),
-    provenance,
-    attributions: ATTRIBUTIONS,
-  };
   const output: PlanOutput = {
     engine_version: MOCK_ENGINE_VERSION,
     api_version: ENGINE_API_VERSION,
@@ -1137,13 +1126,15 @@ export function assessModel(input: PlanInput, location: LocationResolved, profil
     plan,
     requirements,
     warnings,
-    binder: shimBinder('', shimFacts),
+    binder: { title: '', generated_on: input.planning_date, household: '', location: '', status_line: '', review_by: input.planning_date, parts: [], sources: [], credits: [] },
     prepare_markdown: '',
     provenance,
   };
   const result: ModelResult = { output, facts, profile, register, targets, states, schedule };
+  // The Prepare sheet: still the whole v2 packet in the mock. The app reads some of its sections
+  // (the dial sentence in "Your targets", the family plan) until they move to the binder.
   output.prepare_markdown = buildPacket(input, result);
-  output.binder = shimBinder(output.prepare_markdown, shimFacts);
+  output.binder = buildBinder(input, result);
   return result;
 }
 
