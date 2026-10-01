@@ -4,7 +4,7 @@ title: Flooding and flash floods
 kind: checklist
 onset: now
 applies_to: [hazard:riverine_flooding]
-citations: [ready_gov_floods, nws_flood_during, ready_gov_pets, ready_gov_recovering, fcc_wea]
+citations: [ready_gov_floods, nws_flood_during, ready_gov_pets, ready_gov_recovering, fcc_wea, cdc_co_basics]
 pages: 1
 ---
 
@@ -37,7 +37,7 @@ A flood or flash flood warning covers your area, or water is rising around you.[
 ## Where and who
 
 - Where we would go: {where_go}
-- Electric panel: {electric_panel}
+- Electrical panel: {electric_panel}
 - Meeting place outside the neighborhood: {meeting_far}
 
 ## Do not
@@ -50,7 +50,7 @@ A flood or flash flood warning covers your area, or water is rising around you.[
 
 - Go home only when officials say it is safe.[^ready_gov_floods]
 - Clean up in heavy gloves and boots. Watch for snakes.[^ready_gov_floods]
-- Run a generator only outdoors, away from windows.[^ready_gov_floods]
+- Run a generator only outdoors, more than 20 feet from windows, doors and vents.[^cdc_co_basics]
 - For the weeks ahead, see {ref:after}.[^ready_gov_recovering]
 
 ## Sources
@@ -60,3 +60,4 @@ A flood or flash flood warning covers your area, or water is rising around you.[
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
 [^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).
+[^cdc_co_basics]: Centers for Disease Control and Prevention, Carbon Monoxide Poisoning Basics (2026).

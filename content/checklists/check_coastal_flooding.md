@@ -4,7 +4,7 @@ title: Coastal flooding and storm surge
 kind: checklist
 onset: coming
 applies_to: [hazard:coastal_flooding]
-citations: [nhc_storm_surge_overview, ready_gov_floods, ready_gov_evacuation, cdc_evacuation_psa, ready_gov_hurricanes, ready_gov_shelter, hcfl_ev_safety, ready_gov_recovering, floodsmart_start_claim]
+citations: [nhc_storm_surge_overview, ready_gov_floods, ready_gov_evacuation, cdc_evacuation_psa, ready_gov_hurricanes, ready_gov_shelter, hcfl_ev_safety, ready_gov_recovering, floodsmart_start_claim, cdc_co_basics]
 pages: 1
 ---
 ## Use this when
@@ -17,15 +17,15 @@ A coastal flood or storm surge warning covers your area. Surge can push far inla
 2. **Get high.** If not told to leave, move to higher ground or a higher floor.[^ready_gov_floods]
 3. **Turn around.** Never walk, swim or drive through floodwater.[^ready_gov_floods]
 4. **Keep alerts on.** Keep a radio or phone on.[^ready_gov_floods]
-5. **Move things up.** Move papers, medicines and valuables to a higher floor.[^ready_gov_floods]
-6. **Pack a go-bag.** Pack medicines, ID, cash and phone chargers.[^cdc_evacuation_psa] {if:vehicle}Fill the car's gas tank.[^ready_gov_evacuation]{/if}
+5. **Pack a go-bag.** Pack medicines, ID, cash and phone chargers.[^cdc_evacuation_psa] {if:vehicle}Fill the car's gas tank.[^ready_gov_evacuation]{/if}
 
 ## Then
 
-1. **Unplug** small appliances and electronics.[^ready_gov_evacuation]
-2. **Power off.** If water is coming in and it is safe, turn off the main breaker at {electric_panel}.[^ready_gov_hurricanes]
-3. **Tell someone.** Tell {out_of_area_contact} where you are going.[^ready_gov_evacuation]
-4. **Trapped?** Go to the highest floor. Use the roof only if needed, and signal for help.[^ready_gov_floods]
+1. **Move things up.** Move papers, medicines and valuables to a higher floor.[^ready_gov_floods]
+2. **Unplug** small appliances and electronics.[^ready_gov_evacuation]
+3. **Power off.** If water is coming in and it is safe, turn off the main breaker at {electric_panel}.[^ready_gov_hurricanes]
+4. **Tell someone.** Tell {out_of_area_contact} where you are going.[^ready_gov_evacuation]
+5. **Trapped?** Go to the highest floor. Use the roof only if needed, and signal for help.[^ready_gov_floods]
 
 ## Leave or stay
 
@@ -36,6 +36,7 @@ A coastal flood or storm surge warning covers your area. Surge can push far inla
 ## Where and who
 
 - Our evacuation zone:
+- Public shelter: {shelter}
 
 ## Do not
 
@@ -48,7 +49,7 @@ A coastal flood or storm surge warning covers your area. Surge can push far inla
 
 - **Return** only when officials say it is safe.[^ready_gov_floods]
 - **Stay out** of floodwater. It can carry germs, debris and electric current.[^ready_gov_floods]
-- **Run a generator** only outdoors, away from windows.[^ready_gov_floods]
+- **Run a generator** only outdoors, more than 20 feet from windows, doors and vents.[^cdc_co_basics]
 - **Clean up** in gloves and boots. Children should not help.[^ready_gov_floods]
 - **Take photos** of damage before cleanup, then call your insurer.[^ready_gov_recovering][^floodsmart_start_claim] {ref:after}
 
@@ -63,3 +64,4 @@ A coastal flood or storm surge warning covers your area. Surge can push far inla
 [^hcfl_ev_safety]: Hillsborough County, Florida, Staying Safe with Electric Vehicles (hurricane season and flooding) (2025).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).
 [^floodsmart_start_claim]: FEMA, National Flood Insurance Program (FloodSmart), Start a Claim (2026).
+[^cdc_co_basics]: Centers for Disease Control and Prevention, Carbon Monoxide Poisoning Basics (2026).

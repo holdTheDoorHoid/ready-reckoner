@@ -18,7 +18,7 @@ Card payments, a bank, a pharmacy, a hospital or a utility stops working because
 3. **Tell your bank or card company** about any charge you did not make.[^ready_gov_cybersecurity]
 4. **Change your passwords** if you see strange activity.[^ready_gov_cybersecurity]
 5. **Try another pharmacy** if yours cannot fill a prescription.[^fda_drug_shortages_faq]
-6. **Take your written medicine list** to the pharmacy or doctor.[^ready_gov_disability]
+6. **Take your written medicine list** to the pharmacy or doctor.[^ready_gov_disability] {ref:people}
 
 ## Then
 

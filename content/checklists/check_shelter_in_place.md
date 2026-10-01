@@ -4,7 +4,7 @@ title: Shelter-in-place order
 kind: checklist
 onset: coming
 applies_to: [event:shelter_in_place]
-citations: [cdc_shelter_in_place_chemical_2018, ready_gov_shelter, ready_gov_chemical, ready_gov_nuclear, ready_gov_disability]
+citations: [cdc_shelter_in_place_chemical_2018, ready_gov_shelter, ready_gov_chemical, cdc_radiation_get_inside, ready_gov_disability]
 pages: 1
 ---
 ## Use this when
@@ -23,7 +23,7 @@ Officials tell you to stay inside because the outside air may be dangerous. Most
 ## Then
 
 1. **Chemical spill?** Use a room above ground, because the gases sink.[^cdc_shelter_in_place_chemical_2018][^ready_gov_chemical]
-2. **Radiation?** Go to a basement or the middle of the building.[^ready_gov_nuclear]
+2. **Radiation?** Go to a basement or the middle of the building.[^cdc_radiation_get_inside]
 3. **Seal the room** if told to. Tape plastic sheeting over windows, doors and vents, corners first.[^ready_gov_shelter]
 4. **Block gaps** under doors with wet towels.[^ready_gov_chemical]
 5. **Drink stored water,** not tap water.[^cdc_shelter_in_place_chemical_2018]
@@ -59,5 +59,5 @@ Officials tell you to stay inside because the outside air may be dangerous. Most
 [^cdc_shelter_in_place_chemical_2018]: Centers for Disease Control and Prevention (via Internet Archive), Chemical Agents: Facts About Sheltering in Place (2018).
 [^ready_gov_shelter]: FEMA / Ready.gov, Shelter (2026).
 [^ready_gov_chemical]: FEMA / Ready.gov, Chemicals and Hazardous Materials Incidents (2026).
-[^ready_gov_nuclear]: FEMA / Ready.gov (via Internet Archive), Nuclear Explosion (2022).
+[^cdc_radiation_get_inside]: Centers for Disease Control and Prevention, What to Do: Get Inside (radiation emergencies) (2024).
 [^ready_gov_disability]: FEMA / Ready.gov, People with Disabilities (2026).

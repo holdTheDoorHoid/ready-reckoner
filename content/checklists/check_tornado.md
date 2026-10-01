@@ -4,7 +4,7 @@ title: Tornado
 kind: checklist
 onset: now
 applies_to: [hazard:tornado]
-citations: [ready_gov_tornadoes, ready_gov_tornadoes_2014, noaa_spc_tornado_safety, fcc_wea]
+citations: [ready_gov_tornadoes, ready_gov_tornadoes_2014, noaa_spc_tornado_safety, fcc_wea, redcross_power_outage]
 pages: 1
 ---
 ## Use this when
@@ -46,7 +46,7 @@ A tornado warning is issued for your area, or you see a funnel cloud or hear a r
 
 ## When it is over
 
-- Stay clear of fallen power lines and broken utility lines.[^ready_gov_tornadoes]
+- Stay at least 35 feet from fallen power lines, and clear of broken utility lines.[^ready_gov_tornadoes][^redcross_power_outage]
 - Do not go into a damaged building until you are told it is safe.[^ready_gov_tornadoes]
 - Text or use social media to check in; keep phone lines free for emergencies.[^ready_gov_tornadoes]
 - Use the After pages for the first days. {ref:after}
@@ -57,3 +57,4 @@ A tornado warning is issued for your area, or you see a funnel cloud or hear a r
 [^ready_gov_tornadoes_2014]: FEMA / Ready.gov (via Internet Archive), Tornadoes (archived July 2014 version, with the high-rise and mobile-home wording) (2014).
 [^noaa_spc_tornado_safety]: NOAA National Weather Service, Storm Prediction Center, Tornado Safety (The Online Tornado FAQ) (2026).
 [^fcc_wea]: Federal Communications Commission, Wireless Emergency Alerts (WEA) (2025).
+[^redcross_power_outage]: American Red Cross, Power Outage Safety (2026).

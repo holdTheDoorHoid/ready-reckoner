@@ -30,7 +30,7 @@ You smell gas or hear a blowing or hissing noise, or a carbon monoxide (CO) alar
 
 ## Leave or stay
 
-- **Leave if** you smell gas, hear hissing or a CO alarm sounds. Go far enough that you cannot smell gas.[^pa_puc_gas_emergencies]
+- **Leave if** you smell gas, hear hissing or a CO alarm sounds. Go far enough that you cannot smell gas.[^pa_puc_gas_emergencies] {ref:getting_out}
 - **Go to** your meeting place, {meeting_near}, and count heads.[^ready_gov_plan][^cpsc_co_questions_answers]
 - **Call** 911 and the gas company, {gas_utility}, from outside.[^pa_puc_gas_emergencies]
 

@@ -38,7 +38,7 @@ An extreme heat warning is out, or it will stay above 90°F for two or more days
 
 ## Where and who
 
-- Nearest cooling center:
+- Cooling center or shelter: {shelter}
 
 ## Do not
 
@@ -48,7 +48,7 @@ An extreme heat warning is out, or it will stay above 90°F for two or more days
 ## When it is over
 
 - **Check on** older neighbors and family.[^ready_gov_heat]
-- **After a power cut,** throw out food that sat at 40°F or warmer for two hours.[^ready_gov_power_outages]
+- **After a power cut,** throw out food that was 40°F or warmer for 2 hours or more.[^ready_gov_power_outages]
 
 ## Sources
 

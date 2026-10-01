@@ -20,7 +20,7 @@ Your pharmacy cannot fill a prescription, or you hear that a medicine you take i
 ## Then
 
 1. **Ask your drug plan** about a 60- to 90-day supply once you can refill.[^medicare_drugs_disaster]
-2. **Keep a written list** of each person's medicines, doses and allergies.[^ready_gov_disability]
+2. **Keep a written list** of each person's medicines, doses and allergies.[^ready_gov_disability] {ref:people}
 
 ## Leave or stay
 

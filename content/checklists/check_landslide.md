@@ -15,11 +15,11 @@ Heavy rain soaks steep or burned slopes, or you hear rumbling, trees cracking or
 ## Do first
 
 1. **Leave** if officials tell you to, or if you feel unsafe at home.[^ready_gov_landslides]
-2. **Follow the instructions** of local emergency managers.[^ready_gov_landslides]
+2. **In its path?** Move uphill as fast as you can.[^ready_gov_landslides]
 3. **Stay awake and alert** during a storm that could cause a landslide.[^ready_gov_landslides]
 4. **Listen for warnings** on a battery-powered radio.[^ready_gov_landslides]
-5. **In its path?** Move uphill as fast as you can.[^ready_gov_landslides]
-6. **Watch streams** for water that suddenly rises, drops or turns muddy.[^ready_gov_landslides]
+5. **Watch streams** for water that suddenly rises, drops or turns muddy.[^ready_gov_landslides]
+6. **Follow the instructions** of local emergency managers.[^ready_gov_landslides]
 
 ## Then
 
@@ -35,10 +35,11 @@ Heavy rain soaks steep or burned slopes, or you hear rumbling, trees cracking or
 ## Where and who
 
 - Where we would go: {where_go}
-- How you get alerts: {alerts}
+- How we get alerts: {alerts}
 
 ## Do not
 
+- Do not stay to see if a debris flow is coming. By the time you are sure, it is too late to get away safely.[^ready_gov_landslides]
 - Do not cross a road with water or mud flowing on it.[^ready_gov_landslides]
 - Do not cross a bridge if you see a flow coming.[^ready_gov_landslides]
 - Do not go into the slide area, even to help someone. Show rescuers where to go.[^ready_gov_landslides]

@@ -4,7 +4,7 @@ title: Wildfire
 kind: checklist
 onset: now
 applies_to: [hazard:wildfire]
-citations: [ready_gov_wildfires, calfire_go_evacuation, ready_gov_pets, ready_gov_recovering]
+citations: [ready_gov_wildfires, calfire_go_evacuation, usfa_wildfire_evacuation, redcross_power_outage, ready_gov_pets, ready_gov_recovering]
 pages: 1
 ---
 
@@ -15,7 +15,7 @@ A wildfire is near, officials tell you to get ready or leave, or smoke or flames
 ## Do first
 
 1. **Leave right away** when officials tell you to.[^ready_gov_wildfires]
-2. **Leave early** if you feel at risk, even without an order.[^calfire_go_evacuation]
+2. **Leave early** if you feel at risk, or need extra time with children, pets or someone who needs help, even without an order.[^calfire_go_evacuation][^usfa_wildfire_evacuation]
 3. **Put your go-bag in the car.**[^calfire_go_evacuation]
 4. **Wear an N95 mask** in smoke.[^ready_gov_wildfires]
 5. **Trapped?** Call 911 and give your location. Turn on lights for rescuers.[^ready_gov_wildfires]
@@ -46,7 +46,7 @@ A wildfire is near, officials tell you to get ready or leave, or smoke or flames
 ## Do not
 
 - Do not leave sprinklers or water running.[^calfire_go_evacuation]
-- Do not touch power lines. Stay at least 10 feet away.[^calfire_go_evacuation]
+- Do not touch power lines.[^calfire_go_evacuation] Stay at least 35 feet from downed lines.[^redcross_power_outage]
 
 ## When it is over
 
@@ -59,5 +59,7 @@ A wildfire is near, officials tell you to get ready or leave, or smoke or flames
 
 [^ready_gov_wildfires]: FEMA / Ready.gov, Wildfires (2026).
 [^calfire_go_evacuation]: California Department of Forestry and Fire Protection (CAL FIRE), Go Evacuation Guide (Ready for Wildfire): pre-evacuation steps and tips if trapped (2026).
+[^usfa_wildfire_evacuation]: U.S. Fire Administration, Wildfire Evacuation Outreach Materials (2026).
+[^redcross_power_outage]: American Red Cross, Power Outage Safety (2026).
 [^ready_gov_pets]: FEMA / Ready.gov, Pets and Animals (2026).
 [^ready_gov_recovering]: FEMA / Ready.gov, Recovering from Disaster (2026).

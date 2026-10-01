@@ -38,6 +38,7 @@ A smoke alarm sounds, or you see or smell smoke or fire in your home.
 
 - Meeting place near home: {meeting_near}
 - Second way out of each bedroom:
+- Who helps whom get out:
 
 ## Do not
 
