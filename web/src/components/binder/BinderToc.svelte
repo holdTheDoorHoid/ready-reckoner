@@ -11,9 +11,20 @@
   let { binder, current = '', onjump }: { binder: Binder; current?: string; onjump?: (id: string, e: MouseEvent) => void } = $props();
 
   const toc = $derived(tableOfContents(binder));
+  let nav: HTMLElement | undefined = $state();
+
+  // Keep the page on screen in view in the contents (it scrolls on its own on a wide screen).
+  $effect(() => {
+    if (!current || !nav) return;
+    const link = nav.querySelector<HTMLElement>('[aria-current="location"]');
+    const box = nav.closest<HTMLElement>('.binder-side');
+    if (!link || !box || box.scrollHeight <= box.clientHeight) return;
+    const top = link.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop;
+    if (top < box.scrollTop || top > box.scrollTop + box.clientHeight - 40) box.scrollTop = Math.max(0, top - box.clientHeight / 3);
+  });
 </script>
 
-<nav class="binder-toc" aria-label="Binder contents">
+<nav class="binder-toc" aria-label="Binder contents" bind:this={nav}>
   <details open>
     <summary class="binder-toc__summary">Contents</summary>
     <ol class="binder-toc__parts">

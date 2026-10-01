@@ -122,4 +122,36 @@
     color: var(--text-muted);
     overflow-wrap: anywhere;
   }
+  @media print {
+    .binder-page__head {
+      border-bottom: 1.5pt solid #000;
+      margin-bottom: 6pt;
+      padding-bottom: 3pt;
+    }
+    .binder-page__tab {
+      color: #000;
+      font-size: 8.5pt;
+    }
+    .binder-page__tabno {
+      background: #000 !important;
+      color: #fff !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+    .binder-page__title {
+      font-size: 15pt;
+    }
+    .binder-page--cover .binder-page__title {
+      font-size: 24pt;
+      margin-top: 1in;
+    }
+    .binder-page--sources {
+      font-size: 7.5pt;
+    }
+    .binder-page--sources :global(.b-sources),
+    .binder-sources {
+      font-size: 7pt;
+      column-gap: 6mm;
+    }
+  }
 </style>

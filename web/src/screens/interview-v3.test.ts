@@ -626,22 +626,25 @@ describe('the tabs after v0.3.0', () => {
     expect(r.target.querySelector('h1')?.textContent).toBe('Prepare: what to do before');
     expect(said(r)).toContain('The things to do before anything happens: free steps, what to buy and when, decisions to make, and money to set aside.');
     expect(link(r, 'Add your people and places for the binder').getAttribute('href')).toBe('#/people');
-    const sheet = r.target.querySelector('.prepare-sheet')!;
-    expect(sheet.classList.contains('print-only')).toBe(true);
-    expect(sheet.innerHTML).toBe('');
+    const paper = r.target.querySelector('.prepare-print')!;
+    expect(paper.classList.contains('print-only')).toBe(true);
+    expect(paper.querySelector('.prepare-sheet')).toBeNull();
     button(r, 'Print your preparation plan').click();
     await until(() => print.mock.calls.length > 0, 'the print window');
     expect(r.target.querySelector('.prepare-page')?.classList.contains('printing')).toBe(true);
-    // The engine's Prepare sheet, through the site's Markdown renderer.
+    // The engine's Prepare sheet, through the site's Markdown renderer, with its date line.
+    const sheet = paper.querySelector('.prepare-sheet')!;
     expect(sheet.querySelector('h2')?.textContent).toBe(r.app.result.output!.prepare_markdown.match(/^# (.+)$/m)![1]);
+    expect(sheet.querySelector('.prepare-sheet__kicker')?.textContent).toContain('Prepare sheet');
+    expect(sheet.querySelector('.prepare-sheet__section--sources')).not.toBeNull();
     expect(sheet.querySelector('script, img, iframe')).toBeNull();
     window.dispatchEvent(new Event('afterprint'));
     flushSync();
-    expect(sheet.innerHTML).toBe('');
+    expect(paper.querySelector('.prepare-sheet')).toBeNull();
     // The browser's own Print fills it too.
     window.dispatchEvent(new Event('beforeprint'));
     flushSync();
-    expect(sheet.querySelector('h2')).not.toBeNull();
+    expect(paper.querySelector('.prepare-sheet h2')).not.toBeNull();
     window.dispatchEvent(new Event('afterprint'));
   });
 

@@ -333,4 +333,105 @@
     border-top: 1px dashed var(--border);
     margin: var(--s5) 0;
   }
+  @media print {
+    /* Paper: black on white, the same marks as the PDF (palette.ts), shading kept where it means something. */
+    .bh {
+      margin: 8pt 0 3pt;
+      break-after: avoid;
+    }
+    .bh--1 {
+      font-size: 11pt;
+    }
+    .bh--2,
+    .bh--3 {
+      font-size: 10pt;
+    }
+    .step {
+      padding: 1.5pt 4pt 1.5pt 2.2em;
+      margin: 0 0 1.5pt;
+      break-inside: avoid;
+    }
+    .step--memory {
+      background: #e3e3e3 !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+    .field {
+      padding: 2pt 0;
+      border-bottom: 0.5pt solid #8c8c8c;
+      break-inside: avoid;
+    }
+    .ruled {
+      background: repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.6em - 0.6pt), #000 calc(1.6em - 0.6pt), #000 1.6em) !important;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+    .callout {
+      background: #fff !important;
+      border-color: #000 !important;
+      border-radius: 0;
+      break-inside: avoid;
+    }
+    .callout--stop {
+      border-width: 2.5pt !important;
+    }
+    .callout--warning {
+      border-width: 1.5pt !important;
+    }
+    .callout--decision {
+      border-width: 1.25pt !important;
+      border-style: dashed !important;
+    }
+    .callout--note {
+      border-width: 0.75pt !important;
+    }
+    .callout__word {
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+      border-color: #000 !important;
+    }
+    .callout--stop .callout__word {
+      background: #000 !important;
+      color: #fff !important;
+    }
+    .callout--warning .callout__word {
+      background: #4d4d4d !important;
+      color: #fff !important;
+    }
+    .callout--note .callout__word {
+      background: #e6e6e6 !important;
+      color: #000 !important;
+    }
+    .write-in {
+      height: 16pt;
+    }
+    /* Wallet cards: the real size, 3.5 by 2 inches, cut along the dashed edge, never split. */
+    .wallet-cards {
+      display: block;
+    }
+    .wallet-card {
+      display: inline-block;
+      vertical-align: top;
+      box-sizing: border-box;
+      width: 3.5in;
+      height: 2in;
+      overflow: hidden;
+      margin: 0 0.15in 0.15in 0;
+      padding: 6pt 7pt;
+      border: 0.75pt dashed #000 !important;
+      border-radius: 0;
+      font-size: 8pt;
+      line-height: 1.2;
+      break-inside: avoid;
+    }
+    .wallet-card__title {
+      font-size: 9pt;
+      margin-bottom: 2pt;
+    }
+    .binder-break {
+      border: 0;
+      margin: 0;
+      break-after: page;
+    }
+  }
 </style>

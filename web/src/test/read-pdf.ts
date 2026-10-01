@@ -160,8 +160,11 @@ export function readPdf(bytes: Uint8Array): ReadPdf {
       .filter((a) => /\/Subtype \/Link/.test(a))
       .map((a) => {
         const rect = (/\/Rect \[([^\]]*)\]/.exec(a)?.[1] ?? '').trim().split(/\s+/).map(Number);
-        const dest = /\/D \(((?:\\.|[^)])*)\)/.exec(a)?.[1] ?? /\/Dest \(((?:\\.|[^)])*)\)/.exec(a)?.[1];
-        const uri = /\/URI \(((?:\\.|[^)])*)\)/.exec(a)?.[1];
+        // The action is inline, or (as pdfkit writes it) an object of its own.
+        const actionRef = ref(a, 'A');
+        const action = actionRef !== undefined ? (objs.get(actionRef)?.dict ?? '') : a;
+        const dest = /\/D \(((?:\\.|[^)])*)\)/.exec(action)?.[1] ?? /\/Dest \(((?:\\.|[^)])*)\)/.exec(a)?.[1];
+        const uri = /\/URI \(((?:\\.|[^)])*)\)/.exec(action)?.[1];
         return { rect, ...(dest !== undefined ? { dest: literal(dest) } : {}), ...(uri !== undefined ? { uri: literal(uri) } : {}) };
       });
     return { number: i + 1, mediaBox, text, links };

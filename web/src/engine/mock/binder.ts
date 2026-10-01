@@ -151,8 +151,8 @@ export function buildBinder(input: PlanInput, r: ModelResult): Binder {
   const fp: FamilyPlan = input.family_plan ?? {};
   const o = r.output;
   const loc = o.location;
-  const county = loc.state_abbr === 'LA' ? 'Parish' : loc.state_abbr === 'AK' ? '' : 'County';
-  const place = `${loc.county_name}${county ? ` ${county}` : ''}, ${loc.state_name}`;
+  // The mock's county names carry their own "County" ("Philadelphia County"), as its packet prints them.
+  const place = `${loc.county_name}, ${loc.state_name}`;
   const locationLine = `${place}${loc.zip ? ` (ZIP code ${loc.zip})` : ''}`;
   const reviewBy = addMonths(input.planning_date, 12);
   const years = Math.max(1, input.dials.horizon_years);
