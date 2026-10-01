@@ -28,7 +28,9 @@ fn engine_info_carries_versions_and_the_nri_statement() {
         info.data_pack_version.as_deref(),
         manifest["pack_version"].as_str()
     );
-    assert_eq!(info.packs_loaded, ["core"]);
+    // `common::engine()` loads `places` too (county hospitals), since `DATA_DIR_PACKS` now
+    // includes it alongside `core` (wasm3, 2026-10-01).
+    assert_eq!(info.packs_loaded, ["core", "places"]);
     let first = &info.attributions[0];
     assert!(
         first.source.contains("National Risk Index"),

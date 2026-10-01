@@ -96,6 +96,15 @@ const FIXTURES: &[(&str, &str, &str)] = &[
 
 const MANIFEST: &[u8] = include_bytes!("../../../data/manifest.json");
 
+/// The `places` pack's one file: county hospitals with emergency services, read by the binder's
+/// Neighbourhood page once loaded (DESIGN-DELTA-v3 §8). Lazy, like `geo`; loaded here (not at
+/// startup) to check `WasmSource::county_hospitals` end to end, the way the site loads it when
+/// the binder is shown.
+const PLACES: (&str, &[u8]) = (
+    "places/hospitals.csv",
+    include_bytes!("../../../data/places/hospitals.csv"),
+);
+
 /// The core pack's files with the county list last, as `web/src/engine/loader.ts` hands them over
 /// (the site loads the ZIP tables later, when a ZIP code is typed; here they come with the rest).
 /// The test checks this list against the manifest, so a file added to the pack is noticed.
@@ -418,7 +427,19 @@ fn sample_counties_first_then_the_packs_and_every_golden_to_the_last_digit() {
     );
     assert_eq!(info.attributions[0].source, "FEMA National Risk Index");
 
-    // 3. Every fixture, planned from the packs, is its golden file to the last digit.
+    // 3. The lazy `places` pack, as the site loads it when the binder's Neighbourhood page is
+    // shown: one file, after the core pack, never blocking anything that does not ask for it.
+    let (name, bytes) = PLACES;
+    let loaded: PackInfo = value_of(&rr_wasm::load_pack(name, bytes));
+    assert_eq!(loaded.name, name);
+    let info: EngineInfo = value_of(&rr_wasm::engine_info());
+    assert_eq!(info.packs_loaded, ["core", "places"]);
+
+    // 4. Every fixture, planned from the packs, is its golden file to the last digit. Loading
+    // `places` above means every fixture whose county has an emergency-services hospital now
+    // carries a table the golden does not yet (`cargo test -p rr-plan --test goldens` after
+    // `DATA_DIR_PACKS` was switched to include `places`, wasm3 2026-10-01): expected until the
+    // next golden regeneration, which the planner runs once for every workstream together.
     for (name, input, golden) in FIXTURES {
         let golden_version =
             serde_json::from_str::<serde_json::Value>(golden).unwrap()["data_pack_version"]
@@ -438,7 +459,7 @@ fn sample_counties_first_then_the_packs_and_every_golden_to_the_last_digit() {
         );
     }
 
-    // 4. The same input gives the same bytes, and errors come back in the same envelope.
+    // 5. The same input gives the same bytes, and errors come back in the same envelope.
     let envelope = rr_wasm::assess(PHILADELPHIA);
     assert_eq!(rr_wasm::assess(PHILADELPHIA), envelope);
     let output: PlanOutput = value_of(&envelope);

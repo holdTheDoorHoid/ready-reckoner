@@ -1,10 +1,10 @@
 //! Golden files: `fixtures/golden/<fixture>.md` (the binder's Markdown, a rule, then the Prepare
 //! sheet: [`crate::binder::markdown::with_prepare`]) and `.json` (the whole
 //! [`rr_types::PlanOutput`]) for every fixture household, planned against the repository's data
-//! packs (`data/`: the core pack, as the web app plans; the county hospital table of the
-//! Neighborhood page needs the `places` pack and is tested on its own). [`compare_all`] is what the tests (and `rr golden`) run; [`write_all`]
-//! regenerates them when `RR_UPDATE_GOLDENS=1`. A change to a golden must be explained in the
-//! commit message (CLAUDE.md).
+//! packs (`data/`, [`crate::source::DATA_DIR_PACKS`]: the core pack plus `places`, so the
+//! Neighborhood page's county hospital table prints here too, wasm3 2026-10-01). [`compare_all`]
+//! is what the tests (and `rr golden`) run; [`write_all`] regenerates them when
+//! `RR_UPDATE_GOLDENS=1`. A change to a golden must be explained in the commit message (CLAUDE.md).
 
 use std::path::{Path, PathBuf};
 

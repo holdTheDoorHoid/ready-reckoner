@@ -21,11 +21,19 @@
 //! core file in, a county plans (and `county_search` answers) as it will with the whole pack; any
 //! location that carries a ZIP code answers `pack_missing` until the ZIP tables are in, because
 //! a ZIP code decides the county and the facility distances.
+//!
+//! A second, independent file is lazier still: `places/hospitals.csv` (its own manifest pack,
+//! `places`, like `geo`) is never needed to plan, only to print the binder's Neighbourhood page's
+//! county hospital table (DESIGN-DELTA-v3 §8), so the web app loads it only when that page is
+//! shown. `county_hospitals` (below) answers from it through `rr_plan::source::store_hospitals`,
+//! which already reads "not loaded" as "say nothing about it" (`None`), so it needs no `Mode` of
+//! its own: unlike the core pack, a plan is never wrong for lacking it, only incomplete.
 
 use std::collections::BTreeSet;
 
 use rr_data::DataStore;
-use rr_plan::{CountySource, FixtureSource};
+use rr_plan::source::store_hospitals;
+use rr_plan::{CountyHospitals, CountySource, FixtureSource};
 use rr_types::{
     Attribution, BaseRate, CountyRecord, EngineError, ErrorCode, LocationInput, LocationResolved,
     PackInfo, Problem, ProblemCode, RestorationCurve,
@@ -339,5 +347,49 @@ impl CountySource for WasmSource {
             // for an unknown ZIP code.
             Mode::Packs { .. } => self.store.resolve(input),
         }
+    }
+
+    /// The county's hospitals with emergency services, for the binder's Neighbourhood page
+    /// (DESIGN-DELTA-v3 §4.2, §8), once the lazy `places` pack (`places/hospitals.csv`) is
+    /// loaded: `store_hospitals` already answers `None` until then, so this needs no `Mode`
+    /// check of its own. `None` in sample-county mode too (the fourteen built-in counties carry
+    /// no hospital list; `self.store` never has `places` loaded there, since it only gains files
+    /// `load_pack` is given).
+    fn county_hospitals(&self, fips: &str) -> Option<CountyHospitals> {
+        store_hospitals(&self.store, fips)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const HOSPITALS: &[u8] = include_bytes!("../../../data/places/hospitals.csv");
+
+    /// `county_hospitals` answers `None` before the lazy `places` pack is loaded (in
+    /// sample-county mode, which is all a fresh `WasmSource` is); once it is loaded,
+    /// Philadelphia's county has hospitals and Blount County, Alabama's has none, but is still
+    /// `Some` with no rows (the list was checked; see `rr-plan`'s
+    /// `the_hospital_table_appears_where_the_county_has_hospitals` for how the binder's
+    /// Neighbourhood page tells the two apart).
+    #[test]
+    fn county_hospitals_answers_only_once_the_places_pack_is_loaded() {
+        let mut source = WasmSource::new().unwrap();
+        assert_eq!(source.county_hospitals("42101"), None);
+
+        source.load_pack("places/hospitals.csv", HOSPITALS).unwrap();
+        let philadelphia = source.county_hospitals("42101").unwrap();
+        assert!(
+            philadelphia
+                .rows
+                .iter()
+                .any(|h| h.name.contains("TEMPLE UNIVERSITY HOSPITAL")),
+            "{philadelphia:?}"
+        );
+        let blount = source.county_hospitals("01009").unwrap();
+        assert!(
+            blount.rows.is_empty(),
+            "{blount:?}: Blount County, Alabama has none"
+        );
     }
 }
