@@ -27,7 +27,7 @@
  */
 import type { Binder, Block, CalloutKind, Inline, IsoDate, MapSlot, MapSlotKind, Page } from '../../../engine/types';
 import { formatDate } from '../../format';
-import { binderPages, type PageEntry } from '../model';
+import { binderPages, creditsNotShown, type PageEntry, sourceListIndex } from '../model';
 import { CALLOUT_STYLES, HAIRLINE, HEADER_FILL, INK, MEMORY_FILL, MUTED, STEP_STYLES } from '../palette';
 import { labelSheet } from './labels';
 
@@ -104,7 +104,7 @@ const STYLES = {
   coverTitle: { fontSize: 26, bold: true, lineHeight: 1.1, margin: [0, 90, 0, 18] },
   partLabel: { fontSize: 8, bold: true, characterSpacing: 0.6, color: MUTED, margin: [0, 0, 0, 3] },
   h1: { fontSize: 10.5, bold: true, margin: [0, 5, 0, 1.5] },
-  h2: { fontSize: 10, bold: true, margin: [0, 4.5, 0, 1] },
+  h2: { fontSize: 10, bold: true, margin: [0, 4, 0, 1] },
   h3: { fontSize: 9.5, bold: true, italics: true, margin: [0, 4, 0, 1] },
   para: { margin: [0, 0, 0, 4] },
   cell: { fontSize: 9 },
@@ -257,6 +257,8 @@ class Ctx {
   readonly pages: Map<string, PageEntry>;
   /** The type scale of the page being built. */
   private k = 1;
+  /** The page being built. */
+  private page: Page | undefined;
 
   constructor(
     readonly b: Binder,
@@ -290,6 +292,7 @@ class Ctx {
   /** One binder page as a top-level stack starting on a fresh sheet. */
   sheet(e: PageEntry, first: boolean, scale: number): Node {
     this.k = scale;
+    this.page = e.page;
     const p = e.page;
     const firstOfPart = e.inPart === 0;
     const cut = p.kind === 'wallet_cards';
@@ -301,8 +304,7 @@ class Ctx {
       head.push({ text: nfc(p.title), ...this.st('title'), id: pageDest(p.id), outline: true, outlineText: `${e.part.tab}. ${nfc(p.title)}` });
     }
     const width = cut ? this.paper.width - CARD_MARGINS[0] - CARD_MARGINS[2] : this.width;
-    const body = this.blocks(p.blocks, width, p);
-    if (p.kind === 'sources') body.push(...this.sourcesList(p));
+    const body = p.kind === 'sources' ? this.sourcesPage(p, width) : this.blocks(p.blocks, width, p);
     const node: Node = { stack: [...head, ...body], fontSize: BASE_SIZE * this.k };
     if (cut) node.margin = [CARD_MARGINS[0] - MARGINS[0], 0, CARD_MARGINS[2] - MARGINS[2], 0];
     // A part starts on a right-hand page when printed on both sides, and so does the page after a
@@ -310,6 +312,7 @@ class Ctx {
     const afterCut = this.entries[e.index - 1]?.page.kind === 'wallet_cards';
     if (!first) node.pageBreak = this.breakBefore(firstOfPart || cut || afterCut);
     this.k = 1;
+    this.page = undefined;
     return node;
   }
 
@@ -425,8 +428,8 @@ class Ctx {
       if (pair) {
         const gap = 14;
         const half = (width - gap) / 2;
+        // Not unbreakable: on a full page the two lists may run on together, rather than leave a gap.
         push({
-          unbreakable: true,
           columnGap: gap,
           columns: pair.map(([head, list]) => ({ width: half, stack: [this.heading(head.level, head.text), ...this.list(list, false, 1)] })),
         });
@@ -466,7 +469,7 @@ class Ctx {
     if ('bullets' in bl && bl.bullets.length > KEEP + 1) return [this.list(bl.bullets.slice(0, KEEP), false, 1, true), this.list(bl.bullets.slice(KEEP), false, 1)];
     if ('numbered' in bl && bl.numbered.length > KEEP + 1) return [this.list(bl.numbered.slice(0, KEEP), true, 1, true), this.list(bl.numbered.slice(KEEP), true, KEEP + 1)];
     if ('steps' in bl && bl.steps.length > KEEP + 1) return [[this.steps(bl.steps.slice(0, KEEP), width, 1, true)], [this.steps(bl.steps.slice(KEEP), width, KEEP + 1)]];
-    if ('fields' in bl && bl.fields.length > KEEP + 1) return [[this.fields(bl.fields.slice(0, KEEP), width, true)], [this.fields(bl.fields.slice(KEEP), width)]];
+    if ('fields' in bl && bl.fields.length > KEEP + 1 && this.page?.kind !== 'contacts' && this.page?.kind !== 'checklist') return [[this.fields(bl.fields.slice(0, KEEP), width, true)], [this.fields(bl.fields.slice(KEEP), width)]];
     return [this.block(bl, width, page), []];
   }
 
@@ -526,13 +529,33 @@ class Ctx {
 
   /** Labelled answers: the household's words as written, or ruled lines to write on. */
   private fields(rows: readonly { label: string; value?: string; lines: number }[], width: number, continues = false): Node {
+    // "Contacts at a glance" is a phone list, and a checklist's "Where and who" short lines to fill
+    // in: their answers sit in two columns, so the page fits one sheet.
+    const twoUp = this.page?.kind === 'contacts' || this.page?.kind === 'checklist';
+    if (twoUp && rows.length >= 3 && !continues) {
+      const gap = 14;
+      const half = Math.ceil(rows.length / 2);
+      const w = (width - gap) / 2;
+      return {
+        columns: [
+          { ...this.fieldTable(rows.slice(0, half), w, true), width: w },
+          { ...this.fieldTable(rows.slice(half), w, true), width: w },
+        ],
+        columnGap: gap,
+        margin: [0, 0, 0, this.z(5)],
+      };
+    }
+    return this.fieldTable(rows, width, continues);
+  }
+
+  private fieldTable(rows: readonly { label: string; value?: string; lines: number }[], width: number, continues: boolean): Node {
     const labelW = Math.round(width * 0.34);
     const valueW = width - labelW - 16;
     const body = rows.map((r) => [
       { text: nfc(r.label), ...this.st('fieldLabel') },
       r.value !== undefined && r.value !== '' ? { text: nfc(r.value) } : this.ruled(Math.max(1, r.lines), valueW),
     ]);
-    const pad = this.z(2);
+    const pad = this.z(1.6);
     return {
       table: { widths: [labelW, valueW], body, dontBreakRows: true },
       layout: {
@@ -594,7 +617,7 @@ class Ctx {
       const cells: Content[] = Array.from({ length: cols }, (_, i) => {
         const cell = r[i] ?? [];
         // An empty cell is room to write in.
-        return cell.length === 0 ? { text: ' ', ...this.st('cell'), margin: [0, this.z(5), 0, this.z(5)] } : { text: this.run(cell), ...this.st('cell') };
+        return cell.length === 0 ? { text: ' ', ...this.st('cell'), margin: [0, this.z(4), 0, this.z(4)] } : { text: this.run(cell), ...this.st('cell') };
       });
       if (paged) cells.push(this.pageCell(targets[k]));
       return cells;
@@ -766,7 +789,7 @@ class Ctx {
     const cols = Math.max(1, columns.length);
     const head: Content[] = Array.from({ length: cols }, (_, i) => ({ text: nfc(columns[i] ?? ''), ...this.st('th') }));
     const each = (width - 8 * cols - (cols + 1) * 0.5) / cols;
-    const blankRow = () => Array.from({ length: cols }, () => ({ text: ' ', margin: [0, 7, 0, 7] }));
+    const blankRow = () => Array.from({ length: cols }, () => ({ text: ' ', margin: [0, 4, 0, 4] }));
     const heads: Content[][] = heading ? [this.headingRow(heading, cols), head] : [head];
     return {
       table: { headerRows: heads.length, dontBreakRows: true, widths: Array.from({ length: cols }, () => each), body: [...heads, ...Array.from({ length: Math.max(1, rows) }, blankRow)] },
@@ -777,32 +800,47 @@ class Ctx {
 
   // ---- sources --------------------------------------------------------------------------------
 
-  /** The numbered sources (each an anchor that citations link to) and the data credits. */
-  private sourcesList(page: Page): Content[] {
-    const out: Content[] = [];
-    if (this.b.sources.length) {
-      out.push({ text: 'Numbered sources', ...this.st('h1'), headlineLevel: 1 });
-      const items: Node[] = this.b.sources.map((s) => ({
-        id: sourceDest(s.n),
-        text: [
-          { text: `${s.n}. `, bold: true },
-          nfc(`${s.publisher}, ${s.title}${s.year ? ` (${s.year})` : ''}${s.expert ? ', an expert estimate' : ''}.`),
-          ...(s.url ? [{ text: ` ${s.url}`, color: MUTED, link: s.url }] : []),
-        ],
-        fontSize: 7,
-        margin: [0, 0, 0, 2],
-      }));
-      const half = Math.ceil(items.length / 2);
-      out.push({ columns: [{ stack: items.slice(0, half), width: '*' }, { stack: items.slice(half), width: '*' }], columnGap: 14 });
+  /**
+   * The Sources page in small type: the engine's numbered list of sources in two columns, each
+   * item an anchor the citation numbers link to (or, when the page has no such list, the list
+   * from `Binder.sources`), then whatever else the page holds (the data credits, how the binder
+   * was made), and any credit the page does not print itself.
+   */
+  private sourcesPage(p: Page, width: number): Content[] {
+    const k = this.k;
+    this.k = Math.min(k, 0.8);
+    const at = sourceListIndex(p, this.b);
+    const half = (width - 14) / 2;
+    const flow: Content[] = [];
+    const items = (texts: TextRun[]): Content[] =>
+      texts.map((text, i) => ({ id: sourceDest(i + 1), text: [{ text: `${i + 1}. `, bold: true }, ...text], fontSize: 7, margin: [0, 0, 0, 2] }));
+    if (at >= 0) {
+      const list = p.blocks[at]!;
+      flow.push(...this.blocks(p.blocks.slice(0, at), half, p));
+      if ('numbered' in list) flow.push(...items(list.numbered.map((it) => this.run(it))));
+      flow.push(...this.blocks(p.blocks.slice(at + 1), half, p));
+    } else {
+      flow.push(...this.blocks(p.blocks, half, p));
+      if (this.b.sources.length) {
+        flow.push({ text: 'Numbered sources', ...this.st('h1'), headlineLevel: 1 });
+        flow.push(
+          ...items(
+            this.b.sources.map((s) => [
+              nfc(`${s.title}. ${s.publisher}${s.year ? `, ${s.year}` : ''}${s.expert ? ', an expert estimate' : ''}.`),
+              ...(s.url ? [{ text: ` ${s.url}`, color: MUTED, link: s.url }] : []),
+            ]),
+          ),
+        );
+      }
     }
-    // The engine may print the credits on the page itself; then they are not repeated.
-    const shown = page.blocks.flatMap((bl) => ('para' in bl ? [bl.para.map((i) => ('t' in i ? i.t : 'b' in i ? i.b : '')).join('')] : []));
-    const credits = this.b.credits.filter((c) => !shown.some((s) => s.includes(c)));
+    const credits = creditsNotShown(p, this.b);
     if (credits.length) {
-      out.push({ text: 'Data credits', ...this.st('h1'), headlineLevel: 1 });
-      for (const c of credits) out.push({ text: nfc(c), ...this.st('tiny'), margin: [0, 0, 0, 3] });
+      flow.push({ text: 'Data credits', ...this.st('h1'), headlineLevel: 1 });
+      for (const c of credits) flow.push({ text: nfc(c), fontSize: 7, color: MUTED, margin: [0, 0, 0, 3] });
     }
-    return out;
+    this.k = k;
+    // pdfmake's snaking columns fill the left column, then the right, then the next page.
+    return [{ columns: [{ stack: flow, width: half }, { text: '', width: half }], columnGap: 14, snakingColumns: true, fontSize: 7.5 }];
   }
 
   // ---- running text ---------------------------------------------------------------------------
@@ -822,7 +860,8 @@ class Ctx {
     inlines.forEach((i, k) => {
       if ('t' in i) out.push(nfc(i.t));
       else if ('b' in i) out.push({ text: nfc(i.b), bold: true });
-      else if ('blank' in i) out.push({ text: FIGURE_SPACE.repeat(Math.max(3, Math.min(48, i.blank))), decoration: 'underline', decorationColor: INK });
+      // A blank is a run of underscores: pdfmake drops the underline of spaces at the end of a line.
+      else if ('blank' in i) out.push({ text: '_'.repeat(Math.max(3, Math.min(40, i.blank))), color: INK });
       else if ('cite' in i) out.push(...this.cite(i.cite, endsInSpace()));
       else if ('link' in i) {
         const words = nfc(i.link.text);
@@ -857,9 +896,7 @@ class Ctx {
 /** A wallet card: 3½ by 2 inches. */
 export const CARD = { width: 252, height: 144 } as const;
 
-/** A blank to write on is drawn as underlined figure spaces (each as wide as a digit). */
-const FIGURE_SPACE = ' ';
-const THIN_SPACE = ' ';
+const THIN_SPACE = '\u2009';
 
 /** The width of a "Page" column: room for pdfmake's five-digit placeholder at table size. */
 const PAGE_COL = 34;

@@ -18,7 +18,7 @@ import Learn from './Learn.svelte';
 import Maintain from './Maintain.svelte';
 import Money from './Money.svelte';
 import NotFound from './NotFound.svelte';
-import Packet from './Packet.svelte';
+import Binder from './Binder.svelte';
 import People from './People.svelte';
 import Places from './Places.svelte';
 import PlanScreen from './PlanScreen.svelte';
@@ -41,7 +41,7 @@ const SCREENS: [string, Component, string, string][] = [
   ['contacts', Contacts, 'contacts', 'Contacts, pets, vehicles and documents'],
   ['risks', Risks, 'risks', 'Your risks'],
   ['prepare', PlanScreen, 'prepare', 'Prepare: what to do before'],
-  ['binder', Packet, 'binder', 'Your binder'],
+  ['binder', Binder, 'binder', 'Your binder'],
   ['maintain', Maintain, 'maintain', 'Keep it up'],
   ['learn', Learn, 'learn', 'Learn'],
   ['learn article', Learn, 'learn/myths', 'Disaster myths'],
@@ -210,11 +210,14 @@ describe('what the screens show', () => {
     expect(r.text()).toContain('Battery backup for a medical device');
   });
 
-  it('binder: renders the engine packet safely with a print button', async () => {
-    const r = await screen(Packet, 'binder', 'philadelphia-renters-4');
-    expect(r.target.querySelector('.packet h2')?.textContent).toBe('Your preparedness packet');
-    expect(r.target.querySelector('.packet script, .packet img, .packet iframe')).toBeNull();
-    expect([...r.target.querySelectorAll('button')].some((b) => b.textContent?.includes('Print or save as PDF'))).toBe(true);
+  it('binder: renders the engine binder safely, with Download PDF and Print', async () => {
+    const r = await screen(Binder, 'binder', 'philadelphia-renters-4');
+    const binder = r.app.result.output!.binder;
+    expect(r.target.querySelectorAll('.binder-page')).toHaveLength(binder.parts.reduce((n, p) => n + p.pages.length, 0));
+    expect(r.target.querySelector('.binder-doc script, .binder-doc iframe')).toBeNull();
+    const buttons = [...r.target.querySelectorAll('button')].map((b) => b.textContent?.trim());
+    expect(buttons).toContain('Download PDF');
+    expect(buttons).toContain('Print');
   });
 
   it('where: a ZIP code that spans counties asks which one, and keeps the ZIP code', async () => {

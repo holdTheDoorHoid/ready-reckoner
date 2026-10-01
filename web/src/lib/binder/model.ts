@@ -141,6 +141,22 @@ export function blockInlines(block: Block): Inline[] {
   return [];
 }
 
+/**
+ * On the Sources page, the block that lists the numbered sources: a numbered list with one item
+ * per source (the engine prints the list itself; citation numbers point to its items). -1 when
+ * the page has none, and the renderers then print the sources from `Binder.sources`.
+ */
+export function sourceListIndex(page: Page, b: Binder): number {
+  if (page.kind !== 'sources' || b.sources.length === 0) return -1;
+  return page.blocks.findIndex((bl) => 'numbered' in bl && bl.numbered.length === b.sources.length);
+}
+
+/** The data credits a page does not already print (the engine may list them on the Sources page). */
+export function creditsNotShown(page: Page, b: Binder): string[] {
+  const shown = page.blocks.flatMap(blockTexts);
+  return b.credits.filter((c) => !shown.some((s) => s.includes(c)));
+}
+
 // ---------------------------------------------------------------------------------------------
 // Table of contents
 // ---------------------------------------------------------------------------------------------

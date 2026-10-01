@@ -19,7 +19,7 @@ import { render, savedFor, until, withoutOptional, type Rendered } from '../test
 import Contacts from './Contacts.svelte';
 import Have from './Have.svelte';
 import Maintain from './Maintain.svelte';
-import Packet from './Packet.svelte';
+import Binder from './Binder.svelte';
 import People from './People.svelte';
 import Places from './Places.svelte';
 import PlanScreen from './PlanScreen.svelte';
@@ -653,11 +653,11 @@ describe('the tabs after v0.3.0', () => {
 
   it('the binder opens at the wallet cards, from the new address and from the old one', async () => {
     for (const route of ['binder/wallet-cards', 'packet/wallet-cards']) {
-      const r = await open(Packet, route, savedFor(detroit));
+      const r = await open(Binder, route, savedFor(detroit));
       expect(r.target.querySelector('h1')?.textContent).toBe('Your binder');
       expect(window.location.hash).toBe('#/binder/wallet-cards');
       await until(() => (document.activeElement?.textContent ?? '').includes('Wallet cards'), 'focus on the wallet cards');
-      expect(r.target.querySelector('.packet-section.is-cards')?.querySelectorAll('blockquote')).toHaveLength(detroit.people.length);
+      expect(r.target.querySelector('.binder-page--wallet_cards')?.querySelectorAll('.wallet-card')).toHaveLength(detroit.people.length);
     }
   });
 

@@ -51,8 +51,8 @@ export interface RenderedPdf {
   passes: number;
 }
 
-/** At most this many layouts: the first, and up to three redraws of pages over their fit. */
-const MAX_PASSES = 4;
+/** At most this many layouts: the first, and up to two redraws of pages over their fit. */
+const MAX_PASSES = 3;
 
 /**
  * Word units (DESIGN-DELTA-v3 §5.6) that fit on one sheet at full-size type, measured on the
@@ -93,7 +93,7 @@ export async function renderBinderPdf(pdfMake: PdfMakeInstance, fonts: FontFiles
 
 /**
  * The scales for the next layout: every page that took more sheets than its `fit` allows, a step
- * smaller (by what its overflow suggests, at most 0.08 a step, never below `MIN_SCALE`); null when
+ * smaller (by what its overflow suggests, at most 0.16 a step, never below `MIN_SCALE`); null when
  * nothing is over, or nothing over can shrink further.
  */
 export function refit(doc: BinderDoc): Map<string, number> | null {
@@ -106,7 +106,7 @@ export function refit(doc: BinderDoc): Map<string, number> | null {
     const f = sheetFill(s);
     if (!f || f.pages <= allowed || s.scale <= MIN_SCALE) continue;
     const want = s.scale * ((allowed - 0.03) / f.fill) ** (1 / 1.5);
-    next.set(s.entry.page.id, Math.max(MIN_SCALE, Math.min(s.scale - 0.02, Math.max(s.scale - 0.08, want))));
+    next.set(s.entry.page.id, Math.max(MIN_SCALE, Math.min(s.scale - 0.02, Math.max(s.scale - 0.16, want))));
     changed = true;
   }
   return changed ? next : null;

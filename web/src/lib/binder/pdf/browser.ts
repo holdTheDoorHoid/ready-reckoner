@@ -7,7 +7,9 @@
 import pdfMake from 'pdfmake/build/pdfmake.min.js';
 
 import type { Binder } from '../../../engine/types';
-import type { PdfOptions } from './doc';
+import { binderTexts } from '../model';
+import { type PdfOptions, sheetRange } from './doc';
+import { missingCharacters } from './coverage';
 import boldItalicUrl from './fonts/NotoSans-BoldItalic.woff?url';
 import boldUrl from './fonts/NotoSans-Bold.woff?url';
 import italicUrl from './fonts/NotoSans-Italic.woff?url';
@@ -23,7 +25,7 @@ function loadFonts(): Promise<FontFiles> {
   fonts ??= Promise.all(
     (Object.keys(URLS) as (keyof FontFiles)[]).map(async (style) => {
       const res = await fetch(URLS[style]);
-      if (!res.ok) throw new Error(`The PDF's font could not be loaded (${res.status}).`);
+      if (!res.ok) throw new Error(`the PDF's typeface could not be loaded (${res.status})`);
       return [style, new Uint8Array(await res.arrayBuffer())] as const;
     }),
   ).then((pairs) => Object.fromEntries(pairs) as FontFiles);
@@ -31,8 +33,21 @@ function loadFonts(): Promise<FontFiles> {
   return fonts;
 }
 
+export interface MadePdf {
+  blob: Blob;
+  /** Printed pages. */
+  pages: number;
+  /** Characters in the binder the PDF's typeface lacks (they print as empty boxes). */
+  missing: string[];
+}
+
 /** The binder as a PDF file. */
-export async function makeBinderPdf(b: Binder, opts: PdfOptions): Promise<Blob> {
-  const { bytes } = await renderBinderPdf(pdfMake, await loadFonts(), b, opts);
-  return new Blob([bytes as Uint8Array<ArrayBuffer>], { type: 'application/pdf' });
+export async function makeBinderPdf(b: Binder, opts: PdfOptions): Promise<MadePdf> {
+  const { bytes, doc } = await renderBinderPdf(pdfMake, await loadFonts(), b, opts);
+  const last = doc.sheets.at(-1);
+  return {
+    blob: new Blob([bytes as Uint8Array<ArrayBuffer>], { type: 'application/pdf' }),
+    pages: (last && sheetRange(last)?.[1]) ?? 0,
+    missing: missingCharacters(binderTexts(b)),
+  };
 }

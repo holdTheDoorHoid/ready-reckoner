@@ -15,13 +15,13 @@
   import { provideApp } from './lib/app.svelte';
   import { formatHash, provideRouter, ROUTES, type RouteId, type Router } from './lib/router.svelte';
   import About from './screens/About.svelte';
+  import Binder from './screens/Binder.svelte';
   import Contacts from './screens/Contacts.svelte';
   import Have from './screens/Have.svelte';
   import Learn from './screens/Learn.svelte';
   import Maintain from './screens/Maintain.svelte';
   import Money from './screens/Money.svelte';
   import NotFound from './screens/NotFound.svelte';
-  import Packet from './screens/Packet.svelte';
   import People from './screens/People.svelte';
   import Places from './screens/Places.svelte';
   import PlanScreen from './screens/PlanScreen.svelte';
@@ -52,7 +52,7 @@
     contacts: Contacts,
     risks: Risks,
     prepare: PlanScreen,
-    binder: Packet,
+    binder: Binder,
     maintain: Maintain,
     learn: Learn,
     validation: Validation,
