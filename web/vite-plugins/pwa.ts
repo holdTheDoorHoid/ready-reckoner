@@ -5,7 +5,10 @@
  *   without the ZIP tables, as `src/engine/data-files.ts` defines it), and naming the cache after
  *   a hash of their contents (so any change, including new data, ships as a new version).
  * - `contentSecurityPolicy()` adds a CSP to the built `index.html`: scripts only from this site
- *   (plus WebAssembly compilation), no inline scripts, no third-party origins (docs/DESIGN.md §10).
+ *   (plus WebAssembly compilation), no inline scripts, no third-party origins (docs/DESIGN.md §10)
+ *   except the maps' optional, consented services: exactly the origins in
+ *   `src/lib/maps/sources.ts` (`MAP_ORIGINS`), in `connect-src` and `img-src` only (DESIGN-DELTA-v3
+ *   §9.3). Nothing requests them before the household presses "Fetch maps" (web/scripts/e2e.mjs).
  *   It is left out of the dev server, whose hot reload needs inline scripts and a websocket.
  */
 import { createHash } from 'node:crypto';
@@ -17,6 +20,7 @@ import type { Plugin, ResolvedConfig } from 'vite';
 
 import { type Manifest, startupFiles } from '../src/engine/data-files';
 import { DATA_MANIFEST, dataPrecacheList, precacheList } from '../src/pwa/sw-core';
+import { CSP } from './csp';
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -79,20 +83,7 @@ export function serviceWorker(): Plugin {
   };
 }
 
-/** The policy. `'unsafe-inline'` for styles only: Svelte sets style attributes; scripts stay strict. */
-export const CSP = [
-  "default-src 'self'",
-  "script-src 'self' 'wasm-unsafe-eval'",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "font-src 'self'",
-  "connect-src 'self'",
-  "worker-src 'self'",
-  "manifest-src 'self'",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'none'",
-].join('; ');
+export { CSP } from './csp';
 
 export function contentSecurityPolicy(): Plugin {
   return {

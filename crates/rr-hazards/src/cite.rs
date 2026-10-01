@@ -180,8 +180,19 @@ pub const USACE_NLD: &str = "usace_nld";
 /// Association of State Dam Safety Officials, Dam Failures and Incidents: state dam safety
 /// programs reported 173 failures and 587 incidents from January 2005 through June 2013.
 pub const ASDSO: &str = "asdso_dam_failures";
-/// Eviction Lab (Princeton): eviction filings and judgments by county (ODC-BY).
+/// Eviction Lab (Princeton): eviction filings and households threatened by county, 2000–2018
+/// (ODC-BY). The county file has no judgments.
 pub const EVICTION_LAB: &str = "eviction_lab_county_estimates";
+/// Gromis et al. (PNAS, 2022), the paper behind the county file: 3.6 million filings and 2.7
+/// million households threatened a year, 2000–2018; repeat filings 57.4 % of Maryland's cases in
+/// 2018; judgments not recorded consistently enough for national estimates.
+pub const GROMIS_2022: &str = "gromis_2022_eviction_prevalence";
+/// Eviction Lab, Help & FAQ: households threatened and eviction judgments a year, 2000–2018, and
+/// why serial filing makes filings outnumber households.
+pub const EVICTION_LAB_FAQ: &str = "eviction_lab_faq";
+/// Eviction Lab, National Estimates: Eviction in America (2018): 898,479 evictions from 2,350,042
+/// filings in 2016.
+pub const EVICTION_LAB_NATIONAL: &str = "eviction_lab_national";
 /// Insurance Information Institute, facts and statistics on homeowners claims (ISO data): water
 /// damage and freezing, about 1 in 67 insured homes a year.
 pub const III_WATER: &str = "iii_water_damage";
@@ -342,6 +353,9 @@ pub const ALL: &[&str] = &[
     USACE_NLD,
     ASDSO,
     EVICTION_LAB,
+    GROMIS_2022,
+    EVICTION_LAB_FAQ,
+    EVICTION_LAB_NATIONAL,
     III_WATER,
     FCC_ATT_2024,
     ASHP_SHORTAGES,

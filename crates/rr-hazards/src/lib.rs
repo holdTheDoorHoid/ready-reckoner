@@ -580,6 +580,10 @@ fn profile(ctx: &Ctx<'_>, r: &HazardRate, e: &Estimate) -> HazardProfile {
             verb,
         ));
     }
+    if let Some(caveat) = &r.caveat {
+        frequency_sentence.push(' ');
+        frequency_sentence.push_str(caveat);
+    }
     HazardProfile {
         id: r.hazard,
         name: r.hazard.name().to_owned(),

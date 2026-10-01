@@ -44,7 +44,7 @@ const MAPS: MapsState = {
       { lat: 40.0, lon: -75.3 },
     ],
   ],
-  layers: { base: true, places: true, flood: true, surge: false, wildfire: false },
+  layers: { places: true, flood: true, surge: false, wildfire: false },
   fetched_on: '2026-10-02',
 };
 
@@ -163,11 +163,12 @@ describe('the maps (web-only, outside the household)', () => {
           { lat: 2, lon: 2 },
         ],
       ],
-      layers: { base: true, places: true, flood: false, surge: false, wildfire: true },
+      layers: { places: true, flood: false, surge: false, wildfire: true },
     });
-    // A pin is kept to about a metre; layers turned off stay off.
+    // A pin is kept to about a metre; layers turned off stay off; the layers are §9.5's four, so a
+    // street-map choice from an older file (which belonged to one press) is not kept.
     expect(checkMapsState({ home: { lat: 39.123456789, lon: -75.987654321 } })?.home).toEqual({ lat: 39.12346, lon: -75.98765 });
-    expect(checkMapsState({ layers: { base: false, places: false } })?.layers).toEqual({ base: false, places: false, flood: false, surge: false, wildfire: false });
+    expect(checkMapsState({ layers: { base: false, places: false } })?.layers).toEqual({ places: false, flood: false, surge: false, wildfire: false });
     expect(checkMapsState('pins')).toBeUndefined();
     const r = checkSavedPlan({ ...v1(), maps: 'damaged' });
     expect(r.ok && r.plan.maps).toBeUndefined();

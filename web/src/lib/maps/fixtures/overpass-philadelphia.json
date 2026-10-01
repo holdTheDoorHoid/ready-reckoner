@@ -1,0 +1,382 @@
+{
+ "version": 0.6,
+ "generator": "Overpass API (trimmed test fixture)",
+ "osm3s": {
+  "timestamp_osm_base": "2026-09-27T14:51:06Z",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+ },
+ "note": "Trimmed from one real Overpass answer for a Philadelphia (ZIP 19147) household on 2026-09-27: 23 of 464 elements, only the tags the maps read. Elements with negative ids are made up for edge cases. Data (c) OpenStreetMap contributors, ODbL 1.0, openstreetmap.org/copyright.",
+ "elements": [
+  {
+   "type": "node",
+   "id": 367962881,
+   "lat": 39.9326126,
+   "lon": -75.1637461,
+   "tags": {
+    "amenity": "fire_station",
+    "name": "Philadelphia Company10 Fire Station"
+   }
+  },
+  {
+   "type": "node",
+   "id": 367962956,
+   "lat": 39.9335586,
+   "lon": -75.1478158,
+   "tags": {
+    "amenity": "fire_station",
+    "name": "Philadelphia Company 3 Fire Station"
+   }
+  },
+  {
+   "type": "node",
+   "id": 367685768,
+   "lat": 39.9333017,
+   "lon": -75.1421892,
+   "tags": {
+    "addr:housenumber": "1",
+    "addr:street": "Washington Avenue",
+    "amenity": "fire_station",
+    "name": "Philadelphia Marine Number 1 Fire Station"
+   }
+  },
+  {
+   "type": "node",
+   "id": 6624401011,
+   "lat": 39.943015,
+   "lon": -75.1577811,
+   "tags": {
+    "amenity": "police",
+    "name": "South Street Police Sub Station"
+   }
+  },
+  {
+   "type": "node",
+   "id": 357374314,
+   "lat": 39.9480201,
+   "lon": -75.1550189,
+   "tags": {
+    "addr:housenumber": "840",
+    "addr:street": "Walnut Street",
+    "amenity": "hospital",
+    "emergency": "yes",
+    "healthcare": "hospital",
+    "name": "Wills Eye Hospital",
+    "phone": "+1 215 928 3000"
+   }
+  },
+  {
+   "type": "way",
+   "id": 333776344,
+   "center": {
+    "lat": 39.9211411,
+    "lon": -75.1692681
+   },
+   "tags": {
+    "addr:housenumber": "2301",
+    "addr:street": "South Broad Street",
+    "amenity": "hospital",
+    "emergency": "yes",
+    "healthcare": "hospital",
+    "name": "Methodist Hospital",
+    "phone": "+1 215-952-9000"
+   }
+  },
+  {
+   "type": "way",
+   "id": 293554360,
+   "center": {
+    "lat": 39.936828,
+    "lon": -75.1770501
+   },
+   "tags": {
+    "addr:housenumber": "1201",
+    "addr:street": "South 20th Street",
+    "amenity": "police",
+    "name": "Philadelphia Police Department 17th District HQ",
+    "phone": "+1 215-686-3170"
+   }
+  },
+  {
+   "type": "way",
+   "id": 74973040,
+   "center": {
+    "lat": 39.9322757,
+    "lon": -75.1623635
+   },
+   "tags": {
+    "addr:housenumber": "1400",
+    "addr:street": "East Passyunk Avenue",
+    "name": "Acme",
+    "phone": "+1 215-467-2221",
+    "shop": "supermarket"
+   }
+  },
+  {
+   "type": "way",
+   "id": 334890706,
+   "center": {
+    "lat": 39.9333025,
+    "lon": -75.1627285
+   },
+   "tags": {
+    "addr:housenumber": "1100",
+    "addr:street": "Wharton Street",
+    "amenity": "police",
+    "name": "South Philadelphia Police Station"
+   }
+  },
+  {
+   "type": "way",
+   "id": 345057788,
+   "center": {
+    "lat": 39.931449,
+    "lon": -75.1613152
+   },
+   "tags": {
+    "addr:housenumber": "1407",
+    "addr:street": "East Passyunk Avenue",
+    "name": "Passyunk Market",
+    "phone": "+1-215-789-5524",
+    "shop": "supermarket"
+   }
+  },
+  {
+   "type": "way",
+   "id": 427908363,
+   "center": {
+    "lat": 39.9321954,
+    "lon": -75.1607841
+   },
+   "tags": {
+    "addr:housenumber": "1356",
+    "addr:street": "East Passyunk Avenue",
+    "name": "El Paisano Supermarket",
+    "shop": "supermarket"
+   }
+  },
+  {
+   "type": "way",
+   "id": 334890716,
+   "center": {
+    "lat": 39.939298,
+    "lon": -75.1573249
+   },
+   "tags": {
+    "addr:housenumber": "501",
+    "addr:street": "South 9th Street",
+    "amenity": "pharmacy",
+    "healthcare": "pharmacy",
+    "name": "Rite Aid"
+   }
+  },
+  {
+   "type": "way",
+   "id": 940466976,
+   "center": {
+    "lat": 39.9364657,
+    "lon": -75.1603315
+   },
+   "tags": {
+    "amenity": "fuel",
+    "name": "Sunoco",
+    "phone": "+1 215-334-1842"
+   }
+  },
+  {
+   "type": "way",
+   "id": 335519760,
+   "center": {
+    "lat": 39.9339863,
+    "lon": -75.1537092
+   },
+   "tags": {
+    "addr:housenumber": "1111",
+    "addr:street": "South 6th Street",
+    "name": "First Oriental Market",
+    "shop": "supermarket"
+   }
+  },
+  {
+   "type": "way",
+   "id": 709059181,
+   "center": {
+    "lat": 39.9339384,
+    "lon": -75.1529437
+   },
+   "tags": {
+    "amenity": "school",
+    "name": "Vare-Washington Elementary School"
+   }
+  },
+  {
+   "type": "way",
+   "id": 335308202,
+   "center": {
+    "lat": 39.940212,
+    "lon": -75.1516439
+   },
+   "tags": {
+    "addr:housenumber": "704",
+    "addr:street": "East Passyunk Avenue",
+    "healthcare": "pharmacy",
+    "name": "Rite Aid",
+    "phone": "+1 215-627-3151",
+    "shop": "chemist"
+   }
+  },
+  {
+   "type": "way",
+   "id": 705854271,
+   "center": {
+    "lat": 39.9368895,
+    "lon": -75.1539911
+   },
+   "tags": {
+    "addr:housenumber": "601",
+    "addr:street": "Carpenter Street",
+    "amenity": "school",
+    "name": "Nebinger Elementary School"
+   }
+  },
+  {
+   "type": "way",
+   "id": 724590128,
+   "center": {
+    "lat": 39.9396545,
+    "lon": -75.1507515
+   },
+   "tags": {
+    "addr:housenumber": "725",
+    "addr:street": "South 5th Street",
+    "amenity": "school",
+    "name": "William M. Meredith School",
+    "phone": "+1 215-351-7360"
+   }
+  },
+  {
+   "type": "way",
+   "id": 556009518,
+   "center": {
+    "lat": 39.9493517,
+    "lon": -75.1580201
+   },
+   "tags": {
+    "addr:housenumber": "111",
+    "addr:street": "South 11th Street",
+    "amenity": "hospital",
+    "emergency": "yes",
+    "healthcare": "hospital",
+    "name": "Thomas Jefferson University Hospital",
+    "phone": "+1 215-955-6000"
+   }
+  },
+  {
+   "type": "way",
+   "id": 338020153,
+   "center": {
+    "lat": 39.9565909,
+    "lon": -75.1569888
+   },
+   "tags": {
+    "amenity": "police",
+    "name": "Philadelphia Police 6th District"
+   }
+  },
+  {
+   "type": "way",
+   "id": 795452862,
+   "center": {
+    "lat": 39.957054,
+    "lon": -75.1635112
+   },
+   "tags": {
+    "addr:housenumber": "230",
+    "addr:street": "North Broad Street",
+    "amenity": "hospital",
+    "emergency": "yes",
+    "healthcare": "hospital",
+    "name": "Hahnemann University Hospital",
+    "phone": "+1 215 762 7000"
+   }
+  },
+  {
+   "type": "way",
+   "id": 335369054,
+   "center": {
+    "lat": 39.9422022,
+    "lon": -75.1525661
+   },
+   "tags": {
+    "amenity": "fire_station",
+    "name": "Philadelphia Company 11 Fire Station"
+   }
+  },
+  {
+   "type": "relation",
+   "id": 20163080,
+   "center": {
+    "lat": 39.9451283,
+    "lon": -75.1549064
+   },
+   "tags": {
+    "addr:housenumber": "800",
+    "addr:street": "Spruce Street",
+    "amenity": "hospital",
+    "emergency": "yes",
+    "healthcare": "hospital",
+    "name": "Pennsylvania Hospital",
+    "phone": "+1 215 829 3000"
+   }
+  },
+  {
+   "type": "node",
+   "id": -1,
+   "lat": 39.9396,
+   "lon": -75.15725,
+   "tags": {
+    "amenity": "pharmacy",
+    "name": "Rite Aid",
+    "addr:housenumber": "501",
+    "addr:street": "South 9th Street"
+   }
+  },
+  {
+   "type": "node",
+   "id": -2,
+   "lat": 39.9339,
+   "lon": -75.156,
+   "tags": {
+    "amenity": "pharmacy",
+    "phone": "+1 215 555 0100;+1 215 555 0101"
+   }
+  },
+  {
+   "type": "node",
+   "id": -3,
+   "lat": 39.937,
+   "lon": -75.152,
+   "tags": {
+    "amenity": "hospital",
+    "emergency": "no",
+    "name": "A rehabilitation hospital (no emergency room)"
+   }
+  },
+  {
+   "type": "node",
+   "id": -4,
+   "lat": 39.935,
+   "lon": -75.15,
+   "tags": {
+    "amenity": "bench"
+   }
+  },
+  {
+   "type": "way",
+   "id": -5,
+   "tags": {
+    "amenity": "pharmacy",
+    "name": "No position"
+   }
+  }
+ ]
+}

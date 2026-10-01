@@ -425,7 +425,17 @@
           onleave={() => app.plan && tidyRoadside(app.plan.input)}
         />
       {/if}
-      <!-- awaiting: web-maps — its PinMapButton ("Set your home point and meeting places on a map", DESIGN-DELTA-v3 §2.2, §9.4) goes here once both branches are on v0.3. -->
+      <!-- web-maps: "Set your home point and meeting places on a map" (DESIGN-DELTA-v3 §2.2, §9.4).
+           Loaded on first use; nothing is fetched until the button is pressed and the consent
+           screen is accepted. The pins are kept in SavedPlan.maps and draw the binder's maps. -->
+      {#if app.result.output}
+        {@const location = app.result.output.location}
+        <div class="pin-map-slot">
+          {#await import('../components/maps/PinMapButton.svelte') then { default: PinMapButton }}
+            <PinMapButton maps={app.plan?.maps} {location} onchange={(next) => app.plan && (app.plan.maps = next)} />
+          {/await}
+        </div>
+      {/if}
     </section>
 
     <p class="visually-hidden" aria-live="polite">{status}</p>
@@ -533,5 +543,8 @@
   }
   .entry__field label {
     display: block;
+  }
+  .pin-map-slot {
+    margin-top: var(--s4);
   }
 </style>

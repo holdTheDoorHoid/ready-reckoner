@@ -40,6 +40,25 @@ pub fn base_rates() -> Vec<BaseRate> {
     serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap()
 }
 
+/// The repository's national core pack (`data/`), loaded as the web app loads it (manifest
+/// first, every core file checked), or `None` when `data/manifest.json` is absent.
+pub fn store() -> Option<rr_data::DataStore> {
+    let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../data");
+    let manifest_bytes = std::fs::read(dir.join("manifest.json")).ok()?;
+    let manifest: rr_data::Manifest = serde_json::from_slice(&manifest_bytes).ok()?;
+    let mut files: Vec<(String, Vec<u8>)> = vec![("manifest.json".to_owned(), manifest_bytes)];
+    for f in &manifest.packs.get("core")?.files {
+        files.push((f.path.clone(), std::fs::read(dir.join(&f.path)).ok()?));
+    }
+    let refs: Vec<(&str, &[u8])> = files
+        .iter()
+        .map(|(n, b)| (n.as_str(), b.as_slice()))
+        .collect();
+    let mut s = rr_data::DataStore::new();
+    s.load_many(&refs).ok()?;
+    Some(s)
+}
+
 pub fn household(name: &str) -> PlanInput {
     rr_types::fixtures::get(name).unwrap_or_else(|| panic!("no fixture household {name}"))
 }
