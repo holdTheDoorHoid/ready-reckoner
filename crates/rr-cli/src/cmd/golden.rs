@@ -1,4 +1,4 @@
-//! `rr golden [--update]`: the golden packets in `fixtures/golden/`.
+//! `rr golden [--update]`: the golden binders in `fixtures/golden/`.
 //!
 //! By default the goldens are rendered by rr-plan's own helper (`rr_plan::golden::render_all`,
 //! the same one `cargo test -p rr-plan --test goldens` uses), whatever data source that helper
@@ -71,7 +71,10 @@ fn render_with(engine: &Engine<Source>) -> Result<Vec<Golden>, CliError> {
             .map_err(|e| CliError::failure(format!("{name}: {e}")))?;
         out.push(Golden {
             name: name.to_owned(),
-            markdown: output.prepare_markdown.clone(),
+            markdown: rr_plan::binder::markdown::with_prepare(
+                &output.binder,
+                &output.prepare_markdown,
+            ),
             json: rr_plan::to_json(&output),
         });
     }

@@ -9,7 +9,7 @@
 use std::path::{Path, PathBuf};
 
 use rr_data::{DataStore, Manifest};
-use rr_plan::{CountySource, Engine, FixtureSource};
+use rr_plan::{CountyHospitals, CountySource, Engine, FixtureSource};
 use rr_types::{
     Attribution, BaseRate, CountyRecord, EngineError, LocationInput, LocationResolved,
     RestorationCurve,
@@ -343,6 +343,13 @@ impl CountySource for Source {
             Source::Fixtures(f) => CountySource::resolve(f, input),
             // rr-data owns the ZIP rules for the pack (shares, the 80 % rule, suggestions).
             Source::Pack { store, .. } => store.resolve(input),
+        }
+    }
+
+    fn county_hospitals(&self, fips: &str) -> Option<CountyHospitals> {
+        match self {
+            Source::Fixtures(f) => CountySource::county_hospitals(f, fips),
+            Source::Pack { store, .. } => rr_plan::source::store_hospitals(store, fips),
         }
     }
 }

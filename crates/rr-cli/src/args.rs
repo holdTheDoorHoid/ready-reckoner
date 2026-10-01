@@ -31,10 +31,11 @@ pub struct DataArgs {
     /// Use the built-in sample counties instead of a data pack.
     #[arg(long, global = true, conflicts_with = "data")]
     pub fixtures: bool,
-    /// Also load this optional pack (repeat for several), for example `places` (county
-    /// hospitals, read only by the binder). By default only the core pack is loaded, as the web
-    /// app does, so the CLI plans exactly as the site and the goldens do; `surge`, `wildfire_places`
-    /// and `outage_events` are core files now (DESIGN-DELTA-v3 §8) and load with the core pack
+    /// Also load this optional pack (repeat for several), for example `places` (the county
+    /// hospitals the binder's Neighborhood page lists, which the web app loads when it shows the
+    /// binder). By default only the core pack is loaded, as the web app loads it to plan, so the
+    /// CLI plans exactly as the site and the goldens do; `surge`, `wildfire_places` and
+    /// `outage_events` are core files now (DESIGN-DELTA-v3 §8) and load with the core pack
     /// regardless.
     #[arg(
         long = "optional",
@@ -81,8 +82,10 @@ pub enum Packs {
 /// The commands.
 #[derive(Debug, Subcommand)]
 pub enum Command {
-    /// Print the packet (Markdown) and/or the whole plan (PlanOutput JSON) for a household.
+    /// Print the binder and the Prepare sheet (Markdown) and/or the whole plan (PlanOutput JSON).
     Plan(PlanArgs),
+    /// Print the binder only: Markdown, or the Binder as JSON.
+    Binder(BinderArgs),
     /// Print the risk register: ranked hazards and the rare-but-severe box, with sources.
     Risks(HouseholdArgs),
     /// Print how long to be ready for each need, with ranges and when help arrives.
@@ -105,7 +108,7 @@ pub enum Command {
         #[command(subcommand)]
         command: DataCommand,
     },
-    /// Compare the golden packets in fixtures/golden with the engine (--update rewrites them).
+    /// Compare the golden binders in fixtures/golden with the engine (--update rewrites them).
     Golden(GoldenArgs),
     /// Run every fixture household: timing, warnings, uncited items and determinism.
     Doctor(DoctorArgs),
@@ -148,7 +151,8 @@ pub struct PlanArgs {
     /// The household and dials.
     #[command(flatten)]
     pub household: HouseholdArgs,
-    /// What to print: the packet, the PlanOutput JSON, or both (both needs --out).
+    /// What to print: the binder and the Prepare sheet, the PlanOutput JSON, or both (both needs
+    /// --out).
     #[arg(long, value_enum, default_value_t = Format::Md)]
     pub format: Format,
     /// Write `<name>.md` and/or `<name>.json` into this directory instead of printing.
@@ -156,10 +160,21 @@ pub struct PlanArgs {
     pub out: Option<PathBuf>,
 }
 
+/// `rr binder`.
+#[derive(Debug, Clone, Args)]
+pub struct BinderArgs {
+    /// The household and dials.
+    #[command(flatten)]
+    pub household: HouseholdArgs,
+    /// Print the Binder as JSON (`PlanOutput.binder`) instead of Markdown.
+    #[arg(long)]
+    pub json: bool,
+}
+
 /// What `rr plan` prints.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
 pub enum Format {
-    /// The printable packet (Markdown).
+    /// The binder, a rule, then the Prepare sheet (Markdown).
     Md,
     /// The whole PlanOutput (JSON, the bytes the goldens hold).
     Json,

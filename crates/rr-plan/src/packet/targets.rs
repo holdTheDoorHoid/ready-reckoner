@@ -1,18 +1,14 @@
-//! Section: your targets. The dial setting in words (computed from the model, model review
-//! M-04), the duration targets with their ranges and relief rating (with the worst event on
-//! record where the target's own event has no restoration record), "How well do these numbers
-//! hold up?" from the frozen backtest, then one short part per bucket: what to do, its guidance
-//! block's "What helps" and "What to avoid" paragraphs, and the consequence model's own lines
-//! where they apply (the worst event on record, the water system's record, a target rounded up
-//! to the ladder). A bucket whose advice a risk card already gave points to that card; leaving
-//! home and getting home point to the family plan; a damaged home and lost income point to
-//! Documents and money. Then named scenarios and any event that drives the answer.
+//! The targets in words, for the binder's What to expect page and the explain view: a target
+//! with its range ("about 5 days (up to 10 days)"), when help likely arrives and service is mostly
+//! back, how long the worst event on record kept homes out (read as the app reads it), the dial
+//! setting in words (computed from the model, model review M-04) and "How well do these numbers
+//! hold up?" from the frozen backtest.
 
 use rr_consequence::ConsequenceAssessment;
-use rr_types::{BucketAssessment, BucketId, BucketKind, StressTest, Target, TierId};
+use rr_types::{BucketAssessment, BucketId, StressTest, Target};
 
-use super::text::{self, md};
-use super::{Ctx, cite, cite_all};
+use super::text;
+use super::{Ctx, cite};
 
 /// What the dial means, after the model's own sentence (model review Part 3.4): each target holds
 /// for its own need, so the plan also gives ways to cope when one runs out.
@@ -54,7 +50,7 @@ pub fn dial_sentence(c: &ConsequenceAssessment) -> String {
     format!("{} {COPE_SENTENCE}", c.dial_sentence())
 }
 
-fn relief_cell(days: Option<f32>) -> String {
+pub(crate) fn relief_cell(days: Option<f32>) -> String {
     match days {
         Some(d) => format!("about {}", text::day_phrase(round_relief(f64::from(d)))),
         None => "not known".to_owned(),
@@ -162,56 +158,12 @@ pub(crate) fn relief_fallback(b: &BucketAssessment) -> Option<RecordSpan> {
     record_span(b.stress_test.as_ref()?, b.id)
 }
 
-/// The consequence model's sentences a bucket part prints besides the block's advice: the worst
-/// event on record (power and both water buckets), the water system's record (said once, under
-/// no tap water, or under boil water where there is no such part), and the note that a target
-/// was rounded up to the ladder. They are the bucket's own frequency sentences, picked by how the
-/// model opens them.
-fn model_lines(cx: &Ctx<'_>, b: &BucketAssessment) -> Vec<String> {
-    const STRESS: &str = "The worst ";
-    const WATER: [&str; 2] = [
-        "Water-system failures are counted",
-        "We have no record of how your public water system",
-    ];
-    const ROUNDED: &str = "This rounds up to ";
-    let water_here = match b.id {
-        BucketId::WaterOut => true,
-        BucketId::WaterBoil => !is_active(&cx.a.bucket(BucketId::WaterOut).target),
-        _ => false,
-    };
-    b.frequency_sentences
-        .iter()
-        .filter(|s| {
-            s.starts_with(STRESS)
-                || s.starts_with(ROUNDED)
-                || (water_here && WATER.iter().any(|w| s.starts_with(w)))
-        })
-        .map(|s| md(&dedupe_year(s, b.stress_test.as_ref())))
-        .collect()
-}
-
-/// The worst-event sentence names the event and then its year, and some events' names end with
-/// the year already ("Winter storm, March 2018 (2018)"): say the year once.
-fn dedupe_year(sentence: &str, st: Option<&StressTest>) -> String {
-    let Some(st) = st else {
-        return sentence.to_owned();
-    };
-    let y = st.date.year().to_string();
-    if st.event.trim_end().ends_with(&y) {
-        sentence.replacen(&format!("{} ({y})", st.event), &st.event, 1)
-    } else {
-        sentence.to_owned()
-    }
-}
-
-/// "How well do these numbers hold up?" (model review Part 3.1): the frozen backtest's tally
-/// for this version, from the table bundled with the engine (`EngineInfo::validation`), cited to
-/// the published table's registry entry ([`crate::validation::CITATION`]), and what it means for
-/// the household (`topic:validation`).
-fn validation(cx: &Ctx<'_>, out: &mut Vec<String>) {
+/// The "How well do these numbers hold up?" line, with its citation marker; `None` when the
+/// backtest table is empty.
+pub(crate) fn validation_line(cx: &Ctx<'_>) -> Option<String> {
     let v = crate::validation::summary();
     if v.events_tested == 0 {
-        return;
+        return None;
     }
     let meaning = cx
         .blocks_for("topic:validation")
@@ -240,7 +192,7 @@ fn validation(cx: &Ctx<'_>, out: &mut Vec<String>) {
             }
         })
         .unwrap_or_default();
-    out.push(format!(
+    Some(format!(
         "**How well do these numbers hold up?** Tested against {} real disasters, this version \
          covered {}, partly covered {}, fell short on {} and could not model {}.{} {meaning}",
         v.events_tested,
@@ -249,299 +201,7 @@ fn validation(cx: &Ctx<'_>, out: &mut Vec<String>) {
         v.short,
         v.not_modelled,
         cite(crate::validation::CITATION)
-    ));
-    out.push(String::new());
-}
-
-pub(super) fn write(cx: &Ctx<'_>, out: &mut Vec<String>) {
-    let a = cx.a;
-    out.push("## Your targets".to_owned());
-    out.push(String::new());
-    out.push(format!(
-        "How long to be ready for each kind of disruption at the 1-in-{} setting. {}{}",
-        a.input.dials.return_period.years(),
-        md(&dial_sentence(&a.consequence)),
-        cite_all([
-            &rr_types::CitationId::from("rr_research_risk_model"),
-            &rr_types::CitationId::from("rr_risk_model_priors"),
-        ])
-    ));
-    out.push(String::new());
-    out.push(
-        // Headings that read on into their cells ("Help likely in about 3 days") and leave the
-        // columns room, so fewer rows wrap in print (R3-15).
-        "| If this happens | Be ready for | Help likely in | Mostly back in | Enough at |"
-            .to_owned(),
-    );
-    out.push("| --- | --- | --- | --- | --- |".to_owned());
-    let mut fallback_any = false;
-    for b in &a.buckets {
-        if b.id.kind() != BucketKind::Duration {
-            continue;
-        }
-        let back = match relief_fallback(b) {
-            Some(span) => {
-                fallback_any = true;
-                format!("worst on record: {}", span.words())
-            }
-            None => relief_cell(b.relief.as_ref().map(|r| r.mostly_restored_days)),
-        };
-        out.push(format!(
-            "| {} | {} | {} | {back} | {} |",
-            md(&b.name),
-            target_phrase(&b.target),
-            relief_cell(b.relief.as_ref().map(|r| r.help_arrives_days)),
-            tier_cell(b.tier_enough)
-        ));
-    }
-    out.push(String::new());
-    out.push(format!(
-        "Brackets show how uncertain a target is. \"Not known\": no restoration records for the \
-         event behind that target{}",
-        if fallback_any {
-            "; \"worst on record\": no such records either, so the worst event on record stands \
-             in (named below)."
-        } else {
-            "."
-        }
-    ));
-    out.push(String::new());
-    validation(cx, out);
-
-    // Blocks a risk card already showed, with the card's name; and cards whose hazard has one
-    // consequence, whose advice is that bucket's (a medical emergency).
-    let cards = super::risks::cards(cx);
-    let shown: Vec<(String, String)> = cards
-        .iter()
-        .filter_map(|(p, g)| g.map(|g| (g.meta.id.clone(), p.name.clone())))
-        .collect();
-    // Cards whose hazard has one consequence, whose advice is that bucket's (a medical
-    // emergency): the bucket points to the card. Each entry is the pointer line itself.
-    let see = |names: &str| format!("**What helps.** See {names} under Your risks.");
-    let mut single: Vec<(BucketId, String)> = cards
-        .iter()
-        .filter(|(p, g)| g.is_some() && p.buckets.len() == 1)
-        .map(|(p, _)| (p.buckets[0], see(&format!("\"{}\"", md(&p.name)))))
-        .collect();
-    // Dangerous heat or cold at home: the heat-wave and cold-wave cards' advice (cooling places, a
-    // warm room, fans above 90°F, no oven or grill for heat) is this bucket's, and the forecast
-    // list's steps before a heat wave and a freeze cover the other one, so with either card shown
-    // it points there. Not for a home heated with wood, whose stove and chimney advice is this
-    // bucket's own.
-    let card_name = |h: rr_types::HazardId| {
-        cards
-            .iter()
-            .find(|(p, g)| p.id == h && g.is_some())
-            .map(|(p, _)| md(&p.name))
-    };
-    let wood = a.input.housing.heating == rr_types::Heating::Wood;
-    if !wood {
-        match (
-            card_name(rr_types::HazardId::HeatWave),
-            card_name(rr_types::HazardId::ColdWave),
-        ) {
-            (Some(h), Some(c)) => {
-                single.push((BucketId::Thermal, see(&format!("\"{h}\" and \"{c}\""))))
-            }
-            (Some(n), None) | (None, Some(n)) => single.push((
-                BucketId::Thermal,
-                format!(
-                    "**What helps.** See \"{n}\" under Your risks, and the steps before a heat \
-                     wave or a freeze on the forecast list."
-                ),
-            )),
-            (None, None) => {}
-        }
-    }
-
-    // What to do about these is in the documents-and-money section.
-    let elsewhere = [BucketId::HomeLoss, BucketId::Income];
-    // What helps with these is in a packet v2 section of its own (the family plan and wallet
-    // cards, the shelter plan and the forecast list, the house-fire card and the safety rules,
-    // the plan's free steps); their warnings stay here.
-    let medicine_lines = a
-        .input
-        .people
-        .iter()
-        .any(|p| p.medical.daily_rx || p.medical.refrigerated_rx || p.medical.epinephrine);
-    let pointer = |b: BucketId| -> Option<&'static str> {
-        match b {
-            BucketId::Evacuate | BucketId::GetHome => {
-                Some("**What helps.** See Your family plan and Your shelter plan.")
-            }
-            // Lights, a radio and phone power are in the plan; the fridge rule and charging are
-            // in the forecast list; registries are under Local help; a powered device or cold
-            // medicine has its lines under Special needs.
-            BucketId::Power => Some(
-                "**What helps.** A light for each person, a radio and phone power are in your \
-                 plan; keeping food cold and charging up are on the forecast list; registries \
-                 are under Local help.",
-            ),
-            BucketId::Comms => Some(
-                "**What helps.** See Your family plan (staying in touch), the wallet cards and \
-                 the list for when a storm is forecast.",
-            ),
-            BucketId::Fire => Some(
-                "**What helps.** See \"House fire\" under Your risks and the safety rules under \
-                 Your plan.",
-            ),
-            BucketId::Security => {
-                Some("**What helps.** See the home-security and trusted-circle steps in Your plan.")
-            }
-            BucketId::CleanAir => {
-                Some("**What helps.** See the clean room under Your shelter plan.")
-            }
-            // The food itself is on the checklists, in calories; what to avoid stays here.
-            BucketId::Supplies => Some(
-                "**What helps.** The food is on your checklists, counted in calories, not \
-                 servings: pick foods you already eat, and use the oldest first.",
-            ),
-            // Special needs prints the household's own medicine lines (how many days, the
-            // written list, refills, cold storage), so what helps is there.
-            BucketId::Medication if medicine_lines => {
-                Some("**What helps.** See Medicine under Special needs.")
-            }
-            _ => None,
-        }
-    };
-    for b in a.buckets.iter().filter(|b| !elsewhere.contains(&b.id)) {
-        let target = &b.target;
-        if !is_active(target) {
-            continue;
-        }
-        let heading = match b.id.kind() {
-            BucketKind::Duration => format!("### {}: {}", md(&b.name), target_phrase(target)),
-            _ => format!("### {}", md(&b.name)),
-        };
-        out.push(heading);
-        out.push(String::new());
-        let target_words = target_phrase(target);
-        if let Some(g) = cx
-            .blocks_for(&format!("bucket:{}", b.id))
-            .into_iter()
-            .next()
-        {
-            let card: Option<String> = shown
-                .iter()
-                .find(|(id, _)| *id == g.meta.id)
-                .map(|(_, name)| see(&format!("\"{}\"", md(name))))
-                .or_else(|| {
-                    single
-                        .iter()
-                        .find(|(x, _)| *x == b.id)
-                        .map(|(_, line)| line.clone())
-                });
-            let advice = super::advice_paragraphs(&cx.guidance(g, None, Some(&target_words)));
-            let avoid = advice.iter().filter(|p| !p.starts_with("**What helps.**"));
-            match card {
-                Some(line) => out.push(line),
-                None if pointer(b.id).is_some() => {
-                    out.push(pointer(b.id).unwrap_or_default().to_owned());
-                    for para in avoid {
-                        out.push(String::new());
-                        out.push(para.clone());
-                    }
-                }
-                None if advice.is_empty() => {
-                    for para in super::helps_paragraph(&cx.guidance(g, None, Some(&target_words))) {
-                        out.push(para);
-                    }
-                }
-                None => {
-                    // What to do: what helps, and what to avoid (the carbon monoxide, floodwater
-                    // and do-not-drink warnings live here).
-                    for (i, para) in advice.iter().enumerate() {
-                        if i > 0 {
-                            out.push(String::new());
-                        }
-                        out.push(para.clone());
-                    }
-                }
-            }
-            out.push(String::new());
-        }
-        let lines = model_lines(cx, b);
-        if !lines.is_empty() {
-            out.push(format!("{}{}", lines.join(" "), cite_all(&b.sources)));
-            out.push(String::new());
-        }
-    }
-
-    let pointed: Vec<String> = a
-        .buckets
-        .iter()
-        .filter(|b| elsewhere.contains(&b.id) && is_active(&b.target))
-        .map(|b| {
-            match b.id {
-                BucketId::HomeLoss => "a damaged home",
-                _ => "lost income",
-            }
-            .to_owned()
-        })
-        .collect();
-    if !pointed.is_empty() {
-        out.push(format!(
-            "What to do about {} is under Documents and money.",
-            text::join_and(&pointed)
-        ));
-        out.push(String::new());
-    }
-
-    if !a.consequence.scenarios.is_empty() {
-        out.push("### Named scenarios".to_owned());
-        out.push(String::new());
-        out.push(
-            "A named scenario is one rare, severe event that would change your targets a lot; \
-             you can turn each on or off on the risks screen."
-                .to_owned(),
-        );
-        out.push(String::new());
-        for s in &a.consequence.scenarios {
-            out.push(format!(
-                "- **{}** ({}). {} {}{}",
-                md(&s.name),
-                if s.on {
-                    "included in your plan"
-                } else {
-                    "left out of your plan"
-                },
-                md(&s.applies_because),
-                md(&s.effect_summary),
-                cite_all(&s.sources)
-            ));
-        }
-        out.push(String::new());
-    }
-    let cliffs: Vec<&rr_types::Warning> = a
-        .warnings
-        .iter()
-        .filter(|w| w.id.starts_with("cliff_"))
-        .collect();
-    if !cliffs.is_empty() {
-        out.push("### When one event drives the answer".to_owned());
-        out.push(String::new());
-        for w in cliffs {
-            out.push(format!("- **{}** {}", md(&w.message), md(&w.why)));
-        }
-        out.push(String::new());
-    }
-}
-
-/// Whether a bucket has anything to plan for at this setting.
-pub(crate) fn is_active(t: &Target) -> bool {
-    match *t {
-        Target::Days { value, .. } | Target::Months { value, .. } => value > 0.0,
-        Target::Evacuate { p_need_10yr, .. } | Target::Readiness { p_need_10yr, .. } => {
-            p_need_10yr > 0.0
-        }
-    }
-}
-
-fn tier_cell(t: TierId) -> String {
-    match t {
-        TierId::Now => "free steps".to_owned(),
-        other => text::lower_first(other.name()),
-    }
+    ))
 }
 
 #[cfg(test)]

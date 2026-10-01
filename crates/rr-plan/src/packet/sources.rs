@@ -1,8 +1,9 @@
-//! Section 10: sources. Every citation the packet's brackets point to, in their numbered order,
-//! compact: title, publisher, year and the URL once, run together ten to a paragraph so the list
-//! prints in a few pages; the retrieval dates are in the plan's JSON. The expert estimates are
-//! marked. Then the data credits, with the National Risk Index statement exactly as its terms
-//! require.
+//! The Prepare sheet's Sources: every citation its brackets point to, numbered in the order the
+//! sheet first uses them, compact: title, publisher, year and the URL once, run together ten to a
+//! paragraph; the retrieval dates are in the plan's JSON. The expert estimates are marked. Then
+//! the data credits, with the National Risk Index statement exactly as its terms require. Web
+//! addresses are printed exactly as they are: never Markdown-escaped (a backslash before the `#`
+//! in the Eviction Lab address, v0.3 merge note).
 
 use rr_types::Citation;
 
@@ -11,7 +12,7 @@ use crate::pipeline::Assessment;
 
 /// A title without a trailing parenthetical (a journal's volume and pages, a report number): the
 /// URL identifies the work, and the plan's JSON keeps the full title.
-fn short_title(title: &str) -> &str {
+pub(crate) fn short_title(title: &str) -> &str {
     let t = title.trim_end();
     if !t.ends_with(')') {
         return t;
@@ -37,12 +38,12 @@ fn short_title(title: &str) -> &str {
 /// Sources run together in paragraphs of this many.
 const SOURCES_PER_PARAGRAPH: usize = 10;
 
-pub(super) fn write(a: &Assessment, provenance: &[Citation], more: usize, out: &mut Vec<String>) {
+pub(super) fn write(a: &Assessment, provenance: &[Citation], out: &mut Vec<String>) {
     out.push("## Sources".to_owned());
     out.push(String::new());
     out.push(
         "The numbers in brackets point to this list; \"expert estimate\" marks a judgement, not \
-         measured data. The targets and the plan are Ready Reckoner's calculations from these."
+         measured data. The plan is Ready Reckoner's calculation from these."
             .to_owned(),
     );
     out.push(String::new());
@@ -71,16 +72,6 @@ pub(super) fn write(a: &Assessment, provenance: &[Citation], more: usize, out: &
         out.push(chunk.join(" "));
         out.push(String::new());
     }
-    if more > 0 {
-        out.push(format!(
-            "{} more {} behind the plan's quantities and prices {} listed in the app, next to \
-             each number.",
-            more,
-            if more == 1 { "source" } else { "sources" },
-            if more == 1 { "is" } else { "are" }
-        ));
-        out.push(String::new());
-    }
     if let Some(first) = a.attributions.first() {
         out.push("### Data credits".to_owned());
         out.push(String::new());
@@ -107,7 +98,7 @@ pub(super) fn write(a: &Assessment, provenance: &[Citation], more: usize, out: &
             out.push(format!(
                 "> **{}{version}{accessed}.** {}{url}",
                 md(&at.source),
-                md(&at.text)
+                crate::binder::markdown::esc(&at.text)
             ));
             out.push(String::new());
         }

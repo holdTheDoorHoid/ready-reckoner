@@ -28,7 +28,8 @@ fn switching_off_cascadia_lowers_the_coos_bay_targets() {
     assert!(b.scenarios.iter().any(|s| s.id == "cascadia_m9" && !s.on));
     assert!(days(&b, BucketId::Power) < days(&a, BucketId::Power));
     assert!(days(&b, BucketId::WaterOut) < days(&a, BucketId::WaterOut));
-    assert!(b.prepare_markdown.contains("left out of your plan"));
+    // The binder's Risks at a glance still lists the hazard; the scenario itself is on screen.
+    assert!(b.binder.page("risks_glance").is_some());
 }
 
 #[test]
@@ -144,8 +145,12 @@ fn the_horizon_reaches_the_sentences() {
     fifty.dials.horizon_years = 50;
     let a = assess(&one);
     let b = assess(&fifty);
-    assert!(a.prepare_markdown.contains("the next year"));
-    assert!(b.prepare_markdown.contains("the next 50 years"));
+    let (am, bm) = (
+        rr_plan::binder::markdown::render(&a.binder),
+        rr_plan::binder::markdown::render(&b.binder),
+    );
+    assert!(am.contains("the next year"));
+    assert!(bm.contains("the next 50 years"));
     // Targets do not depend on the horizon (it only changes the sentences).
     assert_eq!(days(&a, BucketId::Power), days(&b, BucketId::Power));
 }
@@ -334,7 +339,7 @@ fn staging_steps_count_toward_their_bag_but_are_never_the_bag() {
 
 /// Verification V-15: the 79 counties with no outage records got half a day of power in Juneau
 /// and no heat-or-cold target at all. They now plan with their state's pooled outage series and
-/// the packet says so.
+/// the binder says so (Risks at a glance, notes on the numbers).
 #[test]
 fn a_county_without_outage_records_plans_with_its_states_series() {
     let mut input = household("philadelphia-renters-4");
@@ -351,8 +356,8 @@ fn a_county_without_outage_records_plans_with_its_states_series() {
     assert!(days(&out, BucketId::Thermal) > 0.0);
     assert!(days(&out, BucketId::Comms) >= 2.0);
     assert!(
-        out.prepare_markdown
+        rr_plan::binder::markdown::render(&out.binder)
             .contains("its power-cut figures use Alaska's records (2015-2025) instead"),
-        "the packet's notes name the state series"
+        "the binder's notes on the numbers name the state series"
     );
 }
