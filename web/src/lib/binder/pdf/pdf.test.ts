@@ -29,7 +29,7 @@ import { gridPng } from '../../../test/png';
 import { readPdf, type ReadPdf } from '../../../test/read-pdf';
 import { AWKWARD, FIXTURE_BINDER } from '../fixture';
 import { binderPages, FIT_CAPACITY, fitUnits } from '../model';
-import { type Paper, type PdfMap, type PdfOptions, sheetFill, sheetRange } from './doc';
+import { columnWidths, type Paper, type PdfMap, type PdfOptions, sheetFill, sheetRange } from './doc';
 import { LABEL_SPEC } from './labels';
 import { FONT_FILES, type FontFiles, renderBinderPdf, type RenderedPdf } from './render';
 
@@ -51,6 +51,24 @@ async function draw(b: Binder, opts: Partial<PdfOptions> & { paper: Paper }, nam
 
 /** Text with the PDF's line breaks flattened, for searching. */
 const flat = (s: string) => s.replace(/\s+/g, ' ');
+
+describe('table columns in the PDF', () => {
+  const t = (s: string) => [{ t: s }];
+  it('fill the width, give no column less than its longest word, and give room where it saves lines', () => {
+    const header = ['Mark', 'Name', 'What it is', 'Address or phone'];
+    const rows = [
+      [t('H'), t('Home'), t('Your plan'), t('—')],
+      [t('1'), t('Settlement Music School Mary Louise Curtis Branch'), t('School'), t('704 East Passyunk Avenue · +1 215-627-3151')],
+    ];
+    const w = columnWidths(header, rows, 4, 504, 8);
+    expect(w.reduce((a, b) => a + b, 0)).toBeCloseTo(504 - 8 * 4 - 2.5, 5);
+    // "Mark" is bold: it keeps a width it fits in, though every mark below it is a letter or two.
+    expect(w[0]).toBeGreaterThanOrEqual(8 * 0.52 * (4 * 1.2 + 1));
+    // A date column short enough to fit on one line is given that line.
+    const dated = columnWidths(['What', 'Next check'], [[t('A long description of a thing that wraps onto two or three lines whatever happens'), t('Check by September 1, 2027')]], 2, 300, 9);
+    expect(dated[1]).toBeGreaterThanOrEqual(9 * 0.52 * 'Check by September 1, 2027'.length);
+  });
+});
 
 describe('the PDF binder, from the fixture binder', () => {
   const sizes = { LETTER: [612, 792], A4: [595, 842] } as const;
@@ -146,7 +164,8 @@ describe('the PDF binder, from the fixture binder', () => {
     // The map and everything that explains it share its sheet.
     for (const [p, place] of pictured.map((p, i) => [p, ['Neighborhood', 'Area'][i]!] as const)) {
       const text = flat(p.text);
-      for (const s of [`${place} place 1`, `${place} place 8`, 'FEMA high-risk flood zone', 'Storm-surge zones are not on these maps.', 'OpenStreetMap contributors', 'The bars show 500 ft and 200 m.']) expect(text, `${place}: ${s}`).toContain(s);
+      for (const s of [`${place} place 1`, `${place} place 8`, 'FEMA high-risk flood zone', 'Storm-surge zones are not on these maps.', 'openstreetmap.org/copyright. The bars show 500 ft and 200 m.']) expect(text, `${place}: ${s}`).toContain(s);
+      expect(text).not.toContain('..');
     }
     // The region has no map: its line, and no frame.
     expect(flat(pdf.pages.map((p) => p.text).join('\n'))).toContain('Map of your region and the ways out: no map added.');

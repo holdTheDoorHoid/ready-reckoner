@@ -830,7 +830,12 @@ class Ctx {
     const perLine = (w: number) => w / (small * 0.52);
     const rowLines = (cells: Inline[][]) => Math.max(...cells.map((c, i) => words(inlineChars(c), perLine(legendWidths[i]!))));
     const notes = [...m.statuses.map((x) => x.text), ...m.notes];
-    const credits = `${m.credits.map(nfc).join(' · ')}. ${nfc(m.scale)}`;
+    // The credits, then the scale bars, each ending in one full stop ("… on the map. The bars show …").
+    const credits = [m.credits.map(nfc).join(' · '), nfc(m.scale)]
+      .map((x) => x.trim())
+      .filter(Boolean)
+      .map((x) => (/[.!?]$/.test(x) ? x : `${x}.`))
+      .join(' ');
     const textHeight =
       18 + // caption
       (m.legend.length ? 16 + legendCells.reduce((a, r) => a + rowLines(r) * small * 1.18 + 4.5, 0) + 6 : 0) +
@@ -1168,8 +1173,9 @@ export function columnWidths(header: readonly string[], rows: readonly Inline[][
   const natural: number[] = [];
   const least: number[] = [];
   for (let c = 0; c < cols; c++) {
-    natural.push(Math.max(18, em * Math.max(0, ...cells.map((r) => lineOf(r[c] ?? [])))));
+    // At least its longest word, with a character to spare (the estimate is rough); at most its longest line.
     least.push(Math.max(18, em * (Math.max(0, ...cells.flatMap((r) => r[c] ?? [])) + 1)));
+    natural.push(Math.max(least[c]!, em * Math.max(0, ...cells.map((r) => lineOf(r[c] ?? [])))));
   }
   const total = natural.reduce((a, b) => a + b, 0);
   if (total <= avail) return natural.map((n) => (n * avail) / total);
