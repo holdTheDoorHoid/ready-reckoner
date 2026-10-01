@@ -5,7 +5,7 @@
 mod common;
 
 use common::*;
-use rr_types::{Benefit, HazardDisplay, HazardId as H, PlanInput, math};
+use rr_types::{Benefit, HazardDisplay, HazardId as H, IncomeStability, PlanInput, math};
 use serde_json::json;
 
 /// Rounds to one significant figure, as REVIEW §2.3 prints its ranges.
@@ -579,23 +579,64 @@ fn benefits_stop_only_for_households_that_rely_on_them() {
 }
 
 #[test]
-fn eviction_is_for_renters_and_savings_halve_it() {
+fn eviction_counts_households_and_caps_the_county() {
     let base = county("42101");
     let mut input = household("philadelphia-renters-4");
+    // Without the county column: Eviction Lab's judgment rate, 1.92 per 100 renting households
+    // a year (2014-2018), for stable income.
     let p = profile(&run(&input, &base), H::Eviction).rate_per_year;
-    assert!(
-        close(p, 0.023, 1e-12),
-        "national judgment rate, stable income"
-    );
+    assert!(close(p, 0.0192, 1e-12), "national judgment rate");
     input.finances.emergency_fund_months = 3.0;
     let q = profile(&run(&input, &base), H::Eviction).rate_per_year;
-    assert!(close(q, 0.023 * 0.5, 1e-12));
-    // With the county's filing rate (when the licence allows it): filings × 0.4 to judgments.
+    assert!(close(q, 0.0192 * 0.5, 1e-12), "savings halve it");
+    // With the county's filings: households taken to court, filings ÷ (1 + 1.7 × filings), of
+    // whom 0.32 are ordered to leave.
     let mut f = county("42101");
     f.county.exposure.eviction_filing_rate = Some(0.06);
     input.finances.emergency_fund_months = 0.5;
-    let r = profile(&run(&input, &f), H::Eviction).rate_per_year;
-    assert!(close(r, 0.06 * 0.4, 1e-6));
+    let e = profile(&run(&input, &f), H::Eviction).clone();
+    assert!(close(
+        e.rate_per_year,
+        0.06 / (1.0 + 1.7 * 0.06) * 0.32,
+        1e-6
+    ));
+    assert!(
+        !e.frequency_sentence.contains("cap"),
+        "{}",
+        e.frequency_sentence
+    );
+    let ids: Vec<&str> = e.sources.iter().map(|c| c.as_str()).collect();
+    for id in [
+        "eviction_lab_county_estimates",
+        "gromis_2022_eviction_prevalence",
+        "eviction_lab_faq",
+        "eviction_lab_national",
+        "rr_risk_model_priors",
+    ] {
+        assert!(ids.contains(&id), "{id} in {ids:?}");
+    }
+    // Baltimore County, MD: 1.37 filings per renter household a year, mostly repeats against
+    // the same households. It keeps its own figure (not the national rate), capped at 7 in 100
+    // a year, about half in ten years, and the card says so.
+    f.county.exposure.eviction_filing_rate = Some(1.37);
+    let b = profile(&run(&input, &f), H::Eviction).clone();
+    assert!(close(b.rate_per_year, 0.07, 1e-9), "{}", b.rate_per_year);
+    assert!(
+        b.frequency_sentence
+            .starts_with("Of 100 households like yours, about 50 (")
+            && b.frequency_sentence.ends_with(
+                "Landlords here often take the same renters to court again and again, so we cap \
+                 your county's figure at 7 in 100 households a year."
+            ),
+        "{}",
+        b.frequency_sentence
+    );
+    // Gig income and no savings: the household's own modifiers apply on top of the cap.
+    input.finances.income.stability = IncomeStability::Gig;
+    input.finances.emergency_fund_months = 0.0;
+    let g = profile(&run(&input, &f), H::Eviction).rate_per_year;
+    assert!(close(g, 0.07 * 1.75, 1e-9));
+    assert!(per_100(g, 10.0) < 72.0, "{}", per_100(g, 10.0));
     // Owners never see it.
     assert!(!has_profile(
         &assess("coos-bay-well-owner-2", "41011"),
@@ -1020,7 +1061,7 @@ fn the_contract_v2_households() {
     ));
     assert!(close(
         profile(&a, H::Eviction).rate_per_year,
-        0.023 * 1.75,
+        0.0192 * 1.75,
         1e-9
     ));
     // Galveston: SSI keeps coming through shutdowns; the Houston area's UASI share.

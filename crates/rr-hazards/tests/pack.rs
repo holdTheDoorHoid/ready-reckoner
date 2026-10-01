@@ -4,33 +4,13 @@
 //! (the pack in this branch predates them, so every county runs the fallbacks). Skipped, with a
 //! message, when `data/manifest.json` is absent.
 
+mod common;
+
 use std::path::{Path, PathBuf};
 
-use rr_data::DataStore;
+use common::store;
 use rr_hazards::HazardAssessment;
 use rr_types::{HazardDisplay, HazardId, PlanInput};
-
-fn repo() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
-}
-
-/// The core pack, loaded as the web app loads it (manifest first, every file checked).
-fn store() -> Option<DataStore> {
-    let dir = repo().join("data");
-    let manifest_bytes = std::fs::read(dir.join("manifest.json")).ok()?;
-    let manifest: rr_data::Manifest = serde_json::from_slice(&manifest_bytes).ok()?;
-    let mut files: Vec<(String, Vec<u8>)> = vec![("manifest.json".to_owned(), manifest_bytes)];
-    for f in &manifest.packs.get("core")?.files {
-        files.push((f.path.clone(), std::fs::read(dir.join(&f.path)).ok()?));
-    }
-    let refs: Vec<(&str, &[u8])> = files
-        .iter()
-        .map(|(n, b)| (n.as_str(), b.as_slice()))
-        .collect();
-    let mut s = DataStore::new();
-    s.load_many(&refs).ok()?;
-    Some(s)
-}
 
 fn check(label: &str, a: &HazardAssessment) {
     let rare: Vec<_> = a
