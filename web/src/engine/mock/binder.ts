@@ -43,6 +43,7 @@ import { ATTRIBUTIONS, citation } from './citations';
 import { MOCK_CHECKLISTS, type MockChecklist } from './checklists';
 import type { ModelResult } from './model';
 import { householdPhrase } from './packet';
+import { alsoCheckedLine } from './v2';
 
 /** The engine's status line (rr-plan `packet::STATUS_LINE`). */
 export const STATUS_LINE =
@@ -288,7 +289,7 @@ export function buildBinder(input: PlanInput, r: ModelResult): Binder {
     para(t('Find what is happening, then turn to its page. Everyday emergencies come first, then the risks where you live, most likely first.')),
     { table: { header: ['If this happens', 'Turn to'], rows: indexRows } },
     para(t(notHere.length ? `Not in this binder: ${joinAnd(notHere)}. To add one, tick the family under Your settings.` : 'Every rare family you opted into has its page here.')),
-    para(t('Also checked, and too unlikely here to need a page: the hazards listed under "Also checked" on the Risks screen.')),
+    para(t(alsoCheckedLine(r.register))),
   ]));
   add(1, contacts(input, fp, c, people));
 

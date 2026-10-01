@@ -34,8 +34,11 @@ function answering(output: PlanOutput): Engine {
   return { ...mock, assess: async () => ({ ok: true, value: output }) };
 }
 
+/** The golden's printed Prepare sheet: since v0.3 its `.md` holds the binder, a rule, then the sheet (`rr plan`). */
 function packet(name: FixtureName): string {
-  return readFileSync(join(repoRoot(), 'fixtures', 'golden', `${name}.md`), 'utf8');
+  const md = readFileSync(join(repoRoot(), 'fixtures', 'golden', `${name}.md`), 'utf8');
+  const at = md.indexOf('\n# Prepare: what to do before\n');
+  return at >= 0 ? md.slice(at + 1) : md;
 }
 
 /** Every purchase line of the packet's checklists with its month or months: "- [ ] Name: 7 gallons (month 1)". */

@@ -20,6 +20,8 @@ export const HAIRLINE = '#8c8c8c';
 export const HEADER_FILL = '#e6e6e6';
 /** The band behind a "do first" step. */
 export const MEMORY_FILL = '#e3e3e3';
+/** A section's name across a register (the inventory's kinds of disruption). */
+export const SECTION_FILL = '#f2f2f2';
 
 /** How a callout of each kind is drawn. */
 export interface CalloutStyle {

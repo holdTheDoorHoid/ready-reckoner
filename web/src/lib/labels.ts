@@ -18,6 +18,7 @@ import type {
   HousingKind,
   IncomeStability,
   Mobility,
+  PlanOutput,
   RawWaterSource,
   ReturnPeriod,
   Setting,
@@ -249,16 +250,34 @@ export function dialJointSentence(): string {
 }
 
 /**
+ * Where the engine says what the dial means for this household: a plan (its binder's "What to
+ * expect" page opens with it, v0.3), or the Markdown of a v2 packet (its "Your targets" section; the
+ * stand-in engine still writes one).
+ */
+export type DialSource = string | Pick<PlanOutput, 'binder' | 'prepare_markdown'> | undefined;
+
+/** The paragraph that opens the engine's targets, as plain text. */
+function targetsIntro(src: DialSource): string | undefined {
+  if (src === undefined) return undefined;
+  if (typeof src === 'string') return /^## Your targets\n+(.+)$/m.exec(src)?.[1];
+  const page = src.binder?.parts.flatMap((p) => p.pages).find((p) => p.id === 'what_to_expect');
+  const first = page?.blocks.find((bl) => 'para' in bl);
+  if (first && 'para' in first) return first.para.map((i) => ('t' in i ? i.t : 'b' in i ? i.b : 'link' in i ? i.link.text : '')).join('');
+  return targetsIntro(src.prepare_markdown);
+}
+
+/**
  * The engine's own dial sentence for this household (model review M-04; rr-consequence
- * `dial_sentence`, printed by the packet): "At this setting, about 1 in 10 households like yours
+ * `dial_sentence`, printed in the binder): "At this setting, about 1 in 10 households like yours
  * will face a longer disruption of any one kind in the next 10 years; about 3 in 10 will face at
  * least one kind that runs past its target. That is why …". The contract carries it in one place,
- * the first paragraph of the packet's "Your targets" section, so it is read from there, as the
- * "Also checked" note is (lib/rare.ts). Undefined when the packet has no such paragraph (the
- * stand-in engine) or names another setting (the plan for a newly turned dial is still coming).
+ * the opening paragraph of the binder's "What to expect" page (the v2 packet's "Your targets"
+ * section before it), so it is read from there. Undefined when there is no such paragraph (the
+ * stand-in engine's binder) or it names another setting (the plan for a newly turned dial is still
+ * coming).
  */
-export function engineDialSentence(packetMarkdown: string | undefined, rp: ReturnPeriod): string | undefined {
-  const intro = packetMarkdown ? /^## Your targets\n+(.+)$/m.exec(packetMarkdown)?.[1] : undefined;
+export function engineDialSentence(src: DialSource, rp: ReturnPeriod): string | undefined {
+  const intro = targetsIntro(src);
   if (!intro) return undefined;
   const plain = intro
     .replace(/\[\d+(?:, \d+)*\]/g, '')
@@ -272,8 +291,8 @@ export function engineDialSentence(packetMarkdown: string | undefined, rp: Retur
  * The dial sentence under "How long to be ready for": the engine's own for this household when the
  * plan has it, otherwise what each need's target promises and the joint sentence without a number.
  */
-export function dialSentence(rp: ReturnPeriod, packetMarkdown?: string): string {
-  return engineDialSentence(packetMarkdown, rp) ?? `${returnPeriodHelp(rp)} ${dialJointSentence()}`;
+export function dialSentence(rp: ReturnPeriod, src?: DialSource): string {
+  return engineDialSentence(src, rp) ?? `${returnPeriodHelp(rp)} ${dialJointSentence()}`;
 }
 
 /** Start screen and About (the packet prints it from the engine). Canonical wording; do not edit. */

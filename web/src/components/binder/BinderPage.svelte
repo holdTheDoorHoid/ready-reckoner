@@ -6,7 +6,7 @@
 -->
 <script lang="ts">
   import Icon from '../Icon.svelte';
-  import { creditsNotShown, pageDomId, sourceDomId, sourceListIndex, type PageEntry } from '../../lib/binder/model';
+  import { creditsNotShown, flatBlocks, pageDomId, sourceDomId, sourceListIndex, type PageEntry } from '../../lib/binder/model';
   import BinderBlocks from './BinderBlocks.svelte';
   import type { BinderView } from './view';
 
@@ -17,6 +17,11 @@
   const title = $derived(page.kind === 'cover' ? view.binder.title : page.title);
   /** The engine's own list of the numbered sources on this page, or -1. */
   const listAt = $derived(sourceListIndex(page, view.binder));
+  /** The level of the page's top headings in the engine's tree: those become h4, under the title. */
+  const base = $derived.by(() => {
+    const levels = flatBlocks(page.blocks).flatMap((bl) => ('heading' in bl ? [bl.heading.level] : []));
+    return levels.length ? Math.min(...levels) : 1;
+  });
   /** Credits the page does not print itself. */
   const credits = $derived(page.kind === 'sources' ? creditsNotShown(page, view.binder) : []);
 </script>
@@ -31,7 +36,7 @@
       </button>
     {/if}
   </header>
-  <BinderBlocks blocks={page.blocks} {view} label={title} sourceList={listAt} />
+  <BinderBlocks blocks={page.blocks} {view} {base} label={title} sourceList={listAt} />
   {#if page.kind === 'sources'}
     {#if view.binder.sources.length && listAt < 0}
       <h4 class="binder-sources__title">Numbered sources</h4>

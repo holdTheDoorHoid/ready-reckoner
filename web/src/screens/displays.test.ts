@@ -169,11 +169,11 @@ describe('the rare box (H-02)', () => {
 describe('the Risks cards and targets', () => {
   it('say what the dial means per need and for all needs together (M-04), in the engine’s own words for the household', async () => {
     const { r, out } = await screenWith(Risks, 'risks');
-    // Philadelphia: the packet's own sentence ("about 3 in 10"), not a fixed figure (R3-25).
-    const engine = engineDialSentence(out.prepare_markdown, 'one_in_100')!;
+    // Philadelphia: the binder's own sentence ("about 3 in 10"), not a fixed figure (R3-25).
+    const engine = engineDialSentence(out, 'one_in_100')!;
     expect(engine).toContain('about 1 in 10 households like yours will face a longer disruption of any one kind in the next 10 years; about 3 in 10 will face at least one kind that runs past its target.');
     expect(text(r.target.querySelector('p.dial-sentence'))).toBe(engine);
-    expect(dialSentence('one_in_100', out.prepare_markdown)).toBe(engine);
+    expect(dialSentence('one_in_100', out)).toBe(engine);
     (r.target.querySelector('button[aria-controls="settings-panel"]') as HTMLButtonElement).click();
     flushSync();
     const dial = r.target.querySelector('fieldset.dial')!;

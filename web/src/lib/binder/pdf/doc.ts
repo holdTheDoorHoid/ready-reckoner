@@ -25,10 +25,10 @@
  * Text is the engine's, exactly: user answers are never parsed, only normalised to composed
  * characters (NFC) so an accent typed as two code points prints as one letter.
  */
-import type { Binder, Block, CalloutKind, Inline, IsoDate, MapSlot, MapSlotKind, Page } from '../../../engine/types';
+import type { Binder, Block, CalloutKind, Inline, IsoDate, MapSlot, MapSlotKind, Page, PageKind } from '../../../engine/types';
 import { formatDate } from '../../format';
 import { binderPages, creditsNotShown, flatBlocks, type PageEntry, sourceListIndex } from '../model';
-import { CALLOUT_STYLES, HAIRLINE, HEADER_FILL, INK, MEMORY_FILL, MUTED, STEP_STYLES } from '../palette';
+import { CALLOUT_STYLES, HAIRLINE, HEADER_FILL, INK, MEMORY_FILL, MUTED, SECTION_FILL, STEP_STYLES } from '../palette';
 import { labelSheet } from './labels';
 
 // ---------------------------------------------------------------------------------------------
@@ -145,13 +145,37 @@ export interface BinderDoc {
   definition: Node;
   /** In document order. */
   sheets: Sheet[];
+  /**
+   * The pages whose numbers the text prints ("(Tab 3, Home, page 12)"). pdfmake fills a page
+   * number only on the first line of a paragraph, so these come from the layout before; when one
+   * moved, the binder is laid out again (`render.ts`).
+   */
+  refs: ReadonlySet<string>;
 }
 
-/** The pdfmake document for a binder; `scales` shrinks the type of some pages (by page id). */
-export function binderDocument(b: Binder, opts: PdfOptions, scales: ReadonlyMap<string, number> = new Map()): BinderDoc {
+/** The page each binder page starts on, by page id, once laid out. */
+export function pageStarts(doc: BinderDoc): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const s of doc.sheets) {
+    const range = s.entry ? sheetRange(s) : null;
+    if (s.entry && range) out.set(s.entry.page.id, range[0]);
+  }
+  return out;
+}
+
+/**
+ * The pdfmake document for a binder; `scales` shrinks the type of some pages (by page id), and
+ * `numbers` are the pages' numbers from the layout before, for the cross-references to print.
+ */
+export function binderDocument(
+  b: Binder,
+  opts: PdfOptions,
+  scales: ReadonlyMap<string, number> = new Map(),
+  numbers: ReadonlyMap<string, number> = new Map(),
+): BinderDoc {
   const paper = PAPER_SIZES[opts.paper];
   const entries = binderPages(b);
-  const ctx = new Ctx(b, opts, paper, entries);
+  const ctx = new Ctx(b, opts, paper, entries, numbers);
   const sheets: Sheet[] = [];
   const add = (key: string, node: Node, scale: number, entry?: PageEntry) => {
     const stack = node.stack as Content[];
@@ -189,7 +213,7 @@ export function binderDocument(b: Binder, opts: PdfOptions, scales: ReadonlyMap<
     header: (current: number) => ctx.header(owners.owner(current), current),
     footer: (current: number, count: number) => ctx.footer(owners.owner(current), current, count),
   };
-  return { definition, sheets };
+  return { definition, sheets, refs: ctx.refs };
 }
 
 /** A mark after a sheet's last block: no height, no ink, but a position once laid out. */
@@ -261,12 +285,15 @@ class Ctx {
   private page: Page | undefined;
   /** The page's tables by header: tables with the same columns share their widths and line up. */
   private peers = new Map<string, Inline[][][]>();
+  /** Pages whose numbers the text prints (see `BinderDoc.refs`). */
+  readonly refs = new Set<string>();
 
   constructor(
     readonly b: Binder,
     readonly opts: PdfOptions,
     readonly paper: PaperSize,
     private readonly entries: PageEntry[],
+    private readonly numbers: ReadonlyMap<string, number>,
   ) {
     this.width = paper.width - MARGINS[0] - MARGINS[2];
     this.pages = new Map(entries.map((e) => [e.page.id, e]));
@@ -442,6 +469,12 @@ class Ctx {
           columns: pair.map(([head, list]) => ({ width: half, stack: [this.heading(head.level, head.text), ...this.list(list, false, 1)] })),
         });
         i += 3;
+        continue;
+      }
+      const reg = page && REGISTER_KINDS.has(page.kind) ? registerRun(blocks, i) : null;
+      if (reg) {
+        push(this.register(reg.header, reg.sections, width));
+        i = reg.end - 1;
         continue;
       }
       if ('heading' in bl && next && 'table' in next) {
@@ -625,7 +658,7 @@ class Ctx {
       const cells: Content[] = Array.from({ length: cols }, (_, i) => {
         const cell = r[i] ?? [];
         // An empty cell is room to write in.
-        return cell.length === 0 ? { text: ' ', ...this.st('cell'), margin: [0, this.z(4), 0, this.z(4)] } : { text: this.run(cell), ...this.st('cell') };
+        return cell.length === 0 ? { text: ' ', ...this.st('cell'), margin: [0, this.z(4), 0, this.z(4)] } : { text: this.run(cell, paged ? targets[k] : undefined), ...this.st('cell') };
       });
       if (paged) cells.push(this.pageCell(targets[k]));
       return cells;
@@ -636,6 +669,59 @@ class Ctx {
       table: { headerRows: heads.length, keepWithHeaderRows: 1, dontBreakRows: true, widths: paged ? [...widths, PAGE_COL] : widths, body: [...heads, ...body] },
       layout: this.grid(heading ? 1 : 0),
       margin: [0, heading ? 0 : this.z(2), 0, this.z(6)],
+    };
+  }
+
+  /**
+   * Tables with the same columns, one after another (the inventory's kinds of disruption, the
+   * risks), as one dense register: the column names once at the top and again at the top of each
+   * new sheet, each section's name as a shaded band across the columns, small type and tight rows.
+   * Rows go in runs of a few, each run kept whole, so a section's name never ends a sheet alone.
+   */
+  private register(header: readonly string[], sections: readonly RegisterSection[], width: number): Node {
+    const rows = sections.flatMap((s) => s.rows);
+    const cols = Math.max(header.length, ...rows.map((r) => r.length), 1);
+    const paged = rows.some((r) => lastLink(r.flat(), this.pages) !== undefined);
+    const size = Math.max(REGISTER_MIN_SIZE, REGISTER_SIZE * this.k);
+    const pad = Math.max(1, this.z(1.4));
+    const cellPad = 6;
+    const widths = columnWidths(header, rows, cols, width - (paged ? PAGE_COL + cellPad + 0.5 : 0), size, cellPad);
+    const w = paged ? [...widths, PAGE_COL] : widths;
+    const layout = (fill?: string): Node => ({
+      hLineWidth: () => 0.5,
+      vLineWidth: () => 0.5,
+      hLineColor: () => INK,
+      vLineColor: () => HAIRLINE,
+      fillColor: () => fill ?? null,
+      paddingLeft: () => cellPad / 2,
+      paddingRight: () => cellPad / 2,
+      paddingTop: () => pad,
+      paddingBottom: () => pad,
+    });
+    const head: Content[] = Array.from({ length: cols }, (_, c) => ({ text: nfc(header[c] ?? ''), bold: true, fontSize: size - 0.5 }));
+    if (paged) head.push({ text: 'Page', bold: true, fontSize: size - 0.5, alignment: 'right' });
+    const row = (r: readonly Inline[][]): Content[] => {
+      const target = paged ? lastLink(r.flat(), this.pages) : undefined;
+      const cells: Content[] = Array.from({ length: cols }, (_, c) => {
+        const cell = r[c] ?? [];
+        return cell.length === 0 ? { text: ' ', fontSize: size } : { text: this.run(cell, target), fontSize: size, lineHeight: REGISTER_LEADING };
+      });
+      if (paged) cells.push(target ? { text: '', pageReference: target, fontSize: size, alignment: 'right' } : { text: '', fontSize: size });
+      return cells;
+    };
+    const runs: Content[][] = [];
+    for (const s of sections) {
+      for (let k = 0; k === 0 || k < s.rows.length; k += REGISTER_RUN) {
+        const body: Content[][] = [];
+        if (k === 0 && s.heading) body.push([{ text: nfc(s.heading.text), bold: true, fontSize: size + 0.5, colSpan: w.length, fillColor: SECTION_FILL }, ...Array.from({ length: w.length - 1 }, () => ({}))]);
+        body.push(...s.rows.slice(k, k + REGISTER_RUN).map(row));
+        if (body.length) runs.push([{ table: { widths: w, body, dontBreakRows: true }, layout: layout() }]);
+      }
+    }
+    return {
+      table: { headerRows: 1, keepWithHeaderRows: 1, dontBreakRows: true, widths: [width], body: [[{ table: { widths: w, body: [head] }, layout: layout(HEADER_FILL) }], ...runs] },
+      layout: { hLineWidth: () => 0, vLineWidth: () => 0, paddingLeft: () => 0, paddingRight: () => 0, paddingTop: () => 0, paddingBottom: () => 0 },
+      margin: [0, this.z(2), 0, this.z(6)],
     };
   }
 
@@ -681,10 +767,11 @@ class Ctx {
     const whenW = Math.round(room * 0.4);
     const body = branches.map((br) => {
       const to = br.go_to !== undefined ? this.pages.get(br.go_to) : undefined;
-      const then: TextRun = [...this.run(br.then)];
+      const column = to ? pageDest(to.page.id) : undefined;
+      const then: TextRun = [...this.run(br.then, column)];
       if (to) then.push(then.length ? ' ' : '', { text: `Turn to Tab ${to.part.tab}, ${nfc(to.page.title)}.`, bold: true, linkToDestination: pageDest(to.page.id) });
       const row: Content[] = [
-        { text: this.run(br.when), ...this.st('cell') },
+        { text: this.run(br.when, column), ...this.st('cell') },
         { text: then.filter((x) => x !== ''), ...this.st('cell') },
       ];
       if (paged) row.push(this.pageCell(to ? pageDest(to.page.id) : undefined));
@@ -854,10 +941,11 @@ class Ctx {
   // ---- running text ---------------------------------------------------------------------------
 
   /**
-   * Inlines as a pdfmake text run. A link reads "(Tab 3, Home)" after other words, or just
-   * "Tab 6, House fire" when it is all there is (a "Turn to" cell); in the PDF it jumps to the page.
+   * Inlines as a pdfmake text run. A link reads "(Tab 3, Home, page 12)" after other words, or
+   * "Tab 6, House fire, page 31" when it is all there is; it jumps to the page. In a table row whose
+   * Page column already gives that page (`column`, its destination), the number is left out.
    */
-  run(inlines: readonly Inline[]): TextRun {
+  run(inlines: readonly Inline[], column?: string): TextRun {
     const out: TextRun = [];
     const endsInSpace = () => {
       const last = out[out.length - 1];
@@ -872,8 +960,13 @@ class Ctx {
       else if ('blank' in i) out.push({ text: '_'.repeat(Math.max(3, Math.min(40, i.blank))), color: INK });
       else if ('cite' in i) out.push(...this.cite(i.cite, endsInSpace()));
       else if ('link' in i) {
-        const words = nfc(i.link.text);
         const target = this.pages.has(i.link.to) ? pageDest(i.link.to) : undefined;
+        let words = nfc(i.link.text);
+        if (target && target !== column) {
+          this.refs.add(i.link.to);
+          // Three digits' room until the first layout has numbered the pages.
+          words += `, page ${this.numbers.get(i.link.to) ?? '000'}`;
+        }
         const link: Content = target ? { text: words, linkToDestination: target, decoration: 'underline', decorationStyle: 'dotted' } : words;
         if (alone(k)) out.push(link);
         else out.push(endsInSpace() ? '(' : ' (', link, ')');
@@ -908,6 +1001,42 @@ const THIN_SPACE = '\u2009';
 
 /** The width of a "Page" column: room for pdfmake's five-digit placeholder at table size. */
 const PAGE_COL = 34;
+
+/** Page kinds whose tables print as one register (`Ctx.register`). */
+export const REGISTER_KINDS: ReadonlySet<PageKind> = new Set<PageKind>(['inventory', 'risks_glance']);
+/** A register's type size at full scale, and the least it shrinks to. */
+const REGISTER_SIZE = 8.25;
+const REGISTER_MIN_SIZE = 7;
+/** Rows kept together in a register. */
+const REGISTER_RUN = 5;
+/** A register's line spacing: tighter than the body's, for rows that wrap. */
+const REGISTER_LEADING = 1.08;
+
+interface RegisterSection {
+  heading?: { level: number; text: string };
+  rows: Inline[][][];
+}
+
+/**
+ * The tables from block `i` on that share their columns, each with the heading just above it (if
+ * any): the sections of one register, and the index of the block after them. Null when block `i`
+ * starts no table.
+ */
+function registerRun(blocks: readonly Block[], i: number): { header: readonly string[]; sections: RegisterSection[]; end: number } | null {
+  const sections: RegisterSection[] = [];
+  let header: readonly string[] | undefined;
+  let j = i;
+  while (j < blocks.length) {
+    const bl = blocks[j]!;
+    const next = blocks[j + 1];
+    const pair = 'heading' in bl && next && 'table' in next ? { heading: bl.heading, table: next.table } : 'table' in bl ? { table: bl.table } : null;
+    if (!pair || (header && pair.table.header.join('\u0000') !== header.join('\u0000'))) break;
+    header = pair.table.header;
+    sections.push({ heading: pair.heading, rows: pair.table.rows });
+    j += pair.heading ? 2 : 1;
+  }
+  return header ? { header, sections, end: j } : null;
+}
 
 const PLACEHOLDER: Record<MapSlotKind, string> = {
   neighbourhood: 'your neighborhood',
@@ -944,37 +1073,112 @@ function closingPair(blocks: readonly Block[], i: number): [[{ level: number; te
   ];
 }
 
-function cellChars(cell: readonly Inline[]): { all: number; word: number } {
-  const text = cell.map((i) => ('t' in i ? i.t : 'b' in i ? i.b : 'link' in i ? i.link.text : 'blank' in i ? '_'.repeat(i.blank) : 'cite' in i ? ' [00]' : '')).join('');
-  return { all: [...text].length, word: Math.max(0, ...text.split(/\s+/).map((w) => [...w].length)) };
+/**
+ * A cell's words as widths in characters, roughly as they print: a citation's small numbers count
+ * three quarters of a character each, a blank its underscores.
+ */
+function cellWords(cell: readonly Inline[]): number[] {
+  const out: number[] = [];
+  const words = (text: string, weight = 1) => {
+    for (const w of text.split(/\s+/)) if (w) out.push([...w].length * weight);
+  };
+  for (const i of cell) {
+    if ('t' in i) words(i.t);
+    else if ('b' in i) words(i.b, 1.05);
+    else if ('link' in i) words(i.link.text);
+    else if ('blank' in i) out.push(Math.max(3, Math.min(40, i.blank)));
+    else if ('cite' in i) out.push((`[${i.cite.join(', ')}]`.length + 1) * 0.75);
+  }
+  return out;
+}
+
+/** Lines a cell's words take at `per` characters a line, wrapped at spaces (a longer word breaks). */
+function wrappedLines(words: readonly number[], per: number): number {
+  let lines = 1;
+  let line = 0;
+  for (const w of words) {
+    if (line > 0 && line + 1 + w <= per) {
+      line += 1 + w;
+      continue;
+    }
+    if (line > 0) lines += 1;
+    lines += Math.max(0, Math.ceil(w / per) - 1);
+    line = w > per ? w - per * Math.floor(w / per) : w;
+  }
+  return lines;
 }
 
 /**
- * Column widths in points, filling the table's width: each column as wide as its longest line
- * when they all fit; otherwise short columns (a phone, a date, "have") keep theirs and the long
- * ones share what is left in proportion to their text, never narrower than their longest word.
+ * Column widths in points, filling the table's width. When every column fits its longest line,
+ * each gets that, and the spare room in proportion. Otherwise the widths are chosen so the table
+ * takes the fewest lines: the widest columns are capped first, then room moves between columns
+ * while that saves lines (a date column that would wrap onto a second line on every row gets room
+ * from a description that wraps anyway). No column is narrower than its longest word.
  * (Noto Sans sets a little over half an em a character.)
  */
-export function columnWidths(header: readonly string[], rows: readonly Inline[][][], cols: number, width: number, size = 9): number[] {
+export function columnWidths(header: readonly string[], rows: readonly Inline[][][], cols: number, width: number, size = 9, padding = 8): number[] {
   const em = size * 0.52;
-  const avail = width - 8 * cols - (cols + 1) * 0.5;
+  const avail = width - padding * cols - (cols + 1) * 0.5;
+  const cells: number[][][] = [header.map((h) => cellWords([{ t: h }])), ...rows.map((r) => Array.from({ length: cols }, (_, c) => cellWords(r[c] ?? [])))];
+  const lineOf = (ws: readonly number[]) => ws.reduce((a, w, i) => a + w + (i ? 1 : 0), 0);
   const natural: number[] = [];
   const least: number[] = [];
   for (let c = 0; c < cols; c++) {
-    const h = header[c] ?? '';
-    const cells = [{ all: [...h].length, word: Math.max(0, ...h.split(/\s+/).map((w) => [...w].length)) }, ...rows.map((r) => cellChars(r[c] ?? []))];
-    natural.push(Math.max(18, em * Math.max(...cells.map((x) => x.all))));
-    least.push(Math.max(18, em * (Math.max(...cells.map((x) => x.word)) + 1)));
+    natural.push(Math.max(18, em * Math.max(0, ...cells.map((r) => lineOf(r[c] ?? [])))));
+    least.push(Math.max(18, em * (Math.max(0, ...cells.flatMap((r) => r[c] ?? [])) + 1)));
   }
   const total = natural.reduce((a, b) => a + b, 0);
   if (total <= avail) return natural.map((n) => (n * avail) / total);
-  const short = natural.map((n) => n <= avail * 0.2);
-  const fixed = natural.reduce((a, n, i) => a + (short[i] ? n : 0), 0);
-  const longTotal = natural.reduce((a, n, i) => a + (short[i] ? 0 : n), 0) || 1;
-  const rest = Math.max(0, avail - fixed);
-  const widths = natural.map((n, i) => (short[i] ? n : Math.max(least[i]!, (n * rest) / longTotal)));
-  const sum = widths.reduce((a, b) => a + b, 0);
-  return widths.map((w) => (w * avail) / sum);
+  const leastTotal = least.reduce((a, b) => a + b, 0);
+  if (leastTotal >= avail) return least.map((l) => (l * avail) / leastTotal);
+  // Cap the widest columns at the level that fills the table exactly.
+  let lo = 0;
+  let hi = Math.max(...natural);
+  for (let k = 0; k < 40; k++) {
+    const cap = (lo + hi) / 2;
+    const sum = natural.reduce((a, n, c) => a + Math.max(least[c]!, Math.min(n, cap)), 0);
+    if (sum > avail) hi = cap;
+    else lo = cap;
+  }
+  let ws = natural.map((n, c) => Math.max(least[c]!, Math.min(n, lo)));
+  const spare = avail - ws.reduce((a, b) => a + b, 0);
+  ws[ws.indexOf(Math.max(...ws))]! += spare;
+  // Then move room between columns while it saves lines.
+  const cache = new Map<string, number[]>();
+  const linesAt = (c: number, w: number): number[] => {
+    const per = Math.max(1, Math.floor(w / em));
+    const key = `${c}:${per}`;
+    let got = cache.get(key);
+    if (!got) cache.set(key, (got = cells.map((r) => wrappedLines(r[c] ?? [], per))));
+    return got;
+  };
+  const cost = (w: readonly number[]) => {
+    const per = w.map((x, c) => linesAt(c, x));
+    let n = 0;
+    for (let r = 0; r < cells.length; r++) n += Math.max(...per.map((l) => l[r]!));
+    return n;
+  };
+  let best = cost(ws);
+  for (const step of [24, 12, 6, 3]) {
+    for (let moved = true, rounds = 0; moved && rounds < 50; rounds++) {
+      moved = false;
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < cols; j++) {
+          if (i === j || ws[i]! - step < least[i]!) continue;
+          const next = ws.slice();
+          next[i]! -= step;
+          next[j]! += step;
+          const c = cost(next);
+          if (c < best) {
+            ws = next;
+            best = c;
+            moved = true;
+          }
+        }
+      }
+    }
+  }
+  return ws;
 }
 
 /** Corner cut marks around a card: short lines just outside each corner. */

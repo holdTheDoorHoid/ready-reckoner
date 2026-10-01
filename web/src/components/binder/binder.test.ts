@@ -7,12 +7,16 @@
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import type { Engine } from '../../engine/index';
 import { FIXTURES } from '../../engine/fixtures';
+import { createMockEngine } from '../../engine/mock';
+import type { PlanOutput } from '../../engine/types';
 import { AWKWARD, FIXTURE_BINDER } from '../../lib/binder/fixture';
 import { BLOCK_KINDS, binderPages, blockKind, flatBlocks, pageDomId, sourceDomId } from '../../lib/binder/model';
 import { PAGE_KINDS } from '../../engine/types';
 import Binder from '../../screens/Binder.svelte';
 import { render, savedFor, until, type Rendered } from '../../test/helpers';
+import { golden } from '../../test/real';
 import BinderPage from './BinderPage.svelte';
 import BinderToc from './BinderToc.svelte';
 import { plainView } from './view';
@@ -152,5 +156,50 @@ describe('the Binder screen', () => {
     expect([...r.target.querySelectorAll('button')].map((b) => b.textContent?.trim())).toEqual(expect.arrayContaining(['Download PDF', 'Print', 'Add maps']));
     // Each page can be printed alone.
     expect(r.target.querySelectorAll('.binder-page__head .button').length).toBe(r.target.querySelectorAll('.binder-page').length);
+  });
+});
+
+/** The mock engine, except that `assess` answers with the real engine's output. */
+function answering(output: PlanOutput): Engine {
+  const mock = createMockEngine();
+  return { ...mock, assess: async () => ({ ok: true, value: output }) };
+}
+
+describe("the engine's Philadelphia binder on the Binder screen", () => {
+  let r: Rendered | null = null;
+  afterEach(() => {
+    r?.cleanup();
+    r = null;
+  });
+
+  it('draws every page, every link and citation lands, and the answers print as typed', async () => {
+    const output = golden('philadelphia-renters-4');
+    const binder = output.binder;
+    r = await render(Binder, { plan: savedFor(FIXTURES['philadelphia-renters-4']), route: 'binder', engine: answering(output) });
+    const pages = binderPages(binder);
+    const drawn = [...r.target.querySelectorAll<HTMLElement>('article.binder-page')];
+    expect(drawn.map((a) => a.dataset.page)).toEqual(pages.map((e) => e.page.id));
+    // Every cross-reference names a page of this binder; every citation a numbered source.
+    const ids = new Set([...r.target.querySelectorAll('[id]')].map((e) => e.id));
+    const xrefs = [...r.target.querySelectorAll('a.xref')].map((a) => a.getAttribute('href')!);
+    expect(xrefs.length).toBeGreaterThan(50);
+    expect(xrefs.filter((h) => !ids.has(pageDomId(h.replace('#/binder/', ''))))).toEqual([]);
+    const cites = [...r.target.querySelectorAll('.cite a')].map((a) => a.getAttribute('href')!);
+    expect(cites.length).toBeGreaterThan(100);
+    expect(cites.filter((h) => !ids.has(h.slice(1)))).toEqual([]);
+    // The Sources page's own numbered list carries the anchors, one per source.
+    expect(binder.sources.filter((s) => !ids.has(sourceDomId(s.n))).map((s) => s.n)).toEqual([]);
+    // The household's answers, exactly as the engine passed them on.
+    const values = pages.flatMap((e) => flatBlocks(e.page.blocks).flatMap((bl) => ('fields' in bl ? bl.fields.flatMap((f) => (f.value ? [f.value] : [])) : [])));
+    expect(values.length).toBeGreaterThan(20);
+    const text = r.target.textContent ?? '';
+    for (const v of values) expect(text, v).toContain(v);
+    // Three map slots, none filled yet: one line each, never an empty frame.
+    expect(r.target.querySelectorAll('.binder-map--missing')).toHaveLength(3);
+    // A wallet card for each person; nothing printed as a stray value.
+    const cards = pages.flatMap((e) => e.page.blocks).reduce((n, bl) => n + ('cards' in bl ? bl.cards.length : 0), 0);
+    expect(cards).toBe(FIXTURES['philadelphia-renters-4'].people.length);
+    expect(r.target.querySelectorAll('.wallet-card')).toHaveLength(cards);
+    expect(text).not.toMatch(/undefined|\[object Object\]|NaN/);
   });
 });

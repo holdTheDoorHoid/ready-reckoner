@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { CALLOUT_KINDS } from '../../engine/types';
-import { CALLOUT_STYLES, contrast, greyscale, HAIRLINE, HEADER_FILL, INK, luminance, MEMORY_FILL, MUTED, PAPER, STEP_STYLES } from './palette';
+import { CALLOUT_STYLES, contrast, greyscale, HAIRLINE, HEADER_FILL, INK, luminance, MEMORY_FILL, MUTED, PAPER, SECTION_FILL, STEP_STYLES } from './palette';
 
 describe('the greyscale arithmetic', () => {
   it('matches the WCAG reference values', () => {
@@ -22,7 +22,7 @@ describe('the greyscale arithmetic', () => {
 
 describe('the binder reads the same in black and white', () => {
   it('every colour the PDF draws with is already a grey', () => {
-    const colours = [INK, MUTED, PAPER, HAIRLINE, HEADER_FILL, MEMORY_FILL, ...Object.values(CALLOUT_STYLES).flatMap((s) => [s.labelFill, s.labelInk])];
+    const colours = [INK, MUTED, PAPER, HAIRLINE, HEADER_FILL, MEMORY_FILL, SECTION_FILL, ...Object.values(CALLOUT_STYLES).flatMap((s) => [s.labelFill, s.labelInk])];
     for (const c of colours) expect(greyscale(c), c).toBe(c.toLowerCase());
   });
 
@@ -30,6 +30,10 @@ describe('the binder reads the same in black and white', () => {
     expect(contrast(INK, PAPER)).toBeGreaterThanOrEqual(7);
     expect(contrast(MUTED, PAPER)).toBeGreaterThanOrEqual(7);
     expect(contrast(INK, HEADER_FILL)).toBeGreaterThanOrEqual(7);
+    expect(contrast(INK, SECTION_FILL)).toBeGreaterThanOrEqual(7);
+    // A register's section band shows against the paper, and apart from the column header's.
+    expect(contrast(SECTION_FILL, PAPER)).toBeGreaterThan(1.05);
+    expect(contrast(HEADER_FILL, SECTION_FILL)).toBeGreaterThan(1.05);
   });
 
   it('each callout kind says what it is in a word, readable in greyscale, and looks different from the others', () => {

@@ -3,7 +3,8 @@
   airline steps (the "do first, from memory" ones bold on a band), labelled answers with a ruled
   line where there is none yet, tables, boxed notes that say their kind in a word, leave-or-stay
   decisions as an "If / Then" table, maps, wallet cards, blank logs to fill in by hand, and page
-  breaks for paper. Headings inside a page start at `level` (the page title is the level above).
+  breaks for paper. A page's top headings (the engine's `base` level) are `level` (the page title is
+  the level above), so no heading level is skipped whichever level the engine starts a page at.
 -->
 <script lang="ts">
   import type { Block } from '../../engine/types';
@@ -19,18 +20,21 @@
     blocks,
     view,
     level = 4,
+    base = 1,
     label = '',
     sourceList = -1,
   }: {
     blocks: readonly Block[];
     view: BinderView;
     level?: number;
+    /** The level of the page's top headings in the engine's tree (1 on checklists, 2 on most pages). */
+    base?: number;
     label?: string;
     /** The index of the block that lists the numbered sources: its items become the citations' anchors. */
     sourceList?: number;
   } = $props();
 
-  const tag = (l: number) => `h${Math.min(6, Math.max(2, level + l - 1))}`;
+  const tag = (l: number) => `h${Math.min(6, Math.max(2, level + l - base))}`;
   /** The page a decision branch turns to, with the words a reader sees. */
   const turnTo = (id: string | undefined) => {
     const e = id ? view.pages.get(id) : undefined;
@@ -115,13 +119,13 @@
     {@const s = CALLOUT_STYLES[block.callout.kind] ?? CALLOUT_STYLES.note}
     <div class="callout callout--{block.callout.kind}" role="note" aria-label={block.callout.title ? `${s.word}: ${block.callout.title}` : s.word}>
       <p class="callout__label"><span class="callout__word">{s.word}</span>{#if block.callout.title}<strong>{block.callout.title}</strong>{/if}</p>
-      <BinderBlocks blocks={block.callout.blocks} {view} level={level + 1} {label} />
+      <BinderBlocks blocks={block.callout.blocks} {view} level={level + 1} {base} {label} />
     </div>
   {:else if 'decision' in block}
     <div class="decision">
-      <svelte:element this={tag(1)} class="bh bh--1">{block.decision.question}</svelte:element>
+      <svelte:element this={tag(base)} class="bh bh--1">{block.decision.question}</svelte:element>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-      <div class="table-wrap" tabindex="0" role="region" aria-label={block.decision.question}>
+      <div class="table-wrap" tabindex="0" role="region" aria-label={`${label ? `${label}: ` : ''}${block.decision.question}`}>
         <table class="b-table decision__table">
           <thead><tr><th scope="col">If</th><th scope="col">Then</th></tr></thead>
           <tbody>
@@ -145,7 +149,7 @@
     <ul class="wallet-cards">
       {#each block.cards as card, i (i)}
         <li class="wallet-card">
-          <svelte:element this={tag(2)} class="wallet-card__title">{card.title}</svelte:element>
+          <svelte:element this={tag(base)} class="wallet-card__title">{card.title}</svelte:element>
           {#each card.lines as line, j (j)}<p><BinderInlines inlines={line} {view} /></p>{/each}
         </li>
       {/each}

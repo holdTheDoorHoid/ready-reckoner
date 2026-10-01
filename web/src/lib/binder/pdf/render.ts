@@ -12,7 +12,7 @@ import type { PdfMakeInstance } from 'pdfmake/build/pdfmake.min.js';
 
 import type { Binder } from '../../../engine/types';
 import { fitUnits } from '../model';
-import { binderDocument, type BinderDoc, MIN_SCALE, type PdfOptions, sheetFill, sheetsAllowed } from './doc';
+import { binderDocument, type BinderDoc, MIN_SCALE, pageStarts, type PdfOptions, REGISTER_KINDS, sheetFill, sheetsAllowed } from './doc';
 import coverage from './fonts/coverage.json';
 
 export type FontStyle = 'normal' | 'bold' | 'italics' | 'bolditalics';
@@ -51,8 +51,10 @@ export interface RenderedPdf {
   passes: number;
 }
 
-/** At most this many layouts: the first, and up to two redraws of pages over their fit. */
+/** At most this many layouts that shrink type: the first, and up to two redraws of pages over their fit. */
 const MAX_PASSES = 3;
+/** And at most this many in all, counting layouts that only bring the cross-references' page numbers up to date. */
+const MAX_LAYOUTS = 5;
 
 /**
  * Word units (DESIGN-DELTA-v3 §5.6) that fit on one sheet at full-size type, measured on the
@@ -76,18 +78,24 @@ export async function renderBinderPdf(pdfMake: PdfMakeInstance, fonts: FontFiles
   for (const part of b.parts) {
     for (const page of part.pages) {
       const allowed = sheetsAllowed(page);
-      if (Number.isFinite(allowed)) {
+      // The proxy was calibrated on prose pages; a register sets its tables far denser.
+      if (Number.isFinite(allowed) && !REGISTER_KINDS.has(page.kind)) {
         const k = firstScale(fitUnits(page), allowed);
         if (k < 1) scales.set(page.id, k);
       }
     }
   }
+  let numbers = new Map<string, number>();
   for (let pass = 1; ; pass++) {
-    const doc = binderDocument(b, opts, scales);
+    const doc = binderDocument(b, opts, scales, numbers);
     const bytes = await pdfMake.createPdf(doc.definition).getBuffer();
+    const starts = pageStarts(doc);
+    // The cross-references printed the page numbers of the layout before: are they still right?
+    const stale = [...doc.refs].some((id) => numbers.get(id) !== starts.get(id));
     const next = pass < MAX_PASSES ? refit(doc) : null;
-    if (!next) return { bytes: new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength), doc, passes: pass };
-    scales = next;
+    if ((!next && !stale) || pass >= MAX_LAYOUTS) return { bytes: new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength), doc, passes: pass };
+    if (next) scales = next;
+    numbers = starts;
   }
 }
 

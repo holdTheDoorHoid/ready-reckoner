@@ -179,11 +179,32 @@ export function parseAlsoChecked(packet: string | undefined): AlsoChecked | null
 }
 
 /**
- * The "Also checked" list for the Risks screen: the engine's note when the packet carries one;
- * otherwise every hazard the engine can check that is not on this household's list, by name only.
+ * The engine's "Also checked" line: since v0.3 a paragraph of the binder's "Which checklist?" page
+ * ("Also checked, and too unlikely here to need a page: landslides, wildfires, …", no rates); before
+ * it, a note in the v2 packet, which the stand-in engine still writes.
+ */
+export function alsoCheckedLine(output: PlanOutput): string | undefined {
+  for (const part of output.binder?.parts ?? []) {
+    for (const page of part.pages) {
+      if (page.kind !== 'index') continue;
+      for (const bl of page.blocks) {
+        if (!('para' in bl)) continue;
+        const text = bl.para.map((i) => ('t' in i ? i.t : 'b' in i ? i.b : 'link' in i ? i.link.text : '')).join('');
+        if (/^Also checked\b/.test(text)) return text;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * The "Also checked" list for the Risks screen: the engine's note, with each hazard's rate, when a
+ * v2 packet carries one (the stand-in engine's); else the binder's line, names only (the engine's
+ * since v0.3); otherwise every hazard the engine can check that is not on this household's list,
+ * by name only.
  */
 export function alsoCheckedFor(output: PlanOutput, cat: Catalogue | null): AlsoChecked | null {
-  const note = parseAlsoChecked(output.prepare_markdown);
+  const note = parseAlsoChecked(output.prepare_markdown) ?? parseAlsoChecked(alsoCheckedLine(output));
   if (note) return note;
   const listed = new Set<string>(output.register.map((h) => h.id));
   const rest = (cat?.hazards ?? []).filter((h) => !listed.has(h.id));

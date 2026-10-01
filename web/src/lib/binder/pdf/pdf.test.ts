@@ -8,9 +8,11 @@
  *   version and dates; the tab label sheet is the last page;
  * - printed on both sides, every part and the label sheet start on a right-hand page, and the
  *   wallet cards keep a blank back;
- * - the household's text comes out exactly as typed;
- * - a page that promises one sheet takes one, on the fixture binder and (once the engine's binder
- *   is in the goldens) on the Philadelphia binder, whose page count is checked against a range.
+ * - the household's text comes out exactly as typed, and a cross-reference in a sentence gives
+ *   the page it points to;
+ * - a page that promises one sheet (or two) takes no more, on the fixture binder and on the
+ *   engine's Philadelphia binder (the golden), whose page count is checked against a range and
+ *   logged tab by tab beside the engine's fit proxy.
  *
  * Set RR_PDF_OUT to a folder to keep the files for a look, and RR_GOLDEN_DIR to a folder of
  * golden plans to draw instead of `fixtures/golden` (another branch's goldens, say).
@@ -80,6 +82,8 @@ describe('the PDF binder, from the fixture binder', () => {
       const fire = pdf.pages[pdf.destinations.get('pg-check_house_fire')! - 1]!;
       expect(fire.links.some((l) => l.dest === 'pg-neighbourhood')).toBe(true);
       expect(fire.links.some((l) => l.dest?.startsWith('src-'))).toBe(true);
+      // On paper a cross-reference gives its page: the number the page really has.
+      expect(flat(fire.text)).toContain(`(Tab 9, After a disaster: the first 30 days, page ${pdf.destinations.get('pg-after')})`);
       // Headers carry the tab number and label; footers the running page number and the dates.
       expect(flat(fire.text)).toContain('Happening now');
       expect(flat(fire.text)).toContain(`page ${fire.number} of ${pdf.pages.length}`);
@@ -92,6 +96,7 @@ describe('the PDF binder, from the fixture binder', () => {
       // The household's words, exactly as typed (accents in Latin Extended included).
       const all = flat(pdf.pages.map((p) => p.text).join('\n'));
       for (const s of [AWKWARD.markup, AWKWARD.markdown, AWKWARD.bar, AWKWARD.accents]) expect(all).toContain(s);
+      expect(all).not.toMatch(/page 000\b|\b00000\b/);
       expect(pdf.fonts.every((f) => /\+NotoSans-/.test(f))).toBe(true);
       expect(pdf.info.Title).toBe(FIXTURE_BINDER.title);
     });
@@ -121,7 +126,7 @@ describe('the PDF binder, from the fixture binder', () => {
 });
 
 // ---------------------------------------------------------------------------------------------
-// The engine's binder (the Philadelphia golden), once the binder workstream's tree is in it
+// The engine's binder: the Philadelphia golden
 // ---------------------------------------------------------------------------------------------
 
 function repoRoot(): string {
@@ -131,33 +136,32 @@ function repoRoot(): string {
 
 const GOLDEN_DIR = process.env.RR_GOLDEN_DIR ?? join(repoRoot(), 'fixtures', 'golden');
 const golden = JSON.parse(readFileSync(join(GOLDEN_DIR, 'philadelphia-renters-4.json'), 'utf8')) as { binder: Binder };
-/** The transitional binder (types3) is pages of paragraphs only; the engine's has person pages with fields. */
-const realBinder = binderPages(golden.binder).some((e) => e.page.kind === 'person' && e.page.blocks.some((b) => 'fields' in b));
 
-describe.runIf(realBinder)("the PDF of the engine's Philadelphia binder", () => {
-  it('fits its pages, and comes to between 75 and 110 pages on Letter and on A4', async () => {
-    const lines: string[] = [];
-    for (const paper of ['LETTER', 'A4'] as const) {
+describe("the PDF of the engine's Philadelphia binder", () => {
+  for (const paper of ['LETTER', 'A4'] as const) {
+    it(`keeps every page's fit, and comes to between 75 and 110 pages (${paper === 'LETTER' ? 'Letter' : 'A4'})`, async () => {
       const { r, pdf } = await draw(golden.binder, { paper }, `philadelphia-${paper.toLowerCase()}`);
-      lines.push(`${paper}: ${pdf.pages.length} pages in ${r.passes} layout passes`);
-      expect(pdf.pages.length, paper).toBeGreaterThanOrEqual(75);
-      expect(pdf.pages.length, paper).toBeLessThanOrEqual(110);
+      expect(pdf.pages.length).toBeGreaterThanOrEqual(75);
+      expect(pdf.pages.length).toBeLessThanOrEqual(110);
+      const lines: string[] = [`${paper}: ${pdf.pages.length} pages in ${r.passes} layouts`];
+      const tabs = new Map<number, { real: number; proxy: number }>();
       for (const s of r.doc.sheets) {
         if (!s.entry) continue;
+        const page = s.entry.page;
         const f = sheetFill(s)!;
-        if (s.entry.page.kind === 'inventory') {
-          // awaiting: binder (the inventory promises two sheets and needs three at the smallest type)
-          lines.push(`${paper} inventory (${s.entry.page.fit}): ${fitUnits(s.entry.page)} units, scale ${s.scale.toFixed(2)}, ${f.fill.toFixed(2)} sheets`);
-          continue;
-        }
-        expect(f.pages, `${paper} ${s.entry.page.id} (${s.entry.page.fit}, ${fitUnits(s.entry.page)} units, scale ${s.scale.toFixed(2)})`).toBeLessThanOrEqual(sheetsAllowed(s.entry.page));
-        if (paper === 'LETTER' && s.entry.page.kind === 'checklist') lines.push(`${s.entry.page.id}: ${fitUnits(s.entry.page)} units (proxy ${(fitUnits(s.entry.page) / FIT_CAPACITY).toFixed(2)}), scale ${s.scale.toFixed(2)}, ${f.fill.toFixed(2)} sheets`);
+        expect(f.pages, `${page.id} (${page.fit}, ${fitUnits(page)} units, scale ${s.scale.toFixed(2)})`).toBeLessThanOrEqual(sheetsAllowed(page));
+        const t = tabs.get(s.entry.part.tab) ?? { real: 0, proxy: 0 };
+        t.real += f.pages;
+        t.proxy += Math.max(1, Math.ceil(fitUnits(page) / FIT_CAPACITY));
+        tabs.set(s.entry.part.tab, t);
+        if (page.fit !== 'one' || page.kind === 'checklist') lines.push(`${page.id} (${page.fit}): proxy ${(fitUnits(page) / FIT_CAPACITY).toFixed(2)} pages, PDF ${f.fill.toFixed(2)} sheets at type scale ${s.scale.toFixed(2)}`);
       }
-    }
-    console.info(`Philadelphia, the PDF against the fit proxy:\n  ${lines.join('\n  ')}`);
-  });
-});
-
-describe.runIf(!realBinder)("the PDF of the engine's Philadelphia binder", () => {
-  it.skip('awaits the binder workstream: the goldens still hold the transitional binder', () => {});
+      // Every link in the text gives a page that is really there.
+      const all = flat(pdf.pages.map((p) => p.text).join('\n'));
+      expect(all).not.toMatch(/page 000\b|\b00000\b/);
+      const sorted = [...tabs.entries()].sort((a, b) => a[0] - b[0]);
+      lines.push(`pages per tab, PDF ${sorted.map(([, t]) => t.real).join('/')}; proxy ${sorted.map(([, t]) => t.proxy).join('/')}`);
+      console.info(`Philadelphia, the PDF against the fit proxy (${FIT_CAPACITY} units a page):\n  ${lines.join('\n  ')}`);
+    }, 180_000);
+  }
 });
