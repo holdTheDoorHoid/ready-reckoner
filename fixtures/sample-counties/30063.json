@@ -2,6 +2,7 @@
   "county": {
     "fips": "30063",
     "name": "Missoula",
+    "name_full": "Missoula County",
     "state_abbr": "MT",
     "state_name": "Montana",
     "centroid": {

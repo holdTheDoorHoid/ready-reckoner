@@ -2,6 +2,7 @@
   "county": {
     "fips": "48167",
     "name": "Galveston",
+    "name_full": "Galveston County",
     "state_abbr": "TX",
     "state_name": "Texas",
     "centroid": {

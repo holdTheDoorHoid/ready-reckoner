@@ -59,8 +59,19 @@ impl<'a> Ctx<'a> {
         self.input.dials.horizon_years.max(1)
     }
 
-    /// The county's plain name, for sentences ("Coos County").
+    /// The county's name for sentences, as the Census Bureau writes it ("Coos County", "Baltimore
+    /// city", "Orleans Parish", "Anchorage Municipality"). A record without the full name (the
+    /// hand-built sample counties) rebuilds it from the short name.
     pub fn county_label(&self) -> String {
+        if let Some(full) = self
+            .county
+            .name_full
+            .as_deref()
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+        {
+            return full.to_owned();
+        }
         let name = &self.county.name;
         // Parishes, boroughs and independent cities keep their own word.
         let lower = name.to_ascii_lowercase();
@@ -185,5 +196,66 @@ impl<'a> Ctx<'a> {
     /// The county's plain name with its state ("Jefferson County, Texas").
     pub fn county_and_state(&self) -> String {
         format!("{}, {}", self.county_label(), self.county.state_name)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn label(county: &CountyRecord) -> String {
+        let input = rr_types::fixtures::get("philadelphia-renters-4").unwrap();
+        let json = include_str!("../tests/data/counties/42101.json");
+        let v: serde_json::Value = serde_json::from_str(json).unwrap();
+        let location: LocationResolved = serde_json::from_value(v["location"].clone()).unwrap();
+        Ctx::new(&input, county, &[], &location).county_label()
+    }
+
+    #[test]
+    fn the_label_is_the_census_name() {
+        // The pack's own county table (core/counties.csv), read as the engine reads it.
+        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../data/core/counties.csv");
+        let Ok(csv) = std::fs::read(path) else {
+            eprintln!("data/core/counties.csv not found: skipped");
+            return;
+        };
+        let mut s = rr_data::DataStore::new();
+        s.load_pack("core/counties.csv", &csv).unwrap();
+        for (fips, census) in [
+            // Independent cities are not the county of the same name.
+            ("24510", "Baltimore city"),
+            ("51760", "Richmond city"),
+            ("29510", "St. Louis city"),
+            ("32510", "Carson City"),
+            ("24005", "Baltimore County"),
+            // And the other county types the short name lost.
+            ("51036", "Charles City County"),
+            ("12057", "Hillsborough County"),
+            ("22071", "Orleans Parish"),
+            ("02020", "Anchorage Municipality"),
+            ("02110", "Juneau City and Borough"),
+            ("72127", "San Juan Municipio"),
+            ("11001", "District of Columbia"),
+        ] {
+            assert_eq!(label(s.county(fips).unwrap()), census, "{fips}");
+        }
+    }
+
+    #[test]
+    fn a_record_without_the_census_name_rebuilds_it() {
+        let json = include_str!("../tests/data/counties/42101.json");
+        let v: serde_json::Value = serde_json::from_str(json).unwrap();
+        let mut c: CountyRecord = serde_json::from_value(v["county"].clone()).unwrap();
+        assert_eq!(c.name_full, None, "the hand-built sample counties lack it");
+        assert_eq!(label(&c), "Philadelphia County");
+        (c.name, c.state_abbr) = ("Cameron".into(), "LA".into());
+        assert_eq!(label(&c), "Cameron Parish");
+        (c.name, c.state_abbr) = ("Carson City".into(), "NV".into());
+        assert_eq!(label(&c), "Carson City");
+        // A blank full name is no name.
+        c.name_full = Some(" ".into());
+        assert_eq!(label(&c), "Carson City");
+        c.name_full = Some("Carson City".into());
+        assert_eq!(label(&c), "Carson City");
     }
 }

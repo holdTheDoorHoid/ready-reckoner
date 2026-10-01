@@ -625,8 +625,8 @@ fn eviction_counts_households_and_caps_the_county() {
         b.frequency_sentence
             .starts_with("Of 100 households like yours, about 50 (")
             && b.frequency_sentence.ends_with(
-                "Landlords here often take the same renters to court again and again, so we cap \
-                 your county's figure at 7 in 100 households a year."
+                "Landlords in Philadelphia County often take the same renters to court again and \
+                 again, so we cap its figure at 7 in 100 households a year."
             ),
         "{}",
         b.frequency_sentence

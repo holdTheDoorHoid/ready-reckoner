@@ -108,6 +108,8 @@ pub const CALIBRATION_FILES: &[&str] = calibration::FILES;
 #[derive(Debug, Clone)]
 struct Base {
     name: String,
+    /// The Census name with its type word (`name_full`), when the file has the column.
+    name_full: Option<String>,
     state_abbr: String,
     state_name: String,
     centroid: LatLon,
@@ -523,6 +525,9 @@ impl DataStore {
                     t.col("lon")?,
                     t.col("nca_region")?,
                 );
+                // "Baltimore city", "Orleans Parish": the label rr-hazards prints (optional, so
+                // an older pack without the column still loads).
+                let i_nf = t.opt_col("name_full");
                 self.base.clear();
                 for r in &t.rows {
                     let (Some(lat), Some(lon)) = (f(&r[i_lat]), f(&r[i_lon])) else {
@@ -532,6 +537,9 @@ impl DataStore {
                         r[i_f].clone(),
                         Base {
                             name: r[i_n].clone(),
+                            name_full: i_nf
+                                .map(|i| r[i].trim().to_owned())
+                                .filter(|s| !s.is_empty()),
                             state_abbr: r[i_s].clone(),
                             state_name: r[i_sn].clone(),
                             centroid: LatLon { lat, lon },
@@ -983,6 +991,7 @@ impl DataStore {
                 CountyRecord {
                     fips: fips.clone(),
                     name: base.name.clone(),
+                    name_full: base.name_full.clone(),
                     state_abbr: base.state_abbr.clone(),
                     state_name: base.state_name.clone(),
                     centroid: base.centroid,
@@ -1323,6 +1332,10 @@ mod tests {
         )
         .unwrap();
         assert_eq!(s.county("42101").unwrap().name, "Philadelphia");
+        assert_eq!(
+            s.county("42101").unwrap().name_full.as_deref(),
+            Some("Philadelphia County")
+        );
         assert!(s.county("42101").unwrap().nri.is_empty());
         // NRI rows need the semantics file before they appear.
         s.load_pack("core/nri_hazards.csv", b"fips,hazard,afreq,expb,expp,ealb,ealp,ealt,hlrb,alrb,risk_score\n42101,heat_wave,11.07,1,2,3,4,5,6,7,99.97\n").unwrap();
@@ -1339,6 +1352,35 @@ mod tests {
             AfreqKind::EventsPerYear
         );
         assert_eq!(rec.nri_version, "1.20.0 (December 2025)");
+    }
+
+    #[test]
+    fn the_census_name_is_kept_and_optional() {
+        // Independent cities keep their own word: Baltimore city is not Baltimore County.
+        let mut s = DataStore::new();
+        s.load_pack(
+            "core/counties.csv",
+            b"fips,name,name_full,state_abbr,state_name,lat,lon,land_sqmi,nca_region\n\
+              24005,Baltimore,Baltimore County,MD,Maryland,39.44,-76.62,598.3,northeast\n\
+              24510,Baltimore,Baltimore city,MD,Maryland,39.30,-76.61,80.9,northeast\n",
+        )
+        .unwrap();
+        assert_eq!(
+            s.county("24005").unwrap().name_full.as_deref(),
+            Some("Baltimore County")
+        );
+        assert_eq!(
+            s.county("24510").unwrap().name_full.as_deref(),
+            Some("Baltimore city")
+        );
+        // A file without the column still loads, without the full name.
+        s.load_pack(
+            "core/counties.csv",
+            b"fips,name,state_abbr,state_name,lat,lon,nca_region\n\
+              24510,Baltimore,MD,Maryland,39.30,-76.61,northeast\n",
+        )
+        .unwrap();
+        assert_eq!(s.county("24510").unwrap().name_full, None);
     }
 
     #[test]

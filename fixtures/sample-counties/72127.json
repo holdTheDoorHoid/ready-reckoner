@@ -2,6 +2,7 @@
   "county": {
     "fips": "72127",
     "name": "San Juan",
+    "name_full": "San Juan Municipio",
     "state_abbr": "PR",
     "state_name": "Puerto Rico",
     "centroid": {

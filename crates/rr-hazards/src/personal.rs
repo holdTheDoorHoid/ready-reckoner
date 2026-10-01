@@ -315,8 +315,9 @@ fn eviction(ctx: &Ctx<'_>) -> Option<HazardRate> {
     .with_county_average(base.value);
     if capped {
         r.caveat = Some(format!(
-            "Landlords here often take the same renters to court again and again, so we cap your \
-             county's figure at {} in 100 households a year.",
+            "Landlords in {} often take the same renters to court again and again, so we cap its \
+             figure at {} in 100 households a year.",
+            ctx.county_label(),
             crate::sentence::sig2(EVICTION_CAP * 100.0)
         ));
     }

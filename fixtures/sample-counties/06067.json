@@ -2,6 +2,7 @@
   "county": {
     "fips": "06067",
     "name": "Sacramento",
+    "name_full": "Sacramento County",
     "state_abbr": "CA",
     "state_name": "California",
     "centroid": {
