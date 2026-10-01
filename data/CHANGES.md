@@ -301,3 +301,52 @@ No job run: `rr-etl manifest --rehash` recomputed the checksums, row counts and 
 | File | Rows before | Rows after | sha256 before | sha256 after |
 |---|---:|---:|---|---|
 | `core/events.csv` | 44057 | 44397 | `842d6c2dae85` | `1366f4179fc6` |
+
+## 2026-10-01T12:40:57Z — pack version ad9c33416bad
+
+Jobs run: geography, nri, outages, events, seismic, climate, flood, strategic, geomag, ground, levees, water_systems, smoke, facilities, surge_proxy, eviction, vulnerability, base_rates, series, outage_model, climate_daily, reliability, displacement.
+
+| File | Rows before | Rows after | Added | Removed | Changed | Status |
+|---|---:|---:|---:|---:|---:|---|
+| `core/base_rates.toml` | 27 | 27 | 0 | 0 | 0 | unchanged |
+| `core/climate.csv` | 3231 | 3231 | 0 | 0 | 0 | unchanged |
+| `core/counties.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/ct_crosswalk.csv` | 19 | 19 | 0 | 0 | 0 | unchanged |
+| `core/declarations.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/events.csv` | 44397 | 44397 | 0 | 0 | 0 | unchanged |
+| `core/facilities.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/flood.csv` | 3144 | 3144 | 0 | 0 | 0 | unchanged |
+| `core/geomag.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/ground.csv` | 3225 | 3225 | 0 | 0 | 0 | unchanged |
+| `core/levees.csv` | 3232 | 3232 | 0 | 0 | 3 | changed |
+| `core/nri_counties.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/nri_hazards.csv` | 45853 | 45853 | 0 | 0 | 0 | unchanged |
+| `core/nri_semantics.toml` | 18 | 18 | 0 | 0 | 0 | unchanged |
+| `core/outage_causes.csv` | 3153 | 3153 | 0 | 0 | 0 | unchanged |
+| `core/outage_curves.csv` | 102 | 102 | 0 | 0 | 0 | unchanged |
+| `core/outage_pooled.csv` | 3209 | 3209 | 0 | 0 | 0 | unchanged |
+| `core/outage_stress.csv` | 3186 | 3186 | 0 | 0 | 0 | unchanged |
+| `core/outages.csv` | 3153 | 3153 | 0 | 0 | 0 | unchanged |
+| `core/outages_state.csv` | 53 | 53 | 0 | 0 | 0 | unchanged |
+| `core/reliability.csv` | 3174 | 3174 | 0 | 0 | 0 | unchanged |
+| `core/seismic.csv` | 3225 | 3225 | 0 | 0 | 0 | unchanged |
+| `core/series/drug_shortages.toml` | 14 | 14 | 0 | 0 | 14 | changed |
+| `core/series/fbi_arrests.toml` | 70 | 70 | 0 | 0 | 70 | changed |
+| `core/series/fcc_dirs.toml` | 19 | 19 | 0 | 0 | 0 | unchanged |
+| `core/series/fdic_failures.toml` | 92 | 92 | 0 | 0 | 92 | changed |
+| `core/series/funding_gaps.toml` | 27 | 27 | 0 | 0 | 0 | unchanged |
+| `core/series/ihp_displacement.toml` | 22 | 22 | 0 | 0 | 22 | changed |
+| `core/series/oe417.toml` | 288 | 288 | 0 | 0 | 288 | changed |
+| `core/smoke.csv` | 3225 | 3225 | 0 | 0 | 0 | unchanged |
+| `core/states.csv` | 56 | 56 | 0 | 0 | 0 | unchanged |
+| `core/strategic.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/strategic_sites.toml` | 207 | 207 | 0 | 0 | 0 | unchanged |
+| `core/surge_proxy.csv` | 3232 | 3232 | 0 | 0 | 0 | unchanged |
+| `core/temperature.csv` | 3107 | 3107 | 0 | 0 | 0 | unchanged |
+| `core/vulnerability.csv` | 3144 | 3144 | 0 | 0 | 0 | unchanged |
+| `core/water_systems.csv` | 3171 | 3171 | 0 | 0 | 0 | unchanged |
+| `core/zip_county.csv` | 46772 | 46772 | 0 | 0 | 0 | unchanged |
+| `core/zip_facilities.csv` | 33791 | 33791 | 0 | 0 | 0 | unchanged |
+| `geo/counties.json` | 3222 | 3222 | 0 | 0 | 0 | unchanged |
+| `opt/outage_events/county_events.csv` | 29878 | 29878 | 0 | 0 | 0 | unchanged |
+| `opt/outage_events/holdout.csv` | 130 | 130 | 0 | 0 | 0 | unchanged |

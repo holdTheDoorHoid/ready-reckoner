@@ -7,7 +7,7 @@ url = "https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads"
 licence = "US Government work, public domain (17 U.S.C. 105)"
 attribution = ""
 source = "fbi_cde_arrests"
-retrieved = "2026-09-26"
+retrieved = "2026-10-01"
 how = "fetched"
 notes = [
   "Tables 39 and 40 count arrests reported by agencies that sent all twelve months of data (87-92% of the population in 2023-2025); Table 29 estimates all arrests nationally. National figures by band are the band's reported share of the Table 29 estimate, a derivation: the FBI publishes no national estimate by age or sex.",

@@ -7,7 +7,7 @@ url = "https://data.openei.org/submissions/6458"
 licence = "CC BY 4.0"
 attribution = "Grid disturbance counts derived by Ready Reckoner from the Event-correlated Outage Dataset in America, Pacific Northwest National Laboratory, OpenEI submission 6458 (CC BY 4.0), which links U.S. Department of Energy Form OE-417 electric emergency and disturbance reports to ORNL EAGLE-I outages."
 source = "pnnl_oe417_linkage"
-retrieved = "2026-09-26"
+retrieved = "2026-10-01"
 how = "fetched"
 notes = [
   "2922 distinct OE-417 reports in 2014-2023 (the file's ten yearly event files; the 8- and 24-hour lag variants are not used).",

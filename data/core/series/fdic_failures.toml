@@ -7,7 +7,7 @@ url = "https://banks.data.fdic.gov/bankfind-suite/failures"
 licence = "US Government work, public domain (17 U.S.C. 105)"
 attribution = ""
 source = "fdic_failed_banks"
-retrieved = "2026-09-26"
+retrieved = "2026-10-01"
 how = "fetched"
 notes = [
   "4117 failures and assistance transactions, 1934 to the refresh date; assets are total assets at failure in nominal dollars (QBFASSET, thousands, x 1,000).",
