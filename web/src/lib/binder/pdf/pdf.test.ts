@@ -12,7 +12,8 @@
  * - a page that promises one sheet takes one, on the fixture binder and (once the engine's binder
  *   is in the goldens) on the Philadelphia binder, whose page count is checked against a range.
  *
- * Set RR_PDF_OUT to a folder to keep the files for a look.
+ * Set RR_PDF_OUT to a folder to keep the files for a look, and RR_GOLDEN_DIR to a folder of
+ * golden plans to draw instead of `fixtures/golden` (another branch's goldens, say).
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -128,7 +129,8 @@ function repoRoot(): string {
   throw new Error('no repository root');
 }
 
-const golden = JSON.parse(readFileSync(join(repoRoot(), 'fixtures', 'golden', 'philadelphia-renters-4.json'), 'utf8')) as { binder: Binder };
+const GOLDEN_DIR = process.env.RR_GOLDEN_DIR ?? join(repoRoot(), 'fixtures', 'golden');
+const golden = JSON.parse(readFileSync(join(GOLDEN_DIR, 'philadelphia-renters-4.json'), 'utf8')) as { binder: Binder };
 /** The transitional binder (types3) is pages of paragraphs only; the engine's has person pages with fields. */
 const realBinder = binderPages(golden.binder).some((e) => e.page.kind === 'person' && e.page.blocks.some((b) => 'fields' in b));
 
@@ -137,16 +139,22 @@ describe.runIf(realBinder)("the PDF of the engine's Philadelphia binder", () => 
     const lines: string[] = [];
     for (const paper of ['LETTER', 'A4'] as const) {
       const { r, pdf } = await draw(golden.binder, { paper }, `philadelphia-${paper.toLowerCase()}`);
+      lines.push(`${paper}: ${pdf.pages.length} pages in ${r.passes} layout passes`);
       expect(pdf.pages.length, paper).toBeGreaterThanOrEqual(75);
       expect(pdf.pages.length, paper).toBeLessThanOrEqual(110);
       for (const s of r.doc.sheets) {
-        if (!s.entry || s.entry.page.kind === 'inventory') continue; // awaiting: binder (the inventory promises two sheets and needs three)
+        if (!s.entry) continue;
         const f = sheetFill(s)!;
+        if (s.entry.page.kind === 'inventory') {
+          // awaiting: binder (the inventory promises two sheets and needs three at the smallest type)
+          lines.push(`${paper} inventory (${s.entry.page.fit}): ${fitUnits(s.entry.page)} units, scale ${s.scale.toFixed(2)}, ${f.fill.toFixed(2)} sheets`);
+          continue;
+        }
         expect(f.pages, `${paper} ${s.entry.page.id} (${s.entry.page.fit}, ${fitUnits(s.entry.page)} units, scale ${s.scale.toFixed(2)})`).toBeLessThanOrEqual(sheetsAllowed(s.entry.page));
         if (paper === 'LETTER' && s.entry.page.kind === 'checklist') lines.push(`${s.entry.page.id}: ${fitUnits(s.entry.page)} units (proxy ${(fitUnits(s.entry.page) / FIT_CAPACITY).toFixed(2)}), scale ${s.scale.toFixed(2)}, ${f.fill.toFixed(2)} sheets`);
       }
     }
-    console.info(`Philadelphia checklist pages, proxy against the PDF:\n  ${lines.join('\n  ')}`);
+    console.info(`Philadelphia, the PDF against the fit proxy:\n  ${lines.join('\n  ')}`);
   });
 });
 

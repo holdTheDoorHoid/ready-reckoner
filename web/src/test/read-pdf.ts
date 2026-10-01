@@ -177,9 +177,14 @@ export function readPdf(bytes: Uint8Array): ReadPdf {
     if (!names || !/\/XYZ|\/Fit/.test(names)) continue;
     for (const d of names.matchAll(/\(((?:\\.|[^)])*)\)\s*\[\s*(\d+) 0 R/g)) destinations.set(literal(d[1]!), pageNumber.get(Number(d[2])) ?? 0);
   }
-  const infoDict = [...objs.values()].find((o) => /\/Producer|\/Creator/.test(o.dict))?.dict ?? '';
+  // The trailer's /Info dictionary; pdfkit writes each entry as a string object of its own.
+  const infoId = ref(raw.toString('latin1').slice(raw.lastIndexOf('trailer')), 'Info');
+  const infoDict = (infoId !== undefined ? objs.get(infoId)?.dict : undefined) ?? '';
   const info: Record<string, string> = {};
-  for (const e of infoDict.matchAll(/\/(\w+) \(((?:\\.|[^)])*)\)/g)) info[e[1]!] = textString(literal(e[2]!));
+  for (const e of infoDict.matchAll(/\/(\w+) (?:\(((?:\\.|[^)])*)\)|(\d+) 0 R)/g)) {
+    const str = e[2] ?? /^\s*\(((?:\\.|[^)])*)\)/.exec(objs.get(Number(e[3]))?.dict ?? '')?.[1];
+    if (str !== undefined) info[e[1]!] = textString(literal(str));
+  }
   const fonts = [...objs.values()].flatMap((o) => (/\/Type \/Font/.test(o.dict) ? [/\/BaseFont \/([\w+-]+)/.exec(o.dict)?.[1] ?? ''] : [])).filter(Boolean);
   return { pages, destinations, info, fonts };
 }

@@ -27,7 +27,7 @@
  */
 import type { Binder, Block, CalloutKind, Inline, IsoDate, MapSlot, MapSlotKind, Page } from '../../../engine/types';
 import { formatDate } from '../../format';
-import { binderPages, creditsNotShown, type PageEntry, sourceListIndex } from '../model';
+import { binderPages, creditsNotShown, flatBlocks, type PageEntry, sourceListIndex } from '../model';
 import { CALLOUT_STYLES, HAIRLINE, HEADER_FILL, INK, MEMORY_FILL, MUTED, STEP_STYLES } from '../palette';
 import { labelSheet } from './labels';
 
@@ -259,6 +259,8 @@ class Ctx {
   private k = 1;
   /** The page being built. */
   private page: Page | undefined;
+  /** The page's tables by header: tables with the same columns share their widths and line up. */
+  private peers = new Map<string, Inline[][][]>();
 
   constructor(
     readonly b: Binder,
@@ -294,6 +296,12 @@ class Ctx {
     this.k = scale;
     this.page = e.page;
     const p = e.page;
+    this.peers = new Map();
+    for (const bl of flatBlocks(p.blocks)) {
+      if (!('table' in bl)) continue;
+      const key = bl.table.header.join('\u0000');
+      this.peers.set(key, [...(this.peers.get(key) ?? []), ...bl.table.rows]);
+    }
     const firstOfPart = e.inPart === 0;
     const cut = p.kind === 'wallet_cards';
     const head: Content[] = [];
@@ -622,7 +630,7 @@ class Ctx {
       if (paged) cells.push(this.pageCell(targets[k]));
       return cells;
     });
-    const widths = columnWidths(header, rows, cols, width - (paged ? PAGE_COL + 8.5 : 0), 9 * this.k);
+    const widths = columnWidths(header, this.peers.get(header.join('\u0000')) ?? rows, cols, width - (paged ? PAGE_COL + 8.5 : 0), 9 * this.k);
     const heads: Content[][] = heading ? [this.headingRow(heading, head.length), head] : [head];
     return {
       table: { headerRows: heads.length, keepWithHeaderRows: 1, dontBreakRows: true, widths: paged ? [...widths, PAGE_COL] : widths, body: [...heads, ...body] },
