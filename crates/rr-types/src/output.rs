@@ -115,7 +115,9 @@ pub struct Exposure {
     /// funded areas).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub uasi_share: Option<Sourced<f64>>,
-    /// Eviction filings per renter household per year in the county (Eviction Lab), 0 to 1.
+    /// Eviction filings per renter household per year in the county (Eviction Lab, 2014–2018
+    /// mean). Not a share: where landlords file against the same households again and again it
+    /// exceeds 1 (Baltimore County, MD, 1.37).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub eviction_rate: Option<Sourced<f64>>,
 }

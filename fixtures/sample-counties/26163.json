@@ -2,6 +2,7 @@
   "county": {
     "fips": "26163",
     "name": "Wayne",
+    "name_full": "Wayne County",
     "state_abbr": "MI",
     "state_name": "Michigan",
     "centroid": {

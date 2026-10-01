@@ -160,7 +160,8 @@ fn print_distribution(title: &str, rows: &[Row]) {
 }
 
 /// The words the card adds when the county's own figure was capped.
-const CAPPED: &str = "so we cap your county's figure at 7 in 100 households a year.";
+const CAPPED: &str = "often take the same renters to court again and again, so we cap its figure \
+                      at 7 in 100 households a year.";
 
 /// Households ordered to leave per renter household a year, from the pack's filing rate, before
 /// the cap: filings ÷ (1 + 1.7 × filings) households taken to court, × 0.32 ordered to leave.
@@ -273,6 +274,20 @@ fn eviction_in_every_county() {
         .collect();
     assert_eq!(over_one.len(), 3);
     assert!(over_one.iter().all(|r| (r.rate - 0.07).abs() < 1e-9));
+    // The card names the place as the Census does: Baltimore city is not Baltimore County.
+    for (fips, place) in [
+        ("24005", "Baltimore County"),
+        ("24510", "Baltimore city"),
+        ("24033", "Prince George's County"),
+    ] {
+        let r = reference_rows.iter().find(|r| r.fips == fips).unwrap();
+        assert!(
+            r.sentence
+                .contains(&format!("Landlords in {place} {CAPPED}")),
+            "{fips}: {}",
+            r.sentence
+        );
+    }
     if std::env::var_os("RR_PRINT_EVICTION").is_some() {
         print_distribution(
             "A renting household with stable income and under three months of savings",

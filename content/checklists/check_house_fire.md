@@ -4,7 +4,7 @@ title: House fire
 kind: checklist
 onset: now
 applies_to: [hazard:house_fire]
-citations: [usfa_home_fire_escape_plans, ready_gov_home_fires, usfa_smoke_alarms, usfa_fire_safety_disabilities]
+citations: [usfa_home_fire_escape_plans, ready_gov_home_fires, nfpa_escape_planning, usfa_smoke_alarms, usfa_fire_safety_disabilities]
 pages: 1
 ---
 ## Use this when
@@ -14,9 +14,9 @@ A smoke alarm sounds, or you see or smell smoke or fire in your home.
 ## Do first
 
 1. **Get out.** Leave by the nearest safe way; do not stop for anything.[^usfa_home_fire_escape_plans]
-2. {if:home:apartment_low_rise|apartment_high_rise}**In an apartment building,** close your door behind you, pull the fire alarm on the way out and take the stairs, not the elevator.[^usfa_home_fire_escape_plans]{/if}
+2. {if:home:apartment_low_rise|apartment_high_rise}**In an apartment building,** pull the fire alarm on the way out and take the stairs, not the elevator.[^usfa_home_fire_escape_plans]{/if}
 3. **Stay low.** If there is smoke, crawl under it to your way out.[^ready_gov_home_fires]
-4. **Feel doors first.** If a door or its knob is hot, keep it closed and use your second way out.[^ready_gov_home_fires]
+4. **Feel doors first.** If a door or its knob is hot, keep it closed and use your second way out.[^ready_gov_home_fires] Close doors behind you as you leave.[^nfpa_escape_planning]
 5. **Meet outside.** Go to your meeting place and stay there.[^usfa_home_fire_escape_plans]
 6. **Call 911 from outside.** Call once you are out, not before.[^usfa_home_fire_escape_plans]
 
@@ -58,5 +58,6 @@ A smoke alarm sounds, or you see or smell smoke or fire in your home.
 
 [^usfa_home_fire_escape_plans]: U.S. Fire Administration, Home Fire Escape Plans (2026).
 [^ready_gov_home_fires]: FEMA / Ready.gov, Home Fires (2026).
+[^nfpa_escape_planning]: National Fire Protection Association, How to make a home fire escape plan (2026).
 [^usfa_smoke_alarms]: U.S. Fire Administration, Smoke alarms (2026).
 [^usfa_fire_safety_disabilities]: U.S. Fire Administration, Fire Safety for People with Disabilities (2026).
