@@ -153,59 +153,22 @@ Accounts, sync, sharing links that carry household data, push notifications, nat
 
 ## v0.2.0: the family plan and the new questions (web-interview)
 
-### Your family plan (`#/family`)
+### Your family plan (`#/family`) — removed in v0.3.0
 
-**One job:** write down the household's own plan, in its own words, so it prints on paper. The screen
-sits outside the numbered interview steps. The site navigation lists it right after "Your answers"
-("Family plan"), and each plan step whose answer belongs here links to it: "Make a household plan"
-("Fill in your household plan here"), "Your trusted circle", "Legal readiness", "Plan how you would
-leave" and "Know your shut-offs" (the catalogue ids are listed beside `familySectionFor` in
-`web/src/lib/family.ts`).
-`#/family/<section>` opens the screen at one part: `contact`, `children`, `shelter`, `leave`, `home`,
-`circle`, `lawyer`.
+This screen (its own place in the navigation, outside the numbered interview steps, with
+`#/family/<section>` opening one part: `contact`, `children`, `shelter`, `leave`, `home`, `circle`,
+`lawyer`) is gone. Its questions are now the interview's optional steps 6–8 (the "v0.3.0" section
+below); `#/family` and `#/family/<section>` redirect to the matching step or card with no new
+history entry, and the fields themselves kept their names and limits (`PlanInput.family_plan`) so a
+plan saved under v0.2.0 still loads and still prints the same answers. The privacy note this screen
+used to show is now `docs/PRIVACY.md`'s own "A caution about the address" section.
 
-**Privacy.** A box under the lead says the plan is saved only in this browser and in the plan file
-the household saves, never sent anywhere, and never used to work out the plan. A smaller line says
-the names and numbers are other people's details too, and that until the site has a web address of
-its own, other pages at the same address could in principle read what the browser keeps; if that
-matters, write the plan on the printed packet instead (warn, don't block; DESIGN §10).
+### Wallet cards in the packet — removed in v0.3.0
 
-**Fields** (every one optional free text, `PlanInput.family_plan`; `maxlength` is the engine's
-limit, 300 characters for notes and 80 for names and numbers, so nothing typed is cut later):
-
-| Section | Asks | Shown when |
-| --- | --- | --- |
-| Staying in touch | Someone out of the area everyone checks in with (name, phone); where to meet near home; where to meet outside the neighbourhood; numbers to know by heart (add one at a time, up to 5) | always |
-| Children, school and work | Who picks up the children, and from where; what each person does at work or school | the first only with a child, toddler, baby or teenager, or when already answered; the heading says "Work and school" otherwise |
-| Where to shelter | The safest spot at home; at work or school | always |
-| If you have to leave | Where you would go; two ways out; who takes the animals; roadside assistance number | animals only with pets or livestock, roadside only with a vehicle (or when already answered) |
-| Around the home | Gas shut-off; main water shut-off; electrical panel; neighbours who check on you | always (the gas help adds "leave it blank if you have no gas" when neither the heat nor the stove is gas) |
-| Your trusted circle | Up to 4 people: name, phone, and what they hold (a spare key, copies of our papers, medical power of attorney, backup codes for our accounts) | always; "Add someone" until four |
-| A lawyer | Name or office; phone | always |
-
-**Help from the content blocks.** "Staying in touch" and "Where to shelter" each have a folded guide,
-"How to plan staying in touch" (`plan_communication`) and "Where to shelter, danger by danger"
-(`plan_shelter`), read from `content/guidance/plan_*.md` at build time and trimmed for the household
-exactly as the packet trims them (`web/src/lib/conditions.ts` is rr-content's `apply_conditions_for`,
-ported): a hazard's paragraph stays only where its ten-year chance is at least 1 in 100, the high-rise
-line only in a tall building. Notes are numbered, each linked to its source. A build without the
-files shows a one-paragraph fallback instead.
-
-**Saving.** What is typed is saved as it is typed; leaving a field tidies it the way the engine
-does (trimmed, capped; a blank field is removed; an empty plan leaves no `family_plan` behind).
-List entries (routes, numbers, people) keep their place while being edited; the engine drops empty
-ones. "Put it on paper" at the end has **Print wallet cards** (opens `#/packet/wallet-cards`), **See
-the whole packet**, and, while the plan's household-plan step is not done, **Mark "…" as done**.
-
-### Wallet cards in the packet
-
-The packet prints the family plan right after the summary, then the wallet cards. The web finds the
-cards as the section whose heading names them (its slug contains `wallet`, as in "## Wallet cards"),
-or else the family-plan section (`cardsSection` in `web/src/lib/markdown.ts`). `#/packet/wallet-cards`
-(or `#/packet/<any section slug>`) scrolls to that section and moves focus to its heading. The
-toolbar gains **Print only the wallet cards**, which prints that section alone. Each card is a block
-quote in the packet's Markdown: the web draws it with a dashed cut line, two across on paper, and
-never splits one across pages.
+The packet no longer exists as a single Markdown document, so the wallet cards are no longer found
+by matching a heading's text. They are the binder's own `wallet_cards` page (`docs/BINDER.md` §2;
+`PageKind::WalletCards`), reached directly by page id at
+`#/binder/wallet-cards`, with their own "Print this page" button like any other binder page.
 
 ### New questions in the interview
 
