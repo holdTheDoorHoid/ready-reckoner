@@ -19,7 +19,7 @@ Defined in the round-2 model review (Part 2) before the events were scored, and 
 - **partial**: it covers the median affected household but not the tail;
 - **short**: it is below the median;
 - **over**: it is more than three times the event (counted as covered);
-- **not modelled**: the model has no consequence for it.
+- **not modeled**: the model has no consequence for it.
 
 An event with several needs takes the worst of them. For an evacuation, the target is covered
 when the household is told to keep a go-bag (a ten-year chance of 2 in 100 or more), the warning
@@ -75,7 +75,7 @@ the frozen county records predate the smoke-day column `rr-hazards` reads, so th
 | 8 | Lahaina fire, Maui, Aug 2023 | `lahaina-maui-3` | leave home: wildfire, 15 minutes' warning, 180 days away | USFA preliminary after-action report; warning minutes and time away UNVERIFIED | |
 | 9 | Jackson water crisis, Aug-Sep 2022 | `jackson-hinds-3` | no tap water 7 / 10; boil water 48 / 48 | `npr_jackson_water_restored_2022` (service lost from 29 Aug, restored by 7 Sep), `npr_jackson_boil_2022` (notice late July to 15 Sep); the 10-day tail is UNVERIFIED | \* the violation record's window includes 2022 (earlier violations and EPA's 2020 emergency order came first) |
 | 10 | East Palestine derailment, Feb 2023 | `eastpalestine-3` | leave home: chemical release, 1 hour's warning, 5 days away | Ideastream (evacuation 3-8 Feb) | |
-| 11 | Colonial Pipeline, May 2021 | `colonial-gwinnett-3`, `colonial-mecklenburg-3` | fuel at the pump | WBTV, CNBC | not modelled |
+| 11 | Colonial Pipeline, May 2021 | `colonial-gwinnett-3`, `colonial-mecklenburg-3` | fuel at the pump | WBTV, CNBC | not modeled |
 | 12 | Change Healthcare (Feb 2024) and CrowdStrike (Jul 2024), Franklin County OH | `pharmacy-franklin-oh-2` | medicine 7 / 15 | UnitedHealth (e-prescribing and claims back on day 15); CRS (CrowdStrike, days); median an estimate | |
 | 13 | Hurricane Maria, San Juan, Sep 2017 | `maria-sanjuan-3` | power 84 / 170; no tap water 68 / 150 | EIA, DOE situation reports (`doe_maria_situation_reports`: 8 % still out on day 175), `kishore_2018_maria` (households averaged 84 days without power, 68 without water; the means stand in for the medians, read from a summary, UNVERIFIED); the water tail is an estimate | \* the island grids' major-hurricane class is built from Maria's own restoration record |
 | 14 | Hurricane Maria, Utuado, Sep 2017 | `maria-utuado-3` | as San Juan (the island's figures; Utuado was among the last restored) | as above | \* as above |
@@ -92,7 +92,7 @@ the frozen county records predate the smoke-day column `rr-hazards` reads, so th
 
 **Tally** (22 events):
 
-| Engine and data | Covered | Partial | Short | Not modelled |
+| Engine and data | Covered | Partial | Short | Not modeled |
 | --- | --- | --- | --- | --- |
 | v0.1.0, as the review scored it | 6 | 5 | 10 | 1 |
 | v0.2 as merged before tier 1 (`3c46b9b`), this rule | 6 | 5 | 10 | 1 |
@@ -126,7 +126,7 @@ and the v2 answers; the county-only and pre-event runs are in `target/backtest.m
 | 8 | Lahaina | short: away 2 d vs months | short | as Paradise |
 | 9 | Jackson\* | short: no tap water 3 d, boil 7 d | short: no tap water 21 d (covered), boil 30 d (short) | as Asheville; the boil notice ran 48 days |
 | 10 | East Palestine | partial: away 2 d vs 5 | partial | |
-| 11 | Colonial Pipeline | not modelled | not modelled | fuel is still a gap (a free step covers it) |
+| 11 | Colonial Pipeline | not modeled | not modeled | fuel is still a gap (a free step covers it) |
 | 12 | Change and CrowdStrike | partial: medicine 14 d vs 7 / 15 | covered: medicine 30 d | the medicine-shortage hazard, at rr-hazards' own rate since agent/hazards2 merged (so every run is covered) |
 | 13 | Maria, San Juan\* | short: power 30 d, water 7 d | partial: power 90 d; no tap water 180 d (covered) | Maria's own restoration curve for the island grid (M-10); public water fails with long power cuts (M-03) |
 | 14 | Maria, Utuado\* | short: power 30 d, water 5 d | short: power 45 d, no tap water 60 d | inland, no major-hurricane scenario: the fixed 6 % major share, until rr-hazards passes the county's (about 17 %) |

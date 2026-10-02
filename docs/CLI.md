@@ -413,13 +413,13 @@ Targets at the 1-in-100 setting from frozen inputs (county records from data pac
  ...
  Derecho, Linn County IA, Aug 2020 *                          covered       partial         partial          partial
 
- Run                     Short  Partial  Covered  Over  Not modelled
+ Run                     Short  Partial  Covered  Over  Not modeled
  County only                 9        4        8     0             1
  With v2 tables              8        8        5     0             1
  With v2 answers             6        9        6     0             1
  Pre-event water record      6        9        6     0             1
 
- Headline (with the v2 answers): 6 covered, 9 partial, 6 short, 1 not modelled (over counts as covered).
+ Headline (with the v2 answers): 6 covered, 9 partial, 6 short, 1 not modeled (over counts as covered).
  All 88 recorded verdicts reproduced.
 ```
 
