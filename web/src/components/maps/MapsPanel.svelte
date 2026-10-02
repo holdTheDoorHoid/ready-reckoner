@@ -189,7 +189,7 @@
 <section class="maps-panel card" aria-labelledby="{uid}-title" data-maps-phase={phase} data-maps-status={status}>
   <svelte:element this={`h${headingLevel}`} id="{uid}-title" class="maps-panel__title" tabindex="-1" bind:this={panel}>Maps of your area</svelte:element>
   <p>
-    Three maps for your binder: your neighbourhood, your city or county, and your region with the ways out. They come from outside
+    Three maps for your binder: your neighborhood, your city or county, and your region with the ways out. They come from outside
     services and are fetched only when you ask; you will see exactly who gets what first.
   </p>
 

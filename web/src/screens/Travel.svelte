@@ -49,7 +49,7 @@
     <section aria-labelledby="vehicles-title">
       <h2 id="vehicles-title">Vehicles</h2>
       {#if input.mobility.vehicles.length === 0}
-        <p class="note">No vehicle. The plan leans on walking routes, transit and neighbours for leaving quickly.</p>
+        <p class="note">No vehicle. The plan leans on walking routes, transit and neighbors for leaving quickly.</p>
       {/if}
       <ul class="vehicles">
         {#each input.mobility.vehicles as vehicle, i (i)}

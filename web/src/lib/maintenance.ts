@@ -68,7 +68,7 @@ function titleFor(kind: TaskKind, item: Item): string {
   // Free steps are already phrased as actions ("Test smoke alarms..."), so they keep their names.
   if (item.free) return kind === 'rotate' ? `${item.name} (swap it for fresh)` : item.name;
   if (kind === 'rotate') return `Use and replace: ${name}`;
-  if (kind === 'drill') return `Practise: ${name}`;
+  if (kind === 'drill') return `Practice: ${name}`;
   return `Check: ${name}`;
 }
 

@@ -143,7 +143,7 @@
     </div>
   {:else}
     <StepPrivacy>
-      Everything here is optional. Your answers fill the pages about your home, your neighbourhood and getting out in your binder; anything
+      Everything here is optional. Your answers fill the pages about your home, your neighborhood and getting out in your binder; anything
       left blank prints as a line to fill in by hand. They are kept only on this device and in any plan file you save, never sent anywhere,
       and never used to work out your plan.
     </StepPrivacy>
@@ -152,7 +152,7 @@
       <ul>
         <li><a href="#places-home" onclick={(e) => jumpTo('places-home', { focus: 'h2' }) && e.preventDefault()}>Your home</a></li>
         <li><a href="#places-touch" onclick={(e) => jumpTo('places-touch', { focus: 'h2' }) && e.preventDefault()}>Meeting places and staying in touch</a></li>
-        <li><a href="#places-neighbourhood" onclick={(e) => jumpTo('places-neighbourhood', { focus: 'h2' }) && e.preventDefault()}>Your neighbourhood</a></li>
+        <li><a href="#places-neighbourhood" onclick={(e) => jumpTo('places-neighbourhood', { focus: 'h2' }) && e.preventDefault()}>Your neighborhood</a></li>
         <li><a href="#places-leave" onclick={(e) => jumpTo('places-leave', { focus: 'h2' }) && e.preventDefault()}>Getting out</a></li>
       </ul>
     </nav>
@@ -229,8 +229,8 @@
       />
       <TextField
         id="fp-neighbours"
-        label="Neighbours who check on you, and whom you check on"
-        help="Neighbours are the first help in most disasters."
+        label="Neighbors who check on you, and whom you check on"
+        help="Neighbors are the first help in most disasters."
         value={plan?.neighbours_who_check}
         maxlength={FAMILY_PLAN_TEXT_MAX}
         multiline
@@ -275,7 +275,7 @@
       <TextField
         id="fp-meet-near"
         label="Where to meet near home"
-        help="If you can't get back inside: a neighbour's porch, the corner mailbox."
+        help="If you can't get back inside: a neighbor's porch, the corner mailbox."
         value={plan?.meeting_place_near}
         maxlength={FAMILY_PLAN_TEXT_MAX}
         multiline
@@ -284,7 +284,7 @@
       />
       <TextField
         id="fp-meet-far"
-        label="Where to meet outside the neighbourhood"
+        label="Where to meet outside the neighborhood"
         help="If you can't get home at all: a library, a relative's house, a place of worship."
         value={plan?.meeting_place_far}
         maxlength={FAMILY_PLAN_TEXT_MAX}
@@ -358,7 +358,7 @@
     </section>
 
     <section id="places-neighbourhood" class="card step-card" aria-labelledby="pl-hood-title">
-      <h2 id="pl-hood-title">Your neighbourhood</h2>
+      <h2 id="pl-hood-title">Your neighborhood</h2>
       <p class="section-intro">The places nearby you may need at short notice. Look them up once, on a calm day.</p>
       {@render place(['neighbourhood', 'hospital'], hood?.hospital, 'Nearest hospital with an emergency room', 'of the nearest hospital', { address: true })}
       {@render place(['neighbourhood', 'urgent_care'], hood?.urgent_care, 'Urgent care', 'of the urgent care clinic', {
