@@ -657,9 +657,10 @@ the e2e script does (the OSMF tile policy forbids automated use), and every othe
 any request off 127.0.0.1 and counted it (none was made). One web defect was fixed on this branch;
 engine and content findings are handed back with a proposed fix and no golden is regenerated.
 
-**Recommendation: go**, once `agent/verify3` is merged. Land R4-04 (one content line, every binder
-moves) before tagging if a goldens regeneration fits; R4-02 and R4-03 are small engine fixes that
-move no golden. The rest are notes and known limitations.
+**Recommendation: go**, once `agent/verify3` is merged. Land R4-04 and R4-11 (one content line and
+one engine sentence; every binder moves, so one goldens regeneration for both) before tagging if it
+fits; R4-02 and R4-03 are small engine fixes that move no golden. The rest are notes and known
+limitations.
 
 ### Checks and counts
 
@@ -697,13 +698,16 @@ The web suite never ran while a Rust suite was running (anchored `pgrep` before 
 | R4-08 | Tornado, Do first: "Stay away from windows. Keep away from windows, doors and outside walls." says windows twice | Low | Handed back (content) |
 | R4-09 | The Philadelphia fixture's step 8 describes a dog and a rabbit while step 2 counts one dog, so its cover reads "with 1 dog" and its Pets page lists two animals | Low | Noted (fixture; the binder prints what each step says) |
 | R4-10 | `assess` in Chrome sits on the 50 ms target: Philadelphia 44.8 ms median in the e2e run and 50.0 ms in a sweep of all fourteen fixtures a few minutes later (medians 34–50 ms, worst call 70 ms); 183 ms on a CPU four times slower | Low | Noted: a watch item for v0.3.x, as the planner proposed |
+| R4-11 | The Prepare sheet's safety rule (every household) says "Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring", the one place not in CDC's wording ("only outdoors, more than 20 feet from windows, doors and vents"), and for Cameron it contradicts the same plan's interlock item ("connected through an interlock or transfer switch an electrician installs"), the contradiction checklist-review removed from the evacuation page | Low | Handed back (engine text) |
 
 Known limitations, as decided and not findings: the OSM tile policy question awaits the owner;
 Overpass fails often and the map then says "Nearby places could not be fetched on …" (checked);
 storm surge is not drawn, and the consent screen and the maps say so (checked); one downed-line
 distance, 35 feet, on every page (checked in the five read below); the eviction cap; the two-sheet
 inventory and risks summary; the PDF is not tagged for screen readers and prints letters outside
-Latin and Latin Extended as boxes (the app says so); the footer reads 0.2.0 until the version bump.
+Latin and Latin Extended as boxes (the app says so); the footer reads 0.2.0 until the version
+bump; R3-23 (one spelling) is still open: the maps consent says "neighbourhood", the binder
+"Neighborhood".
 
 ### The binder, for real
 
@@ -732,7 +736,7 @@ risk register which pages it should have. All 28 PDFs, after the R4-01 fix:
   (The PDF adds two or three sheets of contents and the label sheet to the tabs' sheets.) Where
   the real print is shorter than the proxy it is tab 3 (empty map slots print as one line) and
   tab 10 (the sources in two columns of small type).
-- **Contents.** All 2,138 entries (76–83 per binder) print the number of the page their link lands
+- **Contents.** All 2,138 entries (73–83 per binder) print the number of the page their link lands
   on, and that page's header names the entry. Ten from Philadelphia, as printed: Tab 2 People 10;
   Riverside Warehouse 18; Wallet cards 16; Getting out 24; Tab 6 Checklists: happening now 33;
   Coastal flooding and storm surge 60; Supply chain disruption 63; No tap water, or a local water or
@@ -750,7 +754,8 @@ risk register which pages it should have. All 28 PDFs, after the R4-01 fix:
   pages read every row with lines to write on); Philadelphia's 181 typed answers all appear
   exactly as typed, as do Detroit's 28 and Minot's 10.
 - **Wallet cards** (1–5 per binder) never split across sheets; each has its cut marks and the
-  person's name. **The tab label sheet** is the last page of every PDF and carries all ten labels.
+  person's name ("Person 1 (adult)" where none was given). **The tab label sheet** is the last
+  page of every PDF and carries all ten labels.
 - **Both sides.** On A4 printed on both sides (Philadelphia 93 pages, Hays 89, Minot 91) every tab
   and the label sheet start on a right-hand page and the wallet cards have a blank back.
 - **Greyscale.** Five Philadelphia pages rendered in greyscale (the neighbourhood map with its
@@ -774,10 +779,11 @@ County, Texas, which has no hospital in the CMS list.
 
 All plan with no error in the CLI and in the browser; every binder passes the structure check
 (tabs, unique page ids, every link and citation resolves, no empty decision); no template marker is
-left outside the household's own words except where R4-02 says; every answer is echoed exactly once
+left outside the household's own words except where R4-02 says; every answer is echoed exactly, once
 trimmed and capped (the utility and insurer addresses a file can carry but the app never asks for are
 not printed); the Markdown rendering never turns an answer into a heading or a table row; and
-every PDF keeps its contents, links, cards and labels with no word outside the printable area. The
+every PDF keeps its contents, page links, cards and labels with no word outside the printable
+area. The
 mobile home gets its tornado and hurricane lines, the high-rise its tenth-floor and elevator lines and
 the device lines, Ponce and Juneau name the place as the Census does, and Loving County's
 Neighborhood page says it has no listed hospital instead of an empty table. On every screen that
@@ -787,19 +793,19 @@ showed as text. Findings: R4-02, R4-03, R4-07.
 
 ### The interview, saving and forgetting
 
-34 checks in headless Chrome, all passing (`round3/shots/verify3/interview/`): steps 6–8 render
-with "Step N of 8 · optional", a card per person headed by name, "Skip for now" on each and "See
-your risks" at the end, and they render empty for Chicago; `#/plan` and `#/plan/…` go to Prepare, `#/packet` and
-`#/packet/sources` to the binder, `#/packet/wallet-cards` to the wallet cards page (scrolled and
-focused there), `#/family` to step 7 and the old family-plan parts to their cards; a v0.2.0 export
-(version 1, Detroit, from `main`) opens, lands on Prepare, keeps every answer and is stored as
-version 2, and its meeting place reaches the wallet cards; a plan with no sensitive answer saves at
-once; with sensitive answers the save dialog offers "Protect this file with a passphrase", ticked,
-names what the file holds, says a forgotten passphrase cannot be recovered and the binder is the
-backup, refuses a short or mismatched passphrase, and unticking shows the one-sentence warning; the
-protected file is PBKDF2-SHA-256 with 600,000 rounds, a 16-byte salt, a 12-byte IV and AES-GCM, with
-no answer in clear; a plain and a protected file both reopen to the identical household; a wrong
-passphrase says so and lets the person try again; "Forget everything" removes the plan, the
+34 checks in headless Chrome, all passing (`round3/shots/verify3/interview/`): steps 6–8 render with
+"Step N of 8 · optional", a card per person headed by name, "Skip for now" on each and "See your
+risks" at the end, and they render empty for Chicago; `#/plan` and `#/plan/…` go to Prepare,
+`#/packet` and `#/packet/sources` to the binder, `#/packet/wallet-cards` to the wallet cards page
+(scrolled and focused there), `#/family` to step 7 and the old family-plan parts to their cards; a
+v0.2.0 export (version 1, Detroit, from `main`) opens, lands on Prepare, keeps every answer and is
+stored as version 2, and its meeting place reaches the wallet cards; a plan with no sensitive answer
+saves at once; with sensitive answers the save dialog offers "Protect this file with a passphrase",
+ticked, names what the file holds, says a forgotten passphrase cannot be recovered and the binder is
+the backup, refuses a short or mismatched passphrase, and unticking shows the one-sentence warning;
+the protected file is PBKDF2-SHA-256 with 600,000 rounds, a 16-byte salt, a 12-byte IV and AES-GCM,
+with no answer in clear; a plain and a protected file both reopen to the identical household; a
+wrong passphrase says so and lets the person try again; "Forget everything" removes the plan, the
 display settings and the `rr-maps` database. No page error, no request off the machine.
 
 ### Maps
@@ -824,6 +830,17 @@ The 57 checklists cite 184 distinct sources, every one in the 498-entry registry
 through Internet Archive captures) and defined in the page's own Sources. Flesch-Kincaid grade of
 every printed checklist and guidance page in the 14 binders (605 pages): 2.2–7.2, median 3.8, none
 above 8 (Philadelphia's highest, "After a disaster", 7.2).
+
+**The content decisions, checked as a reader** (all 14 binders): every downed or fallen line is "35
+feet" (113 mentions, no other distance near a line); the generator lines use CDC's wording except
+the Prepare sheet's safety rule (R4-11); 15 registry entries cite Internet Archive captures of
+removed pages (Stop the Bleed and Ready.gov's nuclear page among them), three of them behind
+checklist lines; no "Leave or stay?" row is empty anywhere, and the earthquake page's tsunami branch
+prints only for Coos Bay. Eviction: `rr explain --county 24005 hazard eviction` reads "about 50
+(38–71)" with "Landlords in Baltimore County often take the same renters to court again and again,
+so we cap its figure at 7 in 100 households a year". County names read one way through the whole
+binder (cover, risks, `{county}` lines, hazard text) for Richmond city (51760), Baltimore city
+(24510), Baltimore County (24005), St. Louis city (29510) and San Juan Municipio (72127).
 
 **Five checklists read as a stressed reader would** (Philadelphia, Letter, pages 42, 45, 49, 61, 66
 in `round3/shots/verify3/pdf-pages/`). *House fire*: one glance gives the trigger and five bold
@@ -874,3 +891,10 @@ list).
   connection"), or precache it (122 kB gzipped on every first visit). Owner's or planner's call.
 - **R4-08 (content).** `content/checklists/check_tornado.md` line 21: keep the bold lead (a test
   pins it) and make the rest "Keep away from doors and outside walls too."
+- **R4-11 (engine text).** `crates/rr-plan/src/packet/safety.rs:51`: for example "Run it only
+  outdoors, more than 20 feet from windows, doors and vents. Never plug it into a wall outlet or the
+  house wiring; connect it only through a transfer switch or interlock an electrician installs.
+  Backfeeding can electrocute utility workers and neighbors." It keeps the phrase the round-2 test
+  pins (`tests/round2.rs:175`). All 14 `.md` goldens and the `.json` `prepare_markdown` move (one
+  line); add `cdc_co_basics` to its citations if the Prepare sheet should cite CDC (its source
+  numbers then shift).
