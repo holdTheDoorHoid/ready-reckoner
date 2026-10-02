@@ -21,7 +21,7 @@ and who is in their household, it:
 3. sizes the **supplies and actions** that meet those targets, every quantity traceable to a source;
 4. **allocates a real budget** month by month, cheapest risk reduction first, and says when enough
    is enough; and
-5. hands over a **printable packet** and a **maintenance calendar**.
+5. hands over a **printable, during-event binder** and a **maintenance calendar**.
 
 It is a static website that works offline. Nothing the user enters leaves their browser.
 
@@ -147,7 +147,15 @@ Person {
   commute?: { distance_km: f32, mode: car|transit|walk|bike, remote_possible: bool }
   access_needs: [hearing|vision|limited_english|cognitive|supervision|service_animal|dialysis|home_health]
                                                         # v2: CMIST needs; defaults to []
+  profile?: PersonProfile                              # v3: the binder's person page and wallet card
 }
+PersonProfile {                            # v3; every field optional, echoed, never computed with
+  name?, date_of_birth?, phone?, email?, place?: Place, doctor?: Contact, pharmacy?: Contact,
+  conditions?, medications?: [Medication] (≤ 12), allergies?, blood_type?,
+  insurance?: HealthInsurance, id_notes?, notes?
+}                       # Place { kind: work|school|childcare|other, name?, address?, phone?, plan?,
+                        #         pickup?, safest_spot? }; Medication { name?, dose?, schedule?, purpose? };
+                        # HealthInsurance { carrier?, plan_name?, member_id?, group_number?, phone? }
 Pets { dogs: u8, cats: u8, small: u8, large_animals: u8 }
 Mobility { vehicles: [{ fuel: gas|diesel|hybrid|ev }] }
 Finances {
@@ -174,16 +182,39 @@ FamilyPlan {                          # v2; every field optional free text, trim
   school_pickup, work_plans, shelter_spot_home, shelter_spot_work, where_we_would_go,
   routes: [2], neighbours_who_check, who_takes_animals, shutoff_gas, shutoff_water, shutoff_electric,
   trusted_circle: [≤ 4 { name, phone, holds: [spare_key|documents|medical_poa|backup_codes] }],
-  lawyer: {name, phone}, roadside_assistance, numbers_by_heart: [≤ 5]
+  lawyer: {name, phone}, roadside_assistance, numbers_by_heart: [≤ 5],
+  home?: HomeInfo, neighbourhood?: Neighbourhood, pets?: [PetInfo] (≤ 8),            # v3
+  vehicles?: [VehicleInfo] (≤ 4), documents?: DocumentsInfo                          # v3
 }
+HomeInfo { address?, electric_utility?: Contact, gas_utility?: Contact, water_utility?: Contact,     # v3
+           insurer?: Contact, policy_number?, landlord_or_mortgage?: Contact,
+           where_kit?, where_documents?, where_cash?, where_keys? }
+Neighbourhood { hospital?: Contact, urgent_care?: Contact, pharmacy?: Contact, shelter?: Contact,    # v3
+                county_emergency_office?: Contact, alerts? }
+PetInfo { name?, kind?, description?, medications?, vet?: Contact, microchip?, records_where? }      # v3
+VehicleInfo { description?, plate?, insurer?: Contact, policy_number?, kept_in_car? }                 # v3
+DocumentsInfo { accounts?: [AccountInfo] (≤ 12), policies?: [PolicyInfo] (≤ 8), where_originals?,     # v3
+                where_copies?, digital_backup? }
+AccountInfo { institution?, kind?, phone?, last4? }    # v3; last4 keeps only the last 4 digits typed
+PolicyInfo { insurer?, kind?, policy_number?, phone? } # v3
 ```
+
+Contract v3 (v0.3.0) adds `Person.profile` and the five `FamilyPlan` groups above (steps 6–8 of
+the interview, `DESIGN-DELTA-v3.md` §2–§3): every field is optional, echo-only (trimmed and
+length-capped, never checked or computed with; the household's own words), and a group left empty
+is omitted from the JSON, so a v1 or v2 plan still loads unchanged. `docs/ENGINE-API.md` has the
+full field list with every string's character cap. The answers print on the binder's person,
+home, neighborhood, pets, vehicles and documents pages (§9) and on the wallet cards; the engine
+never computes anything from them. The one exception to "ask, don't check": `AccountInfo.last4`
+keeps only the last four digits of whatever was typed, so a pasted full account number never
+reaches the saved file — the app does not ask for full account numbers at all.
 
 Contract v2 (v0.2.0) adds the fields marked v2; every one is optional or defaults when absent, so a
 saved v1 plan still loads. Absent means "not asked", and the engine then assumes nothing: no gas
 range, no raw water source, an unknown water-system record, no benefits. `benefits` gates the
 benefit-interruption hazard; `access_needs` drive the communication plan, registries and evacuation
-help; `family_plan` is captured on a device-only screen and printed after the packet's summary and
-on wallet cards (`docs/ENGINE-API.md` § Changes from v1).
+help; `family_plan` is captured on a device-only screen and, since v0.3.0, printed on the binder's
+home, neighborhood and getting-out pages and on wallet cards (`docs/ENGINE-API.md` § Changes from v1).
 
 ### 4.2 Hazards
 
@@ -429,7 +460,7 @@ license = "US Government Work (public domain)"
 ```
 
 Guidance blocks (`content/guidance/<bucket|hazard|tier|topic>.md`) are short Markdown with front
-matter (`id`, `applies_to`, `citations`). The packet is assembled from them.
+matter (`id`, `applies_to`, `citations`). The binder and the Prepare sheet are assembled from them.
 
 ### 4.7 Budget allocation
 
@@ -463,8 +494,8 @@ hurricane is covered for power, water and food at the same time (this matters fo
 money).
 
 **Rare catastrophic hazards** get a budget cap: specialised items default to $0 and an opt-in allows
-at most 10 % of the monthly budget; the packet shows that the three-day and two-week supplies already
-cover the official "get inside, stay inside, stay tuned" sheltering phase.
+at most 10 % of the monthly budget; the Prepare sheet shows that the three-day and two-week
+supplies already cover the official "get inside, stay inside, stay tuned" sheltering phase.
 
 Guardrails (warn, never block): zero budget; a powered medical device with no power plan by month
 three; refrigerated medication with no cooling plan; no water at all after month one; an
@@ -489,7 +520,8 @@ PlanOutput {
   requirements: [RequirementLine],
   warnings: [Warning],                 # v2 ids: surge_zone_stay_home, cold_chain_power, benefit_lapse,
                                        # plan_too_long, no_raw_water_source, no_cooking_capability
-  packet_markdown: String,             # the printable packet, sections in §9
+  binder: Binder,                      # v3: the during-event binder (ten tabs); see §9, docs/BINDER.md
+  prepare_markdown: String,            # v3: the Prepare sheet (preparation plan), §9
   provenance: [Citation],              # everything referenced above
   recovery: { county_declarations_5yr?, sources }   # v2: facts for the recovery page
 }
@@ -498,8 +530,14 @@ decision, long_horizon, season?, test_interval_months? (v2); EngineInfo gains va
 backtest summary for the public validation page).
 ```
 
-Every v2 output field is left out of the JSON when empty, so v1 outputs read back unchanged;
-`docs/ENGINE-API.md` (contract v2) is the field-by-field reference.
+Every v2 output field is left out of the JSON when empty, so v1 outputs read back unchanged.
+**Contract v3 (v0.3.0) removes `PlanOutput.packet_markdown`** and replaces it with `binder`
+(always present: a tree of tabs, pages and blocks, `rr_types::binder::Binder`) and
+`prepare_markdown` (always present: the short preparation-plan document the Prepare and Keep it up
+tabs print). This is the one breaking change in contract v3: an output saved under v1 or v2 no
+longer parses, so the app always recomputes a plan from its input rather than reading back a stored
+output. `docs/BINDER.md` is the field-by-field reference for the binder's ten tabs and what feeds
+each page; `docs/ENGINE-API.md` is the authoritative type-by-type contract for both v2 and v3.
 
 ## 5. Engine pipeline and crates
 
@@ -510,7 +548,7 @@ PlanInput ─► rr-hazards ─► [HazardProfile] ─► rr-consequence ─► 
                                                     ▼
                           rr-supply ─► [RequirementLine] ─► rr-budget ─► Plan
                                                                           │
-                                      rr-plan (orchestration, packet) ◄───┘
+                                      rr-plan (orchestration, binder) ◄───┘
                                           │                 │
                                       rr-wasm            rr-cli
 ```
@@ -524,7 +562,7 @@ PlanInput ─► rr-hazards ─► [HazardProfile] ─► rr-consequence ─► 
 | `rr-supply` | Quantity rules, requirement lines, tier logic | rr-types, rr-content |
 | `rr-content` | Catalogue + citations + guidance loading and validation (embedded at build) | rr-types |
 | `rr-budget` | Risk function, allocator, guardrails | rr-types, rr-supply, rr-content |
-| `rr-plan` | Pipeline, PlanOutput, packet Markdown | all of the above |
+| `rr-plan` | Pipeline, PlanOutput, the binder and Prepare sheet (Markdown) | all of the above |
 | `rr-wasm` | `wasm-bindgen` surface per `docs/ENGINE-API.md` | rr-plan |
 | `rr-cli` | `plan`, `risks`, `targets --sweep`, `explain`, `catalogue`, `citations --missing`, `county search/show`, `data verify/info`, `golden [--update]`, `doctor` (`docs/CLI.md`) | rr-plan, rr-data (native) |
 | `rr-etl` | Downloads sources, builds packs, writes manifest (native, reqwest); `verify` runs `rr_data::verify` | rr-types, rr-data |
@@ -553,7 +591,7 @@ Rules learned from the research:
   access date plus a "uses NRI data but is not endorsed by FEMA" statement, forbid presenting
   modified data as FEMA's, and let FEMA rescind use. We comply: the app ships only the trimmed
   per-county fields the model needs (never the raw tables), shows the disclaimer with version and date
-  on the About screen and in the packet's sources, and states plainly which numbers are ours. This was
+  on the About screen and in the binder's Sources tab, and states plainly which numbers are ours. This was
   flagged to the owner on 2026-09-25.
 - **NRI v1.20 changed meaning.** Riverine flooding became inland flooding (`IFLD`), social
   vulnerability now comes from Census Community Resilience Estimates, and `AFREQ` is an event count
@@ -590,44 +628,66 @@ it can be (no brand tokens from a denylist, no dosing patterns, no firearm items
 Svelte 5 + Vite + TypeScript, see `docs/UI.md`. The engine is loaded as WebAssembly behind the
 contract in `docs/ENGINE-API.md`; `web/src/engine/mock.ts` implements the same contract with
 plausible fixed data so the interface can be built and tested before the engine lands, and parity
-tests compare mock and wasm shapes. State: `localStorage` key `rr.plan.v1`; export/import JSON.
-Service worker for offline; installable. Print stylesheet renders `packet_markdown` as the packet.
-No third-party scripts, fonts or analytics.
+tests compare mock and wasm shapes.
 
-## 9. The packet
+**Tabs, since v0.3.0, in order:** Start / Your answers (steps 1–5 required; steps 6–8 — Your
+people, Your places, Contacts, pets, vehicles and documents — optional, each marked "optional" with
+a "Skip for now" beside Continue; a question left unanswered prints as a blank line in the binder,
+never a required one), **Risks**, **Prepare** (was Plan), **Binder** (was Packet: a ten-tab,
+during-event document built for printing, §9), **Keep it up**, **Learn**, **About**. The old Family
+plan tab is gone — its questions are now the optional steps — and old addresses redirect with no
+new history entry: `#/family` to Your places, `#/plan[/*]` to Prepare, `#/packet[/*]` to the Binder.
 
-**Since v0.2.0 (§14, the 2026-09-26 packet v2 entry): fifteen sections print for every household, in
-this fixed order, and two more print only when they apply** (marked *conditional* below).
-`docs/PACKET.md` is the authoritative reference — what feeds each section field by field, the card
-rule, the page budget and how it is measured, and the placeholder and conditional-text syntax; read
-it for anything more than the one-line summary here.
+**State and saving.** `localStorage` key `rr.plan.v1` (the stored plan's own `version` field is 2
+as of v0.3.0; a v1 file still loads unchanged). Export and import as JSON. Since v0.3.0, once the
+saved plan holds a sensitive answer (anything in a person's profile beyond their name and phone,
+the home address, an account, a vehicle's plate, a pet's microchip number, or a map's home pin or a
+drawn route, which say where the household lives as plainly as the address), "Save a copy" offers
+to protect the file with a passphrase — on by default, WebCrypto PBKDF2-SHA-256 to an AES-GCM-256
+key, the plain-file choice kept one warning away — and opening a protected file asks for the
+passphrase back, explaining once that a forgotten one cannot be recovered (the printed binder is
+the only backup; `docs/PRIVACY.md` §7). Service worker for offline; installable. The Prepare and
+Keep it up tabs print `prepare_markdown` with the Markdown renderer; the Binder tab renders the
+tree (§9) to HTML on screen and, in the browser, to a PDF for download, so both work offline.
 
-1. Summary: who this is for, the date, where the household stands and what is enough for its risks,
-   the two done months (the bare-minimum kit and everything), the three things that matter most, and
-   what the plan assumes the household already has.
-2. Your family plan: meeting places, the out-of-area contact, school and work plans, shelter spots,
-   evacuation routes, the trusted circle and lawyer, staying in touch — word for word what the
-   household wrote, never computed with.
-3. Wallet cards: one per person, sized to cut out.
-4. Your risks: ranked hazard cards (at most eight; see the card rule in `docs/PACKET.md`), the other
-   ranked hazards as a table, and the nine rare-but-severe families as their own table.
-5. Your targets: the duration buckets with days, ranges, relief times, the worst event on record, and
-   the validation backtest's headline tally.
-6. Your plan: free steps, safety rules, this month and next month in detail, decisions grouped by
-   month, savings, the rare-catastrophe allowance, and the guardrail warnings.
-7. Your shelter plan: where to shelter from wind and from whichever other dangers apply here.
-8. When a storm, freeze or heat wave is forecast: the 48-hour list.
-9. Checklists: every remaining purchase by tier and the month the plan buys it.
-10. *(conditional)* Access and functional needs: only when someone in the household has one.
-11. Local help: the household's state row (evacuation zones, registries, alerts, refill rules).
-12. Documents and money: the Emergency Financial First Aid Kit list, insurance and ID decisions,
-    cash, savings, and the cost of being displaced.
-13. After a disaster: the first 30 days, with the county's own federal-declaration history.
-14. *(conditional)* If it lasts for months: only when the plan has a long-horizon section.
-15. Special needs: medicine, powered devices, infants, older adults, pregnancy, pets, mental health.
-16. Maintenance calendar: rotation, checks, drills, test dates, the yearly review.
-17. Sources: every citation used, in two printed columns, with URLs and retrieval dates, then the
-    data-pack credits.
+**Maps** (web-only; see §10) are fetched only from the Binder tab or the Getting-out card, only
+after a per-press consent screen, and are composed into three printable images kept in the
+browser's own storage, never in the saved file.
+
+No third-party scripts, fonts or analytics: the PDF library and its one embedded font are bundled
+with the site, not loaded from elsewhere.
+
+## 9. The binder
+
+**Since v0.3.0 (§14, the 2026-09-27 binder entry; `docs/DESIGN-DELTA-v3.md` §4): the printable
+packet becomes two documents.** The **binder** is a during-event reference, as long as it needs to
+be, printed and put in a ring binder with ten numbered tabs so a household can find the one page it
+needs without reading the rest; the **Prepare sheet** (`PlanOutput.prepare_markdown`) keeps the
+old packet's before-an-event content — the budget, the safety rules, the month-by-month purchase
+checklists, decisions and savings, the maintenance calendar — trimmed to what is not already on
+screen, and prints from the Prepare and Keep it up tabs and from `rr plan`. **`docs/BINDER.md` is
+the authoritative reference** for the binder — the document model (parts, pages and blocks), what
+feeds each page field by field, the rule for which checklists a household gets, the fit proxy that
+keeps a page to one printed sheet, the Markdown renderer's conventions, and the goldens; read it for
+anything more than the outline here. `docs/PACKET.md`, the v0.2.0 reference this section used to
+point to, now only points to `docs/BINDER.md`, for old links.
+
+| Tab | Holds |
+| --- | --- |
+| 1. Start here | A cover (household, place, date, review-by date, the status line); how to use this binder; Quick start (the first five minutes of any emergency, from memory); Which checklist? (every ranked hazard and everyday emergency, pointing to its tab and page); Contacts at a glance (every number in the binder, plus 911, 988 and Poison Help). |
+| 2. People | One page per person — their own answers exactly as typed, a medicine table, blanks where nothing was answered — then the wallet cards, one per person. |
+| 3. Home and places | The home (shut-offs, utilities, insurer, where things are kept); one page per place in the household's life (work, school, child care); the neighborhood (hospital, pharmacy, shelter, the county's own hospital list, a map); getting out (two ways out, roadside help, two more maps). |
+| 4. Pets, vehicles and documents | One entry per animal and per vehicle, only when the household has them; the Emergency Financial First Aid Kit's documents-and-money checklist. |
+| 5. What you have | A one-page inventory of what the plan has bought, owned already or still needs; risks at a glance, every ranked hazard and rare family in one table, pointing to its checklist. |
+| 6–8. Checklists | Grouped by how much warning they give: 6 happening now (fire, a medical emergency, earthquake, tornado, a break-in, and every everyday emergency); 7 it is coming (hurricane, winter storm, an evacuation order); 8 it goes on (a blackout, a job loss, an eviction). One airline-style page per hazard and per everyday emergency: Use this when, Do first (memorize these), Then, Leave or stay?, the household's own answers filled in, Do not, When it is over, numbered sources. |
+| 9. After | The first 30 days after a disaster, with the county's own federal-declaration history; If it lasts for months, when the plan has a long-horizon part; blank logs for damage, expenses, people contacted and medicines given. |
+| 10. Sources | Every citation the binder uses, numbered as first cited; the data credits; how the binder was made. |
+
+Every tab starts on a new page; page numbers run once through the whole binder, so the table of
+contents and every cross-reference point to a single number. Two renderers share one tree: Markdown
+(the CLI, the goldens, and anyone reading the binder as text) and the web app's HTML-and-PDF
+renderer (`docs/UI.md`, `docs/DESIGN-DELTA-v3.md` §6), which adds a table of contents with real
+page numbers, headers and footers, a tab-label sheet, and embedded maps.
 
 ## 10. Privacy and security
 
@@ -636,6 +696,23 @@ access. Household data is in `localStorage` and in files the user exports. A "fo
 control clears storage. The content security policy forbids inline scripts and external origins
 except for the optional, consented lookups. The repo publishes a threat model note in
 `docs/PRIVACY.md` (Phase 3).
+
+**Since v0.3.0, the first of those optional lookups exists: maps (`docs/DESIGN-DELTA-v3.md` §9).**
+A household may ask the Binder tab or the Getting-out card to fetch three printable maps (the
+neighborhood, the area and the region). Nothing is requested until that press; a **consent
+screen, shown on every press**, names each outside service and says in one sentence what it
+receives before a household can turn it on: OpenStreetMap's tile servers (map tiles, with a public-
+domain Census map as the fallback), OpenStreetMap's Overpass service (a bounding box and the kinds
+of nearby place wanted), FEMA's flood-hazard layer and the US Forest Service's wildfire-hazard
+layer (a bounding box each), and — behind a second, separate warning — OpenStreetMap's address
+search (the typed address, only on an explicit "Search" press, for a household that would rather
+type an address than drop a pin). None of these ever receives the household's answers or its saved
+plan; every request carries only the site's own address as its Referer. The three composed map
+images stay in the browser's own storage (IndexedDB), never in the exported file; only the
+household's own pins and drawn routes travel with the plan. `docs/PRIVACY.md` lists every
+recipient, exactly what it receives, when, and the usage policy it was checked against. A first
+visit, and a household that never presses "Add maps", still makes no request beyond the site's own
+files — checked by the automated end-to-end test on every build.
 
 **Open decision (raised 2026-09-26 by the web workstream): the hosting origin.** Browser storage
 belongs to the whole origin, and `holdthedoorhoid.github.io` is shared by every project the owner
@@ -650,7 +727,7 @@ limitation.
   Philadelphia; a well-water homeowner on the Oregon coast (Cascadia + tsunami); a Miami condo
   retiree on daily medication; a rural Kansas family with livestock; a Phoenix apartment single with
   a CPAP; a Houston suburban household with an EV; a zero-budget student in Chicago.
-- Golden packets in `fixtures/golden/` regenerated by `rr-cli golden`; CI diffs them.
+- Golden binders in `fixtures/golden/` regenerated by `rr golden --update`; CI diffs them.
 - Property tests: more people -> no less water; higher confidence -> no fewer days; more budget ->
   no less coverage; total spend ≤ budget; every item and number cites; targets monotone in horizon.
 - Parity test: mock engine and wasm engine produce structurally identical outputs for the fixtures.
@@ -675,11 +752,55 @@ guidance beyond safe storage and training pointers.
 - **Federal risk data is moving and being withdrawn.** The NRI Future Risk Index is gone, so climate
   multipliers come from NCA5 / CMRA, not from NRI; the ETL must tolerate URL changes and the manifest
   must make a stale snapshot obvious. *(research)*
-- **Scope creep** toward a general prepping encyclopedia. The packet is the product; guidance blocks
-  stay short and attached to a bucket, hazard or tier.
+- **Scope creep** toward a general prepping encyclopedia. The binder and the Prepare sheet are the
+  product; guidance blocks stay short and attached to a bucket, hazard, tier or checklist.
 
 ## 14. Decision log (append only)
 
+- 2026-09-27 to 2026-10-01 — Round 3 and the v0.3.0 contract (planner; `docs/DESIGN-DELTA-v3.md`,
+  `~/Desktop/ready-reckoner-briefs/round3/`). The owner asked for three things: fold the Family
+  plan tab's questions into Your answers, as optional steps whose blanks print as blanks, never as
+  errors; rename Plan to Prepare, to separate what to do beforehand from what to read during an
+  event; and rework the packet into a document meant to be read **during** an event — a table of
+  contents, a page per person, place and matter, an airline-checklist page per hazard ("go here, do
+  this"), as long as it needs to be, printed and put in a tabbed binder — with OpenStreetMap maps of
+  the area. Six questions went to the owner over two interview rounds on 2026-09-27
+  (DESIGN-DELTA-v3 §0): **D1** the preparation material (budget, purchase checklists, the
+  maintenance calendar, the risk analysis) stays out of the binder, in the new Prepare and Keep it
+  up tabs, each with its own short printable sheet; the binder keeps only a one-page inventory and a
+  one-page risks-at-a-glance summary. **D2** ask everything about each person for their binder page
+  — name, date of birth, phone, medical conditions and medications, insurance, school or work place
+  — all of it optional. **D3** a checklist for every hazard in the household's ranked matrix, every
+  everyday emergency a home needs regardless of location (a gas leak, a missing person, a power
+  outage and the like), and every rare family the household opts into. **D4** four reference page
+  groups besides people: the home; the places in the household's life; the neighborhood and getting
+  out; pets, vehicles and documents. **D5** base maps come from OpenStreetMap's own tile servers,
+  fetched only on request and cached on the device, with a public-domain Census map as the fallback.
+  **D6** the home point starts as a pin to drag; typing an address instead is a warned option that
+  queries OpenStreetMap's search service. Two earlier decisions shipped in this round as well: the
+  county eviction column, credited to the Eviction Lab under its ODC-BY licence; and the three
+  optional data packs (storm surge, wildfire-adjacent places, outage events) bundled into the core
+  pack so every household gets them without asking. Planner decisions, each reversible and reported
+  to the owner: the renamed tab is called **Binder**; its checklists are grouped into three tabs by
+  how much warning a hazard gives (happening now / it is coming / it goes on); the binder has ten
+  tabs in all, with a printable tab-label sheet; the saved file is protected with a passphrase by
+  default once it holds a sensitive answer; the app never asks for a full bank account number, only
+  an optional last four digits; a county hospital list and ZIP-code centres join the data pack; the
+  WebAssembly size budget rises to 1.75 MB gzipped (from 1.5). **Contract v3:**
+  `PlanOutput.packet_markdown` is removed — the one breaking change — replaced by `binder` (the
+  ten-tab tree rendered to the binder, `docs/BINDER.md`) and `prepare_markdown` (the Prepare sheet);
+  every input addition (a person's profile; the family plan's home, neighborhood, pets, vehicles
+  and documents groups) is optional and echo-only, so older saved plans still load. Built across
+  thirteen parallel workstreams (the full merge log is in
+  `~/Desktop/ready-reckoner-briefs/round3/INTEGRATION-STATUS.md`): 57 checklist pages (two exemplars
+  from the contract workstream, the other 55 from four content workstreams, every one reviewed line
+  by line against its sources by a fifth); the binder's assembly and Markdown renderer; the web
+  binder screen with an in-browser PDF; the consolidated interview and the passphrase-protected
+  export; the maps feature (§10); a corrected eviction model (households taken to court, not court
+  filings, capped where landlords file repeatedly against the same renters); and a full verification
+  pass (round-4 findings in `docs/VERIFICATION.md`). Released as v0.3.0; see
+  [CHANGELOG.md](../CHANGELOG.md) for what a household sees and the known limitations, and
+  `docs/BINDER.md` for the binder's own reference.
 - 2026-09-26 — Round-2 review and the v0.2.0 contract (agent/types2; `~/Desktop/ready-reckoner-briefs/round2/REVIEW.md`,
   `round2/phase2/DESIGN-DELTA.md`). The review (a site walkthrough, four panels, a 22-event backtest:
   covered 6, partial 5, short 10, not modelled 1) found safety fixes (shipped as v0.1.1), a thin

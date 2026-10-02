@@ -1,8 +1,8 @@
 {
-  "engine_version": "0.2.0",
+  "engine_version": "0.3.0",
   "api_version": 3,
   "data_pack_version": "13d6f99df7dc",
-  "content_version": "2026.09.27+f7b3699b",
+  "content_version": "2026.10.01+90d0a8f5",
   "location": {
     "country": "US",
     "county_fips": "38101",
@@ -32626,7 +32626,7 @@
                 "bullets": [
                   [
                     {
-                      "t": "Made by Ready Reckoner 0.2.0 on October 1, 2026, from the plan's answers."
+                      "t": "Made by Ready Reckoner 0.3.0 on October 1, 2026, from the plan's answers."
                     }
                   ],
                   [
@@ -32636,7 +32636,7 @@
                   ],
                   [
                     {
-                      "t": "Content 2026.09.27+f7b3699b."
+                      "t": "Content 2026.10.01+90d0a8f5."
                     }
                   ],
                   [

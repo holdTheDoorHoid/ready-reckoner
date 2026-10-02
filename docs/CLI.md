@@ -18,21 +18,21 @@ release build takes about 0.8 seconds and 15–30 milliseconds.
 
 | You pass | `rr` uses |
 | --- | --- |
-| nothing | the core pack in `./data` when it has a `manifest.json` (run from the repository root) |
+| nothing | the core pack in `./data`, and its `places` pack (county hospitals) too when the manifest lists one — exactly the packs `fixtures/golden/` is made from — when `./data` has a `manifest.json` (run from the repository root) |
 | nothing, and there is no `./data/manifest.json` | the fourteen built-in sample counties, with a note on standard error |
-| `--data <dir>` | the core pack in `<dir>`; an error (exit 2) if it has no `manifest.json` |
-| `--optional <pack>` | the core pack plus this optional pack (repeat for several): `places` (county hospitals, DESIGN-DELTA-v3 §8; `surge`, `wildfire_places` and `outage_events` are core files now and load with the core pack, no flag needed); an unknown name is an error (exit 2) listing the packs the manifest has |
-| `--all-packs` | every pack the manifest lists, optional ones included |
+| `--data <dir>` | the same packs (core, and `places` when the manifest lists it) in `<dir>`; an error (exit 2) if it has no `manifest.json` |
+| `--optional <pack>` | **loads another manifest pack by name, beyond `core` and `places`** (repeat for several). Today the only one left is `geo` (the county-boundary map the web app draws; no `rr` command reads it, so there is normally no reason to ask for it). Naming `places` again has no effect — it already loads by default. `surge`, `wildfire_places` and `outage_events` are core files now and load with the core pack, no flag needed. An unknown name is an error (exit 2) listing the packs the manifest has |
+| `--all-packs` | every pack the manifest lists (today: `core`, `geo`, `places`) |
 | `--fixtures` | the fourteen sample counties: Maricopa AZ, Miami-Dade FL, Cook IL, Ellis KS, Coos OR, Philadelphia PA, Fort Bend TX (hand-built, in `crates/rr-hazards/tests/data/counties/`), and Sacramento CA, Cameron LA, Wayne MI, Missoula MT, Ward ND, Galveston TX, San Juan PR (the core pack's own records, in `fixtures/sample-counties/`) |
 
-By default `rr` loads only the core pack, as the web app does, so it plans exactly what the site
-and the goldens show; the core pack now includes the eviction column and the storm-surge,
-wildfire-place and outage-event tables that used to be optional packs (bundled 2026-09-27,
-DESIGN-DELTA-v3 §8). Only `places` (county hospitals, read by the binder's Neighborhood page, not
-by the plan) is still a separate pack, and comes in only when asked for with `--optional places`
-or `--all-packs`: then `rr plan` and `rr binder` print the county's hospitals with an emergency
-room, as the web app's binder does once it has loaded that pack. The goldens are planned on the
-core pack alone.
+By default `rr` loads the core pack **and**, when the manifest lists one, the `places` pack too
+(the county hospitals the binder's Neighborhood page lists) — exactly the packs the goldens are
+made from (`rr_plan::source::DATA_DIR_PACKS`), so a bare `rr plan` or `rr binder` prints the golden
+byte for byte, hospital table included, with no flag needed. The core pack already includes the
+eviction column and the storm-surge, wildfire-place and outage-event tables that used to be
+optional packs (bundled 2026-09-27, DESIGN-DELTA-v3 §8). The only pack `rr` does *not* load by
+default is `geo` (the county-boundary map the web app draws for its own map pages); no `rr` command
+reads it, so `--optional geo` or `--all-packs` is rarely useful, but either will load it anyway.
 `rr data verify` and `rr data info`
 always read every pack. A pack is loaded exactly as the web app loads it: `manifest.json` first,
 then every file the manifest lists for the chosen packs, by its manifest path, each checked
@@ -413,13 +413,13 @@ Targets at the 1-in-100 setting from frozen inputs (county records from data pac
  ...
  Derecho, Linn County IA, Aug 2020 *                          covered       partial         partial          partial
 
- Run                     Short  Partial  Covered  Over  Not modelled
+ Run                     Short  Partial  Covered  Over  Not modeled
  County only                 9        4        8     0             1
  With v2 tables              8        8        5     0             1
  With v2 answers             6        9        6     0             1
  Pre-event water record      6        9        6     0             1
 
- Headline (with the v2 answers): 6 covered, 9 partial, 6 short, 1 not modelled (over counts as covered).
+ Headline (with the v2 answers): 6 covered, 9 partial, 6 short, 1 not modeled (over counts as covered).
  All 88 recorded verdicts reproduced.
 ```
 

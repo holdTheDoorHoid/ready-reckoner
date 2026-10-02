@@ -7,7 +7,9 @@ Enter your location and a few facts about your household. Ready Reckoner works o
 hazard data and cited research, which emergencies you should plan for, how many days you should be
 able to manage without power, water, income or help, and what to do about it in what order: a
 72-hour kit and a get-home bag first, then two weeks, then a month, and only as far beyond that as
-your risk justifies. It hands you a printable packet you can keep in a drawer.
+your risk justifies. It hands you a during-event binder to print and keep within reach — a page for
+every person and place in your life, and a step-by-step checklist for whatever actually happens —
+plus printable maps of your area and a short before-an-event plan to work through first.
 
 It exists so that nobody prepares for a nuclear war and gets caught out by a pandemic, a week-long
 ice storm, or a lost job.
@@ -42,12 +44,14 @@ the plan; every dial behind it is there if you want it.
 
 ## Status
 
-**v0.2.0 (September 2026): the full hazard taxonomy, a family plan, and a public validation page.**
-The engine, the website and the printable packet cover 53 ranked and rare hazards for every county
-in the country, sized and priced from 432 cited sources, and checked end to end against 14 golden
-households and a 22-disaster backtest. See [docs/DESIGN.md](docs/DESIGN.md) for the design,
-[docs/ROADMAP.md](docs/ROADMAP.md) for what's built and what's next, [CHANGELOG.md](CHANGELOG.md)
-for what shipped in this version, and the GitHub issues for the day-to-day work list.
+**v0.3.0 (October 2026): a during-event binder, a consolidated interview, and printable maps.** The
+engine and the website cover 53 ranked and rare hazards for every county in the country, sized,
+priced and — since this release — turned into a 57-page set of step-by-step checklists, from 498
+cited sources, checked end to end against 14 golden households and a 22-disaster backtest. See
+[docs/DESIGN.md](docs/DESIGN.md) for the design, [docs/BINDER.md](docs/BINDER.md) for the binder
+itself, [docs/ROADMAP.md](docs/ROADMAP.md) for what's built and what's next,
+[CHANGELOG.md](CHANGELOG.md) for what shipped in this version, and the GitHub issues for the
+day-to-day work list.
 
 ## Try it
 
@@ -62,19 +66,23 @@ A 60-second walkthrough:
    anywhere. A ZIP code that covers more than one county shows each one's share, with a map, so you
    can pick the right one.
 3. **A few questions.** Who is in your household, how you get around, your budget, and what you
-   already have. Skip anything you're unsure of — you can change it later.
+   already have. Skip anything you're unsure of — you can change it later. Three more questions are
+   optional and feed your binder's pages later: your people, your places, and your contacts, pets,
+   vehicles and documents.
 4. **Your risks.** See what is actually likely to affect your household, ranked, with the number of
    days you should be ready for and why, and a source behind every figure.
-5. **Your plan.** A month-by-month list, free steps first, sized to your budget, that tells you when
+5. **Prepare.** A month-by-month list, free steps first, sized to your budget, that tells you when
    you've done enough.
-6. **Your packet.** Everything above, laid out to print in black and white and keep in a drawer.
+6. **Your binder.** A page for every person and place in your household's life, and a step-by-step
+   checklist for every risk on your list and every everyday emergency, organized into ten tabs to
+   print and keep in a binder. Add printable maps of your area if you'd like them.
 
 |  |  |
 | --- | --- |
 | ![Where you live: a ZIP code that covers three counties, with a map to help pick the right one](docs/screenshots/01-where-you-live.png) | ![Your risks: hazards ranked by how likely and how serious they are for this household and county](docs/screenshots/02-your-risks.png) |
 | *Where you live: an ambiguous ZIP code, resolved with a map.* | *Your risks: ranked, with a source behind every number.* |
-| ![Your plan: this month's free steps, progress so far, and when every target will be covered](docs/screenshots/03-your-plan.png) | ![Your packet: a printable summary with the household, the risks and the free steps to start with](docs/screenshots/04-your-packet.png) |
-| *Your plan: free steps first, month by month.* | *Your packet: ready to print and keep in a drawer.* |
+| ![Prepare: this month's free steps, progress so far, and when every target will be covered](docs/screenshots/03-prepare.png) | ![Your binder: a ten-tab, during-event reference with a page per person and place and a checklist for every risk](docs/screenshots/04-your-binder.png) |
+| *Prepare: free steps first, month by month.* | *Your binder: ten tabs, ready to print and keep within reach.* |
 
 ![About and method: which versions are running, and how much data is on this device and why](docs/screenshots/05-about-and-sources.png)
 *About and method: every version, and exactly what data is on your device.*
@@ -115,15 +123,17 @@ Read more: the hazard math in [docs/RISK_MODEL.md](docs/RISK_MODEL.md), the sizi
 ## Privacy
 
 Nothing you enter — your location, your household, your budget — leaves your browser. There is no
-server, no account and no analytics. See [docs/PRIVACY.md](docs/PRIVACY.md) for exactly what is
-stored on your device, what the site downloads and why, what the site's host can and can't see, and
-how to check all of it yourself.
+server, no account and no analytics. The one exception is maps: if you choose to add printable maps
+of your area, the app asks, every time, before it fetches anything, and names exactly who would
+receive what. See [docs/PRIVACY.md](docs/PRIVACY.md) for exactly what is stored on your device, what
+the site downloads and why, what the site's host can and can't see, who the maps feature talks to,
+and how to check all of it yourself.
 
 ## Repository layout
 
 | Path | What |
 | --- | --- |
-| `crates/` | The Rust engine: hazards, consequences, supply sizing, budget allocation, plan and packet generation, plus the CLI, the WebAssembly bindings and the data pipeline |
+| `crates/` | The Rust engine: hazards, consequences, supply sizing, budget allocation, the binder and Prepare sheet, plus the CLI, the WebAssembly bindings and the data pipeline |
 | `web/` | The website (Svelte + TypeScript), which runs the engine in the browser |
 | `data/` | Built data packs and their provenance manifest (raw downloads are never committed) |
 | `content/` | The guidance text and item catalogue (CC BY-SA 4.0) |

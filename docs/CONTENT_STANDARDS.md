@@ -174,7 +174,7 @@ citations: [ready_gov_water, cdc_water_storage]
 Only these five keys are allowed. There is no `reading_level` key: the validator computes the grade
 from the text. The file name is the id, and the id starts with its kind (`bucket_`, `hazard_`,
 `family_`, `tier_`, `plan_`, `after_`, `topic_`). A block applies to at least one target of its own
-kind; the plan workstream decides where each kind prints (`docs/PACKET.md`).
+kind; the plan workstream decides where each kind prints (`docs/BINDER.md`).
 
 | Kind | Target | What it is |
 | --- | --- | --- |
@@ -207,7 +207,7 @@ with `|` (any one matches); an unknown, empty or repeated value is an error.
 
 | Span | Kept when | Values |
 | --- | --- | --- |
-| `{if:<hazard id>}` | the hazard is likely enough for this household (`docs/PACKET.md`) | hazard ids. Hazard and family blocks may name only their own hazards; bucket and tier blocks take none; plan, after and topic blocks may name any |
+| `{if:<hazard id>}` | the hazard is likely enough for this household (`docs/BINDER.md`) | hazard ids. Hazard and family blocks may name only their own hazards; bucket and tier blocks take none; plan, after and topic blocks may name any |
 | `{if:home:<kind>}`, `{if:not_home:<kind>}` | the home is, or is not, of that kind | `apartment_high_rise`, `apartment_low_rise`, `rowhouse`, `detached`, `mobile_home`, `rural_property` |
 | `{if:need:<need>}` | someone in the household has that access or functional need | `hearing`, `vision`, `limited_english`, `cognitive`, `supervision`, `service_animal`, `dialysis`, `home_health` |
 | `{if:has:<item id>}` | the household owns the item or the plan includes it | any catalogue item id |
@@ -237,15 +237,21 @@ retired hazard in `applies_to`, and a `Use this when` of more than two sentences
 have a checklist (a warning until then).
 
 **Life-safety sentences reach paper.** A sentence that could save a life (fire escape, gas leak,
-carbon monoxide, downed lines, CPR, heat stroke, medicine storage) goes in a block the packet
-prints for every household it concerns, and you confirm it in the regenerated packets
-(`docs/PACKET.md`). The packet prints the "What helps" and "What to avoid" paragraphs of every
-active bucket block and of each hazard card. When a bucket's only hazard has a card (medical
-emergency), the bucket prints a pointer to the card instead, so its life-safety lines also go in
-the hazard block (`hazard_medical`). A need may also keep its "What to avoid" and replace its
-"What helps" with a pointer to where that advice is already printed in the same packet (the plan
-does this to stay within 24 pages). Every printed sentence costs space in every packet, and so
-does each new source line, so reuse a source the block already cites when it says the same thing.
+carbon monoxide, downed lines, CPR, heat stroke, medicine storage) must reach the household's
+printed binder, and you confirm it in the regenerated goldens (`docs/BINDER.md`). Since v0.3.0 the
+binder's own checklist pages (`content/checklists/`, §4 above) are where this happens: every
+hazard's and every everyday emergency's page cites its own life-safety steps directly, so the
+content that used to live only in a bucket's or hazard's "What helps"/"What to avoid" guidance
+paragraph belongs on its matching checklist page instead (`check_house_fire` for fire escape,
+`check_gas_leak_or_co` for a gas leak or CO, `check_heat_wave` for heat-stroke signs, and so on).
+The `bucket_*` and `hazard_*` guidance blocks still exist and are still validated the same way, but
+the binder and the Prepare sheet no longer print a block's "What helps"/"What to avoid" paragraphs
+directly (the v2 packet's risk cards are retired; their advice now lives only on the app's Risks
+screen, on screen, not on paper) — so a life-safety fact that only a `bucket_*` or `hazard_*` block
+carries, and that no checklist step repeats, no longer reaches paper at all. When you add or change
+a life-safety sentence, add or update the matching checklist step, not only the guidance block.
+Every printed sentence costs space on its checklist page (§4's 330/620-word budget), and so does
+each new source line, so reuse a citation the page already carries when it says the same thing.
 
 ## 5. Sensitive topics (mechanical enforcement of PRINCIPLES §9)
 

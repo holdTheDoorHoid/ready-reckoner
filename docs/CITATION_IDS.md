@@ -644,6 +644,165 @@ matched in the page's own text.
 | `nws_severe_weather_during` | NWS, What to Do During Severe Weather | plan_shelter | page downloaded; quote: stay away from windows when damaging wind or large hail is approaching. NWS's wind pages say "interior room or basement", not "lowest floor", so the paragraph says that; the tornado paragraph keeps the lowest-floor wording from Ready.gov |
 | `rr_validation_2026` | Ready Reckoner, `docs/VALIDATION.md` (the frozen backtest: events, households, the scoring rule and the verdicts for each version) | the packet's targets section; topic_validation (its covered / partly covered / short wording now follows the file's scoring rule) | read on the `v0.2` branch (32510a6); the file reaches main with the v0.2.0 release, which the URL points at, so no quote is stored |
 
+## Added for checklists-a1 (v0.3.0, tab 6 everyday and smaller hazards, 2026-09-27)
+
+Pages were read as a plain download except where a site refuses scripted clients — cdc.gov,
+cpsc.gov, 911.gov, nia.nih.gov and redcross.org, read in a browser page — or has taken its page
+down: FEMA's *Until Help Arrives* is read from the Internet Archive capture of its PDF (2020-07,
+captured 2025-08-09). Quotes are stored only where the wording was matched in the page's own text;
+non-federal sources (American Red Cross, Alzheimer's Association, NCMEC, Nashville police, Indiana
+DHS, the National Avalanche Center) are paraphrased and carry no quote.
+
+| id | Source | Used in | How it was read |
+| --- | --- | --- | --- |
+| `gov911_faq` | FAQ About Calling 911, National 911 Program (NHTSA), 2023 | Break-in; Gas leak or carbon monoxide alarm; Medical emergency; Something else | browser page (911.gov); quote matched |
+| `fema_until_help_arrives` | Until Help Arrives (web-based training transcript v1.0), FEMA / Ready.gov (via Internet Archive), 2020 | Landslide or debris flow; Medical emergency | Internet Archive capture of the PDF (2025-08-09); quote matched |
+| `cdc_stroke_signs` | Signs and Symptoms of Stroke, CDC, 2026 | Medical emergency | browser page; quote matched |
+| `cdc_heart_attack` | About Heart Attack Symptoms, Risk, and Recovery, CDC, 2024 | Medical emergency | browser page; quote matched |
+| `redcross_choking_adult_child` | Adult & Child Choking, American Red Cross, 2026 | Medical emergency | browser page; paraphrased, no quote |
+| `redcross_bleeding_external` | Bleeding (Life-Threatening External), American Red Cross, 2026 | Medical emergency | browser page; paraphrased, no quote |
+| `cpsc_co_questions_answers` | Carbon Monoxide Questions and Answers, CPSC, 2026 | Gas leak or carbon monoxide alarm | browser page; quote matched |
+| `ojjdp_missing_child_guide` | When Your Child Is Missing (5th ed., 2025 update), DOJ OJJDP | Missing person | plain download (PDF); quote matched |
+| `ncmec_child_missing` | Is Your Child Missing?, NCMEC, 2026 | Missing person | plain download; paraphrased, no quote |
+| `alz_wandering` | Wandering, Alzheimer's Association, 2026 | Missing person | plain download; paraphrased, no quote |
+| `nia_wandering` | Coping With Alzheimer's Behaviors: Wandering and Getting Lost, NIA, 2024 | Missing person | browser page; quote matched |
+| `mnpd_burglary_victim` | What To Do If You're a Victim of a Burglary, Metropolitan Nashville Police Department, 2025 | Break-in | plain download; local-government publication, paraphrased, no quote |
+| `in_dhs_home_protection` | Get Prepared: Home Protection, Indiana Department of Homeland Security, 2026 | Break-in | plain download; state publication, paraphrased, no quote |
+| `cdc_electrical_hazards` | What to Do to Protect Yourself From Electrical Hazards, CDC, 2026 | Severe thunderstorm, strong wind, hail or lightning; Stranded in a vehicle; Burst pipe or water leak | browser page; quote matched |
+| `epa_mold_moisture_guide` | A Brief Guide to Mold, Moisture and Your Home, EPA, 2026 | Burst pipe or water leak | plain download; quote matched |
+| `adot_severe_weather` | Severe Weather, Arizona Department of Transportation, 2026 | Stranded in a vehicle | plain download; state publication, paraphrased, no quote |
+| `nws_lightning_safety` | Overview: Lightning Safety, NOAA National Weather Service, 2026 | Severe thunderstorm, strong wind, hail or lightning | plain download; quote matched |
+| `nws_nwr_deaf` | NOAA Weather Radio for the Deaf and Hard of Hearing, NOAA National Weather Service, 2026 | Severe thunderstorm, strong wind, hail or lightning | plain download; quote matched |
+| `nac_perform_rescue` | Avalanche Safety: Perform a Rescue, National Avalanche Center (avalanche.org), 2026 | Avalanche | plain download; paraphrased, no quote |
+| `usfs_avalanche_safety` | Avalanches (Know Before You Go), USDA Forest Service, 2026 | Avalanche | plain download; quote matched |
+
+Left uncited (no source found): the downed-line-and-burning-car step (a1 could not read the OSHA
+fact sheet; checklist-review read it and added the line, citing the existing `osha_downed_wires`
+id on the vehicle-stranding page), Poison Help 1-800-222-1222 (added to the registry separately by
+the binder workstream, `hrsa_poison_help`, for the binder's Contacts page), calling the water
+company when the main valve will not close, and changing locks or reporting stolen cards after a
+break-in (checklist-review added `ftc_lost_stolen_cards`, below, for the cards step).
+
+## Added for checklists-a2 (v0.3.0 incident checklists, tab 6: large fast hazards, 2026-09-27)
+
+| id | Source | Used in | How it was read |
+| --- | --- | --- | --- |
+| `nws_flood_during` | During a Flood, NOAA National Weather Service, 2026 | Dam or levee failure; Flooding and flash floods | plain download; quote matched |
+| `cdc_radiation_get_inside` | What to Do: Get Inside (radiation emergencies), CDC, 2024 | Chemical, biological or radiological attack; Nuclear attack or EMP; Nuclear power plant accident; Shelter-in-place order | browser page (cdc.gov refuses scripted clients); quote matched |
+| `cdc_radiation_self_decon` | How to Self-Decontaminate after a Radiation Emergency, CDC, 2024 | Nuclear attack or EMP; Nuclear power plant accident | browser page; quote matched |
+| `fema_nuclear_planning_2022` | Planning Guidance for Response to a Nuclear Detonation (3rd ed.), FEMA (via Internet Archive), 2022 | Nuclear attack or EMP | fema.gov refuses scripted clients; Internet Archive capture of the same URL (2026-06-21, text extracted from the PDF), live URL kept so a person can open it; quote matched |
+| `ready_gov_explosions` | Explosions, FEMA / Ready.gov, 2025 | An attack or threat closes your area; An attack or explosion in a public place | browser page (ready.gov refuses scripted clients); quote matched |
+| `calfire_go_evacuation` | Go Evacuation Guide (Ready for Wildfire), CAL FIRE, 2026 | Wildfire | browser page (site refuses scripted clients); state publication, paraphrased, no quote |
+| `nrc_ep_backgrounder` | Backgrounder on Emergency Preparedness at Nuclear Power Plants, NRC, 2024 | Nuclear attack or EMP; Nuclear power plant accident | browser page (nrc.gov refuses scripted clients; the old fact-sheet URL now redirects here); quote matched |
+| `medlineplus_bleeding` | Bleeding (medical encyclopedia: first aid), MedlinePlus, National Library of Medicine, 2025 | An attack or explosion in a public place | plain download; A.D.A.M. encyclopedia content, not public domain, paraphrased, no quote |
+| `cisa_suspicious_items` | Suspicious Activity and Items, CISA, 2026 | An attack or threat closes your area | browser page (cisa.gov refuses scripted clients); quote matched |
+| `cisa_bomb_threats` | Bomb Threats, CISA, 2026 | An attack or threat closes your area | browser page; quote matched |
+| `cisa_bomb_threat_guide_2025` | Bomb Threat Guide (with the Bomb Threat Checklist), CISA (via Internet Archive), 2025 | An attack or threat closes your area | Internet Archive capture of the PDF (2026-06-23, text extracted); quote matched |
+
+Handed back, not cited: "do not gather near the scene; a second device may go off" — none of
+`ready_gov_explosions`, `cisa_suspicious_items`, `cisa_bomb_threats` or
+`cisa_bomb_threat_guide_2025` says this (checklist-review tried FBI and DHS secondary-device
+material too and also could not find it); "go on foot if you can" for tsunami (NWS, Ready.gov and
+the Oregon FAQ do not say it — checklist-review later found it on a different NWS page, added
+below); "do not look at the flash" for a nuclear attack (not on Ready.gov's Radiation Emergencies,
+CDC's Get Inside, or the 2022 capture of the old Ready.gov nuclear page — still open).
+
+## Added for checklists-b (v0.3.0 checklists, tab 7 "it is coming", 2026-09-27)
+
+| id | Source | Used in | How it was read |
+| --- | --- | --- | --- |
+| `ready_gov_space_weather` | Space Weather, FEMA / Ready.gov, 2026 | Severe solar storm | browser page (ready.gov refuses scripted clients); quote matched |
+| `cdc_shelter_in_place_chemical_2018` | Chemical Agents: Facts About Sheltering in Place, CDC (via Internet Archive), 2018 | Shelter-in-place order | CDC removed the page in 2022 (the address now lands on a landing page); Internet Archive capture of 2022-03-05, read as a plain download; quote matched |
+| `nws_winter_storm_during` | What To Do If You're Caught in a Winter Storm, NOAA National Weather Service, 2026 | Winter storm or blizzard | plain download; quote matched |
+| `nws_ice_storms` | Ice Storms, NOAA National Weather Service, 2026 | Ice storm | plain download; quote matched |
+| `nws_cold_during` | During Extremely Cold Weather, NOAA National Weather Service, 2026 | Extreme cold | plain download; quote matched |
+| `nydoh_boil_water_checklist` | Boil Water Notices: Checklist for Residents and Homeowners, New York State Department of Health, 2018 | Boil-water notice | plain download (PDF); the only source found for the after-the-notice-lifts steps (flush the line, ice maker, filters, water heater); state publication, paraphrased, no quote |
+| `cdc_mmwr_community_mitigation_2017` | Community Mitigation Guidelines to Prevent Pandemic Influenza — United States, 2017 (MMWR 66(1)), CDC | Severe pandemic | browser page (cdc.gov refuses scripted clients); quote matched |
+| `cdc_respiratory_when_sick` | Preventing Spread of Respiratory Viruses When You're Sick, CDC, 2025 | Pandemic; Severe pandemic | browser page; quote matched |
+| `cdc_valley_fever_prevention` | Reducing Risk for Valley Fever, CDC, 2024 | Dust storm | browser page; quote matched |
+| `nhc_storm_surge_overview` | Storm Surge Overview, NOAA National Hurricane Center, 2026 | Coastal flooding and storm surge | plain download; quote matched |
+
+17 existing registry entries were re-read the same day to check their wording still matched (no
+fields changed). Where authorities disagree, the page followed the one whose job it is: downed
+power lines are written as 30 feet here (the bucket_power guidance block, PA PUC) where c's pages and
+checklist-review's later pass use 35 feet (the Red Cross); boiling water above 5,000 feet follows
+EPA, not CDC's 6,500 feet; heat-stroke skin follows CDC's "dry or damp", not Ready.gov's "dry, no
+sweat". Dropped for want of a source: ice-loaded trees, moving a car to higher ground before a
+coastal flood, "stay buckled" and "wait for visibility" on the dust-storm page, solar-storm paper
+maps, "call 911 for chest pain" on the smoke page, "avoid alcohol and sugary drinks" for heat,
+drought burn bans, and a pandemic "one healthy shopper" rule.
+
+## Added for checklists-c (v0.3.0 tab 8 checklists: "it goes on", 2026-09-27)
+
+Every page below was read in a browser page (these sites refuse plain HTTP clients); each stored
+quote was matched in the page's own text. Non-federal sources are paraphrased and carry no quote.
+
+| id | Source | Used in | Note |
+| --- | --- | --- | --- |
+| `redcross_power_outage` | Power Outage Safety, American Red Cross, 2026 | Evacuation order; Regional blackout; Hurricane or tropical storm; Ice storm; No tap water, or a local water or gas outage; Power out for months; Power outage at home; Severe thunderstorm, strong wind, hail or lightning; Something else; Tornado; War with attacks on US infrastructure; Wildfire | paraphrased, no quote; backs flashlights not candles, checking in with your support network, eating fresh food first, leaving if the home is too hot or cold or a medical device needs power, 35 feet from downed lines, asking your provider about refrigerated medicine, and having an electrician check tripped breakers first |
+| `fcc_emergency_calling_tips` | Tips for Communicating in an Emergency, FCC, 2026 | Civil unrest; Regional blackout; Phone or internet outage; Power outage at home; Something else; War with attacks on US infrastructure | quote matched (wait 10 seconds before redialing); also backs limiting and shortening calls, texting, trying another service or a landline, naming an out-of-area contact, and calling only while a vehicle is stopped |
+| `fdic_when_bank_fails` | When a Bank Fails: Facts for Depositors, Creditors, and Borrowers, FDIC, 2014 | Bank closures or a bank failure | quote matched: no insured depositor has ever lost money; the FDIC and the new bank both write to depositors; insured banks show the FDIC sign |
+| `fdic_deposit_insurance_faq` | Deposit Insurance FAQs, FDIC, 2024 | Bank closures or a bank failure | backs payout within a few days (usually the next business day), as a new account or a check, and the 1-877-275-3342 line; the payout sentence runs over 50 words, so no quote is stored |
+| `fdic_borrowers_guide` | A Borrower's Guide to an FDIC Insured Bank Failure, FDIC, 2024 | Bank closures or a bank failure | quote matched: a bank failure does not change a borrower's obligation to keep paying; the FDIC mails instructions; hardship borrowers may ask about a workout |
+| `healthcare_gov_sep` | Special Enrollment Periods, CMS / HealthCare.gov, 2026 | An earner dies or can no longer work; Long illness in the household; Job loss | quote matched: losing coverage (job-based included) opens a 60-day Special Enrollment Period, as does the death of someone on the household's Marketplace plan |
+| `healthcare_gov_unemployed` | Health coverage options if you're unemployed, CMS / HealthCare.gov, 2026 | Job loss | quote matched (COBRA if the former employer offers it); also backs one application checking Marketplace, Medicaid and CHIP together, and reporting a new job right away |
+| `ssa_when_someone_dies` | What to do when someone dies, Social Security Administration, 2026 | An earner dies or can no longer work | quote matched: certain family members may get monthly survivor benefits; also backs that a funeral home usually reports the death, otherwise 1-800-772-1213 |
+| `usagov_report_death` | Agencies to notify when someone dies, USAGov, 2026 | An earner dies or can no longer work | quote matched; also backs getting certified copies of the death certificate and notifying banks, card companies and credit bureaus |
+| `ssa_apply_disability` | Apply for Social Security benefits: disability benefits for an adult, Social Security Administration, 2026 | An earner dies or can no longer work; Long illness in the household | quote matched: a condition expected to last at least a year or result in death, and that makes work hard or impossible; apply online or by appointment |
+| `dol_fmla` | Family and Medical Leave Act, U.S. Department of Labor, Wage and Hour Division, 2026 | Long illness in the household | quote matched: up to 12 workweeks of unpaid, job-protected leave in 12 months with group health benefits kept; state law may give more |
+| `fairfax_civil_disorder` | Civil Disorder (Ready Fairfax hazard page, from the county's Community Emergency Response Guide), Fairfax County, Virginia, 2026 | Civil unrest | county publication, paraphrased, no quote; no federal page gives household-level civil-unrest guidance, so this county guide stands in |
+| `usagov_ice_detainee` | Locate someone being detained by ICE for immigration violation or deportation, USAGov, 2026 | A household member is arrested or detained | quote matched: the ICE online detainee locator takes a name, country of birth and birth date, or the A-number |
+| `dhs_report_suspicious` | How to Report Suspicious Activity (If You See Something, Say Something), DHS, 2025 | War with attacks on US infrastructure | quote matched: report to local law enforcement, not to DHS; call 911 in an emergency |
+| `ca_dmv_rules_of_the_road` | California Driver Handbook, Section 7: Laws and Rules of the Road, California DMV, 2026 | Regional blackout | state publication, paraphrased, no quote; a dark traffic light is treated as a four-way stop, then go when safe — the common rule, but traffic law is set by each state |
+| `fda_infant_formula_dos_donts` | Infant Formula: Safety Do's and Don'ts, FDA, 2023 | Supply chain disruption | quote matched: do not make or feed homemade infant formula; call your health care provider with concerns |
+
+Left uncited (no source found): not watering down formula beyond what FDA's page already backs,
+reporting a power outage to the utility, calling the arresting department or jail to locate someone,
+a bare-bones budget line, continuing to file weekly unemployment claims, asking an employer about
+final pay, leave or severance, "only a court can evict you" (needs a HUD or legal-aid source), NCUA
+share-insurance, never running a car in an attached garage, a fridge-then-freezer-then-pantry food
+order, staying off the roads in a blackout, flushing taps after a water outage, and a water-heater
+tank as a source of water (dropped on purpose: unsafe under a boil or do-not-drink notice).
+
+## Added for checklist-review (v0.3.0 practitioner review, 2026-10-01)
+
+Four sources the review added for life-safety lines the four checklist groups above had left
+uncited, each read as a plain download except `nfpa_escape_planning` (a standards body's page,
+read in a browser, paraphrased):
+
+| id | Source | Used in | How it was read |
+| --- | --- | --- | --- |
+| `nws_tsunami_before` | Tsunami Safety: Before a Tsunami, NOAA National Weather Service, 2026 | Tsunami ("go on foot if you can"); also backs "walk to high ground" in the hazard_earthquake guidance block (handed back by checklists-a2 as uncited) | plain download; quote matched |
+| `usfa_wildfire_evacuation` | Wildfire Evacuation Outreach Materials, U.S. Fire Administration, 2026 | Wildfire and Evacuation order ("leave early" when someone needs extra time or help) | plain download; quote matched |
+| `ftc_lost_stolen_cards` | Lost or Stolen Credit, ATM, and Debit Cards, Federal Trade Commission, Consumer Advice, 2026 | Break-in (report stolen cards to the issuer at once) | plain download; quote matched |
+| `nfpa_escape_planning` | How to make a home fire escape plan, National Fire Protection Association, 2026 | House fire ("close doors behind you" added for every home kind, not only apartments) | browser page; standards-body content, paraphrased, no quote |
+
+**Six existing entries re-pointed or re-read**, each re-checked against the exact wording the
+checklists rely on:
+
+- `dhs_stop_the_bleed`: DHS took the live campaign page down in 2025 (the address now shows an
+  archived notice with no instructions). Re-pointed to the Internet Archive capture of DHS's own
+  URL (captured 2024-01-01; the page was last updated 2022-10-14), read as a plain download;
+  publisher now "U.S. Department of Homeland Security (via Internet Archive)", year 2022 (was the
+  live page). Quote re-matched in the capture, which also says where to ask about a course and
+  that bystanders are first on the scene.
+- `ready_gov_nuclear`: the live URL now redirects to Ready.gov's "Radiation Emergencies" page.
+  Re-pointed to the Internet Archive capture of the old Nuclear Explosion page (captured
+  2022-12-22), publisher now "FEMA / Ready.gov (via Internet Archive)", year 2022. The stored quote
+  changed from the page's three headings joined together (not a sentence) to one matched in the
+  capture's text ("Stay inside for 24 hours unless local authorities provide other instructions.").
+  The capture has no "do not look at the flash" line.
+- `ready_gov_power_outages`: same URL and year, re-read 2026-10-01. The stored quote changed from
+  the "discard refrigerated medication after a day" line — which the Sources screen was showing
+  under this entry even though the guidance deliberately follows FDA's insulin rule instead
+  (`docs/CONTENT_STANDARDS.md` §5) — to the sentence the power checklists actually rely on: "Talk
+  to your medical provider about a power outage plan for medical devices powered by electricity and
+  refrigerated medicines."
+- `epa_wildfire_indoor_air`: address corrected to `/emergencies-iaq/wildfires-and-indoor-air-quality-iaq`
+  after checklists-b found the old address answers a 301 redirect; re-read 2026-09-26.
+- `cfpb_facing_eviction` and `fda_drug_shortages_faq`: the registry's "year" field corrected to 2024, the pages' own
+  publication dates (both had been entered as 2026, the retrieval year, not the page's date).
+
 ## Added for hazards3 (v0.3.0, 2026-10-01)
 
 The eviction row counts households, not filings, and caps a county's own figure
@@ -708,6 +867,7 @@ checked; "prior" marks an expert estimate.
 | Data pack v2 county and national files (data-model) | `noaa_nclimgrid_daily`, `eia_861_reliability`, `openfema_declarations`, `openfema_housing_assistance`, `fcc_dirs_reports`, `pnnl_oe417_linkage`, `openfda_drug_shortages`, `fdic_failed_banks`, `crs_rs20348_funding_gaps`, `fbi_cde_arrests` |
 | Legal emergencies (budget) | `bjs_felony_defendants_2009`, `lsc_get_legal_help`, `aclu_stopped_by_police`, `fbi_cde_arrests` |
 | Wind and severe-thunderstorm shelter | `nws_high_wind_during`, `nws_severe_weather_during`, `ready_gov_tornadoes`, `noaa_spc_tornado_safety` |
+| Incident checklists (v0.3.0) | `gov911_faq`, `fema_until_help_arrives`, `cdc_stroke_signs`, `cdc_heart_attack`, `redcross_choking_adult_child`, `redcross_bleeding_external`, `cpsc_co_questions_answers`, `ojjdp_missing_child_guide`, `ncmec_child_missing`, `alz_wandering`, `nia_wandering`, `mnpd_burglary_victim`, `in_dhs_home_protection`, `cdc_electrical_hazards`, `epa_mold_moisture_guide`, `adot_severe_weather`, `nws_lightning_safety`, `nws_nwr_deaf`, `nac_perform_rescue`, `usfs_avalanche_safety`, `nws_flood_during`, `cdc_radiation_get_inside`, `cdc_radiation_self_decon`, `fema_nuclear_planning_2022`, `ready_gov_explosions`, `calfire_go_evacuation`, `nrc_ep_backgrounder`, `medlineplus_bleeding`, `cisa_suspicious_items`, `cisa_bomb_threats`, `cisa_bomb_threat_guide_2025`, `ready_gov_space_weather`, `cdc_shelter_in_place_chemical_2018`, `nws_winter_storm_during`, `nws_ice_storms`, `nws_cold_during`, `nydoh_boil_water_checklist`, `cdc_mmwr_community_mitigation_2017`, `cdc_respiratory_when_sick`, `cdc_valley_fever_prevention`, `nhc_storm_surge_overview`, `redcross_power_outage`, `fcc_emergency_calling_tips`, `fdic_when_bank_fails`, `fdic_deposit_insurance_faq`, `fdic_borrowers_guide`, `healthcare_gov_sep`, `healthcare_gov_unemployed`, `ssa_when_someone_dies`, `usagov_report_death`, `ssa_apply_disability`, `dol_fmla`, `fairfax_civil_disorder`, `usagov_ice_detainee`, `dhs_report_suspicious`, `ca_dmv_rules_of_the_road`, `fda_infant_formula_dos_donts`, `nws_tsunami_before`, `usfa_wildfire_evacuation`, `ftc_lost_stolen_cards`, `nfpa_escape_planning` |
 
 ## Requested
 
