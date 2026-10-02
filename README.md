@@ -123,15 +123,17 @@ Read more: the hazard math in [docs/RISK_MODEL.md](docs/RISK_MODEL.md), the sizi
 ## Privacy
 
 Nothing you enter — your location, your household, your budget — leaves your browser. There is no
-server, no account and no analytics. See [docs/PRIVACY.md](docs/PRIVACY.md) for exactly what is
-stored on your device, what the site downloads and why, what the site's host can and can't see, and
-how to check all of it yourself.
+server, no account and no analytics. The one exception is maps: if you choose to add printable maps
+of your area, the app asks, every time, before it fetches anything, and names exactly who would
+receive what. See [docs/PRIVACY.md](docs/PRIVACY.md) for exactly what is stored on your device, what
+the site downloads and why, what the site's host can and can't see, who the maps feature talks to,
+and how to check all of it yourself.
 
 ## Repository layout
 
 | Path | What |
 | --- | --- |
-| `crates/` | The Rust engine: hazards, consequences, supply sizing, budget allocation, plan and packet generation, plus the CLI, the WebAssembly bindings and the data pipeline |
+| `crates/` | The Rust engine: hazards, consequences, supply sizing, budget allocation, the binder and Prepare sheet, plus the CLI, the WebAssembly bindings and the data pipeline |
 | `web/` | The website (Svelte + TypeScript), which runs the engine in the browser |
 | `data/` | Built data packs and their provenance manifest (raw downloads are never committed) |
 | `content/` | The guidance text and item catalogue (CC BY-SA 4.0) |
