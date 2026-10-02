@@ -111,7 +111,7 @@ function v3Lines(input: PlanInput, plan: FamilyPlan): string[] {
       ['County emergency office', contactText(hood.county_emergency_office)],
       ['Alerts', t(hood.alerts)],
     ]);
-    if (line) out.push(`**Our neighbourhood.** ${line}.`, '');
+    if (line) out.push(`**Our neighborhood.** ${line}.`, '');
   }
   const pets = (plan.pets ?? []).map(
     (a) =>
@@ -168,7 +168,7 @@ export function familyPlanSections(input: PlanInput, hazardLines: string[]): str
   out.push('| Plan | Your answer |', '| --- | --- |');
   const rows: [string, string][] = [
     ['Meeting place near home', cell(plan.meeting_place_near)],
-    ['Meeting place outside the neighbourhood', cell(plan.meeting_place_far)],
+    ['Meeting place outside the neighborhood', cell(plan.meeting_place_far)],
     ['Out-of-area contact (name and phone)', contactText(plan.out_of_area_contact) ?? ''],
   ];
   if (hasChildren(input) || plan.school_pickup) rows.push(['Who picks up the children, and from where', cell(plan.school_pickup)]);
@@ -179,7 +179,7 @@ export function familyPlanSections(input: PlanInput, hazardLines: string[]): str
     ['Where we would go if we had to leave', cell(plan.where_we_would_go)],
     ['Route out, first choice', cell(plan.routes?.[0])],
     ['Route out, second choice', cell(plan.routes?.[1])],
-    ['Neighbours who check on us', cell(plan.neighbours_who_check)],
+    ['Neighbors who check on us', cell(plan.neighbours_who_check)],
   );
   if (hasAnimals(input) || plan.who_takes_animals) rows.push(['Who takes the animals if we cannot', cell(plan.who_takes_animals)]);
   rows.push(
@@ -210,7 +210,7 @@ export function familyPlanSections(input: PlanInput, hazardLines: string[]): str
     out.push(`> **Wallet card: ${personTitle(person, i)}**`, '>');
     out.push(`> - Out-of-area contact: ${contactText(plan.out_of_area_contact) ?? BLANK}`);
     out.push(`> - Meet near home: ${plan.meeting_place_near ? md(plan.meeting_place_near) : BLANK}`);
-    out.push(`> - Meet outside the neighbourhood: ${plan.meeting_place_far ? md(plan.meeting_place_far) : BLANK}`);
+    out.push(`> - Meet outside the neighborhood: ${plan.meeting_place_far ? md(plan.meeting_place_far) : BLANK}`);
     out.push(`> - Lawyer: ${contactText(plan.lawyer) ?? BLANK}`);
     out.push(`> - Trusted circle: ${circleLine(plan) ?? BLANK}`);
     out.push(`> - Know by heart: ${numbersLine(plan) ?? BLANK}`);

@@ -90,7 +90,7 @@ describe('the stand-in engine and contract v3’s answers', () => {
       'Insurance: Sample Health, Silver, XJ-000000, G-0000, 555-0130',
       '**Our home.** Address: 12 Sample Street',
       'Electric company: Sample Power, 555-0190',
-      '**Our neighbourhood.** Hospital: Sample General Hospital, 555-0160, 1 Health Way',
+      '**Our neighborhood.** Hospital: Sample General Hospital, 555-0160, 1 Health Way',
       'Alerts: County text alerts',
       'Vehicle: Blue 2016 hatchback; Plate: SMP-0000',
       'Accounts: First Sample Bank, Checking, 555-0196, ending 0042',

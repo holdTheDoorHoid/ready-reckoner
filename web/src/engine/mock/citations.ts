@@ -50,7 +50,7 @@ export const CITATIONS: Citation[] = [
   mock('mock_price_survey', 'retail price observations'),
   mock('mock_ready_gov_kit', 'emergency kit guidance (stands in for Ready.gov)'),
   mock('mock_fire_safety', 'smoke and CO alarm guidance (stands in for USFA and NFPA)'),
-  mock('mock_social_capital', 'neighbours and disaster recovery (stands in for published research)'),
+  mock('mock_social_capital', 'neighbors and disaster recovery (stands in for published research)'),
   mock('mock_evacuation', 'evacuation notice times'),
   mock('mock_get_home', 'walking pace for getting home'),
   mock('mock_savings_track', 'emergency savings guidance (stands in for the CFPB)'),
