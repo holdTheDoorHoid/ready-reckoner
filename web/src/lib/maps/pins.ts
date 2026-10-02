@@ -15,7 +15,7 @@ export const TOOLS: readonly Tool[] = [...PIN_IDS, 'route1', 'route2'];
 export const TOOL_LABELS: Record<Tool, string> = {
   home: 'Home',
   meeting_near: 'Meeting place near home',
-  meeting_far: 'Meeting place outside your neighbourhood',
+  meeting_far: 'Meeting place outside your neighborhood',
   where_go: 'Where you would go',
   route1: 'Way out 1 (a line)',
   route2: 'Way out 2 (a line)',

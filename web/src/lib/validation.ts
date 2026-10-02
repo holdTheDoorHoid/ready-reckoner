@@ -26,7 +26,7 @@ export const VERDICT_WORDS: Record<Verdict, { label: string; means: string }> = 
     means: 'The target was long enough for a typical home it hit, but not for the longest waits.',
   },
   short: { label: 'Short', means: 'The target was shorter than what a typical home it hit went through.' },
-  not_modelled: { label: 'Not modelled', means: 'The planner has no way to show this kind of event yet.' },
+  not_modelled: { label: 'Not modeled', means: 'The planner has no way to show this kind of event yet.' },
 };
 
 export interface ValidationEvent {
@@ -328,7 +328,7 @@ export const VALIDATION_EVENTS: readonly ValidationEvent[] = [
     place: 'Manhattan, New York (20th floor)',
     when: 'August 2003',
     household: 'A working adult and an older adult on daily prescriptions, renting on the 20th floor',
-    happened: 'Power and tap water out for about 29 hours; up to 4 days in some neighbourhoods.',
+    happened: 'Power and tap water out for about 29 hours; up to 4 days in some neighborhoods.',
     target: 'Power and tap-water targets both long enough.',
     verdict: 'covered',
     before: 'covered',
@@ -375,7 +375,7 @@ export const VALIDATION_EVENTS: readonly ValidationEvent[] = [
     verdict: 'partial',
     before: 'covered',
     in_sample: true,
-    changed: 'Outage records are now pooled across the region: without its own derecho, the county looks like its neighbours.',
+    changed: 'Outage records are now pooled across the region: without its own derecho, the county looks like its neighbors.',
     sources: [],
   },
 ];

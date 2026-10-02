@@ -58,7 +58,7 @@
     </ul>
     <p class="small muted">
       Before this round's changes, and in the first version, checked the same way: covered {VALIDATION_RUN.first.covered}, partly covered
-      {VALIDATION_RUN.first.partial}, short on {VALIDATION_RUN.first.short}, not modelled {VALIDATION_RUN.first.not_modelled}.
+      {VALIDATION_RUN.first.partial}, short on {VALIDATION_RUN.first.short}, not modeled {VALIDATION_RUN.first.not_modelled}.
     </p>
     <p class="small muted">
       Recorded {formatDate(VALIDATION_RUN.recorded)} for {VALIDATION_RUN.label}{summary ? `; data ${summary.data_pack}` : ''}{app.info

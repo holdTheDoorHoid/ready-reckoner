@@ -37,7 +37,7 @@ const TOPICS: { slug: string; raw: string; summary: string }[] = [
     raw: consequencesRaw,
     summary: 'Why the plan is built around no power, no water and no store, instead of a list per disaster.',
   },
-  { slug: 'myths', raw: mythsRaw, summary: 'Panic and looting are much rarer than films suggest. Neighbours are the first help.' },
+  { slug: 'myths', raw: mythsRaw, summary: 'Panic and looting are much rarer than films suggest. Neighbors are the first help.' },
   { slug: 'numbers', raw: numbersRaw, summary: 'From your county and household to days to be ready for, and where each number comes from.' },
   { slug: 'children', raw: childrenRaw, summary: 'Simple facts, a part to play, and practice together.' },
   { slug: 'community', raw: neighboursRaw, summary: 'Knowing the people nearby is one of the strongest protections there is, and it is free.' },

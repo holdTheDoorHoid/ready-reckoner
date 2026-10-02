@@ -190,14 +190,14 @@ describe('the validation page', () => {
     expect(text(r.target.querySelector('.tally__sentence'))).toBe(
       'We checked 22 real disasters. This version covered 6, partly covered 9 and fell short on 6. We cannot model one yet. Here is why, event by event.',
     );
-    expect([...r.target.querySelectorAll('.tally__boxes li')].map(text)).toEqual(['6 Covered', '9 Partly covered', '6 Short', '1 Not modelled']);
+    expect([...r.target.querySelectorAll('.tally__boxes li')].map(text)).toEqual(['6 Covered', '9 Partly covered', '6 Short', '1 Not modeled']);
     const rows = [...r.target.querySelectorAll('table.events tbody tr')];
     expect(rows).toHaveLength(22);
     expect(rows.filter((row) => row.querySelector('.in-sample'))).toHaveLength(11);
     expect(text(rows[0])).toContain('Winter Storm Uri');
     expect(text(rows[0])).toContain('Partly covered');
     expect(text(rows[0])).toContain('Before these changes: short');
-    expect(text(rows[10])).toContain('Not modelled');
+    expect(text(rows[10])).toContain('Not modeled');
     // The misses stay on the page.
     expect(text(r.target)).toContain('What the misses need');
     const results = await axe.run(r.target, { rules: { 'color-contrast': { enabled: false }, region: { enabled: false } } });

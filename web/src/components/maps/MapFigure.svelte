@@ -32,7 +32,7 @@
   const uid = $props.id();
 
   const PLACEHOLDER: Record<MapSlotKind, string> = {
-    neighbourhood: 'your neighbourhood',
+    neighbourhood: 'your neighborhood',
     area: 'your city or county',
     region: 'your region and the ways out',
   };

@@ -311,7 +311,7 @@
               {@render text(['pets', i, 'name'], 'Name', PET_MAX.name, { context: of })}
               {@render text(['pets', i, 'kind'], 'Kind of animal', PET_MAX.kind, { help: 'For example a dog, a cat or a horse.', context: of })}
             </div>
-            {@render text(['pets', i, 'description'], 'What it looks like', PET_MAX.description, { help: 'Colour, size and markings: what would help someone find it.', context: of })}
+            {@render text(['pets', i, 'description'], 'What it looks like', PET_MAX.description, { help: 'Color, size and markings: what would help someone find it.', context: of })}
             {@render text(['pets', i, 'medications'], 'Medicines', PET_MAX.medications, { help: 'Any medicine it takes, and when.', context: of, multiline: true })}
             <ContactFields
               id="ct-pets-{i}-vet"

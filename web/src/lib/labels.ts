@@ -45,7 +45,7 @@ export const SETTING: Record<Setting, Choice> = {
 export const HOUSING_KIND: Record<HousingKind, Choice> = {
   apartment_high_rise: { label: 'Apartment in a tall building', help: 'A building with elevators.' },
   apartment_low_rise: { label: 'Apartment in a low building', help: 'Stairs, no elevators needed.' },
-  rowhouse: { label: 'Rowhouse or townhouse', help: 'Shares a wall with neighbours.' },
+  rowhouse: { label: 'Rowhouse or townhouse', help: 'Shares a wall with neighbors.' },
   detached: { label: 'House', help: 'Stands on its own.' },
   mobile_home: { label: 'Mobile or manufactured home' },
   rural_property: { label: 'Farm or rural property' },
@@ -172,7 +172,7 @@ export const RAW_WATER: Record<RawWaterSource, Choice> = {
   well: { label: 'A well', help: 'One you could draw from without power, with a hand pump or bucket.' },
   surface_nearby: { label: 'A river, lake, pond or creek', help: 'Within a short walk or drive.' },
   rain_barrel: { label: 'A rain barrel or cistern' },
-  neighbour_well: { label: 'A neighbour’s well', help: 'Someone who has agreed to share it.' },
+  neighbour_well: { label: 'A neighbor’s well', help: 'Someone who has agreed to share it.' },
 };
 
 /**
@@ -309,9 +309,9 @@ export const CLIMATE: Record<ClimateHorizon, Choice> = {
 };
 
 export const WATER_LEVEL: Record<WaterLevel, Choice> = {
-  survival: { label: 'Survival', help: 'About 3 litres (¾ gallon) per person a day: drinking only.' },
+  survival: { label: 'Survival', help: 'About 3 liters (¾ gallon) per person a day: drinking only.' },
   basic: { label: 'Basic', help: 'About 1 gallon per person a day: drinking and a little washing. The usual advice.' },
-  comfortable: { label: 'Comfortable', help: 'About 15 litres (4 gallons) per person a day: drinking, washing and cleaning.' },
+  comfortable: { label: 'Comfortable', help: 'About 15 liters (4 gallons) per person a day: drinking, washing and cleaning.' },
 };
 
 export const HORIZONS = [1, 10, 30] as const;

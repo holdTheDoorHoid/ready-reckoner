@@ -6,7 +6,7 @@
 -->
 <script lang="ts">
   import Icon from '../Icon.svelte';
-  import { creditsNotShown, flatBlocks, pageDomId, sourceDomId, sourceListIndex, type PageEntry } from '../../lib/binder/model';
+  import { creditsNotShown, flatBlocks, HOSPITAL_LIST_MISSING, pageDomId, sourceDomId, sourceListIndex, type PageEntry } from '../../lib/binder/model';
   import BinderBlocks from './BinderBlocks.svelte';
   import type { BinderView } from './view';
 
@@ -37,6 +37,10 @@
     {/if}
   </header>
   <BinderBlocks blocks={page.blocks} {view} {base} label={title} sourceList={listAt} />
+  {#if page.kind === 'neighbourhood' && view.hospitalsMissing}
+    <!-- One line at the end of the page, on screen only: on paper it would be an instruction for the app. -->
+    <p class="binder-hospitals-missing no-print">{HOSPITAL_LIST_MISSING}</p>
+  {/if}
   {#if page.kind === 'sources'}
     {#if view.binder.sources.length && listAt < 0}
       <h4 class="binder-sources__title">Numbered sources</h4>
@@ -59,6 +63,14 @@
 </article>
 
 <style>
+  /* As the line a map slot shows when it has no map (BinderMap.svelte). */
+  .binder-hospitals-missing {
+    margin: var(--s3) 0 0;
+    padding: var(--s2) var(--s3);
+    border-left: 3px solid var(--border-strong);
+    background: var(--surface-2);
+    border-radius: var(--r1);
+  }
   .binder-page {
     padding: var(--s5);
     margin: 0 0 var(--s5);

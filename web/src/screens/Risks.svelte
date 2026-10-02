@@ -178,7 +178,7 @@
                   <ChoiceGroup
                     legend="Climate"
                     name="climate"
-                    help="Around 2050 uses projections for your region, labelled as such."
+                    help="Around 2050 uses projections for your region, labeled as such."
                     options={CLIMATE_HORIZONS.map((v) => ({ value: v, label: CLIMATE[v].label }))}
                     value={dials.climate}
                     onchange={(v: ClimateHorizon) => setDial('climate', v, CLIMATE[v].label)}

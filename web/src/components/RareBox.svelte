@@ -165,7 +165,7 @@
                   </p>
                   {#if h.range_only || h.confidence === 'prior'}
                     <p>
-                      <strong>Why a range:</strong> it rests on published forecasts and expert judgement stacked on each other, so it is shown as
+                      <strong>Why a range:</strong> it rests on published forecasts and expert judgment stacked on each other, so it is shown as
                       a range, never as one number. The row is sorted by the middle of the range, which is never shown.
                     </p>
                   {/if}
