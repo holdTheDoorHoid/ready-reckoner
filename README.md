@@ -81,8 +81,8 @@ A 60-second walkthrough:
 | --- | --- |
 | ![Where you live: a ZIP code that covers three counties, with a map to help pick the right one](docs/screenshots/01-where-you-live.png) | ![Your risks: hazards ranked by how likely and how serious they are for this household and county](docs/screenshots/02-your-risks.png) |
 | *Where you live: an ambiguous ZIP code, resolved with a map.* | *Your risks: ranked, with a source behind every number.* |
-| ![Your plan: this month's free steps, progress so far, and when every target will be covered](docs/screenshots/03-your-plan.png) | ![Your packet: a printable summary with the household, the risks and the free steps to start with](docs/screenshots/04-your-packet.png) |
-| *Your plan: free steps first, month by month.* | *Your packet: ready to print and keep in a drawer.* |
+| ![Prepare: this month's free steps, progress so far, and when every target will be covered](docs/screenshots/03-prepare.png) | ![Your binder: a ten-tab, during-event reference with a page per person and place and a checklist for every risk](docs/screenshots/04-your-binder.png) |
+| *Prepare: free steps first, month by month.* | *Your binder: ten tabs, ready to print and keep within reach.* |
 
 ![About and method: which versions are running, and how much data is on this device and why](docs/screenshots/05-about-and-sources.png)
 *About and method: every version, and exactly what data is on your device.*
