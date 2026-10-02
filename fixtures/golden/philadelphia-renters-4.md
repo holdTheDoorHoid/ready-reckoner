@@ -1352,7 +1352,7 @@ Someone is breaking in while you are home, or you come home to a forced door, a 
 
 **Leave or stay?**
 
-- **Leave if** you can get out safely. Go to a neighbour's home or another safe place.[135, 136]
+- **Leave if** you can get out safely. Go to a neighbor's home or another safe place.[135, 136]
 - **Stay if** you cannot get out. Stay locked in a room with a phone until police arrive.[135]
 - **Call** 911 from wherever you are safe.[108]
 
@@ -2716,7 +2716,7 @@ There are riots, violent protests or a curfew near your home, your work or your 
 
 1. **Know your exit routes** in case you have to leave.[213]
 2. **Use your home supplies** of food, water and medicine.[1]
-3. **Look out for your neighbours,** and ask them to look out for you.[214]
+3. **Look out for your neighbors,** and ask them to look out for you.[214]
 4. **If someone near you is tense,** stay calm and friendly, and get help if you need it.[215]
 5. **If violence starts near you, get away.** If you cannot, hide out of sight behind something solid.[143]
 
@@ -2895,7 +2895,7 @@ The power is out across your town or region and could stay out for days. Stores,
 ### Do first
 
 1. **Use flashlights, not candles.[122]**
-2. **Check on your people and neighbours.[122]**
+2. **Check on your people and neighbors.[122]**
 3. **Get news from a battery radio or phone alerts.[122]**
 4. **Text instead of calling.[9]**
 5. **Keep the fridge and freezer closed.[159]**
@@ -3132,7 +3132,7 @@ Write it down as it happens: insurers and FEMA ask for dates, names and receipts
 
 ## Sources
 
-The numbers in brackets point to this list; "expert estimate" marks a judgement, not measured data. The targets and the plan are Ready Reckoner's calculations from these.
+The numbers in brackets point to this list; "expert estimate" marks a judgment, not measured data. The targets and the plan are Ready Reckoner's calculations from these.
 
 1. Build A Kit. FEMA / Ready.gov, 2026. https://www.ready.gov/kit
 2. Make a Plan. American Red Cross, 2026. https://www.redcross.org/get-help/how-to-prepare-for-emergencies/make-a-plan.html
@@ -3171,7 +3171,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 35. CDC Yellow Book 2026: Travel Health Kits. Centers for Disease Control and Prevention, 2025. https://www.cdc.gov/yellow-book/hcp/preparing-international-travelers/travel-health-kits.html
 36. Older Adults. FEMA / Ready.gov, 2026. https://www.ready.gov/older-adults
 37. People with Disabilities. FEMA / Ready.gov, 2026. https://www.ready.gov/disability
-38. Prior art and behavioural science for a household preparedness planner. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/prior-art-and-psychology.md
+38. Prior art and behavioral science for a household preparedness planner. Ready Reckoner contributors, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/prior-art-and-psychology.md
 39. 2 Weeks Ready. Oregon Department of Emergency Management, 2026. https://www.oregon.gov/oem/hazardsprep/Pages/2-Weeks-Ready.aspx
 40. Talking to Children About Disasters. American Academy of Pediatrics (HealthyChildren.org), 2014. https://web.archive.org/web/20140717115224/https://www.healthychildren.org/English/safety-prevention/at-home/Pages/Talking-to-Children-About-Disasters.aspx
 41. During a High Wind Event. NOAA National Weather Service, 2026. https://www.weather.gov/safety/wind-during
@@ -3391,7 +3391,7 @@ The numbers in brackets point to this list; "expert estimate" marks a judgement,
 
 - Made by Ready Reckoner 0.2.0 on October 1, 2026, from the plan's answers.
 - Data pack 13d6f99df7dc.
-- Content 2026.09.27+8467ad60.
+- Content 2026.09.27+f7b3699b.
 - Review it and print it again by October 1, 2027, and whenever something changes.
 
 ---
@@ -3451,7 +3451,7 @@ Your monthly money starts next month, so this month is the free steps above.
 ### Next month: Month 1 (from November 1, 2026), $60 to spend
 
 - [ ] Plan for access and mobility needs
-- [ ] Neighbours and skills
+- [ ] Neighbors and skills
 - [ ] Get the toilet and hand washing ready
 - [ ] Clean-room plan for smoky, dusty or chemical air
 - [ ] Practice: ten-minute drills and the first things to do
@@ -3550,12 +3550,12 @@ One list per step, up to the one your risks need, with each thing's month. This 
 **Person 1**: a 12-mile (19 km) trip, about 4 hours on foot.
 
 - [ ] Keep a get-home bag in the car: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (some amounts are estimates)[11, 12, 13, 14]
-- [ ] For the walk, from home: 2 litres of water and 400 kcal of snacks.[11, 12, 15]
+- [ ] For the walk, from home: 2 liters of water and 400 kcal of snacks.[11, 12, 15]
 
 **Person 2**: a 4-mile (6 km) trip, about an hour on foot.
 
 - [ ] Keep a get-home bag at work or in your daily bag: comfortable walking shoes, a light, a paper map, cash in small bills, a rain or warm layer, and water and snacks from home. Be ready to stay at work for 24 hours if you can't leave. (some amounts are estimates)[11, 12, 13, 14]
-- [ ] For the walk, from home: 0.6 litres of water and 100 kcal of snacks.[11, 12, 15]
+- [ ] For the walk, from home: 0.6 liters of water and 100 kcal of snacks.[11, 12, 15]
 
 ### Extras for the hazards you face
 
@@ -3592,7 +3592,7 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 | June 1, 2027 | Check, then every year: battery or rechargeable fan; towels to wet and cool down; indoor room thermometer |
 | September 1, 2027 | Use and restock, then every 5 years: carbon monoxide alarm on each sleeping level. Check, then every year: one-burner camp stove that burns propane (outdoors only); a warm blanket for each person; warm layers for each person |
 | October 1, 2027 | Check, then every year: make a household plan and a contact card for each person. Check, then every 6 months: family first-aid kit. Yearly review: update your answers, check the documents and contact cards, and start a new calendar |
-| November 1, 2027 | Check, then every year: neighbours and skills; documents and insurance; spare batteries for lights and the radio |
+| November 1, 2027 | Check, then every year: neighbors and skills; documents and insurance; spare batteries for lights and the radio |
 | December 1, 2027 | Check, then every year: your trusted circle: agree who helps whom; legal readiness. Check, then every 6 months: get-home bag for each commuter |
 | January 1, 2028 | Check, then every year: lockout plan |
 | March 1, 2028 | Check, then every 6 months: NOAA Weather Radio with a tone alert; pet go-kit |
@@ -3605,7 +3605,7 @@ Dates count from when each item enters your plan; move them if you buy earlier o
 
 ## Sources
 
-The numbers in brackets point to this list; "expert estimate" marks a judgement, not measured data. The plan is Ready Reckoner's calculation from these.
+The numbers in brackets point to this list; "expert estimate" marks a judgment, not measured data. The plan is Ready Reckoner's calculation from these.
 
 **1** Water. FEMA / Ready.gov, 2021. https://www.ready.gov/water **2** Harm weights used by the allocator. Ready Reckoner, 2026. https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/RISK_MODEL.md Expert estimate. **3** Home Fires. FEMA / Ready.gov, 2026. https://www.ready.gov/home-fires **4** Home Fire Escape Plans. U.S. Fire Administration, 2026. https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/home-fire-escape-plans/ **5** Food and Water in an Emergency. FEMA and American Red Cross (via Internet Archive), 2004. https://web.archive.org/web/20101225233527/http://www.fema.gov/pdf/library/f&web.pdf **6** Power Outages. FEMA / Ready.gov, 2026. https://www.ready.gov/power-outages **7** Carbon Monoxide Poisoning Basics. Centers for Disease Control and Prevention, 2026. https://www.cdc.gov/carbon-monoxide/about/index.html **8** Portable Generator Hazards. U.S. Consumer Product Safety Commission, 2021. https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021_0.pdf **9** Using Portable Generators Safely. Occupational Safety and Health Administration, 2005. https://www.osha.gov/sites/default/files/publications/OSHA3286.pdf **10** Safety Skills. FEMA / Ready.gov, 2026. https://www.ready.gov/safety-skills
 
