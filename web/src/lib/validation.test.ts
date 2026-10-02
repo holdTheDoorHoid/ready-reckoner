@@ -17,10 +17,10 @@ import { agrees, tally, VALIDATION_DOC_URL, VALIDATION_EVENTS, VALIDATION_RUN, V
 /** docs/VALIDATION.md, or another copy to check against before it merges (RR_VALIDATION_MD=path). */
 const DOC = process.env.RR_VALIDATION_MD ?? join(repoRoot(), 'docs', 'VALIDATION.md');
 
-/** "short: boil water 5 d vs 6" -> "short"; "covered (water over)" -> "covered"; "not modelled" -> "not_modelled". */
+/** "short: boil water 5 d vs 6" -> "short"; "covered (water over)" -> "covered"; "not modeled" -> "not_modelled". */
 function verdictOf(cell: string): Verdict {
   const word = cell.trim().toLowerCase();
-  if (word.startsWith('not modelled')) return 'not_modelled';
+  if (word.startsWith('not modeled') || word.startsWith('not modelled')) return 'not_modelled';
   const first = word.split(/[\s:(]/)[0] as Verdict;
   if (!VERDICTS.includes(first)) throw new Error(`no verdict in "${cell}"`);
   return first;
