@@ -14,6 +14,8 @@ export interface BinderView {
   maps: { status: MapsStatus; records: Partial<Record<MapSlotKind, MapRecord>> };
   /** Open the maps panel at its consent screen ("Add maps"); absent where maps cannot be added. */
   addMaps?: () => void;
+  /** The county hospital list has not been downloaded: the Neighborhood page says so (on screen only). */
+  hospitalsMissing?: boolean;
 }
 
 /** A view with no maps (for a binder shown on its own). */

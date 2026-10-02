@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { RawEngine } from './index';
 import { coreLoadOrder, type Manifest, startupFiles, ZIP_FILES, zipFiles } from './data-files';
-import { PackLoader, type LoaderStatus } from './loader';
+import { hospitalListMissing, PackLoader, type LoaderStatus } from './loader';
 import { adaptRawEngine } from './wasm';
 
 const MANIFEST: Manifest = {
@@ -199,5 +199,40 @@ describe('the pack loader', () => {
     expect(loaded.map((l) => l.name)).toEqual(['manifest.json', 'core/base_rates.toml', 'core/nri_hazards.csv']);
     // What depends on the core files fails with it.
     await expect(loader.zip()).rejects.toThrow(/checksum/);
+  });
+});
+
+describe('the county hospital list (verify3 R4-05)', () => {
+  const WITH_PLACES: Manifest = { ...MANIFEST, packs: { ...MANIFEST.packs, places: { files: [{ path: 'places/hospitals.csv', bytes: 50 }] } } };
+  const part = (phase: LoaderStatus['places']['phase']) => ({ phase, bytesLoaded: 0, bytesTotal: 0 });
+
+  it('is missing when its download failed or the site has no hospital file, and only then', () => {
+    expect(hospitalListMissing(part('failed'), WITH_PLACES)).toBe(true);
+    expect(hospitalListMissing(part('failed'), null)).toBe(true);
+    expect(hospitalListMissing(part('ready'), MANIFEST)).toBe(true);
+    // Loaded, still on its way, not asked for yet, a site without data, the stand-in engine.
+    expect(hospitalListMissing(part('ready'), WITH_PLACES)).toBe(false);
+    expect(hospitalListMissing(part('loading'), WITH_PLACES)).toBe(false);
+    expect(hospitalListMissing(part('idle'), WITH_PLACES)).toBe(false);
+    expect(hospitalListMissing(part('none'), null)).toBe(false);
+    expect(hospitalListMissing(part('ready'), null)).toBe(false);
+    expect(hospitalListMissing(undefined, WITH_PLACES)).toBe(false);
+  });
+
+  it('follows the loader: offline it fails; with the file it loads; without it, nothing to load', async () => {
+    const s = fullSite();
+    s.files['data/manifest.json'] = { body: JSON.stringify(WITH_PLACES), type: 'application/json' };
+    // Offline for the hospital file only (as when the binder is first opened without a connection).
+    const offline = new PackLoader(recordingEngine().engine, '/base/', { fetch: (url) => (url.includes('places/') ? Promise.reject(new TypeError('Failed to fetch')) : s.get(url)) });
+    await offline.places().catch(() => undefined);
+    expect(hospitalListMissing(offline.status.places, WITH_PLACES)).toBe(true);
+    s.files['data/places/hospitals.csv'] = { body: 'fips,ccn,name' };
+    const online = new PackLoader(recordingEngine().engine, '/base/', { fetch: s.get });
+    await online.places();
+    expect(hospitalListMissing(online.status.places, WITH_PLACES)).toBe(false);
+    const noPack = new PackLoader(recordingEngine().engine, '/base/', { fetch: fullSite().get });
+    await noPack.places();
+    expect(noPack.status.places.phase).toBe('ready');
+    expect(hospitalListMissing(noPack.status.places, MANIFEST)).toBe(true);
   });
 });
