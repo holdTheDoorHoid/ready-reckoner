@@ -724,7 +724,7 @@ CDC's Get Inside, or the 2022 capture of the old Ready.gov nuclear page — stil
 
 17 existing registry entries were re-read the same day to check their wording still matched (no
 fields changed). Where authorities disagree, the page followed the one whose job it is: downed
-power lines are written as 30 feet here (`bucket_power`, PA PUC) where c's pages and
+power lines are written as 30 feet here (the bucket_power guidance block, PA PUC) where c's pages and
 checklist-review's later pass use 35 feet (the Red Cross); boiling water above 5,000 feet follows
 EPA, not CDC's 6,500 feet; heat-stroke skin follows CDC's "dry or damp", not Ready.gov's "dry, no
 sweat". Dropped for want of a source: ice-loaded trees, moving a car to higher ground before a
@@ -772,7 +772,7 @@ read in a browser, paraphrased):
 
 | id | Source | Used in | How it was read |
 | --- | --- | --- | --- |
-| `nws_tsunami_before` | Tsunami Safety: Before a Tsunami, NOAA National Weather Service, 2026 | Tsunami ("go on foot if you can"); also backs "walk to high ground" in `hazard_earthquake` (handed back by checklists-a2 as uncited) | plain download; quote matched |
+| `nws_tsunami_before` | Tsunami Safety: Before a Tsunami, NOAA National Weather Service, 2026 | Tsunami ("go on foot if you can"); also backs "walk to high ground" in the hazard_earthquake guidance block (handed back by checklists-a2 as uncited) | plain download; quote matched |
 | `usfa_wildfire_evacuation` | Wildfire Evacuation Outreach Materials, U.S. Fire Administration, 2026 | Wildfire and Evacuation order ("leave early" when someone needs extra time or help) | plain download; quote matched |
 | `ftc_lost_stolen_cards` | Lost or Stolen Credit, ATM, and Debit Cards, Federal Trade Commission, Consumer Advice, 2026 | Break-in (report stolen cards to the issuer at once) | plain download; quote matched |
 | `nfpa_escape_planning` | How to make a home fire escape plan, National Fire Protection Association, 2026 | House fire ("close doors behind you" added for every home kind, not only apartments) | browser page; standards-body content, paraphrased, no quote |
@@ -800,7 +800,7 @@ checklists rely on:
   refrigerated medicines."
 - `epa_wildfire_indoor_air`: address corrected to `/emergencies-iaq/wildfires-and-indoor-air-quality-iaq`
   after checklists-b found the old address answers a 301 redirect; re-read 2026-09-26.
-- `cfpb_facing_eviction` and `fda_drug_shortages_faq`: `year` corrected to 2024, the pages' own
+- `cfpb_facing_eviction` and `fda_drug_shortages_faq`: the registry's "year" field corrected to 2024, the pages' own
   publication dates (both had been entered as 2026, the retrieval year, not the page's date).
 
 ## Added for hazards3 (v0.3.0, 2026-10-01)
