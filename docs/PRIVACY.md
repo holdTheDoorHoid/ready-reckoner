@@ -18,7 +18,7 @@ Three separate places are used:
 - **`rr.plan.v1`** holds your household, your dial settings, what you already have, your check-offs
   and paid amounts, your progress through the interview, your family plan (the out-of-area contact,
   meeting places, and the trusted circle of people who'd help), and, since v0.3.0, the answers
-  behind your binder's pages: each person's profile, your home, your neighbourhood, your pets and
+  behind your binder's pages: each person's profile, your home, your neighborhood, your pets and
   vehicles, and your documents-and-money page. **This is the entry most likely to hold someone
   else's personal details, not just your own**, and since v0.3.0 it can hold real medical and
   financial details too. This is the entry that "Save a copy of your plan" writes out as a file and
@@ -114,7 +114,7 @@ steps say this in the same words: *"Names and phone numbers are other people's d
 a saved file somewhere safe. Until Ready Reckoner has a web address of its own, other pages at the
 same address could in principle read what this browser keeps. If that matters to you, write this
 plan on the printed binder instead."* Before relying on this for a real emergency, the site should
-move to an address of its own — a dedicated organisation or a custom domain. Until then, treat this
+move to an address of its own — a dedicated organization or a custom domain. Until then, treat this
 like any shared computer: use "Forget everything" when you're done if that matters to you, protect
 a saved file with a passphrase (on by default once it would need it), and consider keeping sensitive
 answers on the printed binder rather than in the browser if you'd rather not store them there at all.
@@ -171,7 +171,7 @@ anything else has been fetched).
 | U.S. Census Bureau (fallback) | `tigerweb.geo.census.gov` | Only if OpenStreetMap's tile server doesn't answer | The same map squares | Public domain; no published limits |
 | Overpass (FOSSGIS e.V., Germany) | `overpass-api.de` | "Fetch maps" with "Nearby places" ticked | A query naming the boxes around your home and the kinds of place you'd see on the map (never your exact address) | The OSM wiki's Overpass guidance |
 | Overpass fallback (Private.coffee) | `overpass.private.coffee` | Only if the first Overpass server is busy or fails | The same query | The same guidance |
-| FEMA | `hazards.fema.gov` | "Fetch maps" with "Flood zones" ticked | The box around your neighbourhood map (about 1.5 km/1 mile across) | Federal, public |
+| FEMA | `hazards.fema.gov` | "Fetch maps" with "Flood zones" ticked | The box around your neighborhood map (about 1.5 km/1 mile across) | Federal, public |
 | U.S. Forest Service | `imagery.geoplatform.gov` | "Fetch maps" with "Wildfire hazard" ticked | The box around your city or county map | Federal, public |
 | OpenStreetMap Foundation (search) | `nominatim.openstreetmap.org` | Only if you choose "Type an address instead" (after its own warning), on each "Search" press | The address you typed | The Nominatim Usage Policy |
 

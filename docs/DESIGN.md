@@ -204,7 +204,7 @@ the interview, `DESIGN-DELTA-v3.md` §2–§3): every field is optional, echo-on
 length-capped, never checked or computed with; the household's own words), and a group left empty
 is omitted from the JSON, so a v1 or v2 plan still loads unchanged. `docs/ENGINE-API.md` has the
 full field list with every string's character cap. The answers print on the binder's person,
-home, neighbourhood, pets, vehicles and documents pages (§9) and on the wallet cards; the engine
+home, neighborhood, pets, vehicles and documents pages (§9) and on the wallet cards; the engine
 never computes anything from them. The one exception to "ask, don't check": `AccountInfo.last4`
 keeps only the last four digits of whatever was typed, so a pasted full account number never
 reaches the saved file — the app does not ask for full account numbers at all.
@@ -214,7 +214,7 @@ saved v1 plan still loads. Absent means "not asked", and the engine then assumes
 range, no raw water source, an unknown water-system record, no benefits. `benefits` gates the
 benefit-interruption hazard; `access_needs` drive the communication plan, registries and evacuation
 help; `family_plan` is captured on a device-only screen and, since v0.3.0, printed on the binder's
-home, neighbourhood and getting-out pages and on wallet cards (`docs/ENGINE-API.md` § Changes from v1).
+home, neighborhood and getting-out pages and on wallet cards (`docs/ENGINE-API.md` § Changes from v1).
 
 ### 4.2 Hazards
 
@@ -676,7 +676,7 @@ point to, now only points to `docs/BINDER.md`, for old links.
 | --- | --- |
 | 1. Start here | A cover (household, place, date, review-by date, the status line); how to use this binder; Quick start (the first five minutes of any emergency, from memory); Which checklist? (every ranked hazard and everyday emergency, pointing to its tab and page); Contacts at a glance (every number in the binder, plus 911, 988 and Poison Help). |
 | 2. People | One page per person — their own answers exactly as typed, a medicine table, blanks where nothing was answered — then the wallet cards, one per person. |
-| 3. Home and places | The home (shut-offs, utilities, insurer, where things are kept); one page per place in the household's life (work, school, child care); the neighbourhood (hospital, pharmacy, shelter, the county's own hospital list, a map); getting out (two ways out, roadside help, two more maps). |
+| 3. Home and places | The home (shut-offs, utilities, insurer, where things are kept); one page per place in the household's life (work, school, child care); the neighborhood (hospital, pharmacy, shelter, the county's own hospital list, a map); getting out (two ways out, roadside help, two more maps). |
 | 4. Pets, vehicles and documents | One entry per animal and per vehicle, only when the household has them; the Emergency Financial First Aid Kit's documents-and-money checklist. |
 | 5. What you have | A one-page inventory of what the plan has bought, owned already or still needs; risks at a glance, every ranked hazard and rare family in one table, pointing to its checklist. |
 | 6–8. Checklists | Grouped by how much warning they give: 6 happening now (fire, a medical emergency, earthquake, tornado, a break-in, and every everyday emergency); 7 it is coming (hurricane, winter storm, an evacuation order); 8 it goes on (a blackout, a job loss, an eviction). One airline-style page per hazard and per everyday emergency: Use this when, Do first (memorise these), Then, Leave or stay?, the household's own answers filled in, Do not, When it is over, numbered sources. |
@@ -773,7 +773,7 @@ guidance beyond safe storage and training pointers.
   — all of it optional. **D3** a checklist for every hazard in the household's ranked matrix, every
   everyday emergency a home needs regardless of location (a gas leak, a missing person, a power
   outage and the like), and every rare family the household opts into. **D4** four reference page
-  groups besides people: the home; the places in the household's life; the neighbourhood and getting
+  groups besides people: the home; the places in the household's life; the neighborhood and getting
   out; pets, vehicles and documents. **D5** base maps come from OpenStreetMap's own tile servers,
   fetched only on request and cached on the device, with a public-domain Census map as the fallback.
   **D6** the home point starts as a pin to drag; typing an address instead is a warned option that
@@ -789,7 +789,7 @@ guidance beyond safe storage and training pointers.
   WebAssembly size budget rises to 1.75 MB gzipped (from 1.5). **Contract v3:**
   `PlanOutput.packet_markdown` is removed — the one breaking change — replaced by `binder` (the
   ten-tab tree rendered to the binder, `docs/BINDER.md`) and `prepare_markdown` (the Prepare sheet);
-  every input addition (a person's profile; the family plan's home, neighbourhood, pets, vehicles
+  every input addition (a person's profile; the family plan's home, neighborhood, pets, vehicles
   and documents groups) is optional and echo-only, so older saved plans still load. Built across
   thirteen parallel workstreams (the full merge log is in
   `~/Desktop/ready-reckoner-briefs/round3/INTEGRATION-STATUS.md`): 57 checklist pages (two exemplars

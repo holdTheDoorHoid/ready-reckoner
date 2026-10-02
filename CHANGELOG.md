@@ -25,7 +25,7 @@ your say-so, talks to an outside service; see "Maps" below and the rewritten
   calendar.
 - **Ten tabs:** Start here (a cover, how to use the binder, a two-minute "which checklist?" index,
   and every phone number you gave in one place); People (a page per person, then wallet cards);
-  Home and places (your home, every other place in your life, your neighbourhood, getting out);
+  Home and places (your home, every other place in your life, your neighborhood, getting out);
   Pets, vehicles and documents; What you have (a one-page-style inventory and a risks-at-a-glance
   summary); three tabs of checklists, grouped by how much warning you get (happening now / it is
   coming / it goes on); After (the first 30 days, and logs to fill in by hand); Sources.
@@ -47,7 +47,7 @@ your say-so, talks to an outside service; see "Maps" below and the rewritten
 - **A page for every person, home and place that answers your own questions.** Step 6–8 of the
   interview (below) feeds a page per household member — name, birth date, medications, allergies,
   insurance, where they spend the day — plus a page for your home, one for every other place in your
-  life, your neighbourhood (including a list of the county's hospitals with an emergency room), and
+  life, your neighborhood (including a list of the county's hospitals with an emergency room), and
   getting out. Anything you skip prints as a blank line to fill in by hand, never an error.
 - **No page limit, by design.** A typical household's binder runs 75 to 90-some pages — this is a
   reference to keep, not something meant to be read start to finish. In the one household size we
@@ -83,7 +83,7 @@ your say-so, talks to an outside service; see "Maps" below and the rewritten
 ### Maps
 
 - **Add printable maps of your home's area, from OpenStreetMap, on request.** A household can ask
-  for three maps — the immediate neighbourhood, the wider area, and the region between home and
+  for three maps — the immediate neighborhood, the wider area, and the region between home and
   where you'd go — each marked with the household's own points (home, meeting places, nearby
   pharmacies, schools and emergency rooms) and, where they apply, flood zones or wildfire hazard.
   Nothing is fetched until you press "Fetch maps," on a screen that names every outside service by
@@ -129,8 +129,8 @@ your say-so, talks to an outside service; see "Maps" below and the rewritten
 
 ### Data and size
 
-- The data pack adds a county hospital list and the geographic centre of every ZIP code (used to
-  centre the pin map); both load only when they're actually needed, so a household that never opens
+- The data pack adds a county hospital list and the geographic center of every ZIP code (used to
+  center the pin map); both load only when they're actually needed, so a household that never opens
   the binder or adds a map never downloads them.
 - The app itself (the WebAssembly engine, now including 57 checklists' worth of content and the
   logic that assembles the binder) is about 1.55 MB compressed, against a budget raised to 1.75 MB
@@ -140,8 +140,11 @@ your say-so, talks to an outside service; see "Maps" below and the rewritten
 
 ### The site
 
-- **Spelling is now consistently American English across the app's own on-screen text** ("neighbor,"
-  not "neighbourhood," for instance) — a mix the last two releases carried.
+- **Spelling is more consistent in this release.** The planning engine's own text — every
+  checklist, guidance block and catalogue item — now reads in American English throughout; it was a
+  mix before. A few screens the engine doesn't write (a handful of headings and field labels in the
+  interview, written by hand) still read "neighbourhood" rather than "neighborhood"; bringing those
+  the rest of the way is a small follow-up, not a new problem introduced here.
 
 ### Known limitations
 
@@ -181,7 +184,7 @@ your say-so, talks to an outside service; see "Maps" below and the rewritten
 This release adds three public data sources to the ones already credited on the About screen and in
 every binder's Sources tab: the **Eviction Lab at Princeton University** (eviction figures, under
 the Open Data Commons Attribution License), the **Centers for Medicare & Medicaid Services**
-(hospital locations), and the **U.S. Census Bureau** (ZIP-code centre points, with a public-domain
+(hospital locations), and the **U.S. Census Bureau** (ZIP-code center points, with a public-domain
 Census map as a fallback for OpenStreetMap). The maps feature, when you turn it on, also draws on
 **OpenStreetMap contributors** (map tiles and nearby places, under the Open Database License), the
 **Federal Emergency Management Agency's** flood-hazard maps, the **U.S. Forest Service's**
@@ -372,8 +375,9 @@ is handled has changed: still no server, no accounts, nothing sent anywhere.
   nothing else in the plan adjusts — a weather radio, for instance, doesn't move any earlier.
 - **British and American spellings are mixed** through the packet and the site (neighbour/neighbor,
   litre/liter, practise, labour) — not yet passed through a single consistent style. *(Addressed in
-  v0.3.0 for the app's own on-screen text, now consistently American English; content files are
-  being brought in line over time.)*
+  v0.3.0 for the planning engine's own text (checklists, guidance and catalogue items), now
+  consistently American English; a handful of hand-written interview screens still read British and
+  are a small follow-up.)*
 - **The rare-but-severe rows are sorted by the middle of their range**, so a row can appear above one
   whose range is actually higher at both ends. It is a defensible choice, but it means the order isn't
   always the one you'd get from the low end or the high end alone.

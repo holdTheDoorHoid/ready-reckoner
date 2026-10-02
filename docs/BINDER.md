@@ -75,7 +75,7 @@ to a single number that means the same thing on screen, in the PDF and on paper.
 | Tab | Page id(s) | Kind | What feeds it |
 | --- | --- | --- | --- |
 | 1. Start here | `cover` | `cover` | The household's names, the place, the home address, the plan date, "review by … and whenever something changes" (`review_by`), and the status line (`docs/CONTENT_STANDARDS.md` §6). A sample-data warning callout when the plan was built on the built-in sample counties. |
-| | `how_to_use` | `how_to_use` | The `plan_how_to_use_binder` guidance block: how the binder is organised and how to use it (Red Cross and Ready.gov sources). |
+| | `how_to_use` | `how_to_use` | The `plan_how_to_use_binder` guidance block: how the binder is organized and how to use it (Red Cross and Ready.gov sources). |
 | | `quick_start` | `quick_start` | The `plan_quick_start` block: six universal first-five-minutes steps, all "do first from memory" (USFA, Ready.gov home fires, FCC text-to-911, the Red Cross, Ready.gov alerts and evacuation, FCC calling tips). |
 | | `index` | `index` | "Which checklist?": every everyday emergency, then the household's ranked hazards, most likely first, each with its tab and page and the warning names people actually hear ("Flash flood warning" → Flooding; "Air quality alert" → Wildfire smoke); rare families not opted into named in one line, and "Also checked" hazards in another. |
 | | `contacts` | `contacts` | 911, 988, Poison Help (1-800-222-1222, HRSA) and the Disaster Distress Helpline, each cited; then every number the household gave, grouped (people, trusted circle, out-of-area contact, lawyer, doctors, pharmacies, utilities, insurer, landlord, vet, roadside, hospital, county office), blanks where it gave none. |
@@ -85,7 +85,7 @@ to a single number that means the same thing on screen, in the PDF and on paper.
 | | `wallet_cards` | `wallet_cards` | One card per person, named, sized to cut out: the out-of-area contact, the two meeting places, the lawyer, the trusted circle, numbers to know by heart, a medical-notes line. The old `#/packet/wallet-cards` link still lands here. |
 | 3. Home and places | `home` | `home` | The home's address, utilities (company and outage number each), insurer, landlord or mortgage company, the gas/water/electrical shut-offs, where the kit/documents/cash/keys are, the safest spot at home, neighbours who check in — plus that home kind's shelter plan (§3.2 of the UI, `plan_shelter`'s span for that housing kind). |
 | | `place_<n>` | `place` | One page per distinct place in the household's life (work, school, child care), deduplicated by name: address, phone, its own emergency plan, pick-up rules, the safest spot there. |
-| | `neighbourhood` | `neighbourhood` | Meeting places near and outside the neighbourhood, hospital, urgent care, pharmacy, shelter, county emergency office, how the household gets alerts; the county's hospitals-with-emergency-rooms table (up to 12, from the `places` data pack, dated, "check before you need it"; one sentence for a county with none listed, nothing printed if the list has not loaded); `map_slot: neighbourhood`. |
+| | `neighbourhood` | `neighbourhood` | Meeting places near and outside the neighborhood, hospital, urgent care, pharmacy, shelter, county emergency office, how the household gets alerts; the county's hospitals-with-emergency-rooms table (up to 12, from the `places` data pack, dated, "check before you need it"; one sentence for a county with none listed, nothing printed if the list has not loaded); `map_slot: neighbourhood`. |
 | | `getting_out` | `getting_out` | Where the household would go, the two ways out, roadside assistance, the evacuation bucket's warning-by-cause sentence; a "Leaving comes first here" callout where D1's leave-first rule applies (`docs/PACKET.md`'s old rule, carried over: a 25-in-100 ten-year evacuation chance, a major hurricane or local tsunami in the plan, a surge zone, or a fast hazard at 10-in-100 or more); `map_slot: area` and `map_slot: region`. |
 | 4. Pets, vehicles and documents | `pets` (only with animals) | `pets` | One block per animal: name, kind, medications, vet, microchip, where its records are, who takes it if the household can't. |
 | | `vehicles` (only with vehicles) | `vehicles` | One block per vehicle: description, plate, insurer and policy number, what stays in the car, roadside assistance. |
@@ -249,7 +249,7 @@ out's two empty map slots as a whole page each; without maps they print as one l
 **tab 10** (the sources, set in two 7-point columns, fill 8 real pages, not 10). **Adding maps
 costs more, not less, than the proxy assumes**: the proxy counts a map as half a page, but a
 readable map with its legend takes a **whole sheet**, never splitting — with all three maps,
-Philadelphia's Neighbourhood page needs 2 sheets and Getting out needs 3.
+Philadelphia's Neighborhood page needs 2 sheets and Getting out needs 3.
 
 **What does not fit at a readable size, even after calibration:** the owner's D1 request was for a
 **one-page** inventory and a **one-page** risks summary. Neither reaches one sheet. Every ranked
