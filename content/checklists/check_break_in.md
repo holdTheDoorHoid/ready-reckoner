@@ -32,7 +32,7 @@ Someone is breaking in while you are home, or you come home to a forced door, a 
 
 ## Leave or stay
 
-- **Leave if** you can get out safely. Go to a neighbour's home or another safe place.[^in_dhs_home_protection][^mnpd_burglary_victim]
+- **Leave if** you can get out safely. Go to a neighbor's home or another safe place.[^in_dhs_home_protection][^mnpd_burglary_victim]
 - **Stay if** you cannot get out. Stay locked in a room with a phone until police arrive.[^in_dhs_home_protection]
 - **Call** 911 from wherever you are safe.[^gov911_faq]
 

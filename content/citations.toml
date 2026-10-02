@@ -999,7 +999,7 @@ license = "US Government Work (public domain)"
 
 [[citation]]
 id = "ecfr_47_1_1102"
-title = "47 CFR 1.1102, schedule of application fees (wireless licences)"
+title = "47 CFR 1.1102, schedule of application fees (wireless licenses)"
 publisher = "Electronic Code of Federal Regulations"
 year = 2026
 url = "https://www.ecfr.gov/current/title-47/section-1.1102"
@@ -1901,7 +1901,7 @@ publisher = "Martell M., Miles S. and Choe Y."
 year = 2020
 url = "https://arxiv.org/abs/2008.00991"
 retrieved = "2026-09-25"
-license = "arXiv non-exclusive licence (paraphrased, not quoted)"
+license = "arXiv non-exclusive license (paraphrased, not quoted)"
 
 # ---------------------------------------------------------------------------------------------
 # Climate
@@ -2229,7 +2229,7 @@ license = "CC BY-SA 4.0"
 
 [[citation]]
 id = "rr_research_prior_art"
-title = "Prior art and behavioural science for a household preparedness planner (research report)"
+title = "Prior art and behavioral science for a household preparedness planner (research report)"
 publisher = "Ready Reckoner contributors"
 year = 2026
 url = "https://github.com/holdTheDoorHoid/ready-reckoner/blob/main/docs/research/prior-art-and-psychology.md"

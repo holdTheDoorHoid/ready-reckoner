@@ -21,4 +21,4 @@ Supplies help most when you already know what to do with them. Practice and simp
 [^vinnell_2020_shakeout]: Vinnell L.J., Wallis A., Becker J.S. and Johnston D.M., Evaluating the ShakeOut drill in Aotearoa/New Zealand: effects on knowledge, attitudes, and behaviour (International Journal of Disaster Risk Reduction) (2020).
 [^gargano_2017_wtc_training]: Gargano L.M. et al., Previous emergency training and PTSD among World Trade Center evacuees (Journal of Emergency Management 15(5):275–284) (2017).
 [^ready_gov_home_fires]: FEMA / Ready.gov, Home Fires (2026).
-[^rr_research_prior_art]: Ready Reckoner contributors, Prior art and behavioural science for a household preparedness planner (research report) (2026).
+[^rr_research_prior_art]: Ready Reckoner contributors, Prior art and behavioral science for a household preparedness planner (research report) (2026).

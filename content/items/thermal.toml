@@ -14,7 +14,7 @@ look_for = [
   "A small interior room with few windows",
   "Blankets and towels you can use to seal gaps",
   "Your nearest warming center: call 2-1-1 to find one (Ready.gov)",
-  "A way to check on older relatives and neighbours",
+  "A way to check on older relatives and neighbors",
 ]
 avoid = [
   "Heating with a gas oven or stovetop (CDC)",
@@ -39,7 +39,7 @@ look_for = [
   "A shaded, low room (heat rises), with drapes or window reflectors for sunny windows",
   "The address and hours of the nearest cooling center or library",
   "A ride plan for anyone who does not drive",
-  "A daily check-in with older or ill relatives and neighbours in heat",
+  "A daily check-in with older or ill relatives and neighbors in heat",
 ]
 avoid = [
   "Relying on a fan when the room is above 90°F (CDC)",

@@ -177,7 +177,7 @@ unit = "plan"
 buckets = ["evacuate"]
 tier = "now"
 free = true
-spec = "If your household has no vehicle, decide now how you would leave: a friend, relative or neighbour who would drive you, or the bus or train that leads out of your area (Ready.gov). Leave early, before roads fill. If someone in your home has a disability, ask your local emergency management office about its voluntary registry for people who need help (Ready.gov)."
+spec = "If your household has no vehicle, decide now how you would leave: a friend, relative or neighbor who would drive you, or the bus or train that leads out of your area (Ready.gov). Leave early, before roads fill. If someone in your home has a disability, ask your local emergency management office about its voluntary registry for people who need help (Ready.gov)."
 look_for = [
   "One or two people who would drive you, with their numbers on your contact card",
   "The bus or train routes that lead out of your area, and where they stop near you",
@@ -210,7 +210,7 @@ look_for = [
   "Set the fridge and freezer to their coldest, and freeze bottles of water",
   "Bring in or tie down anything outside that wind could throw",
   "Check your go-or-stay card and its trigger",
-  "Check on the neighbours on your contact card",
+  "Check on the neighbors on your contact card",
 ]
 avoid = [
   "Waiting for the storm to start before you prepare",

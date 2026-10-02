@@ -15,7 +15,7 @@ The power is out across your town or region and could stay out for days. Stores,
 
 1. {if:powered_device}**Switch medical devices to backup power.** If it will not last, go where there is power.[^ready_gov_power_outages][^redcross_power_outage]{/if}
 2. **Use flashlights, not candles.**[^redcross_power_outage]
-3. **Check on your people and neighbours.**[^redcross_power_outage]
+3. **Check on your people and neighbors.**[^redcross_power_outage]
 4. **Get news** from a battery radio or phone alerts.[^redcross_power_outage]
 5. **Text instead of calling.**[^fcc_emergency_calling_tips]
 6. **Keep the fridge and freezer closed.**[^ready_gov_power_outages]
