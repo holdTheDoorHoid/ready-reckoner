@@ -11,7 +11,7 @@ import type { Binder, Block, Inline, IsoDate, LocationResolved, Page, PageKind, 
 
 /**
  * Said on the Neighborhood page (on screen) and after Download PDF when the county hospital list
- * has not been downloaded (`hospitalListMissing` in engine/loader.ts; verify3 R4-05).
+ * has not been downloaded (`hospitalListMissing` in engine/data-files.ts; verify3 R4-05).
  */
 export const HOSPITAL_LIST_MISSING = 'The county hospital list has not been downloaded yet. Open the binder once while online and it will be added.';
 

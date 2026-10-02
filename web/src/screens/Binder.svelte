@@ -21,7 +21,7 @@
   import type { BinderView } from '../components/binder/view';
   import Icon from '../components/Icon.svelte';
   import PlanGate from '../components/PlanGate.svelte';
-  import { hospitalListMissing } from '../engine/loader';
+  import { hospitalListMissing } from '../engine/data-files';
   import type { Binder, MapSlot, PlanOutput } from '../engine/types';
   import { followInPageAnchor, jumpTo } from '../lib/anchors';
   import { useApp } from '../lib/app.svelte';

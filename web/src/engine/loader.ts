@@ -50,19 +50,6 @@ export interface LoaderOptions {
 
 const idle = (): PartStatus => ({ phase: 'idle', bytesLoaded: 0, bytesTotal: 0 });
 
-/**
- * Whether the county hospital list for the binder's Neighborhood page is missing on this visit
- * (verify3 R4-05): its download failed (the binder was first opened offline), or the site's data
- * has no hospital file. Not while it is still on its way, not for a site built without data (the
- * built-in sample counties), and not for the stand-in engine, which has no loader (`places`
- * undefined). `manifest` is the loaded manifest, null until it is known.
- */
-export function hospitalListMissing(places: PartStatus | undefined, manifest: Manifest | null): boolean {
-  if (!places) return false;
-  if (places.phase === 'failed') return true;
-  return places.phase === 'ready' && manifest !== null && !manifest.packs.places?.files.some((f) => f.path === PLACES_FILE);
-}
-
 /** Read a response body, reporting bytes as they arrive (when the browser can stream it). */
 async function readBody(response: Response, onBytes: (n: number) => void): Promise<Uint8Array> {
   const reader = response.body?.getReader?.();

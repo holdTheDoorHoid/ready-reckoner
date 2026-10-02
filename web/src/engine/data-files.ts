@@ -36,6 +36,22 @@ export const MAP_FILE = 'geo/counties.json';
 /** County hospitals with emergency services, for the binder's Neighbourhood page; its own pack
  * (`places`, like `geo`), loaded only when that page is shown. */
 export const PLACES_FILE = 'places/hospitals.csv';
+
+/**
+ * Whether the county hospital list for the binder's Neighborhood page is missing on this visit
+ * (verify3 R4-05): its download failed (the binder was first opened offline), or the site's data
+ * has no hospital file. Not while it is still on its way, not for a site built without data (the
+ * built-in sample counties), and not for the stand-in engine, which has no loader (`places`
+ * undefined). `places` is the loader's status for that part (`PartStatus`), `manifest` the loaded
+ * manifest, null until it is known. Here rather than in loader.ts, so the Binder screen can ask
+ * without pulling the loader out of its lazy chunk (and with no import, as this file needs).
+ */
+export function hospitalListMissing(places: { readonly phase: string } | undefined, manifest: Manifest | null): boolean {
+  if (!places) return false;
+  if (places.phase === 'failed') return true;
+  return places.phase === 'ready' && manifest !== null && !manifest.packs.places?.files.some((f) => f.path === PLACES_FILE);
+}
+
 /** `defaults()` puts this well-formed but unreal ZIP code in a new plan; the app must replace it. */
 export const PLACEHOLDER_ZIP = '00000';
 

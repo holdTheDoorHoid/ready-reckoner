@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import type { RawEngine } from './index';
-import { coreLoadOrder, type Manifest, startupFiles, ZIP_FILES, zipFiles } from './data-files';
-import { hospitalListMissing, PackLoader, type LoaderStatus } from './loader';
+import { coreLoadOrder, hospitalListMissing, type Manifest, startupFiles, ZIP_FILES, zipFiles } from './data-files';
+import { PackLoader, type LoaderStatus } from './loader';
 import { adaptRawEngine } from './wasm';
 
 const MANIFEST: Manifest = {
