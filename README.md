@@ -7,7 +7,9 @@ Enter your location and a few facts about your household. Ready Reckoner works o
 hazard data and cited research, which emergencies you should plan for, how many days you should be
 able to manage without power, water, income or help, and what to do about it in what order: a
 72-hour kit and a get-home bag first, then two weeks, then a month, and only as far beyond that as
-your risk justifies. It hands you a printable packet you can keep in a drawer.
+your risk justifies. It hands you a during-event binder to print and keep within reach — a page for
+every person and place in your life, and a step-by-step checklist for whatever actually happens —
+plus printable maps of your area and a short before-an-event plan to work through first.
 
 It exists so that nobody prepares for a nuclear war and gets caught out by a pandemic, a week-long
 ice storm, or a lost job.
@@ -42,12 +44,14 @@ the plan; every dial behind it is there if you want it.
 
 ## Status
 
-**v0.2.0 (September 2026): the full hazard taxonomy, a family plan, and a public validation page.**
-The engine, the website and the printable packet cover 53 ranked and rare hazards for every county
-in the country, sized and priced from 432 cited sources, and checked end to end against 14 golden
-households and a 22-disaster backtest. See [docs/DESIGN.md](docs/DESIGN.md) for the design,
-[docs/ROADMAP.md](docs/ROADMAP.md) for what's built and what's next, [CHANGELOG.md](CHANGELOG.md)
-for what shipped in this version, and the GitHub issues for the day-to-day work list.
+**v0.3.0 (October 2026): a during-event binder, a consolidated interview, and printable maps.** The
+engine and the website cover 53 ranked and rare hazards for every county in the country, sized,
+priced and — since this release — turned into a 57-page set of step-by-step checklists, from 498
+cited sources, checked end to end against 14 golden households and a 22-disaster backtest. See
+[docs/DESIGN.md](docs/DESIGN.md) for the design, [docs/BINDER.md](docs/BINDER.md) for the binder
+itself, [docs/ROADMAP.md](docs/ROADMAP.md) for what's built and what's next,
+[CHANGELOG.md](CHANGELOG.md) for what shipped in this version, and the GitHub issues for the
+day-to-day work list.
 
 ## Try it
 
@@ -62,12 +66,16 @@ A 60-second walkthrough:
    anywhere. A ZIP code that covers more than one county shows each one's share, with a map, so you
    can pick the right one.
 3. **A few questions.** Who is in your household, how you get around, your budget, and what you
-   already have. Skip anything you're unsure of — you can change it later.
+   already have. Skip anything you're unsure of — you can change it later. Three more questions are
+   optional and feed your binder's pages later: your people, your places, and your contacts, pets,
+   vehicles and documents.
 4. **Your risks.** See what is actually likely to affect your household, ranked, with the number of
    days you should be ready for and why, and a source behind every figure.
-5. **Your plan.** A month-by-month list, free steps first, sized to your budget, that tells you when
+5. **Prepare.** A month-by-month list, free steps first, sized to your budget, that tells you when
    you've done enough.
-6. **Your packet.** Everything above, laid out to print in black and white and keep in a drawer.
+6. **Your binder.** A page for every person and place in your household's life, and a step-by-step
+   checklist for every risk on your list and every everyday emergency, organized into ten tabs to
+   print and keep in a binder. Add printable maps of your area if you'd like them.
 
 |  |  |
 | --- | --- |

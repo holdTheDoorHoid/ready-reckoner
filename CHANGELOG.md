@@ -4,6 +4,191 @@ Ready Reckoner has no accounts and no server, so nothing changes on you without 
 lists what shipped in each version, grouped by area, in plain language. It also lists what we
 already know still needs work.
 
+## v0.3.0 — October 2026
+
+The biggest change is what you end up with. Earlier versions handed you a packet to read once,
+with a page budget to stay inside. Ready Reckoner now builds a **during-event binder** — as long as
+it needs to be, organized into ten tabs so you can find the one page you need without reading the
+rest — alongside a short **Prepare sheet** for the things to do beforehand. The interview now asks,
+optionally, for the details the binder's pages need. You can add printable maps of your area. A
+saved file with sensitive details in it is protected with a passphrase by default. And the renter's
+eviction figure is rebuilt on a sounder footing. Nothing about privacy changes in kind — still no
+server, no accounts, nothing sent anywhere by default — but maps are the first feature that, with
+your say-so, talks to an outside service; see "Maps" below and the rewritten
+[privacy page](docs/PRIVACY.md).
+
+### The binder
+
+- **The printable packet is now two documents.** The **binder** is what you print and put in a
+  ring binder with ten tabs, for reference *during* something happening. The **Prepare** tab (see
+  below) keeps the before-an-event material: the budget, the purchase checklists, the maintenance
+  calendar.
+- **Ten tabs:** Start here (a cover, how to use the binder, a two-minute "which checklist?" index,
+  and every phone number you gave in one place); People (a page per person, then wallet cards);
+  Home and places (your home, every other place in your life, your neighbourhood, getting out);
+  Pets, vehicles and documents; What you have (a one-page-style inventory and a risks-at-a-glance
+  summary); three tabs of checklists, grouped by how much warning you get (happening now / it is
+  coming / it goes on); After (the first 30 days, and logs to fill in by hand); Sources.
+- **57 airline-style checklists** — "go here, do this" — cover all 60 things a household's own risks
+  and everyday life might throw at it: every hazard on your ranked list, every family you opted into
+  (nuclear, a severe pandemic and the rest), and seven everyday emergencies every home can face
+  regardless of where it is (a gas leak or CO alarm, a missing person, an evacuation order, a
+  shelter-in-place order, a boil-water notice, a power outage, or something else). Each page has the
+  same shape: **Use this when**, **Do first** (the handful of things worth knowing from memory),
+  **Then**, **Leave or stay?**, your own answers filled in where they matter, **Do not**, and
+  **When it is over** — every instruction numbered to its source. A practitioner review pass checked
+  every page against its authorities afterward: distances and rules were made consistent across
+  pages (downed power lines, for instance, now say 35 feet everywhere, matching the Red Cross,
+  instead of a mix of 10, 30 and 35 feet depending on which page you read), a handful of missing
+  life-safety steps were added (going to high ground on foot during a tsunami or earthquake; leaving
+  early if someone in the household needs extra time or help; reporting stolen cards right away
+  after a break-in), and property steps (calling the insurer, unplugging electronics) were moved out
+  of "Do first" to make room for the steps that actually save a life in the first minutes.
+- **A page for every person, home and place that answers your own questions.** Step 6–8 of the
+  interview (below) feeds a page per household member — name, birth date, medications, allergies,
+  insurance, where they spend the day — plus a page for your home, one for every other place in your
+  life, your neighbourhood (including a list of the county's hospitals with an emergency room), and
+  getting out. Anything you skip prints as a blank line to fill in by hand, never an error.
+- **No page limit, by design.** A typical household's binder runs 75 to 90-some pages — this is a
+  reference to keep, not something meant to be read start to finish. In the one household size we
+  measured closely in the finished PDF, running every checklist and reference page at normal type
+  size, it came to 88 Letter pages (90 with three maps added); every page still keeps its one- or
+  two-page promise, down to crowded pages printing in a smaller type rather than running long.
+- **Download it as a PDF, right from your browser, and it still works offline.** The PDF has a table
+  of contents with real page numbers and working links, a header and footer on every page, and a
+  page of tab labels sized for a standard ten-tab divider set, to cut out and write on. Printing
+  double-sided starts every tab on a right-hand page. It reads fine in black and white: a callout box
+  says what kind it is in a word (STOP, WARNING, DECIDE, NOTE) as well as by its shading. The
+  browser's own Print remains as a fallback.
+
+### Your answers: three new, optional steps
+
+- **The Family plan tab is gone — its questions are now part of the interview**, as three new
+  optional steps after the five that make a plan: **Your people** (step 6), **Your places** (step
+  7), and **Contacts, pets, vehicles and documents** (step 8). Skip any of it with one tap; nothing
+  you leave blank blocks your plan, and it prints as a blank line on the matching binder page, ready
+  to fill in by hand.
+- **Ask everything, once, about each person** who might end up in the binder: date of birth, phone,
+  medical conditions and medications, allergies, blood type, doctor, pharmacy, insurance, and where
+  they spend the day — easy to update and reprint the moment something changes.
+- **The app still never asks for a full bank account number** — only an optional last four digits,
+  even if you paste in the whole thing.
+
+### Prepare (was: Plan)
+
+- **Renamed to say what it is: the things to do *before* something happens.** Same budget,
+  month-by-month checklists, decisions and maintenance calendar as before; it is simply no longer
+  mixed into the same document as the during-event binder.
+
+### Maps
+
+- **Add printable maps of your home's area, from OpenStreetMap, on request.** A household can ask
+  for three maps — the immediate neighbourhood, the wider area, and the region between home and
+  where you'd go — each marked with the household's own points (home, meeting places, nearby
+  pharmacies, schools and emergency rooms) and, where they apply, flood zones or wildfire hazard.
+  Nothing is fetched until you press "Fetch maps," on a screen that names every outside service by
+  name and says in one sentence what it would receive; that screen reappears every time, so a later
+  visit never fetches anything you haven't just agreed to again.
+- **Set your home point by dragging a pin on a map**, or type an address instead if you'd rather —
+  that option carries its own one-time warning, since it sends the typed address to OpenStreetMap's
+  search service.
+- **The map images themselves stay only on your device**, in the browser's own storage, never inside
+  the file you save or share; only the pins and routes you drew travel with your saved plan.
+
+### Keeping your saved file safe
+
+- **A saved file with sensitive details in it is protected with a passphrase by default.** Once your
+  plan holds something sensitive — a person's medical details, your home address, an account or a
+  pet's microchip number — "Save a copy" offers to protect the file, ticked on by default, with the
+  plain-file option left one clear warning away. Opening a protected file asks for the passphrase
+  back and says plainly if it's wrong; there is no way to recover a forgotten one, so the printed
+  binder is worth keeping as a backup.
+
+### Your risks and the numbers behind them
+
+- **The renter's eviction figure is rebuilt.** It previously leaned on an unverified rule of thumb
+  (that roughly 4 in 10 eviction filings end in an actual eviction). It now counts **households
+  taken to court**, not court cases (a renter can be filed against more than once a year), and uses
+  the Eviction Lab's own published share of those households that are actually ordered to leave
+  (about 1 in 3). In the counties where landlords file repeatedly against the same renters — 27 of
+  them, 14 in Maryland — a county's own figure is now capped at 7 in 100 renting households a year,
+  with a line explaining why. Net effect: most counties' figures come down somewhat (Detroit's
+  highest-risk renters: about 81 in 100 over ten years → about 61; Philadelphia: about 27 → 20), a
+  few that had been incorrectly falling back to the national average now show their own, higher,
+  capped figure instead (three Maryland counties where landlords file more than once a year per
+  renter household go from a flat 21 in 100 to a capped 50).
+- **County names read the way the Census Bureau writes them**, for 172 places that used to read
+  wrong: Baltimore and St. Louis's independent cities no longer read as "Baltimore County" or
+  "St. Louis County," Virginia's 38 independent cities are named correctly, and Alaska's boroughs,
+  Puerto Rico's municipios, Connecticut's planning regions, DC and the island areas all read
+  correctly too.
+- **A list of the county's hospitals with an emergency room** now appears on the Neighborhood page,
+  from CMS's own public hospital directory, dated so you know how fresh it is; a county with none
+  listed gets a plain sentence saying so instead of an empty space.
+
+### Data and size
+
+- The data pack adds a county hospital list and the geographic centre of every ZIP code (used to
+  centre the pin map); both load only when they're actually needed, so a household that never opens
+  the binder or adds a map never downloads them.
+- The app itself (the WebAssembly engine, now including 57 checklists' worth of content and the
+  logic that assembles the binder) is about 1.55 MB compressed, against a budget raised to 1.75 MB
+  to make room for it. A first visit — enough to use the app fully offline afterward — downloads
+  about 5.85 MB in total; maps, the PDF tool and the county hospital list only add to that if and
+  when you actually use them.
+
+### The site
+
+- **Spelling is now consistently American English across the app's own on-screen text** ("neighbor,"
+  not "neighbourhood," for instance) — a mix the last two releases carried.
+
+### Known limitations
+
+- **Nearby places on the maps depend on a shared public service (Overpass) that is sometimes slow
+  or briefly unavailable.** When it doesn't answer, the map still comes back — just without that
+  layer, and the map says so with a dated note.
+- **Storm surge is not drawn on the maps.** NOAA does not currently offer it as a map service this
+  app can use; where it would matter, the map points instead to your state's own "know your
+  evacuation zone" tool.
+- **Whether OpenStreetMap's tile rules allow keeping the composed map images awaits a direct answer
+  from OpenStreetMap Foundation volunteers.** The app only fetches map tiles when you press the
+  button, shows the result right away, and keeps the finished images rather than the raw tiles — we
+  believe that is within the spirit of the rules, but have asked to be sure, and will switch to a
+  public-domain Census base map instead if the answer is no.
+- **Five Texas counties that the Eviction Lab's data shows as exactly zero** use the national average
+  instead, because a true zero is less plausible than a gap in the underlying records.
+- **A household that answers every question at the maximum length allowed** can push about 29 of the
+  binder's pages past their one-page promise onto a second sheet. Nothing is cut or lost — the page
+  is simply longer than planned for.
+- **If the binder is opened for the first time with no internet connection**, the county hospital
+  list hasn't had a chance to download yet, and the Neighborhood page says so rather than silently
+  showing nothing.
+- **The full plan-and-binder calculation now typically takes about 50 milliseconds in a real
+  browser**, right at the target we set for feeling instant, mostly from building the much larger
+  binder. Comfortable, but no longer the wide margin it was before; worth watching as more content
+  is added.
+- **A one-page inventory and a one-page risk summary, as originally hoped for, turned out not to fit
+  at a readable type size** for any household we tried; both print as a two-page spread instead.
+  We're leaving this open rather than shrinking the type further or cutting rows without asking
+  first.
+- Ten adversarial test households (deliberately malformed, maximum-length, or containing attempted
+  script injection in their answers) were run through the full binder-and-PDF pipeline; none crashed
+  it, and nothing typed into the app was ever treated as a program to run.
+
+### Credits
+
+This release adds three public data sources to the ones already credited on the About screen and in
+every binder's Sources tab: the **Eviction Lab at Princeton University** (eviction figures, under
+the Open Data Commons Attribution License), the **Centers for Medicare & Medicaid Services**
+(hospital locations), and the **U.S. Census Bureau** (ZIP-code centre points, with a public-domain
+Census map as a fallback for OpenStreetMap). The maps feature, when you turn it on, also draws on
+**OpenStreetMap contributors** (map tiles and nearby places, under the Open Database License), the
+**Federal Emergency Management Agency's** flood-hazard maps, the **U.S. Forest Service's**
+wildfire-hazard maps, and **OpenStreetMap Foundation's Nominatim** service for address search.
+Several checklists also draw on the **National Fire Protection Association**, the **U.S. Fire
+Administration**, the **Storm Prediction Center** and the **National Weather Service**, each cited
+on its own page.
+
 ## v0.2.0 — September 2026
 
 A much larger release than v0.1.1, built as separate workstreams under one shared engine contract
@@ -163,21 +348,31 @@ is handled has changed: still no server, no accounts, nothing sent anywhere.
   everyone in the lower 48 states. Whether that is the right gate, or the right item, is still open;
   say if you'd rather it worked differently.
 - **The extra data packs (surge exposure, wildfire-prone places, individual outage events) are only
-  available from the command line today**, not offered as a choice on the website.
+  available from the command line today**, not offered as a choice on the website. *(Addressed in
+  v0.3.0: all three are now bundled into every household's data automatically, with no choice to
+  make — everyone gets them.)*
 - **A data column for eviction-filing rates was built** but is not shipped in this release, pending
-  sign-off on the source's licence (Eviction Lab, ODC-BY).
+  sign-off on the source's licence (Eviction Lab, ODC-BY). *(Addressed in v0.3.0: the licence was
+  approved, the column shipped, and the underlying figure was then rebuilt on a sounder footing —
+  see the v0.3.0 entry above.)*
 - **The printed packet fills its page budget.** 25 US Letter pages (24 A4) for the reference
   household is a real ceiling now, not headroom — a household with a lot to plan for (a well, insulin,
-  a long Puerto Rico outage) can run a page or two longer.
+  a long Puerto Rico outage) can run a page or two longer. *(Superseded in v0.3.0: the printable
+  packet, and its page budget, no longer exist in this form — see "The binder" in the v0.3.0 entry
+  above.)*
 - **The WebAssembly download is 1.40 MB compressed, against a 1.5 MB ceiling** — about 7% of headroom
-  left before the app needs to either trim data or raise the budget.
+  left before the app needs to either trim data or raise the budget. *(Updated in v0.3.0: the budget
+  was raised to 1.75 MB to fit the binder; see the v0.3.0 entry above for the current figure.)*
 - **The full plan calculation runs in about 46 ms in a command-line JavaScript engine and about 38 ms
   in a real browser, against a 50 ms target.** Comfortable today; worth watching as more hazards and
-  data are added.
+  data are added. *(Updated in v0.3.0: building the larger binder moved this to about 50 ms in a real
+  browser — right at the target; see the v0.3.0 entry above.)*
 - **A household with no phone on file gets only one free step** ("get a charged mobile phone") and
   nothing else in the plan adjusts — a weather radio, for instance, doesn't move any earlier.
 - **British and American spellings are mixed** through the packet and the site (neighbour/neighbor,
-  litre/liter, practise, labour) — not yet passed through a single consistent style.
+  litre/liter, practise, labour) — not yet passed through a single consistent style. *(Addressed in
+  v0.3.0 for the app's own on-screen text, now consistently American English; content files are
+  being brought in line over time.)*
 - **The rare-but-severe rows are sorted by the middle of their range**, so a row can appear above one
   whose range is actually higher at both ends. It is a defensible choice, but it means the order isn't
   always the one you'd get from the low end or the high end alone.

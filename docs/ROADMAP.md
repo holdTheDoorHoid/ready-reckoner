@@ -80,6 +80,32 @@ decisions, trusted circle, legal readiness, lockout plan); the kit and allocator
 outage pooling, event restoration curves, water-system fragility, compound events) with a public
 validation page; and the long-horizon module. Engine contract v2; hosting stays where it is for now.
 
+## Round 3 — The binder, the consolidated interview and maps (2026-09-27)
+
+**Status: done, shipped as v0.3.0 (October 2026).** See [CHANGELOG.md](../CHANGELOG.md) for the
+full release notes and `docs/DESIGN.md` §14 for the decision log of how the programme below was
+built (thirteen parallel workstreams, merged and verified together against contract v3).
+
+The owner asked for three things: fold the Family plan tab into the interview as optional steps,
+with blanks where a question goes unanswered; rename Plan to Prepare, to separate what to do before
+an event from what to read during one; and rework the printable packet into a document meant to be
+read **during** an event rather than planned from — a table of contents, a page per person, place
+and matter, an airline-checklist page per hazard ("go here, do this"), printed and put into a ten-
+tab binder — with OpenStreetMap maps of the area (`docs/DESIGN-DELTA-v3.md` §0). What shipped: the
+**binder** (`docs/BINDER.md`) — ten tabs, 57 airline-style checklists covering every one of the 60
+ranked hazards and everyday emergencies a home might face, a page per person with their own answers
+echoed back, wallet cards, a county hospital table and three printable maps of the area; a short
+**Prepare sheet** for the before-an-event content (the budget, the purchase checklists, the
+maintenance calendar) the binder no longer carries; the interview's optional steps 6–8 (Your
+people, Your places, Contacts/pets/vehicles/documents); a passphrase-protected export, on by
+default once the saved file holds a sensitive answer; an in-browser, offline-capable PDF of the
+whole binder; and a corrected eviction model (households actually taken to court, not court
+filings, capped where landlords file repeatedly against the same renters). Engine contract v3 — the
+one breaking change is the removal of `PlanOutput.packet_markdown`, replaced by `binder` and
+`prepare_markdown`; every other addition (a person's profile, four new reference-page groups) is
+optional, so v1 and v2 saved plans still load unchanged. Hosting stays where it is for now (§10 of
+`docs/DESIGN.md` still tracks that decision).
+
 ## Next
 
 Concrete, near-term follow-ups, mostly from the verification pass
@@ -98,7 +124,7 @@ tracked as GitHub issues; the list here is the standing summary. See
 - Re-size livestock water on a well where a generator is already planned to keep the pump running
   (today the household must already own the generator and its interlock; a generator the plan intends
   to buy doesn't count yet).
-- Fix the printed packet's month-by-month spending so a completed sinking fund and its purchase
+- Fix the Prepare sheet's month-by-month spending so a completed sinking fund and its purchase
   don't both count toward the same month's total.
 - Replace source links that point to a mirror or a search results page with direct links.
 - Recheck price bands that are running high against current prices.
@@ -128,10 +154,44 @@ tracked as GitHub issues; the list here is the standing summary. See
   - Give the website's stand-in engine (used before the real data loads) real sample data for the
     seven newer fixture counties; it currently falls back to a generic per-state entry for them,
     which is fine for development but not a place to add more.
-  - Keep an eye on the two figures closest to their ceilings: the WebAssembly download (1.40 MB of a
-    1.5 MB compressed budget) and the time to work out a full plan (about 46 ms in a command-line
-    JavaScript engine, 38 ms in a real browser, against a 50 ms target). Both are comfortable today,
-    and both have been trending toward their limits as hazards and data are added each round.
+  - **Updated 2026-10-01, v0.3.0:** the WebAssembly download is now 1.55 MB gzipped against the
+    raised 1.75 MB budget (about 11% headroom) — the budget itself moved because the content and
+    assembly code for 57 checklist pages and the binder would not have fit the old 1.5 MB line. A
+    full plan, binder included, now takes about 50–54 ms median in a real browser under load (47–50
+    ms with the machine quiet) against the 50 ms target, of which the binder's own assembly costs
+    roughly 4–9 ms. The timing target is a soft miss on a typical run now, not the comfortable
+    margin it was at v0.2.0; see "From the v0.3.0 build" below.
+- **From the v0.3.0 build**, carried into this list:
+  - `assess()` sits right at, or just past, the 50 ms target on a typical run (previous bullet).
+    Accepted for release as a watch item, not a blocker; worth attention if it keeps rising.
+  - Confirm with the OpenStreetMap Foundation whether keeping three composed, non-tile map images
+    (not the raw map tiles) is consistent with the tile usage policy's rules against "offline use"
+    and "save area for later" features; the app already fetches tiles only on a press, shows the
+    maps at once and keeps images rather than tiles. If not, the one-line fix is switching the base
+    layer to the Census fallback map in `web/src/lib/maps/sources.ts`.
+  - Revisit the "nearby places" lookup (Overpass) if use grows: the main public instance already
+    answers "busy" some of the time, and the fallback instance hung for 90 seconds in testing; a
+    paid or self-hosted instance would remove the dependency on either.
+  - Draw storm-surge zones on the maps once NOAA offers a stable map service for them (today NOAA
+    publishes them only as GeoTIFF downloads and an unversioned Esri cache this app does not use);
+    until then the app says so and points to the state's own "know your zone" tool instead.
+  - Read the Risks screen's dial sentence and "Also checked" line from a structured field in the
+    engine contract instead of fixed wording on two binder pages, so a content change to that
+    wording cannot silently break the on-screen copy.
+  - Read the eviction rate straight from the Eviction Lab's own households-threatened column once
+    that figure is loaded directly, rather than fitting a curve to it from filing counts.
+  - Tag the in-browser PDF for screen readers once the PDF library supports it (the on-screen binder
+    is the accessible version for now), and support non-Latin alphabets in it (those letters print
+    as empty boxes today; the app names them and points to the browser's own Print instead, which
+    uses the device's own fonts).
+  - Decide what a one-page inventory and a one-page risks-at-a-glance summary should leave out (the
+    owner's original request): a compact table does not fit one sheet at a readable type size for
+    any tested household, so the binder ships with the two-sheet version of each; cutting one down
+    to one sheet needs fewer rows, not smaller type — for example, only items still to buy, or the
+    top 25 risks with the rest folded into one line.
+  - Fix the Philadelphia fixture household: it answers with a rabbit in the pets step but the cover
+    counts only the dog from an earlier step, so the cover reads "1 dog" where it should also count
+    the rabbit. Cosmetic, and specific to that one fixture.
 
 ## Later
 

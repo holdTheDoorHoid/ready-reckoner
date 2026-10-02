@@ -381,3 +381,144 @@ the nuclear note shows only while the nuclear row has no location term.
   driver bars. `ExplainButton`: takes content to show first, and ends with the validation link.
   `ItemCard`: decisions and "With:". `SavingsTrack`: the engine's first goal.
 - `web/src/lib/rare.ts`, `targets.ts`, `validation.ts`: the wording and reading rules, with tests.
+
+## v0.3.0: the consolidated interview, Prepare, the Binder and maps
+
+Contract v3 (`docs/ENGINE-API.md`, `docs/DESIGN-DELTA-v3.md`). This section supersedes the Screens
+table and the v0.2.0 notes above where they disagree: the interview is now 8 steps (1–5 required,
+6–8 optional); screen 7 is **Prepare** (was Plan, `#/plan` redirects); screen 8 is the **Binder**
+(was Your packet, `#/packet[/*]` redirects); the standalone **Family plan** screen (`#/family`) is
+gone — its questions are now the optional steps below, and `#/family` redirects to Your places.
+
+### The interview's three optional steps
+
+The progress strip reads **"Step 6 of 8 · optional"** for steps 6–8, each with dashed step circles
+and a **"Skip for now"** control beside Continue; the plan computes with or without them, and a
+question left unanswered prints as a blank line in the binder, never an error. The Start screen's
+button now reads "Add your people and places for the binder"; "Continue your plan" still looks only
+at the required steps (1–5) to decide whether a plan exists.
+
+- **Step 6, Your people (`#/people`).** One card per person from step 2, in the same order, headed
+  "Person 1 (adult)" until a name is typed. Every field is optional: name or nickname; date of
+  birth; phone; email; where they spend the day (work, school, child care or other — guessed from
+  the person's age band when a new place card is started empty — with its name, address, phone, its
+  own emergency plan, pick-up rules, the safest spot there); doctor; pharmacy; conditions;
+  medications (up to 12 rows: name, dose, when taken, what for); allergies; blood type; insurance
+  (carrier, plan name, member ID, group number, phone); ID notes; anything else a helper should
+  know. A paragraph above the cards says what this is for (a page per person in the binder, and the
+  wallet cards) and that it stays on this device and in files the household itself saves.
+- **Step 7, Your places (`#/places`).** Four cards: **Your home** (street address; electric, gas
+  and water companies with their outage numbers; insurer and policy number; landlord or mortgage
+  company; where the kit, documents, cash and spare keys are; plus the v2 fields — gas/water/
+  electrical shut-offs, the safest spot at home, neighbours who check in); **Meeting places and
+  staying in touch** (the v2 fields unchanged, including "the safest spot at work or school");
+  **Your neighbourhood** (nearest hospital with an emergency room, urgent care, the household's
+  pharmacy, the shelter the community opens, the county emergency management office, how the
+  household gets local alerts); **Getting out** (the v2 fields, plus — once maps are turned on,
+  §"Maps" below — "Set your home point and meeting places on a map").
+- **Step 8, Contacts, pets, vehicles and documents (`#/contacts`).** The v2 trusted circle and
+  lawyer fields, unchanged; **Pets and animals** (up to 8: name, kind, description, medications,
+  vet, microchip or tag number, where the records are, who takes them if the household can't);
+  **Vehicles** (up to 4: description, plate, insurer and policy number, what stays in the car);
+  **Documents and money** (accounts, up to 12 — institution, kind, phone, and **only the last four
+  digits** of the account number: a pasted full number is cut down to its last four digits as it is
+  typed, and the app never asks for a full one; insurance policies not already given, up to 8; where
+  the originals, the copies and the digital backup are kept). A "Put it on paper" card closes the
+  step, as it did on the old Family plan screen.
+
+### Prepare (`#/prepare`)
+
+One job: explain the tab (these are the things to do *before* something happens) and print the
+plan. **"Print your preparation plan"** prints the engine's `prepare_markdown` with the same
+Markdown renderer the Binder tab's Markdown fallback uses, opening with "The three things that
+matter most" (or, where it applies, the leave-first decision in its place).
+
+### Saving a copy: the protected export
+
+Once the saved plan holds any sensitive answer (anything in a person's profile beyond their name
+and phone; the home address; the documents group; a vehicle's plate; a pet's microchip number),
+"Save to a file" offers **"Protect this file with a passphrase"**, ticked by default, with a
+passphrase field and a confirmation field (at least 8 characters). Unticking it shows a one-sentence
+warning about what the plain file would expose. Opening a protected file asks for the passphrase,
+says plainly when it is wrong, and — the first time — explains that a forgotten passphrase cannot be
+recovered (the printed binder is the only backup at that point). **"Forget everything"** now also
+deletes the `rr-maps` IndexedDB database (below), not only the two `localStorage` keys.
+
+### The Binder screen (`#/binder`, `#/binder/<page-id>`)
+
+**One job:** show the engine's binder (`docs/BINDER.md`) on screen, print it, or save it as a PDF
+that works without the engine. A contents list stays in view beside the pages (folded by default on
+a phone); opening `#/binder/<page-id>` jumps straight to that page, and the old
+`#/packet/wallet-cards` address still lands on the wallet cards. Every cross-reference in the text
+is a link, and every citation number jumps to its numbered source. The household's own answers
+print exactly as typed — nothing in them is read as Markdown or formatting — and an answer left
+blank becomes a line to write on. "Do first" steps sit bold on a grey band; "Leave or stay?" is an
+If/Then table whose "Go to" column links to the page it names ("Turn to Tab 3, Home"); the four logs
+are blank ruled tables; wallet cards are drawn in boxes. Each page has its own "Print this page"
+button.
+
+**Toolbar:** Download PDF (a Letter/A4 choice and a "printing on both sides" box); Print, the
+browser's own, kept as a fallback; Add maps / Refresh maps (the maps panel below, unchanged from
+where it is reached); a map slot with nothing in it shows one line — "No map added yet" and a
+button — never an empty frame. **Hospitals:** the first time the Binder tab is opened, the browser
+fetches the small county hospital list (the lazy `places` pack) and works the plan out again, so the
+Neighborhood page gains its hospital table; before that, or on a site built with no such pack, the
+page simply has no table and no gap. A household that never opens the Binder tab never downloads
+that pack.
+
+**The PDF**, built in the browser (works offline): a cover, "How to use this binder", and a table of
+contents with real page numbers, every line a link; each tab starts a new page, and with "both
+sides" ticked each tab starts on a right-hand page (a blank left page says "This page is blank on
+purpose."); every page has a header (the tab number and a short title) and a footer ("page 37 of 88
+· version · made … · review by …"); a cross-reference prints as an internal link that also shows the
+page number, "(Tab 9, After a disaster: the first 30 days, page 74)", and a table of links gains a
+"Page" column. The two dense pages — Inventory and Risks at a glance — print as one compact table
+each, with column names repeated at the top of every sheet. A stored map prints with its legend,
+keys, notes and credits all on the one sheet it takes. **Black and white:** a callout names its own
+kind in a word (STOP, WARNING, DECIDE, NOTE) and is also set apart by border weight and shading, not
+colour alone. The file is named `ready-reckoner-binder-<county>-<date>.pdf`. The Prepare sheet and
+Keep it up print as their own single sheets from the same toolbar area on their own tabs; About
+credits the PDF library and its one embedded font.
+
+### Maps (step 7's Getting out card, and the Binder tab)
+
+Both places offer **"Add maps."** Every press — never only the first — opens a **consent screen**
+that names each outside service in plain words and says in one sentence what it would receive, with
+a checkbox per layer (the street map and nearby places ticked by default; flood zones and wildfire
+hazard ticked only where the household's own flood or wildfire chance warrants it), and two buttons,
+**"Fetch maps"** and **"Not now."** Nothing is requested before that press, and the screen remembers
+no answer from last time. Step 7's card shows a shorter version naming only the street map.
+
+**The pin map** (after consent, or "Edit pins") opens an interactive OpenStreetMap street map
+centred on the household's ZIP code. The household drags pins for home, the two meeting places and
+"where we would go," and may draw the two ways out as click-to-add lines ("Undo last point," "Clear
+this line"); **"Put it at the cross"** places a pin for anyone who cannot drag. **"Type an address
+instead"** shows a warning first, then sends one request per "Search" press and offers up to three
+matches to place the pin from.
+
+**After "Fetch maps,"** three printable images appear — the neighbourhood, the area and the region —
+each about 7 by 5 inches on paper: the base map turned grey, with hatched flood-zone and
+wildfire-hazard overlays where they apply; lettered squares for the household's own points; numbered
+discs for nearby places (with leader lines when they crowd); the county line, both ways out, scale
+bars in miles and kilometres, a north arrow and the map credit. Under each map sits a legend table
+(name, kind, address or phone), the overlay pattern key, a dated line for anything that could not be
+fetched ("Flood zones could not be fetched on October 1, 2026"), and dated credits. The panel offers
+**"Refresh maps," "Edit pins"** and **"Remove maps"** (which can also forget the pins).
+
+**Storage:** the pins and drawn routes are saved with the plan, like any other answer. The three map
+images live only in this browser, in an IndexedDB database named `rr-maps` — never in the exported
+file. A plan imported with pins but no images shows "Maps need refreshing." "Forget everything"
+deletes the `rr-maps` database along with everything else.
+
+### Persistence (v3)
+
+`SavedPlan.version` is 2 (the `localStorage` key stays `rr.plan.v1`); a v1 file loads unchanged and
+is written back as v2. `STEP_IDS` gains `people`, `places` and `contacts`, each marked
+`optional: true` in `ROUTES`. `SavedPlan.maps` (web-only, outside `input`, §"Maps" above) holds the
+pins, the drawn routes and which layers were last ticked; the map images themselves are not part of
+the saved plan at all.
+
+### Redirects (no new history entry)
+
+`#/plan[/*]` → `#/prepare`; `#/packet` → `#/binder`; `#/packet/wallet-cards` →
+`#/binder/wallet-cards`; any other `#/packet/*` → `#/binder`; `#/family` → `#/places`.
