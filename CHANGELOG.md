@@ -150,6 +150,21 @@ your say-so, talks to an outside service; see "Maps" below and the rewritten
   by the engine) still read "neighbourhood" rather than "neighborhood"; bringing those the rest of
   the way is a small follow-up, not a new problem introduced here.
 
+### Small fixes found in final verification
+
+- **Every numbered source in the PDF now links to the source it names.** A handful of binders had
+  1–6 citations that led nowhere, from a quirk in how the PDF laid out a source list that started
+  partway down a column.
+- **A typed answer that happens to contain certain punctuation always prints exactly as typed** on
+  checklist pages now. A few such answers used to come out with stray characters, or with a bit of
+  the answer replaced by a cross-reference link it never asked for.
+- **The evacuation checklist's "leave early" line reads correctly** (it used to break apart
+  mid-sentence).
+- **The tornado checklist no longer tells you twice to stay away from windows**; the second mention
+  now also covers doors and outside walls.
+- **The Prepare sheet's generator safety rule now matches the CDC's own wording**, and no longer
+  contradicts the interlock device the same plan may tell a household to buy.
+
 ### Known limitations
 
 - **Nearby places on the maps depend on a shared public service (Overpass) that is sometimes slow
