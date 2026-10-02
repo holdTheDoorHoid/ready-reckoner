@@ -24,7 +24,7 @@ pub struct Household {
     pub cli_toggles: Vec<ScenarioToggle>,
 }
 
-/// Reads, overrides and validates the household.
+/// Reads, tidies (trims and caps the echoed answers), overrides and validates the household.
 ///
 /// # Errors
 ///
@@ -34,6 +34,9 @@ pub fn load(args: &HouseholdArgs) -> Result<Household, CliError> {
     let (name, json) = read(&args.household)?;
     let mut input: PlanInput =
         rr_types::parse_json(&json).map_err(|e| CliError::engine(&e, None))?;
+    // Trim and cap the answers the engine only echoes, as `PlanInput::from_json` does for the
+    // web app, so the CLI prints the same text the app prints (verify3 R4-03).
+    input.tidy();
     apply(&mut input, args);
     let problems = input.validate();
     if !problems.is_empty() {

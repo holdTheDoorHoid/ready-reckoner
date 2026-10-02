@@ -358,7 +358,6 @@ fn checklist_page(bx: &Bx<'_>, s: &Selected<'_>) -> Page {
         answer(bx, name).map(|v| user(&v))
     };
     let r = c.render_for(&bx.cx, &fill);
-    let mark = |s: &str| crate::packet::footnotes_to_markers(s);
 
     let mut blocks: Vec<Block> = Vec::new();
     let several = s.hazards.len() > 1;
@@ -465,6 +464,42 @@ fn checklist_page(bx: &Bx<'_>, s: &Selected<'_>) -> Page {
     p
 }
 
+/// The content's `[^id]` footnotes as citation markers, never inside the household's own words
+/// (the `\u{5}…\u{6}` spans [`user`] makes): an answer is echoed exactly as written, whatever
+/// it contains (verify3 R4-02).
+fn mark(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    let mut rest = s;
+    while let Some(open) = rest.find(USER_OPEN) {
+        out.push_str(&crate::packet::footnotes_to_markers(&rest[..open]));
+        let after = &rest[open..];
+        let end = after
+            .find(USER_CLOSE)
+            .map_or(after.len(), |e| e + USER_CLOSE.len_utf8());
+        out.push_str(&after[..end]);
+        rest = &after[end..];
+    }
+    out.push_str(&crate::packet::footnotes_to_markers(rest));
+    out
+}
+
+/// Where `pat` first occurs in marked text outside the household's own words.
+fn find_outside_user(s: &str, pat: &str) -> Option<usize> {
+    let mut from = 0;
+    while let Some(i) = s[from..].find(pat) {
+        let at = from + i;
+        let before = &s[..at];
+        let inside = before
+            .rfind(USER_OPEN)
+            .is_some_and(|o| !before[o..].contains(USER_CLOSE));
+        if !inside {
+            return Some(at);
+        }
+        from = at + pat.len();
+    }
+    None
+}
+
 /// A "Where and who" line (`Label: answer`, `Label: blank` or `Label:`) as a field row.
 fn where_row(line: &str) -> FieldRow {
     let (label, rest) = match line.split_once(':') {
@@ -500,10 +535,11 @@ fn branch(bx: &Bx<'_>, marked: &str) -> Branch {
     }
 }
 
-/// The text without its first cross-reference to a page in the binder, and that page.
+/// The text without its first cross-reference to a page in the binder, and that page. Only the
+/// content's own `{ref:…}` counts: one typed into an answer stays text.
 fn take_ref(bx: &Bx<'_>, marked: &str) -> (String, Option<String>) {
     let open = rr_content::checklist::REF_OPEN;
-    let Some(start) = marked.find(open) else {
+    let Some(start) = find_outside_user(marked, open) else {
         return (marked.to_owned(), None);
     };
     let after = &marked[start + open.len()..];
@@ -743,6 +779,17 @@ mod tests {
             (when, then),
             (line.as_str(), ""),
             "a colon in the household's words"
+        );
+        // Footnotes and references typed into an answer are the household's words.
+        let u = user("Rosa's [^x] {ref:home} house");
+        let marked = mark(&format!(
+            "Go to {u}.[^ready_gov_evacuation] {{ref:getting_out}}"
+        ));
+        assert!(marked.contains(&u), "{marked:?}");
+        assert!(marked.contains(&crate::packet::cite("ready_gov_evacuation")));
+        assert_eq!(
+            find_outside_user(&marked, "{ref:"),
+            marked.find("{ref:getting_out}")
         );
         let blank = rr_content::checklist::blank_marker(30);
         let line = format!("**Go to** {blank} if the home cannot be lived in.");
