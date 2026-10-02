@@ -163,6 +163,39 @@ fn plan_reads_standard_input() {
         .stdout(plan_markdown(&expected));
 }
 
+/// Answers are trimmed and capped as the app trims and caps them (verify3 R4-03): a 4,000-character
+/// note prints as its first 400 characters, and padding around a name is gone.
+#[test]
+fn the_cli_trims_and_caps_the_answers_as_the_app_does() {
+    let mut v: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(household("chicago-student-zero-budget-1")).unwrap(),
+    )
+    .unwrap();
+    let long = "x".repeat(4000);
+    v["people"][0]["profile"] = serde_json::json!({ "name": "  Alex  ", "notes": long });
+    let out = fixtures()
+        .args(["binder", "--household", "-", "--json"])
+        .write_stdin(v.to_string())
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "{}", stderr(&out));
+    let b: rr_types::Binder = serde_json::from_str(&stdout(&out)).unwrap();
+    let page = b.page("person_1").unwrap();
+    assert_eq!(page.title, "Alex");
+    let notes = page
+        .blocks
+        .iter()
+        .find_map(|bl| match bl {
+            rr_types::binder::Block::Fields(rows) => rows
+                .iter()
+                .find(|r| r.label == "Anything else a helper should know")
+                .and_then(|r| r.value.clone()),
+            _ => None,
+        })
+        .expect("the note");
+    assert_eq!(notes.chars().count(), rr_types::NOTE_MAX);
+}
+
 #[test]
 fn binder_prints_the_binder_alone_as_markdown_or_json() {
     let expected = engine().assess(&fixture("detroit-snap-3")).unwrap();

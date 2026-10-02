@@ -30,7 +30,7 @@ Officials order your area to leave, or warn that an order may come, for any reas
 
 ## Leave or stay
 
-- **Leave early,** before an order, if someone needs extra time or help to leave: small children, pets or a disability.[^usfa_wildfire_evacuation][^ready_gov_evacuation] {ref:getting_out}
+- **Leave early,** before an order, if small children, pets or someone with a disability need extra time or help to leave.[^usfa_wildfire_evacuation][^ready_gov_evacuation] {ref:getting_out}
 - **Go to** {where_go}. If you are split up, meet at {meeting_far}.[^ready_gov_evacuation] {ref:getting_out}
 - **Go to** a public shelter if needed. Text SHELTER and your ZIP code to 43362.[^ready_gov_shelter] {if:pets}Many do not allow pets.[^ready_gov_shelter]{/if}
 - **Call** the {county} emergency management office if you have no way to leave.[^ready_gov_evacuation]
