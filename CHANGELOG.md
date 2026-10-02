@@ -98,8 +98,9 @@ your say-so, talks to an outside service; see "Maps" below and the rewritten
 ### Keeping your saved file safe
 
 - **A saved file with sensitive details in it is protected with a passphrase by default.** Once your
-  plan holds something sensitive — a person's medical details, your home address, an account or a
-  pet's microchip number — "Save a copy" offers to protect the file, ticked on by default, with the
+  plan holds something sensitive — a person's medical details, your home address, an account, a
+  pet's microchip number, or a map pin or route marking where you live — "Save a copy" offers to
+  protect the file, ticked on by default, with the
   plain-file option left one clear warning away. Opening a protected file asks for the passphrase
   back and says plainly if it's wrong; there is no way to recover a forgotten one, so the printed
   binder is worth keeping as a backup.

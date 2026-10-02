@@ -641,7 +641,8 @@ new history entry: `#/family` to Your places, `#/plan[/*]` to Prepare, `#/packet
 **State and saving.** `localStorage` key `rr.plan.v1` (the stored plan's own `version` field is 2
 as of v0.3.0; a v1 file still loads unchanged). Export and import as JSON. Since v0.3.0, once the
 saved plan holds a sensitive answer (anything in a person's profile beyond their name and phone,
-the home address, an account, a vehicle's plate or a pet's microchip number), "Save a copy" offers
+the home address, an account, a vehicle's plate, a pet's microchip number, or a map's home pin or a
+drawn route, which say where the household lives as plainly as the address), "Save a copy" offers
 to protect the file with a passphrase — on by default, WebCrypto PBKDF2-SHA-256 to an AES-GCM-256
 key, the plain-file choice kept one warning away — and opening a protected file asks for the
 passphrase back, explaining once that a forgotten one cannot be recovered (the printed binder is

@@ -436,7 +436,8 @@ matter most" (or, where it applies, the leave-first decision in its place).
 ### Saving a copy: the protected export
 
 Once the saved plan holds any sensitive answer (anything in a person's profile beyond their name
-and phone; the home address; the documents group; a vehicle's plate; a pet's microchip number),
+and phone; the home address; the documents group; a vehicle's plate; a pet's microchip number; or a
+map's home pin or a drawn route, which say where the household lives as plainly as the address),
 "Save to a file" offers **"Protect this file with a passphrase"**, ticked by default, with a
 passphrase field and a confirmation field (at least 8 characters). Unticking it shows a one-sentence
 warning about what the plain file would expose. Opening a protected file asks for the passphrase,
