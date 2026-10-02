@@ -2091,7 +2091,7 @@ fn household_notes(input: &PlanInput, hh: &Household, couplings: &mut Vec<Coupli
         coupling_note(
             couplings,
             "attached_housing",
-            "Shared walls mean a neighbour's fire can reach you; the fire rate is doubled."
+            "Shared walls mean a neighbor's fire can reach you; the fire rate is doubled."
                 .to_owned(),
             &[BucketId::Fire, BucketId::Evacuate],
             "rr-hazards",
@@ -2115,7 +2115,7 @@ fn household_notes(input: &PlanInput, hh: &Household, couplings: &mut Vec<Coupli
             couplings,
             "commute",
             "The get-home bag is sized by the walk home at about 3 miles an hour, with about half \
-             a litre of water per hour in hot weather."
+             a liter of water per hour in hot weather."
                 .to_owned(),
             &[BucketId::GetHome],
             "rr-consequence",

@@ -7,9 +7,9 @@ citations: [clarke_2002_panic, drury_2009_shared_identity, tierney_2006_disaster
 ---
 Disaster movies show panic, looting and people turning on each other. Research on real disasters finds something different. Group panic is rare, and people are often models of cooperation.[^clarke_2002_panic] In interviews with survivors of 11 emergencies, a shared sense of "we are in this together" grew out of the emergency itself and led people to help each other.[^drury_2009_shared_identity] After Hurricane Katrina, news reports greatly exaggerated looting and lawlessness, and those stories fed calls for a military response.[^tierney_2006_disaster_myths]
 
-**Why it matters.** Believing the myth can lead people to hoard, to avoid their neighbours, or to spend on the wrong things. The truth is more useful. The first help usually comes from the people nearby. After Japan's 2011 tsunami, towns with stronger community ties had lower death rates.[^aldrich_sawada_2015] In the 1995 Chicago heat wave, people with more social contact were less likely to die.[^semenza_1996_heat_deaths]
+**Why it matters.** Believing the myth can lead people to hoard, to avoid their neighbors, or to spend on the wrong things. The truth is more useful. The first help usually comes from the people nearby. After Japan's 2011 tsunami, towns with stronger community ties had lower death rates.[^aldrich_sawada_2015] In the 1995 Chicago heat wave, people with more social contact were less likely to die.[^semenza_1996_heat_deaths]
 
-**What to do.** Get to know two neighbours, agree who checks on whom, and plan to give help as well as receive it. About 7 in 10 people expect help from friends and family in a disaster.[^fema_nhs_2024]
+**What to do.** Get to know two neighbors, agree who checks on whom, and plan to give help as well as receive it. About 7 in 10 people expect help from friends and family in a disaster.[^fema_nhs_2024]
 
 ## Sources
 

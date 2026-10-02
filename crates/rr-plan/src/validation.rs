@@ -59,7 +59,7 @@ impl Verdict {
             Verdict::Partial => "partial",
             Verdict::Covered => "covered",
             Verdict::Over => "over (covered)",
-            Verdict::NotModelled => "not modelled",
+            Verdict::NotModelled => "not modeled",
         }
     }
 

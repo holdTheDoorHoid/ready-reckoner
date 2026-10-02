@@ -46,7 +46,7 @@ pub fn battery_fan(people_list: &[Person], hot: bool) -> Sizing {
         )
     } else {
         format!(
-            "{}: {} for the home{extra}. Fans help only while it is below {} °F indoors; above that, go to a cooling centre.",
+            "{}: {} for the home{extra}. Fans help only while it is below {} °F indoors; above that, go to a cooling center.",
             count(q, "battery fan", "battery fans"),
             num(base, 0),
             num(max_f, 0)
@@ -124,12 +124,12 @@ pub fn cooling_plan(hot: bool) -> Sizing {
     let mut b = Basis::new();
     b.cite("cdc_heat_health");
     b.cite("ready_gov_heat");
-    let mut text = "A heat plan: find your nearest cooling centre (dial 2-1-1), pick the coolest room, cover sunny windows, and agree who checks on whom. Never leave people or pets in a closed car.".to_owned();
+    let mut text = "A heat plan: find your nearest cooling center (dial 2-1-1), pick the coolest room, cover sunny windows, and agree who checks on whom. Never leave people or pets in a closed car.".to_owned();
     if hot {
         let max_f = b.k(keys::FAN_MAX_INDOOR_F);
         b.k(keys::HOT_CLIMATE_DAYS_95F);
         text.push_str(&format!(
-            " In a county as hot as yours this plan is your heat cover: write down \"If the power is off and it is {} °F inside, we go to ___\" (a cooling centre, or a relative or friend with power), and how you will get there.",
+            " In a county as hot as yours this plan is your heat cover: write down \"If the power is off and it is {} °F inside, we go to ___\" (a cooling center, or a relative or friend with power), and how you will get there.",
             num(max_f, 0)
         ));
     }
@@ -312,7 +312,7 @@ pub fn warm_room_plan(housing: &Housing, people_list: &[Person]) -> Sizing {
     let hypothermia = b.k(keys::HYPOTHERMIA_F);
     b.cite("cdc_co_basics");
     b.cite("ready_gov_stay_safe_warm");
-    let mut text = "A cold plan: pick one room to keep warm, close off the others, put towels under doors and cover windows at night, and find your nearest warming centre in case the home gets too cold. Never heat with a gas oven, grill, camp stove or generator indoors (carbon monoxide).".to_owned();
+    let mut text = "A cold plan: pick one room to keep warm, close off the others, put towels under doors and cover windows at night, and find your nearest warming center in case the home gets too cold. Never heat with a gas oven, grill, camp stove or generator indoors (carbon monoxide).".to_owned();
     match housing.heating {
         Heating::Wood => text.push_str(
             " Your wood stove keeps you warm as long as you have dry wood; keep the chimney clear.",
@@ -368,7 +368,7 @@ mod tests {
         let plan = warm_room_plan(&p.housing, &p.people);
         assert!(plan.plain.contains("furnaces usually need electricity"));
         assert!(plan.plain.contains("95 °F"));
-        assert!(plan.plain.contains("warming centre"), "{}", plan.plain);
+        assert!(plan.plain.contains("warming center"), "{}", plan.plain);
         assert!(
             plan.citations
                 .iter()

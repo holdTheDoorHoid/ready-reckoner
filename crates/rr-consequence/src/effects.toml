@@ -117,10 +117,10 @@ note = "An adult walks home at about 3 miles per hour."
 
 [params.walk_water_l_per_hour]
 value = 0.5
-unit = "litres per hour of walking in heat"
+unit = "liters per hour of walking in heat"
 evidence = "prior"
 sources = ["rr_risk_model_priors"]
-note = "About half a litre of water per hour of walking in hot weather."
+note = "About half a liter of water per hour of walking in hot weather."
 
 [params.share_hours_away]
 value = 0.27

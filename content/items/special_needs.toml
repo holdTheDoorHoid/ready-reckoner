@@ -13,7 +13,7 @@ spec = "Keep your pet's ID tag and microchip details current, put vaccination re
 look_for = [
   "Microchip contact details that are up to date",
   "Vaccination records and a photo of you with your pet",
-  "A neighbour or friend who agrees to be your pet buddy",
+  "A neighbor or friend who agrees to be your pet buddy",
 ]
 avoid = [
   "Leaving pets behind in an evacuation",
@@ -187,7 +187,7 @@ tier = "now"
 free = true
 spec = "Plan to evacuate large animals early, set up a buddy system with nearby farms to share trailers and pasture, and keep vet records handy (ASPCA). Large animals need about 20 to 30 liters of water a day each, so fill tubs before the power goes out (Sphere)."
 look_for = [
-  "A trailer, or a neighbour's, and animals used to loading",
+  "A trailer, or a neighbor's, and animals used to loading",
   "Two places the animals could go",
   "Water tubs you can fill before a storm",
 ]

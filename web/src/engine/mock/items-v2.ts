@@ -183,7 +183,7 @@ const NEW_ITEMS: Item[] = [
     unit: 'carrier',
     buckets: ['water_out'],
     tier: 'm6',
-    spec: 'Carriers with handles for bringing water from a distribution point or a neighbour’s well.',
+    spec: 'Carriers with handles for bringing water from a distribution point or a neighbor’s well.',
     price: [15, 35, 'carrier'],
     citations: ['mock_water_per_person'],
     v2: { long_horizon: true },

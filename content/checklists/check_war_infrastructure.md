@@ -29,7 +29,7 @@ The United States is at war, and power, water, fuel, phone or internet systems a
 5. **Install software updates.**[^cisa_secure_our_world]
 6. **Report anything suspicious to local police:** who or what, when, where and why.[^dhs_report_suspicious]
 7. **Keep important numbers on paper,** not only in your phone.[^ready_gov_low_cost]
-8. **Check on your people and neighbours.**[^redcross_power_outage]
+8. **Check on your people and neighbors.**[^redcross_power_outage]
 9. **Take breaks from the news.**[^cdc_managing_stress]
 10. **Talk to someone** when stress builds. Call or text 1-800-985-5990.[^samhsa_disaster_distress]
 

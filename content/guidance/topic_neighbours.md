@@ -1,15 +1,15 @@
 ---
 id: topic_neighbours
-title: Neighbours and mutual aid
+title: Neighbors and mutual aid
 kind: topic
 applies_to: [topic:neighbours]
 citations: [aldrich_sawada_2015, ye_aldrich_2019, semenza_1996_heat_deaths, fema_nhs_2024, ready_gov_older_adults, listos_california, ready_gov_cert]
 ---
-Neighbours are a supply, and the plan counts them. After Japan's 2011 tsunami, towns with stronger community ties had lower death rates.[^aldrich_sawada_2015] In neighbourhoods flooded by the same tsunami, strong ties mattered most for older and lower-income people.[^ye_aldrich_2019] In the 1995 Chicago heat wave, living alone raised the risk of dying.[^semenza_1996_heat_deaths]
+Neighbors are a supply, and the plan counts them. After Japan's 2011 tsunami, towns with stronger community ties had lower death rates.[^aldrich_sawada_2015] In neighborhoods flooded by the same tsunami, strong ties mattered most for older and lower-income people.[^ye_aldrich_2019] In the 1995 Chicago heat wave, living alone raised the risk of dying.[^semenza_1996_heat_deaths]
 
-**The gap.** About 7 in 10 people expect help from friends and family in a disaster, but fewer than 2 in 10 had heard how to help their neighbours.[^fema_nhs_2024]
+**The gap.** About 7 in 10 people expect help from friends and family in a disaster, but fewer than 2 in 10 had heard how to help their neighbors.[^fema_nhs_2024]
 
-**What helps.** Swap phone numbers with two neighbours. Agree who checks on whom, especially older neighbours and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[^ready_gov_older_adults] Host a block party, since strong communities start with prepared neighbours.[^listos_california] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[^ready_gov_cert]
+**What helps.** Swap phone numbers with two neighbors. Agree who checks on whom, especially older neighbors and anyone who lives alone. Make a simple contact list for your street. Give a trusted person a spare key, and tell them where your supplies are and how to use any medical equipment.[^ready_gov_older_adults] Host a block party, since strong communities start with prepared neighbors.[^listos_california] Take CERT training to learn fire safety, light search and rescue, and disaster first aid.[^ready_gov_cert]
 
 **What to avoid.** Meet the people next door before you need them. A short hello now makes it easier to knock on a door later.
 

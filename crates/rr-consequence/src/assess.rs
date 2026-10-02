@@ -1708,11 +1708,11 @@ fn hours_on_foot(h: f64) -> String {
 
 fn litres_words(l: f64) -> String {
     if l < 0.75 {
-        "half a litre".to_owned()
+        "half a liter".to_owned()
     } else if l < 1.25 {
-        "a litre".to_owned()
+        "a liter".to_owned()
     } else {
-        format!("{} litres", words::round_nice(l))
+        format!("{} liters", words::round_nice(l))
     }
 }
 
@@ -2246,7 +2246,7 @@ fn capability_advice(bucket: BucketId) -> &'static str {
             "a long spell is better met with one room you can keep warm or cool, warm layers and a place to go than with stored fuel."
         }
         BucketId::Supplies => {
-            "a long stretch is better met with staples you already eat and rotate, and with neighbours who share, than with ever bigger stockpiles."
+            "a long stretch is better met with staples you already eat and rotate, and with neighbors who share, than with ever bigger stockpiles."
         }
         BucketId::Medication => {
             "a long gap is better met by asking the prescriber about an emergency supply and early refills than by stockpiling alone."

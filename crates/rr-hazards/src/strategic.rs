@@ -313,7 +313,7 @@ pub(crate) fn why_here(
 /// The sentence when the pack does not give the county's class.
 pub(crate) const WHY_HERE_UNKNOWN: &str = "The data for where you live does not include its \
     strategic class yet, so this uses the average over every county in the country. Near \
-    missile fields, command centres and the largest cities the chance is higher; far from them \
+    missile fields, command centers and the largest cities the chance is higher; far from them \
     it is lower.";
 
 #[cfg(test)]

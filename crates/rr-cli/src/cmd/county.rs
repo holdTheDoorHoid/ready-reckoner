@@ -111,7 +111,7 @@ pub fn render(c: &CountyRecord, loc: Option<&rr_types::LocationResolved>) -> Str
     let mut s = format!("{}, {} (FIPS {})\n\n", c.name, c.state_name, c.fips);
     let mut t = Table::new(["Field", "Value"]);
     t.row([
-        "Centre".to_owned(),
+        "Center".to_owned(),
         format!("{:.4}, {:.4}", c.centroid.lat, c.centroid.lon),
     ]);
     t.row(["Climate region (NCA5)".to_owned(), c.nca_region.clone()]);

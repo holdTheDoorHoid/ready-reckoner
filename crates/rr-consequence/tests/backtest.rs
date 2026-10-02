@@ -91,7 +91,7 @@ impl Verdict {
             Verdict::Partial => "partial",
             Verdict::Covered => "covered",
             Verdict::Over => "over (covered)",
-            Verdict::NotModelled => "not modelled",
+            Verdict::NotModelled => "not modeled",
         }
     }
     /// Over counts as covered for the event's verdict.
@@ -828,7 +828,7 @@ fn the_frozen_backtest_keeps_its_recorded_verdicts() {
     }
     let _ = writeln!(
         md,
-        "\n\\* in-sample (see docs/VALIDATION.md).\n\n| Run | Short | Partial | Covered | Over | Not modelled |\n|---|---|---|---|---|---|"
+        "\n\\* in-sample (see docs/VALIDATION.md).\n\n| Run | Short | Partial | Covered | Over | Not modeled |\n|---|---|---|---|---|---|"
     );
     for (k, name) in [
         "County only",

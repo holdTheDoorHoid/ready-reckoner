@@ -861,7 +861,7 @@ fn validate_reproduces_every_recorded_verdict_of_the_22_events() {
     );
     assert!(
         text.contains(
-            "Headline (with the v2 answers): 6 covered, 9 partial, 6 short, 1 not modelled"
+            "Headline (with the v2 answers): 6 covered, 9 partial, 6 short, 1 not modeled"
         ),
         "{text}"
     );

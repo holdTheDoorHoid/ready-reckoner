@@ -41,7 +41,7 @@ free = true
 life_safety = true
 spec = "Agree how you will reach each other, where you will meet if you are separated, and who picks up the children (Ready.gov). Pick one out-of-state contact everyone texts to say they are safe, since texts often get through when calls do not, and write key numbers on a card for each wallet or bag (Ready.gov). Add school, daycare and work plans, and go over the plan together once a year."
 look_for = [
-  "A meeting place near home and one outside the neighbourhood",
+  "A meeting place near home and one outside the neighborhood",
   "An out-of-state contact whose number is on every card",
   "A card in every wallet, backpack and go-bag, from Ready.gov's free fillable form",
   "Children: the school or daycare's shelter plan and up-to-date pick-up adults",
@@ -96,11 +96,11 @@ unit = "pair"
 buckets = ["comms"]
 tier = "w2"
 free = false
-spec = "A pair of Family Radio Service handhelds for talking within a neighbourhood when phones are down; the FCC lets anyone use them without a license. Expect about half a mile on the low-power channels and more on the others, depending on buildings and hills."
+spec = "A pair of Family Radio Service handhelds for talking within a neighborhood when phones are down; the FCC lets anyone use them without a license. Expect about half a mile on the low-power channels and more on the others, depending on buildings and hills."
 look_for = [
   "FRS radios (no license needed)",
   "Rechargeable batteries plus a spare set of regular batteries",
-  "A channel your household and neighbours agree on",
+  "A channel your household and neighbors agree on",
 ]
 avoid = [
   "Buying GMRS-only radios without the $35 FCC license",

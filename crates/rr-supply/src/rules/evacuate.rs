@@ -55,7 +55,7 @@ pub fn go_bag(people_list: &[Person], notice_hours_low: f64, days_away: f64) -> 
     let babies = people_list.len() as f64 > n;
     let when = match band {
         NoticeBand::Minutes => {
-            "You may get only minutes of warning (a local tsunami or a fast fire), so keep the bags packed by the door, and one at work if you work in a danger zone. Practise grabbing them and leaving."
+            "You may get only minutes of warning (a local tsunami or a fast fire), so keep the bags packed by the door, and one at work if you work in a danger zone. Practice grabbing them and leaving."
         }
         NoticeBand::Hours => {
             "You may get only a few hours of warning (a flash flood), so keep the bags packed and know your route out."

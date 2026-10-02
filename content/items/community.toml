@@ -3,19 +3,19 @@
 
 [[item]]
 id = "community_know_two_neighbours"
-name = "Neighbours and skills: swap numbers, check on each other, learn first aid"
+name = "Neighbors and skills: swap numbers, check on each other, learn first aid"
 category = "community"
 unit = "action"
 buckets = ["security", "medical_emergency", "thermal", "evacuate", "supplies", "fire"]
 tier = "now"
 free = true
-spec = "Swap phone numbers with at least two neighbours, agree who checks on whom in heat waves, storms and outages, and make a simple street contact list with the neighbours who agree. After the 2011 Japan tsunami, places with stronger social ties had fewer deaths, and in the 1995 Chicago heat wave living alone raised the risk of dying. Take a first-aid, bleeding-control and hands-only CPR class, or free CERT training, so you can help until responders arrive (Ready.gov)."
+spec = "Swap phone numbers with at least two neighbors, agree who checks on whom in heat waves, storms and outages, and make a simple street contact list with the neighbors who agree. After the 2011 Japan tsunami, places with stronger social ties had fewer deaths, and in the 1995 Chicago heat wave living alone raised the risk of dying. Take a first-aid, bleeding-control and hands-only CPR class, or free CERT training, so you can help until responders arrive (Ready.gov)."
 look_for = [
-  "Two neighbours' numbers in your phone and on your contact card",
+  "Two neighbors' numbers in your phone and on your contact card",
   "A daily check-in by phone or at the door in extreme heat or cold, especially for people who live alone",
-  "A street list with only what each neighbour agrees to share, updated each year",
+  "A street list with only what each neighbor agrees to share, updated each year",
   "A free Stop the Bleed class, and a first-aid and CPR class from a hospital, fire department or the Red Cross",
-  "Your local CERT program or a neighbourhood group",
+  "Your local CERT program or a neighborhood group",
 ]
 avoid = [
   "Waiting for a disaster to meet the people next door",

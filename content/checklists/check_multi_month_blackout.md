@@ -25,7 +25,7 @@ Officials say the power may stay out for weeks or months. Water, fuel, stores an
 1. **Cook outdoors only,** at least 20 feet from windows.[^ready_gov_power_outages]
 2. **Eat fresh food first,** then the oldest cans.[^redcross_power_outage][^fsis_shelf_stable]
 3. **Wash hands with soap and water,** or 60% alcohol sanitizer.[^cdc_hygiene_emergency]
-4. **Work with your neighbours** to look out for each other.[^ncpc_home_safety]
+4. **Work with your neighbors** to look out for each other.[^ncpc_home_safety]
 5. **Apply for FEMA help** at 1-800-621-3362 if your county has a disaster declaration.[^disasterassistance_gov]
 6. {if:need:dialysis}**If your dialysis center is closed,** go to the other one you know.[^ready_gov_disability]{/if}
 7. **Talk to someone** when stress builds. Call or text 1-800-985-5990.[^samhsa_disaster_distress]

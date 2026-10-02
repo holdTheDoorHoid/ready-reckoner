@@ -183,7 +183,7 @@ pub fn ors_packets(days: f64, people_list: &[Person]) -> Sizing {
         count(n, "person", "people"),
         fmt_days(days.max(14.0)),
         num(q, 0),
-        count(litres, "litre", "litres")
+        count(litres, "liter", "liters")
     );
     Sizing::new(
         &b,

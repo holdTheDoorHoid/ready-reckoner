@@ -417,7 +417,7 @@ fn treatment_beyond(b: &mut Basis, d: &WaterDaily, target_days: f64, source: Raw
             "water from the stream, river or pond near you that you named"
         }
         RawSource::Named(RawWaterSource::NeighbourWell) => {
-            "water from your neighbour's well, which you said you may use"
+            "water from your neighbor's well, which you said you may use"
         }
         RawSource::Named(RawWaterSource::RainBarrel) => "rain from your rain barrel",
         RawSource::Named(_) => "the raw-water source you named",
@@ -437,7 +437,7 @@ fn treatment_beyond(b: &mut Basis, d: &WaterDaily, target_days: f64, source: Raw
         )
     } else {
         format!(
-            "After day {}, for the other {}: your household needs about {} of safe water each day, about {} in all. You have not named a raw-water source, so a filter adds nothing yet: pick one in your water plan (a stream or pond you can reach, or a neighbour's well you may use), or plan to carry water from a distribution point (see the carriers line). Water you collect must be made safe: filter it, then {}.",
+            "After day {}, for the other {}: your household needs about {} of safe water each day, about {} in all. You have not named a raw-water source, so a filter adds nothing yet: pick one in your water plan (a stream or pond you can reach, or a neighbor's well you may use), or plan to carry water from a distribution point (see the carriers line). Water you collect must be made safe: filter it, then {}.",
             num(cap, 1),
             fmt_days(extra_days),
             gallons(d.total_gal()),
@@ -918,7 +918,7 @@ pub fn rain_catchment_units(
         b.k(keys::RAIN_DRY_SEASON_MIN_SHARE);
         let (dry_in, _) = dry.unwrap_or((0.0, 0.0));
         let text = format!(
-            "Rain barrels will not carry you through the dry season: {state}'s driest three months between April and October bring only about {} inches of rain, too little to refill them. Plan to carry water from a distribution point or a neighbour's well instead (see the carriers line).",
+            "Rain barrels will not carry you through the dry season: {state}'s driest three months between April and October bring only about {} inches of rain, too little to refill them. Plan to carry water from a distribution point or a neighbor's well instead (see the carriers line).",
             num(dry_in, 1)
         );
         let s = Sizing::new(
@@ -1019,7 +1019,7 @@ pub fn water_carriers(
         "a well stops with the power, and water may have to come from somewhere else".to_owned()
     };
     let text = format!(
-        "{} of about {} gallons each for hauling water from a distribution point, a neighbour's well or a spring, because {why}. A full one weighs about {} pounds, so choose a size you can carry, with a good handle.",
+        "{} of about {} gallons each for hauling water from a distribution point, a neighbor's well or a spring, because {why}. A full one weighs about {} pounds, so choose a size you can carry, with a good handle.",
         count(q, "water carrier", "water carriers"),
         num(each, 0),
         num(pounds, 0)

@@ -293,7 +293,7 @@ definition = "A federal program that helps people without insurance replace pres
 citations = ["hhs_aspr_epap"]
 
 [[term]]
-plain = "Neighbourhood disaster training"
+plain = "Neighborhood disaster training"
 term = "CERT (Community Emergency Response Team)"
 definition = "Local training in disaster preparedness, fire safety, light search and rescue, team organization and disaster medical care."
 citations = ["ready_gov_cert"]

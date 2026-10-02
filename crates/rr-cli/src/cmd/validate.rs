@@ -83,7 +83,7 @@ pub fn run(args: &ValidateArgs) -> Result<Output, CliError> {
     }
     s.push('\n');
 
-    let mut tally = Table::new(["Run", "Short", "Partial", "Covered", "Over", "Not modelled"])
+    let mut tally = Table::new(["Run", "Short", "Partial", "Covered", "Over", "Not modeled"])
         .right(1)
         .right(2)
         .right(3)
@@ -105,7 +105,7 @@ pub fn run(args: &ValidateArgs) -> Result<Output, CliError> {
     let h = f.headline_run.min(3);
     let c = report.tally[h];
     s.push_str(&format!(
-        "\n Headline ({}): {} covered, {} partial, {} short, {} not modelled (over counts as \
+        "\n Headline ({}): {} covered, {} partial, {} short, {} not modeled (over counts as \
          covered).\n",
         f.runs[h],
         c[2] + c[3],
@@ -122,7 +122,7 @@ pub fn run(args: &ValidateArgs) -> Result<Output, CliError> {
     ) != (c[2] + c[3], c[1], c[0], c[4])
     {
         s.push_str(&format!(
-            " The app publishes {} covered, {} partial, {} short, {} not modelled from the \
+            " The app publishes {} covered, {} partial, {} short, {} not modeled from the \
              recorded verdicts.\n",
             published.covered, published.partial, published.short, published.not_modelled
         ));
