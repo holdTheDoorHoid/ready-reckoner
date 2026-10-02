@@ -140,15 +140,13 @@ your say-so, talks to an outside service; see "Maps" below and the rewritten
 
 ### The site
 
-- **Spelling is consistently American English almost everywhere now.** Every checklist, guidance
-  paragraph, item description and glossary entry, the sentences the engine itself writes (what a
-  purchase is for, a guardrail warning), and the command line's own output were a mix of British and
-  American spelling before (a cooling "centre", "Practise grabbing them", "not modelled"); all now
-  read American ("center", "Practice", "not modeled"), about 172 words across 69 files. A page's own
-  internal name and a cited source's own published title are left exactly as they are, on purpose. A
-  handful of headings and field labels written directly into a few interview screens (not generated
-  by the engine) still read "neighbourhood" rather than "neighborhood"; bringing those the rest of
-  the way is a small follow-up, not a new problem introduced here.
+- **Spelling is consistently American English now.** Every checklist, guidance paragraph, item
+  description and glossary entry, the sentences the engine itself writes (what a purchase is for, a
+  guardrail warning), the command line's own output, and the remaining interview screens and map
+  labels were a mix of British and American spelling before (a cooling "centre", "Practise grabbing
+  them", "not modelled", "Your neighbourhood"); all now read American ("center", "Practice", "not
+  modeled", "Your neighborhood"). A page's own internal name and a cited source's own published
+  title are left exactly as they are, on purpose.
 
 ### Small fixes found in final verification
 
@@ -394,9 +392,8 @@ is handled has changed: still no server, no accounts, nothing sent anywhere.
   nothing else in the plan adjusts — a weather radio, for instance, doesn't move any earlier.
 - **British and American spellings are mixed** through the packet and the site (neighbour/neighbor,
   litre/liter, practise, labour) — not yet passed through a single consistent style. *(Addressed in
-  v0.3.0 for the content, the engine's own generated text and the command line's output, now
-  consistently American English; a handful of hand-written interview screens still read British and
-  are a small follow-up.)*
+  v0.3.0: the content, the engine's own generated text, the command line's output and the
+  interview's own screens now consistently read American English.)*
 - **The rare-but-severe rows are sorted by the middle of their range**, so a row can appear above one
   whose range is actually higher at both ends. It is a defensible choice, but it means the order isn't
   always the one you'd get from the low end or the high end alone.

@@ -192,10 +192,6 @@ tracked as GitHub issues; the list here is the standing summary. See
   - Fix the Philadelphia fixture household: it answers with a rabbit in the pets step but the cover
     counts only the dog from an earlier step, so the cover reads "1 dog" where it should also count
     the rabbit. Cosmetic, and specific to that one fixture.
-  - Finish the spelling pass on the handful of hand-written interview screens and components it
-    missed: the Places screen's "Your neighbourhood" heading and its "Neighbours who check on you"
-    field label, and the maps feature's "Your neighbourhood" caption (`web/src/lib/maps/slots.ts`)
-    all still read British, where the binder's own matching page already reads "Neighborhood."
 
 ## Later
 
