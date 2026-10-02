@@ -644,3 +644,257 @@ R3-03 (engine side): give `multi_month_blackout` a `location_factor` label so th
 here too. R3-15: measure the v2 Philadelphia print with `packet-pages.mjs` and recalibrate the
 400-words-a-page figure, or trim two pages. R3-16: print months from 1 in the packet, or print
 dates only on both surfaces.
+
+## Round 4: v0.3.0 release verification (agent/verify3, 2026-10-01)
+
+Run on `agent/verify3` from `v0.3` at `10d3c64` (every v0.3.0 workstream merged; data pack
+`13d6f99df7dc`, content `2026.09.27+229b8f98`, contract 3; the version strings still read 0.2.0
+until release-docs3 bumps them). The browser bundle was rebuilt first (`bash
+crates/rr-wasm/build-web.sh`), so every browser check below ran the real engine on the real packs.
+No check contacted an outside service: the map services (OpenStreetMap tiles, the Census base map,
+both Overpass servers, FEMA, the Forest Service, Nominatim) were answered by stubs in the page, as
+the e2e script does (the OSMF tile policy forbids automated use), and every other script refused
+any request off 127.0.0.1 and counted it (none was made). One web defect was fixed on this branch;
+engine and content findings are handed back with a proposed fix and no golden is regenerated.
+
+**Recommendation: go**, once `agent/verify3` is merged. Land R4-04 and R4-11 (one content line and
+one engine sentence; every binder moves, so one goldens regeneration for both) before tagging if it
+fits; R4-02 and R4-03 are small engine fixes that move no golden. The rest are notes and known
+limitations.
+
+### Checks and counts
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Format, lints | `cargo fmt --all --check`; `cargo clippy --workspace --all-targets -- -D warnings` | clean, clean |
+| Rust tests | `cargo test --workspace --no-fail-fast` | 1014 passed, 0 failed, 3 ignored, 82 targets |
+| WebAssembly | `cargo build --target wasm32-unknown-unknown --workspace --exclude rr-cli --exclude rr-etl`; `wasm-pack test --node crates/rr-wasm` | builds; 3 passed |
+| Goldens | `rr golden` | 28 of 28 files match |
+| Doctor | `rr doctor`; `rr --fixtures doctor` | OK on both sources: 14 households, byte-identical reruns, 0 uncited, content 0 errors / 0 warnings, 146 items; release median 21–34 ms (Philadelphia 29) |
+| Citations | `rr citations --missing` | 416 ids referred to; one undefined and formally awaited (`county_boil_water_records`), as in v0.2.0 |
+| Data | `rr data verify` | everything checks out |
+| Backtest | `rr validate --details` | all 88 recorded verdicts reproduced (6 covered, 9 partial, 6 short, 1 not modelled) |
+| Bundle | `bash crates/rr-wasm/build-web.sh`; `npm run build` | engine 4.90 MB raw, 1,553,763 bytes gzipped (budget 1.75 MB, 11 % headroom); data core 4.24 MB, geo 0.30, places 0.12 gzipped file by file. Chunks gzipped: main 190 kB (547 kB raw: the 500 kB warning), PDF 369 kB + four font subsets 106 kB = 475 kB (budget 500), Leaflet 44 kB + 6 kB CSS, maps panel and pin map 19 kB, the stand-in engine 72 kB (the fallback when the engine fails to load) |
+| Web, at the tip | `npm test -- --run --maxWorkers=2`; `npm run check` | 57 files, 578 passed, 1 skipped; 530 files 0 errors 0 warnings |
+| Web, after the fix | same | 57 files, 580 passed, 1 skipped; 530 files 0 / 0 |
+| Site as Pages serves it | `BASE_PATH=/ready-reckoner/ vite build`; `node web/scripts/e2e.mjs`; `node web/scripts/pwa-check.mjs` | e2e 31 of 31, PWA 11 of 11 (details under Performance) |
+| Accessibility | `node web/scripts/screenshots.mjs` (78 pages); a second sweep of every route in dark mode and the v0.3.0 dialogs and panels (maps consent, pin map, address warning, save dialog, binder at a page, wallet cards, an empty step 6) on desktop, dark and phone (37 pages) | 115 pages, 0 axe violations (WCAG 2.0/2.1/2.2 AA and best practice), 0 console errors |
+| The binder as PDF | the app's own Download PDF, captured in headless Chrome, for all 14 fixtures on Letter and A4, then read back (below) | 28 PDFs; every check passes after R4-01 |
+| CI | `gh run list --branch v0.3` | all five jobs green on `10d3c64` (Workflow parse, Rust, CLI oracle, WebAssembly + parity, Web) |
+
+The web suite never ran while a Rust suite was running (anchored `pgrep` before each run).
+
+### Findings
+
+| # | Finding | Severity | Status |
+| --- | --- | --- | --- |
+| R4-01 | PDF: in every binder 1 to 6 numbered sources had no link target, the entries that began a column or a page of the two-column Sources list, so every citation to them led nowhere (102 dead targets across the 28 PDFs). pdfmake drops the anchor of a paragraph whose first line it moves in snaking columns | Low | Fixed `526c9b2` (web; a test draws the golden on both papers) |
+| R4-02 | Household text with `[^…]` or `{ref:…}` in it is changed where a checklist step or a "Leave or stay" branch prints it: `[^x]` becomes two invisible control characters (37 runs on 21 pages for adversarial household 2, and the PDF then warns of "letters … not in the typeface" naming nothing visible); `{ref:home}` inside a branch is cut out and the row gains a "Turn to Tab 3, Home" link (19 branches). Real answers rarely hold these characters, but the rule is that user text is echoed unchanged | Medium | Handed back (engine) |
+| R4-03 | `rr plan` and `rr binder` skip the trim-and-cap step the browser engine applies (`PlanInput::from_json`), so for a household file with over-long answers the command line prints them whole (a 4,000-character note, a 300-character roadside line) where the app prints 400 and 80 characters: the oracle and the app disagree | Low | Handed back (CLI) |
+| R4-04 | Evacuation order, first "Leave or stay?" row, in every binder: "If: Leave early, before an order, if someone needs extra time or help to leave: / Then: small children, pets or a disability." The colon that introduces the examples is read as the end of the condition | Medium | Handed back (content) |
+| R4-05 | Opened offline before the binder was ever shown online, the Neighborhood page (screen and PDF) has no county hospital list and nothing says so: the `places` pack is fetched the first time the binder is shown online, and kept from then on | Low | Noted (proposal below) |
+| R4-06 | `docs/CLI.md` still says a bare `rr` loads the core pack only and that the goldens are planned on it; since `b25c78d` the default is core + `places`, as `rr --help` says | Low | For release-docs3 |
+| R4-07 | With every answer at its length cap (adversarial household 2), 29 pages run past their promised sheets at the 8-point floor (person pages 3 sheets, 19 one-page checklists 2) and a 120-character place name squeezes the header's tab label. Nothing is cut, lost or overlapped | Low | Noted: every realistic household keeps every promise (28 golden PDFs, 9 adversarial) |
+| R4-08 | Tornado, Do first: "Stay away from windows. Keep away from windows, doors and outside walls." says windows twice | Low | Handed back (content) |
+| R4-09 | The Philadelphia fixture's step 8 describes a dog and a rabbit while step 2 counts one dog, so its cover reads "with 1 dog" and its Pets page lists two animals | Low | Noted (fixture; the binder prints what each step says) |
+| R4-10 | `assess` in Chrome sits on the 50 ms target: Philadelphia 44.8 ms median in the e2e run and 50.0 ms in a sweep of all fourteen fixtures a few minutes later (medians 34–50 ms, worst call 70 ms); 183 ms on a CPU four times slower | Low | Noted: a watch item for v0.3.x, as the planner proposed |
+| R4-11 | The Prepare sheet's safety rule (every household) says "Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or the house wiring", the one place not in CDC's wording ("only outdoors, more than 20 feet from windows, doors and vents"), and for Cameron it contradicts the same plan's interlock item ("connected through an interlock or transfer switch an electrician installs"), the contradiction checklist-review removed from the evacuation page | Low | Handed back (engine text) |
+
+Known limitations, as decided and not findings: the OSM tile policy question awaits the owner;
+Overpass fails often and the map then says "Nearby places could not be fetched on …" (checked);
+storm surge is not drawn, and the consent screen and the maps say so (checked); one downed-line
+distance, 35 feet, on every page (checked in the five read below); the eviction cap; the two-sheet
+inventory and risks summary; the PDF is not tagged for screen readers and prints letters outside
+Latin and Latin Extended as boxes (the app says so); the footer reads 0.2.0 until the version
+bump; R3-23 (one spelling) is still open: the maps consent says "neighbourhood", the binder
+"Neighborhood".
+
+### The binder, for real
+
+**Method.** For each fixture household the built site (real engine, real packs) was opened at
+`#/binder` with the household in the page's storage, the county hospitals were let in, and "Download
+PDF" was pressed for Letter and for A4; the blob the app hands the browser was captured instead of
+saved (`round3/shots/verify3/pdfs/`). A reader written for pdfkit's output (the PDF's own xref,
+pages, named destinations, outline and link annotations, no third-party library) and poppler's
+`pdftotext` (layout, reading order and word boxes) then checked each file against the engine's
+binder in the golden `.json`, and an independent script derived from each household's answers and
+risk register which pages it should have. All 28 PDFs, after the R4-01 fix:
+
+- **Pages and fit.** Every binder page has its destination, in binder order; every `fit: one` page
+  (55–65 per binder) takes one sheet and every `fit: two` page at most two; every sheet's header
+  carries its tab number, short title and page title, and every footer reads "page N of M" with the
+  right N and M. Sheets per tab never exceed the engine's proxy:
+
+  | Household | Proxy | Letter | A4 |
+  | --- | --- | --- | --- |
+  | Philadelphia | 87: 6/7/9/3/5/14/14/14/5/10 | 88 pages; 6/7/8/3/5/14/14/14/5/8 | 87; tab 10 is 7 |
+  | Detroit | 83: 6/7/5/1/5/16/13/15/5/10 | 84; 6/7/4/1/5/16/13/15/5/8 | 83 |
+  | Hays | 82: 6/8/4/4/5/15/12/12/6/10 | 83; 6/8/3/4/5/15/12/12/6/8 | 83 |
+  | Chicago (no answers) | 76: 6/4/5/1/4/16/15/11/5/9 | 77; 6/4/4/1/4/16/15/11/5/7 | 76 |
+  | the other ten | 77–82 | 77–83 | 75–82 |
+
+  (The PDF adds two or three sheets of contents and the label sheet to the tabs' sheets.) Where
+  the real print is shorter than the proxy it is tab 3 (empty map slots print as one line) and
+  tab 10 (the sources in two columns of small type).
+- **Contents.** All 2,138 entries (73–83 per binder) print the number of the page their link lands
+  on, and that page's header names the entry. Ten from Philadelphia, as printed: Tab 2 People 10;
+  Riverside Warehouse 18; Wallet cards 16; Getting out 24; Tab 6 Checklists: happening now 33;
+  Coastal flooding and storm surge 60; Supply chain disruption 63; No tap water, or a local water or
+  gas outage 65; Eviction 70; Tab 9 After 75.
+- **Links.** All 4,971 page links land on the page whose title they print ("(Tab 1, Contacts at a
+  glance, page 9)", "Turn to Tab 3, Neighborhood." with 22 in its Page column, "Tab 7, Heat wave"
+  51), and all 32,537 citation links land on the source with that number. Before R4-01, 102 numbered
+  sources across the 28 PDFs had no destination, so the citations to them led nowhere.
+- **Pages the answers imply.** For all 14 households: a page per person (named when a name was
+  given), a page per distinct named place (Philadelphia's four), a pets page exactly when animals
+  are counted, a vehicles page exactly when a vehicle is listed, the four logs, and one checklist
+  for every ranked hazard, every everyday emergency and every opted-in rare family (Minot's two), in
+  the tab its onset names. "Which checklist?" names every ranked hazard (30–37 per household).
+- **Blanks and answers.** Fields left empty print as ruled lines (Chicago's person and contacts
+  pages read every row with lines to write on); Philadelphia's 181 typed answers all appear
+  exactly as typed, as do Detroit's 28 and Minot's 10.
+- **Wallet cards** (1–5 per binder) never split across sheets; each has its cut marks and the
+  person's name ("Person 1 (adult)" where none was given). **The tab label sheet** is the last
+  page of every PDF and carries all ten labels.
+- **Both sides.** On A4 printed on both sides (Philadelphia 93 pages, Hays 89, Minot 91) every tab
+  and the label sheet start on a right-hand page and the wallet cards have a blank back.
+- **Greyscale.** Five Philadelphia pages rendered in greyscale (the neighbourhood map with its
+  hatched flood zones and numbered discs, the region map with the two ways out, risks at a glance
+  with severity in words, the wallet cards, house fire with its shaded "Do first") all read cleanly.
+- **Sizes and time.** Philadelphia: 1.43 MB without maps, 2.49 MB and 90 pages with the three
+  composed maps (web-maps' real Philadelphia composites put in the maps store); 6–9 s to make.
+
+### Adversarial households
+
+Ten households in `round3/shots/verify3/adversarial/` (`make.py` writes them; `cli/` holds the
+release CLI's binder and plan, `pdfs/` the app's Letter PDF): no optional answer at all; every
+optional field at its cap with hostile text (`**`, `|`, `<script>`, `<img onerror>`, `#`,
+`{if:…}`, `{ref:home}`, `{county}`, `[^x]`, a newline and a heading in a note, unbroken 200-letter
+words, a 4,000-character note) and every list at its maximum (12 medicines each, 8 animals, 4
+vehicles, 12 accounts, 8 policies, 4 trusted people); twelve medicines and eight pets in ordinary
+words; every rare family ticked; Piute County, Utah with a one-year horizon (three natural hazards
+reach 1 in 100); a mobile home in Oklahoma County; a 31st-floor flat with an oxygen concentrator;
+Ponce, Puerto Rico with Spanish answers, one typed with a combining accent; Juneau, Alaska; Loving
+County, Texas, which has no hospital in the CMS list.
+
+All plan with no error in the CLI and in the browser; every binder passes the structure check
+(tabs, unique page ids, every link and citation resolves, no empty decision); no template marker is
+left outside the household's own words except where R4-02 says; every answer is echoed exactly, once
+trimmed and capped (the utility and insurer addresses a file can carry but the app never asks for are
+not printed); the Markdown rendering never turns an answer into a heading or a table row; and
+every PDF keeps its contents, page links, cards and labels with no word outside the printable
+area. The
+mobile home gets its tornado and hurricane lines, the high-rise its tenth-floor and elevator lines and
+the device lines, Ponce and Juneau name the place as the Census does, and Loving County's
+Neighborhood page says it has no listed hospital instead of an empty table. On every screen that
+shows the hostile answers (steps 6–8, Risks, Prepare, the binder at the top and at a page, Keep it
+up, Start) nothing ran (`window.__pwned` stayed unset), no element was injected, and the markup
+showed as text. Findings: R4-02, R4-03, R4-07.
+
+### The interview, saving and forgetting
+
+34 checks in headless Chrome, all passing (`round3/shots/verify3/interview/`): steps 6–8 render with
+"Step N of 8 · optional", a card per person headed by name, "Skip for now" on each and "See your
+risks" at the end, and they render empty for Chicago; `#/plan` and `#/plan/…` go to Prepare,
+`#/packet` and `#/packet/sources` to the binder, `#/packet/wallet-cards` to the wallet cards page
+(scrolled and focused there), `#/family` to step 7 and the old family-plan parts to their cards; a
+v0.2.0 export (version 1, Detroit, from `main`) opens, lands on Prepare, keeps every answer and is
+stored as version 2, and its meeting place reaches the wallet cards; a plan with no sensitive answer
+saves at once; with sensitive answers the save dialog offers "Protect this file with a passphrase",
+ticked, names what the file holds, says a forgotten passphrase cannot be recovered and the binder is
+the backup, refuses a short or mismatched passphrase, and unticking shows the one-sentence warning;
+the protected file is PBKDF2-SHA-256 with 600,000 rounds, a 16-byte salt, a 12-byte IV and AES-GCM,
+with no answer in clear; a plain and a protected file both reopen to the identical household; a
+wrong passphrase says so and lets the person try again; "Forget everything" removes the plan, the
+display settings and the `rr-maps` database. No page error, no request off the machine.
+
+### Maps
+
+Every outside service stubbed. A first visit and an opened maps panel send nothing until "Fetch
+maps"; the consent screen names every recipient in `sources.ts` and what each receives, appears on
+every press, and the press then contacts only those origins, each with the site's address alone as
+the Referer; Philadelphia's press asks for 36 tiles (cap 250) and the pin map 9. Each failure path
+leaves its layer out and says so on the binder's maps: OpenStreetMap down, the Census map stands in
+and the legend says so; both down, "The street map could not be fetched on October 1, 2026"; the
+first Overpass server busy, the second is asked once and the places still come; both down, "Nearby
+places could not be fetched on …"; FEMA down, "Flood zones could not be fetched on …"; the Forest
+Service down (wildfire ticked), "Wildfire hazard could not be fetched on …"; every service down,
+nothing is saved and the panel says so. An unticked layer's service is not contacted. The address
+search shows its warning first, sends nothing while typing, and one press of Search sends one
+request with the typed address and offers three matches. The content security policy lists exactly
+the seven origins of `sources.ts`. The composed maps read in greyscale (above).
+
+### Content
+
+The 57 checklists cite 184 distinct sources, every one in the 498-entry registry with a URL (three
+through Internet Archive captures) and defined in the page's own Sources. Flesch-Kincaid grade of
+every printed checklist and guidance page in the 14 binders (605 pages): 2.2–7.2, median 3.8, none
+above 8 (Philadelphia's highest, "After a disaster", 7.2).
+
+**The content decisions, checked as a reader** (all 14 binders): every downed or fallen line is "35
+feet" (113 mentions, no other distance near a line); the generator lines use CDC's wording except
+the Prepare sheet's safety rule (R4-11); 15 registry entries cite Internet Archive captures of
+removed pages (Stop the Bleed and Ready.gov's nuclear page among them), three of them behind
+checklist lines; no "Leave or stay?" row is empty anywhere, and the earthquake page's tsunami branch
+prints only for Coos Bay. Eviction: `rr explain --county 24005 hazard eviction` reads "about 50
+(38–71)" with "Landlords in Baltimore County often take the same renters to court again and again,
+so we cap its figure at 7 in 100 households a year". County names read one way through the whole
+binder (cover, risks, `{county}` lines, hazard text) for Richmond city (51760), Baltimore city
+(24510), Baltimore County (24005), St. Louis city (29510) and San Juan Municipio (72127).
+
+**Five checklists read as a stressed reader would** (Philadelphia, Letter, pages 42, 45, 49, 61, 66
+in `round3/shots/verify3/pdf-pages/`). *House fire*: one glance gives the trigger and five bold
+"Do first" steps on a grey band (get out, stay low, feel doors and close them behind you, meet
+outside, call 911 from outside); the household's empty meeting place is a line to write on; "Who
+helps whom get out" waits for Grandpa Joe's helper. *Tornado*: "Go to your shelter now. Get to
+____" then down low, cover your head; the household's alert answer is filled in where the page says
+to keep listening; the fourth step says windows twice (R4-08). *Evacuation order*: leave as soon as
+told, the go-bag list in one line, the route, a radio, a ride for neighbours; the household's
+shelter and power company are filled in; the first "Leave or stay?" row is the one hard moment
+(R4-04: its "Then" cell reads "small children, pets or a disability."). *Power outage at home*:
+flashlights, check on people, radio, keep the fridge shut; a cooling centre the household named;
+35 feet from a downed line; a carbon-monoxide row. *Medicine shortage*: three calm steps, the
+household's pharmacy and a line for the prescriber's phone, and a pointer to the people pages for
+the medicine list. Each fits its page with room to write, and every step ends in its source number.
+
+### Performance and size
+
+On the Pages build with Chrome's 10 Mbps, 40 ms emulation: the start screen is ready at 2.0 s and
+the county data at 5.3 s; until the offline copy is complete a first visit transfers 5.85 MB
+(core data 3.35 MB, engine 1.57 MB, the PDF chunk 0.37 MB, the main chunk 0.21 MB, fonts 0.11 MB,
+maps 0.07 MB, the stand-in engine 0.07 MB), the five ZIP tables 0.98 MB when a ZIP code is entered
+and the county outlines 0.30 MB. `assess` for Philadelphia: 44.8 ms median of 12 calls (first call
+35.6 ms, slowest 65.3 ms), 47.8 ms with the JSON, 183 ms with the CPU slowed four times; across all
+fourteen fixtures 34–50 ms median (R4-10). The PDF is made in 4–9 s on a quiet machine (up to
+16 s beside a Rust build), offline after one visit too (nothing sent; R4-05 for the hospital
+list).
+
+### Proposed fixes, in brief
+
+- **R4-02 (engine).** In `crates/rr-plan/src/binder/checklists.rs` the household's answers are
+  wrapped as user text (`user()`, line 358), but the step text is then passed whole through
+  `footnotes_to_markers` (line 361; `packet/mod.rs:394`), which turns a `[^x]` inside the answer
+  into a citation marker that the parser then keeps as text, and `take_ref` (line 504) cuts the first
+  `{ref:…}` it finds, inside the answer too. Make both skip the `\u{5}…\u{6}` spans (convert and
+  search only outside them), and add a test with an answer holding `[^x] {ref:home} **b**` in a step
+  and a branch. No golden moves: no fixture answer holds `[^` or `{ref:`.
+- **R4-03 (CLI).** `crates/rr-cli/src/household.rs::load` parses (line 36) and validates but never
+  calls `input.tidy()`, unlike `PlanInput::from_json`, which its own comment says it mirrors; call it
+  after parsing. No golden moves: every fixture answer is trimmed and within its cap.
+- **R4-04 (content).** `content/checklists/check_evacuation_order.md` line 33: write it without the
+  colon, for example "**Leave early,** before an order, if small children, pets or someone with a
+  disability need extra time or help to leave." (two words more; the page is at 322 of 330). The
+  row then reads "If: Leave early … to leave. / Then: Turn to Tab 3, Getting out." All 28 goldens
+  move (that one line, in every binder).
+- **R4-05 (web, proposal).** When the hospital pack has not loaded, say so on the Neighborhood page
+  and in the PDF message ("The county's hospital list loads the first time the binder is open with a
+  connection"), or precache it (122 kB gzipped on every first visit). Owner's or planner's call.
+- **R4-08 (content).** `content/checklists/check_tornado.md` line 21: keep the bold lead (a test
+  pins it) and make the rest "Keep away from doors and outside walls too."
+- **R4-11 (engine text).** `crates/rr-plan/src/packet/safety.rs:51`: for example "Run it only
+  outdoors, more than 20 feet from windows, doors and vents. Never plug it into a wall outlet or the
+  house wiring; connect it only through a transfer switch or interlock an electrician installs.
+  Backfeeding can electrocute utility workers and neighbors." It keeps the phrase the round-2 test
+  pins (`tests/round2.rs:175`). All 14 `.md` goldens and the `.json` `prepare_markdown` move (one
+  line); add `cdc_co_basics` to its citations if the Prepare sheet should cite CDC (its source
+  numbers then shift).

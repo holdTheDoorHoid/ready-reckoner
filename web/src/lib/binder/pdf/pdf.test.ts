@@ -198,10 +198,31 @@ function repoRoot(): string {
 const GOLDEN_DIR = process.env.RR_GOLDEN_DIR ?? join(repoRoot(), 'fixtures', 'golden');
 const golden = JSON.parse(readFileSync(join(GOLDEN_DIR, 'philadelphia-renters-4.json'), 'utf8')) as { binder: Binder };
 
+/** The golden binder drawn once per paper size, for the tests below. */
+const goldenDrawn = new Map<Paper, Promise<{ r: RenderedPdf; pdf: ReadPdf }>>();
+function drawGolden(paper: Paper): Promise<{ r: RenderedPdf; pdf: ReadPdf }> {
+  let d = goldenDrawn.get(paper);
+  if (!d) {
+    d = draw(golden.binder, { paper }, `philadelphia-${paper.toLowerCase()}`);
+    goldenDrawn.set(paper, d);
+  }
+  return d;
+}
+
 describe("the PDF of the engine's Philadelphia binder", () => {
   for (const paper of ['LETTER', 'A4'] as const) {
+    // verify3 R4-01: pdfmake dropped the anchor of a numbered source whose entry began at the top of
+    // a column or a page of the two-column Sources list, so the citations to it led nowhere.
+    it(`makes every numbered source a destination, and every link lands on one (${paper === 'LETTER' ? 'Letter' : 'A4'})`, async () => {
+      const { pdf } = await drawGolden(paper);
+      const missing = golden.binder.sources.map((s) => `src-${s.n}`).filter((d) => !pdf.destinations.has(d));
+      expect(missing, 'numbered sources with no destination').toEqual([]);
+      const dangling = pdf.pages.flatMap((p) => p.links.filter((l) => l.dest !== undefined && !pdf.destinations.has(l.dest)).map((l) => `page ${p.number}: ${l.dest}`));
+      expect(dangling, 'links to a destination that is not in the PDF').toEqual([]);
+    }, 180_000);
+
     it(`keeps every page's fit, and comes to between 75 and 110 pages (${paper === 'LETTER' ? 'Letter' : 'A4'})`, async () => {
-      const { r, pdf } = await draw(golden.binder, { paper }, `philadelphia-${paper.toLowerCase()}`);
+      const { r, pdf } = await drawGolden(paper);
       expect(pdf.pages.length).toBeGreaterThanOrEqual(75);
       expect(pdf.pages.length).toBeLessThanOrEqual(110);
       const lines: string[] = [`${paper}: ${pdf.pages.length} pages in ${r.passes} layouts`];
