@@ -341,7 +341,7 @@ buckets = ["water_out"]
 tier = "w2"
 free = false
 long_horizon = true
-spec = "Sturdy food-grade containers with a handle and a spout, for bringing water home from a distribution point, a neighbour's well or a spring when an outage outlasts the water you store, as households did for weeks after Hurricane Helene in Asheville (EPA). A full 5-gallon carrier weighs about 42 pounds, so pick a size each carrier can lift."
+spec = "Sturdy food-grade containers with a handle and a spout, for bringing water home from a distribution point, a neighbor's well or a spring when an outage outlasts the water you store, as households did for weeks after Hurricane Helene in Asheville (EPA). A full 5-gallon carrier weighs about 42 pounds, so pick a size each carrier can lift."
 look_for = [
   "Food-grade plastic made for drinking water",
   "A comfortable handle and a cap that seals",

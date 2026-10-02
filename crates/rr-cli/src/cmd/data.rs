@@ -235,7 +235,7 @@ fn info(data: &DataArgs) -> Result<Output, CliError> {
                 "Retrieved",
                 "Sources",
                 "Counties without data",
-                "Licences",
+                "Licenses",
             ])
             .right(2)
             .right(3);

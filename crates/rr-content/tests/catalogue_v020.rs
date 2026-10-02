@@ -74,7 +74,7 @@ fn the_practitioner_items_exist_with_their_rules() {
         "coldest",
         "tie down",
         "trigger",
-        "neighbours",
+        "neighbors",
     ] {
         assert!(list.contains(step), "the 48-hour list lacks `{step}`");
     }

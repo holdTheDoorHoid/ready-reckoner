@@ -310,7 +310,7 @@ fn check_citations(content: &Content, r: &mut Report) {
             r.error(&loc, "missing publisher");
         }
         if c.license.trim().is_empty() {
-            r.error(&loc, "missing licence");
+            r.error(&loc, "missing license");
         }
         let url_ok = (c.url.starts_with("https://") || c.url.starts_with("http://"))
             && !c.url.contains(char::is_whitespace)

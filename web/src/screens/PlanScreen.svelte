@@ -71,7 +71,7 @@
     { name: 'Plans and papers', categories: ['plan', 'documents', 'comms', 'money'] },
     { name: 'Water, food and medicine', categories: ['water', 'food', 'medical', 'thermal', 'animals'] },
     { name: 'Getting around', categories: ['transport'] },
-    { name: 'Neighbours', categories: ['community'] },
+    { name: 'Neighbors', categories: ['community'] },
   ];
 
   function groupFree(items: PlanItem[]): { name: string; items: PlanItem[] }[] {

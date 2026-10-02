@@ -1363,11 +1363,11 @@ function buildRequirements(ctx: Ctx): RequirementLine[] {
     bucket: 'security',
     item_class: 'neighbours_numbers',
     quantity: 2,
-    unit: 'neighbour',
+    unit: 'neighbor',
     per: 'household',
     rule: 'mock_two_neighbours',
     citations: ['mock_social_capital'],
-    plain: 'Numbers for at least two neighbours who agree to check on you.',
+    plain: 'Numbers for at least two neighbors who agree to check on you.',
   });
   add({
     id: 'documents',
@@ -1423,7 +1423,7 @@ const FREE_WHY: Record<string, string> = {
   temperature_plan: 'Heat and cold are most dangerous when the power is out. Knowing where to go is free.',
   alarms_test: 'Working smoke alarms roughly halve the chance of dying in a home fire. Testing takes a minute.',
   escape_plan: 'In a fire you may have only a couple of minutes. Practising makes the way out automatic.',
-  neighbours_numbers: 'Neighbours are the first help in almost every disaster. Two phone numbers are a real supply.',
+  neighbours_numbers: 'Neighbors are the first help in almost every disaster. Two phone numbers are a real supply.',
   check_in_agreement: 'People who live alone or can’t get out easily are most at risk in heat and outages. A check-in plan protects them.',
   car_half_tank: 'Fuel pumps need power. Half a tank means you can leave or get home without queueing.',
   ev_charge_habit: 'A charged car is transport, and sometimes a power source. Charging before storms is free.',
@@ -1436,7 +1436,7 @@ const FREE_WHY: Record<string, string> = {
   livestock_water_plan: 'Animals drink far more than people, and a stopped pump affects them first.',
   insurance_check: 'Most people find out what their policy covers after the damage. Reading it now is free.',
   utility_shutoffs: 'A gas leak or burst pipe is much less damaging if you can shut it off in seconds.',
-  community_group: 'Trained neighbours reach people long before outside help can.',
+  community_group: 'Trained neighbors reach people long before outside help can.',
   firearm_safe_storage: 'Locked storage prevents most firearm accidents and gives time in a crisis.',
 };
 

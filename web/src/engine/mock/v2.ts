@@ -637,7 +637,7 @@ const SUB_CAUSES: Partial<Record<HazardId, SubCause[]>> = {
     sub('grid_cyberattack', 'Cyberattack on the grid', 'Hackers switched off parts of Ukraine’s grid in 2015; no US case has cut power.', undefined, ['mock_societal_prior']),
   ],
   house_fire: [
-    sub('co_poisoning', 'Carbon monoxide poisoning', 'Carbon monoxide from a furnace, generator or car builds up indoors, most often after storms when generators run too close to the house. Shown beside fires, not added to them; a CO alarm is the defence.', [7e-5, 3e-4], ['mock_fire_safety']),
+    sub('co_poisoning', 'Carbon monoxide poisoning', 'Carbon monoxide from a furnace, generator or car builds up indoors, most often after storms when generators run too close to the house. Shown beside fires, not added to them; a CO alarm is the defense.', [7e-5, 3e-4], ['mock_fire_safety']),
     sub('battery_fire', 'Lithium battery fire', 'E-bike, scooter and power-bank batteries can catch fire while charging; charge them where you can see them.', undefined, ['mock_fire_safety']),
   ],
   medical_emergency: [sub('falls_older_adults', 'Falls', 'Falls are a leading reason older adults need emergency care; clear floors and light the way at night.', undefined, ['mock_ed_visits'])],

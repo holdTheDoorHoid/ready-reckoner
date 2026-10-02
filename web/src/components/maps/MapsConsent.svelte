@@ -103,7 +103,7 @@
     {/if}
     {#if !chosen.base && !hasHomePin}
       <p class="note" role="status">
-        Without the street map there is nothing to place your pins on, so the maps will centre on the middle of your ZIP code and will
+        Without the street map there is nothing to place your pins on, so the maps will center on the middle of your ZIP code and will
         not mark your home.
       </p>
     {/if}

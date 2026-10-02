@@ -123,6 +123,9 @@ describe('The consent screen', () => {
     expect(m.text()).toContain(SURGE_NOTE);
     expect(m.text()).toContain('internet (IP) address');
     expect(m.text()).toContain('Nothing has been sent yet');
+    // US spelling, as everywhere else in the app (R3-23): "neighborhood", never "neighbourhood".
+    expect(m.text()).toContain('your neighborhood');
+    expect(m.text()).not.toMatch(/neighbour/i);
     await noAxeViolations(m.target, 'the consent screen');
     boxes[1]!.click(); // untick places
     boxes[3]!.click(); // tick wildfire
@@ -192,6 +195,8 @@ describe('The maps panel: nothing is fetched before "Fetch maps", on every press
     expect(m.text()).toContain('Before we fetch your maps');
     expect(fake.requests).toEqual([]);
     expect(fetchSpy).not.toHaveBeenCalled();
+    expect(m.text()).toContain('Three maps for your binder: your neighborhood');
+    expect(m.text()).not.toMatch(/neighbour/i);
     await noAxeViolations(m.target, 'the panel with its consent screen');
   });
 
@@ -413,9 +418,9 @@ function record(extra: Partial<MapRecord> = {}): MapRecord {
 
 describe('A map in its slot', () => {
   it('shows the image with words for it, the numbered legend as text, the pattern keys, statuses and dated credits', async () => {
-    const m = keep(render(MapFigure, { slot: 'neighbourhood', caption: 'Your neighbourhood', record: record() }));
+    const m = keep(render(MapFigure, { slot: 'neighbourhood', caption: 'Your neighborhood', record: record() }));
     const img = m.target.querySelector('img')!;
-    expect(img.getAttribute('alt')).toBe('Map of your neighbourhood, showing H home, 1 places numbered as in the table below. The bars show 500 ft and 200 m.');
+    expect(img.getAttribute('alt')).toBe('Map of your neighborhood, showing H home, 1 places numbered as in the table below. The bars show 500 ft and 200 m.');
     const rows = [...m.target.querySelectorAll('tbody tr')].map((tr) => [...tr.querySelectorAll('td')].map((td) => td.textContent?.trim()));
     expect(rows).toEqual([
       ['H', 'Home', 'Your plan', '—'],

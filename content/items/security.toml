@@ -18,7 +18,7 @@ look_for = [
 ]
 avoid = [
   "Firearms left loaded or unlocked where children, visitors or someone in crisis could reach them",
-  "Counting firearms as a substitute for water, heat, medicine or neighbours",
+  "Counting firearms as a substitute for water, heat, medicine or neighbors",
 ]
 price_band_usd = { low = 0, high = 0, per = "action", note = "Free action: the plan never includes firearms, ammunition or related equipment in a budget." }
 quantity_rule = "once"
@@ -34,10 +34,10 @@ unit = "action"
 buckets = ["security", "comms", "income", "home_loss"]
 tier = "now"
 free = true
-spec = "Lock doors and windows as a habit, light the places someone could hide, and leave a spare key with a trusted neighbour instead of under the mat (NCPC). Turn on two-step login for your bank, email and phone accounts, keep devices updated, and after a disaster be wary of anyone who rushes you or wants payment in cash, gift cards or wire transfers (Ready.gov, CISA, FTC). In a tense moment, notice what is happening, say hello, judge the risk and get help; if an attack happens in a public place, getting away is the top priority (CISA, Ready.gov)."
+spec = "Lock doors and windows as a habit, light the places someone could hide, and leave a spare key with a trusted neighbor instead of under the mat (NCPC). Turn on two-step login for your bank, email and phone accounts, keep devices updated, and after a disaster be wary of anyone who rushes you or wants payment in cash, gift cards or wire transfers (Ready.gov, CISA, FTC). In a tense moment, notice what is happening, say hello, judge the risk and get help; if an attack happens in a public place, getting away is the top priority (CISA, Ready.gov)."
 look_for = [
   "Working locks on every outside door and ground-floor window, and clear, lit paths",
-  "A neighbour who holds a spare key and watches the house when you are away",
+  "A neighbor who holds a spare key and watches the house when you are away",
   "Two-step login on email, bank and phone accounts, and automatic updates turned on",
   "Contractors with a local address and a license you can check, and charities you look up yourself",
   "The two nearest exits wherever you go",
@@ -69,7 +69,7 @@ look_for = [
   "Easy mounting that renters can remove",
 ]
 avoid = [
-  "Pointing it into a neighbour's windows",
+  "Pointing it into a neighbor's windows",
   "Lights that need wiring if you rent",
 ]
 price_band_usd = { low = 24.49, high = 24.99, per = "light", note = "Two retail listings for solar motion-sensor lights: $24.49 and $24.99." }
@@ -87,7 +87,7 @@ unit = "key safe"
 buckets = ["security", "get_home"]
 tier = "w2"
 free = false
-spec = "A sturdy key safe bolted to the wall out of sight, with a push-button or dial code, so family, a neighbour or a responder can let you in when you are locked out, away or hurt. Where you can, choose a model an independent test lab has attack-tested and rated (Sold Secure publishes its list); cheap boxes with four small dials are easy to pry off or decode."
+spec = "A sturdy key safe bolted to the wall out of sight, with a push-button or dial code, so family, a neighbor or a responder can let you in when you are locked out, away or hurt. Where you can, choose a model an independent test lab has attack-tested and rated (Sold Secure publishes its list); cheap boxes with four small dials are easy to pry off or decode."
 look_for = [
   "Solid metal, bolted into brick, concrete or framing, never hung on a doorknob",
   "A code of five digits or more that you can change (Thurrock Council, UK)",
@@ -98,7 +98,7 @@ avoid = [
   "A cheap four-dial box or a fake rock",
   "Leaving the factory code, or writing the code on the box",
 ]
-price_band_usd = { low = 37.0, high = 62.57, per = "key safe", note = "Two home-center listings for wall-mounted push-button key safes: $37.00 and $62.57. A spare key with a trusted neighbour costs nothing; renters keep one with a neighbour instead (the lockout plan)." }
+price_band_usd = { low = 37.0, high = 62.57, per = "key safe", note = "Two home-center listings for wall-mounted push-button key safes: $37.00 and $62.57. A spare key with a trusted neighbor costs nothing; renters keep one with a neighbor instead (the lockout plan)." }
 retrieved = "2026-09-26"
 quantity_rule = "once_if_owned_house"
 citations = ["sold_secure_key_safes", "thurrock_key_safe_advice", "ollam_2022_lawyer_passport_locksmith_gun", "rr_expert_prior", "rr_price_observations_2026_09"]
@@ -114,7 +114,7 @@ unit = "action"
 buckets = ["security", "get_home"]
 tier = "now"
 free = true
-spec = "Plan now for being locked out of your home or car. Leave a spare key with a family member, neighbour or friend. Find a local locksmith before you need one and save the number, because some locksmiths who advertise are not local or trained (FTC)."
+spec = "Plan now for being locked out of your home or car. Leave a spare key with a family member, neighbor or friend. Find a local locksmith before you need one and save the number, because some locksmiths who advertise are not local or trained (FTC)."
 look_for = [
   "A spare house key with someone nearby",
   "A locksmith's number in your phone and on paper",

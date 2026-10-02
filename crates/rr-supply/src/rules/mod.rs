@@ -147,7 +147,7 @@ pub fn round_quantity(unit: &str, x: f64) -> f64 {
         "kcal" => round_to(x, 100.0),
         "Wh" | "watt" | "gram" => round_to(x, 10.0),
         "usd" | "oz" => round_dp(x, 0),
-        "gallon" | "litre" | "lb" | "day" | "person_day" | "pet_day" | "month" => round_dp(x, 1),
+        "gallon" | "liter" | "lb" | "day" | "person_day" | "pet_day" | "month" => round_dp(x, 1),
         _ => ceil_count(x),
     }
 }

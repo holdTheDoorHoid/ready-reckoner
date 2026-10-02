@@ -31,7 +31,7 @@ export type MapSlotBlock = MapSlot;
 
 /** Stand-ins for the binder's three slots until the binder lands (awaiting: binder). */
 export const MAP_SLOT_FIXTURES: readonly MapSlotBlock[] = [
-  { id: 'map-neighbourhood', kind: 'neighbourhood', caption: 'Your neighbourhood' },
+  { id: 'map-neighbourhood', kind: 'neighbourhood', caption: 'Your neighborhood' },
   { id: 'map-area', kind: 'area', caption: 'Your city or county' },
   { id: 'map-region', kind: 'region', caption: 'Getting out: your region' },
 ];

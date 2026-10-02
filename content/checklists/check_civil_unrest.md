@@ -23,7 +23,7 @@ There are riots, violent protests or a curfew near your home, your work or your 
 
 1. **Know your exit routes** in case you have to leave.[^fairfax_civil_disorder]
 2. **Use your home supplies** of food, water and medicine.[^ready_gov_kit]
-3. **Look out for your neighbours,** and ask them to look out for you.[^ncpc_home_safety]
+3. **Look out for your neighbors,** and ask them to look out for you.[^ncpc_home_safety]
 4. **If someone near you is tense,** stay calm and friendly, and get help if you need it.[^cisa_deescalation]
 5. **If violence starts near you, get away.** If you cannot, hide out of sight behind something solid.[^ready_gov_public_spaces]
 

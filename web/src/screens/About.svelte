@@ -49,7 +49,7 @@
       { name: 'County data', what: 'For every county: natural hazards, power outages, storms and other events, climate projections, floods, earthquakes, nearby facilities and how resilient the community is.', files: counties.length, bytes: size(counties), status: phaseWords(app.data?.core.phase, 'Loads when the app opens') },
       { name: 'ZIP code list', what: 'Which county each ZIP code is in, and how far it is from nuclear plants and chemical sites.', files: zips.length, bytes: size(zips), status: phaseWords(app.data?.zip.phase, 'Loads when you type a ZIP code') },
       { name: 'County map', what: 'The outline of every county, for the small maps.', files: map.length, bytes: size(map), status: phaseWords(app.data?.map.phase, 'Loads when a map is shown') },
-      { name: 'Hospitals', what: 'Hospitals with emergency services near you, for the binder.', files: places.length, bytes: size(places), status: phaseWords(app.data?.places.phase, 'Loads when the Neighbourhood page is shown') },
+      { name: 'Hospitals', what: 'Hospitals with emergency services near you, for the binder.', files: places.length, bytes: size(places), status: phaseWords(app.data?.places.phase, 'Loads when the Neighborhood page is shown') },
     ].filter((p) => p.files > 0);
   });
 
@@ -240,7 +240,7 @@
   </section>
 
   <section aria-labelledby="licence-title">
-    <h2 id="licence-title">Licences</h2>
+    <h2 id="licence-title">Licenses</h2>
     <ul>
       <li>The code is free software under the GNU General Public License, version 3.</li>
       <li>Guidance text and tables are under Creative Commons Attribution-ShareAlike 4.0.</li>

@@ -530,7 +530,7 @@ export function buildBinder(input: PlanInput, r: ModelResult): Binder {
     return entry;
   });
   sourcesPage.blocks.push(
-    para(t('The numbers in brackets point to this list; "expert estimate" marks a judgement, not measured data.')),
+    para(t('The numbers in brackets point to this list; "expert estimate" marks a judgment, not measured data.')),
     { numbered: binder.sources.map((s) => [t(`${s.title}. ${s.publisher}${s.year ? `, ${s.year}` : ''}.${s.url ? ` ${s.url}` : ''}`)]) },
     h(1, 'Data credits'),
     { bullets: binder.credits.map((cr) => [t(cr)]) },

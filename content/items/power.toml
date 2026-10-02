@@ -144,7 +144,7 @@ look_for = [
 ]
 avoid = [
   "Running it in a garage, porch or near any opening, even with doors open (CDC)",
-  "Plugging it into a wall outlet or the house wiring: backfeeding can electrocute utility workers and neighbours (CPSC)",
+  "Plugging it into a wall outlet or the house wiring: backfeeding can electrocute utility workers and neighbors (CPSC)",
   "Buying one if you live in an apartment or cannot keep it 20 feet from the building",
   "Assuming a small unit can start a well pump: check the pump's starting watts",
 ]
@@ -243,7 +243,7 @@ unit = "installed kit"
 buckets = ["power", "water_out"]
 tier = "w2"
 free = false
-spec = "An inlet on the outside wall with an interlock kit on the main panel, or a transfer switch, installed by a licensed electrician, so a portable generator can run the well pump and other chosen circuits. It is the only safe way to connect a generator to house wiring: OSHA says to attach one only through a transfer switch a qualified electrician installed, and CPSC warns that plugging a generator into a wall outlet can electrocute utility workers and neighbours."
+spec = "An inlet on the outside wall with an interlock kit on the main panel, or a transfer switch, installed by a licensed electrician, so a portable generator can run the well pump and other chosen circuits. It is the only safe way to connect a generator to house wiring: OSHA says to attach one only through a transfer switch a qualified electrician installed, and CPSC warns that plugging a generator into a wall outlet can electrocute utility workers and neighbors."
 look_for = [
   "A licensed electrician, and a permit where your town requires one",
   "An inlet and interlock rated for your generator's outlet, 240 volts if your well pump runs on it",

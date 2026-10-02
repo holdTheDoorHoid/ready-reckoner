@@ -89,7 +89,7 @@ pub fn get_home_water(index: usize, commute: &Commute, hot: bool) -> Sizing {
         count(crate::format::round_dp(hours, 1), "hour", "hours"),
         num(rate, 2),
         if hot { " in heat" } else { "" },
-        num(super::round_quantity("litre", litres), 1)
+        num(super::round_quantity("liter", litres), 1)
     );
     if litres > carry_max && hot {
         text.push_str(&format!(
@@ -107,7 +107,7 @@ pub fn get_home_water(index: usize, commute: &Commute, hot: bool) -> Sizing {
         "get_home_water",
         "walking_water",
         litres,
-        "litre",
+        "liter",
         Per::Commuter,
         text,
     )
@@ -129,7 +129,7 @@ pub fn get_home_filter(index: usize, commute: &Commute, hot: bool) -> Option<Siz
     b.cite("cdc_water_disinfection");
     let text = format!(
         "A small water filter or purification tablets for person {index}'s walk home, which needs about {} L of water, more than the {} L worth carrying: pack an empty bottle and refill it on the way. Choose a filter rated 0.3 micron or smaller; it does not remove viruses or chemicals.",
-        num(super::round_quantity("litre", litres), 1),
+        num(super::round_quantity("liter", litres), 1),
         num(carry_max, 1)
     );
     Some(Sizing::new(

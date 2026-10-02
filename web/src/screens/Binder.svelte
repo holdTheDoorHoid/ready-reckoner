@@ -21,10 +21,11 @@
   import type { BinderView } from '../components/binder/view';
   import Icon from '../components/Icon.svelte';
   import PlanGate from '../components/PlanGate.svelte';
+  import { hospitalListMissing } from '../engine/data-files';
   import type { Binder, MapSlot, PlanOutput } from '../engine/types';
   import { followInPageAnchor, jumpTo } from '../lib/anchors';
   import { useApp } from '../lib/app.svelte';
-  import { binderPages, findPage, flatBlocks, pageDomId, pageIndex, partDomId, pdfFileName } from '../lib/binder/model';
+  import { binderPages, findPage, flatBlocks, HOSPITAL_LIST_MISSING, pageDomId, pageIndex, partDomId, pdfFileName } from '../lib/binder/model';
   import type { MapsStatus, Paper, PdfMap } from '../lib/binder/pdf/doc';
   import type { CountyOutline } from '../lib/maps/compose';
   import { hasChildren, suggestedLayers } from '../lib/maps/rules';
@@ -65,6 +66,9 @@
   $effect(() => {
     app.loadPlaces();
   });
+  /** The list could not be had (the binder first opened offline, or the site has no hospital file):
+   * the Neighborhood page and the PDF's message say so in one sentence (verify3 R4-05). */
+  const hospitalsMissing = $derived(hospitalListMissing(app.data?.places, app.manifest));
 
   /** A contents link to the page already in the address changes nothing the router sees: jump anyway. */
   function onjump(id: string, e: MouseEvent) {
@@ -143,7 +147,7 @@
   }
 
   function viewOf(binder: Binder): BinderView {
-    return { binder, pages: pageIndex(binder), maps, addMaps };
+    return { binder, pages: pageIndex(binder), maps, addMaps, hospitalsMissing };
   }
 
   // ---- the PDF --------------------------------------------------------------------------------
@@ -193,6 +197,7 @@
       if (made.missing.length) {
         pdfMessage += ` Some letters in your answers are not in the PDF's typeface and show as empty boxes: ${made.missing.join(' ')}. The Print button uses this device's own typefaces instead.`;
       }
+      if (hospitalsMissing) pdfMessage += ` ${HOSPITAL_LIST_MISSING}`;
     } catch (e) {
       const why = e instanceof Error && e.message ? ` (${e.message})` : '';
       pdfMessage = `The PDF could not be made${why}. You can still use Print, and choose "Save as PDF" there.`;

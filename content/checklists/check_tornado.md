@@ -18,7 +18,7 @@ A tornado warning is issued for your area, or you see a funnel cloud or hear a r
 3. {if:home:apartment_low_rise|apartment_high_rise}**Use an inside hallway.** Pick a stairwell or small room with no windows, as low as you can get to quickly.[^ready_gov_tornadoes_2014]{/if}
 4. {if:home:mobile_home}**Leave the mobile home.** Go to a sturdy building or storm shelter nearby.[^ready_gov_tornadoes_2014]{/if}
 5. **Cover your head.** Protect your head and neck with your arms.[^ready_gov_tornadoes]
-6. **Stay away from windows.** Keep away from windows, doors and outside walls.[^ready_gov_tornadoes]
+6. **Stay away from windows.** Keep away from doors and outside walls too.[^ready_gov_tornadoes]
 
 ## Then
 

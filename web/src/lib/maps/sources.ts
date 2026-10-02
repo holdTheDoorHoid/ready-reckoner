@@ -287,14 +287,14 @@ export const RECIPIENTS: readonly Recipient[] = [
     id: 'places',
     layer: 'Nearby places (pharmacies, grocery stores, fire stations, hospitals…)',
     who: 'The Overpass service (FOSSGIS e.V., Germany), which searches OpenStreetMap. If it is busy, a second Overpass server (Private.coffee, formerly kumi.systems) instead.',
-    receives: 'Boxes on the map around your home, from your neighbourhood out to your city or county. Never your home’s exact spot.',
+    receives: 'Boxes on the map around your home, from your neighborhood out to your city or county. Never your home’s exact spot.',
     origins: OVERPASS.urls.map(originOf),
   },
   {
     id: 'flood',
     layer: 'Flood zones',
     who: 'FEMA, the Federal Emergency Management Agency.',
-    receives: 'The box of your neighbourhood map, about 1.5 km (1 mile) across. Never your home’s exact spot.',
+    receives: 'The box of your neighborhood map, about 1.5 km (1 mile) across. Never your home’s exact spot.',
     origins: [originOf(FLOOD.url)],
   },
   {

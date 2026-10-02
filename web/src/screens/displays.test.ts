@@ -364,7 +364,7 @@ describe('Learn (W7)', () => {
       ['myths', 'Disaster myths and what really happens'],
       ['numbers', 'How the numbers are made'],
       ['children', 'Talking with children about emergencies'],
-      ['community', 'Neighbours and mutual aid'],
+      ['community', 'Neighbors and mutual aid'],
       // v0.2.0 (verify2): the Deviant Ollam lessons and the strategic-site explainer were written
       // and reviewed but not reachable anywhere in the app.
       ['before-you-need-them', 'Before you need them'],

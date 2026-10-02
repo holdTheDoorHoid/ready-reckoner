@@ -196,7 +196,7 @@ fn every_line_is_cited_and_well_formed() {
     let rules: BTreeSet<&str> = rule_ids().into_iter().collect();
     let units = [
         "gallon",
-        "litre",
+        "liter",
         "kcal",
         "usd",
         "day",
@@ -711,7 +711,7 @@ fn per_day_rates_reproduce_the_quantities() {
                 "kcal" => 50.0,
                 "Wh" | "watt" | "gram" => 5.0,
                 "usd" | "oz" => 0.5,
-                "gallon" | "litre" | "lb" | "day" | "person_day" | "pet_day" | "month" => 0.051,
+                "gallon" | "liter" | "lb" | "day" | "person_day" | "pet_day" | "month" => 0.051,
                 _ => 1.0, // whole things are rounded up
             };
             assert!(

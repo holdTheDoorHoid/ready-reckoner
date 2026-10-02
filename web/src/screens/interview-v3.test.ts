@@ -338,14 +338,14 @@ describe('Step 7, Your places', () => {
       expect([...r.target.querySelectorAll('section h2')].map((h) => h.textContent)).toEqual([
         'Your home',
         'Meeting places and staying in touch',
-        'Your neighbourhood',
+        'Your neighborhood',
         'Getting out',
       ]);
       const labels = [...r.target.querySelectorAll('label:not(.choice), legend')].map(shown);
       for (const v2 of [
         'Someone out of the area everyone checks in with',
         'Where to meet near home',
-        'Where to meet outside the neighbourhood',
+        'Where to meet outside the neighborhood',
         'Numbers to know by heart',
         'What each person does at work or school',
         'The safest spot at home',
@@ -357,7 +357,7 @@ describe('Step 7, Your places', () => {
         'Gas shut-off',
         'Main water shut-off',
         'Electrical panel or main breaker',
-        'Neighbours who check on you, and whom you check on',
+        'Neighbors who check on you, and whom you check on',
       ]) {
         expect(labels, v2).toContain(v2);
       }

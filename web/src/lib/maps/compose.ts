@@ -183,7 +183,7 @@ const OWN_POINTS: Record<MapSlotKind, { id: 'home' | 'meeting_near' | 'meeting_f
   ],
   area: [
     { id: 'home', mark: 'H', name: 'Home' },
-    { id: 'meeting_far', mark: 'M2', name: 'Meeting place outside the neighbourhood' },
+    { id: 'meeting_far', mark: 'M2', name: 'Meeting place outside the neighborhood' },
   ],
   region: [
     { id: 'home', mark: 'H', name: 'Home' },
@@ -192,8 +192,8 @@ const OWN_POINTS: Record<MapSlotKind, { id: 'home' | 'meeting_near' | 'meeting_f
 };
 
 const HOME_NOTE: Record<Exclude<HomeBasis, 'pin'>, string> = {
-  zip: 'No home pin was placed, so this map is centred on the middle of your ZIP code and your home is not marked.',
-  county: 'No home pin was placed, so this map is centred on the middle of your county and your home is not marked.',
+  zip: 'No home pin was placed, so this map is centered on the middle of your ZIP code and your home is not marked.',
+  county: 'No home pin was placed, so this map is centered on the middle of your county and your home is not marked.',
 };
 
 /** The county outline comes from this app's own data (`data/geo/counties.json`). */

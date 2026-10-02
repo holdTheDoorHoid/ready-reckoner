@@ -21,9 +21,9 @@ const DIAL_LABEL: Record<PlanInput['dials']['return_period'], string> = {
 };
 
 const WATER_LABEL = {
-  survival: 'survival, about 3 litres per person per day (drinking only)',
+  survival: 'survival, about 3 liters per person per day (drinking only)',
   basic: 'basic, about 1 gallon per person per day',
-  comfortable: 'comfortable, about 15 litres per person per day (drinking and washing)',
+  comfortable: 'comfortable, about 15 liters per person per day (drinking and washing)',
 } as const;
 
 const AGE_WORDS: Record<string, [string, string]> = {

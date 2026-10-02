@@ -137,7 +137,7 @@ describe('Composing the three maps for a Philadelphia household', () => {
     ]);
     expect(nb!.legend.map((r) => r.mark)).toEqual(['H', 'M1', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
     expect(nb!.legend.find((r) => r.mark === '3')?.name).toBe('Pharmacy (no name listed)');
-    expect(area!.legend[1]).toEqual({ mark: 'M2', name: 'Meeting place outside the neighbourhood', kind: 'Your plan', own: true });
+    expect(area!.legend[1]).toEqual({ mark: 'M2', name: 'Meeting place outside the neighborhood', kind: 'Your plan', own: true });
     expect(area!.legend.filter((r) => r.kind === 'Hospital with an emergency room').map((r) => r.name)).toContain('Pennsylvania Hospital');
     expect(area!.notes).toContain(HOSPITAL_NOTE);
     expect(region!.legend).toEqual([
@@ -302,7 +302,7 @@ describe('What the household chose', () => {
     const result = await composeMaps(input({ maps: { ...emptyMapsState() }, location: { ...PHILLY, zip_centroid: HOME } }), env);
     const [nb] = result.maps;
     expect(nb!.legend.some((r) => r.mark === 'H')).toBe(false);
-    expect(nb!.notes[0]).toBe('No home pin was placed, so this map is centred on the middle of your ZIP code and your home is not marked.');
+    expect(nb!.notes[0]).toBe('No home pin was placed, so this map is centered on the middle of your ZIP code and your home is not marked.');
   });
 
   it('a meeting place beyond the edge of its map is listed, not drawn', async () => {

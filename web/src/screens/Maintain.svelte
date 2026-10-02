@@ -71,7 +71,7 @@
     app.markDone(`check:${itemId}`, today);
     const planned = app.result.output?.plan.months.flatMap((m) => m.items).find((i) => i.item_id === itemId);
     if (planned && !planned.done) app.record(planned);
-    message = `Practised today: ${name}.`;
+    message = `Practiced today: ${name}.`;
   }
 
   function lastPractised(itemId: string): string | undefined {
@@ -167,7 +167,7 @@
 
 <div class="page page--narrow">
   <h1 id="page-title" tabindex="-1">Keep it up</h1>
-  <p class="lead">A few minutes a month keeps your plan working: use and replace, check, and practise. Missing a month is fine.</p>
+  <p class="lead">A few minutes a month keeps your plan working: use and replace, check, and practice. Missing a month is fine.</p>
   {#if app.plan && app.catalogue}
     <p class="button-row no-print">
       <button type="button" class="button" onclick={() => window.print()}><Icon name="print" /> Print this calendar</button>
@@ -241,7 +241,7 @@
 
     {#if drills.length}
       <section aria-labelledby="drills-title">
-        <h2 id="drills-title">Practise</h2>
+        <h2 id="drills-title">Practice</h2>
         <p class="section-intro">Ten-minute drills make the real thing automatic. They count toward your plan.</p>
         <ul class="tasks">
           {#each drills as d (d.id)}
@@ -250,10 +250,10 @@
               <div>
                 <p class="task__title">{d.name}</p>
                 <p class="small muted">
-                  {d.maintenance?.check_months ? `${intervalLabel(d.maintenance.check_months)}. ` : ''}{last ? `Last practised ${formatDate(last)}.` : 'Not practised yet.'}
+                  {d.maintenance?.check_months ? `${intervalLabel(d.maintenance.check_months)}. ` : ''}{last ? `Last practiced ${formatDate(last)}.` : 'Not practiced yet.'}
                 </p>
               </div>
-              <button type="button" class="button button--small no-print" onclick={() => practised(d.id, d.name)}>Practised today<span class="visually-hidden">: {d.name}</span></button>
+              <button type="button" class="button button--small no-print" onclick={() => practised(d.id, d.name)}>Practiced today<span class="visually-hidden">: {d.name}</span></button>
             </li>
           {/each}
         </ul>

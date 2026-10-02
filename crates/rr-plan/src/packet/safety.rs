@@ -48,10 +48,18 @@ pub const SAFETY_RULES: [SafetyRule; 6] = [
     },
     SafetyRule {
         label: "Generator",
-        text: "Run it outside, 20 feet from windows and doors. Never plug it into a wall outlet or \
-               the house wiring: that can electrocute utility workers and neighbors.",
+        // CDC's wording, as every guidance block and checklist words it, and the connection the
+        // plan's own interlock item buys (verify3 R4-11).
+        text: "Run it outdoors, more than 20 feet from windows, doors and vents. Never plug it \
+               into a wall outlet or the house wiring: that can electrocute utility workers and \
+               neighbors. Connect it only through a transfer switch or interlock an electrician \
+               installs.",
         step: "power_generator",
-        citations: &["ready_gov_power_outages", "cpsc_generator_alert_2021"],
+        citations: &[
+            "cdc_co_basics",
+            "cpsc_generator_alert_2021",
+            "osha_portable_generators",
+        ],
     },
     SafetyRule {
         label: "CPR",

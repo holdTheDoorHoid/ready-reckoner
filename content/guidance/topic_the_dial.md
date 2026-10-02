@@ -18,7 +18,7 @@ No plan covers everything. The dial sets how rare a disruption your plan should 
 
 The default uses the same 1-in-100-a-year yardstick behind FEMA's flood maps.[^fema_flood_zones] In an ordinary city it gives answers close to official advice. For Philadelphia that is about 3 days of power and water, 10 days of food and 2 weeks of medicine.[^rr_research_risk_model]
 
-**When the answer jumps.** Sometimes one big event sits close to your setting, such as a Cascadia earthquake on the Oregon coast. Then a small turn of the dial can move a target from 2 weeks to about 7. The plan tells you when this happens, names the event, and shows your plan with and without it. For long, rare outages it favours tools such as a water filter over huge stockpiles.[^rr_research_risk_model]
+**When the answer jumps.** Sometimes one big event sits close to your setting, such as a Cascadia earthquake on the Oregon coast. Then a small turn of the dial can move a target from 2 weeks to about 7. The plan tells you when this happens, names the event, and shows your plan with and without it. For long, rare outages it favors tools such as a water filter over huge stockpiles.[^rr_research_risk_model]
 
 **What to avoid.** Turning the dial up raises costs quickly. Cover the default fully before you plan for rarer events.
 
