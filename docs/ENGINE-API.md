@@ -563,7 +563,7 @@ page; a `cite` number outside 1 to `sources.len()`; a source whose `n` is not it
 `fields.value` is user text, printed as written, or absent, in which case the renderer draws
 `lines` ruled lines; `steps` with `memory: true` are the "do first from memory" items and render
 bold; `map_slot` is filled by the web app (DESIGN-DELTA-v3 §9) and rendered by the CLI as a
-boxed placeholder ("Map: your neighbourhood. Add it in the app, or paste a printed map here.");
+boxed placeholder ("Map: your neighborhood. Add it in the app, or paste a printed map here.");
 `fit: "one"` is a promise the page fits one printed page, enforced by a word-and-row proxy in
 rr-plan (DESIGN-DELTA-v3 §5.6) and by a real print in verification.
 

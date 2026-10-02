@@ -373,9 +373,9 @@ at the required steps (1–5) to decide whether a plan exists.
 - **Step 7, Your places (`#/places`).** Four cards: **Your home** (street address; electric, gas
   and water companies with their outage numbers; insurer and policy number; landlord or mortgage
   company; where the kit, documents, cash and spare keys are; plus the v2 fields — gas/water/
-  electrical shut-offs, the safest spot at home, neighbours who check in); **Meeting places and
+  electrical shut-offs, the safest spot at home, neighbors who check in); **Meeting places and
   staying in touch** (the v2 fields unchanged, including "the safest spot at work or school");
-  **Your neighbourhood** (nearest hospital with an emergency room, urgent care, the household's
+  **Your neighborhood** (nearest hospital with an emergency room, urgent care, the household's
   pharmacy, the shelter the community opens, the county emergency management office, how the
   household gets local alerts); **Getting out** (the v2 fields, plus — once maps are turned on,
   §"Maps" below — "Set your home point and meeting places on a map").
@@ -460,7 +460,7 @@ this line"); **"Put it at the cross"** places a pin for anyone who cannot drag. 
 instead"** shows a warning first, then sends one request per "Search" press and offers up to three
 matches to place the pin from.
 
-**After "Fetch maps,"** three printable images appear — the neighbourhood, the area and the region —
+**After "Fetch maps,"** three printable images appear — the neighborhood, the area and the region —
 each about 7 by 5 inches on paper: the base map turned grey, with hatched flood-zone and
 wildfire-hazard overlays where they apply; lettered squares for the household's own points; numbered
 discs for nearby places (with leader lines when they crowd); the county line, both ways out, scale

@@ -699,7 +699,7 @@ except for the optional, consented lookups. The repo publishes a threat model no
 
 **Since v0.3.0, the first of those optional lookups exists: maps (`docs/DESIGN-DELTA-v3.md` §9).**
 A household may ask the Binder tab or the Getting-out card to fetch three printable maps (the
-neighbourhood, the area and the region). Nothing is requested until that press; a **consent
+neighborhood, the area and the region). Nothing is requested until that press; a **consent
 screen, shown on every press**, names each outside service and says in one sentence what it
 receives before a household can turn it on: OpenStreetMap's tile servers (map tiles, with a public-
 domain Census map as the fallback), OpenStreetMap's Overpass service (a bounding box and the kinds
