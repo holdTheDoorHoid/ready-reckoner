@@ -3335,9 +3335,9 @@ The numbers in brackets point to this list; "expert estimate" marks a judgment, 
 
 ### How this binder was made
 
-- Made by Ready Reckoner 0.2.0 on October 1, 2026, from the plan's answers.
+- Made by Ready Reckoner 0.3.0 on October 1, 2026, from the plan's answers.
 - Data pack 13d6f99df7dc.
-- Content 2026.09.27+f7b3699b.
+- Content 2026.10.01+90d0a8f5.
 - Review it and print it again by October 1, 2027, and whenever something changes.
 
 ---
