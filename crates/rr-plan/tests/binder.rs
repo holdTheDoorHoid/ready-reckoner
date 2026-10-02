@@ -1269,3 +1269,47 @@ fn county_equivalents_are_named_as_the_census_names_them() {
         sample.binder.location
     );
 }
+
+/// The household's words are echoed as written even when they look like the content's own
+/// markup (verify3 R4-02): a footnote or a cross-reference typed into an answer stays text in a
+/// checklist's steps and branches, never a citation, a control character or a link.
+#[test]
+fn answers_that_look_like_markup_are_echoed_as_written() {
+    let mut input = common::household("philadelphia-renters-4");
+    let plan = input.family_plan.get_or_insert_with(Default::default);
+    let where_go = "Aunt Rosa's [^x] {ref:home} house";
+    let far = "Library {ref:after} [^ready_gov_kit]";
+    plan.where_we_would_go = Some(where_go.into());
+    plan.meeting_place_far = Some(far.into());
+    plan.out_of_area_contact = Some(rr_types::Contact {
+        name: Some("Tanya [^y] {ref:home}".into()),
+        phone: Some("555-0100".into()),
+        address: None,
+    });
+    let out = common::assess(&input);
+    assert_eq!(out.binder.check(), Vec::<String>::new());
+    let page = out.binder.page("check_evacuation_order").unwrap();
+    let texts = page_texts(page).join("\n");
+    for typed in ["Tanya [^y] {ref:home}, 555-0100", where_go, far] {
+        assert!(texts.contains(typed), "{typed:?} changed: {texts}");
+    }
+    for (p, t) in all_texts(&out.binder) {
+        assert!(
+            !t.chars().any(|c| ('\u{1}'..='\u{6}').contains(&c)),
+            "{p}: a marker in {t:?}"
+        );
+    }
+    // The branch still turns to the content's page, not to the one typed in the answer.
+    let go_to = page.blocks.iter().find_map(|b| match b {
+        Block::Decision(d) => d
+            .branches
+            .iter()
+            .find(|br| binder::text_of(&br.when).contains("Aunt Rosa"))
+            .map(|br| br.go_to.clone()),
+        _ => None,
+    });
+    assert_eq!(go_to, Some(Some("getting_out".to_owned())));
+    // In the Markdown the words are escaped text, not a citation or a "(Tab …)" reference.
+    let md = markdown::render(&out.binder);
+    assert!(md.contains(&markdown::esc(where_go)), "{where_go}");
+}
