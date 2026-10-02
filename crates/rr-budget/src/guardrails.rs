@@ -320,7 +320,7 @@ pub(crate) fn check(
             Warning::SURGE_ZONE_STAY_HOME,
             WarningSeverity::Warn,
             message.into(),
-            "Water pushed ashore by a hurricane can flood a whole neighbourhood in minutes, and \
+            "Water pushed ashore by a hurricane can flood a whole neighborhood in minutes, and \
              supplies at home do not make it safe to stay. When officials say to leave, go. Look \
              up your evacuation zone and pick where you would go.",
             &["evacuate"],
@@ -359,7 +359,7 @@ pub(crate) fn check(
             WarningSeverity::Warn,
             "A water filter is in the plan, but no water source to filter is named.".into(),
             "A filter makes raw water safe only if you have some: a well, a creek or pond nearby, \
-             a rain barrel or a neighbour's well. Name one in your home details, or store more \
+             a rain barrel or a neighbor's well. Name one in your home details, or store more \
              water instead.",
             &["water_out"],
         ));

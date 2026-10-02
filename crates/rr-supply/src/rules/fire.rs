@@ -209,13 +209,13 @@ pub fn escape_ladder_count(housing: &Housing) -> Option<Sizing> {
     let floor = f64::from(housing.floor);
     let text = if (lo..=hi).contains(&floor) {
         format!(
-            "You live on floor {}, above the ground: 1 escape ladder for a bedroom window, in case fire or smoke blocks the way out, unless every bedroom already has a second way out such as a fire escape. Keep it by the window and practise with it.",
+            "You live on floor {}, above the ground: 1 escape ladder for a bedroom window, in case fire or smoke blocks the way out, unless every bedroom already has a second way out such as a fire escape. Keep it by the window and practice with it.",
             num(floor, 0)
         )
     } else if is_house(housing) && floor <= 1.0 {
         let levels = b.k(keys::ALARM_LEVELS_HOUSE);
         format!(
-            "A house like yours usually has bedrooms upstairs ({} levels): 1 two-storey escape ladder for an upstairs bedroom window, in case fire or smoke blocks the stairs. Skip it if every bedroom is on the ground floor or already has a second way out, such as a porch roof. Keep it by the window and practise with it.",
+            "A house like yours usually has bedrooms upstairs ({} levels): 1 two-story escape ladder for an upstairs bedroom window, in case fire or smoke blocks the stairs. Skip it if every bedroom is on the ground floor or already has a second way out, such as a porch roof. Keep it by the window and practice with it.",
             num(levels, 0)
         )
     } else {
@@ -240,7 +240,7 @@ pub fn neighbour_contacts() -> Sizing {
     let n = b.k(keys::NEIGHBOUR_CONTACTS);
     let text = format!(
         "Swap phone numbers with {} and agree who checks on whom after a storm or an outage, when phones and roads may be down.",
-        count(n, "neighbour", "neighbours")
+        count(n, "neighbor", "neighbors")
     );
     Sizing::new(
         &b,
@@ -275,7 +275,7 @@ mod tests {
         // two-storey ladder, an estimate, and the escape plan points to it.
         let ladder = escape_ladder_count(&p.housing).unwrap();
         assert_eq!(ladder.quantity, 1.0);
-        assert!(ladder.plain.contains("two-storey"), "{}", ladder.plain);
+        assert!(ladder.plain.contains("two-story"), "{}", ladder.plain);
         assert!(ladder.prior);
         let plan = fire_escape_plan(&p.housing);
         assert_eq!(plan.quantity, 1.0);

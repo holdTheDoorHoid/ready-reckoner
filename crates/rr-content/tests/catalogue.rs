@@ -131,7 +131,7 @@ fn the_free_actions_named_in_the_brief_exist() {
         ("docs_effak", "Emergency Financial First Aid Kit"), // documents copied
         ("comms_contact_card", "where you will meet"),       // family plan
         ("comms_contact_card", "out-of-state contact"),      // out-of-area contact
-        ("community_know_two_neighbours", "two neighbours"), // neighbours' numbers
+        ("community_know_two_neighbours", "two neighbors"),  // neighbours' numbers
         ("fire_test_alarms", "once a month"),                // alarm tests
         ("med_list_written", "refill when a week is left"),  // refill-at-seven rule
         ("water_boil_method", "20 to 80 gallons"),           // water-heater reserve

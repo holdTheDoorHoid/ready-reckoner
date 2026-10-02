@@ -96,7 +96,7 @@ pub fn two_way_radios(people_list: &[Person]) -> Option<Sizing> {
     let years = b.k(keys::GMRS_LICENSE_YEARS);
     b.cite("fcc_frs");
     let text = format!(
-        "{} for the {} aged 13 and over, to reach each other when phones are down. FRS radios need no licence; GMRS radios reach farther but need a {} FCC licence that covers the family for {} years.",
+        "{} for the {} aged 13 and over, to reach each other when phones are down. FRS radios need no license; GMRS radios reach farther but need a {} FCC license that covers the family for {} years.",
         count(n, "two-way radio", "two-way radios"),
         count(n, "person", "people"),
         usd(fee),

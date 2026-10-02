@@ -12,7 +12,7 @@ use crate::packet::text;
 pub(super) fn page(bx: &Bx<'_>) -> Page {
     let a = bx.a();
     let mut blocks = vec![Block::Para(vec![t(
-        "The numbers in brackets point to this list; \"expert estimate\" marks a judgement, not \
+        "The numbers in brackets point to this list; \"expert estimate\" marks a judgment, not \
          measured data. The targets and the plan are Ready Reckoner's calculations from these.",
     )])];
     if !a.attributions.is_empty() {

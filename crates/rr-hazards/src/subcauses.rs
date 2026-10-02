@@ -449,8 +449,8 @@ const DEFS: &[Def] = &[
     Def {
         parent: H::MedicalEmergency,
         id: "birth_during_disaster",
-        name: "Going into labour during a disaster",
-        note: "Labour can start while roads are closed or the power is out. Know two ways to the \
+        name: "Going into labor during a disaster",
+        note: "Labor can start while roads are closed or the power is out. Know two ways to the \
                hospital and pack the go-bag early.",
         rate: None,
         sources: &[cite::CDC_PREGNANCY],
@@ -548,7 +548,7 @@ const DEFS: &[Def] = &[
         name: "Carbon monoxide poisoning",
         note: "Carbon monoxide from a furnace, generator or car builds up indoors, most often after \
                storms when generators run too close to the house. Shown beside fires, not added to \
-               them; a CO alarm is the defence.",
+               them; a CO alarm is the defense.",
         rate: Some((1.5e-4, 7.0e-5, 3.0e-4)),
         sources: &[cite::CDC_CO, cite::CDC_CO_BASICS],
         when: Where::Always,

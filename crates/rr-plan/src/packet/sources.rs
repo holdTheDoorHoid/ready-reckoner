@@ -42,7 +42,7 @@ pub(super) fn write(a: &Assessment, provenance: &[Citation], out: &mut Vec<Strin
     out.push("## Sources".to_owned());
     out.push(String::new());
     out.push(
-        "The numbers in brackets point to this list; \"expert estimate\" marks a judgement, not \
+        "The numbers in brackets point to this list; \"expert estimate\" marks a judgment, not \
          measured data. The plan is Ready Reckoner's calculation from these."
             .to_owned(),
     );

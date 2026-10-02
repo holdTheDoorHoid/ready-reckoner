@@ -727,7 +727,7 @@ pub fn generator_for_well_pump(
     b.cite("osha_portable_generators");
     let n = f64::from(large_animals);
     let mut text = format!(
-        "A generator that can start your well pump, so your {} have water in a power cut that outlasts their {} of stored water; it runs the fridge and lights too. Starting a pump takes {} to {} times its running watts (about {} W running): check the pump's nameplate, and if it runs on 240 volts, choose a generator with a 240-volt outlet. It reaches the pump only through an inlet with an interlock or transfer switch that an electrician installs (see that line); never plug it into a wall outlet, because backfeeding can electrocute utility workers and neighbours. It must run outdoors, at least {} feet from windows, doors and vents, never in a garage, and its fuel goes in approved cans (see the fuel lines).",
+        "A generator that can start your well pump, so your {} have water in a power cut that outlasts their {} of stored water; it runs the fridge and lights too. Starting a pump takes {} to {} times its running watts (about {} W running): check the pump's nameplate, and if it runs on 240 volts, choose a generator with a 240-volt outlet. It reaches the pump only through an inlet with an interlock or transfer switch that an electrician installs (see that line); never plug it into a wall outlet, because backfeeding can electrocute utility workers and neighbors. It must run outdoors, at least {} feet from windows, doors and vents, never in a garage, and its fuel goes in approved cans (see the fuel lines).",
         count(n, "large animal", "large animals"),
         fmt_days(stored_days),
         num(s_lo, 0),
@@ -784,7 +784,7 @@ pub fn generator_connection_units(housing: &Housing, generator: GeneratorFor) ->
         GeneratorFor::Planned => "The generator for the well pump",
     };
     let text = format!(
-        "{whose} can run the well pump, which is wired into the house, only through an inlet with an interlock or transfer switch that a licensed electrician installs: 1 installed kit, with the pump's circuit on it. Never plug a generator into a wall outlet or connect it to the house wiring any other way: backfeeding can electrocute utility workers and neighbours, and OSHA says to connect a generator to a building only through a transfer switch a qualified electrician installed."
+        "{whose} can run the well pump, which is wired into the house, only through an inlet with an interlock or transfer switch that a licensed electrician installs: 1 installed kit, with the pump's circuit on it. Never plug a generator into a wall outlet or connect it to the house wiring any other way: backfeeding can electrocute utility workers and neighbors, and OSHA says to connect a generator to a building only through a transfer switch a qualified electrician installed."
     );
     // For a generator the household owns, the connection is its own part of the power bucket (a
     // life-safety need: the backfeed risk is there now). For the generator the plan buys, it

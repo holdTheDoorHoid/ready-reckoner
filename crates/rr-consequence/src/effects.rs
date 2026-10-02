@@ -568,7 +568,7 @@ impl EffectsTable {
             }
             if row.bucket == BucketId::Income {
                 return Err(fail(
-                    "income is modelled in [[income]], not [[effect]]".into(),
+                    "income is modeled in [[income]], not [[effect]]".into(),
                 ));
             }
             match (row.bucket == BucketId::Evacuate, row.notice_hours) {
