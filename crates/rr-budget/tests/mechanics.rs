@@ -374,8 +374,9 @@ fn rare_catastrophic_items_are_capped() {
             .any(|p| p.item_id == "radiation_meter" && p.rare_catastrophic)
     );
     assert_eq!(month_of(&on, "generator"), Some(10));
-    for m in 1..=4 {
-        let deposit: f32 = on.plan.months[m]
+    assert!(on.plan.months.len() > 4, "the plan reaches month 4");
+    for (m, month) in on.plan.months.iter().enumerate().skip(1).take(4) {
+        let deposit: f32 = month
             .items
             .iter()
             .filter(|i| i.kind == PlanItemKind::Reserve && i.item_id == "radiation_meter")
@@ -663,12 +664,10 @@ fn cpap_battery_under_each_schedule() {
 
     let fixed = setup(Schedule::FixedOrder);
     assert_eq!(battery_month(&fixed), 8);
-    for m in 1..8 {
+    assert!(fixed.plan.months.len() >= 8, "the plan reaches month 7");
+    for (m, month) in fixed.plan.months.iter().enumerate().take(8).skip(1) {
         assert!(
-            fixed.plan.months[m]
-                .items
-                .iter()
-                .all(|i| i.kind == PlanItemKind::Reserve),
+            month.items.iter().all(|i| i.kind == PlanItemKind::Reserve),
             "fixed order: month {m} only saves"
         );
     }

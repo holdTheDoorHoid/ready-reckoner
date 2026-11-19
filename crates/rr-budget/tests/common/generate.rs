@@ -177,10 +177,10 @@ fn v2(c: &mut Case) {
         }
     }
     let needs = [g.pick(&[1.0, 2.0, 4.0]), g.pick(&[1.0, 2.0, 4.0])];
-    for k in 0..n {
-        if !c.meta[k].contributes.is_empty() && g.chance(0.2) {
+    for meta in c.meta.iter_mut().take(n) {
+        if !meta.contributes.is_empty() && g.chance(0.2) {
             let l = g.below(2);
-            c.meta[k].minimum.push(MinimumShare {
+            meta.minimum.push(MinimumShare {
                 line: format!("kit_line_{l}"),
                 units_per_item: g.pick(&[0.5, 1.0, 2.0]),
                 need: needs[l],
