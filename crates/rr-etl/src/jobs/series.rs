@@ -357,7 +357,10 @@ fn oe417(ctx: &Ctx, out: &mut JobOutput) -> Result<()> {
     let mut events: BTreeMap<(String, String), (String, i64, i64, String)> = BTreeMap::new();
     let mut linked: BTreeMap<(String, String), BTreeSet<String>> = BTreeMap::new();
     let names: Vec<String> = (0..archive.len())
-        .filter_map(|i| archive.by_index(i).ok().map(|e| e.name().to_string()))
+        .filter_map(|i| {
+            let entry = archive.by_index(i).ok()?;
+            Some(entry.name().ok()?.to_string())
+        })
         .filter(|n| {
             n.contains("eaglei_outages_with_events_") && n.ends_with(".csv") && !n.contains("_lag")
         })

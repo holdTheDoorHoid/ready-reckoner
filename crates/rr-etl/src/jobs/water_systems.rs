@@ -245,7 +245,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
     let (systems, no_county, no_county_pop) = {
         let mut zip = zip::ZipArchive::new(std::io::Cursor::new(&a.bytes))?;
         let idx = (0..zip.len())
-            .find(|&i| zip.by_index(i).is_ok_and(|e| e.name().ends_with(".csv")))
+            .find(|&i| {
+                zip.by_index(i)
+                    .is_ok_and(|e| e.name().is_ok_and(|n| n.ends_with(".csv")))
+            })
             .ok_or_else(|| data_err("ECHO system search zip has no CSV"))?;
         parse_systems(zip.by_index(idx)?)?
     };
@@ -280,8 +283,7 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
             .find(|&i| {
                 zip.by_index(i).is_ok_and(|e| {
                     e.name()
-                        .to_ascii_uppercase()
-                        .contains("VIOLATIONS_ENFORCEMENT")
+                        .is_ok_and(|n| n.to_ascii_uppercase().contains("VIOLATIONS_ENFORCEMENT"))
                 })
             })
             .ok_or_else(|| {

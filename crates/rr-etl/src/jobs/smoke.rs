@@ -353,7 +353,10 @@ pub fn run(ctx: &Ctx) -> Result<JobOutput> {
         let obs = {
             let mut zip = zip::ZipArchive::new(std::io::Cursor::new(&f.bytes))?;
             let idx = (0..zip.len())
-                .find(|&i| zip.by_index(i).is_ok_and(|e| e.name().ends_with(".csv")))
+                .find(|&i| {
+                    zip.by_index(i)
+                        .is_ok_and(|e| e.name().is_ok_and(|n| n.ends_with(".csv")))
+                })
                 .ok_or_else(|| data_err(format!("{url}: no CSV in the zip")))?;
             parse_aqs(zip.by_index(idx)?)?
         };

@@ -280,7 +280,7 @@ fn entry_names(zip_path: &Path) -> Result<Vec<String>> {
     let mut archive = zip::ZipArchive::new(BufReader::new(File::open(zip_path)?))?;
     let mut out = Vec::new();
     for i in 0..archive.len() {
-        out.push(archive.by_index(i)?.name().to_string());
+        out.push(archive.by_index(i)?.name()?.to_string());
     }
     Ok(out)
 }

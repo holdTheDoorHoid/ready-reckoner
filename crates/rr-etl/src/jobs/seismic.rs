@@ -274,7 +274,7 @@ fn read_curves_entry(path: &Path) -> Result<String> {
     let mut archive = zip::ZipArchive::new(std::fs::File::open(path)?)?;
     let mut found = None;
     for i in 0..archive.len() {
-        let name = archive.by_index(i)?.name().to_ascii_lowercase();
+        let name = archive.by_index(i)?.name()?.to_ascii_lowercase();
         if name.ends_with("pga/curves.csv") && name.contains("760") {
             found = Some(i);
             break;

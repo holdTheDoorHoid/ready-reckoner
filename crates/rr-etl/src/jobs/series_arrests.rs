@@ -187,7 +187,10 @@ pub fn build(ctx: &Ctx, out: &mut JobOutput) -> Result<()> {
         });
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(&zip.bytes))?;
         let names: Vec<String> = (0..archive.len())
-            .filter_map(|i| archive.by_index(i).ok().map(|e| e.name().to_string()))
+            .filter_map(|i| {
+                let entry = archive.by_index(i).ok()?;
+                Some(entry.name().ok()?.to_string())
+            })
             .collect();
         let member = |t: &str| {
             names

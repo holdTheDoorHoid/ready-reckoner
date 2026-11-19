@@ -358,11 +358,11 @@ pub fn zip_entry(zip_bytes: &[u8], name_suffix: &str) -> Result<Vec<u8>> {
     let mut found = None;
     for i in 0..archive.len() {
         let entry = archive.by_index(i)?;
-        if entry
-            .name()
-            .to_ascii_lowercase()
-            .ends_with(&name_suffix.to_ascii_lowercase())
-        {
+        // zip 9 returns an error for a name it cannot decode; such an entry is never the one wanted.
+        if entry.name().is_ok_and(|n| {
+            n.to_ascii_lowercase()
+                .ends_with(&name_suffix.to_ascii_lowercase())
+        }) {
             found = Some(i);
             break;
         }
@@ -382,10 +382,10 @@ pub fn zip_entry_file(path: &Path, name_suffix: &str) -> Result<Vec<u8>> {
     let wanted = name_suffix.to_ascii_lowercase();
     let idx = (0..archive.len())
         .find(|&i| {
-            archive
-                .by_index(i)
-                .map(|e| e.name().to_ascii_lowercase().ends_with(&wanted))
-                .unwrap_or(false)
+            archive.by_index(i).is_ok_and(|e| {
+                e.name()
+                    .is_ok_and(|n| n.to_ascii_lowercase().ends_with(&wanted))
+            })
         })
         .ok_or_else(|| {
             crate::data_err(format!(
